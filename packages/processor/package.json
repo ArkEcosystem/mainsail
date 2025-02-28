@@ -26,6 +26,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/blockchain-utils": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.11.10"
 	},
 	"devDependencies": {

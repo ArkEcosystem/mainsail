@@ -47,6 +47,9 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
+	@inject(Identifiers.Evm.Gas.FeeCalculator)
+	protected readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
+
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
 	public configure(keyPair: Contracts.Validator.ValidatorKeyPair): Contracts.Validator.Validator {
@@ -238,16 +241,15 @@ export class Validator implements Contracts.Validator.Validator {
 		transactions: Contracts.Crypto.Transaction[],
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
+		const previousBlock = this.stateStore.getLastBlock();
+		const height = previousBlock.header.height + 1;
+		const milestone = this.cryptoConfiguration.getMilestone(height);
+
 		const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
 			gasUsed: 0,
 		};
-
-		const previousBlock = this.stateStore.getLastBlock();
-		const height = previousBlock.header.height + 1;
-		const milestone = this.cryptoConfiguration.getMilestone(height);
-
 		const payloadBuffers: Buffer[] = [];
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
 
@@ -261,7 +263,8 @@ export class Validator implements Contracts.Validator.Validator {
 			Utils.assert.defined<number>(data.gasUsed);
 
 			totals.amount = totals.amount.plus(data.value);
-			totals.fee = totals.fee.plus(data.gasPrice);
+			Utils.assert.defined<number>(data.gasUsed);
+			totals.fee = totals.fee.plus(this.gasFeeCalculator.calculateConsumed(data.gasPrice, data.gasUsed));
 			totals.gasUsed += data.gasUsed;
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
