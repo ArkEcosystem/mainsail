@@ -1,3 +1,4 @@
+export * from "./assert.js";
 export * from "./assign.js";
 export * from "./at.js";
 export * from "./base64.js";

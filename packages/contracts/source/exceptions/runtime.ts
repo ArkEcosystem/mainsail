@@ -8,4 +8,5 @@ export class NotImplemented extends RuntimeException {
 	}
 }
 
+// TODO: Check if can be used or removed
 export class AssertionException extends RuntimeException {}
