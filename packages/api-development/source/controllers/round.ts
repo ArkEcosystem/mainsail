@@ -9,11 +9,11 @@ export class RoundController extends Controller {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	@inject(Identifiers.CryptoUtils.ProposerCalculator)
-	private readonly proposerCalculator!: Contracts.CryptoUtils.ProposerCalculator;
+	@inject(Identifiers.BlockchainUtils.ProposerCalculator)
+	private readonly proposerCalculator!: Contracts.BlockchainUtils.ProposerCalculator;
 
-	@inject(Identifiers.CryptoUtils.RoundCalculator)
-	private readonly roundCalculator!: Contracts.CryptoUtils.RoundCalculator;
+	@inject(Identifiers.BlockchainUtils.RoundCalculator)
+	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
 
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const activeValidators = this.validatorSet.getActiveValidators();

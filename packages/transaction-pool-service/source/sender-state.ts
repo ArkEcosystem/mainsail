@@ -25,8 +25,8 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.Services.Trigger.Service)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	@inject(Identifiers.CryptoUtils.FeeCalculator)
-	private readonly feeCalculator!: Contracts.CryptoUtils.FeeCalculator;
+	@inject(Identifiers.BlockchainUtils.FeeCalculator)
+	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
 	#corrupt = false;
 	#wallet!: Contracts.State.Wallet;

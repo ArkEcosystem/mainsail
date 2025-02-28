@@ -9,7 +9,7 @@ export interface MilestoneSearchResult {
 }
 
 @injectable()
-export class RoundCalculator implements Contracts.CryptoUtils.RoundCalculator {
+export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculator {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 

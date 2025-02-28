@@ -35,8 +35,8 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.CryptoUtils.RoundCalculator)
-	private readonly roundCalculator!: Contracts.CryptoUtils.RoundCalculator;
+	@inject(Identifiers.BlockchainUtils.RoundCalculator)
+	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
 
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	private readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
@@ -80,8 +80,8 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	@inject(Identifiers.CryptoUtils.ProposerCalculator)
-	private readonly proposerCalculator!: Contracts.CryptoUtils.ProposerCalculator;
+	@inject(Identifiers.BlockchainUtils.ProposerCalculator)
+	private readonly proposerCalculator!: Contracts.BlockchainUtils.ProposerCalculator;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;

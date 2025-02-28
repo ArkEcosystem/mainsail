@@ -40,7 +40,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		saveState: async () => {},
 	});
 
-	sandbox.app.bind(Identifiers.CryptoUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
+	sandbox.app.bind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
 

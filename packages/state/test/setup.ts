@@ -279,7 +279,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app.bind(Identifiers.Cryptography.Block.Factory).toConstantValue(blockFactory);
 
-	sandbox.app.bind(Identifiers.CryptoUtils.ProposerCalculator).to(ProposalCalculator);
+	sandbox.app.bind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposalCalculator);
 
 	if (!skipBoot) {
 		try {

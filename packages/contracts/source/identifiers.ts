@@ -10,6 +10,13 @@ export const Identifiers = {
 		Thread: Symbol("Application<Thread>"),
 		Version: Symbol("Application<Version>"),
 	},
+	BlockchainUtils: {
+		FeeCalculator: Symbol("BlockchainUtils<FeeCalculator>"),
+		ProposerCalculator: Symbol("BlockchainUtils<ProposerCalculator>"),
+		RoundCalculator: Symbol("BlockchainUtils<RoundCalculator>"),
+		SupplyCalculator: Symbol("BlockchainUtils<SupplyCalculator>"),
+		TimestampCalculator: Symbol("BlockchainUtils<TimestampCalculator>"),
+	},
 	Config: {
 		Flags: Symbol("Config<Flags>"),
 		Plugins: Symbol("Config<Plugins>"),
@@ -42,13 +49,6 @@ export const Identifiers = {
 			PreVote: Symbol("ConsensusStorage<Storage.PreVote>"),
 			Proposal: Symbol("ConsensusStorage<Storage.Proposal>"),
 		},
-	},
-	CryptoUtils: {
-		FeeCalculator: Symbol("CryptoUtils<FeeCalculator>"),
-		ProposerCalculator: Symbol("CryptoUtils<ProposerCalculator>"),
-		RoundCalculator: Symbol("CryptoUtils<RoundCalculator>"),
-		SupplyCalculator: Symbol("CryptoUtils<SupplyCalculator>"),
-		TimestampCalculator: Symbol("CryptoUtils<TimestampCalculator>"),
 	},
 	CryptoWorker: {
 		Worker: {

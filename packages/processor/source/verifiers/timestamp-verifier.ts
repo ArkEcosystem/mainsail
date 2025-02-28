@@ -13,8 +13,8 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.CryptoUtils.TimestampCalculator)
-	private readonly timestampCalculator!: Contracts.CryptoUtils.TimestampCalculator;
+	@inject(Identifiers.BlockchainUtils.TimestampCalculator)
+	private readonly timestampCalculator!: Contracts.BlockchainUtils.TimestampCalculator;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (unit.getBlock().data.height === 0) {

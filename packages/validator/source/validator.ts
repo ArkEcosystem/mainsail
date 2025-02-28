@@ -29,8 +29,8 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messagesFactory!: Contracts.Crypto.MessageFactory;
 
-	@inject(Identifiers.CryptoUtils.RoundCalculator)
-	private readonly roundCalculator!: Contracts.CryptoUtils.RoundCalculator;
+	@inject(Identifiers.BlockchainUtils.RoundCalculator)
+	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
 
 	@inject(Identifiers.State.Store)
 	protected readonly stateStore!: Contracts.State.Store;

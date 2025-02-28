@@ -13,8 +13,8 @@ export class AbstractProcessor {
 	@inject(Identifiers.State.Store)
 	private readonly stateStore!: Contracts.State.Store;
 
-	@inject(Identifiers.CryptoUtils.TimestampCalculator)
-	private readonly timestampCalculator!: Contracts.CryptoUtils.TimestampCalculator;
+	@inject(Identifiers.BlockchainUtils.TimestampCalculator)
+	private readonly timestampCalculator!: Contracts.BlockchainUtils.TimestampCalculator;
 
 	protected hasValidHeightOrRound(message: { height: number; round: number }): boolean {
 		return message.height === this.getConsensus().getHeight() && message.round >= this.getConsensus().getRound();

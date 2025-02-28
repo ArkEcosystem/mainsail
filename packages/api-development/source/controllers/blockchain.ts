@@ -5,8 +5,8 @@ import { Controller } from "./controller.js";
 
 @injectable()
 export class BlockchainController extends Controller {
-	@inject(Identifiers.CryptoUtils.SupplyCalculator)
-	private readonly supplyCalculator!: Contracts.CryptoUtils.SupplyCalculator;
+	@inject(Identifiers.BlockchainUtils.SupplyCalculator)
+	private readonly supplyCalculator!: Contracts.BlockchainUtils.SupplyCalculator;
 
 	public async index() {
 		const { data } = this.stateStore.getLastBlock();

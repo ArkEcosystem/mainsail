@@ -16,8 +16,8 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
-	@inject(Identifiers.CryptoUtils.FeeCalculator)
-	protected readonly feeCalculator!: Contracts.CryptoUtils.FeeCalculator;
+	@inject(Identifiers.BlockchainUtils.FeeCalculator)
+	protected readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	protected readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;

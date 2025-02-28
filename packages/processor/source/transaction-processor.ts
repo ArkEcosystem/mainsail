@@ -17,8 +17,8 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.CryptoUtils.FeeCalculator)
-	private readonly feeCalculator!: Contracts.CryptoUtils.FeeCalculator;
+	@inject(Identifiers.BlockchainUtils.FeeCalculator)
+	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;

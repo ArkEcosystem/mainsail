@@ -36,8 +36,8 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.CryptoUtils.RoundCalculator)
-	private readonly roundCalculator!: Contracts.CryptoUtils.RoundCalculator;
+	@inject(Identifiers.BlockchainUtils.RoundCalculator)
+	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
 
 	@inject(Identifiers.State.Store)
 	private readonly stateStore!: Contracts.State.Store;

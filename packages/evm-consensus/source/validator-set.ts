@@ -9,8 +9,8 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	@inject(Identifiers.Evm.ContractService.Consensus)
 	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
 
-	@inject(Identifiers.CryptoUtils.RoundCalculator)
-	private readonly roundCalculator!: Contracts.CryptoUtils.RoundCalculator;
+	@inject(Identifiers.BlockchainUtils.RoundCalculator)
+	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
 
 	#topValidators: Contracts.State.ValidatorWallet[] = [];
 	#indexByAddress: Map<string, number> = new Map();

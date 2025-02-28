@@ -217,7 +217,7 @@ export class Snapshot {
 				const receipt = this.receipts[transaction.id!];
 				if (receipt) {
 					const consumedGas = this.sandbox.app
-						.get<Contracts.CryptoUtils.FeeCalculator>(Identifiers.CryptoUtils.FeeCalculator)
+						.get<Contracts.BlockchainUtils.FeeCalculator>(Identifiers.BlockchainUtils.FeeCalculator)
 						.calculateConsumed(transaction.data.gasPrice, Number(receipt.receipt.gasUsed));
 					console.log(
 						"found receipt with",

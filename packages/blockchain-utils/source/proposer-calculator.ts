@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
-export class ProposerCalculator implements Contracts.CryptoUtils.ProposerCalculator {
+export class ProposerCalculator implements Contracts.BlockchainUtils.ProposerCalculator {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 

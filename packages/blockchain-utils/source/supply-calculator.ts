@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
-export class SupplyCalculator implements Contracts.CryptoUtils.SupplyCalculator {
+export class SupplyCalculator implements Contracts.BlockchainUtils.SupplyCalculator {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 

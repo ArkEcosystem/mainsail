@@ -14,10 +14,10 @@ export { isMinority } from "./is-minority.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.CryptoUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
-		this.app.bind(Identifiers.CryptoUtils.FeeCalculator).to(FeeCalculator).inSingletonScope();
-		this.app.bind(Identifiers.CryptoUtils.RoundCalculator).to(RoundCalculator).inSingletonScope();
-		this.app.bind(Identifiers.CryptoUtils.SupplyCalculator).to(SupplyCalculator).inSingletonScope();
-		this.app.bind(Identifiers.CryptoUtils.TimestampCalculator).to(TimestampCalculator).inSingletonScope();
+		this.app.bind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
+		this.app.bind(Identifiers.BlockchainUtils.FeeCalculator).to(FeeCalculator).inSingletonScope();
+		this.app.bind(Identifiers.BlockchainUtils.RoundCalculator).to(RoundCalculator).inSingletonScope();
+		this.app.bind(Identifiers.BlockchainUtils.SupplyCalculator).to(SupplyCalculator).inSingletonScope();
+		this.app.bind(Identifiers.BlockchainUtils.TimestampCalculator).to(TimestampCalculator).inSingletonScope();
 	}
 }
