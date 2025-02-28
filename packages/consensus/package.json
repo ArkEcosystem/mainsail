@@ -22,10 +22,10 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
+		"@mainsail/blockchain-utils": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/blockchain-utils": "workspace:*",
 		"dayjs": "1.11.10"
 	},
 	"devDependencies": {
