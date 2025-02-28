@@ -46,7 +46,7 @@
 		"@mainsail/snapshot-legacy-exporter": "workspace:*",
 		"@mainsail/snapshot-legacy-importer": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@mainsail/crypto-utils": "workspace:*",
+		"@mainsail/blockchain-utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"bip39": "3.1.0",
 		"dayjs": "1.11.10",

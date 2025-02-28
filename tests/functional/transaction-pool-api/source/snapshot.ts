@@ -3,7 +3,7 @@ import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus"
 import { assert, Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
 import { getAccountByAddressOrPublicKey, getLegacyColdWallets } from "./utils.js";
-import { FeeCalculator } from "packages/crypto-utils/distribution/fee-calculator.js";
+import { FeeCalculator } from "packages/blockchain-utils/distribution/fee-calculator.js";
 
 export const takeSnapshot = async (sandbox: Sandbox): Promise<Snapshot> => {
 	const snapshot = new Snapshot(sandbox);

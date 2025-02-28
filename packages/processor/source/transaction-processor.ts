@@ -1,6 +1,6 @@
+import { formatCurrency } from "@mainsail/blockchain-utils";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { formatCurrency } from "@mainsail/crypto-utils";
 
 @injectable()
 export class TransactionProcessor implements Contracts.Processor.TransactionProcessor {

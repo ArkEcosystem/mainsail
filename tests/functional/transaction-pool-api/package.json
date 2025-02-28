@@ -30,7 +30,7 @@
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-consensus-bls12-381": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
-		"@mainsail/crypto-utils": "workspace:*",
+		"@mainsail/blockchain-utils": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",
 		"@mainsail/logger-pino": "workspace:*",

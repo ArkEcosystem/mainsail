@@ -31,7 +31,7 @@
 			"package": "@mainsail/crypto-wif"
 		},
 		{
-			"package": "@mainsail/crypto-utils"
+			"package": "@mainsail/blockchain-utils"
 		},
 		{
 			"package": "@mainsail/serializer"
@@ -141,7 +141,7 @@
 			"package": "@mainsail/crypto-wif"
 		},
 		{
-			"package": "@mainsail/crypto-utils"
+			"package": "@mainsail/blockchain-utils"
 		},
 		{
 			"package": "@mainsail/serializer"
@@ -191,7 +191,7 @@
 			"package": "@mainsail/crypto-wif"
 		},
 		{
-			"package": "@mainsail/crypto-utils"
+			"package": "@mainsail/blockchain-utils"
 		},
 		{
 			"package": "@mainsail/serializer"
@@ -262,7 +262,7 @@
 			"package": "@mainsail/crypto-wif"
 		},
 		{
-			"package": "@mainsail/crypto-utils"
+			"package": "@mainsail/blockchain-utils"
 		},
 		{
 			"package": "@mainsail/serializer"

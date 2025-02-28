@@ -1,6 +1,6 @@
+import { isMajority, isMinority } from "@mainsail/blockchain-utils";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { isMajority, isMinority } from "@mainsail/crypto-utils";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()

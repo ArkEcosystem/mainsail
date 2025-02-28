@@ -275,15 +275,15 @@ importers:
       '@mainsail/api-common':
         specifier: workspace:*
         version: link:../api-common
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-utils':
-        specifier: workspace:*
-        version: link:../crypto-utils
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -416,15 +416,15 @@ importers:
       '@mainsail/api-database':
         specifier: workspace:*
         version: link:../api-database
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-utils':
-        specifier: workspace:*
-        version: link:../crypto-utils
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../evm-consensus
@@ -478,6 +478,25 @@ importers:
       '@types/semver':
         specifier: 7.5.8
         version: 7.5.8
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
+  packages/blockchain-utils:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
@@ -631,6 +650,9 @@ importers:
 
   packages/configuration-generator:
     dependencies:
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -673,9 +695,6 @@ importers:
       '@mainsail/crypto-transaction-evm-call':
         specifier: workspace:*
         version: link:../crypto-transaction-evm-call
-      '@mainsail/crypto-utils':
-        specifier: workspace:*
-        version: link:../crypto-utils
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -746,15 +765,15 @@ importers:
 
   packages/consensus:
     dependencies:
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-utils':
-        specifier: workspace:*
-        version: link:../crypto-utils
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -855,6 +874,9 @@ importers:
       '@mainsail/api-transaction-pool':
         specifier: workspace:*
         version: link:../api-transaction-pool
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/bootstrap':
         specifier: workspace:*
         version: link:../bootstrap
@@ -915,9 +937,6 @@ importers:
       '@mainsail/crypto-transaction-evm-call':
         specifier: workspace:*
         version: link:../crypto-transaction-evm-call
-      '@mainsail/crypto-utils':
-        specifier: workspace:*
-        version: link:../crypto-utils
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -1741,25 +1760,6 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
-  packages/crypto-utils:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
   packages/crypto-validation:
     dependencies:
       '@mainsail/contracts':
@@ -1902,15 +1902,15 @@ importers:
 
   packages/evm-consensus:
     dependencies:
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-utils':
-        specifier: workspace:*
-        version: link:../crypto-utils
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
@@ -2284,15 +2284,15 @@ importers:
       '@hapi/teamwork':
         specifier: 6.0.0
         version: 6.0.0
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-utils':
-        specifier: workspace:*
-        version: link:../crypto-utils
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2372,15 +2372,15 @@ importers:
 
   packages/processor:
     dependencies:
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-utils':
-        specifier: workspace:*
-        version: link:../crypto-utils
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2738,15 +2738,15 @@ importers:
 
   packages/transaction-pool-service:
     dependencies:
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-utils':
-        specifier: workspace:*
-        version: link:../crypto-utils
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2803,6 +2803,9 @@ importers:
 
   packages/transactions:
     dependencies:
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2812,9 +2815,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/crypto-utils':
-        specifier: workspace:*
-        version: link:../crypto-utils
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2914,15 +2914,15 @@ importers:
       '@chainsafe/bls-keystore':
         specifier: 3.0.1
         version: 3.0.1
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-utils':
-        specifier: workspace:*
-        version: link:../crypto-utils
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../evm-consensus
@@ -3204,6 +3204,9 @@ importers:
 
   tests/functional/transaction-pool-api:
     devDependencies:
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../../../packages/blockchain-utils
       '@mainsail/consensus':
         specifier: workspace:*
         version: link:../../../packages/consensus
@@ -3255,9 +3258,6 @@ importers:
       '@mainsail/crypto-transaction-evm-call':
         specifier: workspace:*
         version: link:../../../packages/crypto-transaction-evm-call
-      '@mainsail/crypto-utils':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-utils
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../../../packages/crypto-validation

@@ -28,7 +28,7 @@
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@mainsail/crypto-utils": "workspace:*",
+		"@mainsail/blockchain-utils": "workspace:*",
 		"joi": "17.12.2"
 	},
 	"devDependencies": {

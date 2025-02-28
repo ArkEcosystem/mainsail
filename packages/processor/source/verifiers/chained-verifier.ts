@@ -1,6 +1,6 @@
+import { isBlockChained } from "@mainsail/blockchain-utils";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { isBlockChained } from "@mainsail/crypto-utils";
 
 @injectable()
 export class ChainedVerifier implements Contracts.Processor.Handler {

@@ -27,7 +27,7 @@
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@mainsail/crypto-utils": "workspace:*",
+		"@mainsail/blockchain-utils": "workspace:*",
 		"ethers": "^6.11.0"
 	},
 	"devDependencies": {

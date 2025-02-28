@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/crypto-utils",
+	"name": "@mainsail/blockchain-utils",
 	"version": "0.0.1-evm.14",
 	"description": "Common blockchain utils for the Mainsail blockchain.",
 	"license": "GPL-3.0-only",

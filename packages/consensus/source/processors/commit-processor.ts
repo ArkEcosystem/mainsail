@@ -1,6 +1,6 @@
+import { isMajority } from "@mainsail/blockchain-utils";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { isMajority } from "@mainsail/crypto-utils";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 

@@ -33,7 +33,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/crypto-utils": "workspace:*",
+		"@mainsail/blockchain-utils": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"ajv": "8.12.0",
 		"dayjs": "1.11.10",
