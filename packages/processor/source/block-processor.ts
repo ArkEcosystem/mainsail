@@ -56,8 +56,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@optional()
 	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
 
-	@inject(Identifiers.Evm.Gas.FeeCalculator)
-	protected readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
+	@inject(Identifiers.BlockchainUtils.FeeCalculator)
+	protected readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<Contracts.Processor.BlockProcessorResult> {
 		const processResult = { gasUsed: 0, receipts: new Map(), success: false };
@@ -186,7 +186,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			Utils.assert.defined(transaction.data.gasUsed);
 
 			totalGas = totalGas.plus(
-				this.gasFeeCalculator.calculateConsumed(transaction.data.gasUsed, transaction.data.gasPrice),
+				this.feeCalculator.calculateConsumed(transaction.data.gasUsed, transaction.data.gasPrice),
 			);
 		}
 

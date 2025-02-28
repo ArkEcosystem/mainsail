@@ -47,8 +47,8 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
-	@inject(Identifiers.Evm.Gas.FeeCalculator)
-	protected readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
+	@inject(Identifiers.BlockchainUtils.FeeCalculator)
+	protected readonly gasFeeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
