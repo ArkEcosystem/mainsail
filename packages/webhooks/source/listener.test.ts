@@ -1,6 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
-import { Application, Utils } from "@mainsail/kernel";
+import { Application } from "@mainsail/kernel";
+import { http } from "@mainsail/utils";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { describe } from "../../test-framework/source";
@@ -60,7 +61,7 @@ describe<{
 	});
 
 	it("should broadcast to registered webhooks", async ({ database, listener }) => {
-		const spyOnPost = stub(Utils.http, "post").resolvedValue({
+		const spyOnPost = stub(http, "post").resolvedValue({
 			statusCode: 200,
 		});
 		const spyOnDebug = stub(logger, "debug");
@@ -80,7 +81,7 @@ describe<{
 	});
 
 	it("should log error if broadcast is not successful", async ({ database, listener }) => {
-		const spyOnPost = stub(Utils.http, "post").callsFake(() => {
+		const spyOnPost = stub(http, "post").callsFake(() => {
 			throw new Error("dummy error");
 		});
 		const spyOnError = stub(logger, "error");
@@ -100,7 +101,7 @@ describe<{
 	});
 
 	it("#should not broadcast if webhook is disabled", async ({ database, listener }) => {
-		const spyOnPost = stub(Utils.http, "post");
+		const spyOnPost = stub(http, "post");
 
 		webhook.enabled = false;
 		database.create(webhook);
@@ -111,7 +112,7 @@ describe<{
 	});
 
 	it("should not broadcast if event is webhook event", async ({ database, listener }) => {
-		const spyOnPost = stub(Utils.http, "post");
+		const spyOnPost = stub(http, "post");
 
 		database.create(webhook);
 
@@ -121,7 +122,7 @@ describe<{
 	});
 
 	it("should broadcast if webhook condition is satisfied", async ({ database, listener }) => {
-		const spyOnPost = stub(Utils.http, "post").resolvedValue({
+		const spyOnPost = stub(http, "post").resolvedValue({
 			statusCode: 200,
 		});
 		const spyOnDispatch = stub(eventDispatcher, "dispatch");
@@ -146,7 +147,7 @@ describe<{
 	});
 
 	it("should broadcast satisfied webhook condition with nested key", async ({ database, listener }) => {
-		const spyOnPost = stub(Utils.http, "post").resolvedValue({
+		const spyOnPost = stub(http, "post").resolvedValue({
 			statusCode: 200,
 		});
 		const spyOnDispatch = stub(eventDispatcher, "dispatch");
@@ -171,7 +172,7 @@ describe<{
 	});
 
 	it("should broadcast satisfied webhook condition with nested key", async ({ database, listener }) => {
-		const spyOnPost = stub(Utils.http, "post").resolvedValue({
+		const spyOnPost = stub(http, "post").resolvedValue({
 			statusCode: 200,
 		});
 		const spyOnDispatch = stub(eventDispatcher, "dispatch");
@@ -197,7 +198,7 @@ describe<{
 	});
 
 	it("should not broadcast if webhook condition is not satisfied", async ({ database, listener }) => {
-		const spyOnPost = stub(Utils.http, "post");
+		const spyOnPost = stub(http, "post");
 
 		webhook.conditions = [
 			{
@@ -214,7 +215,7 @@ describe<{
 	});
 
 	it("should not broadcast if webhook condition with nested key is not satisfied", async ({ database, listener }) => {
-		const spyOnPost = stub(Utils.http, "post");
+		const spyOnPost = stub(http, "post");
 
 		webhook.conditions = [
 			{
@@ -235,7 +236,7 @@ describe<{
 			throw new Error("dummy error");
 		});
 
-		const spyOnPost = stub(Utils.http, "post");
+		const spyOnPost = stub(http, "post");
 
 		webhook.conditions = [
 			{

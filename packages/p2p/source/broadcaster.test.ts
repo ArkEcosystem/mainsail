@@ -1,6 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
+import { BigNumber, cloneDeep } from "@mainsail/utils";
 
 import { describeSkip, Sandbox } from "../../test-framework/source";
 import { Broadcaster } from "./broadcaster";
@@ -142,7 +141,7 @@ describeSkip<{
 		async ({ context, dataset }) => {
 			const count = dataset;
 
-			const temporaryBlock = Utils.cloneDeep(context.block);
+			const temporaryBlock = cloneDeep(context.block);
 
 			temporaryBlock.data.id = "random_id";
 

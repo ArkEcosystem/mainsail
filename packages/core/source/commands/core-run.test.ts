@@ -1,5 +1,5 @@
 import { Utils } from "@mainsail/cli";
-import { Utils as AppUtils } from "@mainsail/kernel";
+import { sleep } from "@mainsail/utils";
 import { writeJSONSync } from "fs-extra/esm";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -25,7 +25,7 @@ describe<{
 
 		cli.execute(Command);
 
-		await AppUtils.sleep(200);
+		await sleep(200);
 
 		spyBuildApplication.calledOnce();
 		spyBuildPeerFlags.calledOnce();
