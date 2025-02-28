@@ -28,10 +28,10 @@
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@mainsail/blockchain-utils": "workspace:*",
 		"joi": "17.12.2"
 	},
 	"devDependencies": {
+		"@mainsail/blockchain-utils": "workspace:*",
 		"@mainsail/crypto-address-base58": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",

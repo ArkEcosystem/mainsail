@@ -275,9 +275,6 @@ importers:
       '@mainsail/api-common':
         specifier: workspace:*
         version: link:../api-common
-      '@mainsail/blockchain-utils':
-        specifier: workspace:*
-        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -416,9 +413,6 @@ importers:
       '@mainsail/api-database':
         specifier: workspace:*
         version: link:../api-database
-      '@mainsail/blockchain-utils':
-        specifier: workspace:*
-        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -650,9 +644,6 @@ importers:
 
   packages/configuration-generator:
     dependencies:
-      '@mainsail/blockchain-utils':
-        specifier: workspace:*
-        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1902,9 +1893,6 @@ importers:
 
   packages/evm-consensus:
     dependencies:
-      '@mainsail/blockchain-utils':
-        specifier: workspace:*
-        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2738,9 +2726,6 @@ importers:
 
   packages/transaction-pool-service:
     dependencies:
-      '@mainsail/blockchain-utils':
-        specifier: workspace:*
-        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2803,9 +2788,6 @@ importers:
 
   packages/transactions:
     dependencies:
-      '@mainsail/blockchain-utils':
-        specifier: workspace:*
-        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2914,9 +2896,6 @@ importers:
       '@chainsafe/bls-keystore':
         specifier: 3.0.1
         version: 3.0.1
-      '@mainsail/blockchain-utils':
-        specifier: workspace:*
-        version: link:../blockchain-utils
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2936,6 +2915,9 @@ importers:
         specifier: 17.12.2
         version: 17.12.2
     devDependencies:
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58

@@ -32,12 +32,15 @@ const EXCEPTIONS = {
 		devDependencies: [],
 	},
 	"@mainsail/configuration-generator": {
-		dependencies: ["@mainsail/crypto-key-pair-ecdsa", "@mainsail/crypto-signature-schnorr-secp256k1", "@mainsail/snapshot-legacy-exporter"],
+		dependencies: [
+			"@mainsail/crypto-key-pair-ecdsa",
+			"@mainsail/crypto-signature-schnorr-secp256k1",
+			"@mainsail/snapshot-legacy-exporter",
+		],
 		devDependencies: [],
 	},
 	"@mainsail/core": {
 		dependencies: [
-			"@mainsail/evm-consensus",
 			"@mainsail/api-common",
 			"@mainsail/api-database",
 			"@mainsail/api-development",
@@ -45,6 +48,7 @@ const EXCEPTIONS = {
 			"@mainsail/api-http",
 			"@mainsail/api-sync",
 			"@mainsail/api-transaction-pool",
+			"@mainsail/blockchain-utils",
 			"@mainsail/bootstrap",
 			"@mainsail/consensus-storage",
 			"@mainsail/consensus",
@@ -81,6 +85,7 @@ const EXCEPTIONS = {
 			"@mainsail/crypto-worker",
 			"@mainsail/database",
 			"@mainsail/evm-api-worker",
+			"@mainsail/evm-consensus",
 			"@mainsail/evm-consensus",
 			"@mainsail/evm-contracts",
 			"@mainsail/evm-gas-fee",
