@@ -31,6 +31,9 @@
 			"package": "@mainsail/crypto-wif"
 		},
 		{
+			"package": "@mainsail/blockchain-utils"
+		},
+		{
 			"package": "@mainsail/serializer"
 		},
 		{
@@ -38,9 +41,6 @@
 		},
 		{
 			"package": "@mainsail/evm-service"
-		},
-		{
-			"package": "@mainsail/evm-gas-fee"
 		},
 		{
 			"package": "@mainsail/crypto-transaction"
@@ -188,13 +188,13 @@
 			"package": "@mainsail/crypto-wif"
 		},
 		{
+			"package": "@mainsail/blockchain-utils"
+		},
+		{
 			"package": "@mainsail/serializer"
 		},
 		{
 			"package": "@mainsail/evm-service"
-		},
-		{
-			"package": "@mainsail/evm-gas-fee"
 		},
 		{
 			"package": "@mainsail/crypto-block"
