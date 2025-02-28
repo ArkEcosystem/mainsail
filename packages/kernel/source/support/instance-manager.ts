@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-
-import { pascalCase } from "../utils/index.js";
+import { pascalCase } from "@mainsail/utils";
 
 @injectable()
 export abstract class InstanceManager<T> {

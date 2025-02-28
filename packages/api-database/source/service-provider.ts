@@ -1,4 +1,5 @@
-import { Providers, Utils } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 import { DataSource } from "typeorm";
 import { URL } from "url";
 
@@ -56,7 +57,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}
 
 		const options = this.config().get<PostgresConnectionOptions>("database");
-		Utils.assert.defined(options);
+		assert.defined(options);
 
 		try {
 			const dataSource = new DataSource({

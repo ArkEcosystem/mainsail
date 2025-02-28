@@ -287,6 +287,9 @@ importers:
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       joi:
         specifier: 17.12.2
         version: 17.12.2
@@ -768,6 +771,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       dayjs:
         specifier: 1.11.10
         version: 1.11.10
@@ -1287,6 +1293,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       deepmerge:
         specifier: 4.3.1
         version: 4.3.1
@@ -1815,6 +1824,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       joi:
         specifier: 17.12.2
         version: 17.12.2
@@ -2200,6 +2212,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       joi:
         specifier: 17.12.2
         version: 17.12.2
@@ -2222,6 +2237,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       joi:
         specifier: 17.12.2
         version: 17.12.2
@@ -2244,6 +2262,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       joi:
         specifier: 17.12.2
         version: 17.12.2
@@ -2413,6 +2434,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       pg:
         specifier: 8.13.1
         version: 8.13.1
@@ -2803,6 +2827,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
     devDependencies:
       uvu:
         specifier: ^0.5.6

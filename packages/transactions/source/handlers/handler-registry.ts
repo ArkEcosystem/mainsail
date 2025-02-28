@@ -1,6 +1,6 @@
 import { inject, injectable, multiInject, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 import { TransactionHandlerProvider } from "./handler-provider.js";
 import { TransactionHandler } from "./transaction.js";
@@ -26,7 +26,7 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.Transa
 
 	public getRegisteredHandlerByType(internalType: number, version = 0): TransactionHandler {
 		const [handler] = this.handlers;
-		Utils.assert.defined(handler);
+		assert.defined(handler);
 		return handler;
 	}
 

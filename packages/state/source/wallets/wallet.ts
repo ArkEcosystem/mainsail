@@ -1,7 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
+import { assert, BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class Wallet implements Contracts.State.Wallet {
@@ -78,7 +77,7 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public legacySecondPublicKey(): string {
-		Utils.assert.defined(this.legacyAttributes.secondPublicKey);
+		assert.defined(this.legacyAttributes.secondPublicKey);
 		return this.legacyAttributes.secondPublicKey;
 	}
 }

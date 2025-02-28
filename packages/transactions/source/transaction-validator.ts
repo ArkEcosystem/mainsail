@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils as AppUtils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 import { strictEqual } from "assert";
 
 @injectable()
@@ -46,7 +46,7 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 			transaction,
 		);
 
-		AppUtils.assert.string(transaction.data.senderAddress);
+		assert.string(transaction.data.senderAddress);
 
 		return receipt;
 	}

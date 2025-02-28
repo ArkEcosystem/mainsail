@@ -1,6 +1,7 @@
 import { injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 import { Deployer } from "./deployer.js";
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
@@ -25,7 +26,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).info("Booting EVM Consensus...");
 
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
-		Utils.assert.defined(genesisBlock);
+		assert.defined(genesisBlock);
 
 		this.app.bind(EvmConsensusIdentifiers.Internal.Deployer).to(Deployer).inSingletonScope();
 

@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 import { ReceiptResource } from "../resources/index.js";
 
@@ -37,7 +37,7 @@ export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action {
 			return null;
 		}
 
-		Utils.assert.defined(transaction.data.blockHeight);
+		assert.defined(transaction.data.blockHeight);
 
 		const header = await this.databaseService.getBlockHeader(transaction.data.blockHeight);
 		if (!header) {

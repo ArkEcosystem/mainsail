@@ -1,7 +1,7 @@
 import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { get } from "@mainsail/utils";
 
 import { PeerResource } from "../resources/index.js";
 import { Controller } from "./controller.js";
@@ -20,7 +20,7 @@ export class ApiNodesController extends Controller {
 
 		const limit: number = +request.query.limit || 100;
 
-		let offset: number = +(Utils.get(request.query, "offset", 0) || 0);
+		let offset: number = +(get(request.query, "offset", 0) || 0);
 
 		if (offset <= 0 && +request.query.page > 1) {
 			offset = (+request.query.page - 1) * limit;

@@ -25,6 +25,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"deepmerge": "4.3.1",
 		"lodash.clone": "4.5.0",
 		"lodash.get": "4.4.2",

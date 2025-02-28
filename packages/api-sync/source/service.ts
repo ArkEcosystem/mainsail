@@ -5,8 +5,8 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Types, Utils } from "@mainsail/kernel";
-import { chunk, sleep, validatorSetPack } from "@mainsail/utils";
+import { Providers, Types } from "@mainsail/kernel";
+import { BigNumber, chunk, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { Listeners } from "./contracts.js";
@@ -225,8 +225,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			return [
 				account.address,
 				addressToPublicKey[account.address] ?? null,
-				Utils.BigNumber.make(account.balance).toFixed(),
-				Utils.BigNumber.make(account.nonce).toFixed(),
+				BigNumber.make(account.balance).toFixed(),
+				BigNumber.make(account.nonce).toFixed(),
 				attributes,
 				header.height.toFixed(),
 			];
@@ -388,7 +388,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				})
 				.where("id = :id", { id: 1 })
 				.andWhere("height = :previousHeight", {
-					previousHeight: Utils.BigNumber.make(deferred.block.height).minus(1).toFixed(),
+					previousHeight: BigNumber.make(deferred.block.height).minus(1).toFixed(),
 				})
 				.execute();
 

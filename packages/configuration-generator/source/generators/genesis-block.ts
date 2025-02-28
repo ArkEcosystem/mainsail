@@ -3,8 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
-import { Utils } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
+import { assert, BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
 import { ethers } from "ethers";
 
@@ -258,7 +257,7 @@ export class GenesisBlockGenerator extends Generator {
 		for (const transaction of transactions) {
 			const { serialized, data } = transaction;
 
-			Utils.assert.string(data.id);
+			assert.string(data.id);
 
 			const { receipt } = await this.evm.process({
 				blockContext: {
@@ -297,7 +296,7 @@ export class GenesisBlockGenerator extends Generator {
 		});
 
 		await this.evm.calculateActiveValidators({
-			activeValidators: Utils.BigNumber.make(options.validators).toBigInt(),
+			activeValidators: BigNumber.make(options.validators).toBigInt(),
 			commitKey,
 			specId: Contracts.Evm.SpecId.SHANGHAI,
 			timestamp,
@@ -329,7 +328,7 @@ export class GenesisBlockGenerator extends Generator {
 							"0000000000000000000000000000000000000000000000000000000000000000",
 						)),
 					timestamp: dayjs(options.epoch).valueOf(),
-					totalAmount: options.snapshot ? Utils.BigNumber.make(options.premine) : totals.amount,
+					totalAmount: options.snapshot ? BigNumber.make(options.premine) : totals.amount,
 					totalFee: totals.fee,
 					totalGasUsed: totals.gasUsed,
 					transactions: transactionData,
@@ -357,8 +356,8 @@ export class GenesisBlockGenerator extends Generator {
 	}
 
 	async #buildFromLegacySnapshot(options: Contracts.NetworkGenerator.GenesisBlockOptions) {
-		Utils.assert.defined(options.snapshot);
-		Utils.assert.defined(this.snapshotLegacyImporter);
+		assert.defined(options.snapshot);
+		assert.defined(this.snapshotLegacyImporter);
 
 		// Load snapshot into EVM
 		const result = await this.snapshotLegacyImporter.import({

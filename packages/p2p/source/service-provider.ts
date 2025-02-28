@@ -1,5 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services, Utils } from "@mainsail/kernel";
+import { Providers, Services } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 import Joi from "joi";
 
 import {
@@ -98,7 +99,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	#registerFactories(): void {
 		this.app.bind(Identifiers.P2P.Peer.Factory).toFactory<Peer, [string]>(() => (ip: string) => {
 			const sanitizedIp = sanitizeRemoteAddress(ip);
-			Utils.assert.string(sanitizedIp);
+			assert.string(sanitizedIp);
 
 			return this.app.resolve(Peer).init(sanitizedIp, Number(this.config().getRequired<number>("server.port")));
 		});
@@ -110,7 +111,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.P2P.TxPoolNode.Factory).toFactory<TxPoolNode, [string]>(() => (ip: string) => {
 			const sanitizedIp = sanitizeRemoteAddress(ip);
-			Utils.assert.string(sanitizedIp);
+			assert.string(sanitizedIp);
 
 			return this.app.resolve(TxPoolNode).init(sanitizedIp, this.config().getRequired<number>("txPoolPort"));
 		});
@@ -171,7 +172,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	async #buildServer(): Promise<void> {
 		const server = this.app.get<Contracts.P2P.Server>(Identifiers.P2P.Server);
 		const serverConfig = this.config().getRequired<{ hostname: string; port: number }>("server");
-		Utils.assert.defined(serverConfig);
+		assert.defined(serverConfig);
 
 		await server.initialize("P2P Server", serverConfig);
 	}

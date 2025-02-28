@@ -1,7 +1,6 @@
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
+import { assert, BigNumber, sleep } from "@mainsail/utils";
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
@@ -73,7 +72,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			for (const [index, transaction] of block.transactions.entries()) {
 				if (index % 20 === 0) {
-					await Utils.sleep(0);
+					await sleep(0);
 				}
 
 				const receipt = await this.transactionProcessor.process(unit, transaction);
@@ -183,7 +182,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	#verifyTotalFee(block: Contracts.Crypto.Block): void {
 		let totalGas = BigNumber.ZERO;
 		for (const transaction of block.transactions) {
-			Utils.assert.defined(transaction.data.gasUsed);
+			assert.defined(transaction.data.gasUsed);
 
 			totalGas = totalGas.plus(
 				this.feeCalculator.calculateConsumed(transaction.data.gasUsed, transaction.data.gasPrice),
@@ -200,8 +199,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		if (block.header.height === 0) {
 			// Assume snapshot is present if the previous block points to a non-zero hash
 			if (block.header.previousBlock !== "0000000000000000000000000000000000000000000000000000000000000000") {
-				Utils.assert.defined(this.snapshotImporter);
-				Utils.assert.defined(this.snapshotImporter.result);
+				assert.defined(this.snapshotImporter);
+				assert.defined(this.snapshotImporter.result);
 				previousStateHash = this.snapshotImporter.result.stateHash;
 			} else {
 				previousStateHash = "0000000000000000000000000000000000000000000000000000000000000000";
@@ -247,7 +246,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const block = unit.getBlock();
 
 		await this.evm.updateRewardsAndVotes({
-			blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),
+			blockReward: BigNumber.make(milestone.reward).toBigInt(),
 			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
 			specId: milestone.evmSpec,
 			timestamp: BigInt(block.header.timestamp),
@@ -265,7 +264,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const block = unit.getBlock();
 
 		await this.evm.calculateActiveValidators({
-			activeValidators: Utils.BigNumber.make(activeValidators).toBigInt(),
+			activeValidators: BigNumber.make(activeValidators).toBigInt(),
 			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
 			specId: evmSpec,
 			timestamp: BigInt(block.header.timestamp),

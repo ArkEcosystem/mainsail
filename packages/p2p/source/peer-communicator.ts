@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
+import { assert, http } from "@mainsail/utils";
 
 import { constants } from "./constants.js";
 import { Routes, SocketErrors } from "./enums.js";
@@ -68,7 +69,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			Object.entries(peer.plugins).map(async ([name, plugin]) => {
 				peer.ports[name] = -1;
 				try {
-					const { statusCode } = await Utils.http.head(`http://${peer.ip}:${plugin.port}/`);
+					const { statusCode } = await http.head(`http://${peer.ip}:${plugin.port}/`);
 
 					if (statusCode === 200) {
 						peer.ports[name] = plugin.port;
@@ -187,7 +188,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			throw validationError;
 		}
 
-		Utils.assert.defined(parsedResponsePayload.headers);
+		assert.defined(parsedResponsePayload.headers);
 		void this.headerService.handle(peer, parsedResponsePayload.headers);
 
 		return parsedResponsePayload;

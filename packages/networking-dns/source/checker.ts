@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
+import { shuffle } from "@mainsail/utils";
 import dns from "dns";
 import util from "util";
 
@@ -16,7 +17,7 @@ export class Checker {
 	public async execute(): Promise<void> {
 		const lookupService = util.promisify(dns.lookupService);
 
-		for (const host of Utils.shuffle(this.configuration.getRequired<string[]>("hosts"))) {
+		for (const host of shuffle(this.configuration.getRequired<string[]>("hosts"))) {
 			try {
 				await lookupService(host, 53);
 

@@ -1,6 +1,6 @@
 import { Commands, Contracts, Utils } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
-import { Utils as AppUtils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 import { readJSONSync } from "fs-extra/esm";
 import Joi from "joi";
 import path from "path";
@@ -20,7 +20,7 @@ export class Command extends Commands.Command {
 
 	public async execute(): Promise<void> {
 		const { name } = readJSONSync(path.resolve(new URL(".", import.meta.url).pathname, "../../package.json"));
-		AppUtils.assert.string(name);
+		assert.string(name);
 
 		const flags: Contracts.AnyObject = {
 			...this.getFlags(),

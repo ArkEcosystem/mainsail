@@ -1,4 +1,4 @@
-import { Utils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 import { strictEqual } from "assert";
 
 import { FactoryFunction, FactoryFunctionOptions, HookFunction } from "./types.js";
@@ -60,11 +60,11 @@ export class Factory {
 		const states: string[] = [...this.#modifiers.states.values()];
 		const initialState: string | undefined = states.shift();
 
-		Utils.assert.string(initialState);
+		assert.string(initialState);
 
 		const function_: FactoryFunction | undefined = this.#states.get(initialState);
 
-		Utils.assert.defined(function_);
+		assert.defined(function_);
 
 		let result: T = await function_({
 			entity: undefined,
@@ -77,7 +77,7 @@ export class Factory {
 		for (const state of states) {
 			const function_: FactoryFunction | undefined = this.#states.get(state);
 
-			Utils.assert.defined(function_);
+			assert.defined(function_);
 
 			result = await function_({
 				entity: result,
@@ -118,7 +118,7 @@ export class Factory {
 
 		const hooks: Set<HookFunction> | undefined = this.#hooks.get(state);
 
-		Utils.assert.defined(hooks);
+		assert.defined(hooks);
 
 		hooks.add(function_);
 

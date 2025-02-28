@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
-import { get } from "@mainsail/utils";
+import { get, http } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { conditions } from "./conditions.js";
@@ -38,7 +37,7 @@ export class Listener {
 		const start = performance.now();
 
 		try {
-			const { statusCode } = await Utils.http.post(webhook.target, {
+			const { statusCode } = await http.post(webhook.target, {
 				body: {
 					data: payload as any,
 					// @TODO utils currently expects a primitive as data

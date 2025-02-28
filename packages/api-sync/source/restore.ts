@@ -7,8 +7,7 @@ import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { UsernamesAbi } from "@mainsail/evm-contracts";
-import { Utils } from "@mainsail/kernel";
-import { chunk, validatorSetPack } from "@mainsail/utils";
+import { assert, BigNumber, chunk, validatorSetPack } from "@mainsail/utils";
 import { ethers } from "ethers";
 import { performance } from "perf_hooks";
 
@@ -33,7 +32,7 @@ interface RestoreContext {
 	mostRecentCommit: Contracts.Crypto.Commit;
 
 	lastHeight: number;
-	totalSupply: Utils.BigNumber;
+	totalSupply: BigNumber;
 
 	validatorAttributes: Record<string, ValidatorAttributes>;
 	userAttributes: Record<string, UserAttributes>;
@@ -41,11 +40,11 @@ interface RestoreContext {
 
 interface ValidatorAttributes {
 	lastBlock?: Contracts.Crypto.BlockHeader;
-	totalForgedFees: Utils.BigNumber;
-	totalForgedRewards: Utils.BigNumber;
+	totalForgedFees: BigNumber;
+	totalForgedRewards: BigNumber;
 	producedBlocks: number;
 
-	voteBalance: Utils.BigNumber;
+	voteBalance: BigNumber;
 	votersCount: number;
 	blsPublicKey: string;
 	isResigned: boolean;
@@ -161,7 +160,7 @@ export class Restore {
 
 				totalSupply: this.databaseService.isEmpty()
 					? this.stateStore.getGenesisCommit().block.data.totalAmount
-					: Utils.BigNumber.ZERO,
+					: BigNumber.ZERO,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				transactionTypeRepository: this.transactionTypeRepositoryFactory(entityManager),
 				userAttributes: {},
@@ -337,8 +336,8 @@ export class Restore {
 				blsPublicKey: validator.blsPublicKey,
 				isResigned: validator.isResigned,
 				producedBlocks: 0,
-				totalForgedFees: Utils.BigNumber.ZERO,
-				totalForgedRewards: Utils.BigNumber.ZERO,
+				totalForgedFees: BigNumber.ZERO,
+				totalForgedRewards: BigNumber.ZERO,
 				voteBalance: validator.voteBalance,
 				votersCount: validator.votersCount,
 			};
@@ -431,8 +430,8 @@ export class Restore {
 								}
 							: {}),
 					},
-					balance: Utils.BigNumber.make(account.balance).toFixed(),
-					nonce: Utils.BigNumber.make(account.nonce).toFixed(),
+					balance: BigNumber.make(account.balance).toFixed(),
+					nonce: BigNumber.make(account.nonce).toFixed(),
 					publicKey: context.addressToPublicKey[account.address] ?? null,
 					updated_at: "0",
 				});
@@ -463,7 +462,7 @@ export class Restore {
 			for (const wallet of result.wallets) {
 				legacyColdWallets.push({
 					address: wallet.address,
-					balance: Utils.BigNumber.make(wallet.balance).toFixed(),
+					balance: BigNumber.make(wallet.balance).toFixed(),
 					...(Object.keys(wallet.legacyAttributes).length > 0 ? { attributes: wallet.legacyAttributes } : {}),
 					mergeInfoTransactionHash: wallet.mergeInfo?.txHash,
 					mergeInfoWalletAddress: wallet.mergeInfo?.address,
@@ -506,8 +505,8 @@ export class Restore {
 			const result = await this.evm.getReceipts(offset ?? 0n, BATCH_SIZE);
 
 			for (const receipt of result.receipts) {
-				Utils.assert.defined(receipt.txHash);
-				Utils.assert.defined(receipt.blockHeight);
+				assert.defined(receipt.txHash);
+				assert.defined(receipt.blockHeight);
 
 				// Initial deployment receipts
 				if (receipt.blockHeight >= BigInt(2 ** 32)) {
@@ -515,7 +514,7 @@ export class Restore {
 				}
 
 				receipts.push({
-					blockHeight: Utils.BigNumber.make(receipt.blockHeight).toFixed(),
+					blockHeight: BigNumber.make(receipt.blockHeight).toFixed(),
 					deployedContractAddress: receipt.deployedContractAddress,
 					gasRefunded: Number(receipt.gasRefunded),
 					gasUsed: Number(receipt.gasUsed),
@@ -596,7 +595,7 @@ export class Restore {
 			const constructor = handler.getConstructor();
 
 			const key: string | undefined = constructor.key;
-			Utils.assert.string(key);
+			assert.string(key);
 
 			types.push({ key, schema: constructor.getSchema().properties });
 		}

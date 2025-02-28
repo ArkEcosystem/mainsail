@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
+import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {
@@ -232,7 +233,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 		if (this.getPoolSize() >= maxTransactionsInPool) {
 			const lowest = await this.poolQuery.getFromLowestPriority().first();
-			if (Utils.BigNumber.make(transaction.data.gasPrice).isLessThanEqual(lowest.data.gasPrice)) {
+			if (BigNumber.make(transaction.data.gasPrice).isLessThanEqual(lowest.data.gasPrice)) {
 				throw new Exceptions.TransactionPoolFullError(transaction, lowest.data.gasPrice);
 			}
 

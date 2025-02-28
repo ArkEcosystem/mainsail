@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { ConsensusAbi, ERC1967ProxyAbi, MultiPaymentAbi, UsernamesAbi } from "@mainsail/evm-contracts";
-import { Utils } from "@mainsail/kernel";
+import { assert, BigNumber } from "@mainsail/utils";
 import { ethers, sha256 } from "ethers";
 
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
@@ -60,12 +60,12 @@ export class Deployer {
 	}
 
 	async #initialize(): Promise<void> {
-		Utils.assert.defined(this.#genesisBlockInfo);
+		assert.defined(this.#genesisBlockInfo);
 
 		const genesisInfo = {
 			account: this.#genesisBlockInfo.generatorAddress,
 			deployerAccount: this.deployerAddress,
-			initialSupply: Utils.BigNumber.make(this.#genesisBlockInfo.totalAmount).toBigInt(),
+			initialSupply: BigNumber.make(this.#genesisBlockInfo.totalAmount).toBigInt(),
 
 			usernameContract: ethers.getCreateAddress({ from: this.deployerAddress, nonce: 3 }), // PROXY Uses nonce 3
 			validatorContract: ethers.getCreateAddress({ from: this.deployerAddress, nonce: 1 }), // PROXY Uses nonce 1

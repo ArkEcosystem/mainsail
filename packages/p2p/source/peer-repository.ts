@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 import ip from "ip";
 
 // @TODO review the implementation
@@ -24,7 +25,7 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 	public getPeer(ip: string): Contracts.P2P.Peer {
 		const peer: Contracts.P2P.Peer | undefined = this.#peers.get(ip);
 
-		Utils.assert.defined(peer);
+		assert.defined(peer);
 
 		return peer;
 	}
@@ -52,7 +53,7 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 	public getPendingPeer(ip: string): Contracts.P2P.Peer {
 		const peer = this.#peersPending.get(ip);
 
-		Utils.assert.defined(peer);
+		assert.defined(peer);
 
 		return peer;
 	}

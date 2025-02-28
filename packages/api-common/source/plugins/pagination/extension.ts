@@ -1,7 +1,7 @@
 // Based on https://github.com/fknop/hapi-pagination
 
 import { applyToDefaults, assert } from "@hapi/hoek";
-import { Utils } from "@mainsail/kernel";
+import { get } from "@mainsail/utils";
 import Qs from "querystring";
 
 export class Extension {
@@ -32,7 +32,7 @@ export class Extension {
 
 			// ! should be set through validation schema
 			setParameter("page", 1);
-			setParameter("limit", Utils.get(this.config, "query.limit.default", 100));
+			setParameter("limit", get(this.config, "query.limit.default", 100));
 		}
 
 		return h.continue;

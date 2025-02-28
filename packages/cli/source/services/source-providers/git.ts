@@ -1,4 +1,4 @@
-import { Utils } from "@mainsail/kernel";
+import { isGit } from "@mainsail/utils";
 
 import { execa } from "../../execa.js";
 import { AbstractSource } from "./abstract-source.js";
@@ -9,7 +9,7 @@ export class Git extends AbstractSource {
 	}
 
 	public async exists(value: string): Promise<boolean> {
-		return Utils.isGit(value);
+		return isGit(value);
 	}
 
 	public async update(value: string): Promise<void> {

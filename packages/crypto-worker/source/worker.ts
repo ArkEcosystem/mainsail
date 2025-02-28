@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { sleep } from "@mainsail/utils";
 
 @injectable()
 export class Worker implements Contracts.Crypto.Worker {
@@ -16,7 +16,7 @@ export class Worker implements Contracts.Crypto.Worker {
 		this.ipcSubprocess = this.createWorkerSubprocess();
 
 		while (this.#booting) {
-			await Utils.sleep(50);
+			await sleep(50);
 		}
 
 		if (this.#booted) {

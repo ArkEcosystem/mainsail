@@ -1,6 +1,7 @@
 import { Keystore } from "@chainsafe/bls-keystore";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 import Joi from "joi";
 
 import { BIP38, BIP39 } from "./keys/index.js";
@@ -21,7 +22,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		const validators: Contracts.Validator.Validator[] = [];
 		const validatorConfig = this.app.config<{ secrets: string[]; keystore?: string }>("validators");
-		Utils.assert.defined(validatorConfig);
+		assert.defined(validatorConfig);
 		const { secrets, keystore } = validatorConfig;
 
 		for (const secret of secrets.values()) {

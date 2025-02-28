@@ -1,8 +1,8 @@
 import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
-import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
+import { assert } from "@mainsail/utils";
 
 import { Controller } from "./controller.js";
 
@@ -22,9 +22,9 @@ export class TransactionsController extends Controller {
 			const typeGroup: number | undefined = constructor.typeGroup;
 			const key: string | undefined = constructor.key;
 
-			AppUtils.assert.number(type);
-			AppUtils.assert.number(typeGroup);
-			AppUtils.assert.string(key);
+			assert.number(type);
+			assert.number(typeGroup);
+			assert.string(key);
 
 			if (typeGroups[typeGroup] === undefined) {
 				typeGroups[typeGroup] = {};
@@ -46,8 +46,8 @@ export class TransactionsController extends Controller {
 			const type: number | undefined = constructor.type;
 			const typeGroup: number | undefined = constructor.typeGroup;
 
-			AppUtils.assert.number(type);
-			AppUtils.assert.number(typeGroup);
+			assert.number(type);
+			assert.number(typeGroup);
 
 			if (schemasByType[typeGroup] === undefined) {
 				schemasByType[typeGroup] = {};

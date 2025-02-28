@@ -1,7 +1,6 @@
 import { inject, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils as AppUtils, Utils } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
+import { assert, BigNumber } from "@mainsail/utils";
 
 import secrets from "../internal/passphrases.json";
 import { getWalletNonce } from "./generic.js";
@@ -215,7 +214,7 @@ export class TransactionFactory {
 			return this.#nonce;
 		}
 
-		AppUtils.assert.string(this.#senderPublicKey);
+		assert.string(this.#senderPublicKey);
 
 		return getWalletNonce(this.app, this.#senderPublicKey);
 	}
@@ -232,7 +231,7 @@ export class TransactionFactory {
 	}
 
 	async #sign<T>(quantity: number, method: string): Promise<T[]> {
-		Utils.assert.defined(this.#networkConfig);
+		assert.defined(this.#networkConfig);
 		this.configuration.setConfig(this.#networkConfig);
 
 		if (!this.#senderPublicKey) {

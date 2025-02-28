@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
-import { ByteBuffer } from "@mainsail/utils";
+import { assert, ByteBuffer } from "@mainsail/utils";
 import type { Database, RootDatabase } from "lmdb";
 
 @injectable()
@@ -256,7 +255,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		}
 
 		const bytes = await this.#readCommitBytes(this.#state.height);
-		Utils.assert.buffer(bytes);
+		assert.buffer(bytes);
 		return await this.commitFactory.fromBytes(bytes);
 	}
 
@@ -288,7 +287,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 				);
 
 				for (const tx of commit.block.transactions) {
-					Utils.assert.number(tx.data.sequence);
+					assert.number(tx.data.sequence);
 					const key = `${height}-${tx.data.sequence}`;
 					void this.transactionIdStorage.put(tx.id, key);
 
@@ -329,7 +328,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		}
 
 		const blockBuffer: Buffer | undefined = await this.#readBlockBytes(height);
-		Utils.assert.buffer(blockBuffer);
+		assert.buffer(blockBuffer);
 
 		return Buffer.concat([commitBuffer, blockBuffer]);
 	}
@@ -350,7 +349,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		for (let index = 0; index < blockHeader.numberOfTransactions; index++) {
 			const key = `${height}-${index}`;
 			const transaction: Buffer | undefined = this.transactionStorage.get(key);
-			Utils.assert.buffer(transaction);
+			assert.buffer(transaction);
 
 			const sizeBuff = ByteBuffer.fromSize(4);
 			sizeBuff.writeUint32(transaction.length - 8);
@@ -358,7 +357,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		}
 
 		const transactionIds: string[] | undefined = this.transactionIdStorage.get(height);
-		Utils.assert.defined(transactionIds);
+		assert.defined(transactionIds);
 
 		return Buffer.concat([blockBuffer, ...transactions]);
 	}
@@ -376,7 +375,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	async #readTransaction(key): Promise<Contracts.Crypto.Transaction | undefined> {
 		const transactionBytes: Buffer | undefined = this.transactionStorage.get(key);
-		Utils.assert.buffer(transactionBytes);
+		assert.buffer(transactionBytes);
 
 		const buffer = ByteBuffer.fromBuffer(transactionBytes);
 		const height = buffer.readUint32();
@@ -387,7 +386,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		transaction.data.blockHeight = height;
 
 		const blockBuffer = this.#readBlockHeaderBytes(height);
-		Utils.assert.buffer(blockBuffer);
+		assert.buffer(blockBuffer);
 		const block = await this.blockDeserializer.deserializeHeader(blockBuffer);
 		transaction.data.blockId = block.id;
 

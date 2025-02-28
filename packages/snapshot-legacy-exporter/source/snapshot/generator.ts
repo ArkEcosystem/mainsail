@@ -2,7 +2,8 @@ import { createHash } from "node:crypto";
 import { writeFile } from "node:fs/promises";
 
 import { inject, injectable } from "@mainsail/container";
-import { Application, Providers, Utils } from "@mainsail/kernel";
+import { Application, Providers } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 import { DataSource } from "typeorm";
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
 
@@ -28,7 +29,7 @@ export class Generator {
 			.discover("@mainsail/snapshot-legacy-exporter", process.cwd());
 
 		const options = pluginConfig.get<DatabaseOptions>("database");
-		Utils.assert.defined(options);
+		assert.defined(options);
 
 		const dataSource = new DataSource({
 			...options,

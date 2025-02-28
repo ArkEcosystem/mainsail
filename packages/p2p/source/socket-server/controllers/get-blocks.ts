@@ -1,7 +1,7 @@
 import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { pluralize } from "@mainsail/utils";
 
 import { constants } from "../../constants.js";
 import { mapAddr } from "../utils/map-addr.js";
@@ -49,7 +49,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 		}
 
 		this.logger.info(
-			`${mapAddr(request.info.remoteAddress)} has downloaded ${Utils.pluralize(
+			`${mapAddr(request.info.remoteAddress)} has downloaded ${pluralize(
 				"block",
 				blocksToReturn.length,
 				true,

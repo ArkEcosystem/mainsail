@@ -1,9 +1,8 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Proposal } from "@mainsail/crypto-messages";
-import { Utils } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
-import { BigNumber } from "@mainsail/utils";
+import { assert, BigNumber } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 import { ethers } from "ethers";
 
@@ -80,12 +79,12 @@ export const makeCustomProposal = async (
 				},
 				transaction,
 			);
-		} catch (ex) {
+		} catch {
 			result = { gasUsed: transaction.gasLimit };
 		}
 
 		const { data, serialized } = transaction;
-		Utils.assert.string(data.id);
+		assert.string(data.id);
 
 		totals.amount = totals.amount.plus(data.amount);
 		totals.fee = totals.fee.plus(data.fee);

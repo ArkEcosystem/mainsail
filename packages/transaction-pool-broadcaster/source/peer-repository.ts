@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 @injectable()
 export class PeerRepository implements Contracts.TransactionPool.PeerRepository {
@@ -16,7 +16,7 @@ export class PeerRepository implements Contracts.TransactionPool.PeerRepository 
 	public getPeer(ip: string): Contracts.TransactionPool.Peer {
 		const peer = this.#peers.get(ip);
 
-		Utils.assert.defined(peer);
+		assert.defined(peer);
 
 		return peer;
 	}

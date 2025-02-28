@@ -2,8 +2,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
 import { TransactionFactory } from "@mainsail/crypto-transaction";
-import { Utils as AppUtils } from "@mainsail/kernel";
-import { ByteBuffer } from "@mainsail/utils";
+import { ByteBuffer, sleep } from "@mainsail/utils";
 
 import { IDFactory } from "./id.factory.js";
 
@@ -128,7 +127,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 
 		for (let index = 0; index < block.transactions.length; index++) {
 			if (index % 20 === 0) {
-				await AppUtils.sleep(0);
+				await sleep(0);
 			}
 
 			const transaction = await this.transactionFactory.fromBytes(block.transactions[index] as any);

@@ -1,7 +1,7 @@
 import { isMajority, isMinority } from "@mainsail/blockchain-utils";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 @injectable()
 export class RoundState implements Contracts.Consensus.RoundState {
@@ -80,7 +80,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 	public getValidator(consensusPublicKey: string): Contracts.State.ValidatorWallet {
 		const validator = this.#validators.get(consensusPublicKey);
-		Utils.assert.defined(validator);
+		assert.defined(validator);
 		return validator;
 	}
 
@@ -113,7 +113,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 			const majority = await this.aggregatePrecommits();
 
 			const proposal = this.getProposal();
-			Utils.assert.defined(proposal);
+			assert.defined(proposal);
 
 			const round = proposal.round;
 			const block = proposal.getData().block;
@@ -310,7 +310,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	}
 
 	#getSignatures(s: Map<number, { signature: string; blockId?: string }>): Map<number, { signature: string }> {
-		Utils.assert.defined(this.#proposal);
+		assert.defined(this.#proposal);
 		const filtered: Map<number, { signature: string }> = new Map();
 
 		const block = this.#proposal.getData().block;

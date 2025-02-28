@@ -25,6 +25,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"pg": "8.13.1",
 		"tmp": "0.2.3",
 		"typeorm": "0.3.20"

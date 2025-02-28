@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
-import { Utils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
+import { assert } from "@mainsail/utils";
 
 import { EvmCallTransaction } from "../versions/index.js";
 
@@ -30,7 +30,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Evm.TransactionReceipt> {
-		Utils.assert.string(transaction.id);
+		assert.string(transaction.id);
 
 		const { evmSpec } = this.configuration.getMilestone();
 

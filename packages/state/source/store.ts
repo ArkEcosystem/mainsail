@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 @injectable()
 export class Store implements Contracts.State.Store {
@@ -23,7 +23,7 @@ export class Store implements Contracts.State.Store {
 	}
 
 	public getGenesisCommit(): Contracts.Crypto.Commit {
-		Utils.assert.defined(this.#genesisBlock);
+		assert.defined(this.#genesisBlock);
 
 		return this.#genesisBlock;
 	}
@@ -34,7 +34,7 @@ export class Store implements Contracts.State.Store {
 	}
 
 	public getLastBlock(): Contracts.Crypto.Block {
-		Utils.assert.defined(this.#lastBlock);
+		assert.defined(this.#lastBlock);
 		return this.#lastBlock;
 	}
 

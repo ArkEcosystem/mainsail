@@ -1,8 +1,8 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
-import { Providers, Utils } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
+import { Providers } from "@mainsail/kernel";
+import { assert, BigNumber } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 @injectable()
@@ -201,7 +201,7 @@ export class Validator implements Contracts.Validator.Validator {
 			}
 
 			await validator.getEvm().updateRewardsAndVotes({
-				blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),
+				blockReward: BigNumber.make(milestone.reward).toBigInt(),
 				commitKey,
 				specId: milestone.evmSpec,
 				timestamp: BigInt(timestamp),
@@ -212,7 +212,7 @@ export class Validator implements Contracts.Validator.Validator {
 				const { activeValidators } = this.cryptoConfiguration.getMilestone(previousBlock.header.height + 2);
 
 				await validator.getEvm().calculateActiveValidators({
-					activeValidators: Utils.BigNumber.make(activeValidators).toBigInt(),
+					activeValidators: BigNumber.make(activeValidators).toBigInt(),
 					commitKey,
 					specId: milestone.evmSpec,
 					timestamp: BigInt(timestamp),
@@ -259,11 +259,11 @@ export class Validator implements Contracts.Validator.Validator {
 
 		for (const transaction of transactions) {
 			const { data, serialized } = transaction;
-			Utils.assert.string(data.id);
-			Utils.assert.number(data.gasUsed);
+			assert.string(data.id);
+			assert.number(data.gasUsed);
 
 			totals.amount = totals.amount.plus(data.value);
-			Utils.assert.number(data.gasUsed);
+			assert.number(data.gasUsed);
 			totals.fee = totals.fee.plus(this.gasFeeCalculator.calculateConsumed(data.gasPrice, data.gasUsed));
 			totals.gasUsed += data.gasUsed;
 

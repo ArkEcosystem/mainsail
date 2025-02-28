@@ -1,7 +1,8 @@
 import Sntp from "@hapi/sntp";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
+import { shuffle } from "@mainsail/utils";
 
 @injectable()
 export class Checker {
@@ -15,7 +16,7 @@ export class Checker {
 	public async execute(): Promise<void> {
 		const timeout: number = this.configuration.getOptional("timeout", 2000);
 
-		for (const host of Utils.shuffle(this.configuration.getOptional<string[]>("hosts", []))) {
+		for (const host of shuffle(this.configuration.getOptional<string[]>("hosts", []))) {
 			try {
 				await Sntp.time({
 					host,

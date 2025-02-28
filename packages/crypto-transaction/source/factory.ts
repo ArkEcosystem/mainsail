@@ -1,6 +1,6 @@
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Utils as AppUtils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 @injectable()
 export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
@@ -66,9 +66,9 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		try {
 			const transaction = await this.deserializer.deserialize(serialized);
 
-			AppUtils.assert.number(transaction.data.v);
-			AppUtils.assert.string(transaction.data.r);
-			AppUtils.assert.string(transaction.data.s);
+			assert.number(transaction.data.v);
+			assert.string(transaction.data.r);
+			assert.string(transaction.data.s);
 
 			const hash = await this.utils.toHash(transaction.data, {
 				excludeSignature: true,

@@ -1,7 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
-import { BigNumber, ByteBuffer, validatorSetPack, validatorSetUnpack } from "@mainsail/utils";
+import { assert, BigNumber, ByteBuffer, validatorSetPack, validatorSetUnpack } from "@mainsail/utils";
 
 @injectable()
 export class Serializer implements Contracts.Serializer.Serializer {
@@ -111,7 +110,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 
 			if (schema.type === "validatorSet") {
 				const validatorSet = data[property];
-				Utils.assert.array<boolean>(validatorSet);
+				assert.array<boolean>(validatorSet);
 
 				const packed = validatorSetPack(validatorSet);
 
@@ -122,7 +121,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 			}
 
 			if (schema.type === "hex") {
-				Utils.assert.string(data[property]["serialized"]);
+				assert.string(data[property]["serialized"]);
 
 				const serialized = Buffer.from(data[property]["serialized"], "hex");
 				result.writeUint32(serialized.length);

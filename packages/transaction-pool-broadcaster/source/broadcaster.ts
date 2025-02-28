@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
+import { shuffle, take } from "@mainsail/utils";
 
 @injectable()
 export class Broadcaster implements Contracts.TransactionPool.Broadcaster {
@@ -24,6 +25,6 @@ export class Broadcaster implements Contracts.TransactionPool.Broadcaster {
 
 	#getPeersForBroadcast(): Contracts.TransactionPool.Peer[] {
 		const maxPeersBroadcast: number = this.configuration.getRequired<number>("maxPeersBroadcast");
-		return Utils.take(Utils.shuffle(this.repository.getPeers()), maxPeersBroadcast);
+		return take(shuffle(this.repository.getPeers()), maxPeersBroadcast);
 	}
 }

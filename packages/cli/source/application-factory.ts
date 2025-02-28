@@ -1,6 +1,6 @@
 import { Container, interfaces } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 import { ActionFactory } from "./action-factory.js";
 import {
@@ -68,11 +68,11 @@ export class ApplicationFactory {
 		app.bind(Identifiers.Package).toConstantValue(package_);
 
 		// Paths
-		Utils.assert.string(package_.name);
+		assert.string(package_.name);
 		app.bind(Identifiers.ConsolePaths).toConstantValue(environmentPaths.get(package_.name));
 
 		const applicationName = package_.name?.split("/")[1];
-		Utils.assert.string(applicationName);
+		assert.string(applicationName);
 
 		app.bind(Identifiers.Application.Name).toConstantValue(applicationName);
 

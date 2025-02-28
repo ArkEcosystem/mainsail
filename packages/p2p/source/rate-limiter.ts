@@ -1,4 +1,4 @@
-import { Utils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 import { RateLimiterMemory, RLWrapperBlackAndWhite } from "rate-limiter-flexible";
 
 export interface RateLimiterConfiguration {
@@ -44,7 +44,7 @@ export class RateLimiter {
 		if (endpoint && this.#endpoints.has(endpoint)) {
 			const rateLimiter: RateLimiterMemory | undefined = this.#endpoints.get(endpoint);
 
-			Utils.assert.defined(rateLimiter);
+			assert.defined(rateLimiter);
 
 			await rateLimiter.consume(ip);
 		}
@@ -69,7 +69,7 @@ export class RateLimiter {
 		if (endpoint && this.#endpoints.has(endpoint)) {
 			const endpointLimiters: RateLimiterMemory | undefined = this.#endpoints.get(endpoint);
 
-			Utils.assert.defined(endpointLimiters);
+			assert.defined(endpointLimiters);
 
 			const endpointLimiter = await endpointLimiters.get(ip);
 			if (endpointLimiter !== null && endpointLimiter.remainingPoints <= 0) {

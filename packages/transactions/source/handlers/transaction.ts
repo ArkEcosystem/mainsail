@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Utils as AppUtils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 @injectable()
 export abstract class TransactionHandler implements Contracts.Transactions.TransactionHandler {
@@ -23,7 +23,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	protected readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	public async verify(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
-		AppUtils.assert.string(transaction.data.senderAddress);
+		assert.string(transaction.data.senderAddress);
 		return this.verifier.verifyHash(transaction.data);
 	}
 

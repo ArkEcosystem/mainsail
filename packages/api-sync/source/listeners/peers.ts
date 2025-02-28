@@ -5,7 +5,7 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";
 
@@ -24,7 +24,7 @@ export class Peers extends AbstractListener<Contracts.P2P.Peer, Models.Peer> {
 
 	protected getEventId(event: Contracts.P2P.Peer): string {
 		const ip = event.ip;
-		Utils.assert.string(ip);
+		assert.string(ip);
 		return ip;
 	}
 

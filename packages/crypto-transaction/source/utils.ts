@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils as AppUtils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 import { encodeRlp, keccak256, toBeArray } from "ethers";
 
 @injectable()
@@ -33,9 +33,9 @@ export class Utils implements Contracts.Crypto.TransactionUtils {
 		];
 
 		if (options && !options.excludeSignature) {
-			AppUtils.assert.number(transaction.v);
-			AppUtils.assert.string(transaction.r);
-			AppUtils.assert.string(transaction.s);
+			assert.number(transaction.v);
+			assert.string(transaction.r);
+			assert.string(transaction.s);
 
 			fields.push(toBeArray(transaction.v - 27), `0x${transaction.r}`, `0x${transaction.s}`);
 		}

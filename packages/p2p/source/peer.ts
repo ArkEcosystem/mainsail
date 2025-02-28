@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
-import { Types, Utils } from "@mainsail/kernel";
+import { Types } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 import dayjs, { Dayjs } from "dayjs";
 
 import { getPeerUrl } from "./utils/get-peer-url.js";
@@ -51,7 +52,7 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public get header(): Contracts.P2P.HeaderData {
 		// State can be undefined when the peer is not yet verified.
-		Utils.assert.defined(this.#header);
+		assert.defined(this.#header);
 
 		return this.#header;
 	}

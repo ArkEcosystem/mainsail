@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
-import { Utils as AppUtils } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
+import { assert, BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class Verifier implements Contracts.Crypto.BlockVerifier {
@@ -28,7 +27,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 			if (blockData.height === 0) {
 				let validPreviousBlock = false;
 				if (constants.snapshot) {
-					AppUtils.assert.defined(constants.snapshot.hash);
+					assert.defined(constants.snapshot.hash);
 					validPreviousBlock = blockData.previousBlock === constants.snapshot.hash;
 				} else {
 					validPreviousBlock =

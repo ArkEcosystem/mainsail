@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { assert, isEmpty } from "@mainsail/utils";
 import chalk, { ChalkInstance } from "chalk";
 import { error as console_error } from "console";
 import pino from "pino";
@@ -138,7 +138,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 				this.#combinedFileStream.end();
 
 				return new Promise<void>((resolve) => {
-					Utils.assert.defined(this.#combinedFileStream);
+					assert.defined(this.#combinedFileStream);
 					this.#combinedFileStream.on("finish", () => {
 						resolve();
 					});
@@ -152,7 +152,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			return;
 		}
 
-		if (Utils.isEmpty(message)) {
+		if (isEmpty(message)) {
 			return;
 		}
 

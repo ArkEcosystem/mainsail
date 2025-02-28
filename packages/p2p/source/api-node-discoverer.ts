@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services, Utils } from "@mainsail/kernel";
+import { Providers, Services } from "@mainsail/kernel";
+import { shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 import { normalizeUrl } from "./index.js";
@@ -59,7 +60,7 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 	}
 
 	async discoverNewApiNodes(): Promise<any> {
-		const peers = Utils.shuffle(this.peerRepository.getPeers()).slice(0, 5);
+		const peers = shuffle(this.peerRepository.getPeers()).slice(0, 5);
 		return Promise.all(peers.map((peer) => this.discoverApiNodes(peer)));
 	}
 

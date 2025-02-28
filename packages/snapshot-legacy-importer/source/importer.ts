@@ -4,9 +4,8 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
-import { Utils } from "@mainsail/kernel";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
-import { BigNumber } from "@mainsail/utils";
+import { assert, BigNumber } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
 import { ethers, sha256 } from "ethers";
 
@@ -83,7 +82,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		} = genesisBlock;
 
 		const milestone = this.configuration.getMilestone(0);
-		Utils.assert.defined(milestone.snapshot);
+		assert.defined(milestone.snapshot);
 
 		this.logger.info(`Importing genesis snapshot: ${milestone.snapshot.hash}`);
 
@@ -164,7 +163,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			});
 
 			if (wallet.attributes["vote"]) {
-				Utils.assert.string(wallet.publicKey);
+				assert.string(wallet.publicKey);
 
 				const vote = await this.addressFactory.fromPublicKey(wallet.attributes["vote"]);
 
@@ -285,7 +284,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		this.logger.info(`seeding ${this.#data.validators.length} validators`);
 
 		for (const validator of this.#data.validators) {
-			Utils.assert.defined(validator.ethAddress);
+			assert.defined(validator.ethAddress);
 
 			// TODO: remove this once the actual BLS keys are available
 			if (validator.blsPublicKey === "TODO") {
@@ -329,7 +328,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		this.logger.info(`seeding ${this.#data.voters.length} voters`);
 
 		for (const voter of this.#data.voters) {
-			Utils.assert.defined(voter.ethAddress);
+			assert.defined(voter.ethAddress);
 
 			if (!validatorLookup[voter.vote]) {
 				this.logger.warning(`!!! skipping voter ${voter.arkAddress} for non-existent validator: ${voter.vote}`);

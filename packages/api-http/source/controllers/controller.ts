@@ -7,7 +7,8 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 import { EnrichedBlock, EnrichedTransaction } from "../resources/index.js";
 
@@ -115,8 +116,8 @@ export class Controller extends AbstractController {
 			await Promise.all(promises);
 		}
 
-		Utils.assert.defined(generator);
-		Utils.assert.defined(state);
+		assert.defined(generator);
+		assert.defined(state);
 
 		return { ...block, generator, state };
 	}

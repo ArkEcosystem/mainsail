@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Services, Utils } from "@mainsail/kernel";
+import { Services } from "@mainsail/kernel";
+import { http } from "@mainsail/utils";
 import { readJSONSync } from "fs-extra/esm";
 
 @injectable()
@@ -81,7 +82,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 
 			// URL...
 			this.logger.debug(`GET ${url}`);
-			const { data } = await Utils.http.get(url);
+			const { data } = await http.get(url);
 			return typeof data === "object" ? data : JSON.parse(data);
 		}
 

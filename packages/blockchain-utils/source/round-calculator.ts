@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 export interface MilestoneSearchResult {
 	found: boolean;
@@ -67,7 +67,7 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 
 			result.round += spanHeight / Math.max(1, activeValidators);
 			result.roundHeight = nextMilestone.height;
-			Utils.assert.number(nextMilestone.data);
+			assert.number(nextMilestone.data);
 			result.maxValidators = nextMilestone.data;
 
 			activeValidators = nextMilestone.data;

@@ -1,10 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { pascalCase } from "@mainsail/utils";
 
 // @TODO revisit the implementation of the class and see if it can be removed
-// import { Class } from "../types";
-import { pascalCase } from "../utils/index.js";
-
 @injectable()
 export abstract class ClassManager {
 	@inject(Identifiers.Application.Instance)

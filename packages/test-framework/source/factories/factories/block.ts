@@ -1,6 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
+import { assert, BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 import secrets from "../../internal/passphrases.json";
@@ -60,7 +59,7 @@ export const registerBlockFactory = async (
 
 		for (const transaction of transactions) {
 			const { data, serialized } = transaction;
-			Utils.assert.string(data.id);
+			assert.string(data.id);
 
 			totals.value = totals.value.plus(data.value);
 			totals.gasPrice = totals.gasPrice.plus(data.gasPrice);

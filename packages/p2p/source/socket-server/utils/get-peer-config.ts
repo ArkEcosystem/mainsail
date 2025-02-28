@@ -1,5 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services, Utils } from "@mainsail/kernel";
+import { Providers, Services } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 type PluginConfig = { package: string; options: any };
 
@@ -34,7 +35,7 @@ const getPluginsConfig = (plugins: PluginConfig[], app: Contracts.Kernel.Applica
 
 		const serviceProviderName: string | undefined = serviceProvider.name();
 
-		Utils.assert.string(serviceProviderName);
+		assert.string(serviceProviderName);
 
 		return {
 			options: serviceProvider.config().all(),

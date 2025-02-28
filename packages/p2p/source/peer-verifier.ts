@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 import { isValidVersion } from "./utils/index.js";
@@ -90,7 +90,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		const blockToCompare =
 			block.data.height === heightToRequest ? block : await this.database.getBlock(heightToRequest);
 
-		Utils.assert.defined(blockToCompare);
+		assert.defined(blockToCompare);
 
 		if (receivedCommit.block.data.height !== blockToCompare.data.height) {
 			throw new Error("Received block does not match the requested height");

@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/kernel";
-import { randomNumber, shuffle } from "@mainsail/utils";
+import { Providers } from "@mainsail/kernel";
+import { groupBy, pluralize, randomNumber, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 import delay from "delay";
 
@@ -48,10 +48,8 @@ export class Service implements Contracts.P2P.Service {
 
 		await this.peerDiscoverer.populateSeedPeers();
 
-		for (const [version, peers] of Object.entries(
-			Utils.groupBy(this.repository.getPeers(), (peer) => peer.version),
-		)) {
-			this.logger.info(`Discovered ${Utils.pluralize("peer", peers.length, true)} with v${version}.`);
+		for (const [version, peers] of Object.entries(groupBy(this.repository.getPeers(), (peer) => peer.version))) {
+			this.logger.info(`Discovered ${pluralize("peer", peers.length, true)} with v${version}.`);
 		}
 
 		void this.mainLoop();
@@ -113,7 +111,7 @@ export class Service implements Contracts.P2P.Service {
 
 	public async cleansePeers({ fast, peerCount }: { fast: boolean; peerCount: number }): Promise<void> {
 		const max = Math.min(this.repository.getPeers().length, peerCount);
-		const peers = Utils.shuffle(this.repository.getPeers()).slice(0, max);
+		const peers = shuffle(this.repository.getPeers()).slice(0, max);
 
 		if (max === 0) {
 			return;
@@ -122,7 +120,7 @@ export class Service implements Contracts.P2P.Service {
 		let unresponsivePeers = 0;
 		const pingDelay = fast ? 1500 : this.configuration.getRequired<number>("verifyTimeout");
 
-		this.logger.info(`Checking ${Utils.pluralize("peer", max, true)}`);
+		this.logger.info(`Checking ${pluralize("peer", max, true)}`);
 
 		// we use Promise.race to cut loose in case some communicator.ping() does not resolve within the delay
 		// in that case we want to keep on with our program execution while ping promises can finish in the background
@@ -151,7 +149,7 @@ export class Service implements Contracts.P2P.Service {
 		});
 
 		if (unresponsivePeers > 0) {
-			this.logger.debug(`Removed ${Utils.pluralize("peer", unresponsivePeers, true)}`);
+			this.logger.debug(`Removed ${pluralize("peer", unresponsivePeers, true)}`);
 		}
 	}
 

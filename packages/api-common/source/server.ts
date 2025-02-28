@@ -2,7 +2,8 @@ import Boom from "@hapi/boom";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
+import { merge } from "@mainsail/utils";
 import { readFileSync } from "fs";
 
 import { Processor } from "./rcp/index.js";
@@ -127,6 +128,6 @@ export abstract class AbstractServer {
 		}
 
 		const defaultOptions = this.defaultOptions();
-		return Utils.merge(defaultOptions, options);
+		return merge(defaultOptions, options);
 	}
 }

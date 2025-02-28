@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 @injectable()
 export class ProposerCalculator implements Contracts.BlockchainUtils.ProposerCalculator {
@@ -18,7 +18,7 @@ export class ProposerCalculator implements Contracts.BlockchainUtils.ProposerCal
 
 		const offset = (this.stateStore.getTotalRound() + round) % activeValidators;
 		const result = this.validatorMatrix[offset % activeValidators];
-		Utils.assert.number(result);
+		assert.number(result);
 		return result;
 	}
 }

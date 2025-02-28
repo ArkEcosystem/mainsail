@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { get, orderBy } from "@mainsail/utils";
 import semver from "semver";
 
 import { BannedPeerResource, PeerResource } from "../resources/index.js";
@@ -35,7 +35,7 @@ export class PeersController extends Controller {
 
 		const limit: number = +request.query.limit || 100;
 
-		let offset: number = +(Utils.get(request.query, "offset", 0) || 0);
+		let offset: number = +(get(request.query, "offset", 0) || 0);
 
 		if (offset <= 0 && +request.query.page > 1) {
 			offset = (+request.query.page - 1) * limit;
@@ -58,7 +58,7 @@ export class PeersController extends Controller {
 					break;
 				}
 				case "height": {
-					results = Utils.orderBy(
+					results = orderBy(
 						results,
 						(element) => element.header[orderByMapped[0]],
 						orderByMapped[1] === "asc" ? "asc" : "desc", // ? why desc is default
@@ -66,7 +66,7 @@ export class PeersController extends Controller {
 					break;
 				}
 				case "latency": {
-					results = Utils.orderBy(results, orderByMapped[0], orderByMapped[1] === "asc" ? "asc" : "desc");
+					results = orderBy(results, orderByMapped[0], orderByMapped[1] === "asc" ? "asc" : "desc");
 					break;
 				}
 				default: {
@@ -102,7 +102,7 @@ export class PeersController extends Controller {
 		const totalCount: number = result.length;
 		const limit: number = +request.query.limit || 100;
 
-		let offset: number = +(Utils.get(request.query, "offset", 0) || 0);
+		let offset: number = +(get(request.query, "offset", 0) || 0);
 
 		if (offset <= 0 && +request.query.page > 1) {
 			offset = (+request.query.page - 1) * limit;
