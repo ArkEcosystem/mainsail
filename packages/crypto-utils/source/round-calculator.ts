@@ -2,7 +2,11 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-import { getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info.js";
+export interface MilestoneSearchResult {
+	found: boolean;
+	height: number;
+	data: any;
+}
 
 @injectable()
 export class RoundCalculator implements Contracts.CryptoUtils.RoundCalculator {
@@ -48,7 +52,7 @@ export class RoundCalculator implements Contracts.CryptoUtils.RoundCalculator {
 
 		let milestoneHeight = 0;
 
-		const milestones = getMilestonesWhichAffectActiveValidatorCount(this.configuration);
+		const milestones = this.getMilestonesWhichAffectActiveValidatorCount(this.configuration);
 		for (let index = 0; index < milestones.length - 1; index++) {
 			if (height < nextMilestone.height) {
 				break;
@@ -108,4 +112,25 @@ export class RoundCalculator implements Contracts.CryptoUtils.RoundCalculator {
 			roundHeight,
 		};
 	}
+
+	public getMilestonesWhichAffectActiveValidatorCount = (
+		configuration: Contracts.Crypto.Configuration,
+	): Array<MilestoneSearchResult> => {
+		const milestones: Array<MilestoneSearchResult> = [
+			{
+				data: configuration.getMilestone(0).activeValidators,
+				found: true,
+				height: 0,
+			},
+		];
+
+		let nextMilestone = configuration.getNextMilestoneWithNewKey(0, "activeValidators");
+
+		while (nextMilestone.found) {
+			milestones.push(nextMilestone);
+			nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeValidators");
+		}
+
+		return milestones;
+	};
 }

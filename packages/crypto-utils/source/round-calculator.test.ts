@@ -352,3 +352,27 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 		assert.true(roundCalculator.isNewRound(63));
 	});
 });
+
+describe<Context>("RoundCalculator - getMilestonesWhichAffectActiveDelegateCount", ({ assert, beforeEach, it }) => {
+	beforeEach(setup);
+
+	it("should return milestones which changes delegate count", ({ configuration, roundCalculator }) => {
+		configuration.setConfig({
+			...crypto,
+			milestones: [{ activeValidators: 4, height: 1 }],
+		});
+
+		const milestones = [
+			{ activeValidators: 4, height: 0 },
+			{ activeValidators: 4, height: 1 },
+			{ activeValidators: 4, height: 5 },
+			{ activeValidators: 8, height: 9 },
+			{ activeValidators: 8, height: 15 },
+		];
+
+		const config = { ...crypto, milestones };
+		configuration.setConfig({ ...crypto, milestones: milestones });
+
+		assert.length(roundCalculator.getMilestonesWhichAffectActiveValidatorCount(configuration), 2);
+	});
+});

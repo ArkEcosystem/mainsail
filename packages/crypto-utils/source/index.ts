@@ -1,14 +1,11 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { calculateApproval } from "./calculate-forging-info.js";
 import { FeeCalculator } from "./fee-calculator.js";
 import { RoundCalculator } from "./round-calculator.js";
 import { Selector } from "./selector.js";
 import { SupplyCalculator } from "./supply-calculator.js";
 import { TimestampCalculator } from "./timestamp-calculator.js";
-
-export const validatorCalculator = { calculateApproval };
 
 export { formatCurrency } from "./format-currency.js";
 export { getBlockNotChainedErrorMessage, isBlockChained } from "./is-block-chained.js";
