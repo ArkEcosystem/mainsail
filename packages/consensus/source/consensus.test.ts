@@ -1,5 +1,5 @@
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { Lock } from "@mainsail/utils";
 
 import { describe, Sandbox } from "../../test-framework/source";
 import { Consensus } from "./consensus";
@@ -143,7 +143,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.sandbox.app.bind(Identifiers.Consensus.Processor.Proposal).toConstantValue(context.proposalProcessor);
 		context.sandbox.app.bind(Identifiers.Consensus.Bootstrapper).toConstantValue(context.bootstrapper);
 		context.sandbox.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
-		context.sandbox.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Utils.Lock());
+		context.sandbox.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Lock());
 		+context.sandbox.app.bind(Identifiers.Validator.Repository).toConstantValue(context.validatorsRepository);
 		context.sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
 		context.sandbox.app
