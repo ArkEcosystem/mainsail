@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils as AppUtils } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
+import { Lock } from "@mainsail/utils";
 
 @injectable()
 export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
@@ -13,7 +14,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 
 	#concurrency = 0;
 
-	readonly #lock: AppUtils.Lock = new AppUtils.Lock();
+	readonly #lock = new Lock();
 
 	readonly #transactions: Contracts.Crypto.Transaction[] = [];
 

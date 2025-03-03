@@ -1,6 +1,7 @@
 import { interfaces } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
+import { Lock } from "@mainsail/utils";
 
 import { Aggregator } from "./aggregator.js";
 import { Bootstrapper } from "./bootstrapper.js";
@@ -19,7 +20,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.Processor.PreVote).to(PrevoteProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Processor.PreCommit).to(PrecommitProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Processor.Commit).to(CommitProcessor).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Utils.Lock());
+		this.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Lock());
 
 		this.app
 			.bind(Identifiers.Consensus.CommitState.Factory)

@@ -1,6 +1,7 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils as KernelUtils } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
+import { isBlacklisted, isWhitelisted } from "@mainsail/utils";
 
 import { isValidVersion } from "./utils/index.js";
 import { isValidPeerIp } from "./validation/index.js";
@@ -59,7 +60,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	}
 
 	public isWhitelisted(peer: Contracts.P2P.Peer): boolean {
-		return KernelUtils.isWhitelisted(this.configuration.getOptional<string[]>("remoteAccess", []), peer.ip);
+		return isWhitelisted(this.configuration.getOptional<string[]>("remoteAccess", []), peer.ip);
 	}
 
 	public async validateAndAcceptPeer(ip: string, options: Contracts.P2P.AcceptNewPeerOptions = {}): Promise<void> {
@@ -82,11 +83,11 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			return false;
 		}
 
-		if (!KernelUtils.isWhitelisted(this.configuration.getRequired("whitelist"), ip)) {
+		if (!isWhitelisted(this.configuration.getRequired("whitelist"), ip)) {
 			return false;
 		}
 
-		if (KernelUtils.isBlacklisted(this.configuration.getRequired("blacklist"), ip)) {
+		if (isBlacklisted(this.configuration.getRequired("blacklist"), ip)) {
 			return false;
 		}
 

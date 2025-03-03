@@ -1,5 +1,5 @@
 import Boom from "@hapi/boom";
-import { Utils } from "@mainsail/kernel";
+import { isWhitelisted } from "@mainsail/utils";
 
 import { getIp } from "../utils/index.js";
 
@@ -12,7 +12,7 @@ export const whitelist = {
 					return h.continue;
 				}
 
-				if (Utils.isWhitelisted(options.whitelist, getIp(request, options.trustProxy))) {
+				if (isWhitelisted(options.whitelist, getIp(request, options.trustProxy))) {
 					return h.continue;
 				}
 

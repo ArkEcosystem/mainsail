@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { IpAddress } from "@mainsail/utils";
 import delay from "delay";
 
 import { Client } from "./hapi-nes/index.js";
@@ -50,7 +50,7 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		const timeSinceLastConnectionCreate = Date.now() - (this.#lastConnectionCreate.get(peer.ip) ?? 0);
 		await delay(Math.max(0, TEN_SECONDS_IN_MILLISECONDS - timeSinceLastConnectionCreate));
 
-		const connection = new Client(`ws://${Utils.IpAddress.normalizeAddress(peer.ip)}:${peer.port}`, {
+		const connection = new Client(`ws://${IpAddress.normalizeAddress(peer.ip)}:${peer.port}`, {
 			timeout: 10_000,
 		});
 		this.connections.set(peer.ip, connection);

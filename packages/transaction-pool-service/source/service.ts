@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
+import { Providers } from "@mainsail/kernel";
+import { BigNumber, Lock } from "@mainsail/utils";
 
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {
@@ -34,7 +34,7 @@ export class Service implements Contracts.TransactionPool.Service {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
-	readonly #lock: Utils.Lock = new Utils.Lock();
+	readonly #lock = new Lock();
 
 	#disposed = false;
 

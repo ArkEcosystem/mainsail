@@ -1,5 +1,5 @@
 import Boom from "@hapi/boom";
-import { Utils } from "@mainsail/kernel";
+import { isWhitelisted } from "@mainsail/utils";
 
 export const whitelist = {
 	name: "whitelist",
@@ -10,7 +10,7 @@ export const whitelist = {
 					return h.continue;
 				}
 
-				if (Utils.isWhitelisted(options.whitelist, request.info.remoteAddress)) {
+				if (isWhitelisted(options.whitelist, request.info.remoteAddress)) {
 					return h.continue;
 				}
 
