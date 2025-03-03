@@ -2849,6 +2849,12 @@ importers:
       fast-sort:
         specifier: ^3.4.0
         version: 3.4.0
+      ipaddr.js:
+        specifier: 2.2.0
+        version: 2.2.0
+      nanomatch:
+        specifier: 1.2.13
+        version: 1.2.13
       type-fest:
         specifier: 4.12.0
         version: 4.12.0
@@ -6956,6 +6962,10 @@ packages:
 
   ipaddr.js@2.1.0:
     resolution: {integrity: sha512-LlbxQ7xKzfBusov6UMi4MFpEg0m+mAm9xyNGEduwXMEDuf4WfzB/RZwMVYEd7IKGvh4IUkEXYxtAVu9T3OelJQ==}
+    engines: {node: '>= 10'}
+
+  ipaddr.js@2.2.0:
+    resolution: {integrity: sha512-Ag3wB2o37wslZS19hZqorUnrnzSkpOVy+IiiDEiTqNubEYpYuHWIf6K4psgN2ZWKExS4xhVCrRVfb/wfW8fWJA==}
     engines: {node: '>= 10'}
 
   is-accessor-descriptor@1.0.1:
@@ -14787,6 +14797,8 @@ snapshots:
   ipaddr.js@1.9.1: {}
 
   ipaddr.js@2.1.0: {}
+
+  ipaddr.js@2.2.0: {}
 
   is-accessor-descriptor@1.0.1:
     dependencies:
