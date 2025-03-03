@@ -2050,9 +2050,6 @@ importers:
       glob:
         specifier: 10.3.10
         version: 10.3.10
-      ipaddr.js:
-        specifier: 2.1.0
-        version: 2.1.0
       joi:
         specifier: 17.12.2
         version: 17.12.2
