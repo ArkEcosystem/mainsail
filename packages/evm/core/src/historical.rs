@@ -1,15 +1,15 @@
 use std::collections::BTreeMap;
 
-use heed::RwTxn;
+use heed::{RoTxn, RwTxn};
 use revm::primitives::{AccountInfo, Address, B256, U256};
 
 use crate::db::Error;
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct HistoricalAccountData {
-    balance: U256,
-    nonce: u64,
-    code_hash: B256,
+    pub balance: U256,
+    pub nonce: u64,
+    pub code_hash: B256,
 }
 
 impl From<AccountInfo> for HistoricalAccountData {
@@ -22,10 +22,11 @@ impl From<AccountInfo> for HistoricalAccountData {
     }
 }
 
-pub struct AccountHistoryWriter {
+pub struct AccountHistory {
     capacity: u64,
 }
-impl AccountHistoryWriter {
+
+impl AccountHistory {
     pub fn new(capacity: u64) -> Self {
         Self { capacity }
     }
@@ -61,7 +62,7 @@ impl AccountHistoryWriter {
 
     pub fn get_by_block_and_address(
         &self,
-        txn: &mut RwTxn,
+        txn: &RoTxn,
         database: &heed::Database<
             heed::types::U64<heed::byteorder::BigEndian>,
             heed::types::SerdeBincode<BTreeMap<Address, HistoricalAccountData>>,
@@ -82,7 +83,7 @@ impl AccountHistoryWriter {
 }
 
 #[test]
-fn test_history_writer() {
+fn test_account_history() {
     let path = tempfile::Builder::new()
         .prefix("evm.mdb")
         .tempdir()
@@ -93,16 +94,16 @@ fn test_history_writer() {
     )
     .expect("database");
 
-    let writer = AccountHistoryWriter::new(10);
+    let history = AccountHistory::new(10);
     let mut txn = db.env.write_txn().unwrap();
 
-    let accounts_history = &db.inner.borrow().accounts_history.unwrap();
+    let history_db = &db.inner.borrow().accounts_history.unwrap();
 
     // Height 1
-    writer
+    history
         .insert(
             &mut txn,
-            accounts_history,
+            history_db,
             1,
             vec![
                 (
@@ -126,10 +127,10 @@ fn test_history_writer() {
         .unwrap();
 
     // Height 2
-    writer
+    history
         .insert(
             &mut txn,
-            accounts_history,
+            history_db,
             2,
             vec![
                 (
@@ -153,18 +154,14 @@ fn test_history_writer() {
         .unwrap();
 
     // Height 3 - 4 (empty)
-    writer
-        .insert(&mut txn, accounts_history, 3, vec![])
-        .unwrap();
-    writer
-        .insert(&mut txn, accounts_history, 4, vec![])
-        .unwrap();
+    history.insert(&mut txn, history_db, 3, vec![]).unwrap();
+    history.insert(&mut txn, history_db, 4, vec![]).unwrap();
 
     // Height 5
-    writer
+    history
         .insert(
             &mut txn,
-            accounts_history,
+            history_db,
             5,
             vec![
                 (
@@ -225,8 +222,8 @@ fn test_history_writer() {
             5,
         ),
     ] {
-        let account = writer
-            .get_by_block_and_address(&mut txn, accounts_history, height, &address)
+        let account = history
+            .get_by_block_and_address(&mut txn, history_db, height, &address)
             .unwrap();
 
         assert!(account.is_some_and(|a| a
@@ -275,8 +272,8 @@ fn test_history_writer() {
             1,
         ),
     ] {
-        let account = writer
-            .get_by_block_and_address(&mut txn, accounts_history, height, &address)
+        let account = history
+            .get_by_block_and_address(&mut txn, history_db, height, &address)
             .unwrap();
 
         assert!(account.is_some_and(|a| a
@@ -295,8 +292,8 @@ fn test_history_writer() {
             revm::primitives::address!("0000000000000000000000000000000000000003"),
         ),
     ] {
-        let account = writer
-            .get_by_block_and_address(&mut txn, accounts_history, height, &address)
+        let account = history
+            .get_by_block_and_address(&mut txn, history_db, height, &address)
             .unwrap();
         assert!(account.is_none());
     }
@@ -331,8 +328,8 @@ fn test_history_writer() {
             3,
         ),
     ] {
-        let account = writer
-            .get_by_block_and_address(&mut txn, accounts_history, height, &address)
+        let account = history
+            .get_by_block_and_address(&mut txn, history_db, height, &address)
             .unwrap();
 
         assert!(account.is_some_and(|a| a
@@ -363,8 +360,8 @@ fn test_history_writer() {
             revm::primitives::address!("0000000000000000000000000000000000000004"),
         ),
     ] {
-        let account = writer
-            .get_by_block_and_address(&mut txn, accounts_history, height, &address)
+        let account = history
+            .get_by_block_and_address(&mut txn, history_db, height, &address)
             .unwrap();
         assert!(account.is_none());
     }
@@ -378,8 +375,8 @@ fn test_history_writer() {
             4,
         ),
     ] {
-        let account = writer
-            .get_by_block_and_address(&mut txn, accounts_history, height, &address)
+        let account = history
+            .get_by_block_and_address(&mut txn, history_db, height, &address)
             .unwrap();
 
         assert!(account.is_some_and(|a| a
@@ -392,7 +389,7 @@ fn test_history_writer() {
 }
 
 #[test]
-fn test_history_writer_capacity() {
+fn test_accounts_history_capacity() {
     let path = tempfile::Builder::new()
         .prefix("evm.mdb")
         .tempdir()
@@ -403,18 +400,18 @@ fn test_history_writer_capacity() {
     )
     .expect("database");
 
-    let writer = AccountHistoryWriter::new(3);
+    let history = AccountHistory::new(3);
     let mut txn = db.env.write_txn().unwrap();
 
-    let accounts_history = &db.inner.borrow().accounts_history.unwrap();
+    let history_db = &db.inner.borrow().accounts_history.unwrap();
 
     for i in 0..5 {
         println!("writing i... {}", i);
         // Height 1
-        writer
+        history
             .insert(
                 &mut txn,
-                accounts_history,
+                history_db,
                 i as u64,
                 vec![
                     (
@@ -451,8 +448,8 @@ fn test_history_writer_capacity() {
             revm::primitives::address!("0000000000000000000000000000000000000001"),
         ),
     ] {
-        let account = writer
-            .get_by_block_and_address(&mut txn, accounts_history, height, &address)
+        let account = history
+            .get_by_block_and_address(&mut txn, history_db, height, &address)
             .unwrap();
         assert!(account.is_none());
     }
@@ -499,8 +496,8 @@ fn test_history_writer_capacity() {
             6,
         ),
     ] {
-        let account = writer
-            .get_by_block_and_address(&mut txn, accounts_history, height, &address)
+        let account = history
+            .get_by_block_and_address(&mut txn, history_db, height, &address)
             .unwrap();
 
         assert!(account.is_some_and(|a| a
@@ -514,8 +511,8 @@ fn test_history_writer_capacity() {
     // Write empty blocks until everything is evicted
     for i in 5..10 {
         // Height 1
-        writer
-            .insert(&mut txn, accounts_history, i as u64, vec![])
+        history
+            .insert(&mut txn, history_db, i as u64, vec![])
             .unwrap();
     }
 
@@ -525,8 +522,8 @@ fn test_history_writer_capacity() {
             revm::primitives::address!("0000000000000000000000000000000000000001"),
             revm::primitives::address!("0000000000000000000000000000000000000002"),
         ] {
-            let account = writer
-                .get_by_block_and_address(&mut txn, accounts_history, i, &address)
+            let account = history
+                .get_by_block_and_address(&mut txn, history_db, i, &address)
                 .unwrap();
             assert!(account.is_none());
         }

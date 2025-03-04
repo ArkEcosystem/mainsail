@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     account::AccountInfoExtended,
-    historical::{AccountHistoryWriter, HistoricalAccountData},
+    historical::{AccountHistory, HistoricalAccountData},
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::{LogLevel, Logger},
     receipt::{map_execution_result, TxReceipt},
@@ -166,7 +166,7 @@ pub struct GenesisInfo {
 pub struct PersistentDB {
     pub(crate) env: heed::Env,
     pub(crate) inner: RefCell<InnerStorage>,
-    pub(crate) history_writer: Option<AccountHistoryWriter>,
+    pub(crate) accounts_history: Option<AccountHistory>,
     logger: Logger,
     pub genesis_info: Option<GenesisInfo>,
 }
@@ -247,11 +247,11 @@ impl PersistentDB {
                 Some("accounts"),
             )?;
 
-        let (accounts_history, history_writer) = match opts.history_size {
+        let (accounts_history_db, accounts_history) = match opts.history_size {
             Some(history_size) if history_size > 0 => {
                 let db = env.create_database::<HeedHeight, heed::types::SerdeBincode<
             BTreeMap<Address, HistoricalAccountData>>>(&mut wtxn, Some("accounts_history")) ?;
-                (Some(db), Some(AccountHistoryWriter::new(history_size)))
+                (Some(db), Some(AccountHistory::new(history_size)))
             }
             _ => (None, None),
         };
@@ -290,14 +290,14 @@ impl PersistentDB {
             env,
             inner: RefCell::new(InnerStorage {
                 accounts,
-                accounts_history,
+                accounts_history: accounts_history_db,
                 commits,
                 contracts,
                 legacy_attributes,
                 legacy_cold_wallets,
                 storage,
             }),
-            history_writer,
+            accounts_history,
             logger: opts.logger.unwrap_or_default(),
             genesis_info: None,
         })
@@ -634,13 +634,13 @@ impl PersistentDB {
             }
 
             // Update account history
-            if let Some(accounts_history) = &inner.accounts_history {
-                self.history_writer
+            if let Some(db) = &inner.accounts_history {
+                self.accounts_history
                     .as_ref()
-                    .expect("history writer")
+                    .expect("accounts history")
                     .insert(
                         rwtxn,
-                        accounts_history,
+                        db,
                         key.0,
                         accounts
                             .into_iter()
