@@ -15,7 +15,6 @@ export class EvmInstance implements Contracts.Evm.Instance {
 	@postConstruct()
 	public initialize() {
 		this.#evm = new Evm({
-			path: this.app.dataPath(),
 			historySize: 256n,
 			logger: (level: LogLevel, message: string) => {
 				try {
@@ -51,6 +50,7 @@ export class EvmInstance implements Contracts.Evm.Instance {
 					}
 				} catch {}
 			},
+			path: this.app.dataPath(),
 		});
 	}
 
