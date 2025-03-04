@@ -19,3 +19,22 @@ export const resolveBlockTag = async (
 		}
 	}
 };
+
+export const getHistoryHeightFromBlockTag = async (
+	tag: string | Contracts.Crypto.BlockTag,
+): Promise<bigint | undefined> => {
+	if (tag.startsWith("0x")) {
+		return BigInt(Number.parseInt(tag));
+	}
+
+	switch (tag as Contracts.Crypto.BlockTag) {
+		case "finalized":
+		case "latest":
+		case "safe": {
+			return undefined; // do not use history
+		}
+		default: {
+			throw new Error("invalid blockTag:" + tag);
+		}
+	}
+};

@@ -86,8 +86,8 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		});
 	}
 
-	public async getAccountInfo(address: string): Promise<Contracts.Evm.AccountInfo> {
-		return this.#evm.getAccountInfo(address);
+	public async getAccountInfo(address: string, height?: bigint): Promise<Contracts.Evm.AccountInfo> {
+		return this.#evm.getAccountInfo(address, height);
 	}
 
 	public async getAccountInfoExtended(
@@ -140,8 +140,8 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		unit.setAccountUpdates(result.dirtyAccounts);
 	}
 
-	public async codeAt(address: string): Promise<string> {
-		return this.#evm.codeAt(address);
+	public async codeAt(address: string, height?: bigint): Promise<string> {
+		return this.#evm.codeAt(address, height);
 	}
 
 	public async storageAt(address: string, slot: bigint): Promise<string> {

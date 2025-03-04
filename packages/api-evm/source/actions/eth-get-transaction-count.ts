@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { getHistoryHeightFromBlockTag } from "../utils/resolve-block-tag.js";
 
 @injectable()
 export class EthGetTransactionCount implements Contracts.Api.RPC.Action {
@@ -20,8 +21,10 @@ export class EthGetTransactionCount implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: [string, string]): Promise<string> {
-		const [address] = parameters;
-		const accountInfo = await this.evm.getAccountInfo(address);
+		const [address, blockTag] = parameters;
+		const height = await getHistoryHeightFromBlockTag(blockTag);
+
+		const accountInfo = await this.evm.getAccountInfo(address, height);
 
 		return `0x${accountInfo.nonce.toString(16)}`;
 	}

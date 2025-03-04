@@ -19,7 +19,7 @@ export interface Instance extends CommitHandler {
 	process(txContext: TransactionContext): Promise<ProcessResult>;
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
-	getAccountInfo(address: string): Promise<AccountInfo>;
+	getAccountInfo(address: string, height?: bigint): Promise<AccountInfo>;
 	getAccountInfoExtended(address: string, legacyAddress?: string): Promise<AccountInfoExtended>;
 	importAccountInfo(info: AccountInfoExtended): Promise<void>;
 	importLegacyColdWallet(wallet: ImportLegacyColdWallet): Promise<void>;
@@ -31,7 +31,7 @@ export interface Instance extends CommitHandler {
 	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;
 	logsBloom(commitKey: CommitKey): Promise<string>;
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
-	codeAt(address: string): Promise<string>;
+	codeAt(address: string, height?: bigint): Promise<string>;
 	storageAt(address: string, slot: bigint): Promise<string>;
 	mode(): EvmMode;
 	dispose(): Promise<void>;
