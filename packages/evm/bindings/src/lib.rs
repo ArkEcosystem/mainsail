@@ -56,15 +56,15 @@ impl EvmInner {
     pub fn new(opts: EvmOptions) -> Self {
         let logger = JsLogger::new(opts.logger_callback).expect("logger ok");
 
-        let mut opts = PersistentDBOptions::new(opts.path).with_logger(logger.inner());
+        let mut db_opts = PersistentDBOptions::new(opts.path).with_logger(logger.inner());
 
         if let Some(history_size) = opts.history_size {
             if history_size > 0 {
-                opts = opts.with_history_size(history_size)
+                db_opts = db_opts.with_history_size(history_size)
             }
         }
 
-        let persistent_db = PersistentDB::new(opts).expect("path ok");
+        let persistent_db = PersistentDB::new(db_opts).expect("path ok");
 
         EvmInner {
             persistent_db,
