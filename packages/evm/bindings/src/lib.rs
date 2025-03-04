@@ -126,11 +126,18 @@ impl EvmInner {
         })
     }
 
-    pub fn code_at(&mut self, address: Address) -> std::result::Result<Bytes, EVMError<String>> {
-        let account = self
-            .persistent_db
-            .basic(address)
-            .map_err(|err| EVMError::Database(format!("account lookup failed: {}", err).into()))?;
+    pub fn code_at(
+        &mut self,
+        address: Address,
+        height: Option<u64>,
+    ) -> std::result::Result<Bytes, EVMError<String>> {
+        let account = match height {
+            None => self.persistent_db.basic(address),
+            Some(height) => self
+                .persistent_db
+                .get_historical_account_info(height, address),
+        }
+        .map_err(|err| EVMError::Database(format!("account lookup failed: {}", err).into()))?;
 
         match account {
             Some(account) => {
@@ -350,8 +357,16 @@ impl EvmInner {
     pub fn get_account_info(
         &mut self,
         address: Address,
+        height: Option<u64>,
     ) -> std::result::Result<AccountInfo, EVMError<String>> {
-        match self.persistent_db.basic(address) {
+        let result = match height {
+            None => self.persistent_db.basic(address),
+            Some(height) => self
+                .persistent_db
+                .get_historical_account_info(height, address),
+        };
+
+        match result {
             Ok(account) => Ok(account.unwrap_or_default()),
             Err(err) => Err(EVMError::Database(
                 format!("account lookup failed: {}", err).into(),
@@ -1047,10 +1062,21 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<JsAccountInfo>")]
-    pub fn get_account_info(&mut self, node_env: Env, address: JsString) -> Result<JsObject> {
+    pub fn get_account_info(
+        &mut self,
+        node_env: Env,
+        address: JsString,
+        height: Option<JsBigInt>,
+    ) -> Result<JsObject> {
         let address = utils::create_address_from_js_string(address)?;
+
+        let height = match height {
+            Some(height) => Some(height.get_u64()?.0),
+            None => None,
+        };
+
         node_env.execute_tokio_future(
-            Self::get_account_info_async(self.evm.clone(), address),
+            Self::get_account_info_async(self.evm.clone(), address, height),
             |&mut node_env, result| Ok(result::JsAccountInfo::new(&node_env, result)?),
         )
     }
@@ -1176,10 +1202,20 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<string>")]
-    pub fn code_at(&mut self, node_env: Env, address: JsString) -> Result<JsObject> {
+    pub fn code_at(
+        &mut self,
+        node_env: Env,
+        address: JsString,
+        height: Option<JsBigInt>,
+    ) -> Result<JsObject> {
         let address = utils::create_address_from_js_string(address)?;
+        let height = match height {
+            Some(height) => Some(height.get_u64()?.0),
+            None => None,
+        };
+
         node_env.execute_tokio_future(
-            Self::code_at_async(self.evm.clone(), address),
+            Self::code_at_async(self.evm.clone(), address, height),
             |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
         )
     }
@@ -1274,9 +1310,10 @@ impl JsEvmWrapper {
     async fn get_account_info_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         address: Address,
+        height: Option<u64>,
     ) -> Result<AccountInfo> {
         let mut lock = evm.lock().await;
-        let result = lock.get_account_info(address);
+        let result = lock.get_account_info(address, height);
 
         match result {
             Ok(account) => Result::Ok(account),
@@ -1379,9 +1416,10 @@ impl JsEvmWrapper {
     async fn code_at_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         address: Address,
+        height: Option<u64>,
     ) -> Result<String> {
         let mut lock = evm.lock().await;
-        let result = lock.code_at(address);
+        let result = lock.code_at(address, height);
 
         match result {
             Ok(code) => Result::Ok(revm::primitives::hex::encode_prefixed(code.as_ref())),

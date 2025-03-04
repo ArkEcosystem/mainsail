@@ -420,6 +420,37 @@ impl PersistentDB {
         })
     }
 
+    pub fn get_historical_account_info(
+        &mut self,
+        height: u64,
+        address: Address,
+    ) -> Result<Option<AccountInfo>, Error> {
+        match self.inner.borrow().accounts_history {
+            Some(db) => {
+                let tx_env = self.env.read_txn()?;
+
+                match self.accounts_history.as_ref() {
+                    Some(accounts_history) => {
+                        let data = accounts_history
+                            .get_by_block_and_address(&tx_env, &db, height, &address)?;
+
+                        match data {
+                            Some(data) => Ok(Some(AccountInfo {
+                                balance: data.balance,
+                                nonce: data.nonce,
+                                code_hash: data.code_hash,
+                                ..Default::default()
+                            })),
+                            None => Ok(None),
+                        }
+                    }
+                    None => Ok(None),
+                }
+            }
+            None => Ok(None),
+        }
+    }
+
     pub fn get_legacy_attributes(
         &mut self,
         address: Address,
