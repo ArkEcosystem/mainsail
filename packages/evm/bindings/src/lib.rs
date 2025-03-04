@@ -1,16 +1,16 @@
-use std::{collections::HashMap, path::PathBuf, sync::Arc, u64};
+use std::{collections::HashMap, sync::Arc, u64};
 
 use ctx::{
-    BlockContext, CalculateActiveValidatorsContext, ExecutionContext, GenesisContext,
-    JsCalculateActiveValidatorsContext, JsCommitKey, JsGenesisContext, JsPrepareNextCommitContext,
-    JsPreverifyTransactionContext, JsTransactionContext, JsTransactionViewContext,
-    JsUpdateRewardsAndVotesContext, PrepareNextCommitContext, PreverifyTxContext, TxContext,
-    TxViewContext, UpdateRewardsAndVotesContext,
+    BlockContext, CalculateActiveValidatorsContext, EvmOptions, ExecutionContext, GenesisContext,
+    JsCalculateActiveValidatorsContext, JsCommitKey, JsEvmOptions, JsGenesisContext,
+    JsPrepareNextCommitContext, JsPreverifyTransactionContext, JsTransactionContext,
+    JsTransactionViewContext, JsUpdateRewardsAndVotesContext, PrepareNextCommitContext,
+    PreverifyTxContext, TxContext, TxViewContext, UpdateRewardsAndVotesContext,
 };
 use logger::JsLogger;
 use mainsail_evm_core::{
     account::AccountInfoExtended,
-    db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB},
+    db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB, PersistentDBOptions},
     legacy::{LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
     logs_bloom,
@@ -53,9 +53,18 @@ pub struct EvmInner {
 unsafe impl Send for EvmInner {}
 
 impl EvmInner {
-    pub fn new(path: PathBuf, logger_callback: Option<JsFunction>) -> Self {
-        let logger = JsLogger::new(logger_callback).expect("logger ok");
-        let persistent_db = PersistentDB::new(path, Some(logger.inner())).expect("path ok");
+    pub fn new(opts: EvmOptions) -> Self {
+        let logger = JsLogger::new(opts.logger_callback).expect("logger ok");
+
+        let mut opts = PersistentDBOptions::new(opts.path).with_logger(logger.inner());
+
+        if let Some(history_size) = opts.history_size {
+            if history_size > 0 {
+                opts = opts.with_history_size(history_size)
+            }
+        }
+
+        let persistent_db = PersistentDB::new(opts).expect("path ok");
 
         EvmInner {
             persistent_db,
@@ -943,13 +952,10 @@ pub struct JsEvmWrapper {
 #[napi]
 impl JsEvmWrapper {
     #[napi(constructor)]
-    pub fn new(path: JsString, logger_callback: Option<JsFunction>) -> Result<Self> {
-        let path = path.into_utf8()?.into_owned()?;
+    pub fn new(opts: JsEvmOptions) -> Result<Self> {
+        let opts = EvmOptions::try_from(opts)?;
         Ok(JsEvmWrapper {
-            evm: Arc::new(tokio::sync::Mutex::new(EvmInner::new(
-                path.into(),
-                logger_callback,
-            ))),
+            evm: Arc::new(tokio::sync::Mutex::new(EvmInner::new(opts))),
         })
     }
 

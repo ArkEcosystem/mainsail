@@ -14,39 +14,43 @@ export class EvmInstance implements Contracts.Evm.Instance {
 
 	@postConstruct()
 	public initialize() {
-		this.#evm = new Evm(this.app.dataPath(), (level: LogLevel, message: string) => {
-			try {
-				switch (level) {
-					case LogLevel.Info: {
-						this.logger.info(message);
-						break;
+		this.#evm = new Evm({
+			path: this.app.dataPath(),
+			historySize: 256n,
+			logger: (level: LogLevel, message: string) => {
+				try {
+					switch (level) {
+						case LogLevel.Info: {
+							this.logger.info(message);
+							break;
+						}
+						case LogLevel.Debug: {
+							this.logger.debug(message);
+							break;
+						}
+						case LogLevel.Notice: {
+							this.logger.notice(message);
+							break;
+						}
+						case LogLevel.Emergency: {
+							this.logger.emergency(message);
+							break;
+						}
+						case LogLevel.Alert: {
+							this.logger.alert(message);
+							break;
+						}
+						case LogLevel.Critical: {
+							this.logger.critical(message);
+							break;
+						}
+						case LogLevel.Warning: {
+							this.logger.warning(message);
+							break;
+						}
 					}
-					case LogLevel.Debug: {
-						this.logger.debug(message);
-						break;
-					}
-					case LogLevel.Notice: {
-						this.logger.notice(message);
-						break;
-					}
-					case LogLevel.Emergency: {
-						this.logger.emergency(message);
-						break;
-					}
-					case LogLevel.Alert: {
-						this.logger.alert(message);
-						break;
-					}
-					case LogLevel.Critical: {
-						this.logger.critical(message);
-						break;
-					}
-					case LogLevel.Warning: {
-						this.logger.warning(message);
-						break;
-					}
-				}
-			} catch {}
+				} catch {}
+			},
 		});
 	}
 

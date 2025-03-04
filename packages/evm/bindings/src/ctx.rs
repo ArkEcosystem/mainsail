@@ -1,11 +1,18 @@
-use std::str::FromStr;
+use std::{path::PathBuf, str::FromStr};
 
 use mainsail_evm_core::{db::CommitKey, legacy::LegacyAddress};
-use napi::{JsBigInt, JsBuffer, JsString};
+use napi::{JsBigInt, JsBuffer, JsFunction, JsString};
 use napi_derive::napi;
 use revm::primitives::{Address, Bytes, SpecId, B256, U256};
 
 use crate::utils;
+
+#[napi(object)]
+pub struct JsEvmOptions {
+    pub path: JsString,
+    pub logger: Option<JsFunction>,
+    pub history_size: Option<JsBigInt>,
+}
 
 #[napi(object)]
 pub struct JsTransactionContext {
@@ -173,6 +180,12 @@ pub struct UpdateRewardsAndVotesContext {
     pub block_reward: u128,
     pub validator_address: Address,
     pub spec_id: SpecId,
+}
+
+pub struct EvmOptions {
+    pub path: PathBuf,
+    pub logger_callback: Option<JsFunction>,
+    pub history_size: Option<u64>,
 }
 
 #[derive(Debug)]
@@ -367,6 +380,24 @@ impl TryFrom<JsGenesisContext> for GenesisContext {
             username_contract: utils::create_address_from_js_string(value.username_contract)?,
             deployer_account: utils::create_address_from_js_string(value.deployer_account)?,
             initial_supply: utils::convert_bigint_to_u256(value.initial_supply)?,
+        })
+    }
+}
+
+impl TryFrom<JsEvmOptions> for EvmOptions {
+    type Error = anyhow::Error;
+
+    fn try_from(value: JsEvmOptions) -> Result<Self, Self::Error> {
+        let history_size = if let Some(history_size) = value.history_size {
+            Some(history_size.get_u64()?.0)
+        } else {
+            None
+        };
+
+        Ok(EvmOptions {
+            path: value.path.into_utf8()?.into_owned()?.into(),
+            logger_callback: value.logger,
+            history_size,
         })
     }
 }

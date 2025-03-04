@@ -163,6 +163,32 @@ pub struct PersistentDB {
     pub genesis_info: Option<GenesisInfo>,
 }
 
+#[derive(Default)]
+pub struct PersistentDBOptions {
+    pub path: PathBuf,
+    pub logger: Option<Logger>,
+    pub history_size: Option<u64>,
+}
+
+impl PersistentDBOptions {
+    pub fn new(path: PathBuf) -> Self {
+        Self {
+            path,
+            ..Default::default()
+        }
+    }
+
+    pub fn with_logger(mut self, logger: Logger) -> Self {
+        self.logger.replace(logger);
+        self
+    }
+
+    pub fn with_history_size(mut self, history_size: u64) -> Self {
+        self.history_size.replace(history_size);
+        self
+    }
+}
+
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
     #[error("IO error")]
@@ -178,20 +204,26 @@ pub enum Error {
 }
 
 impl PersistentDB {
-    pub fn new(path: PathBuf, logger: Option<Logger>) -> Result<Self, Error> {
-        std::fs::create_dir_all(&path)?;
+    pub fn new(opts: PersistentDBOptions) -> Result<Self, Error> {
+        std::fs::create_dir_all(&opts.path)?;
 
         let mut env_builder = EnvOpenOptions::new();
-        env_builder.max_dbs(6);
+
+        let mut max_dbs = 6;
+        if opts.history_size.is_some() {
+            max_dbs += 1;
+        }
+
+        env_builder.max_dbs(max_dbs);
         env_builder.map_size(1 * MAP_SIZE_UNIT);
         unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
 
-        let env = unsafe { env_builder.open(path.join("evm.mdb")) }?;
+        let env = unsafe { env_builder.open(opts.path.join("evm.mdb")) }?;
 
-        Self::new_with_env(env, logger)
+        Self::new_with_env(env, opts)
     }
 
-    pub fn new_with_env(env: heed::Env, logger: Option<Logger>) -> Result<Self, Error> {
+    pub fn new_with_env(env: heed::Env, opts: PersistentDBOptions) -> Result<Self, Error> {
         let real_disk_size = env.real_disk_size()?;
         if real_disk_size >= env.info().map_size as u64 {
             // ensure initial map size is always larger than disk size
@@ -246,7 +278,7 @@ impl PersistentDB {
                 legacy_cold_wallets,
                 storage,
             }),
-            logger: logger.unwrap_or_default(),
+            logger: opts.logger.unwrap_or_default(),
             genesis_info: None,
         })
     }
@@ -814,7 +846,7 @@ fn test_open_db() {
         .tempdir()
         .unwrap();
 
-    assert!(PersistentDB::new(tmp.path().to_path_buf(), None).is_ok());
+    assert!(PersistentDB::new(PersistentDBOptions::new(tmp.path().to_path_buf())).is_ok());
 }
 
 #[test]
@@ -824,7 +856,8 @@ fn test_commit_changes() {
         .tempdir()
         .unwrap();
 
-    let mut db = PersistentDB::new(path.path().to_path_buf(), None).expect("database");
+    let mut db =
+        PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
 
     // 1) Lookup empty account
     let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
@@ -906,7 +939,8 @@ fn test_storage() {
         .tempdir()
         .unwrap();
 
-    let mut db = PersistentDB::new(path.path().to_path_buf(), None).expect("database");
+    let mut db =
+        PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
 
     let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
     let mut state = HashMap::new();
@@ -977,7 +1011,8 @@ fn test_storage_overwrite() {
         .tempdir()
         .unwrap();
 
-    let mut db = PersistentDB::new(path.path().to_path_buf(), None).expect("database");
+    let mut db =
+        PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
 
     let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
     let mut state = HashMap::new();
@@ -1127,7 +1162,7 @@ fn test_resize_on_commit() {
 
     let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
 
-    let mut db = PersistentDB::new_with_env(env, None).expect("open");
+    let mut db = PersistentDB::new_with_env(env, Default::default()).expect("open");
     assert_eq!(db.env.info().map_size, 4096 * 10);
 
     // large commit to trigger a resize
@@ -1146,7 +1181,7 @@ fn test_resize_on_commit() {
     drop(db);
 
     let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
-    let db = PersistentDB::new_with_env(env, None).expect("open");
+    let db = PersistentDB::new_with_env(env, Default::default()).expect("open");
     assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
 }
 
@@ -1157,7 +1192,8 @@ fn test_read_accounts() {
         .tempdir()
         .unwrap();
 
-    let db = PersistentDB::new(path.path().to_path_buf(), None).expect("database");
+    let db =
+        PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
 
     let addresses = [
         address!("27b1fdb04752bbc536007a920d24acb045561c26"),
@@ -1232,7 +1268,8 @@ fn test_read_receipts() {
         .tempdir()
         .unwrap();
 
-    let db = PersistentDB::new(path.path().to_path_buf(), None).expect("database");
+    let db =
+        PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
 
     let target_height = 100;
     let mut total_receipts = 0;
