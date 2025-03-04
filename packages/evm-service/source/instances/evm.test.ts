@@ -67,9 +67,12 @@ describe<{
 	it("should call log hook", async ({ sandbox, instance }) => {
 		let hookCalled = 0;
 
-		const evm = new Evm(sandbox.app.dataPath("loghook"), (level, message) => {
-			//console.log("CALLED HOOK", { level, message, hookCalled });
-			hookCalled++;
+		const evm = new Evm({
+			path: sandbox.app.dataPath("loghook"),
+			logger: (level, message) => {
+				//console.log("CALLED HOOK", { level, message, hookCalled });
+				hookCalled++;
+			},
 		});
 
 		assert.equal(hookCalled, 0);
