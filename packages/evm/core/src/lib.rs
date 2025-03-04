@@ -1,6 +1,7 @@
 pub mod account;
 pub mod db;
 mod events;
+pub mod historical;
 pub mod legacy;
 pub mod logger;
 pub mod logs_bloom;
