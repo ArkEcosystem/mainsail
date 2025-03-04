@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     account::AccountInfoExtended,
+    historical::{AccountHistoryWriter, HistoricalAccountData},
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::{LogLevel, Logger},
     receipt::{map_execution_result, TxReceipt},
@@ -19,7 +20,7 @@ use crate::{
 };
 
 #[derive(Debug)]
-struct AddressWrapper(Address);
+pub(crate) struct AddressWrapper(Address);
 impl heed::BytesEncode<'_> for AddressWrapper {
     type EItem = AddressWrapper;
 
@@ -37,7 +38,7 @@ impl heed::BytesDecode<'_> for AddressWrapper {
 }
 
 #[derive(Debug)]
-struct LegacyAddressWrapper(LegacyAddress);
+pub(crate) struct LegacyAddressWrapper(LegacyAddress);
 impl heed::BytesEncode<'_> for LegacyAddressWrapper {
     type EItem = LegacyAddressWrapper;
 
@@ -55,7 +56,7 @@ impl heed::BytesDecode<'_> for LegacyAddressWrapper {
 }
 
 #[derive(Debug)]
-struct ContractWrapper(B256);
+pub(crate) struct ContractWrapper(B256);
 impl heed::BytesEncode<'_> for ContractWrapper {
     type EItem = ContractWrapper;
 
@@ -64,10 +65,10 @@ impl heed::BytesEncode<'_> for ContractWrapper {
     }
 }
 
-type HeedHeight = heed::types::U64<heed::byteorder::LittleEndian>;
+type HeedHeight = heed::types::U64<heed::byteorder::BigEndian>;
 
 #[derive(Debug)]
-struct StorageEntryWrapper(U256, U256);
+pub(crate) struct StorageEntryWrapper(U256, U256);
 impl heed::BytesEncode<'_> for StorageEntryWrapper {
     type EItem = StorageEntryWrapper;
 
@@ -105,22 +106,28 @@ impl Comparator for StorageEntryDupSortCmp {
 
 // txHash -> receipt
 #[derive(Default, Debug, Serialize, Deserialize)]
-struct CommitReceipts {
+pub(crate) struct CommitReceipts {
     accounts_hash: B256,
     storage_hash: B256,
     contracts_hash: B256,
     tx_receipts: HashMap<B256, TxReceipt>,
 }
 
-struct InnerStorage {
-    accounts: heed::Database<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>,
-    commits: heed::Database<HeedHeight, heed::types::SerdeBincode<CommitReceipts>>,
-    contracts: heed::Database<ContractWrapper, heed::types::SerdeBincode<Bytecode>>,
-    legacy_attributes:
+pub(crate) struct InnerStorage {
+    pub accounts: heed::Database<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>,
+    pub accounts_history: Option<
+        heed::Database<
+            HeedHeight,
+            heed::types::SerdeBincode<BTreeMap<Address, HistoricalAccountData>>,
+        >,
+    >,
+    pub commits: heed::Database<HeedHeight, heed::types::SerdeBincode<CommitReceipts>>,
+    pub contracts: heed::Database<ContractWrapper, heed::types::SerdeBincode<Bytecode>>,
+    pub legacy_attributes:
         heed::Database<AddressWrapper, heed::types::SerdeBincode<LegacyAccountAttributes>>,
-    legacy_cold_wallets:
+    pub legacy_cold_wallets:
         heed::Database<LegacyAddressWrapper, heed::types::SerdeBincode<LegacyColdWallet>>,
-    storage: heed::Database<AddressWrapper, StorageEntryWrapper>,
+    pub storage: heed::Database<AddressWrapper, StorageEntryWrapper>,
 }
 
 // A (height, round) pair used to associate state with a processable unit.
@@ -157,8 +164,9 @@ pub struct GenesisInfo {
 }
 
 pub struct PersistentDB {
-    env: heed::Env,
-    inner: RefCell<InnerStorage>,
+    pub(crate) env: heed::Env,
+    pub(crate) inner: RefCell<InnerStorage>,
+    pub(crate) history_writer: Option<AccountHistoryWriter>,
     logger: Logger,
     pub genesis_info: Option<GenesisInfo>,
 }
@@ -238,6 +246,16 @@ impl PersistentDB {
                 &mut wtxn,
                 Some("accounts"),
             )?;
+
+        let (accounts_history, history_writer) = match opts.history_size {
+            Some(history_size) if history_size > 0 => {
+                let db = env.create_database::<HeedHeight, heed::types::SerdeBincode<
+            BTreeMap<Address, HistoricalAccountData>>>(&mut wtxn, Some("accounts_history")) ?;
+                (Some(db), Some(AccountHistoryWriter::new(history_size)))
+            }
+            _ => (None, None),
+        };
+
         let commits = env
             .create_database::<HeedHeight, heed::types::SerdeBincode<CommitReceipts>>(
                 &mut wtxn,
@@ -272,12 +290,14 @@ impl PersistentDB {
             env,
             inner: RefCell::new(InnerStorage {
                 accounts,
+                accounts_history,
                 commits,
                 contracts,
                 legacy_attributes,
                 legacy_cold_wallets,
                 storage,
             }),
+            history_writer,
             logger: opts.logger.unwrap_or_default(),
             genesis_info: None,
         })
@@ -603,7 +623,7 @@ impl PersistentDB {
             storage.par_sort_by_key(|a| a.address);
 
             // Update accounts
-            for (address, account) in accounts.into_iter() {
+            for (address, account) in accounts.iter() {
                 let address = AddressWrapper(*address);
 
                 if let Some(account) = account {
@@ -611,6 +631,22 @@ impl PersistentDB {
                 } else {
                     inner.accounts.delete(rwtxn, &address)?;
                 }
+            }
+
+            // Update account history
+            if let Some(accounts_history) = &inner.accounts_history {
+                self.history_writer
+                    .as_ref()
+                    .expect("history writer")
+                    .insert(
+                        rwtxn,
+                        accounts_history,
+                        key.0,
+                        accounts
+                            .into_iter()
+                            .map(|a| (a.0, a.1.take().unwrap_or_default()))
+                            .collect(),
+                    )?;
             }
 
             // Update legacy attributes
