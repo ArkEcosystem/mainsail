@@ -145,6 +145,8 @@ export class Validator implements Contracts.Validator.Validator {
 
 		const validator = this.createTransactionValidator();
 
+		let totalFee = BigNumber.ZERO;
+
 		try {
 			await validator.getEvm().initializeGenesis(this.genesisInfo);
 			await validator.getEvm().prepareNextCommit({ commitKey });
@@ -188,6 +190,10 @@ export class Validator implements Contracts.Validator.Validator {
 					gasLeft -= Number(result.gasUsed);
 
 					transaction.data.gasUsed = Number(result.gasUsed);
+					totalFee = totalFee.plus(
+						this.gasFeeCalculator.calculateConsumed(transaction.data.gasPrice, transaction.data.gasUsed),
+					);
+
 					candidateTransactions.push(transaction);
 				} catch (error) {
 					this.logger.warning(
@@ -201,7 +207,7 @@ export class Validator implements Contracts.Validator.Validator {
 			}
 
 			await validator.getEvm().updateRewardsAndVotes({
-				blockReward: BigNumber.make(milestone.reward).toBigInt(),
+				blockReward: BigNumber.make(milestone.reward).plus(totalFee).toBigInt(),
 				commitKey,
 				specId: milestone.evmSpec,
 				timestamp: BigInt(timestamp),

@@ -84,7 +84,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			this.#verifyConsumedAllGas(block, processResult);
 			this.#verifyTotalFee(block);
-			await this.#updateRewardsAndVotes(unit);
+			await this.#updateRewardsAndVotes(block);
 			await this.#calculateActiveValidators(unit);
 			await this.#verifyStateHash(block);
 			await this.#verifyLogsBloom(block);
@@ -241,12 +241,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		handler.emitEvents(transaction);
 	}
 
-	async #updateRewardsAndVotes(unit: Contracts.Processor.ProcessableUnit) {
+	async #updateRewardsAndVotes(block: Contracts.Crypto.Block) {
 		const milestone = this.configuration.getMilestone();
-		const block = unit.getBlock();
 
 		await this.evm.updateRewardsAndVotes({
-			blockReward: BigNumber.make(milestone.reward).toBigInt(),
+			blockReward: BigNumber.make(milestone.reward).plus(block.header.totalFee).toBigInt(),
 			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
 			specId: milestone.evmSpec,
 			timestamp: BigInt(block.header.timestamp),
