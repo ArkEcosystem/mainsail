@@ -268,6 +268,9 @@ impl EvmInner {
         let mut rewards = HashMap::<Address, u128>::new();
         rewards.insert(ctx.validator_address, ctx.block_reward);
 
+        self.logger
+            .log(LogLevel::Debug, format!("validator rewards {:?}", rewards));
+
         match state_commit::apply_rewards(&mut self.persistent_db, &mut pending_commit, rewards) {
             Ok(_) => {
                 // call into consensus contract to update votes
