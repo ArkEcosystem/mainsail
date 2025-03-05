@@ -245,7 +245,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const milestone = this.configuration.getMilestone();
 
 		await this.evm.updateRewardsAndVotes({
-			blockReward: BigNumber.make(milestone.reward).plus(block.header.totalFee).toBigInt(),
+			// TODO: include fee in reward directly? (requires `Verifier` logic to be updated)
+			blockReward: BigNumber.make(block.header.reward).plus(block.header.totalFee).toBigInt(),
 			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
 			specId: milestone.evmSpec,
 			timestamp: BigInt(block.header.timestamp),
