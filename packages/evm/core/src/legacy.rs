@@ -1,5 +1,5 @@
 use bs58;
-use revm::primitives::{alloy_primitives::wrap_fixed_bytes, Address, B256, U256};
+use revm::primitives::{Address, B256, U256, alloy_primitives::wrap_fixed_bytes};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
@@ -91,9 +91,9 @@ fn encode_base58check(data: &[u8]) -> String {
 }
 
 #[cfg(test)]
-mod testsc {
+mod tests {
     use crate::legacy::{
-        decode_base58check, encode_base58check, LegacyAddress, LegacyAddressError,
+        LegacyAddress, LegacyAddressError, decode_base58check, encode_base58check,
     };
 
     #[test]

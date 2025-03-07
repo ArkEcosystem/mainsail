@@ -5,14 +5,14 @@ use std::{
 
 use heed::{Comparator, EnvFlags, EnvOpenOptions};
 use rayon::slice::ParallelSliceMut;
-use revm::{primitives::*, CacheState, Database, DatabaseRef, TransitionState};
+use revm::{CacheState, Database, DatabaseRef, TransitionState, primitives::*};
 use serde::{Deserialize, Serialize};
 
 use crate::{
     account::AccountInfoExtended,
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::{LogLevel, Logger},
-    receipt::{map_execution_result, TxReceipt},
+    receipt::{TxReceipt, map_execution_result},
     state_changes,
     state_commit::StateCommit,
     state_hash,
@@ -526,8 +526,8 @@ impl PersistentDB {
     pub fn commit(&self, state_commit: &mut StateCommit) -> Result<(), Error> {
         let StateCommit {
             key,
-            ref mut change_set,
-            ref results,
+            change_set,
+            results,
         } = state_commit;
 
         match self.commit_to_db(*key, change_set, results) {
@@ -558,12 +558,12 @@ impl PersistentDB {
 
         let mut apply_changes = |rwtxn: &mut heed::RwTxn| -> Result<(), Error> {
             let state_changes::StateChangeset {
-                ref mut accounts,
-                ref mut storage,
-                ref mut contracts,
-                ref mut legacy_attributes,
-                ref mut legacy_cold_wallets,
-                ref mut merged_legacy_cold_wallets,
+                accounts,
+                storage,
+                contracts,
+                legacy_attributes,
+                legacy_cold_wallets,
+                merged_legacy_cold_wallets,
             } = change_set;
 
             accounts.par_sort_by_key(|a| a.0);
@@ -608,7 +608,7 @@ impl PersistentDB {
             for state_changes::StorageChangeset {
                 address,
                 wipe_storage,
-                ref mut storage,
+                storage,
             } in storage.into_iter()
             {
                 let mut iter = inner.storage.iter_mut(rwtxn)?;
