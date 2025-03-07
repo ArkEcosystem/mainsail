@@ -4,8 +4,8 @@ members = ["core", "bindings"]
 
 [workspace.package]
 version = "0.1.0"
-rust-version = "1.75"
-edition = "2021"
+rust-version = "1.85"
+edition = "2024"
 license = "GPL-3.0-only"
 authors = [""]
 
