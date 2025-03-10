@@ -20,6 +20,8 @@ export interface Configuration {
 
 	getHeight(): number;
 
+	getGenesisHeight(): number;
+
 	isNewMilestone(height?: number): boolean;
 
 	getMilestone(height?: number): Milestone;

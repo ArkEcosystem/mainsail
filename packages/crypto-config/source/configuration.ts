@@ -5,6 +5,7 @@ import deepmerge from "deepmerge";
 import clone from "lodash.clone";
 import get from "lodash.get";
 import set from "lodash.set";
+
 @injectable()
 export class Configuration implements Contracts.Crypto.Configuration {
 	#config: Contracts.Crypto.NetworkConfig | undefined;
@@ -67,6 +68,11 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 	public getHeight(): number {
 		return this.#height;
+	}
+
+	public getGenesisHeight(): number {
+		assert.defined(this.#config);
+		return this.#config.genesisBlock.block.height;
 	}
 
 	public isNewMilestone(height?: number): boolean {
