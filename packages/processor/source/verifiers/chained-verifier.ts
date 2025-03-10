@@ -8,14 +8,15 @@ export class ChainedVerifier implements Contracts.Processor.Handler {
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.State.Store)
-	private readonly stateStore!: Contracts.State.Store;
+	private readonly store!: Contracts.State.Store;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (unit.getBlock().data.height === 0) {
+		// TODO: Check if someone can exploit this
+		if (unit.getBlock().data.height === this.store.getGenesisHeight()) {
 			return;
 		}
 
-		if (!isBlockChained(this.stateStore.getLastBlock().data, unit.getBlock().data)) {
+		if (!isBlockChained(this.store.getLastBlock().data, unit.getBlock().data)) {
 			throw new Exceptions.BlockNotChained(unit.getBlock());
 		}
 	}

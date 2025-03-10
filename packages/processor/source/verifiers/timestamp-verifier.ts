@@ -8,7 +8,7 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.State.Store)
-	private readonly stateStore!: Contracts.State.Store;
+	private readonly store!: Contracts.State.Store;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
@@ -17,7 +17,7 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 	private readonly timestampCalculator!: Contracts.BlockchainUtils.TimestampCalculator;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (unit.getBlock().data.height === 0) {
+		if (unit.getBlock().data.height === this.store.getGenesisHeight()) {
 			return;
 		}
 
@@ -27,10 +27,7 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 
 		if (
 			unit.getBlock().data.timestamp <
-			this.timestampCalculator.calculateMinimalTimestamp(
-				this.stateStore.getLastBlock(),
-				unit.getBlock().data.round,
-			)
+			this.timestampCalculator.calculateMinimalTimestamp(this.store.getLastBlock(), unit.getBlock().data.round)
 		) {
 			throw new Exceptions.InvalidTimestamp(unit.getBlock());
 		}
