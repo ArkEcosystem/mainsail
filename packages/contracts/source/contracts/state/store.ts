@@ -10,6 +10,8 @@ export interface Store extends CommitHandler {
 	setHeight(height: number): void;
 	getHeight(): number;
 
+	getGenesisHeight(): number;
+
 	setTotalRound(totalRound: number): void;
 	getTotalRound(): number;
 }

@@ -49,6 +49,12 @@ export class Store implements Contracts.State.Store {
 		}
 	}
 
+	public getGenesisHeight(): number {
+		assert.defined(this.#genesisCommit);
+
+		return this.#genesisCommit.block.data.height;
+	}
+
 	public getHeight(): number {
 		return this.#height;
 	}
