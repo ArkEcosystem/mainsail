@@ -793,7 +793,7 @@ describe<{
 					blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
 					...deployConfig,
 				}),
-			"Panic in async function",
+			"transaction validation error: lack of funds (0) for max fee (2)",
 		);
 	});
 
