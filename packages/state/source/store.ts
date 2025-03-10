@@ -13,19 +13,19 @@ export class Store implements Contracts.State.Store {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	#genesisBlock?: Contracts.Crypto.Commit;
+	#genesisCommit?: Contracts.Crypto.Commit;
 	#lastBlock?: Contracts.Crypto.Block;
 	#height = 0;
 	#totalRound = 0;
 
 	public setGenesisCommit(block: Contracts.Crypto.Commit): void {
-		this.#genesisBlock = block;
+		this.#genesisCommit = block;
 	}
 
 	public getGenesisCommit(): Contracts.Crypto.Commit {
-		assert.defined(this.#genesisBlock);
+		assert.defined(this.#genesisCommit);
 
-		return this.#genesisBlock;
+		return this.#genesisCommit;
 	}
 
 	public setLastBlock(block: Contracts.Crypto.Block): void {
