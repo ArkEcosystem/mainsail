@@ -656,14 +656,11 @@ impl EvmInner {
                         match err {
                             revm::primitives::InvalidTransaction::CallGasCostMoreThanGasLimit
                             | revm::primitives::InvalidTransaction::NonceTooHigh { .. }
-                            | revm::primitives::InvalidTransaction::NonceTooLow { .. } => {
-                                return Err(EVMError::Transaction(err));
-                            }
-                            revm::primitives::InvalidTransaction::LackOfFundForMaxFee {
-                                fee,
-                                balance,
+                            | revm::primitives::InvalidTransaction::NonceTooLow { .. }
+                            | revm::primitives::InvalidTransaction::LackOfFundForMaxFee {
+                                ..
                             } => {
-                                todo!("lack of funds (fee={} balance={})", fee, balance);
+                                return Err(EVMError::Transaction(err));
                             }
                             // revm::primitives::InvalidTransaction::PriorityFeeGreaterThanMaxFee => todo!(),
                             // revm::primitives::InvalidTransaction::GasPriceLessThanBasefee => todo!(),
