@@ -260,7 +260,7 @@ export class Restore {
 				// Update block related validator attributes
 				const validatorAttributes = context.validatorAttributes[block.header.generatorAddress];
 				if (!validatorAttributes) {
-					if (block.header.height !== 0) {
+					if (block.header.height !== this.configuration.getGenesisHeight()) {
 						throw new Error("unexpected validator");
 					}
 				} else {

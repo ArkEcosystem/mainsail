@@ -24,7 +24,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 		try {
 			const constants = this.configuration.getMilestone(blockData.height);
 
-			if (blockData.height === 0) {
+			if (blockData.height === this.configuration.getGenesisHeight()) {
 				let validPreviousBlock = false;
 				if (constants.snapshot) {
 					assert.defined(constants.snapshot.hash);
@@ -39,7 +39,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 				}
 			}
 
-			if (blockData.height !== 0 && !blockData.previousBlock) {
+			if (blockData.height !== this.configuration.getGenesisHeight() && !blockData.previousBlock) {
 				result.errors.push("Invalid previous block");
 			}
 
