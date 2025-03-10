@@ -196,7 +196,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	async #verifyStateHash(block: Contracts.Crypto.Block): Promise<void> {
 		let previousStateHash;
-		if (block.header.height === this.stateStore.getGenesisHeight()) {
+		if (block.header.height === this.configuration.getGenesisHeight()) {
 			// Assume snapshot is present if the previous block points to a non-zero hash
 			if (block.header.previousBlock !== "0000000000000000000000000000000000000000000000000000000000000000") {
 				assert.defined(this.snapshotImporter);

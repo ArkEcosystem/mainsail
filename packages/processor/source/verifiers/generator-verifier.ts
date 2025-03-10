@@ -6,17 +6,17 @@ export class GeneratorVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
 	@inject(Identifiers.BlockchainUtils.ProposerCalculator)
 	private readonly proposerCalculator!: Contracts.BlockchainUtils.ProposerCalculator;
 
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	@inject(Identifiers.State.Store)
-	private readonly store!: Contracts.State.Store;
-
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (unit.getBlock().data.height === this.store.getGenesisHeight()) {
+		if (unit.getBlock().data.height === this.configuration.getGenesisHeight()) {
 			return;
 		}
 
