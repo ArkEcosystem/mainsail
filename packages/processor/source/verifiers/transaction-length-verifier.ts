@@ -16,7 +16,7 @@ export class TransactionLengthVerifier implements Contracts.Processor.Handler {
 
 		const maxTransactions = this.configuration.getMilestone().block.maxTransactions;
 
-		if (unit.getBlock().data.transactions.length > maxTransactions) {
+		if (unit.getBlock().data.numberOfTransactions > maxTransactions) {
 			throw new Exceptions.InvalidBlockTransactionLength(unit.getBlock());
 		}
 	}
