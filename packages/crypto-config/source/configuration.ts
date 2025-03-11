@@ -21,6 +21,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			milestones: clone(config.milestones) as Contracts.Crypto.Milestone[],
 			network: clone(config.network),
 		};
+		this.#height = this.#config.genesisBlock.block.height;
 
 		this.#validateMilestones();
 		this.#buildConstants();
@@ -89,7 +90,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 	public getMilestone(height?: number): Contracts.Crypto.Milestone {
 		if (!this.#milestone || !this.#milestones) {
-			throw new Error();
+			throw new Error(`Missing milestone for height ${height}`);
 		}
 
 		if (height === undefined) {
