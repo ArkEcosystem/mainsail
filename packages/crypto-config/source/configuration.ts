@@ -217,13 +217,15 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			throw new Error();
 		}
 
+		const initialHeight = this.#config.genesisBlock.block.height;
+
 		const validatorMilestones = this.#config.milestones
 			.sort((a, b) => a.height - b.height)
 			.filter((milestone) => milestone.activeValidators !== undefined);
 
 		for (let index = 0; index < validatorMilestones.length; index++) {
 			const current = validatorMilestones[index];
-			if (current.height > 0 && current.activeValidators === 0) {
+			if (current.height > initialHeight && current.activeValidators === 0) {
 				throw new Exceptions.InvalidNumberOfActiveValidatorsError(
 					`Bad milestone at height: ${current.height}. The number of validators must be greater than 0.`,
 				);
@@ -239,7 +241,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 				continue;
 			}
 
-			if (previous.height === 0 && previous.activeValidators === 0) {
+			if (previous.height === initialHeight && previous.activeValidators === 0) {
 				continue;
 			}
 

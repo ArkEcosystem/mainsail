@@ -166,7 +166,7 @@ export class Bootstrapper {
 
 	async #tryImportSnapshot(): Promise<void> {
 		const genesisBlock = this.stateStore.getGenesisCommit();
-		const milestone = this.configuration.getMilestone(0);
+		const milestone = this.configuration.getMilestone();
 
 		// assume snapshot is present if the previous block points to a non-zero hash
 		if (
