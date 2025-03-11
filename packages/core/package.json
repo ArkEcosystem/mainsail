@@ -20,6 +20,7 @@
 		"clean": "del distribution",
 		"full:testnet": "cross-env-shell CORE_PATH_CONFIG=./bin/config/testnet pnpm run mainsail core:run -- --env=test",
 		"mainsail": "node ./bin/run.js",
+		"mainsail:debug": "node --inspect-brk ./bin/run.js",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 pnpm run test",
