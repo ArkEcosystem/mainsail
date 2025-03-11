@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
-import { assert, BigNumber } from "@mainsail/utils";
+import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class Verifier implements Contracts.Crypto.BlockVerifier {
@@ -24,24 +24,25 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 		try {
 			const constants = this.configuration.getMilestone(blockData.height);
 
-			if (blockData.height === this.configuration.getGenesisHeight()) {
-				let validPreviousBlock = false;
-				if (constants.snapshot) {
-					assert.defined(constants.snapshot.hash);
-					validPreviousBlock = blockData.previousBlock === constants.snapshot.hash;
-				} else {
-					validPreviousBlock =
-						blockData.previousBlock === "0000000000000000000000000000000000000000000000000000000000000000";
-				}
+			// TODO: Check if can be removed
+			// if (blockData.height === this.configuration.getGenesisHeight()) {
+			// 	let validPreviousBlock = false;
+			// 	if (constants.snapshot) {
+			// 		assert.defined(constants.snapshot.hash);
+			// 		validPreviousBlock = blockData.previousBlock === constants.snapshot.hash;
+			// 	} else {
+			// 		validPreviousBlock =
+			// 			blockData.previousBlock === "0000000000000000000000000000000000000000000000000000000000000000";
+			// 	}
 
-				if (!validPreviousBlock) {
-					result.errors.push("Genesis block has invalid previous block");
-				}
-			}
+			// 	if (!validPreviousBlock) {
+			// 		result.errors.push("Genesis block has invalid previous block");
+			// 	}
+			// }
 
-			if (blockData.height !== this.configuration.getGenesisHeight() && !blockData.previousBlock) {
-				result.errors.push("Invalid previous block");
-			}
+			// if (blockData.height !== this.configuration.getGenesisHeight() && !blockData.previousBlock) {
+			// 	result.errors.push("Invalid previous block");
+			// }
 
 			if (!blockData.reward.isEqualTo(constants.reward)) {
 				result.errors.push(
