@@ -5,7 +5,7 @@ import { Contracts } from "@mainsail/contracts";
 export class MilestonesGenerator {
 	#data: Contracts.Crypto.MilestonePartial[] = [];
 
-	setInitial(options: Contracts.NetworkGenerator.MilestoneOptions): MilestonesGenerator {
+	setInitial(options: Contracts.NetworkGenerator.InternalOptions): MilestonesGenerator {
 		this.#data = [
 			{
 				activeValidators: 0,
@@ -23,7 +23,7 @@ export class MilestonesGenerator {
 					minimumGasLimit: 21_000,
 					minimumGasPrice: 5 * 1e9,
 				},
-				height: 0,
+				height: options.initialHeight,
 				reward: "0",
 				satoshi: {
 					decimals: 18,
@@ -40,7 +40,7 @@ export class MilestonesGenerator {
 			},
 			{
 				activeValidators: options.validators,
-				height: 1,
+				height: options.initialHeight + 1,
 			},
 		];
 
