@@ -35,22 +35,24 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 	}
 
 	public calculateRound(height: number): Contracts.Shared.RoundInfo {
-		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(0, "activeValidators");
-		let activeValidators = this.configuration.getMilestone(0).activeValidators;
+		const genesisHeight = this.configuration.getGenesisHeight();
+
+		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(genesisHeight, "activeValidators");
+		let activeValidators = this.configuration.getMilestone(genesisHeight).activeValidators;
 
 		// Genesis round requires special treatment
-		if (height === 0) {
-			return { maxValidators: 0, nextRound: 1, round: 0, roundHeight: 0 };
+		if (height === genesisHeight) {
+			return { maxValidators: 0, nextRound: 1, round: 0, roundHeight: genesisHeight };
 		}
 
 		const result: Contracts.Shared.RoundInfo = {
 			maxValidators: 0,
 			nextRound: 0,
 			round: 1,
-			roundHeight: 1,
+			roundHeight: genesisHeight + 1,
 		};
 
-		let milestoneHeight = 0;
+		let milestoneHeight = genesisHeight;
 
 		const milestones = this.getMilestonesWhichAffectActiveValidatorCount(this.configuration);
 		for (let index = 0; index < milestones.length - 1; index++) {
@@ -59,7 +61,7 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 			}
 
 			const spanHeight = nextMilestone.height - milestoneHeight - 1;
-			if (milestoneHeight > 0 && spanHeight % activeValidators !== 0) {
+			if (milestoneHeight > genesisHeight && spanHeight % activeValidators !== 0) {
 				throw new Exceptions.InvalidMilestoneConfigurationError(
 					`Bad milestone at height: ${height}. The number of validators can only be changed at the beginning of a new round.`,
 				);
@@ -116,15 +118,17 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 	public getMilestonesWhichAffectActiveValidatorCount = (
 		configuration: Contracts.Crypto.Configuration,
 	): Array<MilestoneSearchResult> => {
+		const genesisHeight = this.configuration.getGenesisHeight();
+
 		const milestones: Array<MilestoneSearchResult> = [
 			{
-				data: configuration.getMilestone(0).activeValidators,
+				data: configuration.getMilestone(genesisHeight).activeValidators,
 				found: true,
-				height: 0,
+				height: genesisHeight,
 			},
 		];
 
-		let nextMilestone = configuration.getNextMilestoneWithNewKey(0, "activeValidators");
+		let nextMilestone = configuration.getNextMilestoneWithNewKey(genesisHeight, "activeValidators");
 
 		while (nextMilestone.found) {
 			milestones.push(nextMilestone);
