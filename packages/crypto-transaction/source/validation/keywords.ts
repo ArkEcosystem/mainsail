@@ -54,7 +54,7 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 
 						// The height check is needed for when e.g. the genesis block itself is being built.
 						const height = configuration.getHeight();
-						let valid = height === 0;
+						let valid = height === configuration.getGenesisHeight();
 
 						// Otherwise lookup by transaction id
 						if (!valid && parentSchema && parentSchema.parentData && parentSchema.parentData.id) {
