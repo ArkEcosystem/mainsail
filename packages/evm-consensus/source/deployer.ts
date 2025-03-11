@@ -77,7 +77,7 @@ export class Deployer {
 	}
 
 	#getBlockContext(): Contracts.Evm.BlockContext {
-		const milestone = this.configuration.getMilestone(0);
+		const milestone = this.configuration.getMilestone();
 
 		// Commit Key chosen in a way such that it does not conflict with blocks.
 		return {
@@ -89,7 +89,7 @@ export class Deployer {
 	}
 
 	#getSpecId(): Contracts.Evm.SpecId {
-		const milestone = this.configuration.getMilestone(0);
+		const milestone = this.configuration.getMilestone();
 		return milestone.evmSpec;
 	}
 
