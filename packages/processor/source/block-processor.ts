@@ -227,7 +227,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		});
 
 		if (block.header.logsBloom !== logsBloom) {
-			throw new Error(`Logs bloom mismatch! ${block.header.stateHash} != ${logsBloom}`);
+			throw new Error(`Logs bloom mismatch! ${block.header.logsBloom} != ${logsBloom}`);
 		}
 	}
 
