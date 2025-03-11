@@ -136,7 +136,7 @@ export class ConfigurationGenerator {
 						genesisBlock: {
 							// @ts-ignore
 							block: {
-								height: 0,
+								height: internalOptions.initialHeight,
 							},
 						},
 						milestones,
