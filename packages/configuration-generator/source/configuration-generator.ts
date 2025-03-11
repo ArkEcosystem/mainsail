@@ -132,8 +132,12 @@ export class ConfigurationGenerator {
 						.generate();
 
 					this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
-						// @ts-ignore
-						genesisBlock: {},
+						genesisBlock: {
+							// @ts-ignore
+							block: {
+								height: 0,
+							},
+						},
 						milestones,
 						// @ts-ignore
 						network: {},

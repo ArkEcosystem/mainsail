@@ -90,7 +90,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 	public getMilestone(height?: number): Contracts.Crypto.Milestone {
 		if (!this.#milestone || !this.#milestones) {
-			throw new Error(`Missing milestone for height ${height}`);
+			throw new Error(`Milestones are not initialized`);
 		}
 
 		if (height === undefined) {

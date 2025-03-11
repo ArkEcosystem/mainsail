@@ -5,13 +5,11 @@ import { Configuration } from "./configuration.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		try {
-			this.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		this.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-			const config: Contracts.Crypto.NetworkConfigPartial = this.#fromConfigRepository();
+		const config: Contracts.Crypto.NetworkConfigPartial = this.#fromConfigRepository();
 
-			this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(config);
-		} catch {}
+		this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(config);
 	}
 
 	#fromConfigRepository(): Contracts.Crypto.NetworkConfigPartial {

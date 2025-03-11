@@ -78,8 +78,13 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CoreSnapshotLegacyImporter).register();
 	await app.resolve(EvmService).register();
 
-	// @ts-ignore
 	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
+		genesisBlock: {
+			// @ts-ignore
+			block: {
+				height: 0,
+			},
+		},
 		milestones: [
 			{
 				evmSpec: Contracts.Evm.SpecId.SHANGHAI,
