@@ -53,12 +53,6 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 				result.errors.push("Serialized payload size mismatch");
 			}
 
-			if (blockData.totalGasUsed > constants.block.maxGasLimit && blockData.height > 0) {
-				result.errors.push(
-					`Total gas used ${blockData.totalGasUsed} exceeds max gas limit ${constants.block.maxGasLimit}`,
-				);
-			}
-
 			if (block.transactions.length !== blockData.numberOfTransactions) {
 				result.errors.push("Invalid number of transactions");
 			}

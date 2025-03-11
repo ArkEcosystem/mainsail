@@ -41,6 +41,14 @@ export class InvalidBlockTransactionLength extends ValidatorException {
 	}
 }
 
+export class ExceededGasLimit extends ValidatorException {
+	public constructor(block: Block, maxGasLimit: number) {
+		super(
+			`Block ${block.data.id} with  total gas used ${block.data.totalGasUsed} exceeds max gas limit of ${maxGasLimit}.`,
+		);
+	}
+}
+
 export class FutureBlock extends ValidatorException {
 	public constructor(block: Block) {
 		super(`Block ${block.data.id} timestamp is from future.`);

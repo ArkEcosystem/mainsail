@@ -3,6 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import {
 	ChainedVerifier,
+	GasLimitVerifier,
 	GeneratorVerifier,
 	RewardVerifier,
 	TimestampVerifier,
@@ -27,5 +28,7 @@ export class BlockVerifier implements Contracts.Processor.Verifier {
 		await this.app.resolve(RewardVerifier).execute(unit);
 
 		await this.app.resolve(TransactionLengthVerifier).execute(unit);
+
+		await this.app.resolve(GasLimitVerifier).execute(unit);
 	}
 }
