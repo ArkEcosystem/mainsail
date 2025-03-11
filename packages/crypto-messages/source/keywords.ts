@@ -1,65 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 import { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
-export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
-	const limitToActiveValidators: FuncKeywordDefinition = {
-		// TODO: Check type (same as bignum)
-		// @ts-ignore
-		compile(schema) {
-			return (data, parentSchema: AnySchemaObject) => {
-				if (!Array.isArray(data)) {
-					return false;
-				}
-
-				const height = parseHeight(parentSchema);
-				const { activeValidators } = configuration.getMilestone(height ?? 1);
-				const minimum = schema.minimum !== undefined ? schema.minimum : activeValidators;
-
-				if (data.length < minimum || data.length > activeValidators) {
-					return false;
-				}
-
-				return true;
-			};
-		},
-		errors: false,
-		keyword: "limitToActiveValidators",
-		metaSchema: {
-			properties: {
-				minimum: { type: "integer" },
-			},
-			type: "object",
-		},
-	};
-
-	const isValidatorIndex: FuncKeywordDefinition = {
-		// TODO: Check type (same as bignum)
-		// @ts-ignore
-		compile() {
-			return (data, parentSchema: AnySchemaObject) => {
-				const height = parseHeight(parentSchema);
-				const { activeValidators } = configuration.getMilestone(height ?? 1);
-
-				if (!Number.isInteger(data)) {
-					return false;
-				}
-
-				return data >= 0 && data < activeValidators;
-			};
-		},
-		errors: false,
-		keyword: "isValidatorIndex",
-		metaSchema: {
-			type: "object",
-		},
-	};
-
-	return {
-		isValidatorIndex,
-		limitToActiveValidators,
-	};
-};
-
 const parseHeight = (parentSchema): number | undefined => {
 	if (!parentSchema || !parentSchema.parentData) {
 		return undefined;
@@ -94,4 +35,63 @@ const parseHeight = (parentSchema): number | undefined => {
 	// height: 4 byte (8 hex)
 	const offset = lockProofSize + 2 + 12;
 	return Buffer.from(serialized.slice(offset, offset + 8), "hex").readUInt32LE();
+};
+
+export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
+	const limitToActiveValidators: FuncKeywordDefinition = {
+		// TODO: Check type (same as bignum)
+		// @ts-ignore
+		compile(schema) {
+			return (data, parentSchema: AnySchemaObject) => {
+				if (!Array.isArray(data)) {
+					return false;
+				}
+
+				const height = parseHeight(parentSchema);
+				const { activeValidators } = configuration.getMilestone(height);
+				const minimum = schema.minimum !== undefined ? schema.minimum : activeValidators;
+
+				if (data.length < minimum || data.length > activeValidators) {
+					return false;
+				}
+
+				return true;
+			};
+		},
+		errors: false,
+		keyword: "limitToActiveValidators",
+		metaSchema: {
+			properties: {
+				minimum: { type: "integer" },
+			},
+			type: "object",
+		},
+	};
+
+	const isValidatorIndex: FuncKeywordDefinition = {
+		// TODO: Check type (same as bignum)
+		// @ts-ignore
+		compile() {
+			return (data, parentSchema: AnySchemaObject) => {
+				const height = parseHeight(parentSchema);
+				const { activeValidators } = configuration.getMilestone(height);
+
+				if (!Number.isInteger(data)) {
+					return false;
+				}
+
+				return data >= 0 && data < activeValidators;
+			};
+		},
+		errors: false,
+		keyword: "isValidatorIndex",
+		metaSchema: {
+			type: "object",
+		},
+	};
+
+	return {
+		isValidatorIndex,
+		limitToActiveValidators,
+	};
 };
