@@ -44,12 +44,6 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 			// 	result.errors.push("Invalid previous block");
 			// }
 
-			if (!blockData.reward.isEqualTo(constants.reward)) {
-				result.errors.push(
-					["Invalid block reward:", blockData.reward, "expected:", constants.reward].join(" "),
-				);
-			}
-
 			if (blockData.version !== constants.block.version) {
 				result.errors.push("Invalid block version");
 			}

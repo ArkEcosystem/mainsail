@@ -20,6 +20,14 @@ export class InvalidTimestamp extends ValidatorException {
 		super(`Block ${block.data.id} timestamp is too low.`);
 	}
 }
+
+export class InvalidReward extends ValidatorException {
+	public constructor(block: Block, expectedReward: string) {
+		super(
+			`Block ${block.data.id} has invalid reward. Block reward is ${block.data.reward} instead ${expectedReward}.`,
+		);
+	}
+}
 export class FutureBlock extends ValidatorException {
 	public constructor(block: Block) {
 		super(`Block ${block.data.id} timestamp is from future.`);

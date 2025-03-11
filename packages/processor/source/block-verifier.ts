@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { ChainedVerifier, GeneratorVerifier, TimestampVerifier } from "./verifiers/index.js";
+import { ChainedVerifier, GeneratorVerifier, RewardVerifier, TimestampVerifier } from "./verifiers/index.js";
 
 @injectable()
 export class BlockVerifier implements Contracts.Processor.Verifier {
@@ -14,5 +14,7 @@ export class BlockVerifier implements Contracts.Processor.Verifier {
 		await this.app.resolve(TimestampVerifier).execute(unit);
 
 		await this.app.resolve(GeneratorVerifier).execute(unit);
+
+		await this.app.resolve(RewardVerifier).execute(unit);
 	}
 }
