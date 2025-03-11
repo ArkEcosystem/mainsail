@@ -28,6 +28,12 @@ export class InvalidReward extends ValidatorException {
 		);
 	}
 }
+export class InvalidBlockVersion extends ValidatorException {
+	public constructor(block: Block) {
+		super(`Block ${block.data.id} has invalid version.`);
+	}
+}
+
 export class FutureBlock extends ValidatorException {
 	public constructor(block: Block) {
 		super(`Block ${block.data.id} timestamp is from future.`);

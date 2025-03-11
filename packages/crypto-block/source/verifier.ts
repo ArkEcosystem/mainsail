@@ -44,10 +44,6 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 			// 	result.errors.push("Invalid previous block");
 			// }
 
-			if (blockData.version !== constants.block.version) {
-				result.errors.push("Invalid block version");
-			}
-
 			const totalSize = this.headerSize() + block.header.payloadLength;
 			if (totalSize > constants.block.maxPayload) {
 				result.errors.push(`Payload is too large: ${totalSize} > ${constants.block.maxPayload}`);
