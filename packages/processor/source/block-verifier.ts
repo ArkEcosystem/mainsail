@@ -6,6 +6,7 @@ import {
 	GeneratorVerifier,
 	RewardVerifier,
 	TimestampVerifier,
+	TransactionLengthVerifier,
 	VersionVerifier,
 } from "./verifiers/index.js";
 
@@ -24,5 +25,7 @@ export class BlockVerifier implements Contracts.Processor.Verifier {
 		await this.app.resolve(VersionVerifier).execute(unit);
 
 		await this.app.resolve(RewardVerifier).execute(unit);
+
+		await this.app.resolve(TransactionLengthVerifier).execute(unit);
 	}
 }

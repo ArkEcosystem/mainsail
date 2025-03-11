@@ -28,9 +28,16 @@ export class InvalidReward extends ValidatorException {
 		);
 	}
 }
+
 export class InvalidBlockVersion extends ValidatorException {
 	public constructor(block: Block) {
 		super(`Block ${block.data.id} has invalid version.`);
+	}
+}
+
+export class InvalidBlockTransactionLength extends ValidatorException {
+	public constructor(block: Block) {
+		super(`Block ${block.data.id} has exceeded max transactions limit.`);
 	}
 }
 
