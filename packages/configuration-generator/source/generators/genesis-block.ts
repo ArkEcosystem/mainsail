@@ -235,7 +235,7 @@ export class GenesisBlockGenerator extends Generator {
 
 		const payloadBuffers: Buffer[] = [];
 		const commitKey = {
-			height: BigInt(0),
+			height: BigInt(options.initialHeight),
 			round: BigInt(0),
 		};
 		const timestamp = BigInt(dayjs(options.epoch).valueOf());
@@ -362,7 +362,7 @@ export class GenesisBlockGenerator extends Generator {
 		// Load snapshot into EVM
 		const result = await this.snapshotLegacyImporter.import({
 			commitKey: {
-				height: 0n,
+				height: 0n, // TODO: read from snapshot (follow up)
 				round: 0n,
 			},
 			timestamp: dayjs(options.epoch).valueOf(),
