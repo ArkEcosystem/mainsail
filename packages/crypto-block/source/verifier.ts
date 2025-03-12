@@ -22,27 +22,11 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 		};
 
 		try {
-			const constants = this.configuration.getMilestone(blockData.height);
-
-			// TODO: Check if can be removed
-			// if (blockData.height === this.configuration.getGenesisHeight()) {
-			// 	let validPreviousBlock = false;
-			// 	if (constants.snapshot) {
-			// 		assert.defined(constants.snapshot.hash);
-			// 		validPreviousBlock = blockData.previousBlock === constants.snapshot.hash;
-			// 	} else {
-			// 		validPreviousBlock =
-			// 			blockData.previousBlock === "0000000000000000000000000000000000000000000000000000000000000000";
-			// 	}
-
-			// 	if (!validPreviousBlock) {
-			// 		result.errors.push("Genesis block has invalid previous block");
-			// 	}
-			// }
+			const milestone = this.configuration.getMilestone(blockData.height);
 
 			const totalSize = this.headerSize() + block.header.payloadLength;
-			if (totalSize > constants.block.maxPayload) {
-				result.errors.push(`Payload is too large: ${totalSize} > ${constants.block.maxPayload}`);
+			if (totalSize > milestone.block.maxPayload) {
+				result.errors.push(`Payload is too large: ${totalSize} > ${milestone.block.maxPayload}`);
 			}
 
 			if (totalSize !== Buffer.byteLength(block.serialized, "hex")) {
