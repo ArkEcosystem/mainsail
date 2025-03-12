@@ -50,7 +50,7 @@
 		"dayjs": "1.11.10",
 		"fs-extra": "11.2.0",
 		"lodash.clonedeep": "4.5.0",
-		"memoizee": "0.4.15",
+		"memoizee": "0.4.17",
 		"tmp": "0.2.3"
 	},
 	"devDependencies": {
