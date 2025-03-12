@@ -2030,8 +2030,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       cron:
-        specifier: 3.1.6
-        version: 3.1.6
+        specifier: 4.1.0
+        version: 4.1.0
       date-fns:
         specifier: 3.4.0
         version: 3.4.0
@@ -2066,9 +2066,6 @@ importers:
       '@types/capture-console':
         specifier: 1.0.5
         version: 1.0.5
-      '@types/cron':
-        specifier: 2.0.1
-        version: 2.0.1
       '@types/deepmerge':
         specifier: 2.2.0
         version: 2.2.0
@@ -4269,9 +4266,6 @@ packages:
   '@types/chance@1.1.6':
     resolution: {integrity: sha512-V+pm3stv1Mvz8fSKJJod6CglNGVqEQ6OyuqitoDkWywEODM/eJd1eSuIp9xt6DrX8BWZ2eDSIzbw1tPCUTvGbQ==}
 
-  '@types/cron@2.0.1':
-    resolution: {integrity: sha512-WHa/1rtNtD2Q/H0+YTTZoty+/5rcE66iAFX2IY+JuUoOACsevYyFkSYu/2vdw+G5LrmO7Lxowrqm0av4k3qWNQ==}
-
   '@types/deepmerge@2.2.0':
     resolution: {integrity: sha512-FEQYDHh6+Q+QXKSrIY46m+/lAmAj/bk4KpLaam+hArmzaVpMBHLcfwOH2Q2UOkWM7XsdY9PmZpGyPAjh/JRGhQ==}
     deprecated: This is a stub types definition. deepmerge provides its own type definitions, so you do not need this installed.
@@ -4343,9 +4337,6 @@ packages:
 
   '@types/log-process-errors@6.3.1':
     resolution: {integrity: sha512-eXvb1jzPnVOS1skHyNwt7iyt5axqU2nbEOp3ICBbW5UpL3b9PNpCVQ1bovwj7Tkclejhdu+e7kd8hQZvC9Wsgg==}
-
-  '@types/luxon@3.3.8':
-    resolution: {integrity: sha512-jYvz8UMLDgy3a5SkGJne8H7VA7zPV2Lwohjx0V8V31+SqAjNmurWMkk9cQhfvlcnXWudBpK9xPM1n4rljOcHYQ==}
 
   '@types/luxon@3.4.2':
     resolution: {integrity: sha512-TifLZlFudklWlMBfhubvgqTXRzLDI5pCbGa4P8a3wPyUQSW+1xQ5eDsreP9DWHX3tjq1ke96uYG/nwundroWcA==}
@@ -5457,8 +5448,9 @@ packages:
       typescript:
         optional: true
 
-  cron@3.1.6:
-    resolution: {integrity: sha512-cvFiQCeVzsA+QPM6fhjBtlKGij7tLLISnTSvFxVdnFGLdz+ZdXN37kNe0i2gefmdD17XuZA6n2uPVwzl4FxW/w==}
+  cron@4.1.0:
+    resolution: {integrity: sha512-wmcuXr2qP0UZStYgwruG6jC2AYSO9n5VMm2t93hmcEXEjWY3S2bsXe3sfGUrTs/uQ1AvRCrZ0Pp9Q032L/V9tw==}
+    engines: {node: '>=18.x'}
 
   croner@4.1.97:
     resolution: {integrity: sha512-/f6gpQuxDaqXu+1kwQYSckUglPaOrHdbIlBAu0YuW8/Cdb45XwXYNUBXg3r/9Mo6n540Kn/smKcZWko5x99KrQ==}
@@ -7672,8 +7664,8 @@ packages:
   lunr@2.3.9:
     resolution: {integrity: sha512-zTU3DaZaF3Rt9rhN3uBMGQD3dD2/vFQqnvZCDv4dl5iOzq2IZQqTxu90r4E5J+nP70J3ilqVCrbho2eWaeW8Ow==}
 
-  luxon@3.4.4:
-    resolution: {integrity: sha512-zobTr7akeGHnv7eBOXcRgMeCP6+uyYsczwmeRCauvpvaAltgNyTbLH/+VaEAPUeWBT+1GuNmz4wC/6jtQzbbVA==}
+  luxon@3.5.0:
+    resolution: {integrity: sha512-rh+Zjr6DNfUYR3bPwJEnuwDdqMbxZW7LOQfUN4B54+Cl+0o5zaU9RJ6bcidfDtC1cWCZXQ+nvX8bf6bAji37QQ==}
     engines: {node: '>=12'}
 
   madge@6.1.0:
@@ -11626,11 +11618,6 @@ snapshots:
 
   '@types/chance@1.1.6': {}
 
-  '@types/cron@2.0.1':
-    dependencies:
-      '@types/luxon': 3.4.2
-      '@types/node': 20.11.16
-
   '@types/deepmerge@2.2.0':
     dependencies:
       deepmerge: 4.3.1
@@ -11707,8 +11694,6 @@ snapshots:
   '@types/lodash@4.17.13': {}
 
   '@types/log-process-errors@6.3.1': {}
-
-  '@types/luxon@3.3.8': {}
 
   '@types/luxon@3.4.2': {}
 
@@ -13034,10 +13019,10 @@ snapshots:
     optionalDependencies:
       typescript: 5.4.2
 
-  cron@3.1.6:
+  cron@4.1.0:
     dependencies:
-      '@types/luxon': 3.3.8
-      luxon: 3.4.4
+      '@types/luxon': 3.4.2
+      luxon: 3.5.0
 
   croner@4.1.97: {}
 
@@ -15595,7 +15580,7 @@ snapshots:
 
   lunr@2.3.9: {}
 
-  luxon@3.4.4: {}
+  luxon@3.5.0: {}
 
   madge@6.1.0(typescript@5.4.2):
     dependencies:
