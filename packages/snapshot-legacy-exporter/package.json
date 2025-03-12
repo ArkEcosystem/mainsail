@@ -31,7 +31,6 @@
 		"typeorm": "0.3.21"
 	},
 	"devDependencies": {
-		"@types/env-paths": "2.1.0",
 		"@types/fs-extra": "11.0.4",
 		"@types/pg": "8.11.11",
 		"@types/pumpify": "1.4.4",

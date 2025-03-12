@@ -592,9 +592,6 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
-      '@types/env-paths':
-        specifier: 2.1.0
-        version: 2.1.0
       '@types/fast-levenshtein':
         specifier: 0.0.4
         version: 0.0.4
@@ -607,9 +604,6 @@ importers:
       '@types/listr':
         specifier: 0.14.9
         version: 0.14.9
-      '@types/ora':
-        specifier: 3.2.0
-        version: 3.2.0
       '@types/prompts':
         specifier: 2.4.9
         version: 2.4.9
@@ -732,9 +726,6 @@ importers:
         specifier: 0.2.3
         version: 0.2.3
     devDependencies:
-      '@types/env-paths':
-        specifier: 2.1.0
-        version: 2.1.0
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -1028,9 +1019,6 @@ importers:
         specifier: 2.4.2
         version: 2.4.2
     devDependencies:
-      '@types/env-paths':
-        specifier: 2.1.0
-        version: 2.1.0
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -1297,9 +1285,6 @@ importers:
         specifier: 4.3.2
         version: 4.3.2
     devDependencies:
-      '@types/deepmerge':
-        specifier: 2.2.0
-        version: 2.2.0
       '@types/lodash.clone':
         specifier: 4.5.9
         version: 4.5.9
@@ -2045,12 +2030,6 @@ importers:
       '@types/capture-console':
         specifier: 1.0.5
         version: 1.0.5
-      '@types/deepmerge':
-        specifier: 2.2.0
-        version: 2.2.0
-      '@types/env-paths':
-        specifier: 2.1.0
-        version: 2.1.0
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -2125,9 +2104,6 @@ importers:
       '@types/capture-console':
         specifier: 1.0.5
         version: 1.0.5
-      '@types/chalk':
-        specifier: 2.2.0
-        version: 2.2.0
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -2306,9 +2282,6 @@ importers:
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
-      '@types/delay':
-        specifier: 3.1.0
-        version: 3.1.0
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -2405,9 +2378,6 @@ importers:
         specifier: 0.3.21
         version: 0.3.21(better-sqlite3@11.8.1)(pg@8.14.0)(reflect-metadata@0.2.2)
     devDependencies:
-      '@types/env-paths':
-        specifier: 2.1.0
-        version: 2.1.0
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -2826,9 +2796,6 @@ importers:
       '@hapi/hapi':
         specifier: 21.4.0
         version: 21.4.0
-      '@types/deepmerge':
-        specifier: 2.2.0
-        version: 2.2.0
       big-number:
         specifier: 2.0.0
         version: 2.0.0
@@ -4248,27 +4215,11 @@ packages:
   '@types/capture-console@1.0.5':
     resolution: {integrity: sha512-OECSr7P5FzAjBAa70/awBruhZjeBF7MrBs9wS9qfECnb6X0xIQRmdqf9XJTceZrLaZ1teclZKUCzTIFJ4dmJGg==}
 
-  '@types/chalk@2.2.0':
-    resolution: {integrity: sha512-1zzPV9FDe1I/WHhRkf9SNgqtRJWZqrBWgu7JGveuHmmyR9CnAPCie2N/x+iHrgnpYBIcCJWHBoMRv2TRWktsvw==}
-    deprecated: This is a stub types definition for chalk (https://github.com/chalk/chalk). chalk provides its own type definitions, so you don't need @types/chalk installed!
-
   '@types/chance@1.1.6':
     resolution: {integrity: sha512-V+pm3stv1Mvz8fSKJJod6CglNGVqEQ6OyuqitoDkWywEODM/eJd1eSuIp9xt6DrX8BWZ2eDSIzbw1tPCUTvGbQ==}
 
-  '@types/deepmerge@2.2.0':
-    resolution: {integrity: sha512-FEQYDHh6+Q+QXKSrIY46m+/lAmAj/bk4KpLaam+hArmzaVpMBHLcfwOH2Q2UOkWM7XsdY9PmZpGyPAjh/JRGhQ==}
-    deprecated: This is a stub types definition. deepmerge provides its own type definitions, so you do not need this installed.
-
-  '@types/delay@3.1.0':
-    resolution: {integrity: sha512-Mt16D+JxuzA2iu5VTnGS1ziGoaSAD2SZJF4Os3rxUnMk7sBSOkdH43yxoZVxSEud6t1V1JScFBaZA8r6ByjYMw==}
-    deprecated: This is a stub types definition. delay provides its own type definitions, so you do not need this installed.
-
   '@types/duplexify@3.6.4':
     resolution: {integrity: sha512-2eahVPsd+dy3CL6FugAzJcxoraWhUghZGEQJns1kTKfCXWKJ5iG/VkaB05wRVrDKHfOFKqb0X0kXh91eE99RZg==}
-
-  '@types/env-paths@2.1.0':
-    resolution: {integrity: sha512-yq3kN22C5uYFNdj56dT6wp9dliB3994T04CE3KhqpnRaVxMRouJj46TRbfLV2ILGyrNkgA7o38M5R50HQ+BPog==}
-    deprecated: This is a stub types definition. env-paths provides its own type definitions, so you do not need this installed.
 
   '@types/fast-levenshtein@0.0.4':
     resolution: {integrity: sha512-tkDveuitddQCxut1Db8eEFfMahTjOumTJGPHmT9E7KUH+DkVq9WTpVvlfenf3S+uCBeu8j5FP2xik/KfxOEjeA==}
@@ -4353,10 +4304,6 @@ packages:
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
-
-  '@types/ora@3.2.0':
-    resolution: {integrity: sha512-jll99xUKpiFbIFZSQcxm4numfsLaOWBzWNaRk3PvTSE7BPqTzzOCFmS0mQ7m8qkTfmYhuYbehTGsxkvRLPC++w==}
-    deprecated: This is a stub types definition. ora provides its own type definitions, so you do not need this installed.
 
   '@types/parse-json@4.0.2':
     resolution: {integrity: sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==}
@@ -11647,27 +11594,11 @@ snapshots:
     dependencies:
       '@types/node': 20.11.16
 
-  '@types/chalk@2.2.0':
-    dependencies:
-      chalk: 5.4.1
-
   '@types/chance@1.1.6': {}
-
-  '@types/deepmerge@2.2.0':
-    dependencies:
-      deepmerge: 4.3.1
-
-  '@types/delay@3.1.0':
-    dependencies:
-      delay: 6.0.0
 
   '@types/duplexify@3.6.4':
     dependencies:
       '@types/node': 20.11.16
-
-  '@types/env-paths@2.1.0':
-    dependencies:
-      env-paths: 3.0.0
 
   '@types/fast-levenshtein@0.0.4': {}
 
@@ -11751,10 +11682,6 @@ snapshots:
       undici-types: 6.19.8
 
   '@types/normalize-package-data@2.4.4': {}
-
-  '@types/ora@3.2.0':
-    dependencies:
-      ora: 8.2.0
 
   '@types/parse-json@4.0.2': {}
 

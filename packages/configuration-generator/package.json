@@ -55,7 +55,6 @@
 		"tmp": "0.2.3"
 	},
 	"devDependencies": {
-		"@types/env-paths": "2.1.0",
 		"@types/fs-extra": "11.0.4",
 		"@types/tmp": "0.2.6",
 		"env-paths": "3.0.0",

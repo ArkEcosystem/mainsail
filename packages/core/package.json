@@ -93,7 +93,6 @@
 		"prompts": "2.4.2"
 	},
 	"devDependencies": {
-		"@types/env-paths": "2.1.0",
 		"@types/fs-extra": "11.0.4",
 		"@types/prompts": "2.4.9",
 		"@types/tmp": "0.2.6",
