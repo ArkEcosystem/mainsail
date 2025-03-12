@@ -36,7 +36,7 @@
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"boxen": "7.1.1",
+		"boxen": "8.0.1",
 		"dayjs": "1.11.10",
 		"envfile": "7.1.0",
 		"fs-extra": "11.2.0",
