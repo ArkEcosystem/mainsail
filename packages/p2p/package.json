@@ -44,7 +44,7 @@
 		"joi": "17.12.2",
 		"long": "^5.2.3",
 		"protobufjs": "7.2.6",
-		"rate-limiter-flexible": "5.0.0",
+		"rate-limiter-flexible": "6.0.0",
 		"semver": "7.6.0",
 		"ws": "8.16.0"
 	},

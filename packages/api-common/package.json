@@ -33,7 +33,7 @@
 		"ajv": "8.12.0",
 		"joi": "17.12.2",
 		"nanomatch": "1.2.13",
-		"rate-limiter-flexible": "5.0.0"
+		"rate-limiter-flexible": "6.0.0"
 	},
 	"devDependencies": {
 		"@types/ip": "1.1.3",
