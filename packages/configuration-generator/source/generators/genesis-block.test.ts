@@ -25,6 +25,11 @@ describe<{
 
 		// @ts-ignore
 		app.get<Contracts.Crypto.Configuration>(AppIdentifiers.Cryptography.Configuration).setConfig({
+			genesisBlock: {
+				block: {
+					height: 0,
+				},
+			},
 			milestones: [
 				{
 					address: { bech32m: "ark" },
@@ -34,8 +39,8 @@ describe<{
 					// @ts-ignore
 					gas: {
 						maximumGasLimit: 2_000_000,
-						minimumGasLimit: 21_000,
 						maximumGasPrice: 10_000 * 1e9,
+						minimumGasLimit: 21_000,
 						minimumGasPrice: 5 * 1e9,
 					},
 
@@ -57,6 +62,7 @@ describe<{
 				chainId: 123,
 				distribute: true,
 				epoch: new Date(),
+				initialHeight: 0,
 				premine: "2000000000",
 				validators: 53,
 			} as Contracts.NetworkGenerator.InternalOptions),

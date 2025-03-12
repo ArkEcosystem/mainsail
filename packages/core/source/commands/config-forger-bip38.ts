@@ -77,7 +77,9 @@ export class Command extends Commands.Command {
 			},
 			{
 				task: async () => {
-					await this.app.resolve(CryptoServiceProvider).register();
+					try {
+						await this.app.resolve(CryptoServiceProvider).register();
+					} catch {}
 
 					const keyPair = await this.app.resolve(KeyPairFactory).fromMnemonic(flags.bip39);
 

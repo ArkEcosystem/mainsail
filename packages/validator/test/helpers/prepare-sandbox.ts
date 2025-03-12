@@ -1,8 +1,9 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
+import { ServiceProvider as BlockchainUtils } from "@mainsail/blockchain-utils";
+import { Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
+import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
-import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
+import { Configuration } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreConsensusBls12381 } from "@mainsail/crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/crypto-key-pair-schnorr";
@@ -12,7 +13,6 @@ import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-trans
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
-import { ServiceProvider as BlockchainUtils } from "@mainsail/blockchain-utils";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
@@ -25,13 +25,17 @@ import { Sandbox } from "../../../test-framework/source";
 export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox = new Sandbox();
 
+	context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+	context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
+	context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
+
 	await context.sandbox.app.resolve(CoreTriggers).register();
 	await context.sandbox.app.resolve(CoreEvents).register();
 
 	await context.sandbox.app.resolve(CoreSerializer).register();
 	await context.sandbox.app.resolve(CoreValidation).register();
 	await context.sandbox.app.resolve(BlockchainUtils).register();
-	await context.sandbox.app.resolve(CoreCryptoConfig).register();
+	// await context.sandbox.app.resolve(CoreCryptoConfig).register();
 
 	await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();
 
@@ -46,7 +50,6 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 
 	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 	context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({ getRequired: () => 0.75 }); // txCollatorFactor
-	context.sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
 	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
 	await context.sandbox.app.resolve(CoreTransactions).register();
@@ -69,15 +72,15 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	});
 
 	const validator = {
-		validate: async () => true,
 		getEvm: () => ({
-			stateHash: async () => "0000000000000000000000000000000000000000000000000000000000000000",
-			logsBloom: async () => "0".repeat(512),
-			initializeGenesis: async () => {},
-			prepareNextCommit: async () => {},
-			updateRewardsAndVotes: async () => {},
 			dispose: async () => {},
+			initializeGenesis: async () => {},
+			logsBloom: async () => "0".repeat(512),
+			prepareNextCommit: async () => {},
+			stateHash: async () => "0000000000000000000000000000000000000000000000000000000000000000",
+			updateRewardsAndVotes: async () => {},
 		}),
+		validate: async () => true,
 	};
 	context.sandbox.app.rebind(Identifiers.Transaction.Validator.Factory).toConstantValue(() => validator);
 
@@ -89,9 +92,9 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 			header: {
 				height: 1,
 				id: "0000000000000000000000000000000000000000000000000000000000000000",
+				logsBloom: "0".repeat(512),
 				previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 				stateHash: "0000000000000000000000000000000000000000000000000000000000000000",
-				logsBloom: "0".repeat(512),
 			},
 		}),
 	});

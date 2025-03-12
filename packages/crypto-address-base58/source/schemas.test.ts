@@ -23,6 +23,12 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 		context.sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
+			genesisBlock: {
+				// @ts-ignore
+				block: {
+					height: 0,
+				},
+			},
 			milestones: [
 				// @ts-ignore
 				{

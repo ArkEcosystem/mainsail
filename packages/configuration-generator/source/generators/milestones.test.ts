@@ -1,4 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
+
 import { describe } from "../../../test-framework/source";
 import { MilestonesGenerator } from "./milestones";
 
@@ -22,8 +23,9 @@ describe<{
 				.setInitial({
 					blockTime: 8000,
 					epoch: date,
-					maxBlockPayload: 2000,
+					initialHeight: 0,
 					maxBlockGasLimit: 1000,
+					maxBlockPayload: 2000,
 					maxTxPerBlock: 100,
 					validators: 53,
 					vendorFieldLength: 255,
@@ -33,31 +35,31 @@ describe<{
 				{
 					activeValidators: 0,
 					block: {
-						maxPayload: 2000,
 						maxGasLimit: 1000,
+						maxPayload: 2000,
 						maxTransactions: 100,
 						version: 1,
-					},
-					timeouts: {
-						tolerance: 100,
-						blockPrepareTime: 4000,
-						blockTime: 8000,
-						stageTimeout: 2000,
-						stageTimeoutIncrease: 2000,
 					},
 					epoch: date.toISOString().slice(0, 11) + "00:00:00.000Z",
 					evmSpec: Contracts.Evm.SpecId.SHANGHAI,
 					gas: {
-						minimumGasPrice: 5 * 1e9,
+						maximumGasLimit: 2_000_000,
 						maximumGasPrice: 10_000 * 1e9,
 						minimumGasLimit: 21_000,
-						maximumGasLimit: 2_000_000,
+						minimumGasPrice: 5 * 1e9,
 					},
 					height: 0,
 					reward: "0",
 					satoshi: {
 						decimals: 18,
 						denomination: 1e18,
+					},
+					timeouts: {
+						blockPrepareTime: 4000,
+						blockTime: 8000,
+						stageTimeout: 2000,
+						stageTimeoutIncrease: 2000,
+						tolerance: 100,
 					},
 					vendorFieldLength: 255,
 				},

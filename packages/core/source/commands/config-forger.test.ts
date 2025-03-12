@@ -1,5 +1,5 @@
-import { ensureDirSync, readJSONSync, writeJSONSync } from "fs-extra/esm";
 import { Keystore } from "@chainsafe/bls-keystore";
+import { ensureDirSync, readJSONSync, writeJSONSync } from "fs-extra/esm";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 

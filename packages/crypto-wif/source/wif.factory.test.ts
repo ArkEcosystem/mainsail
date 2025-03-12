@@ -16,8 +16,11 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({
-			// @ts-ignore
-			genesisBlock: {},
+			genesisBlock: {
+				block: {
+					height: 0,
+				},
+			},
 			milestones: [],
 			// @ts-ignore
 			network: devnet,

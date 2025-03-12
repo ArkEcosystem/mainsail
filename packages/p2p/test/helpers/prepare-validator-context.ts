@@ -18,6 +18,7 @@ type Context = {
 export const prepareValidatorContext = (context: Context) => {
 	context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 	context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+	context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
 
 	const keywords = makeKeywords();
 	context.validator.addKeyword(keywords.buffer);

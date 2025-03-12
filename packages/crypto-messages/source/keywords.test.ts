@@ -17,6 +17,7 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
 
 		const keywords = makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration));
 		context.validator.addKeyword(keywords.limitToActiveValidators);
