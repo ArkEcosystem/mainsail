@@ -11,7 +11,9 @@ export class SupplyCalculator implements Contracts.BlockchainUtils.SupplyCalcula
 		const initialSupply = BigNumber.make(this.configuration.get("genesisBlock.block.totalAmount"));
 
 		const milestones = this.configuration.get("milestones");
-		if (height === 0 || milestones.length === 0) {
+		const genesisHeight = this.configuration.getGenesisHeight();
+
+		if (height === genesisHeight || milestones.length === 0) {
 			return initialSupply;
 		}
 

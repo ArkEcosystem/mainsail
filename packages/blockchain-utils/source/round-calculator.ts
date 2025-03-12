@@ -15,6 +15,7 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 
 	public isNewRound(height: number): boolean {
 		const milestones = this.configuration.get("milestones");
+		const genesisHeight = this.configuration.getGenesisHeight();
 
 		// Since milestones are merged, find the first milestone to introduce the validator count.
 		let milestone;
@@ -31,7 +32,7 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 			}
 		}
 
-		return height === 0 || (height - Math.max(milestone.height, 1)) % milestone.activeValidators === 0;
+		return height === genesisHeight || (height - Math.max(milestone.height, 1)) % milestone.activeValidators === 0;
 	}
 
 	public calculateRound(height: number): Contracts.Shared.RoundInfo {
