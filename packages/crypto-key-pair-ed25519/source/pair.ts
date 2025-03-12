@@ -6,7 +6,7 @@ import { etc } from "@noble/ed25519";
 import { sha256 } from "@noble/hashes/sha256";
 import { sha512 } from "@noble/hashes/sha512";
 import { mnemonicToSeedSync } from "@scure/bip39";
-import WIF from "wif";
+import { decode } from "wif";
 etc.sha512Sync = (...m) => sha512(etc.concatBytes(...m));
 
 @injectable()
@@ -23,7 +23,7 @@ export class KeyPairFactory implements Contracts.Crypto.KeyPairFactory {
 	}
 
 	public async fromWIF(wif: string): Promise<Contracts.Crypto.KeyPair> {
-		const decoded = WIF.decode(wif, this.configuration.get("network.wif"));
+		const decoded = decode(wif, this.configuration.get("network.wif"));
 		const privateKey = Buffer.from(decoded.privateKey);
 
 		return {

@@ -30,13 +30,12 @@
 		"@mainsail/utils": "workspace:*",
 		"@scure/bip39": "^1.2.2",
 		"bls12-381-keygen": "^0.2.3",
-		"wif": "^4.0.0"
+		"wif": "5.0.0"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"@types/wif": "^2.0.5",
 		"bip39": "3.1.0",
 		"uvu": "^0.5.6"
 	},

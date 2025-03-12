@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import wif from "wif";
+import { encode } from "wif";
 
 @injectable()
 export class WIFFactory implements Contracts.Crypto.WIFFactory {
@@ -14,10 +14,18 @@ export class WIFFactory implements Contracts.Crypto.WIFFactory {
 	public async fromMnemonic(mnemonic: string): Promise<string> {
 		const { compressed, privateKey }: Contracts.Crypto.KeyPair = await this.keyPairFactory.fromMnemonic(mnemonic);
 
-		return wif.encode(this.configuration.get("network.wif"), Buffer.from(privateKey, "hex"), compressed);
+		return encode({
+			compressed,
+			privateKey: Buffer.from(privateKey, "hex"),
+			version: this.configuration.get("network.wif"),
+		});
 	}
 
 	public async fromKeys(keys: Contracts.Crypto.KeyPair): Promise<string> {
-		return wif.encode(this.configuration.get("network.wif"), Buffer.from(keys.privateKey, "hex"), keys.compressed);
+		return encode({
+			compressed: keys.compressed,
+			privateKey: Buffer.from(keys.privateKey, "hex"),
+			version: this.configuration.get("network.wif"),
+		});
 	}
 }

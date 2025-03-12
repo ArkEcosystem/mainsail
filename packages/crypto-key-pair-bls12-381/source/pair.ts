@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { mnemonicToSeedSync } from "@scure/bip39";
 import { deriveChild, deriveMaster } from "bls12-381-keygen";
-import WIF from "wif";
+import { decode } from "wif";
 
 import { getBls } from "./get-bls.js";
 
@@ -21,7 +21,7 @@ export class KeyPairFactory implements Contracts.Crypto.KeyPairFactory {
 
 	public async fromWIF(wif: string): Promise<Contracts.Crypto.KeyPair> {
 		const bls = await getBls();
-		const decoded = WIF.decode(wif, this.configuration.get("network.wif"));
+		const decoded = decode(wif, this.configuration.get("network.wif"));
 		const privateKey = Buffer.from(decoded.privateKey);
 
 		return {
