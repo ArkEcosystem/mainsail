@@ -34,7 +34,6 @@
 	"devDependencies": {
 		"@types/chance": "1.1.6",
 		"@types/fs-extra": "11.0.4",
-		"@types/sinon": "^17.0.3",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
