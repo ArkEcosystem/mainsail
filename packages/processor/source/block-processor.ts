@@ -99,7 +99,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	public async commit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (this.apiSync && unit.height > 0) {
+		if (this.apiSync && unit.height > this.configuration.getGenesisHeight()) {
 			await this.apiSync.beforeCommit();
 		}
 
@@ -119,7 +119,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.txPoolWorker.onCommit(unit);
 		await this.evmWorker.onCommit(unit);
 
-		if (this.apiSync && unit.height > 0) {
+		if (this.apiSync && unit.height > this.configuration.getGenesisHeight()) {
 			await this.apiSync.onCommit(unit);
 		}
 

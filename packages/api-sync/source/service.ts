@@ -331,7 +331,7 @@ export class Sync implements Contracts.ApiSync.Service {
 	}
 
 	public async getLastSyncedBlockHeight(): Promise<number> {
-		return (await this.blockRepositoryFactory().getLatestHeight()) ?? 0;
+		return (await this.blockRepositoryFactory().getLatestHeight()) ?? this.configuration.getGenesisHeight();
 	}
 
 	async #bootstrapRestore(): Promise<void> {
@@ -505,12 +505,14 @@ export class Sync implements Contracts.ApiSync.Service {
 	}
 
 	async #resetDatabaseIfNecessary(): Promise<void> {
+		const genesisHeight = this.configuration.getGenesisHeight();
 		const lastHeight = this.databaseService.isEmpty()
-			? 0
+			? genesisHeight
 			: (await this.databaseService.getLastCommit()).block.header.height;
 
 		const [blocks] = await this.dataSource.query(
-			"select coalesce(max(height), 0)::bigint as max_height, count(1) as count from blocks",
+			"select coalesce(max(height), ?)::bigint as max_height, count(1) as count from blocks",
+			[genesisHeight],
 		);
 		const blocksOk = blocks.count !== "0" && blocks.max_height === lastHeight.toFixed();
 
@@ -523,7 +525,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			return;
 		}
 
-		if (lastHeight !== 0 || blocks.count !== "0") {
+		if (lastHeight !== genesisHeight || blocks.count !== "0") {
 			this.logger.warning(`Clearing API database for full restore.`);
 		}
 
