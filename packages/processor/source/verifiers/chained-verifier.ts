@@ -15,7 +15,6 @@ export class ChainedVerifier implements Contracts.Processor.Handler {
 	private readonly store!: Contracts.State.Store;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		// TODO: Check if someone can exploit this
 		const blockData = unit.getBlock().data;
 
 		if (blockData.height === this.configuration.getGenesisHeight()) {
