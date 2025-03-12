@@ -1,5 +1,5 @@
 import { execaNode, execaSync } from "execa";
-export type { ExecaReturnValue, ExecaSyncReturnValue } from "execa";
+export type { Result, SyncResult } from "execa";
 
 export const execa = {
 	run: execaNode,

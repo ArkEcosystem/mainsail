@@ -98,7 +98,7 @@
 		"@types/prompts": "2.4.9",
 		"@types/tmp": "0.2.6",
 		"cross-env": "7.0.3",
-		"execa": "8.0.1",
+		"execa": "9.5.2",
 		"tmp": "0.2.3",
 		"uvu": "^0.5.6"
 	},

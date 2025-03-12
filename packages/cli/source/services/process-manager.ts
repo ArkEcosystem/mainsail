@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 
 import { ProcessDescription, ProcessIdentifier, ProcessState } from "../contracts.js";
-import { execa, ExecaReturnValue, ExecaSyncReturnValue } from "../execa.js";
+import { execa, Result, SyncResult } from "../execa.js";
 import { Flags } from "../utils/index.js";
 
 @injectable()
@@ -11,6 +11,10 @@ export class ProcessManager {
 			const { stdout } = this.#shellSync("pm2 jlist");
 
 			if (!stdout) {
+				return [];
+			}
+
+			if (typeof stdout !== "string") {
 				return [];
 			}
 
@@ -36,7 +40,7 @@ export class ProcessManager {
 		return processes.find((process: ProcessDescription) => [process.id, process.name].includes(id));
 	}
 
-	public start(options: Record<string, any>, flags: Record<string, any>): ExecaSyncReturnValue {
+	public start(options: Record<string, any>, flags: Record<string, any>): SyncResult {
 		let command = `pm2 start ${options.script}`;
 
 		if (options.node_args) {
@@ -54,7 +58,7 @@ export class ProcessManager {
 		return this.#shellSync(command);
 	}
 
-	public stop(id: ProcessIdentifier, flags: Record<string, any> = {}): ExecaSyncReturnValue {
+	public stop(id: ProcessIdentifier, flags: Record<string, any> = {}): SyncResult {
 		let command = `pm2 stop ${id}`;
 
 		if (Object.keys(flags).length > 0) {
@@ -64,7 +68,7 @@ export class ProcessManager {
 		return this.#shellSync(command);
 	}
 
-	public restart(id: ProcessIdentifier, flags: Record<string, any> = { "update-env": true }): ExecaSyncReturnValue {
+	public restart(id: ProcessIdentifier, flags: Record<string, any> = { "update-env": true }): SyncResult {
 		let command = `pm2 restart ${id}`;
 
 		if (Object.keys(flags).length > 0) {
@@ -74,39 +78,35 @@ export class ProcessManager {
 		return this.#shellSync(command);
 	}
 
-	public reload(id: ProcessIdentifier): ExecaSyncReturnValue {
+	public reload(id: ProcessIdentifier): SyncResult {
 		return this.#shellSync(`pm2 reload ${id}`);
 	}
 
-	public reset(id: ProcessIdentifier): ExecaSyncReturnValue {
+	public reset(id: ProcessIdentifier): SyncResult {
 		return this.#shellSync(`pm2 reset ${id}`);
 	}
 
-	public delete(id: ProcessIdentifier): ExecaSyncReturnValue {
+	public delete(id: ProcessIdentifier): SyncResult {
 		return this.#shellSync(`pm2 delete ${id}`);
 	}
 
-	public flush(): ExecaSyncReturnValue {
+	public flush(): SyncResult {
 		return this.#shellSync("pm2 flush");
 	}
 
-	public reloadLogs(): ExecaSyncReturnValue {
+	public reloadLogs(): SyncResult {
 		return this.#shellSync("pm2 reloadLogs");
 	}
 
-	public ping(): ExecaSyncReturnValue {
+	public ping(): SyncResult {
 		return this.#shellSync("pm2 ping");
 	}
 
-	public update(): ExecaSyncReturnValue {
+	public update(): SyncResult {
 		return this.#shellSync("pm2 update");
 	}
 
-	public async trigger(
-		id: ProcessIdentifier,
-		processActionName: string,
-		parameter?: string,
-	): Promise<ExecaReturnValue> {
+	public async trigger(id: ProcessIdentifier, processActionName: string, parameter?: string): Promise<Result> {
 		return this.#shell(`pm2 trigger ${id} ${processActionName} ${parameter}`);
 	}
 
@@ -168,11 +168,11 @@ export class ProcessManager {
 		return !this.has(id);
 	}
 
-	async #shell(command: string): Promise<ExecaReturnValue> {
+	async #shell(command: string): Promise<Result> {
 		return execa.run(command, { shell: true });
 	}
 
-	#shellSync(command: string): ExecaSyncReturnValue {
+	#shellSync(command: string): SyncResult {
 		return execa.sync(command, { shell: true });
 	}
 }
