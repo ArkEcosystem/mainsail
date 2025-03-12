@@ -27,7 +27,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"dayjs": "1.11.10"
+		"dayjs": "1.11.13"
 	},
 	"devDependencies": {
 		"uvu": "^0.5.6"

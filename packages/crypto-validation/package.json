@@ -25,7 +25,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"ajv": "8.12.0"
+		"ajv": "8.17.1"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",

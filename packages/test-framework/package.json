@@ -47,8 +47,8 @@
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"bip39": "3.1.0",
-		"dayjs": "1.11.10",
-		"fs-extra": "11.2.0",
+		"dayjs": "1.11.13",
+		"fs-extra": "11.3.0",
 		"lodash.clonedeep": "4.5.0",
 		"memoizee": "0.4.17",
 		"tmp": "0.2.3"
@@ -59,7 +59,7 @@
 		"@types/lodash.clonedeep": "4.5.9",
 		"@types/memoizee": "0.4.11",
 		"@types/tmp": "0.2.6",
-		"joi": "17.12.2",
+		"joi": "17.13.3",
 		"uvu": "0.5.6"
 	},
 	"engines": {

@@ -26,8 +26,8 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"ajv": "8.12.0",
-		"ethers": "6.11.0"
+		"ajv": "8.17.1",
+		"ethers": "6.13.5"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-address-base58": "workspace:*",

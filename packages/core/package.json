@@ -29,7 +29,7 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
-		"@chainsafe/bls-keystore": "3.0.1",
+		"@chainsafe/bls-keystore": "3.1.0",
 		"@mainsail/api-common": "workspace:*",
 		"@mainsail/api-database": "workspace:*",
 		"@mainsail/api-development": "workspace:*",
@@ -84,11 +84,11 @@
 		"@mainsail/webhooks": "workspace:*",
 		"bip39": "3.1.0",
 		"boxen": "8.0.1",
-		"dayjs": "1.11.10",
+		"dayjs": "1.11.13",
 		"env-paths": "3.0.0",
 		"envfile": "7.1.0",
-		"fs-extra": "11.2.0",
-		"joi": "17.12.2",
+		"fs-extra": "11.3.0",
+		"joi": "17.13.3",
 		"kleur": "4.1.5",
 		"prompts": "2.4.2"
 	},

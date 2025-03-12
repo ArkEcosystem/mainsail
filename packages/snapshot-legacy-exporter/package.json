@@ -26,14 +26,14 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"pg": "8.13.1",
+		"pg": "8.14.0",
 		"tmp": "0.2.3",
 		"typeorm": "0.3.21"
 	},
 	"devDependencies": {
 		"@types/env-paths": "2.1.0",
 		"@types/fs-extra": "11.0.4",
-		"@types/pg": "8.11.10",
+		"@types/pg": "8.11.11",
 		"@types/pumpify": "1.4.4",
 		"@types/tmp": "0.2.6",
 		"env-paths": "3.0.0",

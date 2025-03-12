@@ -23,12 +23,12 @@
 	},
 	"dependencies": {
 		"@hapi/boom": "10.0.1",
-		"@hapi/hapi": "21.3.6",
+		"@hapi/hapi": "21.4.0",
 		"@mainsail/api-common": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"joi": "17.12.2"
+		"joi": "17.13.3"
 	},
 	"devDependencies": {
 		"@types/ip": "1.1.3",

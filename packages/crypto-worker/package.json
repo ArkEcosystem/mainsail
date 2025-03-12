@@ -25,7 +25,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"joi": "17.12.2"
+		"joi": "17.13.3"
 	},
 	"devDependencies": {
 		"@types/chance": "1.1.6",

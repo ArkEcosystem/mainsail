@@ -28,7 +28,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@scure/bip39": "^1.2.2",
+		"@scure/bip39": "^1.5.4",
 		"bls12-381-keygen": "^0.2.3",
 		"wif": "5.0.0"
 	},

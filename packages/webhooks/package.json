@@ -22,13 +22,13 @@
 	},
 	"dependencies": {
 		"@hapi/boom": "10.0.1",
-		"@hapi/hapi": "21.3.6",
+		"@hapi/hapi": "21.4.0",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"fs-extra": "11.2.0",
-		"joi": "17.12.2",
+		"fs-extra": "11.3.0",
+		"joi": "17.13.3",
 		"lowdb": "7.0.1",
 		"uuid": "11.1.0"
 	},

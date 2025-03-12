@@ -31,7 +31,7 @@
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@types/fs-extra": "11.0.4",
 		"@types/pumpify": "1.4.4",
-		"@types/sinon": "^17.0.3",
+		"@types/sinon": "^17.0.4",
 		"sinon": "^19.0.2",
 		"uvu": "^0.5.6"
 	},
