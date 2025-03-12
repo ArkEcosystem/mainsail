@@ -35,10 +35,8 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreSerializer).register();
 	await context.sandbox.app.resolve(CoreValidation).register();
 	await context.sandbox.app.resolve(BlockchainUtils).register();
-	// await context.sandbox.app.resolve(CoreCryptoConfig).register();
 
 	await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();
-
 	await context.sandbox.app.resolve(CoreCryptoSignatureEcdsa).register();
 	await context.sandbox.app.resolve(CoreCryptoKeyPairSchnorr).register();
 
