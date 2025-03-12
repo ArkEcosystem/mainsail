@@ -1,5 +1,4 @@
-import { ClientRequest, globalAgent, IncomingMessage } from "http";
-import { request, RequestOptions } from "https";
+import { ClientRequest, globalAgent, IncomingMessage, request, RequestOptions } from "http";
 import { JsonArray, JsonObject, Primitive } from "type-fest";
 import { parse } from "url";
 

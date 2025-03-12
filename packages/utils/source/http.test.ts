@@ -187,9 +187,9 @@ describe("HTTP", ({ it, assert, beforeAll, afterAll, each }) => {
 				assert.true(success);
 				assert.equal(statusCode, 200);
 				assert.equal(data, "a".repeat(responseSize));
-			} catch (ex) {
+			} catch (error) {
 				assert.false(success);
-				assert.equal(ex.message, "response too large");
+				assert.equal(error.message, "response too large");
 			}
 		},
 		[
@@ -200,8 +200,8 @@ describe("HTTP", ({ it, assert, beforeAll, afterAll, each }) => {
 			{ maxContentLength: 100, responseSize: 100, success: true },
 			{ maxContentLength: 100, responseSize: 101, success: false },
 			{ maxContentLength: 999, responseSize: 500, success: true },
-			{ maxContentLength: 999, responseSize: 500000, success: false },
-			{ maxContentLength: 500000, responseSize: 400000, success: true },
+			{ maxContentLength: 999, responseSize: 500_000, success: false },
+			{ maxContentLength: 500_000, responseSize: 400_000, success: true },
 		],
 	);
 });
