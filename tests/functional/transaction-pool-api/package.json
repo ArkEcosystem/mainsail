@@ -54,9 +54,9 @@
 		"@mainsail/crypto-transaction-evm-call": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@types/tmp": "0.2.6",
-		"ethers": "^6.11.0",
+		"ethers": "6.11.0",
 		"tmp": "0.2.3",
-		"uvu": "^0.5.6"
+		"uvu": "0.5.6"
 	},
 	"engines": {
 		"node": ">=20.x"

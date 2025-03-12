@@ -31,7 +31,7 @@
 	},
 	"devDependencies": {
 		"@types/hapi__sntp": "3.1.4",
-		"uvu": "^0.5.6"
+		"uvu": "0.5.6"
 	},
 	"engines": {
 		"node": ">=20.x"

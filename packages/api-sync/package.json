@@ -29,11 +29,11 @@
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"ethers": "^6.13.5",
+		"ethers": "6.13.5",
 		"joi": "17.13.3"
 	},
 	"devDependencies": {
-		"uvu": "^0.5.6"
+		"uvu": "0.5.6"
 	},
 	"engines": {
 		"node": ">=20.x"

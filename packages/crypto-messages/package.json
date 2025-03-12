@@ -43,7 +43,7 @@
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"uvu": "^0.5.6"
+		"uvu": "0.5.6"
 	},
 	"engines": {
 		"node": ">=20.x"

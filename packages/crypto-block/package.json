@@ -42,11 +42,11 @@
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"@types/lodash.clone": "^4.5.9",
-		"@types/lodash.clonedeep": "^4.5.9",
-		"lodash.clone": "^4.5.0",
-		"lodash.clonedeep": "^4.5.0",
-		"uvu": "^0.5.6"
+		"@types/lodash.clone": "4.5.9",
+		"@types/lodash.clonedeep": "4.5.9",
+		"lodash.clone": "4.5.0",
+		"lodash.clonedeep": "4.5.0",
+		"uvu": "0.5.6"
 	},
 	"engines": {
 		"node": ">=20.x"

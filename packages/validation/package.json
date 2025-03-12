@@ -30,7 +30,7 @@
 		"ajv-keywords": "5.1.0"
 	},
 	"devDependencies": {
-		"uvu": "^0.5.6"
+		"uvu": "0.5.6"
 	},
 	"engines": {
 		"node": ">=20.x"

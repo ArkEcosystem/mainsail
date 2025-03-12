@@ -36,8 +36,8 @@
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"ethers": "^6.13.5",
-		"uvu": "^0.5.6"
+		"ethers": "6.13.5",
+		"uvu": "0.5.6"
 	},
 	"engines": {
 		"node": ">=20.x"
