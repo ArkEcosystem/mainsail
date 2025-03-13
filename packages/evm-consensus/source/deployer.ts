@@ -95,7 +95,7 @@ export class Deployer {
 
 	async #deployConsensusContract(): Promise<string> {
 		// CONSENSUS
-		const consensusResult = await this.evm.process({
+		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
 			caller: this.deployerAddress,
 			data: Buffer.concat([Buffer.from(ethers.getBytes(ConsensusAbi.bytecode.object))]),
@@ -107,22 +107,19 @@ export class Deployer {
 			value: 0n,
 		});
 
-		if (!consensusResult.receipt.success) {
+		if (!receipt.success) {
 			throw new Error("failed to deploy Consensus contract");
 		}
 
-		if (
-			consensusResult.receipt.deployedContractAddress !==
-			ethers.getCreateAddress({ from: this.deployerAddress, nonce: 0 })
-		) {
+		if (receipt.deployedContractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 0 })) {
 			throw new Error("Contract address mismatch");
 		}
 
 		this.logger.info(
-			`Deployed Consensus contract from ${this.deployerAddress} to ${consensusResult.receipt.deployedContractAddress}`,
+			`Deployed Consensus contract from ${this.deployerAddress} to ${receipt.deployedContractAddress}`,
 		);
 
-		return consensusResult.receipt.deployedContractAddress!;
+		return receipt.deployedContractAddress!;
 	}
 
 	async #deployConsensusProxy(consensusContractAddress: string): Promise<void> {
@@ -135,7 +132,7 @@ export class Deployer {
 			.encode(["address", "bytes"], [consensusContractAddress, initializerCalldata])
 			.slice(2);
 
-		const proxyResult = await this.evm.process({
+		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
 			caller: this.deployerAddress,
 			data: Buffer.concat([
@@ -150,24 +147,21 @@ export class Deployer {
 			value: 0n,
 		});
 
-		if (!proxyResult.receipt.success) {
+		if (!receipt.success) {
 			throw new Error("failed to deploy Consensus PROXY contract");
 		}
 
-		if (
-			proxyResult.receipt.deployedContractAddress !==
-			ethers.getCreateAddress({ from: this.deployerAddress, nonce: 1 })
-		) {
+		if (receipt.deployedContractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 1 })) {
 			throw new Error("Contract address mismatch");
 		}
 
 		this.logger.info(
-			`Deployed Consensus PROXY contract from ${this.deployerAddress} to ${proxyResult.receipt.deployedContractAddress}`,
+			`Deployed Consensus PROXY contract from ${this.deployerAddress} to ${receipt.deployedContractAddress}`,
 		);
 
 		this.#emitContractDeployed({
 			activeImplementation: consensusContractAddress,
-			address: proxyResult.receipt.deployedContractAddress!,
+			address: receipt.deployedContractAddress!,
 			implementations: [{ abi: ConsensusAbi.abi, address: consensusContractAddress }],
 			name: "consensus",
 			proxy: "UUPS",
@@ -175,11 +169,11 @@ export class Deployer {
 
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
-			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
+			.toConstantValue(receipt.deployedContractAddress!);
 	}
 
 	async #deployUsernamesContract(): Promise<string> {
-		const result = await this.evm.process({
+		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
 			caller: this.deployerAddress,
 			data: Buffer.concat([Buffer.from(ethers.getBytes(UsernamesAbi.bytecode.object))]),
@@ -191,21 +185,19 @@ export class Deployer {
 			value: 0n,
 		});
 
-		if (!result.receipt.success) {
+		if (!receipt.success) {
 			throw new Error("failed to deploy Usernames contract");
 		}
 
-		if (
-			result.receipt.deployedContractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 2 })
-		) {
+		if (receipt.deployedContractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 2 })) {
 			throw new Error("Contract address mismatch");
 		}
 
 		this.logger.info(
-			`Deployed Usernames contract from ${this.deployerAddress} to ${result.receipt.deployedContractAddress}`,
+			`Deployed Usernames contract from ${this.deployerAddress} to ${receipt.deployedContractAddress}`,
 		);
 
-		return result.receipt.deployedContractAddress!;
+		return receipt.deployedContractAddress!;
 	}
 
 	async #deployUsernamesProxy(usernamesContractAddress: string): Promise<void> {
@@ -218,7 +210,7 @@ export class Deployer {
 			.encode(["address", "bytes"], [usernamesContractAddress, initializerCalldata])
 			.slice(2);
 
-		const proxyResult = await this.evm.process({
+		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
 			caller: this.deployerAddress,
 			data: Buffer.concat([
@@ -233,24 +225,21 @@ export class Deployer {
 			value: 0n,
 		});
 
-		if (!proxyResult.receipt.success) {
+		if (!receipt.success) {
 			throw new Error("failed to deploy Usernames PROXY contract");
 		}
 
-		if (
-			proxyResult.receipt.deployedContractAddress !==
-			ethers.getCreateAddress({ from: this.deployerAddress, nonce: 3 })
-		) {
+		if (receipt.deployedContractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 3 })) {
 			throw new Error("Contract address mismatch");
 		}
 
 		this.logger.info(
-			`Deployed Usernames PROXY contract from ${this.deployerAddress} to ${proxyResult.receipt.deployedContractAddress}`,
+			`Deployed Usernames PROXY contract from ${this.deployerAddress} to ${receipt.deployedContractAddress}`,
 		);
 
 		this.#emitContractDeployed({
 			activeImplementation: usernamesContractAddress,
-			address: proxyResult.receipt.deployedContractAddress!,
+			address: receipt.deployedContractAddress!,
 			implementations: [{ abi: UsernamesAbi.abi, address: usernamesContractAddress }],
 			name: "usernames",
 			proxy: "UUPS",
@@ -258,11 +247,11 @@ export class Deployer {
 
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Usernames)
-			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
+			.toConstantValue(receipt.deployedContractAddress!);
 	}
 
 	async #deployMultiPaymentContract(): Promise<string> {
-		const result = await this.evm.process({
+		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
 			caller: this.deployerAddress,
 			data: Buffer.concat([Buffer.from(ethers.getBytes(MultiPaymentAbi.bytecode.object))]),
@@ -274,21 +263,19 @@ export class Deployer {
 			value: 0n,
 		});
 
-		if (!result.receipt.success) {
+		if (!receipt.success) {
 			throw new Error("failed to deploy MultiPayment contract");
 		}
 
-		if (
-			result.receipt.deployedContractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 4 })
-		) {
+		if (receipt.deployedContractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 4 })) {
 			throw new Error("Contract address mismatch");
 		}
 
 		this.logger.info(
-			`Deployed MultiPayment contract from ${this.deployerAddress} to ${result.receipt.deployedContractAddress}`,
+			`Deployed MultiPayment contract from ${this.deployerAddress} to ${receipt.deployedContractAddress}`,
 		);
 
-		return result.receipt.deployedContractAddress!;
+		return receipt.deployedContractAddress!;
 	}
 
 	async #deployMultiPaymentProxy(multiPaymentAddress: string): Promise<void> {
@@ -301,7 +288,7 @@ export class Deployer {
 			.encode(["address", "bytes"], [multiPaymentAddress, initializerCalldata])
 			.slice(2);
 
-		const proxyResult = await this.evm.process({
+		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
 			caller: this.deployerAddress,
 			data: Buffer.concat([
@@ -316,24 +303,21 @@ export class Deployer {
 			value: 0n,
 		});
 
-		if (!proxyResult.receipt.success) {
+		if (!receipt.success) {
 			throw new Error("failed to deploy MultiPayment PROXY contract");
 		}
 
-		if (
-			proxyResult.receipt.deployedContractAddress !==
-			ethers.getCreateAddress({ from: this.deployerAddress, nonce: 5 })
-		) {
+		if (receipt.deployedContractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 5 })) {
 			throw new Error("Contract address mismatch");
 		}
 
 		this.logger.info(
-			`Deployed MultiPayment PROXY contract from ${this.deployerAddress} to ${proxyResult.receipt.deployedContractAddress}`,
+			`Deployed MultiPayment PROXY contract from ${this.deployerAddress} to ${receipt.deployedContractAddress}`,
 		);
 
 		this.#emitContractDeployed({
 			activeImplementation: multiPaymentAddress,
-			address: proxyResult.receipt.deployedContractAddress!,
+			address: receipt.deployedContractAddress!,
 			implementations: [{ abi: MultiPaymentAbi.abi, address: multiPaymentAddress }],
 			name: "multi-payments",
 			proxy: "UUPS",
@@ -341,7 +325,7 @@ export class Deployer {
 
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment)
-			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
+			.toConstantValue(receipt.deployedContractAddress!);
 	}
 
 	public getDeploymentEvents(): Contracts.Evm.DeployerContract[] {
@@ -352,5 +336,15 @@ export class Deployer {
 	#emitContractDeployed(event: Contracts.Evm.DeployerContract): void {
 		this.#deploymentEvents.push(event);
 		void this.events.dispatch(Events.DeployerEvent.ContractCreated, event);
+	}
+
+	async #processTransaction(context: Contracts.Evm.TransactionContext): Promise<Contracts.Evm.TransactionReceipt> {
+		const { receipt } = await this.evm.getReceipt(context.blockContext.commitKey.height, context.txHash);
+		if (receipt) {
+			return receipt;
+		}
+
+		const result = await this.evm.process(context);
+		return result.receipt;
 	}
 }
