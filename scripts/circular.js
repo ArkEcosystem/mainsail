@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import madge from "madge";
-import { resolve, dirname, join } from "path";
+import { resolve, join } from "path";
 import { lstatSync, readdirSync } from "fs";
 
 const source = resolve(join(process.cwd(), "packages"));
