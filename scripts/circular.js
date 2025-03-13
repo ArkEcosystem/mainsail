@@ -1,9 +1,9 @@
-const chalk = require("chalk");
-const madge = require("madge");
-const { resolve } = require("path");
-const { lstatSync, readdirSync } = require("fs");
+import chalk from "chalk";
+import madge from "madge";
+import { resolve, dirname, join } from "path";
+import { lstatSync, readdirSync } from "fs";
 
-const source = resolve(__dirname, "../packages");
+const source = resolve(join(process.cwd(), "packages"));
 
 const pkgs = readdirSync(source)
 	.filter((name) => lstatSync(`${source}/${name}`).isDirectory())
