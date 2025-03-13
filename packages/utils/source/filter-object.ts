@@ -1,6 +1,6 @@
 import { FunctionReturning } from "./internal/index.js";
 
-export const filterObject = <T extends {}>(iterable: T, iteratee: FunctionReturning): T => {
+export const filterObject = <T extends Record<string, any>>(iterable: T, iteratee: FunctionReturning): T => {
 	const keys = Object.keys(iterable);
 	const length: number = keys.length;
 	const result = {};

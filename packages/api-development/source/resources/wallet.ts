@@ -3,15 +3,15 @@ import { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class WalletResource implements Contracts.Api.Resource {
-	public raw(resource: Contracts.State.Wallet): object {
+	public raw(resource: Contracts.State.Wallet): Record<string, any> {
 		return JSON.parse(JSON.stringify(resource));
 	}
 
-	public transform(resource: Contracts.State.Wallet): object {
+	public transform(resource: Contracts.State.Wallet): Record<string, any> {
 		return this.getWalletResource(resource);
 	}
 
-	private getWalletResource(wallet: Contracts.State.Wallet): Object {
+	private getWalletResource(wallet: Contracts.State.Wallet): Record<string, any> {
 		return {
 			address: wallet.getAddress(),
 			// publicKey: wallet.getPublicKey(),

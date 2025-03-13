@@ -29,8 +29,6 @@ export class Validator implements Contracts.Crypto.Validator {
 		try {
 			this.ajv_.validate(schemaKeyReference, data);
 
-			this.ajv_.errors;
-
 			return {
 				error: this.ajv_.errors ? this.ajv_.errorsText() : undefined,
 				errors: this.ajv_.errors || undefined,

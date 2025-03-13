@@ -16,7 +16,7 @@ export const postPrevote = {
 			Buffer.from(proto.PostPrevoteRequest.encode(object).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): {} =>
+		deserialize: (payload: Buffer): Record<string, any> =>
 			proto.PostPrevoteResponse.toObject(proto.PostPrevoteResponse.decode(payload), {
 				defaults: true,
 			}),

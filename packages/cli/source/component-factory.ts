@@ -43,27 +43,27 @@ export class ComponentFactory {
 		return this.app.get<AppHeader>(Identifiers.AppHeader).render();
 	}
 
-	public async askDate(message: string, options: object = {}): Promise<string> {
+	public async askDate(message: string, options: Record<string, any> = {}): Promise<string> {
 		return this.app.get<AskDate>(Identifiers.AskDate).render(message, options);
 	}
 
-	public async askHidden(message: string, options: object = {}): Promise<string> {
+	public async askHidden(message: string, options: Record<string, any> = {}): Promise<string> {
 		return this.app.get<AskHidden>(Identifiers.AskHidden).render(message, options);
 	}
 
-	public async askNumber(message: string, options: object = {}): Promise<number> {
+	public async askNumber(message: string, options: Record<string, any> = {}): Promise<number> {
 		return this.app.get<AskNumber>(Identifiers.AskNumber).render(message, options);
 	}
 
-	public async askPassword(message: string, options: object = {}): Promise<string> {
+	public async askPassword(message: string, options: Record<string, any> = {}): Promise<string> {
 		return this.app.get<AskPassword>(Identifiers.AskPassword).render(message, options);
 	}
 
-	public async ask(message: string, options: object = {}): Promise<string> {
+	public async ask(message: string, options: Record<string, any> = {}): Promise<string> {
 		return this.app.get<Ask>(Identifiers.Ask).render(message, options);
 	}
 
-	public async autoComplete(message: string, choices: any[], options: object = {}): Promise<string> {
+	public async autoComplete(message: string, choices: any[], options: Record<string, any> = {}): Promise<string> {
 		return this.app.get<AutoComplete>(Identifiers.AutoComplete).render(message, choices, options);
 	}
 
@@ -75,7 +75,7 @@ export class ComponentFactory {
 		return this.app.get<Clear>(Identifiers.Clear).render();
 	}
 
-	public async confirm(message: string, options: object = {}): Promise<boolean> {
+	public async confirm(message: string, options: Record<string, any> = {}): Promise<boolean> {
 		return this.app.get<Confirm>(Identifiers.Confirm).render(message, options);
 	}
 
@@ -99,7 +99,7 @@ export class ComponentFactory {
 		return this.app.get<Log>(Identifiers.Log).render(message);
 	}
 
-	public async multiSelect(message: string, choices: any[], options: object = {}): Promise<string[]> {
+	public async multiSelect(message: string, choices: any[], options: Record<string, any> = {}): Promise<string[]> {
 		return this.app.get<MultiSelect>(Identifiers.MultiSelect).render(message, choices, options);
 	}
 
@@ -111,11 +111,11 @@ export class ComponentFactory {
 		return this.app.get<Prompt>(Identifiers.Prompt).render(options);
 	}
 
-	public async select(message: string, choices: any[], options: object = {}): Promise<string> {
+	public async select(message: string, choices: any[], options: Record<string, any> = {}): Promise<string> {
 		return this.app.get<Select>(Identifiers.Select).render(message, choices, options);
 	}
 
-	public spinner(options?: string | Options | undefined): Ora {
+	public spinner(options?: string | Options): Ora {
 		return this.app.get<Spinner>(Identifiers.Spinner).render(options);
 	}
 
@@ -123,7 +123,7 @@ export class ComponentFactory {
 		return this.app.get<Success>(Identifiers.Success).render(message);
 	}
 
-	public table(head: string[], callback: any, options: object = {}): void {
+	public table(head: string[], callback: any, options: Record<string, any> = {}): void {
 		return this.app.get<Table>(Identifiers.Table).render(head, callback, options);
 	}
 
@@ -135,7 +135,7 @@ export class ComponentFactory {
 		return this.app.get<Title>(Identifiers.Title).render(title);
 	}
 
-	public async toggle(message: string, options: object = {}): Promise<boolean> {
+	public async toggle(message: string, options: Record<string, any> = {}): Promise<boolean> {
 		return this.app.get<Toggle>(Identifiers.Toggle).render(message, options);
 	}
 

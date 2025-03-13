@@ -83,7 +83,7 @@ export const everyOrCriteria = <TCriteria>(
 export const hasOrCriteria = <TCriteria>(criteria: OrCriteria<TCriteria>): boolean =>
 	someOrCriteria(criteria, () => true);
 
-export const handleAndCriteria = async <TEntity, TCriteria extends {}>(
+export const handleAndCriteria = async <TEntity, TCriteria extends Record<string, any>>(
 	criteria: TCriteria,
 	callback: <K extends keyof TCriteria>(key: K) => Promise<Expression<TEntity>>,
 ): Promise<AndExpression<TEntity>> => {

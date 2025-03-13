@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { Worker } from "worker_threads";
 
-export class Subprocess<T extends {}> implements Contracts.Kernel.IPC.Subprocess<T> {
+export class Subprocess<T extends Record<string, any>> implements Contracts.Kernel.IPC.Subprocess<T> {
 	private lastId = 1;
 	private readonly subprocess: Worker;
 	private readonly callbacks = new Map<number, Contracts.Kernel.IPC.RequestCallbacks<T>>();

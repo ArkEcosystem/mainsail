@@ -1,4 +1,4 @@
-type BigNumberType = bigint | number | string | BigInt | BigNumber;
+type BigNumberType = bigint | number | string | BigNumber;
 
 export class BigNumber {
 	public static readonly ZERO: BigNumber = new BigNumber(0);

@@ -16,7 +16,7 @@ export const postPrecommit = {
 			Buffer.from(proto.PostPrecommitRequest.encode(object).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): {} =>
+		deserialize: (payload: Buffer): Record<string, any> =>
 			proto.PostPrecommitResponse.toObject(proto.PostPrecommitResponse.decode(payload), { defaults: true }),
 		serialize: (object: types.postPrecommit.IPostPrecommitResponse): Buffer =>
 			Buffer.from(proto.PostPrecommitResponse.encode(object).finish()),

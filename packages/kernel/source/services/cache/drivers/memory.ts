@@ -27,9 +27,11 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	public async get(key: K): Promise<T | undefined> {
 		const value: T | undefined = this.#store.get(key);
 
-		value
-			? void this.eventDispatcher.dispatch(Events.CacheEvent.Hit, { key, value })
-			: void this.eventDispatcher.dispatch(Events.CacheEvent.Missed, { key });
+		if (value) {
+			void this.eventDispatcher.dispatch(Events.CacheEvent.Hit, { key, value });
+		} else {
+			void this.eventDispatcher.dispatch(Events.CacheEvent.Missed, { key });
+		}
 
 		return value;
 	}

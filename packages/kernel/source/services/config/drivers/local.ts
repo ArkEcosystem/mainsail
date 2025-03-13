@@ -145,7 +145,6 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 	#loadFromLocation(files: string[]): KeyValuePair {
 		for (const file of files) {
-			3;
 			const fullPath: string = this.app.configPath(file);
 			if (existsSync(fullPath)) {
 				const config: KeyValuePair | undefined =

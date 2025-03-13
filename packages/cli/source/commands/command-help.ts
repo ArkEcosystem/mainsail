@@ -71,7 +71,7 @@ ${flags}`;
 		return output.join("\n");
 	}
 
-	#buildProperties<T extends {}>(properties: T) {
+	#buildProperties<T extends Record<string, any>>(properties: T) {
 		const options: string[] = [];
 		const descriptions: string[] = [];
 

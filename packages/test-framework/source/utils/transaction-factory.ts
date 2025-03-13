@@ -123,12 +123,6 @@ export class TransactionFactory {
 		return this;
 	}
 
-	public withNetwork(network: string): TransactionFactory {
-		this.#network = network;
-
-		return this;
-	}
-
 	public withNetworkConfig(networkConfig: Contracts.Crypto.NetworkConfig): TransactionFactory {
 		this.#networkConfig = networkConfig;
 

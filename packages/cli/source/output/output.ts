@@ -11,15 +11,13 @@ enum OutputVerbosity {
 export class Output {
 	#verbosity: number = OutputVerbosity.Normal;
 
-	#realStdout: Function = process.stdout.write;
+	#realStdout: (msg: string) => boolean = process.stdout.write;
 
 	public mute() {
-		// @ts-ignore - We don't care about the type error, we just want to noop it.
-		process.stdout.write = () => {};
+		process.stdout.write = (msg: string) => true;
 	}
 
 	public unmute() {
-		// @ts-ignore - We don't care about the type error, we just want to restore it.
 		process.stdout.write = this.#realStdout;
 	}
 

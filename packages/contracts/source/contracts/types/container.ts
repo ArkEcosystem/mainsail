@@ -1,4 +1,4 @@
-export type Constructor<T = {}> = new (...arguments_: any[]) => T;
+export type Constructor<T = Record<string, any>> = new (...arguments_: any[]) => T;
 
 export type FunctionReturning<T> = (...arguments_: Array<any>) => T;
 

@@ -60,7 +60,11 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		events: Contracts.Kernel.EventName[] | Array<[Contracts.Kernel.EventName, Contracts.Kernel.EventListener]>,
 	): void {
 		for (const event of events) {
-			Array.isArray(event) ? this.forget(event[0], event[1]) : this.forget(event);
+			if (Array.isArray(event)) {
+				this.forget(event[0], event[1]);
+			} else {
+				this.forget(event);
+			}
 		}
 	}
 

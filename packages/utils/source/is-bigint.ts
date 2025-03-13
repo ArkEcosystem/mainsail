@@ -1,1 +1,1 @@
-export const isBigInt = (value: unknown): value is BigInt => typeof value === "bigint";
+export const isBigInt = (value: unknown): value is bigint => typeof value === "bigint";

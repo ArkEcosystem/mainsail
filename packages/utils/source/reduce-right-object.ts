@@ -1,6 +1,6 @@
 import { FunctionReturning } from "./internal/index.js";
 
-export const reduceRightObject = <T extends {}, V>(
+export const reduceRightObject = <T extends Record<string, any>, V>(
 	iterable: T,
 	iteratee: FunctionReturning,
 	initialValue?: V,

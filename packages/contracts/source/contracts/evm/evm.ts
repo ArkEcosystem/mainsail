@@ -53,7 +53,7 @@ export interface PreverifyTransactionResult {
 	readonly error?: string;
 }
 
-export interface CommitResult {}
+export type CommitResult = Record<string, any>;
 
 export interface AccountInfo {
 	readonly nonce: bigint;

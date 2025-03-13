@@ -36,10 +36,10 @@ export type BlockRepositoryExtension = {
 
 export type BlockRepository = ExtendedRepository<Block> & BlockRepositoryExtension;
 
-export type ConfigurationRepositoryExtension = {};
+export type ConfigurationRepositoryExtension = Record<string, any>;
 export type ConfigurationRepository = ExtendedRepository<Configuration> & ConfigurationRepositoryExtension;
 
-export type ContractRepositoryExtension = {};
+export type ContractRepositoryExtension = Record<string, any>;
 export type ContractRepository = ExtendedRepository<Contract> & ContractRepositoryExtension;
 
 export type ApiNodeRepositoryExtension = {
@@ -66,7 +66,7 @@ export type PeerRepositoryExtension = {
 
 export type PeerRepository = ExtendedRepository<Peer> & PeerRepositoryExtension;
 
-export type TransactionTypeRepositoryExtension = {};
+export type TransactionTypeRepositoryExtension = Record<string, any>;
 export type TransactionTypeRepository = ExtendedRepository<TransactionType> & TransactionTypeRepositoryExtension;
 
 export type FeeStatistics = {
@@ -89,11 +89,11 @@ export type TransactionRepositoryExtension = {
 };
 export type TransactionRepository = ExtendedRepository<Transaction> & TransactionRepositoryExtension;
 
-export type LegacyColdWalletRepositoryExtension = {};
+export type LegacyColdWalletRepositoryExtension = Record<string, any>;
 export type LegacyColdWalletRepository = ExtendedRepository<LegacyColdWallet> & LegacyColdWalletRepositoryExtension;
-export type ValidatorRoundRepositoryExtension = {};
+export type ValidatorRoundRepositoryExtension = Record<string, any>;
 export type ValidatorRoundRepository = ExtendedRepository<ValidatorRound> & ValidatorRoundRepositoryExtension;
-export type PluginRepositoryExtension = {};
+export type PluginRepositoryExtension = Record<string, any>;
 export type PluginRepository = ExtendedRepository<Plugin> & PluginRepositoryExtension;
 export type ReceiptRepositoryExtension = {
 	findManyByCriteria(
@@ -104,7 +104,7 @@ export type ReceiptRepositoryExtension = {
 	): Promise<ResultsPage<Receipt>>;
 };
 export type ReceiptRepository = ExtendedRepository<Receipt> & ReceiptRepositoryExtension;
-export type StateRepositoryExtension = {};
+export type StateRepositoryExtension = Record<string, any>;
 export type StateRepository = ExtendedRepository<State> & StateRepositoryExtension;
 
 export type WalletRepositoryExtension = {

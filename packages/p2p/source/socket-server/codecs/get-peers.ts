@@ -5,7 +5,7 @@ const proto = (_protos as any).default.getPeers as typeof types.getPeers;
 
 export const getPeers = {
 	request: {
-		deserialize: (payload: Buffer): {} => proto.GetPeersRequest.decode(payload),
+		deserialize: (payload: Buffer): Record<string, any> => proto.GetPeersRequest.decode(payload),
 		serialize: (object: types.getPeers.GetPeersRequest): Buffer =>
 			Buffer.from(proto.GetPeersRequest.encode(object).finish()),
 	},

@@ -5,7 +5,7 @@ const proto = (_protos as any).default.getApiNodes as typeof types.getApiNodes;
 
 export const getApiNodes = {
 	request: {
-		deserialize: (payload: Buffer): {} => proto.GetApiNodesRequest.decode(payload),
+		deserialize: (payload: Buffer): Record<string, any> => proto.GetApiNodesRequest.decode(payload),
 		serialize: (object: types.getApiNodes.GetApiNodesRequest): Buffer =>
 			Buffer.from(proto.GetApiNodesRequest.encode(object).finish()),
 	},

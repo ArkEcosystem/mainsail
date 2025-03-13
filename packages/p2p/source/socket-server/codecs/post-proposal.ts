@@ -16,7 +16,7 @@ export const postProposal = {
 			Buffer.from(proto.PostProposalRequest.encode(object).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): {} =>
+		deserialize: (payload: Buffer): Record<string, any> =>
 			proto.PostProposalResponse.toObject(proto.PostProposalResponse.decode(payload), { defaults: true }),
 		serialize: (object: types.postProposal.IPostProposalResponse): Buffer =>
 			Buffer.from(proto.PostProposalResponse.encode(object).finish()),

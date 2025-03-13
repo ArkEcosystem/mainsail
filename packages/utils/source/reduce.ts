@@ -3,7 +3,7 @@ import { isArray } from "./is-array.js";
 import { reduceArray } from "./reduce-array.js";
 import { reduceObject } from "./reduce-object.js";
 
-export const reduce = <T extends {}, V>(
+export const reduce = <T extends Record<string, any>, V>(
 	iterable: T | T[],
 	iteratee: FunctionReturning,
 	initialValue: V,

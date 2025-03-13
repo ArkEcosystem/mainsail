@@ -5,7 +5,7 @@ const proto = (_protos as any).default.getStatus as typeof types.getStatus;
 
 export const getStatus = {
 	request: {
-		deserialize: (payload: Buffer): {} => proto.GetStatusRequest.decode(payload),
+		deserialize: (payload: Buffer): Record<string, any> => proto.GetStatusRequest.decode(payload),
 		serialize: (object: types.getStatus.GetStatusRequest): Buffer =>
 			Buffer.from(proto.GetStatusRequest.encode(object).finish()),
 	},
