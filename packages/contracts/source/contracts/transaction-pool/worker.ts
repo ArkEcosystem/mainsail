@@ -3,7 +3,7 @@ import { EventListener } from "../kernel/index.js";
 import { EventCallback, Subprocess } from "../kernel/ipc.js";
 import { KeyValuePair } from "../types/index.js";
 
-export interface WorkerFlags extends KeyValuePair {}
+export type WorkerFlags = KeyValuePair;
 
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;

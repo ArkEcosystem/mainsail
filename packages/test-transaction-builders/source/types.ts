@@ -38,13 +38,13 @@ export interface ValidatorRegistrationOptions extends TransactionOptions {
 	validatorPublicKey?: string;
 }
 
-export interface ValidatorResignationOptions extends TransactionOptions {}
+export type ValidatorResignationOptions = TransactionOptions;
 
 export interface UsernameRegistrationOptions extends TransactionOptions {
 	username?: string;
 }
 
-export interface UsernameResignationOptions extends TransactionOptions {}
+export type UsernameResignationOptions = TransactionOptions;
 
 export interface MultiSignatureOptions extends TransactionOptions {
 	participants: Contracts.Crypto.KeyPair[];
