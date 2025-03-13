@@ -1,11 +1,11 @@
-export interface Stage {
-	process(payload: any);
+export interface Stage<T> {
+	process(payload: T): Promise<T>;
 }
 
-export interface Pipeline {
-	pipe(stage: Function | Stage): Pipeline;
+export type PipelineFunction<T> = (parameter: T) => Promise<T>;
 
-	process<T>(payload: T): Promise<T | undefined>;
+export interface Pipeline<T> {
+	pipe(stage: PipelineFunction<T> | Stage<T>): Pipeline<T>;
 
-	processSync<T>(payload: T): T | undefined;
+	process(payload: T): Promise<T | undefined>;
 }

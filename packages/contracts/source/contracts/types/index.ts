@@ -8,6 +8,6 @@ export type ActionArguments = Record<string, any>;
 
 export type CacheFactory<K, T> = <K, T>() => CacheStore<K, T>;
 
-export type PipelineFactory = () => Pipeline;
+export type PipelineFactory<T> = () => Pipeline<T>;
 
 export type QueueFactory = () => Queue;

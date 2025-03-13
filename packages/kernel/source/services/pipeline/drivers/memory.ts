@@ -2,20 +2,22 @@ import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
 @injectable()
-export class MemoryPipeline implements Contracts.Kernel.Pipeline {
-	public constructor(private readonly stages: Array<Function | Contracts.Kernel.Stage> = []) {}
+export class MemoryPipeline<T> implements Contracts.Kernel.Pipeline<T> {
+	public constructor(
+		private readonly stages: Array<Contracts.Kernel.PipelineFunction<T> | Contracts.Kernel.Stage<T>> = [],
+	) {}
 
-	public pipe(stage: Function | Contracts.Kernel.Stage): Contracts.Kernel.Pipeline {
-		const stages: Array<Function | Contracts.Kernel.Stage> = [...this.stages];
+	public pipe(stage: Contracts.Kernel.PipelineFunction<T> | Contracts.Kernel.Stage<T>): Contracts.Kernel.Pipeline<T> {
+		const stages: Array<Contracts.Kernel.PipelineFunction<T> | Contracts.Kernel.Stage<T>> = [...this.stages];
 
 		stages.push(stage);
 
-		return new MemoryPipeline(stages);
+		return new MemoryPipeline<T>(stages);
 	}
 
-	public async process<T>(payload: T): Promise<T | undefined> {
+	public async process(payload: T): Promise<T | undefined> {
 		for (const stage of this.stages) {
-			if (typeof stage === "function") {
+			if (this.#isPipelineFunction(stage)) {
 				payload = await stage(payload);
 			} else {
 				payload = await stage.process(payload);
@@ -25,15 +27,9 @@ export class MemoryPipeline implements Contracts.Kernel.Pipeline {
 		return payload;
 	}
 
-	public processSync<T>(payload: T): T | undefined {
-		for (const stage of this.stages) {
-			if (typeof stage === "function") {
-				payload = stage(payload);
-			} else {
-				payload = stage.process(payload);
-			}
-		}
-
-		return payload;
+	#isPipelineFunction<T>(
+		value: Contracts.Kernel.PipelineFunction<T> | Contracts.Kernel.Stage<T>,
+	): value is Contracts.Kernel.PipelineFunction<T> {
+		return typeof value === "function";
 	}
 }
