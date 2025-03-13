@@ -50,7 +50,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 
 	// Loosely based on https://github.com/ethereum/go-ethereum/blob/5606cbc710ffcf327740e4db54776eb8a3c1a2fc/eth/gasestimator/gasestimator.go#L54
 	public async handle(parameters: [TxData]): Promise<any> {
-		const defaultGas = 21000;
+		const defaultGas = 21_000;
 
 		const [data] = parameters;
 
@@ -111,7 +111,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 		// check that gas amount and use as a limit for the binary search.
 		const optimisticGasLimit = (receipt.gasUsed + receipt.gasRefunded + 2300n) * (64n / 63n);
 		if (optimisticGasLimit < maxGasLimit) {
-			let { success, executionError } = await this.#execute({ ...context, gasLimit: optimisticGasLimit });
+			const { success, executionError } = await this.#execute({ ...context, gasLimit: optimisticGasLimit });
 			if (executionError) {
 				// This should not happen under normal conditions since if we make it this far the
 				// transaction had run without error at least once before.
@@ -164,9 +164,9 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 
 		try {
 			const { receipt } = await this.evm.process(context);
-			return { success: receipt.success, receipt };
+			return { receipt, success: receipt.success };
 		} catch (error) {
-			return { success: false, executionError: error.message };
+			return { executionError: error.message, success: false };
 		}
 	}
 }
