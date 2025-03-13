@@ -14,11 +14,11 @@ use mainsail_evm_core::{
     legacy::{LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
     logs_bloom,
-    receipt::{map_execution_result, TxReceipt},
+    receipt::{TxReceipt, map_execution_result},
     state_changes::AccountUpdate,
     state_commit, state_hash,
 };
-use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
+use napi::{JsBigInt, JsObject, JsString, bindgen_prelude::*};
 use napi_derive::napi;
 use result::{
     CommitResult, JsAccountInfoExtended, JsLegacyColdWallet, PreverifyTxResult, TxViewResult,
@@ -26,12 +26,12 @@ use result::{
 use revm::interpreter::Host;
 
 use revm::{
+    Database, DatabaseCommit, Evm, TransitionAccount,
     db::{State, WrapDatabaseRef},
     primitives::{
-        hex::ToHexExt, AccountInfo, Address, Bytecode, Bytes, EVMError, ExecutionResult,
-        ResultAndState, B256, U256,
+        AccountInfo, Address, B256, Bytecode, Bytes, EVMError, ExecutionResult, ResultAndState,
+        U256, hex::ToHexExt,
     },
-    Database, DatabaseCommit, Evm, TransitionAccount,
 };
 
 mod ctx;
@@ -599,22 +599,11 @@ impl EvmInner {
     ) -> std::result::Result<TxReceipt, EVMError<String>> {
         let commit_key = tx_ctx.block_context.commit_key;
 
-        // Check if already committed and return existing receipt
-        let (committed, receipt) = self
+        let (committed, _) = self
             .persistent_db
             .get_committed_receipt(commit_key.0, tx_ctx.tx_hash)
             .map_err(|err| EVMError::Database(format!("commit receipt lookup: {}", err).into()))?;
-
-        if committed {
-            match receipt {
-                Some(receipt) => return Ok(receipt),
-                None => {
-                    return Err(EVMError::Database(
-                        "found commit, but tx hash is missing".into(),
-                    ))
-                }
-            }
-        }
+        assert!(!committed);
 
         if let Some(mut pending) = self.pending_commit.as_mut() {
             assert!(pending.key == commit_key, "pending commit key mismatch");
