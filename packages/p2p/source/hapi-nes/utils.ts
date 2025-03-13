@@ -97,7 +97,7 @@ export const parseNesMessage = (buf: Buffer): NesMessage => {
 export const stringifyNesMessage = (messageObj: NesMessage): Buffer => {
 	const pathBuf = Buffer.from(messageObj.path || "");
 	const socketBuf = Buffer.from(messageObj.socket || "");
-	const payloadBuf = Buffer.from(messageObj.payload || "");
+	const payloadBuf = messageObj.payload ?? Buffer.from("");
 
 	const bufHeader = Buffer.alloc(HEADER_BYTE_LENGTH);
 
