@@ -11,7 +11,7 @@ export class CappedSet<T> {
 		if (this.#data.size >= this.#maxSize) {
 			const oldest = this.#data.values().next().value;
 
-			if (oldest) {
+			if (oldest !== undefined) {
 				this.#data.delete(oldest);
 			}
 		}
