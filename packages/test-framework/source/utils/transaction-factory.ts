@@ -2,7 +2,7 @@ import { inject, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { assert, BigNumber } from "@mainsail/utils";
 
-import secrets from "../internal/passphrases.json";
+import secrets from "../internal/passphrases.json" with { type: "json" };
 import { getWalletNonce } from "./generic.js";
 
 const defaultPassphrase: string = secrets[0];

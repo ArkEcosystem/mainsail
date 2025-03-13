@@ -9,9 +9,11 @@ export class CappedSet<T> {
 
 	public add(newElement: T): void {
 		if (this.#data.size >= this.#maxSize) {
-			const oldest: T = this.#data.values().next().value;
+			const oldest = this.#data.values().next().value;
 
-			this.#data.delete(oldest);
+			if (oldest) {
+				this.#data.delete(oldest);
+			}
 		}
 
 		this.#data.add(newElement);

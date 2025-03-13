@@ -3,7 +3,7 @@ import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
 import { BigNumber } from "@mainsail/utils";
 
-import secrets from "../../internal/passphrases.json";
+import secrets from "../../internal/passphrases.json" with { type: "json" };
 import { FactoryBuilder } from "../factory-builder.js";
 import { EvmCallOptions, TransactionOptions, TransferOptions } from "../types.js";
 import { generateApp } from "./generate-app.js";

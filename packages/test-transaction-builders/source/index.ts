@@ -10,4 +10,4 @@ export * as Utils from "./utils.js";
 // export * as ValidatorRegistrations from "./validator-registrations.js";
 // export * as ValidatorResignations from "./validator-resignations.js";
 // export * as Votes from "./votes.js";
-export { default as DARK20Abi } from "./abis/DARK20.json" assert { type: "json" };
+export { default as DARK20Abi } from "./abis/DARK20.json" with { type: "json" };

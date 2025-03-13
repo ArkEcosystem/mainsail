@@ -239,25 +239,27 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#checkResponse(
-		prevotes: Map<number, Contracts.Crypto.Prevote>,
-		precommits: Map<number, Contracts.Crypto.Precommit>,
+		prevotesMap: Map<number, Contracts.Crypto.Prevote>,
+		precommitsMap: Map<number, Contracts.Crypto.Precommit>,
 		job: DownloadJob,
 	) {
-		// ALlow response to be empty
-		if (prevotes.size === 0 && precommits.size === 0) {
+		const prevotes = [...prevotesMap.values()];
+		const precommits = [...precommitsMap.values()];
+
+		// Allow response to be empty
+		if (prevotes.length === 0 && precommits.length === 0) {
 			return;
 		}
 
 		this.state.resetLastMessageTime();
 
 		// Check actual received round, because we might have received a full response even if we marked request as a partial
-		const receivedRound =
-			prevotes.size > 0 ? prevotes.values().next().value.round : precommits.values().next().value.round;
+		const receivedRound = prevotes.length > 0 ? prevotes[0].round : precommits[0].round;
 
 		if (job.ourHeader.round < receivedRound) {
-			this.#checkFullRoundResponse(prevotes, precommits, job);
+			this.#checkFullRoundResponse(prevotesMap, precommitsMap, job);
 		} else {
-			this.#checkPartialRoundResponse(prevotes, precommits, job);
+			this.#checkPartialRoundResponse(prevotesMap, precommitsMap, job);
 		}
 	}
 
