@@ -26,7 +26,7 @@ export interface Instance extends CommitHandler {
 	getAccounts(offset: bigint, limit: bigint): Promise<GetAccountsResult>;
 	getLegacyColdWallets(offset: bigint, limit: bigint): Promise<GetLegacyColdWalletsResult>;
 	getReceipts(offset: bigint, limit: bigint): Promise<GetReceiptsResult>;
-	getReceipt(height: number, txHash: string): Promise<GetReceiptResult>;
+	getReceipt(height: bigint, txHash: string): Promise<GetReceiptResult>;
 	calculateActiveValidators(context: CalculateActiveValidatorsContext): Promise<void>;
 	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;
 	logsBloom(commitKey: CommitKey): Promise<string>;

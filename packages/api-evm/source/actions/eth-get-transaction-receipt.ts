@@ -45,7 +45,7 @@ export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action {
 			return null;
 		}
 
-		const { receipt } = await this.evm.getReceipt(transaction.data.blockHeight, transaction.id);
+		const { receipt } = await this.evm.getReceipt(BigInt(transaction.data.blockHeight), transaction.id);
 		if (!receipt) {
 			// eslint-disable-next-line unicorn/no-null
 			return null;
