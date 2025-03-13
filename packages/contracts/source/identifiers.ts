@@ -237,9 +237,6 @@ export const Identifiers = {
 			Manager: Symbol("Kernel<Log.Manager>"),
 			Service: Symbol("Kernel<Log.Service>"),
 		},
-		Mixin: {
-			Service: Symbol("Kernel<Mixin.Service>"),
-		},
 		Pipeline: {
 			Factory: Symbol("Kernel<Pipeline.Factory>"),
 		},
