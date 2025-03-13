@@ -1,6 +1,7 @@
-const { readdirSync, writeFileSync } = require("fs");
-const { resolve } = require("path");
-const YAML = require("yaml");
+import { assert } from "console";
+import { readdirSync, writeFileSync } from "fs";
+import { resolve, join } from "path";
+import YAML from "yaml";
 
 const workflow = {
 	jobs: {
@@ -91,7 +92,11 @@ const directories = readdirSync(resolve("packages"), { withFileTypes: true })
 
 for (const directory of directories) {
 	try {
-		if (require(`../packages/${directory}/package.json`)["scripts"]["test"] === undefined) {
+		const packageJson = (
+			await import(join(process.cwd(), `/packages/${directory}/package.json`), { assert: { type: "json" } })
+		).default;
+
+		if (packageJson["scripts"]["test"] === undefined) {
 			console.log(`Package [${directory}] has no [test] script.`);
 
 			continue;
@@ -108,4 +113,4 @@ for (const directory of directories) {
 	}
 }
 
-writeFileSync(resolve(".github/workflows/unit.yml"), YAML.stringify(workflow, { indent: 4 }));
+writeFileSync(join(process.cwd(), ".github/workflows/unit.yml"), YAML.stringify(workflow, { indent: 4 }));

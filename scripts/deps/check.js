@@ -1,6 +1,6 @@
-const depcheck = require("depcheck");
-const { resolve, join } = require("path");
-const { readdirSync, lstatSync } = require("fs");
+import depcheck from "depcheck";
+import { resolve, join } from "path";
+import { readdirSync, lstatSync } from "fs";
 
 // Dependency categorization:
 // USAGE in code -> Type:
@@ -230,7 +230,7 @@ class Import {
 }
 
 const main = async () => {
-	const source = resolve(__dirname, "../../packages");
+	const source = resolve(process.cwd(), "packages");
 
 	const pkgs = readdirSync(source)
 		.filter((name) => lstatSync(`${source}/${name}`).isDirectory())
@@ -239,7 +239,7 @@ const main = async () => {
 	let pass = true;
 
 	for (const pkg of pkgs) {
-		const packageJson = require(join(source, pkg, "package.json"));
+		const packageJson = (await import(join(source, pkg, "package.json"), { assert: { type: "json" } })).default;
 
 		await depcheck(
 			join(source, pkg),
@@ -249,13 +249,13 @@ const main = async () => {
 			},
 			(result) => {
 				const imports = Object.keys(result.using).map((name) => new Import(name, result.using[name]));
-				const package = new Package(packageJson, imports);
+				const pkg = new Package(packageJson, imports);
 
-				if (!package.pass()) {
+				if (!pkg.pass()) {
 					pass = false;
-					console.log("Package: ", package.name);
+					console.log("Package: ", pkg.name);
 
-					const { missing, unused, devMissing, devUnused } = package;
+					const { missing, unused, devMissing, devUnused } = pkg;
 
 					console.log({
 						missing,
