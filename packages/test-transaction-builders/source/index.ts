@@ -3,7 +3,7 @@ export * as EvmCalls from "./evm-calls.js";
 // export * as MultiSignatureRegistrations from "./multi-signature-registrations.js";
 // export * as Transfers from "./transfers.js";
 export * as Types from "./types.js";
-export * as Utils from "./utils.js";
+export * as Utils from "./utilities.js";
 // export * as UsernameRegistrations from "./username-registrations.js";
 // export * as UsernameResignations from "./username-resignations.js";
 // export * as Utils from "./utils.js";

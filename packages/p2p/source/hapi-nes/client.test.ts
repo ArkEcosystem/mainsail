@@ -6,7 +6,7 @@ import * as Hoek from "@hapi/hoek";
 import * as Teamwork from "@hapi/teamwork";
 import { Client } from "./client";
 import { plugin } from "./plugin";
-import { stringifyNesMessage } from "./utils";
+import { stringifyNesMessage } from "./utilities";
 
 describeSkip<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 	const createServerWithPlugin = async (pluginOptions = {}, serverOptions = {}, withPreResponseHandler = false) => {

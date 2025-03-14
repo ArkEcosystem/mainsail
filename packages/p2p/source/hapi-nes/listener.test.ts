@@ -6,7 +6,7 @@ import * as Teamwork from "@hapi/teamwork";
 import { Client } from "./client";
 import { plugin } from "./plugin";
 import { Socket } from "./socket";
-import { parseNesMessage } from "./utils";
+import { parseNesMessage } from "./utilities";
 
 describeSkip("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 	beforeEach(() => {

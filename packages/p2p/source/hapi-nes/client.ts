@@ -8,7 +8,7 @@
 
 import WebSocket from "ws";
 
-import { parseNesMessage, stringifyNesMessage } from "./utils.js";
+import { parseNesMessage, stringifyNesMessage } from "./utilities.js";
 import { errorTypes } from "./constants.js";
 import { constants } from "../constants.js";
 

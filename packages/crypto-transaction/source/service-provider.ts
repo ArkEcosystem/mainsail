@@ -7,7 +7,7 @@ import { TransactionRegistry } from "./registry.js";
 import { Serializer } from "./serializer.js";
 import { Signer } from "./signer.js";
 import { TransactionTypeFactory } from "./types/index.js";
-import { Utils as Utilities } from "./utils.js";
+import { Utils as Utilities } from "./utilities.js";
 import { makeFormats, makeKeywords, schemas } from "./validation/index.js";
 import { Verifier } from "./verifier.js";
 

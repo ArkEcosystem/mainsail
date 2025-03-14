@@ -1,6 +1,6 @@
 import { BigNumber } from "@mainsail/utils";
 
-import { Mutable } from "../../utils.js";
+import { Mutable } from "../../utilities.js";
 import { Transaction, TransactionData, TransactionJson } from "./transactions.js";
 
 export interface BlockVerification {

@@ -3,7 +3,7 @@ import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus"
 import { assert, Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
 
-import { getAccountByAddressOrPublicKey, getLegacyColdWallets } from "./utils.js";
+import { getAccountByAddressOrPublicKey, getLegacyColdWallets } from "./utilities.js";
 
 interface WalletState {
 	balance: BigNumber;

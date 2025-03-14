@@ -7,7 +7,7 @@ import { dirSync } from "tmp";
 import { MemoryDatabase } from "./database.js";
 import { PoolWorker } from "./pool-worker.js";
 import { Worker } from "./worker.js";
-import { getLegacyColdWallets } from "./utils.js";
+import { getLegacyColdWallets } from "./utilities.js";
 
 type PluginOptions = Record<string, any>;
 

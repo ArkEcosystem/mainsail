@@ -2,7 +2,7 @@ import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 import { Transaction } from "./types/index.js";
-import { signedSchema, strictSchema } from "./validation/utils.js";
+import { signedSchema, strictSchema } from "./validation/utilities.js";
 
 export type TransactionConstructor = typeof Transaction;
 

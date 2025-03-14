@@ -3,7 +3,7 @@ import { Events } from "@mainsail/contracts";
 
 import { describe } from "../../../test-framework/source";
 import { Webhook } from "../interfaces";
-import { respondWithResource } from "./utils";
+import { respondWithResource } from "./utilities";
 
 describe("Utils", ({ it, assert }) => {
 	const data: Webhook = {

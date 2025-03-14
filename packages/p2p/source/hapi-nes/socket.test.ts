@@ -5,7 +5,7 @@ import * as Hoek from "@hapi/hoek";
 import * as Teamwork from "@hapi/teamwork";
 import { Client } from "./client";
 import { plugin } from "./plugin";
-import { stringifyNesMessage } from "./utils";
+import { stringifyNesMessage } from "./utilities";
 import { default as Ws } from "ws";
 import delay from "delay";
 

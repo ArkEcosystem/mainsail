@@ -5,7 +5,7 @@ import Bounce from "@hapi/bounce";
 import { clone } from "@hapi/hoek";
 import Teamwork from "@hapi/teamwork";
 
-import { parseNesMessage, protocol, stringifyNesMessage } from "./utils.js";
+import { parseNesMessage, protocol, stringifyNesMessage } from "./utilities.js";
 
 const internals = {
 	version: "2",

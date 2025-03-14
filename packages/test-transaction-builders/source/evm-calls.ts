@@ -4,7 +4,7 @@ import { BigNumberish, ethers } from "ethers";
 
 import { default as DARK20 } from "./abis/DARK20.json" with { type: "json" };
 import { Context, EvmCallOptions } from "./types.js";
-import { buildSignedTransaction, getAddressByPublicKey } from "./utils.js";
+import { buildSignedTransaction, getAddressByPublicKey } from "./utilities.js";
 
 export const makeEvmCall = async (
 	{ sandbox, wallets }: Context,

@@ -7,7 +7,7 @@ import { randomBytes } from "crypto";
 
 import { whitelist } from "./plugins/whitelist.js";
 import { destroy, show, store, update } from "./schema.js";
-import { respondWithResource } from "./utils.js";
+import { respondWithResource } from "./utilities.js";
 
 export type WebhookAppState = { database: Contracts.Webhooks.Database };
 export type WebhookServer = HapiServer<WebhookAppState>;

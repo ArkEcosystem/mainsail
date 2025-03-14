@@ -6,6 +6,6 @@ export * from "./serializer.js";
 export * from "./service-provider.js";
 export * from "./signer.js";
 export * from "./types/index.js";
-export * from "./utils.js";
+export * from "./utilities.js";
 export * from "./validation/index.js";
 export * from "./verifier.js";
