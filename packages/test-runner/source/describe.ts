@@ -27,8 +27,10 @@ interface CallbackArguments<T> {
 	loader: typeof loader;
 	match: sinon.SinonMatch;
 	nock: typeof nock;
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	only: Function;
 	schema: typeof schema;
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	skip: Function;
 	spy: (owner?: object, method?: string) => Spy;
 	spyFn: () => Spy;

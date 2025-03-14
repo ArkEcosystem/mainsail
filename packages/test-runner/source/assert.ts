@@ -67,6 +67,7 @@ export const assert = {
 	number: (value: unknown): void => uvu.type(value, "number"),
 	object: (value: unknown): void => uvu.type(value, "object"),
 	positive: (value: number): void => uvu.ok(value > 0),
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	rejects: async (callback: Function, ...expected: (uvu.Message | Constructable)[]): Promise<void> => {
 		try {
 			await callback();
@@ -94,6 +95,7 @@ export const assert = {
 			uvu.ok(true);
 		}
 	},
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	resolves: async (callback: Function): Promise<void> => {
 		try {
 			await callback();
@@ -131,6 +133,7 @@ export const assert = {
 	startsWith: (value: string, prefix: string): void => uvu.ok(value.startsWith(prefix)),
 	string: (value: unknown): void => uvu.type(value, "string"),
 	stringArray: (values: unknown[]): void => uvu.ok(values.every((value) => typeof value === "string")),
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	throws: (function_: Function, expects?: uvu.Message | RegExp | Function): void => {
 		if (typeof expects === "string") {
 			expects = new RegExp(expects);
