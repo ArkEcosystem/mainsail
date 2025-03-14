@@ -6,10 +6,10 @@ import { ActionArguments } from "../../types/index.js";
 import { Action } from "./action.js";
 
 @injectable()
-export class Triggers {
-	readonly #triggers: Map<string, Action> = new Map<string, Action>();
+export class Triggers<T> {
+	readonly #triggers: Map<string, Action<T>> = new Map<string, Action<T>>();
 
-	public bind(name: string, action: Action): Action {
+	public bind(name: string, action: Action<T>): Action<T> {
 		if (this.#triggers.has(name)) {
 			throw new Exceptions.InvalidArgumentException(`The given trigger [${name}] is already registered.`);
 		}
@@ -23,7 +23,7 @@ export class Triggers {
 		return action;
 	}
 
-	public unbind(name: string): Action {
+	public unbind(name: string): Action<T> {
 		const trigger = this.#triggers.get(name);
 
 		if (!trigger) {
@@ -35,16 +35,16 @@ export class Triggers {
 		return trigger;
 	}
 
-	public rebind(name: string, action: Action): Action {
+	public rebind(name: string, action: Action<T>): Action<T> {
 		this.unbind(name);
 
 		return this.bind(name, action);
 	}
 
-	public get(name: string): Action {
+	public get(name: string): Action<T> | undefined {
 		this.#throwIfActionIsMissing(name);
 
-		const trigger: Action | undefined = this.#triggers.get(name);
+		const trigger = this.#triggers.get(name);
 
 		assert.defined(trigger);
 
@@ -80,7 +80,7 @@ export class Triggers {
 	}
 
 	async #callBeforeHooks<T>(trigger: string, arguments_: ActionArguments): Promise<void> {
-		const hooks: Set<Function> = this.get(trigger).hooks("before");
+		const hooks = this.get(trigger).hooks("before");
 
 		for (const hook of hooks) {
 			await hook(arguments_);
@@ -88,7 +88,7 @@ export class Triggers {
 	}
 
 	async #callAfterHooks<T>(trigger: string, arguments_: ActionArguments, result: T): Promise<void> {
-		const hooks: Set<Function> = this.get(trigger).hooks("after");
+		const hooks = this.get(trigger).hooks("after");
 
 		for (const hook of hooks) {
 			await hook(arguments_, result);
@@ -102,7 +102,7 @@ export class Triggers {
 		error: Error,
 		stage: string,
 	): Promise<void> {
-		const hooks: Set<Function> = this.get(trigger).hooks("error");
+		const hooks = this.get(trigger).hooks("error");
 
 		for (const hook of hooks) {
 			await hook(arguments_, result, error, stage);
