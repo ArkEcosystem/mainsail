@@ -1,6 +1,3 @@
-// import globals from "globals";
-// import pluginJs from "@eslint/js";
-
 import tseslint from "typescript-eslint";
 import prettier from "eslint-plugin-prettier";
 import promise from "eslint-plugin-promise";
@@ -36,32 +33,17 @@ export default [
 			},
 		},
 	},
-
 	{
 		plugins: {
-			// "@typescript-eslint": fixupPluginRules(typescriptEslint),
 			prettier: prettier,
 			promise: promise,
 			"simple-import-sort": simpleImportSort,
 			sonarjs: sonarjs,
 			"sort-keys-fix": sortKeysFix,
-			// "testing-library": testingLibrary,
 			unicorn: unicorn,
 			"unused-imports": unusedImports,
 			import: esImport,
 		},
-
-		// languageOptions: {
-		// 	parser: tsParser,
-		// 	ecmaVersion: 5,
-		// 	sourceType: "script",
-
-		// 	parserOptions: {
-		// 		project: "tsconfig.eslint.json",
-		// 		extraFileExtensions: [".json"],
-		// 		projectFolderIgnoreList: ["build", "coverage", "node_modules", "public"],
-		// 	},
-		// },
 
 		rules: {
 			"@typescript-eslint/ban-ts-comment": "off",
@@ -201,6 +183,4 @@ export default [
 			"unicorn/prefer-event-target": "warn",
 		},
 	},
-	// { languageOptions: { globals: globals.node } },
-	// pluginJs.configs.recommended,
 ];
