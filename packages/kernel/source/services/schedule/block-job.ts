@@ -15,11 +15,11 @@ export class BlockJob implements Job {
 
 	protected blockCount = 1;
 
-	public execute(callback: Function): void {
+	public execute(callback: () => void): void {
 		const onCallback = async () => {
 			const start = performance.now();
 
-			await callback();
+			callback();
 
 			await this.events.dispatch(Events.ScheduleEvent.BlockJobFinished, {
 				blockCount: this.blockCount,
