@@ -34,6 +34,7 @@ export default [
 			"**/LICENSE",
 			"**/CODE_OF_CONDUCT.md",
 			"**/scripts",
+			"eslint.config.mjs",
 			"packages/p2p/source/hapi-nes",
 		],
 	},
