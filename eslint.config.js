@@ -10,7 +10,6 @@ import sortKeysFix from "eslint-plugin-sort-keys-fix";
 import unicorn from "eslint-plugin-unicorn";
 import unusedImports from "eslint-plugin-unused-imports";
 
-/** @type {import('eslint').Linter.Config[]} */
 export default [
 	{
 		ignores: [
@@ -117,6 +116,7 @@ export default [
 			"no-unneeded-ternary": "warn",
 			"no-unused-expressions": "off",
 			"no-unused-vars": "off",
+			"no-empty": "warn",
 
 			"prefer-const": [
 				"warn",
@@ -192,7 +192,6 @@ export default [
 			"unicorn/no-typeof-undefined": "warn",
 			"unicorn/prefer-add-event-listener": "warn",
 			"unicorn/switch-case-braces": "warn",
-			// "no-empty": "warn",
 			"unicorn/require-number-to-fixed-digits-argument": "off",
 			"unicorn/prefer-logical-operator-over-ternary": "off",
 			"unicorn/no-negated-condition": "off",
