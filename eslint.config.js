@@ -133,9 +133,8 @@ export default [
 			],
 
 			"promise/param-names": "warn",
-			// "simple-import-sort/exports": "error",
-			// "simple-import-sort/imports": "warn"
-
+			"simple-import-sort/exports": "error",
+			"simple-import-sort/imports": "warn",
 			"sonarjs/cognitive-complexity": "warn",
 			"sonarjs/no-all-duplicated-branches": "warn",
 			"sonarjs/no-collapsible-if": "warn",
@@ -183,7 +182,7 @@ export default [
 			"unicorn/prefer-ternary": "off",
 			"unicorn/prefer-top-level-await": "warn",
 			"unicorn/prevent-abbreviations": "warn",
-			// "unused-imports/no-unused-imports-ts": "warn",
+			"unused-imports/no-unused-imports": "warn",
 			"unicorn/prefer-object-from-entries": "warn",
 			"@typescript-eslint/no-floating-promises": "error",
 			"@typescript-eslint/await-thenable": "warn",
