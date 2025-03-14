@@ -2,8 +2,8 @@
 // import pluginJs from "@eslint/js";
 
 import tseslint from "typescript-eslint";
-import promise from "eslint-plugin-promise";
 import prettier from "eslint-plugin-prettier";
+import promise from "eslint-plugin-promise";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import sonarjs from "eslint-plugin-sonarjs";
 import sortKeysFix from "eslint-plugin-sort-keys-fix";
@@ -132,7 +132,7 @@ export default [
 				},
 			],
 
-			// "promise/param-names": "warn",
+			"promise/param-names": "warn",
 			// "simple-import-sort/exports": "error",
 			// "simple-import-sort/imports": "warn"
 
@@ -188,7 +188,7 @@ export default [
 			"@typescript-eslint/no-floating-promises": "error",
 			"@typescript-eslint/await-thenable": "warn",
 			"@typescript-eslint/unbound-method": "warn",
-			// "promise/always-return": "warn",
+			"promise/always-return": "warn",
 			"unicorn/prefer-default-parameters": "warn",
 			"unicorn/no-typeof-undefined": "warn",
 			"unicorn/prefer-add-event-listener": "warn",
