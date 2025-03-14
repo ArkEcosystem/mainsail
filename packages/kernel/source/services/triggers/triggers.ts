@@ -63,13 +63,13 @@ export class Triggers<T> {
 			await this.#callBeforeHooks(name, arguments_);
 
 			stage = "execute";
-			result = await this.get(name).execute<T>(arguments_);
+			result = await this.get(name)!.execute<T>(arguments_);
 
 			stage = "after";
 			await this.#callAfterHooks<T>(name, arguments_, result);
 		} catch (error) {
 			// Handle errors inside error hooks. Rethrow error if there are no error hooks.
-			if (this.get(name).hooks("error").size > 0) {
+			if (this.get(name)!.hooks("error").size > 0) {
 				await this.#callErrorHooks(name, arguments_, result, error, stage);
 			} else {
 				throw error;
@@ -79,8 +79,9 @@ export class Triggers<T> {
 		return result;
 	}
 
-	async #callBeforeHooks<T>(trigger: string, arguments_: ActionArguments): Promise<void> {
-		const hooks = this.get(trigger).hooks("before");
+	// @ts-ignore
+	async #callBeforeHooks<T>(trigger: string, arguments_: TemplateTStringsArray): Promise<void> {
+		const hooks = this.get(trigger)!.hooks("before");
 
 		for (const hook of hooks) {
 			await hook(arguments_);
@@ -88,9 +89,10 @@ export class Triggers<T> {
 	}
 
 	async #callAfterHooks<T>(trigger: string, arguments_: ActionArguments, result: T): Promise<void> {
-		const hooks = this.get(trigger).hooks("after");
+		const hooks = this.get(trigger)!.hooks("after");
 
 		for (const hook of hooks) {
+			// @ts-ignore
 			await hook(arguments_, result);
 		}
 	}
@@ -102,9 +104,10 @@ export class Triggers<T> {
 		error: Error,
 		stage: string,
 	): Promise<void> {
-		const hooks = this.get(trigger).hooks("error");
+		const hooks = this.get(trigger)!.hooks("error");
 
 		for (const hook of hooks) {
+			// @ts-ignore
 			await hook(arguments_, result, error, stage);
 		}
 	}
