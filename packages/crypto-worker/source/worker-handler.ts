@@ -93,7 +93,7 @@ export class WorkerScriptHandler implements Contracts.Crypto.WorkerScriptHandler
 			app.rebind(Identifiers.Services.Log.Service).to(Services.Log.NullLogger);
 		}
 
-		// eslint-disable-next-line @typescript-eslint/await-thenable
+		 
 		await app.boot();
 		this.#impl = app.resolve(WorkerImpl);
 	}

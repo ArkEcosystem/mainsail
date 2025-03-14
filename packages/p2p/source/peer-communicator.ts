@@ -5,7 +5,6 @@ import { assert, http } from "@mainsail/utils";
 
 import { constants } from "./constants.js";
 import { Routes, SocketErrors } from "./enums.js";
-// eslint-disable-next-line import/no-namespace
 import * as replySchemas from "./reply-schemas/index.js";
 import { Codecs } from "./socket-server/codecs/index.js";
 import { Throttle } from "./throttle.js";

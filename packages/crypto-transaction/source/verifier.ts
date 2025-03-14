@@ -11,7 +11,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	private readonly validator!: Contracts.Crypto.Validator;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils!: Contracts.Crypto.TransactionUtils;
+	private readonly utils!: Contracts.Crypto.TransactionUtilities;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;

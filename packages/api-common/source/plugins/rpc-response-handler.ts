@@ -2,7 +2,7 @@ import { Boom } from "@hapi/boom";
 import { ResponseObject, Server as HapiServer } from "@hapi/hapi";
 import { Contracts } from "@mainsail/contracts";
 
-import { Utils } from "../rcp/index.js";
+import { Utils as Utilities } from "../rcp/index.js";
 
 const responseIsBoom = (response: ResponseObject | Boom): response is Boom => !!(response as Boom).isBoom;
 
@@ -15,8 +15,8 @@ export const rpcResponseHandler = {
 
 				if (responseIsBoom(response) && request.method === "post" && request.path === "") {
 					return h.response(
-						Utils.prepareRcpError(
-							Utils.getRcpId(request),
+						Utilities.prepareRcpError(
+							Utilities.getRcpId(request),
 							Contracts.Api.RPC.ErrorCode.InternalError,
 							response.output.payload.message,
 						),

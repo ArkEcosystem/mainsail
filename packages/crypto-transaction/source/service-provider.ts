@@ -7,7 +7,7 @@ import { TransactionRegistry } from "./registry.js";
 import { Serializer } from "./serializer.js";
 import { Signer } from "./signer.js";
 import { TransactionTypeFactory } from "./types/index.js";
-import { Utils } from "./utils.js";
+import { Utils as Utilities } from "./utils.js";
 import { makeFormats, makeKeywords, schemas } from "./validation/index.js";
 import { Verifier } from "./verifier.js";
 
@@ -19,7 +19,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Transaction.Registry).to(TransactionRegistry).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Signer).to(Signer).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utils).inSingletonScope();
+		this.app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utilities).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier).inSingletonScope();
 
 		this.#registerValidation();

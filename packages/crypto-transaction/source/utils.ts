@@ -4,7 +4,7 @@ import { assert } from "@mainsail/utils";
 import { encodeRlp, keccak256, toBeArray } from "ethers";
 
 @injectable()
-export class Utils implements Contracts.Crypto.TransactionUtils {
+export class Utils implements Contracts.Crypto.TransactionUtilities {
 	@inject(Identifiers.Cryptography.Transaction.Serializer)
 	private readonly serializer!: Contracts.Crypto.TransactionSerializer;
 

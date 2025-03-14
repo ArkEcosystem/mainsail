@@ -11,10 +11,10 @@ enum OutputVerbosity {
 export class Output {
 	#verbosity: number = OutputVerbosity.Normal;
 
-	#realStdout: (msg: string) => boolean = process.stdout.write;
+	#realStdout: (message: string) => boolean = process.stdout.write;
 
 	public mute() {
-		process.stdout.write = (msg: string) => true;
+		process.stdout.write = (message: string) => true;
 	}
 
 	public unmute() {

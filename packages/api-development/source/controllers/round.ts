@@ -30,7 +30,7 @@ export class RoundController extends Controller {
 			...this.roundCalculator.calculateRound(height),
 			// Map the active validator set (static, vote-weighted, etc.) to actual proposal order
 			validators: orderedValidators.map((validator) => ({
-				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+				 
 				// rank: validator.getVoteBalance().toFixed(),
 				voteBalance: validator.voteBalance.toFixed(),
 

@@ -15,7 +15,7 @@ export class WorkerScriptHandler implements Contracts.Evm.WorkerScriptHandler {
 			flags,
 		});
 
-		// eslint-disable-next-line @typescript-eslint/await-thenable
+		 
 		await app.boot();
 		this.#app = app;
 	}

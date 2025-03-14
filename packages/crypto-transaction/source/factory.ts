@@ -25,7 +25,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	private readonly serializer!: Contracts.Crypto.TransactionSerializer;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils!: Contracts.Crypto.TransactionUtils;
+	private readonly utils!: Contracts.Crypto.TransactionUtilities;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly verifier!: Contracts.Crypto.TransactionVerifier;

@@ -8,7 +8,7 @@ export class Signer {
 	private readonly signatureFactory!: Contracts.Crypto.Signature;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils!: Contracts.Crypto.TransactionUtils;
+	private readonly utils!: Contracts.Crypto.TransactionUtilities;
 
 	public async sign(
 		transaction: Contracts.Crypto.TransactionData,

@@ -133,7 +133,7 @@ export interface TransactionRegistry {
 	deregisterTransactionType(constructor: TransactionConstructor): void;
 }
 
-export interface TransactionUtils {
+export interface TransactionUtilities {
 	toBytes(data: TransactionData): Promise<Buffer>;
 
 	toHash(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;

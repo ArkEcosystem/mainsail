@@ -1,11 +1,11 @@
-/*eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars*/
+/*eslint-disable no-redeclare*/
 "use strict";
 
 import * as _$protobuf from "protobufjs";
 const $protobuf = _$protobuf.default;
 
 // Common aliases
-var $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;
+var $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $utility = $protobuf.util;
 
 // Exported root namespace
 var $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
@@ -38,9 +38,9 @@ $root.getApiNodes = (function() {
          */
         function ApiNode(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -74,9 +74,9 @@ $root.getApiNodes = (function() {
          */
         ApiNode.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.url != null && Object.hasOwnProperty.call(message, "url"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.url);
+                {writer = $Writer.create();}
+            if (message.url != undefined && Object.hasOwnProperty.call(message, "url"))
+                {writer.uint32(/* id 1, wireType 2 =*/10).string(message.url);}
             return writer;
         };
 
@@ -106,7 +106,7 @@ $root.getApiNodes = (function() {
          */
         ApiNode.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getApiNodes.ApiNode();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -115,9 +115,10 @@ $root.getApiNodes = (function() {
                         message.url = reader.string();
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -135,7 +136,7 @@ $root.getApiNodes = (function() {
          */
         ApiNode.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -149,10 +150,10 @@ $root.getApiNodes = (function() {
          */
         ApiNode.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.url != null && message.hasOwnProperty("url"))
-                if (!$util.isString(message.url))
-                    return "url: string expected";
+                {return "object expected";}
+            if (message.url != undefined && message.hasOwnProperty("url"))
+                {if (!$utility.isString(message.url))
+                    {return "url: string expected";}}
             return null;
         };
 
@@ -166,10 +167,10 @@ $root.getApiNodes = (function() {
          */
         ApiNode.fromObject = function fromObject(object) {
             if (object instanceof $root.getApiNodes.ApiNode)
-                return object;
+                {return object;}
             var message = new $root.getApiNodes.ApiNode();
-            if (object.url != null)
-                message.url = String(object.url);
+            if (object.url != undefined)
+                {message.url = String(object.url);}
             return message;
         };
 
@@ -184,12 +185,12 @@ $root.getApiNodes = (function() {
          */
         ApiNode.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults)
-                object.url = "";
-            if (message.url != null && message.hasOwnProperty("url"))
-                object.url = message.url;
+                {object.url = "";}
+            if (message.url != undefined && message.hasOwnProperty("url"))
+                {object.url = message.url;}
             return object;
         };
 
@@ -241,9 +242,9 @@ $root.getApiNodes = (function() {
          */
         function GetApiNodesRequest(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -277,9 +278,9 @@ $root.getApiNodes = (function() {
          */
         GetApiNodesRequest.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();}
             return writer;
         };
 
@@ -309,7 +310,7 @@ $root.getApiNodes = (function() {
          */
         GetApiNodesRequest.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getApiNodes.GetApiNodesRequest();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -318,9 +319,10 @@ $root.getApiNodes = (function() {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -338,7 +340,7 @@ $root.getApiNodes = (function() {
          */
         GetApiNodesRequest.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -352,11 +354,11 @@ $root.getApiNodes = (function() {
          */
         GetApiNodesRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
             return null;
         };
@@ -371,11 +373,11 @@ $root.getApiNodes = (function() {
          */
         GetApiNodesRequest.fromObject = function fromObject(object) {
             if (object instanceof $root.getApiNodes.GetApiNodesRequest)
-                return object;
+                {return object;}
             var message = new $root.getApiNodes.GetApiNodesRequest();
-            if (object.headers != null) {
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".getApiNodes.GetApiNodesRequest.headers: object expected");
+                    {throw TypeError(".getApiNodes.GetApiNodesRequest.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -392,12 +394,12 @@ $root.getApiNodes = (function() {
          */
         GetApiNodesRequest.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults)
-                object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+                {object.headers = null;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
             return object;
         };
 
@@ -451,9 +453,9 @@ $root.getApiNodes = (function() {
         function GetApiNodesResponse(properties) {
             this.apiNodes = [];
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -470,7 +472,7 @@ $root.getApiNodes = (function() {
          * @memberof getApiNodes.GetApiNodesResponse
          * @instance
          */
-        GetApiNodesResponse.prototype.apiNodes = $util.emptyArray;
+        GetApiNodesResponse.prototype.apiNodes = $utility.emptyArray;
 
         /**
          * Creates a new GetApiNodesResponse instance using the specified properties.
@@ -495,12 +497,12 @@ $root.getApiNodes = (function() {
          */
         GetApiNodesResponse.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.apiNodes != null && message.apiNodes.length)
-                for (var i = 0; i < message.apiNodes.length; ++i)
-                    $root.getApiNodes.ApiNode.encode(message.apiNodes[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();}
+            if (message.apiNodes != undefined && message.apiNodes.length > 0)
+                {for (var index = 0; index < message.apiNodes.length; ++index)
+                    {$root.getApiNodes.ApiNode.encode(message.apiNodes[index], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();}}
             return writer;
         };
 
@@ -530,7 +532,7 @@ $root.getApiNodes = (function() {
          */
         GetApiNodesResponse.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getApiNodes.GetApiNodesResponse();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -540,14 +542,15 @@ $root.getApiNodes = (function() {
                         break;
                     }
                 case 2: {
-                        if (!(message.apiNodes && message.apiNodes.length))
-                            message.apiNodes = [];
+                        if (!(message.apiNodes && message.apiNodes.length > 0))
+                            {message.apiNodes = [];}
                         message.apiNodes.push($root.getApiNodes.ApiNode.decode(reader, reader.uint32()));
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -565,7 +568,7 @@ $root.getApiNodes = (function() {
          */
         GetApiNodesResponse.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -579,19 +582,19 @@ $root.getApiNodes = (function() {
          */
         GetApiNodesResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
-            if (message.apiNodes != null && message.hasOwnProperty("apiNodes")) {
+            if (message.apiNodes != undefined && message.hasOwnProperty("apiNodes")) {
                 if (!Array.isArray(message.apiNodes))
-                    return "apiNodes: array expected";
-                for (var i = 0; i < message.apiNodes.length; ++i) {
-                    var error = $root.getApiNodes.ApiNode.verify(message.apiNodes[i]);
+                    {return "apiNodes: array expected";}
+                for (var index = 0; index < message.apiNodes.length; ++index) {
+                    var error = $root.getApiNodes.ApiNode.verify(message.apiNodes[index]);
                     if (error)
-                        return "apiNodes." + error;
+                        {return "apiNodes." + error;}
                 }
             }
             return null;
@@ -607,21 +610,21 @@ $root.getApiNodes = (function() {
          */
         GetApiNodesResponse.fromObject = function fromObject(object) {
             if (object instanceof $root.getApiNodes.GetApiNodesResponse)
-                return object;
+                {return object;}
             var message = new $root.getApiNodes.GetApiNodesResponse();
-            if (object.headers != null) {
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".getApiNodes.GetApiNodesResponse.headers: object expected");
+                    {throw TypeError(".getApiNodes.GetApiNodesResponse.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             if (object.apiNodes) {
                 if (!Array.isArray(object.apiNodes))
-                    throw TypeError(".getApiNodes.GetApiNodesResponse.apiNodes: array expected");
+                    {throw TypeError(".getApiNodes.GetApiNodesResponse.apiNodes: array expected");}
                 message.apiNodes = [];
-                for (var i = 0; i < object.apiNodes.length; ++i) {
-                    if (typeof object.apiNodes[i] !== "object")
-                        throw TypeError(".getApiNodes.GetApiNodesResponse.apiNodes: object expected");
-                    message.apiNodes[i] = $root.getApiNodes.ApiNode.fromObject(object.apiNodes[i]);
+                for (var index = 0; index < object.apiNodes.length; ++index) {
+                    if (typeof object.apiNodes[index] !== "object")
+                        {throw TypeError(".getApiNodes.GetApiNodesResponse.apiNodes: object expected");}
+                    message.apiNodes[index] = $root.getApiNodes.ApiNode.fromObject(object.apiNodes[index]);
                 }
             }
             return message;
@@ -638,18 +641,18 @@ $root.getApiNodes = (function() {
          */
         GetApiNodesResponse.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.arrays || options.defaults)
-                object.apiNodes = [];
+                {object.apiNodes = [];}
             if (options.defaults)
-                object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
-            if (message.apiNodes && message.apiNodes.length) {
+                {object.headers = null;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
+            if (message.apiNodes && message.apiNodes.length > 0) {
                 object.apiNodes = [];
-                for (var j = 0; j < message.apiNodes.length; ++j)
-                    object.apiNodes[j] = $root.getApiNodes.ApiNode.toObject(message.apiNodes[j], options);
+                for (var index = 0; index < message.apiNodes.length; ++index)
+                    {object.apiNodes[index] = $root.getApiNodes.ApiNode.toObject(message.apiNodes[index], options);}
             }
             return object;
         };
@@ -716,9 +719,9 @@ $root.getBlocks = (function() {
          */
         function GetBlocksRequest(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -768,13 +771,13 @@ $root.getBlocks = (function() {
          */
         GetBlocksRequest.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.fromHeight != null && Object.hasOwnProperty.call(message, "fromHeight"))
-                writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.fromHeight);
-            if (message.limit != null && Object.hasOwnProperty.call(message, "limit"))
-                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.limit);
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.fromHeight != undefined && Object.hasOwnProperty.call(message, "fromHeight"))
+                {writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.fromHeight);}
+            if (message.limit != undefined && Object.hasOwnProperty.call(message, "limit"))
+                {writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.limit);}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();}
             return writer;
         };
 
@@ -804,7 +807,7 @@ $root.getBlocks = (function() {
          */
         GetBlocksRequest.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getBlocks.GetBlocksRequest();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -821,9 +824,10 @@ $root.getBlocks = (function() {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -841,7 +845,7 @@ $root.getBlocks = (function() {
          */
         GetBlocksRequest.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -855,17 +859,17 @@ $root.getBlocks = (function() {
          */
         GetBlocksRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.fromHeight != null && message.hasOwnProperty("fromHeight"))
-                if (!$util.isInteger(message.fromHeight))
-                    return "fromHeight: integer expected";
-            if (message.limit != null && message.hasOwnProperty("limit"))
-                if (!$util.isInteger(message.limit))
-                    return "limit: integer expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.fromHeight != undefined && message.hasOwnProperty("fromHeight"))
+                {if (!$utility.isInteger(message.fromHeight))
+                    {return "fromHeight: integer expected";}}
+            if (message.limit != undefined && message.hasOwnProperty("limit"))
+                {if (!$utility.isInteger(message.limit))
+                    {return "limit: integer expected";}}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
             return null;
         };
@@ -880,15 +884,15 @@ $root.getBlocks = (function() {
          */
         GetBlocksRequest.fromObject = function fromObject(object) {
             if (object instanceof $root.getBlocks.GetBlocksRequest)
-                return object;
+                {return object;}
             var message = new $root.getBlocks.GetBlocksRequest();
-            if (object.fromHeight != null)
-                message.fromHeight = object.fromHeight >>> 0;
-            if (object.limit != null)
-                message.limit = object.limit >>> 0;
-            if (object.headers != null) {
+            if (object.fromHeight != undefined)
+                {message.fromHeight = object.fromHeight >>> 0;}
+            if (object.limit != undefined)
+                {message.limit = object.limit >>> 0;}
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".getBlocks.GetBlocksRequest.headers: object expected");
+                    {throw TypeError(".getBlocks.GetBlocksRequest.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -905,19 +909,19 @@ $root.getBlocks = (function() {
          */
         GetBlocksRequest.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults) {
                 object.fromHeight = 0;
                 object.limit = 0;
                 object.headers = null;
             }
-            if (message.fromHeight != null && message.hasOwnProperty("fromHeight"))
-                object.fromHeight = message.fromHeight;
-            if (message.limit != null && message.hasOwnProperty("limit"))
-                object.limit = message.limit;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.fromHeight != undefined && message.hasOwnProperty("fromHeight"))
+                {object.fromHeight = message.fromHeight;}
+            if (message.limit != undefined && message.hasOwnProperty("limit"))
+                {object.limit = message.limit;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
             return object;
         };
 
@@ -971,9 +975,9 @@ $root.getBlocks = (function() {
         function GetBlocksResponse(properties) {
             this.blocks = [];
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -990,7 +994,7 @@ $root.getBlocks = (function() {
          * @memberof getBlocks.GetBlocksResponse
          * @instance
          */
-        GetBlocksResponse.prototype.blocks = $util.emptyArray;
+        GetBlocksResponse.prototype.blocks = $utility.emptyArray;
 
         /**
          * Creates a new GetBlocksResponse instance using the specified properties.
@@ -1015,12 +1019,12 @@ $root.getBlocks = (function() {
          */
         GetBlocksResponse.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.blocks != null && message.blocks.length)
-                for (var i = 0; i < message.blocks.length; ++i)
-                    writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.blocks[i]);
+                {writer = $Writer.create();}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();}
+            if (message.blocks != undefined && message.blocks.length > 0)
+                {for (var index = 0; index < message.blocks.length; ++index)
+                    {writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.blocks[index]);}}
             return writer;
         };
 
@@ -1050,7 +1054,7 @@ $root.getBlocks = (function() {
          */
         GetBlocksResponse.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getBlocks.GetBlocksResponse();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -1060,14 +1064,15 @@ $root.getBlocks = (function() {
                         break;
                     }
                 case 2: {
-                        if (!(message.blocks && message.blocks.length))
-                            message.blocks = [];
+                        if (!(message.blocks && message.blocks.length > 0))
+                            {message.blocks = [];}
                         message.blocks.push(reader.bytes());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -1085,7 +1090,7 @@ $root.getBlocks = (function() {
          */
         GetBlocksResponse.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -1099,18 +1104,18 @@ $root.getBlocks = (function() {
          */
         GetBlocksResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
-            if (message.blocks != null && message.hasOwnProperty("blocks")) {
+            if (message.blocks != undefined && message.hasOwnProperty("blocks")) {
                 if (!Array.isArray(message.blocks))
-                    return "blocks: array expected";
-                for (var i = 0; i < message.blocks.length; ++i)
-                    if (!(message.blocks[i] && typeof message.blocks[i].length === "number" || $util.isString(message.blocks[i])))
-                        return "blocks: buffer[] expected";
+                    {return "blocks: array expected";}
+                for (var index = 0; index < message.blocks.length; ++index)
+                    {if (!(message.blocks[index] && typeof message.blocks[index].length === "number" || $utility.isString(message.blocks[index])))
+                        {return "blocks: buffer[] expected";}}
             }
             return null;
         };
@@ -1125,22 +1130,22 @@ $root.getBlocks = (function() {
          */
         GetBlocksResponse.fromObject = function fromObject(object) {
             if (object instanceof $root.getBlocks.GetBlocksResponse)
-                return object;
+                {return object;}
             var message = new $root.getBlocks.GetBlocksResponse();
-            if (object.headers != null) {
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".getBlocks.GetBlocksResponse.headers: object expected");
+                    {throw TypeError(".getBlocks.GetBlocksResponse.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             if (object.blocks) {
                 if (!Array.isArray(object.blocks))
-                    throw TypeError(".getBlocks.GetBlocksResponse.blocks: array expected");
+                    {throw TypeError(".getBlocks.GetBlocksResponse.blocks: array expected");}
                 message.blocks = [];
-                for (var i = 0; i < object.blocks.length; ++i)
-                    if (typeof object.blocks[i] === "string")
-                        $util.base64.decode(object.blocks[i], message.blocks[i] = $util.newBuffer($util.base64.length(object.blocks[i])), 0);
-                    else if (object.blocks[i].length >= 0)
-                        message.blocks[i] = object.blocks[i];
+                for (var index = 0; index < object.blocks.length; ++index)
+                    {if (typeof object.blocks[index] === "string")
+                        {$utility.base64.decode(object.blocks[index], message.blocks[index] = $utility.newBuffer($utility.base64.length(object.blocks[index])), 0);}
+                    else if (object.blocks[index].length >= 0)
+                        {message.blocks[index] = object.blocks[index];}}
             }
             return message;
         };
@@ -1156,18 +1161,18 @@ $root.getBlocks = (function() {
          */
         GetBlocksResponse.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.arrays || options.defaults)
-                object.blocks = [];
+                {object.blocks = [];}
             if (options.defaults)
-                object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
-            if (message.blocks && message.blocks.length) {
+                {object.headers = null;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
+            if (message.blocks && message.blocks.length > 0) {
                 object.blocks = [];
-                for (var j = 0; j < message.blocks.length; ++j)
-                    object.blocks[j] = options.bytes === String ? $util.base64.encode(message.blocks[j], 0, message.blocks[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.blocks[j]) : message.blocks[j];
+                for (var index = 0; index < message.blocks.length; ++index)
+                    {object.blocks[index] = options.bytes === String ? $utility.base64.encode(message.blocks[index], 0, message.blocks[index].length) : options.bytes === Array ? Array.prototype.slice.call(message.blocks[index]) : message.blocks[index];}
             }
             return object;
         };
@@ -1232,9 +1237,9 @@ $root.getMessages = (function() {
          */
         function GetMessagesRequest(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -1268,9 +1273,9 @@ $root.getMessages = (function() {
          */
         GetMessagesRequest.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();}
             return writer;
         };
 
@@ -1300,7 +1305,7 @@ $root.getMessages = (function() {
          */
         GetMessagesRequest.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getMessages.GetMessagesRequest();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -1309,9 +1314,10 @@ $root.getMessages = (function() {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -1329,7 +1335,7 @@ $root.getMessages = (function() {
          */
         GetMessagesRequest.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -1343,11 +1349,11 @@ $root.getMessages = (function() {
          */
         GetMessagesRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
             return null;
         };
@@ -1362,11 +1368,11 @@ $root.getMessages = (function() {
          */
         GetMessagesRequest.fromObject = function fromObject(object) {
             if (object instanceof $root.getMessages.GetMessagesRequest)
-                return object;
+                {return object;}
             var message = new $root.getMessages.GetMessagesRequest();
-            if (object.headers != null) {
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".getMessages.GetMessagesRequest.headers: object expected");
+                    {throw TypeError(".getMessages.GetMessagesRequest.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -1383,12 +1389,12 @@ $root.getMessages = (function() {
          */
         GetMessagesRequest.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults)
-                object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+                {object.headers = null;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
             return object;
         };
 
@@ -1444,9 +1450,9 @@ $root.getMessages = (function() {
             this.prevotes = [];
             this.precommits = [];
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -1463,7 +1469,7 @@ $root.getMessages = (function() {
          * @memberof getMessages.GetMessagesResponse
          * @instance
          */
-        GetMessagesResponse.prototype.prevotes = $util.emptyArray;
+        GetMessagesResponse.prototype.prevotes = $utility.emptyArray;
 
         /**
          * GetMessagesResponse precommits.
@@ -1471,7 +1477,7 @@ $root.getMessages = (function() {
          * @memberof getMessages.GetMessagesResponse
          * @instance
          */
-        GetMessagesResponse.prototype.precommits = $util.emptyArray;
+        GetMessagesResponse.prototype.precommits = $utility.emptyArray;
 
         /**
          * Creates a new GetMessagesResponse instance using the specified properties.
@@ -1496,15 +1502,15 @@ $root.getMessages = (function() {
          */
         GetMessagesResponse.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.prevotes != null && message.prevotes.length)
-                for (var i = 0; i < message.prevotes.length; ++i)
-                    writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.prevotes[i]);
-            if (message.precommits != null && message.precommits.length)
-                for (var i = 0; i < message.precommits.length; ++i)
-                    writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.precommits[i]);
+                {writer = $Writer.create();}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();}
+            if (message.prevotes != undefined && message.prevotes.length > 0)
+                {for (var index = 0; index < message.prevotes.length; ++index)
+                    {writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.prevotes[index]);}}
+            if (message.precommits != undefined && message.precommits.length > 0)
+                {for (var index = 0; index < message.precommits.length; ++index)
+                    {writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.precommits[index]);}}
             return writer;
         };
 
@@ -1534,7 +1540,7 @@ $root.getMessages = (function() {
          */
         GetMessagesResponse.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getMessages.GetMessagesResponse();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -1544,20 +1550,21 @@ $root.getMessages = (function() {
                         break;
                     }
                 case 2: {
-                        if (!(message.prevotes && message.prevotes.length))
-                            message.prevotes = [];
+                        if (!(message.prevotes && message.prevotes.length > 0))
+                            {message.prevotes = [];}
                         message.prevotes.push(reader.bytes());
                         break;
                     }
                 case 3: {
-                        if (!(message.precommits && message.precommits.length))
-                            message.precommits = [];
+                        if (!(message.precommits && message.precommits.length > 0))
+                            {message.precommits = [];}
                         message.precommits.push(reader.bytes());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -1575,7 +1582,7 @@ $root.getMessages = (function() {
          */
         GetMessagesResponse.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -1589,25 +1596,25 @@ $root.getMessages = (function() {
          */
         GetMessagesResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
-            if (message.prevotes != null && message.hasOwnProperty("prevotes")) {
+            if (message.prevotes != undefined && message.hasOwnProperty("prevotes")) {
                 if (!Array.isArray(message.prevotes))
-                    return "prevotes: array expected";
-                for (var i = 0; i < message.prevotes.length; ++i)
-                    if (!(message.prevotes[i] && typeof message.prevotes[i].length === "number" || $util.isString(message.prevotes[i])))
-                        return "prevotes: buffer[] expected";
+                    {return "prevotes: array expected";}
+                for (var index = 0; index < message.prevotes.length; ++index)
+                    {if (!(message.prevotes[index] && typeof message.prevotes[index].length === "number" || $utility.isString(message.prevotes[index])))
+                        {return "prevotes: buffer[] expected";}}
             }
-            if (message.precommits != null && message.hasOwnProperty("precommits")) {
+            if (message.precommits != undefined && message.hasOwnProperty("precommits")) {
                 if (!Array.isArray(message.precommits))
-                    return "precommits: array expected";
-                for (var i = 0; i < message.precommits.length; ++i)
-                    if (!(message.precommits[i] && typeof message.precommits[i].length === "number" || $util.isString(message.precommits[i])))
-                        return "precommits: buffer[] expected";
+                    {return "precommits: array expected";}
+                for (var index = 0; index < message.precommits.length; ++index)
+                    {if (!(message.precommits[index] && typeof message.precommits[index].length === "number" || $utility.isString(message.precommits[index])))
+                        {return "precommits: buffer[] expected";}}
             }
             return null;
         };
@@ -1622,32 +1629,32 @@ $root.getMessages = (function() {
          */
         GetMessagesResponse.fromObject = function fromObject(object) {
             if (object instanceof $root.getMessages.GetMessagesResponse)
-                return object;
+                {return object;}
             var message = new $root.getMessages.GetMessagesResponse();
-            if (object.headers != null) {
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".getMessages.GetMessagesResponse.headers: object expected");
+                    {throw TypeError(".getMessages.GetMessagesResponse.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             if (object.prevotes) {
                 if (!Array.isArray(object.prevotes))
-                    throw TypeError(".getMessages.GetMessagesResponse.prevotes: array expected");
+                    {throw TypeError(".getMessages.GetMessagesResponse.prevotes: array expected");}
                 message.prevotes = [];
-                for (var i = 0; i < object.prevotes.length; ++i)
-                    if (typeof object.prevotes[i] === "string")
-                        $util.base64.decode(object.prevotes[i], message.prevotes[i] = $util.newBuffer($util.base64.length(object.prevotes[i])), 0);
-                    else if (object.prevotes[i].length >= 0)
-                        message.prevotes[i] = object.prevotes[i];
+                for (var index = 0; index < object.prevotes.length; ++index)
+                    {if (typeof object.prevotes[index] === "string")
+                        {$utility.base64.decode(object.prevotes[index], message.prevotes[index] = $utility.newBuffer($utility.base64.length(object.prevotes[index])), 0);}
+                    else if (object.prevotes[index].length >= 0)
+                        {message.prevotes[index] = object.prevotes[index];}}
             }
             if (object.precommits) {
                 if (!Array.isArray(object.precommits))
-                    throw TypeError(".getMessages.GetMessagesResponse.precommits: array expected");
+                    {throw TypeError(".getMessages.GetMessagesResponse.precommits: array expected");}
                 message.precommits = [];
-                for (var i = 0; i < object.precommits.length; ++i)
-                    if (typeof object.precommits[i] === "string")
-                        $util.base64.decode(object.precommits[i], message.precommits[i] = $util.newBuffer($util.base64.length(object.precommits[i])), 0);
-                    else if (object.precommits[i].length >= 0)
-                        message.precommits[i] = object.precommits[i];
+                for (var index = 0; index < object.precommits.length; ++index)
+                    {if (typeof object.precommits[index] === "string")
+                        {$utility.base64.decode(object.precommits[index], message.precommits[index] = $utility.newBuffer($utility.base64.length(object.precommits[index])), 0);}
+                    else if (object.precommits[index].length >= 0)
+                        {message.precommits[index] = object.precommits[index];}}
             }
             return message;
         };
@@ -1663,25 +1670,25 @@ $root.getMessages = (function() {
          */
         GetMessagesResponse.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.arrays || options.defaults) {
                 object.prevotes = [];
                 object.precommits = [];
             }
             if (options.defaults)
-                object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
-            if (message.prevotes && message.prevotes.length) {
+                {object.headers = null;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
+            if (message.prevotes && message.prevotes.length > 0) {
                 object.prevotes = [];
-                for (var j = 0; j < message.prevotes.length; ++j)
-                    object.prevotes[j] = options.bytes === String ? $util.base64.encode(message.prevotes[j], 0, message.prevotes[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.prevotes[j]) : message.prevotes[j];
+                for (var index = 0; index < message.prevotes.length; ++index)
+                    {object.prevotes[index] = options.bytes === String ? $utility.base64.encode(message.prevotes[index], 0, message.prevotes[index].length) : options.bytes === Array ? Array.prototype.slice.call(message.prevotes[index]) : message.prevotes[index];}
             }
-            if (message.precommits && message.precommits.length) {
+            if (message.precommits && message.precommits.length > 0) {
                 object.precommits = [];
-                for (var j = 0; j < message.precommits.length; ++j)
-                    object.precommits[j] = options.bytes === String ? $util.base64.encode(message.precommits[j], 0, message.precommits[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.precommits[j]) : message.precommits[j];
+                for (var index = 0; index < message.precommits.length; ++index)
+                    {object.precommits[index] = options.bytes === String ? $utility.base64.encode(message.precommits[index], 0, message.precommits[index].length) : options.bytes === Array ? Array.prototype.slice.call(message.precommits[index]) : message.precommits[index];}
             }
             return object;
         };
@@ -1746,9 +1753,9 @@ $root.getPeers = (function() {
          */
         function GetPeersRequest(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -1782,9 +1789,9 @@ $root.getPeers = (function() {
          */
         GetPeersRequest.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();}
             return writer;
         };
 
@@ -1814,7 +1821,7 @@ $root.getPeers = (function() {
          */
         GetPeersRequest.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getPeers.GetPeersRequest();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -1823,9 +1830,10 @@ $root.getPeers = (function() {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -1843,7 +1851,7 @@ $root.getPeers = (function() {
          */
         GetPeersRequest.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -1857,11 +1865,11 @@ $root.getPeers = (function() {
          */
         GetPeersRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
             return null;
         };
@@ -1876,11 +1884,11 @@ $root.getPeers = (function() {
          */
         GetPeersRequest.fromObject = function fromObject(object) {
             if (object instanceof $root.getPeers.GetPeersRequest)
-                return object;
+                {return object;}
             var message = new $root.getPeers.GetPeersRequest();
-            if (object.headers != null) {
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".getPeers.GetPeersRequest.headers: object expected");
+                    {throw TypeError(".getPeers.GetPeersRequest.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -1897,12 +1905,12 @@ $root.getPeers = (function() {
          */
         GetPeersRequest.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults)
-                object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+                {object.headers = null;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
             return object;
         };
 
@@ -1956,9 +1964,9 @@ $root.getPeers = (function() {
         function GetPeersResponse(properties) {
             this.peers = [];
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -1975,7 +1983,7 @@ $root.getPeers = (function() {
          * @memberof getPeers.GetPeersResponse
          * @instance
          */
-        GetPeersResponse.prototype.peers = $util.emptyArray;
+        GetPeersResponse.prototype.peers = $utility.emptyArray;
 
         /**
          * Creates a new GetPeersResponse instance using the specified properties.
@@ -2000,12 +2008,12 @@ $root.getPeers = (function() {
          */
         GetPeersResponse.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.peers != null && message.peers.length)
-                for (var i = 0; i < message.peers.length; ++i)
-                    $root.shared.PeerLike.encode(message.peers[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();}
+            if (message.peers != undefined && message.peers.length > 0)
+                {for (var index = 0; index < message.peers.length; ++index)
+                    {$root.shared.PeerLike.encode(message.peers[index], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();}}
             return writer;
         };
 
@@ -2035,7 +2043,7 @@ $root.getPeers = (function() {
          */
         GetPeersResponse.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getPeers.GetPeersResponse();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -2045,14 +2053,15 @@ $root.getPeers = (function() {
                         break;
                     }
                 case 2: {
-                        if (!(message.peers && message.peers.length))
-                            message.peers = [];
+                        if (!(message.peers && message.peers.length > 0))
+                            {message.peers = [];}
                         message.peers.push($root.shared.PeerLike.decode(reader, reader.uint32()));
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -2070,7 +2079,7 @@ $root.getPeers = (function() {
          */
         GetPeersResponse.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -2084,19 +2093,19 @@ $root.getPeers = (function() {
          */
         GetPeersResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
-            if (message.peers != null && message.hasOwnProperty("peers")) {
+            if (message.peers != undefined && message.hasOwnProperty("peers")) {
                 if (!Array.isArray(message.peers))
-                    return "peers: array expected";
-                for (var i = 0; i < message.peers.length; ++i) {
-                    var error = $root.shared.PeerLike.verify(message.peers[i]);
+                    {return "peers: array expected";}
+                for (var index = 0; index < message.peers.length; ++index) {
+                    var error = $root.shared.PeerLike.verify(message.peers[index]);
                     if (error)
-                        return "peers." + error;
+                        {return "peers." + error;}
                 }
             }
             return null;
@@ -2112,21 +2121,21 @@ $root.getPeers = (function() {
          */
         GetPeersResponse.fromObject = function fromObject(object) {
             if (object instanceof $root.getPeers.GetPeersResponse)
-                return object;
+                {return object;}
             var message = new $root.getPeers.GetPeersResponse();
-            if (object.headers != null) {
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".getPeers.GetPeersResponse.headers: object expected");
+                    {throw TypeError(".getPeers.GetPeersResponse.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             if (object.peers) {
                 if (!Array.isArray(object.peers))
-                    throw TypeError(".getPeers.GetPeersResponse.peers: array expected");
+                    {throw TypeError(".getPeers.GetPeersResponse.peers: array expected");}
                 message.peers = [];
-                for (var i = 0; i < object.peers.length; ++i) {
-                    if (typeof object.peers[i] !== "object")
-                        throw TypeError(".getPeers.GetPeersResponse.peers: object expected");
-                    message.peers[i] = $root.shared.PeerLike.fromObject(object.peers[i]);
+                for (var index = 0; index < object.peers.length; ++index) {
+                    if (typeof object.peers[index] !== "object")
+                        {throw TypeError(".getPeers.GetPeersResponse.peers: object expected");}
+                    message.peers[index] = $root.shared.PeerLike.fromObject(object.peers[index]);
                 }
             }
             return message;
@@ -2143,18 +2152,18 @@ $root.getPeers = (function() {
          */
         GetPeersResponse.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.arrays || options.defaults)
-                object.peers = [];
+                {object.peers = [];}
             if (options.defaults)
-                object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
-            if (message.peers && message.peers.length) {
+                {object.headers = null;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
+            if (message.peers && message.peers.length > 0) {
                 object.peers = [];
-                for (var j = 0; j < message.peers.length; ++j)
-                    object.peers[j] = $root.shared.PeerLike.toObject(message.peers[j], options);
+                for (var index = 0; index < message.peers.length; ++index)
+                    {object.peers[index] = $root.shared.PeerLike.toObject(message.peers[index], options);}
             }
             return object;
         };
@@ -2219,9 +2228,9 @@ $root.getProposal = (function() {
          */
         function GetProposalRequest(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -2255,9 +2264,9 @@ $root.getProposal = (function() {
          */
         GetProposalRequest.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();}
             return writer;
         };
 
@@ -2287,7 +2296,7 @@ $root.getProposal = (function() {
          */
         GetProposalRequest.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getProposal.GetProposalRequest();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -2296,9 +2305,10 @@ $root.getProposal = (function() {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -2316,7 +2326,7 @@ $root.getProposal = (function() {
          */
         GetProposalRequest.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -2330,11 +2340,11 @@ $root.getProposal = (function() {
          */
         GetProposalRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
             return null;
         };
@@ -2349,11 +2359,11 @@ $root.getProposal = (function() {
          */
         GetProposalRequest.fromObject = function fromObject(object) {
             if (object instanceof $root.getProposal.GetProposalRequest)
-                return object;
+                {return object;}
             var message = new $root.getProposal.GetProposalRequest();
-            if (object.headers != null) {
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".getProposal.GetProposalRequest.headers: object expected");
+                    {throw TypeError(".getProposal.GetProposalRequest.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -2370,12 +2380,12 @@ $root.getProposal = (function() {
          */
         GetProposalRequest.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults)
-                object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+                {object.headers = null;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
             return object;
         };
 
@@ -2428,9 +2438,9 @@ $root.getProposal = (function() {
          */
         function GetProposalResponse(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -2447,7 +2457,7 @@ $root.getProposal = (function() {
          * @memberof getProposal.GetProposalResponse
          * @instance
          */
-        GetProposalResponse.prototype.proposal = $util.newBuffer([]);
+        GetProposalResponse.prototype.proposal = $utility.newBuffer([]);
 
         /**
          * Creates a new GetProposalResponse instance using the specified properties.
@@ -2472,11 +2482,11 @@ $root.getProposal = (function() {
          */
         GetProposalResponse.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.proposal != null && Object.hasOwnProperty.call(message, "proposal"))
-                writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.proposal);
+                {writer = $Writer.create();}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();}
+            if (message.proposal != undefined && Object.hasOwnProperty.call(message, "proposal"))
+                {writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.proposal);}
             return writer;
         };
 
@@ -2506,7 +2516,7 @@ $root.getProposal = (function() {
          */
         GetProposalResponse.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getProposal.GetProposalResponse();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -2519,9 +2529,10 @@ $root.getProposal = (function() {
                         message.proposal = reader.bytes();
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -2539,7 +2550,7 @@ $root.getProposal = (function() {
          */
         GetProposalResponse.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -2553,15 +2564,15 @@ $root.getProposal = (function() {
          */
         GetProposalResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
-            if (message.proposal != null && message.hasOwnProperty("proposal"))
-                if (!(message.proposal && typeof message.proposal.length === "number" || $util.isString(message.proposal)))
-                    return "proposal: buffer expected";
+            if (message.proposal != undefined && message.hasOwnProperty("proposal"))
+                {if (!(message.proposal && typeof message.proposal.length === "number" || $utility.isString(message.proposal)))
+                    {return "proposal: buffer expected";}}
             return null;
         };
 
@@ -2575,18 +2586,18 @@ $root.getProposal = (function() {
          */
         GetProposalResponse.fromObject = function fromObject(object) {
             if (object instanceof $root.getProposal.GetProposalResponse)
-                return object;
+                {return object;}
             var message = new $root.getProposal.GetProposalResponse();
-            if (object.headers != null) {
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".getProposal.GetProposalResponse.headers: object expected");
+                    {throw TypeError(".getProposal.GetProposalResponse.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
-            if (object.proposal != null)
-                if (typeof object.proposal === "string")
-                    $util.base64.decode(object.proposal, message.proposal = $util.newBuffer($util.base64.length(object.proposal)), 0);
+            if (object.proposal != undefined)
+                {if (typeof object.proposal === "string")
+                    {$utility.base64.decode(object.proposal, message.proposal = $utility.newBuffer($utility.base64.length(object.proposal)), 0);}
                 else if (object.proposal.length >= 0)
-                    message.proposal = object.proposal;
+                    {message.proposal = object.proposal;}}
             return message;
         };
 
@@ -2601,22 +2612,22 @@ $root.getProposal = (function() {
          */
         GetProposalResponse.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults) {
                 object.headers = null;
                 if (options.bytes === String)
-                    object.proposal = "";
+                    {object.proposal = "";}
                 else {
                     object.proposal = [];
                     if (options.bytes !== Array)
-                        object.proposal = $util.newBuffer(object.proposal);
+                        {object.proposal = $utility.newBuffer(object.proposal);}
                 }
             }
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
-            if (message.proposal != null && message.hasOwnProperty("proposal"))
-                object.proposal = options.bytes === String ? $util.base64.encode(message.proposal, 0, message.proposal.length) : options.bytes === Array ? Array.prototype.slice.call(message.proposal) : message.proposal;
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
+            if (message.proposal != undefined && message.hasOwnProperty("proposal"))
+                {object.proposal = options.bytes === String ? $utility.base64.encode(message.proposal, 0, message.proposal.length) : options.bytes === Array ? Array.prototype.slice.call(message.proposal) : message.proposal;}
             return object;
         };
 
@@ -2680,9 +2691,9 @@ $root.getStatus = (function() {
          */
         function GetStatusRequest(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -2716,9 +2727,9 @@ $root.getStatus = (function() {
          */
         GetStatusRequest.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();}
             return writer;
         };
 
@@ -2748,7 +2759,7 @@ $root.getStatus = (function() {
          */
         GetStatusRequest.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusRequest();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -2757,9 +2768,10 @@ $root.getStatus = (function() {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -2777,7 +2789,7 @@ $root.getStatus = (function() {
          */
         GetStatusRequest.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -2791,11 +2803,11 @@ $root.getStatus = (function() {
          */
         GetStatusRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
             return null;
         };
@@ -2810,11 +2822,11 @@ $root.getStatus = (function() {
          */
         GetStatusRequest.fromObject = function fromObject(object) {
             if (object instanceof $root.getStatus.GetStatusRequest)
-                return object;
+                {return object;}
             var message = new $root.getStatus.GetStatusRequest();
-            if (object.headers != null) {
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".getStatus.GetStatusRequest.headers: object expected");
+                    {throw TypeError(".getStatus.GetStatusRequest.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -2831,12 +2843,12 @@ $root.getStatus = (function() {
          */
         GetStatusRequest.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults)
-                object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+                {object.headers = null;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
             return object;
         };
 
@@ -2890,9 +2902,9 @@ $root.getStatus = (function() {
          */
         function GetStatusResponse(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -2942,13 +2954,13 @@ $root.getStatus = (function() {
          */
         GetStatusResponse.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.state != null && Object.hasOwnProperty.call(message, "state"))
-                $root.getStatus.GetStatusResponse.State.encode(message.state, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.config != null && Object.hasOwnProperty.call(message, "config"))
-                $root.getStatus.GetStatusResponse.Config.encode(message.config, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();}
+            if (message.state != undefined && Object.hasOwnProperty.call(message, "state"))
+                {$root.getStatus.GetStatusResponse.State.encode(message.state, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();}
+            if (message.config != undefined && Object.hasOwnProperty.call(message, "config"))
+                {$root.getStatus.GetStatusResponse.Config.encode(message.config, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();}
             return writer;
         };
 
@@ -2978,7 +2990,7 @@ $root.getStatus = (function() {
          */
         GetStatusResponse.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusResponse();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -2995,9 +3007,10 @@ $root.getStatus = (function() {
                         message.config = $root.getStatus.GetStatusResponse.Config.decode(reader, reader.uint32());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -3015,7 +3028,7 @@ $root.getStatus = (function() {
          */
         GetStatusResponse.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -3029,21 +3042,21 @@ $root.getStatus = (function() {
          */
         GetStatusResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
-            if (message.state != null && message.hasOwnProperty("state")) {
+            if (message.state != undefined && message.hasOwnProperty("state")) {
                 var error = $root.getStatus.GetStatusResponse.State.verify(message.state);
                 if (error)
-                    return "state." + error;
+                    {return "state." + error;}
             }
-            if (message.config != null && message.hasOwnProperty("config")) {
+            if (message.config != undefined && message.hasOwnProperty("config")) {
                 var error = $root.getStatus.GetStatusResponse.Config.verify(message.config);
                 if (error)
-                    return "config." + error;
+                    {return "config." + error;}
             }
             return null;
         };
@@ -3058,21 +3071,21 @@ $root.getStatus = (function() {
          */
         GetStatusResponse.fromObject = function fromObject(object) {
             if (object instanceof $root.getStatus.GetStatusResponse)
-                return object;
+                {return object;}
             var message = new $root.getStatus.GetStatusResponse();
-            if (object.headers != null) {
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".getStatus.GetStatusResponse.headers: object expected");
+                    {throw TypeError(".getStatus.GetStatusResponse.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
-            if (object.state != null) {
+            if (object.state != undefined) {
                 if (typeof object.state !== "object")
-                    throw TypeError(".getStatus.GetStatusResponse.state: object expected");
+                    {throw TypeError(".getStatus.GetStatusResponse.state: object expected");}
                 message.state = $root.getStatus.GetStatusResponse.State.fromObject(object.state);
             }
-            if (object.config != null) {
+            if (object.config != undefined) {
                 if (typeof object.config !== "object")
-                    throw TypeError(".getStatus.GetStatusResponse.config: object expected");
+                    {throw TypeError(".getStatus.GetStatusResponse.config: object expected");}
                 message.config = $root.getStatus.GetStatusResponse.Config.fromObject(object.config);
             }
             return message;
@@ -3089,19 +3102,19 @@ $root.getStatus = (function() {
          */
         GetStatusResponse.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults) {
                 object.headers = null;
                 object.state = null;
                 object.config = null;
             }
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
-            if (message.state != null && message.hasOwnProperty("state"))
-                object.state = $root.getStatus.GetStatusResponse.State.toObject(message.state, options);
-            if (message.config != null && message.hasOwnProperty("config"))
-                object.config = $root.getStatus.GetStatusResponse.Config.toObject(message.config, options);
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
+            if (message.state != undefined && message.hasOwnProperty("state"))
+                {object.state = $root.getStatus.GetStatusResponse.State.toObject(message.state, options);}
+            if (message.config != undefined && message.hasOwnProperty("config"))
+                {object.config = $root.getStatus.GetStatusResponse.Config.toObject(message.config, options);}
             return object;
         };
 
@@ -3151,9 +3164,9 @@ $root.getStatus = (function() {
              */
             function State(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
-                            this[keys[i]] = properties[keys[i]];
+                    {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                        {if (properties[keys[index]] != undefined)
+                            {this[keys[index]] = properties[keys[index]];}}}
             }
 
             /**
@@ -3195,11 +3208,11 @@ $root.getStatus = (function() {
              */
             State.encode = function encode(message, writer) {
                 if (!writer)
-                    writer = $Writer.create();
-                if (message.height != null && Object.hasOwnProperty.call(message, "height"))
-                    writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.height);
-                if (message.id != null && Object.hasOwnProperty.call(message, "id"))
-                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.id);
+                    {writer = $Writer.create();}
+                if (message.height != undefined && Object.hasOwnProperty.call(message, "height"))
+                    {writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.height);}
+                if (message.id != undefined && Object.hasOwnProperty.call(message, "id"))
+                    {writer.uint32(/* id 2, wireType 2 =*/18).string(message.id);}
                 return writer;
             };
 
@@ -3229,7 +3242,7 @@ $root.getStatus = (function() {
              */
             State.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
-                    reader = $Reader.create(reader);
+                    {reader = $Reader.create(reader);}
                 var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusResponse.State();
                 while (reader.pos < end) {
                     var tag = reader.uint32();
@@ -3242,9 +3255,10 @@ $root.getStatus = (function() {
                             message.id = reader.string();
                             break;
                         }
-                    default:
+                    default: {
                         reader.skipType(tag & 7);
                         break;
+                    }
                     }
                 }
                 return message;
@@ -3262,7 +3276,7 @@ $root.getStatus = (function() {
              */
             State.decodeDelimited = function decodeDelimited(reader) {
                 if (!(reader instanceof $Reader))
-                    reader = new $Reader(reader);
+                    {reader = new $Reader(reader);}
                 return this.decode(reader, reader.uint32());
             };
 
@@ -3276,13 +3290,13 @@ $root.getStatus = (function() {
              */
             State.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
-                    return "object expected";
-                if (message.height != null && message.hasOwnProperty("height"))
-                    if (!$util.isInteger(message.height))
-                        return "height: integer expected";
-                if (message.id != null && message.hasOwnProperty("id"))
-                    if (!$util.isString(message.id))
-                        return "id: string expected";
+                    {return "object expected";}
+                if (message.height != undefined && message.hasOwnProperty("height"))
+                    {if (!$utility.isInteger(message.height))
+                        {return "height: integer expected";}}
+                if (message.id != undefined && message.hasOwnProperty("id"))
+                    {if (!$utility.isString(message.id))
+                        {return "id: string expected";}}
                 return null;
             };
 
@@ -3296,12 +3310,12 @@ $root.getStatus = (function() {
              */
             State.fromObject = function fromObject(object) {
                 if (object instanceof $root.getStatus.GetStatusResponse.State)
-                    return object;
+                    {return object;}
                 var message = new $root.getStatus.GetStatusResponse.State();
-                if (object.height != null)
-                    message.height = object.height >>> 0;
-                if (object.id != null)
-                    message.id = String(object.id);
+                if (object.height != undefined)
+                    {message.height = object.height >>> 0;}
+                if (object.id != undefined)
+                    {message.id = String(object.id);}
                 return message;
             };
 
@@ -3316,16 +3330,16 @@ $root.getStatus = (function() {
              */
             State.toObject = function toObject(message, options) {
                 if (!options)
-                    options = {};
+                    {options = {};}
                 var object = {};
                 if (options.defaults) {
                     object.height = 0;
                     object.id = "";
                 }
-                if (message.height != null && message.hasOwnProperty("height"))
-                    object.height = message.height;
-                if (message.id != null && message.hasOwnProperty("id"))
-                    object.id = message.id;
+                if (message.height != undefined && message.hasOwnProperty("height"))
+                    {object.height = message.height;}
+                if (message.id != undefined && message.hasOwnProperty("id"))
+                    {object.id = message.id;}
                 return object;
             };
 
@@ -3380,9 +3394,9 @@ $root.getStatus = (function() {
             function Config(properties) {
                 this.plugins = {};
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
-                            this[keys[i]] = properties[keys[i]];
+                    {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                        {if (properties[keys[index]] != undefined)
+                            {this[keys[index]] = properties[keys[index]];}}}
             }
 
             /**
@@ -3407,7 +3421,7 @@ $root.getStatus = (function() {
              * @memberof getStatus.GetStatusResponse.Config
              * @instance
              */
-            Config.prototype.plugins = $util.emptyObject;
+            Config.prototype.plugins = $utility.emptyObject;
 
             /**
              * Creates a new Config instance using the specified properties.
@@ -3432,16 +3446,16 @@ $root.getStatus = (function() {
              */
             Config.encode = function encode(message, writer) {
                 if (!writer)
-                    writer = $Writer.create();
-                if (message.version != null && Object.hasOwnProperty.call(message, "version"))
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);
-                if (message.network != null && Object.hasOwnProperty.call(message, "network"))
-                    $root.getStatus.GetStatusResponse.Config.Network.encode(message.network, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                if (message.plugins != null && Object.hasOwnProperty.call(message, "plugins"))
-                    for (var keys = Object.keys(message.plugins), i = 0; i < keys.length; ++i) {
-                        writer.uint32(/* id 3, wireType 2 =*/26).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
-                        $root.getStatus.GetStatusResponse.Config.Plugin.encode(message.plugins[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
-                    }
+                    {writer = $Writer.create();}
+                if (message.version != undefined && Object.hasOwnProperty.call(message, "version"))
+                    {writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);}
+                if (message.network != undefined && Object.hasOwnProperty.call(message, "network"))
+                    {$root.getStatus.GetStatusResponse.Config.Network.encode(message.network, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();}
+                if (message.plugins != undefined && Object.hasOwnProperty.call(message, "plugins"))
+                    {for (var keys = Object.keys(message.plugins), index = 0; index < keys.length; ++index) {
+                        writer.uint32(/* id 3, wireType 2 =*/26).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[index]);
+                        $root.getStatus.GetStatusResponse.Config.Plugin.encode(message.plugins[keys[index]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
+                    }}
                 return writer;
             };
 
@@ -3471,7 +3485,7 @@ $root.getStatus = (function() {
              */
             Config.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
-                    reader = $Reader.create(reader);
+                    {reader = $Reader.create(reader);}
                 var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusResponse.Config(), key, value;
                 while (reader.pos < end) {
                     var tag = reader.uint32();
@@ -3485,31 +3499,35 @@ $root.getStatus = (function() {
                             break;
                         }
                     case 3: {
-                            if (message.plugins === $util.emptyObject)
-                                message.plugins = {};
+                            if (message.plugins === $utility.emptyObject)
+                                {message.plugins = {};}
                             var end2 = reader.uint32() + reader.pos;
                             key = "";
                             value = null;
                             while (reader.pos < end2) {
                                 var tag2 = reader.uint32();
                                 switch (tag2 >>> 3) {
-                                case 1:
+                                case 1: {
                                     key = reader.string();
                                     break;
-                                case 2:
+                                }
+                                case 2: {
                                     value = $root.getStatus.GetStatusResponse.Config.Plugin.decode(reader, reader.uint32());
                                     break;
-                                default:
+                                }
+                                default: {
                                     reader.skipType(tag2 & 7);
                                     break;
+                                }
                                 }
                             }
                             message.plugins[key] = value;
                             break;
                         }
-                    default:
+                    default: {
                         reader.skipType(tag & 7);
                         break;
+                    }
                     }
                 }
                 return message;
@@ -3527,7 +3545,7 @@ $root.getStatus = (function() {
              */
             Config.decodeDelimited = function decodeDelimited(reader) {
                 if (!(reader instanceof $Reader))
-                    reader = new $Reader(reader);
+                    {reader = new $Reader(reader);}
                 return this.decode(reader, reader.uint32());
             };
 
@@ -3541,23 +3559,23 @@ $root.getStatus = (function() {
              */
             Config.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
-                    return "object expected";
-                if (message.version != null && message.hasOwnProperty("version"))
-                    if (!$util.isString(message.version))
-                        return "version: string expected";
-                if (message.network != null && message.hasOwnProperty("network")) {
+                    {return "object expected";}
+                if (message.version != undefined && message.hasOwnProperty("version"))
+                    {if (!$utility.isString(message.version))
+                        {return "version: string expected";}}
+                if (message.network != undefined && message.hasOwnProperty("network")) {
                     var error = $root.getStatus.GetStatusResponse.Config.Network.verify(message.network);
                     if (error)
-                        return "network." + error;
+                        {return "network." + error;}
                 }
-                if (message.plugins != null && message.hasOwnProperty("plugins")) {
-                    if (!$util.isObject(message.plugins))
-                        return "plugins: object expected";
+                if (message.plugins != undefined && message.hasOwnProperty("plugins")) {
+                    if (!$utility.isObject(message.plugins))
+                        {return "plugins: object expected";}
                     var key = Object.keys(message.plugins);
-                    for (var i = 0; i < key.length; ++i) {
-                        var error = $root.getStatus.GetStatusResponse.Config.Plugin.verify(message.plugins[key[i]]);
+                    for (var index = 0; index < key.length; ++index) {
+                        var error = $root.getStatus.GetStatusResponse.Config.Plugin.verify(message.plugins[key[index]]);
                         if (error)
-                            return "plugins." + error;
+                            {return "plugins." + error;}
                     }
                 }
                 return null;
@@ -3573,23 +3591,23 @@ $root.getStatus = (function() {
              */
             Config.fromObject = function fromObject(object) {
                 if (object instanceof $root.getStatus.GetStatusResponse.Config)
-                    return object;
+                    {return object;}
                 var message = new $root.getStatus.GetStatusResponse.Config();
-                if (object.version != null)
-                    message.version = String(object.version);
-                if (object.network != null) {
+                if (object.version != undefined)
+                    {message.version = String(object.version);}
+                if (object.network != undefined) {
                     if (typeof object.network !== "object")
-                        throw TypeError(".getStatus.GetStatusResponse.Config.network: object expected");
+                        {throw TypeError(".getStatus.GetStatusResponse.Config.network: object expected");}
                     message.network = $root.getStatus.GetStatusResponse.Config.Network.fromObject(object.network);
                 }
                 if (object.plugins) {
                     if (typeof object.plugins !== "object")
-                        throw TypeError(".getStatus.GetStatusResponse.Config.plugins: object expected");
+                        {throw TypeError(".getStatus.GetStatusResponse.Config.plugins: object expected");}
                     message.plugins = {};
-                    for (var keys = Object.keys(object.plugins), i = 0; i < keys.length; ++i) {
-                        if (typeof object.plugins[keys[i]] !== "object")
-                            throw TypeError(".getStatus.GetStatusResponse.Config.plugins: object expected");
-                        message.plugins[keys[i]] = $root.getStatus.GetStatusResponse.Config.Plugin.fromObject(object.plugins[keys[i]]);
+                    for (var keys = Object.keys(object.plugins), index = 0; index < keys.length; ++index) {
+                        if (typeof object.plugins[keys[index]] !== "object")
+                            {throw TypeError(".getStatus.GetStatusResponse.Config.plugins: object expected");}
+                        message.plugins[keys[index]] = $root.getStatus.GetStatusResponse.Config.Plugin.fromObject(object.plugins[keys[index]]);
                     }
                 }
                 return message;
@@ -3606,23 +3624,23 @@ $root.getStatus = (function() {
              */
             Config.toObject = function toObject(message, options) {
                 if (!options)
-                    options = {};
+                    {options = {};}
                 var object = {};
                 if (options.objects || options.defaults)
-                    object.plugins = {};
+                    {object.plugins = {};}
                 if (options.defaults) {
                     object.version = "";
                     object.network = null;
                 }
-                if (message.version != null && message.hasOwnProperty("version"))
-                    object.version = message.version;
-                if (message.network != null && message.hasOwnProperty("network"))
-                    object.network = $root.getStatus.GetStatusResponse.Config.Network.toObject(message.network, options);
+                if (message.version != undefined && message.hasOwnProperty("version"))
+                    {object.version = message.version;}
+                if (message.network != undefined && message.hasOwnProperty("network"))
+                    {object.network = $root.getStatus.GetStatusResponse.Config.Network.toObject(message.network, options);}
                 var keys2;
-                if (message.plugins && (keys2 = Object.keys(message.plugins)).length) {
+                if (message.plugins && (keys2 = Object.keys(message.plugins)).length > 0) {
                     object.plugins = {};
-                    for (var j = 0; j < keys2.length; ++j)
-                        object.plugins[keys2[j]] = $root.getStatus.GetStatusResponse.Config.Plugin.toObject(message.plugins[keys2[j]], options);
+                    for (var index = 0; index < keys2.length; ++index)
+                        {object.plugins[keys2[index]] = $root.getStatus.GetStatusResponse.Config.Plugin.toObject(message.plugins[keys2[index]], options);}
                 }
                 return object;
             };
@@ -3676,9 +3694,9 @@ $root.getStatus = (function() {
                  */
                 function Network(properties) {
                     if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
+                        {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                            {if (properties[keys[index]] != undefined)
+                                {this[keys[index]] = properties[keys[index]];}}}
                 }
 
                 /**
@@ -3744,17 +3762,17 @@ $root.getStatus = (function() {
                  */
                 Network.encode = function encode(message, writer) {
                     if (!writer)
-                        writer = $Writer.create();
-                    if (message.name != null && Object.hasOwnProperty.call(message, "name"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
-                    if (message.nethash != null && Object.hasOwnProperty.call(message, "nethash"))
-                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.nethash);
-                    if (message.explorer != null && Object.hasOwnProperty.call(message, "explorer"))
-                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.explorer);
-                    if (message.token != null && Object.hasOwnProperty.call(message, "token"))
-                        $root.getStatus.GetStatusResponse.Config.Network.Token.encode(message.token, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-                    if (message.version != null && Object.hasOwnProperty.call(message, "version"))
-                        writer.uint32(/* id 5, wireType 0 =*/40).uint32(message.version);
+                        {writer = $Writer.create();}
+                    if (message.name != undefined && Object.hasOwnProperty.call(message, "name"))
+                        {writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);}
+                    if (message.nethash != undefined && Object.hasOwnProperty.call(message, "nethash"))
+                        {writer.uint32(/* id 2, wireType 2 =*/18).string(message.nethash);}
+                    if (message.explorer != undefined && Object.hasOwnProperty.call(message, "explorer"))
+                        {writer.uint32(/* id 3, wireType 2 =*/26).string(message.explorer);}
+                    if (message.token != undefined && Object.hasOwnProperty.call(message, "token"))
+                        {$root.getStatus.GetStatusResponse.Config.Network.Token.encode(message.token, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();}
+                    if (message.version != undefined && Object.hasOwnProperty.call(message, "version"))
+                        {writer.uint32(/* id 5, wireType 0 =*/40).uint32(message.version);}
                     return writer;
                 };
 
@@ -3784,7 +3802,7 @@ $root.getStatus = (function() {
                  */
                 Network.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
+                        {reader = $Reader.create(reader);}
                     var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusResponse.Config.Network();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
@@ -3809,9 +3827,10 @@ $root.getStatus = (function() {
                                 message.version = reader.uint32();
                                 break;
                             }
-                        default:
+                        default: {
                             reader.skipType(tag & 7);
                             break;
+                        }
                         }
                     }
                     return message;
@@ -3829,7 +3848,7 @@ $root.getStatus = (function() {
                  */
                 Network.decodeDelimited = function decodeDelimited(reader) {
                     if (!(reader instanceof $Reader))
-                        reader = new $Reader(reader);
+                        {reader = new $Reader(reader);}
                     return this.decode(reader, reader.uint32());
                 };
 
@@ -3843,24 +3862,24 @@ $root.getStatus = (function() {
                  */
                 Network.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.name != null && message.hasOwnProperty("name"))
-                        if (!$util.isString(message.name))
-                            return "name: string expected";
-                    if (message.nethash != null && message.hasOwnProperty("nethash"))
-                        if (!$util.isString(message.nethash))
-                            return "nethash: string expected";
-                    if (message.explorer != null && message.hasOwnProperty("explorer"))
-                        if (!$util.isString(message.explorer))
-                            return "explorer: string expected";
-                    if (message.token != null && message.hasOwnProperty("token")) {
+                        {return "object expected";}
+                    if (message.name != undefined && message.hasOwnProperty("name"))
+                        {if (!$utility.isString(message.name))
+                            {return "name: string expected";}}
+                    if (message.nethash != undefined && message.hasOwnProperty("nethash"))
+                        {if (!$utility.isString(message.nethash))
+                            {return "nethash: string expected";}}
+                    if (message.explorer != undefined && message.hasOwnProperty("explorer"))
+                        {if (!$utility.isString(message.explorer))
+                            {return "explorer: string expected";}}
+                    if (message.token != undefined && message.hasOwnProperty("token")) {
                         var error = $root.getStatus.GetStatusResponse.Config.Network.Token.verify(message.token);
                         if (error)
-                            return "token." + error;
+                            {return "token." + error;}
                     }
-                    if (message.version != null && message.hasOwnProperty("version"))
-                        if (!$util.isInteger(message.version))
-                            return "version: integer expected";
+                    if (message.version != undefined && message.hasOwnProperty("version"))
+                        {if (!$utility.isInteger(message.version))
+                            {return "version: integer expected";}}
                     return null;
                 };
 
@@ -3874,21 +3893,21 @@ $root.getStatus = (function() {
                  */
                 Network.fromObject = function fromObject(object) {
                     if (object instanceof $root.getStatus.GetStatusResponse.Config.Network)
-                        return object;
+                        {return object;}
                     var message = new $root.getStatus.GetStatusResponse.Config.Network();
-                    if (object.name != null)
-                        message.name = String(object.name);
-                    if (object.nethash != null)
-                        message.nethash = String(object.nethash);
-                    if (object.explorer != null)
-                        message.explorer = String(object.explorer);
-                    if (object.token != null) {
+                    if (object.name != undefined)
+                        {message.name = String(object.name);}
+                    if (object.nethash != undefined)
+                        {message.nethash = String(object.nethash);}
+                    if (object.explorer != undefined)
+                        {message.explorer = String(object.explorer);}
+                    if (object.token != undefined) {
                         if (typeof object.token !== "object")
-                            throw TypeError(".getStatus.GetStatusResponse.Config.Network.token: object expected");
+                            {throw TypeError(".getStatus.GetStatusResponse.Config.Network.token: object expected");}
                         message.token = $root.getStatus.GetStatusResponse.Config.Network.Token.fromObject(object.token);
                     }
-                    if (object.version != null)
-                        message.version = object.version >>> 0;
+                    if (object.version != undefined)
+                        {message.version = object.version >>> 0;}
                     return message;
                 };
 
@@ -3903,7 +3922,7 @@ $root.getStatus = (function() {
                  */
                 Network.toObject = function toObject(message, options) {
                     if (!options)
-                        options = {};
+                        {options = {};}
                     var object = {};
                     if (options.defaults) {
                         object.name = "";
@@ -3912,16 +3931,16 @@ $root.getStatus = (function() {
                         object.token = null;
                         object.version = 0;
                     }
-                    if (message.name != null && message.hasOwnProperty("name"))
-                        object.name = message.name;
-                    if (message.nethash != null && message.hasOwnProperty("nethash"))
-                        object.nethash = message.nethash;
-                    if (message.explorer != null && message.hasOwnProperty("explorer"))
-                        object.explorer = message.explorer;
-                    if (message.token != null && message.hasOwnProperty("token"))
-                        object.token = $root.getStatus.GetStatusResponse.Config.Network.Token.toObject(message.token, options);
-                    if (message.version != null && message.hasOwnProperty("version"))
-                        object.version = message.version;
+                    if (message.name != undefined && message.hasOwnProperty("name"))
+                        {object.name = message.name;}
+                    if (message.nethash != undefined && message.hasOwnProperty("nethash"))
+                        {object.nethash = message.nethash;}
+                    if (message.explorer != undefined && message.hasOwnProperty("explorer"))
+                        {object.explorer = message.explorer;}
+                    if (message.token != undefined && message.hasOwnProperty("token"))
+                        {object.token = $root.getStatus.GetStatusResponse.Config.Network.Token.toObject(message.token, options);}
+                    if (message.version != undefined && message.hasOwnProperty("version"))
+                        {object.version = message.version;}
                     return object;
                 };
 
@@ -3971,9 +3990,9 @@ $root.getStatus = (function() {
                      */
                     function Token(properties) {
                         if (properties)
-                            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                                if (properties[keys[i]] != null)
-                                    this[keys[i]] = properties[keys[i]];
+                            {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                                {if (properties[keys[index]] != undefined)
+                                    {this[keys[index]] = properties[keys[index]];}}}
                     }
 
                     /**
@@ -4015,11 +4034,11 @@ $root.getStatus = (function() {
                      */
                     Token.encode = function encode(message, writer) {
                         if (!writer)
-                            writer = $Writer.create();
-                        if (message.name != null && Object.hasOwnProperty.call(message, "name"))
-                            writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
-                        if (message.symbol != null && Object.hasOwnProperty.call(message, "symbol"))
-                            writer.uint32(/* id 2, wireType 2 =*/18).string(message.symbol);
+                            {writer = $Writer.create();}
+                        if (message.name != undefined && Object.hasOwnProperty.call(message, "name"))
+                            {writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);}
+                        if (message.symbol != undefined && Object.hasOwnProperty.call(message, "symbol"))
+                            {writer.uint32(/* id 2, wireType 2 =*/18).string(message.symbol);}
                         return writer;
                     };
 
@@ -4049,7 +4068,7 @@ $root.getStatus = (function() {
                      */
                     Token.decode = function decode(reader, length) {
                         if (!(reader instanceof $Reader))
-                            reader = $Reader.create(reader);
+                            {reader = $Reader.create(reader);}
                         var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusResponse.Config.Network.Token();
                         while (reader.pos < end) {
                             var tag = reader.uint32();
@@ -4062,9 +4081,10 @@ $root.getStatus = (function() {
                                     message.symbol = reader.string();
                                     break;
                                 }
-                            default:
+                            default: {
                                 reader.skipType(tag & 7);
                                 break;
+                            }
                             }
                         }
                         return message;
@@ -4082,7 +4102,7 @@ $root.getStatus = (function() {
                      */
                     Token.decodeDelimited = function decodeDelimited(reader) {
                         if (!(reader instanceof $Reader))
-                            reader = new $Reader(reader);
+                            {reader = new $Reader(reader);}
                         return this.decode(reader, reader.uint32());
                     };
 
@@ -4096,13 +4116,13 @@ $root.getStatus = (function() {
                      */
                     Token.verify = function verify(message) {
                         if (typeof message !== "object" || message === null)
-                            return "object expected";
-                        if (message.name != null && message.hasOwnProperty("name"))
-                            if (!$util.isString(message.name))
-                                return "name: string expected";
-                        if (message.symbol != null && message.hasOwnProperty("symbol"))
-                            if (!$util.isString(message.symbol))
-                                return "symbol: string expected";
+                            {return "object expected";}
+                        if (message.name != undefined && message.hasOwnProperty("name"))
+                            {if (!$utility.isString(message.name))
+                                {return "name: string expected";}}
+                        if (message.symbol != undefined && message.hasOwnProperty("symbol"))
+                            {if (!$utility.isString(message.symbol))
+                                {return "symbol: string expected";}}
                         return null;
                     };
 
@@ -4116,12 +4136,12 @@ $root.getStatus = (function() {
                      */
                     Token.fromObject = function fromObject(object) {
                         if (object instanceof $root.getStatus.GetStatusResponse.Config.Network.Token)
-                            return object;
+                            {return object;}
                         var message = new $root.getStatus.GetStatusResponse.Config.Network.Token();
-                        if (object.name != null)
-                            message.name = String(object.name);
-                        if (object.symbol != null)
-                            message.symbol = String(object.symbol);
+                        if (object.name != undefined)
+                            {message.name = String(object.name);}
+                        if (object.symbol != undefined)
+                            {message.symbol = String(object.symbol);}
                         return message;
                     };
 
@@ -4136,16 +4156,16 @@ $root.getStatus = (function() {
                      */
                     Token.toObject = function toObject(message, options) {
                         if (!options)
-                            options = {};
+                            {options = {};}
                         var object = {};
                         if (options.defaults) {
                             object.name = "";
                             object.symbol = "";
                         }
-                        if (message.name != null && message.hasOwnProperty("name"))
-                            object.name = message.name;
-                        if (message.symbol != null && message.hasOwnProperty("symbol"))
-                            object.symbol = message.symbol;
+                        if (message.name != undefined && message.hasOwnProperty("name"))
+                            {object.name = message.name;}
+                        if (message.symbol != undefined && message.hasOwnProperty("symbol"))
+                            {object.symbol = message.symbol;}
                         return object;
                     };
 
@@ -4202,9 +4222,9 @@ $root.getStatus = (function() {
                  */
                 function Plugin(properties) {
                     if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
+                        {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                            {if (properties[keys[index]] != undefined)
+                                {this[keys[index]] = properties[keys[index]];}}}
                 }
 
                 /**
@@ -4254,13 +4274,13 @@ $root.getStatus = (function() {
                  */
                 Plugin.encode = function encode(message, writer) {
                     if (!writer)
-                        writer = $Writer.create();
-                    if (message.port != null && Object.hasOwnProperty.call(message, "port"))
-                        writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.port);
-                    if (message.enabled != null && Object.hasOwnProperty.call(message, "enabled"))
-                        writer.uint32(/* id 2, wireType 0 =*/16).bool(message.enabled);
-                    if (message.estimateTotalCount != null && Object.hasOwnProperty.call(message, "estimateTotalCount"))
-                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.estimateTotalCount);
+                        {writer = $Writer.create();}
+                    if (message.port != undefined && Object.hasOwnProperty.call(message, "port"))
+                        {writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.port);}
+                    if (message.enabled != undefined && Object.hasOwnProperty.call(message, "enabled"))
+                        {writer.uint32(/* id 2, wireType 0 =*/16).bool(message.enabled);}
+                    if (message.estimateTotalCount != undefined && Object.hasOwnProperty.call(message, "estimateTotalCount"))
+                        {writer.uint32(/* id 3, wireType 0 =*/24).bool(message.estimateTotalCount);}
                     return writer;
                 };
 
@@ -4290,7 +4310,7 @@ $root.getStatus = (function() {
                  */
                 Plugin.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
+                        {reader = $Reader.create(reader);}
                     var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusResponse.Config.Plugin();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
@@ -4307,9 +4327,10 @@ $root.getStatus = (function() {
                                 message.estimateTotalCount = reader.bool();
                                 break;
                             }
-                        default:
+                        default: {
                             reader.skipType(tag & 7);
                             break;
+                        }
                         }
                     }
                     return message;
@@ -4327,7 +4348,7 @@ $root.getStatus = (function() {
                  */
                 Plugin.decodeDelimited = function decodeDelimited(reader) {
                     if (!(reader instanceof $Reader))
-                        reader = new $Reader(reader);
+                        {reader = new $Reader(reader);}
                     return this.decode(reader, reader.uint32());
                 };
 
@@ -4341,16 +4362,16 @@ $root.getStatus = (function() {
                  */
                 Plugin.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.port != null && message.hasOwnProperty("port"))
-                        if (!$util.isInteger(message.port))
-                            return "port: integer expected";
-                    if (message.enabled != null && message.hasOwnProperty("enabled"))
-                        if (typeof message.enabled !== "boolean")
-                            return "enabled: boolean expected";
-                    if (message.estimateTotalCount != null && message.hasOwnProperty("estimateTotalCount"))
-                        if (typeof message.estimateTotalCount !== "boolean")
-                            return "estimateTotalCount: boolean expected";
+                        {return "object expected";}
+                    if (message.port != undefined && message.hasOwnProperty("port"))
+                        {if (!$utility.isInteger(message.port))
+                            {return "port: integer expected";}}
+                    if (message.enabled != undefined && message.hasOwnProperty("enabled"))
+                        {if (typeof message.enabled !== "boolean")
+                            {return "enabled: boolean expected";}}
+                    if (message.estimateTotalCount != undefined && message.hasOwnProperty("estimateTotalCount"))
+                        {if (typeof message.estimateTotalCount !== "boolean")
+                            {return "estimateTotalCount: boolean expected";}}
                     return null;
                 };
 
@@ -4364,14 +4385,14 @@ $root.getStatus = (function() {
                  */
                 Plugin.fromObject = function fromObject(object) {
                     if (object instanceof $root.getStatus.GetStatusResponse.Config.Plugin)
-                        return object;
+                        {return object;}
                     var message = new $root.getStatus.GetStatusResponse.Config.Plugin();
-                    if (object.port != null)
-                        message.port = object.port >>> 0;
-                    if (object.enabled != null)
-                        message.enabled = Boolean(object.enabled);
-                    if (object.estimateTotalCount != null)
-                        message.estimateTotalCount = Boolean(object.estimateTotalCount);
+                    if (object.port != undefined)
+                        {message.port = object.port >>> 0;}
+                    if (object.enabled != undefined)
+                        {message.enabled = Boolean(object.enabled);}
+                    if (object.estimateTotalCount != undefined)
+                        {message.estimateTotalCount = Boolean(object.estimateTotalCount);}
                     return message;
                 };
 
@@ -4386,19 +4407,19 @@ $root.getStatus = (function() {
                  */
                 Plugin.toObject = function toObject(message, options) {
                     if (!options)
-                        options = {};
+                        {options = {};}
                     var object = {};
                     if (options.defaults) {
                         object.port = 0;
                         object.enabled = false;
                         object.estimateTotalCount = false;
                     }
-                    if (message.port != null && message.hasOwnProperty("port"))
-                        object.port = message.port;
-                    if (message.enabled != null && message.hasOwnProperty("enabled"))
-                        object.enabled = message.enabled;
-                    if (message.estimateTotalCount != null && message.hasOwnProperty("estimateTotalCount"))
-                        object.estimateTotalCount = message.estimateTotalCount;
+                    if (message.port != undefined && message.hasOwnProperty("port"))
+                        {object.port = message.port;}
+                    if (message.enabled != undefined && message.hasOwnProperty("enabled"))
+                        {object.enabled = message.enabled;}
+                    if (message.estimateTotalCount != undefined && message.hasOwnProperty("estimateTotalCount"))
+                        {object.estimateTotalCount = message.estimateTotalCount;}
                     return object;
                 };
 
@@ -4469,9 +4490,9 @@ $root.postPrecommit = (function() {
          */
         function PostPrecommitRequest(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -4480,7 +4501,7 @@ $root.postPrecommit = (function() {
          * @memberof postPrecommit.PostPrecommitRequest
          * @instance
          */
-        PostPrecommitRequest.prototype.precommit = $util.newBuffer([]);
+        PostPrecommitRequest.prototype.precommit = $utility.newBuffer([]);
 
         /**
          * PostPrecommitRequest headers.
@@ -4513,11 +4534,11 @@ $root.postPrecommit = (function() {
          */
         PostPrecommitRequest.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.precommit != null && Object.hasOwnProperty.call(message, "precommit"))
-                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.precommit);
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.precommit != undefined && Object.hasOwnProperty.call(message, "precommit"))
+                {writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.precommit);}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();}
             return writer;
         };
 
@@ -4547,7 +4568,7 @@ $root.postPrecommit = (function() {
          */
         PostPrecommitRequest.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postPrecommit.PostPrecommitRequest();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -4560,9 +4581,10 @@ $root.postPrecommit = (function() {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -4580,7 +4602,7 @@ $root.postPrecommit = (function() {
          */
         PostPrecommitRequest.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -4594,14 +4616,14 @@ $root.postPrecommit = (function() {
          */
         PostPrecommitRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.precommit != null && message.hasOwnProperty("precommit"))
-                if (!(message.precommit && typeof message.precommit.length === "number" || $util.isString(message.precommit)))
-                    return "precommit: buffer expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.precommit != undefined && message.hasOwnProperty("precommit"))
+                {if (!(message.precommit && typeof message.precommit.length === "number" || $utility.isString(message.precommit)))
+                    {return "precommit: buffer expected";}}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
             return null;
         };
@@ -4616,16 +4638,16 @@ $root.postPrecommit = (function() {
          */
         PostPrecommitRequest.fromObject = function fromObject(object) {
             if (object instanceof $root.postPrecommit.PostPrecommitRequest)
-                return object;
+                {return object;}
             var message = new $root.postPrecommit.PostPrecommitRequest();
-            if (object.precommit != null)
-                if (typeof object.precommit === "string")
-                    $util.base64.decode(object.precommit, message.precommit = $util.newBuffer($util.base64.length(object.precommit)), 0);
+            if (object.precommit != undefined)
+                {if (typeof object.precommit === "string")
+                    {$utility.base64.decode(object.precommit, message.precommit = $utility.newBuffer($utility.base64.length(object.precommit)), 0);}
                 else if (object.precommit.length >= 0)
-                    message.precommit = object.precommit;
-            if (object.headers != null) {
+                    {message.precommit = object.precommit;}}
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".postPrecommit.PostPrecommitRequest.headers: object expected");
+                    {throw TypeError(".postPrecommit.PostPrecommitRequest.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -4642,22 +4664,22 @@ $root.postPrecommit = (function() {
          */
         PostPrecommitRequest.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults) {
                 if (options.bytes === String)
-                    object.precommit = "";
+                    {object.precommit = "";}
                 else {
                     object.precommit = [];
                     if (options.bytes !== Array)
-                        object.precommit = $util.newBuffer(object.precommit);
+                        {object.precommit = $utility.newBuffer(object.precommit);}
                 }
                 object.headers = null;
             }
-            if (message.precommit != null && message.hasOwnProperty("precommit"))
-                object.precommit = options.bytes === String ? $util.base64.encode(message.precommit, 0, message.precommit.length) : options.bytes === Array ? Array.prototype.slice.call(message.precommit) : message.precommit;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.precommit != undefined && message.hasOwnProperty("precommit"))
+                {object.precommit = options.bytes === String ? $utility.base64.encode(message.precommit, 0, message.precommit.length) : options.bytes === Array ? Array.prototype.slice.call(message.precommit) : message.precommit;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
             return object;
         };
 
@@ -4709,9 +4731,9 @@ $root.postPrecommit = (function() {
          */
         function PostPrecommitResponse(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -4745,9 +4767,9 @@ $root.postPrecommit = (function() {
          */
         PostPrecommitResponse.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();}
             return writer;
         };
 
@@ -4777,7 +4799,7 @@ $root.postPrecommit = (function() {
          */
         PostPrecommitResponse.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postPrecommit.PostPrecommitResponse();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -4786,9 +4808,10 @@ $root.postPrecommit = (function() {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -4806,7 +4829,7 @@ $root.postPrecommit = (function() {
          */
         PostPrecommitResponse.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -4820,11 +4843,11 @@ $root.postPrecommit = (function() {
          */
         PostPrecommitResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
             return null;
         };
@@ -4839,11 +4862,11 @@ $root.postPrecommit = (function() {
          */
         PostPrecommitResponse.fromObject = function fromObject(object) {
             if (object instanceof $root.postPrecommit.PostPrecommitResponse)
-                return object;
+                {return object;}
             var message = new $root.postPrecommit.PostPrecommitResponse();
-            if (object.headers != null) {
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".postPrecommit.PostPrecommitResponse.headers: object expected");
+                    {throw TypeError(".postPrecommit.PostPrecommitResponse.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -4860,12 +4883,12 @@ $root.postPrecommit = (function() {
          */
         PostPrecommitResponse.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults)
-                object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+                {object.headers = null;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
             return object;
         };
 
@@ -4930,9 +4953,9 @@ $root.postPrevote = (function() {
          */
         function PostPrevoteRequest(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -4941,7 +4964,7 @@ $root.postPrevote = (function() {
          * @memberof postPrevote.PostPrevoteRequest
          * @instance
          */
-        PostPrevoteRequest.prototype.prevote = $util.newBuffer([]);
+        PostPrevoteRequest.prototype.prevote = $utility.newBuffer([]);
 
         /**
          * PostPrevoteRequest headers.
@@ -4974,11 +4997,11 @@ $root.postPrevote = (function() {
          */
         PostPrevoteRequest.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.prevote != null && Object.hasOwnProperty.call(message, "prevote"))
-                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.prevote);
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.prevote != undefined && Object.hasOwnProperty.call(message, "prevote"))
+                {writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.prevote);}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();}
             return writer;
         };
 
@@ -5008,7 +5031,7 @@ $root.postPrevote = (function() {
          */
         PostPrevoteRequest.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postPrevote.PostPrevoteRequest();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -5021,9 +5044,10 @@ $root.postPrevote = (function() {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -5041,7 +5065,7 @@ $root.postPrevote = (function() {
          */
         PostPrevoteRequest.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -5055,14 +5079,14 @@ $root.postPrevote = (function() {
          */
         PostPrevoteRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.prevote != null && message.hasOwnProperty("prevote"))
-                if (!(message.prevote && typeof message.prevote.length === "number" || $util.isString(message.prevote)))
-                    return "prevote: buffer expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.prevote != undefined && message.hasOwnProperty("prevote"))
+                {if (!(message.prevote && typeof message.prevote.length === "number" || $utility.isString(message.prevote)))
+                    {return "prevote: buffer expected";}}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
             return null;
         };
@@ -5077,16 +5101,16 @@ $root.postPrevote = (function() {
          */
         PostPrevoteRequest.fromObject = function fromObject(object) {
             if (object instanceof $root.postPrevote.PostPrevoteRequest)
-                return object;
+                {return object;}
             var message = new $root.postPrevote.PostPrevoteRequest();
-            if (object.prevote != null)
-                if (typeof object.prevote === "string")
-                    $util.base64.decode(object.prevote, message.prevote = $util.newBuffer($util.base64.length(object.prevote)), 0);
+            if (object.prevote != undefined)
+                {if (typeof object.prevote === "string")
+                    {$utility.base64.decode(object.prevote, message.prevote = $utility.newBuffer($utility.base64.length(object.prevote)), 0);}
                 else if (object.prevote.length >= 0)
-                    message.prevote = object.prevote;
-            if (object.headers != null) {
+                    {message.prevote = object.prevote;}}
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".postPrevote.PostPrevoteRequest.headers: object expected");
+                    {throw TypeError(".postPrevote.PostPrevoteRequest.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -5103,22 +5127,22 @@ $root.postPrevote = (function() {
          */
         PostPrevoteRequest.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults) {
                 if (options.bytes === String)
-                    object.prevote = "";
+                    {object.prevote = "";}
                 else {
                     object.prevote = [];
                     if (options.bytes !== Array)
-                        object.prevote = $util.newBuffer(object.prevote);
+                        {object.prevote = $utility.newBuffer(object.prevote);}
                 }
                 object.headers = null;
             }
-            if (message.prevote != null && message.hasOwnProperty("prevote"))
-                object.prevote = options.bytes === String ? $util.base64.encode(message.prevote, 0, message.prevote.length) : options.bytes === Array ? Array.prototype.slice.call(message.prevote) : message.prevote;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.prevote != undefined && message.hasOwnProperty("prevote"))
+                {object.prevote = options.bytes === String ? $utility.base64.encode(message.prevote, 0, message.prevote.length) : options.bytes === Array ? Array.prototype.slice.call(message.prevote) : message.prevote;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
             return object;
         };
 
@@ -5170,9 +5194,9 @@ $root.postPrevote = (function() {
          */
         function PostPrevoteResponse(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -5206,9 +5230,9 @@ $root.postPrevote = (function() {
          */
         PostPrevoteResponse.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();}
             return writer;
         };
 
@@ -5238,7 +5262,7 @@ $root.postPrevote = (function() {
          */
         PostPrevoteResponse.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postPrevote.PostPrevoteResponse();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -5247,9 +5271,10 @@ $root.postPrevote = (function() {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -5267,7 +5292,7 @@ $root.postPrevote = (function() {
          */
         PostPrevoteResponse.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -5281,11 +5306,11 @@ $root.postPrevote = (function() {
          */
         PostPrevoteResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
             return null;
         };
@@ -5300,11 +5325,11 @@ $root.postPrevote = (function() {
          */
         PostPrevoteResponse.fromObject = function fromObject(object) {
             if (object instanceof $root.postPrevote.PostPrevoteResponse)
-                return object;
+                {return object;}
             var message = new $root.postPrevote.PostPrevoteResponse();
-            if (object.headers != null) {
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".postPrevote.PostPrevoteResponse.headers: object expected");
+                    {throw TypeError(".postPrevote.PostPrevoteResponse.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -5321,12 +5346,12 @@ $root.postPrevote = (function() {
          */
         PostPrevoteResponse.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults)
-                object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+                {object.headers = null;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
             return object;
         };
 
@@ -5391,9 +5416,9 @@ $root.postProposal = (function() {
          */
         function PostProposalRequest(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -5402,7 +5427,7 @@ $root.postProposal = (function() {
          * @memberof postProposal.PostProposalRequest
          * @instance
          */
-        PostProposalRequest.prototype.proposal = $util.newBuffer([]);
+        PostProposalRequest.prototype.proposal = $utility.newBuffer([]);
 
         /**
          * PostProposalRequest headers.
@@ -5435,11 +5460,11 @@ $root.postProposal = (function() {
          */
         PostProposalRequest.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.proposal != null && Object.hasOwnProperty.call(message, "proposal"))
-                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.proposal);
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.proposal != undefined && Object.hasOwnProperty.call(message, "proposal"))
+                {writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.proposal);}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();}
             return writer;
         };
 
@@ -5469,7 +5494,7 @@ $root.postProposal = (function() {
          */
         PostProposalRequest.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postProposal.PostProposalRequest();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -5482,9 +5507,10 @@ $root.postProposal = (function() {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -5502,7 +5528,7 @@ $root.postProposal = (function() {
          */
         PostProposalRequest.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -5516,14 +5542,14 @@ $root.postProposal = (function() {
          */
         PostProposalRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.proposal != null && message.hasOwnProperty("proposal"))
-                if (!(message.proposal && typeof message.proposal.length === "number" || $util.isString(message.proposal)))
-                    return "proposal: buffer expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.proposal != undefined && message.hasOwnProperty("proposal"))
+                {if (!(message.proposal && typeof message.proposal.length === "number" || $utility.isString(message.proposal)))
+                    {return "proposal: buffer expected";}}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
             return null;
         };
@@ -5538,16 +5564,16 @@ $root.postProposal = (function() {
          */
         PostProposalRequest.fromObject = function fromObject(object) {
             if (object instanceof $root.postProposal.PostProposalRequest)
-                return object;
+                {return object;}
             var message = new $root.postProposal.PostProposalRequest();
-            if (object.proposal != null)
-                if (typeof object.proposal === "string")
-                    $util.base64.decode(object.proposal, message.proposal = $util.newBuffer($util.base64.length(object.proposal)), 0);
+            if (object.proposal != undefined)
+                {if (typeof object.proposal === "string")
+                    {$utility.base64.decode(object.proposal, message.proposal = $utility.newBuffer($utility.base64.length(object.proposal)), 0);}
                 else if (object.proposal.length >= 0)
-                    message.proposal = object.proposal;
-            if (object.headers != null) {
+                    {message.proposal = object.proposal;}}
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".postProposal.PostProposalRequest.headers: object expected");
+                    {throw TypeError(".postProposal.PostProposalRequest.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -5564,22 +5590,22 @@ $root.postProposal = (function() {
          */
         PostProposalRequest.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults) {
                 if (options.bytes === String)
-                    object.proposal = "";
+                    {object.proposal = "";}
                 else {
                     object.proposal = [];
                     if (options.bytes !== Array)
-                        object.proposal = $util.newBuffer(object.proposal);
+                        {object.proposal = $utility.newBuffer(object.proposal);}
                 }
                 object.headers = null;
             }
-            if (message.proposal != null && message.hasOwnProperty("proposal"))
-                object.proposal = options.bytes === String ? $util.base64.encode(message.proposal, 0, message.proposal.length) : options.bytes === Array ? Array.prototype.slice.call(message.proposal) : message.proposal;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.proposal != undefined && message.hasOwnProperty("proposal"))
+                {object.proposal = options.bytes === String ? $utility.base64.encode(message.proposal, 0, message.proposal.length) : options.bytes === Array ? Array.prototype.slice.call(message.proposal) : message.proposal;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
             return object;
         };
 
@@ -5631,9 +5657,9 @@ $root.postProposal = (function() {
          */
         function PostProposalResponse(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -5667,9 +5693,9 @@ $root.postProposal = (function() {
          */
         PostProposalResponse.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                {writer = $Writer.create();}
+            if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers"))
+                {$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();}
             return writer;
         };
 
@@ -5699,7 +5725,7 @@ $root.postProposal = (function() {
          */
         PostProposalResponse.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postProposal.PostProposalResponse();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -5708,9 +5734,10 @@ $root.postProposal = (function() {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32());
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -5728,7 +5755,7 @@ $root.postProposal = (function() {
          */
         PostProposalResponse.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -5742,11 +5769,11 @@ $root.postProposal = (function() {
          */
         PostProposalResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
+                {return "object expected";}
+            if (message.headers != undefined && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
-                    return "headers." + error;
+                    {return "headers." + error;}
             }
             return null;
         };
@@ -5761,11 +5788,11 @@ $root.postProposal = (function() {
          */
         PostProposalResponse.fromObject = function fromObject(object) {
             if (object instanceof $root.postProposal.PostProposalResponse)
-                return object;
+                {return object;}
             var message = new $root.postProposal.PostProposalResponse();
-            if (object.headers != null) {
+            if (object.headers != undefined) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".postProposal.PostProposalResponse.headers: object expected");
+                    {throw TypeError(".postProposal.PostProposalResponse.headers: object expected");}
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -5782,12 +5809,12 @@ $root.postProposal = (function() {
          */
         PostProposalResponse.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults)
-                object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+                {object.headers = null;}
+            if (message.headers != undefined && message.hasOwnProperty("headers"))
+                {object.headers = $root.shared.Headers.toObject(message.headers, options);}
             return object;
         };
 
@@ -5859,9 +5886,9 @@ $root.shared = (function() {
             this.validatorsSignedPrevote = [];
             this.validatorsSignedPrecommit = [];
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -5910,7 +5937,7 @@ $root.shared = (function() {
          * @memberof shared.Headers
          * @instance
          */
-        Headers.prototype.validatorsSignedPrevote = $util.emptyArray;
+        Headers.prototype.validatorsSignedPrevote = $utility.emptyArray;
 
         /**
          * Headers validatorsSignedPrecommit.
@@ -5918,7 +5945,7 @@ $root.shared = (function() {
          * @memberof shared.Headers
          * @instance
          */
-        Headers.prototype.validatorsSignedPrecommit = $util.emptyArray;
+        Headers.prototype.validatorsSignedPrecommit = $utility.emptyArray;
 
         // OneOf field names bound to virtual getters and setters
         var $oneOfFields;
@@ -5930,8 +5957,8 @@ $root.shared = (function() {
          * @instance
          */
         Object.defineProperty(Headers.prototype, "_proposedBlockId", {
-            get: $util.oneOfGetter($oneOfFields = ["proposedBlockId"]),
-            set: $util.oneOfSetter($oneOfFields)
+            get: $utility.oneOfGetter($oneOfFields = ["proposedBlockId"]),
+            set: $utility.oneOfSetter($oneOfFields)
         });
 
         /**
@@ -5957,27 +5984,27 @@ $root.shared = (function() {
          */
         Headers.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.version != null && Object.hasOwnProperty.call(message, "version"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);
-            if (message.height != null && Object.hasOwnProperty.call(message, "height"))
-                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.height);
-            if (message.round != null && Object.hasOwnProperty.call(message, "round"))
-                writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.round);
-            if (message.step != null && Object.hasOwnProperty.call(message, "step"))
-                writer.uint32(/* id 4, wireType 0 =*/32).uint32(message.step);
-            if (message.proposedBlockId != null && Object.hasOwnProperty.call(message, "proposedBlockId"))
-                writer.uint32(/* id 5, wireType 2 =*/42).string(message.proposedBlockId);
-            if (message.validatorsSignedPrevote != null && message.validatorsSignedPrevote.length) {
+                {writer = $Writer.create();}
+            if (message.version != undefined && Object.hasOwnProperty.call(message, "version"))
+                {writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);}
+            if (message.height != undefined && Object.hasOwnProperty.call(message, "height"))
+                {writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.height);}
+            if (message.round != undefined && Object.hasOwnProperty.call(message, "round"))
+                {writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.round);}
+            if (message.step != undefined && Object.hasOwnProperty.call(message, "step"))
+                {writer.uint32(/* id 4, wireType 0 =*/32).uint32(message.step);}
+            if (message.proposedBlockId != undefined && Object.hasOwnProperty.call(message, "proposedBlockId"))
+                {writer.uint32(/* id 5, wireType 2 =*/42).string(message.proposedBlockId);}
+            if (message.validatorsSignedPrevote != undefined && message.validatorsSignedPrevote.length > 0) {
                 writer.uint32(/* id 6, wireType 2 =*/50).fork();
-                for (var i = 0; i < message.validatorsSignedPrevote.length; ++i)
-                    writer.bool(message.validatorsSignedPrevote[i]);
+                for (var index = 0; index < message.validatorsSignedPrevote.length; ++index)
+                    {writer.bool(message.validatorsSignedPrevote[index]);}
                 writer.ldelim();
             }
-            if (message.validatorsSignedPrecommit != null && message.validatorsSignedPrecommit.length) {
+            if (message.validatorsSignedPrecommit != undefined && message.validatorsSignedPrecommit.length > 0) {
                 writer.uint32(/* id 7, wireType 2 =*/58).fork();
-                for (var i = 0; i < message.validatorsSignedPrecommit.length; ++i)
-                    writer.bool(message.validatorsSignedPrecommit[i]);
+                for (var index = 0; index < message.validatorsSignedPrecommit.length; ++index)
+                    {writer.bool(message.validatorsSignedPrecommit[index]);}
                 writer.ldelim();
             }
             return writer;
@@ -6009,7 +6036,7 @@ $root.shared = (function() {
          */
         Headers.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.Headers();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -6035,30 +6062,31 @@ $root.shared = (function() {
                         break;
                     }
                 case 6: {
-                        if (!(message.validatorsSignedPrevote && message.validatorsSignedPrevote.length))
-                            message.validatorsSignedPrevote = [];
+                        if (!(message.validatorsSignedPrevote && message.validatorsSignedPrevote.length > 0))
+                            {message.validatorsSignedPrevote = [];}
                         if ((tag & 7) === 2) {
                             var end2 = reader.uint32() + reader.pos;
                             while (reader.pos < end2)
-                                message.validatorsSignedPrevote.push(reader.bool());
+                                {message.validatorsSignedPrevote.push(reader.bool());}
                         } else
-                            message.validatorsSignedPrevote.push(reader.bool());
+                            {message.validatorsSignedPrevote.push(reader.bool());}
                         break;
                     }
                 case 7: {
-                        if (!(message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length))
-                            message.validatorsSignedPrecommit = [];
+                        if (!(message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length > 0))
+                            {message.validatorsSignedPrecommit = [];}
                         if ((tag & 7) === 2) {
                             var end2 = reader.uint32() + reader.pos;
                             while (reader.pos < end2)
-                                message.validatorsSignedPrecommit.push(reader.bool());
+                                {message.validatorsSignedPrecommit.push(reader.bool());}
                         } else
-                            message.validatorsSignedPrecommit.push(reader.bool());
+                            {message.validatorsSignedPrecommit.push(reader.bool());}
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -6076,7 +6104,7 @@ $root.shared = (function() {
          */
         Headers.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -6090,38 +6118,38 @@ $root.shared = (function() {
          */
         Headers.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
+                {return "object expected";}
             var properties = {};
-            if (message.version != null && message.hasOwnProperty("version"))
-                if (!$util.isString(message.version))
-                    return "version: string expected";
-            if (message.height != null && message.hasOwnProperty("height"))
-                if (!$util.isInteger(message.height))
-                    return "height: integer expected";
-            if (message.round != null && message.hasOwnProperty("round"))
-                if (!$util.isInteger(message.round))
-                    return "round: integer expected";
-            if (message.step != null && message.hasOwnProperty("step"))
-                if (!$util.isInteger(message.step))
-                    return "step: integer expected";
-            if (message.proposedBlockId != null && message.hasOwnProperty("proposedBlockId")) {
+            if (message.version != undefined && message.hasOwnProperty("version"))
+                {if (!$utility.isString(message.version))
+                    {return "version: string expected";}}
+            if (message.height != undefined && message.hasOwnProperty("height"))
+                {if (!$utility.isInteger(message.height))
+                    {return "height: integer expected";}}
+            if (message.round != undefined && message.hasOwnProperty("round"))
+                {if (!$utility.isInteger(message.round))
+                    {return "round: integer expected";}}
+            if (message.step != undefined && message.hasOwnProperty("step"))
+                {if (!$utility.isInteger(message.step))
+                    {return "step: integer expected";}}
+            if (message.proposedBlockId != undefined && message.hasOwnProperty("proposedBlockId")) {
                 properties._proposedBlockId = 1;
-                if (!$util.isString(message.proposedBlockId))
-                    return "proposedBlockId: string expected";
+                if (!$utility.isString(message.proposedBlockId))
+                    {return "proposedBlockId: string expected";}
             }
-            if (message.validatorsSignedPrevote != null && message.hasOwnProperty("validatorsSignedPrevote")) {
+            if (message.validatorsSignedPrevote != undefined && message.hasOwnProperty("validatorsSignedPrevote")) {
                 if (!Array.isArray(message.validatorsSignedPrevote))
-                    return "validatorsSignedPrevote: array expected";
-                for (var i = 0; i < message.validatorsSignedPrevote.length; ++i)
-                    if (typeof message.validatorsSignedPrevote[i] !== "boolean")
-                        return "validatorsSignedPrevote: boolean[] expected";
+                    {return "validatorsSignedPrevote: array expected";}
+                for (var index = 0; index < message.validatorsSignedPrevote.length; ++index)
+                    {if (typeof message.validatorsSignedPrevote[index] !== "boolean")
+                        {return "validatorsSignedPrevote: boolean[] expected";}}
             }
-            if (message.validatorsSignedPrecommit != null && message.hasOwnProperty("validatorsSignedPrecommit")) {
+            if (message.validatorsSignedPrecommit != undefined && message.hasOwnProperty("validatorsSignedPrecommit")) {
                 if (!Array.isArray(message.validatorsSignedPrecommit))
-                    return "validatorsSignedPrecommit: array expected";
-                for (var i = 0; i < message.validatorsSignedPrecommit.length; ++i)
-                    if (typeof message.validatorsSignedPrecommit[i] !== "boolean")
-                        return "validatorsSignedPrecommit: boolean[] expected";
+                    {return "validatorsSignedPrecommit: array expected";}
+                for (var index = 0; index < message.validatorsSignedPrecommit.length; ++index)
+                    {if (typeof message.validatorsSignedPrecommit[index] !== "boolean")
+                        {return "validatorsSignedPrecommit: boolean[] expected";}}
             }
             return null;
         };
@@ -6136,31 +6164,31 @@ $root.shared = (function() {
          */
         Headers.fromObject = function fromObject(object) {
             if (object instanceof $root.shared.Headers)
-                return object;
+                {return object;}
             var message = new $root.shared.Headers();
-            if (object.version != null)
-                message.version = String(object.version);
-            if (object.height != null)
-                message.height = object.height >>> 0;
-            if (object.round != null)
-                message.round = object.round >>> 0;
-            if (object.step != null)
-                message.step = object.step >>> 0;
-            if (object.proposedBlockId != null)
-                message.proposedBlockId = String(object.proposedBlockId);
+            if (object.version != undefined)
+                {message.version = String(object.version);}
+            if (object.height != undefined)
+                {message.height = object.height >>> 0;}
+            if (object.round != undefined)
+                {message.round = object.round >>> 0;}
+            if (object.step != undefined)
+                {message.step = object.step >>> 0;}
+            if (object.proposedBlockId != undefined)
+                {message.proposedBlockId = String(object.proposedBlockId);}
             if (object.validatorsSignedPrevote) {
                 if (!Array.isArray(object.validatorsSignedPrevote))
-                    throw TypeError(".shared.Headers.validatorsSignedPrevote: array expected");
+                    {throw TypeError(".shared.Headers.validatorsSignedPrevote: array expected");}
                 message.validatorsSignedPrevote = [];
-                for (var i = 0; i < object.validatorsSignedPrevote.length; ++i)
-                    message.validatorsSignedPrevote[i] = Boolean(object.validatorsSignedPrevote[i]);
+                for (var index = 0; index < object.validatorsSignedPrevote.length; ++index)
+                    {message.validatorsSignedPrevote[index] = Boolean(object.validatorsSignedPrevote[index]);}
             }
             if (object.validatorsSignedPrecommit) {
                 if (!Array.isArray(object.validatorsSignedPrecommit))
-                    throw TypeError(".shared.Headers.validatorsSignedPrecommit: array expected");
+                    {throw TypeError(".shared.Headers.validatorsSignedPrecommit: array expected");}
                 message.validatorsSignedPrecommit = [];
-                for (var i = 0; i < object.validatorsSignedPrecommit.length; ++i)
-                    message.validatorsSignedPrecommit[i] = Boolean(object.validatorsSignedPrecommit[i]);
+                for (var index = 0; index < object.validatorsSignedPrecommit.length; ++index)
+                    {message.validatorsSignedPrecommit[index] = Boolean(object.validatorsSignedPrecommit[index]);}
             }
             return message;
         };
@@ -6176,7 +6204,7 @@ $root.shared = (function() {
          */
         Headers.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.arrays || options.defaults) {
                 object.validatorsSignedPrevote = [];
@@ -6188,28 +6216,28 @@ $root.shared = (function() {
                 object.round = 0;
                 object.step = 0;
             }
-            if (message.version != null && message.hasOwnProperty("version"))
-                object.version = message.version;
-            if (message.height != null && message.hasOwnProperty("height"))
-                object.height = message.height;
-            if (message.round != null && message.hasOwnProperty("round"))
-                object.round = message.round;
-            if (message.step != null && message.hasOwnProperty("step"))
-                object.step = message.step;
-            if (message.proposedBlockId != null && message.hasOwnProperty("proposedBlockId")) {
+            if (message.version != undefined && message.hasOwnProperty("version"))
+                {object.version = message.version;}
+            if (message.height != undefined && message.hasOwnProperty("height"))
+                {object.height = message.height;}
+            if (message.round != undefined && message.hasOwnProperty("round"))
+                {object.round = message.round;}
+            if (message.step != undefined && message.hasOwnProperty("step"))
+                {object.step = message.step;}
+            if (message.proposedBlockId != undefined && message.hasOwnProperty("proposedBlockId")) {
                 object.proposedBlockId = message.proposedBlockId;
                 if (options.oneofs)
-                    object._proposedBlockId = "proposedBlockId";
+                    {object._proposedBlockId = "proposedBlockId";}
             }
-            if (message.validatorsSignedPrevote && message.validatorsSignedPrevote.length) {
+            if (message.validatorsSignedPrevote && message.validatorsSignedPrevote.length > 0) {
                 object.validatorsSignedPrevote = [];
-                for (var j = 0; j < message.validatorsSignedPrevote.length; ++j)
-                    object.validatorsSignedPrevote[j] = message.validatorsSignedPrevote[j];
+                for (var index = 0; index < message.validatorsSignedPrevote.length; ++index)
+                    {object.validatorsSignedPrevote[index] = message.validatorsSignedPrevote[index];}
             }
-            if (message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length) {
+            if (message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length > 0) {
                 object.validatorsSignedPrecommit = [];
-                for (var j = 0; j < message.validatorsSignedPrecommit.length; ++j)
-                    object.validatorsSignedPrecommit[j] = message.validatorsSignedPrecommit[j];
+                for (var index = 0; index < message.validatorsSignedPrecommit.length; ++index)
+                    {object.validatorsSignedPrecommit[index] = message.validatorsSignedPrecommit[index];}
             }
             return object;
         };
@@ -6264,9 +6292,9 @@ $root.shared = (function() {
          */
         function PeerLike(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
+                {for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index)
+                    {if (properties[keys[index]] != undefined)
+                        {this[keys[index]] = properties[keys[index]];}}}
         }
 
         /**
@@ -6316,13 +6344,13 @@ $root.shared = (function() {
          */
         PeerLike.encode = function encode(message, writer) {
             if (!writer)
-                writer = $Writer.create();
-            if (message.ip != null && Object.hasOwnProperty.call(message, "ip"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.ip);
-            if (message.port != null && Object.hasOwnProperty.call(message, "port"))
-                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.port);
-            if (message.protocol != null && Object.hasOwnProperty.call(message, "protocol"))
-                writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.protocol);
+                {writer = $Writer.create();}
+            if (message.ip != undefined && Object.hasOwnProperty.call(message, "ip"))
+                {writer.uint32(/* id 1, wireType 2 =*/10).string(message.ip);}
+            if (message.port != undefined && Object.hasOwnProperty.call(message, "port"))
+                {writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.port);}
+            if (message.protocol != undefined && Object.hasOwnProperty.call(message, "protocol"))
+                {writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.protocol);}
             return writer;
         };
 
@@ -6352,7 +6380,7 @@ $root.shared = (function() {
          */
         PeerLike.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
+                {reader = $Reader.create(reader);}
             var end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.PeerLike();
             while (reader.pos < end) {
                 var tag = reader.uint32();
@@ -6369,9 +6397,10 @@ $root.shared = (function() {
                         message.protocol = reader.uint32();
                         break;
                     }
-                default:
+                default: {
                     reader.skipType(tag & 7);
                     break;
+                }
                 }
             }
             return message;
@@ -6389,7 +6418,7 @@ $root.shared = (function() {
          */
         PeerLike.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
+                {reader = new $Reader(reader);}
             return this.decode(reader, reader.uint32());
         };
 
@@ -6403,16 +6432,16 @@ $root.shared = (function() {
          */
         PeerLike.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.ip != null && message.hasOwnProperty("ip"))
-                if (!$util.isString(message.ip))
-                    return "ip: string expected";
-            if (message.port != null && message.hasOwnProperty("port"))
-                if (!$util.isInteger(message.port))
-                    return "port: integer expected";
-            if (message.protocol != null && message.hasOwnProperty("protocol"))
-                if (!$util.isInteger(message.protocol))
-                    return "protocol: integer expected";
+                {return "object expected";}
+            if (message.ip != undefined && message.hasOwnProperty("ip"))
+                {if (!$utility.isString(message.ip))
+                    {return "ip: string expected";}}
+            if (message.port != undefined && message.hasOwnProperty("port"))
+                {if (!$utility.isInteger(message.port))
+                    {return "port: integer expected";}}
+            if (message.protocol != undefined && message.hasOwnProperty("protocol"))
+                {if (!$utility.isInteger(message.protocol))
+                    {return "protocol: integer expected";}}
             return null;
         };
 
@@ -6426,14 +6455,14 @@ $root.shared = (function() {
          */
         PeerLike.fromObject = function fromObject(object) {
             if (object instanceof $root.shared.PeerLike)
-                return object;
+                {return object;}
             var message = new $root.shared.PeerLike();
-            if (object.ip != null)
-                message.ip = String(object.ip);
-            if (object.port != null)
-                message.port = object.port >>> 0;
-            if (object.protocol != null)
-                message.protocol = object.protocol >>> 0;
+            if (object.ip != undefined)
+                {message.ip = String(object.ip);}
+            if (object.port != undefined)
+                {message.port = object.port >>> 0;}
+            if (object.protocol != undefined)
+                {message.protocol = object.protocol >>> 0;}
             return message;
         };
 
@@ -6448,19 +6477,19 @@ $root.shared = (function() {
          */
         PeerLike.toObject = function toObject(message, options) {
             if (!options)
-                options = {};
+                {options = {};}
             var object = {};
             if (options.defaults) {
                 object.ip = "";
                 object.port = 0;
                 object.protocol = 0;
             }
-            if (message.ip != null && message.hasOwnProperty("ip"))
-                object.ip = message.ip;
-            if (message.port != null && message.hasOwnProperty("port"))
-                object.port = message.port;
-            if (message.protocol != null && message.hasOwnProperty("protocol"))
-                object.protocol = message.protocol;
+            if (message.ip != undefined && message.hasOwnProperty("ip"))
+                {object.ip = message.ip;}
+            if (message.port != undefined && message.hasOwnProperty("port"))
+                {object.port = message.port;}
+            if (message.protocol != undefined && message.hasOwnProperty("protocol"))
+                {object.protocol = message.protocol;}
             return object;
         };
 

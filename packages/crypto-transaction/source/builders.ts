@@ -23,7 +23,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	protected readonly signer!: Contracts.Crypto.TransactionSigner;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	protected readonly utils!: Contracts.Crypto.TransactionUtils;
+	protected readonly utils!: Contracts.Crypto.TransactionUtilities;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;

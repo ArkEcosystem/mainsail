@@ -23,7 +23,6 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 			flags,
 		});
 
-		// eslint-disable-next-line @typescript-eslint/await-thenable
 		await app.boot();
 		this.#app = app;
 	}
