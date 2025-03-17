@@ -41,8 +41,8 @@ export class Application implements Contracts.Kernel.Application {
 		try {
 			await this.#bootstrapWith("serviceProviders");
 			this.#booted = true;
-		} catch (ex) {
-			await this.terminate(ex.name, ex);
+		} catch (error) {
+			await this.terminate(error.name, error);
 		}
 	}
 
