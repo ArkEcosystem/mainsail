@@ -1,5 +1,6 @@
-import { Block, Commit } from "../crypto/index.js";
-import { AccountUpdate } from "../evm/index.js";
+import { Block } from "../crypto/block.js";
+import { Commit } from "../crypto/commit.js";
+import { AccountUpdate } from "../evm/evm.js";
 import { BlockProcessorResult } from "./block-processor-result.js";
 
 export interface ProcessableUnit {
