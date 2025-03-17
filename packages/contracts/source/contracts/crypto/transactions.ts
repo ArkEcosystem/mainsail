@@ -1,6 +1,7 @@
 import { BigNumber } from "@mainsail/utils";
 
 import type { EcdsaSignature, KeyPair } from "./identities.js";
+import type { MultiSignatureAsset } from "./legacy.js";
 import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction {
@@ -69,17 +70,6 @@ export interface TransactionJson {
 	gasUsed?: number;
 	blockId?: string;
 	blockHeight?: number;
-}
-
-export interface MultiSignatureLegacyAsset {
-	min: number;
-	lifetime: number;
-	keysgroup: string[];
-}
-
-export interface MultiSignatureAsset {
-	min: number;
-	publicKeys: string[];
 }
 
 export interface SerializeOptions {

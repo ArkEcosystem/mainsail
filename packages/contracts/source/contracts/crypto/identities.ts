@@ -1,6 +1,6 @@
 import { ByteBuffer } from "@mainsail/utils";
 
-import type { MultiSignatureAsset } from "./transactions.js";
+import type { MultiSignatureAsset } from "./legacy.js";
 
 export interface KeyPair {
 	publicKey: string;
