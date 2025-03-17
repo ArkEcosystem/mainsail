@@ -14,7 +14,6 @@ export const Builder = {
 				plugins: context.plugins,
 			});
 
-			 
 			await app.boot();
 		}
 

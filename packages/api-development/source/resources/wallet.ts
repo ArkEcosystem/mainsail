@@ -16,10 +16,10 @@ export class WalletResource implements Contracts.Api.Resource {
 			address: wallet.getAddress(),
 			// publicKey: wallet.getPublicKey(),
 			// username: wallet.hasAttribute("username") ? wallet.getAttribute("username") : undefined,
-			 
+
 			balance: wallet.getBalance(),
 			nonce: wallet.getNonce(),
-			 
+
 			// attributes: wallet.getAttributes(),
 		};
 	}

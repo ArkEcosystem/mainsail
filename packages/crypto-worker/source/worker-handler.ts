@@ -93,7 +93,6 @@ export class WorkerScriptHandler implements Contracts.Crypto.WorkerScriptHandler
 			app.rebind(Identifiers.Services.Log.Service).to(Services.Log.NullLogger);
 		}
 
-		 
 		await app.boot();
 		this.#impl = app.resolve(WorkerImpl);
 	}

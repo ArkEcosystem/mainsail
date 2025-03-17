@@ -15,7 +15,6 @@ export class WorkerScriptHandler implements Contracts.Evm.WorkerScriptHandler {
 			flags,
 		});
 
-		 
 		await app.boot();
 		this.#app = app;
 	}
