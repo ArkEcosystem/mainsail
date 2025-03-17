@@ -38,9 +38,12 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	public async boot(): Promise<void> {
-		await this.#bootstrapWith("serviceProviders");
-
-		this.#booted = true;
+		try {
+			await this.#bootstrapWith("serviceProviders");
+			this.#booted = true;
+		} catch (ex) {
+			await this.terminate(ex.name, ex);
+		}
 	}
 
 	public async reboot(): Promise<void> {
