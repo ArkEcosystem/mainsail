@@ -117,7 +117,13 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	}
 
 	public async getStruct(): Promise<Contracts.Crypto.TransactionData> {
-		if (!this.data.senderAddress || !this.data.senderPublicKey || !this.data.r || !this.data.s || !this.data.v) {
+		if (
+			!this.data.senderAddress ||
+			!this.data.senderPublicKey ||
+			!this.data.r ||
+			!this.data.s ||
+			this.data.v === undefined
+		) {
 			throw new Exceptions.MissingTransactionSignatureError();
 		}
 

@@ -76,7 +76,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	public async verifyHash(data: Contracts.Crypto.TransactionData): Promise<boolean> {
 		const { v, r, s, senderPublicKey } = data;
 
-		if (!v || !r || !s || !senderPublicKey) {
+		if (v === undefined || !r || !s || !senderPublicKey) {
 			return false;
 		}
 
