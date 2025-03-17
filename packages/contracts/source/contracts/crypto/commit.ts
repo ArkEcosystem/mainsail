@@ -1,4 +1,4 @@
-import type { ProcessableUnit } from "../processor.js";
+import type { ProcessableUnit } from "../processor/index.js";
 import type { Block, BlockData, BlockJson } from "./block.js";
 
 export interface CommitJson {
