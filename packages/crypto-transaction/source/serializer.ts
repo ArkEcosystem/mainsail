@@ -21,7 +21,7 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 		];
 
 		if (transaction.data.v && transaction.data.r && transaction.data.s && !options.excludeSignature) {
-			fields.push(toBeArray(transaction.data.v - 27), `0x${transaction.data.r}`, `0x${transaction.data.s}`);
+			fields.push(toBeArray(transaction.data.v), `0x${transaction.data.r}`, `0x${transaction.data.s}`);
 		}
 
 		const rlpEncoded = encodeRlp(fields);

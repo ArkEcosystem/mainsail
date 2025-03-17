@@ -33,7 +33,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		data.data = this.#parseData(decoded[7].toString());
 
 		if (decoded.length === 12) {
-			data.v = this.#parseNumber(decoded[9].toString()) + 27;
+			data.v = this.#parseNumber(decoded[9].toString());
 			data.r = decoded[10].toString().slice(2);
 			data.s = decoded[11].toString().slice(2);
 		}

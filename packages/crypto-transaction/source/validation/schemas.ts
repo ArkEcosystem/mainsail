@@ -50,7 +50,7 @@ export const transactionBaseSchema: SchemaObject = {
 
 		senderPublicKey: { $ref: "publicKey" },
 
-		v: { maximum: 28, minimum: 27, type: "number" },
+		v: { maximum: 1, minimum: 0, type: "number" },
 		value: { bignumber: { maximum: undefined, minimum: 0 } },
 		// signatures: {
 		// 	items: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }], type: "string" },

@@ -37,7 +37,7 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 			assert.string(transaction.r);
 			assert.string(transaction.s);
 
-			fields.push(toBeArray(transaction.v - 27), `0x${transaction.r}`, `0x${transaction.s}`);
+			fields.push(toBeArray(transaction.v), `0x${transaction.r}`, `0x${transaction.s}`);
 		}
 
 		const eip1559Prefix = "02"; // marker for Type 2 (EIP1559) transaction which is the standard nowadays

@@ -68,7 +68,7 @@ export class Signature implements Contracts.Crypto.Signature {
 		return {
 			r: signature.slice(0, 32).toString("hex"),
 			s: signature.slice(32, 64).toString("hex"),
-			v: recoverId + 27,
+			v: recoverId,
 		};
 	}
 
@@ -86,7 +86,7 @@ export class Signature implements Contracts.Crypto.Signature {
 	}
 
 	public recoverPublicKey(message: Buffer, signature: Contracts.Crypto.EcdsaSignature): string {
-		const v = signature.v - 27;
+		const v = signature.v;
 		const signatureRS = Buffer.from(signature.r + signature.s, "hex");
 		return secp256k1.recover(message, signatureRS, v, true).toString("hex");
 	}
