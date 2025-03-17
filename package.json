@@ -17,7 +17,7 @@
 		"deps:types": "./node_modules/typesync/bin/typesync",
 		"docker": "node ./scripts/docker/generate-docker.js",
 		"format": "pnpm run lint && pnpm run prettier",
-		"lint": "eslint packages/*/source/*/*.ts --fix",
+		"lint": "eslint packages/*/source --fix",
 		"lint:test": "eslint packages/ --ext .test.ts --fix",
 		"madge:circular": "node ./scripts/circular.js",
 		"madge:graph": "./node_modules/madge/bin/cli.js --image circular-graph.svg --extensions ts ./packages/**/source",

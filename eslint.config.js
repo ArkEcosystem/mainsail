@@ -13,6 +13,7 @@ export default [
 		ignores: [
 			"**/*.test.ts",
 			"**/*.d.ts",
+			"**/*.js",
 			"**/bin",
 			"**/dist",
 			"**/distribution",
