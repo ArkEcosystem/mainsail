@@ -169,9 +169,10 @@ export class Application implements Contracts.Kernel.Application {
 		}
 		this.#terminating = true;
 
-		const message = `reason: ${reason} error: ${error?.message}`;
-		if (reason || error) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service)[error ? "error" : "warning"](message);
+		if (reason) {
+			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service)[error ? "error" : "warning"](
+				`Application shutdown: ${reason}`,
+			);
 		}
 
 		if (error) {
