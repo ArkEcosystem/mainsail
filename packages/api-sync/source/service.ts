@@ -511,7 +511,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			: (await this.databaseService.getLastCommit()).block.header.height;
 
 		const [blocks] = await this.dataSource.query(
-			"select coalesce(max(height), ?)::bigint as max_height, count(1) as count from blocks",
+			"select coalesce(max(height), $1)::bigint as max_height, count(1) as count from blocks",
 			[genesisHeight],
 		);
 		const blocksOk = blocks.count !== "0" && blocks.max_height === lastHeight.toFixed();
