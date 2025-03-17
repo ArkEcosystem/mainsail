@@ -1,14 +1,14 @@
 {
-	"address": "0xbeD188132e6edcCB4A45027D127902292a06BDca",
+	"address": "0x70b5c0F93ADA05137ea5D196377f6C7d70E7f5f4",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "3343dc431b651a0e14fccdb01eccc6a02c0be4c9f1593b08e4b3ea37ac009fb1",
-		"publicKey": "8632fb34c815641c6c5fc991bd913d3ea60ad055de7c034d1fea1e10ad04ca889b87445f3d64fdb60933bab3546bfd46"
+		"privateKey": "6af803c58fafe4b5af9622b4d6829c4cf6949a637de5e2efbf3921405c1dbe94",
+		"publicKey": "8b82f6f4810fb41f88886fbe585faf64fb3ae734a0c33cabf9736c0e14e678aa0116a6a42aa76f5b5bc88988f8be3207"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "d57d2069e8165aa7814312fa4abaeb022d7a59534098bc51e3972604bf268163",
-		"publicKey": "03ca0529f6b85c79570cca07b504a6b6d5be6f0675a4f4b1c3c146fcb9f6eb7a6c"
+		"privateKey": "93ffb0afbbfb49ba9086044e5f6293f6952705268d7fe6c8d4d18a51e13d4756",
+		"publicKey": "024608598cd9b7f89dfad63cb783b12fe5fe6b0d925ab313d11005621e3600c68c"
 	},
-	"passphrase": "praise boss digital athlete bamboo country define balance tragic horse habit interest sign sample sail empower husband trouble program bundle clever shoe clump goat"
+	"passphrase": "tomato resource kangaroo century gift giraffe dizzy rebuild wrist eagle bridge coast illegal pencil dust verify excess demand shield ocean when loud luggage tuna"
 }
