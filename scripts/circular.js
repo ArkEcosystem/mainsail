@@ -7,6 +7,7 @@ const source = resolve(join(process.cwd(), "packages"));
 
 const pkgs = readdirSync(source)
 	.filter((name) => lstatSync(`${source}/${name}`).isDirectory())
+	.filter((name) => name !== "evm")
 	.sort();
 
 for (const pkg of pkgs) {
