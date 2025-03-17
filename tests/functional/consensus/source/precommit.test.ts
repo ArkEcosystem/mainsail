@@ -16,7 +16,7 @@ import {
 	makeProposal,
 	prepareNodeValidators,
 	snoozeForBlock,
-} from "./utils.js";
+} from "./utilities.js";
 
 describe<{
 	nodes: Sandbox[];

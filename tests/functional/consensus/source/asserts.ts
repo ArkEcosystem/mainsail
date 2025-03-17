@@ -3,7 +3,7 @@ import { interfaces } from "@mainsail/container";
 import { Sandbox } from "@mainsail/test-framework";
 import { assert } from "@mainsail/test-runner";
 
-import { getLastCommit, snoozeForInvalidBlock } from "./utils.js";
+import { getLastCommit, snoozeForInvalidBlock } from "./utilities.js";
 
 export const assertBockHeight = async (sandbox: Sandbox | Sandbox[], height: number): Promise<void> => {
 	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];

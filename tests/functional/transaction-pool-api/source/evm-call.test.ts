@@ -10,7 +10,7 @@ import {
 	getWallets,
 	isTransactionCommitted,
 	waitBlock,
-} from "./utils.js";
+} from "./utilities.js";
 import { ethers } from "ethers";
 
 describe<{

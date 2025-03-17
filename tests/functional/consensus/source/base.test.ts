@@ -5,7 +5,7 @@ import validators from "../config/validators.json";
 import { assertBlockId, assertBockHeight } from "./asserts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
-import { getLastCommit, prepareNodeValidators, snoozeForBlock } from "./utils.js";
+import { getLastCommit, prepareNodeValidators, snoozeForBlock } from "./utilities.js";
 
 describe<{
 	nodes: Sandbox[];

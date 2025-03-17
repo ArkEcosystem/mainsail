@@ -15,7 +15,7 @@ import {
 	prepareNodeValidators,
 	snoozeForBlock,
 	snoozeForRound,
-} from "./utils.js";
+} from "./utilities.js";
 import { makeCustomProposal, makeTransactionBuilderContext } from "./custom-proposal.js";
 import { EvmCalls } from "@mainsail/test-transaction-builders";
 

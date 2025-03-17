@@ -18,7 +18,7 @@ import { Validator } from "./contracts.js";
 import { makeCustomProposal, makeTransactionBuilderContext } from "./custom-proposal.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
-import { getValidators, prepareNodeValidators, snoozeForBlock } from "./utils.js";
+import { getValidators, prepareNodeValidators, snoozeForBlock } from "./utilities.js";
 
 describe<{
 	nodes: Sandbox[];
