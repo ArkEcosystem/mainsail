@@ -6,9 +6,6 @@ export class Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
-
 	@inject(Identifiers.Consensus.Service)
 	private readonly consensus!: Contracts.Consensus.Service;
 
@@ -60,29 +57,25 @@ export class Bootstrapper {
 	private readonly evmWorker!: Contracts.Evm.Worker;
 
 	public async bootstrap(): Promise<void> {
-		try {
-			await this.#setGenesisCommit();
-			await this.#checkStoredGenesisCommit();
+		await this.#setGenesisCommit();
+		await this.#checkStoredGenesisCommit();
 
-			if (this.databaseService.isEmpty()) {
-				await this.#initGenesisState();
-			} else {
-				await this.#initPostGenesisState();
-			}
-
-			this.state.setBootstrap(false);
-
-			this.validatorRepository.printLoadedValidators();
-			await this.txPoolWorker.start(this.stateStore.getHeight());
-			await this.evmWorker.start(this.stateStore.getHeight());
-
-			void this.runConsensus();
-
-			await this.p2pServer.boot();
-			await this.p2pService.boot();
-		} catch (error) {
-			this.logger.error(error.stack);
+		if (this.databaseService.isEmpty()) {
+			await this.#initGenesisState();
+		} else {
+			await this.#initPostGenesisState();
 		}
+
+		this.state.setBootstrap(false);
+
+		this.validatorRepository.printLoadedValidators();
+		await this.txPoolWorker.start(this.stateStore.getHeight());
+		await this.evmWorker.start(this.stateStore.getHeight());
+
+		void this.runConsensus();
+
+		await this.p2pServer.boot();
+		await this.p2pService.boot();
 	}
 
 	async runConsensus(): Promise<void> {

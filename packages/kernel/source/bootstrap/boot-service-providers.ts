@@ -31,11 +31,12 @@ export class BootServiceProviders implements Contracts.Kernel.Bootstrapper {
 				try {
 					await this.serviceProviders.boot(name);
 				} catch (error) {
-					this.logger.error(`${name}: ${error.stack}`);
 					const isRequired: boolean = await serviceProvider.required();
 
 					if (isRequired) {
 						throw new Exceptions.ServiceProviderCannotBeBooted(serviceProviderName, error.message);
+					} else {
+						this.logger.warning(`${name}: ${error.stack}`);
 					}
 
 					this.serviceProviders.fail(serviceProviderName);
