@@ -1,7 +1,7 @@
 import { ReceiptRepository, ReceiptRepositoryExtension, RepositoryDataSource } from "../contracts.js";
 import { Receipt } from "../models/index.js";
 import { ReceiptFilter } from "../search/filters/receipt-filter.js";
-import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search/index.js";
+import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search/types/index.js";
 import { makeExtendedRepository } from "./repository-extension.js";
 
 export const makeReceiptRepository = (dataSource: RepositoryDataSource): ReceiptRepository =>

@@ -15,9 +15,9 @@ import {
 	ValidatorRound,
 	Wallet,
 } from "./models/index.js";
-import { Expression } from "./search/expressions.js";
-import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search/index.js";
 import { QueryHelper } from "./search/query-helper.js";
+import { Expression } from "./search/types/expressions.js";
+import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search/types/index.js";
 
 export type RepositoryDataSource = DataSource | EntityManager;
 

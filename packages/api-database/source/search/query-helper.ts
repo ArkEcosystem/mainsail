@@ -1,6 +1,6 @@
 import { EntityMetadata } from "typeorm";
 
-import { Expression, JsonFieldAccessor } from "./expressions.js";
+import { Expression, JsonFieldAccessor } from "./types/expressions.js";
 
 export type SqlExpression = {
 	query: string;

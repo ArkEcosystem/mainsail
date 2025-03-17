@@ -6,8 +6,9 @@ import {
 	RepositoryExtension,
 	ThisRepositoryExtension,
 } from "../contracts.js";
-import { Expression } from "../search/expressions.js";
-import { Expressions, Options, Pagination, QueryHelper, ResultsPage, Sorting } from "../search/index.js";
+import { QueryHelper } from "../search/index.js";
+import { Expression } from "../search/types/expressions.js";
+import { Expressions, Options, Pagination, ResultsPage, Sorting } from "../search/types/index.js";
 
 const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExtension<TEntity> &
 	ThisRepositoryExtension<TEntity> => ({

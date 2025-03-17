@@ -2,8 +2,26 @@ import { RepositoryDataSource, WalletRepository, WalletRepositoryExtension } fro
 import { Wallet } from "../models/wallet.js";
 import { DelegateFilter } from "../search/filters/delegate-filter.js";
 import { WalletFilter } from "../search/filters/index.js";
-import { Criteria, Options, Pagination, ResultsPage, SortFragment, Sorting } from "../search/index.js";
+import { Criteria, Options, Pagination, ResultsPage, SortFragment, Sorting } from "../search/types/index.js";
 import { makeExtendedRepository } from "./repository-extension.js";
+
+const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting => {
+	if (sorting.length === 0) {
+		return defaultSort;
+	}
+
+	return sorting.map(
+		(item): SortFragment => ({
+			direction: item.direction,
+			jsonFieldAccessor: {
+				cast: "numeric",
+				fieldName: item.property.replace("attributes.", ""),
+				operator: "->>",
+			},
+			property: "attributes",
+		}),
+	);
+};
 
 export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRepository =>
 	makeExtendedRepository<Wallet, WalletRepositoryExtension>(Wallet, dataSource, {
@@ -49,21 +67,3 @@ export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRe
 			);
 		},
 	});
-
-const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting => {
-	if (sorting.length === 0) {
-		return defaultSort;
-	}
-
-	return sorting.map(
-		(item): SortFragment => ({
-			direction: item.direction,
-			jsonFieldAccessor: {
-				cast: "numeric",
-				fieldName: item.property.replace("attributes.", ""),
-				operator: "->>",
-			},
-			property: "attributes",
-		}),
-	);
-};
