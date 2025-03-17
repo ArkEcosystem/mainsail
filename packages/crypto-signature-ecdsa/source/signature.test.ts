@@ -31,7 +31,7 @@ describe("Signature", ({ assert, it }) => {
 		assert.equal(signature, {
 			r: "66f1c6d9fe13834f6e348aae40426060339ed8cba7d9b2f105c8220be095877c",
 			s: "1368fffd8294f1e22086703d33511fc8bb25231d6e9dc64d6449035003184bdd",
-			v: 28,
+			v: 1,
 		});
 
 		const recoveredPublicKey = new Signature().recoverPublicKey(message, signature);
