@@ -60,11 +60,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	#registerActions(): void {
 		this.app
-			.get<Services.Triggers.Triggers<unknown>>(Identifiers.Services.Trigger.Service)
+			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 			.bind("verifyTransaction", this.app.resolve(VerifyTransactionAction));
 
 		this.app
-			.get<Services.Triggers.Triggers<unknown>>(Identifiers.Services.Trigger.Service)
+			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 			.bind("throwIfCannotBeApplied", this.app.resolve(ThrowIfCannotBeAppliedAction));
 	}
 }

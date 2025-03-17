@@ -6,10 +6,10 @@ import { ActionArguments } from "../../types/index.js";
 import { Action } from "./action.js";
 
 @injectable()
-export class Triggers<T> {
-	readonly #triggers: Map<string, Action<T>> = new Map<string, Action<T>>();
+export class Triggers {
+	readonly #triggers: Map<string, Action<any>> = new Map<string, Action<any>>();
 
-	public bind(name: string, action: Action<T>): Action<T> {
+	public bind<T>(name: string, action: Action<T>): Action<T> {
 		if (this.#triggers.has(name)) {
 			throw new Exceptions.InvalidArgumentException(`The given trigger [${name}] is already registered.`);
 		}
@@ -23,7 +23,7 @@ export class Triggers<T> {
 		return action;
 	}
 
-	public unbind(name: string): Action<T> {
+	public unbind<T>(name: string): Action<T> {
 		const trigger = this.#triggers.get(name);
 
 		if (!trigger) {
@@ -35,13 +35,13 @@ export class Triggers<T> {
 		return trigger;
 	}
 
-	public rebind(name: string, action: Action<T>): Action<T> {
+	public rebind<T>(name: string, action: Action<T>): Action<T> {
 		this.unbind(name);
 
 		return this.bind(name, action);
 	}
 
-	public get(name: string): Action<T> | undefined {
+	public get<T>(name: string): Action<T> | undefined {
 		this.#throwIfActionIsMissing(name);
 
 		const trigger = this.#triggers.get(name);

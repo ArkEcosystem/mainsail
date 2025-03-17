@@ -26,11 +26,10 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 			const { peers } = await this.communicator.getPeers(peer);
 
 			for (const peer of peers) {
-				await this.app
-					.get<
-						Services.Triggers.Triggers<{ ip: string; options: Contracts.P2P.AcceptNewPeerOptions }>
-					>(Identifiers.Services.Trigger.Service)
-					.call("validateAndAcceptPeer", { ip: peer.ip, options: {} });
+				await this.app.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service).call<{
+					ip: string;
+					options: Contracts.P2P.AcceptNewPeerOptions;
+				}>("validateAndAcceptPeer", { ip: peer.ip, options: {} });
 			}
 		} catch (error) {
 			this.logger.debug(`Failed to get peers from ${peer.ip}: ${error.message}`);
@@ -65,11 +64,10 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 
 		return Promise.all(
 			Object.values(peers).map((peer: Contracts.P2P.Peer) =>
-				this.app
-					.get<
-						Services.Triggers.Triggers<{ ip: string; options: Contracts.P2P.AcceptNewPeerOptions }>
-					>(Identifiers.Services.Trigger.Service)
-					.call("validateAndAcceptPeer", { ip: peer.ip, options: { seed: true } }),
+				this.app.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service).call<{
+					ip: string;
+					options: Contracts.P2P.AcceptNewPeerOptions;
+				}>("validateAndAcceptPeer", { ip: peer.ip, options: { seed: true } }),
 			),
 		);
 	}

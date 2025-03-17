@@ -23,7 +23,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
 	@inject(Identifiers.Services.Trigger.Service)
-	private readonly triggers!: Services.Triggers.Triggers<unknown>;
+	private readonly triggers!: Services.Triggers.Triggers;
 
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
