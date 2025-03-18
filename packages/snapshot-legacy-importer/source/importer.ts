@@ -93,7 +93,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			block: { header },
 		} = genesisBlock;
 
-		const milestone = this.configuration.getMilestone(0);
+		const milestone = this.configuration.getMilestone(this.configuration.getGenesisHeight());
 		assert.defined(milestone.snapshot);
 
 		this.logger.info(`Importing genesis snapshot: ${milestone.snapshot.hash}`);
@@ -115,7 +115,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		});
 
 		if (result.stateHash !== header.stateHash) {
-			throw new Error("genesis block snapshot state hash mismatch ");
+			throw new Error(
+				`genesis block snapshot state hash mismatch (expected: ${header.stateHash} got: ${result.stateHash})`,
+			);
 		}
 
 		if (result.initialTotalSupply !== header.totalAmount.toBigInt()) {
@@ -139,6 +141,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const validators: Contracts.Snapshot.ImportedLegacyValidator[] = [];
 
 		let foundColdWallets = 0;
+
+		let totalSupply = 0n;
 
 		for (const wallet of snapshot.wallets) {
 			hash.update(JSON.stringify(wallet));
@@ -201,6 +205,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 					username: wallet.attributes["delegate"]["username"],
 				});
 			}
+
+			totalSupply += balance;
 		}
 
 		const calculatedHash = hash.digest("hex");
@@ -214,22 +220,26 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				validators: validators.length,
 				voters: voters.length,
 				wallets: wallets.length,
+				genesisHeight: snapshot.chainTip.height,
+				totalSupply: totalSupply.toString(),
 			})}`,
 		);
 
 		this.#data = {
 			result: undefined,
 			snapshotHash: calculatedHash,
+			genesisHeight: BigInt(snapshot.chainTip.height),
 			validators,
 			voters,
 			wallets,
+			totalSupply,
 		};
 	}
 
 	public async import(
 		options: Contracts.Snapshot.LegacyImportOptions,
 	): Promise<Contracts.Snapshot.LegacyImportResult> {
-		await this.evm.prepareNextCommit({ commitKey: { height: 0n, round: 0n } });
+		await this.evm.prepareNextCommit({ commitKey: { height: options.commitKey.height, round: 0n } });
 
 		const deployerAccount = await this.evm.getAccountInfo(this.deployerAddress);
 		this.#nonce = deployerAccount.nonce;
@@ -256,6 +266,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		// 5) Calculate state hash
 		const stateHash = await this.evm.stateHash(options.commitKey, this.#data.snapshotHash);
+
+		if (totalSupply !== this.totalSupply) {
+			throw new Error("totalSupply mismatch");
+		}
 
 		return {
 			initialTotalSupply: totalSupply,

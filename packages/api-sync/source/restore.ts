@@ -661,7 +661,7 @@ export class Restore {
 		const iface = new ethers.Interface(UsernamesAbi.abi);
 		const data = iface.encodeFunctionData("getUsername", [account]).slice(2);
 
-		const { evmSpec } = this.configuration.getMilestone(0);
+		const { evmSpec } = this.configuration.getMilestone(this.configuration.getGenesisHeight());
 
 		const result = await this.evm.view({
 			caller: this.deployerAddress,

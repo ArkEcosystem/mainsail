@@ -95,13 +95,18 @@ export class GenesisBlockGenerator extends Generator {
 		validatorsCount: number,
 		options: Contracts.NetworkGenerator.InternalOptions,
 	) {
+		const premine = options.snapshot ? this.snapshotLegacyImporter!.totalSupply : options.premine;
+
 		await this.app.resolve(Deployer).deploy({
 			generatorAddress: genesisWalletAddress,
+			initialHeight: options.snapshot
+				? Number(this.snapshotLegacyImporter!.genesisHeight)
+				: options.initialHeight,
 			timestamp: dayjs(options.epoch).valueOf(),
 			totalAmount: (options.distribute
 				? // Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`)
-					BigNumber.make(options.premine).dividedBy(validatorsCount).times(validatorsCount)
-				: BigNumber.make(options.premine)
+					BigNumber.make(premine).dividedBy(validatorsCount).times(validatorsCount)
+				: BigNumber.make(premine)
 			).toString(),
 		});
 
@@ -362,15 +367,21 @@ export class GenesisBlockGenerator extends Generator {
 		// Load snapshot into EVM
 		const result = await this.snapshotLegacyImporter.import({
 			commitKey: {
-				height: 0n, // TODO: read from snapshot (follow up)
+				height: this.snapshotLegacyImporter.genesisHeight,
 				round: 0n,
 			},
 			timestamp: dayjs(options.epoch).valueOf(),
 		});
 
+		options.initialHeight = Number(this.snapshotLegacyImporter.genesisHeight);
+
 		options.snapshot.snapshotHash = this.snapshotLegacyImporter.snapshotHash;
 		options.snapshot.stateHash = result.stateHash;
 		options.premine = result.initialTotalSupply.toString();
+
+		this.app
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.set("genesisBlock.block.height", options.initialHeight);
 
 		console.log(result);
 	}
