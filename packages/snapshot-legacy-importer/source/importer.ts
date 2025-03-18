@@ -50,10 +50,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		totalSupply: bigint;
 		result: Contracts.Snapshot.LegacyImportResult | undefined;
 	} = {
-		result: undefined,
-		snapshotHash: "",
 		genesisHeight: 0n,
 		previousGenesisBlockHash: "",
+		result: undefined,
+		snapshotHash: "",
 		totalSupply: 0n,
 		validators: [],
 		voters: [],
@@ -217,23 +217,23 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		this.logger.info(
 			`snapshot stats: ${JSON.stringify({
 				coldWallets: foundColdWallets,
+				genesisHeight: snapshot.chainTip.height,
+				totalSupply: totalSupply.toString(),
 				validators: validators.length,
 				voters: voters.length,
 				wallets: wallets.length,
-				genesisHeight: snapshot.chainTip.height,
-				totalSupply: totalSupply.toString(),
 			})}`,
 		);
 
 		this.#data = {
-			result: undefined,
-			snapshotHash: calculatedHash,
 			genesisHeight: BigInt(snapshot.chainTip.height),
 			previousGenesisBlockHash: snapshot.chainTip.id,
+			result: undefined,
+			snapshotHash: calculatedHash,
+			totalSupply,
 			validators,
 			voters,
 			wallets,
-			totalSupply,
 		};
 	}
 

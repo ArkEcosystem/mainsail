@@ -160,8 +160,8 @@ export class ConfigurationGenerator {
 							Identifiers.Snapshot.Legacy.Importer,
 						);
 						milestones[0].snapshot = {
-							snapshotHash: importer.snapshotHash,
 							previousGenesisBlockHash: importer.previousGenesisBlockHash,
+							snapshotHash: importer.snapshotHash,
 						};
 
 						if (importer.validators) {
