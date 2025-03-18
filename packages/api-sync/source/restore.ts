@@ -150,7 +150,7 @@ export class Restore {
 				configurationRepository: this.configurationRepositoryFactory(entityManager),
 				contractRepository: this.contractRepositoryFactory(entityManager),
 				entityManager,
-				lastHeight: 0,
+				lastHeight: this.configuration.getGenesisHeight(),
 				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
 				mostRecentCommit,
 				publicKeyToAddress: {},
@@ -223,7 +223,7 @@ export class Restore {
 		const BATCH_SIZE = 1000;
 		const t0 = performance.now();
 
-		let currentHeight = 0;
+		let currentHeight = this.configuration.getGenesisHeight();
 
 		do {
 			const commits = this.databaseService.readCommits(
