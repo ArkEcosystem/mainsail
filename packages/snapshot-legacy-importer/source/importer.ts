@@ -45,10 +45,14 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		voters: Contracts.Snapshot.ImportedLegacyVoter[];
 		validators: Contracts.Snapshot.ImportedLegacyValidator[];
 		snapshotHash: string;
+		genesisHeight: bigint;
+		totalSupply: bigint;
 		result: Contracts.Snapshot.LegacyImportResult | undefined;
 	} = {
 		result: undefined,
 		snapshotHash: "",
+		genesisHeight: 0n,
+		totalSupply: 0n,
 		validators: [],
 		voters: [],
 		wallets: [],
@@ -68,6 +72,14 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 	public get snapshotHash(): string {
 		return this.#data.snapshotHash;
+	}
+
+	public get genesisHeight(): bigint {
+		return this.#data.genesisHeight;
+	}
+
+	public get totalSupply(): bigint {
+		return this.#data.totalSupply;
 	}
 
 	public get result(): Contracts.Snapshot.LegacyImportResult | undefined {
