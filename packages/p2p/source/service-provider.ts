@@ -19,7 +19,6 @@ import { MessageDownloader } from "./downloader/message-downloader.js";
 import { ProposalDownloader } from "./downloader/proposal-downloader.js";
 import { Header } from "./header.js";
 import { HeaderService } from "./header-service.js";
-import { normalizeUrl } from "./index.js";
 import { Logger } from "./logger.js";
 import { Peer } from "./peer.js";
 import { PeerCommunicator } from "./peer-communicator.js";
@@ -35,6 +34,7 @@ import { State } from "./state.js";
 import { Throttle } from "./throttle.js";
 import { TxPoolNode } from "./tx-pool-node.js";
 import { TxPoolNodeVerifier } from "./tx-pool-node-verifier.js";
+import { normalizeUrl } from "./utils/index.js";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
