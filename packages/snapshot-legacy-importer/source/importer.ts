@@ -46,12 +46,14 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		validators: Contracts.Snapshot.ImportedLegacyValidator[];
 		snapshotHash: string;
 		genesisHeight: bigint;
+		previousGenesisBlockHash: string;
 		totalSupply: bigint;
 		result: Contracts.Snapshot.LegacyImportResult | undefined;
 	} = {
 		result: undefined,
 		snapshotHash: "",
 		genesisHeight: 0n,
+		previousGenesisBlockHash: "",
 		totalSupply: 0n,
 		validators: [],
 		voters: [],
@@ -78,6 +80,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		return this.#data.genesisHeight;
 	}
 
+	public get previousGenesisBlockHash(): string {
+		return this.#data.previousGenesisBlockHash;
+	}
+
 	public get totalSupply(): bigint {
 		return this.#data.totalSupply;
 	}
@@ -96,16 +102,16 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const milestone = this.configuration.getMilestone(this.configuration.getGenesisHeight());
 		assert.defined(milestone.snapshot);
 
-		this.logger.info(`Importing genesis snapshot: ${milestone.snapshot.hash}`);
+		this.logger.info(`Importing genesis snapshot: ${milestone.snapshot.snapshotHash}`);
 
 		// TODO: fix hardcoded path
-		await this.prepare(`./snapshot-${milestone.snapshot.hash}.json`);
+		await this.prepare(`./snapshot-${milestone.snapshot.snapshotHash}.json`);
 
-		if (this.snapshotHash !== milestone.snapshot.hash) {
+		if (this.snapshotHash !== milestone.snapshot.snapshotHash) {
 			throw new Error("imported snapshot hash mismatch");
 		}
 
-		if (this.snapshotHash !== header.previousBlock) {
+		if (this.previousGenesisBlockHash !== header.previousBlock) {
 			throw new Error("genesis block previous block hash mismatch ");
 		}
 
@@ -113,12 +119,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			commitKey: { height: BigInt(header.height), round: BigInt(header.round) },
 			timestamp: header.timestamp,
 		});
-
-		if (result.stateHash !== header.stateHash) {
-			throw new Error(
-				`genesis block snapshot state hash mismatch (expected: ${header.stateHash} got: ${result.stateHash})`,
-			);
-		}
 
 		if (result.initialTotalSupply !== header.totalAmount.toBigInt()) {
 			throw new Error("genesis block snapshot supply mismatch ");
@@ -229,6 +229,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			result: undefined,
 			snapshotHash: calculatedHash,
 			genesisHeight: BigInt(snapshot.chainTip.height),
+			previousGenesisBlockHash: snapshot.chainTip.id,
 			validators,
 			voters,
 			wallets,
@@ -264,16 +265,12 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		// 4) Seed usernames
 		await this.#seedUsernames(options);
 
-		// 5) Calculate state hash
-		const stateHash = await this.evm.stateHash(options.commitKey, this.#data.snapshotHash);
-
 		if (totalSupply !== this.totalSupply) {
 			throw new Error("totalSupply mismatch");
 		}
 
 		return {
 			initialTotalSupply: totalSupply,
-			stateHash,
 		};
 	}
 

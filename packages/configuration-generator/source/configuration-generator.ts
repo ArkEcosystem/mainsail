@@ -159,7 +159,10 @@ export class ConfigurationGenerator {
 						const importer = this.app.get<Contracts.Snapshot.LegacyImporter>(
 							Identifiers.Snapshot.Legacy.Importer,
 						);
-						milestones[0].snapshot = { hash: importer.snapshotHash };
+						milestones[0].snapshot = {
+							snapshotHash: importer.snapshotHash,
+							previousGenesisBlockHash: importer.previousGenesisBlockHash,
+						};
 
 						if (importer.validators) {
 							const importedValidatorMnemonics: string[] = [];

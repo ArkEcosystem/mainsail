@@ -322,16 +322,15 @@ export class GenesisBlockGenerator extends Generator {
 					).toString("hex"),
 					payloadLength,
 					previousBlock:
-						options.snapshot?.snapshotHash ??
+						options.snapshot?.previousGenesisBlockHash ??
 						"0000000000000000000000000000000000000000000000000000000000000000",
 					reward: BigNumber.ZERO,
 					round: 0,
-					stateHash:
-						options.snapshot?.stateHash ??
-						(await this.evm.stateHash(
-							commitKey,
+					stateHash: await this.evm.stateHash(
+						commitKey,
+						options.snapshot?.snapshotHash ??
 							"0000000000000000000000000000000000000000000000000000000000000000",
-						)),
+					),
 					timestamp: dayjs(options.epoch).valueOf(),
 					totalAmount: options.snapshot ? BigNumber.make(options.premine) : totals.amount,
 					totalFee: totals.fee,
@@ -376,7 +375,7 @@ export class GenesisBlockGenerator extends Generator {
 		options.initialHeight = Number(this.snapshotLegacyImporter.genesisHeight);
 
 		options.snapshot.snapshotHash = this.snapshotLegacyImporter.snapshotHash;
-		options.snapshot.stateHash = result.stateHash;
+		options.snapshot.previousGenesisBlockHash = this.snapshotLegacyImporter.previousGenesisBlockHash;
 		options.premine = result.initialTotalSupply.toString();
 
 		this.app

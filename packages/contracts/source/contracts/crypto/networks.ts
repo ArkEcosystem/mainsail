@@ -54,7 +54,8 @@ export type MilestoneGas = {
 };
 
 export type MilestoneSnapshot = {
-	hash?: string;
+	snapshotHash: string;
+	previousGenesisBlockHash: string;
 };
 
 export type Milestone = {

@@ -11,6 +11,7 @@ export interface LegacyImporter {
 	voters: ImportedLegacyVoter[];
 	snapshotHash: string;
 	genesisHeight: bigint;
+	previousGenesisBlockHash: string;
 	totalSupply: bigint;
 	result: LegacyImportResult | undefined;
 }
@@ -22,7 +23,6 @@ export interface LegacyImportOptions {
 
 export interface LegacyImportResult {
 	readonly initialTotalSupply: bigint;
-	readonly stateHash: string;
 }
 
 export interface ImportedLegacyWallet {

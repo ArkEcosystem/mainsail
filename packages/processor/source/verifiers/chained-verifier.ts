@@ -22,8 +22,8 @@ export class ChainedVerifier implements Contracts.Processor.Handler {
 
 			let validPreviousBlock = false;
 			if (milestone.snapshot) {
-				assert.defined(milestone.snapshot.hash);
-				validPreviousBlock = blockData.previousBlock === milestone.snapshot.hash;
+				assert.defined(milestone.snapshot);
+				validPreviousBlock = blockData.previousBlock === milestone.snapshot.previousGenesisBlockHash;
 			} else {
 				validPreviousBlock =
 					blockData.previousBlock === "0000000000000000000000000000000000000000000000000000000000000000";
