@@ -1,14 +1,14 @@
 {
-    "address": "0x5DD297a9F10025a7dd205cb796965712a6733d16",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "5567357b1ee30eaf91a3fb1f5aa5f2c9b400bde8788539799c2b5d2d5c591b31",
-        "publicKey": "af7a35b3dd826f8516257827ca5304317d8c232bac82bef29af3746e9fd089f72969d41330907be43686aa4144a229c0"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "382b331bd587fc0f9bb7ddeafafe6b3e5e869b420765cf6942fb114677292c83",
-        "publicKey": "031be488def89c3577a1a6f7665c86ce26a1d92a191b6ce04892c9b4727641ba6c"
-    },
-    "passphrase": "obscure ramp ocean finger swing bird cup stamp giggle person path broccoli limb dove pupil rate decline voyage bacon easy clerk exclude husband wise"
+	"address": "0x5DD297a9F10025a7dd205cb796965712a6733d16",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "5567357b1ee30eaf91a3fb1f5aa5f2c9b400bde8788539799c2b5d2d5c591b31",
+		"publicKey": "af7a35b3dd826f8516257827ca5304317d8c232bac82bef29af3746e9fd089f72969d41330907be43686aa4144a229c0"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "382b331bd587fc0f9bb7ddeafafe6b3e5e869b420765cf6942fb114677292c83",
+		"publicKey": "031be488def89c3577a1a6f7665c86ce26a1d92a191b6ce04892c9b4727641ba6c"
+	},
+	"passphrase": "obscure ramp ocean finger swing bird cup stamp giggle person path broccoli limb dove pupil rate decline voyage bacon easy clerk exclude husband wise"
 }
