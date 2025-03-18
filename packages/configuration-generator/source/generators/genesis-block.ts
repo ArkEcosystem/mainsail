@@ -95,7 +95,10 @@ export class GenesisBlockGenerator extends Generator {
 		validatorsCount: number,
 		options: Contracts.NetworkGenerator.InternalOptions,
 	) {
-		const premine = options.snapshot ? this.snapshotLegacyImporter!.totalSupply : options.premine;
+		if (options.snapshot) {
+			options.premine = this.snapshotLegacyImporter!.totalSupply.toString();
+			options.distribute = false;
+		}
 
 		await this.app.resolve(Deployer).deploy({
 			generatorAddress: genesisWalletAddress,
@@ -105,8 +108,8 @@ export class GenesisBlockGenerator extends Generator {
 			timestamp: dayjs(options.epoch).valueOf(),
 			totalAmount: (options.distribute
 				? // Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`)
-					BigNumber.make(premine).dividedBy(validatorsCount).times(validatorsCount)
-				: BigNumber.make(premine)
+					BigNumber.make(options.premine).dividedBy(validatorsCount).times(validatorsCount)
+				: BigNumber.make(options.premine)
 			).toString(),
 		});
 
