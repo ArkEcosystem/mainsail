@@ -239,7 +239,7 @@ const main = async () => {
 	let pass = true;
 
 	for (const pkg of pkgs) {
-		const packageJson = (await import(join(source, pkg, "package.json"), { assert: { type: "json" } })).default;
+		const packageJson = (await import(join(source, pkg, "package.json"), { with: { type: "json" } })).default;
 
 		await depcheck(
 			join(source, pkg),
