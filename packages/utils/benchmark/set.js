@@ -10,4 +10,3 @@ var object = {
 
 export const utils = () => set(object, "a.b.c", 4);
 export const lodash = () => lodashSet(object, "a.b.c", 4);
-
