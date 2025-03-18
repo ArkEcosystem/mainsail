@@ -1,5 +1,5 @@
-const { has } = require("../distribution");
-const lodash = require("lodash/has");
+import { has } from "../distribution/has.js";
+import lodashHas from "lodash/has.js";
 
 var object = {
 	a: {
@@ -7,6 +7,5 @@ var object = {
 	},
 };
 
-exports["utils"] = () => has(object, "a.b");
-
-exports["lodash"] = () => lodash(object, "a.b");
+export const utils = () => has(object, "a.b");
+export const lodash = () => lodashHas(object, "a.b");

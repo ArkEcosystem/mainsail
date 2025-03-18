@@ -1,6 +1,5 @@
-const { isNumber } = require("../distribution");
-const lodash = require("lodash/isNumber");
+import { isNumber } from "../distribution/is-number.js";
+import lodashIsNumber from "lodash/isNumber.js";
 
-exports["utils"] = () => isNumber("abc");
-
-exports["lodash"] = () => lodash("abc");
+export const utils = () => isNumber("abc");
+export const lodash = () => lodashIsNumber("abc");

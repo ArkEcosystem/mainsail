@@ -1,6 +1,5 @@
-const { isEqual } = require("../distribution");
-const lodash = require("lodash/isEqual");
+import { isEqual } from "../distribution/is-equal.js";
+import lodashIsEqual from "lodash/isEqual.js";
 
-exports["utils"] = () => isEqual("abc", "abc");
-
-exports["lodash"] = () => lodash("abc", "abc");
+export const utils = () => isEqual("abc", "abc");
+export const lodash = () => lodashIsEqual("abc", "abc");

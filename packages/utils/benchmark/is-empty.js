@@ -1,6 +1,5 @@
-const { isEmpty } = require("../distribution");
-const lodash = require("lodash/isEmpty");
+import { isEmpty } from "../distribution/is-empty.js";
+import lodashIsEmpty from "lodash/isEmpty.js";
 
-exports["utils"] = () => isEmpty("abc");
-
-exports["lodash"] = () => lodash("abc");
+export const utils = () => isEmpty("abc");
+export const lodash = () => lodashIsEmpty("abc");

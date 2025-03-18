@@ -1,5 +1,5 @@
-const { partition } = require("../distribution");
-const lodash = require("lodash/partition");
+import { partition } from "../distribution/partition.js";
+import lodashPartition from "lodash/partition.js";
 
 const users = [
 	{
@@ -19,6 +19,5 @@ const users = [
 	},
 ];
 
-exports["utils"] = () => partition(users, (o) => o.active);
-
-exports["lodash"] = () => lodash(users, (o) => o.active);
+export const utils = () => partition(users, (o) => o.active);
+export const lodash = () => lodashPartition(users, (o) => o.active);

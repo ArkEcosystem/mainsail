@@ -1,6 +1,5 @@
-const { isUndefined } = require("../distribution");
-const lodash = require("lodash/isUndefined");
+import { isUndefined } from "../distribution/is-undefined.js";
+import lodashIsUndefined from "lodash/isUndefined.js";
 
-exports["utils"] = () => isUndefined("abc");
-
-exports["lodash"] = () => lodash("abc");
+export const utils = () => isUndefined("abc");
+export const lodash = () => lodashIsUndefined("abc");

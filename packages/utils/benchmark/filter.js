@@ -1,5 +1,5 @@
-const { filter } = require("../distribution");
-const lodash = require("lodash/filter");
+import { filter } from "../distribution/filter.js";
+import lodashFilter from "lodash/filter.js";
 
 const users = [
 	{
@@ -14,8 +14,6 @@ const users = [
 	},
 ];
 
-exports["native"] = () => users.filter((o) => !o.active);
-
-exports["utils"] = () => filter(users, (o) => !o.active);
-
-exports["lodash"] = () => lodash(users, (o) => !o.active);
+export const native = () => users.filter((o) => !o.active);
+export const utils = () => filter(users, (o) => !o.active);
+export const lodash = () => lodashFilter(users, (o) => !o.active);

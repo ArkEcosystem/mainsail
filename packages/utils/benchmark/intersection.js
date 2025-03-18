@@ -1,6 +1,5 @@
-const { intersection } = require("../distribution");
-const lodash = require("lodash/intersection");
+import { intersection } from "../distribution/intersection.js";
+import lodashIntersection from "lodash/intersection.js";
 
-exports["utils"] = () => intersection([2, 1], [2, 3]);
-
-exports["lodash"] = () => lodash([2, 1], [2, 3]);
+export const utils = () => intersection([2, 1], [2, 3]);
+export const lodash = () => lodashIntersection([2, 1], [2, 3]);

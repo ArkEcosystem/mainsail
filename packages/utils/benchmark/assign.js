@@ -1,5 +1,5 @@
-const { assign } = require("../distribution");
-const lodash = require("lodash/assign");
+import { assign } from "../distribution/assign.js";
+import lodashAssign from "lodash/assign.js";
 
 function Foo() {
 	this.a = 1;
@@ -12,7 +12,7 @@ function Bar() {
 Foo.prototype.b = 2;
 Bar.prototype.d = 4;
 
-exports["utils"] = () =>
+export const utils = () =>
 	assign(
 		{
 			a: 0,
@@ -21,8 +21,8 @@ exports["utils"] = () =>
 		new Bar(),
 	);
 
-exports["lodash"] = () =>
-	lodash(
+export const lodash = () =>
+	lodashAssign(
 		{
 			a: 0,
 		},

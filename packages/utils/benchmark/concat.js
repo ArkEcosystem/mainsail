@@ -1,6 +1,5 @@
-const { concat } = require("../distribution");
-const lodash = require("lodash/concat");
+import { concat } from "../distribution/concat.js";
+import lodashConcat from "lodash/concat.js";
 
-exports["utils"] = () => concat([1], [2]);
-
-exports["lodash"] = () => lodash([1], [2]);
+export const utils = () => concat([1], [2]);
+export const lodash = () => lodashConcat([1], [2]);

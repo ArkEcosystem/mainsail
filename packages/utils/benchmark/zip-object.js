@@ -1,6 +1,5 @@
-const { zipObject } = require("../distribution");
-const lodash = require("lodash/zipObject");
+import { zipObject } from "../distribution/zip-object.js";
+import lodashZipObject from "lodash/zipObject.js";
 
-exports["utils"] = () => zipObject(["a", "b"], [1, 2]);
-
-exports["lodash"] = () => lodash(["a", "b"], [1, 2]);
+export const utils = () => zipObject(["a", "b"], [1, 2]);
+export const lodash = () => lodashZipObject(["a", "b"], [1, 2]);

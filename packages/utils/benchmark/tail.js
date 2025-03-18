@@ -1,6 +1,5 @@
-const { tail } = require("../distribution");
-const lodash = require("lodash/tail");
+import { tail } from "../distribution/tail.js";
+import lodashTail from "lodash/tail.js";
 
-exports["utils"] = () => tail([1, 2, 3]);
-
-exports["lodash"] = () => lodash([1, 2, 3]);
+export const  utils = () => tail([1, 2, 3]);
+export const  lodash = () => lodashTail([1, 2, 3]);

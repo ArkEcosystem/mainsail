@@ -1,6 +1,5 @@
-const { uniqBy } = require("../distribution");
-const lodash = require("lodash/uniqBy");
+import { uniqBy } from "../distribution/uniq-by.js";
+import lodashUniqBy from "lodash/uniqBy.js";
 
-exports["utils"] = () => uniqBy([2.1, 1.2, 2.3], Math.floor);
-
-exports["lodash"] = () => lodash([2.1, 1.2, 2.3], Math.floor);
+export const utils = () => uniqBy([2.1, 1.2, 2.3], Math.floor);
+export const lodash = () => lodashUniqBy([2.1, 1.2, 2.3], Math.floor);

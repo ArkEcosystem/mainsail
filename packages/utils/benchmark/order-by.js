@@ -1,5 +1,5 @@
-const { orderBy } = require("../distribution");
-const lodash = require("lodash/orderBy");
+import { orderBy } from "../distribution/order-by.js";
+import lodashOrderBy from "lodash/orderBy.js";
 
 const users = [
 	{
@@ -20,6 +20,5 @@ const users = [
 	},
 ];
 
-exports["utils"] = () => orderBy(users, ["user", "age"], ["asc", "desc"]);
-
-exports["lodash"] = () => lodash(users, ["user", "age"], ["asc", "desc"]);
+export const utils = () => orderBy(users, ["user", "age"], ["asc", "desc"]);
+export const lodash = () => lodashOrderBy(users, ["user", "age"], ["asc", "desc"]);

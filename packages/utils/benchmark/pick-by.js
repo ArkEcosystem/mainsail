@@ -1,7 +1,8 @@
-const { isNumber, pickBy } = require("../distribution");
-const lodash = require("lodash/pickBy");
+import { pickBy } from "../distribution/pick-by.js";
+import { isNumber } from "../distribution/is-number.js";
+import lodashPickBy from "lodash/pickBy.js";
 
-exports["utils"] = () =>
+export const utils = () =>
 	pickBy(
 		{
 			a: 1,
@@ -10,9 +11,8 @@ exports["utils"] = () =>
 		},
 		isNumber,
 	);
-
-exports["lodash"] = () =>
-	lodash(
+export const lodash = () =>
+	lodashPickBy(
 		{
 			a: 1,
 			b: "2",

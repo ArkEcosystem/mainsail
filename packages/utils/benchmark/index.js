@@ -1,20 +1,26 @@
-const { readdirSync } = require("fs");
-const bench = require("micro-bmark");
+import { readdirSync } from "fs";
+import { join } from "path";
+import { fileURLToPath } from "url";
 
-const { run, mark } = bench; // or bench.mark
+import bench from "micro-bmark";
 
-run(async () => {
-	const suites = readdirSync(__dirname)
+const path = fileURLToPath(join(import.meta.url, "../"));
+
+const run = async () => {
+	const suites = readdirSync(path)
 		.filter((name) => name !== "index.js")
-		.filter((name) => name !== "helpers.js")
 		.sort();
 
 	for (const suite of suites) {
-		for (const [label, callback] of Object.entries(require(`./${suite}`))) {
-			await mark(label, callback);
+		console.log(`\n${suite}`);
+
+		for (const [label, callback] of Object.entries(await import(join(path, suite)))) {
+			await bench(label, callback);
 		}
 	}
 
 	// bench.logMem();
 	// bench.getTime();
-});
+};
+
+await run();

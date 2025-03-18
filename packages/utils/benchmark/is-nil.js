@@ -1,6 +1,5 @@
-const { isNil } = require("../distribution");
-const lodash = require("lodash/isNil");
+import { isNil } from "../distribution/is-nil.js";
+import lodashIsNil from "lodash/isNil.js";
 
-exports["utils"] = () => isNil("abc");
-
-exports["lodash"] = () => lodash("abc");
+export const utils = () => isNil("abc");
+export const lodash = () => lodashIsNil("abc");

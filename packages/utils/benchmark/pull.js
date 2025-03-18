@@ -1,6 +1,5 @@
-const { pull } = require("../distribution");
-const lodash = require("lodash/pull");
+import { pull } from "../distribution/pull.js";
+import lodashPull from "lodash/pull.js";
 
-exports["utils"] = () => pull(["a", "b", "c", "a", "b", "c"], "a", "c");
-
-exports["lodash"] = () => lodash(["a", "b", "c", "a", "b", "c"], "a", "c");
+export const utils = () => pull(["a", "b", "c", "a", "b", "c"], "a", "c");
+export const lodash = () => lodashPull(["a", "b", "c", "a", "b", "c"], "a", "c");

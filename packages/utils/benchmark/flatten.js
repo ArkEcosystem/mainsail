@@ -1,6 +1,5 @@
-const { flatten } = require("../distribution");
-const lodash = require("lodash/flatten");
+import { flatten } from "../distribution/flatten.js";
+import lodashFlatten from "lodash/flatten.js";
 
-exports["utils"] = () => flatten([1, [2, [3, [4]], 5]]);
-
-exports["lodash"] = () => lodash([1, [2, [3, [4]], 5]]);
+export const utils = () => flatten([1, [2, [3, [4]], 5]]);
+export const lodash = () => lodashFlatten([1, [2, [3, [4]], 5]]);

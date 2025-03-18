@@ -1,6 +1,6 @@
-const { isNumber, omitBy } = require("../distribution");
-const lodash = require("lodash/omitBy");
+import { omitBy } from "../distribution/omit-by.js";
+import { isNumber } from "../distribution/is-number.js";
+import lodashOmitBy from "lodash/omitBy.js";
 
-exports["utils"] = () => omitBy({ a: 1, b: "2", c: 3 }, isNumber);
-
-exports["lodash"] = () => lodash({ a: 1, b: "2", c: 3 }, isNumber);
+export const utils = () => omitBy({ a: 1, b: "2", c: 3 }, isNumber);
+export const lodash = () => lodashOmitBy({ a: 1, b: "2", c: 3 }, isNumber);

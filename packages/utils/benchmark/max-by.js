@@ -1,5 +1,5 @@
-const { maxBy } = require("../distribution");
-const lodash = require("lodash/maxBy");
+import { maxBy } from "../distribution/max-by.js";
+import lodashMaxBy from "lodash/maxBy.js";
 
 const objects = [
 	{
@@ -10,6 +10,5 @@ const objects = [
 	},
 ];
 
-exports["utils"] = () => maxBy(objects, (o) => o.n);
-
-exports["lodash"] = () => lodash(objects, (o) => o.n);
+export const utils = () => maxBy(objects, (o) => o.n);
+export const lodash = () => lodashMaxBy(objects, (o) => o.n);

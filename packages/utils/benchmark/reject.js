@@ -1,5 +1,5 @@
-const { reject } = require("../distribution");
-const lodash = require("lodash/reject");
+import { reject } from "../distribution/reject.js";
+import lodashReject from "lodash/reject.js";
 
 const users = [
 	{
@@ -13,6 +13,6 @@ const users = [
 		active: true,
 	},
 ];
-exports["utils"] = () => reject(users, (o) => o.active);
 
-exports["lodash"] = () => lodash(users, (o) => o.active);
+export const utils = () => reject(users, (o) => o.active);
+export const lodash = () => lodashReject(users, (o) => o.active);

@@ -1,6 +1,5 @@
-const { pullAll } = require("../distribution");
-const lodash = require("lodash/pullAll");
+import { pullAll } from "../distribution/pull-all.js";
+import lodashPullAll from "lodash/pullAll.js";
 
-exports["utils"] = () => pullAll(["a", "b", "c", "a", "b", "c"], "a", "c");
-
-exports["lodash"] = () => lodash(["a", "b", "c", "a", "b", "c"], "a", "c");
+export const utils = () => pullAll(["a", "b", "c", "a", "b", "c"], "a", "c");
+export const lodash = () => lodashPullAll(["a", "b", "c", "a", "b", "c"], "a", "c");

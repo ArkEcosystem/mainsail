@@ -1,6 +1,5 @@
-const { unionBy } = require("../distribution");
-const lodash = require("lodash/unionBy");
+import { unionBy } from "../distribution/union-by.js";
+import lodashUnionBy from "lodash/unionBy.js";
 
-exports["utils"] = () => unionBy([2.1], [1.2, 2.3], Math.floor);
-
-exports["lodash"] = () => lodash([2.1], [1.2, 2.3], Math.floor);
+export const utils = () => unionBy([2.1], [1.2, 2.3], Math.floor);
+export const lodash = () => lodashUnionBy([2.1], [1.2, 2.3], Math.floor);

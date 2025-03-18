@@ -1,6 +1,5 @@
-const { indexOf } = require("../distribution");
-const lodash = require("lodash/indexOf");
+import { indexOf } from "../distribution/index-of.js";
+import lodashIndexOf from "lodash/indexOf.js";
 
-exports["utils"] = () => indexOf([1, 2, 1, 2], 2);
-
-exports["lodash"] = () => lodash([1, 2, 1, 2], 2);
+export const utils = () => indexOf([1, 2, 1, 2], 2);
+export const lodash = () => lodashIndexOf([1, 2, 1, 2], 2);

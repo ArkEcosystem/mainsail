@@ -1,6 +1,5 @@
-const { isBoolean } = require("../distribution");
-const lodash = require("lodash/isBoolean");
+import { isBoolean } from "../distribution/is-boolean.js";
+import lodashIsBoolean from "lodash/isBoolean.js";
 
-exports["utils"] = () => isBoolean("abc");
-
-exports["lodash"] = () => lodash("abc");
+export const utils = () => isBoolean("abc");
+export const lodash = () => lodashIsBoolean("abc");

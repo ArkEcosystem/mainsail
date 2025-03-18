@@ -1,5 +1,5 @@
-const { mapValues } = require("../distribution");
-const lodash = require("lodash/mapValues");
+import { mapValues } from "../distribution/map-values.js";
+import lodashMapValues from "lodash/mapValues.js";
 
 const users = {
 	fred: {
@@ -12,6 +12,5 @@ const users = {
 	},
 };
 
-exports["utils"] = () => mapValues(users, (o) => o.age);
-
-exports["lodash"] = () => lodash(users, (o) => o.age);
+export const utils = () => mapValues(users, (o) => o.age);
+export const lodash = () => lodashMapValues(users, (o) => o.age);

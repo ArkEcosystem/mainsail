@@ -1,6 +1,5 @@
-const { fill } = require("../distribution");
-const lodash = require("lodash/fill");
+import { fill } from "../distribution/fill.js";
+import lodashFill from "lodash/fill.js";
 
-exports["utils"] = () => fill([1, 2, 3], "a");
-
-exports["lodash"] = () => lodash([1, 2, 3], "a");
+export const utils = () => fill([1, 2, 3], "a");
+export const lodash = () => lodashFill([1, 2, 3], "a");

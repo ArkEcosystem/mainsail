@@ -1,7 +1,7 @@
-const { pullAllBy } = require("../distribution");
-const lodash = require("lodash/pullAllBy");
+import { pullAllBy } from "../distribution/pull-all-by.js";
+import lodashPullAllBy from "lodash/pullAllBy.js";
 
-exports["utils"] = () =>
+export const utils = () =>
 	pullAllBy(
 		[
 			{
@@ -28,8 +28,8 @@ exports["utils"] = () =>
 		(o) => o.x,
 	);
 
-exports["lodash"] = () =>
-	lodash(
+export const lodash = () =>
+	lodashPullAllBy(
 		[
 			{
 				x: 1,

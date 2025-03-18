@@ -1,6 +1,5 @@
-const { castArray } = require("../distribution");
-const lodash = require("lodash/castArray");
+import { castArray } from "../distribution/cast-array.js";
+import lodashCastArray from "lodash/castArray.js";
 
-exports["utils"] = () => castArray("abc");
-
-exports["lodash"] = () => lodash("abc");
+export const utils = () => castArray("abc");
+export const lodash = () => lodashCastArray("abc");

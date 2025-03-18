@@ -1,6 +1,5 @@
-const { isString } = require("../distribution");
-const lodash = require("lodash/isString");
+import { isString } from "../distribution/is-string.js";
+import lodashIsString from "lodash/isString.js";
 
-exports["utils"] = () => isString("abc");
-
-exports["lodash"] = () => lodash("abc");
+export const utils = () => isString("abc");
+export const lodash = () => lodashIsString("abc");

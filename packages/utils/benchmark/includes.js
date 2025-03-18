@@ -1,6 +1,5 @@
-const { includes } = require("../distribution");
-const lodash = require("lodash/includes");
+import { includes } from "../distribution/includes.js";
+import lodashIncludes from "lodash/includes.js";
 
-exports["utils"] = () => includes([1, 2, 3], 1);
-
-exports["lodash"] = () => lodash([1, 2, 3], 1);
+export const utils = () => includes([1, 2, 3], 1);
+export const lodash = () => lodashIncludes([1, 2, 3], 1);

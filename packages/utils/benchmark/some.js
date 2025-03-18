@@ -1,8 +1,6 @@
-const { some } = require("../distribution");
-const lodash = require("lodash/some");
+import { some } from "../distribution/some.js";
+import lodashSome from "lodash/some.js";
 
-exports["native"] = () => [null, 0, "yes", false].some(Boolean);
-
-exports["utils"] = () => some([null, 0, "yes", false], Boolean);
-
-exports["lodash"] = () => lodash([null, 0, "yes", false], Boolean);
+export const native = () => [null, 0, "yes", false].some(Boolean);
+export const utils = () => some([null, 0, "yes", false], Boolean);
+export const lodash = () => lodashSome([null, 0, "yes", false], Boolean);

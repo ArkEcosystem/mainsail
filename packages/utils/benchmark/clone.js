@@ -1,5 +1,5 @@
-const { clone } = require("../distribution");
-const lodash = require("lodash/clone");
+import { clone } from "../distribution/clone.js";
+import lodashClone from "lodash/clone.js";
 
 const objects = [
 	{
@@ -10,6 +10,5 @@ const objects = [
 	},
 ];
 
-exports["utils"] = () => clone(objects);
-
-exports["lodash"] = () => lodash(objects);
+export const utils = () => clone(objects);
+export const lodash = () => lodashClone(objects);

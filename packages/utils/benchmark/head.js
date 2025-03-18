@@ -1,6 +1,5 @@
-const { head } = require("../distribution");
-const lodash = require("lodash/head");
+import { head } from "../distribution/head.js";
+import lodashHead from "lodash/head.js";
 
-exports["utils"] = () => head([1, 2, 3]);
-
-exports["lodash"] = () => lodash([1, 2, 3]);
+export const utils = () => head([1, 2, 3]);
+export const lodash = () => lodashHead([1, 2, 3]);

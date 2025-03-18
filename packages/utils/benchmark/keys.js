@@ -1,5 +1,5 @@
-const { keys } = require("../distribution");
-const lodash = require("lodash/keys");
+import { keys } from "../distribution/keys.js";
+import lodashKeys from "lodash/keys.js";
 
 function Foo() {
 	this.a = 1;
@@ -8,6 +8,5 @@ function Foo() {
 
 Foo.prototype.c = 3;
 
-exports["utils"] = () => keys(new Foo());
-
-exports["lodash"] = () => lodash(new Foo());
+export const utils = () => keys(new Foo());
+export const lodash = () => lodashKeys(new Foo());

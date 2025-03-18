@@ -1,5 +1,5 @@
-const { keyBy } = require("../distribution");
-const lodash = require("lodash/keyBy");
+import { keyBy } from "../distribution/key-by.js";
+import lodashKeyBy from "lodash/keyBy.js";
 
 const array = [
 	{
@@ -12,6 +12,5 @@ const array = [
 	},
 ];
 
-exports["utils"] = () => keyBy(array, (o) => String.fromCharCode(o.code));
-
-exports["lodash"] = () => lodash(array, (o) => String.fromCharCode(o.code));
+export const utils = () => keyBy(array, (o) => String.fromCharCode(o.code));
+export const lodash = () => lodashKeyBy(array, (o) => String.fromCharCode(o.code));

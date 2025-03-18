@@ -1,6 +1,5 @@
-const { randomNumber } = require("../distribution");
-const lodash = require("lodash/random");
+import { randomNumber } from "../distribution/random-number.js"
+import lodashRandomNumber from "lodash/random.js"
 
-exports["utils"] = () => randomNumber(1, 10);
-
-exports["lodash"] = () => lodash(1, 10);
+export const utils = () => randomNumber(1, 10);
+export const lodash = () => lodashRandomNumber(1, 10);

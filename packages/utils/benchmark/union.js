@@ -1,6 +1,5 @@
-const { union } = require("../distribution");
-const lodash = require("lodash/union");
+import { union } from "../distribution/union.js";
+import lodashUnion from "lodash/union.js";
 
-exports["utils"] = () => union([2], [1, 2]);
-
-exports["lodash"] = () => lodash([2], [1, 2]);
+export const utils = () => union([2], [1, 2]);
+export const lodash = () => lodashUnion([2], [1, 2]);

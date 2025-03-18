@@ -1,6 +1,5 @@
-const { groupBy } = require("../distribution");
-const lodash = require("lodash/groupBy");
+import { groupBy } from "../distribution/group-by.js";
+import lodashGroupBy from "lodash/groupBy.js";
 
-exports["utils"] = () => groupBy([6.1, 4.2, 6.3], Math.floor);
-
-exports["lodash"] = () => lodash([6.1, 4.2, 6.3], Math.floor);
+export const utils = () => groupBy([6.1, 4.2, 6.3], Math.floor);
+export const lodash = () => lodashGroupBy([6.1, 4.2, 6.3], Math.floor);

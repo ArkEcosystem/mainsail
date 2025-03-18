@@ -1,6 +1,5 @@
-const { min } = require("../distribution");
-const lodash = require("lodash/min");
+import { min } from "../distribution/min.js";
+import lodashMin from "lodash/min.js";
 
-exports["utils"] = () => min([4, 2, 8, 6]);
-
-exports["lodash"] = () => lodash([4, 2, 8, 6]);
+export const utils = () => min([4, 2, 8, 6]);
+export const lodash = () => lodashMin([4, 2, 8, 6]);

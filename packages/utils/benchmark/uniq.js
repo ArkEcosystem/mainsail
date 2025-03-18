@@ -1,6 +1,5 @@
-const { uniq } = require("../distribution");
-const lodash = require("lodash/uniq");
+import { uniq } from "../distribution/uniq.js";
+import lodashUniq from "lodash/uniq.js";
 
-exports["utils"] = () => uniq([2, 1, 2]);
-
-exports["lodash"] = () => lodash([2, 1, 2]);
+export const utils = () => uniq([2, 1, 2]);
+export const lodash = () => lodashUniq([2, 1, 2]);

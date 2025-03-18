@@ -1,4 +1,4 @@
-const { parse } = require("../distribution");
+import { parse } from "../distribution/parse.js";
 
 const json = JSON.stringify(
 	new Array(1000).fill({
@@ -8,6 +8,5 @@ const json = JSON.stringify(
 	}),
 );
 
-exports["native"] = () => JSON.parse(json);
-
-exports["utils"] = () => parse(json);
+export const native = () => JSON.parse(json);
+export const utils = () => parse(json);

@@ -1,6 +1,5 @@
-const { lowerFirst } = require("../distribution");
-const lodash = require("lodash/lowerFirst");
+import { lowerFirst } from "../distribution/lower-first.js";
+import lodashLowerFirst from "lodash/lowerFirst.js";
 
-exports["utils"] = () => lowerFirst("__FOO_BAR__");
-
-exports["lodash"] = () => lodash("__FOO_BAR__");
+export const utils = () => lowerFirst("__FOO_BAR__");
+export const lodash = () => lodashLowerFirst("__FOO_BAR__");

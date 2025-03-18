@@ -1,5 +1,5 @@
-const { findIndex } = require("../distribution");
-const lodash = require("lodash/findIndex");
+import { findIndex } from "../distribution/find-index.js";
+import lodashFindIndex from "lodash/findIndex.js";
 
 const users = [
 	{
@@ -16,6 +16,5 @@ const users = [
 	},
 ];
 
-exports["utils"] = () => findIndex(users, (o) => o.user === "fred");
-
-exports["lodash"] = () => lodash(users, (o) => o.user === "fred");
+export const utils = () => findIndex(users, (o) => o.user === "fred");
+export const lodash = () => lodashFindIndex(users, (o) => o.user === "fred");

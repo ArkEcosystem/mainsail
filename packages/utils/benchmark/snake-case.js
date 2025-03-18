@@ -1,6 +1,5 @@
-const { snakeCase } = require("../distribution");
-const lodash = require("lodash/snakeCase");
+import { snakeCase } from "../distribution/snake-case.js";
+import lodashSnakeCase from "lodash/snakeCase.js";
 
-exports["utils"] = () => snakeCase("Foo Bar");
-
-exports["lodash"] = () => lodash("Foo Bar");
+export const utils = () => snakeCase("Foo Bar");
+export const lodash = () => lodashSnakeCase("Foo Bar");

@@ -1,6 +1,5 @@
-const { isObject } = require("../distribution");
-const lodash = require("lodash/isObject");
+import { isObject } from "../distribution/is-object.js";
+import lodashIsObject from "lodash/isObject.js";
 
-exports["utils"] = () => isObject("abc");
-
-exports["lodash"] = () => lodash("abc");
+export const utils = () => isObject("abc");
+export const lodash = () => lodashIsObject("abc");

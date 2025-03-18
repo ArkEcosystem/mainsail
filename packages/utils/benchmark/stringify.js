@@ -1,5 +1,4 @@
-const { stringify } = require("../distribution");
+import { stringify } from "../distribution/stringify.js";
 
-exports["native"] = () => JSON.stringify([1, 2, 3]);
-
-exports["utils"] = () => stringify([1, 2, 3]);
+export const native = () => JSON.stringify([1, 2, 3]);
+export const utils = () => stringify([1, 2, 3]);

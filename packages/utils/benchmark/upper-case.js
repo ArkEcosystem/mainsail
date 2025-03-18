@@ -1,6 +1,5 @@
-const { upperCase } = require("../distribution");
-const lodash = require("lodash/upperCase");
+import { upperCase } from "../distribution/upper-case.js";
+import lodashUpperCase from "lodash/upperCase.js";
 
-exports["utils"] = () => upperCase("__FOO_BAR__");
-
-exports["lodash"] = () => lodash("__FOO_BAR__");
+export const utils = () => upperCase("__FOO_BAR__");
+export const lodash = () => lodashUpperCase("__FOO_BAR__");

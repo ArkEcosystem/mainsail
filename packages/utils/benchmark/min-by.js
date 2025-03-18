@@ -1,5 +1,5 @@
-const { minBy } = require("../distribution");
-const lodash = require("lodash/minBy");
+import { minBy } from "../distribution/min-by.js";
+import lodashMinBy from "lodash/minBy.js";
 
 const objects = [
 	{
@@ -10,6 +10,5 @@ const objects = [
 	},
 ];
 
-exports["utils"] = () => minBy(objects, (o) => o.n);
-
-exports["lodash"] = () => lodash(objects, (o) => o.n);
+export const utils = () => minBy(objects, (o) => o.n);
+export const lodash = () => lodashMinBy(objects, (o) => o.n);

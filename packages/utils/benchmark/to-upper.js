@@ -1,8 +1,6 @@
-const { toUpper } = require("../distribution");
-const lodash = require("lodash/toUpper");
+import { toUpper } from "../distribution/to-upper.js";
+import lodashToUpper from "lodash/toUpper.js";
 
-exports["native"] = () => "__FOO_BAR__".toUpperCase();
-
-exports["utils"] = () => toUpper("__FOO_BAR__");
-
-exports["lodash"] = () => lodash("__FOO_BAR__");
+export const native = () => "__FOO_BAR__".toUpperCase();
+export const utils = () => toUpper("__FOO_BAR__");
+export const lodash = () => lodashToUpper("__FOO_BAR__");

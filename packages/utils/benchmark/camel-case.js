@@ -1,6 +1,5 @@
-const { camelCase } = require("../distribution");
-const lodash = require("lodash/camelCase");
+import { camelCase } from "../distribution/camel-case.js";
+import lodashCamelCase from "lodash/camelCase.js";
 
-exports["utils"] = () => camelCase("Foo Bar");
-
-exports["lodash"] = () => lodash("Foo Bar");
+export const utils = () => camelCase("Foo Bar");
+export const lodash = () => lodashCamelCase("Foo Bar");

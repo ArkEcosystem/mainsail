@@ -1,5 +1,5 @@
-const { merge } = require("../distribution");
-const lodash = require("lodash/merge");
+import { merge } from "../distribution/merge.js";
+import lodashMerge from "lodash/merge.js";
 
 var object = {
 	a: [
@@ -23,6 +23,5 @@ var other = {
 	],
 };
 
-exports["utils"] = () => merge(object, other);
-
-exports["lodash"] = () => lodash(object, other);
+export const utils = () => merge(object, other);
+export const lodash = () => lodashMerge(object, other);

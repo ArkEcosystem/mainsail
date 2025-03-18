@@ -1,5 +1,5 @@
-const { get } = require("../distribution");
-const lodash = require("lodash/get");
+import { get } from "../distribution/get.js";
+import lodashGet from "lodash/get.js";
 
 var object = {
 	a: {
@@ -9,6 +9,5 @@ var object = {
 	},
 };
 
-exports["utils"] = () => get(object, "a.b.c");
-
-exports["lodash"] = () => lodash(object, "a.b.c");
+export const utils = () => get(object, "a.b.c");
+export const lodash = () => lodashGet(object, "a.b.c");

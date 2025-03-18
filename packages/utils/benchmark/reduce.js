@@ -1,8 +1,6 @@
-const { reduce } = require("../distribution");
-const lodash = require("lodash/reduce");
+import { reduce } from "../distribution/reduce.js";
+import lodashReduce from "lodash/reduce.js";
 
-exports["native"] = () => [1, 2].reduce((sum, n) => sum + n, 0);
-
-exports["utils"] = () => reduce([1, 2], (sum, n) => sum + n, 0);
-
-exports["lodash"] = () => lodash([1, 2], (sum, n) => sum + n, 0);
+export const native = () => [1, 2].reduce((sum, n) => sum + n, 0);
+export const utils = () => reduce([1, 2], (sum, n) => sum + n, 0);
+export const lodash = () => lodashReduce([1, 2], (sum, n) => sum + n, 0);

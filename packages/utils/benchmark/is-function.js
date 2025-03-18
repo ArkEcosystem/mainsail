@@ -1,6 +1,5 @@
-const { isFunction } = require("../distribution");
-const lodash = require("lodash/isFunction");
+import { isFunction } from "../distribution/is-function.js";
+import lodashIsFunction from "lodash/isFunction.js";
 
-exports["utils"] = () => isFunction("abc");
-
-exports["lodash"] = () => lodash("abc");
+export const utils = () => isFunction("abc");
+export const lodash = () => lodashIsFunction("abc");

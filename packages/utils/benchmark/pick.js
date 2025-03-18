@@ -1,7 +1,7 @@
-const { pick } = require("../distribution");
-const lodash = require("lodash/pick");
+import { pick } from "../distribution/pick.js";
+import lodashPick from "lodash/pick.js";
 
-exports["utils"] = () =>
+export const utils = () =>
 	pick(
 		{
 			a: 1,
@@ -11,8 +11,8 @@ exports["utils"] = () =>
 		["a", "c"],
 	);
 
-exports["lodash"] = () =>
-	lodash(
+export const lodash = () =>
+	lodashPick(
 		{
 			a: 1,
 			b: "2",

@@ -1,6 +1,5 @@
-const { isArray } = require("../distribution");
-const lodash = require("lodash/isArray");
+import { isArray } from "../distribution/is-array.js";
+import lodashIsArray from "lodash/isArray.js";
 
-exports["utils"] = () => isArray("abc");
-
-exports["lodash"] = () => lodash("abc");
+export const utils = () => isArray("abc");
+export const lodash = () => lodashIsArray("abc");

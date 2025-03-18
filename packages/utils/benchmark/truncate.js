@@ -1,12 +1,11 @@
-const { truncate } = require("../distribution");
-const lodash = require("lodash/truncate");
+import { truncate } from "../distribution/truncate.js";
+import lodashTruncate from "lodash/truncate.js";
 
-exports["utils"] = () =>
+export const utils = () =>
 	truncate("Hello World", {
 		length: 5,
 	});
-
-exports["lodash"] = () =>
-	lodash("Hello World", {
+export const lodash = () =>
+	lodashTruncate("Hello World", {
 		length: 5,
 	});

@@ -1,6 +1,5 @@
-const { max } = require("../distribution");
-const lodash = require("lodash/max");
+import { max } from "../distribution/max.js";
+import lodashMax from "lodash/max.js";
 
-exports["utils"] = () => max([4, 2, 8, 6]);
-
-exports["lodash"] = () => lodash([4, 2, 8, 6]);
+export const utils= () => max([4, 2, 8, 6]);
+export const lodash = () => lodashMax([4, 2, 8, 6]);

@@ -1,6 +1,5 @@
-const { isSymbol } = require("../distribution");
-const lodash = require("lodash/isSymbol");
+import { isSymbol } from "../distribution/is-symbol.js";
+import lodashIsSymbol from "lodash/isSymbol.js";
 
-exports["utils"] = () => isSymbol("abc");
-
-exports["lodash"] = () => lodash("abc");
+export const utils = () => isSymbol("abc");
+export const lodash = () => lodashIsSymbol("abc");

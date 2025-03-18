@@ -1,8 +1,6 @@
-const { map } = require("../distribution");
-const lodash = require("lodash/map");
+import { map } from "../distribution/map.js";
+import lodashMap from "lodash/map.js";
 
-exports["native"] = () => [4, 8].map((n) => n * n);
-
-exports["utils"] = () => map([4, 8], (n) => n * n);
-
-exports["lodash"] = () => lodash([4, 8], (n) => n * n);
+export const native = () => [4, 8].map((n) => n * n);
+export const utils = () => map([4, 8], (n) => n * n);
+export const lodash = () => lodashMap([4, 8], (n) => n * n);

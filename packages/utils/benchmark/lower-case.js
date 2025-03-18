@@ -1,6 +1,5 @@
-const { lowerCase } = require("../distribution");
-const lodash = require("lodash/lowerCase");
+import { lowerCase } from "../distribution/lower-case.js";
+import lodashLowerCase from "lodash/lowerCase.js";
 
-exports["utils"] = () => lowerCase("__FOO_BAR__");
-
-exports["lodash"] = () => lodash("__FOO_BAR__");
+export const utils = () => lowerCase("__FOO_BAR__");
+export const lodash = () => lodashLowerCase("__FOO_BAR__");

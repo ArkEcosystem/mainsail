@@ -1,5 +1,5 @@
-const { findKey } = require("../distribution");
-const lodash = require("lodash/findKey");
+import { findKey } from "../distribution/find-key.js";
+import lodashFindKey from "lodash/findKey.js";
 
 const users = {
 	barney: {
@@ -16,6 +16,5 @@ const users = {
 	},
 };
 
-exports["utils"] = () => findKey(users, (o) => o.age < 40);
-
-exports["lodash"] = () => lodash(users, (o) => o.age < 40);
+export const utils = () => findKey(users, (o) => o.age < 40);
+export const lodash = () => lodashFindKey(users, (o) => o.age < 40);

@@ -1,5 +1,5 @@
-const { find } = require("../distribution");
-const lodash = require("lodash/find");
+import { find } from "../distribution/find.js";
+import lodashFind from "lodash/find.js";
 
 const users = [
 	{
@@ -19,6 +19,5 @@ const users = [
 	},
 ];
 
-exports["utils"] = () => find(users, (o) => o.age < 40);
-
-exports["lodash"] = () => lodash(users, (o) => o.age < 40);
+export const utils = () => find(users, (o) => o.age < 40);
+export const lodash = () => lodashFind(users, (o) => o.age < 40);

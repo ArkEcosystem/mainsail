@@ -1,5 +1,5 @@
-const { unset } = require("../distribution");
-const lodash = require("lodash/unset");
+import { unset } from "../distribution/unset.js";
+import lodashUnset from "lodash/unset.js";
 
 var object = {
 	a: {
@@ -9,6 +9,5 @@ var object = {
 	},
 };
 
-exports["utils"] = () => unset(object, "a.b.c");
-
-exports["lodash"] = () => lodash(object, "a.b.c");
+export const utils = () => unset(object, "a.b.c");
+export const lodash = () => lodashUnset(object, "a.b.c");

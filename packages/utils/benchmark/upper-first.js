@@ -1,6 +1,5 @@
-const { upperFirst } = require("../distribution");
-const lodash = require("lodash/upperFirst");
+import { upperFirst } from "../distribution/upper-first.js";
+import lodashUpperFirst from "lodash/upperFirst.js";
 
-exports["utils"] = () => upperFirst("__FOO_BAR__");
-
-exports["lodash"] = () => lodash("__FOO_BAR__");
+export const utils = () => upperFirst("__FOO_BAR__");
+export const lodash = () => lodashUpperFirst("__FOO_BAR__");

@@ -1,6 +1,5 @@
-const { words } = require("../distribution");
-const lodash = require("lodash/words");
+import { words } from "../distribution/words.js";
+import lodashWords from "lodash/words.js";
 
-exports["utils"] = () => words("fred, barney, & pebbles");
-
-exports["lodash"] = () => lodash("fred, barney, & pebbles");
+export const utils = () => words("fred, barney, & pebbles");
+export const lodash = () => lodashWords("fred, barney, & pebbles");

@@ -1,5 +1,5 @@
-const { sortBy } = require("../distribution");
-const lodash = require("lodash/orderBy");
+import { sortByDesc } from "../distribution/sort-by-desc.js";
+import lodashSortBy from "lodash/orderBy.js";
 
 const users = [
 	{
@@ -20,6 +20,5 @@ const users = [
 	},
 ];
 
-exports["utils"] = () => sortBy(users, ["user", "age"]);
-
-exports["lodash"] = () => lodash(users, ["user", "age"], ["desc", "desc"]);
+export const utils = () => sortByDesc(users, ["user", "age"]);
+export const lodash = () => lodashSortBy(users, ["user", "age"], ["desc", "desc"]);
