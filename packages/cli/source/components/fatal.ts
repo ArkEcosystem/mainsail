@@ -3,7 +3,7 @@ import { bgRed, white } from "kleur/colors";
 
 import { Runtime } from "../exceptions/index.js";
 import { Identifiers } from "../ioc/index.js";
-import type { Logger } from "../services/index.js";
+import type { Logger } from "../services/logger.js";
 
 @injectable()
 export class Fatal {
