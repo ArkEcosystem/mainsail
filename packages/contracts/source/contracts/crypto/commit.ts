@@ -1,4 +1,3 @@
-import type { ProcessableUnit } from "../processor.js";
 import type { Block, BlockData, BlockJson } from "./block.js";
 
 export interface CommitJson {
@@ -40,8 +39,4 @@ export interface CommitSerializer {
 
 export interface CommitDeserializer {
 	deserializeCommitProof(serialized: Buffer): Promise<CommitProof>;
-}
-
-export interface CommitHandler {
-	onCommit(unit: ProcessableUnit): Promise<void>;
 }

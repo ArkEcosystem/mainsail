@@ -1,5 +1,5 @@
 import { AggregatedSignature, Commit, Precommit, Prevote, Proposal } from "../crypto/index.js";
-import { ProcessableUnit } from "../processor.js";
+import { ProcessableUnit } from "../processor/index.js";
 import { ValidatorWallet } from "../state/index.js";
 import { Step } from "./enums.js";
 

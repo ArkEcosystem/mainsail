@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 
 import { Identifiers } from "../ioc/index.js";
-import { ProcessManager } from "../services/index.js";
+import type { ProcessManager } from "../services/index.js";
 
 @injectable()
 export class AbortErroredProcess {

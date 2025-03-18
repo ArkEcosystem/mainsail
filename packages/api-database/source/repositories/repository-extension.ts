@@ -1,40 +1,14 @@
-import { EntityTarget, ObjectLiteral, Repository, SelectQueryBuilder } from "typeorm";
+import { EntityTarget, ObjectLiteral, SelectQueryBuilder } from "typeorm";
 
-import { RepositoryDataSource } from "../contracts.js";
-import { Expression } from "../search/expressions.js";
-import { Expressions, Options, Pagination, QueryHelper, ResultsPage, Sorting } from "../search/index.js";
-
-export interface RepositoryExtension<TEntity extends ObjectLiteral> {
-	queryHelper: QueryHelper<TEntity>;
-
-	addWhere(queryBuilder: SelectQueryBuilder<TEntity>, expression: Expressions.Expression<TEntity>): void;
-
-	addOrderBy(queryBuilder: SelectQueryBuilder<TEntity>, sorting: Sorting): void;
-
-	addSkipOffset(queryBuilder: SelectQueryBuilder<TEntity>, pagination: Pagination): void;
-
-	findManyByExpression(expression: Expressions.Expression<TEntity>, sorting?: Sorting): Promise<TEntity[]>;
-
-	listByExpression(
-		expression: Expression<TEntity>,
-		sorting: Sorting,
-		pagination: Pagination,
-		options?: Options,
-	): Promise<ResultsPage<TEntity>>;
-}
-
-export type ExtendedRepository<TEntity extends ObjectLiteral> = RepositoryExtension<TEntity> & Repository<TEntity>;
-export type ThisRepositoryExtension<TEntity extends ObjectLiteral> = ThisType<ExtendedRepository<TEntity>>;
-
-export const makeExtendedRepository = <TEntity extends ObjectLiteral, CustomRepository>(
-	entity: EntityTarget<TEntity>,
-	dataSource: RepositoryDataSource,
-	extend: CustomRepository & ThisType<ExtendedRepository<TEntity> & CustomRepository>,
-): ExtendedRepository<TEntity> & CustomRepository =>
-	dataSource.getRepository(entity).extend<RepositoryExtension<TEntity> & CustomRepository>({
-		...getRepositoryExtension(),
-		...extend,
-	});
+import {
+	ExtendedRepository,
+	RepositoryDataSource,
+	RepositoryExtension,
+	ThisRepositoryExtension,
+} from "../contracts.js";
+import { QueryHelper } from "../search/index.js";
+import { Expression } from "../search/types/expressions.js";
+import { Expressions, Options, Pagination, ResultsPage, Sorting } from "../search/types/index.js";
 
 const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExtension<TEntity> &
 	ThisRepositoryExtension<TEntity> => ({
@@ -134,3 +108,13 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 
 	queryHelper: new QueryHelper(),
 });
+
+export const makeExtendedRepository = <TEntity extends ObjectLiteral, CustomRepository>(
+	entity: EntityTarget<TEntity>,
+	dataSource: RepositoryDataSource,
+	extend: CustomRepository & ThisType<ExtendedRepository<TEntity> & CustomRepository>,
+): ExtendedRepository<TEntity> & CustomRepository =>
+	dataSource.getRepository(entity).extend<RepositoryExtension<TEntity> & CustomRepository>({
+		...getRepositoryExtension(),
+		...extend,
+	});

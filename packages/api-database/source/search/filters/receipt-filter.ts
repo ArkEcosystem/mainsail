@@ -1,7 +1,7 @@
 import { Receipt } from "../../models/index.js";
-import { OrReceiptCriteria, ReceiptCriteria } from "../criteria.js";
-import { Expression } from "../expressions.js";
 import { handleAndCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
+import { OrReceiptCriteria, ReceiptCriteria } from "../types/criteria.js";
+import { Expression } from "../types/expressions.js";
 
 export class ReceiptFilter {
 	public static async getExpression(...criteria: OrReceiptCriteria[]): Promise<Expression<Receipt>> {

@@ -9,7 +9,7 @@ export * as Evm from "./evm/index.js";
 export * as Kernel from "./kernel/index.js";
 export * as NetworkGenerator from "./network-generator.js";
 export * as P2P from "./p2p/index.js";
-export * as Processor from "./processor.js";
+export * as Processor from "./processor/index.js";
 export * as Serializer from "./serializer.js";
 export * as Shared from "./shared/index.js";
 export * as Snapshot from "./snapshot.js";

@@ -4,7 +4,7 @@ import { Providers, Services } from "@mainsail/kernel";
 import { shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
-import { normalizeUrl } from "./index.js";
+import { normalizeUrl } from "./utils/index.js";
 
 @injectable()
 export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {

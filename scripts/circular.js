@@ -5,19 +5,26 @@ import { lstatSync, readdirSync } from "fs";
 
 const source = resolve(join(process.cwd(), "packages"));
 
-const pkgs = readdirSync(source)
-	.filter((name) => lstatSync(`${source}/${name}`).isDirectory())
-	.sort();
+const main = async () => {
+	const pkgs = readdirSync(source)
+		.filter((name) => lstatSync(`${source}/${name}`).isDirectory())
+		.filter((name) => name !== "evm")
+		.sort();
 
-for (const pkg of pkgs) {
-	const fullPath = `${source}/${pkg}/source`;
+	let pass = true;
 
-	madge(fullPath, {
-		fileExtensions: ["ts"],
-	}).then((res) => {
+	for (const pkg of pkgs) {
+		const fullPath = `${source}/${pkg}/source`;
+
+		const res = await madge(fullPath, {
+			fileExtensions: ["ts"],
+		});
+
 		const circularDependencies = res.circular();
 
 		if (circularDependencies.length > 0) {
+			pass = false;
+
 			console.log(
 				chalk.bgRed.white.bold(`[${pkg}]: Found ${circularDependencies.length} circular dependencies!`),
 			);
@@ -38,5 +45,11 @@ for (const pkg of pkgs) {
 				console.log(tree.join(""));
 			}
 		}
-	});
-}
+	}
+
+	if (!pass) {
+		process.exit(1);
+	}
+};
+
+await main();

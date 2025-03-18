@@ -1,4 +1,6 @@
-import { BlockFactory, PublicKeyFactory, Signature, TransactionFactory } from "../crypto/index.js";
+import { BlockFactory } from "../crypto/block.js";
+import { PublicKeyFactory, Signature } from "../crypto/identities.js";
+import { TransactionFactory } from "../crypto/transactions.js";
 import { Requests, Subprocess } from "../kernel/ipc.js";
 import { KeyValuePair } from "../types/index.js";
 

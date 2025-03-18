@@ -1,4 +1,6 @@
-import type { CacheStore, Pipeline, Queue } from "../kernel/index.js";
+import type { CacheStore } from "../kernel/cache.js";
+import type { Pipeline } from "../kernel/pipeline.js";
+import type { Queue } from "../kernel/queue.js";
 
 export type { Class, JsonObject, JsonValue, PackageJson, Primitive } from "type-fest";
 

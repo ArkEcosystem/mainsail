@@ -1,4 +1,4 @@
-import { CommitHandler } from "./crypto/commit.js";
+import { CommitHandler } from "./crypto/commit-handler.js";
 import { ValidatorWallet } from "./state/index.js";
 
 export interface Service extends CommitHandler {

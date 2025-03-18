@@ -1,7 +1,7 @@
 import { BlockRepository, BlockRepositoryExtension, RepositoryDataSource } from "../contracts.js";
 import { Block } from "../models/block.js";
 import { BlockFilter } from "../search/filters/index.js";
-import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search/index.js";
+import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search/types/index.js";
 import { makeExtendedRepository } from "./repository-extension.js";
 
 export const makeBlockRepository = (dataSource: RepositoryDataSource): BlockRepository =>

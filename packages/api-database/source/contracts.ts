@@ -1,4 +1,4 @@
-import { type DataSource, EntityManager } from "typeorm";
+import { type DataSource, EntityManager, ObjectLiteral, Repository, SelectQueryBuilder } from "typeorm";
 
 import {
 	ApiNode,
@@ -15,8 +15,9 @@ import {
 	ValidatorRound,
 	Wallet,
 } from "./models/index.js";
-import type { ExtendedRepository } from "./repositories/repository-extension.js";
-import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search/index.js";
+import { QueryHelper } from "./search/query-helper.js";
+import { Expression } from "./search/types/expressions.js";
+import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search/types/index.js";
 
 export type RepositoryDataSource = DataSource | EntityManager;
 
@@ -144,3 +145,25 @@ export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConne
 export interface Migrations {
 	run(): Promise<void>;
 }
+
+export interface RepositoryExtension<TEntity extends ObjectLiteral> {
+	queryHelper: QueryHelper<TEntity>;
+
+	addWhere(queryBuilder: SelectQueryBuilder<TEntity>, expression: Expression<TEntity>): void;
+
+	addOrderBy(queryBuilder: SelectQueryBuilder<TEntity>, sorting: Sorting): void;
+
+	addSkipOffset(queryBuilder: SelectQueryBuilder<TEntity>, pagination: Pagination): void;
+
+	findManyByExpression(expression: Expression<TEntity>, sorting?: Sorting): Promise<TEntity[]>;
+
+	listByExpression(
+		expression: Expression<TEntity>,
+		sorting: Sorting,
+		pagination: Pagination,
+		options?: Options,
+	): Promise<ResultsPage<TEntity>>;
+}
+
+export type ExtendedRepository<TEntity extends ObjectLiteral> = RepositoryExtension<TEntity> & Repository<TEntity>;
+export type ThisRepositoryExtension<TEntity extends ObjectLiteral> = ThisType<ExtendedRepository<TEntity>>;

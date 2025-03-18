@@ -2,7 +2,7 @@ import { injectable } from "@mainsail/container";
 
 import { ProcessDescription, ProcessIdentifier, ProcessState } from "../contracts.js";
 import { execa, Result, SyncResult } from "../execa.js";
-import { Flags } from "../utils/index.js";
+import { Flags } from "../utils/flags.js";
 
 @injectable()
 export class ProcessManager {

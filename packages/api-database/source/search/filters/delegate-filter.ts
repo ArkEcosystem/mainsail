@@ -1,4 +1,5 @@
 import { Wallet } from "../../models/index.js";
+import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 import {
 	DelegateBlocks,
 	DelegateCriteria,
@@ -7,9 +8,8 @@ import {
 	DelegateResourceLastBlock,
 	OrDelegateCriteria,
 	OrNumericCriteria,
-} from "../criteria.js";
-import { Expression, JsonFieldCastType } from "../expressions.js";
-import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
+} from "../types/criteria.js";
+import { Expression, JsonFieldCastType } from "../types/expressions.js";
 import { WalletFilter } from "./wallet-filter.js";
 
 export class DelegateFilter {
