@@ -235,8 +235,10 @@ export class Sync implements Contracts.ApiSync.Service {
 		// The block validator/dirty validators might not be part of the account updates if no rewards have been distributed,
 		// thus ensure they are manually inserted.
 		for (const validatorAddress of [
-			header.generatorAddress,
-			...Object.values<Contracts.State.ValidatorWallet>(dirtyValidators).map((v) => v.address),
+			...new Set([
+				header.generatorAddress,
+				...Object.values<Contracts.State.ValidatorWallet>(dirtyValidators).map((v) => v.address),
+			]),
 		]) {
 			if (!accountUpdates[validatorAddress]) {
 				wallets.push([
