@@ -14,6 +14,6 @@
 		"gasLimit": "200000",
 		"data": "0x6dd7d8ea0000000000000000000000006df1492c168d0818f65faeaa4f7b4dc6d5a73607",
 		"signature": "ed00a08529b14053cabe409572189a398968afae3682be0ef2be8adb33f598f00e9f6cfd2ccbe892313cb70d9a204421b20e17ff3808de9981bb8d93e5cfb85501",
-		"signatures": null
+		"legacySecondSignature": null
 	}
 ]
