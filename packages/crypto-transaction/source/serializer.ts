@@ -21,7 +21,13 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 		];
 
 		if (transaction.data.v !== undefined && transaction.data.r && transaction.data.s && !options.excludeSignature) {
+			// 9, 10, 11
 			fields.push(toBeArray(transaction.data.v), `0x${transaction.data.r}`, `0x${transaction.data.s}`);
+
+			if (transaction.data.legacySecondSignature) {
+				// 12
+				fields.push(`0x${transaction.data.legacySecondSignature}`);
+			}
 		}
 
 		const rlpEncoded = encodeRlp(fields);
