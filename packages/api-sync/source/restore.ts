@@ -291,13 +291,13 @@ export class Restore {
 						gasLimit: data.gasLimit,
 						gasPrice: data.gasPrice,
 						id: data.id as unknown as string,
+						legacySecondSignature: data.legacySecondSignature,
 						nonce: data.nonce.toFixed(),
 						recipientAddress: data.recipientAddress,
 						senderAddress: data.senderAddress,
 						senderPublicKey: data.senderPublicKey,
 						sequence: data.sequence as unknown as number,
 						signature: `${data.r}${data.s}${data.v!.toString(16)}`,
-						legacySecondSignature: data.legacySecondSignature,
 						timestamp: block.header.timestamp.toFixed(),
 					});
 				}
