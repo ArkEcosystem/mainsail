@@ -94,7 +94,7 @@ export interface TransactionVerifier {
 
 export interface TransactionSigner {
 	sign(transaction: TransactionData, keys: KeyPair, options?: SerializeOptions): Promise<EcdsaSignature>;
-	multiSign(transaction: TransactionData, keys: KeyPair, index?: number): Promise<string>;
+	legacySecondSign(transaction: TransactionData, keys: KeyPair, options?: SerializeOptions): Promise<string>;
 }
 
 export interface TransactionSerializer {

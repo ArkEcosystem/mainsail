@@ -1,8 +1,8 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class Signer {
+export class Signer implements Contracts.Crypto.TransactionSigner {
 	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "wallet")
 	private readonly signatureFactory!: Contracts.Crypto.Signature;
@@ -29,11 +29,20 @@ export class Signer {
 		return signature;
 	}
 
-	public async multiSign(
+	public async legacySecondSign(
 		transaction: Contracts.Crypto.TransactionData,
 		keys: Contracts.Crypto.KeyPair,
-		index = -1,
+		options?: Contracts.Crypto.SerializeOptions,
 	): Promise<string> {
-		throw new Exceptions.NotImplemented(this.constructor.name, "multiSign");
+		if (!options || options.excludeSignature === undefined) {
+			options = { excludeSignature: true, ...options };
+		}
+
+		const hash: Buffer = await this.utils.toHash(transaction, options);
+		const signature = await this.signatureFactory.sign(hash, Buffer.from(keys.privateKey, "hex"));
+
+		transaction.legacySecondSignature = signature;
+
+		return signature;
 	}
 }
