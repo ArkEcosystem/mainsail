@@ -30,8 +30,7 @@ export const transactionBaseSchema: SchemaObject = {
 		id: { anyOf: [{ $ref: "transactionId" }, { type: "null" }] },
 		// Legacy
 		legacySecondSignature: {
-			// TODO: double check format
-			allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }],
+			allOf: [{ maxLength: 146, minLength: 140 }, { $ref: "alphanumeric" }],
 			type: "string",
 		},
 
@@ -52,13 +51,6 @@ export const transactionBaseSchema: SchemaObject = {
 
 		v: { maximum: 1, minimum: 0, type: "number" },
 		value: { bignumber: { maximum: undefined, minimum: 0 } },
-		// signatures: {
-		// 	items: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }], type: "string" },
-		// 	maxItems: 16,
-		// 	minItems: 1,
-		// 	type: "array",
-		// 	uniqueItems: true,
-		// },
 	},
 	required: ["senderAddress", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
 	type: "object",
