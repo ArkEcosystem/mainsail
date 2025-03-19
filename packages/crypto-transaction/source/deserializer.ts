@@ -41,7 +41,6 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 			// Legacy second signature
 			if (decoded.length === 13) {
 				data.legacySecondSignature = decoded[12].toString().slice(2);
-				console.log("legacySecondSignature", data.legacySecondSignature);
 			}
 		}
 
