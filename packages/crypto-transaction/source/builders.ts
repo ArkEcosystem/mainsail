@@ -130,6 +130,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		const struct: Contracts.Crypto.TransactionData = {
 			gasPrice: this.data.gasPrice,
 			id: await this.utils.getId(await this.build()),
+			legacySecondSignature: this.data.legacySecondSignature,
 			network: this.data.network,
 			nonce: this.data.nonce,
 			r: this.data.r,
@@ -137,7 +138,6 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 			senderAddress: this.data.senderAddress,
 			senderPublicKey: this.data.senderPublicKey,
 			v: this.data.v,
-			legacySecondSignature: this.data.legacySecondSignature,
 		} as Contracts.Crypto.TransactionData;
 
 		return struct;
