@@ -137,7 +137,7 @@ export class Restore {
 			: this.databaseService.getLastCommit());
 
 		this.logger.info(
-			`Performing database restore of ${(mostRecentCommit.block.header.height + 1).toLocaleString()} blocks. this might take a while.`,
+			`Performing database restore of ${(mostRecentCommit.block.header.number + 1).toLocaleString()} blocks. this might take a while.`,
 		);
 
 		const t0 = performance.now();
@@ -227,8 +227,8 @@ export class Restore {
 
 		do {
 			const commits = this.databaseService.readCommits(
-				Math.min(currentHeight, mostRecentCommit.block.header.height),
-				Math.min(currentHeight + BATCH_SIZE, mostRecentCommit.block.header.height),
+				Math.min(currentHeight, mostRecentCommit.block.header.number),
+				Math.min(currentHeight + BATCH_SIZE, mostRecentCommit.block.header.number),
 			);
 
 			const blocks: Models.Block[] = [];
@@ -238,7 +238,7 @@ export class Restore {
 				blocks.push({
 					commitRound: proof.round,
 					generatorAddress: block.header.generatorAddress,
-					height: block.header.height.toFixed(),
+					height: block.header.number.toFixed(),
 					id: block.header.id,
 					numberOfTransactions: block.header.numberOfTransactions,
 					payloadHash: block.header.payloadHash,
@@ -252,7 +252,7 @@ export class Restore {
 					totalAmount: block.header.totalAmount.toFixed(),
 					totalFee: block.header.totalFee.toFixed(),
 					totalGasUsed: block.header.totalGasUsed,
-					validatorRound: this.roundCalculator.calculateRound(block.header.height).round,
+					validatorRound: this.roundCalculator.calculateRound(block.header.number).round,
 					validatorSet: validatorSetPack(proof.validators).toString(),
 					version: block.header.version,
 				});
@@ -260,7 +260,7 @@ export class Restore {
 				// Update block related validator attributes
 				const validatorAttributes = context.validatorAttributes[block.header.generatorAddress];
 				if (!validatorAttributes) {
-					if (block.header.height !== this.configuration.getGenesisHeight()) {
+					if (block.header.number !== this.configuration.getGenesisHeight()) {
 						throw new Error("unexpected validator");
 					}
 				} else {
@@ -285,7 +285,7 @@ export class Restore {
 
 					transactions.push({
 						amount: data.value.toFixed(),
-						blockHeight: block.header.height.toFixed(),
+						blockHeight: block.header.number.toFixed(),
 						blockId: block.header.id,
 						data: data.data,
 						gasLimit: data.gasLimit,
@@ -302,7 +302,7 @@ export class Restore {
 					});
 				}
 
-				context.lastHeight = block.header.height;
+				context.lastHeight = block.header.number;
 				context.totalSupply = context.totalSupply.plus(block.header.totalAmount.plus(block.header.totalFee));
 			}
 
@@ -316,14 +316,14 @@ export class Restore {
 				await transactionRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
-			if (currentHeight % 10_000 === 0 || currentHeight + BATCH_SIZE > mostRecentCommit.block.header.height) {
+			if (currentHeight % 10_000 === 0 || currentHeight + BATCH_SIZE > mostRecentCommit.block.header.number) {
 				const t1 = performance.now();
 				this.logger.info(`Restored blocks: ${(context.lastHeight + 1).toLocaleString()} elapsed: ${t1 - t0}ms`);
 				await new Promise<void>((resolve) => setImmediate(resolve)); // Log might stuck if this line is removed
 			}
 
 			currentHeight += BATCH_SIZE;
-		} while (currentHeight <= mostRecentCommit.block.header.height);
+		} while (currentHeight <= mostRecentCommit.block.header.number);
 	}
 
 	async #ingestConsensusData(context: RestoreContext): Promise<void> {
@@ -394,7 +394,7 @@ export class Restore {
 										.toFixed(),
 									validatorLastBlock: validatorAttributes.lastBlock
 										? {
-												height: validatorAttributes.lastBlock.height,
+												height: validatorAttributes.lastBlock.number,
 												id: validatorAttributes.lastBlock.id,
 												timestamp: validatorAttributes.lastBlock.timestamp,
 											}

@@ -23,7 +23,7 @@ export const registerBlockFactory = async (
 
 		const { reward } = app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-			.getMilestone(previousBlock.height);
+			.getMilestone(previousBlock.number);
 
 		const transactions: Contracts.Crypto.Transaction[] = options.transactions || [];
 		if (options.transactionsCount) {
@@ -82,7 +82,7 @@ export const registerBlockFactory = async (
 							"wallet",
 						)
 						.fromMnemonic(passphrase),
-					height: previousBlock.height + 1,
+					number: previousBlock.number + 1,
 					logsBloom: "0".repeat(512),
 					numberOfTransactions: transactions.length,
 					payloadHash: (

@@ -145,7 +145,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			const receipt = receipts?.get(transaction.id);
 			if (receipt) {
 				transactionReceipts.push({
-					blockHeight: header.height.toFixed(),
+					blockHeight: header.number.toFixed(),
 					deployedContractAddress: receipt.deployedContractAddress,
 					gasRefunded: Number(receipt.gasRefunded),
 					gasUsed: Number(receipt.gasUsed),
@@ -192,7 +192,7 @@ export class Sync implements Contracts.ApiSync.Service {
 							validatorForgedRewards: header.totalAmount.toFixed(),
 							validatorForgedTotal: header.totalFee.plus(header.totalAmount).toFixed(),
 							validatorLastBlock: {
-								height: header.height,
+								height: header.number,
 								id: header.id,
 								timestamp: header.timestamp,
 							},
@@ -228,7 +228,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				BigNumber.make(account.balance).toFixed(),
 				BigNumber.make(account.nonce).toFixed(),
 				attributes,
-				header.height.toFixed(),
+				header.number.toFixed(),
 			];
 		});
 
@@ -249,7 +249,7 @@ export class Sync implements Contracts.ApiSync.Service {
 					{
 						...validatorAttributes(validatorAddress),
 					},
-					header.height.toFixed(),
+					header.number.toFixed(),
 				]);
 			}
 		}
@@ -258,7 +258,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			block: {
 				commitRound: proof.round,
 				generatorAddress: header.generatorAddress,
-				height: header.height.toFixed(),
+				height: header.number.toFixed(),
 				id: header.id,
 				numberOfTransactions: header.numberOfTransactions,
 				payloadHash: header.payloadHash,
@@ -272,7 +272,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
 				totalGasUsed: header.totalGasUsed,
-				validatorRound: this.roundCalculator.calculateRound(header.height).round,
+				validatorRound: this.roundCalculator.calculateRound(header.number).round,
 				validatorSet: validatorSetPack(proof.validators).toString(),
 				version: header.version,
 			},
@@ -283,7 +283,7 @@ export class Sync implements Contracts.ApiSync.Service {
 
 			transactions: transactions.map(({ data }) => ({
 				amount: data.value.toFixed(),
-				blockHeight: header.height.toFixed(),
+				blockHeight: header.number.toFixed(),
 				blockId: header.id,
 				data: data.data,
 				gasLimit: data.gasLimit,
@@ -300,15 +300,15 @@ export class Sync implements Contracts.ApiSync.Service {
 			})),
 			wallets,
 
-			...(this.roundCalculator.isNewRound(header.height + 1)
+			...(this.roundCalculator.isNewRound(header.number + 1)
 				? {
-						validatorRound: this.#createValidatorRound(header.height + 1),
+						validatorRound: this.#createValidatorRound(header.number + 1),
 					}
 				: {}),
 
-			...(this.configuration.isNewMilestone(header.height + 1)
+			...(this.configuration.isNewMilestone(header.number + 1)
 				? {
-						newMilestones: this.configuration.getMilestone(header.height + 1),
+						newMilestones: this.configuration.getMilestone(header.number + 1),
 					}
 				: {}),
 		};
@@ -316,7 +316,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		return this.#queueDeferredSync(deferredSync);
 	}
 
-	#createValidatorRound(height: number): Models.ValidatorRound {
+	#createValidatorRound(number: number): Models.ValidatorRound {
 		const activeValidators = this.validatorSet.getActiveValidators();
 
 		// Map the active validator set (static, vote-weighted, etc.) to actual proposal order
@@ -326,7 +326,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		);
 
 		return {
-			...this.roundCalculator.calculateRound(height),
+			...this.roundCalculator.calculateRound(number),
 			validators: validatorWallets.map((v) => v.address),
 			votes: validatorWallets.map((v) => v.voteBalance.toFixed()),
 		};
@@ -510,7 +510,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		const genesisHeight = this.configuration.getGenesisHeight();
 		const lastHeight = this.databaseService.isEmpty()
 			? genesisHeight
-			: (await this.databaseService.getLastCommit()).block.header.height;
+			: (await this.databaseService.getLastCommit()).block.header.number;
 
 		const [blocks] = await this.dataSource.query(
 			"select coalesce(max(height), $1)::bigint as max_height, count(1) as count from blocks",

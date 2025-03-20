@@ -536,7 +536,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	async #bootstrap(): Promise<void> {
 		const state = await this.bootstrapper.run();
 
-		if (state && state.height === this.stateStore.getLastBlock().data.height + 1) {
+		if (state && state.height === this.stateStore.getLastBlock().data.number + 1) {
 			this.#step = state.step;
 			this.#height = state.height;
 			this.#round = state.round;
@@ -546,7 +546,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			if (state) {
 				this.logger.warning(
 					`Skipping state restore, because stored height is ${state.height}, but should be ${
-						this.stateStore.getLastBlock().data.height + 1
+						this.stateStore.getLastBlock().data.number + 1
 					}`,
 				);
 
@@ -554,7 +554,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			}
 
 			const lastBlock = this.stateStore.getLastBlock();
-			this.#height = lastBlock.data.height + 1;
+			this.#height = lastBlock.data.number + 1;
 		}
 
 		if (this.#height !== this.configuration.getHeight()) {

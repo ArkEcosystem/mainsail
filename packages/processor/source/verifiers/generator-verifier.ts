@@ -16,7 +16,7 @@ export class GeneratorVerifier implements Contracts.Processor.Handler {
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (unit.getBlock().data.height === this.configuration.getGenesisHeight()) {
+		if (unit.getBlock().data.number === this.configuration.getGenesisHeight()) {
 			return;
 		}
 

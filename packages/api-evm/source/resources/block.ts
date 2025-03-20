@@ -14,11 +14,11 @@ export class BlockResource {
 	public async transform(block: Contracts.Crypto.Block, transactionObject: boolean): Promise<object> {
 		const blockData: Contracts.Crypto.BlockData = block.data;
 
-		const milestone = this.configuration.getMilestone(blockData.height);
+		const milestone = this.configuration.getMilestone(blockData.number);
 
 		/* eslint-disable sort-keys-fix/sort-keys-fix */
 		return {
-			number: `0x${blockData.height.toString(16)}`,
+			number: `0x${blockData.number.toString(16)}`,
 			hash: `0x${blockData.id}`,
 			parentHash: `0x${blockData.previousBlock}`,
 			nonce: "0x0000000000000000",
@@ -49,7 +49,7 @@ export class BlockResource {
 		return Promise.all(
 			block.transactions.map(async (transaction) => {
 				transaction.data.blockId = block.data.id;
-				transaction.data.blockHeight = block.data.height;
+				transaction.data.blockHeight = block.data.number;
 				return await transactionResource.transform(transaction.data);
 			}),
 		);

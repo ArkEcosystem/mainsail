@@ -127,29 +127,29 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 		this.logger.debug(`Processing blocks ${job.heightFrom}-${job.heightTo} from ${job.peer.ip}`);
 
-		let height = job.heightFrom;
+		let number = job.heightFrom;
 		job.status = JobStatus.Processing;
 
 		try {
 			const bytesForProcess = [...job.blocks];
 
 			while (bytesForProcess.length > 0) {
-				const roundInfo = this.roundCalculator.calculateRound(height);
+				const roundInfo = this.roundCalculator.calculateRound(number);
 
 				// TODO: Check if can use workers
 				// Slice to the end of the round, to ensure validator set is the same
 				const commits = await Promise.all(
 					bytesForProcess
-						.splice(0, roundInfo.roundHeight + roundInfo.maxValidators - height)
+						.splice(0, roundInfo.roundHeight + roundInfo.maxValidators - number)
 						.map(async (buff) => await this.commitFactory.fromBytes(buff)),
 				);
 
 				// Check heights
 				for (const [index, commit] of commits.entries()) {
-					if (commit.block.data.height !== height + index) {
+					if (commit.block.data.number !== number + index) {
 						throw new Error(
-							`Received block height ${commit.block.data.height} does not match expected height ${
-								height + index
+							`Received block height ${commit.block.data.number} does not match expected height ${
+								number + index
 							}`,
 						);
 					}
@@ -169,7 +169,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 						throw new Error(`Received block is invalid`);
 					}
 
-					height++;
+					number++;
 				}
 			}
 
@@ -181,7 +181,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			await this.database.persist();
 		}
 
-		if (job.heightTo !== height - 1) {
+		if (job.heightTo !== number - 1) {
 			this.#handleMissingBlocks(job);
 			return;
 		}

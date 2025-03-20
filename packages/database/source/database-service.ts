@@ -260,14 +260,14 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	public addCommit(commit: Contracts.Crypto.Commit): void {
-		this.#commitCache.set(commit.block.data.height, commit);
-		this.#blockIdCache.set(commit.block.data.id, commit.block.data.height);
+		this.#commitCache.set(commit.block.data.number, commit);
+		this.#blockIdCache.set(commit.block.data.id, commit.block.data.number);
 
 		for (const tx of commit.block.transactions) {
 			this.#transactionCache.set(tx.id, tx);
 		}
 
-		this.#state.height = commit.block.data.height;
+		this.#state.height = commit.block.data.number;
 		this.#state.totalRound += commit.proof.round + 1;
 	}
 

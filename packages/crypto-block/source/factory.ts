@@ -112,7 +112,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 
 			if (fatal) {
 				throw new Exceptions.BlockSchemaError(
-					data.height,
+					data.number,
 					`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
 						`${error.message}: ${JSON.stringify(error.data)}`,
 				);

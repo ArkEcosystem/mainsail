@@ -12,7 +12,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 	#accountUpdates: Array<Contracts.Evm.AccountUpdate> = [];
 
 	public get height(): number {
-		return this.#commit.block.data.height;
+		return this.#commit.block.data.number;
 	}
 
 	public get round(): number {

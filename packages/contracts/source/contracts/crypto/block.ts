@@ -24,7 +24,7 @@ export interface BlockData {
 
 	readonly timestamp: number;
 	readonly version: number;
-	readonly height: number;
+	readonly number: number;
 	readonly round: number;
 	readonly previousBlock: string;
 	readonly stateHash: string;

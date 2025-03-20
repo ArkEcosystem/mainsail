@@ -12,7 +12,7 @@ export class TimestampCalculator implements Contracts.BlockchainUtils.TimestampC
 			throw new Error(`Round ${round} is too high`);
 		}
 
-		const milestone = this.configuration.getMilestone(previousBlock.data.height + 1);
+		const milestone = this.configuration.getMilestone(previousBlock.data.number + 1);
 		const roundForMath = Math.max(0, round - 1);
 
 		return (

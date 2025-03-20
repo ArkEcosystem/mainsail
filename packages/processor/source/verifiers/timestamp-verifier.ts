@@ -17,7 +17,7 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 	private readonly timestampCalculator!: Contracts.BlockchainUtils.TimestampCalculator;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (unit.getBlock().data.height === this.configuration.getGenesisHeight()) {
+		if (unit.getBlock().data.number === this.configuration.getGenesisHeight()) {
 			return;
 		}
 

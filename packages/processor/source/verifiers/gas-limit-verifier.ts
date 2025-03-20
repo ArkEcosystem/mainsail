@@ -10,7 +10,7 @@ export class GasLimitVerifier implements Contracts.Processor.Handler {
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (unit.getBlock().data.height === this.configuration.getGenesisHeight()) {
+		if (unit.getBlock().data.number === this.configuration.getGenesisHeight()) {
 			return;
 		}
 

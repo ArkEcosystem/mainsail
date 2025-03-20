@@ -23,7 +23,7 @@ export class BlockResource implements Contracts.Api.Resource {
 			// 	publicKey: generator.getPublicKey(),
 			// 	username: generator.hasAttribute("username") ? generator.getAttribute("username") : undefined,
 			// },
-			height: +blockData.height,
+			height: +blockData.number,
 			id: blockData.id,
 			payload: {
 				hash: blockData.payloadHash,

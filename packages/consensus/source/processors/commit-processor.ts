@@ -48,14 +48,14 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 			publicKeys.push(Buffer.from(validatorPublicKey, "hex"));
 		}
 
-		const { activeValidators } = this.configuration.getMilestone(block.header.height);
+		const { activeValidators } = this.configuration.getMilestone(block.header.number);
 		if (!isMajority(publicKeys.length, activeValidators)) {
 			return false;
 		}
 
 		const precommit = await this.serializer.serializePrecommitForSignature({
 			blockId: block.data.id,
-			height: block.data.height,
+			height: block.data.number,
 			round: proof.round,
 			type: Contracts.Crypto.MessageType.Precommit,
 		});
@@ -64,6 +64,6 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 	}
 
 	#hasValidHeight(commit: Contracts.Crypto.Commit): boolean {
-		return commit.block.data.height === this.getConsensus().getHeight();
+		return commit.block.data.number === this.getConsensus().getHeight();
 	}
 }

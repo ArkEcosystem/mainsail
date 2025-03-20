@@ -22,7 +22,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 		};
 
 		try {
-			const milestone = this.configuration.getMilestone(blockData.height);
+			const milestone = this.configuration.getMilestone(blockData.number);
 
 			const totalSize = this.headerSize() + block.header.payloadLength;
 			if (totalSize > milestone.block.maxPayload) {
@@ -68,7 +68,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 
 			if (
 				!totalAmount.isEqualTo(blockData.totalAmount) && // Only the genesis block can have a 'totalAmount' while having no transactions.
-				(block.header.height > 0 || block.header.transactions.length > 0) // TODO: check if can be removed
+				(block.header.number > 0 || block.header.transactions.length > 0) // TODO: check if can be removed
 			) {
 				result.errors.push("Invalid total amount");
 			}

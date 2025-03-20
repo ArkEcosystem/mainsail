@@ -14,10 +14,10 @@ export class BlockchainController extends Controller {
 		return {
 			data: {
 				block: {
-					height: data.height,
+					height: data.number,
 					id: data.id,
 				},
-				supply: this.supplyCalculator.calculateSupply(data.height),
+				supply: this.supplyCalculator.calculateSupply(data.number),
 			},
 		};
 	}

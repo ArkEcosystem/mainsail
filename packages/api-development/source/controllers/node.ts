@@ -18,9 +18,9 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				height: lastBlock.data.height,
+				height: lastBlock.data.number,
 				networkHeight: networkHeight - 1, // Use -1 to determine last block state. Consensus state is provided.
-				synced: lastBlock.data.height + 1 >= networkHeight,
+				synced: lastBlock.data.number + 1 >= networkHeight,
 			},
 		};
 	}

@@ -17,7 +17,7 @@ export class ChainedVerifier implements Contracts.Processor.Handler {
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const blockData = unit.getBlock().data;
 
-		if (blockData.height === this.configuration.getGenesisHeight()) {
+		if (blockData.number === this.configuration.getGenesisHeight()) {
 			const milestone = this.configuration.getMilestone();
 
 			let validPreviousBlock = false;
