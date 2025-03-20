@@ -297,7 +297,7 @@ export class Restore {
 						senderPublicKey: data.senderPublicKey,
 						sequence: data.sequence as unknown as number,
 						signature: `${data.r}${data.s}${data.v!.toString(16)}`,
-						signatures: undefined, //data.signatures,s
+						legacySecondSignature: data.legacySecondSignature,
 						timestamp: block.header.timestamp.toFixed(),
 					});
 				}
