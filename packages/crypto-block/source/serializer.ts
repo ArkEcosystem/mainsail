@@ -26,7 +26,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				timestamp: {
 					type: "uint48",
 				},
-				height: {
+				number: {
 					type: "uint32",
 				},
 				round: {
@@ -80,7 +80,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				timestamp: {
 					type: "uint48",
 				},
-				height: {
+				number: {
 					type: "uint32",
 				},
 				round: {

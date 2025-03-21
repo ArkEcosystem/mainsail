@@ -58,7 +58,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 				timestamp: {
 					type: "uint48",
 				},
-				height: {
+				number: {
 					type: "uint32",
 				},
 				round: {

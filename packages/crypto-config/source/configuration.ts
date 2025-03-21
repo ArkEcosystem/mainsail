@@ -21,7 +21,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			milestones: clone(config.milestones) as Contracts.Crypto.Milestone[],
 			network: clone(config.network),
 		};
-		this.#height = this.#config.genesisBlock.block.height;
+		this.#height = this.#config.genesisBlock.block.number;
 
 		this.#validateMilestones();
 		this.#buildConstants();
@@ -73,7 +73,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 	public getGenesisHeight(): number {
 		assert.defined(this.#config);
-		return this.#config.genesisBlock.block.height;
+		return this.#config.genesisBlock.block.number;
 	}
 
 	public isNewMilestone(height?: number): boolean {
@@ -217,7 +217,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			throw new Error();
 		}
 
-		const initialHeight = this.#config.genesisBlock.block.height;
+		const initialHeight = this.#config.genesisBlock.block.number;
 
 		const validatorMilestones = this.#config.milestones
 			.sort((a, b) => a.height - b.height)

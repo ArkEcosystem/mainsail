@@ -147,7 +147,7 @@ export class ConfigurationGenerator {
 						genesisBlock: {
 							// @ts-ignore
 							block: {
-								height: internalOptions.initialHeight,
+								number: internalOptions.initialHeight,
 							},
 						},
 						milestones,

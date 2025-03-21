@@ -84,7 +84,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 		genesisBlock: {
 			// @ts-ignore
 			block: {
-				height: 0,
+				number: 0,
 			},
 		},
 		milestones: [
