@@ -54,7 +54,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 		}
 
 		const precommit = await this.serializer.serializePrecommitForSignature({
-			blockId: block.data.id,
+			blockId: block.data.hash,
 			height: block.data.number,
 			round: proof.round,
 			type: Contracts.Crypto.MessageType.Precommit,

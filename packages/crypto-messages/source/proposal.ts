@@ -85,7 +85,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 
 	public toString(): string {
 		return JSON.stringify({
-			block: this.#data?.block.header.id,
+			block: this.#data?.block.header.hash,
 			height: this.#height,
 			round: this.#round,
 			validatorIndex: this.#validatorIndex,

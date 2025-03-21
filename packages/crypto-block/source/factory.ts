@@ -23,7 +23,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		data: Utils.Mutable<Contracts.Crypto.BlockDataSerializable>,
 		transactions: Contracts.Crypto.Transaction[],
 	): Promise<Contracts.Crypto.Block> {
-		const block: Contracts.Crypto.BlockData = { ...data, id: await this.idFactory.make(data) };
+		const block: Contracts.Crypto.BlockData = { ...data, hash: await this.idFactory.make(data) };
 
 		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
 

@@ -275,12 +275,12 @@ export class Validator implements Contracts.Validator.Validator {
 		return this.blockFactory.make(
 			{
 				generatorAddress,
-				number,
 				logsBloom,
+				number,
 				numberOfTransactions: transactionData.length,
 				payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 				payloadLength,
-				previousBlock: previousBlock.header.id,
+				previousBlock: previousBlock.header.hash,
 				reward: BigNumber.make(milestone.reward),
 				round,
 				stateHash,

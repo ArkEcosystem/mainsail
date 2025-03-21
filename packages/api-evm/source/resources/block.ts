@@ -19,7 +19,7 @@ export class BlockResource {
 		/* eslint-disable sort-keys-fix/sort-keys-fix */
 		return {
 			number: `0x${blockData.number.toString(16)}`,
-			hash: `0x${blockData.id}`,
+			hash: `0x${blockData.hash}`,
 			parentHash: `0x${blockData.previousBlock}`,
 			nonce: "0x0000000000000000",
 			sha3Uncles: "0x1dcc4de8dec75d7aab85b567b6ccd41ad4e2a311b82e5872087ed76f0f1ccf8f", // No uncles in ARK, this is hash of empty list
@@ -48,7 +48,7 @@ export class BlockResource {
 		const transactionResource = this.app.resolve(TransactionResource);
 		return Promise.all(
 			block.transactions.map(async (transaction) => {
-				transaction.data.blockId = block.data.id;
+				transaction.data.blockId = block.data.hash;
 				transaction.data.blockHeight = block.data.number;
 				return await transactionResource.transform(transaction.data);
 			}),

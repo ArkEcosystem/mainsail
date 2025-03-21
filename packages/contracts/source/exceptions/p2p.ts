@@ -4,7 +4,7 @@ import { Exception } from "./base.js";
 export class TooManyTransactionsError extends Exception {
 	public constructor(block: BlockData) {
 		super(
-			`Received block ${block.id} number ${block.number} contained too many transactions (${block.numberOfTransactions}).`,
+			`Received block ${block.hash} number ${block.number} contained too many transactions (${block.numberOfTransactions}).`,
 		);
 	}
 }

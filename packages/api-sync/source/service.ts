@@ -193,7 +193,7 @@ export class Sync implements Contracts.ApiSync.Service {
 							validatorForgedTotal: header.totalFee.plus(header.totalAmount).toFixed(),
 							validatorLastBlock: {
 								height: header.number,
-								id: header.id,
+								id: header.hash,
 								timestamp: header.timestamp,
 							},
 							validatorProducedBlocks: 1,
@@ -259,7 +259,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				commitRound: proof.round,
 				generatorAddress: header.generatorAddress,
 				height: header.number.toFixed(),
-				id: header.id,
+				id: header.hash,
 				numberOfTransactions: header.numberOfTransactions,
 				payloadHash: header.payloadHash,
 				payloadLength: header.payloadLength,
@@ -284,7 +284,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			transactions: transactions.map(({ data }) => ({
 				amount: data.value.toFixed(),
 				blockHeight: header.number.toFixed(),
-				blockId: header.id,
+				blockId: header.hash,
 				data: data.data,
 				gasLimit: data.gasLimit,
 				gasPrice: data.gasPrice,

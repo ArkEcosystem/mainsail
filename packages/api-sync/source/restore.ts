@@ -239,7 +239,7 @@ export class Restore {
 					commitRound: proof.round,
 					generatorAddress: block.header.generatorAddress,
 					height: block.header.number.toFixed(),
-					id: block.header.id,
+					id: block.header.hash,
 					numberOfTransactions: block.header.numberOfTransactions,
 					payloadHash: block.header.payloadHash,
 					payloadLength: block.header.payloadLength,
@@ -286,7 +286,7 @@ export class Restore {
 					transactions.push({
 						amount: data.value.toFixed(),
 						blockHeight: block.header.number.toFixed(),
-						blockId: block.header.id,
+						blockId: block.header.hash,
 						data: data.data,
 						gasLimit: data.gasLimit,
 						gasPrice: data.gasPrice,
@@ -397,7 +397,7 @@ export class Restore {
 									validatorLastBlock: validatorAttributes.lastBlock
 										? {
 												height: validatorAttributes.lastBlock.number,
-												id: validatorAttributes.lastBlock.id,
+												id: validatorAttributes.lastBlock.hash,
 												timestamp: validatorAttributes.lastBlock.timestamp,
 											}
 										: {},

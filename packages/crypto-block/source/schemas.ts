@@ -18,9 +18,9 @@ export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockHea
 		$id: "blockHeader",
 		properties: {
 			generatorAddress: { $ref: "address" },
-			number: { minimum: 0, type: "integer" },
-			id: { $ref: "blockId" },
+			hash: { $ref: "blockId" },
 			logsBloom: { $ref: "logsBloom" },
+			number: { minimum: 0, type: "integer" },
 			numberOfTransactions: { minimum: 0, type: "integer" },
 			payloadHash: { $ref: "hex" },
 			payloadLength: { minimum: 0, type: "integer" },
@@ -34,7 +34,7 @@ export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockHea
 			version: { enum: [1] },
 		},
 		required: [
-			"id",
+			"hash",
 			"timestamp",
 			"previousBlock",
 			"number",

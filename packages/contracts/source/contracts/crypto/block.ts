@@ -20,7 +20,7 @@ export interface Block {
 }
 
 export interface BlockData {
-	readonly id: string;
+	readonly hash: string;
 
 	readonly timestamp: number;
 	readonly version: number;
@@ -44,7 +44,7 @@ export interface BlockData {
 }
 
 export interface BlockJson {
-	readonly id: string;
+	readonly hash: string;
 
 	readonly timestamp: number;
 	readonly version: number;
@@ -66,7 +66,7 @@ export interface BlockJson {
 	readonly transactions: TransactionJson[];
 }
 
-export type BlockDataSerializable = Omit<BlockData, "id">;
+export type BlockDataSerializable = Omit<BlockData, "hash">;
 
 export interface BlockFactory {
 	make(data: Mutable<BlockDataSerializable>, transactions: Transaction[]): Promise<Block>;

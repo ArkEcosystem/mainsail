@@ -91,7 +91,7 @@ export const registerBlockFactory = async (
 							.sha256(payloadBuffers)
 					).toString("hex"),
 					payloadLength,
-					previousBlock: previousBlock.id,
+					previousBlock: previousBlock.hash,
 					reward: BigNumber.make(options.reward || reward),
 					round: 0,
 					stateHash: "0".repeat(64),

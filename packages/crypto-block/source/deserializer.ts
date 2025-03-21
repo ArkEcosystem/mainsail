@@ -25,7 +25,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 
 		const header: Utils.Mutable<Contracts.Crypto.BlockData> = await this.#deserializeBufferHeader(buffer);
 
-		header.id = await this.idFactory.make(header);
+		header.hash = await this.idFactory.make(header);
 
 		return header;
 	}
@@ -41,7 +41,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 			transactions = await this.#deserializeTransactions(block, buffer);
 		}
 
-		block.id = await this.idFactory.make(block);
+		block.hash = await this.idFactory.make(block);
 
 		return { data: block, transactions };
 	}

@@ -261,7 +261,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	public addCommit(commit: Contracts.Crypto.Commit): void {
 		this.#commitCache.set(commit.block.data.number, commit);
-		this.#blockIdCache.set(commit.block.data.id, commit.block.data.number);
+		this.#blockIdCache.set(commit.block.data.hash, commit.block.data.number);
 
 		for (const tx of commit.block.transactions) {
 			this.#transactionCache.set(tx.id, tx);
@@ -298,7 +298,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 					void this.transactionStorage.put(key, buff.toBuffer());
 				}
-				void this.blockIdStorage.put(commit.block.data.id, height);
+				void this.blockIdStorage.put(commit.block.data.hash, height);
 			}
 
 			void this.stateStorage.put("state", this.#state);
@@ -388,7 +388,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		const blockBuffer = this.#readBlockHeaderBytes(height);
 		assert.buffer(blockBuffer);
 		const block = await this.blockDeserializer.deserializeHeader(blockBuffer);
-		transaction.data.blockId = block.id;
+		transaction.data.blockId = block.hash;
 
 		return transaction;
 	}

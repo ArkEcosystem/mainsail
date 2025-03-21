@@ -194,7 +194,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 			return false;
 		}
 
-		return this.#isMajority(this.#getPrevoteCount(this.#proposal.getData().block.data.id));
+		return this.#isMajority(this.#getPrevoteCount(this.#proposal.getData().block.data.hash));
 	}
 
 	public hasMajorityPrevotesAny(): boolean {
@@ -210,7 +210,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 			return false;
 		}
 
-		return this.#isMajority(this.#getPrecommitCount(this.#proposal.getData().block.data.id));
+		return this.#isMajority(this.#getPrecommitCount(this.#proposal.getData().block.data.hash));
 	}
 
 	public hasMajorityPrecommitsAny(): boolean {
@@ -316,7 +316,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		const block = this.#proposal.getData().block;
 
 		for (const [key, value] of s) {
-			if (value.blockId === block.header.id) {
+			if (value.blockId === block.header.hash) {
 				filtered.set(key, value);
 			}
 		}

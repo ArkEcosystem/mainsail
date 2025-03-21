@@ -35,7 +35,7 @@ export class Header implements Contracts.P2P.Header {
 		return {
 			height: this.height,
 			proposedBlockId:
-				this.proposal && this.proposal.isDataDeserialized ? this.proposal.getData().block.data.id : undefined,
+				this.proposal && this.proposal.isDataDeserialized ? this.proposal.getData().block.data.hash : undefined,
 			round: this.round,
 			step: this.step,
 			validatorsSignedPrecommit: this.validatorsSignedPrecommit,

@@ -96,8 +96,8 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			throw new Error("Received block does not match the requested height");
 		}
 
-		if (receivedCommit.block.data.id !== blockToCompare.data.id) {
-			throw new Error("Received block does not match the requested id. Peer is on a different chain.");
+		if (receivedCommit.block.data.hash !== blockToCompare.data.hash) {
+			throw new Error("Received block does not match the requested hash. Peer is on a different chain.");
 		}
 	}
 }

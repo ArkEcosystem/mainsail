@@ -91,7 +91,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		}
 
 		const data = await this.messageSerializer.serializePrevoteForSignature({
-			blockId: proposal.getData().block.header.id,
+			blockId: proposal.getData().block.header.hash,
 			height: proposal.height,
 			round: proposal.validRound,
 			type: Contracts.Crypto.MessageType.Prevote,

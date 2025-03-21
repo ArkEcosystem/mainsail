@@ -242,10 +242,10 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#step = Contracts.Consensus.Step.Prevote;
 
 		const { block } = proposal.getData();
-		this.logger.info(`Received proposal ${this.#height}/${this.#round} blockId: ${block.data.id}`);
+		this.logger.info(`Received proposal ${this.#height}/${this.#round} block hash: ${block.data.hash}`);
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
-		await this.prevote(roundState.getProcessorResult() ? block.data.id : undefined);
+		await this.prevote(roundState.getProcessorResult() ? block.data.hash : undefined);
 	}
 
 	protected async onProposalLocked(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -264,13 +264,13 @@ export class Consensus implements Contracts.Consensus.Service {
 		const { block } = proposal.getData();
 		this.#step = Contracts.Consensus.Step.Prevote;
 
-		this.logger.info(`Received proposal ${this.#height}/${this.#round} with locked blockId: ${block.data.id}`);
+		this.logger.info(`Received proposal ${this.#height}/${this.#round} with locked block hash: ${block.data.hash}`);
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
 		const lockedRound = this.getLockedRound();
 
 		if ((!lockedRound || lockedRound <= proposal.validRound) && roundState.getProcessorResult()) {
-			await this.prevote(block.data.id);
+			await this.prevote(block.data.hash);
 		} else {
 			await this.prevote();
 		}
@@ -291,7 +291,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		const { block } = proposal.getData();
 
-		this.logger.info(`Received +2/3 prevotes for ${this.#height}/${this.#round} blockId: ${block.data.id}`);
+		this.logger.info(`Received +2/3 prevotes for ${this.#height}/${this.#round} block hash: ${block.data.hash}`);
 
 		this.#didMajorityPrevote = true;
 
@@ -301,7 +301,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#step = Contracts.Consensus.Step.Precommit;
 
 			await this.eventDispatcher.dispatch(Events.ConsensusEvent.PrevotedProposal, this.getState());
-			await this.precommit(block.data.id);
+			await this.precommit(block.data.hash);
 		} else {
 			this.#validValue = roundState;
 
@@ -353,12 +353,12 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		if (!roundState.getProcessorResult().success) {
 			this.logger.info(
-				`Block ${block.data.id} on height ${this.#height} received +2/3 precommits but is invalid`,
+				`Block ${block.data.hash} on height ${this.#height} received +2/3 precommits but is invalid`,
 			);
 			return;
 		}
 
-		this.logger.info(`Received +2/3 precommits for ${this.#height}/${roundState.round} blockId: ${block.data.id}`);
+		this.logger.info(`Received +2/3 precommits for ${this.#height}/${roundState.round} block number: ${block.data.hash}`);
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.PrecommitedProposal, this.getState());
 
 		await this.commitLock.runExclusive(async () => {
@@ -466,7 +466,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.logger.info(
 				`Proposing valid block ${this.#height}/${
 					this.#round
-				} from round ${this.getValidRound()} with blockId: ${block.data.id}`,
+				} from round ${this.getValidRound()} with block hash: ${block.data.hash}`,
 			);
 
 			return await registeredProposer.propose(
@@ -483,7 +483,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#round,
 			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
 		);
-		this.logger.info(`Proposing new block ${this.#height}/${this.#round} with blockId: ${block.data.id}`);
+		this.logger.info(`Proposing new block ${this.#height}/${this.#round} with block hash: ${block.data.hash}`);
 
 		void this.eventDispatcher.dispatch(Events.BlockEvent.Forged, block.data);
 

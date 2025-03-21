@@ -101,7 +101,7 @@ export class Bootstrapper {
 			return;
 		}
 
-		if (this.stateStore.getGenesisCommit().block.data.id !== genesisBlock.data.id) {
+		if (this.stateStore.getGenesisCommit().block.data.hash !== genesisBlock.data.hash) {
 			throw new Error("Block from crypto.json doesn't match stored genesis block");
 		}
 	}

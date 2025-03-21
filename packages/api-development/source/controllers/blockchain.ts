@@ -15,7 +15,7 @@ export class BlockchainController extends Controller {
 			data: {
 				block: {
 					height: data.number,
-					id: data.id,
+					id: data.hash,
 				},
 				supply: this.supplyCalculator.calculateSupply(data.number),
 			},
