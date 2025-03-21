@@ -127,9 +127,20 @@ export class ConfigurationGenerator {
 		if (writeOptions.writeCrypto) {
 			tasks.push({
 				task: async () => {
+					if (options.snapshot) {
+						const importer = this.app.get<Contracts.Snapshot.LegacyImporter>(
+							Identifiers.Snapshot.Legacy.Importer,
+						);
+						await importer.prepare(options.snapshot.path);
+						internalOptions.initialHeight = Number(importer.genesisHeight);
+					}
+
 					const milestones = this.milestonesGenerator
 						.setInitial(internalOptions)
-						.setReward(internalOptions.rewardHeight, internalOptions.rewardAmount)
+						.setReward(
+							internalOptions.initialHeight + internalOptions.rewardHeight,
+							internalOptions.rewardAmount,
+						)
 						.generate();
 
 					this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
@@ -148,9 +159,10 @@ export class ConfigurationGenerator {
 						const importer = this.app.get<Contracts.Snapshot.LegacyImporter>(
 							Identifiers.Snapshot.Legacy.Importer,
 						);
-						await importer.prepare(options.snapshot.path);
-
-						milestones[0].snapshot = { hash: importer.snapshotHash };
+						milestones[0].snapshot = {
+							previousGenesisBlockHash: importer.previousGenesisBlockHash,
+							snapshotHash: importer.snapshotHash,
+						};
 
 						if (importer.validators) {
 							const importedValidatorMnemonics: string[] = [];

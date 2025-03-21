@@ -41,7 +41,8 @@ export class TransactionResource implements Contracts.Api.Resource {
 			senderPublicKey: resource.senderPublicKey,
 
 			signature: resource.signature,
-			signatures: resource.signatures,
+
+			...(resource.legacySecondSignature ? { legacySecondSignature: resource.legacySecondSignature } : {}),
 
 			timestamp: resource.timestamp ? +resource.timestamp : undefined,
 

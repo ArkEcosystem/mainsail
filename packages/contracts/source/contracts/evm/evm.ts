@@ -8,6 +8,7 @@ export interface GenesisInfo {
 	readonly deployerAccount: string;
 	readonly validatorContract: string;
 	readonly usernameContract: string;
+	readonly initialHeight: bigint;
 	readonly initialSupply: bigint;
 }
 

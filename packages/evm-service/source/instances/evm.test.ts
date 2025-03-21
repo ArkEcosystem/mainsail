@@ -891,6 +891,7 @@ describe<{
 		await instance.initializeGenesis({
 			account: sender.address,
 			initialSupply,
+			initialHeight: 0n,
 			deployerAccount: ethers.ZeroAddress,
 			usernameContract: ethers.ZeroAddress,
 			validatorContract: ethers.ZeroAddress,

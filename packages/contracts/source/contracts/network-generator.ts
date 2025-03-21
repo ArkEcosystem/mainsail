@@ -46,7 +46,7 @@ export type GenesisBlockOptions = {
 export type SnapshotOptions = {
 	path: string;
 	snapshotHash?: string;
-	stateHash?: string;
+	previousGenesisBlockHash?: string;
 };
 
 export type InternalOptions = EnvironmentOptions &

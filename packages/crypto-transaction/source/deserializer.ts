@@ -32,10 +32,16 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		data.value = this.#parseBigNumber(decoded[6].toString());
 		data.data = this.#parseData(decoded[7].toString());
 
-		if (decoded.length === 12) {
+		// Signature
+		if (decoded.length >= 12) {
 			data.v = this.#parseNumber(decoded[9].toString());
 			data.r = decoded[10].toString().slice(2);
 			data.s = decoded[11].toString().slice(2);
+
+			// Legacy second signature
+			if (decoded.length === 13) {
+				data.legacySecondSignature = decoded[12].toString().slice(2);
+			}
 		}
 
 		const instance: Contracts.Crypto.Transaction = this.transactionTypeFactory.create(data);

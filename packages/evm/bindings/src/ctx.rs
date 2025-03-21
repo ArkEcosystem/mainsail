@@ -3,7 +3,7 @@ use std::{path::PathBuf, str::FromStr};
 use mainsail_evm_core::{db::CommitKey, legacy::LegacyAddress};
 use napi::{JsBigInt, JsBuffer, JsFunction, JsString};
 use napi_derive::napi;
-use revm::primitives::{Address, Bytes, SpecId, B256, U256};
+use revm::primitives::{Address, B256, Bytes, SpecId, U256};
 
 use crate::utils;
 
@@ -69,6 +69,7 @@ pub struct JsGenesisContext {
     pub deployer_account: JsString,
     pub validator_contract: JsString,
     pub username_contract: JsString,
+    pub initial_height: JsBigInt,
     pub initial_supply: JsBigInt,
 }
 
@@ -161,6 +162,7 @@ pub struct GenesisContext {
     pub deployer_account: Address,
     pub validator_contract: Address,
     pub username_contract: Address,
+    pub initial_height: u64,
     pub initial_supply: U256,
 }
 
@@ -379,6 +381,7 @@ impl TryFrom<JsGenesisContext> for GenesisContext {
             validator_contract: utils::create_address_from_js_string(value.validator_contract)?,
             username_contract: utils::create_address_from_js_string(value.username_contract)?,
             deployer_account: utils::create_address_from_js_string(value.deployer_account)?,
+            initial_height: value.initial_height.get_u64()?.0,
             initial_supply: utils::convert_bigint_to_u256(value.initial_supply)?,
         })
     }

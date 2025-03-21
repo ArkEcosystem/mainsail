@@ -74,9 +74,10 @@ impl EvmInner {
     }
 
     pub fn prepare_next_commit(&mut self, ctx: PrepareNextCommitContext) -> Result<()> {
+        let genesis_height = self.genesis_height();
         if let Some(pending) = self.pending_commit.as_ref() {
             // do not replace any pending commit, while still in bootstrapping phase.
-            if pending.key == CommitKey(0, 0) && ctx.commit_key == pending.key {
+            if pending.key == CommitKey(genesis_height, 0) && ctx.commit_key == pending.key {
                 return Ok(());
             }
 
@@ -181,6 +182,7 @@ impl EvmInner {
             deployer_account: genesis_ctx.deployer_account,
             validator_contract: genesis_ctx.validator_contract,
             username_contract: genesis_ctx.username_contract,
+            initial_height: genesis_ctx.initial_height,
             initial_supply: genesis_ctx.initial_supply,
         });
 
@@ -431,8 +433,10 @@ impl EvmInner {
         &mut self,
         info: AccountInfoExtended,
     ) -> std::result::Result<(), EVMError<String>> {
+        let genesis_height = self.genesis_height();
+
         let pending = self.pending_commit.as_mut().unwrap();
-        assert_eq!(pending.key, CommitKey(0, 0));
+        assert_eq!(pending.key, CommitKey(genesis_height, 0));
         assert!(!pending.cache.accounts.contains_key(&info.address));
 
         let (address, info, legacy_attributes) = info.into_parts();
@@ -445,8 +449,10 @@ impl EvmInner {
         &mut self,
         wallet: LegacyColdWallet,
     ) -> std::result::Result<(), EVMError<String>> {
+        let genesis_height = self.genesis_height();
+
         let pending = self.pending_commit.as_mut().unwrap();
-        assert_eq!(pending.key, CommitKey(0, 0));
+        assert_eq!(pending.key, CommitKey(genesis_height, 0));
 
         assert!(!pending.legacy_cold_wallets.contains_key(&wallet.address));
         pending.legacy_cold_wallets.insert(wallet.address, wallet);
@@ -940,6 +946,16 @@ impl EvmInner {
 
     fn drop_pending_commit(&mut self) {
         self.take_pending_commit();
+    }
+
+    #[inline]
+    fn genesis_height(&mut self) -> u64 {
+        self.persistent_db
+            .genesis_info
+            .as_ref()
+            .cloned()
+            .unwrap_or_default()
+            .initial_height
     }
 }
 

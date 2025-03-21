@@ -1,14 +1,14 @@
 {
-	"address": "0x70b5c0F93ADA05137ea5D196377f6C7d70E7f5f4",
+	"address": "0x5DD297a9F10025a7dd205cb796965712a6733d16",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "6af803c58fafe4b5af9622b4d6829c4cf6949a637de5e2efbf3921405c1dbe94",
-		"publicKey": "8b82f6f4810fb41f88886fbe585faf64fb3ae734a0c33cabf9736c0e14e678aa0116a6a42aa76f5b5bc88988f8be3207"
+		"privateKey": "5567357b1ee30eaf91a3fb1f5aa5f2c9b400bde8788539799c2b5d2d5c591b31",
+		"publicKey": "af7a35b3dd826f8516257827ca5304317d8c232bac82bef29af3746e9fd089f72969d41330907be43686aa4144a229c0"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "93ffb0afbbfb49ba9086044e5f6293f6952705268d7fe6c8d4d18a51e13d4756",
-		"publicKey": "024608598cd9b7f89dfad63cb783b12fe5fe6b0d925ab313d11005621e3600c68c"
+		"privateKey": "382b331bd587fc0f9bb7ddeafafe6b3e5e869b420765cf6942fb114677292c83",
+		"publicKey": "031be488def89c3577a1a6f7665c86ce26a1d92a191b6ce04892c9b4727641ba6c"
 	},
-	"passphrase": "tomato resource kangaroo century gift giraffe dizzy rebuild wrist eagle bridge coast illegal pencil dust verify excess demand shield ocean when loud luggage tuna"
+	"passphrase": "obscure ramp ocean finger swing bird cup stamp giggle person path broccoli limb dove pupil rate decline voyage bacon easy clerk exclude husband wise"
 }

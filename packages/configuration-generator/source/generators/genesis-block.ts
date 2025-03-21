@@ -95,8 +95,16 @@ export class GenesisBlockGenerator extends Generator {
 		validatorsCount: number,
 		options: Contracts.NetworkGenerator.InternalOptions,
 	) {
+		if (options.snapshot) {
+			options.premine = "0";
+			options.distribute = false;
+		}
+
 		await this.app.resolve(Deployer).deploy({
 			generatorAddress: genesisWalletAddress,
+			initialHeight: options.snapshot
+				? Number(this.snapshotLegacyImporter!.genesisHeight)
+				: options.initialHeight,
 			timestamp: dayjs(options.epoch).valueOf(),
 			totalAmount: (options.distribute
 				? // Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`)
@@ -317,16 +325,15 @@ export class GenesisBlockGenerator extends Generator {
 					).toString("hex"),
 					payloadLength,
 					previousBlock:
-						options.snapshot?.snapshotHash ??
+						options.snapshot?.previousGenesisBlockHash ??
 						"0000000000000000000000000000000000000000000000000000000000000000",
 					reward: BigNumber.ZERO,
 					round: 0,
-					stateHash:
-						options.snapshot?.stateHash ??
-						(await this.evm.stateHash(
-							commitKey,
+					stateHash: await this.evm.stateHash(
+						commitKey,
+						options.snapshot?.snapshotHash ??
 							"0000000000000000000000000000000000000000000000000000000000000000",
-						)),
+					),
 					timestamp: dayjs(options.epoch).valueOf(),
 					totalAmount: options.snapshot ? BigNumber.make(options.premine) : totals.amount,
 					totalFee: totals.fee,
@@ -362,15 +369,21 @@ export class GenesisBlockGenerator extends Generator {
 		// Load snapshot into EVM
 		const result = await this.snapshotLegacyImporter.import({
 			commitKey: {
-				height: 0n, // TODO: read from snapshot (follow up)
+				height: this.snapshotLegacyImporter.genesisHeight,
 				round: 0n,
 			},
 			timestamp: dayjs(options.epoch).valueOf(),
 		});
 
+		options.initialHeight = Number(this.snapshotLegacyImporter.genesisHeight);
+
 		options.snapshot.snapshotHash = this.snapshotLegacyImporter.snapshotHash;
-		options.snapshot.stateHash = result.stateHash;
-		options.premine = result.initialTotalSupply.toString();
+		options.snapshot.previousGenesisBlockHash = this.snapshotLegacyImporter.previousGenesisBlockHash;
+		options.premine = "0";
+
+		this.app
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.set("genesisBlock.block.height", options.initialHeight);
 
 		console.log(result);
 	}

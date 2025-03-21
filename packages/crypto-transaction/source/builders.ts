@@ -100,17 +100,17 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.#signWithKeyPair(await this.keyPairFactory.fromWIF(wif));
 	}
 
-	// public async multiSign(passphrase: string, index: number): Promise<TBuilder> {
-	// 	return this.#multiSignWithKeyPair(index, await this.keyPairFactory.fromMnemonic(passphrase));
-	// }
+	public async legacySecondSign(passphrase: string): Promise<TBuilder> {
+		return this.#legacySecondSignWithKeyPair(await this.keyPairFactory.fromMnemonic(passphrase));
+	}
 
-	// public async multiSignWithKeyPair(keys: Contracts.Crypto.KeyPair, index: number): Promise<TBuilder> {
-	// 	return this.#multiSignWithKeyPair(index, keys);
-	// }
+	public async legacySecondSignWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TBuilder> {
+		return this.#legacySecondSignWithKeyPair(keys);
+	}
 
-	// public async multiSignWithWif(index: number, wif: string): Promise<TBuilder> {
-	// 	return this.#multiSignWithKeyPair(index, await this.keyPairFactory.fromWIF(wif));
-	// }
+	public async legacySecondsignWithWif(wif: string): Promise<TBuilder> {
+		return this.#legacySecondSignWithKeyPair(await this.keyPairFactory.fromWIF(wif));
+	}
 
 	public async verify(): Promise<boolean> {
 		return this.verifier.verifyHash(this.data);
@@ -130,6 +130,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		const struct: Contracts.Crypto.TransactionData = {
 			gasPrice: this.data.gasPrice,
 			id: await this.utils.getId(await this.build()),
+			legacySecondSignature: this.data.legacySecondSignature,
 			network: this.data.network,
 			nonce: this.data.nonce,
 			r: this.data.r,
@@ -138,10 +139,6 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 			senderPublicKey: this.data.senderPublicKey,
 			v: this.data.v,
 		} as Contracts.Crypto.TransactionData;
-
-		// if (Array.isArray(this.data.signatures)) {
-		// 	struct.signatures = this.data.signatures;
-		// }
 
 		return struct;
 	}
@@ -169,15 +166,19 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.instance();
 	}
 
-	// async #multiSignWithKeyPair(index: number, keys: Contracts.Crypto.KeyPair): Promise<TBuilder> {
-	// 	if (!this.data.signatures) {
-	// 		this.data.signatures = [];
-	// 	}
+	async #legacySecondSignWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TBuilder> {
+		const data = this.#getSigningObject();
+		const { error } = await this.verifier.verifySchema(data, false);
+		if (error) {
+			throw new Exceptions.ValidationFailed(error);
+		}
 
-	// 	await this.signer.multiSign(this.#getSigningObject(), keys, index);
+		const signature = await this.signer.legacySecondSign(data, keys);
 
-	// 	return this.instance();
-	// }
+		this.data.legacySecondSignature = signature;
+
+		return this.instance();
+	}
 
 	#getSigningObject(): Contracts.Crypto.TransactionData {
 		const data: Contracts.Crypto.TransactionData = {

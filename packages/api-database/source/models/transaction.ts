@@ -97,7 +97,7 @@ export class Transaction {
 	@Column({
 		default: undefined,
 		nullable: true,
-		type: "jsonb",
+		type: "varchar",
 	})
-	public readonly signatures: string[] | undefined;
+	public readonly legacySecondSignature: string | undefined;
 }

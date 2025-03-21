@@ -150,7 +150,7 @@ export class Restore {
 				configurationRepository: this.configurationRepositoryFactory(entityManager),
 				contractRepository: this.contractRepositoryFactory(entityManager),
 				entityManager,
-				lastHeight: 0,
+				lastHeight: this.configuration.getGenesisHeight(),
 				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
 				mostRecentCommit,
 				publicKeyToAddress: {},
@@ -223,7 +223,7 @@ export class Restore {
 		const BATCH_SIZE = 1000;
 		const t0 = performance.now();
 
-		let currentHeight = 0;
+		let currentHeight = this.configuration.getGenesisHeight();
 
 		do {
 			const commits = this.databaseService.readCommits(
@@ -291,13 +291,13 @@ export class Restore {
 						gasLimit: data.gasLimit,
 						gasPrice: data.gasPrice,
 						id: data.id as unknown as string,
+						legacySecondSignature: data.legacySecondSignature,
 						nonce: data.nonce.toFixed(),
 						recipientAddress: data.recipientAddress,
 						senderAddress: data.senderAddress,
 						senderPublicKey: data.senderPublicKey,
 						sequence: data.sequence as unknown as number,
 						signature: `${data.r}${data.s}${data.v!.toString(16)}`,
-						signatures: undefined, //data.signatures,s
 						timestamp: block.header.timestamp.toFixed(),
 					});
 				}
@@ -372,6 +372,8 @@ export class Restore {
 			}
 		}
 
+		let totalAccountBalance = 0n;
+
 		do {
 			const result = await this.evm.getAccounts(offset ?? 0n, BATCH_SIZE);
 
@@ -435,6 +437,8 @@ export class Restore {
 					publicKey: context.addressToPublicKey[account.address] ?? null,
 					updated_at: "0",
 				});
+
+				totalAccountBalance += account.balance;
 			}
 
 			offset = result.nextOffset;
@@ -442,6 +446,11 @@ export class Restore {
 
 		for (const batch of chunk(accounts, 256)) {
 			await context.walletRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
+		}
+
+		// When restoring from a legacy snapshot, add the total account balance since the genesis block totalAmount does not take them into account.
+		if (this.snapshotImporter) {
+			context.totalSupply = context.totalSupply.plus(totalAccountBalance);
 		}
 
 		const t1 = performance.now();
@@ -661,7 +670,7 @@ export class Restore {
 		const iface = new ethers.Interface(UsernamesAbi.abi);
 		const data = iface.encodeFunctionData("getUsername", [account]).slice(2);
 
-		const { evmSpec } = this.configuration.getMilestone(0);
+		const { evmSpec } = this.configuration.getMilestone(this.configuration.getGenesisHeight());
 
 		const result = await this.evm.view({
 			caller: this.deployerAddress,

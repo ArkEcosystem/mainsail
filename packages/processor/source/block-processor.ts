@@ -201,7 +201,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			if (block.header.previousBlock !== "0000000000000000000000000000000000000000000000000000000000000000") {
 				assert.defined(this.snapshotImporter);
 				assert.defined(this.snapshotImporter.result);
-				previousStateHash = this.snapshotImporter.result.stateHash;
+				previousStateHash = this.snapshotImporter.snapshotHash;
 			} else {
 				previousStateHash = "0000000000000000000000000000000000000000000000000000000000000000";
 			}

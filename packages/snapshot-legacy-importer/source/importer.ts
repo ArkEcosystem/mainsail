@@ -45,10 +45,16 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		voters: Contracts.Snapshot.ImportedLegacyVoter[];
 		validators: Contracts.Snapshot.ImportedLegacyValidator[];
 		snapshotHash: string;
+		genesisHeight: bigint;
+		previousGenesisBlockHash: string;
+		totalSupply: bigint;
 		result: Contracts.Snapshot.LegacyImportResult | undefined;
 	} = {
+		genesisHeight: 0n,
+		previousGenesisBlockHash: "",
 		result: undefined,
 		snapshotHash: "",
+		totalSupply: 0n,
 		validators: [],
 		voters: [],
 		wallets: [],
@@ -70,6 +76,18 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		return this.#data.snapshotHash;
 	}
 
+	public get genesisHeight(): bigint {
+		return this.#data.genesisHeight;
+	}
+
+	public get previousGenesisBlockHash(): string {
+		return this.#data.previousGenesisBlockHash;
+	}
+
+	public get totalSupply(): bigint {
+		return this.#data.totalSupply;
+	}
+
 	public get result(): Contracts.Snapshot.LegacyImportResult | undefined {
 		return this.#data.result;
 	}
@@ -81,19 +99,19 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			block: { header },
 		} = genesisBlock;
 
-		const milestone = this.configuration.getMilestone(0);
+		const milestone = this.configuration.getMilestone(this.configuration.getGenesisHeight());
 		assert.defined(milestone.snapshot);
 
-		this.logger.info(`Importing genesis snapshot: ${milestone.snapshot.hash}`);
+		this.logger.info(`Importing genesis snapshot: ${milestone.snapshot.snapshotHash}`);
 
 		// TODO: fix hardcoded path
-		await this.prepare(`./snapshot-${milestone.snapshot.hash}.json`);
+		await this.prepare(`./snapshot-${milestone.snapshot.snapshotHash}.json`);
 
-		if (this.snapshotHash !== milestone.snapshot.hash) {
+		if (this.snapshotHash !== milestone.snapshot.snapshotHash) {
 			throw new Error("imported snapshot hash mismatch");
 		}
 
-		if (this.snapshotHash !== header.previousBlock) {
+		if (this.previousGenesisBlockHash !== header.previousBlock) {
 			throw new Error("genesis block previous block hash mismatch ");
 		}
 
@@ -101,14 +119,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			commitKey: { height: BigInt(header.number), round: BigInt(header.round) },
 			timestamp: header.timestamp,
 		});
-
-		if (result.stateHash !== header.stateHash) {
-			throw new Error("genesis block snapshot state hash mismatch ");
-		}
-
-		if (result.initialTotalSupply !== header.totalAmount.toBigInt()) {
-			throw new Error("genesis block snapshot supply mismatch ");
-		}
 
 		this.#data.result = result;
 
@@ -127,6 +137,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const validators: Contracts.Snapshot.ImportedLegacyValidator[] = [];
 
 		let foundColdWallets = 0;
+
+		let totalSupply = 0n;
 
 		for (const wallet of snapshot.wallets) {
 			hash.update(JSON.stringify(wallet));
@@ -189,6 +201,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 					username: wallet.attributes["delegate"]["username"],
 				});
 			}
+
+			totalSupply += balance;
 		}
 
 		const calculatedHash = hash.digest("hex");
@@ -196,9 +210,13 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			throw new Error(`failed to verify snapshot integrity: ${snapshot.hash} - ${calculatedHash}`);
 		}
 
+		const genesisHeight = BigInt(snapshot.chainTip.height) + 1n;
+
 		this.logger.info(
 			`snapshot stats: ${JSON.stringify({
 				coldWallets: foundColdWallets,
+				genesisHeight: genesisHeight.toString(),
+				totalSupply: totalSupply.toString(),
 				validators: validators.length,
 				voters: voters.length,
 				wallets: wallets.length,
@@ -206,8 +224,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		);
 
 		this.#data = {
+			genesisHeight,
+			previousGenesisBlockHash: snapshot.chainTip.id,
 			result: undefined,
 			snapshotHash: calculatedHash,
+			totalSupply,
 			validators,
 			voters,
 			wallets,
@@ -217,7 +238,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	public async import(
 		options: Contracts.Snapshot.LegacyImportOptions,
 	): Promise<Contracts.Snapshot.LegacyImportResult> {
-		await this.evm.prepareNextCommit({ commitKey: { height: 0n, round: 0n } });
+		await this.evm.prepareNextCommit({ commitKey: { height: options.commitKey.height, round: 0n } });
 
 		const deployerAccount = await this.evm.getAccountInfo(this.deployerAddress);
 		this.#nonce = deployerAccount.nonce;
@@ -242,12 +263,12 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		// 4) Seed usernames
 		await this.#seedUsernames(options);
 
-		// 5) Calculate state hash
-		const stateHash = await this.evm.stateHash(options.commitKey, this.#data.snapshotHash);
+		if (totalSupply !== this.totalSupply) {
+			throw new Error("totalSupply mismatch");
+		}
 
 		return {
 			initialTotalSupply: totalSupply,
-			stateHash,
 		};
 	}
 

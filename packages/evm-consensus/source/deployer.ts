@@ -10,6 +10,7 @@ export interface GenesisBlockInfo {
 	readonly timestamp: number;
 	readonly totalAmount: string;
 	readonly generatorAddress: string;
+	readonly initialHeight: number;
 }
 
 @injectable()
@@ -65,6 +66,7 @@ export class Deployer {
 		const genesisInfo = {
 			account: this.#genesisBlockInfo.generatorAddress,
 			deployerAccount: this.deployerAddress,
+			initialHeight: BigNumber.make(this.#genesisBlockInfo.initialHeight).toBigInt(),
 			initialSupply: BigNumber.make(this.#genesisBlockInfo.totalAmount).toBigInt(),
 
 			usernameContract: ethers.getCreateAddress({ from: this.deployerAddress, nonce: 3 }), // PROXY Uses nonce 3
