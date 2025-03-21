@@ -67,13 +67,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 			}
 
 			if (!totalAmount.isEqualTo(blockData.totalAmount)) {
-				if (
-					// Only the genesis block can have a 'totalAmount' while having no transactions.
-					block.header.height !== this.configuration.getGenesisHeight() ||
-					block.header.transactions.length > 0
-				) {
-					result.errors.push("Invalid total amount");
-				}
+				result.errors.push("Invalid total amount");
 			}
 
 			if (totalPayloadLength !== blockData.payloadLength) {

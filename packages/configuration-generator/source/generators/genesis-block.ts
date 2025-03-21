@@ -96,7 +96,7 @@ export class GenesisBlockGenerator extends Generator {
 		options: Contracts.NetworkGenerator.InternalOptions,
 	) {
 		if (options.snapshot) {
-			options.premine = this.snapshotLegacyImporter!.totalSupply.toString();
+			options.premine = "0";
 			options.distribute = false;
 		}
 
@@ -379,7 +379,7 @@ export class GenesisBlockGenerator extends Generator {
 
 		options.snapshot.snapshotHash = this.snapshotLegacyImporter.snapshotHash;
 		options.snapshot.previousGenesisBlockHash = this.snapshotLegacyImporter.previousGenesisBlockHash;
-		options.premine = result.initialTotalSupply.toString();
+		options.premine = "0";
 
 		this.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)

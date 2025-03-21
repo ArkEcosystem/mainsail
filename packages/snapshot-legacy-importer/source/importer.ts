@@ -120,10 +120,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			timestamp: header.timestamp,
 		});
 
-		if (result.initialTotalSupply !== header.totalAmount.toBigInt()) {
-			throw new Error("genesis block snapshot supply mismatch ");
-		}
-
 		this.#data.result = result;
 
 		return result;
