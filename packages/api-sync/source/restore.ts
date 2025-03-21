@@ -372,6 +372,8 @@ export class Restore {
 			}
 		}
 
+		let totalAccountBalance = 0n;
+
 		do {
 			const result = await this.evm.getAccounts(offset ?? 0n, BATCH_SIZE);
 
@@ -435,6 +437,8 @@ export class Restore {
 					publicKey: context.addressToPublicKey[account.address] ?? null,
 					updated_at: "0",
 				});
+
+				totalAccountBalance += account.balance;
 			}
 
 			offset = result.nextOffset;
@@ -442,6 +446,11 @@ export class Restore {
 
 		for (const batch of chunk(accounts, 256)) {
 			await context.walletRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
+		}
+
+		// When restoring from a legacy snapshot, add the total account balance since the genesis block totalAmount does not take them into account.
+		if (this.snapshotImporter) {
+			context.totalSupply = context.totalSupply.plus(totalAccountBalance);
 		}
 
 		const t1 = performance.now();
