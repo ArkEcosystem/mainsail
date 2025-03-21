@@ -18,7 +18,7 @@ export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockHea
 		$id: "blockHeader",
 		properties: {
 			generatorAddress: { $ref: "address" },
-			height: { minimum: 0, type: "integer" },
+			number: { minimum: 0, type: "integer" },
 			id: { $ref: "blockId" },
 			logsBloom: { $ref: "logsBloom" },
 			numberOfTransactions: { minimum: 0, type: "integer" },
@@ -37,7 +37,7 @@ export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockHea
 			"id",
 			"timestamp",
 			"previousBlock",
-			"height",
+			"number",
 			"stateHash",
 			"logsBloom",
 			"totalGasUsed",
