@@ -214,10 +214,12 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			throw new Error(`failed to verify snapshot integrity: ${snapshot.hash} - ${calculatedHash}`);
 		}
 
+		const genesisHeight = BigInt(snapshot.chainTip.height) + 1n;
+
 		this.logger.info(
 			`snapshot stats: ${JSON.stringify({
 				coldWallets: foundColdWallets,
-				genesisHeight: snapshot.chainTip.height,
+				genesisHeight: genesisHeight.toString(),
 				totalSupply: totalSupply.toString(),
 				validators: validators.length,
 				voters: voters.length,
@@ -226,7 +228,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		);
 
 		this.#data = {
-			genesisHeight: BigInt(snapshot.chainTip.height),
+			genesisHeight,
 			previousGenesisBlockHash: snapshot.chainTip.id,
 			result: undefined,
 			snapshotHash: calculatedHash,
