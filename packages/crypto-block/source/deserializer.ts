@@ -95,7 +95,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 				payloadHash: {
 					type: "hash",
 				},
-				generatorAddress: {
+				proposer: {
 					type: "address",
 				},
 			},

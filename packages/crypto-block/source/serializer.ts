@@ -62,7 +62,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				payloadHash: {
 					type: "hash",
 				},
-				generatorAddress: {
+				proposer: {
 					type: "address",
 				},
 			},
@@ -116,7 +116,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				payloadHash: {
 					type: "hash",
 				},
-				generatorAddress: {
+				proposer: {
 					type: "address",
 				},
 				transactions: {
