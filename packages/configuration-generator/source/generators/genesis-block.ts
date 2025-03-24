@@ -247,7 +247,7 @@ export class GenesisBlockGenerator extends Generator {
 			round: BigInt(0),
 		};
 		const timestamp = BigInt(dayjs(options.epoch).valueOf());
-		const generatorAddress = await this.app
+		const proposer = await this.app
 			.getTagged<Contracts.Crypto.AddressFactory>(
 				Identifiers.Cryptography.Identity.Address.Factory,
 				"type",
@@ -272,7 +272,7 @@ export class GenesisBlockGenerator extends Generator {
 					commitKey,
 					gasLimit: BigInt(30_000_000),
 					timestamp,
-					validatorAddress: generatorAddress,
+					validatorAddress: proposer,
 				},
 				caller: transaction.data.senderAddress,
 				data: Buffer.from(transaction.data.data, "hex"),
@@ -300,7 +300,7 @@ export class GenesisBlockGenerator extends Generator {
 			commitKey,
 			specId: Contracts.Evm.SpecId.SHANGHAI,
 			timestamp,
-			validatorAddress: generatorAddress,
+			validatorAddress: proposer,
 		});
 
 		await this.evm.calculateActiveValidators({
@@ -308,25 +308,25 @@ export class GenesisBlockGenerator extends Generator {
 			commitKey,
 			specId: Contracts.Evm.SpecId.SHANGHAI,
 			timestamp,
-			validatorAddress: generatorAddress,
+			validatorAddress: proposer,
 		});
 
 		return {
 			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
-					generatorAddress,
-					number: options.initialHeight ?? 0,
+					proposer,
 					logsBloom: await this.evm.logsBloom(commitKey),
+					number: options.initialHeight ?? 0,
 					numberOfTransactions: transactions.length,
+					parentHash:
+						options.snapshot?.previousGenesisBlockHash ??
+						"0000000000000000000000000000000000000000000000000000000000000000",
 					payloadHash: (
 						await this.app
 							.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
 							.sha256(payloadBuffers)
 					).toString("hex"),
 					payloadLength,
-					parentHash:
-						options.snapshot?.previousGenesisBlockHash ??
-						"0000000000000000000000000000000000000000000000000000000000000000",
 					reward: BigNumber.ZERO,
 					round: 0,
 					stateHash: await this.evm.stateHash(

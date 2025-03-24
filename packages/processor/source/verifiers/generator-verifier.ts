@@ -23,7 +23,7 @@ export class GeneratorVerifier implements Contracts.Processor.Handler {
 		const validatorIndex = this.proposerCalculator.getValidatorIndex(unit.getBlock().data.round);
 		const validator = this.validatorSet.getValidator(validatorIndex);
 
-		if (unit.getBlock().data.generatorAddress !== validator.address) {
+		if (unit.getBlock().data.proposer !== validator.address) {
 			throw new Exceptions.InvalidGenerator(unit.getBlock(), validator.address);
 		}
 	}

@@ -75,13 +75,6 @@ export const registerBlockFactory = async (
 		const commit = {
 			block: await app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
-					generatorAddress: await app
-						.getTagged<Contracts.Crypto.AddressFactory>(
-							Identifiers.Cryptography.Identity.Address.Factory,
-							"type",
-							"wallet",
-						)
-						.fromMnemonic(passphrase),
 					logsBloom: "0".repeat(512),
 					number: previousBlock.number + 1,
 					numberOfTransactions: transactions.length,
@@ -92,6 +85,13 @@ export const registerBlockFactory = async (
 							.sha256(payloadBuffers)
 					).toString("hex"),
 					payloadLength,
+					proposer: await app
+						.getTagged<Contracts.Crypto.AddressFactory>(
+							Identifiers.Cryptography.Identity.Address.Factory,
+							"type",
+							"wallet",
+						)
+						.fromMnemonic(passphrase),
 					reward: BigNumber.make(options.reward || reward),
 					round: 0,
 					stateHash: "0".repeat(64),

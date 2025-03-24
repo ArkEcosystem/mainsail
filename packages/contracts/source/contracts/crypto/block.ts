@@ -36,7 +36,7 @@ export interface BlockData {
 	readonly reward: BigNumber;
 	readonly payloadLength: number;
 	readonly payloadHash: string;
-	readonly generatorAddress: string;
+	readonly proposer: string;
 
 	// TODO: transactions field is missing when retrieved from storage
 	// and numberOfTransactions = 0
@@ -60,7 +60,7 @@ export interface BlockJson {
 	readonly reward: string;
 	readonly payloadLength: number;
 	readonly payloadHash: string;
-	readonly generatorAddress: string;
+	readonly proposer: string;
 
 	readonly serialized?: string;
 	readonly transactions: TransactionJson[];

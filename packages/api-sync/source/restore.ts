@@ -237,7 +237,7 @@ export class Restore {
 			for await (const { proof, block } of commits) {
 				blocks.push({
 					commitRound: proof.round,
-					generatorAddress: block.header.generatorAddress,
+					generatorAddress: block.header.proposer,
 					height: block.header.number.toFixed(),
 					id: block.header.hash,
 					numberOfTransactions: block.header.numberOfTransactions,
@@ -258,7 +258,7 @@ export class Restore {
 				});
 
 				// Update block related validator attributes
-				const validatorAttributes = context.validatorAttributes[block.header.generatorAddress];
+				const validatorAttributes = context.validatorAttributes[block.header.proposer];
 				if (!validatorAttributes) {
 					if (block.header.number !== this.configuration.getGenesisHeight()) {
 						throw new Error("unexpected validator");

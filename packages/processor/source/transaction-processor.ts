@@ -41,7 +41,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 					commitKey,
 					gasLimit: BigInt(milestone.block.maxGasLimit),
 					timestamp: BigInt(unit.getBlock().data.timestamp),
-					validatorAddress: unit.getBlock().data.generatorAddress,
+					validatorAddress: unit.getBlock().data.proposer,
 				},
 				instance: this.evm,
 			},

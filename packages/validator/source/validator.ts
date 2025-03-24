@@ -235,7 +235,7 @@ export class Validator implements Contracts.Validator.Validator {
 
 	async #makeBlock(
 		round: number,
-		generatorAddress: string,
+		proposer: string,
 		logsBloom: string,
 		stateHash: string,
 		transactions: Contracts.Crypto.Transaction[],
@@ -274,13 +274,13 @@ export class Validator implements Contracts.Validator.Validator {
 
 		return this.blockFactory.make(
 			{
-				generatorAddress,
 				logsBloom,
 				number,
 				numberOfTransactions: transactionData.length,
 				parentHash: previousBlock.header.hash,
 				payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 				payloadLength,
+				proposer,
 				reward: BigNumber.make(milestone.reward),
 				round,
 				stateHash,

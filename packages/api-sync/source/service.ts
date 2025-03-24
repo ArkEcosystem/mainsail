@@ -171,7 +171,7 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		const validatorAttributes = (address: string) => {
 			const dirtyValidator = dirtyValidators[address];
-			const isBlockValidator = header.generatorAddress === address;
+			const isBlockValidator = header.proposer === address;
 
 			return {
 				...(dirtyValidator
@@ -236,7 +236,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		// thus ensure they are manually inserted.
 		for (const validatorAddress of [
 			...new Set([
-				header.generatorAddress,
+				header.proposer,
 				...Object.values<Contracts.State.ValidatorWallet>(dirtyValidators).map((v) => v.address),
 			]),
 		]) {
@@ -257,7 +257,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		const deferredSync: DeferredSync = {
 			block: {
 				commitRound: proof.round,
-				generatorAddress: header.generatorAddress,
+				generatorAddress: header.proposer,
 				height: header.number.toFixed(),
 				id: header.hash,
 				numberOfTransactions: header.numberOfTransactions,

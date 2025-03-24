@@ -58,7 +58,7 @@ export class FutureBlock extends ValidatorException {
 export class InvalidGenerator extends ValidatorException {
 	public constructor(block: Block, expectedValidator: string) {
 		super(
-			`Block ${block.data.hash} has invalid generator. Block generator is ${block.data.generatorAddress} instead ${expectedValidator}.`,
+			`Block ${block.data.hash} has invalid generator. Proposer is ${block.data.proposer} instead ${expectedValidator}.`,
 		);
 	}
 }
