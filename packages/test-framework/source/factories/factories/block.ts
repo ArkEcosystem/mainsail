@@ -78,7 +78,6 @@ export const registerBlockFactory = async (
 					gasUsed: totals.gasUsed,
 					logsBloom: "0".repeat(512),
 					number: previousBlock.number + 1,
-					numberOfTransactions: transactions.length,
 					parentHash: previousBlock.hash,
 					payloadLength,
 					proposer: await app
@@ -95,6 +94,7 @@ export const registerBlockFactory = async (
 					totalAmount: BigNumber.make(totals.value),
 					totalFee: BigNumber.make(totals.gasPrice),
 					transactions: transactionData,
+					transactionsCount: transactions.length,
 					transactionsRoot: (
 						await app
 							.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)

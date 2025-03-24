@@ -346,7 +346,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		const blockHeader = await this.blockDeserializer.deserializeHeader(blockBuffer);
 
 		const transactions: Buffer[] = [];
-		for (let index = 0; index < blockHeader.numberOfTransactions; index++) {
+		for (let index = 0; index < blockHeader.transactionsCount; index++) {
 			const key = `${height}-${index}`;
 			const transaction: Buffer | undefined = this.transactionStorage.get(key);
 			assert.buffer(transaction);

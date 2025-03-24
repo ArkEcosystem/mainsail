@@ -33,7 +33,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 				result.errors.push("Serialized payload size mismatch");
 			}
 
-			if (block.transactions.length !== blockData.numberOfTransactions) {
+			if (block.transactions.length !== blockData.transactionsCount) {
 				result.errors.push("Invalid number of transactions");
 			}
 

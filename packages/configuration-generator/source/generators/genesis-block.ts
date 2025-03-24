@@ -317,7 +317,6 @@ export class GenesisBlockGenerator extends Generator {
 					gasUsed: totals.gasUsed,
 					logsBloom: await this.evm.logsBloom(commitKey),
 					number: options.initialHeight ?? 0,
-					numberOfTransactions: transactions.length,
 					parentHash:
 						options.snapshot?.previousGenesisBlockHash ??
 						"0000000000000000000000000000000000000000000000000000000000000000",
@@ -334,6 +333,7 @@ export class GenesisBlockGenerator extends Generator {
 					totalAmount: options.snapshot ? BigNumber.make(options.premine) : totals.amount,
 					totalFee: totals.fee,
 					transactions: transactionData,
+					transactionsCount: transactions.length,
 					transactionsRoot: (
 						await this.app
 							.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)

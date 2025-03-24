@@ -29,7 +29,7 @@ export interface BlockData {
 	readonly parentHash: string;
 	readonly stateRoot: string;
 	readonly logsBloom: string;
-	readonly numberOfTransactions: number;
+	readonly transactionsCount: number;
 	readonly gasUsed: number;
 	readonly totalAmount: BigNumber;
 	readonly totalFee: BigNumber;
@@ -39,7 +39,7 @@ export interface BlockData {
 	readonly proposer: string;
 
 	// TODO: transactions field is missing when retrieved from storage
-	// and numberOfTransactions = 0
+	// and transactionsCount = 0
 	readonly transactions: TransactionData[];
 }
 
@@ -53,7 +53,7 @@ export interface BlockJson {
 	readonly parentHash: string;
 	readonly stateRoot: string;
 	readonly logsBloom: string;
-	readonly numberOfTransactions: number;
+	readonly transactionsCount: number;
 	readonly gasUsed: number;
 	readonly totalAmount: string;
 	readonly totalFee: string;

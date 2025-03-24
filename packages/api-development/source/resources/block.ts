@@ -31,7 +31,7 @@ export class BlockResource implements Contracts.Api.Resource {
 			},
 			previous: blockData.parentHash,
 			timestamp: blockData.timestamp,
-			transactions: blockData.numberOfTransactions,
+			transactions: blockData.transactionsCount,
 			version: blockData.version,
 		};
 	}

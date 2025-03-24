@@ -26,6 +26,6 @@ export class EthGetBlockTransactionCountByHash implements Contracts.Api.RPC.Acti
 			return null;
 		}
 
-		return `0x${block.numberOfTransactions.toString(16)}`;
+		return `0x${block.transactionsCount.toString(16)}`;
 	}
 }

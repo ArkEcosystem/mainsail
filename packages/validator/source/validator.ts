@@ -70,14 +70,14 @@ export class Validator implements Contracts.Validator.Validator {
 		const previousBlock = this.stateStore.getLastBlock();
 		const height = previousBlock.header.number + 1;
 
-		const { logsBloom, stateRoot: stateHash, transactions } = await this.#getTransactionsForForging(
-			generatorAddress,
-			timestamp,
-			{
-				height: BigInt(height),
-				round: BigInt(round),
-			},
-		);
+		const {
+			logsBloom,
+			stateRoot: stateHash,
+			transactions,
+		} = await this.#getTransactionsForForging(generatorAddress, timestamp, {
+			height: BigInt(height),
+			round: BigInt(round),
+		});
 		return this.#makeBlock(round, generatorAddress, logsBloom, stateHash, transactions, timestamp);
 	}
 
@@ -277,7 +277,6 @@ export class Validator implements Contracts.Validator.Validator {
 				gasUsed: totals.gasUsed,
 				logsBloom,
 				number,
-				numberOfTransactions: transactionData.length,
 				parentHash: previousBlock.header.hash,
 				payloadLength,
 				proposer,
@@ -288,6 +287,7 @@ export class Validator implements Contracts.Validator.Validator {
 				totalAmount: totals.amount,
 				totalFee: totals.fee,
 				transactions: transactionData,
+				transactionsCount: transactionData.length,
 				transactionsRoot: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 				version: 1,
 			},

@@ -240,7 +240,7 @@ export class Restore {
 					generatorAddress: block.header.proposer,
 					height: block.header.number.toFixed(),
 					id: block.header.hash,
-					numberOfTransactions: block.header.numberOfTransactions,
+					numberOfTransactions: block.header.transactionsCount,
 					payloadHash: block.header.transactionsRoot,
 					payloadLength: block.header.payloadLength,
 					previousBlock: block.header.parentHash,
