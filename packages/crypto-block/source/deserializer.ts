@@ -83,7 +83,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 				amount: {
 					type: "uint256",
 				},
-				totalFee: {
+				fee: {
 					type: "uint256",
 				},
 				reward: {

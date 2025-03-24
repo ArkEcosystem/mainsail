@@ -50,7 +50,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				amount: {
 					type: "uint256",
 				},
-				totalFee: {
+				fee: {
 					type: "uint256",
 				},
 				reward: {
@@ -104,7 +104,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				amount: {
 					type: "uint256",
 				},
-				totalFee: {
+				fee: {
 					type: "uint256",
 				},
 				reward: {
