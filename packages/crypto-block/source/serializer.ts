@@ -41,7 +41,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				logsBloom: {
 					type: "hash",
 				},
-				numberOfTransactions: {
+				transactionsCount: {
 					type: "uint16",
 				},
 				gasUsed: {
@@ -95,7 +95,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				logsBloom: {
 					type: "hash",
 				},
-				numberOfTransactions: {
+				transactionsCount: {
 					type: "uint16",
 				},
 				gasUsed: {
