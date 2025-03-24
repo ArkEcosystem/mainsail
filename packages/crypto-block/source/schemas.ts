@@ -20,6 +20,7 @@ export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockHea
 			hash: { $ref: "blockId" },
 			logsBloom: { $ref: "logsBloom" },
 			number: { minimum: 0, type: "integer" },
+			gasUsed: { minimum: 0, type: "integer" },
 			numberOfTransactions: { minimum: 0, type: "integer" },
 			parentHash: { $ref: "blockId" },
 			payloadHash: { $ref: "hex" },
@@ -30,7 +31,6 @@ export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockHea
 			timestamp: { maximum: 2 ** 48 - 1, minimum: 0, type: "integer" },
 			totalAmount: { bignumber: { minimum: 0 } },
 			totalFee: { bignumber: { minimum: 0 } },
-			totalGasUsed: { minimum: 0, type: "integer" },
 			version: { enum: [1] },
 		},
 		required: [

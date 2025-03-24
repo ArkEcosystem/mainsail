@@ -44,7 +44,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				numberOfTransactions: {
 					type: "uint16",
 				},
-				totalGasUsed: {
+				gasUsed: {
 					type: "uint32",
 				},
 				totalAmount: {
@@ -98,7 +98,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				numberOfTransactions: {
 					type: "uint16",
 				},
-				totalGasUsed: {
+				gasUsed: {
 					type: "uint32",
 				},
 				totalAmount: {

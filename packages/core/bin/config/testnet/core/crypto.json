@@ -14,7 +14,7 @@
 			"timestamp": 1742274585321,
 			"totalAmount": "124999999999999999999999959",
 			"totalFee": "0",
-			"totalGasUsed": 20491092,
+			"gasUsed": 20491092,
 			"transactions": [
 				{
 					"network": 10000,

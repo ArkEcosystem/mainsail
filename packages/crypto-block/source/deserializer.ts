@@ -77,7 +77,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 				numberOfTransactions: {
 					type: "uint16",
 				},
-				totalGasUsed: {
+				gasUsed: {
 					type: "uint32",
 				},
 				totalAmount: {
