@@ -241,7 +241,7 @@ export class Restore {
 					height: block.header.number.toFixed(),
 					id: block.header.hash,
 					numberOfTransactions: block.header.numberOfTransactions,
-					payloadHash: block.header.payloadHash,
+					payloadHash: block.header.transactionsRoot,
 					payloadLength: block.header.payloadLength,
 					previousBlock: block.header.parentHash,
 					reward: block.header.reward.toFixed(),

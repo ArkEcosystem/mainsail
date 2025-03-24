@@ -74,7 +74,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 				result.errors.push("Invalid payload length");
 			}
 
-			if ((await this.hashFactory.sha256(payloadBuffers)).toString("hex") !== blockData.payloadHash) {
+			if ((await this.hashFactory.sha256(payloadBuffers)).toString("hex") !== blockData.transactionsRoot) {
 				result.errors.push("Invalid payload hash");
 			}
 		} catch (error) {

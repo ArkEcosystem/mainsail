@@ -80,11 +80,6 @@ export const registerBlockFactory = async (
 					number: previousBlock.number + 1,
 					numberOfTransactions: transactions.length,
 					parentHash: previousBlock.hash,
-					payloadHash: (
-						await app
-							.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
-							.sha256(payloadBuffers)
-					).toString("hex"),
 					payloadLength,
 					proposer: await app
 						.getTagged<Contracts.Crypto.AddressFactory>(
@@ -100,6 +95,11 @@ export const registerBlockFactory = async (
 					totalAmount: BigNumber.make(totals.value),
 					totalFee: BigNumber.make(totals.gasPrice),
 					transactions: transactionData,
+					transactionsRoot: (
+						await app
+							.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
+							.sha256(payloadBuffers)
+					).toString("hex"),
 					version: 1,
 				},
 				transactions,

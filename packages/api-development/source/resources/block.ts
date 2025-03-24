@@ -26,7 +26,7 @@ export class BlockResource implements Contracts.Api.Resource {
 			height: +blockData.number,
 			id: blockData.hash,
 			payload: {
-				hash: blockData.payloadHash,
+				hash: blockData.transactionsRoot,
 				length: blockData.payloadLength,
 			},
 			previous: blockData.parentHash,

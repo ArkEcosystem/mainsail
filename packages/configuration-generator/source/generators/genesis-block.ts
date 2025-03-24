@@ -321,11 +321,6 @@ export class GenesisBlockGenerator extends Generator {
 					parentHash:
 						options.snapshot?.previousGenesisBlockHash ??
 						"0000000000000000000000000000000000000000000000000000000000000000",
-					payloadHash: (
-						await this.app
-							.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
-							.sha256(payloadBuffers)
-					).toString("hex"),
 					payloadLength,
 					proposer,
 					reward: BigNumber.ZERO,
@@ -339,6 +334,11 @@ export class GenesisBlockGenerator extends Generator {
 					totalAmount: options.snapshot ? BigNumber.make(options.premine) : totals.amount,
 					totalFee: totals.fee,
 					transactions: transactionData,
+					transactionsRoot: (
+						await this.app
+							.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
+							.sha256(payloadBuffers)
+					).toString("hex"),
 					version: 1,
 				},
 				transactions,

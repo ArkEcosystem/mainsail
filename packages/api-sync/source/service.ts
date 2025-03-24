@@ -261,7 +261,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				height: header.number.toFixed(),
 				id: header.hash,
 				numberOfTransactions: header.numberOfTransactions,
-				payloadHash: header.payloadHash,
+				payloadHash: header.transactionsRoot,
 				payloadLength: header.payloadLength,
 				previousBlock: header.parentHash,
 				reward: header.reward.toFixed(),
