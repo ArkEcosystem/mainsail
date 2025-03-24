@@ -89,7 +89,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 				reward: {
 					type: "uint256",
 				},
-				payloadLength: {
+				payloadSize: {
 					type: "uint32",
 				},
 				transactionsRoot: {

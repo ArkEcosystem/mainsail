@@ -56,7 +56,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				reward: {
 					type: "uint256",
 				},
-				payloadLength: {
+				payloadSize: {
 					type: "uint32",
 				},
 				transactionsRoot: {
@@ -110,7 +110,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				reward: {
 					type: "uint256",
 				},
-				payloadLength: {
+				payloadSize: {
 					type: "uint32",
 				},
 				transactionsRoot: {
