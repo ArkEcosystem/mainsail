@@ -64,7 +64,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 				round: {
 					type: "uint32",
 				},
-				previousBlock: {
+				parentHash: {
 					type: "hash",
 				},
 				stateHash: {

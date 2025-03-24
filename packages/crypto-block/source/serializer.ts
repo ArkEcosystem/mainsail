@@ -32,7 +32,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				round: {
 					type: "uint32",
 				},
-				previousBlock: {
+				parentHash: {
 					type: "hash",
 				},
 				stateHash: {
@@ -86,7 +86,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				round: {
 					type: "uint32",
 				},
-				previousBlock: {
+				parentHash: {
 					type: "hash",
 				},
 				stateHash: {
