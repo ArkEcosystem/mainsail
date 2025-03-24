@@ -189,8 +189,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			);
 		}
 
-		if (!totalGas.isEqualTo(block.header.totalFee)) {
-			throw new Error(`Block fee ${block.header.totalFee} does not match consumed fee ${totalGas}`);
+		if (!totalGas.isEqualTo(block.header.fee)) {
+			throw new Error(`Block fee ${block.header.fee} does not match consumed fee ${totalGas}`);
 		}
 	}
 

@@ -250,7 +250,7 @@ export class Restore {
 					stateHash: block.header.stateRoot,
 					timestamp: block.header.timestamp.toFixed(),
 					totalAmount: block.header.amount.toFixed(),
-					totalFee: block.header.totalFee.toFixed(),
+					totalFee: block.header.fee.toFixed(),
 					totalGasUsed: block.header.gasUsed,
 					validatorRound: this.roundCalculator.calculateRound(block.header.number).round,
 					validatorSet: validatorSetPack(proof.validators).toString(),
@@ -265,9 +265,7 @@ export class Restore {
 					}
 				} else {
 					validatorAttributes.producedBlocks += 1;
-					validatorAttributes.totalForgedFees = validatorAttributes.totalForgedFees.plus(
-						block.header.totalFee,
-					);
+					validatorAttributes.totalForgedFees = validatorAttributes.totalForgedFees.plus(block.header.fee);
 					validatorAttributes.totalForgedRewards = validatorAttributes.totalForgedFees.plus(
 						block.header.reward,
 					);
@@ -303,7 +301,7 @@ export class Restore {
 				}
 
 				context.lastHeight = block.header.number;
-				context.totalSupply = context.totalSupply.plus(block.header.amount.plus(block.header.totalFee));
+				context.totalSupply = context.totalSupply.plus(block.header.amount.plus(block.header.fee));
 			}
 
 			// too large queries are not good for postgres

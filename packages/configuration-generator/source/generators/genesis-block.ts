@@ -314,6 +314,8 @@ export class GenesisBlockGenerator extends Generator {
 		return {
 			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
+					amount: options.snapshot ? BigNumber.make(options.premine) : totals.amount,
+					fee: totals.fee,
 					gasUsed: totals.gasUsed,
 					logsBloom: await this.evm.logsBloom(commitKey),
 					number: options.initialHeight ?? 0,
@@ -330,8 +332,6 @@ export class GenesisBlockGenerator extends Generator {
 							"0000000000000000000000000000000000000000000000000000000000000000",
 					),
 					timestamp: dayjs(options.epoch).valueOf(),
-					amount: options.snapshot ? BigNumber.make(options.premine) : totals.amount,
-					totalFee: totals.fee,
 					transactions: transactionData,
 					transactionsCount: transactions.length,
 					transactionsRoot: (
