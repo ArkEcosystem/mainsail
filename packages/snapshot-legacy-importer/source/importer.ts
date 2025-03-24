@@ -111,7 +111,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			throw new Error("imported snapshot hash mismatch");
 		}
 
-		if (this.previousGenesisBlockHash !== header.previousBlock) {
+		if (this.previousGenesisBlockHash !== header.parentHash) {
 			throw new Error("genesis block previous block hash mismatch ");
 		}
 

@@ -198,7 +198,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		let previousStateHash;
 		if (block.header.number === this.configuration.getGenesisHeight()) {
 			// Assume snapshot is present if the previous block points to a non-zero hash
-			if (block.header.previousBlock !== "0000000000000000000000000000000000000000000000000000000000000000") {
+			if (block.header.parentHash !== "0000000000000000000000000000000000000000000000000000000000000000") {
 				assert.defined(this.snapshotImporter);
 				assert.defined(this.snapshotImporter.result);
 				previousStateHash = this.snapshotImporter.snapshotHash;

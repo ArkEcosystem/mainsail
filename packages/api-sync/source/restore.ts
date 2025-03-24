@@ -243,7 +243,7 @@ export class Restore {
 					numberOfTransactions: block.header.numberOfTransactions,
 					payloadHash: block.header.payloadHash,
 					payloadLength: block.header.payloadLength,
-					previousBlock: block.header.previousBlock,
+					previousBlock: block.header.parentHash,
 					reward: block.header.reward.toFixed(),
 					round: block.header.round,
 					signature: proof.signature,

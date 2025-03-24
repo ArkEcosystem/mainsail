@@ -324,7 +324,7 @@ export class GenesisBlockGenerator extends Generator {
 							.sha256(payloadBuffers)
 					).toString("hex"),
 					payloadLength,
-					previousBlock:
+					parentHash:
 						options.snapshot?.previousGenesisBlockHash ??
 						"0000000000000000000000000000000000000000000000000000000000000000",
 					reward: BigNumber.ZERO,

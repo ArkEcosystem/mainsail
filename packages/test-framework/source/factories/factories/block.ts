@@ -82,16 +82,16 @@ export const registerBlockFactory = async (
 							"wallet",
 						)
 						.fromMnemonic(passphrase),
-					number: previousBlock.number + 1,
 					logsBloom: "0".repeat(512),
+					number: previousBlock.number + 1,
 					numberOfTransactions: transactions.length,
+					parentHash: previousBlock.hash,
 					payloadHash: (
 						await app
 							.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
 							.sha256(payloadBuffers)
 					).toString("hex"),
 					payloadLength,
-					previousBlock: previousBlock.hash,
 					reward: BigNumber.make(options.reward || reward),
 					round: 0,
 					stateHash: "0".repeat(64),

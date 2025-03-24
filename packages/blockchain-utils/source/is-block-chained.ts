@@ -11,7 +11,7 @@ const getBlockChainedDetails = (
 	previousBlock: Contracts.Crypto.BlockData,
 	nextBlock: Contracts.Crypto.BlockData,
 ): BlockChainedDetails => {
-	const followsPrevious: boolean = nextBlock.previousBlock === previousBlock.hash;
+	const followsPrevious: boolean = nextBlock.parentHash === previousBlock.hash;
 	const isPlusOne: boolean = nextBlock.number === previousBlock.number + 1;
 
 	const isAfterPrevious: boolean = previousBlock.timestamp < nextBlock.timestamp;
@@ -38,7 +38,7 @@ export const getBlockNotChainedErrorMessage = (
 
 	const messagePrefix: string =
 		`Block { height: ${nextBlock.number}, hash: ${nextBlock.hash}, ` +
-		`previousBlock: ${nextBlock.previousBlock} } is not chained to the ` +
+		`previousBlock: ${nextBlock.parentHash} } is not chained to the ` +
 		`previous block { height: ${previousBlock.number}, hash: ${previousBlock.hash} }`;
 
 	let messageDetail: string | undefined;

@@ -23,10 +23,10 @@ export class ChainedVerifier implements Contracts.Processor.Handler {
 			let validPreviousBlock = false;
 			if (milestone.snapshot) {
 				assert.defined(milestone.snapshot);
-				validPreviousBlock = blockData.previousBlock === milestone.snapshot.previousGenesisBlockHash;
+				validPreviousBlock = blockData.parentHash === milestone.snapshot.previousGenesisBlockHash;
 			} else {
 				validPreviousBlock =
-					blockData.previousBlock === "0000000000000000000000000000000000000000000000000000000000000000";
+					blockData.parentHash === "0000000000000000000000000000000000000000000000000000000000000000";
 			}
 
 			if (!validPreviousBlock) {
