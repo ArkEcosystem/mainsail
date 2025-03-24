@@ -189,8 +189,8 @@ export class Sync implements Contracts.ApiSync.Service {
 					? {
 							// incrementally applied in UPSERT below
 							validatorForgedFees: header.totalFee.toFixed(),
-							validatorForgedRewards: header.totalAmount.toFixed(),
-							validatorForgedTotal: header.totalFee.plus(header.totalAmount).toFixed(),
+							validatorForgedRewards: header.amount.toFixed(),
+							validatorForgedTotal: header.totalFee.plus(header.amount).toFixed(),
 							validatorLastBlock: {
 								height: header.number,
 								id: header.hash,
@@ -269,7 +269,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				signature: proof.signature,
 				stateHash: header.stateRoot,
 				timestamp: header.timestamp.toFixed(),
-				totalAmount: header.totalAmount.toFixed(),
+				totalAmount: header.amount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
 				totalGasUsed: header.gasUsed,
 				validatorRound: this.roundCalculator.calculateRound(header.number).round,

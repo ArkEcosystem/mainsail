@@ -274,6 +274,7 @@ export class Validator implements Contracts.Validator.Validator {
 
 		return this.blockFactory.make(
 			{
+				amount: totals.amount,
 				gasUsed: totals.gasUsed,
 				logsBloom,
 				number,
@@ -284,7 +285,6 @@ export class Validator implements Contracts.Validator.Validator {
 				round,
 				stateRoot,
 				timestamp,
-				totalAmount: totals.amount,
 				totalFee: totals.fee,
 				transactions: transactionData,
 				transactionsCount: transactionData.length,

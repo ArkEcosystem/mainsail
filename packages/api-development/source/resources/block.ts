@@ -12,7 +12,7 @@ export class BlockResource implements Contracts.Api.Resource {
 
 		return {
 			forged: {
-				amount: blockData.totalAmount.toFixed(),
+				amount: blockData.amount.toFixed(),
 				fee: blockData.totalFee.toFixed(),
 				reward: blockData.reward.toFixed(),
 				total: blockData.reward.plus(blockData.totalFee).toFixed(),

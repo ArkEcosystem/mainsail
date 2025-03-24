@@ -159,7 +159,7 @@ export class Restore {
 				stateRepository: this.stateRepositoryFactory(entityManager),
 
 				totalSupply: this.databaseService.isEmpty()
-					? this.stateStore.getGenesisCommit().block.data.totalAmount
+					? this.stateStore.getGenesisCommit().block.data.amount
 					: BigNumber.ZERO,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				transactionTypeRepository: this.transactionTypeRepositoryFactory(entityManager),
@@ -249,7 +249,7 @@ export class Restore {
 					signature: proof.signature,
 					stateHash: block.header.stateRoot,
 					timestamp: block.header.timestamp.toFixed(),
-					totalAmount: block.header.totalAmount.toFixed(),
+					totalAmount: block.header.amount.toFixed(),
 					totalFee: block.header.totalFee.toFixed(),
 					totalGasUsed: block.header.gasUsed,
 					validatorRound: this.roundCalculator.calculateRound(block.header.number).round,
@@ -303,7 +303,7 @@ export class Restore {
 				}
 
 				context.lastHeight = block.header.number;
-				context.totalSupply = context.totalSupply.plus(block.header.totalAmount.plus(block.header.totalFee));
+				context.totalSupply = context.totalSupply.plus(block.header.amount.plus(block.header.totalFee));
 			}
 
 			// too large queries are not good for postgres

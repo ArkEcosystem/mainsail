@@ -45,7 +45,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	public async fromJson(json: Contracts.Crypto.BlockJson): Promise<Contracts.Crypto.Block> {
 		// @ts-ignore
 		const data: Utils.Mutable<Contracts.Crypto.BlockData> = { ...json };
-		data.totalAmount = BigNumber.make(data.totalAmount);
+		data.amount = BigNumber.make(data.amount);
 		data.totalFee = BigNumber.make(data.totalFee);
 		data.reward = BigNumber.make(data.reward);
 

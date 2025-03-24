@@ -330,7 +330,7 @@ export class GenesisBlockGenerator extends Generator {
 							"0000000000000000000000000000000000000000000000000000000000000000",
 					),
 					timestamp: dayjs(options.epoch).valueOf(),
-					totalAmount: options.snapshot ? BigNumber.make(options.premine) : totals.amount,
+					amount: options.snapshot ? BigNumber.make(options.premine) : totals.amount,
 					totalFee: totals.fee,
 					transactions: transactionData,
 					transactionsCount: transactions.length,

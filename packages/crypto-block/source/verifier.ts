@@ -40,7 +40,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 			// Checking if transactions of the block adds up to block values.
 			const appliedTransactions: Record<string, Contracts.Crypto.TransactionData> = {};
 
-			let totalAmount: BigNumber = BigNumber.ZERO;
+			let amount: BigNumber = BigNumber.ZERO;
 
 			// The initial payload length takes the overhead for each serialized transaction into account
 			// which is a uint32 per transaction to store the individual length.
@@ -60,13 +60,13 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 
 				appliedTransactions[transaction.id] = transaction.data;
 
-				totalAmount = totalAmount.plus(transaction.data.value);
+				amount = amount.plus(transaction.data.value);
 				totalPayloadLength += transaction.serialized.byteLength;
 
 				payloadBuffers.push(bytes);
 			}
 
-			if (!totalAmount.isEqualTo(blockData.totalAmount)) {
+			if (!amount.isEqualTo(blockData.amount)) {
 				result.errors.push("Invalid total amount");
 			}
 

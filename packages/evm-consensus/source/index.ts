@@ -34,7 +34,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			generatorAddress: genesisBlock.block.proposer,
 			initialHeight: genesisBlock.block.number,
 			timestamp: genesisBlock.block.timestamp,
-			totalAmount: genesisBlock.block.totalAmount,
+			totalAmount: genesisBlock.block.amount,
 		});
 	}
 }
