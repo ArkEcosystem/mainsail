@@ -29,7 +29,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				hashByteLength + // previousBlock
 				hashByteLength + // stateHash
 				256 + // logsBloom
-				2 + // numberOfTransactions
+				2 + // transactionsCount
 				4 + // totalGasUsed
 				32 + // totalAmount
 				32 + // totalFee

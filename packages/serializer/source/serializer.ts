@@ -240,7 +240,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 			if (schema.type === "transactions") {
 				target[property] = [];
 
-				for (let index = 0; index < (target as any).numberOfTransactions; index++) {
+				for (let index = 0; index < (target as any).transactionsCount; index++) {
 					target[property].push(source.readBytes(source.readUint32()));
 				}
 				continue;

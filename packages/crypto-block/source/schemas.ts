@@ -7,8 +7,8 @@ export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockHea
 		properties: {
 			transactions: {
 				$ref: "transactions",
-				maxItems: { $data: "1/numberOfTransactions" },
-				minItems: { $data: "1/numberOfTransactions" },
+				maxItems: { $data: "1/transactionsCount" },
+				minItems: { $data: "1/transactionsCount" },
 				type: "array",
 			},
 		},
