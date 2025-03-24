@@ -257,7 +257,7 @@ export class GenesisBlockGenerator extends Generator {
 
 		// The initial payload length takes the overhead for each serialized transaction into account
 		// which is a uint32 per transaction to store the individual length.
-		let payloadLength = transactions.length * 4;
+		let payloadSize = transactions.length * 4;
 
 		await this.evm.prepareNextCommit({ commitKey });
 
@@ -292,7 +292,7 @@ export class GenesisBlockGenerator extends Generator {
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
 			transactionData.push(data);
-			payloadLength += serialized.length;
+			payloadSize += serialized.length;
 		}
 
 		await this.evm.updateRewardsAndVotes({
@@ -322,7 +322,7 @@ export class GenesisBlockGenerator extends Generator {
 					parentHash:
 						options.snapshot?.previousGenesisBlockHash ??
 						"0000000000000000000000000000000000000000000000000000000000000000",
-					payloadLength,
+					payloadSize,
 					proposer,
 					reward: BigNumber.ZERO,
 					round: 0,

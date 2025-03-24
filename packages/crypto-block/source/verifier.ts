@@ -24,7 +24,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 		try {
 			const milestone = this.configuration.getMilestone(blockData.number);
 
-			const totalSize = this.headerSize() + block.header.payloadLength;
+			const totalSize = this.headerSize() + block.header.payloadSize;
 			if (totalSize > milestone.block.maxPayload) {
 				result.errors.push(`Payload is too large: ${totalSize} > ${milestone.block.maxPayload}`);
 			}
@@ -70,7 +70,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 				result.errors.push("Invalid amount");
 			}
 
-			if (totalPayloadLength !== blockData.payloadLength) {
+			if (totalPayloadLength !== blockData.payloadSize) {
 				result.errors.push("Invalid payload length");
 			}
 

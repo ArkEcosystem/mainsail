@@ -12,7 +12,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 	private readonly headerSize!: () => number;
 
 	public totalSize(block: Contracts.Crypto.BlockDataSerializable): number {
-		return this.headerSize() + block.payloadLength;
+		return this.headerSize() + block.payloadSize;
 	}
 
 	public async serializeHeader(block: Contracts.Crypto.BlockDataSerializable): Promise<Buffer> {

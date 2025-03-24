@@ -109,7 +109,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 		buf: ByteBuffer,
 	): Promise<Contracts.Crypto.Transaction[]> {
 		await this.serializer.deserialize<Contracts.Crypto.BlockData>(buf, block, {
-			length: block.payloadLength,
+			length: block.payloadSize,
 			schema: {
 				transactions: {
 					type: "transactions",

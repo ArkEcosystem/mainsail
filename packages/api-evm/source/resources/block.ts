@@ -32,7 +32,7 @@ export class BlockResource {
 			totalDifficulty: "0x0",
 			baseFeePerGas: "0x0",
 			extraData: "0x",
-			size: `0x${blockData.payloadLength.toString(16)}`, // TODO: Implement block size
+			size: `0x${blockData.payloadSize.toString(16)}`, // TODO: Add block header size
 			gasLimit: `0x${milestone.block.maxGasLimit.toString(16)}`,
 			gasUsed: `0x${blockData.gasUsed.toString(16)}`,
 			timestamp: `0x${blockData.timestamp.toString(16)}`,
