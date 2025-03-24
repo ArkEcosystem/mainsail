@@ -16,7 +16,7 @@ export class GasLimitVerifier implements Contracts.Processor.Handler {
 
 		const maxGasLimit = this.configuration.getMilestone().block.maxGasLimit;
 
-		if (unit.getBlock().data.totalGasUsed > maxGasLimit) {
+		if (unit.getBlock().data.gasUsed > maxGasLimit) {
 			throw new Exceptions.ExceededGasLimit(unit.getBlock(), maxGasLimit);
 		}
 	}

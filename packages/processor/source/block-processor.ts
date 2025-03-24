@@ -137,7 +137,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		if (!this.state.isBootstrap()) {
 			const block = unit.getBlock();
 			this.logger.info(
-				`Block ${unit.height.toLocaleString()}/${unit.round.toLocaleString()} with ${block.data.numberOfTransactions.toLocaleString()} tx(s) committed (gasUsed=${block.data.totalGasUsed.toLocaleString()})`,
+				`Block ${unit.height.toLocaleString()}/${unit.round.toLocaleString()} with ${block.data.numberOfTransactions.toLocaleString()} tx(s) committed (gasUsed=${block.data.gasUsed.toLocaleString()})`,
 			);
 		}
 	}
@@ -160,7 +160,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		processorResult: Contracts.Processor.BlockProcessorResult,
 		gasUsed: number,
 	): void {
-		const totalGas = block.header.totalGasUsed;
+		const totalGas = block.header.gasUsed;
 
 		if (processorResult.gasUsed + gasUsed > totalGas) {
 			throw new Error("Cannot consume more gas");
@@ -173,7 +173,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		block: Contracts.Crypto.Block,
 		processorResult: Contracts.Processor.BlockProcessorResult,
 	): void {
-		const totalGas = block.header.totalGasUsed;
+		const totalGas = block.header.gasUsed;
 		if (totalGas !== processorResult.gasUsed) {
 			throw new Error(`Block gas ${totalGas} does not match consumed gas ${processorResult.gasUsed}`);
 		}

@@ -34,7 +34,7 @@ export class BlockResource {
 			extraData: "0x",
 			size: `0x${blockData.payloadLength.toString(16)}`, // TODO: Implement block size
 			gasLimit: `0x${milestone.block.maxGasLimit.toString(16)}`,
-			gasUsed: `0x${blockData.totalGasUsed.toString(16)}`,
+			gasUsed: `0x${blockData.gasUsed.toString(16)}`,
 			timestamp: `0x${blockData.timestamp.toString(16)}`,
 			transactions: transactionObject
 				? await this.#transformTransactions(block)

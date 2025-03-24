@@ -271,7 +271,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				timestamp: header.timestamp.toFixed(),
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
-				totalGasUsed: header.totalGasUsed,
+				totalGasUsed: header.gasUsed,
 				validatorRound: this.roundCalculator.calculateRound(header.number).round,
 				validatorSet: validatorSetPack(proof.validators).toString(),
 				version: header.version,

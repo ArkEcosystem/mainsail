@@ -251,7 +251,7 @@ export class Restore {
 					timestamp: block.header.timestamp.toFixed(),
 					totalAmount: block.header.totalAmount.toFixed(),
 					totalFee: block.header.totalFee.toFixed(),
-					totalGasUsed: block.header.totalGasUsed,
+					totalGasUsed: block.header.gasUsed,
 					validatorRound: this.roundCalculator.calculateRound(block.header.number).round,
 					validatorSet: validatorSetPack(proof.validators).toString(),
 					version: block.header.version,

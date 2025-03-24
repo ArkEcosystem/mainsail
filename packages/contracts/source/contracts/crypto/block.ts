@@ -30,7 +30,7 @@ export interface BlockData {
 	readonly stateHash: string;
 	readonly logsBloom: string;
 	readonly numberOfTransactions: number;
-	readonly totalGasUsed: number;
+	readonly gasUsed: number;
 	readonly totalAmount: BigNumber;
 	readonly totalFee: BigNumber;
 	readonly reward: BigNumber;
@@ -54,7 +54,7 @@ export interface BlockJson {
 	readonly stateHash: string;
 	readonly logsBloom: string;
 	readonly numberOfTransactions: number;
-	readonly totalGasUsed: number;
+	readonly gasUsed: number;
 	readonly totalAmount: string;
 	readonly totalFee: string;
 	readonly reward: string;

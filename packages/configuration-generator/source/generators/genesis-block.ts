@@ -314,7 +314,7 @@ export class GenesisBlockGenerator extends Generator {
 		return {
 			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
-					proposer,
+					gasUsed: totals.gasUsed,
 					logsBloom: await this.evm.logsBloom(commitKey),
 					number: options.initialHeight ?? 0,
 					numberOfTransactions: transactions.length,
@@ -327,6 +327,7 @@ export class GenesisBlockGenerator extends Generator {
 							.sha256(payloadBuffers)
 					).toString("hex"),
 					payloadLength,
+					proposer,
 					reward: BigNumber.ZERO,
 					round: 0,
 					stateHash: await this.evm.stateHash(
@@ -337,7 +338,6 @@ export class GenesisBlockGenerator extends Generator {
 					timestamp: dayjs(options.epoch).valueOf(),
 					totalAmount: options.snapshot ? BigNumber.make(options.premine) : totals.amount,
 					totalFee: totals.fee,
-					totalGasUsed: totals.gasUsed,
 					transactions: transactionData,
 					version: 1,
 				},

@@ -75,6 +75,7 @@ export const registerBlockFactory = async (
 		const commit = {
 			block: await app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
+					gasUsed: totals.gasUsed,
 					logsBloom: "0".repeat(512),
 					number: previousBlock.number + 1,
 					numberOfTransactions: transactions.length,
@@ -98,7 +99,6 @@ export const registerBlockFactory = async (
 					timestamp: options.timestamp || dayjs().valueOf(),
 					totalAmount: BigNumber.make(totals.value),
 					totalFee: BigNumber.make(totals.gasPrice),
-					totalGasUsed: totals.gasUsed,
 					transactions: transactionData,
 					version: 1,
 				},
