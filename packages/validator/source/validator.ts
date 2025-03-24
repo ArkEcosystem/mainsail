@@ -70,7 +70,7 @@ export class Validator implements Contracts.Validator.Validator {
 		const previousBlock = this.stateStore.getLastBlock();
 		const height = previousBlock.header.number + 1;
 
-		const { logsBloom, stateHash, transactions } = await this.#getTransactionsForForging(
+		const { logsBloom, stateRoot: stateHash, transactions } = await this.#getTransactionsForForging(
 			generatorAddress,
 			timestamp,
 			{
@@ -140,7 +140,7 @@ export class Validator implements Contracts.Validator.Validator {
 		generatorAddress: string,
 		timestamp: number,
 		commitKey: Contracts.Evm.CommitKey,
-	): Promise<{ logsBloom: string; stateHash: string; transactions: Contracts.Crypto.Transaction[] }> {
+	): Promise<{ logsBloom: string; stateRoot: string; transactions: Contracts.Crypto.Transaction[] }> {
 		const transactionBytes = await this.txPoolWorker.getTransactionBytes();
 
 		const validator = this.createTransactionValidator();
@@ -221,11 +221,11 @@ export class Validator implements Contracts.Validator.Validator {
 			}
 
 			const logsBloom = await validator.getEvm().logsBloom(commitKey);
-			const stateHash = await validator.getEvm().stateHash(commitKey, previousBlock.header.stateHash);
+			const stateRoot = await validator.getEvm().stateHash(commitKey, previousBlock.header.stateRoot);
 
 			return {
 				logsBloom,
-				stateHash,
+				stateRoot,
 				transactions: candidateTransactions,
 			};
 		} finally {
@@ -237,7 +237,7 @@ export class Validator implements Contracts.Validator.Validator {
 		round: number,
 		proposer: string,
 		logsBloom: string,
-		stateHash: string,
+		stateRoot: string,
 		transactions: Contracts.Crypto.Transaction[],
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
@@ -274,17 +274,17 @@ export class Validator implements Contracts.Validator.Validator {
 
 		return this.blockFactory.make(
 			{
+				gasUsed: totals.gasUsed,
 				logsBloom,
 				number,
 				numberOfTransactions: transactionData.length,
-				gasUsed: totals.gasUsed,
 				parentHash: previousBlock.header.hash,
 				payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 				payloadLength,
 				proposer,
 				reward: BigNumber.make(milestone.reward),
 				round,
-				stateHash,
+				stateRoot,
 				timestamp,
 				totalAmount: totals.amount,
 				totalFee: totals.fee,

@@ -95,7 +95,7 @@ export const registerBlockFactory = async (
 						.fromMnemonic(passphrase),
 					reward: BigNumber.make(options.reward || reward),
 					round: 0,
-					stateHash: "0".repeat(64),
+					stateRoot: "0".repeat(64),
 					timestamp: options.timestamp || dayjs().valueOf(),
 					totalAmount: BigNumber.make(totals.value),
 					totalFee: BigNumber.make(totals.gasPrice),

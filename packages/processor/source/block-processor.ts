@@ -195,28 +195,28 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #verifyStateHash(block: Contracts.Crypto.Block): Promise<void> {
-		let previousStateHash;
+		let previousStateRoot;
 		if (block.header.number === this.configuration.getGenesisHeight()) {
 			// Assume snapshot is present if the previous block points to a non-zero hash
 			if (block.header.parentHash !== "0000000000000000000000000000000000000000000000000000000000000000") {
 				assert.defined(this.snapshotImporter);
 				assert.defined(this.snapshotImporter.result);
-				previousStateHash = this.snapshotImporter.snapshotHash;
+				previousStateRoot = this.snapshotImporter.snapshotHash;
 			} else {
-				previousStateHash = "0000000000000000000000000000000000000000000000000000000000000000";
+				previousStateRoot = "0000000000000000000000000000000000000000000000000000000000000000";
 			}
 		} else {
 			const previousBlock = this.stateStore.getLastBlock();
-			previousStateHash = previousBlock.header.stateHash;
+			previousStateRoot = previousBlock.header.stateRoot;
 		}
 
-		const stateHash = await this.evm.stateHash(
+		const stateRoot = await this.evm.stateHash(
 			{ height: BigInt(block.header.number), round: BigInt(block.header.round) },
-			previousStateHash,
+			previousStateRoot,
 		);
 
-		if (block.header.stateHash !== stateHash) {
-			throw new Error(`State hash mismatch! ${block.header.stateHash} != ${stateHash}`);
+		if (block.header.stateRoot !== stateRoot) {
+			throw new Error(`State root mismatch! ${block.header.stateRoot} != ${stateRoot}`);
 		}
 	}
 

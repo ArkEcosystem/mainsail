@@ -27,7 +27,7 @@ export interface BlockData {
 	readonly number: number;
 	readonly round: number;
 	readonly parentHash: string;
-	readonly stateHash: string;
+	readonly stateRoot: string;
 	readonly logsBloom: string;
 	readonly numberOfTransactions: number;
 	readonly gasUsed: number;
@@ -51,7 +51,7 @@ export interface BlockJson {
 	readonly number: number;
 	readonly round: number;
 	readonly parentHash: string;
-	readonly stateHash: string;
+	readonly stateRoot: string;
 	readonly logsBloom: string;
 	readonly numberOfTransactions: number;
 	readonly gasUsed: number;

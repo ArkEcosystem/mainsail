@@ -247,7 +247,7 @@ export class Restore {
 					reward: block.header.reward.toFixed(),
 					round: block.header.round,
 					signature: proof.signature,
-					stateHash: block.header.stateHash,
+					stateHash: block.header.stateRoot,
 					timestamp: block.header.timestamp.toFixed(),
 					totalAmount: block.header.totalAmount.toFixed(),
 					totalFee: block.header.totalFee.toFixed(),
