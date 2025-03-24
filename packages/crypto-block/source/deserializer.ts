@@ -67,7 +67,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 				parentHash: {
 					type: "hash",
 				},
-				stateHash: {
+				stateRoot: {
 					type: "hash",
 				},
 				logsBloom: {

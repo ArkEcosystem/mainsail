@@ -35,7 +35,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				parentHash: {
 					type: "hash",
 				},
-				stateHash: {
+				stateRoot: {
 					type: "hash",
 				},
 				logsBloom: {
@@ -89,7 +89,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				parentHash: {
 					type: "hash",
 				},
-				stateHash: {
+				stateRoot: {
 					type: "hash",
 				},
 				logsBloom: {
