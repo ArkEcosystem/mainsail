@@ -28,7 +28,7 @@ const setup = (context: Context) => {
 };
 
 const blockReward = (n: number) => BigNumber.WEI.times(n);
-const initialSupply = BigNumber.make(crypto.genesisBlock.block.totalAmount);
+const initialSupply = BigNumber.make(crypto.genesisBlock.block.amount);
 
 describe<Context>("Supply Calculator - calculateSupply", ({ assert, beforeEach, it, each }) => {
 	beforeEach(setup);

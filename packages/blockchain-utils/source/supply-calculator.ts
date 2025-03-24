@@ -8,7 +8,7 @@ export class SupplyCalculator implements Contracts.BlockchainUtils.SupplyCalcula
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	calculateSupply(height: number): BigNumber {
-		const initialSupply = BigNumber.make(this.configuration.get("genesisBlock.block.totalAmount"));
+		const initialSupply = BigNumber.make(this.configuration.get("genesisBlock.block.amount"));
 
 		const milestones = this.configuration.get("milestones");
 		const genesisHeight = this.configuration.getGenesisHeight();

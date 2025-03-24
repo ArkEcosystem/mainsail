@@ -37,16 +37,16 @@ export const getBlockNotChainedErrorMessage = (
 	}
 
 	const messagePrefix: string =
-		`Block { height: ${nextBlock.number}, hash: ${nextBlock.hash}, ` +
-		`previousBlock: ${nextBlock.parentHash} } is not chained to the ` +
-		`previous block { height: ${previousBlock.number}, hash: ${previousBlock.hash} }`;
+		`Block { number: ${nextBlock.number}, hash: ${nextBlock.hash}, ` +
+		`parentHash: ${nextBlock.parentHash} } is not chained to the ` +
+		`previous block { number: ${previousBlock.number}, hash: ${previousBlock.hash} }`;
 
 	let messageDetail: string | undefined;
 
 	if (!details.followsPrevious) {
 		messageDetail = `previous block hash mismatch`;
 	} else if (!details.isPlusOne) {
-		messageDetail = `height is not plus one`;
+		messageDetail = `number is not plus one`;
 	} else if (!details.isAfterPrevious) {
 		messageDetail = `previous timestamp is after current timestamp: ${previousBlock.timestamp} VS ${nextBlock.timestamp}`;
 	}
