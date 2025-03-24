@@ -17,6 +17,7 @@ export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockHea
 	blockHeader: {
 		$id: "blockHeader",
 		properties: {
+			amount: { bignumber: { minimum: 0 } },
 			gasUsed: { minimum: 0, type: "integer" },
 			hash: { $ref: "blockId" },
 			logsBloom: { $ref: "logsBloom" },
@@ -27,7 +28,6 @@ export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockHea
 			reward: { bignumber: { minimum: 0 } },
 			stateRoot: { $ref: "hex" },
 			timestamp: { maximum: 2 ** 48 - 1, minimum: 0, type: "integer" },
-			totalAmount: { bignumber: { minimum: 0 } },
 			totalFee: { bignumber: { minimum: 0 } },
 			transactionsCount: { minimum: 0, type: "integer" },
 			transactionsRoot: { $ref: "hex" },
@@ -42,8 +42,8 @@ export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockHea
 			"number",
 			"stateRoot",
 			"logsBloom",
-			"totalGasUsed",
-			"totalAmount",
+			"gasUsed",
+			"amount",
 			"totalFee",
 			"reward",
 			"proposer",

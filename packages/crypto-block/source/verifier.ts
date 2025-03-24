@@ -67,7 +67,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 			}
 
 			if (!amount.isEqualTo(blockData.amount)) {
-				result.errors.push("Invalid total amount");
+				result.errors.push("Invalid amount");
 			}
 
 			if (totalPayloadLength !== blockData.payloadLength) {
