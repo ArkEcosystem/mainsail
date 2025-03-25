@@ -43,9 +43,7 @@ export class InvalidBlockTransactionLength extends ValidatorException {
 
 export class ExceededGasLimit extends ValidatorException {
 	public constructor(block: Block, maxGasLimit: number) {
-		super(
-			`Block ${block.data.hash} with  gas used ${block.data.gasUsed} exceeds max gas limit of ${maxGasLimit}.`,
-		);
+		super(`Block ${block.data.hash} with  gas used ${block.data.gasUsed} exceeds max gas limit of ${maxGasLimit}.`);
 	}
 }
 
