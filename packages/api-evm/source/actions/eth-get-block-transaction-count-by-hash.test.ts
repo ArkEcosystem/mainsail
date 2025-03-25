@@ -54,7 +54,7 @@ describe<{
 	});
 
 	it("should return 0x0", async ({ action, database }) => {
-		const spyGetBlockHeaderById = stub(database, "getBlockHeaderById").returnValue({ numberOfTransactions: 0 });
+		const spyGetBlockHeaderById = stub(database, "getBlockHeaderById").returnValue({ transactionsCount: 0 });
 
 		assert.equal(
 			await action.handle(["0x0000000000000000000000000000000000000000000000000000000000000000"]),
@@ -66,7 +66,7 @@ describe<{
 	});
 
 	it("should return 0x14", async ({ action, database }) => {
-		const spyGetBlockHeaderById = stub(database, "getBlockHeaderById").returnValue({ numberOfTransactions: 20 });
+		const spyGetBlockHeaderById = stub(database, "getBlockHeaderById").returnValue({ transactionsCount: 20 });
 
 		assert.equal(
 			await action.handle(["0x0000000000000000000000000000000000000000000000000000000000000000"]),
