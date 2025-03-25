@@ -98,8 +98,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		context.block = {
 			data: {
-				height: 1,
-				id: "blockId",
+				number: 1,
+				hash: "blockId",
 			},
 		};
 
@@ -345,7 +345,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPropose.calledOnce();
 		spyValidatorPropose.calledWith(1, 1, 0, block, lockProof); // validator set, round, validRound, block, lockProof
 		spyLoggerInfo.calledWith(`>> Starting new round: ${1}/${1} with proposer: ${proposer.address}`);
-		spyLoggerInfo.calledWith(`Proposing valid block ${1}/${1} from round ${0} with blockId: ${block.data.id}`);
+		spyLoggerInfo.calledWith(`Proposing valid block ${1}/${1} from round ${0} with block hash: ${block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.RoundStarted, {
 			height: 1,
@@ -450,7 +450,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onProposal - should return if not from valid proposer", async ({ consensus }) => {});
 
-	it("#onProposal - broadcast prevote block id, if block is valid & not locked", async ({
+	it("#onProposal - broadcast prevote block hash, if block is valid & not locked", async ({
 		consensus,
 		validatorSet,
 		validatorsRepository,
@@ -491,9 +491,9 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyGetProcessorResult.calledOnce();
 		getValidatorIndexByWalletAddress.calledOnce();
 		spyValidatorPrevote.calledOnce();
-		spyValidatorPrevote.calledWith(1, 1, 0, block.data.id); // validatorIndex, height, round, blockId
+		spyValidatorPrevote.calledWith(1, 1, 0, block.data.hash); // validatorIndex, height, round, blockId
 
-		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} blockId: ${proposal.getData().block.data.id}`);
+		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} block hash: ${proposal.getData().block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
 			height: 1,
@@ -549,7 +549,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyPrevoteProcess.calledOnce();
 		spyPrevoteProcess.calledWith(prevote);
-		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} blockId: ${proposal.getData().block.data.id}`);
+		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} block hash: ${proposal.getData().block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
 			height: 1,
@@ -604,7 +604,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrevote.neverCalled();
 		spyPrevoteProcess.neverCalled();
 
-		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} blockId: ${proposal.getData().block.data.id}`);
+		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} block hash: ${proposal.getData().block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
 			height: 1,
@@ -622,7 +622,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onProposal - broadcast prevote null, if locked value exists", async ({ consensus }) => {});
 
-	it("#onProposalLocked - broadcast prevote block id, if block is valid and lockedRound is undefined", async ({
+	it("#onProposalLocked - broadcast prevote block hash, if block is valid and lockedRound is undefined", async ({
 		consensus,
 		validatorSet,
 		validatorsRepository,
@@ -667,12 +667,12 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		getValidatorIndexByWalletAddress.calledOnce();
 
 		spyValidatorPrevote.calledOnce();
-		spyValidatorPrevote.calledWith(1, 1, 1, block.data.id);
+		spyValidatorPrevote.calledWith(1, 1, 1, block.data.hash);
 
 		spyPrevoteProcess.calledOnce();
 		spyPrevoteProcess.calledWith(prevote);
 		spyLoggerInfo.calledWith(
-			`Received proposal ${1}/${1} with locked blockId: ${proposal.getData().block.data.id}`,
+			`Received proposal ${1}/${1} with locked block hash: ${proposal.getData().block.data.hash}`,
 		);
 		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
 			height: 1,
@@ -685,7 +685,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
 	});
 
-	it("#onProposalLocked - broadcast prevote block id, if block is valid and valid round is higher or equal than lockedRound ", async () => {});
+	it("#onProposalLocked - broadcast prevote block hash, if block is valid and valid round is higher or equal than lockedRound ", async () => {});
 
 	it("#onProposalLocked - broadcast prevote null, if block is valid and lockedRound is undefined", async ({
 		consensus,
@@ -876,10 +876,12 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		getValidatorIndexByWalletAddress.calledOnce();
 		getValidatorIndexByWalletAddress.calledWith(proposer.address);
 		spyValidatorPrecommit.calledOnce();
-		spyValidatorPrecommit.calledWith(1, 1, 0, block.data.id);
+		spyValidatorPrecommit.calledWith(1, 1, 0, block.data.hash);
 		spyPrecommitProcess.calledOnce();
 		spyPrecommitProcess.calledWith(precommit);
-		spyLoggerInfo.calledWith(`Received +2/3 prevotes for ${1}/${0} blockId: ${proposal.getData().block.data.id}`);
+		spyLoggerInfo.calledWith(
+			`Received +2/3 prevotes for ${1}/${0} block hash: ${proposal.getData().block.data.hash}`,
+		);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.PrevotedProposal, {
 			height: 1,
@@ -964,7 +966,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		getValidatorIndexByWalletAddress.calledOnce();
 		getValidatorIndexByWalletAddress.calledWith(proposer.address);
 		spyValidatorPrecommit.calledOnce();
-		spyValidatorPrecommit.calledWith(1, 1, 0, block.data.id);
+		spyValidatorPrecommit.calledWith(1, 1, 0, block.data.hash);
 		spyPrecommitProcess.calledOnce();
 		spyPrecommitProcess.calledWith(precommit);
 
@@ -979,7 +981,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(proposer.blsPublicKey);
 		spyValidatorPrecommit.calledOnce();
-		spyValidatorPrecommit.calledWith(1, 1, 0, block.data.id);
+		spyValidatorPrecommit.calledWith(1, 1, 0, block.data.hash);
 		spyPrecommitProcess.calledOnce();
 		spyPrecommitProcess.calledWith(precommit);
 
@@ -1356,7 +1358,9 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyConsensusStartRound.calledOnce();
 		spyConsensusStartRound.calledWith(0);
 		spyRoundStateRepositoryClear.calledOnce();
-		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0} blockId: ${proposal.getData().block.data.id}`);
+		spyLoggerInfo.calledWith(
+			`Received +2/3 precommits for ${1}/${0} block hash: ${proposal.getData().block.data.hash}`,
+		);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.PrecommitedProposal, {
 			height: 1,
@@ -1422,7 +1426,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyBlockProcessorCommit.neverCalled();
 		spyConsensusStartRound.neverCalled();
 		spyRoundStateRepositoryClear.neverCalled();
-		spyLoggerInfo.calledWith(`Block ${block.data.id} on height ${1} received +2/3 precommits but is invalid`);
+		spyLoggerInfo.calledWith(`Block ${block.data.hash} on height ${1} received +2/3 precommits but is invalid`);
 		assert.equal(consensus.getHeight(), 1);
 	});
 

@@ -358,7 +358,9 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		this.logger.info(`Received +2/3 precommits for ${this.#height}/${roundState.round} block number: ${block.data.hash}`);
+		this.logger.info(
+			`Received +2/3 precommits for ${this.#height}/${roundState.round} block hash: ${block.data.hash}`,
+		);
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.PrecommitedProposal, this.getState());
 
 		await this.commitLock.runExclusive(async () => {
