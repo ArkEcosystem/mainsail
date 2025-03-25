@@ -25,10 +25,10 @@ describe<{
 	});
 
 	it("should return the status based on last block", async ({ controller }) => {
-		const height = 1987;
-		const id = "984003423092345907";
+		const number = 1987;
+		const hash = "984003423092345907";
 		const lastBlock = {
-			data: { height, id },
+			data: { number, hash },
 		};
 
 		stub(store, "getLastBlock").returnValue(lastBlock);
@@ -38,8 +38,8 @@ describe<{
 		assert.equal(status, {
 			config: {},
 			state: {
-				height,
-				id,
+				height: number,
+				id: hash,
 			},
 		});
 	});
