@@ -3,7 +3,7 @@ import { Contracts, Exceptions, Identifiers, Utils } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 import { sealBlock } from "./block.js";
-import { IDFactory } from "./id.factory.js";
+import { HashFactory } from "./hash.factory.js";
 
 @injectable()
 export class BlockFactory implements Contracts.Crypto.BlockFactory {
@@ -13,8 +13,8 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	@inject(Identifiers.Cryptography.Block.Deserializer)
 	private readonly deserializer!: Contracts.Crypto.BlockDeserializer;
 
-	@inject(Identifiers.Cryptography.Block.IDFactory)
-	private readonly idFactory!: IDFactory;
+	@inject(Identifiers.Cryptography.Block.HashFactory)
+	private readonly hashFactory!: HashFactory;
 
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.Validator;
@@ -23,7 +23,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		data: Utils.Mutable<Contracts.Crypto.BlockDataSerializable>,
 		transactions: Contracts.Crypto.Transaction[],
 	): Promise<Contracts.Crypto.Block> {
-		const block: Contracts.Crypto.BlockData = { ...data, hash: await this.idFactory.make(data) };
+		const block: Contracts.Crypto.BlockData = { ...data, hash: await this.hashFactory.make(data) };
 
 		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
 

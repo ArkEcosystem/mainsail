@@ -3,14 +3,14 @@ import { Providers } from "@mainsail/kernel";
 
 import { Deserializer } from "./deserializer.js";
 import { BlockFactory } from "./factory.js";
-import { IDFactory } from "./id.factory.js";
+import { HashFactory } from "./hash.factory.js";
 import { schemas } from "./schemas.js";
 import { Serializer } from "./serializer.js";
 import { Verifier } from "./verifier.js";
 
 export * from "./deserializer.js";
 export * from "./factory.js";
-export * from "./id.factory.js";
+export * from "./hash.factory.js";
 export * from "./schemas.js";
 export * from "./serializer.js";
 export * from "./verifier.js";
@@ -42,7 +42,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.Cryptography.Block.Deserializer).to(Deserializer).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Block.Factory).to(BlockFactory).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Block.IDFactory).to(IDFactory).inSingletonScope();
+		this.app.bind(Identifiers.Cryptography.Block.HashFactory).to(HashFactory).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Block.Verifier).to(Verifier).inSingletonScope();
 

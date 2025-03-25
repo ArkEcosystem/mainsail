@@ -17,7 +17,7 @@ import crypto from "../../../core/bin/config/testnet/core/crypto.json" with { ty
 import { Sandbox } from "../../../test-framework/source/index.js";
 import { Deserializer } from "../../source/deserializer.js";
 import { BlockFactory } from "../../source/factory.js";
-import { IDFactory } from "../../source/id.factory.js";
+import { HashFactory } from "../../source/hash.factory.js";
 import { Serializer } from "../../source/serializer.js";
 // import { prepareBlock } from "./prepare-block.js";
 
@@ -68,7 +68,7 @@ export const prepareSandbox = async (context) => {
 	await context.sandbox.app.resolve(CoreCryptoTransactionEvmCall).register();
 	context.sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer);
 	context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).to(Deserializer);
-	context.sandbox.app.bind(Identifiers.Cryptography.Block.IDFactory).to(IDFactory);
+	context.sandbox.app.bind(Identifiers.Cryptography.Block.HashFactory).to(HashFactory);
 	context.sandbox.app.bind(Identifiers.Cryptography.Block.Factory).to(BlockFactory);
 
 	// await prepareBlock(context);

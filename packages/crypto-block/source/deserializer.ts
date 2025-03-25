@@ -4,12 +4,12 @@ import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
 import { TransactionFactory } from "@mainsail/crypto-transaction";
 import { ByteBuffer, sleep } from "@mainsail/utils";
 
-import { IDFactory } from "./id.factory.js";
+import { HashFactory } from "./hash.factory.js";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.BlockDeserializer {
-	@inject(Identifiers.Cryptography.Block.IDFactory)
-	private readonly idFactory!: IDFactory;
+	@inject(Identifiers.Cryptography.Block.HashFactory)
+	private readonly hashFactory!: HashFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: TransactionFactory;
@@ -25,7 +25,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 
 		const header: Utils.Mutable<Contracts.Crypto.BlockData> = await this.#deserializeBufferHeader(buffer);
 
-		header.hash = await this.idFactory.make(header);
+		header.hash = await this.hashFactory.make(header);
 
 		return header;
 	}
@@ -41,7 +41,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 			transactions = await this.#deserializeTransactions(block, buffer);
 		}
 
-		block.hash = await this.idFactory.make(block);
+		block.hash = await this.hashFactory.make(block);
 
 		return { data: block, transactions };
 	}
