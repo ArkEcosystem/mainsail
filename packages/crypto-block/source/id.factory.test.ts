@@ -17,13 +17,13 @@ describe<{
 		const id = await idFactory.make(blockData);
 
 		assert.string(id);
-		assert.equal(id, blockData.id);
+		assert.equal(id, blockData.hash);
 	});
 
 	it("#make - should return block id with transactions", async ({ idFactory }) => {
 		const id = await idFactory.make(blockDataWithTransactions);
 
 		assert.string(id);
-		assert.equal(id, blockDataWithTransactions.id);
+		assert.equal(id, blockDataWithTransactions.hash);
 	});
 });
