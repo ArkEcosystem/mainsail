@@ -178,7 +178,7 @@ export class Snapshot {
 			return stateDeltas;
 		}
 
-		const blocks = await database.findBlocks(0, (await database.getLastCommit()).block.header.height);
+		const blocks = await database.findBlocks(0, (await database.getLastCommit()).block.header.number);
 		const updateBalanceDelta = async (addressOrPublicKey: string, delta: BigNumber): Promise<void> => {
 			const account = await getAccountByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
 
@@ -252,10 +252,7 @@ export class Snapshot {
 			await incrementNonce(this.sandbox.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer));
 
 			// Validator balance
-			await positiveBalanceChange(
-				block.header.generatorAddress,
-				block.header.reward.plus(totalValidatorFeeReward),
-			);
+			await positiveBalanceChange(block.header.proposer, block.header.reward.plus(totalValidatorFeeReward));
 		}
 
 		for (const [address, delta] of Object.entries(this.manualDeltas)) {

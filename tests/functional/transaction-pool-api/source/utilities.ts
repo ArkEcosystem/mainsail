@@ -32,7 +32,7 @@ export const getRandomFundedWallet = async (
 
 	amount = amount ?? BigNumber.make("1000000000000000000");
 
-	const fundTx = await EvmCalls.makeEvmCall(context, { value: amount.toBigInt(), recipient, sender: funder });
+	const fundTx = await EvmCalls.makeEvmCall(context, { recipient, sender: funder, value: amount.toBigInt() });
 
 	await addTransactionsToPool(context, [fundTx]);
 	await waitBlock(context);
@@ -198,7 +198,7 @@ export const hasBalance = async (
 // 	return walletRepository.findByPublicKey(multiSigPublicKey);
 // };
 
-const publicKeyToAddress = async (sandbox: Sandbox, publicKey: string): Promise<string> => {
+export const publicKeyToAddress = async (sandbox: Sandbox, publicKey: string): Promise<string> => {
 	const { app } = sandbox;
 	return app
 		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
@@ -259,7 +259,7 @@ export const getTransactionReceipt = async (
 		}
 
 		const evm = sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
-		const { receipt } = await evm.getReceipt(BigInt(block.header.height), id);
+		const { receipt } = await evm.getReceipt(BigInt(block.header.number), id);
 		return receipt;
 	}
 
@@ -319,12 +319,12 @@ export const getLegacyColdWallets = async (
 		const legacyAddress = await legacyAddressFactory.fromPublicKey(walletKeyPair.publicKey);
 		legacyColdWallets.push({
 			keyPair: walletKeyPair,
-			mainsailAddress,
 			legacyColdWallet: {
 				address: legacyAddress,
 				balance: 1_000_000_000_000_000_000n,
 				legacyAttributes: {},
 			},
+			mainsailAddress,
 		});
 	}
 

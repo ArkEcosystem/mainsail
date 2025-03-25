@@ -172,7 +172,7 @@ describe<{
 		const block = await factory.fromJson(blockDataJson);
 
 		// Recalculated id
-		blockDataClone.id = blockDataJson.id;
+		blockDataClone.hash = blockDataJson.hash;
 
 		assertBlockData(assert, block.data, blockDataClone);
 		assertBlockData(assert, block.header, blockDataClone);
@@ -184,7 +184,7 @@ describe<{
 		const block = await factory.fromJson(blockDataWithTransactionsJson);
 
 		// Recalculated id
-		blockDataWithTransactionsClone.id = blockDataWithTransactionsJson.id;
+		blockDataWithTransactionsClone.hash = blockDataWithTransactionsJson.hash;
 
 		assertBlockData(assert, block.data, blockDataWithTransactionsClone);
 		assertBlockData(assert, block.header, blockDataWithTransactionsClone);
