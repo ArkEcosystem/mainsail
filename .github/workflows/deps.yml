@@ -35,8 +35,7 @@ jobs:
               run: pnpm run deps:check
         strategy:
             matrix:
-                node-version:
-                    - 20.x
+                node-version: [22.x]
 name: Dependencies
 on:
     pull_request:
