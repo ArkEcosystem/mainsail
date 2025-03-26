@@ -1,6 +1,7 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Evm, LogLevel } from "@mainsail/evm";
+import { Evm, JsCommitData, LogLevel } from "@mainsail/evm";
+import { assert, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class EvmInstance implements Contracts.Evm.Instance {
@@ -9,6 +10,12 @@ export class EvmInstance implements Contracts.Evm.Instance {
 
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
+
+	@inject(Identifiers.Cryptography.Commit.ProofSize)
+	private readonly proofSize!: () => number;
+
+	@inject(Identifiers.Cryptography.Block.HeaderSize)
+	private readonly headerSize!: () => number;
 
 	#evm!: Evm;
 
@@ -134,10 +141,10 @@ export class EvmInstance implements Contracts.Evm.Instance {
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const { height } = unit;
-		const round = unit.getBlock().data.round;
+		const { height, round } = unit.getBlock().data;
+		const commitData = await this.#prepareCommitData(unit);
 
-		const result = await this.#evm.commit({ height: BigInt(height), round: BigInt(round) });
+		const result = await this.#evm.commit({ height: BigInt(height), round: BigInt(round) }, commitData);
 		unit.setAccountUpdates(result.dirtyAccounts);
 	}
 
@@ -159,5 +166,48 @@ export class EvmInstance implements Contracts.Evm.Instance {
 
 	public mode(): Contracts.Evm.EvmMode {
 		return Contracts.Evm.EvmMode.Persistent;
+	}
+
+	async #prepareCommitData(unit: Contracts.Processor.ProcessableUnit): Promise<JsCommitData | undefined> {
+		if (!("getCommit" in unit)) {
+			return undefined;
+		}
+
+		const { block, proof, serialized } = await unit.getCommit();
+
+		const {
+			header: { height, round, id },
+		} = block;
+
+		console.log({ totalRound: unit.round, height, round, id, proofRound: proof.round });
+
+		const proofSize = this.proofSize();
+		const headerSize = this.headerSize();
+
+		const commitBuffer = Buffer.from(serialized.slice(0, (proofSize + headerSize) * 2), "hex");
+		const proofBuffer = commitBuffer.subarray(0, proofSize);
+		const blockBuffer = commitBuffer.subarray(proofSize, proofSize + headerSize);
+
+		const transactionBuffers: Buffer[] = [];
+		const transactionIds: string[] = [];
+		for (const transaction of block.transactions) {
+			assert.number(transaction.data.sequence);
+
+			const buff = ByteBuffer.fromSize(transaction.serialized.length + 8);
+			buff.writeUint32(height);
+			buff.writeUint32(transaction.data.sequence);
+			buff.writeBytes(transaction.serialized);
+
+			transactionBuffers.push(buff.toBuffer());
+			transactionIds.push(transaction.id);
+		}
+
+		return {
+			blockId: id,
+			block: blockBuffer,
+			transactionIds,
+			transactions: transactionBuffers,
+			proof: proofBuffer,
+		};
 	}
 }

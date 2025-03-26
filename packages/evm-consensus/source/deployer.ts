@@ -55,7 +55,7 @@ export class Deployer {
 
 		await this.evm.onCommit({
 			...this.#getBlockContext().commitKey,
-			getBlock: () => ({ data: { round: BigInt(0) } }),
+			getBlock: () => ({ data: { ...this.#getBlockContext().commitKey } }),
 			setAccountUpdates: () => ({}),
 		} as any);
 	}
