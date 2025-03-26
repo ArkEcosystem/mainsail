@@ -200,6 +200,9 @@
 			"package": "@mainsail/crypto-block"
 		},
 		{
+			"package": "@mainsail/crypto-commit"
+		},
+		{
 			"package": "@mainsail/crypto-transaction"
 		},
 		{
