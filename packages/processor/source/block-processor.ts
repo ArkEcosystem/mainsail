@@ -105,13 +105,16 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		const commit = await unit.getCommit();
 
-		if (!this.state.isBootstrap()) {
-			this.databaseService.addCommit(commit);
+		this.databaseService.addCommit(commit);
 
-			if (unit.persist) {
-				await this.databaseService.persist();
-			}
-		}
+		// TODO: delete me
+		// if (!this.state.isBootstrap()) {
+		// 	this.databaseService.addCommit(commit);
+
+		// 	if (unit.persist) {
+		// 		await this.databaseService.persist();
+		// 	}
+		// }
 
 		await this.stateStore.onCommit(unit);
 		await this.evm.onCommit(unit);

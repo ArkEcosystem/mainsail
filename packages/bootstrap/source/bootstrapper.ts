@@ -137,8 +137,9 @@ export class Bootstrapper {
 	async #processGenesisBlock(): Promise<void> {
 		const genesisBlock = this.stateStore.getGenesisCommit();
 		await this.#processCommit(genesisBlock);
-		this.databaseService.addCommit(genesisBlock);
-		await this.databaseService.persist();
+		// TODO: to delete
+		// this.databaseService.addCommit(genesisBlock);
+		// await this.databaseService.persist();
 	}
 
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {
