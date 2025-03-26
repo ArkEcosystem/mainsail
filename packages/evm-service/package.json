@@ -41,6 +41,7 @@
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/validation": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"@types/tmp": "0.2.6",
 		"ethers": "6.13.5",
 		"tmp": "0.2.3",

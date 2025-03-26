@@ -1816,9 +1816,6 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
-      lmdb:
-        specifier: 3.2.6
-        version: 3.2.6
     devDependencies:
       '@types/tmp':
         specifier: 0.2.6
@@ -1936,6 +1933,9 @@ importers:
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
