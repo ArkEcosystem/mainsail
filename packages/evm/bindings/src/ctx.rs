@@ -104,8 +104,8 @@ pub struct JsCommitKey {
 #[napi(object)]
 pub struct JsCommitData {
     pub block_id: JsString,
-    pub proof: JsBuffer,
     pub block: JsBuffer,
+    pub proof: JsBuffer,
     pub transaction_ids: Vec<JsString>,
     pub transactions: Vec<JsBuffer>,
 }

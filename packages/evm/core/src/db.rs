@@ -55,6 +55,23 @@ impl heed::BytesDecode<'_> for LegacyAddressWrapper {
     }
 }
 
+pub(crate) struct BytesWrapper(Bytes);
+impl heed::BytesEncode<'_> for BytesWrapper {
+    type EItem = BytesWrapper;
+
+    fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
+        Ok(Cow::Borrowed(item.0.as_ref()))
+    }
+}
+
+impl heed::BytesDecode<'_> for BytesWrapper {
+    type DItem = BytesWrapper;
+
+    fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
+        Ok(BytesWrapper(Bytes::from_iter(bytes)))
+    }
+}
+
 #[derive(Debug)]
 pub(crate) struct HashWrapper(B256);
 impl heed::BytesEncode<'_> for HashWrapper {
@@ -69,6 +86,16 @@ impl heed::BytesEncode<'_> for HashWrapper {
 pub(crate) struct StringWrapper(String);
 impl heed::BytesEncode<'_> for StringWrapper {
     type EItem = StringWrapper;
+
+    fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
+        Ok(Cow::Borrowed(item.0.as_bytes()))
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct StaticStringWrapper(&'static str);
+impl heed::BytesEncode<'_> for StaticStringWrapper {
+    type EItem = StaticStringWrapper;
 
     fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
         Ok(Cow::Borrowed(item.0.as_bytes()))
@@ -139,10 +166,11 @@ pub(crate) struct InnerStorage {
         heed::Database<LegacyAddressWrapper, heed::types::SerdeBincode<LegacyColdWallet>>,
     pub storage: heed::Database<AddressWrapper, StorageEntryWrapper>,
     // Carried over from previous database-service.ts lmdb backend
-    pub proofs: heed::Database<HeedHeight, heed::types::Bytes>,
-    pub blocks: heed::Database<HeedHeight, heed::types::Bytes>,
+    pub state: heed::Database<StaticStringWrapper, heed::types::SerdeBincode<Bytes>>,
+    pub proofs: heed::Database<HeedHeight, heed::types::SerdeBincode<Bytes>>,
+    pub blocks: heed::Database<HeedHeight, heed::types::SerdeBincode<Bytes>>,
     pub blocks_id_height: heed::Database<HashWrapper, HeedHeight>,
-    pub transactions: heed::Database<StringWrapper, heed::types::Bytes>,
+    pub transactions: heed::Database<StringWrapper, heed::types::SerdeBincode<Bytes>>,
     pub transactions_id_key: heed::Database<HashWrapper, heed::types::SerdeBincode<String>>,
     //
 }
@@ -239,7 +267,7 @@ pub enum Error {
 }
 
 impl PersistentDB {
-    const MAX_DBS: u32 = 11;
+    const MAX_DBS: u32 = 12;
 
     pub fn new(opts: PersistentDBOptions) -> Result<Self, Error> {
         std::fs::create_dir_all(&opts.path)?;
@@ -313,13 +341,21 @@ impl PersistentDB {
             .create(&mut wtxn)?;
 
         // Carried over from previous database-service.ts lmdb backend
-        let proofs =
-            env.create_database::<HeedHeight, heed::types::Bytes>(&mut wtxn, Some("proofs"))?;
-        let blocks =
-            env.create_database::<HeedHeight, heed::types::Bytes>(&mut wtxn, Some("blocks"))?;
+        let state = env.create_database::<StaticStringWrapper, heed::types::SerdeBincode<Bytes>>(
+            &mut wtxn,
+            Some("state"),
+        )?;
+        let proofs = env.create_database::<HeedHeight, heed::types::SerdeBincode<Bytes>>(
+            &mut wtxn,
+            Some("proofs"),
+        )?;
+        let blocks = env.create_database::<HeedHeight, heed::types::SerdeBincode<Bytes>>(
+            &mut wtxn,
+            Some("blocks"),
+        )?;
         let blocks_id_height =
             env.create_database::<HashWrapper, HeedHeight>(&mut wtxn, Some("blocks_id_height"))?;
-        let transactions = env.create_database::<StringWrapper, heed::types::Bytes>(
+        let transactions = env.create_database::<StringWrapper, heed::types::SerdeBincode<Bytes>>(
             &mut wtxn,
             Some("transactions"),
         )?;
@@ -342,6 +378,7 @@ impl PersistentDB {
                 legacy_attributes,
                 legacy_cold_wallets,
                 storage,
+                state,
                 proofs,
                 blocks,
                 blocks_id_height,
@@ -858,7 +895,7 @@ impl PersistentDB {
                 } = commit_data;
 
                 // Update blocks
-                inner.blocks.put(rwtxn, &key.0, block)?;
+                inner.blocks.put(rwtxn, &key.0, &block)?;
                 inner
                     .blocks_id_height
                     .put(rwtxn, &HashWrapper(*block_id), &key.0)?;
@@ -885,6 +922,17 @@ impl PersistentDB {
                         .transactions
                         .put(rwtxn, &StringWrapper(key), transaction)?;
                 }
+
+                // Update state
+                let total_round_key = StaticStringWrapper("total_round");
+                let current_total_round =
+                    read_total_round(inner.state.get(rwtxn, &total_round_key)?);
+
+                inner.state.put(
+                    rwtxn,
+                    &total_round_key,
+                    &Bytes::from_iter((current_total_round + key.1 + 1).to_le_bytes()),
+                )?;
             }
             // ========================================
 
@@ -954,6 +1002,85 @@ impl PersistentDB {
             ))),
             None => Ok(None),
         }
+    }
+
+    pub fn is_empty(&self) -> Result<bool, Error> {
+        let env = self.env.clone();
+        let rtxn = env.read_txn().expect("read");
+        let inner = self.inner.borrow();
+
+        Ok(inner.blocks.is_empty(&rtxn)?)
+    }
+
+    pub fn get_state(&self) -> Result<(u64, u64), Error> {
+        let env = self.env.clone();
+        let rtxn = env.read_txn().expect("read");
+        let inner = self.inner.borrow();
+
+        let total_round = read_total_round(
+            inner
+                .state
+                .get(&rtxn, &StaticStringWrapper("total_round"))?,
+        );
+
+        let height = match inner.blocks.last(&rtxn)? {
+            Some((height, _)) => height,
+            None => 0,
+        };
+
+        Ok((height, total_round))
+    }
+
+    pub fn get_block_header_bytes(&self, height: u64) -> Result<Option<Bytes>, Error> {
+        let env = self.env.clone();
+        let rtxn = env.read_txn().expect("read");
+        let inner = self.inner.borrow();
+
+        Ok(inner.blocks.get(&rtxn, &height)?)
+    }
+
+    pub fn get_block_height_by_id(&self, id: B256) -> Result<Option<u64>, Error> {
+        let env = self.env.clone();
+        let rtxn = env.read_txn().expect("read");
+        let inner = self.inner.borrow();
+
+        Ok(inner.blocks_id_height.get(&rtxn, &HashWrapper(id))?)
+    }
+
+    pub fn get_proof_bytes(&self, height: u64) -> Result<Option<Bytes>, Error> {
+        let env = self.env.clone();
+        let rtxn = env.read_txn().expect("read");
+        let inner = self.inner.borrow();
+
+        Ok(inner.proofs.get(&rtxn, &height)?)
+    }
+
+    pub fn get_transaction_bytes(&self, key: String) -> Result<Option<Bytes>, Error> {
+        let env = self.env.clone();
+        let rtxn = env.read_txn().expect("read");
+        let inner = self.inner.borrow();
+
+        Ok(inner.transactions.get(&rtxn, &StringWrapper(key))?)
+    }
+
+    pub fn get_transaction_key_by_id(&self, id: B256) -> Result<Option<String>, Error> {
+        let env = self.env.clone();
+        let rtxn = env.read_txn().expect("read");
+        let inner = self.inner.borrow();
+
+        Ok(inner.transactions_id_key.get(&rtxn, &HashWrapper(id))?)
+    }
+}
+
+fn read_total_round(item: Option<Bytes>) -> u64 {
+    match item {
+        Some(total_round) => {
+            assert_eq!(total_round.len(), 8);
+            let mut buffer = [0u8; 8];
+            buffer[..8].copy_from_slice(&total_round[..8]);
+            u64::from_le_bytes(buffer)
+        }
+        None => 0,
     }
 }
 

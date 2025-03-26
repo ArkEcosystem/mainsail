@@ -41,6 +41,15 @@ pub(crate) fn convert_bigint_to_u256(mut js_bigint: JsBigInt) -> anyhow::Result<
     U256::try_from_le_slice(&bytes[..]).ok_or_else(|| anyhow::anyhow!("invalid bigint"))
 }
 
+pub(crate) fn convert_bytes_to_js_buffer(
+    node_env: &napi::Env,
+    bytes: Bytes,
+) -> anyhow::Result<JsBuffer> {
+    Ok(node_env
+        .create_buffer_with_data(Into::<Vec<u8>>::into(bytes))?
+        .into_raw())
+}
+
 pub(crate) fn convert_u256_to_bigint(
     node_env: &napi::Env,
     value: U256,
