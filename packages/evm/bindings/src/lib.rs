@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Arc, u64};
 
 use ctx::{
     BlockContext, CalculateActiveValidatorsContext, EvmOptions, ExecutionContext, GenesisContext,
-    JsCalculateActiveValidatorsContext, JsCommitKey, JsEvmOptions, JsGenesisContext,
+    JsCalculateActiveValidatorsContext, JsCommitData, JsCommitKey, JsEvmOptions, JsGenesisContext,
     JsPrepareNextCommitContext, JsPreverifyTransactionContext, JsTransactionContext,
     JsTransactionViewContext, JsUpdateRewardsAndVotesContext, PrepareNextCommitContext,
     PreverifyTxContext, TxContext, TxViewContext, UpdateRewardsAndVotesContext,
@@ -10,7 +10,7 @@ use ctx::{
 use logger::JsLogger;
 use mainsail_evm_core::{
     account::AccountInfoExtended,
-    db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB, PersistentDBOptions},
+    db::{CommitData, CommitKey, GenesisInfo, PendingCommit, PersistentDB, PersistentDBOptions},
     legacy::{LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
     logs_bloom,
@@ -720,11 +720,13 @@ impl EvmInner {
     pub fn commit(
         &mut self,
         commit_key: CommitKey,
+        commit_data: Option<CommitData>,
     ) -> std::result::Result<Vec<AccountUpdate>, EVMError<String>> {
-        if self.persistent_db.is_height_committed(commit_key.0) {
-            self.drop_pending_commit();
-            return Ok(Default::default());
-        }
+        // TODO: double check if still needed
+        // if self.persistent_db.is_height_committed(commit_key.0) {
+        //     self.drop_pending_commit();
+        //     return Ok(Default::default());
+        // }
 
         if self
             .pending_commit
@@ -752,7 +754,7 @@ impl EvmInner {
                 //     ),
                 // );
 
-                state_commit::commit_to_db(&mut self.persistent_db, pending_commit)
+                state_commit::commit_to_db(&mut self.persistent_db, pending_commit, commit_data)
             }
             None => Ok(Default::default()),
         };
@@ -1238,10 +1240,21 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<JsCommitResult>")]
-    pub fn commit(&mut self, node_env: Env, commit_key: JsCommitKey) -> Result<JsObject> {
+    pub fn commit(
+        &mut self,
+        node_env: Env,
+        commit_key: JsCommitKey,
+        commit_data: Option<JsCommitData>,
+    ) -> Result<JsObject> {
         let commit_key = CommitKey::try_from(commit_key)?;
+        let commit_data = if let Some(commit_data) = commit_data {
+            Some(CommitData::try_from(commit_data)?)
+        } else {
+            None
+        };
+
         node_env.execute_tokio_future(
-            Self::commit_async(self.evm.clone(), commit_key),
+            Self::commit_async(self.evm.clone(), commit_key, commit_data),
             |&mut node_env, result| Ok(result::JsCommitResult::new(&node_env, result)?),
         )
     }
@@ -1448,9 +1461,10 @@ impl JsEvmWrapper {
     async fn commit_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         commit_key: CommitKey,
+        commit_data: Option<CommitData>,
     ) -> Result<CommitResult> {
         let mut lock = evm.lock().await;
-        let result = lock.commit(commit_key);
+        let result = lock.commit(commit_key, commit_data);
 
         match result {
             Ok(result) => Result::Ok(CommitResult {

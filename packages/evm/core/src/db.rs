@@ -56,12 +56,22 @@ impl heed::BytesDecode<'_> for LegacyAddressWrapper {
 }
 
 #[derive(Debug)]
-pub(crate) struct ContractWrapper(B256);
-impl heed::BytesEncode<'_> for ContractWrapper {
-    type EItem = ContractWrapper;
+pub(crate) struct HashWrapper(B256);
+impl heed::BytesEncode<'_> for HashWrapper {
+    type EItem = HashWrapper;
 
     fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
         Ok(Cow::Borrowed(item.0.as_slice()))
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct StringWrapper(String);
+impl heed::BytesEncode<'_> for StringWrapper {
+    type EItem = StringWrapper;
+
+    fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
+        Ok(Cow::Borrowed(item.0.as_bytes()))
     }
 }
 
@@ -122,17 +132,33 @@ pub(crate) struct InnerStorage {
         >,
     >,
     pub commits: heed::Database<HeedHeight, heed::types::SerdeBincode<CommitReceipts>>,
-    pub contracts: heed::Database<ContractWrapper, heed::types::SerdeBincode<Bytecode>>,
+    pub contracts: heed::Database<HashWrapper, heed::types::SerdeBincode<Bytecode>>,
     pub legacy_attributes:
         heed::Database<AddressWrapper, heed::types::SerdeBincode<LegacyAccountAttributes>>,
     pub legacy_cold_wallets:
         heed::Database<LegacyAddressWrapper, heed::types::SerdeBincode<LegacyColdWallet>>,
     pub storage: heed::Database<AddressWrapper, StorageEntryWrapper>,
+    // Carried over from previous database-service.ts lmdb backend
+    pub proofs: heed::Database<HeedHeight, heed::types::Bytes>,
+    pub blocks: heed::Database<HeedHeight, heed::types::Bytes>,
+    pub blocks_id_height: heed::Database<HashWrapper, HeedHeight>,
+    pub transactions: heed::Database<StringWrapper, heed::types::Bytes>,
+    pub transactions_id_key: heed::Database<HashWrapper, heed::types::SerdeBincode<String>>,
+    //
 }
 
 // A (height, round) pair used to associate state with a processable unit.
 #[derive(Hash, PartialEq, Eq, Debug, Default, Clone, Copy)]
 pub struct CommitKey(pub u64, pub u64);
+
+#[derive(Default)]
+pub struct CommitData {
+    pub block_id: B256,
+    pub proof: Bytes,
+    pub block: Bytes,
+    pub transaction_ids: Vec<B256>,
+    pub transactions: Vec<Bytes>,
+}
 
 #[derive(Clone, Debug, Default)]
 pub struct PendingCommit {
@@ -213,12 +239,14 @@ pub enum Error {
 }
 
 impl PersistentDB {
+    const MAX_DBS: u32 = 11;
+
     pub fn new(opts: PersistentDBOptions) -> Result<Self, Error> {
         std::fs::create_dir_all(&opts.path)?;
 
         let mut env_builder = EnvOpenOptions::new();
 
-        let mut max_dbs = 6;
+        let mut max_dbs = Self::MAX_DBS;
         if opts.history_size.is_some() {
             max_dbs += 1;
         }
@@ -262,11 +290,10 @@ impl PersistentDB {
                 &mut wtxn,
                 Some("commits"),
             )?;
-        let contracts = env
-            .create_database::<ContractWrapper, heed::types::SerdeBincode<Bytecode>>(
-                &mut wtxn,
-                Some("contracts"),
-            )?;
+        let contracts = env.create_database::<HashWrapper, heed::types::SerdeBincode<Bytecode>>(
+            &mut wtxn,
+            Some("contracts"),
+        )?;
         let legacy_attributes = env
             .create_database::<AddressWrapper, heed::types::SerdeBincode<LegacyAccountAttributes>>(
                 &mut wtxn,
@@ -285,6 +312,24 @@ impl PersistentDB {
             .dup_sort_comparator::<StorageEntryDupSortCmp>()
             .create(&mut wtxn)?;
 
+        // Carried over from previous database-service.ts lmdb backend
+        let proofs =
+            env.create_database::<HeedHeight, heed::types::Bytes>(&mut wtxn, Some("proofs"))?;
+        let blocks =
+            env.create_database::<HeedHeight, heed::types::Bytes>(&mut wtxn, Some("blocks"))?;
+        let blocks_id_height =
+            env.create_database::<HashWrapper, HeedHeight>(&mut wtxn, Some("blocks_id_height"))?;
+        let transactions = env.create_database::<StringWrapper, heed::types::Bytes>(
+            &mut wtxn,
+            Some("transactions"),
+        )?;
+        let transactions_id_key = env
+            .create_database::<HashWrapper, heed::types::SerdeBincode<String>>(
+                &mut wtxn,
+                Some("transactions_id_key"),
+            )?;
+        //
+
         wtxn.commit()?;
 
         Ok(Self {
@@ -297,6 +342,11 @@ impl PersistentDB {
                 legacy_attributes,
                 legacy_cold_wallets,
                 storage,
+                proofs,
+                blocks,
+                blocks_id_height,
+                transactions,
+                transactions_id_key,
             }),
             accounts_history,
             logger: opts.logger.unwrap_or_default(),
@@ -580,7 +630,7 @@ impl DatabaseRef for PersistentDB {
         let txn = self.env.read_txn()?;
         let inner = self.inner.borrow();
 
-        let contract = match inner.contracts.get(&txn, &ContractWrapper(code_hash))? {
+        let contract = match inner.contracts.get(&txn, &HashWrapper(code_hash))? {
             Some(contract) => contract,
             None => Default::default(),
         };
@@ -607,14 +657,18 @@ impl DatabaseRef for PersistentDB {
 }
 
 impl PersistentDB {
-    pub fn commit(&self, state_commit: &mut StateCommit) -> Result<(), Error> {
+    pub fn commit(
+        &self,
+        state_commit: &mut StateCommit,
+        commit_data: &Option<CommitData>,
+    ) -> Result<(), Error> {
         let StateCommit {
             key,
             change_set,
             results,
         } = state_commit;
 
-        match self.commit_to_db(*key, change_set, results) {
+        match self.commit_to_db(*key, change_set, commit_data, results) {
             Ok(_) => return Ok(()),
             Err(err) => match &err {
                 Error::Heed(heed_err) => match heed_err {
@@ -633,6 +687,7 @@ impl PersistentDB {
         &self,
         key: CommitKey,
         change_set: &mut state_changes::StateChangeset,
+        commit_data: &Option<CommitData>,
         results: &BTreeMap<B256, ExecutionResult>,
     ) -> Result<(), Error> {
         assert!(!self.is_height_committed(key.0));
@@ -699,9 +754,7 @@ impl PersistentDB {
 
             // Update contracts
             for (hash, bytecode) in contracts.into_iter() {
-                inner
-                    .contracts
-                    .put(rwtxn, &ContractWrapper(*hash), &bytecode)?;
+                inner.contracts.put(rwtxn, &HashWrapper(*hash), &bytecode)?;
             }
 
             // Update storage
@@ -792,6 +845,48 @@ impl PersistentDB {
                     &legacy_cold_wallet.legacy_attributes,
                 )?;
             }
+
+            // ========================================
+            //
+            if let Some(commit_data) = commit_data {
+                let CommitData {
+                    block_id,
+                    block,
+                    proof,
+                    transaction_ids,
+                    transactions,
+                } = commit_data;
+
+                // Update blocks
+                inner.blocks.put(rwtxn, &key.0, block)?;
+                inner
+                    .blocks_id_height
+                    .put(rwtxn, &HashWrapper(*block_id), &key.0)?;
+
+                // Update proofs
+                inner.proofs.put(rwtxn, &key.0, proof)?;
+
+                // Update transactions
+                for (sequence, transaction) in transactions.iter().enumerate() {
+                    let key = format!("{}-{}", key.0, sequence);
+                    let transaction_id = transaction_ids[sequence];
+
+                    inner
+                        .transactions_id_key
+                        .put(rwtxn, &HashWrapper(transaction_id), &key)?;
+
+                    // TODO: unused but present in original implementation
+                    // void this.transactionIdStorage.put(
+                    // 	height,
+                    // 	commit.block.transactions.map((tx) => tx.id),
+                    // );
+
+                    inner
+                        .transactions
+                        .put(rwtxn, &StringWrapper(key), transaction)?;
+                }
+            }
+            // ========================================
 
             // Finalize commit
             let mut tx_receipts = HashMap::new();
@@ -978,6 +1073,7 @@ fn test_commit_changes() {
             transitions: TransitionState { transitions: state },
             ..Default::default()
         },
+        Default::default(),
     )
     .expect("ok");
 
@@ -1058,6 +1154,7 @@ fn test_storage() {
             transitions: TransitionState { transitions: state },
             ..Default::default()
         },
+        Default::default(),
     )
     .expect("ok");
 
@@ -1118,6 +1215,7 @@ fn test_storage_overwrite() {
             transitions: TransitionState { transitions: state },
             ..Default::default()
         },
+        Default::default(),
     )
     .expect("ok");
 
@@ -1154,6 +1252,7 @@ fn test_storage_overwrite() {
             transitions: TransitionState { transitions: state },
             ..Default::default()
         },
+        Default::default(),
     )
     .expect("ok");
 
@@ -1223,7 +1322,7 @@ fn test_resize_on_commit() {
         .unwrap();
 
     let mut env_builder = EnvOpenOptions::new();
-    env_builder.max_dbs(6);
+    env_builder.max_dbs(PersistentDB::MAX_DBS);
     env_builder.map_size(4096 * 10); // start with very small (few kB)
 
     unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
@@ -1234,14 +1333,20 @@ fn test_resize_on_commit() {
     assert_eq!(db.env.info().map_size, 4096 * 10);
 
     // large commit to trigger a resize
-    crate::state_commit::commit_to_db(&mut db, create_large_commit(0, 1024)).expect("ok");
+    crate::state_commit::commit_to_db(&mut db, create_large_commit(0, 1024), Default::default())
+        .expect("ok");
 
     // increased to next MAP_SIZE_UNIT
     assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
 
     // add more commits without triggering another resize
     for i in 0..10 {
-        crate::state_commit::commit_to_db(&mut db, create_large_commit(i + 1, 1024)).expect("ok");
+        crate::state_commit::commit_to_db(
+            &mut db,
+            create_large_commit(i + 1, 1024),
+            Default::default(),
+        )
+        .expect("ok");
         assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
     }
 

@@ -1,8 +1,8 @@
 use std::collections::BTreeMap;
 
 use revm::{
-    db::{states::StorageSlot, BundleState, OriginalValuesKnown},
-    primitives::{AccountInfo, Address, Bytecode, B256, KECCAK_EMPTY, U256},
+    db::{BundleState, OriginalValuesKnown, states::StorageSlot},
+    primitives::{AccountInfo, Address, B256, Bytecode, KECCAK_EMPTY, U256},
 };
 
 use crate::legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet};
@@ -10,7 +10,7 @@ use crate::legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet};
 /// Loosely based on https://github.com/bluealloy/revm/blob/v36/crates/revm/src/db/states/changes.rs and https://github.com/bluealloy/revm/blob/v36/crates/revm/src/db/states/bundle_state.rs#L449
 //
 /// The only change being that we preserve the old storage value.
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Default)]
 pub struct StateChangeset {
     /// Vector of **not** sorted accounts information.
     pub accounts: Vec<(Address, Option<AccountInfo>)>,

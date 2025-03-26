@@ -2,8 +2,8 @@ use std::str::FromStr;
 
 use anyhow;
 use mainsail_evm_core::legacy::LegacyAddress;
-use napi::{JsBigInt, JsString};
-use revm::primitives::{Address, Bytes, B256, U256};
+use napi::{JsBigInt, JsBuffer, JsString};
+use revm::primitives::{Address, B256, Bytes, U256};
 
 pub(crate) fn create_address_from_js_string(js_str: JsString) -> anyhow::Result<Address> {
     let js_str = js_str.into_utf8()?;
@@ -18,6 +18,13 @@ pub(crate) fn create_legacy_address_from_js_string(
     let slice = js_str.as_str()?;
 
     LegacyAddress::try_from(slice).map_err(|err| anyhow::anyhow!("legacy address parse: {:?}", err))
+}
+
+pub(crate) fn convert_js_buffer_to_bytes(js_buffer: JsBuffer) -> anyhow::Result<Bytes> {
+    let buffer: Vec<u8> = js_buffer.into_value()?.as_ref().into();
+    let bytes = Bytes::from(buffer);
+
+    Ok(bytes)
 }
 
 pub(crate) fn convert_string_to_b256(js_str: JsString) -> anyhow::Result<B256> {
