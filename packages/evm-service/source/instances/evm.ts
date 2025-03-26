@@ -4,7 +4,7 @@ import { Evm, JsCommitData, LogLevel } from "@mainsail/evm";
 import { assert, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
-export class EvmInstance implements Contracts.Evm.Instance {
+export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storage {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
@@ -168,18 +168,50 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return Contracts.Evm.EvmMode.Persistent;
 	}
 
+	public async getState(): Promise<{ height: number; totalRound: number }> {
+		const state = await this.#evm.getState();
+		return { height: Number(state.height), totalRound: Number(state.totalRound) };
+	}
+
+	public async getBlockHeaderBytes(height: number): Promise<Buffer | undefined> {
+		return this.#evm.getBlockHeaderBytes(BigInt(height));
+	}
+
+	public async getBlockHeightById(id: string): Promise<number | undefined> {
+		const result = await this.#evm.getBlockHeightById(id);
+		if (!result) {
+			return undefined;
+		}
+
+		return Number(result);
+	}
+
+	public async getProofBytes(height: number): Promise<Buffer | undefined> {
+		return this.#evm.getProofBytes(BigInt(height));
+	}
+
+	public async getTransactionBytes(key: string): Promise<Buffer | undefined> {
+		return this.#evm.getTransactionBytes(key);
+	}
+
+	public async getTransactionKeyById(id: string): Promise<string | undefined> {
+		return this.#evm.getTransactionKeyById(id);
+	}
+
+	public async isEmpty(): Promise<boolean> {
+		return this.#evm.isEmpty();
+	}
+
 	async #prepareCommitData(unit: Contracts.Processor.ProcessableUnit): Promise<JsCommitData | undefined> {
 		if (!("getCommit" in unit)) {
 			return undefined;
 		}
 
-		const { block, proof, serialized } = await unit.getCommit();
+		const { block, serialized } = await unit.getCommit();
 
 		const {
-			header: { height, round, id },
+			header: { height, id },
 		} = block;
-
-		console.log({ totalRound: unit.round, height, round, id, proofRound: proof.round });
 
 		const proofSize = this.proofSize();
 		const headerSize = this.headerSize();
