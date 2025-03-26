@@ -94,7 +94,7 @@ export class Bootstrapper {
 	}
 
 	async #checkStoredGenesisCommit(): Promise<void> {
-		const genesisBlock = await this.databaseService.getBlock(0);
+		const genesisBlock = await this.databaseService.getBlock(this.configuration.getGenesisHeight());
 
 		if (!genesisBlock) {
 			return;
