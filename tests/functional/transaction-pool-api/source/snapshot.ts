@@ -174,7 +174,7 @@ export class Snapshot {
 		const database = this.sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
 
 		const stateDeltas: Record<string, WalletState> = {};
-		if (database.isEmpty()) {
+		if (await database.isEmpty()) {
 			return stateDeltas;
 		}
 

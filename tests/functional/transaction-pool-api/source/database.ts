@@ -7,7 +7,7 @@ export class MemoryDatabase implements Contracts.Database.DatabaseService {
 
 	#commits: Contracts.Crypto.Commit[] = [];
 
-	public isEmpty(): boolean {
+	public async isEmpty(): Promise<boolean> {
 		return this.#commits.length === 0;
 	}
 
@@ -55,7 +55,7 @@ export class MemoryDatabase implements Contracts.Database.DatabaseService {
 	getCommitById(id: string): Promise<Contracts.Crypto.Commit | undefined> {
 		throw new Error("Method not implemented.");
 	}
-	hasCommitById(id: string): boolean {
+	hasCommitById(id: string): Promise<boolean> {
 		throw new Error("Method not implemented.");
 	}
 
