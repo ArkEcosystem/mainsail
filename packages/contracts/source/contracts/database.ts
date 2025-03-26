@@ -7,14 +7,14 @@ export interface State {
 
 export interface DatabaseService {
 	initialize(): Promise<void>;
-	isEmpty(): boolean;
+	isEmpty(): Promise<boolean>;
 
 	getState(): State;
 
 	getCommit(height: number): Promise<Commit | undefined>;
 	getCommitById(id: string): Promise<Commit | undefined>;
 	getLastCommit(): Promise<Commit>;
-	hasCommitById(id: string): boolean;
+	hasCommitById(id: string): Promise<boolean>;
 	findCommitBuffers(start: number, end: number): Promise<Buffer[]>;
 	readCommits(start: number, end: number): AsyncGenerator<Commit>;
 
@@ -30,5 +30,4 @@ export interface DatabaseService {
 	getTransactionByBlockHeightAndIndex(height: number, index: number): Promise<Transaction | undefined>;
 
 	addCommit(block: Commit): void;
-	persist(): Promise<void>;
 }
