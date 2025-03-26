@@ -60,7 +60,7 @@ export class Bootstrapper {
 		await this.#setGenesisCommit();
 		await this.#checkStoredGenesisCommit();
 
-		if (this.databaseService.isEmpty()) {
+		if (await this.databaseService.isEmpty()) {
 			await this.#initGenesisState();
 		} else {
 			await this.#initPostGenesisState();
@@ -112,7 +112,7 @@ export class Bootstrapper {
 	}
 
 	async #initGenesisState(): Promise<void> {
-		if (!this.databaseService.isEmpty()) {
+		if (!(await this.databaseService.isEmpty())) {
 			throw new Error("initGenesisState must be called on empty database");
 		}
 

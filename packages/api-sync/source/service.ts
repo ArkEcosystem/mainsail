@@ -508,7 +508,7 @@ export class Sync implements Contracts.ApiSync.Service {
 
 	async #resetDatabaseIfNecessary(): Promise<void> {
 		const genesisHeight = this.configuration.getGenesisHeight();
-		const lastHeight = this.databaseService.isEmpty()
+		const lastHeight = (await this.databaseService.isEmpty())
 			? genesisHeight
 			: (await this.databaseService.getLastCommit()).block.header.height;
 

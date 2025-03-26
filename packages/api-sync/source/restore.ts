@@ -132,7 +132,8 @@ export class Restore {
 	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
 
 	public async restore(): Promise<void> {
-		const mostRecentCommit = await (this.databaseService.isEmpty()
+		const isEmpty = await this.databaseService.isEmpty();
+		const mostRecentCommit = await (isEmpty
 			? this.stateStore.getGenesisCommit()
 			: this.databaseService.getLastCommit());
 
@@ -158,9 +159,7 @@ export class Restore {
 
 				stateRepository: this.stateRepositoryFactory(entityManager),
 
-				totalSupply: this.databaseService.isEmpty()
-					? this.stateStore.getGenesisCommit().block.data.totalAmount
-					: BigNumber.ZERO,
+				totalSupply: isEmpty ? this.stateStore.getGenesisCommit().block.data.totalAmount : BigNumber.ZERO,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				transactionTypeRepository: this.transactionTypeRepositoryFactory(entityManager),
 				userAttributes: {},
