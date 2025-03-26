@@ -235,11 +235,11 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		}
 
 		return {
-			blockId: id,
 			block: blockBuffer,
+			blockId: id,
+			proof: proofBuffer,
 			transactionIds,
 			transactions: transactionBuffers,
-			proof: proofBuffer,
 		};
 	}
 }
