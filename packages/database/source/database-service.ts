@@ -159,7 +159,6 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return undefined;
 		}
 
-		// Get TX from storage
 		return this.#readTransaction(`${height}-${index}`);
 	}
 
@@ -167,7 +166,6 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		height: number,
 		index: number,
 	): Promise<Contracts.Crypto.Transaction | undefined> {
-		// Get TX from storage
 		return this.#readTransaction(`${height}-${index}`);
 	}
 
