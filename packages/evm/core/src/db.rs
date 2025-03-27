@@ -675,8 +675,8 @@ impl PersistentDB {
                         db,
                         key.0,
                         accounts
-                            .into_iter()
-                            .map(|a| (a.0, a.1.take().unwrap_or_default()))
+                            .iter()
+                            .map(|a| (a.0, a.1.clone().unwrap_or_default()))
                             .collect(),
                     )?;
             }
