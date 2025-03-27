@@ -19,11 +19,6 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 		return this.#commit.proof.round;
 	}
 
-	public get persist(): boolean {
-		// TODO: check with seba
-		return true; // Block downloader will store block in database, to improve performance
-	}
-
 	public get validators(): string[] {
 		return [...this.#validators.keys()];
 	}

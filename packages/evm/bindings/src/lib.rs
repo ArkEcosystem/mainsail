@@ -722,12 +722,6 @@ impl EvmInner {
         commit_key: CommitKey,
         commit_data: Option<CommitData>,
     ) -> std::result::Result<Vec<AccountUpdate>, EVMError<String>> {
-        // TODO: double check if still needed
-        // if self.persistent_db.is_height_committed(commit_key.0) {
-        //     self.drop_pending_commit();
-        //     return Ok(Default::default());
-        // }
-
         if self
             .pending_commit
             .as_ref()

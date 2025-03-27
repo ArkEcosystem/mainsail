@@ -912,12 +912,6 @@ impl PersistentDB {
                         .transactions_id_key
                         .put(rwtxn, &HashWrapper(transaction_id), &key)?;
 
-                    // TODO: unused but present in original implementation
-                    // void this.transactionIdStorage.put(
-                    // 	height,
-                    // 	commit.block.transactions.map((tx) => tx.id),
-                    // );
-
                     inner
                         .transactions
                         .put(rwtxn, &StringWrapper(key), transaction)?;
