@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use alloy_sol_types::SolEvent;
 use revm::{
     db::WrapDatabaseRef,
-    primitives::{Address, ExecutionResult, B256},
+    primitives::{Address, B256, ExecutionResult},
 };
 
 use crate::{
