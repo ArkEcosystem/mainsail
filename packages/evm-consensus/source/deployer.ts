@@ -53,9 +53,12 @@ export class Deployer {
 		const multiPaymentContractAddress = await this.#deployMultiPaymentContract();
 		await this.#deployMultiPaymentProxy(multiPaymentContractAddress);
 
+		const commitKey = this.#getBlockContext().commitKey;
+
+		// TODO: Don't cast to any
 		await this.evm.onCommit({
 			...this.#getBlockContext().commitKey,
-			getBlock: () => ({ data: { ...this.#getBlockContext().commitKey } }),
+			getBlock: () => ({ data: { number: commitKey.height, round: commitKey.round } }),
 			setAccountUpdates: () => ({}),
 		} as any);
 	}
