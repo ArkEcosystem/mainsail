@@ -1,14 +1,21 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Evm, LogLevel } from "@mainsail/evm";
+import { Evm, JsCommitData, LogLevel } from "@mainsail/evm";
+import { assert, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
-export class EvmInstance implements Contracts.Evm.Instance {
+export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storage {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
+
+	@inject(Identifiers.Cryptography.Commit.ProofSize)
+	private readonly proofSize!: () => number;
+
+	@inject(Identifiers.Cryptography.Block.HeaderSize)
+	private readonly headerSize!: () => number;
 
 	#evm!: Evm;
 
@@ -134,10 +141,10 @@ export class EvmInstance implements Contracts.Evm.Instance {
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const { height } = unit;
-		const round = unit.getBlock().data.round;
+		const { height, round } = unit.getBlock().data;
+		const commitData = await this.#prepareCommitData(unit);
 
-		const result = await this.#evm.commit({ height: BigInt(height), round: BigInt(round) });
+		const result = await this.#evm.commit({ height: BigInt(height), round: BigInt(round) }, commitData);
 		unit.setAccountUpdates(result.dirtyAccounts);
 	}
 
@@ -159,5 +166,80 @@ export class EvmInstance implements Contracts.Evm.Instance {
 
 	public mode(): Contracts.Evm.EvmMode {
 		return Contracts.Evm.EvmMode.Persistent;
+	}
+
+	public async getState(): Promise<{ height: number; totalRound: number }> {
+		const state = await this.#evm.getState();
+		return { height: Number(state.height), totalRound: Number(state.totalRound) };
+	}
+
+	public async getBlockHeaderBytes(height: number): Promise<Buffer | undefined> {
+		return this.#evm.getBlockHeaderBytes(BigInt(height));
+	}
+
+	public async getBlockHeightById(id: string): Promise<number | undefined> {
+		const result = await this.#evm.getBlockHeightById(id);
+		if (!result) {
+			return undefined;
+		}
+
+		return Number(result);
+	}
+
+	public async getProofBytes(height: number): Promise<Buffer | undefined> {
+		return this.#evm.getProofBytes(BigInt(height));
+	}
+
+	public async getTransactionBytes(key: string): Promise<Buffer | undefined> {
+		return this.#evm.getTransactionBytes(key);
+	}
+
+	public async getTransactionKeyById(id: string): Promise<string | undefined> {
+		return this.#evm.getTransactionKeyById(id);
+	}
+
+	public async isEmpty(): Promise<boolean> {
+		return this.#evm.isEmpty();
+	}
+
+	async #prepareCommitData(unit: Contracts.Processor.ProcessableUnit): Promise<JsCommitData | undefined> {
+		if (!("getCommit" in unit)) {
+			return undefined;
+		}
+
+		const { block, serialized } = await unit.getCommit();
+
+		const {
+			header: { height, id },
+		} = block;
+
+		const proofSize = this.proofSize();
+		const headerSize = this.headerSize();
+
+		const commitBuffer = Buffer.from(serialized.slice(0, (proofSize + headerSize) * 2), "hex");
+		const proofBuffer = commitBuffer.subarray(0, proofSize);
+		const blockBuffer = commitBuffer.subarray(proofSize, proofSize + headerSize);
+
+		const transactionBuffers: Buffer[] = [];
+		const transactionIds: string[] = [];
+		for (const transaction of block.transactions) {
+			assert.number(transaction.data.sequence);
+
+			const buff = ByteBuffer.fromSize(transaction.serialized.length + 8);
+			buff.writeUint32(height);
+			buff.writeUint32(transaction.data.sequence);
+			buff.writeBytes(transaction.serialized);
+
+			transactionBuffers.push(buff.toBuffer());
+			transactionIds.push(transaction.id);
+		}
+
+		return {
+			block: blockBuffer,
+			blockId: id,
+			proof: proofBuffer,
+			transactionIds,
+			transactions: transactionBuffers,
+		};
 	}
 }

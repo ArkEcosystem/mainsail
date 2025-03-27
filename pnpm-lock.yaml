@@ -1816,16 +1816,7 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
-      lmdb:
-        specifier: 3.2.6
-        version: 3.2.6
     devDependencies:
-      '@types/tmp':
-        specifier: 0.2.6
-        version: 0.2.6
-      tmp:
-        specifier: 0.2.3
-        version: 0.2.3
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1899,6 +1890,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
     devDependencies:
       '@mainsail/crypto-address-base58':
         specifier: workspace:*

@@ -18,7 +18,7 @@ export class EthGetUncleByBlockHashAndIndex implements Contracts.Api.RPC.Action 
 	};
 
 	public async handle(parameters: [string]): Promise<null> {
-		if (!this.databaseService.hasCommitById(parameters[0].slice(2))) {
+		if (!(await this.databaseService.hasCommitById(parameters[0].slice(2)))) {
 			throw new Exceptions.RpcError("Block not found");
 		}
 

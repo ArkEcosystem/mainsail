@@ -21,9 +21,6 @@ type DownloadJob = {
 
 @injectable()
 export class BlockDownloader implements Contracts.P2P.Downloader {
-	@inject(Identifiers.Database.Service)
-	private readonly database!: Contracts.Database.DatabaseService;
-
 	@inject(Identifiers.P2P.Peer.Communicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
@@ -177,8 +174,6 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		} catch (error) {
 			this.#handleJobError(job, error);
 			return;
-		} finally {
-			await this.database.persist();
 		}
 
 		if (job.heightTo !== number - 1) {

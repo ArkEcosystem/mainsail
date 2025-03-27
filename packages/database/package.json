@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/database",
-	"version": "0.0.1-evm.14",
+	"version": "0.0.1-evm.16",
 	"description": "LMDB based database for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -25,12 +25,9 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"lmdb": "3.2.6"
+		"@mainsail/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"@types/tmp": "0.2.6",
-		"tmp": "0.2.3",
 		"uvu": "0.5.6"
 	},
 	"engines": {

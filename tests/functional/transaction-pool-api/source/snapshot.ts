@@ -92,8 +92,7 @@ export class Snapshot {
 
 	public async validate(): Promise<void> {
 		// All account changes from block 0 onwards
-		const accountDeltas = await this.collectAccountDeltas();
-
+		const { accountDeltas, lastHeight } = await this.collectAccountDeltas();
 		// Verify final balance of all wallets matches with delta and snapshot taken at block 0
 		const validateBalance = async (account: Contracts.Evm.AccountInfoExtended): Promise<boolean> => {
 			const currentBalance = BigNumber.make(account.balance);
@@ -157,7 +156,17 @@ export class Snapshot {
 		let allValid = true;
 		const evm = this.sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 		const { accounts } = await evm.getAccounts(0n, 1000n);
-		for (const account of accounts) {
+		for (let account of accounts) {
+			// Look up historical values for non contracts
+			if ((await evm.codeAt(account.address)) === "0x") {
+				const historical = await evm.getAccountInfo(account.address, BigInt(lastHeight));
+				account = {
+					...account,
+					balance: historical.balance,
+					nonce: historical.nonce,
+				};
+			}
+
 			if (!(await validateBalance(account))) {
 				allValid = false;
 			}
@@ -170,23 +179,23 @@ export class Snapshot {
 		assert.true(allValid);
 	}
 
-	private async collectAccountDeltas(): Promise<Record<string, WalletState>> {
+	private async collectAccountDeltas(): Promise<{ accountDeltas: Record<string, WalletState>; lastHeight: number }> {
 		const database = this.sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
 
-		const stateDeltas: Record<string, WalletState> = {};
-		if (database.isEmpty()) {
-			return stateDeltas;
+		const accountDeltas: Record<string, WalletState> = {};
+		if (await database.isEmpty()) {
+			return { accountDeltas, lastHeight: 0 };
 		}
 
-		const blocks = await database.findBlocks(0, (await database.getLastCommit()).block.header.number);
+		const blocks = await database.findBlocks(1, (await database.getLastCommit()).block.header.number);
 		const updateBalanceDelta = async (addressOrPublicKey: string, delta: BigNumber): Promise<void> => {
 			const account = await getAccountByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
 
-			if (!stateDeltas[account.address]) {
-				stateDeltas[account.address] = { balance: BigNumber.ZERO, nonce: BigNumber.ZERO };
+			if (!accountDeltas[account.address]) {
+				accountDeltas[account.address] = { balance: BigNumber.ZERO, nonce: BigNumber.ZERO };
 			}
 
-			stateDeltas[account.address].balance = stateDeltas[account.address].balance.plus(delta);
+			accountDeltas[account.address].balance = accountDeltas[account.address].balance.plus(delta);
 		};
 
 		const positiveBalanceChange = async (addressOrPublicKey: string, amount: BigNumber): Promise<void> => {
@@ -197,17 +206,17 @@ export class Snapshot {
 			await updateBalanceDelta(addressOrPublicKey, amount.times(-1));
 		};
 
-		const incrementNonce = async (addressOrPublicKey: string): Promise<void> => {
+		const incrementNonce = async (height: number, addressOrPublicKey: string): Promise<void> => {
 			const account = await getAccountByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
 
-			if (!stateDeltas[account.address]) {
-				stateDeltas[account.address] = {
+			if (!accountDeltas[account.address]) {
+				accountDeltas[account.address] = {
 					balance: BigNumber.ZERO,
 					nonce: BigNumber.ZERO,
 				};
 			}
 
-			stateDeltas[account.address].nonce = stateDeltas[account.address].nonce.plus(BigNumber.ONE);
+			accountDeltas[account.address].nonce = accountDeltas[account.address].nonce.plus(BigNumber.ONE);
 		};
 
 		for (const block of blocks) {
@@ -231,13 +240,13 @@ export class Snapshot {
 
 					// subtract fee and increase nonce of sender
 					await negativeBalanceChange(receipt.sender, consumedGas);
-					await incrementNonce(receipt.sender);
+					await incrementNonce(block.header.height, receipt.sender);
 
 					if (receipt.receipt.deployedContractAddress) {
 						// As per EIP-161, the initial nonce for a new contract starts at 1 and not 0.
 						//
 						// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-161.md#specification
-						await incrementNonce(receipt.receipt.deployedContractAddress);
+						await incrementNonce(block.header.height, receipt.receipt.deployedContractAddress);
 					}
 
 					// add transferred value to recipient (if any)
@@ -249,25 +258,28 @@ export class Snapshot {
 			}
 
 			// each block increases nonce of internal address due to vote&reward updates
-			await incrementNonce(this.sandbox.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer));
+			await incrementNonce(
+				block.header.height,
+				this.sandbox.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer),
+			);
 
 			// Validator balance
 			await positiveBalanceChange(block.header.proposer, block.header.reward.plus(totalValidatorFeeReward));
 		}
 
 		for (const [address, delta] of Object.entries(this.manualDeltas)) {
-			if (!stateDeltas[address]) {
-				stateDeltas[address] = {
+			if (!accountDeltas[address]) {
+				accountDeltas[address] = {
 					balance: BigNumber.ZERO,
 					nonce: BigNumber.ZERO,
 				};
 			}
 
-			const stateDelta = stateDeltas[address];
+			const stateDelta = accountDeltas[address];
 			stateDelta.balance = stateDelta.balance.plus(delta.balance);
 			stateDelta.nonce = stateDelta.nonce.plus(delta.nonce);
 		}
 
-		return stateDeltas;
+		return { accountDeltas, lastHeight: blocks[blocks.length - 1]?.header?.height ?? 0 };
 	}
 }

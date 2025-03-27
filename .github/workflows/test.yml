@@ -15,8 +15,7 @@ jobs:
     build:
         strategy:
             matrix:
-                node-version:
-                    - 20.x
+                node-version: [22.x]
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-unit
@@ -64,8 +63,7 @@ jobs:
             - build
         strategy:
             matrix:
-                node-version:
-                    - 20.x
+                node-version: [22.x]
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-unit
@@ -238,8 +236,7 @@ jobs:
             - build
         strategy:
             matrix:
-                node-version:
-                    - 20.x
+                node-version: [22.x]
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-integration
@@ -304,7 +301,7 @@ jobs:
 
         strategy:
             matrix:
-                node-version: [20.x]
+                node-version: [22.x]
                 name: ["consensus"]
 
         steps:
@@ -381,7 +378,7 @@ jobs:
 
         strategy:
             matrix:
-                node-version: [20.x]
+                node-version: [22.x]
                 name: ["clients"]
 
         steps:

@@ -4,7 +4,6 @@ import { Sandbox } from "@mainsail/test-framework";
 import { resolve } from "path";
 import { dirSync } from "tmp";
 
-import { MemoryDatabase } from "./database.js";
 import { PoolWorker } from "./pool-worker.js";
 import { Worker } from "./worker.js";
 import { getLegacyColdWallets } from "./utilities.js";
@@ -47,8 +46,6 @@ const setup = async () => {
 	sandbox.app.bind(Identifiers.Evm.Worker).toConstantValue({
 		onCommit: async () => {},
 	});
-
-	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
 	sandbox.app
@@ -97,6 +94,7 @@ const setup = async () => {
 		"@mainsail/serializer",
 		"@mainsail/crypto-block",
 		"@mainsail/evm-service",
+		"@mainsail/database",
 		"@mainsail/blockchain-utils",
 		"@mainsail/crypto-transaction",
 		"@mainsail/crypto-transaction-evm-call",

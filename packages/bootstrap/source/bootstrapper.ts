@@ -60,7 +60,7 @@ export class Bootstrapper {
 		await this.#setGenesisCommit();
 		await this.#checkStoredGenesisCommit();
 
-		if (this.databaseService.isEmpty()) {
+		if (await this.databaseService.isEmpty()) {
 			await this.#initGenesisState();
 		} else {
 			await this.#initPostGenesisState();
@@ -94,8 +94,7 @@ export class Bootstrapper {
 	}
 
 	async #checkStoredGenesisCommit(): Promise<void> {
-		// TODO: use genesis height from config
-		const genesisBlock = await this.databaseService.getBlock(0);
+		const genesisBlock = await this.databaseService.getBlock(this.configuration.getGenesisHeight());
 
 		if (!genesisBlock) {
 			return;
@@ -113,7 +112,7 @@ export class Bootstrapper {
 	}
 
 	async #initGenesisState(): Promise<void> {
-		if (!this.databaseService.isEmpty()) {
+		if (!(await this.databaseService.isEmpty())) {
 			throw new Error("initGenesisState must be called on empty database");
 		}
 
@@ -138,8 +137,6 @@ export class Bootstrapper {
 	async #processGenesisBlock(): Promise<void> {
 		const genesisBlock = this.stateStore.getGenesisCommit();
 		await this.#processCommit(genesisBlock);
-		this.databaseService.addCommit(genesisBlock);
-		await this.databaseService.persist();
 	}
 
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {

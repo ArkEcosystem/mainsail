@@ -1,7 +1,10 @@
-use std::{path::PathBuf, str::FromStr};
+use std::path::PathBuf;
 
-use mainsail_evm_core::{db::CommitKey, legacy::LegacyAddress};
-use napi::{JsBigInt, JsBuffer, JsFunction, JsString};
+use mainsail_evm_core::{
+    db::{CommitData, CommitKey},
+    legacy::LegacyAddress,
+};
+use napi::{JsBigInt, JsBuffer, JsFunction, JsNumber, JsString};
 use napi_derive::napi;
 use revm::primitives::{Address, B256, Bytes, SpecId, U256};
 
@@ -26,6 +29,7 @@ pub struct JsTransactionContext {
     pub nonce: JsBigInt,
     pub data: JsBuffer,
     pub tx_hash: JsString,
+    pub sequence: Option<JsNumber>,
     pub block_context: JsBlockContext,
     pub spec_id: JsString,
 }
@@ -98,6 +102,15 @@ pub struct JsCommitKey {
 }
 
 #[napi(object)]
+pub struct JsCommitData {
+    pub block_id: JsString,
+    pub block: JsBuffer,
+    pub proof: JsBuffer,
+    pub transaction_ids: Vec<JsString>,
+    pub transactions: Vec<JsBuffer>,
+}
+
+#[napi(object)]
 pub struct JsPrepareNextCommitContext {
     pub commit_key: JsCommitKey,
 }
@@ -135,6 +148,7 @@ pub struct TxContext {
     pub nonce: u64,
     pub data: Bytes,
     pub tx_hash: B256,
+    pub sequence: Option<u32>,
     pub block_context: BlockContext,
     pub spec_id: SpecId,
 }
@@ -249,6 +263,36 @@ impl TryFrom<JsCommitKey> for CommitKey {
     }
 }
 
+impl TryFrom<JsCommitData> for CommitData {
+    type Error = anyhow::Error;
+
+    fn try_from(value: JsCommitData) -> Result<Self, Self::Error> {
+        let proof = utils::convert_js_buffer_to_bytes(value.proof)?;
+        let block = utils::convert_js_buffer_to_bytes(value.block)?;
+        let block_id = utils::convert_string_to_b256(value.block_id)?;
+
+        let mut transaction_ids = Vec::with_capacity(value.transaction_ids.len());
+        for transaction_id in value.transaction_ids {
+            transaction_ids.push(utils::convert_string_to_b256(transaction_id)?);
+        }
+
+        let mut transactions = Vec::with_capacity(value.transactions.len());
+        for transaction in value.transactions {
+            transactions.push(utils::convert_js_buffer_to_bytes(transaction)?);
+        }
+
+        assert_eq!(transaction_ids.len(), transactions.len());
+
+        Ok(CommitData {
+            block_id,
+            block,
+            proof,
+            transaction_ids,
+            transactions,
+        })
+    }
+}
+
 impl TryFrom<JsPrepareNextCommitContext> for PrepareNextCommitContext {
     type Error = anyhow::Error;
 
@@ -290,6 +334,12 @@ impl TryFrom<JsTransactionContext> for TxContext {
             None
         };
 
+        let sequence = if let Some(sequence) = value.sequence {
+            Some(sequence.get_uint32()?)
+        } else {
+            None
+        };
+
         let tx_ctx = TxContext {
             recipient,
             gas_limit: value.gas_limit.try_into()?,
@@ -299,9 +349,8 @@ impl TryFrom<JsTransactionContext> for TxContext {
             value: utils::convert_bigint_to_u256(value.value)?,
             nonce: value.nonce.get_u64()?.0,
             data: Bytes::from(buf.as_ref().to_owned()),
-            tx_hash: B256::try_from(
-                &Bytes::from_str(value.tx_hash.into_utf8()?.as_str()?)?.as_ref()[..],
-            )?,
+            tx_hash: utils::convert_string_to_b256(value.tx_hash)?,
+            sequence,
             block_context: value.block_context.try_into()?,
             spec_id: parse_spec_id(value.spec_id)?,
         };
@@ -337,9 +386,7 @@ impl TryFrom<JsPreverifyTransactionContext> for PreverifyTxContext {
             value: utils::convert_bigint_to_u256(value.value)?,
             nonce: value.nonce.get_u64()?.0,
             data: Bytes::from(buf.as_ref().to_owned()),
-            tx_hash: B256::try_from(
-                &Bytes::from_str(value.tx_hash.into_utf8()?.as_str()?)?.as_ref()[..],
-            )?,
+            tx_hash: utils::convert_string_to_b256(value.tx_hash)?,
             block_gas_limit: utils::convert_bigint_to_u256(value.block_gas_limit)?,
             spec_id: parse_spec_id(value.spec_id)?,
         };

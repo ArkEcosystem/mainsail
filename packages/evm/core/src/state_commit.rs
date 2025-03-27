@@ -3,11 +3,11 @@ use std::collections::{BTreeMap, HashMap};
 use alloy_sol_types::SolEvent;
 use revm::{
     db::WrapDatabaseRef,
-    primitives::{Address, ExecutionResult, B256},
+    primitives::{Address, B256, ExecutionResult},
 };
 
 use crate::{
-    db::{CommitKey, Error, GenesisInfo, PendingCommit, PersistentDB},
+    db::{CommitData, CommitKey, Error, GenesisInfo, PendingCommit, PersistentDB},
     state_changes::{self, AccountMergeInfo, AccountUpdate},
 };
 
@@ -87,17 +87,18 @@ pub fn apply_rewards(
 pub fn commit_to_db(
     db: &mut PersistentDB,
     pending_commit: PendingCommit,
+    commit_data: Option<CommitData>,
 ) -> Result<Vec<AccountUpdate>, crate::db::Error> {
     let genesis_info = db.genesis_info.clone();
     let mut commit = build_commit(db, pending_commit, true)?;
 
-    match db.commit(&mut commit) {
+    match db.commit(&mut commit, &commit_data) {
         Ok(_) => Ok(collect_dirty_accounts(commit, &genesis_info)),
         Err(err) => match &err {
             Error::DbFull => {
                 // try to resize the db and attempt another commit on success
                 db.resize().and_then(|_| {
-                    db.commit(&mut commit)
+                    db.commit(&mut commit, &commit_data)
                         .and_then(|_| Ok(collect_dirty_accounts(commit, &genesis_info)))
                 })
             }

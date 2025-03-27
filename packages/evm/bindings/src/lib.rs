@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Arc, u64};
 
 use ctx::{
     BlockContext, CalculateActiveValidatorsContext, EvmOptions, ExecutionContext, GenesisContext,
-    JsCalculateActiveValidatorsContext, JsCommitKey, JsEvmOptions, JsGenesisContext,
+    JsCalculateActiveValidatorsContext, JsCommitData, JsCommitKey, JsEvmOptions, JsGenesisContext,
     JsPrepareNextCommitContext, JsPreverifyTransactionContext, JsTransactionContext,
     JsTransactionViewContext, JsUpdateRewardsAndVotesContext, PrepareNextCommitContext,
     PreverifyTxContext, TxContext, TxViewContext, UpdateRewardsAndVotesContext,
@@ -10,7 +10,7 @@ use ctx::{
 use logger::JsLogger;
 use mainsail_evm_core::{
     account::AccountInfoExtended,
-    db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB, PersistentDBOptions},
+    db::{CommitData, CommitKey, GenesisInfo, PendingCommit, PersistentDB, PersistentDBOptions},
     legacy::{LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
     logs_bloom,
@@ -720,12 +720,8 @@ impl EvmInner {
     pub fn commit(
         &mut self,
         commit_key: CommitKey,
+        commit_data: Option<CommitData>,
     ) -> std::result::Result<Vec<AccountUpdate>, EVMError<String>> {
-        if self.persistent_db.is_height_committed(commit_key.0) {
-            self.drop_pending_commit();
-            return Ok(Default::default());
-        }
-
         if self
             .pending_commit
             .as_ref()
@@ -752,7 +748,7 @@ impl EvmInner {
                 //     ),
                 // );
 
-                state_commit::commit_to_db(&mut self.persistent_db, pending_commit)
+                state_commit::commit_to_db(&mut self.persistent_db, pending_commit, commit_data)
             }
             None => Ok(Default::default()),
         };
@@ -820,6 +816,98 @@ impl EvmInner {
             Ok(result) => Ok(result.encode_hex()),
             Err(err) => Err(EVMError::Database(
                 format!("logs_bloom failed: {}", err).into(),
+            )),
+        }
+    }
+
+    pub fn is_empty(&mut self) -> std::result::Result<bool, EVMError<String>> {
+        let result = self.persistent_db.is_empty();
+
+        match result {
+            Ok(result) => Ok(result),
+            Err(err) => Err(EVMError::Database(
+                format!("is_empty failed: {}", err).into(),
+            )),
+        }
+    }
+
+    pub fn get_state(&mut self) -> std::result::Result<(u64, u64), EVMError<String>> {
+        let result = self.persistent_db.get_state();
+
+        match result {
+            Ok(result) => Ok(result),
+            Err(err) => Err(EVMError::Database(
+                format!("get_state failed: {}", err).into(),
+            )),
+        }
+    }
+
+    pub fn get_block_header_bytes(
+        &mut self,
+        height: u64,
+    ) -> std::result::Result<Option<Bytes>, EVMError<String>> {
+        let result = self.persistent_db.get_block_header_bytes(height);
+
+        match result {
+            Ok(result) => Ok(result),
+            Err(err) => Err(EVMError::Database(
+                format!("get_block_header_bytes failed: {}", err).into(),
+            )),
+        }
+    }
+
+    pub fn get_block_height_by_id(
+        &mut self,
+        id: B256,
+    ) -> std::result::Result<Option<u64>, EVMError<String>> {
+        let result = self.persistent_db.get_block_height_by_id(id);
+
+        match result {
+            Ok(result) => Ok(result),
+            Err(err) => Err(EVMError::Database(
+                format!("get_block_height_by_id failed: {}", err).into(),
+            )),
+        }
+    }
+
+    pub fn get_proof_bytes(
+        &mut self,
+        height: u64,
+    ) -> std::result::Result<Option<Bytes>, EVMError<String>> {
+        let result = self.persistent_db.get_proof_bytes(height);
+
+        match result {
+            Ok(result) => Ok(result),
+            Err(err) => Err(EVMError::Database(
+                format!("get_proof_bytes failed: {}", err).into(),
+            )),
+        }
+    }
+
+    pub fn get_transaction_bytes(
+        &mut self,
+        key: String,
+    ) -> std::result::Result<Option<Bytes>, EVMError<String>> {
+        let result = self.persistent_db.get_transaction_bytes(key);
+
+        match result {
+            Ok(result) => Ok(result),
+            Err(err) => Err(EVMError::Database(
+                format!("get_transaction_bytes failed: {}", err).into(),
+            )),
+        }
+    }
+
+    pub fn get_transaction_key_by_id(
+        &mut self,
+        id: B256,
+    ) -> std::result::Result<Option<String>, EVMError<String>> {
+        let result = self.persistent_db.get_transaction_key_by_id(id);
+
+        match result {
+            Ok(result) => Ok(result),
+            Err(err) => Err(EVMError::Database(
+                format!("get_transaction_key_by_id failed: {}", err).into(),
             )),
         }
     }
@@ -1238,10 +1326,21 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<JsCommitResult>")]
-    pub fn commit(&mut self, node_env: Env, commit_key: JsCommitKey) -> Result<JsObject> {
+    pub fn commit(
+        &mut self,
+        node_env: Env,
+        commit_key: JsCommitKey,
+        commit_data: Option<JsCommitData>,
+    ) -> Result<JsObject> {
         let commit_key = CommitKey::try_from(commit_key)?;
+        let commit_data = if let Some(commit_data) = commit_data {
+            Some(CommitData::try_from(commit_data)?)
+        } else {
+            None
+        };
+
         node_env.execute_tokio_future(
-            Self::commit_async(self.evm.clone(), commit_key),
+            Self::commit_async(self.evm.clone(), commit_key, commit_data),
             |&mut node_env, result| Ok(result::JsCommitResult::new(&node_env, result)?),
         )
     }
@@ -1267,6 +1366,94 @@ impl JsEvmWrapper {
         node_env.execute_tokio_future(
             Self::logs_bloom_async(self.evm.clone(), commit_key),
             |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<boolean>")]
+    pub fn is_empty(&mut self, node_env: Env) -> Result<JsObject> {
+        node_env.execute_tokio_future(
+            Self::is_empty_async(self.evm.clone()),
+            |&mut node_env, result| Ok(node_env.get_boolean(result)?),
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<JsGetState>")]
+    pub fn get_state(&mut self, node_env: Env) -> Result<JsObject> {
+        node_env.execute_tokio_future(
+            Self::get_state_async(self.evm.clone()),
+            |&mut node_env, result| Ok(result::JsGetState::new(&node_env, result)?),
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<Buffer | undefined>")]
+    pub fn get_block_header_bytes(&mut self, node_env: Env, height: JsBigInt) -> Result<JsObject> {
+        let height = height.get_u64()?.0;
+        node_env.execute_tokio_future(
+            Self::get_block_header_bytes_async(self.evm.clone(), height),
+            |&mut node_env, result| {
+                Ok(match result {
+                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(&node_env, bytes)?),
+                    None => None,
+                })
+            },
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<bigint | undefined>")]
+    pub fn get_block_height_by_id(&mut self, node_env: Env, id: JsString) -> Result<JsObject> {
+        let id = utils::convert_string_to_b256(id)?;
+
+        node_env.execute_tokio_future(
+            Self::get_block_height_by_id_async(self.evm.clone(), id),
+            |&mut node_env, result| {
+                Ok(match result {
+                    Some(result) => Some(node_env.create_bigint_from_u64(result)?),
+                    None => None,
+                })
+            },
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<Buffer | undefined>")]
+    pub fn get_proof_bytes(&mut self, node_env: Env, height: JsBigInt) -> Result<JsObject> {
+        let height = height.get_u64()?.0;
+        node_env.execute_tokio_future(
+            Self::get_proof_bytes_async(self.evm.clone(), height),
+            |&mut node_env, result| {
+                Ok(match result {
+                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(&node_env, bytes)?),
+                    None => None,
+                })
+            },
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<Buffer | undefined>")]
+    pub fn get_transaction_bytes(&mut self, node_env: Env, key: JsString) -> Result<JsObject> {
+        let key = key.into_utf8()?.into_owned()?;
+        node_env.execute_tokio_future(
+            Self::get_transaction_bytes_async(self.evm.clone(), key),
+            |&mut node_env, result| {
+                Ok(match result {
+                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(&node_env, bytes)?),
+                    None => None,
+                })
+            },
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<string | undefined>")]
+    pub fn get_transaction_key_by_id(&mut self, node_env: Env, id: JsString) -> Result<JsObject> {
+        let id = utils::convert_string_to_b256(id)?;
+
+        node_env.execute_tokio_future(
+            Self::get_transaction_key_by_id_async(self.evm.clone(), id),
+            |&mut node_env, result| {
+                Ok(match result {
+                    Some(result) => Some(node_env.create_string(&result)?),
+                    None => None,
+                })
+            },
         )
     }
 
@@ -1448,9 +1635,10 @@ impl JsEvmWrapper {
     async fn commit_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         commit_key: CommitKey,
+        commit_data: Option<CommitData>,
     ) -> Result<CommitResult> {
         let mut lock = evm.lock().await;
-        let result = lock.commit(commit_key);
+        let result = lock.commit(commit_key, commit_data);
 
         match result {
             Ok(result) => Result::Ok(CommitResult {
@@ -1536,6 +1724,91 @@ impl JsEvmWrapper {
     ) -> Result<Option<TxReceipt>> {
         let mut lock = evm.lock().await;
         let result = lock.get_receipt(height, tx_hash);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn is_empty_async(evm: Arc<tokio::sync::Mutex<EvmInner>>) -> Result<bool> {
+        let mut lock = evm.lock().await;
+        let result = lock.is_empty();
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_state_async(evm: Arc<tokio::sync::Mutex<EvmInner>>) -> Result<(u64, u64)> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_state();
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_block_header_bytes_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        height: u64,
+    ) -> Result<Option<Bytes>> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_block_header_bytes(height);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_block_height_by_id_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        id: B256,
+    ) -> Result<Option<u64>> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_block_height_by_id(id);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_proof_bytes_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        height: u64,
+    ) -> Result<Option<Bytes>> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_proof_bytes(height);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_transaction_bytes_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        key: String,
+    ) -> Result<Option<Bytes>> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_transaction_bytes(key);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_transaction_key_by_id_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        id: B256,
+    ) -> Result<Option<String>> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_transaction_key_by_id(id);
 
         match result {
             Ok(result) => Result::Ok(result),

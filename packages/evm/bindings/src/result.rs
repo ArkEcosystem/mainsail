@@ -6,7 +6,7 @@ use mainsail_evm_core::{
 };
 use napi::{JsBigInt, JsBoolean, JsBuffer, JsNumber, JsString};
 use napi_derive::napi;
-use revm::primitives::{AccountInfo, Bytes, B256};
+use revm::primitives::{AccountInfo, B256, Bytes};
 
 use crate::utils;
 
@@ -524,5 +524,20 @@ impl JsGetReceipt {
         };
 
         Ok(JsGetReceipt { receipt })
+    }
+}
+
+#[napi(object)]
+pub struct JsGetState {
+    pub height: JsBigInt,
+    pub total_round: JsBigInt,
+}
+
+impl JsGetState {
+    pub fn new(node_env: &napi::Env, state: (u64, u64)) -> anyhow::Result<Self> {
+        Ok(JsGetState {
+            height: node_env.create_bigint_from_u64(state.0)?,
+            total_round: node_env.create_bigint_from_u64(state.1)?,
+        })
     }
 }
