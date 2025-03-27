@@ -105,10 +105,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		const commit = await unit.getCommit();
 
-		this.databaseService.addCommit(commit);
-
-		await this.stateStore.onCommit(unit);
 		await this.evm.onCommit(unit);
+		await this.stateStore.onCommit(unit);
+		await this.databaseService.onCommit(unit);
 		await this.validatorSet.onCommit(unit);
 		await this.txPoolWorker.onCommit(unit);
 		await this.evmWorker.onCommit(unit);
