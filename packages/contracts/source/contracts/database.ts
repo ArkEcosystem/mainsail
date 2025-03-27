@@ -1,11 +1,12 @@
-import { Block, BlockHeader, Commit, Transaction } from "./crypto/index.js";
+import { Block, BlockHeader, Commit, CommitHandler, Transaction } from "./crypto/index.js";
+import { ProcessableUnit } from "./processor/index.js";
 
 export interface State {
 	height: number;
 	totalRound: number;
 }
 
-export interface DatabaseService {
+export interface DatabaseService extends CommitHandler {
 	initialize(): Promise<void>;
 	isEmpty(): Promise<boolean>;
 
@@ -29,5 +30,5 @@ export interface DatabaseService {
 	getTransactionByBlockIdAndIndex(blockId: string, index: number): Promise<Transaction | undefined>;
 	getTransactionByBlockHeightAndIndex(height: number, index: number): Promise<Transaction | undefined>;
 
-	addCommit(block: Commit): void;
+	onCommit(unit: ProcessableUnit): Promise<void>;
 }

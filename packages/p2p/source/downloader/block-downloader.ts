@@ -174,9 +174,6 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		} catch (error) {
 			this.#handleJobError(job, error);
 			return;
-		} finally {
-			// TODO: blocks are now always persisted during commit
-			//await this.database.persist();
 		}
 
 		if (job.heightTo !== height - 1) {
