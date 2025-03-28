@@ -11,7 +11,7 @@ const EXPECTED_NUMBER_OF_PEERS = 5;
 let webhookTarget;
 let peers = [];
 
-const peerBlockHeightMap = new Map();
+const peerBlockNumberMap = new Map();
 
 (async () => {
 	await discoverPeers();
@@ -43,7 +43,7 @@ async function discoverPeers() {
 	} while (peers.length < EXPECTED_NUMBER_OF_PEERS);
 
 	for (const peer of peers) {
-		peerBlockHeightMap.set(peer.ip, 0);
+		peerBlockNumberMap.set(peer.ip, 0);
 	}
 }
 
@@ -51,21 +51,21 @@ async function setupWebhook() {
 	app.post("/callback", function (req, res) {
 		res.status(200).end();
 
-		const { height } = req.body.data;
+		const { number } = req.body.data;
 
-		if (!peerBlockHeightMap.has(req.ip)) {
+		if (!peerBlockNumberMap.has(req.ip)) {
 			console.log("ignoring peer callback", req.ip);
 			return;
 		}
 
-		console.log(`got block ${height} from ${req.ip}`);
-		peerBlockHeightMap.set(req.ip, height);
+		console.log(`got block ${number} from ${req.ip}`);
+		peerBlockNumberMap.set(req.ip, number);
 
-		if (height >= TARGET_HEIGHT && peerBlockHeightMap.has(req.ip)) {
+		if (number >= TARGET_HEIGHT && peerBlockNumberMap.has(req.ip)) {
 			console.log(`received target ${TARGET_HEIGHT} from ${req.ip}`);
-			peerBlockHeightMap.delete(req.ip);
+			peerBlockNumberMap.delete(req.ip);
 
-			if (peerBlockHeightMap.size === 0) {
+			if (peerBlockNumberMap.size === 0) {
 				console.log(`successfully reached target height on all peers, exiting.`);
 				process.exit(0);
 			}
