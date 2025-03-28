@@ -240,13 +240,13 @@ export class Snapshot {
 
 					// subtract fee and increase nonce of sender
 					await negativeBalanceChange(receipt.sender, consumedGas);
-					await incrementNonce(block.header.height, receipt.sender);
+					await incrementNonce(block.header.number, receipt.sender);
 
 					if (receipt.receipt.deployedContractAddress) {
 						// As per EIP-161, the initial nonce for a new contract starts at 1 and not 0.
 						//
 						// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-161.md#specification
-						await incrementNonce(block.header.height, receipt.receipt.deployedContractAddress);
+						await incrementNonce(block.header.number, receipt.receipt.deployedContractAddress);
 					}
 
 					// add transferred value to recipient (if any)
@@ -259,7 +259,7 @@ export class Snapshot {
 
 			// each block increases nonce of internal address due to vote&reward updates
 			await incrementNonce(
-				block.header.height,
+				block.header.number,
 				this.sandbox.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer),
 			);
 
@@ -280,6 +280,6 @@ export class Snapshot {
 			stateDelta.nonce = stateDelta.nonce.plus(delta.nonce);
 		}
 
-		return { accountDeltas, lastHeight: blocks[blocks.length - 1]?.header?.height ?? 0 };
+		return { accountDeltas, lastHeight: blocks[blocks.length - 1]?.header?.number ?? 0 };
 	}
 }
