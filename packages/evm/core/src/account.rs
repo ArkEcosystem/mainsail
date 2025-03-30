@@ -1,4 +1,4 @@
-use revm::primitives::{AccountInfo, Address};
+use revm::{primitives::Address, state::AccountInfo};
 use serde::{Deserialize, Serialize};
 
 use crate::legacy::LegacyAccountAttributes;

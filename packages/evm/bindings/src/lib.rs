@@ -23,15 +23,15 @@ use napi_derive::napi;
 use result::{
     CommitResult, JsAccountInfoExtended, JsLegacyColdWallet, PreverifyTxResult, TxViewResult,
 };
-use revm::interpreter::Host;
-
 use revm::{
-    Database, DatabaseCommit, Evm, TransitionAccount,
-    db::{State, WrapDatabaseRef},
-    primitives::{
-        AccountInfo, Address, B256, Bytecode, Bytes, EVMError, ExecutionResult, ResultAndState,
-        U256, hex::ToHexExt,
+    Database, DatabaseCommit, MainBuilder,
+    context::{
+        BlockEnv, TransactTo, TxEnv,
+        result::{EVMError, ExecutionResult, ResultAndState},
     },
+    database::{State, TransitionAccount, WrapDatabaseRef},
+    primitives::{Address, B256, Bytes, TxKind, U256, hex::ToHexExt},
+    state::{AccountInfo, Bytecode},
 };
 
 mod ctx;
@@ -150,7 +150,6 @@ impl EvmInner {
                     })?;
 
                 Ok(match code {
-                    Bytecode::LegacyRaw(code) => code,
                     Bytecode::LegacyAnalyzed(code) => code.original_bytes(),
                     Bytecode::Eof(code) => code.raw.clone(),
                     Bytecode::Eip7702(code) => code.raw.clone(),
@@ -232,7 +231,7 @@ impl EvmInner {
             }),
             caller: genesis_info.deployer_account,
             recipient: Some(genesis_info.validator_contract),
-            data: revm::primitives::Bytes::from(calldata.0),
+            data: Bytes::from(calldata.0),
             value: U256::ZERO,
             nonce: Some(nonce),
             gas_limit: Some(u64::MAX),
@@ -323,7 +322,7 @@ impl EvmInner {
                     }),
                     caller: genesis_info.deployer_account,
                     recipient: Some(genesis_info.validator_contract),
-                    data: revm::primitives::Bytes::from(calldata.0),
+                    data: Bytes::from(calldata.0),
                     value: U256::ZERO,
                     nonce: Some(nonce),
                     gas_limit: Some(u64::MAX),
@@ -673,34 +672,34 @@ impl EvmInner {
                 match err {
                     EVMError::Transaction(err) => {
                         match err {
-                            revm::primitives::InvalidTransaction::CallGasCostMoreThanGasLimit
-                            | revm::primitives::InvalidTransaction::NonceTooHigh { .. }
-                            | revm::primitives::InvalidTransaction::NonceTooLow { .. }
-                            | revm::primitives::InvalidTransaction::LackOfFundForMaxFee {
+                            revm::context::result::InvalidTransaction::CallGasCostMoreThanGasLimit {.. }
+                            | revm::context::result::InvalidTransaction::NonceTooHigh { .. }
+                            | revm::context::result::InvalidTransaction::NonceTooLow { .. }
+                            | revm::context::result::InvalidTransaction::LackOfFundForMaxFee {
                                 ..
                             } => {
                                 return Err(EVMError::Transaction(err));
                             }
-                            // revm::primitives::InvalidTransaction::PriorityFeeGreaterThanMaxFee => todo!(),
-                            // revm::primitives::InvalidTransaction::GasPriceLessThanBasefee => todo!(),
-                            // revm::primitives::InvalidTransaction::CallerGasLimitMoreThanBlock => todo!(),
-                            // revm::primitives::InvalidTransaction::RejectCallerWithCode => todo!(),
-                            // revm::primitives::InvalidTransaction::OverflowPaymentInTransaction => todo!(),
-                            // revm::primitives::InvalidTransaction::NonceOverflowInTransaction => todo!(),
-                            // revm::primitives::InvalidTransaction::CreateInitCodeSizeLimit => todo!(),
-                            // revm::primitives::InvalidTransaction::InvalidChainId => todo!(),
-                            // revm::primitives::InvalidTransaction::AccessListNotSupported => todo!(),
-                            // revm::primitives::InvalidTransaction::MaxFeePerBlobGasNotSupported => todo!(),
-                            // revm::primitives::InvalidTransaction::BlobVersionedHashesNotSupported => todo!(),
-                            // revm::primitives::InvalidTransaction::BlobGasPriceGreaterThanMax => todo!(),
-                            // revm::primitives::InvalidTransaction::EmptyBlobs => todo!(),
-                            // revm::primitives::InvalidTransaction::BlobCreateTransaction => todo!(),
-                            // revm::primitives::InvalidTransaction::TooManyBlobs { max, have } => todo!(),
-                            // revm::primitives::InvalidTransaction::BlobVersionNotSupported => todo!(),
-                            // revm::primitives::InvalidTransaction::EofInitcodesNotSupported => todo!(),
-                            // revm::primitives::InvalidTransaction::EofInitcodesNumberLimit => todo!(),
-                            // revm::primitives::InvalidTransaction::EofInitcodesSizeLimit => todo!(),
-                            // revm::primitives::InvalidTransaction::EofCrateShouldHaveToAddress => todo!(),
+                            // revm::context::result::InvalidTransaction::PriorityFeeGreaterThanMaxFee => todo!(),
+                            // revm::context::result::InvalidTransaction::GasPriceLessThanBasefee => todo!(),
+                            // revm::context::result::InvalidTransaction::CallerGasLimitMoreThanBlock => todo!(),
+                            // revm::context::result::InvalidTransaction::RejectCallerWithCode => todo!(),
+                            // revm::context::result::InvalidTransaction::OverflowPaymentInTransaction => todo!(),
+                            // revm::context::result::InvalidTransaction::NonceOverflowInTransaction => todo!(),
+                            // revm::context::result::InvalidTransaction::CreateInitCodeSizeLimit => todo!(),
+                            // revm::context::result::InvalidTransaction::InvalidChainId => todo!(),
+                            // revm::context::result::InvalidTransaction::AccessListNotSupported => todo!(),
+                            // revm::context::result::InvalidTransaction::MaxFeePerBlobGasNotSupported => todo!(),
+                            // revm::context::result::InvalidTransaction::BlobVersionedHashesNotSupported => todo!(),
+                            // revm::context::result::InvalidTransaction::BlobGasPriceGreaterThanMax => todo!(),
+                            // revm::context::result::InvalidTransaction::EmptyBlobs => todo!(),
+                            // revm::context::result::InvalidTransaction::BlobCreateTransaction => todo!(),
+                            // revm::context::result::InvalidTransaction::TooManyBlobs { max, have } => todo!(),
+                            // revm::context::result::InvalidTransaction::BlobVersionNotSupported => todo!(),
+                            // revm::context::result::InvalidTransaction::EofInitcodesNotSupported => todo!(),
+                            // revm::context::result::InvalidTransaction::EofInitcodesNumberLimit => todo!(),
+                            // revm::context::result::InvalidTransaction::EofInitcodesSizeLimit => todo!(),
+                            // revm::context::result::InvalidTransaction::EofCrateShouldHaveToAddress => todo!(),
                             _ => {
                                 todo!("unhandled tx err {:?}", err);
                             }
@@ -960,8 +959,8 @@ impl EvmInner {
                 tx_env.value = ctx.value;
                 tx_env.nonce = ctx.nonce;
                 tx_env.transact_to = match ctx.recipient {
-                    Some(recipient) => revm::primitives::TransactTo::Call(recipient),
-                    None => revm::primitives::TransactTo::Create,
+                    Some(recipient) => TransactTo::Call(recipient),
+                    None => TransactTo::Create,
                 };
 
                 tx_env.data = ctx.data;

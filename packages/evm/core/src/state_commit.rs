@@ -2,8 +2,9 @@ use std::collections::{BTreeMap, HashMap};
 
 use alloy_sol_types::SolEvent;
 use revm::{
-    db::WrapDatabaseRef,
-    primitives::{Address, B256, ExecutionResult},
+    context::result::ExecutionResult,
+    database::WrapDatabaseRef,
+    primitives::{Address, B256},
 };
 
 use crate::{
@@ -36,10 +37,13 @@ pub fn build_commit(
         merged_legacy_cold_wallets,
     } = pending_commit;
 
-    let mut state_builder = revm::State::builder().with_cached_prestate(cache).build();
+    let mut state_builder = revm::database::State::builder()
+        .with_cached_prestate(cache)
+        .build();
 
     state_builder.transition_state = Some(transitions);
-    state_builder.merge_transitions(revm::db::states::bundle_state::BundleRetention::PlainState);
+    state_builder
+        .merge_transitions(revm::database::states::bundle_state::BundleRetention::PlainState);
 
     let bundle = state_builder.take_bundle();
     let mut change_set = state_changes::bundle_into_change_set(bundle);
@@ -63,7 +67,7 @@ pub fn apply_rewards(
     pending: &mut PendingCommit,
     rewards: HashMap<Address, u128>,
 ) -> Result<(), crate::db::Error> {
-    let mut state = revm::State::builder()
+    let mut state = revm::database::State::builder()
         .with_bundle_update()
         .with_cached_prestate(std::mem::take(&mut pending.cache))
         .with_database(WrapDatabaseRef(&db))

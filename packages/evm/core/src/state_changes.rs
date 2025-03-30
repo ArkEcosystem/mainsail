@@ -1,8 +1,9 @@
 use std::collections::BTreeMap;
 
 use revm::{
-    db::{BundleState, OriginalValuesKnown, states::StorageSlot},
-    primitives::{AccountInfo, Address, B256, Bytecode, KECCAK_EMPTY, U256},
+    database::{BundleState, OriginalValuesKnown, states::StorageSlot},
+    primitives::{Address, B256, KECCAK_EMPTY, U256},
+    state::{AccountInfo, Bytecode},
 };
 
 use crate::legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet};

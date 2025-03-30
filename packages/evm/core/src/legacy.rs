@@ -1,5 +1,6 @@
+use alloy_primitives::wrap_fixed_bytes;
 use bs58;
-use revm::primitives::{Address, B256, U256, alloy_primitives::wrap_fixed_bytes};
+use revm::primitives::{Address, B256, U256};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 

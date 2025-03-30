@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, str::FromStr};
 
 use mainsail_evm_core::{
     db::{CommitData, CommitKey},
@@ -6,7 +6,7 @@ use mainsail_evm_core::{
 };
 use napi::{JsBigInt, JsBuffer, JsFunction, JsNumber, JsString};
 use napi_derive::napi;
-use revm::primitives::{Address, B256, Bytes, SpecId, U256};
+use revm::primitives::{Address, B256, Bytes, U256, hardfork::SpecId};
 
 use crate::utils;
 
@@ -127,13 +127,13 @@ pub struct PreverifyTxContext {
     /// Omit recipient when deploying a contract
     pub recipient: Option<Address>,
     pub gas_limit: u64,
-    pub gas_price: U256,
+    pub gas_price: u128,
     pub value: U256,
     pub nonce: u64,
     pub data: Bytes,
     pub tx_hash: B256,
     pub spec_id: SpecId,
-    pub block_gas_limit: U256,
+    pub block_gas_limit: u64,
 }
 
 #[derive(Debug)]
@@ -493,9 +493,11 @@ fn parse_spec_id(spec_id: JsString) -> Result<SpecId, anyhow::Error> {
     }
 
     // Any supported spec is listed in the first match arm
-    let spec_id = spec_id.as_str().into();
-    match spec_id {
-        SpecId::SHANGHAI => Ok(spec_id),
+    match SpecId::from_str(spec_id.as_str()) {
+        Ok(spec_id) => match spec_id {
+            SpecId::SHANGHAI => Ok(spec_id),
+            _ => Err(anyhow::anyhow!("unsupported spec_id")),
+        },
         _ => Err(anyhow::anyhow!("invalid spec_id")),
     }
 }

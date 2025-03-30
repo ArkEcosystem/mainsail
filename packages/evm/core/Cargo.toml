@@ -14,6 +14,7 @@ ethers-providers = { workspace = true }
 revm = { workspace = true }
 alloy-sol-types = { workspace = true }
 alloy-primitives = { workspace = true }
+alloy-provider = { workspace = true }
 serde = { workspace = true }
 bincode = { workspace = true }
 thiserror = { workspace = true }
@@ -23,7 +24,7 @@ tokio = { workspace = true }
 heed = { git = "https://github.com/oXtxNt9U/heed.git", branch = "mainsail", features = [
 ] }
 rayon = "1.10.0"
-derive_more = { version = "1.0" }
+derive_more = { version = "2" }
 bytes = { version = "1.0" }
 bs58 = { version = "0.5.1" }
 sha2 = { version = "0.10.8" }

@@ -1,7 +1,10 @@
 use std::collections::BTreeMap;
 
 use heed::{RoTxn, RwTxn};
-use revm::primitives::{AccountInfo, Address, B256, U256};
+use revm::{
+    primitives::{Address, B256, U256},
+    state::AccountInfo,
+};
 
 use crate::db::Error;
 

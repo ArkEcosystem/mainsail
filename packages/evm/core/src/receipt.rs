@@ -1,4 +1,7 @@
-use revm::primitives::{Bytes, ExecutionResult, Log};
+use revm::{
+    context::result::{ExecutionResult, Output},
+    primitives::{Bytes, Log},
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
@@ -20,7 +23,7 @@ pub fn map_execution_result(result: ExecutionResult) -> TxReceipt {
             logs,
             ..
         } => match output {
-            revm::primitives::Output::Call(output) => TxReceipt {
+            Output::Call(output) => TxReceipt {
                 gas_used,
                 gas_refunded,
                 success: true,
@@ -28,7 +31,7 @@ pub fn map_execution_result(result: ExecutionResult) -> TxReceipt {
                 logs: Some(logs),
                 output: Some(output),
             },
-            revm::primitives::Output::Create(output, address) => TxReceipt {
+            Output::Create(output, address) => TxReceipt {
                 gas_used,
                 gas_refunded,
                 success: true,
