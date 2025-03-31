@@ -164,10 +164,6 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 		return this.#evm.logsBloom(commitKey);
 	}
 
-	public mode(): Contracts.Evm.EvmMode {
-		return Contracts.Evm.EvmMode.Persistent;
-	}
-
 	public async getState(): Promise<{ height: number; totalRound: number }> {
 		const state = await this.#evm.getState();
 		return { height: Number(state.height), totalRound: Number(state.totalRound) };

@@ -4,7 +4,6 @@ import {
 	AccountInfoExtended,
 	CalculateActiveValidatorsContext,
 	CommitKey,
-	EvmMode,
 	GenesisInfo,
 	GetAccountsResult,
 	GetLegacyColdWalletsResult,
@@ -41,6 +40,5 @@ export interface Instance extends CommitHandler {
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
 	codeAt(address: string, height?: bigint): Promise<string>;
 	storageAt(address: string, slot: bigint): Promise<string>;
-	mode(): EvmMode;
 	dispose(): Promise<void>;
 }

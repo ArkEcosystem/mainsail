@@ -1,8 +1,3 @@
-export enum EvmMode {
-	Ephemeral,
-	Persistent,
-}
-
 export interface GenesisInfo {
 	readonly account: string;
 	readonly deployerAccount: string;
