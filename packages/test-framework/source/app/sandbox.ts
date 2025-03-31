@@ -88,7 +88,7 @@ export class Sandbox {
 			//
 			// Therefore, for now we simply manually dispose the services that are known to require explicit closing such as the EVM.
 			// In the future, we should automate this by tracking.
-			for (const tag of ["evm", "validator", "transaction-pool"]) {
+			for (const tag of ["evm", "validator", "transaction-pool", "rpc"]) {
 				if (this.#configApp?.isBoundTagged(Identifiers.Evm.Instance, "instance", tag)) {
 					{
 						await this.#configApp

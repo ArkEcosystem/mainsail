@@ -4,7 +4,7 @@ import { Evm, JsCommitData, LogLevel } from "@mainsail/evm";
 import { assert, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
-export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storage {
+export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storage {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
@@ -21,9 +21,12 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 
 	@postConstruct()
 	public initialize() {
+		const logPrefix = `${this.constructor.name}`;
+
 		this.#evm = new Evm({
 			historySize: 256n,
 			logger: (level: LogLevel, message: string) => {
+				message = `[${logPrefix}] ${message}`;
 				try {
 					switch (level) {
 						case LogLevel.Info: {
@@ -162,10 +165,6 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 
 	public async logsBloom(commitKey: Contracts.Evm.CommitKey): Promise<string> {
 		return this.#evm.logsBloom(commitKey);
-	}
-
-	public mode(): Contracts.Evm.EvmMode {
-		return Contracts.Evm.EvmMode.Persistent;
 	}
 
 	public async getState(): Promise<{ height: number; totalRound: number }> {
