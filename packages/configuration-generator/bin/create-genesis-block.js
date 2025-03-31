@@ -25,7 +25,7 @@ async function run() {
 		// },
 	});
 
-	for (const tag of ["evm", "validator", "transaction-pool"]) {
+	for (const tag of ["evm", "validator", "transaction-pool", "rpc"]) {
 		if (app.isBoundTagged(AppIdentifiers.Evm.Instance, "instance", tag)) {
 			await app.getTagged(AppIdentifiers.Evm.Instance, "instance", tag).dispose();
 		}

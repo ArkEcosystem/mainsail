@@ -6,7 +6,7 @@ import { getHistoryHeightFromBlockTag } from "../utils/resolve-block-tag.js";
 @injectable()
 export class EthGetCodeAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "evm")
+	@tagged("instance", "rpc")
 	private readonly evm!: Contracts.Evm.Instance;
 
 	public readonly name: string = "eth_getCode";

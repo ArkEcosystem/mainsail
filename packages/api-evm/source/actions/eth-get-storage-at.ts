@@ -4,7 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 @injectable()
 export class EthGetStorageAtAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "evm")
+	@tagged("instance", "rpc")
 	private readonly evm!: Contracts.Evm.Instance;
 
 	public readonly name: string = "eth_getStorageAt";

@@ -13,7 +13,7 @@ export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action {
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
 	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "evm")
+	@tagged("instance", "rpc")
 	private readonly evm!: Contracts.Evm.Instance;
 
 	public readonly name: string = "eth_getTransactionReceipt";
