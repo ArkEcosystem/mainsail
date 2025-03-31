@@ -1,2 +1,2 @@
-export * from "./ephemeral.js";
+export * from "./instances.js";
 export * from "./evm.js";
