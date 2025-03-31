@@ -55,9 +55,6 @@
 			"package": "@mainsail/logger-pino"
 		},
 		{
-			"package": "@mainsail/snapshot-legacy-importer"
-		},
-		{
 			"package": "@mainsail/state"
 		},
 		{
