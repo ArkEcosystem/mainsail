@@ -21,9 +21,12 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 
 	@postConstruct()
 	public initialize() {
+		const logPrefix = `${this.constructor.name}`;
+
 		this.#evm = new Evm({
 			historySize: 256n,
 			logger: (level: LogLevel, message: string) => {
+				message = `[${logPrefix}] ${message}`;
 				try {
 					switch (level) {
 						case LogLevel.Info: {
