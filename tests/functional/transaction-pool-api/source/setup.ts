@@ -14,6 +14,7 @@ const setup = async () => {
 	const sandbox = new Sandbox();
 
 	sandbox.app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
+	sandbox.app.bind(Identifiers.Application.Version).toConstantValue("1.0");
 	sandbox.app.bind(Identifiers.Config.Flags).toConstantValue({});
 	sandbox.app.bind(Identifiers.Config.Plugins).toConstantValue({});
 	sandbox.app
@@ -77,6 +78,11 @@ const setup = async () => {
 			maxTransactionBytes: 50_000,
 
 			storage: ":memory:",
+		},
+		"@mainsail/api-sync": {
+			syncInterval: 250,
+			maxSyncAttempts: 1,
+			truncateDatabase: "1",
 		},
 	};
 
@@ -157,15 +163,15 @@ const getPluginConfiguration = async (
 	packageId: string,
 	options: PluginOptions,
 ): Promise<Providers.PluginConfiguration | undefined> => {
+	let defaults = {};
 	try {
-		const { defaults } = await import(`${packageId}/distribution/defaults.js`);
-
-		return sandbox.app
-			.resolve(Providers.PluginConfiguration)
-			.from(packageId, defaults)
-			.merge(options[packageId] || {});
+		({ defaults } = await import(`${packageId}/distribution/defaults.js`));
 	} catch {}
-	return undefined;
+
+	return sandbox.app
+		.resolve(Providers.PluginConfiguration)
+		.from(packageId, defaults)
+		.merge(options[packageId] || {});
 };
 
 const bootstrap = async (sandbox: Sandbox) => {

@@ -348,6 +348,11 @@ export class Sync implements Contracts.ApiSync.Service {
 				let success = false;
 				const baseDelay = 500;
 
+				const maxAttempts = this.pluginConfiguration.getOptional<number>(
+					"maxSyncAttempts",
+					Number.MAX_SAFE_INTEGER,
+				);
+
 				let attempts = 0;
 				do {
 					try {
@@ -361,7 +366,7 @@ export class Sync implements Contracts.ApiSync.Service {
 						);
 						await sleep(nextAttemptDelay);
 					}
-				} while (!success);
+				} while (!success && attempts < maxAttempts);
 			},
 		});
 	}
