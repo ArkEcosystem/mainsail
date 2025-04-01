@@ -24,12 +24,13 @@ use result::{
     CommitResult, JsAccountInfoExtended, JsLegacyColdWallet, PreverifyTxResult, TxViewResult,
 };
 use revm::{
-    Database, DatabaseCommit, MainBuilder,
+    Database, DatabaseCommit, ExecuteEvm, MainBuilder, MainContext,
     context::{
-        BlockEnv, TransactTo, TxEnv,
+        BlockEnv, Cfg, ContextTr, TxEnv,
         result::{EVMError, ExecutionResult, ResultAndState},
     },
     database::{State, TransitionAccount, WrapDatabaseRef},
+    handler::EvmTr,
     primitives::{Address, B256, Bytes, TxKind, U256, hex::ToHexExt},
     state::{AccountInfo, Bytecode},
 };
@@ -225,7 +226,7 @@ impl EvmInner {
         match self.transact_evm(ExecutionContext {
             block_context: Some(BlockContext {
                 commit_key: ctx.commit_key,
-                gas_limit: U256::MAX,
+                gas_limit: u64::MAX,
                 timestamp: ctx.timestamp,
                 validator_address: ctx.validator_address,
             }),
@@ -235,7 +236,7 @@ impl EvmInner {
             value: U256::ZERO,
             nonce: Some(nonce),
             gas_limit: Some(u64::MAX),
-            gas_price: U256::ZERO,
+            gas_price: 0,
             spec_id: ctx.spec_id,
             tx_hash: None,
         }) {
@@ -316,7 +317,7 @@ impl EvmInner {
                 match self.transact_evm(ExecutionContext {
                     block_context: Some(BlockContext {
                         commit_key: ctx.commit_key,
-                        gas_limit: U256::MAX,
+                        gas_limit: u64::MAX,
                         timestamp: ctx.timestamp,
                         validator_address: ctx.validator_address,
                     }),
@@ -326,7 +327,7 @@ impl EvmInner {
                     value: U256::ZERO,
                     nonce: Some(nonce),
                     gas_limit: Some(u64::MAX),
-                    gas_price: U256::ZERO,
+                    gas_price: 0,
                     spec_id: ctx.spec_id,
                     tx_hash: None,
                 }) {
