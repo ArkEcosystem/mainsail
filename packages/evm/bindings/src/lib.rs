@@ -541,37 +541,32 @@ impl EvmInner {
             .with_database(WrapDatabaseRef(&self.persistent_db))
             .build();
 
-        let mut evm = Evm::builder()
+        let evm = revm::Context::mainnet()
             .with_db(state_db)
-            .with_spec_id(ctx.spec_id)
-            .modify_block_env(|block_env| {
+            .modify_cfg_chained(|cfg| {
+                cfg.spec = ctx.spec_id;
+            })
+            .modify_block_chained(|block_env: &mut BlockEnv| {
                 block_env.gas_limit = ctx.block_gas_limit;
             })
-            .modify_tx_env(|tx_env| {
+            .modify_tx_chained(|tx_env: &mut TxEnv| {
                 tx_env.gas_limit = ctx.gas_limit;
                 tx_env.gas_price = ctx.gas_price;
                 tx_env.caller = ctx.caller;
                 tx_env.value = ctx.value;
-                tx_env.nonce = Some(ctx.nonce);
-                tx_env.transact_to = match ctx.recipient {
-                    Some(recipient) => revm::primitives::TransactTo::Call(recipient),
-                    None => revm::primitives::TransactTo::Create,
+                tx_env.nonce = ctx.nonce;
+                tx_env.kind = match ctx.recipient {
+                    Some(recipient) => TxKind::Call(recipient),
+                    None => TxKind::Create,
                 };
 
                 tx_env.data = ctx.data;
             })
-            .build();
+            .build_mainnet();
 
-        // TODO: instead of validating only the initial_tx_gas, we can consider calling `evm.preverify_transaction()`
-        // which applies more checks against the given state. However, the current use cases (tx pool)
-        // do not require further checks (e.g. nonce) as they are already present. Furthermore, if we chose to do so
-        // we have to perform more book keeping of sender states while they live in the tx pool similar to how `PendingCommit` works.
-
-        let ctx = &mut evm.context;
-        let env = ctx.env();
-        let result = evm.handler.validation().initial_tx_gas(env);
-
-        evm.handler.post_execution().clear(ctx);
+        let ctx = evm.ctx_ref();
+        let result =
+            revm::handler::validation::validate_initial_tx_gas(ctx.tx(), ctx.cfg().spec().into());
 
         Ok(match result {
             Ok(result) => PreverifyTxResult {
@@ -939,36 +934,39 @@ impl EvmInner {
             .with_database(WrapDatabaseRef(&self.persistent_db))
             .build();
 
-        let mut evm = Evm::builder()
+        let mut evm = revm::Context::mainnet()
             .with_db(state_db)
-            .with_spec_id(ctx.spec_id)
-            .modify_block_env(|block_env| {
+            .modify_cfg_chained(|cfg| {
+                cfg.spec = ctx.spec_id;
+                cfg.disable_nonce_check = ctx.nonce.is_none();
+            })
+            .modify_block_chained(|block_env: &mut BlockEnv| {
                 let Some(block_ctx) = ctx.block_context.as_ref() else {
                     return;
                 };
 
-                block_env.number = U256::from(block_ctx.commit_key.0);
-                block_env.coinbase = block_ctx.validator_address;
+                block_env.number = block_ctx.commit_key.0;
+                block_env.beneficiary = block_ctx.validator_address;
                 block_env.timestamp = block_ctx.timestamp;
                 block_env.gas_limit = block_ctx.gas_limit;
                 block_env.difficulty = U256::ZERO;
             })
-            .modify_tx_env(|tx_env| {
+            .modify_tx_chained(|tx_env: &mut TxEnv| {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or_else(|| 15_000_000);
                 tx_env.gas_price = ctx.gas_price;
                 tx_env.caller = ctx.caller;
                 tx_env.value = ctx.value;
-                tx_env.nonce = ctx.nonce;
-                tx_env.transact_to = match ctx.recipient {
-                    Some(recipient) => TransactTo::Call(recipient),
-                    None => TransactTo::Create,
+                tx_env.nonce = ctx.nonce.unwrap_or_default();
+                tx_env.kind = match ctx.recipient {
+                    Some(recipient) => TxKind::Call(recipient),
+                    None => TxKind::Create,
                 };
 
                 tx_env.data = ctx.data;
             })
-            .build();
+            .build_mainnet();
 
-        let result = evm.transact();
+        let result = evm.replay();
 
         match result {
             Ok(result) => {
@@ -979,7 +977,7 @@ impl EvmInner {
                     if let Some(pending_commit) = &mut self.pending_commit {
                         assert_eq!(commit_key, pending_commit.key);
 
-                        let state_db = evm.db_mut();
+                        let state_db = evm.db();
 
                         state_db.commit(state);
 
