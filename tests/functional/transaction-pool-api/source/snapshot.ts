@@ -202,31 +202,47 @@ export class Snapshot {
 					// to race condition here. Hence it needs special treatment:
 					let nonceMismatch = true;
 					if (account.address === "0x0000000000000000000000000000000000000001") {
-						const blockRepositoryFactory =
-							this.sandbox.app.get<ApiDatabaseContracts.BlockRepositoryFactory>(
-								ApiDatabaseIdentifiers.BlockRepositoryFactory,
-							);
-						const contractRepositoryFactory =
-							this.sandbox.app.get<ApiDatabaseContracts.ContractRepositoryFactory>(
-								ApiDatabaseIdentifiers.ContractRepositoryFactory,
-							);
-
-						const numberOfBlocks = await blockRepositoryFactory().createQueryBuilder().getCount();
-						const roundCalculator = this.sandbox.app.get<Contracts.BlockchainUtils.RoundCalculator>(
-							Identifiers.BlockchainUtils.RoundCalculator,
+						const dataSource = this.sandbox.app.get<ApiDatabaseContracts.RepositoryDataSource>(
+							ApiDatabaseIdentifiers.DataSource,
 						);
-						const { round } = roundCalculator.calculateRound(numberOfBlocks - 1);
-						const contracts = await contractRepositoryFactory().createQueryBuilder().getMany();
-						let numberOfContracts = contracts.length;
-						for (const contract of contracts) {
-							numberOfContracts += contract.implementations.length;
-						}
 
-						// number of blocks + current round + number of deployed contracts
-						const expectedNonce = numberOfBlocks + round + numberOfContracts;
-						if (BigNumber.make(expectedNonce).isEqualTo(dbWallet.nonce)) {
-							nonceMismatch = false;
-						}
+						await dataSource.transaction("REPEATABLE READ", async (entityManager) => {
+							const deployerDbWallet = await walletRepositoryFactory(entityManager)
+								.createQueryBuilder()
+								.where("address = :address", { address: account.address })
+								.getOneOrFail();
+
+							const blockRepositoryFactory =
+								this.sandbox.app.get<ApiDatabaseContracts.BlockRepositoryFactory>(
+									ApiDatabaseIdentifiers.BlockRepositoryFactory,
+								);
+							const contractRepositoryFactory =
+								this.sandbox.app.get<ApiDatabaseContracts.ContractRepositoryFactory>(
+									ApiDatabaseIdentifiers.ContractRepositoryFactory,
+								);
+
+							const numberOfBlocks = await blockRepositoryFactory(entityManager)
+								.createQueryBuilder()
+								.getCount();
+							const roundCalculator = this.sandbox.app.get<Contracts.BlockchainUtils.RoundCalculator>(
+								Identifiers.BlockchainUtils.RoundCalculator,
+							);
+							const { round } = roundCalculator.calculateRound(numberOfBlocks - 1);
+							const contracts = await contractRepositoryFactory(entityManager)
+								.createQueryBuilder()
+								.getMany();
+							let numberOfContracts = contracts.length;
+							for (const contract of contracts) {
+								numberOfContracts += contract.implementations.length;
+							}
+
+							// number of blocks + current round + number of deployed contracts
+							const expectedNonce = numberOfBlocks + round + numberOfContracts;
+							console.log("-- COMPARING DEPLOYER WALLET", expectedNonce, deployerDbWallet, dbWallet);
+							if (BigNumber.make(expectedNonce).isEqualTo(deployerDbWallet.nonce)) {
+								nonceMismatch = false;
+							}
+						});
 					}
 
 					if (nonceMismatch) {
