@@ -73,7 +73,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 			gasPrice: BigInt(transaction.data.gasPrice),
 			legacyAddress: transaction.data.senderLegacyAddress,
 			nonce: transaction.data.nonce.toBigInt(),
-			recipient: transaction.data.recipientAddress,
+			recipient: transaction.data.to,
 			specId: milestone.evmSpec,
 			txHash: transaction.data.hash,
 			value: transaction.data.value.toBigInt(),

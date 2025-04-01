@@ -291,7 +291,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				id: data.hash,
 				legacySecondSignature: data.legacySecondSignature,
 				nonce: data.nonce.toFixed(),
-				recipientAddress: data.recipientAddress,
+				recipientAddress: data.to,
 				senderAddress: data.from,
 				senderPublicKey: data.senderPublicKey,
 				sequence: data.sequence as unknown as number,

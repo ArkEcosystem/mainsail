@@ -28,7 +28,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 		data.gasPrice = this.#parseNumber(decoded[3].toString());
 		data.gasLimit = this.#parseNumber(decoded[4].toString());
-		data.recipientAddress = recipientAddressRaw ? getAddress(recipientAddressRaw) : undefined;
+		data.to = recipientAddressRaw ? getAddress(recipientAddressRaw) : undefined;
 		data.value = this.#parseBigNumber(decoded[6].toString());
 		data.data = this.#parseData(decoded[7].toString());
 

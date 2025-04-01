@@ -18,7 +18,7 @@ export class TransactionResource {
 			maxFeePerGas: `0x${transaction.gasPrice.toString(16)}`,
 			nonce: `0x${transaction.nonce.toString(16)}`,
 			// eslint-disable-next-line unicorn/no-null
-			to: transaction.recipientAddress || null,
+			to: transaction.to || null,
 			transactionIndex: `0x${transaction.sequence?.toString(16)}`,
 			value: `0x${transaction.value.toString(16)}`,
 			type: `0x2`,

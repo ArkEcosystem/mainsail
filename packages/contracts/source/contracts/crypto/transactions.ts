@@ -20,7 +20,7 @@ export interface TransactionData {
 	from: string;
 	senderLegacyAddress?: string;
 	senderPublicKey: string;
-	recipientAddress?: string;
+	to?: string;
 
 	value: BigNumber;
 
@@ -49,7 +49,7 @@ export interface TransactionJson {
 
 	from: string;
 	senderPublicKey: string;
-	recipientAddress?: string;
+	to?: string;
 
 	value: string;
 

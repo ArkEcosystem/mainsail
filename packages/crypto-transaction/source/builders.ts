@@ -69,7 +69,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	}
 
 	public recipientAddress(recipientAddress: string): TBuilder {
-		this.data.recipientAddress = recipientAddress;
+		this.data.to = recipientAddress;
 
 		return this.instance();
 	}
@@ -148,7 +148,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		this.data.from = await this.addressFactory.fromPublicKey(keys.publicKey);
 
 		if (this.signWithSenderAsRecipient) {
-			this.data.recipientAddress = this.data.from;
+			this.data.to = this.data.from;
 		}
 
 		const data = this.#getSigningObject();

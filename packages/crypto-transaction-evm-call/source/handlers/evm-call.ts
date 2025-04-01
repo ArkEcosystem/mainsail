@@ -46,7 +46,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				gasPrice: BigInt(transaction.data.gasPrice),
 				legacyAddress: senderLegacyAddress,
 				nonce: transaction.data.nonce.toBigInt(),
-				recipient: transaction.data.recipientAddress,
+				recipient: transaction.data.to,
 				sequence: transaction.data.sequence,
 				specId: evmSpec,
 				txHash: transaction.hash,

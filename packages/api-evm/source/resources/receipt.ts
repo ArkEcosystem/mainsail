@@ -15,7 +15,7 @@ export class ReceiptResource {
 			blockHash: `0x${transaction.blockHash}`,
 			blockNumber: `0x${transaction.blockNumber?.toString(16)}`,
 			from: transaction.from,
-			to: transaction.recipientAddress,
+			to: transaction.to,
 			// TODO: Calculate
 			cumulativeGasUsed: "0x0", // The sum of the base fee and tip paid per unit of gas.
 			effectiveGasUsed: "0x0", // The total amount of gas used when this transaction was executed in the block.

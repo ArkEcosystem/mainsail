@@ -32,7 +32,7 @@ export class EvmCallBuilder extends TransactionBuilder<EvmCallBuilder> {
 		const struct: Contracts.Crypto.TransactionData = await super.getStruct();
 
 		struct.value = this.data.value;
-		struct.recipientAddress = this.data.recipientAddress;
+		struct.to = this.data.to;
 
 		return struct;
 	}
