@@ -27,7 +27,7 @@ export const transactionBaseSchema: SchemaObject = {
 	properties: {
 		gasLimit: { transactionGasLimit: {} },
 		gasPrice: { transactionGasPrice: {} },
-		id: { anyOf: [{ $ref: "transactionId" }, { type: "null" }] },
+		hash: { anyOf: [{ $ref: "transactionId" }, { type: "null" }] },
 		// Legacy
 		legacySecondSignature: {
 			allOf: [{ maxLength: 146, minLength: 140 }, { $ref: "alphanumeric" }],
