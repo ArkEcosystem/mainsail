@@ -36,6 +36,8 @@
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/state": "workspace:*",
 		"@mainsail/database": "workspace:*",
+		"@mainsail/api-database": "workspace:*",
+		"@mainsail/api-sync": "workspace:*",
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/evm-service": "workspace:*",
 		"@mainsail/evm-api-worker": "workspace:*",

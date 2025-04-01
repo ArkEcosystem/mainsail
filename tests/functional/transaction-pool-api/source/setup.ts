@@ -95,6 +95,8 @@ const setup = async () => {
 		"@mainsail/crypto-block",
 		"@mainsail/evm-service",
 		"@mainsail/database",
+		"@mainsail/api-database",
+		"@mainsail/api-sync",
 		"@mainsail/blockchain-utils",
 		"@mainsail/crypto-transaction",
 		"@mainsail/crypto-transaction-evm-call",
@@ -199,6 +201,8 @@ const bootstrap = async (sandbox: Sandbox) => {
 
 	const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
 	validatorSet.restore();
+
+	await sandbox.app.get<Contracts.ApiSync.Service>(Identifiers.ApiSync.Service).bootstrap();
 
 	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 
