@@ -1,3 +1,8 @@
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Models,
+} from "@mainsail/api-database";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert, Sandbox } from "@mainsail/test-framework";
@@ -93,6 +98,19 @@ export class Snapshot {
 	public async validate(): Promise<void> {
 		// All account changes from block 0 onwards
 		const { accountDeltas, lastHeight } = await this.collectAccountDeltas();
+
+		const walletRepositoryFactory = this.sandbox.app.get<ApiDatabaseContracts.WalletRepositoryFactory>(
+			ApiDatabaseIdentifiers.WalletRepositoryFactory,
+		);
+
+		let totalSupplyDb = BigNumber.ZERO;
+		const dbWallets = await walletRepositoryFactory().createQueryBuilder().select().getMany();
+		const dbWalletsLookup: Record<string, Models.Wallet> = dbWallets.reduce((acc, curr) => {
+			totalSupplyDb = totalSupplyDb.plus(curr.balance);
+			acc[curr.address] = curr;
+			return acc;
+		}, {});
+
 		// Verify final balance of all wallets matches with delta and snapshot taken at block 0
 		const validateBalance = async (account: Contracts.Evm.AccountInfoExtended): Promise<boolean> => {
 			const currentBalance = BigNumber.make(account.balance);
@@ -150,10 +168,104 @@ export class Snapshot {
 				ok = false;
 			}
 
+			const dbWallet = dbWalletsLookup[account.address];
+			if (!dbWallet) {
+				console.log("-- DB WALLET NOT FOUND", account.address);
+
+				ok = false;
+			} else {
+				if (!expected.balance.isEqualTo(dbWallet.balance)) {
+					// If it doesn't match; the discrepancy must come from a merged legacy cold wallet
+					const legacyColdWallet = this.legacyColdWallets[account.address];
+					if (
+						!legacyColdWallet ||
+						!BigNumber.make(legacyColdWallet.balance).isEqualTo(
+							BigNumber.make(dbWallet.balance).minus(expected.balance),
+						)
+					) {
+						console.log(
+							"-- DB WALLET BALANCE MISMATCH",
+							account.address,
+							"EXPECTED",
+							expected.balance.toString(),
+							"ACTUAL",
+							dbWallet.balance,
+							"DIFF",
+							expected.balance.minus(dbWallet.balance).toString(),
+						);
+						ok = false;
+					}
+				}
+
+				if (!expected.nonce.isEqualTo(dbWallet.nonce)) {
+					// Nonce of the internal address is incremented on each block which is suspect
+					// to race condition here. Hence it needs special treatment:
+					let nonceMismatch = true;
+					if (account.address === "0x0000000000000000000000000000000000000001") {
+						const dataSource = this.sandbox.app.get<ApiDatabaseContracts.RepositoryDataSource>(
+							ApiDatabaseIdentifiers.DataSource,
+						);
+
+						await dataSource.transaction("REPEATABLE READ", async (entityManager) => {
+							const deployerDbWallet = await walletRepositoryFactory(entityManager)
+								.createQueryBuilder()
+								.where("address = :address", { address: account.address })
+								.getOneOrFail();
+
+							const blockRepositoryFactory =
+								this.sandbox.app.get<ApiDatabaseContracts.BlockRepositoryFactory>(
+									ApiDatabaseIdentifiers.BlockRepositoryFactory,
+								);
+							const contractRepositoryFactory =
+								this.sandbox.app.get<ApiDatabaseContracts.ContractRepositoryFactory>(
+									ApiDatabaseIdentifiers.ContractRepositoryFactory,
+								);
+
+							const numberOfBlocks = await blockRepositoryFactory(entityManager)
+								.createQueryBuilder()
+								.getCount();
+							const roundCalculator = this.sandbox.app.get<Contracts.BlockchainUtils.RoundCalculator>(
+								Identifiers.BlockchainUtils.RoundCalculator,
+							);
+							const { round } = roundCalculator.calculateRound(numberOfBlocks - 1);
+							const contracts = await contractRepositoryFactory(entityManager)
+								.createQueryBuilder()
+								.getMany();
+							let numberOfContracts = contracts.length;
+							for (const contract of contracts) {
+								numberOfContracts += contract.implementations.length;
+							}
+
+							// number of blocks + current round + number of deployed contracts
+							const expectedNonce = numberOfBlocks + round + numberOfContracts;
+							console.log("-- COMPARING DEPLOYER WALLET", expectedNonce, deployerDbWallet, dbWallet);
+							if (BigNumber.make(expectedNonce).isEqualTo(deployerDbWallet.nonce)) {
+								nonceMismatch = false;
+							}
+						});
+					}
+
+					if (nonceMismatch) {
+						console.log(
+							"-- DB WALLET NONCE MISMATCH",
+							account.address,
+							"EXPECTED",
+							expected.nonce.toString(),
+							"ACTUAL",
+							dbWallet.nonce,
+							"DIFF",
+							expected.nonce.minus(dbWallet.nonce).toString(),
+						);
+						ok = false;
+					}
+				}
+			}
+
 			return ok;
 		};
 
 		let allValid = true;
+		let totalSupply = BigNumber.ZERO;
 		const evm = this.sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 		const { accounts } = await evm.getAccounts(0n, 1000n);
 		for (let account of accounts) {
@@ -167,9 +279,22 @@ export class Snapshot {
 				};
 			}
 
+			totalSupply = totalSupply.plus(account.balance);
+
 			if (!(await validateBalance(account))) {
 				allValid = false;
 			}
+		}
+
+		// Verify total supply
+		const stateRepositoryFactory = this.sandbox.app.get<ApiDatabaseContracts.StateRepositoryFactory>(
+			ApiDatabaseIdentifiers.StateRepositoryFactory,
+		);
+
+		const dbState = await stateRepositoryFactory().createQueryBuilder().select().getOneOrFail();
+		if (!totalSupply.isEqualTo(dbState.supply) && !totalSupply.isEqualTo(totalSupplyDb)) {
+			console.log("-- DB TOTAL SUPPLY MISMATCH", totalSupply, dbState.supply, totalSupplyDb);
+			allValid = false;
 		}
 
 		if (!allValid) {

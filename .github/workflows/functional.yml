@@ -20,6 +20,17 @@ jobs:
                 node-version: [22.x]
                 name: ["transaction-pool-api"]
 
+        services:
+            postgres:
+                image: postgres:16
+                env:
+                    POSTGRES_DB: test_db
+                    POSTGRES_USER: test_db
+                    POSTGRES_PASSWORD: password
+                ports:
+                    - 127.0.0.1:5432:5432
+                options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
         steps:
             - uses: actions/checkout@v4
               with:

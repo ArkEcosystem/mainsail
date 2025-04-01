@@ -46,7 +46,11 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 		const syncInterval = this.getSyncIntervalMs();
 
 		this.#syncInterval = setInterval(async () => {
-			await this.#syncToDatabase();
+			try {
+				await this.#syncToDatabase();
+			} catch (ex) {
+				this.logger.error(`#syncToDatabase failed: ${ex}`);
+			}
 		}, syncInterval);
 	}
 

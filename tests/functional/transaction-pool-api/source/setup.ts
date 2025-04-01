@@ -14,6 +14,7 @@ const setup = async () => {
 	const sandbox = new Sandbox();
 
 	sandbox.app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
+	sandbox.app.bind(Identifiers.Application.Version).toConstantValue("1.0");
 	sandbox.app.bind(Identifiers.Config.Flags).toConstantValue({});
 	sandbox.app.bind(Identifiers.Config.Plugins).toConstantValue({});
 	sandbox.app
@@ -78,6 +79,11 @@ const setup = async () => {
 
 			storage: ":memory:",
 		},
+		"@mainsail/api-sync": {
+			syncInterval: 250,
+			maxSyncAttempts: 1,
+			truncateDatabase: "1",
+		},
 	};
 
 	const packages = [
@@ -95,6 +101,8 @@ const setup = async () => {
 		"@mainsail/crypto-block",
 		"@mainsail/evm-service",
 		"@mainsail/database",
+		"@mainsail/api-database",
+		"@mainsail/api-sync",
 		"@mainsail/blockchain-utils",
 		"@mainsail/crypto-transaction",
 		"@mainsail/crypto-transaction-evm-call",
@@ -155,15 +163,15 @@ const getPluginConfiguration = async (
 	packageId: string,
 	options: PluginOptions,
 ): Promise<Providers.PluginConfiguration | undefined> => {
+	let defaults = {};
 	try {
-		const { defaults } = await import(`${packageId}/distribution/defaults.js`);
-
-		return sandbox.app
-			.resolve(Providers.PluginConfiguration)
-			.from(packageId, defaults)
-			.merge(options[packageId] || {});
+		({ defaults } = await import(`${packageId}/distribution/defaults.js`));
 	} catch {}
-	return undefined;
+
+	return sandbox.app
+		.resolve(Providers.PluginConfiguration)
+		.from(packageId, defaults)
+		.merge(options[packageId] || {});
 };
 
 const bootstrap = async (sandbox: Sandbox) => {
@@ -199,6 +207,8 @@ const bootstrap = async (sandbox: Sandbox) => {
 
 	const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
 	validatorSet.restore();
+
+	await sandbox.app.get<Contracts.ApiSync.Service>(Identifiers.ApiSync.Service).bootstrap();
 
 	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 

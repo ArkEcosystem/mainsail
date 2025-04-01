@@ -3129,6 +3129,12 @@ importers:
 
   tests/functional/transaction-pool-api:
     devDependencies:
+      '@mainsail/api-database':
+        specifier: workspace:*
+        version: link:../../../packages/api-database
+      '@mainsail/api-sync':
+        specifier: workspace:*
+        version: link:../../../packages/api-sync
       '@mainsail/blockchain-utils':
         specifier: workspace:*
         version: link:../../../packages/blockchain-utils
