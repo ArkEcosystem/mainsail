@@ -14,7 +14,7 @@ export class EvmCallTransaction extends Transaction {
 				data: { bytecode: {} },
 				gasLimit: { transactionGasLimit: {} },
 				gasPrice: { transactionGasPrice: {} },
-				recipientAddress: { $ref: "address" },
+				to: { $ref: "address" },
 				value: { bignumber: { maximum: undefined, minimum: 0 } },
 			},
 			required: ["gasPrice", "gasLimit"],
