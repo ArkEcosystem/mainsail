@@ -102,8 +102,11 @@ export class Snapshot {
 		const walletRepositoryFactory = this.sandbox.app.get<ApiDatabaseContracts.WalletRepositoryFactory>(
 			ApiDatabaseIdentifiers.WalletRepositoryFactory,
 		);
+
+		let totalSupplyDb = BigNumber.ZERO;
 		const dbWallets = await walletRepositoryFactory().createQueryBuilder().select().getMany();
 		const dbWalletsLookup: Record<string, Models.Wallet> = dbWallets.reduce((acc, curr) => {
+			totalSupplyDb = totalSupplyDb.plus(curr.balance);
 			acc[curr.address] = curr;
 			return acc;
 		}, {});
@@ -246,6 +249,7 @@ export class Snapshot {
 		};
 
 		let allValid = true;
+		let totalSupply = BigNumber.ZERO;
 		const evm = this.sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 		const { accounts } = await evm.getAccounts(0n, 1000n);
 		for (let account of accounts) {
@@ -259,9 +263,22 @@ export class Snapshot {
 				};
 			}
 
+			totalSupply = totalSupply.plus(account.balance);
+
 			if (!(await validateBalance(account))) {
 				allValid = false;
 			}
+		}
+
+		// Verify total supply
+		const stateRepositoryFactory = this.sandbox.app.get<ApiDatabaseContracts.StateRepositoryFactory>(
+			ApiDatabaseIdentifiers.StateRepositoryFactory,
+		);
+
+		const dbState = await stateRepositoryFactory().createQueryBuilder().select().getOneOrFail();
+		if (!totalSupply.isEqualTo(dbState.supply) && !totalSupply.isEqualTo(totalSupplyDb)) {
+			console.log("-- DB TOTAL SUPPLY MISMATCH", totalSupply, dbState.supply, totalSupplyDb);
+			allValid = false;
 		}
 
 		if (!allValid) {
