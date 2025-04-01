@@ -9,7 +9,7 @@ export class TransactionResource {
 			blockHash: `0x${transaction.blockHash}`,
 			blockNumber: `0x${transaction.blockNumber?.toString(16)}`,
 			chainId: `0x${transaction.network.toString(16)}`,
-			from: transaction.senderAddress,
+			from: transaction.from,
 			gas: `0x${transaction.gasLimit.toString(16)}`,
 			gasPrice: `0x${transaction.gasPrice.toString(16)}`,
 			hash: `0x${transaction.hash}`,

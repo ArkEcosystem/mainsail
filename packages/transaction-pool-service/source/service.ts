@@ -204,10 +204,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 		const transaction = await this.poolQuery.getFromLowestPriority().first();
 
-		const removedTransactions = await this.mempool.removeTransaction(
-			transaction.data.senderAddress,
-			transaction.hash,
-		);
+		const removedTransactions = await this.mempool.removeTransaction(transaction.data.from, transaction.hash);
 
 		for (const removedTransaction of removedTransactions) {
 			this.storage.removeTransaction(removedTransaction.hash);

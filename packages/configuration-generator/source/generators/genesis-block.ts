@@ -274,7 +274,7 @@ export class GenesisBlockGenerator extends Generator {
 					timestamp,
 					validatorAddress: proposer,
 				},
-				caller: transaction.data.senderAddress,
+				caller: transaction.data.from,
 				data: Buffer.from(transaction.data.data, "hex"),
 				gasLimit: BigInt(transaction.data.gasLimit),
 				gasPrice: BigInt(transaction.data.gasPrice),

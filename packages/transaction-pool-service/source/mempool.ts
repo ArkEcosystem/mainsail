@@ -32,19 +32,19 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	}
 
 	public async addTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
-		const { senderAddress, senderLegacyAddress } = transaction.data;
+		const { from, senderLegacyAddress } = transaction.data;
 
-		let senderMempool = this.#senderMempools.get(senderAddress);
+		let senderMempool = this.#senderMempools.get(from);
 		if (!senderMempool) {
-			senderMempool = await this.createSenderMempool.call(this, senderAddress, senderLegacyAddress);
-			this.#senderMempools.set(senderAddress, senderMempool);
-			this.logger.debug(`${senderAddress} state created`);
+			senderMempool = await this.createSenderMempool.call(this, from, senderLegacyAddress);
+			this.#senderMempools.set(from, senderMempool);
+			this.logger.debug(`${from} state created`);
 		}
 
 		try {
 			await senderMempool.addTransaction(transaction);
 		} finally {
-			this.#removeDisposableMempool(senderAddress);
+			this.#removeDisposableMempool(from);
 		}
 	}
 

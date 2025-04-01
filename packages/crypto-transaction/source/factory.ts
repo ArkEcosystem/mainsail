@@ -79,7 +79,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 				s: transaction.data.s,
 				v: transaction.data.v,
 			});
-			transaction.data.senderAddress = await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey);
+			transaction.data.from = await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey);
 
 			if (this.legacyAddressFactory) {
 				transaction.data.senderLegacyAddress = await this.legacyAddressFactory.fromPublicKey(

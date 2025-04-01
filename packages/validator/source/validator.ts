@@ -191,10 +191,10 @@ export class Validator implements Contracts.Validator.Validator {
 					candidateTransactions.push(transaction);
 				} catch (error) {
 					this.logger.warning(
-						`tx ${transaction.hash} from ${transaction.data.senderAddress} failed to collate: ${error.message}`,
+						`tx ${transaction.hash} from ${transaction.data.from} failed to collate: ${error.message}`,
 					);
 
-					await this.txPoolWorker.removeTransaction(transaction.data.senderAddress, transaction.hash);
+					await this.txPoolWorker.removeTransaction(transaction.data.from, transaction.hash);
 
 					failedSenders.add(transaction.data.senderPublicKey);
 				}

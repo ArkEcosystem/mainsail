@@ -17,7 +17,7 @@ export type TransactionSchema = Record<string, any>;
 export interface TransactionData {
 	network: number;
 
-	senderAddress: string;
+	from: string;
 	senderLegacyAddress?: string;
 	senderPublicKey: string;
 	recipientAddress?: string;
@@ -47,7 +47,7 @@ export interface TransactionData {
 export interface TransactionJson {
 	network?: number;
 
-	senderAddress: string;
+	from: string;
 	senderPublicKey: string;
 	recipientAddress?: string;
 

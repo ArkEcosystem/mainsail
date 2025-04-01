@@ -51,7 +51,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		const sendersAddresses: Set<string> = new Set();
 
 		for (const transaction of unit.getBlock().transactions) {
-			sendersAddresses.add(transaction.data.senderAddress);
+			sendersAddresses.add(transaction.data.from);
 		}
 
 		await this.ipcSubprocess.sendRequest("commit", unit.height, [...sendersAddresses.keys()]);
