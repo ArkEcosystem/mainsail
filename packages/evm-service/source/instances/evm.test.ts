@@ -525,53 +525,7 @@ describe<{
 		);
 	});
 
-	it("should return existing receipt when already committed", async ({ instance }) => {
-		const [sender] = wallets;
-
-		const commitKey = { height: BigInt(0), round: BigInt(0) };
-		const txHash = getRandomTxHash();
-		let { receipt } = await instance.process({
-			caller: sender.address,
-			value: 0n,
-			nonce: 0n,
-			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
-			blockContext: { ...blockContext, commitKey },
-			txHash,
-			...deployConfig,
-		});
-
-		assert.true(receipt.success);
-		assert.equal(receipt.gasUsed, 964_156n);
-		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
-		assert.length(receipt.logs, 1);
-
-		await instance.onCommit({
-			...commitKey,
-			getBlock: () => ({
-				data: { ...commitKey },
-			}),
-			setAccountUpdates: () => {},
-		} as any);
-
-		const prevReceipt = receipt;
-
-		({ receipt } = await instance.process({
-			caller: sender.address,
-			value: 0n,
-			nonce: 1n,
-			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
-			blockContext: { ...blockContext, commitKey },
-			txHash,
-			...deployConfig,
-		}));
-
-		assert.true(receipt.success);
-		assert.equal(receipt.gasUsed, 964_156n);
-		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
-		assert.equal(receipt.logs, prevReceipt.logs);
-	});
-
-	it("should throw when passing non-existent tx hash for committed receipt", async ({ instance }) => {
+	it("should panic when passing non-existent tx hash for committed receipt", async ({ instance }) => {
 		const [sender] = wallets;
 
 		const commitKey = { height: BigInt(0), round: BigInt(0) };
@@ -607,7 +561,7 @@ describe<{
 				txHash: randomTxHash,
 				...deployConfig,
 			});
-		}, "found commit, but tx hash is missing");
+		}, "assertion failed: !committed");
 	});
 
 	it("should deploy, transfer multipe times and update balance correctly", async ({ instance }) => {
@@ -710,7 +664,7 @@ describe<{
 					gasPrice: 5n,
 					specId: Contracts.Evm.SpecId.SHANGHAI,
 				}),
-			"transaction validation error: call gas cost exceeds the gas limit",
+			"transaction validation error: call gas cost (137330) exceeds the gas limit (30000)",
 		);
 	});
 
@@ -935,7 +889,7 @@ describe<{
 		assert.equal(result, {
 			success: false,
 			initialGasUsed: 0n,
-			error: "preverify failed: transaction validation error: call gas cost exceeds the gas limit",
+			error: "preverify failed: call gas cost (137330) exceeds the gas limit (21000)",
 		});
 	});
 });

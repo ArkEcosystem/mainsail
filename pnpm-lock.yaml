@@ -1903,6 +1903,9 @@ importers:
       '@mainsail/crypto-block':
         specifier: workspace:*
         version: link:../crypto-block
+      '@mainsail/crypto-commit':
+        specifier: workspace:*
+        version: link:../crypto-commit
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
