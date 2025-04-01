@@ -12,12 +12,11 @@ export class EvmCallTransaction extends Transaction {
 			$id: "evmCall",
 			properties: {
 				data: { bytecode: {} },
-				gasLimit: { transactionGasLimit: {} },
 				gasPrice: { transactionGasPrice: {} },
 				to: { $ref: "address" },
 				value: { bignumber: { maximum: undefined, minimum: 0 } },
 			},
-			required: ["gasPrice", "gasLimit"],
+			required: ["gasPrice", "gas"],
 		});
 	}
 }
