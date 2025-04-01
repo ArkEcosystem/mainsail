@@ -1,3 +1,8 @@
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Models,
+} from "@mainsail/api-database";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert, Sandbox } from "@mainsail/test-framework";
@@ -93,6 +98,16 @@ export class Snapshot {
 	public async validate(): Promise<void> {
 		// All account changes from block 0 onwards
 		const { accountDeltas, lastHeight } = await this.collectAccountDeltas();
+
+		const walletRepositoryFactory = this.sandbox.app.get<ApiDatabaseContracts.WalletRepositoryFactory>(
+			ApiDatabaseIdentifiers.WalletRepositoryFactory,
+		);
+		const dbWallets = await walletRepositoryFactory().createQueryBuilder().select().getMany();
+		const dbWalletsLookup: Record<string, Models.Wallet> = dbWallets.reduce((acc, curr) => {
+			acc[curr.address] = curr;
+			return acc;
+		}, {});
+
 		// Verify final balance of all wallets matches with delta and snapshot taken at block 0
 		const validateBalance = async (account: Contracts.Evm.AccountInfoExtended): Promise<boolean> => {
 			const currentBalance = BigNumber.make(account.balance);
@@ -148,6 +163,83 @@ export class Snapshot {
 				);
 
 				ok = false;
+			}
+
+			const dbWallet = dbWalletsLookup[account.address];
+			if (!dbWallet) {
+				console.log("-- DB WALLET NOT FOUND", account.address);
+
+				ok = false;
+			} else {
+				if (!expected.balance.isEqualTo(dbWallet.balance)) {
+					// If it doesn't match; the discrepancy must come from a merged legacy cold wallet
+					const legacyColdWallet = this.legacyColdWallets[account.address];
+					if (
+						!legacyColdWallet ||
+						!BigNumber.make(legacyColdWallet.balance).isEqualTo(
+							BigNumber.make(dbWallet.balance).minus(expected.balance),
+						)
+					) {
+						console.log(
+							"-- DB WALLET BALANCE MISMATCH",
+							account.address,
+							"EXPECTED",
+							expected.balance.toString(),
+							"ACTUAL",
+							dbWallet.balance,
+							"DIFF",
+							expected.balance.minus(dbWallet.balance).toString(),
+						);
+						ok = false;
+					}
+				}
+
+				if (!expected.nonce.isEqualTo(dbWallet.nonce)) {
+					// Nonce of the internal address is incremented on each block which is suspect
+					// to race condition here. Hence it needs special treatment:
+					let nonceMismatch = true;
+					if (account.address === "0x0000000000000000000000000000000000000001") {
+						const blockRepositoryFactory =
+							this.sandbox.app.get<ApiDatabaseContracts.BlockRepositoryFactory>(
+								ApiDatabaseIdentifiers.BlockRepositoryFactory,
+							);
+						const contractRepositoryFactory =
+							this.sandbox.app.get<ApiDatabaseContracts.ContractRepositoryFactory>(
+								ApiDatabaseIdentifiers.ContractRepositoryFactory,
+							);
+
+						const numberOfBlocks = await blockRepositoryFactory().createQueryBuilder().getCount();
+						const roundCalculator = this.sandbox.app.get<Contracts.BlockchainUtils.RoundCalculator>(
+							Identifiers.BlockchainUtils.RoundCalculator,
+						);
+						const { round } = roundCalculator.calculateRound(numberOfBlocks - 1);
+						const contracts = await contractRepositoryFactory().createQueryBuilder().getMany();
+						let numberOfContracts = contracts.length;
+						for (const contract of contracts) {
+							numberOfContracts += contract.implementations.length;
+						}
+
+						// number of blocks + current round + number of deployed contracts
+						const expectedNonce = numberOfBlocks + round + numberOfContracts;
+						if (BigNumber.make(expectedNonce).isEqualTo(dbWallet.nonce)) {
+							nonceMismatch = false;
+						}
+					}
+
+					if (nonceMismatch) {
+						console.log(
+							"-- DB WALLET NONCE MISMATCH",
+							account.address,
+							"EXPECTED",
+							expected.nonce.toString(),
+							"ACTUAL",
+							dbWallet.nonce,
+							"DIFF",
+							expected.nonce.minus(dbWallet.nonce).toString(),
+						);
+						ok = false;
+					}
+				}
 			}
 
 			return ok;
