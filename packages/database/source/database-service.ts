@@ -251,7 +251,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		const transaction = await this.transactionFactory.fromBytes(buffer.getRemainder());
 
 		transaction.data.sequence = sequence;
-		transaction.data.blockHeight = height;
+		transaction.data.blockNumber = height;
 
 		const blockBuffer = await this.#readBlockHeaderBytes(height);
 		assert.buffer(blockBuffer);

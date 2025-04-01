@@ -41,7 +41,7 @@ export interface TransactionData {
 	sequence?: number;
 	gasUsed?: number;
 	blockHash?: string;
-	blockHeight?: number;
+	blockNumber?: number;
 }
 
 export interface TransactionJson {
@@ -69,7 +69,7 @@ export interface TransactionJson {
 	sequence?: number;
 	gasUsed?: number;
 	blockHash?: string;
-	blockHeight?: number;
+	blockNumber?: number;
 }
 
 export interface SerializeOptions {

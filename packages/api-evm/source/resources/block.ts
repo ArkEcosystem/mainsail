@@ -49,7 +49,7 @@ export class BlockResource {
 		return Promise.all(
 			block.transactions.map(async (transaction) => {
 				transaction.data.blockHash = block.data.hash;
-				transaction.data.blockHeight = block.data.number;
+				transaction.data.blockNumber = block.data.number;
 				return await transactionResource.transform(transaction.data);
 			}),
 		);

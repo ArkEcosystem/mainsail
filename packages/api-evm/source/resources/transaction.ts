@@ -7,7 +7,7 @@ export class TransactionResource {
 		/* eslint-disable sort-keys-fix/sort-keys-fix */
 		return {
 			blockHash: `0x${transaction.blockHash}`,
-			blockNumber: `0x${transaction.blockHeight?.toString(16)}`,
+			blockNumber: `0x${transaction.blockNumber?.toString(16)}`,
 			chainId: `0x${transaction.network.toString(16)}`,
 			from: transaction.senderAddress,
 			gas: `0x${transaction.gasLimit.toString(16)}`,

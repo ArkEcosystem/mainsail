@@ -13,7 +13,7 @@ export class ReceiptResource {
 			transactionHash: `0x${transaction.hash}`,
 			transactionIndex: `0x${transaction.sequence?.toString(16)}`,
 			blockHash: `0x${transaction.blockHash}`,
-			blockNumber: `0x${transaction.blockHeight?.toString(16)}`,
+			blockNumber: `0x${transaction.blockNumber?.toString(16)}`,
 			from: transaction.senderAddress,
 			to: transaction.recipientAddress,
 			// TODO: Calculate
