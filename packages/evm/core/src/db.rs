@@ -5,7 +5,13 @@ use std::{
 
 use heed::{Comparator, EnvFlags, EnvOpenOptions};
 use rayon::slice::ParallelSliceMut;
-use revm::{CacheState, Database, DatabaseRef, TransitionState, primitives::*};
+use revm::{
+    Database, DatabaseRef,
+    context::{DBErrorMarker, result::ExecutionResult},
+    database::{CacheState, TransitionState},
+    primitives::*,
+    state::{AccountInfo, Bytecode},
+};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -265,6 +271,8 @@ pub enum Error {
     #[error("infallible error")]
     Infallible(#[from] Infallible),
 }
+
+impl DBErrorMarker for Error {}
 
 impl PersistentDB {
     const MAX_DBS: u32 = 12;
@@ -652,7 +660,7 @@ impl DatabaseRef for PersistentDB {
         let basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
             Some(account) => account,
             None => match &self.genesis_info {
-                Some(genesis) if genesis.account == address => revm::primitives::AccountInfo {
+                Some(genesis) if genesis.account == address => revm::state::AccountInfo {
                     balance: genesis.initial_supply,
                     ..Default::default()
                 },
@@ -1097,7 +1105,7 @@ impl PendingCommit {
         info: AccountInfo,
         legacy_attributes: Option<LegacyAccountAttributes>,
     ) {
-        let mut state = revm::State::builder()
+        let mut state = revm::database::State::builder()
             .with_bundle_update()
             .with_cached_prestate(std::mem::take(&mut self.cache))
             .build();
@@ -1157,9 +1165,9 @@ fn test_commit_changes() {
     // 2) Update balance for account
     let mut state = HashMap::new();
 
-    let mut account = Account::new_not_existing();
+    let mut account = revm::state::Account::new_not_existing();
     account.info.balance = U256::from(100);
-    account.status = AccountStatus::Touched;
+    account.status = revm::state::AccountStatus::Touched;
 
     let code = Bytecode::new();
     account.info.code_hash = code.hash_slow();
@@ -1168,19 +1176,19 @@ fn test_commit_changes() {
     let mut storage = HashMap::new();
     storage.insert(
         U256::from(1),
-        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(1234)),
+        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1234)),
     );
     storage.insert(
         U256::from(2),
-        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(5678)),
+        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(5678)),
     );
 
     state.insert(
         address,
-        revm::db::TransitionAccount {
-            status: revm::db::AccountStatus::InMemoryChange,
+        revm::database::TransitionAccount {
+            status: revm::database::AccountStatus::InMemoryChange,
             info: Some(account.info.clone()),
-            previous_status: revm::db::AccountStatus::Loaded,
+            previous_status: revm::database::AccountStatus::Loaded,
             previous_info: None,
             storage,
             storage_was_destroyed: false,
@@ -1230,38 +1238,38 @@ fn test_storage() {
     let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
     let mut state = HashMap::new();
 
-    let mut account = Account::new_not_existing();
-    account.status = AccountStatus::Touched;
+    let mut account = revm::state::Account::new_not_existing();
+    account.status = revm::state::AccountStatus::Touched;
 
     let mut storage = HashMap::new();
 
     storage.insert(
         U256::from(99),
-        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(99)),
+        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(99)),
     );
     storage.insert(
         U256::from(1),
-        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
     );
     storage.insert(
         U256::from(101),
-        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(101)),
+        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(101)),
     );
     storage.insert(
         U256::from(2),
-        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(2)),
+        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(2)),
     );
     storage.insert(
         U256::from(4),
-        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(4)),
+        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(4)),
     );
 
     state.insert(
         address,
-        revm::db::TransitionAccount {
-            status: revm::db::AccountStatus::InMemoryChange,
+        revm::database::TransitionAccount {
+            status: revm::database::AccountStatus::InMemoryChange,
             info: Some(account.info.clone()),
-            previous_status: revm::db::AccountStatus::Loaded,
+            previous_status: revm::database::AccountStatus::Loaded,
             previous_info: None,
             storage,
             storage_was_destroyed: false,
@@ -1303,26 +1311,26 @@ fn test_storage_overwrite() {
     let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
     let mut state = HashMap::new();
 
-    let mut account = Account::new_not_existing();
-    account.status = AccountStatus::Touched;
+    let mut account = revm::state::Account::new_not_existing();
+    account.status = revm::state::AccountStatus::Touched;
 
     let mut storage = HashMap::new();
 
     storage.insert(
         U256::from(1),
-        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
     );
     storage.insert(
         U256::from(2),
-        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(2)),
+        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(2)),
     );
 
     state.insert(
         address,
-        revm::db::TransitionAccount {
-            status: revm::db::AccountStatus::InMemoryChange,
+        revm::database::TransitionAccount {
+            status: revm::database::AccountStatus::InMemoryChange,
             info: Some(account.info.clone()),
-            previous_status: revm::db::AccountStatus::Loaded,
+            previous_status: revm::database::AccountStatus::Loaded,
             previous_info: None,
             storage,
             storage_was_destroyed: false,
@@ -1350,16 +1358,16 @@ fn test_storage_overwrite() {
     let mut storage = HashMap::new();
     storage.insert(
         U256::from(1),
-        revm::db::states::StorageSlot::new_changed(U256::from(1), U256::from(99)),
+        revm::database::states::StorageSlot::new_changed(U256::from(1), U256::from(99)),
     );
 
     let mut state = HashMap::new();
     state.insert(
         address,
-        revm::db::TransitionAccount {
-            status: revm::db::AccountStatus::Changed,
+        revm::database::TransitionAccount {
+            status: revm::database::AccountStatus::Changed,
             info: Some(account.info.clone()),
-            previous_status: revm::db::AccountStatus::Loaded,
+            previous_status: revm::database::AccountStatus::Loaded,
             previous_info: None,
             storage,
             storage_was_destroyed: false,
@@ -1406,24 +1414,24 @@ fn test_resize_on_commit() {
 
         let mut state = HashMap::new();
 
-        let mut account = Account::new_not_existing();
-        account.status = AccountStatus::Touched;
+        let mut account = revm::state::Account::new_not_existing();
+        account.status = revm::state::AccountStatus::Touched;
 
         let mut storage = HashMap::new();
 
         for i in 0..n {
             storage.insert(
                 U256::from(i + 1),
-                revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+                revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
             );
         }
 
         state.insert(
             address,
-            revm::db::TransitionAccount {
-                status: revm::db::AccountStatus::InMemoryChange,
+            revm::database::TransitionAccount {
+                status: revm::database::AccountStatus::InMemoryChange,
                 info: Some(account.info.clone()),
-                previous_status: revm::db::AccountStatus::Loaded,
+                previous_status: revm::database::AccountStatus::Loaded,
                 previous_info: None,
                 storage,
                 storage_was_destroyed: false,

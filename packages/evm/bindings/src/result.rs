@@ -6,7 +6,10 @@ use mainsail_evm_core::{
 };
 use napi::{JsBigInt, JsBoolean, JsBuffer, JsNumber, JsString};
 use napi_derive::napi;
-use revm::primitives::{AccountInfo, B256, Bytes};
+use revm::{
+    primitives::{B256, Bytes},
+    state::AccountInfo,
+};
 
 use crate::utils;
 

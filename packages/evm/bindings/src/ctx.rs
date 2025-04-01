@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, str::FromStr};
 
 use mainsail_evm_core::{
     db::{CommitData, CommitKey},
@@ -6,7 +6,7 @@ use mainsail_evm_core::{
 };
 use napi::{JsBigInt, JsBuffer, JsFunction, JsNumber, JsString};
 use napi_derive::napi;
-use revm::primitives::{Address, B256, Bytes, SpecId, U256};
+use revm::primitives::{Address, B256, Bytes, U256, hardfork::SpecId};
 
 use crate::utils;
 
@@ -127,13 +127,13 @@ pub struct PreverifyTxContext {
     /// Omit recipient when deploying a contract
     pub recipient: Option<Address>,
     pub gas_limit: u64,
-    pub gas_price: U256,
+    pub gas_price: u128,
     pub value: U256,
     pub nonce: u64,
     pub data: Bytes,
     pub tx_hash: B256,
     pub spec_id: SpecId,
-    pub block_gas_limit: U256,
+    pub block_gas_limit: u64,
 }
 
 #[derive(Debug)]
@@ -143,7 +143,7 @@ pub struct TxContext {
     /// Omit recipient when deploying a contract
     pub recipient: Option<Address>,
     pub gas_limit: u64,
-    pub gas_price: U256,
+    pub gas_price: u128,
     pub value: U256,
     pub nonce: u64,
     pub data: Bytes,
@@ -165,8 +165,8 @@ pub struct TxViewContext {
 #[derive(Debug)]
 pub struct BlockContext {
     pub commit_key: CommitKey,
-    pub gas_limit: U256,
-    pub timestamp: U256,
+    pub gas_limit: u64,
+    pub timestamp: u64,
     pub validator_address: Address,
 }
 
@@ -183,7 +183,7 @@ pub struct GenesisContext {
 #[derive(Debug)]
 pub struct CalculateActiveValidatorsContext {
     pub commit_key: CommitKey,
-    pub timestamp: U256,
+    pub timestamp: u64,
     pub active_validators: u8,
     pub validator_address: Address,
     pub spec_id: SpecId,
@@ -192,7 +192,7 @@ pub struct CalculateActiveValidatorsContext {
 #[derive(Debug)]
 pub struct UpdateRewardsAndVotesContext {
     pub commit_key: CommitKey,
-    pub timestamp: U256,
+    pub timestamp: u64,
     pub block_reward: u128,
     pub validator_address: Address,
     pub spec_id: SpecId,
@@ -209,7 +209,7 @@ pub struct ExecutionContext {
     pub caller: Address,
     pub recipient: Option<Address>,
     pub gas_limit: Option<u64>,
-    pub gas_price: U256,
+    pub gas_price: u128,
     pub value: U256,
     pub nonce: Option<u64>,
     pub data: Bytes,
@@ -224,7 +224,7 @@ impl From<TxViewContext> for ExecutionContext {
             caller: value.caller,
             recipient: Some(value.recipient),
             gas_limit: value.gas_limit,
-            gas_price: U256::ZERO,
+            gas_price: 0,
             value: U256::ZERO,
             nonce: None,
             data: value.data,
@@ -309,8 +309,8 @@ impl TryFrom<JsBlockContext> for BlockContext {
     fn try_from(value: JsBlockContext) -> Result<Self, Self::Error> {
         Ok(BlockContext {
             commit_key: value.commit_key.try_into()?,
-            gas_limit: U256::from(value.gas_limit.get_u64()?.0),
-            timestamp: U256::from(value.timestamp.get_u64()?.0),
+            gas_limit: value.gas_limit.get_u64()?.0,
+            timestamp: value.timestamp.get_u64()?.0,
             validator_address: utils::create_address_from_js_string(value.validator_address)?,
         })
     }
@@ -319,7 +319,7 @@ impl TryFrom<JsBlockContext> for BlockContext {
 impl TryFrom<JsTransactionContext> for TxContext {
     type Error = anyhow::Error;
 
-    fn try_from(value: JsTransactionContext) -> std::result::Result<Self, Self::Error> {
+    fn try_from(mut value: JsTransactionContext) -> std::result::Result<Self, Self::Error> {
         let buf = value.data.into_value()?;
 
         let recipient = if let Some(recipient) = value.recipient {
@@ -343,7 +343,7 @@ impl TryFrom<JsTransactionContext> for TxContext {
         let tx_ctx = TxContext {
             recipient,
             gas_limit: value.gas_limit.try_into()?,
-            gas_price: utils::convert_bigint_to_u256(value.gas_price)?,
+            gas_price: value.gas_price.get_u128()?.1,
             caller: utils::create_address_from_js_string(value.caller)?,
             legacy_address,
             value: utils::convert_bigint_to_u256(value.value)?,
@@ -362,7 +362,9 @@ impl TryFrom<JsTransactionContext> for TxContext {
 impl TryFrom<JsPreverifyTransactionContext> for PreverifyTxContext {
     type Error = anyhow::Error;
 
-    fn try_from(value: JsPreverifyTransactionContext) -> std::result::Result<Self, Self::Error> {
+    fn try_from(
+        mut value: JsPreverifyTransactionContext,
+    ) -> std::result::Result<Self, Self::Error> {
         let buf = value.data.into_value()?;
 
         let recipient = if let Some(recipient) = value.recipient {
@@ -380,14 +382,14 @@ impl TryFrom<JsPreverifyTransactionContext> for PreverifyTxContext {
         let tx_ctx = PreverifyTxContext {
             recipient,
             gas_limit: value.gas_limit.try_into()?,
-            gas_price: utils::convert_bigint_to_u256(value.gas_price)?,
+            gas_price: value.gas_price.get_u128()?.1,
             caller: utils::create_address_from_js_string(value.caller)?,
             legacy_address,
             value: utils::convert_bigint_to_u256(value.value)?,
             nonce: value.nonce.get_u64()?.0,
             data: Bytes::from(buf.as_ref().to_owned()),
             tx_hash: utils::convert_string_to_b256(value.tx_hash)?,
-            block_gas_limit: utils::convert_bigint_to_u256(value.block_gas_limit)?,
+            block_gas_limit: value.block_gas_limit.get_u64()?.0,
             spec_id: parse_spec_id(value.spec_id)?,
         };
 
@@ -458,7 +460,7 @@ impl TryFrom<JsCalculateActiveValidatorsContext> for CalculateActiveValidatorsCo
     fn try_from(value: JsCalculateActiveValidatorsContext) -> Result<Self, Self::Error> {
         Ok(CalculateActiveValidatorsContext {
             commit_key: value.commit_key.try_into()?,
-            timestamp: U256::from(value.timestamp.get_u64()?.0),
+            timestamp: value.timestamp.get_u64()?.0,
             validator_address: utils::create_address_from_js_string(value.validator_address)?,
             active_validators: u8::try_from(match value.active_validators.get_u64() {
                 Ok(active_validators) => active_validators.0,
@@ -475,7 +477,7 @@ impl TryFrom<JsUpdateRewardsAndVotesContext> for UpdateRewardsAndVotesContext {
     fn try_from(mut value: JsUpdateRewardsAndVotesContext) -> Result<Self, Self::Error> {
         Ok(UpdateRewardsAndVotesContext {
             commit_key: value.commit_key.try_into()?,
-            timestamp: U256::from(value.timestamp.get_u64()?.0),
+            timestamp: value.timestamp.get_u64()?.0,
             validator_address: utils::create_address_from_js_string(value.validator_address)?,
             block_reward: value.block_reward.get_u128()?.1,
             spec_id: parse_spec_id(value.spec_id)?,
@@ -493,9 +495,11 @@ fn parse_spec_id(spec_id: JsString) -> Result<SpecId, anyhow::Error> {
     }
 
     // Any supported spec is listed in the first match arm
-    let spec_id = spec_id.as_str().into();
-    match spec_id {
-        SpecId::SHANGHAI => Ok(spec_id),
+    match SpecId::from_str(spec_id.as_str()) {
+        Ok(spec_id) => match spec_id {
+            SpecId::SHANGHAI => Ok(spec_id),
+            _ => Err(anyhow::anyhow!("unsupported spec_id")),
+        },
         _ => Err(anyhow::anyhow!("invalid spec_id")),
     }
 }
