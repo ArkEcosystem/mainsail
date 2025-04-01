@@ -230,7 +230,7 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 			buff.writeBytes(transaction.serialized);
 
 			transactionBuffers.push(buff.toBuffer());
-			transactionIds.push(transaction.id);
+			transactionIds.push(transaction.hash);
 		}
 
 		return {

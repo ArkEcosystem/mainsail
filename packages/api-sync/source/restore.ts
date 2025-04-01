@@ -287,7 +287,7 @@ export class Restore {
 						data: data.data,
 						gasLimit: data.gasLimit,
 						gasPrice: data.gasPrice,
-						id: data.id as unknown as string,
+						id: data.hash,
 						legacySecondSignature: data.legacySecondSignature,
 						nonce: data.nonce.toFixed(),
 						recipientAddress: data.recipientAddress,

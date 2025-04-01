@@ -12,7 +12,7 @@ export class TransactionResource {
 			from: transaction.senderAddress,
 			gas: `0x${transaction.gasLimit.toString(16)}`,
 			gasPrice: `0x${transaction.gasPrice.toString(16)}`,
-			hash: `0x${transaction.id}`,
+			hash: `0x${transaction.hash}`,
 			input: `0x${transaction.data}`,
 			maxPriorityFeePerGas: `0x0`,
 			maxFeePerGas: `0x${transaction.gasPrice.toString(16)}`,

@@ -59,13 +59,13 @@ export const registerBlockFactory = async (
 
 		for (const transaction of transactions) {
 			const { data, serialized } = transaction;
-			assert.string(data.id);
+			assert.string(data.hash);
 
 			totals.value = totals.value.plus(data.value);
 			totals.gasPrice = totals.gasPrice.plus(data.gasPrice);
 			totals.gasUsed += data.gasLimit;
 
-			payloadBuffers.push(Buffer.from(data.id, "hex"));
+			payloadBuffers.push(Buffer.from(data.hash, "hex"));
 			transactionData.push(data);
 			payloadSize += serialized.length;
 		}

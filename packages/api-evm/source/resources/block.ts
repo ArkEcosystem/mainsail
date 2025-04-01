@@ -38,7 +38,7 @@ export class BlockResource {
 			timestamp: `0x${blockData.timestamp.toString(16)}`,
 			transactions: transactionObject
 				? await this.#transformTransactions(block)
-				: block.transactions.map((transaction) => transaction.id),
+				: block.transactions.map((transaction) => transaction.hash),
 			uncles: [],
 		};
 		/* eslint-enable sort-keys-fix/sort-keys-fix */

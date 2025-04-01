@@ -75,7 +75,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 			nonce: transaction.data.nonce.toBigInt(),
 			recipient: transaction.data.recipientAddress,
 			specId: milestone.evmSpec,
-			txHash: transaction.data.id,
+			txHash: transaction.data.hash,
 			value: transaction.data.value.toBigInt(),
 		});
 

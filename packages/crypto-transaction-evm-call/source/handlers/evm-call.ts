@@ -30,7 +30,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Evm.TransactionReceipt> {
-		assert.string(transaction.id);
+		assert.string(transaction.hash);
 
 		const { evmSpec } = this.configuration.getMilestone();
 
@@ -49,14 +49,14 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				recipient: transaction.data.recipientAddress,
 				sequence: transaction.data.sequence,
 				specId: evmSpec,
-				txHash: transaction.id,
+				txHash: transaction.hash,
 				value: transaction.data.value.toBigInt(),
 			});
 
 			void this.#emit(Events.EvmEvent.TransactionReceipt, {
 				receipt,
 				sender: senderAddress,
-				transactionId: transaction.id,
+				transactionId: transaction.hash,
 			});
 
 			return receipt;

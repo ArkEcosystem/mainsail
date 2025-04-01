@@ -27,7 +27,7 @@ export class EthSendRawTransactionAction implements Contracts.Api.RPC.Action {
 		if (response.statusCode === 200) {
 			if (response.data.data.accept.length > 0) {
 				const tx = await this.transactionFactory.fromHex(parameters[0].slice(2));
-				return `0x${tx.id}`;
+				return `0x${tx.hash}`;
 			} else {
 				throw new Exceptions.RpcError(response.data.errors[0].message);
 			}

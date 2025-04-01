@@ -56,18 +56,18 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 						const height = configuration.getHeight();
 						let valid = height === configuration.getGenesisHeight();
 
-						// Otherwise lookup by transaction id
-						if (!valid && parentSchema && parentSchema.parentData && parentSchema.parentData.id) {
+						// Otherwise lookup by transaction hash
+						if (!valid && parentSchema && parentSchema.parentData && parentSchema.parentData.hash) {
 							if (genesisTransactionsLookup.size === 0) {
 								const genesisBlock = configuration.get<Contracts.Crypto.BlockData | undefined>(
 									"genesisBlock.block",
 								);
 								for (const transaction of genesisBlock?.transactions || []) {
-									genesisTransactionsLookup.add(transaction.id);
+									genesisTransactionsLookup.add(transaction.hash);
 								}
 							}
 
-							valid = genesisTransactionsLookup.has(parentSchema.parentData.id);
+							valid = genesisTransactionsLookup.has(parentSchema.parentData.hash);
 						}
 
 						return valid;

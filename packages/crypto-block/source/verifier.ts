@@ -48,17 +48,17 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 
 			const payloadBuffers: Buffer[] = [];
 			for (const transaction of block.transactions) {
-				if (!transaction || !transaction.id) {
+				if (!transaction || !transaction.hash) {
 					throw new Error();
 				}
 
-				const bytes: Buffer = Buffer.from(transaction.id, "hex");
+				const bytes: Buffer = Buffer.from(transaction.hash, "hex");
 
-				if (appliedTransactions[transaction.id]) {
-					result.errors.push(`Encountered duplicate transaction: ${transaction.id}`);
+				if (appliedTransactions[transaction.hash]) {
+					result.errors.push(`Encountered duplicate transaction: ${transaction.hash}`);
 				}
 
-				appliedTransactions[transaction.id] = transaction.data;
+				appliedTransactions[transaction.hash] = transaction.data;
 
 				amount = amount.plus(transaction.data.value);
 				totalPayloadLength += transaction.serialized.byteLength;

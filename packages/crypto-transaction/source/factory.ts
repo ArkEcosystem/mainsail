@@ -87,7 +87,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 				);
 			}
 
-			transaction.data.id = await this.utils.getId(transaction);
+			transaction.data.hash = await this.utils.getId(transaction);
 
 			const { error } = await this.verifier.verifySchema(transaction.data, strict);
 

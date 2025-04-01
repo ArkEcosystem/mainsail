@@ -5,7 +5,7 @@ import type { MultiSignatureAsset } from "./legacy.js";
 import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction {
-	readonly id: string;
+	readonly hash: string;
 	readonly key: string;
 
 	data: TransactionData;
@@ -30,7 +30,7 @@ export interface TransactionData {
 	nonce: BigNumber;
 	data: string;
 
-	id: string;
+	hash: string;
 	timestamp: number;
 
 	v?: number;
@@ -59,7 +59,7 @@ export interface TransactionJson {
 	nonce: string;
 	data: string;
 
-	id?: string;
+	hash?: string;
 	timestamp?: number;
 
 	v?: number;
@@ -87,7 +87,7 @@ export interface TransactionVerifier {
 
 	verifyHash(data: TransactionData): Promise<boolean>;
 
-	verifySchema(data: Omit<TransactionData, "id">, strict?: boolean): Promise<SchemaValidationResult>;
+	verifySchema(data: Omit<TransactionData, "hash">, strict?: boolean): Promise<SchemaValidationResult>;
 
 	verifyLegacySecondSignature(data: TransactionData, legacySecondPublicKey: string): Promise<boolean>;
 }

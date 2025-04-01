@@ -10,7 +10,7 @@ export class ReceiptResource {
 	): Promise<object> {
 		/* eslint-disable sort-keys-fix/sort-keys-fix */
 		return {
-			transactionHash: `0x${transaction.id}`,
+			transactionHash: `0x${transaction.hash}`,
 			transactionIndex: `0x${transaction.sequence?.toString(16)}`,
 			blockHash: `0x${transaction.blockId}`,
 			blockNumber: `0x${transaction.blockHeight?.toString(16)}`,

@@ -64,8 +64,8 @@ export class Service implements Contracts.TransactionPool.Service {
 			const removedTransactions = await this.mempool.reAddTransactions(sendersAddresses);
 
 			for (const transaction of removedTransactions) {
-				this.storage.removeTransaction(transaction.id);
-				this.logger.debug(`Removed tx ${transaction.id}`);
+				this.storage.removeTransaction(transaction.hash);
+				this.logger.debug(`Removed tx ${transaction.hash}`);
 				void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.data);
 			}
 
@@ -79,25 +79,25 @@ export class Service implements Contracts.TransactionPool.Service {
 				return;
 			}
 
-			if (this.storage.hasTransaction(transaction.id)) {
+			if (this.storage.hasTransaction(transaction.hash)) {
 				throw new Exceptions.TransactionAlreadyInPoolError(transaction);
 			}
 
 			this.storage.addTransaction({
 				height: this.stateStore.getHeight(),
-				id: transaction.id,
+				id: transaction.hash,
 				senderPublicKey: transaction.data.senderPublicKey,
 				serialized: transaction.serialized,
 			});
 
 			try {
 				await this.#addTransactionToMempool(transaction);
-				this.logger.debug(`tx ${transaction.id} added to pool`);
+				this.logger.debug(`tx ${transaction.hash} added to pool`);
 
 				void this.events.dispatch(Events.TransactionEvent.AddedToPool, transaction.data);
 			} catch (error) {
-				this.storage.removeTransaction(transaction.id);
-				this.logger.warning(`tx ${transaction.id} failed to enter pool: ${error.message}`);
+				this.storage.removeTransaction(transaction.hash);
+				this.logger.warning(`tx ${transaction.hash} failed to enter pool: ${error.message}`);
 
 				void this.events.dispatch(Events.TransactionEvent.RejectedByPool, transaction.data);
 
@@ -189,8 +189,8 @@ export class Service implements Contracts.TransactionPool.Service {
 			);
 
 			for (const removedTransaction of removedTransactions) {
-				this.storage.removeTransaction(removedTransaction.id);
-				this.logger.debug(`Removed old tx ${removedTransaction.id}`);
+				this.storage.removeTransaction(removedTransaction.hash);
+				this.logger.debug(`Removed old tx ${removedTransaction.hash}`);
 
 				void this.events.dispatch(Events.TransactionEvent.Expired, removedTransaction.data);
 			}
@@ -206,12 +206,12 @@ export class Service implements Contracts.TransactionPool.Service {
 
 		const removedTransactions = await this.mempool.removeTransaction(
 			transaction.data.senderAddress,
-			transaction.id,
+			transaction.hash,
 		);
 
 		for (const removedTransaction of removedTransactions) {
-			this.storage.removeTransaction(removedTransaction.id);
-			this.logger.debug(`Removed lowest priority tx ${removedTransaction.id}`);
+			this.storage.removeTransaction(removedTransaction.hash);
+			this.logger.debug(`Removed lowest priority tx ${removedTransaction.hash}`);
 			void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, removedTransaction.data);
 		}
 	}
