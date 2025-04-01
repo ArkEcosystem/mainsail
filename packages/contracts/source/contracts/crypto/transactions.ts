@@ -24,7 +24,7 @@ export interface TransactionData {
 
 	value: BigNumber;
 
-	gasLimit: number;
+	gas: number;
 	gasPrice: number;
 
 	nonce: BigNumber;
@@ -53,7 +53,7 @@ export interface TransactionJson {
 
 	value: string;
 
-	gasLimit: number;
+	gas: number;
 	gasPrice: number;
 
 	nonce: string;

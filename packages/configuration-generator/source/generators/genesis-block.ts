@@ -276,7 +276,7 @@ export class GenesisBlockGenerator extends Generator {
 				},
 				caller: transaction.data.from,
 				data: Buffer.from(transaction.data.data, "hex"),
-				gasLimit: BigInt(transaction.data.gasLimit),
+				gasLimit: BigInt(transaction.data.gas),
 				gasPrice: BigInt(transaction.data.gasPrice),
 				nonce: transaction.data.nonce.toBigInt(),
 				recipient: transaction.data.to,

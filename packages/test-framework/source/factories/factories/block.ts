@@ -63,7 +63,8 @@ export const registerBlockFactory = async (
 
 			totals.value = totals.value.plus(data.value);
 			totals.gasPrice = totals.gasPrice.plus(data.gasPrice);
-			totals.gasUsed += data.gasLimit;
+			// TODO: calculate actual gas used
+			totals.gasUsed += data.gas;
 
 			payloadBuffers.push(Buffer.from(data.hash, "hex"));
 			transactionData.push(data);

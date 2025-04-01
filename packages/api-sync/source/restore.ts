@@ -285,7 +285,7 @@ export class Restore {
 						blockHeight: block.header.number.toFixed(),
 						blockId: block.header.hash,
 						data: data.data,
-						gasLimit: data.gasLimit,
+						gasLimit: data.gas,
 						gasPrice: data.gasPrice,
 						id: data.hash,
 						legacySecondSignature: data.legacySecondSignature,

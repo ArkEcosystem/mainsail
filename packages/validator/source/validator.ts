@@ -174,9 +174,9 @@ export class Validator implements Contracts.Validator.Validator {
 				}
 
 				try {
-					const gasLimit = transaction.data.gasLimit;
+					const gas = transaction.data.gas;
 
-					if (gasLeft - gasLimit < 0) {
+					if (gasLeft - gas < 0) {
 						break;
 					}
 
