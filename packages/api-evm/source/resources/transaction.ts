@@ -6,7 +6,7 @@ export class TransactionResource {
 	public async transform(transaction: Contracts.Crypto.TransactionData): Promise<object> {
 		/* eslint-disable sort-keys-fix/sort-keys-fix */
 		return {
-			blockHash: `0x${transaction.blockId}`,
+			blockHash: `0x${transaction.blockHash}`,
 			blockNumber: `0x${transaction.blockHeight?.toString(16)}`,
 			chainId: `0x${transaction.network.toString(16)}`,
 			from: transaction.senderAddress,

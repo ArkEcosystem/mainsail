@@ -40,7 +40,7 @@ export interface TransactionData {
 
 	sequence?: number;
 	gasUsed?: number;
-	blockId?: string;
+	blockHash?: string;
 	blockHeight?: number;
 }
 
@@ -68,7 +68,7 @@ export interface TransactionJson {
 
 	sequence?: number;
 	gasUsed?: number;
-	blockId?: string;
+	blockHash?: string;
 	blockHeight?: number;
 }
 

@@ -256,7 +256,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		const blockBuffer = await this.#readBlockHeaderBytes(height);
 		assert.buffer(blockBuffer);
 		const block = await this.blockDeserializer.deserializeHeader(blockBuffer);
-		transaction.data.blockId = block.hash;
+		transaction.data.blockHash = block.hash;
 
 		return transaction;
 	}
