@@ -552,6 +552,7 @@ impl EvmInner {
             .modify_tx_chained(|tx_env: &mut TxEnv| {
                 tx_env.gas_limit = ctx.gas_limit;
                 tx_env.gas_price = ctx.gas_price;
+                tx_env.gas_priority_fee = None;
                 tx_env.caller = ctx.caller;
                 tx_env.value = ctx.value;
                 tx_env.nonce = ctx.nonce;
@@ -954,6 +955,7 @@ impl EvmInner {
             .modify_tx_chained(|tx_env: &mut TxEnv| {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or_else(|| 15_000_000);
                 tx_env.gas_price = ctx.gas_price;
+                tx_env.gas_priority_fee = None;
                 tx_env.caller = ctx.caller;
                 tx_env.value = ctx.value;
                 tx_env.nonce = ctx.nonce.unwrap_or_default();
