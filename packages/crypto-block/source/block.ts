@@ -12,7 +12,7 @@ export const sealBlock = ({ data, serialized, transactions }: BlockArguments): C
 		header: data,
 		serialized,
 		transactions: transactions.map((transaction, index) => {
-			transaction.data.sequence = index;
+			transaction.data.transactionIndex = index;
 			return transaction;
 		}),
 	});

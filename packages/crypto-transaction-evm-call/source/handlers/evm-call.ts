@@ -47,7 +47,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				legacyAddress: senderLegacyAddress,
 				nonce: transaction.data.nonce.toBigInt(),
 				recipient: transaction.data.to,
-				sequence: transaction.data.sequence,
+				sequence: transaction.data.transactionIndex,
 				specId: evmSpec,
 				txHash: transaction.hash,
 				value: transaction.data.value.toBigInt(),

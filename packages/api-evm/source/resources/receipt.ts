@@ -11,7 +11,7 @@ export class ReceiptResource {
 		/* eslint-disable sort-keys-fix/sort-keys-fix */
 		return {
 			transactionHash: `0x${transaction.hash}`,
-			transactionIndex: `0x${transaction.sequence?.toString(16)}`,
+			transactionIndex: `0x${transaction.transactionIndex?.toString(16)}`,
 			blockHash: `0x${transaction.blockHash}`,
 			blockNumber: `0x${transaction.blockNumber?.toString(16)}`,
 			from: transaction.from,

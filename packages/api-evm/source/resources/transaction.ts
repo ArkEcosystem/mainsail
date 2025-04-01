@@ -19,7 +19,7 @@ export class TransactionResource {
 			nonce: `0x${transaction.nonce.toString(16)}`,
 			// eslint-disable-next-line unicorn/no-null
 			to: transaction.to || null,
-			transactionIndex: `0x${transaction.sequence?.toString(16)}`,
+			transactionIndex: `0x${transaction.transactionIndex?.toString(16)}`,
 			value: `0x${transaction.value.toString(16)}`,
 			type: `0x2`,
 			v: `0x${transaction.v}`,

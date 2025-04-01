@@ -38,7 +38,7 @@ export interface TransactionData {
 	s?: string;
 	legacySecondSignature?: string;
 
-	sequence?: number;
+	transactionIndex?: number;
 	gasUsed?: number;
 	blockHash?: string;
 	blockNumber?: number;
@@ -66,7 +66,7 @@ export interface TransactionJson {
 	r?: string;
 	s?: string;
 
-	sequence?: number;
+	transactionIndex?: number;
 	gasUsed?: number;
 	blockHash?: string;
 	blockNumber?: number;

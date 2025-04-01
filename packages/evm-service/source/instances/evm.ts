@@ -222,11 +222,11 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 		const transactionBuffers: Buffer[] = [];
 		const transactionIds: string[] = [];
 		for (const transaction of block.transactions) {
-			assert.number(transaction.data.sequence);
+			assert.number(transaction.data.transactionIndex);
 
 			const buff = ByteBuffer.fromSize(transaction.serialized.length + 8);
 			buff.writeUint32(height);
-			buff.writeUint32(transaction.data.sequence);
+			buff.writeUint32(transaction.data.transactionIndex);
 			buff.writeBytes(transaction.serialized);
 
 			transactionBuffers.push(buff.toBuffer());

@@ -167,7 +167,7 @@ export class Validator implements Contracts.Validator.Validator {
 				}
 
 				const transaction = await this.transactionFactory.fromBytes(bytes);
-				transaction.data.sequence = candidateTransactions.length;
+				transaction.data.transactionIndex = candidateTransactions.length;
 
 				if (failedSenders.has(transaction.data.senderPublicKey)) {
 					continue;
