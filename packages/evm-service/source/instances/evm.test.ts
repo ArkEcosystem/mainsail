@@ -114,7 +114,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(0), round: BigInt(0) },
+				data: { number: BigInt(0), round: BigInt(0) },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -147,6 +147,7 @@ describe<{
 		//     uint256 txGasPrice;
 		//     address txOrigin;
 		// }
+
 		assert.equal(data[0], 1245n);
 		assert.equal(data[1], 123_456_789n);
 		assert.equal(data[2], 12_000_000n);
@@ -173,7 +174,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(0), round: BigInt(0) },
+				data: { number: BigInt(0), round: BigInt(0) },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -208,7 +209,7 @@ describe<{
 			height: BigInt(1),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(1), round: BigInt(0) },
+				data: { number: BigInt(1), round: BigInt(0) },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -231,7 +232,7 @@ describe<{
 				height: commitKey.height,
 				round: commitKey.round,
 				getBlock: () => ({
-					data: { height: commitKey.height, round: commitKey.round },
+					data: { number: commitKey.height, round: commitKey.round },
 				}),
 				setAccountUpdates: () => {},
 			} as any);
@@ -341,7 +342,7 @@ describe<{
 				height: commitKey.height,
 				round: commitKey.round,
 				getBlock: () => ({
-					data: { height: commitKey.height, round: commitKey.round },
+					data: { number: commitKey.height, round: commitKey.round },
 				}),
 				setAccountUpdates: () => {},
 			} as any);
@@ -422,7 +423,7 @@ describe<{
 		await instance.onCommit({
 			...commitKey,
 			getBlock: () => ({
-				data: { ...commitKey },
+				data: { number: commitKey.height, round: commitKey.round },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -474,7 +475,7 @@ describe<{
 				instance.onCommit({
 					...commitKey1,
 					getBlock: () => ({
-						data: { ...commitKey1 },
+						data: { number: commitKey1.height, round: commitKey1.round },
 					}),
 					setAccountUpdates: () => {},
 				} as any),
@@ -485,7 +486,7 @@ describe<{
 			instance.onCommit({
 				...commitKey2,
 				getBlock: () => ({
-					data: { ...commitKey2 },
+					data: { number: commitKey2.height, round: commitKey2.round },
 				}),
 				setAccountUpdates: () => {},
 			} as any),
@@ -503,7 +504,7 @@ describe<{
 					height: 0,
 					round: 0,
 					getBlock: () => ({
-						data: { height: 0, round: 0 },
+						data: { number: 0, round: 0 },
 					}),
 					setAccountUpdates: () => {},
 				} as any),
@@ -544,7 +545,7 @@ describe<{
 		await instance.onCommit({
 			...commitKey,
 			getBlock: () => ({
-				data: { ...commitKey },
+				data: { number: commitKey.height, round: commitKey.round },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -581,7 +582,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(0), round: BigInt(0) },
+				data: { number: BigInt(0), round: BigInt(0) },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -638,7 +639,7 @@ describe<{
 			height: BigInt(1),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(1), round: BigInt(0) },
+				data: { number: BigInt(1), round: BigInt(0) },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -727,7 +728,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(0), round: BigInt(0) },
+				data: { number: BigInt(0), round: BigInt(0) },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -774,7 +775,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(0), round: BigInt(0) },
+				data: { number: BigInt(0), round: BigInt(0) },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -816,7 +817,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(0), round: BigInt(0) },
+				data: { number: BigInt(0), round: BigInt(0) },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
