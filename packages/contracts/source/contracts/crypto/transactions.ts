@@ -128,5 +128,5 @@ export interface TransactionUtilities {
 
 	toHash(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;
 
-	getId(transaction: Transaction): Promise<string>;
+	getHash(transaction: Transaction): Promise<string>;
 }

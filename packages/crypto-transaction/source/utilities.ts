@@ -46,7 +46,7 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 		return Buffer.from(keccak256(Buffer.from(`${eip1559Prefix}${encoded}`, "hex")).slice(2), "hex");
 	}
 
-	public async getId(transaction: Contracts.Crypto.Transaction): Promise<string> {
+	public async getHash(transaction: Contracts.Crypto.Transaction): Promise<string> {
 		return (await this.toHash(transaction.data, { excludeSignature: false })).toString("hex");
 	}
 }
