@@ -11,18 +11,16 @@ describe<{
 			data: {
 				amount: BigNumber.make(100),
 				gasPrice: 900 * 1e9,
-				id: "dummy-tx-id",
+				hash: "dummy-tx-id",
 				network: 30,
 				nonce: BigNumber.make(1),
-				senderPublicKey: "dummy-sender-key",
+				from: "dummy-sender-key",
 				type: Contracts.Crypto.TransactionType.Transfer,
-				version: 2,
 			},
-			id: "dummy-tx-id",
+			hash: "dummy-tx-id",
 			key: "some-key",
 			serialized: Buffer.from("dummy"),
 			type: Contracts.Crypto.TransactionType.Transfer,
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		};
 	});
 
@@ -31,7 +29,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_RETRY");
-		assert.equal(error.message, `tx ${context.transaction.id} cannot be added to pool, please retry`);
+		assert.equal(error.message, `tx ${context.transaction.hash} cannot be added to pool, please retry`);
 	});
 
 	it("TransactionAlreadyInPoolError", (context) => {
@@ -39,7 +37,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_DUPLICATE");
-		assert.equal(error.message, `tx ${context.transaction.id} is already in pool`);
+		assert.equal(error.message, `tx ${context.transaction.hash} is already in pool`);
 	});
 
 	it("TransactionExceedsMaximumByteSizeError", (context) => {
@@ -47,7 +45,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_TOO_LARGE");
-		assert.equal(error.message, `tx ${context.transaction.id} exceeds size limit of 1024 byte(s)`);
+		assert.equal(error.message, `tx ${context.transaction.hash} exceeds size limit of 1024 byte(s)`);
 	});
 
 	it("TransactionFeeTooLowError", (context) => {
@@ -55,7 +53,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_LOW_FEE");
-		assert.equal(error.message, `tx ${context.transaction.id} fee is too low to enter the pool`);
+		assert.equal(error.message, `tx ${context.transaction.hash} fee is too low to enter the pool`);
 	});
 
 	it("SenderExceededMaximumTransactionCountError", (context) => {
@@ -63,7 +61,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_EXCEEDS_MAX_COUNT");
-		assert.equal(error.message, `tx ${context.transaction.id} exceeds sender's transaction count limit of 1`);
+		assert.equal(error.message, `tx ${context.transaction.hash} exceeds sender's transaction count limit of 1`);
 	});
 
 	it("TransactionPoolFullError", (context) => {
@@ -73,7 +71,7 @@ describe<{
 		assert.equal(error.type, "ERR_POOL_FULL");
 		assert.equal(
 			error.message,
-			`tx ${context.transaction.id} fee 900000000000 is lower than 1000000000000 already in pool`,
+			`tx ${context.transaction.hash} fee 900000000000 is lower than 1000000000000 already in pool`,
 		);
 	});
 
@@ -85,7 +83,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_APPLY");
-		assert.equal(error.message, `tx ${context.transaction.id} cannot be applied: Something went horribly wrong`);
+		assert.equal(error.message, `tx ${context.transaction.hash} cannot be applied: Something went horribly wrong`);
 	});
 
 	it("TransactionFailedToVerifyError", (context) => {
@@ -93,7 +91,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_BAD_DATA");
-		assert.equal(error.message, `tx ${context.transaction.id} didn't pass verification`);
+		assert.equal(error.message, `tx ${context.transaction.hash} didn't pass verification`);
 	});
 
 	it("TransactionFromWrongNetworkError", (context) => {
@@ -101,7 +99,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_WRONG_NETWORK");
-		assert.equal(error.message, `tx ${context.transaction.id} network 30 doesn't match node's network 23`);
+		assert.equal(error.message, `tx ${context.transaction.hash} network 30 doesn't match node's network 23`);
 	});
 
 	it("InvalidTransactionDataError", (context) => {

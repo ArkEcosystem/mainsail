@@ -30,11 +30,11 @@ describe<{
 				amount: BigNumber.make(100),
 				gasPrice: 100 * 1e9,
 				nonce: BigNumber.make(1),
-				senderAddress: "sender1",
+				from: "sender1",
 				type: 1,
 				version: 2,
 			},
-			id: "dummy-tx-id",
+			hash: "dummy-tx-id",
 			key: "some-key",
 			serialized: Buffer.from("dummy"),
 			type: Contracts.Crypto.TransactionType.Transfer,
@@ -46,11 +46,11 @@ describe<{
 				amount: BigNumber.make(100),
 				gasPrice: 200 * 1e9,
 				nonce: BigNumber.make(2),
-				senderAddress: "sender1",
+				from: "sender1",
 				type: 1,
 				version: 2,
 			},
-			id: "dummy-tx-id-2",
+			hash: "dummy-tx-id-2",
 			key: "some-key-2",
 			serialized: Buffer.from("dummy-2"),
 			type: Contracts.Crypto.TransactionType.ValidatorRegistration,
@@ -62,11 +62,11 @@ describe<{
 				amount: BigNumber.make(100),
 				gasPrice: 300 * 1e9,
 				nonce: BigNumber.make(3),
-				senderAddress: "sender2",
+				from: "sender2",
 				type: 1,
 				version: 2,
 			},
-			id: "dummy-tx-id-3",
+			hash: "dummy-tx-id-3",
 			key: "some-key-3",
 			serialized: Buffer.from("dummy-3"),
 			type: Contracts.Crypto.TransactionType.Transfer,
@@ -78,11 +78,11 @@ describe<{
 				amount: BigNumber.make(100),
 				gasPrice: 400 * 1e9,
 				nonce: BigNumber.make(4),
-				senderAddress: "sender2",
+				from: "sender2",
 				type: 1,
 				version: 2,
 			},
-			id: "dummy-tx-id-4",
+			hash: "dummy-tx-id-4",
 			key: "some-key-3",
 			serialized: Buffer.from("dummy-4"),
 			type: Contracts.Crypto.TransactionType.ValidatorRegistration,
@@ -157,9 +157,9 @@ describe<{
 
 	it("whereId - should filter transactions by id", async (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = await queryIterable.whereId(context.sender1Transaction200.id).all();
+		const result = await queryIterable.whereId(context.sender1Transaction200.hash).all();
 
 		assert.length(result, 1);
-		assert.equal(result[0].id, context.sender1Transaction200.id);
+		assert.equal(result[0].hash, context.sender1Transaction200.hash);
 	});
 });
