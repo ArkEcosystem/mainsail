@@ -256,22 +256,22 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		const deferredSync: DeferredSync = {
 			block: {
+				amount: header.amount.toFixed(),
 				commitRound: proof.round,
-				generatorAddress: header.proposer,
+				fee: header.fee.toFixed(),
+				gasUsed: header.gasUsed,
 				hash: header.hash,
-				height: header.number.toFixed(),
-				numberOfTransactions: header.transactionsCount,
-				payloadHash: header.transactionsRoot,
-				payloadLength: header.payloadSize,
-				previousBlock: header.parentHash,
+				number: header.number.toFixed(),
+				parentHash: header.parentHash,
+				payloadSize: header.payloadSize,
+				proposer: header.proposer,
 				reward: header.reward.toFixed(),
 				round: header.round,
 				signature: proof.signature,
-				stateHash: header.stateRoot,
+				stateRoot: header.stateRoot,
 				timestamp: header.timestamp.toFixed(),
-				totalAmount: header.amount.toFixed(),
-				totalFee: header.fee.toFixed(),
-				totalGasUsed: header.gasUsed,
+				transactionsCount: header.transactionsCount,
+				transactionsRoot: header.transactionsRoot,
 				validatorRound: this.roundCalculator.calculateRound(header.number).round,
 				validatorSet: validatorSetPack(proof.validators).toString(),
 				version: header.version,
@@ -390,12 +390,12 @@ export class Sync implements Contracts.ApiSync.Service {
 				.createQueryBuilder()
 				.update()
 				.set({
-					height: deferred.block.height,
+					height: deferred.block.number,
 					supply: () => `supply + ${deferred.block.reward}`,
 				})
 				.where("id = :id", { id: 1 })
 				.andWhere("height = :previousHeight", {
-					previousHeight: BigNumber.make(deferred.block.height).minus(1).toFixed(),
+					previousHeight: BigNumber.make(deferred.block.number).minus(1).toFixed(),
 				})
 				.execute();
 
@@ -507,7 +507,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		const t1 = performance.now();
 
 		if (!this.state.isBootstrap()) {
-			this.logger.debug(`synced commit: ${deferred.block.height} in ${t1 - t0}ms`);
+			this.logger.debug(`synced commit: ${deferred.block.number} in ${t1 - t0}ms`);
 		}
 	}
 

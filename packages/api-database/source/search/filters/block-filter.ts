@@ -34,7 +34,7 @@ export class BlockFilter {
 				case "previousBlock": {
 					return handleOrCriteria(criteria.previousBlock, async (c) => ({
 						op: "equal",
-						property: "previousBlock",
+						property: "parentHash",
 						value: c,
 					}));
 				}
@@ -85,14 +85,14 @@ export class BlockFilter {
 				case "payloadHash": {
 					return handleOrCriteria(criteria.payloadHash, async (c) => ({
 						op: "equal",
-						property: "payloadHash",
+						property: "stateRoot",
 						value: c,
 					}));
 				}
 				case "generatorAddress": {
 					return handleOrCriteria(criteria.generatorAddress, async (c) => ({
 						op: "equal",
-						property: "generatorAddress",
+						property: "proposer",
 						value: c,
 					}));
 				}

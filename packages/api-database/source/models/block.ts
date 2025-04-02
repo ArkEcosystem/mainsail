@@ -27,42 +27,42 @@ export class Block {
 	@Column({
 		type: "varchar",
 	})
-	public readonly previousBlock!: string;
+	public readonly parentHash!: string;
 
 	@Column({
 		type: "varchar",
 	})
-	public readonly stateHash!: string;
+	public readonly stateRoot!: string;
 
 	@Column({
 		nullable: false,
 		type: "bigint",
 	})
-	public readonly height!: string;
+	public readonly number!: string;
 
 	@Column({
 		nullable: false,
 		type: "integer",
 	})
-	public readonly numberOfTransactions!: number;
+	public readonly transactionsCount!: number;
 
 	@Column({
 		nullable: false,
 		type: "integer",
 	})
-	public readonly totalGasUsed!: number;
+	public readonly gasUsed!: number;
 
 	@Column({
 		nullable: false,
 		type: "numeric",
 	})
-	public readonly totalAmount!: string;
+	public readonly amount!: string;
 
 	@Column({
 		nullable: false,
 		type: "numeric",
 	})
-	public readonly totalFee!: string;
+	public readonly fee!: string;
 
 	@Column({
 		nullable: false,
@@ -74,19 +74,19 @@ export class Block {
 		nullable: false,
 		type: "integer",
 	})
-	public readonly payloadLength!: number;
+	public readonly payloadSize!: number;
 
 	@Column({
 		nullable: false,
 		type: "varchar",
 	})
-	public readonly payloadHash!: string;
+	public readonly transactionsRoot!: string;
 
 	@Column({
 		nullable: false,
 		type: "varchar",
 	})
-	public readonly generatorAddress!: string;
+	public readonly proposer!: string;
 
 	@Column({
 		nullable: false,

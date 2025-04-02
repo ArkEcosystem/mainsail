@@ -31,7 +31,7 @@ export class BlocksController extends Controller {
 			return this.toPagination(blocks, BlockResource, request.query.transform);
 		}
 
-		const generatorAddresses = blocks.results.map(({ generatorAddress }) => generatorAddress);
+		const generatorAddresses = blocks.results.map(({ proposer }) => proposer);
 		const generators = await this.walletRepositoryFactory()
 			.createQueryBuilder()
 			.select()

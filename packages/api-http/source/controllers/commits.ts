@@ -41,7 +41,7 @@ export class CommitsController extends Controller {
 
 		return {
 			data: {
-				height: block.height,
+				number: block.number,
 				signature: block.signature,
 				validators,
 			},

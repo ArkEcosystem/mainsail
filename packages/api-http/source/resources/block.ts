@@ -16,12 +16,12 @@ export class BlockResource implements Contracts.Api.Resource {
 
 	public transform(resource: EnrichedBlock): object {
 		return {
-			confirmations: +resource.state.height ? Number(resource.state.height) - Number(resource.height) : 0,
+			confirmations: +resource.state.height ? Number(resource.state.height) - Number(resource.number) : 0,
 			forged: {
-				amount: BigNumber.make(resource.totalAmount),
-				fee: resource.totalFee,
+				amount: BigNumber.make(resource.amount),
+				fee: resource.fee,
 				reward: resource.reward,
-				total: BigNumber.make(resource.reward).plus(resource.totalFee).toFixed(),
+				total: BigNumber.make(resource.reward).plus(resource.fee).toFixed(),
 			},
 			generator: {
 				address: resource.generator.address,
@@ -29,15 +29,15 @@ export class BlockResource implements Contracts.Api.Resource {
 				username: resource.generator.attributes?.["username"] ?? undefined,
 			},
 			hash: resource.hash,
-			height: +resource.height,
+			height: +resource.number,
 			payload: {
-				hash: resource.payloadHash,
-				length: resource.payloadLength,
+				hash: resource.transactionsRoot,
+				length: resource.payloadSize,
 			},
-			previous: resource.previousBlock,
+			previous: resource.parentHash,
 			signature: resource.signature,
 			timestamp: +resource.timestamp,
-			transactions: resource.numberOfTransactions,
+			transactions: resource.transactionsCount,
 
 			version: resource.version,
 		};
