@@ -348,7 +348,7 @@ export class Snapshot {
 			let totalValidatorFeeReward = BigNumber.ZERO;
 
 			for (const transaction of block.transactions) {
-				const receipt = this.receipts[transaction.id!];
+				const receipt = this.receipts[transaction.hash!];
 				if (receipt) {
 					const consumedGas = this.sandbox.app
 						.get<Contracts.BlockchainUtils.FeeCalculator>(Identifiers.BlockchainUtils.FeeCalculator)
@@ -375,9 +375,9 @@ export class Snapshot {
 					}
 
 					// add transferred value to recipient (if any)
-					if (transaction.data.recipientAddress && transaction.data.value.isGreaterThan(0)) {
+					if (transaction.data.to && transaction.data.value.isGreaterThan(0)) {
 						await negativeBalanceChange(receipt.sender, transaction.data.value);
-						await positiveBalanceChange(transaction.data.recipientAddress, transaction.data.value);
+						await positiveBalanceChange(transaction.data.to, transaction.data.value);
 					}
 				}
 			}

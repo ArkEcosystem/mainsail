@@ -248,7 +248,7 @@ describe<{
 		assert.equal(invalid, [0]);
 		assert.equal(errors, {
 			"0": {
-				message: `tx ${tx.id} cannot be applied: Insufficient balance in the wallet.`,
+				message: `tx ${tx.hash} cannot be applied: Insufficient balance in the wallet.`,
 				type: "ERR_APPLY",
 			},
 		});

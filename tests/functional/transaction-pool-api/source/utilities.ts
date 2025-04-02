@@ -221,7 +221,7 @@ export const getBalanceByAddress = async (sandbox: Sandbox, address: string): Pr
 
 export const isTransactionCommitted = async (
 	{ sandbox, wallets }: { sandbox: Sandbox; wallets: Contracts.Crypto.KeyPair[] },
-	{ id }: Contracts.Crypto.Transaction,
+	{ hash }: Contracts.Crypto.Transaction,
 ): Promise<boolean> => {
 	const store = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
 	const currentHeight = store.getHeight();
@@ -234,7 +234,7 @@ export const isTransactionCommitted = async (
 
 	let found = false;
 	for (const block of forgedBlocks) {
-		found = block.transactions.some((transaction) => transaction.id === id);
+		found = block.transactions.some((transaction) => transaction.hash === hash);
 		if (found) {
 			break;
 		}
@@ -245,7 +245,7 @@ export const isTransactionCommitted = async (
 
 export const getTransactionReceipt = async (
 	{ sandbox }: { sandbox: Sandbox },
-	{ id }: Contracts.Crypto.Transaction,
+	{ hash }: Contracts.Crypto.Transaction,
 ): Promise<Contracts.Evm.TransactionReceipt | undefined> => {
 	const store = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
 	const currentHeight = store.getHeight();
@@ -254,12 +254,12 @@ export const getTransactionReceipt = async (
 	const forgedBlocks = await database.findBlocks(0, currentHeight);
 
 	for (const block of forgedBlocks) {
-		if (!block.transactions.some((transaction) => transaction.id === id)) {
+		if (!block.transactions.some((transaction) => transaction.hash === hash)) {
 			continue;
 		}
 
 		const evm = sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
-		const { receipt } = await evm.getReceipt(BigInt(block.header.number), id);
+		const { receipt } = await evm.getReceipt(BigInt(block.header.number), hash);
 		return receipt;
 	}
 
