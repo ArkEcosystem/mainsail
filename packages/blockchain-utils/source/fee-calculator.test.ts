@@ -11,7 +11,7 @@ describe("FeeCalculator", ({ assert, it }) => {
 
 		assert.equal(
 			feeCalculator
-				.calculate({ data: { gasLimit: 21_000, gasPrice: 5 * 1e9 } } as Contracts.Crypto.Transaction)
+				.calculate({ data: { gas: 21_000, gasPrice: 5 * 1e9 } } as Contracts.Crypto.Transaction)
 				.toBigInt(),
 			105_000_000_000_000n,
 		);
