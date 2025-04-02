@@ -258,8 +258,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			block: {
 				commitRound: proof.round,
 				generatorAddress: header.proposer,
+				hash: header.hash,
 				height: header.number.toFixed(),
-				id: header.hash,
 				numberOfTransactions: header.transactionsCount,
 				payloadHash: header.transactionsRoot,
 				payloadLength: header.payloadSize,

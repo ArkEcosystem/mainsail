@@ -16,7 +16,7 @@ export class BlockFilter {
 		return handleAndCriteria(criteria, async (key) => {
 			switch (key) {
 				case "id": {
-					return handleOrCriteria(criteria.id, async (c) => ({ op: "equal", property: "id", value: c }));
+					return handleOrCriteria(criteria.id, async (c) => ({ op: "equal", property: "hash", value: c }));
 				}
 				case "version": {
 					return handleOrCriteria(criteria.version, async (c) => ({

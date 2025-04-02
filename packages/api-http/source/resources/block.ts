@@ -28,8 +28,8 @@ export class BlockResource implements Contracts.Api.Resource {
 				publicKey: resource.generator.publicKey,
 				username: resource.generator.attributes?.["username"] ?? undefined,
 			},
+			hash: resource.hash,
 			height: +resource.height,
-			id: resource.id,
 			payload: {
 				hash: resource.payloadHash,
 				length: resource.payloadLength,

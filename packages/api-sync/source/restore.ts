@@ -237,8 +237,8 @@ export class Restore {
 				blocks.push({
 					commitRound: proof.round,
 					generatorAddress: block.header.proposer,
+					hash: block.header.hash,
 					height: block.header.number.toFixed(),
-					id: block.header.hash,
 					numberOfTransactions: block.header.transactionsCount,
 					payloadHash: block.header.transactionsRoot,
 					payloadLength: block.header.payloadSize,
