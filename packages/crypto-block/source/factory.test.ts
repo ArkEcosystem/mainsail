@@ -160,11 +160,11 @@ describe<{
 
 	it("#fromData - should throw on invalid transaction data", async ({ factory }) => {
 		// @ts-ignore
-		delete blockDataWithTransactionsClone.transactions[0].id;
+		delete blockDataWithTransactionsClone.transactions[0].hash;
 
 		await assert.rejects(
 			() => factory.fromData(blockDataWithTransactionsClone),
-			"Invalid data at /transactions/0: must have required property 'id': undefined",
+			"Invalid data at /transactions/0: must have required property 'hash': undefined",
 		);
 	});
 

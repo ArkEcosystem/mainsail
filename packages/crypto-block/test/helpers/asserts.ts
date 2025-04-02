@@ -21,14 +21,14 @@ export const assertBlockData = (assert, data1, data2) => {
 
 export const assertTransactionData = (assert, transactionData1, transactionData2) => {
 	const transactionFields = [
-		"id",
+		"hash",
 		"senderPublicKey",
-		"senderAddress",
+		"from",
 		"gasPrice",
-		"gasLimit",
+		"gas",
 		"network",
 		"value",
-		"recipientAddress",
+		"to",
 		"v",
 		"r",
 		"s",
