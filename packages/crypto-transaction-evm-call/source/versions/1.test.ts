@@ -53,11 +53,11 @@ describe<{
 	const transactionOriginal = {
 		value: 0,
 		gasPrice: 5 * 1e9,
-		gasLimit: 21000,
+		gas: 21000,
 		nonce: 1,
-		recipientId: ethers.ZeroAddress,
+		to: ethers.ZeroAddress,
 		senderPublicKey: "a".repeat(66),
-		senderAddress: "0x" + "a".repeat(40),
+		from: "0x" + "a".repeat(40),
 		type: 0,
 	};
 
