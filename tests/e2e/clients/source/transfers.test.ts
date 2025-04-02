@@ -58,7 +58,7 @@ describe<{
 			const result = await client.sendTx(serialized);
 			ids.push(result);
 
-			assert.equal(`0x${transaction.id}`, result);
+			assert.equal(`0x${transaction.hash}`, result);
 		}
 
 		await new Promise((resolve) => {
@@ -67,6 +67,7 @@ describe<{
 
 		for (const id of ids) {
 			const receipt = await localClient.getReceipt(id);
+
 			assert.equal(receipt.status, "0x1");
 		}
 	});

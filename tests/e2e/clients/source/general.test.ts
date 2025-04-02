@@ -67,7 +67,7 @@ describe<{
 	});
 
 	it("Transaction - should get genesis transaction by hash", async ({ localClient, clients }) => {
-		const hash = `0x${genesisBlock.block.transactions[0].id}`;
+		const hash = `0x${genesisBlock.block.transactions[0].hash}`;
 		const tx = await localClient.getTransaction(hash);
 
 		for (const client of clients) {
@@ -86,7 +86,7 @@ describe<{
 	});
 
 	it("Transaction - should get genesis receipt by hash", async ({ localClient, clients }) => {
-		const hash = `0x${genesisBlock.block.transactions[0].id}`;
+		const hash = `0x${genesisBlock.block.transactions[0].hash}`;
 		const receipt = await localClient.getReceipt(hash);
 
 		for (const client of clients) {
@@ -96,7 +96,7 @@ describe<{
 	});
 
 	it("Account - should get wallet balance", async ({ localClient, clients }) => {
-		const address = genesisBlock.block.transactions[0].recipientAddress;
+		const address = genesisBlock.block.transactions[0].to;
 		const balance = await localClient.getBalance(address);
 
 		assert.not.equal(balance, 0);
@@ -108,7 +108,7 @@ describe<{
 	});
 
 	it("Account - should get wallet nonce", async ({ localClient, clients }) => {
-		const address = genesisBlock.block.transactions[0].senderAddress;
+		const address = genesisBlock.block.transactions[0].from;
 		const nonce = await localClient.getNonce(address);
 
 		assert.not.equal(nonce, 0);
