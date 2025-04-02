@@ -87,15 +87,13 @@ describe<{
 	});
 
 	const transactionOriginal = {
-		gasLimit: 21_000,
+		gas: 21_000,
 		gasPrice: 5 * 1e9,
-		id: "1".repeat(64),
+		hash: "1".repeat(64),
 		network: 10_000,
 		nonce: 1,
-		senderAddress: "0x" + "a".repeat(40),
+		from: "0x" + "a".repeat(40),
 		senderPublicKey: "a".repeat(66),
-		signature: "b".repeat(130),
-		type: 1,
 		value: 0,
 	};
 
@@ -211,7 +209,7 @@ describe<{
 		assert.undefined(validator.validate("transaction", transaction).error);
 
 		// Fails for non-genesis tx
-		transaction.id = "2".repeat(64);
+		transaction.hash = "2".repeat(64);
 		assert.true(validator.validate("transaction", transaction).error.includes("gasPrice"));
 
 		// But works on height 0
@@ -227,7 +225,7 @@ describe<{
 		for (const char of validChars) {
 			const transaction = {
 				...transactionOriginal,
-				id: char.repeat(64),
+				hash: char.repeat(64),
 			};
 
 			assert.undefined(validator.validate("transaction", transaction).error);
@@ -238,10 +236,10 @@ describe<{
 		for (const value of invalidValues) {
 			const transaction = {
 				...transactionOriginal,
-				id: value,
+				hash: value,
 			};
 
-			assert.true(validator.validate("transaction", transaction).error.includes("id"));
+			assert.true(validator.validate("transaction", transaction).error.includes("hash"));
 		}
 	});
 
