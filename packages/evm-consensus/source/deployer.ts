@@ -37,12 +37,16 @@ export class Deployer {
 	#genesisBlockInfo!: GenesisBlockInfo;
 
 	#nonce = 0;
+	#needsCommit = false;
+
 	#generateTxHash = () => sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
 
 	public async deploy(genesisBlockInfo: GenesisBlockInfo): Promise<void> {
 		this.#genesisBlockInfo = genesisBlockInfo;
 
-		await this.#initialize();
+		const { commitKey } = this.#getBlockContext();
+
+		await this.#initialize(commitKey);
 
 		const consensusContractAddress = await this.#deployConsensusContract();
 		await this.#deployConsensusProxy(consensusContractAddress);
@@ -53,17 +57,16 @@ export class Deployer {
 		const multiPaymentContractAddress = await this.#deployMultiPaymentContract();
 		await this.#deployMultiPaymentProxy(multiPaymentContractAddress);
 
-		const commitKey = this.#getBlockContext().commitKey;
-
-		// TODO: Don't cast to any
-		await this.evm.onCommit({
-			...this.#getBlockContext().commitKey,
-			getBlock: () => ({ data: { number: commitKey.height, round: commitKey.round } }),
-			setAccountUpdates: () => ({}),
-		} as any);
+		if (this.#needsCommit) {
+			await this.evm.onCommit({
+				commitKey,
+				getBlock: () => ({ header: { ...commitKey, number: commitKey.height } }),
+				setAccountUpdates: () => ({}),
+			} as any);
+		}
 	}
 
-	async #initialize(): Promise<void> {
+	async #initialize(commitKey: Contracts.Evm.CommitKey): Promise<void> {
 		assert.defined(this.#genesisBlockInfo);
 
 		const genesisInfo = {
@@ -76,6 +79,7 @@ export class Deployer {
 			validatorContract: ethers.getCreateAddress({ from: this.deployerAddress, nonce: 1 }), // PROXY Uses nonce 1
 		};
 
+		await this.evm.prepareNextCommit({ commitKey });
 		await this.evm.initializeGenesis(genesisInfo);
 
 		this.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(genesisInfo);
@@ -350,6 +354,9 @@ export class Deployer {
 		}
 
 		const result = await this.evm.process(context);
+
+		this.#needsCommit = true;
+
 		return result.receipt;
 	}
 }

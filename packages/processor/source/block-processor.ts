@@ -62,13 +62,17 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const processResult = { gasUsed: 0, receipts: new Map(), success: false };
 
 		try {
+			await this.verifier.verify(unit);
+
 			const block = unit.getBlock();
 
 			await this.evm.prepareNextCommit({
-				commitKey: { height: BigInt(block.header.number), round: BigInt(block.header.round) },
+				commitKey: {
+					blockId: block.header.hash,
+					height: BigInt(block.header.number),
+					round: BigInt(block.header.round),
+				},
 			});
-
-			await this.verifier.verify(unit);
 
 			for (const [index, transaction] of block.transactions.entries()) {
 				if (index % 20 === 0) {
@@ -204,7 +208,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 
 		const stateRoot = await this.evm.stateHash(
-			{ height: BigInt(block.header.number), round: BigInt(block.header.round) },
+			{ blockId: block.header.hash, height: BigInt(block.header.number), round: BigInt(block.header.round) },
 			previousStateRoot,
 		);
 
@@ -215,6 +219,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	async #verifyLogsBloom(block: Contracts.Crypto.Block): Promise<void> {
 		const logsBloom = await this.evm.logsBloom({
+			blockId: block.header.hash,
 			height: BigInt(block.header.number),
 			round: BigInt(block.header.round),
 		});
@@ -240,7 +245,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		await this.evm.updateRewardsAndVotes({
 			blockReward: BigNumber.make(milestone.reward).toBigInt(),
-			commitKey: { height: BigInt(block.header.number), round: BigInt(block.header.round) },
+			commitKey: {
+				blockId: block.header.hash,
+				height: BigInt(block.header.number),
+				round: BigInt(block.header.round),
+			},
 			specId: milestone.evmSpec,
 			timestamp: BigInt(block.header.timestamp),
 			validatorAddress: block.header.proposer,
@@ -258,7 +267,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		await this.evm.calculateActiveValidators({
 			activeValidators: BigNumber.make(activeValidators).toBigInt(),
-			commitKey: { height: BigInt(block.header.number), round: BigInt(block.header.round) },
+			commitKey: {
+				blockId: block.header.hash,
+				height: BigInt(block.header.number),
+				round: BigInt(block.header.round),
+			},
 			specId: evmSpec,
 			timestamp: BigInt(block.header.timestamp),
 			validatorAddress: block.header.proposer,
