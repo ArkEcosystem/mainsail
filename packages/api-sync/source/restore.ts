@@ -282,20 +282,20 @@ export class Restore {
 
 					transactions.push({
 						amount: data.value.toFixed(),
-						blockHeight: block.header.number.toFixed(),
-						blockId: block.header.hash,
+						blockHash: block.header.hash,
+						blockNumber: block.header.number.toFixed(),
 						data: data.data,
-						gasLimit: data.gas,
+						from: data.from,
+						gas: data.gas,
 						gasPrice: data.gasPrice,
-						id: data.hash,
+						hash: data.hash,
 						legacySecondSignature: data.legacySecondSignature,
 						nonce: data.nonce.toFixed(),
-						recipientAddress: data.to,
-						senderAddress: data.from,
 						senderPublicKey: data.senderPublicKey,
-						sequence: data.transactionIndex!,
 						signature: `${data.r}${data.s}${data.v!.toString(16)}`,
 						timestamp: block.header.timestamp.toFixed(),
+						to: data.to,
+						transactionIndex: data.transactionIndex!,
 					});
 				}
 

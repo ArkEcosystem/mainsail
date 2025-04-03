@@ -5,30 +5,31 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 		// language=postgresql
 		await queryRunner.query(`
             CREATE UNIQUE INDEX transactions_sender_nonce ON transactions(sender_public_key, nonce);
-            CREATE INDEX transactions_recipient_address ON transactions(recipient_address);
+		CREATE INDEX transactions_to ON transactions("to");
             CREATE INDEX transactions_sender ON transactions(sender_public_key);
-            CREATE INDEX transactions_sender_address ON transactions(sender_address);
+		CREATE INDEX transactions_from ON transactions("from");
 
-            CREATE INDEX transactions_block_id ON transactions(block_id);
-            CREATE INDEX transactions_block_height_sequence ON transactions(block_height, sequence);
+
+            CREATE INDEX transactions_block_hash ON transactions(block_hash);
+            CREATE INDEX transactions_block_number_transaction_index ON transactions(block_number, transaction_index);
 
             CREATE INDEX transactions_amount ON transactions(amount);
             CREATE INDEX transactions_gas_price ON transactions(gas_price);
             CREATE INDEX transactions_nonce ON transactions(nonce);
 
-            CREATE INDEX transactions_amount_sequence ON transactions(amount, sequence);
-            CREATE INDEX transactions_gas_price_sequence ON transactions(gas_price, sequence);
-            CREATE INDEX transactions_nonce_sequence ON transactions(nonce, sequence);
-            CREATE INDEX transactions_timestamp_sequence ON transactions(timestamp, sequence);
+            CREATE INDEX transactions_amount_transaction_index ON transactions(amount, transaction_index);
+            CREATE INDEX transactions_gas_price_transaction_index ON transactions(gas_price, transaction_index);
+            CREATE INDEX transactions_nonce_transaction_index ON transactions(nonce, transaction_index);
+            CREATE INDEX transactions_timestamp_transaction_index ON transactions(timestamp, transaction_index);
 
-            CREATE INDEX transactions_amount_asc_sequence_desc ON transactions(amount ASC, sequence DESC);
-            CREATE INDEX transactions_gas_price_asc_sequence_desc ON transactions(gas_price ASC, sequence DESC);
-            CREATE INDEX transactions_nonce_asc_sequence_desc ON transactions(nonce ASC, sequence DESC);
-            CREATE INDEX transactions_timestamp_asc_sequence_desc ON transactions(timestamp ASC, sequence DESC);
+            CREATE INDEX transactions_amount_asc_transaction_index_desc ON transactions(amount ASC, transaction_index DESC);
+            CREATE INDEX transactions_gas_price_asc_transaction_index_desc ON transactions(gas_price ASC, transaction_index DESC);
+            CREATE INDEX transactions_nonce_asc_transaction_index_desc ON transactions(nonce ASC, transaction_index DESC);
+            CREATE INDEX transactions_timestamp_asc_transaction_index_desc ON transactions(timestamp ASC, transaction_index DESC);
 
             CREATE INDEX transactions_function_sig_address ON transactions(
                   SUBSTRING(data FROM 1 FOR 4),
-                  recipient_address
+                  "to"
             );
 
             CREATE INDEX blocks_transactions_count ON blocks(transactions_count);
@@ -37,7 +38,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX blocks_fee ON blocks(fee);
             CREATE INDEX blocks_validator_round ON blocks(validator_round);
 
-            CREATE INDEX receipts_block_height ON receipts(block_height);
+            CREATE INDEX receipts_block_block_number ON receipts(block_height);
 
             CREATE INDEX wallets_balance ON wallets(balance);
             CREATE INDEX wallets_attributes ON wallets using GIN(attributes);
@@ -55,35 +56,35 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 		// language=postgresql
 		await queryRunner.query(`
             DROP INDEX transactions_sender_nonce;
-            DROP INDEX transactions_recipient_address;
+            DROP INDEX transactions_to;
             DROP INDEX transactions_sender;
-            DROP INDEX transactions_sender_address;
+            DROP INDEX transactions_from;
 
-            DROP INDEX transactions_block_id;
-            DROP INDEX transactions_block_height_sequence;
+            DROP INDEX transactions_block_hash;
+            DROP INDEX transactions_block_number_transaction_index;
 
             DROP INDEX transactions_amount;
             DROP INDEX transactions_gas_price;
             DROP INDEX transactions_nonce;
 
-            DROP INDEX transactions_amount_sequence;
-            DROP INDEX transactions_gas_price_sequence;
-            DROP INDEX transactions_nonce_sequence;
-            DROP INDEX transactions_timestamp_sequence;
+            DROP INDEX transactions_amount_transaction_index;
+            DROP INDEX transactions_gas_price_transaction_index;
+            DROP INDEX transactions_nonce_transaction_index;
+            DROP INDEX transactions_timestamp_transaction_index;
 
-            DROP INDEX transactions_amount_asc_sequence_desc;
-            DROP INDEX transactions_gas_price_asc_sequence_desc;
-            DROP INDEX transactions_nonce_asc_sequence_desc;
-            DROP INDEX transactions_timestamp_asc_sequence_desc;
+            DROP INDEX transactions_amount_asc_transaction_index_desc;
+            DROP INDEX transactions_gas_price_asc_transaction_index_desc;
+            DROP INDEX transactions_nonce_asc_transaction_index_desc;
+            DROP INDEX transactions_timestamp_asc_transaction_index_desc;
             DROP INDEX transactions_function_sig_address;
 
-            DROP INDEX blocks_number_of_transactions;
+            DROP INDEX blocks_transactions_count;
             DROP INDEX blocks_reward;
-            DROP INDEX blocks_total_amount;
-            DROP INDEX blocks_total_fee;
+            DROP INDEX blocks_amount;
+            DROP INDEX blocks_fee;
             DROP INDEX blocks_validator_round;
 
-            DROP INDEX receipts_block_height;
+            DROP INDEX receipts_block_block_number;
 
             DROP INDEX wallets_balance;
             DROP INDEX wallets_attributes;

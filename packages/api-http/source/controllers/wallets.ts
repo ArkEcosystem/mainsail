@@ -82,7 +82,7 @@ export class WalletsController extends Controller {
 			return Boom.notFound("Wallet not found");
 		}
 
-		return this.getTransactions(request, { recipientId: wallet.address });
+		return this.getTransactions(request, { to: wallet.address });
 	}
 
 	public async votes(request: Hapi.Request) {

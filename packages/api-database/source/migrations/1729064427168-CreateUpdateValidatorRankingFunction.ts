@@ -8,7 +8,7 @@ export class CreateUpdateValidatorRankingFunction1729064427168 implements Migrat
             RETURNS VOID AS $$
             BEGIN
                 WITH all_validators AS (
-                    SELECT 
+                    SELECT
                         address,
                         (attributes->>'validatorVoteBalance')::numeric AS vote_balance,
                         COALESCE((attributes->>'validatorResigned')::boolean, FALSE) AS is_resigned
@@ -24,14 +24,14 @@ export class CreateUpdateValidatorRankingFunction1729064427168 implements Migrat
                     ORDER BY is_resigned ASC, vote_balance DESC, address ASC
                 )
                 UPDATE wallets
-                SET 
+                SET
                     attributes = attributes || jsonb_build_object(
                         'validatorRank', ranking.rank,
                         'validatorApproval', ROUND(COALESCE(ranking.vote_balance::numeric / NULLIF(state.supply::numeric, 0), 0), 4)
                     )
                 FROM ranking
                 CROSS JOIN state
-                WHERE wallets.address = ranking.address;		
+                WHERE wallets.address = ranking.address;
             END;
             $$
             LANGUAGE plpgsql;

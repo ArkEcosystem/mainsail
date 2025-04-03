@@ -38,15 +38,15 @@ export type BlockDataWithTransactionData = {
 export type TransactionCriteria = {
 	address?: OrEqualCriteria<string>;
 	senderId?: OrEqualCriteria<string>;
-	recipientId?: OrEqualCriteria<string>;
-	id?: OrEqualCriteria<string>;
+	to?: OrEqualCriteria<string>;
+	hash?: OrEqualCriteria<string>;
 	version?: OrEqualCriteria<number>;
-	blockId?: OrEqualCriteria<string>;
-	sequence?: OrNumericCriteria<number>;
+	blockHash?: OrEqualCriteria<string>;
+	transactionIndex?: OrNumericCriteria<number>;
 	timestamp?: OrNumericCriteria<number>;
 	nonce?: OrNumericCriteria<string>;
 	senderPublicKey?: OrEqualCriteria<string>;
-	senderAddress?: OrEqualCriteria<string>;
+	from?: OrEqualCriteria<string>;
 	amount?: OrNumericCriteria<string>;
 	gasPrice?: OrNumericCriteria<number>;
 	data?: OrEqualCriteria<string>;

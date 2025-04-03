@@ -34,24 +34,24 @@ export class TransactionFilter {
 						this.handleSenderIdCriteria(c, walletRepository),
 					);
 				}
-				case "recipientId": {
-					return handleOrCriteria(criteria.recipientId, async (c) =>
+				case "to": {
+					return handleOrCriteria(criteria.to, async (c) =>
 						// @ts-ignore
 						this.handleRecipientAddressCriteria(c),
 					);
 				}
-				case "id": {
-					return handleOrCriteria(criteria.id, async (c) => ({ op: "equal", property: "id", value: c }));
+				case "hash": {
+					return handleOrCriteria(criteria.hash, async (c) => ({ op: "equal", property: "hash", value: c }));
 				}
-				case "blockId": {
-					return handleOrCriteria(criteria.blockId, async (c) => ({
+				case "blockHash": {
+					return handleOrCriteria(criteria.blockHash, async (c) => ({
 						op: "equal",
-						property: "blockId",
+						property: "blockHash",
 						value: c,
 					}));
 				}
-				case "sequence": {
-					return handleOrCriteria(criteria.sequence, async (c) =>
+				case "transactionIndex": {
+					return handleOrCriteria(criteria.transactionIndex, async (c) =>
 						// @ts-ignore
 						handleComparisonCriteria("sequence", c),
 					);
@@ -74,8 +74,8 @@ export class TransactionFilter {
 						this.handleSenderPublicKeyCriteria(c),
 					);
 				}
-				case "senderAddress": {
-					return handleOrCriteria(criteria.senderAddress, async (c) =>
+				case "from": {
+					return handleOrCriteria(criteria.from, async (c) =>
 						// @ts-ignore
 						this.handleSenderAddressCritera(c),
 					);
@@ -143,7 +143,7 @@ export class TransactionFilter {
 	}
 
 	private static async handleSenderAddressCritera(criteria: EqualCriteria<string>): Promise<Expression<Transaction>> {
-		return { op: "equal", property: "senderAddress", value: criteria };
+		return { op: "equal", property: "from", value: criteria };
 	}
 
 	private static async handleRecipientAddressCriteria(

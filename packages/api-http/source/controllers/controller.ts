@@ -129,7 +129,7 @@ export class Controller extends AbstractController {
 		const [state, receipts] = await Promise.all([
 			context?.state ?? this.getState(),
 			this.getReceipts(
-				resultPage.results.map((tx) => tx.id),
+				resultPage.results.map((tx) => tx.hash),
 				context?.fullReceipt ?? false,
 			),
 		]);
@@ -138,7 +138,7 @@ export class Controller extends AbstractController {
 			...resultPage,
 			results: await Promise.all(
 				resultPage.results.map((tx) =>
-					this.enrichTransaction(tx, state, receipts[tx.id] ?? null, context?.fullReceipt),
+					this.enrichTransaction(tx, state, receipts[tx.hash] ?? null, context?.fullReceipt),
 				),
 			),
 		};
@@ -152,10 +152,10 @@ export class Controller extends AbstractController {
 	): Promise<EnrichedTransaction> {
 		const [_state, receipts] = await Promise.all([
 			state ? state : this.getState(),
-			receipt !== undefined ? receipt : this.getReceipts([transaction.id], fullReceipt),
+			receipt !== undefined ? receipt : this.getReceipts([transaction.hash], fullReceipt),
 		]);
 
-		return { ...transaction, receipt: receipt ?? receipts?.[transaction.id] ?? undefined, state: _state };
+		return { ...transaction, receipt: receipt ?? receipts?.[transaction.hash] ?? undefined, state: _state };
 	}
 
 	protected getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {
