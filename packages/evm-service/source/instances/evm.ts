@@ -147,7 +147,7 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 		const { height, round, id: blockId } = unit.getBlock().header;
 		const commitData = await this.#prepareCommitData(unit);
 
-		const result = await this.#evm.commit({ height: BigInt(height), round: BigInt(round), blockId }, commitData);
+		const result = await this.#evm.commit({ blockId, height: BigInt(height), round: BigInt(round) }, commitData);
 		unit.setAccountUpdates(result.dirtyAccounts);
 	}
 

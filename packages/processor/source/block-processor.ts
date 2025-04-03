@@ -68,9 +68,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			await this.evm.prepareNextCommit({
 				commitKey: {
+					blockId: block.header.id,
 					height: BigInt(block.header.height),
 					round: BigInt(block.header.round),
-					blockId: block.header.id,
 				},
 			});
 
@@ -208,7 +208,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 
 		const stateHash = await this.evm.stateHash(
-			{ height: BigInt(block.header.height), round: BigInt(block.header.round), blockId: block.header.id },
+			{ blockId: block.header.id, height: BigInt(block.header.height), round: BigInt(block.header.round) },
 			previousStateHash,
 		);
 
@@ -219,9 +219,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	async #verifyLogsBloom(block: Contracts.Crypto.Block): Promise<void> {
 		const logsBloom = await this.evm.logsBloom({
+			blockId: block.header.id,
 			height: BigInt(block.header.height),
 			round: BigInt(block.header.round),
-			blockId: block.header.id,
 		});
 
 		if (block.header.logsBloom !== logsBloom) {
@@ -246,9 +246,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.evm.updateRewardsAndVotes({
 			blockReward: BigNumber.make(milestone.reward).toBigInt(),
 			commitKey: {
+				blockId: block.header.id,
 				height: BigInt(block.header.height),
 				round: BigInt(block.header.round),
-				blockId: block.header.id,
 			},
 			specId: milestone.evmSpec,
 			timestamp: BigInt(block.header.timestamp),
@@ -268,9 +268,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.evm.calculateActiveValidators({
 			activeValidators: BigNumber.make(activeValidators).toBigInt(),
 			commitKey: {
+				blockId: block.header.id,
 				height: BigInt(block.header.height),
 				round: BigInt(block.header.round),
-				blockId: block.header.id,
 			},
 			specId: evmSpec,
 			timestamp: BigInt(block.header.timestamp),
