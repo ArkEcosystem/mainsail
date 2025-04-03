@@ -98,6 +98,8 @@ describe<{
 		const iface = new ethers.Interface(MainsailGlobals.abi);
 
 		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ commitKey });
+
 		let { receipt } = await instance.process({
 			caller: sender.address,
 			value: 0n,
@@ -159,13 +161,17 @@ describe<{
 	it("should deploy, transfer and and update balance correctly", async ({ instance }) => {
 		const [sender, recipient] = wallets;
 
+		let commitKey = { height: BigInt(0), round: BigInt(0) };
+
+		await instance.prepareNextCommit({ commitKey });
+
 		let { receipt } = await instance.process({
 			caller: sender.address,
 			value: 0n,
 			nonce: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
+			blockContext: { ...blockContext, commitKey },
 			...deployConfig,
 		});
 
@@ -173,7 +179,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(0), round: BigInt(0) },
+				data: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -192,6 +198,10 @@ describe<{
 
 		const amount = ethers.parseEther("1999");
 
+		commitKey = { height: BigInt(1), round: BigInt(0) };
+
+		await instance.prepareNextCommit({ commitKey });
+
 		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, amount]);
 		({ receipt } = await instance.process({
 			caller: sender.address,
@@ -200,7 +210,7 @@ describe<{
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey: { height: BigInt(1), round: BigInt(0) } },
+			blockContext: { ...blockContext, commitKey },
 			...transferConfig,
 		}));
 
@@ -208,7 +218,7 @@ describe<{
 			height: BigInt(1),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(1), round: BigInt(0) },
+				data: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -371,13 +381,16 @@ describe<{
 	it("should revert on invalid call", async ({ instance }) => {
 		const [sender] = wallets;
 
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ commitKey });
+
 		let { receipt } = await instance.process({
 			caller: sender.address,
 			value: 0n,
 			nonce: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
+			blockContext: { ...blockContext, commitKey },
 			...deployConfig,
 		});
 
@@ -391,7 +404,7 @@ describe<{
 			data: Buffer.from("0xdead", "hex"),
 			recipient: contractAddress,
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
+			blockContext: { ...blockContext, commitKey },
 			...transferConfig,
 		}));
 
@@ -468,42 +481,44 @@ describe<{
 			});
 		});
 
-		// Commit (1,0) fails since it was overwritten
-		await assert.rejects(
-			async () =>
-				instance.onCommit({
-					...commitKey1,
-					getBlock: () => ({
-						data: { ...commitKey1 },
-					}),
-					setAccountUpdates: () => {},
-				} as any),
-			"invalid commit key",
-		);
-		// Commit (1,1) succeeds
+		// Commit (1,0) succeeds
 		await assert.resolves(async () =>
 			instance.onCommit({
-				...commitKey2,
+				...commitKey1,
 				getBlock: () => ({
-					data: { ...commitKey2 },
+					data: { ...commitKey1 },
 				}),
 				setAccountUpdates: () => {},
 			} as any),
 		);
 
+		// Commit (1,1) fails since it was dropped
+		await assert.rejects(async () => {
+			await instance.onCommit({
+				...commitKey2,
+				getBlock: () => ({
+					data: { ...commitKey2 },
+				}),
+				setAccountUpdates: () => {},
+			} as any);
+		}, "assertion failed: self.pending_commits.contains_key(&commit_key)");
+
 		// Balance updated correctly
 		const balance = await getBalance(instance, contractAddress!, recipient.address);
-		assert.equal(ethers.parseEther("2"), balance);
+		assert.equal(ethers.parseEther("1"), balance);
 	});
 
 	it("should not throw when commit is empty", async ({ instance }) => {
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ commitKey });
+
 		await assert.resolves(
 			async () =>
 				await instance.onCommit({
 					height: 0,
 					round: 0,
 					getBlock: () => ({
-						data: { height: 0, round: 0 },
+						data: { ...commitKey },
 					}),
 					setAccountUpdates: () => {},
 				} as any),
@@ -530,6 +545,8 @@ describe<{
 
 		const commitKey = { height: BigInt(0), round: BigInt(0) };
 		const txHash = getRandomTxHash();
+
+		await instance.prepareNextCommit({ commitKey });
 
 		await instance.process({
 			caller: sender.address,
@@ -567,12 +584,15 @@ describe<{
 	it("should deploy, transfer multipe times and update balance correctly", async ({ instance }) => {
 		const [sender, recipient] = wallets;
 
+		let commitKey = { height: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ commitKey });
+
 		let { receipt } = await instance.process({
 			caller: sender.address,
 			value: 0n,
 			nonce: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
-			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
+			blockContext: { ...blockContext, commitKey },
 			txHash: getRandomTxHash(),
 			...deployConfig,
 		});
@@ -581,7 +601,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(0), round: BigInt(0) },
+				data: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -596,6 +616,9 @@ describe<{
 		const iface = new ethers.Interface(MainsailERC20.abi);
 		const amount = ethers.parseEther("1999");
 
+		commitKey = { height: BigInt(1), round: BigInt(0) };
+		await instance.prepareNextCommit({ commitKey });
+
 		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, amount]);
 		({ receipt } = await instance.process({
 			caller: sender.address,
@@ -603,7 +626,7 @@ describe<{
 			nonce: 1n,
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
-			blockContext: { ...blockContext, commitKey: { height: BigInt(1), round: BigInt(0) } },
+			blockContext: { ...blockContext, commitKey },
 			txHash: getRandomTxHash(),
 			...transferConfig,
 		}));
@@ -614,7 +637,7 @@ describe<{
 			nonce: 2n,
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
-			blockContext: { ...blockContext, commitKey: { height: BigInt(1), round: BigInt(0) } },
+			blockContext: { ...blockContext, commitKey },
 			txHash: getRandomTxHash(),
 			...transferConfig,
 		}));
@@ -625,7 +648,7 @@ describe<{
 			nonce: 3n,
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
-			blockContext: { ...blockContext, commitKey: { height: BigInt(1), round: BigInt(0) } },
+			blockContext: { ...blockContext, commitKey },
 			txHash: getRandomTxHash(),
 			...transferConfig,
 		}));
@@ -638,7 +661,7 @@ describe<{
 			height: BigInt(1),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(1), round: BigInt(0) },
+				data: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -712,6 +735,9 @@ describe<{
 		code = await instance.codeAt(ethers.ZeroAddress);
 		assert.equal(code, "0x");
 
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ commitKey });
+
 		// deployed code
 		const { receipt } = await instance.process({
 			caller: sender.address,
@@ -719,7 +745,7 @@ describe<{
 			nonce: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
+			blockContext: { ...blockContext, commitKey },
 			...deployConfig,
 		});
 
@@ -727,7 +753,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(0), round: BigInt(0) },
+				data: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -757,6 +783,9 @@ describe<{
 	it("should throw when nonce is wrong", async ({ instance }) => {
 		const [sender] = wallets;
 
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ commitKey });
+
 		await assert.resolves(
 			async () =>
 				await instance.process({
@@ -765,7 +794,7 @@ describe<{
 					nonce: 0n,
 					data: Buffer.from("00", "hex"),
 					txHash: getRandomTxHash(),
-					blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
+					blockContext: { ...blockContext, commitKey },
 					...deployConfig,
 				}),
 		);
@@ -774,7 +803,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(0), round: BigInt(0) },
+				data: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -802,13 +831,16 @@ describe<{
 		assert.equal(slot, ethers.ZeroHash);
 
 		// deploy erc20
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ commitKey });
+
 		const { receipt } = await instance.process({
 			caller: sender.address,
 			value: 0n,
 			nonce: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
+			blockContext: { ...blockContext, commitKey },
 			...deployConfig,
 		});
 
@@ -816,7 +848,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(0), round: BigInt(0) },
+				data: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
