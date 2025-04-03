@@ -62,6 +62,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const processResult = { gasUsed: 0, receipts: new Map(), success: false };
 
 		try {
+			await this.verifier.verify(unit);
+
 			const block = unit.getBlock();
 
 			await this.evm.prepareNextCommit({
@@ -71,8 +73,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 					blockId: block.header.id,
 				},
 			});
-
-			await this.verifier.verify(unit);
 
 			for (const [index, transaction] of block.transactions.entries()) {
 				if (index % 20 === 0) {
