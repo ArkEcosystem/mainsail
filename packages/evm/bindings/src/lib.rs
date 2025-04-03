@@ -243,7 +243,7 @@ impl EvmInner {
         }) {
             Ok(receipt) => {
                 self.logger.log(
-                    LogLevel::Info,
+                    LogLevel::Debug,
                     format!(
                         "calculate_active_validators {:?} {:?}",
                         ctx.commit_key, receipt
@@ -328,7 +328,7 @@ impl EvmInner {
                 }) {
                     Ok(receipt) => {
                         self.logger.log(
-                            LogLevel::Info,
+                            LogLevel::Debug,
                             format!(
                                 "vote_update {:?} {:?} {:?}",
                                 ctx.commit_key,
