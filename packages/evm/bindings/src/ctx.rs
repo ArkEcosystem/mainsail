@@ -99,6 +99,7 @@ pub struct JsUpdateRewardsAndVotesContext {
 pub struct JsCommitKey {
     pub height: JsBigInt,
     pub round: JsBigInt,
+    pub block_id: Option<JsString>,
 }
 
 #[napi(object)]
@@ -256,9 +257,16 @@ impl TryFrom<JsCommitKey> for CommitKey {
     type Error = anyhow::Error;
 
     fn try_from(value: JsCommitKey) -> Result<Self, Self::Error> {
+        let block_id = if let Some(block_id) = value.block_id {
+            utils::convert_string_to_b256(block_id)?
+        } else {
+            B256::ZERO
+        };
+
         Ok(CommitKey(
             value.height.get_u64()?.0,
             value.round.get_u64()?.0,
+            block_id,
         ))
     }
 }

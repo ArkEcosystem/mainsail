@@ -45,7 +45,8 @@ pub struct EvmInner {
     persistent_db: PersistentDB,
 
     // A pending commit consists of one or more transactions.
-    pending_commit: Option<PendingCommit>,
+    //pending_commit: Option<PendingCommit>,
+    pending_commits: HashMap<CommitKey, PendingCommit>,
 
     logger: JsLogger,
 }
@@ -69,32 +70,35 @@ impl EvmInner {
 
         EvmInner {
             persistent_db,
-            pending_commit: Default::default(),
+            pending_commits: Default::default(),
             logger,
         }
     }
 
     pub fn prepare_next_commit(&mut self, ctx: PrepareNextCommitContext) -> Result<()> {
         let genesis_height = self.genesis_height();
-        if let Some(pending) = self.pending_commit.as_ref() {
+        if let Some(pending) = self.pending_commits.get(&ctx.commit_key) {
             // do not replace any pending commit, while still in bootstrapping phase.
-            if pending.key == CommitKey(genesis_height, 0) && ctx.commit_key == pending.key {
+            if pending.key.0 == genesis_height && ctx.commit_key == pending.key {
                 return Ok(());
             }
 
             self.logger.log(
                 LogLevel::Debug,
                 format!(
-                    "discarding existing pending commit {:?} for {:?}",
+                    "replacing existing pending commit {:?} for {:?}",
                     pending.key, ctx.commit_key
                 ),
             );
         }
 
-        self.pending_commit.replace(PendingCommit {
+        let pending_commit = PendingCommit {
             key: ctx.commit_key,
             ..Default::default()
-        });
+        };
+
+        self.pending_commits
+            .insert(pending_commit.key, pending_commit);
 
         Ok(())
     }
@@ -194,11 +198,8 @@ impl EvmInner {
         ctx: CalculateActiveValidatorsContext,
     ) -> std::result::Result<(), EVMError<String>> {
         assert!(
-            self.pending_commit
-                .as_ref()
-                .is_some_and(|c| c.key == ctx.commit_key),
-            "calculate_active_validators pending commit key mismatch {:?} - {:?}",
-            self.pending_commit.as_ref().map(|c| c.key),
+            self.pending_commits.contains_key(&ctx.commit_key),
+            "calculate_active_validators is missing commit key {:?}",
             ctx.commit_key
         );
 
@@ -220,7 +221,7 @@ impl EvmInner {
             .expect("encode calculateActiveValidators");
 
         let nonce = self
-            .get_account_nonce(genesis_info.deployer_account)
+            .get_account_nonce(&ctx.commit_key, genesis_info.deployer_account)
             .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
 
         match self.transact_evm(ExecutionContext {
@@ -242,7 +243,7 @@ impl EvmInner {
         }) {
             Ok(receipt) => {
                 self.logger.log(
-                    LogLevel::Info,
+                    LogLevel::Debug,
                     format!(
                         "calculate_active_validators {:?} {:?}",
                         ctx.commit_key, receipt
@@ -266,15 +267,10 @@ impl EvmInner {
         ctx: UpdateRewardsAndVotesContext,
     ) -> std::result::Result<(), EVMError<String>> {
         assert!(
-            self.pending_commit
-                .as_ref()
-                .is_some_and(|c| c.key == ctx.commit_key),
-            "update_rewards_and_votes pending commit key mismatch {:?} - {:?}",
-            self.pending_commit.as_ref().map(|c| c.key),
+            self.pending_commits.contains_key(&ctx.commit_key),
+            "update_rewards_and_votes is missing commit key {:?}",
             ctx.commit_key
         );
-
-        let mut pending_commit = self.pending_commit.as_mut().expect("ok");
 
         let genesis_info = self
             .persistent_db
@@ -283,6 +279,11 @@ impl EvmInner {
             .expect("genesis info")
             .clone();
 
+        let nonce = self
+            .get_account_nonce(&ctx.commit_key, genesis_info.deployer_account)
+            .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
+
+        let mut pending_commit = self.pending_commits.get_mut(&ctx.commit_key).expect("ok");
         let mut rewards = HashMap::<Address, u128>::new();
         rewards.insert(ctx.validator_address, ctx.block_reward);
 
@@ -308,12 +309,6 @@ impl EvmInner {
                     .encode("updateVoters", voters.clone())
                     .expect("encode updateVoters");
 
-                let nonce = self
-                    .get_account_nonce(genesis_info.deployer_account)
-                    .map_err(|err| {
-                        EVMError::Database(format!("get_account_nonce: {err}").into())
-                    })?;
-
                 match self.transact_evm(ExecutionContext {
                     block_context: Some(BlockContext {
                         commit_key: ctx.commit_key,
@@ -333,7 +328,7 @@ impl EvmInner {
                 }) {
                     Ok(receipt) => {
                         self.logger.log(
-                            LogLevel::Info,
+                            LogLevel::Debug,
                             format!(
                                 "vote_update {:?} {:?} {:?}",
                                 ctx.commit_key,
@@ -433,10 +428,12 @@ impl EvmInner {
         &mut self,
         info: AccountInfoExtended,
     ) -> std::result::Result<(), EVMError<String>> {
+        assert_eq!(self.pending_commits.len(), 1);
+
         let genesis_height = self.genesis_height();
 
-        let pending = self.pending_commit.as_mut().unwrap();
-        assert_eq!(pending.key, CommitKey(genesis_height, 0));
+        let (_, pending) = self.pending_commits.iter_mut().next().expect("ok");
+        assert_eq!(pending.key.0, genesis_height);
         assert!(!pending.cache.accounts.contains_key(&info.address));
 
         let (address, info, legacy_attributes) = info.into_parts();
@@ -449,10 +446,12 @@ impl EvmInner {
         &mut self,
         wallet: LegacyColdWallet,
     ) -> std::result::Result<(), EVMError<String>> {
+        assert_eq!(self.pending_commits.len(), 1);
+
         let genesis_height = self.genesis_height();
 
-        let pending = self.pending_commit.as_mut().unwrap();
-        assert_eq!(pending.key, CommitKey(genesis_height, 0));
+        let (_, pending) = self.pending_commits.iter_mut().next().expect("ok");
+        assert_eq!(pending.key.0, genesis_height);
 
         assert!(!pending.legacy_cold_wallets.contains_key(&wallet.address));
         pending.legacy_cold_wallets.insert(wallet.address, wallet);
@@ -599,7 +598,7 @@ impl EvmInner {
         &mut self,
         tx_ctx: TxContext,
     ) -> std::result::Result<TxReceipt, EVMError<String>> {
-        let commit_key = tx_ctx.block_context.commit_key;
+        let commit_key = &tx_ctx.block_context.commit_key;
 
         let (committed, _) = self
             .persistent_db
@@ -607,9 +606,7 @@ impl EvmInner {
             .map_err(|err| EVMError::Database(format!("commit receipt lookup: {}", err).into()))?;
         assert!(!committed);
 
-        if let Some(mut pending) = self.pending_commit.as_mut() {
-            assert!(pending.key == commit_key, "pending commit key mismatch");
-
+        if let Some(mut pending) = self.pending_commits.get_mut(commit_key) {
             // Make legacy cold wallet balance available to pending commit if not already present
             if let Some(legacy_address) = tx_ctx.legacy_address {
                 if !pending
@@ -718,38 +715,20 @@ impl EvmInner {
         commit_key: CommitKey,
         commit_data: Option<CommitData>,
     ) -> std::result::Result<Vec<AccountUpdate>, EVMError<String>> {
-        if self
-            .pending_commit
-            .as_ref()
-            .is_some_and(|pending| pending.key != commit_key)
-        {
-            return Err(EVMError::Database(
-                format!(
-                    "invalid commit key: {:#?} - {:#?}",
-                    self.pending_commit.as_ref().map(|c| c.key),
-                    commit_key
-                )
-                .into(),
-            ));
-        }
+        assert!(self.pending_commits.contains_key(&commit_key));
 
-        let outcome = match self.take_pending_commit() {
-            Some(pending_commit) => {
-                // self.logger.log(
-                //     LogLevel::Info,
-                //     format!(
-                //         "committing {:?} with {} transitions",
-                //         commit_key,
-                //         pending_commit.transitions.transitions.len(),
-                //     ),
-                // );
+        let pending_commit = self.take_pending_commit(commit_key);
 
-                state_commit::commit_to_db(&mut self.persistent_db, pending_commit, commit_data)
-            }
-            None => Ok(Default::default()),
-        };
+        // self.logger.log(
+        //     LogLevel::Info,
+        //     format!(
+        //         "committing {:?} with {} transitions",
+        //         commit_key,
+        //         pending_commit.transitions.transitions.len(),
+        //     ),
+        // );
 
-        match outcome {
+        match state_commit::commit_to_db(&mut self.persistent_db, pending_commit, commit_data) {
             Ok(result) => Ok(result),
             Err(err) => Err(EVMError::Database(format!("commit failed: {}", err).into())),
         }
@@ -760,21 +739,14 @@ impl EvmInner {
         commit_key: CommitKey,
         current_hash: B256,
     ) -> std::result::Result<String, EVMError<String>> {
-        if self
-            .pending_commit
-            .as_ref()
-            .is_some_and(|pending| pending.key != commit_key)
-        {
-            self.drop_pending_commit();
-        }
-
         let pending_commit = self
-            .pending_commit
-            .get_or_insert_with(|| PendingCommit {
+            .pending_commits
+            .get(&commit_key)
+            .cloned() // TODO: try get rid of clone
+            .unwrap_or_else(|| PendingCommit {
                 key: commit_key,
                 ..Default::default()
-            })
-            .clone();
+            });
 
         let result = state_hash::calculate(&mut self.persistent_db, pending_commit, current_hash);
 
@@ -790,21 +762,14 @@ impl EvmInner {
         &mut self,
         commit_key: CommitKey,
     ) -> std::result::Result<String, EVMError<String>> {
-        if self
-            .pending_commit
-            .as_ref()
-            .is_some_and(|pending| pending.key != commit_key)
-        {
-            self.drop_pending_commit();
-        }
-
         let pending_commit = self
-            .pending_commit
-            .get_or_insert_with(|| PendingCommit {
+            .pending_commits
+            .get(&commit_key)
+            .cloned() // TODO: try get rid of clone
+            .unwrap_or_else(|| PendingCommit {
                 key: commit_key,
                 ..Default::default()
-            })
-            .clone();
+            });
 
         let result = logs_bloom::calculate(&pending_commit);
 
@@ -922,13 +887,11 @@ impl EvmInner {
     ) -> std::result::Result<ExecutionResult, EVMError<mainsail_evm_core::db::Error>> {
         let mut state_builder = State::builder().with_bundle_update();
 
-        if let Some(commit_key) = ctx.block_context.as_ref().map(|b| b.commit_key) {
-            let pending_commit = self
-                .pending_commit
-                .get_or_insert_with(|| PendingCommit::new(commit_key));
-
-            state_builder =
-                state_builder.with_cached_prestate(std::mem::take(&mut pending_commit.cache));
+        if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key) {
+            if let Some(pending_commit) = self.pending_commits.get_mut(commit_key) {
+                state_builder =
+                    state_builder.with_cached_prestate(std::mem::take(&mut pending_commit.cache));
+            }
         }
 
         let state_db = state_builder
@@ -975,14 +938,11 @@ impl EvmInner {
                 let ResultAndState { state, result } = result;
 
                 // Update state if transaction is part of a commit
-                if let Some(commit_key) = ctx.block_context.as_ref().map(|b| b.commit_key) {
-                    if let Some(pending_commit) = &mut self.pending_commit {
-                        assert_eq!(commit_key, pending_commit.key);
+                if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key) {
+                    let state_db = evm.db();
+                    state_db.commit(state);
 
-                        let state_db = evm.db();
-
-                        state_db.commit(state);
-
+                    if let Some(pending_commit) = self.pending_commits.get_mut(commit_key) {
                         pending_commit.cache = std::mem::take(&mut state_db.cache);
 
                         if let Some(tx_hash) = ctx.tx_hash {
@@ -1009,9 +969,10 @@ impl EvmInner {
 
     fn get_account_nonce(
         &mut self,
+        commit_key: &CommitKey,
         account: Address,
     ) -> std::result::Result<u64, mainsail_evm_core::db::Error> {
-        if let Some(pending) = &self.pending_commit {
+        if let Some(pending) = self.pending_commits.get(commit_key) {
             if pending.cache.accounts.contains_key(&account) {
                 if let Some(cache) = pending.cache.accounts.get(&account) {
                     if let Some(account) = &cache.account {
@@ -1028,12 +989,25 @@ impl EvmInner {
         return Ok(Default::default());
     }
 
-    fn take_pending_commit(&mut self) -> Option<PendingCommit> {
-        self.pending_commit.take()
-    }
+    fn take_pending_commit(&mut self, commit_key: CommitKey) -> PendingCommit {
+        let pending_commit = self
+            .pending_commits
+            .remove(&commit_key)
+            .expect("pending commit exists");
 
-    fn drop_pending_commit(&mut self) {
-        self.take_pending_commit();
+        if self.pending_commits.len() > 0 {
+            self.logger.log(
+                LogLevel::Debug,
+                format!(
+                    "taking {commit_key:?} and dropping {:?}",
+                    self.pending_commits.keys().collect::<Vec<_>>()
+                ),
+            );
+        }
+
+        self.pending_commits.clear();
+
+        pending_commit
     }
 
     #[inline]

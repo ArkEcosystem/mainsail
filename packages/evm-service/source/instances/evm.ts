@@ -26,7 +26,7 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 		this.#evm = new Evm({
 			historySize: 256n,
 			logger: (level: LogLevel, message: string) => {
-				message = `[${logPrefix}] ${message}`;
+				message = `(${logPrefix}) ${message}`;
 				try {
 					switch (level) {
 						case LogLevel.Info: {
@@ -144,10 +144,10 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const { number, round } = unit.getBlock().data;
+		const { number, round, hash: blockId } = unit.getBlock().header;
 		const commitData = await this.#prepareCommitData(unit);
 
-		const result = await this.#evm.commit({ height: BigInt(number), round: BigInt(round) }, commitData);
+		const result = await this.#evm.commit({ blockId, height: BigInt(number), round: BigInt(round) }, commitData);
 		unit.setAccountUpdates(result.dirtyAccounts);
 	}
 
