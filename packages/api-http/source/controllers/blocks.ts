@@ -55,7 +55,7 @@ export class BlocksController extends Controller {
 		const block = await this.blockRepositoryFactory()
 			.createQueryBuilder()
 			.select()
-			.where("height = :height", { height: 0 })
+			.where("number = :number", { number: 0 })
 			.getOne();
 
 		return this.respondEnrichedBlock(block, request);
@@ -65,7 +65,7 @@ export class BlocksController extends Controller {
 		const block = await this.blockRepositoryFactory()
 			.createQueryBuilder()
 			.select()
-			.orderBy("height", "DESC")
+			.orderBy("number", "DESC")
 			.limit(1)
 			.getOne();
 

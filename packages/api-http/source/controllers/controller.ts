@@ -161,7 +161,7 @@ export class Controller extends AbstractController {
 	protected getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {
 		const asHeight = Number(idOrHeight);
 		// NOTE: This assumes all block ids are sha256 and never a valid number below this threshold.
-		return !isNaN(asHeight) && asHeight <= Number.MAX_SAFE_INTEGER ? { height: asHeight } : { id: idOrHeight };
+		return !isNaN(asHeight) && asHeight <= Number.MAX_SAFE_INTEGER ? { number: asHeight } : { hash: idOrHeight };
 	}
 
 	protected getReceiptColumns(fullReceipt?: boolean): string[] {

@@ -15,8 +15,8 @@ export class BlockFilter {
 	private static async handleBlockCriteria(criteria: BlockCriteria): Promise<Expression<Block>> {
 		return handleAndCriteria(criteria, async (key) => {
 			switch (key) {
-				case "id": {
-					return handleOrCriteria(criteria.id, async (c) => ({ op: "equal", property: "hash", value: c }));
+				case "hash": {
+					return handleOrCriteria(criteria.hash, async (c) => ({ op: "equal", property: "hash", value: c }));
 				}
 				case "version": {
 					return handleOrCriteria(criteria.version, async (c) => ({
@@ -31,17 +31,17 @@ export class BlockFilter {
 						handleComparisonCriteria("timestamp", c),
 					);
 				}
-				case "previousBlock": {
-					return handleOrCriteria(criteria.previousBlock, async (c) => ({
+				case "parentHash": {
+					return handleOrCriteria(criteria.parentHash, async (c) => ({
 						op: "equal",
 						property: "parentHash",
 						value: c,
 					}));
 				}
-				case "height": {
-					return handleOrCriteria(criteria.height, async (c) =>
+				case "number": {
+					return handleOrCriteria(criteria.number, async (c) =>
 						// @ts-ignore
-						handleComparisonCriteria("height", c),
+						handleComparisonCriteria("number", c),
 					);
 				}
 
@@ -52,22 +52,22 @@ export class BlockFilter {
 					);
 				}
 
-				case "numberOfTransactions": {
-					return handleOrCriteria(criteria.numberOfTransactions, async (c) =>
+				case "transactionsCount": {
+					return handleOrCriteria(criteria.transactionsCount, async (c) =>
 						// @ts-ignore
-						handleComparisonCriteria("numberOfTransactions", c),
+						handleComparisonCriteria("transactionsCount", c),
 					);
 				}
-				case "totalAmount": {
-					return handleOrCriteria(criteria.totalAmount, async (c) =>
+				case "amount": {
+					return handleOrCriteria(criteria.amount, async (c) =>
 						// @ts-ignore
-						handleComparisonCriteria("totalAmount", c),
+						handleComparisonCriteria("amount", c),
 					);
 				}
-				case "totalFee": {
-					return handleOrCriteria(criteria.totalFee, async (c) =>
+				case "fee": {
+					return handleOrCriteria(criteria.fee, async (c) =>
 						// @ts-ignore
-						handleComparisonCriteria("totalFee", c),
+						handleComparisonCriteria("fee", c),
 					);
 				}
 				case "reward": {
@@ -76,21 +76,21 @@ export class BlockFilter {
 						handleComparisonCriteria("reward", c),
 					);
 				}
-				case "payloadLength": {
-					return handleOrCriteria(criteria.payloadLength, async (c) =>
+				case "payloadSize": {
+					return handleOrCriteria(criteria.payloadSize, async (c) =>
 						// @ts-ignore
-						handleComparisonCriteria("payloadLength", c),
+						handleComparisonCriteria("payloadSize", c),
 					);
 				}
-				case "payloadHash": {
-					return handleOrCriteria(criteria.payloadHash, async (c) => ({
+				case "transactionsRoot": {
+					return handleOrCriteria(criteria.transactionsRoot, async (c) => ({
 						op: "equal",
-						property: "stateRoot",
+						property: "transactionsRoot",
 						value: c,
 					}));
 				}
-				case "generatorAddress": {
-					return handleOrCriteria(criteria.generatorAddress, async (c) => ({
+				case "proposer": {
+					return handleOrCriteria(criteria.proposer, async (c) => ({
 						op: "equal",
 						property: "proposer",
 						value: c,

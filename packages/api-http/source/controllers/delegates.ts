@@ -88,7 +88,7 @@ export class DelegatesController extends Controller {
 
 		const criteria: Search.Criteria.BlockCriteria = {
 			...request.query,
-			generatorAddress: delegate.address,
+			proposer: delegate.address,
 		};
 
 		const pagination = this.getListingPage(request);

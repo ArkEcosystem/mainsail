@@ -9,8 +9,8 @@ export const delegateCriteriaSchemaObject = {
 	attributes: Joi.object(),
 	blocks: {
 		last: {
-			height: blockCriteriaSchemaObject.height,
-			id: blockCriteriaSchemaObject.id,
+			hash: blockCriteriaSchemaObject.hash,
+			number: blockCriteriaSchemaObject.number,
 		},
 		produced: Schemas.createRangeCriteriaSchema(Joi.number().integer().min(0)),
 	},

@@ -31,17 +31,17 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
                   recipient_address
             );
 
-            CREATE INDEX blocks_number_of_transactions ON blocks(number_of_transactions);
+            CREATE INDEX blocks_transactions_count ON blocks(transactions_count);
             CREATE INDEX blocks_reward ON blocks(reward);
-            CREATE INDEX blocks_total_amount ON blocks(total_amount);
-            CREATE INDEX blocks_total_fee ON blocks(total_fee);
+            CREATE INDEX blocks_amount ON blocks(amount);
+            CREATE INDEX blocks_fee ON blocks(fee);
             CREATE INDEX blocks_validator_round ON blocks(validator_round);
 
             CREATE INDEX receipts_block_height ON receipts(block_height);
 
             CREATE INDEX wallets_balance ON wallets(balance);
             CREATE INDEX wallets_attributes ON wallets using GIN(attributes);
-            CREATE INDEX wallets_validators ON wallets ((attributes->>'validatorPublicKey')) 
+            CREATE INDEX wallets_validators ON wallets ((attributes->>'validatorPublicKey'))
                             WHERE (attributes ? 'validatorPublicKey');
             CREATE UNIQUE INDEX wallets_unique_public_key ON wallets (public_key)
             WHERE public_key IS NOT NULL;

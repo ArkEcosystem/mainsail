@@ -3,9 +3,9 @@ import { Column, Entity, Unique } from "typeorm";
 @Entity({
 	name: "blocks",
 })
-@Unique("unique_block_height", ["height"])
+@Unique("unique_block_number", ["number"])
 @Unique("unique_block_timestamp", ["timestamp"])
-@Unique("unique_previous_block", ["previousBlock"])
+@Unique("unique_parent_hash", ["parentHash"])
 export class Block {
 	@Column({
 		primary: true,

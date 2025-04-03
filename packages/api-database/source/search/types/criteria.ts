@@ -13,19 +13,19 @@ export type OrLikeCriteria<T> = OrCriteria<LikeCriteria<T>>;
 export type OrContainsCriteria<T> = OrCriteria<ContainsCriteria<T>>;
 
 export type BlockCriteria = {
-	id?: OrEqualCriteria<string>;
+	hash?: OrEqualCriteria<string>;
 	version?: OrEqualCriteria<number>;
 	timestamp?: OrNumericCriteria<number>;
-	previousBlock?: OrEqualCriteria<string>;
-	height?: OrNumericCriteria<number | string>;
+	parentHash?: OrEqualCriteria<string>;
+	number?: OrNumericCriteria<number | string>;
 	round?: OrEqualCriteria<number>;
-	numberOfTransactions?: OrNumericCriteria<number>;
-	totalAmount?: OrNumericCriteria<number | string>;
-	totalFee?: OrNumericCriteria<number | string>;
+	transactionsCount?: OrNumericCriteria<number>;
+	amount?: OrNumericCriteria<number | string>;
+	fee?: OrNumericCriteria<number | string>;
 	reward?: OrNumericCriteria<number | string>;
-	payloadLength?: OrNumericCriteria<number>;
-	payloadHash?: OrEqualCriteria<string>;
-	generatorAddress?: OrEqualCriteria<string>;
+	payloadSize?: OrNumericCriteria<number>;
+	transactionsRoot?: OrEqualCriteria<string>;
+	proposer?: OrEqualCriteria<string>;
 };
 
 export type OrBlockCriteria = OrCriteria<BlockCriteria>;
