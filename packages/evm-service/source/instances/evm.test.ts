@@ -116,7 +116,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { height: BigInt(0), round: BigInt(0) },
+				header: { height: BigInt(0), round: BigInt(0) },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -179,7 +179,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { ...commitKey },
+				header: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -218,7 +218,7 @@ describe<{
 			height: BigInt(1),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { ...commitKey },
+				header: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -241,7 +241,7 @@ describe<{
 				height: commitKey.height,
 				round: commitKey.round,
 				getBlock: () => ({
-					data: { height: commitKey.height, round: commitKey.round },
+					header: { height: commitKey.height, round: commitKey.round },
 				}),
 				setAccountUpdates: () => {},
 			} as any);
@@ -351,7 +351,7 @@ describe<{
 				height: commitKey.height,
 				round: commitKey.round,
 				getBlock: () => ({
-					data: { height: commitKey.height, round: commitKey.round },
+					header: { height: commitKey.height, round: commitKey.round },
 				}),
 				setAccountUpdates: () => {},
 			} as any);
@@ -435,7 +435,7 @@ describe<{
 		await instance.onCommit({
 			...commitKey,
 			getBlock: () => ({
-				data: { ...commitKey },
+				header: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -486,7 +486,7 @@ describe<{
 			instance.onCommit({
 				...commitKey1,
 				getBlock: () => ({
-					data: { ...commitKey1 },
+					header: { ...commitKey1 },
 				}),
 				setAccountUpdates: () => {},
 			} as any),
@@ -497,7 +497,7 @@ describe<{
 			await instance.onCommit({
 				...commitKey2,
 				getBlock: () => ({
-					data: { ...commitKey2 },
+					header: { ...commitKey2 },
 				}),
 				setAccountUpdates: () => {},
 			} as any);
@@ -518,7 +518,7 @@ describe<{
 					height: 0,
 					round: 0,
 					getBlock: () => ({
-						data: { ...commitKey },
+						header: { ...commitKey },
 					}),
 					setAccountUpdates: () => {},
 				} as any),
@@ -561,7 +561,7 @@ describe<{
 		await instance.onCommit({
 			...commitKey,
 			getBlock: () => ({
-				data: { ...commitKey },
+				header: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -601,7 +601,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { ...commitKey },
+				header: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -661,7 +661,7 @@ describe<{
 			height: BigInt(1),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { ...commitKey },
+				header: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -753,7 +753,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { ...commitKey },
+				header: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -803,7 +803,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { ...commitKey },
+				header: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -848,7 +848,7 @@ describe<{
 			height: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				data: { ...commitKey },
+				header: { ...commitKey },
 			}),
 			setAccountUpdates: () => {},
 		} as any);

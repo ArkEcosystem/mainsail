@@ -65,7 +65,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			const block = unit.getBlock();
 
 			await this.evm.prepareNextCommit({
-				commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
+				commitKey: {
+					height: BigInt(block.header.height),
+					round: BigInt(block.header.round),
+					blockId: block.header.id,
+				},
 			});
 
 			await this.verifier.verify(unit);
@@ -204,7 +208,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 
 		const stateHash = await this.evm.stateHash(
-			{ height: BigInt(block.header.height), round: BigInt(block.header.round) },
+			{ height: BigInt(block.header.height), round: BigInt(block.header.round), blockId: block.header.id },
 			previousStateHash,
 		);
 
@@ -217,6 +221,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const logsBloom = await this.evm.logsBloom({
 			height: BigInt(block.header.height),
 			round: BigInt(block.header.round),
+			blockId: block.header.id,
 		});
 
 		if (block.header.logsBloom !== logsBloom) {
@@ -240,7 +245,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		await this.evm.updateRewardsAndVotes({
 			blockReward: BigNumber.make(milestone.reward).toBigInt(),
-			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
+			commitKey: {
+				height: BigInt(block.header.height),
+				round: BigInt(block.header.round),
+				blockId: block.header.id,
+			},
 			specId: milestone.evmSpec,
 			timestamp: BigInt(block.header.timestamp),
 			validatorAddress: block.header.generatorAddress,
@@ -258,7 +267,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		await this.evm.calculateActiveValidators({
 			activeValidators: BigNumber.make(activeValidators).toBigInt(),
-			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
+			commitKey: {
+				height: BigInt(block.header.height),
+				round: BigInt(block.header.round),
+				blockId: block.header.id,
+			},
 			specId: evmSpec,
 			timestamp: BigInt(block.header.timestamp),
 			validatorAddress: block.header.generatorAddress,

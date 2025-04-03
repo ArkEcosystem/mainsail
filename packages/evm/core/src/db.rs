@@ -181,9 +181,9 @@ pub(crate) struct InnerStorage {
     //
 }
 
-// A (height, round) pair used to associate state with a processable unit.
+// A key of (height, round, block_id) used to associate state with a processable unit.
 #[derive(Hash, PartialEq, Eq, Debug, Default, Clone, Copy)]
-pub struct CommitKey(pub u64, pub u64);
+pub struct CommitKey(pub u64, pub u64, pub B256);
 
 #[derive(Default)]
 pub struct CommitData {
@@ -713,7 +713,7 @@ impl PersistentDB {
             results,
         } = state_commit;
 
-        match self.commit_to_db(*key, change_set, commit_data, results) {
+        match self.commit_to_db(key, change_set, commit_data, results) {
             Ok(_) => return Ok(()),
             Err(err) => match &err {
                 Error::Heed(heed_err) => match heed_err {
@@ -730,7 +730,7 @@ impl PersistentDB {
 
     fn commit_to_db(
         &self,
-        key: CommitKey,
+        key: &CommitKey,
         change_set: &mut state_changes::StateChangeset,
         commit_data: &Option<CommitData>,
         results: &BTreeMap<B256, ExecutionResult>,
@@ -1198,7 +1198,7 @@ fn test_commit_changes() {
     crate::state_commit::commit_to_db(
         &mut db,
         PendingCommit {
-            key: CommitKey(0, 0),
+            key: CommitKey::default(),
             transitions: TransitionState { transitions: state },
             ..Default::default()
         },
@@ -1279,7 +1279,7 @@ fn test_storage() {
     crate::state_commit::commit_to_db(
         &mut db,
         PendingCommit {
-            key: CommitKey(0, 0),
+            key: CommitKey::default(),
             transitions: TransitionState { transitions: state },
             ..Default::default()
         },
@@ -1340,7 +1340,7 @@ fn test_storage_overwrite() {
     crate::state_commit::commit_to_db(
         &mut db,
         PendingCommit {
-            key: CommitKey(0, 0),
+            key: CommitKey::default(),
             transitions: TransitionState { transitions: state },
             ..Default::default()
         },
@@ -1377,7 +1377,7 @@ fn test_storage_overwrite() {
     crate::state_commit::commit_to_db(
         &mut db,
         PendingCommit {
-            key: CommitKey(1, 0),
+            key: CommitKey(1, 0, B256::ZERO),
             transitions: TransitionState { transitions: state },
             ..Default::default()
         },
@@ -1439,7 +1439,7 @@ fn test_resize_on_commit() {
         );
 
         PendingCommit {
-            key: CommitKey(height, 0),
+            key: CommitKey(height, 0, B256::ZERO),
             transitions: TransitionState { transitions: state },
             ..Default::default()
         }

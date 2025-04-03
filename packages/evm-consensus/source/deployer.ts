@@ -60,7 +60,7 @@ export class Deployer {
 		if (this.#needsCommit) {
 			await this.evm.onCommit({
 				commitKey,
-				getBlock: () => ({ data: { ...commitKey } }),
+				getBlock: () => ({ header: { ...commitKey } }),
 				setAccountUpdates: () => ({}),
 			} as any);
 		}

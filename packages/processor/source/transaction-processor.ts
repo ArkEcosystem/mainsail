@@ -27,12 +27,15 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		unit: Contracts.Processor.ProcessableUnit,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Evm.TransactionReceipt> {
-		const milestone = this.configuration.getMilestone(unit.height);
+		const block = unit.getBlock();
+
+		const milestone = this.configuration.getMilestone(block.header.height);
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
 		const commitKey: Contracts.Evm.CommitKey = {
-			height: BigInt(unit.height),
-			round: BigInt(unit.getBlock().data.round),
+			height: BigInt(block.header.height),
+			round: BigInt(block.header.round),
+			blockId: block.header.id,
 		};
 
 		const transactionHandlerContext: Contracts.Transactions.TransactionHandlerContext = {
@@ -40,8 +43,8 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 				blockContext: {
 					commitKey,
 					gasLimit: BigInt(milestone.block.maxGasLimit),
-					timestamp: BigInt(unit.getBlock().data.timestamp),
-					validatorAddress: unit.getBlock().data.generatorAddress,
+					timestamp: BigInt(block.header.timestamp),
+					validatorAddress: block.header.generatorAddress,
 				},
 				instance: this.evm,
 			},

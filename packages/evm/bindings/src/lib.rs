@@ -79,7 +79,7 @@ impl EvmInner {
         let genesis_height = self.genesis_height();
         if let Some(pending) = self.pending_commits.get(&ctx.commit_key) {
             // do not replace any pending commit, while still in bootstrapping phase.
-            if pending.key == CommitKey(genesis_height, 0) && ctx.commit_key == pending.key {
+            if pending.key.0 == genesis_height && ctx.commit_key == pending.key {
                 return Ok(());
             }
 
@@ -221,7 +221,7 @@ impl EvmInner {
             .expect("encode calculateActiveValidators");
 
         let nonce = self
-            .get_account_nonce(ctx.commit_key, genesis_info.deployer_account)
+            .get_account_nonce(&ctx.commit_key, genesis_info.deployer_account)
             .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
 
         match self.transact_evm(ExecutionContext {
@@ -280,7 +280,7 @@ impl EvmInner {
             .clone();
 
         let nonce = self
-            .get_account_nonce(ctx.commit_key, genesis_info.deployer_account)
+            .get_account_nonce(&ctx.commit_key, genesis_info.deployer_account)
             .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
 
         let mut pending_commit = self.pending_commits.get_mut(&ctx.commit_key).expect("ok");
@@ -433,7 +433,7 @@ impl EvmInner {
         let genesis_height = self.genesis_height();
 
         let (_, pending) = self.pending_commits.iter_mut().next().expect("ok");
-        assert_eq!(pending.key, CommitKey(genesis_height, 0));
+        assert_eq!(pending.key.0, genesis_height);
         assert!(!pending.cache.accounts.contains_key(&info.address));
 
         let (address, info, legacy_attributes) = info.into_parts();
@@ -451,7 +451,7 @@ impl EvmInner {
         let genesis_height = self.genesis_height();
 
         let (_, pending) = self.pending_commits.iter_mut().next().expect("ok");
-        assert_eq!(pending.key, CommitKey(genesis_height, 0));
+        assert_eq!(pending.key.0, genesis_height);
 
         assert!(!pending.legacy_cold_wallets.contains_key(&wallet.address));
         pending.legacy_cold_wallets.insert(wallet.address, wallet);
@@ -598,7 +598,7 @@ impl EvmInner {
         &mut self,
         tx_ctx: TxContext,
     ) -> std::result::Result<TxReceipt, EVMError<String>> {
-        let commit_key = tx_ctx.block_context.commit_key;
+        let commit_key = &tx_ctx.block_context.commit_key;
 
         let (committed, _) = self
             .persistent_db
@@ -606,7 +606,7 @@ impl EvmInner {
             .map_err(|err| EVMError::Database(format!("commit receipt lookup: {}", err).into()))?;
         assert!(!committed);
 
-        if let Some(mut pending) = self.pending_commits.get_mut(&commit_key) {
+        if let Some(mut pending) = self.pending_commits.get_mut(commit_key) {
             // Make legacy cold wallet balance available to pending commit if not already present
             if let Some(legacy_address) = tx_ctx.legacy_address {
                 if !pending
@@ -887,8 +887,8 @@ impl EvmInner {
     ) -> std::result::Result<ExecutionResult, EVMError<mainsail_evm_core::db::Error>> {
         let mut state_builder = State::builder().with_bundle_update();
 
-        if let Some(commit_key) = ctx.block_context.as_ref().map(|b| b.commit_key) {
-            if let Some(pending_commit) = self.pending_commits.get_mut(&commit_key) {
+        if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key) {
+            if let Some(pending_commit) = self.pending_commits.get_mut(commit_key) {
                 state_builder =
                     state_builder.with_cached_prestate(std::mem::take(&mut pending_commit.cache));
             }
@@ -938,11 +938,11 @@ impl EvmInner {
                 let ResultAndState { state, result } = result;
 
                 // Update state if transaction is part of a commit
-                if let Some(commit_key) = ctx.block_context.as_ref().map(|b| b.commit_key) {
+                if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key) {
                     let state_db = evm.db();
                     state_db.commit(state);
 
-                    if let Some(pending_commit) = self.pending_commits.get_mut(&commit_key) {
+                    if let Some(pending_commit) = self.pending_commits.get_mut(commit_key) {
                         pending_commit.cache = std::mem::take(&mut state_db.cache);
 
                         if let Some(tx_hash) = ctx.tx_hash {
@@ -969,10 +969,10 @@ impl EvmInner {
 
     fn get_account_nonce(
         &mut self,
-        commit_key: CommitKey,
+        commit_key: &CommitKey,
         account: Address,
     ) -> std::result::Result<u64, mainsail_evm_core::db::Error> {
-        if let Some(pending) = self.pending_commits.get(&commit_key) {
+        if let Some(pending) = self.pending_commits.get(commit_key) {
             if pending.cache.accounts.contains_key(&account) {
                 if let Some(cache) = pending.cache.accounts.get(&account) {
                     if let Some(account) = &cache.account {
