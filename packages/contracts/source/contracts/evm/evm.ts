@@ -169,6 +169,7 @@ export interface UpdateRewardsAndVotesContext {
 export interface CommitKey {
 	readonly height: bigint;
 	readonly round: bigint;
+	readonly blockId?: string;
 }
 
 export interface TransactionReceipt {
