@@ -713,15 +713,21 @@ describe<{
 	});
 
 	it("should return state hash", async ({ instance }) => {
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ commitKey });
+
 		const hash = await instance.stateHash(
-			{ height: BigInt(0), round: BigInt(0) },
+			commitKey,
 			"0000000000000000000000000000000000000000000000000000000000000000",
 		);
 		assert.equal(hash, "0722d8002560934d7004b8b849101024bf7ec2aaa2c3396f7292d4ac8cdae5ab");
 	});
 
 	it("should return logs bloom", async ({ instance }) => {
-		const logsBloom = await instance.logsBloom({ height: BigInt(0), round: BigInt(0) });
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ commitKey });
+
+		const logsBloom = await instance.logsBloom(commitKey);
 		assert.equal(logsBloom, "0".repeat(512));
 	});
 
