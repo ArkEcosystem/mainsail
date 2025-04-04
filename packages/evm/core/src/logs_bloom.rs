@@ -3,8 +3,12 @@ use revm::primitives::alloy_primitives::Bloom;
 use crate::db::PendingCommit;
 
 pub fn calculate(pending_commit: &PendingCommit) -> Result<Bloom, crate::db::Error> {
-    let receipt_blooms = pending_commit
-        .results
+    let results = match pending_commit.built_commit.as_ref() {
+        Some(commit) => &commit.results,
+        None => &pending_commit.results,
+    };
+
+    let receipt_blooms = results
         .values()
         .map(|r| Bloom::from_iter(r.logs()))
         .collect::<Vec<Bloom>>();
