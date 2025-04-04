@@ -190,18 +190,27 @@ const bootstrap = async (sandbox: Sandbox) => {
 
 	const blockProcessor = sandbox.app.get<Contracts.Processor.BlockProcessor>(Identifiers.Processor.BlockProcessor);
 
-	const result = await blockProcessor.process(commitState);
-	if (!result) {
-		throw new Error("Failed to process genesis block");
-	}
+	const evm = sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+
+	await evm.prepareNextCommit({
+		commitKey: {
+			height: BigInt(commitState.height),
+			round: BigInt(commitState.round),
+			blockId: commitState.getBlock().header.hash,
+		},
+	});
 
 	// Import some legacy cold wallets
 	const legacyColdWallets = await getLegacyColdWallets(sandbox);
-	const evm = sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 	for (const { legacyColdWallet } of legacyColdWallets) {
 		await evm.importLegacyColdWallet(legacyColdWallet);
 	}
 	//
+
+	const result = await blockProcessor.process(commitState);
+	if (!result) {
+		throw new Error("Failed to process genesis block");
+	}
 
 	await blockProcessor.commit(commitState);
 
