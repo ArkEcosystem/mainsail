@@ -52,11 +52,9 @@ export abstract class AbstractServer {
 			if ("isBoom" in request.response && request.response.isBoom && request.response.isServer) {
 				if (request.response.name === "QueryFailedError") {
 					const message = `${request.response.name} ${request.response.message}`;
-					// @ts-ignore
 					this.logger.warning(`${request.path} - ${message}`);
 					request.response = Boom.badRequest(message);
 				} else {
-					// @ts-ignore
 					this.logger.error(`${request.path} - ${request.response.stack ?? request.response.message}`);
 				}
 			}

@@ -111,6 +111,7 @@ export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<Api
 		error: (message) => console.log(message),
 		info: (message) => console.log(message),
 		notice: (message) => console.log(message),
+		warning: (message) => console.log(message),
 	});
 
 	context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue({
