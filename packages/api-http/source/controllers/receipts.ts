@@ -40,7 +40,7 @@ export class ReceiptsController extends Controller {
 
 		const [receipts, totalCount] = await query
 			.orderBy("transaction.blockHeight", "DESC")
-			.addOrderBy("transaction.sequence", "DESC")
+			.addOrderBy("transaction.transactionIndex", "DESC")
 			.offset(pagination.offset)
 			.limit(pagination.limit)
 			.select()
@@ -61,7 +61,7 @@ export class ReceiptsController extends Controller {
 		const receipt = await this.receiptRepositoryFactory()
 			.createQueryBuilder("receipt")
 			.select(this.getReceiptColumns(request.query.fullReceipt))
-			.where("id = :id", { id: request.params.id })
+			.where("hash = :hash", { hash: request.params.hash })
 			.getOne();
 
 		if (!receipt) {
@@ -78,11 +78,11 @@ export class ReceiptsController extends Controller {
 		const query = this.receiptRepositoryFactory()
 			.createQueryBuilder("receipt")
 			.select(this.getReceiptColumns(request.query.fullReceipt))
-			.innerJoin(Models.Transaction, "transaction", "receipt.id = transaction.id")
+			.innerJoin(Models.Transaction, "transaction", "receipt.hash = transaction.hash")
 			.where("receipt.deployedContractAddress IS NOT NULL");
 
 		if (criteria.sender) {
-			query.innerJoin(Models.Wallet, "wallet", "transaction.senderAddress = wallet.address").andWhere(
+			query.innerJoin(Models.Wallet, "wallet", "transaction.from = wallet.address").andWhere(
 				new ApiDatabaseContracts.Brackets((qb) => {
 					qb.where("wallet.publicKey = :sender", { sender: criteria.sender }).orWhere(
 						"wallet.address = :sender",
@@ -93,8 +93,8 @@ export class ReceiptsController extends Controller {
 		}
 
 		const [receipts, totalCount] = await query
-			.orderBy("transaction.blockHeight", "DESC")
-			.addOrderBy("transaction.sequence", "DESC")
+			.orderBy("transaction.blockNumber", "DESC")
+			.addOrderBy("transaction.transactionIndex", "DESC")
 			.offset(pagination.offset)
 			.limit(pagination.limit)
 			.select()

@@ -10,7 +10,7 @@ export class Receipt {
 		primary: true,
 		type: "varchar",
 	})
-	public readonly id!: string;
+	public readonly hash!: string;
 
 	@Column({
 		nullable: false,

@@ -45,7 +45,7 @@ export class TransactionsController extends Controller {
 		const transaction = await this.transactionRepositoryFactory()
 			.createQueryBuilder()
 			.select()
-			.where("id = :id", { id: request.params.id })
+			.where("hash = :hash", { hash: request.params.hash })
 			.getOne();
 
 		return this.respondEnrichedTransaction(transaction, request);

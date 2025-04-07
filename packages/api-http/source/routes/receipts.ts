@@ -26,7 +26,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					fullReceipt: Joi.bool().default(true),
 					recipient: address,
 					sender: walletId,
-					txHash: transactionCriteriaSchemaObject.id,
+					txHash: transactionCriteriaSchemaObject.hash,
 				}).concat(Schemas.pagination),
 			},
 		},

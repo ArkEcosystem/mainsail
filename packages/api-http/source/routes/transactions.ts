@@ -39,7 +39,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		options: {
 			validate: {
 				params: Joi.object({
-					id: Joi.string().hex().length(64),
+					hash: Joi.string().hex().length(64),
 				}),
 				query: Joi.object({
 					fullReceipt: Joi.bool().default(false),
@@ -47,7 +47,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				}),
 			},
 		},
-		path: "/transactions/{id}",
+		path: "/transactions/{hash}",
 	});
 
 	server.route({

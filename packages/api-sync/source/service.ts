@@ -149,7 +149,7 @@ export class Sync implements Contracts.ApiSync.Service {
 					deployedContractAddress: receipt.deployedContractAddress,
 					gasRefunded: Number(receipt.gasRefunded),
 					gasUsed: Number(receipt.gasUsed),
-					id: transaction.hash,
+					hash: transaction.hash,
 					logs: receipt.logs,
 					output: receipt.output,
 					success: receipt.success,

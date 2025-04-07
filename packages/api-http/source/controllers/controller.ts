@@ -51,17 +51,17 @@ export class Controller extends AbstractController {
 		return configuration ?? ({} as Models.Configuration);
 	}
 
-	protected async getReceipts(ids: string[], full = false): Promise<Record<string, Models.Receipt>> {
+	protected async getReceipts(hashes: string[], full = false): Promise<Record<string, Models.Receipt>> {
 		const receiptRepository = this.receiptRepositoryFactory();
 
 		const receipts = await receiptRepository
 			.createQueryBuilder("receipt")
 			.select(this.getReceiptColumns(full))
-			.whereInIds(ids)
+			.whereInIds(hashes)
 			.getMany();
 
 		return receipts.reduce((accumulator, current) => {
-			accumulator[current.id] = current;
+			accumulator[current.hash] = current;
 			return accumulator;
 		}, {});
 	}
@@ -166,7 +166,7 @@ export class Controller extends AbstractController {
 
 	protected getReceiptColumns(fullReceipt?: boolean): string[] {
 		let columns = [
-			"receipt.id",
+			"receipt.hash",
 			"receipt.success",
 			"receipt.gasUsed",
 			"receipt.gasRefunded",

@@ -45,41 +45,39 @@ export const numberFixedOrBetween = Joi.alternatives().try(
 	}),
 );
 
-export const blocksOrderBy = orderBy.default("height:desc");
-export const transactionsOrderBy = orderBy.default(["timestamp:desc", "sequence:desc"]);
+export const blocksOrderBy = orderBy.default("number:desc");
+export const transactionsOrderBy = orderBy.default(["timestamp:desc", "transactionIndex:desc"]);
 
 export const blockCriteriaSchemas = {
-	blockSignature: Schemas.orEqualCriteria(Joi.string().hex()),
-	generatorAddress: Schemas.orEqualCriteria(Joi.string().hex().length(66)),
-	height: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
-	id: Schemas.orEqualCriteria(blockId),
-	numberOfTransactions: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	proposer: Schemas.orEqualCriteria(Joi.string().hex().length(66)),
+	number: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	hash: Schemas.orEqualCriteria(blockId),
+	transactionsCount: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	payloadHash: Schemas.orEqualCriteria(Joi.string().hex()),
-	payloadLength: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
-	previousBlock: Schemas.orEqualCriteria(blockId),
+	payloadSize: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	parentHash: Schemas.orEqualCriteria(blockId),
 	reward: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	round: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	timestamp: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
-	totalAmount: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
-	totalFee: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
-	version: Schemas.orEqualCriteria(Joi.number().integer().min(0)),
+	amount: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	fee: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 };
 
 export const transactionCriteriaSchemas = {
 	address: Schemas.orEqualCriteria(address),
-	amount: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	value: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	asset: Schemas.orContainsCriteria(Joi.object()),
-	blockId: Schemas.orEqualCriteria(blockId),
+	blockHash: Schemas.orEqualCriteria(blockId),
 	data: Schemas.orEqualCriteria(
 		Joi.alternatives().try(Joi.string().valid("", "0x"), Joi.string().hex({ prefix: "optional" }).max(10)),
 	),
 	gasPrice: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
-	id: Schemas.orEqualCriteria(Joi.string().hex().length(64)),
+	hash: Schemas.orEqualCriteria(Joi.string().hex().length(64)),
 	nonce: Schemas.orNumericCriteria(Joi.number().integer().positive()),
-	recipientId: Schemas.orEqualCriteria(address),
-	senderAddress: Schemas.orEqualCriteria(address),
+	to: Schemas.orEqualCriteria(address),
+	from: Schemas.orEqualCriteria(address),
 	senderId: Schemas.orEqualCriteria(address),
 	senderPublicKey: Schemas.orEqualCriteria(Joi.string().hex().length(66)),
-	sequence: Schemas.orNumericCriteria(Joi.number().integer().positive()),
+	transactionIndex: Schemas.orNumericCriteria(Joi.number().integer().positive()),
 	timestamp: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 };

@@ -53,7 +53,7 @@ export class TransactionFilter {
 				case "transactionIndex": {
 					return handleOrCriteria(criteria.transactionIndex, async (c) =>
 						// @ts-ignore
-						handleComparisonCriteria("sequence", c),
+						handleComparisonCriteria("transactionIndex", c),
 					);
 				}
 				case "timestamp": {
@@ -151,7 +151,7 @@ export class TransactionFilter {
 	): Promise<Expression<Transaction>> {
 		return {
 			op: "equal",
-			property: "recipientAddress" as keyof Transaction,
+			property: "to" as keyof Transaction,
 			value: criteria,
 		};
 	}

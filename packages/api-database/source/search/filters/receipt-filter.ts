@@ -18,7 +18,7 @@ export class ReceiptFilter {
 				case "txHash": {
 					return handleOrCriteria(criteria.txHash, async (c) => ({
 						op: "equal",
-						property: "id",
+						property: "hash",
 						value: c,
 					}));
 				}
