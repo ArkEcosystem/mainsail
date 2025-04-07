@@ -4,11 +4,11 @@ import { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class ReceiptResource implements Contracts.Api.Resource {
-	public raw(resource: Models.Peer): object {
+	public raw(resource: Models.Receipt): object {
 		return resource;
 	}
 
-	public transform(resource: Models.Peer): object {
+	public transform(resource: Models.Receipt): object {
 		return resource;
 	}
 }

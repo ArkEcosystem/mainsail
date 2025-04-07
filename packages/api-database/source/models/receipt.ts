@@ -10,7 +10,7 @@ export class Receipt {
 		primary: true,
 		type: "varchar",
 	})
-	public readonly hash!: string;
+	public readonly transactionHash!: string;
 
 	@Column({
 		nullable: false,
@@ -22,7 +22,7 @@ export class Receipt {
 		nullable: false,
 		type: "bigint",
 	})
-	public readonly blockHeight!: string;
+	public readonly blockNumber!: string;
 
 	@Column({
 		nullable: false,

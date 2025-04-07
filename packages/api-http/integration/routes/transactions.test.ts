@@ -13,7 +13,6 @@ describe<{
 }>("Transactions", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 
-	// TODO:
 	const options = { transform: false };
 
 	beforeAll(async (context) => {
@@ -41,7 +40,7 @@ describe<{
 		assert.equal(statusCode, 200);
 		assert.equal(
 			data.data,
-			[...transactions].sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+			[...transactions].sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
 		);
 	});
 
@@ -53,20 +52,20 @@ describe<{
 				path: "/transactions?data=0x",
 				result: [...transactions]
 					.filter((tx) => tx.data === "")
-					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+					.sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
 			},
 			{
 				path: "/transactions?data=",
 				result: [...transactions]
 					.filter((tx) => tx.data === "")
-					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+					.sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
 			},
 			{ path: "/transactions?data=88888888", result: [] },
 			{
 				path: "/transactions?data=6dd7d8ea",
 				result: [...transactions]
 					.filter((tx) => tx.data.startsWith("0x6dd7d8ea"))
-					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+					.sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
 			},
 		];
 
@@ -84,22 +83,22 @@ describe<{
 		const transaction = transactions[transactions.length - 1];
 		const testCases = [
 			{
-				path: `/transactions?senderAddress=${transaction.senderAddress}`,
+				path: `/transactions?from=${transaction.from}`,
 				result: [...transactions]
-					.filter((tx) => tx.senderAddress === transaction.senderAddress)
-					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+					.filter((tx) => tx.from === transaction.from)
+					.sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
 			},
 			{
-				path: `/transactions?senderId=${transaction.senderAddress}`,
+				path: `/transactions?senderId=${transaction.from}`,
 				result: [...transactions]
-					.filter((tx) => tx.senderAddress === transaction.senderAddress)
-					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+					.filter((tx) => tx.from === transaction.from)
+					.sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
 			},
 			{
-				path: `/transactions?address=${transaction.recipientAddress}`,
+				path: `/transactions?address=${transaction.to}`,
 				result: [...transactions]
-					.filter((tx) => tx.recipientAddress === transaction.recipientAddress)
-					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+					.filter((tx) => tx.to === transaction.to)
+					.sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
 			},
 		];
 
@@ -109,12 +108,12 @@ describe<{
 			assert.equal(data.data, result);
 		}
 	});
-	//
-	it("/transactions/{id}", async () => {
+
+	it("/transactions/{hash}", async () => {
 		await apiContext.transactionRepository.save(transactions);
 
-		const id = transactions.at(-1).id;
-		const { statusCode, data } = await request(`/transactions/${id}`, options);
+		const hash = transactions.at(-1)?.hash;
+		const { statusCode, data } = await request(`/transactions/${hash}`, options);
 		assert.equal(statusCode, 200);
 		assert.equal(data.data, transactions.at(-1));
 	});
@@ -135,7 +134,7 @@ describe<{
 		assert.equal(statusCode, 200);
 		assert.equal(
 			data.data,
-			[...receiptTransactions].sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+			[...receiptTransactions].sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
 		);
 	});
 });

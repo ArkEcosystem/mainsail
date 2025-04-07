@@ -15,10 +15,10 @@ export class ReceiptFilter {
 	private static async handleReceiptCriteria(criteria: ReceiptCriteria): Promise<Expression<Receipt>> {
 		return handleAndCriteria(criteria, async (key) => {
 			switch (key) {
-				case "txHash": {
-					return handleOrCriteria(criteria.txHash, async (c) => ({
+				case "transactionHash": {
+					return handleOrCriteria(criteria.transactionHash, async (c) => ({
 						op: "equal",
-						property: "hash",
+						property: "transactionHash",
 						value: c,
 					}));
 				}

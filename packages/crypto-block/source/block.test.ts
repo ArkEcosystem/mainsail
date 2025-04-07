@@ -17,9 +17,9 @@ describe<{}>("Block", ({ it, assert }) => {
 			.make<Contracts.Crypto.Transaction>();
 
 		const indexedTransaction1 = clone(transaction1);
-		indexedTransaction1.data.sequence = 1;
+		indexedTransaction1.data.transactionIndex = 1;
 		const indexedTransaction2 = clone(transaction2);
-		indexedTransaction2.data.sequence = 1;
+		indexedTransaction2.data.transactionIndex = 1;
 
 		const block = sealBlock({
 			data: blockData,

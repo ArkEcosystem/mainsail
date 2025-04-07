@@ -512,19 +512,19 @@ export class Restore {
 
 			for (const receipt of result.receipts) {
 				assert.defined(receipt.txHash);
-				assert.defined(receipt.blockHeight);
+				assert.defined(receipt.blockNumber);
 
 				// Initial deployment receipts
-				if (receipt.blockHeight >= BigInt(2 ** 32)) {
+				if (receipt.blockNumber >= BigInt(2 ** 32)) {
 					continue;
 				}
 
 				receipts.push({
-					blockHeight: BigNumber.make(receipt.blockHeight).toFixed(),
+					blockNumber: BigNumber.make(receipt.blockNumber).toFixed(),
 					deployedContractAddress: receipt.deployedContractAddress,
 					gasRefunded: Number(receipt.gasRefunded),
 					gasUsed: Number(receipt.gasUsed),
-					hash: receipt.txHash.slice(2),
+					transactionHash: receipt.txHash.slice(2),
 					logs: receipt.logs,
 					output: receipt.output,
 					success: receipt.success,

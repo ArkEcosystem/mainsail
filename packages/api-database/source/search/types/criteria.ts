@@ -117,9 +117,9 @@ export type ApiNodeCriteria = {
 export type OrApiNodeCriteria = OrCriteria<ApiNodeCriteria>;
 
 export type ReceiptCriteria = {
-	txHash?: OrEqualCriteria<string>;
-	sender?: OrEqualCriteria<string>;
-	recipient?: OrEqualCriteria<string>;
+	transactionHash?: OrEqualCriteria<string>;
+	from?: OrEqualCriteria<string>;
+	to?: OrEqualCriteria<string>;
 };
 
 export type OrReceiptCriteria = OrCriteria<ReceiptCriteria>;

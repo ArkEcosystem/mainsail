@@ -181,7 +181,7 @@ export interface TransactionReceipt {
 	readonly output?: Buffer;
 
 	// Only present when reading receipts explicitly via `get_receipts`
-	readonly blockHeight?: bigint;
+	readonly blockNumber?: bigint;
 	readonly txHash?: string;
 }
 

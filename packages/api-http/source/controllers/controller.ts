@@ -61,7 +61,7 @@ export class Controller extends AbstractController {
 			.getMany();
 
 		return receipts.reduce((accumulator, current) => {
-			accumulator[current.hash] = current;
+			accumulator[current.transactionHash] = current;
 			return accumulator;
 		}, {});
 	}
@@ -166,7 +166,7 @@ export class Controller extends AbstractController {
 
 	protected getReceiptColumns(fullReceipt?: boolean): string[] {
 		let columns = [
-			"receipt.hash",
+			"receipt.transactionHash",
 			"receipt.success",
 			"receipt.gasUsed",
 			"receipt.gasRefunded",
