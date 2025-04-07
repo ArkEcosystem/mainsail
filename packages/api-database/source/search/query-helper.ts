@@ -25,31 +25,36 @@ export class QueryHelper<TEntity> {
 				throw new Error(`Can't apply json field accessor to ${String(property)} column`);
 			}
 
-			// 'validatorBlock.height' => ['validatorBlock', 'height']
+			// 'validatorBlock.number' => ['validatorBlock', 'number']
 			const pathFields = jsonFieldAccessor.fieldName.split(".");
 
-			// ['validatorBlock', 'height'] => ['validatorBlock']
+			// ['validatorBlock', 'number'] => ['validatorBlock']
 			const lastField = pathFields.splice(-1, 1);
 
 			// ['validatorBlock', 'nested', 'attribute'] => 'validatorBlock'->'nested'->'attribute'
 			const fieldPath = pathFields.map((f) => `'${f}'`).join("->");
 
-			// 'validatorBlock'->'last' => 'validatorBlock'->'last'->>'height'
+			// 'validatorBlock'->'last' => 'validatorBlock'->'last'->>'number'
 			let fullFieldPath = `${fieldPath}${jsonFieldAccessor.operator}'${lastField}'`;
 			if (fieldPath.length > 0) {
-				// 'validatorBlock'->'last'->>'height' => column->'validatorBlock'->'last'->>'height'
+				// 'validatorBlock'->'last'->>'number' => column->'validatorBlock'->'last'->>'number'
 				fullFieldPath = `${column.databaseName}->${fullFieldPath}`;
 			} else {
-				// ->>'height' => column->>'height'
+				// ->>'number' => column->>'number'
 				fullFieldPath = `${column.databaseName}${fullFieldPath}`;
 			}
 
 			if (jsonFieldAccessor.cast) {
-				// (column->'validatorBlock'->'last'->>'height')::bigint
+				// (column->'validatorBlock'->'last'->>'number')::bigint
 				fullFieldPath = `(${fullFieldPath})::${jsonFieldAccessor.cast}`;
 			}
 
 			return fullFieldPath;
+		}
+
+		// Escape reserved keyword
+		if (["to", "from"].includes(column.databaseName)) {
+			return `"${column.databaseName}"`;
 		}
 
 		return column.databaseName;
