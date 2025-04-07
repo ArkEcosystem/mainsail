@@ -14,7 +14,7 @@
 			"username": "genesis_13",
 			"validatorLastBlock": {
 				"id": "ba456e32153484e1d3b09bb78660d2354e10fae26a13b57d295906699657962a",
-				"height": 54,
+				"number": 54,
 				"timestamp": 1698830550727
 			},
 			"validatorForgedFees": "0",
@@ -41,7 +41,7 @@
 			"username": "genesis_31",
 			"validatorLastBlock": {
 				"id": "06c09aac552063430fb8bf2a2727b17052a40ce061692505eb3595883e6d85e8",
-				"height": 2,
+				"number": 2,
 				"timestamp": 1698212696291
 			},
 			"validatorForgedFees": "0",
@@ -68,7 +68,7 @@
 			"username": "genesis_5",
 			"validatorLastBlock": {
 				"id": "14677cb7b9af73083e3842948c69a54d28e06d05bd941926958485ac618d7835",
-				"height": 3,
+				"number": 3,
 				"timestamp": 1698212704297
 			},
 			"validatorForgedFees": "0",
@@ -95,7 +95,7 @@
 			"username": "genesis_40",
 			"validatorLastBlock": {
 				"id": "4906070f6d32697b0d8a424bdaaa3b3c5b63754138e68365153ac822737de83d",
-				"height": 4,
+				"number": 4,
 				"timestamp": 1698212712299
 			},
 			"validatorForgedFees": "0",
@@ -122,7 +122,7 @@
 			"username": "genesis_17",
 			"validatorLastBlock": {
 				"id": "ce345a81896b3b6910ad7c868b677a29b3d6db11b7f8b1078ee079ab0954dc2a",
-				"height": 5,
+				"number": 5,
 				"timestamp": 1698212720306
 			},
 			"validatorForgedFees": "0",
@@ -149,7 +149,7 @@
 			"username": "genesis_8",
 			"validatorLastBlock": {
 				"id": "75217fab03269e0908040b95675f97678131e4ec6df1edfee0f6f8a34ef8d4a6",
-				"height": 6,
+				"number": 6,
 				"timestamp": 1698212728313
 			},
 			"validatorForgedFees": "0",
@@ -176,7 +176,7 @@
 			"username": "genesis_32",
 			"validatorLastBlock": {
 				"id": "d7bf62e229e68c4f1c4ed214820b7e9d9580d6a0840901df08178e0f565a90e4",
-				"height": 7,
+				"number": 7,
 				"timestamp": 1698212736319
 			},
 			"validatorForgedFees": "0",
@@ -203,7 +203,7 @@
 			"username": "genesis_53",
 			"validatorLastBlock": {
 				"id": "86ad9eaffb32e6793195b7cecdcc5b577c5ce1b6e29da90b6866eadbb5144a23",
-				"height": 8,
+				"number": 8,
 				"timestamp": 1698212744327
 			},
 			"validatorForgedFees": "0",

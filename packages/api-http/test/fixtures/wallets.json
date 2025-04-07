@@ -11,7 +11,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "52583d409e2efed78069b6381c70152c8aec3ccf9532cbaf789022595c5f4679",
-				"height": 417,
+				"number": 417,
 				"timestamp": 1732760546366
 			},
 			"validatorPublicKey": "9163b2fd7dada2cd922de6fe62bb99529069606183eff0bda9f0eea3be9b0bd3600e4ad6d0dc11c9a48967c1cc30fa32",
@@ -36,7 +36,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "e3f1e9793de9aa1d017c3ab91c56c1c17d3f4d407e3c4eefc22824f7ddf839b0",
-				"height": 436,
+				"number": 436,
 				"timestamp": 1732760950076
 			},
 			"validatorPublicKey": "95f67c887c925b3f88e7370236b67ccf11d93fe09cc582cd5a6cd61fe4e0e438677cb2023f04ddacd16d58b67333f2e3",
@@ -58,7 +58,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "aa4e40d9ae4f2127c4ef0046d3e29219f64447160351bea763c39082747603f3",
-				"height": 416,
+				"number": 416,
 				"timestamp": 1732760538366
 			},
 			"validatorPublicKey": "b6021c19450b120957642ea43a58eb3e532ed7d7c4f6df56774f037a8edee4b3b10ecb919c288acf0f1ddf19995bf6a9",
@@ -83,7 +83,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "9cc2fa8cb919e34029e7d856ea0d0006c0fd2f185f42b86e632455fec01f5919",
-				"height": 420,
+				"number": 420,
 				"timestamp": 1732760632191
 			},
 			"validatorPublicKey": "8a07af64d3e119cfb1f31c920f6e090c0b344cbbd17f863ad9848828e7ccda2f0a425b790cd327b23bef877bd6d02a68",
@@ -108,7 +108,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "966ebcee11cdab5269ef38cb6cca403ff8466fc227b3b8b4d77f2ff23fc93e23",
-				"height": 396,
+				"number": 396,
 				"timestamp": 1732757896972
 			},
 			"validatorPublicKey": "a3cca49a765dd09ed10a06e1b87bc94e52cdde597aa05793c7278eeec952ba6a726acd3cbe7c14b4ec82b850564135fc",
@@ -133,7 +133,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "413211970c8e0cf74099d31d9033ea10cef42427ebdcedad1bfba344c4fe9714",
-				"height": 421,
+				"number": 421,
 				"timestamp": 1732760640191
 			},
 			"validatorPublicKey": "84842213fc7c140de2098d49701f02c7430ca8c4bc320c8d7dd9ecd341649c118737774d635e66ddf1ef23b3bb05db0e",
@@ -158,7 +158,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "2b4959f38e8e2edce5d1c089074c1274b11a817d88c0924214c955e176d3e152",
-				"height": 428,
+				"number": 428,
 				"timestamp": 1732760886076
 			},
 			"validatorPublicKey": "acf5c09ee64883e99c19f5d6010816856514c504f6c4473c513ff1586b4aa7a015e8d9ce65cd6e46e113d0afd721a79f",
@@ -180,7 +180,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "f9e075982e05bac37eba3c419837fc2de0979bb4fdeff28c49c8c51d78b18750",
-				"height": 419,
+				"number": 419,
 				"timestamp": 1732760624191
 			},
 			"validatorPublicKey": "a8ab6a364428b7ee466710682e1623ada514ce013da4984e6fa3a2d42df08f7a530e939010f66795ad8f1f9d68fbb5ff",
@@ -205,7 +205,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "ede40c9827331d5f97ca72c075bfabc61d4d68a18c5dbf4a786e1a7325f2d2fd",
-				"height": 410,
+				"number": 410,
 				"timestamp": 1732758008972
 			},
 			"validatorPublicKey": "b728f50b79d3202db67fd8a14c58d5a2ffd629cd60ea47926fab1b873afcd240988f878ba147b3d7e7d3364a1f860ea2",
@@ -230,7 +230,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "4348c3f4710267e6fb3e1b52b6e2e066039e00fe6ab81a161fbe35b0c03e99c9",
-				"height": 402,
+				"number": 402,
 				"timestamp": 1732757944972
 			},
 			"validatorPublicKey": "86c9ed20c7d5e8b45c310054eb5e1f8c03cabae749f65872ca91f98bf7f47781a66c63056924a0261663eed7690eb4ba",
@@ -255,7 +255,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "732d0f867822afe07e05ec01c1dd8b476bca30c96cbdb0873ad7d4f2a34c9a9c",
-				"height": 385,
+				"number": 385,
 				"timestamp": 1732757808972
 			},
 			"validatorPublicKey": "b3a8099eaeba8d9e6186904d7a8baaa50a29a18a33bb5477c83f54a13f4dfe7a9baf5829a4d8476588becb82a32346e2",
@@ -280,7 +280,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "a5f624bc0f0ad81b6f643f77f1c2f86d18e62889c0852a6fe7c49b628fb8717b",
-				"height": 373,
+				"number": 373,
 				"timestamp": 1732757712972
 			},
 			"validatorPublicKey": "8de394803c98f2df8052b25a0686e9c14685d389c6c5b915b09b9b61ccfce47422785bef9df1ae76cd578282c7ceed5e",
@@ -305,7 +305,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "8a1c37be854a98578c536c76b89fc0a6120190cffb20b395e711ed624831f798",
-				"height": 376,
+				"number": 376,
 				"timestamp": 1732757736972
 			},
 			"validatorPublicKey": "8f63ade4ef0095a409c729796ddee5b51c9deb36fabe33dfc2b8c0c25558714070ba08f7425fcb6dd24e25acd3bbddc8",
@@ -330,7 +330,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "092e5ff5b7893a572b6c370167d6e4fbc16480f0248bb36da4385f8e8ca1734d",
-				"height": 400,
+				"number": 400,
 				"timestamp": 1732757928972
 			},
 			"validatorPublicKey": "aedc9c6e8b6efadb2102755cdff1ef129aac8a1450e778c0490aaf7504ee63f195f0f0d79f31603b4582e5498419ee1c",
@@ -355,7 +355,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "22b998a21da0a5cc72ad631470528b48caf5a353ab30b78362a42ce210967faa",
-				"height": 429,
+				"number": 429,
 				"timestamp": 1732760894076
 			},
 			"validatorPublicKey": "8aedd456b82ecb5f7e564c6058ab1ef6e076c8458f7bca554c33e2889476c93c47a673eccc6611afee40d99adaffcd8e",
@@ -377,7 +377,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "6c576b9144fdaca35bcd3e624f3589091432634a2a0b34fa2a1f14952f9fadde",
-				"height": 403,
+				"number": 403,
 				"timestamp": 1732757952972
 			},
 			"validatorPublicKey": "85f250c20f6803a70c1c516e6ef6985b3fe164c7b638d6dd3c715a9fa1a98bce99d4cd89f009d874bb3f6c24b4e747bc",
@@ -402,7 +402,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "6b607e9ce07345ef98c3990628cc0fdcf937cae8f8faad03e7a7983f2efd9ea8",
-				"height": 390,
+				"number": 390,
 				"timestamp": 1732757848972
 			},
 			"validatorPublicKey": "822a43afa3b29892af917038cc5e6ba2468520c2550d2dbacdf123184152d52a13bd63b645988638da387f4ab1cc78dc",
@@ -427,7 +427,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "253e132c248b53dcf4f2a43365e42704d130fba8e99dc1a4f79975da15f2602c",
-				"height": 382,
+				"number": 382,
 				"timestamp": 1732757784972
 			},
 			"validatorPublicKey": "af5a00196bf750fd6f396982e1567ac43158db5482ae574f67797f67bf6794453d66259fefff264eaa39e1b40d184420",
@@ -452,7 +452,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "2fb24cca23e7382d140ac568a606249fcf1ec9dd02e972300622344ef03fcf47",
-				"height": 394,
+				"number": 394,
 				"timestamp": 1732757880972
 			},
 			"validatorPublicKey": "b3617a27a71eea406fd55aef9d671bd729bee528a902c73acf3e96482895ae54b34d5ad85880c22299ec37504a9577a4",
@@ -477,7 +477,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "3b5fd0afc78e7e52f73bccc3af1dd4e08b675e647036b30108c564fbc45db0b2",
-				"height": 384,
+				"number": 384,
 				"timestamp": 1732757800972
 			},
 			"validatorPublicKey": "b01e27ad75bc0060ec6c6eedf42587ef0502231534adbdfcab087278feafa42d8e9bff46363fb9daacb6a4d9f29e7029",
@@ -502,7 +502,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "d3162580523e393b1f5422fb031b3c3f84fcba373d845a1d585a738e6d08f626",
-				"height": 392,
+				"number": 392,
 				"timestamp": 1732757864972
 			},
 			"validatorPublicKey": "b92abcdfa0ec37288ac27cdf235fa95589ac9d9336b27bc36e926cf6794350e6c3304dceb5c8279093f4dde40c22a77f",
@@ -527,7 +527,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "b5991adb49490582a1936afe2eb892dba2445fe57ec3ce2232e3193229086b21",
-				"height": 378,
+				"number": 378,
 				"timestamp": 1732757752972
 			},
 			"validatorPublicKey": "b4381c11fbb2f85d098c485289cb7051925a428ffd89d317538b9e1c1e74fb115d7bf10a97ca9247ec89c3357497b7f7",
@@ -552,7 +552,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "dc6908eed1e0b600cc3881f183700d9eec83728336f869b6cf68936fad2b41d4",
-				"height": 430,
+				"number": 430,
 				"timestamp": 1732760902076
 			},
 			"validatorPublicKey": "9376760430d50d81926345d996ab3af9d733674e7f1902692390190bc0b63ec1dd319a61a5e697ba8d5d26c3a402e79b",
@@ -574,7 +574,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "b16b59d0071190fabcd00bfe6ff30f254543fe28674bd794c067da33d842895f",
-				"height": 406,
+				"number": 406,
 				"timestamp": 1732757976972
 			},
 			"validatorPublicKey": "97cfff60356bc7e17bbb3a0c40517387a7d2401e44eb3720f6a5e2bb03ce1af714e78dd1e03cbccf370aba0d901582af",
@@ -599,7 +599,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "4c46e54ec51311ded884280548376476474b1ff151934f7171c8b90baf104920",
-				"height": 414,
+				"number": 414,
 				"timestamp": 1732760484388
 			},
 			"validatorPublicKey": "8ac9fae1ebe9e5064ed6fc276eb03e1a82bbeef27d6552dea1c76a93bc5a90e6861da172031c6a8ee6acae8c558b6847",
@@ -624,7 +624,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "bf27d2257155abb90cad6210de07a19dde1bfc3d520fc89140d8a68459bdf0bd",
-				"height": 380,
+				"number": 380,
 				"timestamp": 1732757768972
 			},
 			"validatorPublicKey": "a3551524404e775cdf1b615180e0e3d93a3f6f893a1aba6ac5c0dfdfab27138248a09ab192a74be4b43161d5d6b7819d",
@@ -649,7 +649,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "375ef3722b0247bbe18fbe57c7fb21e0d0eb184a749d7d2b3336baf9e60b9d2f",
-				"height": 399,
+				"number": 399,
 				"timestamp": 1732757920972
 			},
 			"validatorPublicKey": "a357c721675a0224a79700a57dc042b4d4a0cb48d297c964fc371e4ee5b1c34c1b9b934e3ae7d25c9d4251d0b64a2ade",
@@ -674,7 +674,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "8160ac3f13ede171d89ffab8137c4e5472c564b404430b51b00e48d6099c4bbc",
-				"height": 411,
+				"number": 411,
 				"timestamp": 1732758016972
 			},
 			"validatorPublicKey": "a75a84876d643557b8e9f25e03d242d6788c641ffce5d8cad30dd167d5831e68befb578ea9e6b71395e5f7b8ac2b4e2e",
@@ -699,7 +699,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "8472ae7aef18a93093db7ec1c93d6bd033b8d122d39f121a6a3952eb9b55afd4",
-				"height": 377,
+				"number": 377,
 				"timestamp": 1732757744972
 			},
 			"validatorPublicKey": "b703821def042b05b4a6ace72d6593c06c6cbe4fa7a94d9926acf5054c72ffed1367ac180675ff97126db0826629bc8e",
@@ -724,7 +724,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "ae86954b79a3d326391d0780a297f05e8f7c479998d3fcbe08ab2b023a1f1e07",
-				"height": 398,
+				"number": 398,
 				"timestamp": 1732757912972
 			},
 			"validatorPublicKey": "8b5ae84064cee731f2cc2b40ab0302d1b21b79bae3679d7ac5e60e99c4aaba48dddf18dcaf5be0ad7d36cc7c08cb1a2a",
@@ -749,7 +749,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "cd2b52c7fe8922c453104f6b89a1a411ca5147d54a1ae7e7b40934e56405c180",
-				"height": 375,
+				"number": 375,
 				"timestamp": 1732757728972
 			},
 			"validatorPublicKey": "8be194f6e1da080a52bc272698bcb5800cab35e6ea66334b4cf60fc22693df8a6ae62a6a5ee523e8e66d5e837c33c80a",
@@ -774,7 +774,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "fcb1d9c36e8224c98aeb70e00be9b6219d647c1071ab10aca8dea502d8840ea7",
-				"height": 405,
+				"number": 405,
 				"timestamp": 1732757968972
 			},
 			"validatorPublicKey": "b43fb192d4861ade898bc488335249624dabacf06d6c290727f3bfc059e2998e9a54af774e79f7934629be9145f44403",
@@ -799,7 +799,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "cd486e5b93aeaf533e0bc2284c6bb86db24127bfe57e60d5254f96c57000ba5a",
-				"height": 409,
+				"number": 409,
 				"timestamp": 1732758000972
 			},
 			"validatorPublicKey": "a21cc17eebc33f2d7bd6025365822e382e30773613188710db40a20b08b4cc4d218d43c04646273fa4620a99d6b3fa33",
@@ -824,7 +824,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "882aa771a9348fd7ead69506862db13478b2606f8f360921388257beba312394",
-				"height": 437,
+				"number": 437,
 				"timestamp": 1732760958076
 			},
 			"validatorPublicKey": "8f98e2b5eef4cc1617ce2e83851e2cb86bc9fe5b12c4cbbb65a498e9635be7cde33f1901812b4ac4cebefedf53307a35",
@@ -846,7 +846,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "558970ec6513239272f4ab18193e89023e33faacda340f2f8aa3ed2fd2b59435",
-				"height": 438,
+				"number": 438,
 				"timestamp": 1732760966076
 			},
 			"validatorPublicKey": "8baeb377e82db8e934dc89371873dfbdd47275fe138ab0886b9192e28a819f99593e5e3846ccf79ac1220c2d9d5636ab",
@@ -868,7 +868,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "dd3a57ef5985a37aa0af303633477b61c773dfec1865bc4784787af0c58f591a",
-				"height": 425,
+				"number": 425,
 				"timestamp": 1732760672191
 			},
 			"validatorPublicKey": "951a2595e82150f3d338ad9832289574c0c2c366ff9f1625be06ca7300d1d80497d1b16318c4c37645406df92a0ea2fd",
@@ -893,7 +893,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "4ee601c7a7b3109f93c43b1408eaf301e1ec8d084018a6fc88991e9d322e8fd1",
-				"height": 432,
+				"number": 432,
 				"timestamp": 1732760918076
 			},
 			"validatorPublicKey": "831c32b5ffc3b4d76de192456675bf380ba402afff1acc4c66e9a99f0ed12e4de06891c7fd88252e6885550b5a6bfa41",
@@ -915,7 +915,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "3a6acbdc0dc739fb72f41e6c6657193299d4597332ae98d80c55dd2c6c8f2897",
-				"height": 426,
+				"number": 426,
 				"timestamp": 1732760680191
 			},
 			"validatorPublicKey": "95cf9a48901aed6bbc2df32e2ca2228956323a1303f439f419eda7619a1c15071a227b119f6de2d928636c3fbc32090f",
@@ -940,7 +940,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "ddabdcc4f82a1d8ea1b2c06e23e8f0a7f68abd7eb347ed810d310003602b19a2",
-				"height": 423,
+				"number": 423,
 				"timestamp": 1732760656191
 			},
 			"validatorPublicKey": "b11d5e76d0448073a285a8cfc2250cf6290a5a4f05c8b8c09f5fa83c799ec1a04e59bc32d4e959d8bb05ebadc4521f40",
@@ -965,7 +965,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "e42a3685b5e2d159a71a861430d661401c0a1a0ab715778a2d8d21403bda49b7",
-				"height": 374,
+				"number": 374,
 				"timestamp": 1732757720972
 			},
 			"validatorPublicKey": "933e2a1501fd403178a375f5458cb385755535a9d5253807afd857e60e99ac5c0979f6c781e8cf55dfdedba5209de505",
@@ -990,7 +990,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "7db7e7d3a50420fb3cb1009639ede7de7c939125c9c2979544469ad4c90d4b30",
-				"height": 431,
+				"number": 431,
 				"timestamp": 1732760910076
 			},
 			"validatorPublicKey": "aed34dc7c9d370efc64aef186d35c9b6a852ab20748f3293ba9ae528363335c991def3081a34fa0bdeb62a367d86fc5c",
@@ -1012,7 +1012,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "8401cddab85905ca5d146a64e884ee1d12822f0e3adc41baf264daa53df3f601",
-				"height": 427,
+				"number": 427,
 				"timestamp": 1732760878076
 			},
 			"validatorPublicKey": "95acbae2700166c759dbc7297caa15f576197cfdb939003a278efbbb63876475351b8247f9975b5324fd3ecb36821b6a",
@@ -1034,7 +1034,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "3a433fcd38ecdd3760becaea52f2919d5d15ab768ed196e17f5bd1950adb95b7",
-				"height": 404,
+				"number": 404,
 				"timestamp": 1732757960972
 			},
 			"validatorPublicKey": "a10b25b64072f86b789df27b1b839cc66c19634f7e8471eef859071bc22d779bea3d1d3f1a47f04ca82e993ba9eda99f",
@@ -1059,7 +1059,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "e8d272dfeb980e95845e6a62dbdd4a1f7e62cca7ad085b758a262e279326b0e2",
-				"height": 381,
+				"number": 381,
 				"timestamp": 1732757776972
 			},
 			"validatorPublicKey": "ac9554a42ee9979058c722e57dfa9bde2adad89cb1698705c4f647a770d8c25b74b33c106f80bf647c4f432759d9c9d7",
@@ -1084,7 +1084,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "dc03cb4ce08784d63207275135803e1cf0b06eec0117d8c50ae64d9b8e9b6b44",
-				"height": 379,
+				"number": 379,
 				"timestamp": 1732757760972
 			},
 			"validatorPublicKey": "94b1c44ad78ce1909872ab172dd24d2e810aadd2d10893581e8f112fad1626843db34e8a48fdc5ccc32201ff5f60a658",
@@ -1109,7 +1109,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "361df4cfdb8706b0c53ee12d4ebea5607f2b461c9d26d1e927711c3244808163",
-				"height": 401,
+				"number": 401,
 				"timestamp": 1732757936972
 			},
 			"validatorPublicKey": "b891d20c515178e763e874aeb5507efb764abdbb2445b732384738f8aa59d03e46c9ee4d18a79646b9e29aaadba8374a",
@@ -1134,7 +1134,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "2eef9db161b5b51fd2a7d1702a78f883d64344c4711aa9e8f6a6e8001c112e62",
-				"height": 372,
+				"number": 372,
 				"timestamp": 1732757704972
 			},
 			"validatorPublicKey": "8d9d2993cd36f2305c9a720b20c4b3f3a2bd61223cc1258ff40000bfd3401def250cc8a8f13df69ed5c3acef8d03a915",
@@ -1159,7 +1159,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "cf8e71fd9b45c3ac3a88d6b30f3d858b0783ec64aab7e325ce5142402fe96a98",
-				"height": 433,
+				"number": 433,
 				"timestamp": 1732760926076
 			},
 			"validatorPublicKey": "982da46988283f0229de6d7d00c48bc0b3462d7685cdb640134a84d2a231959151c7fe2fa36224048a0b30978364421c",
@@ -1181,7 +1181,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "638d26f572d8650f2ea2e6b5e8b46952a5d0f3335805b016275b17a89818ab4c",
-				"height": 408,
+				"number": 408,
 				"timestamp": 1732757992972
 			},
 			"validatorPublicKey": "ac4ca760cb7d61c106362673a85de40b796a70c6410941dfa1624b3bb2ed79b1b4775d2327f4cccfaa9ff05e1d838b34",
@@ -1206,7 +1206,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "8a6dc8e31d0c1f02739b38f14e5f824b11b44c47a8f4e26c0583823a59b46fe8",
-				"height": 434,
+				"number": 434,
 				"timestamp": 1732760934076
 			},
 			"validatorPublicKey": "a9e635e4026ec24509efdd4f41f4fd8bb3100e8f4c20b7b2385420e1e4b9f02c1a84dad8f4f1871617fc2f417ba94c8d",
@@ -1228,7 +1228,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "e46ffd857d3dff91a17dedd4168d7786cf8b410a42b51bf523a01aa50fe33435",
-				"height": 418,
+				"number": 418,
 				"timestamp": 1732760554366
 			},
 			"validatorPublicKey": "949c9a89822b9a7bbba94841bdb532164866175b5a0ed9ccfe14fb017f1ef34b2ad9d7132758d31caa90460a49fd0256",
@@ -1253,7 +1253,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "db5e5e1a3840262ed44f1ce88d9f6242a0fdad0d5f86b993499991a070e04c1a",
-				"height": 435,
+				"number": 435,
 				"timestamp": 1732760942076
 			},
 			"validatorPublicKey": "b068b42ee40c750b2ef1f92b3264f6ded5b4d1abdd147b8ad0b0645b8e50b79b5e88883b7bc2ad9827cfa22ed6050b1c",
@@ -1275,7 +1275,7 @@
 			"validatorResigned": false,
 			"validatorLastBlock": {
 				"id": "d7b9ebd111196526d5e2928e48f590b9c7276608edd6600c21b44c9aeef032e2",
-				"height": 389,
+				"number": 389,
 				"timestamp": 1732757840972
 			},
 			"validatorPublicKey": "b4a60dcdb5ef24946d4c1783829ed61f23d1a582d046604301c5eb9328cf52ab88573eaaa913cdeae8cdd90eccb7fde2",

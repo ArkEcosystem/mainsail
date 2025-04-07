@@ -53,8 +53,8 @@ describe<{
 				),
 			},
 			{
-				path: "attributes.validatorLastBlock.height=3",
-				result: wallets.filter((w) => w.attributes.validatorLastBlock?.height === 3),
+				path: "attributes.validatorLastBlock.number=3",
+				result: wallets.filter((w) => w.attributes.validatorLastBlock?.number === 3),
 			},
 			{
 				path: "attributes.validatorProducedBlocks.from=1",
@@ -132,12 +132,12 @@ describe<{
 					.slice(0, 2),
 			},
 			{
-				path: "/wallets?limit=15&orderBy=attributes.validatorLastBlock.height:asc",
+				path: "/wallets?limit=15&orderBy=attributes.validatorLastBlock.number:asc",
 				result: [...wallets]
 					.sort(
 						(a, b) =>
-							Number(a.attributes.validatorLastBlock?.height) -
-							Number(b.attributes.validatorLastBlock?.height),
+							Number(a.attributes.validatorLastBlock?.number) -
+							Number(b.attributes.validatorLastBlock?.number),
 					)
 					.slice(0, 15),
 			},

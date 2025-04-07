@@ -46,10 +46,10 @@ describe<{
 	it("/delegates?orderBy", async () => {
 		await apiContext.walletRepository.save(delegates);
 
-		const { data } = await request("/delegates?orderBy=attributes.validatorLastBlock.height:desc", options);
+		const { data } = await request("/delegates?orderBy=attributes.validatorLastBlock.number:desc", options);
 
 		const sorted = [...delegates];
-		sorted.sort((a, b) => +b.attributes.validatorLastBlock.height - a.attributes.validatorLastBlock.height);
+		sorted.sort((a, b) => +b.attributes.validatorLastBlock.number - a.attributes.validatorLastBlock.number);
 		assert.equal(data.data, sorted);
 	});
 

@@ -48,19 +48,19 @@ describe<{
 				result: receiptsResult,
 			},
 			{
-				query: `?txHash=${receipts[0].id}`,
+				query: `?transactionHash=${receipts[0].transactionHash}`,
 				result: [receiptsResult[0]],
 			},
 			{
-				query: "?txHash=0000000000000000000000000000000000000000000000000000000000000001",
+				query: "?transactionHash=0000000000000000000000000000000000000000000000000000000000000001",
 				result: [],
 			},
 			{
-				query: `?sender=${receiptTransactions[0].senderPublicKey}`,
+				query: `?from=${receiptTransactions[0].senderPublicKey}`,
 				result: receiptsResult,
 			},
 			{
-				query: `?recipient=${receipts[1].deployedContractAddress}`,
+				query: `?to=${receipts[1].deployedContractAddress}`,
 				result: [receiptsResult[0]],
 			},
 		];
@@ -76,31 +76,30 @@ describe<{
 		}
 	});
 
-	it("/receipts/{id}", async () => {
+	it("/receipts/{transactionHash}", async () => {
 		await apiContext.transactionRepository.save(receiptTransactions);
 		await apiContext.receiptsRepository.save(receipts);
 		await apiContext.walletRepository.save(receiptWallets);
 
 		const testCases = [
 			{
-				id: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+				transactionHash: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				statusCode: 404,
 				result: null,
 			},
 			{
-				id: receipts[0].id,
+				transactionHash: receipts[0].transactionHash,
 				result: receiptsResult[0],
 			},
 			{
-				id: receipts[receiptsResult.length - 1].id,
+				transactionHash: receipts[receiptsResult.length - 1].transactionHash,
 				result: receiptsResult[receiptsResult.length - 1],
 			},
 		];
 
-		for (const { id, statusCode: expectedStatusCode = 200, result } of testCases) {
+		for (const { transactionHash, statusCode: expectedStatusCode = 200, result } of testCases) {
 			try {
-				const { statusCode, data } = await request(`/receipts/${id}`, options);
-
+				const { statusCode, data } = await request(`/receipts/${transactionHash}`, options);
 				assert.equal(statusCode, expectedStatusCode);
 				assert.equal(data, result);
 			} catch (ex) {
@@ -125,11 +124,11 @@ describe<{
 				result: [receiptsResult[1]],
 			},
 			{
-				query: `?sender=${receiptTransactions[0].senderPublicKey}`,
+				query: `?from=${receiptTransactions[0].senderPublicKey}`,
 				result: [receiptsResult[1]],
 			},
 			{
-				query: `?sender=asdfgfg`,
+				query: `?from=asdfgfg`,
 				result: [],
 			},
 		];

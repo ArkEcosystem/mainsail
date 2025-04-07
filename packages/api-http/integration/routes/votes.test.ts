@@ -40,11 +40,11 @@ describe<{
 		assert.equal(data.data, votes);
 	});
 
-	it("/votes/{id}", async () => {
+	it("/votes/{hash}", async () => {
 		await apiContext.transactionRepository.save(votes);
 
-		const id = votes[votes.length - 1].id;
-		const { statusCode, data } = await request(`/votes/${id}`, options);
+		const hash = votes[votes.length - 1].hash;
+		const { statusCode, data } = await request(`/votes/${hash}`, options);
 		assert.equal(statusCode, 200);
 		assert.equal(data.data, votes[votes.length - 1]);
 	});
