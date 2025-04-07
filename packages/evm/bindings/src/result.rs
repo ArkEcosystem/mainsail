@@ -85,7 +85,7 @@ impl JsPreverifyTransactionResult {
 
 #[napi(object)]
 pub struct JsTransactionReceipt {
-    pub block_height: Option<JsBigInt>,
+    pub block_number: Option<JsBigInt>,
     pub tx_hash: Option<JsString>,
 
     pub gas_used: JsBigInt,
@@ -139,7 +139,7 @@ impl JsTransactionReceipt {
                     .unwrap()
                     .into_raw()
             }),
-            block_height: None,
+            block_number: None,
             tx_hash: None,
         })
     }
@@ -489,7 +489,7 @@ impl JsGetReceipts {
             for (hash, tx_receipt) in tx_receipts {
                 let mut receipt = JsTransactionReceipt::new(node_env, tx_receipt)?;
 
-                receipt.block_height = Some(node_env.create_bigint_from_u64(height)?);
+                receipt.block_number = Some(node_env.create_bigint_from_u64(height)?);
                 receipt.tx_hash = Some(node_env.create_string_from_std(hash.to_string())?);
 
                 mapped.push(receipt);
@@ -518,7 +518,7 @@ impl JsGetReceipt {
         let receipt = match receipt {
             Some(receipt) => {
                 let mut receipt = JsTransactionReceipt::new(node_env, receipt)?;
-                receipt.block_height = Some(node_env.create_bigint_from_u64(height)?);
+                receipt.block_number = Some(node_env.create_bigint_from_u64(height)?);
                 receipt.tx_hash = Some(node_env.create_string_from_std(tx_hash.to_string())?);
 
                 Some(receipt)

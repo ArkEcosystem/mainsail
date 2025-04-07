@@ -362,7 +362,7 @@ export class Sync implements Contracts.ApiSync.Service {
 						const nextAttemptDelay = Math.min(baseDelay + attempts * 500, maxDelay);
 						attempts++;
 						this.logger.warning(
-							`sync encountered exception: ${error.message}. retry #${attempts} in ... ${nextAttemptDelay}ms`,
+							`sync encountered exception: ${error.message} (query: ${error.query}). retry #${attempts} in ... ${nextAttemptDelay}ms`,
 						);
 						await sleep(nextAttemptDelay);
 					}
@@ -395,7 +395,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				})
 				.where("id = :id", { id: 1 })
 				.andWhere("blockNumber = :previousBlockNumber", {
-					blockNumber: BigNumber.make(deferred.block.number).minus(1).toFixed(),
+					previousBlockNumber: BigNumber.make(deferred.block.number).minus(1).toFixed(),
 				})
 				.execute();
 
