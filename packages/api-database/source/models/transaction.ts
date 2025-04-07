@@ -65,7 +65,7 @@ export class Transaction {
 		nullable: false,
 		type: "numeric",
 	})
-	public readonly amount!: string;
+	public readonly value!: string;
 
 	@Column({
 		nullable: false,

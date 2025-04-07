@@ -25,7 +25,7 @@ export class TransactionResource implements Contracts.Api.Resource {
 		}
 
 		return {
-			amount: resource.amount,
+			value: resource.value,
 			blockHash: resource.blockHash,
 
 			confirmations,

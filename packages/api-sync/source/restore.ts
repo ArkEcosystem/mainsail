@@ -281,7 +281,7 @@ export class Restore {
 					}
 
 					transactions.push({
-						amount: data.value.toFixed(),
+						value: data.value.toFixed(),
 						blockHash: block.header.hash,
 						blockNumber: block.header.number.toFixed(),
 						data: data.data,

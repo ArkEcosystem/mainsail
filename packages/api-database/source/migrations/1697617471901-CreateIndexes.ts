@@ -13,16 +13,16 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX transactions_block_hash ON transactions(block_hash);
             CREATE INDEX transactions_block_number_transaction_index ON transactions(block_number, transaction_index);
 
-            CREATE INDEX transactions_amount ON transactions(amount);
+            CREATE INDEX transactions_value ON transactions(value);
             CREATE INDEX transactions_gas_price ON transactions(gas_price);
             CREATE INDEX transactions_nonce ON transactions(nonce);
 
-            CREATE INDEX transactions_amount_transaction_index ON transactions(amount, transaction_index);
+            CREATE INDEX transactions_value_transaction_index ON transactions(value, transaction_index);
             CREATE INDEX transactions_gas_price_transaction_index ON transactions(gas_price, transaction_index);
             CREATE INDEX transactions_nonce_transaction_index ON transactions(nonce, transaction_index);
             CREATE INDEX transactions_timestamp_transaction_index ON transactions(timestamp, transaction_index);
 
-            CREATE INDEX transactions_amount_asc_transaction_index_desc ON transactions(amount ASC, transaction_index DESC);
+            CREATE INDEX transactions_value_asc_transaction_index_desc ON transactions(value ASC, transaction_index DESC);
             CREATE INDEX transactions_gas_price_asc_transaction_index_desc ON transactions(gas_price ASC, transaction_index DESC);
             CREATE INDEX transactions_nonce_asc_transaction_index_desc ON transactions(nonce ASC, transaction_index DESC);
             CREATE INDEX transactions_timestamp_asc_transaction_index_desc ON transactions(timestamp ASC, transaction_index DESC);
@@ -63,16 +63,16 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX transactions_block_hash;
             DROP INDEX transactions_block_number_transaction_index;
 
-            DROP INDEX transactions_amount;
+            DROP INDEX transactions_value;
             DROP INDEX transactions_gas_price;
             DROP INDEX transactions_nonce;
 
-            DROP INDEX transactions_amount_transaction_index;
+            DROP INDEX transactions_value_transaction_index;
             DROP INDEX transactions_gas_price_transaction_index;
             DROP INDEX transactions_nonce_transaction_index;
             DROP INDEX transactions_timestamp_transaction_index;
 
-            DROP INDEX transactions_amount_asc_transaction_index_desc;
+            DROP INDEX transactions_value_asc_transaction_index_desc;
             DROP INDEX transactions_gas_price_asc_transaction_index_desc;
             DROP INDEX transactions_nonce_asc_transaction_index_desc;
             DROP INDEX transactions_timestamp_asc_transaction_index_desc;

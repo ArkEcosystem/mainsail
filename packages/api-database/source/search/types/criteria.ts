@@ -47,7 +47,7 @@ export type TransactionCriteria = {
 	nonce?: OrNumericCriteria<string>;
 	senderPublicKey?: OrEqualCriteria<string>;
 	from?: OrEqualCriteria<string>;
-	amount?: OrNumericCriteria<string>;
+	value?: OrNumericCriteria<string>;
 	gasPrice?: OrNumericCriteria<number>;
 	data?: OrEqualCriteria<string>;
 };

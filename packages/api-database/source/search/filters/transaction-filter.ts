@@ -80,10 +80,10 @@ export class TransactionFilter {
 						this.handleSenderAddressCritera(c),
 					);
 				}
-				case "amount": {
-					return handleOrCriteria(criteria.amount, async (c) =>
+				case "value": {
+					return handleOrCriteria(criteria.value, async (c) =>
 						// @ts-ignore
-						handleComparisonCriteria("amount", c),
+						handleComparisonCriteria("value", c),
 					);
 				}
 				case "gasPrice": {

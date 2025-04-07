@@ -282,7 +282,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			receipts: transactionReceipts,
 
 			transactions: transactions.map(({ data }) => ({
-				amount: data.value.toFixed(),
+				value: data.value.toFixed(),
 				blockHash: header.hash,
 				blockNumber: header.number.toFixed(),
 				data: data.data,
