@@ -194,7 +194,7 @@ pub struct CommitData {
     pub transactions: Vec<Bytes>,
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Debug, Default)]
 pub struct PendingCommit {
     pub key: CommitKey,
     pub cache: CacheState,
@@ -212,6 +212,9 @@ pub struct PendingCommit {
     // The option indicates whether a corresponding cold wallet has been found and merged. To avoid
     // redundant lookups, any address present in the map is skipped when processing a transaction.
     pub merged_legacy_cold_wallets: BTreeMap<Address, Option<(B256, LegacyAddress)>>,
+
+    // Optimization to avoid unnecessary (deep) clones of commit data.
+    pub built_commit: Option<StateCommit>,
 }
 
 #[derive(Clone, Debug, Default, Serialize)]
@@ -1096,6 +1099,7 @@ impl PendingCommit {
             legacy_attributes: Default::default(),
             legacy_cold_wallets: Default::default(),
             merged_legacy_cold_wallets: Default::default(),
+            built_commit: Default::default(),
         }
     }
 

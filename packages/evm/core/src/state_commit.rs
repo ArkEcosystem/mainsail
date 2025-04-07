@@ -19,46 +19,31 @@ pub struct StateCommit {
     pub results: BTreeMap<B256, ExecutionResult>,
 }
 
-pub fn build_commit(
-    db: &mut PersistentDB,
-    pending_commit: PendingCommit,
-    is_commit_to_db: bool,
-) -> Result<StateCommit, crate::db::Error> {
-    let _ = is_commit_to_db;
-    let _ = db;
-
-    let PendingCommit {
-        key,
-        cache,
-        results,
-        transitions,
-        legacy_attributes,
-        legacy_cold_wallets,
-        merged_legacy_cold_wallets,
-    } = pending_commit;
-
+pub fn build_commit(pending_commit: &mut PendingCommit) -> Result<StateCommit, crate::db::Error> {
+    assert!(pending_commit.built_commit.is_none());
     let mut state_builder = revm::database::State::builder()
-        .with_cached_prestate(cache)
+        .with_cached_prestate(std::mem::take(&mut pending_commit.cache))
         .build();
 
-    state_builder.transition_state = Some(transitions);
+    state_builder.transition_state = Some(std::mem::take(&mut pending_commit.transitions));
     state_builder
         .merge_transitions(revm::database::states::bundle_state::BundleRetention::PlainState);
 
     let bundle = state_builder.take_bundle();
     let mut change_set = state_changes::bundle_into_change_set(bundle);
 
-    change_set.legacy_attributes = legacy_attributes;
-    change_set.legacy_cold_wallets = legacy_cold_wallets;
-    change_set.merged_legacy_cold_wallets = merged_legacy_cold_wallets
-        .into_iter()
-        .filter_map(|(key, legacy)| legacy.map(|v| (key, v)))
-        .collect();
+    change_set.legacy_attributes = std::mem::take(&mut pending_commit.legacy_attributes);
+    change_set.legacy_cold_wallets = std::mem::take(&mut pending_commit.legacy_cold_wallets);
+    change_set.merged_legacy_cold_wallets =
+        std::mem::take(&mut pending_commit.merged_legacy_cold_wallets)
+            .into_iter()
+            .filter_map(|(key, legacy)| legacy.map(|v| (key, v)))
+            .collect();
 
     Ok(StateCommit {
-        key,
+        key: pending_commit.key,
         change_set,
-        results,
+        results: std::mem::take(&mut pending_commit.results),
     })
 }
 
@@ -90,11 +75,14 @@ pub fn apply_rewards(
 
 pub fn commit_to_db(
     db: &mut PersistentDB,
-    pending_commit: PendingCommit,
+    mut pending_commit: PendingCommit,
     commit_data: Option<CommitData>,
 ) -> Result<Vec<AccountUpdate>, crate::db::Error> {
     let genesis_info = db.genesis_info.clone();
-    let mut commit = build_commit(db, pending_commit, true)?;
+    let mut commit = match pending_commit.built_commit {
+        Some(commit) => commit,
+        None => build_commit(&mut pending_commit)?,
+    };
 
     match db.commit(&mut commit, &commit_data) {
         Ok(_) => Ok(collect_dirty_accounts(commit, &genesis_info)),

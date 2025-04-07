@@ -1,24 +1,31 @@
 use rayon::slice::ParallelSliceMut;
-use revm::primitives::{keccak256, B256};
+use revm::primitives::{B256, keccak256};
 use serde::Serialize;
 
 use crate::{
     db::{GenesisInfo, PendingCommit, PersistentDB},
     state_changes::StateChangeset,
-    state_commit::{build_commit, StateCommit},
+    state_commit::{StateCommit, build_commit},
 };
 
 pub fn calculate(
     db: &mut PersistentDB,
-    pending_commit: PendingCommit,
+    pending_commit: &mut PendingCommit,
     current_hash: B256,
 ) -> Result<B256, crate::db::Error> {
     let committed_hashes = db.get_committed_hashes(pending_commit.key.0)?;
-    let state_commit = build_commit(db, pending_commit, false)?;
+
+    if pending_commit.built_commit.is_none() {
+        let state_commit = build_commit(pending_commit)?;
+        pending_commit.built_commit.replace(state_commit);
+    };
 
     calculate_state_hash(
         current_hash,
-        &state_commit,
+        pending_commit
+            .built_commit
+            .as_ref()
+            .expect("state commit exists"),
         committed_hashes,
         &db.genesis_info,
     )

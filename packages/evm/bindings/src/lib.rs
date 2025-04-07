@@ -741,12 +741,8 @@ impl EvmInner {
     ) -> std::result::Result<String, EVMError<String>> {
         let pending_commit = self
             .pending_commits
-            .get(&commit_key)
-            .cloned() // TODO: try get rid of clone
-            .unwrap_or_else(|| PendingCommit {
-                key: commit_key,
-                ..Default::default()
-            });
+            .get_mut(&commit_key)
+            .expect("pending commit exists");
 
         let result = state_hash::calculate(&mut self.persistent_db, pending_commit, current_hash);
 
@@ -765,13 +761,9 @@ impl EvmInner {
         let pending_commit = self
             .pending_commits
             .get(&commit_key)
-            .cloned() // TODO: try get rid of clone
-            .unwrap_or_else(|| PendingCommit {
-                key: commit_key,
-                ..Default::default()
-            });
+            .expect("pending commit exists");
 
-        let result = logs_bloom::calculate(&pending_commit);
+        let result = logs_bloom::calculate(pending_commit);
 
         match result {
             Ok(result) => Ok(result.encode_hex()),
