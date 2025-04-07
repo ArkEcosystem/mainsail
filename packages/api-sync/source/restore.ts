@@ -281,7 +281,6 @@ export class Restore {
 					}
 
 					transactions.push({
-						value: data.value.toFixed(),
 						blockHash: block.header.hash,
 						blockNumber: block.header.number.toFixed(),
 						data: data.data,
@@ -292,6 +291,7 @@ export class Restore {
 						legacySecondSignature: data.legacySecondSignature,
 						nonce: data.nonce.toFixed(),
 						senderPublicKey: data.senderPublicKey,
+						value: data.value.toFixed(),
 						signature: `${data.r}${data.s}${data.v!.toString(16)}`,
 						timestamp: block.header.timestamp.toFixed(),
 						to: data.to,
@@ -393,8 +393,8 @@ export class Restore {
 										.toFixed(),
 									validatorLastBlock: validatorAttributes.lastBlock
 										? {
-												number: validatorAttributes.lastBlock.number,
 												id: validatorAttributes.lastBlock.hash,
+												number: validatorAttributes.lastBlock.number,
 												timestamp: validatorAttributes.lastBlock.timestamp,
 											}
 										: {},
@@ -524,10 +524,10 @@ export class Restore {
 					deployedContractAddress: receipt.deployedContractAddress,
 					gasRefunded: Number(receipt.gasRefunded),
 					gasUsed: Number(receipt.gasUsed),
-					transactionHash: receipt.txHash.slice(2),
 					logs: receipt.logs,
 					output: receipt.output,
 					success: receipt.success,
+					transactionHash: receipt.txHash.slice(2),
 				});
 			}
 

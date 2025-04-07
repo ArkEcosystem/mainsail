@@ -149,10 +149,10 @@ export class Sync implements Contracts.ApiSync.Service {
 					deployedContractAddress: receipt.deployedContractAddress,
 					gasRefunded: Number(receipt.gasRefunded),
 					gasUsed: Number(receipt.gasUsed),
-					transactionHash: transaction.hash,
 					logs: receipt.logs,
 					output: receipt.output,
 					success: receipt.success,
+					transactionHash: transaction.hash,
 				});
 			}
 		}
@@ -192,8 +192,8 @@ export class Sync implements Contracts.ApiSync.Service {
 							validatorForgedRewards: header.amount.toFixed(),
 							validatorForgedTotal: header.fee.plus(header.amount).toFixed(),
 							validatorLastBlock: {
-								number: header.number,
 								id: header.hash,
+								number: header.number,
 								timestamp: header.timestamp,
 							},
 							validatorProducedBlocks: 1,
@@ -282,7 +282,6 @@ export class Sync implements Contracts.ApiSync.Service {
 			receipts: transactionReceipts,
 
 			transactions: transactions.map(({ data }) => ({
-				value: data.value.toFixed(),
 				blockHash: header.hash,
 				blockNumber: header.number.toFixed(),
 				data: data.data,
@@ -293,6 +292,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				legacySecondSignature: data.legacySecondSignature,
 				nonce: data.nonce.toFixed(),
 				senderPublicKey: data.senderPublicKey,
+				value: data.value.toFixed(),
 				signature: `${data.r}${data.s}${data.v!.toString(16)}`,
 				timestamp: header.timestamp.toFixed(),
 				to: data.to,

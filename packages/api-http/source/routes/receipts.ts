@@ -23,9 +23,9 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				query: Joi.object({
+					from: walletId,
 					fullReceipt: Joi.bool().default(true),
 					to: address,
-					from: walletId,
 					transactionHash: transactionCriteriaSchemaObject.hash,
 				}).concat(Schemas.pagination),
 			},
@@ -60,8 +60,8 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				query: Joi.object({
-					fullReceipt: Joi.bool().default(false),
 					from: walletId,
+					fullReceipt: Joi.bool().default(false),
 				}).concat(Schemas.pagination),
 			},
 		},

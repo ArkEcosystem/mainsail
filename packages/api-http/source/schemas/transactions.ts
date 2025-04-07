@@ -13,8 +13,8 @@ export const transactionCriteriaSchemaObject = {
 			.regex(/^[\d%a-z]{1,64}$/)
 			.regex(/%/),
 	),
-	to: walletAddressSchema,
 	senderPublicKey: walletPublicKeySchema,
+	to: walletAddressSchema,
 };
 
 export const transactionParamSchema = transactionHashSchema;
