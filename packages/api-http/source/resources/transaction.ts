@@ -21,7 +21,7 @@ export class TransactionResource implements Contracts.Api.Resource {
 	public async transform(resource: EnrichedTransaction): Promise<object> {
 		let confirmations: number | undefined;
 		if (resource.blockNumber) {
-			confirmations = +resource.state.height - +resource.blockNumber + 1;
+			confirmations = +resource.state.blockNumber - +resource.blockNumber + 1;
 		}
 
 		return {

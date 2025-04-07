@@ -4,7 +4,7 @@ import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { VotesController } from "../controllers/votes.js";
-import { transactionIdSchema, transactionSortingSchema } from "../schemas/index.js";
+import { transactionHashSchema, transactionSortingSchema } from "../schemas/index.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(VotesController);
@@ -40,7 +40,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			plugins: {},
 			validate: {
 				params: Joi.object({
-					id: transactionIdSchema,
+					hash: transactionHashSchema,
 				}),
 				query: Joi.object({
 					fullReceipt: Joi.bool().default(false),
@@ -48,6 +48,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				}),
 			},
 		},
-		path: "/votes/{id}",
+		path: "/votes/{hash}",
 	});
 };

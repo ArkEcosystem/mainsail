@@ -119,7 +119,7 @@ export class WalletFilter {
 				"nonce",
 				"validatorRank",
 				"validatorProducedBlocks",
-				"validatorLastBlock.height",
+				"validatorLastBlock.number",
 				"validatorLastBlock.timestamp",
 			].includes(attribute)
 		) {

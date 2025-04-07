@@ -13,7 +13,7 @@ export class State {
 	@Column({
 		type: "bigint",
 	})
-	public height!: string;
+	public blockNumber!: string;
 
 	@Column({
 		type: "numeric",

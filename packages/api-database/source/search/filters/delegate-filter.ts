@@ -181,8 +181,8 @@ export class DelegateFilter {
 				addExpression(item.id, "validatorLastBlock.id");
 			}
 
-			if (item.height) {
-				addExpression(item.height, "validatorLastBlock.height", "bigint");
+			if (item.number) {
+				addExpression(item.number, "validatorLastBlock.number", "bigint");
 			}
 		}
 

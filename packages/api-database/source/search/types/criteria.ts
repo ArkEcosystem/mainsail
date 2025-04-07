@@ -66,7 +66,7 @@ export type OrWalletCriteria = OrCriteria<WalletCriteria>;
 
 export type DelegateResourceLastBlock = {
 	id?: OrEqualCriteria<string>;
-	height?: OrNumericCriteria<number>;
+	number?: OrNumericCriteria<number>;
 };
 
 export type DelegateForged = {

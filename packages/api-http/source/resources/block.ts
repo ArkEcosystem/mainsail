@@ -16,7 +16,9 @@ export class BlockResource implements Contracts.Api.Resource {
 
 	public transform(resource: EnrichedBlock): object {
 		return {
-			confirmations: +resource.state.height ? Number(resource.state.height) - Number(resource.number) : 0,
+			confirmations: +resource.state.blockNumber
+				? Number(resource.state.blockNumber) - Number(resource.number)
+				: 0,
 			forged: {
 				amount: BigNumber.make(resource.amount),
 				fee: resource.fee,

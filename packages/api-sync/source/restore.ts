@@ -393,7 +393,7 @@ export class Restore {
 										.toFixed(),
 									validatorLastBlock: validatorAttributes.lastBlock
 										? {
-												height: validatorAttributes.lastBlock.number,
+												number: validatorAttributes.lastBlock.number,
 												id: validatorAttributes.lastBlock.hash,
 												timestamp: validatorAttributes.lastBlock.timestamp,
 											}
@@ -631,7 +631,7 @@ export class Restore {
 			.insert()
 			.orIgnore()
 			.values({
-				height: context.lastHeight.toFixed(),
+				blockNumber: context.lastHeight.toFixed(),
 				id: 1,
 				supply: context.totalSupply.toFixed(),
 			})

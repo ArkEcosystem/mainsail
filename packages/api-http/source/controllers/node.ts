@@ -27,7 +27,7 @@ export class NodeController extends Controller {
 	public async status(request: Hapi.Request) {
 		const state = await this.getState();
 		const medianPeerHeight = await this.peerRepositoryFactory().getMedianPeerHeight();
-		const ownHeight = Number(state?.height ?? 0);
+		const ownHeight = Number(state?.blockNumber ?? 0);
 
 		return {
 			data: {
@@ -42,7 +42,7 @@ export class NodeController extends Controller {
 	public async syncing(request: Hapi.Request) {
 		const state = await this.getState();
 		const medianPeerHeight = await this.peerRepositoryFactory().getMedianPeerHeight();
-		const ownHeight = Number(state?.height ?? 0);
+		const ownHeight = Number(state?.blockNumber ?? 0);
 
 		return {
 			data: {

@@ -9,10 +9,10 @@ export const responseHeaders = {
 		);
 
 		return async (request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Hapi.Lifecycle.ReturnValue> => {
-			const blockHeight = await blockRepositoryFactory().getLatestHeight();
+			const blockNumber = await blockRepositoryFactory().getLatestHeight();
 
 			const responsePropertyToUpdate = "isBoom" in request.response ? request.response.output : request.response;
-			responsePropertyToUpdate.headers["x-block-height"] = blockHeight;
+			responsePropertyToUpdate.headers["x-block-number"] = blockNumber;
 
 			return h.continue;
 		};

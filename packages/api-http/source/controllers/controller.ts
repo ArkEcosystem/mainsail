@@ -41,7 +41,7 @@ export class Controller extends AbstractController {
 	protected async getState(): Promise<Models.State> {
 		const stateRepository = this.stateRepositoryFactory();
 		const state = await stateRepository.createQueryBuilder().getOne();
-		return state ?? ({ height: "0", supply: "0" } as Models.State);
+		return state ?? ({ blockNumber: "0", supply: "0" } as Models.State);
 	}
 
 	protected async getConfiguration(): Promise<Models.Configuration> {

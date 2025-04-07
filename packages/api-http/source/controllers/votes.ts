@@ -46,7 +46,7 @@ export class VotesController extends Controller {
 		const transaction = await this.transactionRepositoryFactory()
 			.createQueryBuilder()
 			.select()
-			.where("id = :id", { id: request.params.id })
+			.where("hash = :hash", { hash: request.params.hash })
 			.andWhere("SUBSTRING(data FROM 1 FOR 4) = :data", { data: `\\x${FunctionSigs.ConsensusV1.Vote.slice(2)}` })
 			.getOne();
 

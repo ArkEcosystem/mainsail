@@ -192,7 +192,7 @@ export class Sync implements Contracts.ApiSync.Service {
 							validatorForgedRewards: header.amount.toFixed(),
 							validatorForgedTotal: header.fee.plus(header.amount).toFixed(),
 							validatorLastBlock: {
-								height: header.number,
+								number: header.number,
 								id: header.hash,
 								timestamp: header.timestamp,
 							},
@@ -390,12 +390,12 @@ export class Sync implements Contracts.ApiSync.Service {
 				.createQueryBuilder()
 				.update()
 				.set({
-					height: deferred.block.number,
+					blockNumber: deferred.block.number,
 					supply: () => `supply + ${deferred.block.reward}`,
 				})
 				.where("id = :id", { id: 1 })
-				.andWhere("height = :previousHeight", {
-					previousHeight: BigNumber.make(deferred.block.number).minus(1).toFixed(),
+				.andWhere("blockNumber = :previousBlockNumber", {
+					blockNumber: BigNumber.make(deferred.block.number).minus(1).toFixed(),
 				})
 				.execute();
 
