@@ -49,10 +49,10 @@ export const blocksOrderBy = orderBy.default("number:desc");
 export const transactionsOrderBy = orderBy.default(["timestamp:desc", "transactionIndex:desc"]);
 
 export const blockCriteriaSchemas = {
-	hash: Schemas.orEqualCriteria(blockId),
 	amount: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
-	number: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	fee: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	hash: Schemas.orEqualCriteria(blockId),
+	number: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	parentHash: Schemas.orEqualCriteria(blockId),
 	payloadHash: Schemas.orEqualCriteria(Joi.string().hex()),
 	payloadSize: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
@@ -77,7 +77,7 @@ export const transactionCriteriaSchemas = {
 	senderId: Schemas.orEqualCriteria(address),
 	senderPublicKey: Schemas.orEqualCriteria(Joi.string().hex().length(66)),
 	timestamp: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
-	value: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	to: Schemas.orEqualCriteria(address),
 	transactionIndex: Schemas.orNumericCriteria(Joi.number().integer().positive()),
+	value: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 };

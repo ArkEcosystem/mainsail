@@ -291,11 +291,11 @@ export class Restore {
 						legacySecondSignature: data.legacySecondSignature,
 						nonce: data.nonce.toFixed(),
 						senderPublicKey: data.senderPublicKey,
-						value: data.value.toFixed(),
 						signature: `${data.r}${data.s}${data.v!.toString(16)}`,
 						timestamp: block.header.timestamp.toFixed(),
 						to: data.to,
 						transactionIndex: data.transactionIndex!,
+						value: data.value.toFixed(),
 					});
 				}
 
