@@ -67,14 +67,14 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 		const preverified = await evm.preverifyTransaction({
 			blockGasLimit: BigInt(milestone.block.maxGasLimit),
-			from: transaction.data.from,
 			data: Buffer.from(transaction.data.data, "hex"),
+			from: transaction.data.from,
 			gasLimit: BigInt(transaction.data.gas),
 			gasPrice: BigInt(transaction.data.gasPrice),
 			legacyAddress: transaction.data.senderLegacyAddress,
 			nonce: transaction.data.nonce.toBigInt(),
-			to: transaction.data.to,
 			specId: milestone.evmSpec,
+			to: transaction.data.to,
 			txHash: transaction.data.hash,
 			value: transaction.data.value.toBigInt(),
 		});

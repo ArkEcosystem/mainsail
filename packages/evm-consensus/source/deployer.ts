@@ -106,8 +106,8 @@ export class Deployer {
 		// CONSENSUS
 		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
-			from: this.deployerAddress,
 			data: Buffer.concat([Buffer.from(ethers.getBytes(ConsensusAbi.bytecode.object))]),
+			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
 			gasPrice: BigInt(0),
 			nonce: BigInt(0),
@@ -141,11 +141,11 @@ export class Deployer {
 
 		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
-			from: this.deployerAddress,
 			data: Buffer.concat([
 				Buffer.from(ethers.getBytes(ERC1967ProxyAbi.bytecode.object)),
 				Buffer.from(proxyConstructorArguments, "hex"),
 			]),
+			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
 			gasPrice: BigInt(0),
 			nonce: BigInt(1),
@@ -180,8 +180,8 @@ export class Deployer {
 	async #deployUsernamesContract(): Promise<string> {
 		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
-			from: this.deployerAddress,
 			data: Buffer.concat([Buffer.from(ethers.getBytes(UsernamesAbi.bytecode.object))]),
+			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
 			gasPrice: BigInt(0),
 			nonce: BigInt(2),
@@ -215,11 +215,11 @@ export class Deployer {
 
 		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
-			from: this.deployerAddress,
 			data: Buffer.concat([
 				Buffer.from(ethers.getBytes(ERC1967ProxyAbi.bytecode.object)),
 				Buffer.from(proxyConstructorArguments, "hex"),
 			]),
+			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
 			gasPrice: BigInt(0),
 			nonce: BigInt(3),
@@ -254,8 +254,8 @@ export class Deployer {
 	async #deployMultiPaymentContract(): Promise<string> {
 		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
-			from: this.deployerAddress,
 			data: Buffer.concat([Buffer.from(ethers.getBytes(MultiPaymentAbi.bytecode.object))]),
+			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
 			gasPrice: BigInt(0),
 			nonce: BigInt(4),
@@ -289,11 +289,11 @@ export class Deployer {
 
 		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
-			from: this.deployerAddress,
 			data: Buffer.concat([
 				Buffer.from(ethers.getBytes(ERC1967ProxyAbi.bytecode.object)),
 				Buffer.from(proxyConstructorArguments, "hex"),
 			]),
+			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
 			gasPrice: BigInt(0),
 			nonce: BigInt(5),

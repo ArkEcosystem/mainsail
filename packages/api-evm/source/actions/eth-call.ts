@@ -47,11 +47,12 @@ export class CallAction implements Contracts.Api.RPC.Action {
 		const [data] = parameters;
 
 		const { success, output } = await this.evm.view({
-			from: data.from ?? "0x" + "0".repeat(40), // default to zero address
+			// default to zero address
 			data: Buffer.from(ethers.getBytes(data.data)),
+			from: data.from ?? "0x" + "0".repeat(40),
 			gasLimit: data.gas ? BigInt(data.gas) : undefined,
-			to: data.to,
 			specId: Contracts.Evm.SpecId.LATEST,
+			to: data.to,
 		});
 
 		if (success) {

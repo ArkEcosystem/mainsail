@@ -670,10 +670,10 @@ export class Restore {
 		const { evmSpec } = this.configuration.getMilestone(this.configuration.getGenesisHeight());
 
 		const result = await this.evm.view({
-			from: this.deployerAddress,
 			data: Buffer.from(data, "hex"),
-			to: this.usernamesContractAddress,
+			from: this.deployerAddress,
 			specId: evmSpec,
+			to: this.usernamesContractAddress,
 		});
 
 		if (!result.success) {

@@ -29,10 +29,10 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 		const data = iface.encodeFunctionData("getActiveValidators").slice(2);
 
 		const result = await this.evm.view({
-			from: deployerAddress,
 			data: Buffer.from(data, "hex"),
-			to: consensusContractAddress,
+			from: deployerAddress,
 			specId: evmSpec,
+			to: consensusContractAddress,
 		});
 
 		if (!result.success) {
@@ -68,10 +68,10 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 		const data = iface.encodeFunctionData("getAllValidators").slice(2);
 
 		const result = await this.evm.view({
-			from: deployerAddress,
 			data: Buffer.from(data, "hex"),
-			to: consensusContractAddress,
+			from: deployerAddress,
 			specId: evmSpec,
+			to: consensusContractAddress,
 		});
 
 		if (!result.success) {
@@ -111,10 +111,10 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 		const data = iface.encodeFunctionData("getVotesCount").slice(2);
 
 		const result = await this.evm.view({
-			from: deployerAddress,
 			data: Buffer.from(data, "hex"),
-			to: consensusContractAddress,
+			from: deployerAddress,
 			specId: evmSpec,
+			to: consensusContractAddress,
 		});
 
 		if (!result.success) {
