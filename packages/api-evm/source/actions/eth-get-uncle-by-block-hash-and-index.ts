@@ -13,7 +13,7 @@ export class EthGetUncleByBlockHashAndIndex implements Contracts.Api.RPC.Action 
 		maxItems: 2,
 		minItems: 2,
 
-		prefixItems: [{ $ref: "prefixedBlockId" }, { $ref: "prefixedHex" }],
+		prefixItems: [{ $ref: "prefixedBlockHash" }, { $ref: "prefixedHex" }],
 		type: "array",
 	};
 

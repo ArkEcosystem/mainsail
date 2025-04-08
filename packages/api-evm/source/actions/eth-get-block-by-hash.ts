@@ -19,7 +19,7 @@ export class EthGetBlockByHashAction implements Contracts.Api.RPC.Action {
 		maxItems: 2,
 		minItems: 2,
 
-		prefixItems: [{ $ref: "prefixedBlockId" }, { type: "boolean" }],
+		prefixItems: [{ $ref: "prefixedBlockHash" }, { type: "boolean" }],
 		type: "array",
 	};
 

@@ -6,7 +6,7 @@ export const headers = {
 			type: "integer",
 		},
 		proposedBlockId: {
-			$ref: "blockId",
+			$ref: "blockHash",
 		},
 		round: {
 			minimum: 0,

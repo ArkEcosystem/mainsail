@@ -14,7 +14,7 @@ export class EthGetBlockTransactionCountByHash implements Contracts.Api.RPC.Acti
 		maxItems: 1,
 		minItems: 1,
 
-		prefixItems: [{ $ref: "prefixedBlockId" }],
+		prefixItems: [{ $ref: "prefixedBlockHash" }],
 		type: "array",
 	};
 

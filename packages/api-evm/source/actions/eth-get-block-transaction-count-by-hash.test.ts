@@ -31,7 +31,7 @@ describe<{
 
 	it("schema should be array with 0 parameters", ({ action, validator }) => {
 		validator.addSchema(cryptoValidationSchemas.prefixedHex);
-		validator.addSchema(cryptoBlockSchemas.prefixedBlockId);
+		validator.addSchema(cryptoBlockSchemas.prefixedBlockHash);
 		validator.addSchema(action.schema);
 
 		assert.undefined(

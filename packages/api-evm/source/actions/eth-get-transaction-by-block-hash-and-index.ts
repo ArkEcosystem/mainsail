@@ -19,7 +19,7 @@ export class EthGetTransactionByBlockHashAndIndex implements Contracts.Api.RPC.A
 		maxItems: 2,
 		minItems: 2,
 
-		prefixItems: [{ $ref: "prefixedBlockId" }, { $ref: "prefixedHex" }],
+		prefixItems: [{ $ref: "prefixedBlockHash" }, { $ref: "prefixedHex" }],
 		type: "array",
 	};
 

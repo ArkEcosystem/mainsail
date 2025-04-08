@@ -8,7 +8,7 @@ export const schemas: Record<
 	precommit: {
 		$id: "precommit",
 		properties: {
-			blockId: { $ref: "blockId" },
+			blockId: { $ref: "blockHash" },
 			height: { minimum: 1, type: "integer" },
 			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
@@ -21,7 +21,7 @@ export const schemas: Record<
 	prevote: {
 		$id: "prevote",
 		properties: {
-			blockId: { $ref: "blockId" },
+			blockId: { $ref: "blockHash" },
 			height: { minimum: 1, type: "integer" },
 			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },

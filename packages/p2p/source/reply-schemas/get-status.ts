@@ -100,7 +100,7 @@ export const getStatus = {
 					type: "integer",
 				},
 				id: {
-					$ref: "blockId",
+					$ref: "blockHash",
 				},
 			},
 			required: ["id", "height"],

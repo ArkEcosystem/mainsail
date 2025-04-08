@@ -39,25 +39,25 @@ describe<{
 		}
 	});
 
-	it("blockId - should be ok", ({ validator }) => {
+	it("blockHash - should be ok", ({ validator }) => {
 		const lenght = 64;
 		const validChars = "0123456789abcdef";
 
 		for (const char of validChars) {
-			assert.undefined(validator.validate("blockId", char.repeat(lenght)).error);
+			assert.undefined(validator.validate("blockHash", char.repeat(lenght)).error);
 		}
 	});
 
-	it("blockId - should not be ok", ({ validator }) => {
+	it("blockHash - should not be ok", ({ validator }) => {
 		const lenght = 64;
 		const invalidChars = "ABCDEFGHIJKLMNOghijklmno$%!+-";
 
 		for (const char of invalidChars) {
-			assert.defined(validator.validate("blockId", char.repeat(lenght)).error);
+			assert.defined(validator.validate("blockHash", char.repeat(lenght)).error);
 		}
 
-		assert.defined(validator.validate("blockId", "a".repeat(lenght - 1)).error);
-		assert.defined(validator.validate("blockId", "a".repeat(lenght + 1)).error);
+		assert.defined(validator.validate("blockHash", "a".repeat(lenght - 1)).error);
+		assert.defined(validator.validate("blockHash", "a".repeat(lenght + 1)).error);
 	});
 
 	const blockOriginal = {
@@ -159,7 +159,7 @@ describe<{
 		}
 	});
 
-	it("blockHeader - hash should be blockId", ({ validator }) => {
+	it("blockHeader - hash should be blockHash", ({ validator }) => {
 		assert.true(
 			validator
 				.validate("blockHeader", {
@@ -219,7 +219,7 @@ describe<{
 		);
 	});
 
-	it("blockHeader - parentHash should be blockId", ({ validator }) => {
+	it("blockHeader - parentHash should be blockHash", ({ validator }) => {
 		assert.true(
 			validator
 				.validate("blockHeader", {
