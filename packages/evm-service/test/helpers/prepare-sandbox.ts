@@ -60,7 +60,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox.app.bind(Identifiers.State.Store).toConstantValue({
 		getLastBlock: () => ({
 			data: {
-				height: 1,
+				number: 1,
 				id: "0000000000000000000000000000000000000000000000000000000000000000",
 			},
 		}),
