@@ -146,12 +146,12 @@ export class Sync implements Contracts.ApiSync.Service {
 			if (receipt) {
 				transactionReceipts.push({
 					blockNumber: header.number.toFixed(),
-					deployedContractAddress: receipt.deployedContractAddress,
+					contractAddress: receipt.deployedContractAddress,
 					gasRefunded: Number(receipt.gasRefunded),
 					gasUsed: Number(receipt.gasUsed),
 					logs: receipt.logs,
 					output: receipt.output,
-					success: receipt.success,
+					status: receipt.success ? 1 : 0,
 					transactionHash: transaction.hash,
 				});
 			}

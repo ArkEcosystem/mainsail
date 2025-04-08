@@ -78,7 +78,7 @@ export class ReceiptsController extends Controller {
 			.createQueryBuilder("receipt")
 			.select(this.getReceiptColumns(request.query.fullReceipt))
 			.innerJoin(Models.Transaction, "transaction", "receipt.transactionHash = transaction.hash")
-			.where("receipt.deployedContractAddress IS NOT NULL");
+			.where("receipt.contractAddress IS NOT NULL");
 
 		if (criteria.from) {
 			query.innerJoin(Models.Wallet, "wallet", "transaction.from = wallet.address").andWhere(

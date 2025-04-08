@@ -167,10 +167,10 @@ export class Controller extends AbstractController {
 	protected getReceiptColumns(fullReceipt?: boolean): string[] {
 		let columns = [
 			"receipt.transactionHash",
-			"receipt.success",
+			"receipt.status",
 			"receipt.gasUsed",
 			"receipt.gasRefunded",
-			"receipt.deployedContractAddress",
+			"receipt.contractAddress",
 		];
 		if (fullReceipt) {
 			columns = [...columns, "receipt.output", "receipt.logs"];

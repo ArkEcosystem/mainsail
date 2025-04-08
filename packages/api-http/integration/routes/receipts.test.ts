@@ -60,7 +60,7 @@ describe<{
 				result: receiptsResult,
 			},
 			{
-				query: `?to=${receipts[1].deployedContractAddress}`,
+				query: `?to=${receipts[1].contractAddress}`,
 				result: [receiptsResult[0]],
 			},
 		];

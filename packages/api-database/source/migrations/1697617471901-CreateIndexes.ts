@@ -39,6 +39,8 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX blocks_validator_round ON blocks(validator_round);
 
             CREATE INDEX receipts_block_height ON receipts(block_number);
+            CREATE INDEX receipts_contracts ON receipts(contract_address) 
+            WHERE contract_address IS NOT NULL;
 
             CREATE INDEX wallets_balance ON wallets(balance);
             CREATE INDEX wallets_attributes ON wallets using GIN(attributes);
@@ -85,6 +87,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX blocks_validator_round;
 
             DROP INDEX receipts_block_height;
+            DROP INDEX receipts_contracts;
 
             DROP INDEX wallets_balance;
             DROP INDEX wallets_attributes;

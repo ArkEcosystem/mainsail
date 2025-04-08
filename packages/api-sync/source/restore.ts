@@ -521,12 +521,12 @@ export class Restore {
 
 				receipts.push({
 					blockNumber: BigNumber.make(receipt.blockNumber).toFixed(),
-					deployedContractAddress: receipt.deployedContractAddress,
+					contractAddress: receipt.deployedContractAddress,
 					gasRefunded: Number(receipt.gasRefunded),
 					gasUsed: Number(receipt.gasUsed),
 					logs: receipt.logs,
 					output: receipt.output,
-					success: receipt.success,
+					status: receipt.success ? 1 : 0,
 					transactionHash: receipt.txHash.slice(2),
 				});
 			}
