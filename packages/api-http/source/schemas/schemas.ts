@@ -3,9 +3,7 @@ import Joi from "joi";
 
 import { walletAddressSchema } from "./wallets.js";
 
-// Old
-
-export const blockId = Joi.alternatives().try(
+export const blockHash = Joi.alternatives().try(
 	Joi.string().min(1).max(20).regex(/^\d+$/, "decimal non-negative integer"),
 	Joi.string().length(64).hex(),
 );
@@ -51,9 +49,9 @@ export const transactionsOrderBy = orderBy.default(["timestamp:desc", "transacti
 export const blockCriteriaSchemas = {
 	amount: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	fee: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
-	hash: Schemas.orEqualCriteria(blockId),
+	hash: Schemas.orEqualCriteria(blockHash),
 	number: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
-	parentHash: Schemas.orEqualCriteria(blockId),
+	parentHash: Schemas.orEqualCriteria(blockHash),
 	payloadHash: Schemas.orEqualCriteria(Joi.string().hex()),
 	payloadSize: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	proposer: Schemas.orEqualCriteria(Joi.string().hex().length(66)),
@@ -66,7 +64,7 @@ export const blockCriteriaSchemas = {
 export const transactionCriteriaSchemas = {
 	address: Schemas.orEqualCriteria(address),
 	asset: Schemas.orContainsCriteria(Joi.object()),
-	blockHash: Schemas.orEqualCriteria(blockId),
+	blockHash: Schemas.orEqualCriteria(blockHash),
 	data: Schemas.orEqualCriteria(
 		Joi.alternatives().try(Joi.string().valid("", "0x"), Joi.string().hex({ prefix: "optional" }).max(10)),
 	),

@@ -14,7 +14,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		options: {
 			validate: {
 				params: Joi.object({
-					id: server.app.schemas.blockId,
+					id: server.app.schemas.blockHash,
 				}),
 			},
 		},
