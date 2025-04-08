@@ -76,10 +76,10 @@ impl EvmInner {
     }
 
     pub fn prepare_next_commit(&mut self, ctx: PrepareNextCommitContext) -> Result<()> {
-        let genesis_height = self.genesis_height();
+        let genesis_block_number = self.genesis_block_number();
         if let Some(pending) = self.pending_commits.get(&ctx.commit_key) {
             // do not replace any pending commit, while still in bootstrapping phase.
-            if pending.key.0 == genesis_height && ctx.commit_key == pending.key {
+            if pending.key.0 == genesis_block_number && ctx.commit_key == pending.key {
                 return Ok(());
             }
 
@@ -135,13 +135,13 @@ impl EvmInner {
     pub fn code_at(
         &mut self,
         address: Address,
-        height: Option<u64>,
+        block_number: Option<u64>,
     ) -> std::result::Result<Bytes, EVMError<String>> {
-        let account = match height {
+        let account = match block_number {
             None => self.persistent_db.basic(address),
-            Some(height) => self
+            Some(block_number) => self
                 .persistent_db
-                .get_historical_account_info(height, address),
+                .get_historical_account_info(block_number, address),
         }
         .map_err(|err| EVMError::Database(format!("account lookup failed: {}", err).into()))?;
 
@@ -186,7 +186,7 @@ impl EvmInner {
             deployer_account: genesis_ctx.deployer_account,
             validator_contract: genesis_ctx.validator_contract,
             username_contract: genesis_ctx.username_contract,
-            initial_height: genesis_ctx.initial_height,
+            initial_block_number: genesis_ctx.initial_block_number,
             initial_supply: genesis_ctx.initial_supply,
         });
 
@@ -354,13 +354,13 @@ impl EvmInner {
     pub fn get_account_info(
         &mut self,
         address: Address,
-        height: Option<u64>,
+        block_number: Option<u64>,
     ) -> std::result::Result<AccountInfo, EVMError<String>> {
-        let result = match height {
+        let result = match block_number {
             None => self.persistent_db.basic(address),
-            Some(height) => self
+            Some(block_number) => self
                 .persistent_db
-                .get_historical_account_info(height, address),
+                .get_historical_account_info(block_number, address),
         };
 
         match result {
@@ -430,10 +430,10 @@ impl EvmInner {
     ) -> std::result::Result<(), EVMError<String>> {
         assert_eq!(self.pending_commits.len(), 1);
 
-        let genesis_height = self.genesis_height();
+        let genesis_block_number = self.genesis_block_number();
 
         let (_, pending) = self.pending_commits.iter_mut().next().expect("ok");
-        assert_eq!(pending.key.0, genesis_height);
+        assert_eq!(pending.key.0, genesis_block_number);
         assert!(!pending.cache.accounts.contains_key(&info.address));
 
         let (address, info, legacy_attributes) = info.into_parts();
@@ -448,10 +448,10 @@ impl EvmInner {
     ) -> std::result::Result<(), EVMError<String>> {
         assert_eq!(self.pending_commits.len(), 1);
 
-        let genesis_height = self.genesis_height();
+        let genesis_block_number = self.genesis_block_number();
 
         let (_, pending) = self.pending_commits.iter_mut().next().expect("ok");
-        assert_eq!(pending.key.0, genesis_height);
+        assert_eq!(pending.key.0, genesis_block_number);
 
         assert!(!pending.legacy_cold_wallets.contains_key(&wallet.address));
         pending.legacy_cold_wallets.insert(wallet.address, wallet);
@@ -583,10 +583,10 @@ impl EvmInner {
 
     pub fn get_receipt(
         &mut self,
-        height: u64,
+        block_number: u64,
         tx_hash: B256,
     ) -> std::result::Result<Option<TxReceipt>, EVMError<String>> {
-        match self.persistent_db.get_receipt(height, tx_hash) {
+        match self.persistent_db.get_receipt(block_number, tx_hash) {
             Ok(receipt) => Ok(receipt),
             Err(err) => Err(EVMError::Database(
                 format!("failed reading receipt: {}", err).into(),
@@ -795,9 +795,9 @@ impl EvmInner {
 
     pub fn get_block_header_bytes(
         &mut self,
-        height: u64,
+        block_number: u64,
     ) -> std::result::Result<Option<Bytes>, EVMError<String>> {
-        let result = self.persistent_db.get_block_header_bytes(height);
+        let result = self.persistent_db.get_block_header_bytes(block_number);
 
         match result {
             Ok(result) => Ok(result),
@@ -807,25 +807,25 @@ impl EvmInner {
         }
     }
 
-    pub fn get_block_height_by_id(
+    pub fn get_block_number_by_hash(
         &mut self,
-        id: B256,
+        block_hash: B256,
     ) -> std::result::Result<Option<u64>, EVMError<String>> {
-        let result = self.persistent_db.get_block_height_by_id(id);
+        let result = self.persistent_db.get_block_number_by_hash(block_hash);
 
         match result {
             Ok(result) => Ok(result),
             Err(err) => Err(EVMError::Database(
-                format!("get_block_height_by_id failed: {}", err).into(),
+                format!("get_block_number_by_hash failed: {}", err).into(),
             )),
         }
     }
 
     pub fn get_proof_bytes(
         &mut self,
-        height: u64,
+        block_number: u64,
     ) -> std::result::Result<Option<Bytes>, EVMError<String>> {
-        let result = self.persistent_db.get_proof_bytes(height);
+        let result = self.persistent_db.get_proof_bytes(block_number);
 
         match result {
             Ok(result) => Ok(result),
@@ -849,16 +849,16 @@ impl EvmInner {
         }
     }
 
-    pub fn get_transaction_key_by_id(
+    pub fn get_transaction_key_by_hash(
         &mut self,
-        id: B256,
+        tx_hash: B256,
     ) -> std::result::Result<Option<String>, EVMError<String>> {
-        let result = self.persistent_db.get_transaction_key_by_id(id);
+        let result = self.persistent_db.get_transaction_key_by_hash(tx_hash);
 
         match result {
             Ok(result) => Ok(result),
             Err(err) => Err(EVMError::Database(
-                format!("get_transaction_key_by_id failed: {}", err).into(),
+                format!("get_transaction_key_by_hash failed: {}", err).into(),
             )),
         }
     }
@@ -1001,13 +1001,13 @@ impl EvmInner {
     }
 
     #[inline]
-    fn genesis_height(&mut self) -> u64 {
+    fn genesis_block_number(&mut self) -> u64 {
         self.persistent_db
             .genesis_info
             .as_ref()
             .cloned()
             .unwrap_or_default()
-            .initial_height
+            .initial_block_number
     }
 }
 
@@ -1120,17 +1120,17 @@ impl JsEvmWrapper {
         &mut self,
         node_env: Env,
         address: JsString,
-        height: Option<JsBigInt>,
+        block_number: Option<JsBigInt>,
     ) -> Result<JsObject> {
         let address = utils::create_address_from_js_string(address)?;
 
-        let height = match height {
-            Some(height) => Some(height.get_u64()?.0),
+        let block_number = match block_number {
+            Some(block_number) => Some(block_number.get_u64()?.0),
             None => None,
         };
 
         node_env.execute_tokio_future(
-            Self::get_account_info_async(self.evm.clone(), address, height),
+            Self::get_account_info_async(self.evm.clone(), address, block_number),
             |&mut node_env, result| Ok(result::JsAccountInfo::new(&node_env, result)?),
         )
     }
@@ -1239,17 +1239,20 @@ impl JsEvmWrapper {
     pub fn get_receipt(
         &mut self,
         node_env: Env,
-        height: JsBigInt,
+        block_number: JsBigInt,
         tx_hash: JsString,
     ) -> Result<JsObject> {
-        let height = height.get_u64()?.0;
+        let block_number = block_number.get_u64()?.0;
         let tx_hash = utils::convert_string_to_b256(tx_hash)?;
 
         node_env.execute_tokio_future(
-            Self::get_receipt_async(self.evm.clone(), height, tx_hash),
+            Self::get_receipt_async(self.evm.clone(), block_number, tx_hash),
             move |&mut node_env, result| {
                 Ok(result::JsGetReceipt::new(
-                    &node_env, result, height, tx_hash,
+                    &node_env,
+                    result,
+                    block_number,
+                    tx_hash,
                 )?)
             },
         )
@@ -1260,16 +1263,16 @@ impl JsEvmWrapper {
         &mut self,
         node_env: Env,
         address: JsString,
-        height: Option<JsBigInt>,
+        block_number: Option<JsBigInt>,
     ) -> Result<JsObject> {
         let address = utils::create_address_from_js_string(address)?;
-        let height = match height {
-            Some(height) => Some(height.get_u64()?.0),
+        let block_number = match block_number {
+            Some(block_number) => Some(block_number.get_u64()?.0),
             None => None,
         };
 
         node_env.execute_tokio_future(
-            Self::code_at_async(self.evm.clone(), address, height),
+            Self::code_at_async(self.evm.clone(), address, block_number),
             |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
         )
     }
@@ -1350,10 +1353,14 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<Buffer | undefined>")]
-    pub fn get_block_header_bytes(&mut self, node_env: Env, height: JsBigInt) -> Result<JsObject> {
-        let height = height.get_u64()?.0;
+    pub fn get_block_header_bytes(
+        &mut self,
+        node_env: Env,
+        block_number: JsBigInt,
+    ) -> Result<JsObject> {
+        let block_number = block_number.get_u64()?.0;
         node_env.execute_tokio_future(
-            Self::get_block_header_bytes_async(self.evm.clone(), height),
+            Self::get_block_header_bytes_async(self.evm.clone(), block_number),
             |&mut node_env, result| {
                 Ok(match result {
                     Some(bytes) => Some(utils::convert_bytes_to_js_buffer(&node_env, bytes)?),
@@ -1364,11 +1371,15 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<bigint | undefined>")]
-    pub fn get_block_height_by_id(&mut self, node_env: Env, id: JsString) -> Result<JsObject> {
-        let id = utils::convert_string_to_b256(id)?;
+    pub fn get_block_number_by_hash(
+        &mut self,
+        node_env: Env,
+        block_hash: JsString,
+    ) -> Result<JsObject> {
+        let block_hash = utils::convert_string_to_b256(block_hash)?;
 
         node_env.execute_tokio_future(
-            Self::get_block_height_by_id_async(self.evm.clone(), id),
+            Self::get_block_number_by_hash_async(self.evm.clone(), block_hash),
             |&mut node_env, result| {
                 Ok(match result {
                     Some(result) => Some(node_env.create_bigint_from_u64(result)?),
@@ -1379,10 +1390,10 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<Buffer | undefined>")]
-    pub fn get_proof_bytes(&mut self, node_env: Env, height: JsBigInt) -> Result<JsObject> {
-        let height = height.get_u64()?.0;
+    pub fn get_proof_bytes(&mut self, node_env: Env, block_number: JsBigInt) -> Result<JsObject> {
+        let block_number = block_number.get_u64()?.0;
         node_env.execute_tokio_future(
-            Self::get_proof_bytes_async(self.evm.clone(), height),
+            Self::get_proof_bytes_async(self.evm.clone(), block_number),
             |&mut node_env, result| {
                 Ok(match result {
                     Some(bytes) => Some(utils::convert_bytes_to_js_buffer(&node_env, bytes)?),
@@ -1407,11 +1418,15 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<string | undefined>")]
-    pub fn get_transaction_key_by_id(&mut self, node_env: Env, id: JsString) -> Result<JsObject> {
-        let id = utils::convert_string_to_b256(id)?;
+    pub fn get_transaction_key_by_hash(
+        &mut self,
+        node_env: Env,
+        tx_hash: JsString,
+    ) -> Result<JsObject> {
+        let tx_hash = utils::convert_string_to_b256(tx_hash)?;
 
         node_env.execute_tokio_future(
-            Self::get_transaction_key_by_id_async(self.evm.clone(), id),
+            Self::get_transaction_key_by_hash_async(self.evm.clone(), tx_hash),
             |&mut node_env, result| {
                 Ok(match result {
                     Some(result) => Some(node_env.create_string(&result)?),
@@ -1463,10 +1478,10 @@ impl JsEvmWrapper {
     async fn get_account_info_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         address: Address,
-        height: Option<u64>,
+        block_number: Option<u64>,
     ) -> Result<AccountInfo> {
         let mut lock = evm.lock().await;
-        let result = lock.get_account_info(address, height);
+        let result = lock.get_account_info(address, block_number);
 
         match result {
             Ok(account) => Result::Ok(account),
@@ -1569,10 +1584,10 @@ impl JsEvmWrapper {
     async fn code_at_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         address: Address,
-        height: Option<u64>,
+        block_number: Option<u64>,
     ) -> Result<String> {
         let mut lock = evm.lock().await;
-        let result = lock.code_at(address, height);
+        let result = lock.code_at(address, block_number);
 
         match result {
             Ok(code) => Result::Ok(revm::primitives::hex::encode_prefixed(code.as_ref())),
@@ -1683,11 +1698,11 @@ impl JsEvmWrapper {
 
     async fn get_receipt_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        height: u64,
+        block_number: u64,
         tx_hash: B256,
     ) -> Result<Option<TxReceipt>> {
         let mut lock = evm.lock().await;
-        let result = lock.get_receipt(height, tx_hash);
+        let result = lock.get_receipt(block_number, tx_hash);
 
         match result {
             Ok(result) => Result::Ok(result),
@@ -1717,10 +1732,10 @@ impl JsEvmWrapper {
 
     async fn get_block_header_bytes_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        height: u64,
+        block_number: u64,
     ) -> Result<Option<Bytes>> {
         let mut lock = evm.lock().await;
-        let result = lock.get_block_header_bytes(height);
+        let result = lock.get_block_header_bytes(block_number);
 
         match result {
             Ok(result) => Result::Ok(result),
@@ -1728,12 +1743,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn get_block_height_by_id_async(
+    async fn get_block_number_by_hash_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        id: B256,
+        block_hash: B256,
     ) -> Result<Option<u64>> {
         let mut lock = evm.lock().await;
-        let result = lock.get_block_height_by_id(id);
+        let result = lock.get_block_number_by_hash(block_hash);
 
         match result {
             Ok(result) => Result::Ok(result),
@@ -1743,10 +1758,10 @@ impl JsEvmWrapper {
 
     async fn get_proof_bytes_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        height: u64,
+        block_number: u64,
     ) -> Result<Option<Bytes>> {
         let mut lock = evm.lock().await;
-        let result = lock.get_proof_bytes(height);
+        let result = lock.get_proof_bytes(block_number);
 
         match result {
             Ok(result) => Result::Ok(result),
@@ -1767,12 +1782,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn get_transaction_key_by_id_async(
+    async fn get_transaction_key_by_hash_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        id: B256,
+        tx_hash: B256,
     ) -> Result<Option<String>> {
         let mut lock = evm.lock().await;
-        let result = lock.get_transaction_key_by_id(id);
+        let result = lock.get_transaction_key_by_hash(tx_hash);
 
         match result {
             Ok(result) => Result::Ok(result),

@@ -52,8 +52,8 @@ fn calculate_state_hash(
 
     let mut hashes = Vec::with_capacity(5);
 
-    let height = state.key.0.to_le_bytes();
-    hashes.push(height.as_slice());
+    let block_number = state.key.0.to_le_bytes();
+    hashes.push(block_number.as_slice());
 
     let genesis_info_hash = match genesis_info {
         Some(info) => calculate_hash(info)?,

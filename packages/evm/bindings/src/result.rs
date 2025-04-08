@@ -475,7 +475,7 @@ impl JsGetReceipts {
     pub fn new(
         node_env: &napi::Env,
         next_offset: Option<u64>,
-        receipts_by_height: Vec<(u64, Vec<(B256, TxReceipt)>)>,
+        receipts_by_block_number: Vec<(u64, Vec<(B256, TxReceipt)>)>,
     ) -> anyhow::Result<Self> {
         let next_offset = match next_offset {
             Some(next_offset) => Some(node_env.create_bigint_from_u64(next_offset)?),
@@ -483,11 +483,11 @@ impl JsGetReceipts {
         };
 
         let mut mapped = vec![];
-        for (height, tx_receipts) in receipts_by_height {
+        for (block_number, tx_receipts) in receipts_by_block_number {
             for (hash, tx_receipt) in tx_receipts {
                 let mut receipt = JsTransactionReceipt::new(node_env, tx_receipt)?;
 
-                receipt.block_number = Some(node_env.create_bigint_from_u64(height)?);
+                receipt.block_number = Some(node_env.create_bigint_from_u64(block_number)?);
                 receipt.tx_hash = Some(node_env.create_string_from_std(hash.to_string())?);
 
                 mapped.push(receipt);
@@ -510,13 +510,13 @@ impl JsGetReceipt {
     pub fn new(
         node_env: &napi::Env,
         receipt: Option<TxReceipt>,
-        height: u64,
+        block_number: u64,
         tx_hash: B256,
     ) -> anyhow::Result<Self> {
         let receipt = match receipt {
             Some(receipt) => {
                 let mut receipt = JsTransactionReceipt::new(node_env, receipt)?;
-                receipt.block_number = Some(node_env.create_bigint_from_u64(height)?);
+                receipt.block_number = Some(node_env.create_bigint_from_u64(block_number)?);
                 receipt.tx_hash = Some(node_env.create_string_from_std(tx_hash.to_string())?);
 
                 Some(receipt)
@@ -530,14 +530,14 @@ impl JsGetReceipt {
 
 #[napi(object)]
 pub struct JsGetState {
-    pub height: JsBigInt,
+    pub block_number: JsBigInt,
     pub total_round: JsBigInt,
 }
 
 impl JsGetState {
     pub fn new(node_env: &napi::Env, state: (u64, u64)) -> anyhow::Result<Self> {
         Ok(JsGetState {
-            height: node_env.create_bigint_from_u64(state.0)?,
+            block_number: node_env.create_bigint_from_u64(state.0)?,
             total_round: node_env.create_bigint_from_u64(state.1)?,
         })
     }

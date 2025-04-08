@@ -73,7 +73,7 @@ pub struct JsGenesisContext {
     pub deployer_account: JsString,
     pub validator_contract: JsString,
     pub username_contract: JsString,
-    pub initial_height: JsBigInt,
+    pub initial_block_number: JsBigInt,
     pub initial_supply: JsBigInt,
 }
 
@@ -97,17 +97,17 @@ pub struct JsUpdateRewardsAndVotesContext {
 
 #[napi(object)]
 pub struct JsCommitKey {
-    pub height: JsBigInt,
+    pub block_number: JsBigInt,
     pub round: JsBigInt,
-    pub block_id: Option<JsString>,
+    pub block_hash: Option<JsString>,
 }
 
 #[napi(object)]
 pub struct JsCommitData {
-    pub block_id: JsString,
+    pub block_hash: JsString,
     pub block: JsBuffer,
     pub proof: JsBuffer,
-    pub transaction_ids: Vec<JsString>,
+    pub transaction_hashes: Vec<JsString>,
     pub transactions: Vec<JsBuffer>,
 }
 
@@ -177,7 +177,7 @@ pub struct GenesisContext {
     pub deployer_account: Address,
     pub validator_contract: Address,
     pub username_contract: Address,
-    pub initial_height: u64,
+    pub initial_block_number: u64,
     pub initial_supply: U256,
 }
 
@@ -257,16 +257,16 @@ impl TryFrom<JsCommitKey> for CommitKey {
     type Error = anyhow::Error;
 
     fn try_from(value: JsCommitKey) -> Result<Self, Self::Error> {
-        let block_id = if let Some(block_id) = value.block_id {
-            utils::convert_string_to_b256(block_id)?
+        let block_hash = if let Some(block_hash) = value.block_hash {
+            utils::convert_string_to_b256(block_hash)?
         } else {
             B256::ZERO
         };
 
         Ok(CommitKey(
-            value.height.get_u64()?.0,
+            value.block_number.get_u64()?.0,
             value.round.get_u64()?.0,
-            block_id,
+            block_hash,
         ))
     }
 }
@@ -277,11 +277,11 @@ impl TryFrom<JsCommitData> for CommitData {
     fn try_from(value: JsCommitData) -> Result<Self, Self::Error> {
         let proof = utils::convert_js_buffer_to_bytes(value.proof)?;
         let block = utils::convert_js_buffer_to_bytes(value.block)?;
-        let block_id = utils::convert_string_to_b256(value.block_id)?;
+        let block_hash = utils::convert_string_to_b256(value.block_hash)?;
 
-        let mut transaction_ids = Vec::with_capacity(value.transaction_ids.len());
-        for transaction_id in value.transaction_ids {
-            transaction_ids.push(utils::convert_string_to_b256(transaction_id)?);
+        let mut transaction_hashes = Vec::with_capacity(value.transaction_hashes.len());
+        for transaction_hash in value.transaction_hashes {
+            transaction_hashes.push(utils::convert_string_to_b256(transaction_hash)?);
         }
 
         let mut transactions = Vec::with_capacity(value.transactions.len());
@@ -289,13 +289,13 @@ impl TryFrom<JsCommitData> for CommitData {
             transactions.push(utils::convert_js_buffer_to_bytes(transaction)?);
         }
 
-        assert_eq!(transaction_ids.len(), transactions.len());
+        assert_eq!(transaction_hashes.len(), transactions.len());
 
         Ok(CommitData {
-            block_id,
+            block_hash,
             block,
             proof,
-            transaction_ids,
+            transaction_hashes,
             transactions,
         })
     }
@@ -438,7 +438,7 @@ impl TryFrom<JsGenesisContext> for GenesisContext {
             validator_contract: utils::create_address_from_js_string(value.validator_contract)?,
             username_contract: utils::create_address_from_js_string(value.username_contract)?,
             deployer_account: utils::create_address_from_js_string(value.deployer_account)?,
-            initial_height: value.initial_height.get_u64()?.0,
+            initial_block_number: value.initial_block_number.get_u64()?.0,
             initial_supply: utils::convert_bigint_to_u256(value.initial_supply)?,
         })
     }

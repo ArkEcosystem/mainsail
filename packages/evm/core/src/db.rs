@@ -108,7 +108,7 @@ impl heed::BytesEncode<'_> for StaticStringWrapper {
     }
 }
 
-type HeedHeight = heed::types::U64<heed::byteorder::BigEndian>;
+type HeedBlockNumber = heed::types::U64<heed::byteorder::BigEndian>;
 
 #[derive(Debug)]
 pub(crate) struct StorageEntryWrapper(U256, U256);
@@ -160,11 +160,11 @@ pub(crate) struct InnerStorage {
     pub accounts: heed::Database<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>,
     pub accounts_history: Option<
         heed::Database<
-            HeedHeight,
+            HeedBlockNumber,
             heed::types::SerdeBincode<BTreeMap<Address, HistoricalAccountData>>,
         >,
     >,
-    pub commits: heed::Database<HeedHeight, heed::types::SerdeBincode<CommitReceipts>>,
+    pub commits: heed::Database<HeedBlockNumber, heed::types::SerdeBincode<CommitReceipts>>,
     pub contracts: heed::Database<HashWrapper, heed::types::SerdeBincode<Bytecode>>,
     pub legacy_attributes:
         heed::Database<AddressWrapper, heed::types::SerdeBincode<LegacyAccountAttributes>>,
@@ -173,24 +173,24 @@ pub(crate) struct InnerStorage {
     pub storage: heed::Database<AddressWrapper, StorageEntryWrapper>,
     // Carried over from previous database-service.ts lmdb backend
     pub state: heed::Database<StaticStringWrapper, heed::types::SerdeBincode<Bytes>>,
-    pub proofs: heed::Database<HeedHeight, heed::types::SerdeBincode<Bytes>>,
-    pub blocks: heed::Database<HeedHeight, heed::types::SerdeBincode<Bytes>>,
-    pub blocks_id_height: heed::Database<HashWrapper, HeedHeight>,
+    pub proofs: heed::Database<HeedBlockNumber, heed::types::SerdeBincode<Bytes>>,
+    pub blocks: heed::Database<HeedBlockNumber, heed::types::SerdeBincode<Bytes>>,
+    pub blocks_hash_number: heed::Database<HashWrapper, HeedBlockNumber>,
     pub transactions: heed::Database<StringWrapper, heed::types::SerdeBincode<Bytes>>,
-    pub transactions_id_key: heed::Database<HashWrapper, heed::types::SerdeBincode<String>>,
+    pub transactions_hash_key: heed::Database<HashWrapper, heed::types::SerdeBincode<String>>,
     //
 }
 
-// A key of (height, round, block_id) used to associate state with a processable unit.
+// A key of (block_number, round, block_hash) used to associate state with a processable unit.
 #[derive(Hash, PartialEq, Eq, Debug, Default, Clone, Copy)]
 pub struct CommitKey(pub u64, pub u64, pub B256);
 
 #[derive(Default)]
 pub struct CommitData {
-    pub block_id: B256,
+    pub block_hash: B256,
     pub proof: Bytes,
     pub block: Bytes,
-    pub transaction_ids: Vec<B256>,
+    pub transaction_hashes: Vec<B256>,
     pub transactions: Vec<Bytes>,
 }
 
@@ -223,7 +223,7 @@ pub struct GenesisInfo {
     pub deployer_account: Address,
     pub validator_contract: Address,
     pub username_contract: Address,
-    pub initial_height: u64,
+    pub initial_block_number: u64,
     pub initial_supply: U256,
 }
 
@@ -317,7 +317,7 @@ impl PersistentDB {
 
         let (accounts_history_db, accounts_history) = match opts.history_size {
             Some(history_size) if history_size > 0 => {
-                let db = env.create_database::<HeedHeight, heed::types::SerdeBincode<
+                let db = env.create_database::<HeedBlockNumber, heed::types::SerdeBincode<
             BTreeMap<Address, HistoricalAccountData>>>(&mut wtxn, Some("accounts_history")) ?;
                 (Some(db), Some(AccountHistory::new(history_size)))
             }
@@ -325,7 +325,7 @@ impl PersistentDB {
         };
 
         let commits = env
-            .create_database::<HeedHeight, heed::types::SerdeBincode<CommitReceipts>>(
+            .create_database::<HeedBlockNumber, heed::types::SerdeBincode<CommitReceipts>>(
                 &mut wtxn,
                 Some("commits"),
             )?;
@@ -356,24 +356,26 @@ impl PersistentDB {
             &mut wtxn,
             Some("state"),
         )?;
-        let proofs = env.create_database::<HeedHeight, heed::types::SerdeBincode<Bytes>>(
+        let proofs = env.create_database::<HeedBlockNumber, heed::types::SerdeBincode<Bytes>>(
             &mut wtxn,
             Some("proofs"),
         )?;
-        let blocks = env.create_database::<HeedHeight, heed::types::SerdeBincode<Bytes>>(
+        let blocks = env.create_database::<HeedBlockNumber, heed::types::SerdeBincode<Bytes>>(
             &mut wtxn,
             Some("blocks"),
         )?;
-        let blocks_id_height =
-            env.create_database::<HashWrapper, HeedHeight>(&mut wtxn, Some("blocks_id_height"))?;
+        let blocks_hash_number = env.create_database::<HashWrapper, HeedBlockNumber>(
+            &mut wtxn,
+            Some("blocks_hash_number"),
+        )?;
         let transactions = env.create_database::<StringWrapper, heed::types::SerdeBincode<Bytes>>(
             &mut wtxn,
             Some("transactions"),
         )?;
-        let transactions_id_key = env
+        let transactions_hash_key = env
             .create_database::<HashWrapper, heed::types::SerdeBincode<String>>(
                 &mut wtxn,
-                Some("transactions_id_key"),
+                Some("transactions_hash_key"),
             )?;
         //
 
@@ -392,9 +394,9 @@ impl PersistentDB {
                 state,
                 proofs,
                 blocks,
-                blocks_id_height,
+                blocks_hash_number,
                 transactions,
-                transactions_id_key,
+                transactions_hash_key,
             }),
             accounts_history,
             logger: opts.logger.unwrap_or_default(),
@@ -498,8 +500,8 @@ impl PersistentDB {
             iter,
             |item| match item {
                 Some(item) => {
-                    let (height, CommitReceipts { tx_receipts, .. }) = item?;
-                    Ok(Some((height, tx_receipts.into_iter().collect())))
+                    let (block_number, CommitReceipts { tx_receipts, .. }) = item?;
+                    Ok(Some((block_number, tx_receipts.into_iter().collect())))
                 }
                 None => Ok(None),
             },
@@ -508,10 +510,14 @@ impl PersistentDB {
         )
     }
 
-    pub fn get_receipt(&self, height: u64, tx_hash: B256) -> Result<Option<TxReceipt>, Error> {
+    pub fn get_receipt(
+        &self,
+        block_number: u64,
+        tx_hash: B256,
+    ) -> Result<Option<TxReceipt>, Error> {
         let tx_env = self.env.read_txn()?;
 
-        let commits = self.inner.borrow().commits.get(&tx_env, &height)?;
+        let commits = self.inner.borrow().commits.get(&tx_env, &block_number)?;
 
         Ok(match commits {
             Some(inner) => inner.tx_receipts.get(&tx_hash).cloned(),
@@ -521,7 +527,7 @@ impl PersistentDB {
 
     pub fn get_historical_account_info(
         &mut self,
-        height: u64,
+        block_number: u64,
         address: Address,
     ) -> Result<Option<AccountInfo>, Error> {
         match self.inner.borrow().accounts_history {
@@ -530,8 +536,12 @@ impl PersistentDB {
 
                 match self.accounts_history.as_ref() {
                     Some(accounts_history) => {
-                        let data = accounts_history
-                            .get_by_block_and_address(&tx_env, &db, height, &address)?;
+                        let data = accounts_history.get_by_block_and_address(
+                            &tx_env,
+                            &db,
+                            block_number,
+                            &address,
+                        )?;
 
                         match data {
                             Some(data) => Ok(Some(AccountInfo {
@@ -738,7 +748,7 @@ impl PersistentDB {
         commit_data: &Option<CommitData>,
         results: &BTreeMap<B256, ExecutionResult>,
     ) -> Result<(), Error> {
-        assert!(!self.is_height_committed(key.0));
+        assert!(!self.is_block_committed(key.0));
 
         let mut rwtxn = self.env.write_txn()?;
         let inner = self.inner.borrow_mut();
@@ -898,18 +908,18 @@ impl PersistentDB {
             //
             if let Some(commit_data) = commit_data {
                 let CommitData {
-                    block_id,
+                    block_hash,
                     block,
                     proof,
-                    transaction_ids,
+                    transaction_hashes,
                     transactions,
                 } = commit_data;
 
                 // Update blocks
                 inner.blocks.put(rwtxn, &key.0, &block)?;
                 inner
-                    .blocks_id_height
-                    .put(rwtxn, &HashWrapper(*block_id), &key.0)?;
+                    .blocks_hash_number
+                    .put(rwtxn, &HashWrapper(*block_hash), &key.0)?;
 
                 // Update proofs
                 inner.proofs.put(rwtxn, &key.0, proof)?;
@@ -917,11 +927,11 @@ impl PersistentDB {
                 // Update transactions
                 for (sequence, transaction) in transactions.iter().enumerate() {
                     let key = format!("{}-{}", key.0, sequence);
-                    let transaction_id = transaction_ids[sequence];
+                    let transaction_hash = transaction_hashes[sequence];
 
                     inner
-                        .transactions_id_key
-                        .put(rwtxn, &HashWrapper(transaction_id), &key)?;
+                        .transactions_hash_key
+                        .put(rwtxn, &HashWrapper(transaction_hash), &key)?;
 
                     inner
                         .transactions
@@ -971,35 +981,41 @@ impl PersistentDB {
         Ok(())
     }
 
-    pub fn is_height_committed(&self, height: u64) -> bool {
+    pub fn is_block_committed(&self, block_number: u64) -> bool {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
 
-        inner.commits.get(&rtxn, &height).is_ok_and(|v| v.is_some())
+        inner
+            .commits
+            .get(&rtxn, &block_number)
+            .is_ok_and(|v| v.is_some())
     }
 
     pub fn get_committed_receipt(
         &self,
-        height: u64,
+        block_number: u64,
         tx_hash: B256,
     ) -> Result<(bool, Option<TxReceipt>), Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
 
-        match inner.commits.get(&rtxn, &height)? {
+        match inner.commits.get(&rtxn, &block_number)? {
             Some(receipts) => Ok((true, receipts.tx_receipts.get(&tx_hash).cloned())),
             None => Ok((false, None)),
         }
     }
 
-    pub fn get_committed_hashes(&self, height: u64) -> Result<Option<(B256, B256, B256)>, Error> {
+    pub fn get_committed_hashes(
+        &self,
+        block_number: u64,
+    ) -> Result<Option<(B256, B256, B256)>, Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
 
-        match inner.commits.get(&rtxn, &height)? {
+        match inner.commits.get(&rtxn, &block_number)? {
             Some(receipts) => Ok(Some((
                 receipts.accounts_hash,
                 receipts.contracts_hash,
@@ -1028,36 +1044,38 @@ impl PersistentDB {
                 .get(&rtxn, &StaticStringWrapper("total_round"))?,
         );
 
-        let height = match inner.blocks.last(&rtxn)? {
-            Some((height, _)) => height,
+        let block_number = match inner.blocks.last(&rtxn)? {
+            Some((block_number, _)) => block_number,
             None => 0,
         };
 
-        Ok((height, total_round))
+        Ok((block_number, total_round))
     }
 
-    pub fn get_block_header_bytes(&self, height: u64) -> Result<Option<Bytes>, Error> {
+    pub fn get_block_header_bytes(&self, block_number: u64) -> Result<Option<Bytes>, Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
 
-        Ok(inner.blocks.get(&rtxn, &height)?)
+        Ok(inner.blocks.get(&rtxn, &block_number)?)
     }
 
-    pub fn get_block_height_by_id(&self, id: B256) -> Result<Option<u64>, Error> {
+    pub fn get_block_number_by_hash(&self, block_hash: B256) -> Result<Option<u64>, Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
 
-        Ok(inner.blocks_id_height.get(&rtxn, &HashWrapper(id))?)
+        Ok(inner
+            .blocks_hash_number
+            .get(&rtxn, &HashWrapper(block_hash))?)
     }
 
-    pub fn get_proof_bytes(&self, height: u64) -> Result<Option<Bytes>, Error> {
+    pub fn get_proof_bytes(&self, block_number: u64) -> Result<Option<Bytes>, Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
 
-        Ok(inner.proofs.get(&rtxn, &height)?)
+        Ok(inner.proofs.get(&rtxn, &block_number)?)
     }
 
     pub fn get_transaction_bytes(&self, key: String) -> Result<Option<Bytes>, Error> {
@@ -1068,12 +1086,14 @@ impl PersistentDB {
         Ok(inner.transactions.get(&rtxn, &StringWrapper(key))?)
     }
 
-    pub fn get_transaction_key_by_id(&self, id: B256) -> Result<Option<String>, Error> {
+    pub fn get_transaction_key_by_hash(&self, tx_hash: B256) -> Result<Option<String>, Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
 
-        Ok(inner.transactions_id_key.get(&rtxn, &HashWrapper(id))?)
+        Ok(inner
+            .transactions_hash_key
+            .get(&rtxn, &HashWrapper(tx_hash))?)
     }
 }
 
@@ -1411,9 +1431,9 @@ fn test_next_map_size() {
 
 #[test]
 fn test_resize_on_commit() {
-    let create_large_commit = |height: u64, n: usize| {
+    let create_large_commit = |block_number: u64, n: usize| {
         let mut buf = vec![0; 32];
-        buf[0..8].copy_from_slice(&height.to_le_bytes());
+        buf[0..8].copy_from_slice(&block_number.to_le_bytes());
         let address = Address::from_word(ethers_core::utils::keccak256(buf).into());
 
         let mut state = HashMap::new();
@@ -1443,7 +1463,7 @@ fn test_resize_on_commit() {
         );
 
         PendingCommit {
-            key: CommitKey(height, 0, B256::ZERO),
+            key: CommitKey(block_number, 0, B256::ZERO),
             transitions: TransitionState { transitions: state },
             ..Default::default()
         }
@@ -1577,7 +1597,7 @@ fn test_read_receipts() {
     let db =
         PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
 
-    let target_height = 100;
+    let target_block = 100;
     let mut total_receipts = 0;
 
     {
@@ -1592,14 +1612,14 @@ fn test_read_receipts() {
             B256::from(U256::from(hasher.finish() + offset))
         }
 
-        for i in 0..target_height {
-            let height = (i + 1) as u64;
+        for i in 0..target_block {
+            let block_number = (i + 1) as u64;
 
             let receipts: HashMap<B256, TxReceipt> = HashMap::from([
-                (random_b256(height, 0), TxReceipt::default()),
-                (random_b256(height, 1), TxReceipt::default()),
-                (random_b256(height, 2), TxReceipt::default()),
-                (random_b256(height, 3), TxReceipt::default()),
+                (random_b256(block_number, 0), TxReceipt::default()),
+                (random_b256(block_number, 1), TxReceipt::default()),
+                (random_b256(block_number, 2), TxReceipt::default()),
+                (random_b256(block_number, 3), TxReceipt::default()),
             ]);
 
             total_receipts += receipts.len();
@@ -1609,7 +1629,7 @@ fn test_read_receipts() {
                 .commits
                 .put(
                     &mut wtxn,
-                    &height,
+                    &block_number,
                     &CommitReceipts {
                         tx_receipts: receipts,
                         ..Default::default()
@@ -1623,13 +1643,13 @@ fn test_read_receipts() {
     const LIMIT: u64 = 7;
     let mut offset = 0;
 
-    let mut read_height = 0;
+    let mut read_block_number = 0;
     let mut read_receipts = 0;
 
     loop {
         let (next, items) = db.get_receipts(offset, LIMIT).unwrap();
-        for (height, receipts) in items {
-            read_height = height;
+        for (block_number, receipts) in items {
+            read_block_number = block_number;
             read_receipts += receipts.len();
         }
 
@@ -1647,6 +1667,6 @@ fn test_read_receipts() {
         }
     }
 
-    assert_eq!(read_height, target_height);
+    assert_eq!(read_block_number, target_block);
     assert_eq!(read_receipts, total_receipts);
 }

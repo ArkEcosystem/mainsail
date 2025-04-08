@@ -102,7 +102,7 @@ fn test_account_history() {
 
     let history_db = &db.inner.borrow().accounts_history.unwrap();
 
-    // Height 1
+    // Block 1
     history
         .insert(
             &mut txn,
@@ -129,7 +129,7 @@ fn test_account_history() {
         )
         .unwrap();
 
-    // Height 2
+    // Block 2
     history
         .insert(
             &mut txn,
@@ -156,11 +156,11 @@ fn test_account_history() {
         )
         .unwrap();
 
-    // Height 3 - 4 (empty)
+    // Block 3 - 4 (empty)
     history.insert(&mut txn, history_db, 3, vec![]).unwrap();
     history.insert(&mut txn, history_db, 4, vec![]).unwrap();
 
-    // Height 5
+    // Block 5
     history
         .insert(
             &mut txn,
@@ -187,37 +187,37 @@ fn test_account_history() {
         )
         .unwrap();
 
-    // Assert Account 1 at respective heights (1 - 5)
-    for (height, address, balance, nonce) in vec![
-        // Height 1
+    // Assert Account 1 at respective blocks (1 - 5)
+    for (block_number, address, balance, nonce) in vec![
+        // Block 1
         (
             1,
             revm::primitives::address!("0000000000000000000000000000000000000001"),
             U256::from(1),
             1,
         ),
-        // Height 2
+        // Block 2
         (
             2,
             revm::primitives::address!("0000000000000000000000000000000000000001"),
             U256::from(2),
             1,
         ),
-        // Height 3 (unchanged since height 2)
+        // Block 3 (unchanged since block_number 2)
         (
             3,
             revm::primitives::address!("0000000000000000000000000000000000000001"),
             U256::from(2),
             1,
         ),
-        // Height 4 (unchanged since height 2)
+        // Block 4 (unchanged since block_number 2)
         (
             4,
             revm::primitives::address!("0000000000000000000000000000000000000001"),
             U256::from(2),
             1,
         ),
-        // Height 5
+        // Block 5
         (
             5,
             revm::primitives::address!("0000000000000000000000000000000000000001"),
@@ -226,7 +226,7 @@ fn test_account_history() {
         ),
     ] {
         let account = history
-            .get_by_block_and_address(&mut txn, history_db, height, &address)
+            .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
 
         assert!(account.is_some_and(|a| a
@@ -237,37 +237,37 @@ fn test_account_history() {
             }));
     }
 
-    // Assert Account 2 at respective heights (1 - 5)
-    for (height, address, balance, nonce) in vec![
-        // Height 1
+    // Assert Account 2 at respective block_numbers (1 - 5)
+    for (block_number, address, balance, nonce) in vec![
+        // Block 1
         (
             1,
             revm::primitives::address!("0000000000000000000000000000000000000002"),
             U256::from(2),
             1,
         ),
-        // Height 2 (unchanged since height 1)
+        // Block 2 (unchanged since block_number 1)
         (
             2,
             revm::primitives::address!("0000000000000000000000000000000000000002"),
             U256::from(2),
             1,
         ),
-        // Height 3 (unchanged since height 1)
+        // Block 3 (unchanged since block_number 1)
         (
             3,
             revm::primitives::address!("0000000000000000000000000000000000000002"),
             U256::from(2),
             1,
         ),
-        // Height 4 (unchanged since height 1)
+        // Block 4 (unchanged since block_number 1)
         (
             4,
             revm::primitives::address!("0000000000000000000000000000000000000002"),
             U256::from(2),
             1,
         ),
-        // Height 5 (unchanged since height 1)
+        // Block 5 (unchanged since block_number 1)
         (
             5,
             revm::primitives::address!("0000000000000000000000000000000000000002"),
@@ -276,7 +276,7 @@ fn test_account_history() {
         ),
     ] {
         let account = history
-            .get_by_block_and_address(&mut txn, history_db, height, &address)
+            .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
 
         assert!(account.is_some_and(|a| a
@@ -287,43 +287,43 @@ fn test_account_history() {
             }));
     }
 
-    // Assert Account 3 at respective heights (1 - 5)
-    for (height, address) in vec![
-        // Height 1 - non existent
+    // Assert Account 3 at respective block_numbers (1 - 5)
+    for (block_number, address) in vec![
+        // Block 1 - non existent
         (
             1,
             revm::primitives::address!("0000000000000000000000000000000000000003"),
         ),
     ] {
         let account = history
-            .get_by_block_and_address(&mut txn, history_db, height, &address)
+            .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
         assert!(account.is_none());
     }
 
-    for (height, address, balance, nonce) in vec![
-        // Height 2
+    for (block_number, address, balance, nonce) in vec![
+        // Block 2
         (
             2,
             revm::primitives::address!("0000000000000000000000000000000000000003"),
             U256::from(3),
             3,
         ),
-        // Height 3 (unchanged since height 2)
+        // Block 3 (unchanged since block_number 2)
         (
             3,
             revm::primitives::address!("0000000000000000000000000000000000000003"),
             U256::from(3),
             3,
         ),
-        // Height 4 (unchanged since height 2)
+        // Block 4 (unchanged since block_number 2)
         (
             4,
             revm::primitives::address!("0000000000000000000000000000000000000003"),
             U256::from(3),
             3,
         ),
-        // Height 5 (unchanged since height 2)
+        // Block 5 (unchanged since block_number 2)
         (
             5,
             revm::primitives::address!("0000000000000000000000000000000000000003"),
@@ -332,7 +332,7 @@ fn test_account_history() {
         ),
     ] {
         let account = history
-            .get_by_block_and_address(&mut txn, history_db, height, &address)
+            .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
 
         assert!(account.is_some_and(|a| a
@@ -343,9 +343,9 @@ fn test_account_history() {
             }));
     }
 
-    // Assert Account 4 at respective heights (1 - 5)
-    for (height, address) in vec![
-        // Height 1 - non existent
+    // Assert Account 4 at respective block_numbers (1 - 5)
+    for (block_number, address) in vec![
+        // Block 1 - non existent
         (
             1,
             revm::primitives::address!("0000000000000000000000000000000000000004"),
@@ -364,13 +364,13 @@ fn test_account_history() {
         ),
     ] {
         let account = history
-            .get_by_block_and_address(&mut txn, history_db, height, &address)
+            .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
         assert!(account.is_none());
     }
 
-    for (height, address, balance, nonce) in vec![
-        // Height 5
+    for (block_number, address, balance, nonce) in vec![
+        // Block 5
         (
             5,
             revm::primitives::address!("0000000000000000000000000000000000000004"),
@@ -379,7 +379,7 @@ fn test_account_history() {
         ),
     ] {
         let account = history
-            .get_by_block_and_address(&mut txn, history_db, height, &address)
+            .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
 
         assert!(account.is_some_and(|a| a
@@ -410,7 +410,7 @@ fn test_accounts_history_capacity() {
 
     for i in 0..5 {
         println!("writing i... {}", i);
-        // Height 1
+        // Block 1
         history
             .insert(
                 &mut txn,
@@ -439,27 +439,27 @@ fn test_accounts_history_capacity() {
     }
 
     // Assert accounts not available below capacity
-    for (height, address) in vec![
-        // Height 0
+    for (block_number, address) in vec![
+        // Block 0
         (
             0,
             revm::primitives::address!("0000000000000000000000000000000000000001"),
         ),
-        // Height 1
+        // Block 1
         (
             1,
             revm::primitives::address!("0000000000000000000000000000000000000001"),
         ),
     ] {
         let account = history
-            .get_by_block_and_address(&mut txn, history_db, height, &address)
+            .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
         assert!(account.is_none());
     }
 
-    // Assert accounts found at respective heights (2+)
-    for (height, address, balance, nonce) in vec![
-        // Height 2
+    // Assert accounts found at respective block_numbers (2+)
+    for (block_number, address, balance, nonce) in vec![
+        // Block 2
         (
             2,
             revm::primitives::address!("0000000000000000000000000000000000000001"),
@@ -472,7 +472,7 @@ fn test_accounts_history_capacity() {
             U256::from(4),
             4,
         ),
-        // Height 3
+        // Block 3
         (
             3,
             revm::primitives::address!("0000000000000000000000000000000000000001"),
@@ -485,7 +485,7 @@ fn test_accounts_history_capacity() {
             U256::from(5),
             5,
         ),
-        // Height 4
+        // Block 4
         (
             4,
             revm::primitives::address!("0000000000000000000000000000000000000001"),
@@ -500,7 +500,7 @@ fn test_accounts_history_capacity() {
         ),
     ] {
         let account = history
-            .get_by_block_and_address(&mut txn, history_db, height, &address)
+            .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
 
         assert!(account.is_some_and(|a| a
@@ -513,7 +513,7 @@ fn test_accounts_history_capacity() {
 
     // Write empty blocks until everything is evicted
     for i in 5..10 {
-        // Height 1
+        // Block 1
         history
             .insert(&mut txn, history_db, i as u64, vec![])
             .unwrap();
