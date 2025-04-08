@@ -48,7 +48,7 @@ export class ValidatorRoundsController extends Controller {
 		return this.respondWithResource(validatorRounds, ValidatorRoundResource, false);
 	}
 
-	public async delegates(request: Hapi.Request) {
+	public async validators(request: Hapi.Request) {
 		const round = await this.validatorRoundRepositoryFactory()
 			.createQueryBuilder()
 			.select()

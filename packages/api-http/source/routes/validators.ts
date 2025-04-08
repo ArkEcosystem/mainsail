@@ -3,18 +3,18 @@ import { Schemas } from "@mainsail/api-common";
 import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-import { DelegatesController } from "../controllers/delegates.js";
+import { ValidatorsController } from "../controllers/validators.js";
 import {
 	blockSortingSchema,
-	delegateCriteriaSchema,
-	delegateSortingSchema,
+	validatorCriteriaSchema,
+	validatorSortingSchema,
 	walletCriteriaSchema,
 	walletParamSchema as walletParameterSchema,
 	walletSortingSchema,
 } from "../schemas/index.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
-	const controller = server.app.app.resolve(DelegatesController);
+	const controller = server.app.app.resolve(ValidatorsController);
 	server.bind(controller);
 
 	server.route({
@@ -26,12 +26,12 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				query: Joi.object()
-					.concat(delegateCriteriaSchema)
-					.concat(delegateSortingSchema)
+					.concat(validatorCriteriaSchema)
+					.concat(validatorSortingSchema)
 					.concat(Schemas.pagination),
 			},
 		},
-		path: "/delegates",
+		path: "/validators",
 	});
 
 	server.route({
@@ -44,7 +44,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				}),
 			},
 		},
-		path: "/delegates/{id}",
+		path: "/validators/{id}",
 	});
 
 	server.route({
@@ -61,7 +61,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				query: Joi.object().concat(walletCriteriaSchema).concat(walletSortingSchema).concat(Schemas.pagination),
 			},
 		},
-		path: "/delegates/{id}/voters",
+		path: "/validators/{id}/voters",
 	});
 
 	server.route({
@@ -86,6 +86,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					.concat(Schemas.pagination),
 			},
 		},
-		path: "/delegates/{id}/blocks",
+		path: "/validators/{id}/blocks",
 	});
 };

@@ -39,7 +39,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.delegates(request),
+		handler: (request: Hapi.Request) => controller.validators(request),
 		method: "GET",
 		options: {
 			validate: {
@@ -48,6 +48,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				}),
 			},
 		},
-		path: "/rounds/{id}/delegates",
+		path: "/rounds/{id}/validators",
 	});
 };

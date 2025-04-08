@@ -64,27 +64,27 @@ export type WalletCriteria = {
 
 export type OrWalletCriteria = OrCriteria<WalletCriteria>;
 
-export type DelegateResourceLastBlock = {
+export type ValidatorResourceLastBlock = {
 	id?: OrEqualCriteria<string>;
 	number?: OrNumericCriteria<number>;
 };
 
-export type DelegateForged = {
+export type ValidatorForged = {
 	fees?: OrNumericCriteria<string>;
 	rewards?: OrNumericCriteria<string>;
 	total?: OrNumericCriteria<string>;
 };
 
-export type DelegateProduction = {
+export type ValidatorProduction = {
 	approval?: OrNumericCriteria<number>;
 };
 
-export type DelegateBlocks = {
+export type ValidatorBlocks = {
 	produced?: OrNumericCriteria<number>;
-	last?: DelegateResourceLastBlock;
+	last?: ValidatorResourceLastBlock;
 };
 
-export type DelegateCriteria = {
+export type ValidatorCriteria = {
 	address?: OrEqualCriteria<string>;
 	publicKey?: OrEqualCriteria<string>;
 	balance?: OrNumericCriteria<string>;
@@ -93,14 +93,14 @@ export type DelegateCriteria = {
 	rank?: OrEqualCriteria<number>;
 	isResigned?: OrEqualCriteria<boolean>;
 
-	forged?: DelegateForged;
-	production?: DelegateProduction;
-	blocks?: DelegateBlocks;
+	forged?: ValidatorForged;
+	production?: ValidatorProduction;
+	blocks?: ValidatorBlocks;
 
 	attributes?: OrContainsCriteria<Record<string, any>>;
 };
 
-export type OrDelegateCriteria = OrCriteria<DelegateCriteria>;
+export type OrValidatorCriteria = OrCriteria<ValidatorCriteria>;
 
 export type PeerCriteria = {
 	ip?: OrEqualCriteria<string>;

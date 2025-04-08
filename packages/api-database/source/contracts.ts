@@ -116,8 +116,8 @@ export type WalletRepositoryExtension = {
 		options?: Options,
 	): Promise<ResultsPage<Wallet>>;
 
-	findManyDelegatesByCritera(
-		delegateCriteria: Criteria.OrDelegateCriteria,
+	findManyValidatorsByCritera(
+		validatorCriteria: Criteria.OrValidatorCriteria,
 		sorting: Sorting,
 		pagination: Pagination,
 		options?: Options,

@@ -1,6 +1,6 @@
 import { RepositoryDataSource, WalletRepository, WalletRepositoryExtension } from "../contracts.js";
 import { Wallet } from "../models/wallet.js";
-import { DelegateFilter } from "../search/filters/delegate-filter.js";
+import { ValidatorFilter } from "../search/filters/validator-filter.js";
 import { WalletFilter } from "../search/filters/index.js";
 import { Criteria, Options, Pagination, ResultsPage, SortFragment, Sorting } from "../search/types/index.js";
 import { makeExtendedRepository } from "./repository-extension.js";
@@ -46,13 +46,13 @@ export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRe
 			);
 		},
 
-		async findManyDelegatesByCritera(
-			delegateCriteria: Criteria.OrDelegateCriteria,
+		async findManyValidatorsByCritera(
+			validatorCriteria: Criteria.OrValidatorCriteria,
 			sorting: Sorting,
 			pagination: Pagination,
 			options?: Options,
 		): Promise<ResultsPage<Wallet>> {
-			const walletExpression = await DelegateFilter.getExpression(delegateCriteria);
+			const walletExpression = await ValidatorFilter.getExpression(validatorCriteria);
 			return this.listByExpression(
 				walletExpression,
 				convertToJsonbSorting(sorting, [

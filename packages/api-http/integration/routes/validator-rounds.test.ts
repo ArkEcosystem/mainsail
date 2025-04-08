@@ -88,9 +88,9 @@ describe<{
 		}
 	});
 
-	it("/rounds/{id}/delegates", async () => {
+	it("/rounds/{id}/validators", async () => {
 		await apiContext.validatorRoundRepository.save(validatorRounds);
-		const { statusCode, data } = await request("/rounds/1/delegates", options);
+		const { statusCode, data } = await request("/rounds/1/validators", options);
 		assert.equal(statusCode, 200);
 		assert.equal(data.data, validatorRound);
 	});

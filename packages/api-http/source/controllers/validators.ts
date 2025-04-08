@@ -8,12 +8,12 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
-import { BlockResource, DelegateResource, WalletResource } from "../resources/index.js";
-import { delegateCriteriaSchemaObject, walletCriteriaSchemaObject } from "../schemas/index.js";
+import { BlockResource, ValidatorResource, WalletResource } from "../resources/index.js";
+import { validatorCriteriaSchemaObject, walletCriteriaSchemaObject } from "../schemas/index.js";
 import { Controller } from "./controller.js";
 
 @injectable()
-export class DelegatesController extends Controller {
+export class ValidatorsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
 
@@ -22,37 +22,37 @@ export class DelegatesController extends Controller {
 		const sorting = this.getListingOrder(request);
 		const criteria = this.getQueryCriteria(
 			request.query,
-			delegateCriteriaSchemaObject,
-		) as Search.Criteria.DelegateCriteria;
+			validatorCriteriaSchemaObject,
+		) as Search.Criteria.ValidatorCriteria;
 		const options = this.getListingOptions();
 
-		const wallets = await this.walletRepositoryFactory().findManyDelegatesByCritera(
+		const wallets = await this.walletRepositoryFactory().findManyValidatorsByCritera(
 			criteria,
 			sorting,
 			pagination,
 			options,
 		);
 
-		return this.toPagination(wallets, DelegateResource, request.query.transform);
+		return this.toPagination(wallets, ValidatorResource, request.query.transform);
 	}
 
 	public async show(request: Hapi.Request) {
 		const walletId = request.params.id as string;
 
-		const delegate = await this.getWallet(walletId);
-		if (!delegate) {
-			return Boom.notFound("Delegate not found");
+		const validator = await this.getWallet(walletId);
+		if (!validator) {
+			return Boom.notFound("Validator not found");
 		}
 
-		return this.respondWithResource(delegate, DelegateResource, request.params.transform);
+		return this.respondWithResource(validator, ValidatorResource, request.params.transform);
 	}
 
 	public async voters(request: Hapi.Request) {
 		const walletId = request.params.id as string;
 
-		const delegate = await this.getWallet(walletId);
-		if (!delegate) {
-			return Boom.notFound("Delegate not found");
+		const validator = await this.getWallet(walletId);
+		if (!validator) {
+			return Boom.notFound("Validator not found");
 		}
 
 		const pagination = this.getQueryPagination(request.query);
@@ -67,7 +67,7 @@ export class DelegatesController extends Controller {
 			{
 				...criteria,
 				attributes: {
-					vote: delegate.address,
+					vote: validator.address,
 				},
 			},
 			sorting,
@@ -81,14 +81,14 @@ export class DelegatesController extends Controller {
 	public async blocks(request: Hapi.Request) {
 		const walletId = request.params.id as string;
 
-		const delegate = await this.getWallet(walletId);
-		if (!delegate || !delegate.publicKey) {
-			return Boom.notFound("Delegate not found");
+		const validator = await this.getWallet(walletId);
+		if (!validator || !validator.publicKey) {
+			return Boom.notFound("Validator not found");
 		}
 
 		const criteria: Search.Criteria.BlockCriteria = {
 			...request.query,
-			proposer: delegate.address,
+			proposer: validator.address,
 		};
 
 		const pagination = this.getListingPage(request);
@@ -99,7 +99,7 @@ export class DelegatesController extends Controller {
 		const state = await this.getState();
 
 		return this.toPagination(
-			await this.enrichBlockResult(blocks, { generators: { [delegate.address]: delegate }, state }),
+			await this.enrichBlockResult(blocks, { generators: { [validator.address]: validator }, state }),
 			BlockResource,
 			request.query.transform,
 		);

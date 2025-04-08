@@ -1,6 +1,6 @@
 export * from "./api-node.js";
 export * from "./block.js";
-export * from "./delegate.js";
+export * from "./validator.js";
 export * from "./legacy-cold-wallet.js";
 export * from "./peer.js";
 export * from "./receipt.js";

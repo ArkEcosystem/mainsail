@@ -1,21 +1,21 @@
 import { Wallet } from "../../models/index.js";
 import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 import {
-	DelegateBlocks,
-	DelegateCriteria,
-	DelegateForged,
-	DelegateProduction,
-	DelegateResourceLastBlock,
-	OrDelegateCriteria,
+	ValidatorBlocks,
+	ValidatorCriteria,
+	ValidatorForged,
+	ValidatorProduction,
+	ValidatorResourceLastBlock,
+	OrValidatorCriteria,
 	OrNumericCriteria,
 } from "../types/criteria.js";
 import { Expression, JsonFieldCastType } from "../types/expressions.js";
 import { WalletFilter } from "./wallet-filter.js";
 
-export class DelegateFilter {
-	public static async getExpression(...criteria: OrDelegateCriteria[]): Promise<Expression<Wallet>> {
+export class ValidatorFilter {
+	public static async getExpression(...criteria: OrValidatorCriteria[]): Promise<Expression<Wallet>> {
 		const expressions = await Promise.all(
-			criteria.map((c) => handleOrCriteria(c, (c) => this.handleDelegateCriteria(c))),
+			criteria.map((c) => handleOrCriteria(c, (c) => this.handleValidatorCriteria(c))),
 		);
 
 		return optimizeExpression({
@@ -32,7 +32,7 @@ export class DelegateFilter {
 		});
 	}
 
-	private static async handleDelegateCriteria(criteria: DelegateCriteria): Promise<Expression<Wallet>> {
+	private static async handleValidatorCriteria(criteria: ValidatorCriteria): Promise<Expression<Wallet>> {
 		return handleAndCriteria(criteria, async (key) => {
 			switch (key) {
 				case "address": {
@@ -100,7 +100,7 @@ export class DelegateFilter {
 		});
 	}
 
-	private static async handleForgedCriteria(criteria?: DelegateForged): Promise<Expression<Wallet>> {
+	private static async handleForgedCriteria(criteria?: ValidatorForged): Promise<Expression<Wallet>> {
 		if (!criteria) {
 			return { op: "false" };
 		}
@@ -114,7 +114,7 @@ export class DelegateFilter {
 				),
 			);
 
-		for (const item of criteria as DelegateForged[]) {
+		for (const item of criteria as ValidatorForged[]) {
 			if (item.fees) {
 				addExpression(item.fees, "validatorForgedFees");
 			}
@@ -131,7 +131,7 @@ export class DelegateFilter {
 		return { expressions: await Promise.all(expressions), op: "or" };
 	}
 
-	private static async handleBlocksCriteria(criteria?: DelegateBlocks): Promise<Expression<Wallet>> {
+	private static async handleBlocksCriteria(criteria?: ValidatorBlocks): Promise<Expression<Wallet>> {
 		if (!criteria) {
 			return { op: "false" };
 		}
@@ -145,7 +145,7 @@ export class DelegateFilter {
 				),
 			);
 
-		for (const item of criteria as DelegateBlocks[]) {
+		for (const item of criteria as ValidatorBlocks[]) {
 			if (item.produced) {
 				addExpression(item.produced, "validatorProducedBlocks");
 			}
@@ -158,7 +158,7 @@ export class DelegateFilter {
 		return { expressions: await Promise.all(expressions), op: "or" };
 	}
 
-	private static async handleLastBlockCriteria(criteria?: DelegateResourceLastBlock): Promise<Expression<Wallet>> {
+	private static async handleLastBlockCriteria(criteria?: ValidatorResourceLastBlock): Promise<Expression<Wallet>> {
 		if (!criteria) {
 			return { op: "false" };
 		}
@@ -176,7 +176,7 @@ export class DelegateFilter {
 				),
 			);
 
-		for (const item of criteria as DelegateResourceLastBlock[]) {
+		for (const item of criteria as ValidatorResourceLastBlock[]) {
 			if (item.id) {
 				addExpression(item.id, "validatorLastBlock.id");
 			}
@@ -189,7 +189,7 @@ export class DelegateFilter {
 		return { expressions: await Promise.all(expressions), op: "or" };
 	}
 
-	private static async handleProductionCriteria(criteria?: DelegateProduction): Promise<Expression<Wallet>> {
+	private static async handleProductionCriteria(criteria?: ValidatorProduction): Promise<Expression<Wallet>> {
 		if (!criteria) {
 			return { op: "false" };
 		}
@@ -203,7 +203,7 @@ export class DelegateFilter {
 				),
 			);
 
-		for (const item of criteria as DelegateProduction[]) {
+		for (const item of criteria as ValidatorProduction[]) {
 			if (item.approval) {
 				addExpression(item.approval, "validatorApproval");
 			}
