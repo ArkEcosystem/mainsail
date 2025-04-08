@@ -33,8 +33,8 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
 		const commitKey: Contracts.Evm.CommitKey = {
-			blockId: block.header.hash,
-			height: BigInt(block.header.number),
+			blockHash: block.header.hash,
+			blockNumber: BigInt(block.header.number),
 			round: BigInt(block.header.round),
 		};
 

@@ -90,15 +90,15 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 		return this.#evm.initializeGenesis({
 			account: info.account,
 			deployerAccount: info.deployerAccount,
-			initialHeight: info.initialHeight,
+			initialBlockNumber: info.initialBlockNumber,
 			initialSupply: info.initialSupply,
 			usernameContract: info.usernameContract,
 			validatorContract: info.validatorContract,
 		});
 	}
 
-	public async getAccountInfo(address: string, height?: bigint): Promise<Contracts.Evm.AccountInfo> {
-		return this.#evm.getAccountInfo(address, height);
+	public async getAccountInfo(address: string, blockNumber?: bigint): Promise<Contracts.Evm.AccountInfo> {
+		return this.#evm.getAccountInfo(address, blockNumber);
 	}
 
 	public async getAccountInfoExtended(
@@ -131,8 +131,8 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 		return this.#evm.getReceipts(offset, limit);
 	}
 
-	public async getReceipt(height: bigint, txHash: string): Promise<Contracts.Evm.GetReceiptResult> {
-		return this.#evm.getReceipt(height, txHash);
+	public async getReceipt(blockNumber: bigint, txHash: string): Promise<Contracts.Evm.GetReceiptResult> {
+		return this.#evm.getReceipt(blockNumber, txHash);
 	}
 
 	public async updateRewardsAndVotes(context: Contracts.Evm.UpdateRewardsAndVotesContext): Promise<void> {
@@ -144,15 +144,18 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const { number, round, hash: blockId } = unit.getBlock().header;
+		const { number, round, hash } = unit.getBlock().header;
 		const commitData = await this.#prepareCommitData(unit);
 
-		const result = await this.#evm.commit({ blockId, height: BigInt(number), round: BigInt(round) }, commitData);
+		const result = await this.#evm.commit(
+			{ blockHash: hash, blockNumber: BigInt(number), round: BigInt(round) },
+			commitData,
+		);
 		unit.setAccountUpdates(result.dirtyAccounts);
 	}
 
-	public async codeAt(address: string, height?: bigint): Promise<string> {
-		return this.#evm.codeAt(address, height);
+	public async codeAt(address: string, blockNumber?: bigint): Promise<string> {
+		return this.#evm.codeAt(address, blockNumber);
 	}
 
 	public async storageAt(address: string, slot: bigint): Promise<string> {
@@ -167,17 +170,17 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 		return this.#evm.logsBloom(commitKey);
 	}
 
-	public async getState(): Promise<{ height: number; totalRound: number }> {
+	public async getState(): Promise<{ blockNumber: number; totalRound: number }> {
 		const state = await this.#evm.getState();
-		return { height: Number(state.height), totalRound: Number(state.totalRound) };
+		return { blockNumber: Number(state.blockNumber), totalRound: Number(state.totalRound) };
 	}
 
 	public async getBlockHeaderBytes(height: number): Promise<Buffer | undefined> {
 		return this.#evm.getBlockHeaderBytes(BigInt(height));
 	}
 
-	public async getBlockHeightById(id: string): Promise<number | undefined> {
-		const result = await this.#evm.getBlockHeightById(id);
+	public async getBlockNumberByHash(blockHash: string): Promise<number | undefined> {
+		const result = await this.#evm.getBlockNumberByHash(blockHash);
 		if (!result) {
 			return undefined;
 		}
@@ -185,16 +188,16 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 		return Number(result);
 	}
 
-	public async getProofBytes(height: number): Promise<Buffer | undefined> {
-		return this.#evm.getProofBytes(BigInt(height));
+	public async getProofBytes(blockNumber: number): Promise<Buffer | undefined> {
+		return this.#evm.getProofBytes(BigInt(blockNumber));
 	}
 
 	public async getTransactionBytes(key: string): Promise<Buffer | undefined> {
 		return this.#evm.getTransactionBytes(key);
 	}
 
-	public async getTransactionKeyById(id: string): Promise<string | undefined> {
-		return this.#evm.getTransactionKeyById(id);
+	public async getTransactionKeyByHash(txHash: string): Promise<string | undefined> {
+		return this.#evm.getTransactionKeyByHash(txHash);
 	}
 
 	public async isEmpty(): Promise<boolean> {
@@ -209,7 +212,7 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 		const { block, serialized } = await unit.getCommit();
 
 		const {
-			header: { number: height, hash: id },
+			header: { number: height, hash },
 		} = block;
 
 		const proofSize = this.proofSize();
@@ -220,7 +223,7 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 		const blockBuffer = commitBuffer.subarray(proofSize, proofSize + headerSize);
 
 		const transactionBuffers: Buffer[] = [];
-		const transactionIds: string[] = [];
+		const transactionHashes: string[] = [];
 		for (const transaction of block.transactions) {
 			assert.number(transaction.data.transactionIndex);
 
@@ -230,14 +233,14 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 			buff.writeBytes(transaction.serialized);
 
 			transactionBuffers.push(buff.toBuffer());
-			transactionIds.push(transaction.hash);
+			transactionHashes.push(transaction.hash);
 		}
 
 		return {
 			block: blockBuffer,
-			blockId: id,
+			blockHash: hash,
 			proof: proofBuffer,
-			transactionIds,
+			transactionHashes,
 			transactions: transactionBuffers,
 		};
 	}

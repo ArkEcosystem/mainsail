@@ -1,9 +1,9 @@
 export interface Storage {
-	getState(): Promise<{ height: number; totalRound: number }>;
-	getBlockHeaderBytes(height: number): Promise<Buffer | undefined>;
-	getBlockHeightById(id: string): Promise<number | undefined>;
-	getProofBytes(height: number): Promise<Buffer | undefined>;
+	getState(): Promise<{ blockNumber: number; totalRound: number }>;
+	getBlockHeaderBytes(blockNumber: number): Promise<Buffer | undefined>;
+	getBlockNumberByHash(blockHash: string): Promise<number | undefined>;
+	getProofBytes(blockNumber: number): Promise<Buffer | undefined>;
 	getTransactionBytes(key: string): Promise<Buffer | undefined>;
-	getTransactionKeyById(id: string): Promise<string | undefined>;
+	getTransactionKeyByHash(txHash: string): Promise<string | undefined>;
 	isEmpty(): Promise<boolean>;
 }

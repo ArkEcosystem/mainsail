@@ -66,7 +66,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 			}
 		}
 
-		const commitKey = { height: BigInt(this.configuration.getHeight()), round: BigInt(0) };
+		const commitKey = { blockNumber: BigInt(this.configuration.getHeight()), round: BigInt(0) };
 
 		let maxGasLimit = data.gas ? BigInt(data.gas) : BigInt(block.maxGasLimit);
 		let minGasLimit = maxGasLimit;

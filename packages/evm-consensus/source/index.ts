@@ -32,7 +32,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		await this.app.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer).deploy({
 			generatorAddress: genesisBlock.block.proposer,
-			initialHeight: genesisBlock.block.number,
+			initialBlockNumber: genesisBlock.block.number,
 			timestamp: genesisBlock.block.timestamp,
 			totalAmount: genesisBlock.block.amount,
 		});

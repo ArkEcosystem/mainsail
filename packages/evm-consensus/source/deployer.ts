@@ -10,7 +10,7 @@ export interface GenesisBlockInfo {
 	readonly timestamp: number;
 	readonly totalAmount: string;
 	readonly generatorAddress: string;
-	readonly initialHeight: number;
+	readonly initialBlockNumber: number;
 }
 
 @injectable()
@@ -60,7 +60,7 @@ export class Deployer {
 		if (this.#needsCommit) {
 			await this.evm.onCommit({
 				commitKey,
-				getBlock: () => ({ header: { ...commitKey, number: commitKey.height } }),
+				getBlock: () => ({ header: { ...commitKey, number: commitKey.blockNumber } }),
 				setAccountUpdates: () => ({}),
 			} as any);
 		}
@@ -72,7 +72,7 @@ export class Deployer {
 		const genesisInfo = {
 			account: this.#genesisBlockInfo.generatorAddress,
 			deployerAccount: this.deployerAddress,
-			initialHeight: BigNumber.make(this.#genesisBlockInfo.initialHeight).toBigInt(),
+			initialBlockNumber: BigNumber.make(this.#genesisBlockInfo.initialBlockNumber).toBigInt(),
 			initialSupply: BigNumber.make(this.#genesisBlockInfo.totalAmount).toBigInt(),
 
 			usernameContract: ethers.getCreateAddress({ from: this.deployerAddress, nonce: 3 }), // PROXY Uses nonce 3
@@ -90,7 +90,7 @@ export class Deployer {
 
 		// Commit Key chosen in a way such that it does not conflict with blocks.
 		return {
-			commitKey: { height: BigInt(2 ** 32 + 1), round: BigInt(0) },
+			commitKey: { blockNumber: BigInt(2 ** 32 + 1), round: BigInt(0) },
 			gasLimit: BigInt(milestone.block.maxGasLimit),
 			timestamp: BigInt(this.#genesisBlockInfo.timestamp),
 			validatorAddress: this.deployerAddress,
@@ -338,7 +338,7 @@ export class Deployer {
 	}
 
 	async #processTransaction(context: Contracts.Evm.TransactionContext): Promise<Contracts.Evm.TransactionReceipt> {
-		const { receipt } = await this.evm.getReceipt(context.blockContext.commitKey.height, context.txHash);
+		const { receipt } = await this.evm.getReceipt(context.blockContext.commitKey.blockNumber, context.txHash);
 		if (receipt) {
 			return receipt;
 		}

@@ -2,7 +2,7 @@ import { Block, BlockHeader, Commit, CommitHandler, Transaction } from "./crypto
 import { ProcessableUnit } from "./processor/index.js";
 
 export interface State {
-	height: number;
+	blockNumber: number;
 	totalRound: number;
 }
 

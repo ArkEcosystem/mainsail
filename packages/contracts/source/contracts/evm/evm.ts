@@ -3,7 +3,7 @@ export interface GenesisInfo {
 	readonly deployerAccount: string;
 	readonly validatorContract: string;
 	readonly usernameContract: string;
-	readonly initialHeight: bigint;
+	readonly initialBlockNumber: bigint;
 	readonly initialSupply: bigint;
 }
 
@@ -167,9 +167,9 @@ export interface UpdateRewardsAndVotesContext {
 }
 
 export interface CommitKey {
-	readonly height: bigint;
+	readonly blockNumber: bigint;
 	readonly round: bigint;
-	readonly blockId?: string;
+	readonly blockHash?: string;
 }
 
 export interface TransactionReceipt {

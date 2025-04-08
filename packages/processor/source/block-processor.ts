@@ -68,8 +68,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			await this.evm.prepareNextCommit({
 				commitKey: {
-					blockId: block.header.hash,
-					height: BigInt(block.header.number),
+					blockHash: block.header.hash,
+					blockNumber: BigInt(block.header.number),
 					round: BigInt(block.header.round),
 				},
 			});
@@ -208,7 +208,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 
 		const stateRoot = await this.evm.stateHash(
-			{ blockId: block.header.hash, height: BigInt(block.header.number), round: BigInt(block.header.round) },
+			{
+				blockHash: block.header.hash,
+				blockNumber: BigInt(block.header.number),
+				round: BigInt(block.header.round),
+			},
 			previousStateRoot,
 		);
 
@@ -219,8 +223,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	async #verifyLogsBloom(block: Contracts.Crypto.Block): Promise<void> {
 		const logsBloom = await this.evm.logsBloom({
-			blockId: block.header.hash,
-			height: BigInt(block.header.number),
+			blockHash: block.header.hash,
+			blockNumber: BigInt(block.header.number),
 			round: BigInt(block.header.round),
 		});
 
@@ -246,8 +250,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.evm.updateRewardsAndVotes({
 			blockReward: BigNumber.make(milestone.reward).toBigInt(),
 			commitKey: {
-				blockId: block.header.hash,
-				height: BigInt(block.header.number),
+				blockHash: block.header.hash,
+				blockNumber: BigInt(block.header.number),
 				round: BigInt(block.header.round),
 			},
 			specId: milestone.evmSpec,
@@ -268,8 +272,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.evm.calculateActiveValidators({
 			activeValidators: BigNumber.make(activeValidators).toBigInt(),
 			commitKey: {
-				blockId: block.header.hash,
-				height: BigInt(block.header.number),
+				blockHash: block.header.hash,
+				blockNumber: BigInt(block.header.number),
 				round: BigInt(block.header.round),
 			},
 			specId: evmSpec,

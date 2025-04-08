@@ -68,14 +68,14 @@ export class Validator implements Contracts.Validator.Validator {
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
 		const previousBlock = this.stateStore.getLastBlock();
-		const height = previousBlock.header.number + 1;
+		const blockNumber = previousBlock.header.number + 1;
 
 		const {
 			logsBloom,
 			stateRoot: stateHash,
 			transactions,
 		} = await this.#getTransactionsForForging(generatorAddress, timestamp, {
-			height: BigInt(height),
+			blockNumber: BigInt(blockNumber),
 			round: BigInt(round),
 		});
 		return this.#makeBlock(round, generatorAddress, logsBloom, stateHash, transactions, timestamp);
