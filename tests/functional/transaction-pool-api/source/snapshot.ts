@@ -367,11 +367,11 @@ export class Snapshot {
 					await negativeBalanceChange(receipt.sender, consumedGas);
 					await incrementNonce(block.header.number, receipt.sender);
 
-					if (receipt.receipt.deployedContractAddress) {
+					if (receipt.receipt.contractAddress) {
 						// As per EIP-161, the initial nonce for a new contract starts at 1 and not 0.
 						//
 						// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-161.md#specification
-						await incrementNonce(block.header.number, receipt.receipt.deployedContractAddress);
+						await incrementNonce(block.header.number, receipt.receipt.contractAddress);
 					}
 
 					// add transferred value to recipient (if any)
