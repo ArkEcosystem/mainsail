@@ -1,13 +1,13 @@
 import { Wallet } from "../../models/index.js";
 import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 import {
+	OrNumericCriteria,
+	OrValidatorCriteria,
 	ValidatorBlocks,
 	ValidatorCriteria,
 	ValidatorForged,
 	ValidatorProduction,
 	ValidatorResourceLastBlock,
-	OrValidatorCriteria,
-	OrNumericCriteria,
 } from "../types/criteria.js";
 import { Expression, JsonFieldCastType } from "../types/expressions.js";
 import { WalletFilter } from "./wallet-filter.js";

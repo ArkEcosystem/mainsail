@@ -17,6 +17,17 @@ export const schemas: Record<
 		},
 		type: "object",
 	},
+	blockHash: {
+		$id: "blockHash",
+		allOf: [
+			{
+				$ref: "hex",
+				maxLength: 64,
+				minLength: 64,
+			},
+		],
+		type: "string",
+	},
 	blockHeader: {
 		$id: "blockHeader",
 		properties: {
@@ -54,17 +65,6 @@ export const schemas: Record<
 			"version",
 		],
 		type: "object",
-	},
-	blockHash: {
-		$id: "blockHash",
-		allOf: [
-			{
-				$ref: "hex",
-				maxLength: 64,
-				minLength: 64,
-			},
-		],
-		type: "string",
 	},
 	logsBloom: {
 		$id: "logsBloom",
