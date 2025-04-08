@@ -51,10 +51,10 @@ export class AsyncVotesIterator implements AsyncIterable<Contracts.Evm.Vote> {
 		const data = iface.encodeFunctionData("getVotes", [this.#address, VOTES_PER_REQUEST]).slice(2);
 
 		const result = await this.evm.view({
-			caller: deployerAddress,
+			from: deployerAddress,
 			data: Buffer.from(data, "hex"),
 			gasLimit: 100_000_000n,
-			recipient: consensusContractAddress,
+			to: consensusContractAddress,
 			specId: evmSpec,
 		});
 

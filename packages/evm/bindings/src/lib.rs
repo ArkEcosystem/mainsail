@@ -231,8 +231,8 @@ impl EvmInner {
                 timestamp: ctx.timestamp,
                 validator_address: ctx.validator_address,
             }),
-            caller: genesis_info.deployer_account,
-            recipient: Some(genesis_info.validator_contract),
+            from: genesis_info.deployer_account,
+            to: Some(genesis_info.validator_contract),
             data: Bytes::from(calldata.0),
             value: U256::ZERO,
             nonce: Some(nonce),
@@ -316,8 +316,8 @@ impl EvmInner {
                         timestamp: ctx.timestamp,
                         validator_address: ctx.validator_address,
                     }),
-                    caller: genesis_info.deployer_account,
-                    recipient: Some(genesis_info.validator_contract),
+                    from: genesis_info.deployer_account,
+                    to: Some(genesis_info.validator_contract),
                     data: Bytes::from(calldata.0),
                     value: U256::ZERO,
                     nonce: Some(nonce),
@@ -516,7 +516,7 @@ impl EvmInner {
                 Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
                     let mut legacy_balances = HashMap::<Address, u128>::new();
                     legacy_balances.insert(
-                        ctx.caller,
+                        ctx.from,
                         legacy_cold_wallet.balance.try_into().expect("fit u128"),
                     );
                     state_commit::apply_rewards(
@@ -552,10 +552,10 @@ impl EvmInner {
                 tx_env.gas_limit = ctx.gas_limit;
                 tx_env.gas_price = ctx.gas_price;
                 tx_env.gas_priority_fee = None;
-                tx_env.caller = ctx.caller;
+                tx_env.caller = ctx.from;
                 tx_env.value = ctx.value;
                 tx_env.nonce = ctx.nonce;
-                tx_env.kind = match ctx.recipient {
+                tx_env.kind = match ctx.to {
                     Some(recipient) => TxKind::Call(recipient),
                     None => TxKind::Create,
                 };
@@ -611,7 +611,7 @@ impl EvmInner {
             if let Some(legacy_address) = tx_ctx.legacy_address {
                 if !pending
                     .merged_legacy_cold_wallets
-                    .contains_key(&tx_ctx.caller)
+                    .contains_key(&tx_ctx.from)
                 {
                     // Make legacy balance available to account in pending commit
                     match self
@@ -625,7 +625,7 @@ impl EvmInner {
                         Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
                             let mut legacy_balances = HashMap::<Address, u128>::new();
                             legacy_balances.insert(
-                                tx_ctx.caller,
+                                tx_ctx.from,
                                 legacy_cold_wallet.balance.try_into().expect("fit u128"),
                             );
 
@@ -642,13 +642,11 @@ impl EvmInner {
 
                             pending
                                 .merged_legacy_cold_wallets
-                                .insert(tx_ctx.caller, Some((tx_ctx.tx_hash, legacy_address)));
+                                .insert(tx_ctx.from, Some((tx_ctx.tx_hash, legacy_address)));
                         }
                         _ => {
                             // Prevent subsequent look ups for same sender in same commit
-                            pending
-                                .merged_legacy_cold_wallets
-                                .insert(tx_ctx.caller, None);
+                            pending.merged_legacy_cold_wallets.insert(tx_ctx.from, None);
                         }
                     }
                 }
@@ -911,10 +909,10 @@ impl EvmInner {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or_else(|| 15_000_000);
                 tx_env.gas_price = ctx.gas_price;
                 tx_env.gas_priority_fee = None;
-                tx_env.caller = ctx.caller;
+                tx_env.caller = ctx.from;
                 tx_env.value = ctx.value;
                 tx_env.nonce = ctx.nonce.unwrap_or_default();
-                tx_env.kind = match ctx.recipient {
+                tx_env.kind = match ctx.to {
                     Some(recipient) => TxKind::Call(recipient),
                     None => TxKind::Create,
                 };

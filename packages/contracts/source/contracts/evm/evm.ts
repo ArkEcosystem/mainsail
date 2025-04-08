@@ -86,26 +86,26 @@ export interface PrepareNextCommitContext {
 }
 
 export interface PreverifyTransactionContext {
-	readonly caller: string;
+	readonly from: string;
 	readonly legacyAddress?: string;
 	/** Omit recipient when deploying a contract */
-	readonly recipient?: string;
+	readonly to?: string;
 	readonly gasLimit: bigint;
 	readonly value: bigint;
 	readonly gasPrice: bigint;
 	readonly nonce: bigint;
 	readonly data: Buffer;
 	readonly txHash: string;
-	readonly sequence?: number;
+	readonly index?: number;
 	readonly specId: SpecId;
 	readonly blockGasLimit: bigint;
 }
 
 export interface TransactionContext {
-	readonly caller: string;
+	readonly from: string;
 	readonly legacyAddress?: string;
 	/** Omit recipient when deploying a contract */
-	readonly recipient?: string;
+	readonly to?: string;
 	readonly gasLimit: bigint;
 	readonly value: bigint;
 	readonly gasPrice: bigint;
@@ -113,13 +113,13 @@ export interface TransactionContext {
 	readonly data: Buffer;
 	readonly blockContext: BlockContext;
 	readonly txHash: string;
-	readonly sequence?: number;
+	readonly index?: number;
 	readonly specId: SpecId;
 }
 
 export interface TransactionViewContext {
-	readonly caller: string;
-	readonly recipient: string;
+	readonly from: string;
+	readonly to: string;
 	readonly data: Buffer;
 	readonly specId: SpecId;
 	readonly gasLimit?: bigint;
@@ -175,8 +175,8 @@ export interface CommitKey {
 export interface TransactionReceipt {
 	readonly gasUsed: bigint;
 	readonly gasRefunded: bigint;
-	readonly success: boolean;
-	readonly deployedContractAddress?: string;
+	readonly status: number;
+	readonly contractAddress?: string;
 	readonly logs: any;
 	readonly output?: Buffer;
 

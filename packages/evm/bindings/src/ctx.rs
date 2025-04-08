@@ -19,27 +19,27 @@ pub struct JsEvmOptions {
 
 #[napi(object)]
 pub struct JsTransactionContext {
-    pub caller: JsString,
+    pub from: JsString,
     pub legacy_address: Option<JsString>,
     /// Omit recipient when deploying a contract
-    pub recipient: Option<JsString>,
+    pub to: Option<JsString>,
     pub gas_limit: JsBigInt,
     pub gas_price: JsBigInt,
     pub value: JsBigInt,
     pub nonce: JsBigInt,
     pub data: JsBuffer,
     pub tx_hash: JsString,
-    pub sequence: Option<JsNumber>,
+    pub index: Option<JsNumber>,
     pub block_context: JsBlockContext,
     pub spec_id: JsString,
 }
 
 #[napi(object)]
 pub struct JsPreverifyTransactionContext {
-    pub caller: JsString,
+    pub from: JsString,
     pub legacy_address: Option<JsString>,
     /// Omit recipient when deploying a contract
-    pub recipient: Option<JsString>,
+    pub to: Option<JsString>,
     pub gas_limit: JsBigInt,
     pub gas_price: JsBigInt,
     pub value: JsBigInt,
@@ -52,8 +52,8 @@ pub struct JsPreverifyTransactionContext {
 
 #[napi(object)]
 pub struct JsTransactionViewContext {
-    pub caller: JsString,
-    pub recipient: JsString,
+    pub from: JsString,
+    pub to: JsString,
     pub data: JsBuffer,
     pub spec_id: JsString,
     pub gas_limit: Option<JsBigInt>,
@@ -123,10 +123,10 @@ pub struct PrepareNextCommitContext {
 
 #[derive(Debug)]
 pub struct PreverifyTxContext {
-    pub caller: Address,
+    pub from: Address,
     pub legacy_address: Option<LegacyAddress>,
     /// Omit recipient when deploying a contract
-    pub recipient: Option<Address>,
+    pub to: Option<Address>,
     pub gas_limit: u64,
     pub gas_price: u128,
     pub value: U256,
@@ -139,25 +139,25 @@ pub struct PreverifyTxContext {
 
 #[derive(Debug)]
 pub struct TxContext {
-    pub caller: Address,
+    pub from: Address,
     pub legacy_address: Option<LegacyAddress>,
     /// Omit recipient when deploying a contract
-    pub recipient: Option<Address>,
+    pub to: Option<Address>,
     pub gas_limit: u64,
     pub gas_price: u128,
     pub value: U256,
     pub nonce: u64,
     pub data: Bytes,
     pub tx_hash: B256,
-    pub sequence: Option<u32>,
+    pub index: Option<u32>,
     pub block_context: BlockContext,
     pub spec_id: SpecId,
 }
 
 #[derive(Debug)]
 pub struct TxViewContext {
-    pub caller: Address,
-    pub recipient: Address,
+    pub from: Address,
+    pub to: Address,
     pub data: Bytes,
     pub spec_id: SpecId,
     pub gas_limit: Option<u64>,
@@ -207,8 +207,8 @@ pub struct EvmOptions {
 
 #[derive(Debug)]
 pub struct ExecutionContext {
-    pub caller: Address,
-    pub recipient: Option<Address>,
+    pub from: Address,
+    pub to: Option<Address>,
     pub gas_limit: Option<u64>,
     pub gas_price: u128,
     pub value: U256,
@@ -222,8 +222,8 @@ pub struct ExecutionContext {
 impl From<TxViewContext> for ExecutionContext {
     fn from(value: TxViewContext) -> Self {
         Self {
-            caller: value.caller,
-            recipient: Some(value.recipient),
+            from: value.from,
+            to: Some(value.to),
             gas_limit: value.gas_limit,
             gas_price: 0,
             value: U256::ZERO,
@@ -239,8 +239,8 @@ impl From<TxViewContext> for ExecutionContext {
 impl From<TxContext> for ExecutionContext {
     fn from(value: TxContext) -> Self {
         Self {
-            caller: value.caller,
-            recipient: value.recipient,
+            from: value.from,
+            to: value.to,
             gas_limit: Some(value.gas_limit),
             gas_price: value.gas_price,
             value: value.value,
@@ -330,8 +330,8 @@ impl TryFrom<JsTransactionContext> for TxContext {
     fn try_from(mut value: JsTransactionContext) -> std::result::Result<Self, Self::Error> {
         let buf = value.data.into_value()?;
 
-        let recipient = if let Some(recipient) = value.recipient {
-            Some(utils::create_address_from_js_string(recipient)?)
+        let to = if let Some(to) = value.to {
+            Some(utils::create_address_from_js_string(to)?)
         } else {
             None
         };
@@ -342,23 +342,23 @@ impl TryFrom<JsTransactionContext> for TxContext {
             None
         };
 
-        let sequence = if let Some(sequence) = value.sequence {
-            Some(sequence.get_uint32()?)
+        let index = if let Some(index) = value.index {
+            Some(index.get_uint32()?)
         } else {
             None
         };
 
         let tx_ctx = TxContext {
-            recipient,
+            to,
             gas_limit: value.gas_limit.try_into()?,
             gas_price: value.gas_price.get_u128()?.1,
-            caller: utils::create_address_from_js_string(value.caller)?,
+            from: utils::create_address_from_js_string(value.from)?,
             legacy_address,
             value: utils::convert_bigint_to_u256(value.value)?,
             nonce: value.nonce.get_u64()?.0,
             data: Bytes::from(buf.as_ref().to_owned()),
             tx_hash: utils::convert_string_to_b256(value.tx_hash)?,
-            sequence,
+            index,
             block_context: value.block_context.try_into()?,
             spec_id: parse_spec_id(value.spec_id)?,
         };
@@ -375,8 +375,8 @@ impl TryFrom<JsPreverifyTransactionContext> for PreverifyTxContext {
     ) -> std::result::Result<Self, Self::Error> {
         let buf = value.data.into_value()?;
 
-        let recipient = if let Some(recipient) = value.recipient {
-            Some(utils::create_address_from_js_string(recipient)?)
+        let to = if let Some(to) = value.to {
+            Some(utils::create_address_from_js_string(to)?)
         } else {
             None
         };
@@ -388,10 +388,10 @@ impl TryFrom<JsPreverifyTransactionContext> for PreverifyTxContext {
         };
 
         let tx_ctx = PreverifyTxContext {
-            recipient,
+            to,
             gas_limit: value.gas_limit.try_into()?,
             gas_price: value.gas_price.get_u128()?.1,
-            caller: utils::create_address_from_js_string(value.caller)?,
+            from: utils::create_address_from_js_string(value.from)?,
             legacy_address,
             value: utils::convert_bigint_to_u256(value.value)?,
             nonce: value.nonce.get_u64()?.0,
@@ -418,8 +418,8 @@ impl TryFrom<JsTransactionViewContext> for TxViewContext {
         };
 
         let tx_ctx = TxViewContext {
-            caller: utils::create_address_from_js_string(value.caller)?,
-            recipient: utils::create_address_from_js_string(value.recipient)?,
+            from: utils::create_address_from_js_string(value.from)?,
+            to: utils::create_address_from_js_string(value.to)?,
             data: Bytes::from(buf.as_ref().to_owned()),
             spec_id: parse_spec_id(value.spec_id)?,
             gas_limit,

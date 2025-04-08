@@ -328,11 +328,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				this.#getTransactionContext({
 					...options,
 					data,
-					recipient: this.#consensusProxyContractAddress,
+					to: this.#consensusProxyContractAddress,
 				}),
 			);
 
-			if (!result.receipt.success) {
+			if (!result.receipt.status) {
 				throw new Error("failed to add validator");
 			}
 		}
@@ -362,11 +362,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				this.#getTransactionContext({
 					...options,
 					data,
-					recipient: this.#consensusProxyContractAddress,
+					to: this.#consensusProxyContractAddress,
 				}),
 			);
 
-			if (!result.receipt.success) {
+			if (!result.receipt.status) {
 				throw new Error("failed to add vote");
 			}
 		}
@@ -388,11 +388,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				this.#getTransactionContext({
 					...options,
 					data,
-					recipient: this.#usernamesProxyContractAddress,
+					to: this.#usernamesProxyContractAddress,
 				}),
 			);
 
-			if (!result.receipt.success) {
+			if (!result.receipt.status) {
 				throw new Error("failed to add username");
 			}
 		}
@@ -401,7 +401,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	#getTransactionContext(
 		options: Contracts.Snapshot.LegacyImportOptions & {
 			data: string;
-			recipient: string;
+			to: string;
 		},
 	): Contracts.Evm.TransactionContext {
 		const { evmSpec } = this.configuration.getMilestone();
@@ -414,12 +414,12 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				timestamp: BigInt(options.timestamp),
 				validatorAddress: this.deployerAddress,
 			},
-			caller: this.deployerAddress,
+			from: this.deployerAddress,
 			data: Buffer.from(options.data, "hex"),
 			gasLimit: BigInt(10_000_000),
 			gasPrice: BigInt(0),
 			nonce,
-			recipient: options.recipient,
+			to: options.to,
 			specId: evmSpec,
 			txHash: this.#generateTxHash(),
 			value: 0n,

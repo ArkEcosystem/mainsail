@@ -521,12 +521,12 @@ export class Restore {
 
 				receipts.push({
 					blockNumber: BigNumber.make(receipt.blockNumber).toFixed(),
-					contractAddress: receipt.deployedContractAddress,
+					contractAddress: receipt.contractAddress,
 					gasRefunded: Number(receipt.gasRefunded),
 					gasUsed: Number(receipt.gasUsed),
 					logs: receipt.logs,
 					output: receipt.output,
-					status: receipt.success ? 1 : 0,
+					status: receipt.status,
 					transactionHash: receipt.txHash.slice(2),
 				});
 			}
@@ -670,9 +670,9 @@ export class Restore {
 		const { evmSpec } = this.configuration.getMilestone(this.configuration.getGenesisHeight());
 
 		const result = await this.evm.view({
-			caller: this.deployerAddress,
+			from: this.deployerAddress,
 			data: Buffer.from(data, "hex"),
-			recipient: this.usernamesContractAddress,
+			to: this.usernamesContractAddress,
 			specId: evmSpec,
 		});
 

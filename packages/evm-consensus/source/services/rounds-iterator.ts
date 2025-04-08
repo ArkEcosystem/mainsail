@@ -55,10 +55,10 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 		const data = iface.encodeFunctionData("getRounds", [this.#offset, ROUNDS_PER_REQUEST]).slice(2);
 
 		const result = await this.evm.view({
-			caller: deployerAddress,
+			from: deployerAddress,
 			data: Buffer.from(data, "hex"),
 			gasLimit: 100_000_000n,
-			recipient: consensusContractAddress,
+			to: consensusContractAddress,
 			specId: evmSpec,
 		});
 

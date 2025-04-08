@@ -40,14 +40,14 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 			const { instance, blockContext } = context.evm;
 			const { receipt } = await instance.process({
 				blockContext,
-				caller: from,
+				from,
 				data: Buffer.from(transaction.data.data, "hex"),
 				gasLimit: BigInt(transaction.data.gas),
 				gasPrice: BigInt(transaction.data.gasPrice),
 				legacyAddress: senderLegacyAddress,
 				nonce: transaction.data.nonce.toBigInt(),
-				recipient: transaction.data.to,
-				sequence: transaction.data.transactionIndex,
+				to: transaction.data.to,
+				index: transaction.data.transactionIndex,
 				specId: evmSpec,
 				txHash: transaction.hash,
 				value: transaction.data.value.toBigInt(),

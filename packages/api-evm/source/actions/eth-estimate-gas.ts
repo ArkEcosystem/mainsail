@@ -78,12 +78,12 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 				timestamp: BigInt(dayjs().valueOf()),
 				validatorAddress: "0x0000000000000000000000000000000000000001",
 			},
-			caller: data.from,
+			from: data.from,
 			data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
 			gasLimit: maxGasLimit,
 			gasPrice: data.gasPrice ? BigInt(data.gasPrice) : BigInt(gas.minimumGasPrice),
 			nonce: accountInfo.nonce,
-			recipient: data.to,
+			to: data.to,
 			specId: evmSpec,
 			txHash: "0".repeat(64),
 			value: data.value ? BigInt(data.value) : BigInt(0),
@@ -164,7 +164,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 
 		try {
 			const { receipt } = await this.evm.process(context);
-			return { receipt, success: receipt.success };
+			return { receipt, success: receipt.status === 1 };
 		} catch (error) {
 			return { executionError: error.message, success: false };
 		}

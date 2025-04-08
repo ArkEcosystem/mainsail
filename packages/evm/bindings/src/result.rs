@@ -90,10 +90,9 @@ pub struct JsTransactionReceipt {
 
     pub gas_used: JsBigInt,
     pub gas_refunded: JsBigInt,
-    pub success: bool,
-    pub deployed_contract_address: Option<JsString>,
+    pub status: JsNumber,
+    pub contract_address: Option<JsString>,
 
-    // TODO: typing
     pub logs: serde_json::Value,
     pub output: Option<JsBuffer>,
 }
@@ -117,18 +116,17 @@ pub struct PreverifyTxResult {
 
 impl JsTransactionReceipt {
     pub fn new(node_env: &napi::Env, receipt: TxReceipt) -> anyhow::Result<Self> {
-        let deployed_contract_address =
-            if let Some(contract_address) = receipt.deployed_contract_address {
-                Some(node_env.create_string_from_std(contract_address)?)
-            } else {
-                None
-            };
+        let contract_address = if let Some(contract_address) = receipt.contract_address {
+            Some(node_env.create_string_from_std(contract_address)?)
+        } else {
+            None
+        };
 
         Ok(JsTransactionReceipt {
             gas_used: node_env.create_bigint_from_u64(receipt.gas_used)?,
             gas_refunded: node_env.create_bigint_from_u64(receipt.gas_refunded)?,
-            success: receipt.success,
-            deployed_contract_address,
+            status: node_env.create_uint32(receipt.success as u32)?,
+            contract_address,
             logs: receipt
                 .logs
                 .map(|l| serde_json::to_value(l).unwrap())

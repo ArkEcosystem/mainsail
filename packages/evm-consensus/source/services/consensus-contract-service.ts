@@ -29,9 +29,9 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 		const data = iface.encodeFunctionData("getActiveValidators").slice(2);
 
 		const result = await this.evm.view({
-			caller: deployerAddress,
+			from: deployerAddress,
 			data: Buffer.from(data, "hex"),
-			recipient: consensusContractAddress,
+			to: consensusContractAddress,
 			specId: evmSpec,
 		});
 
@@ -68,9 +68,9 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 		const data = iface.encodeFunctionData("getAllValidators").slice(2);
 
 		const result = await this.evm.view({
-			caller: deployerAddress,
+			from: deployerAddress,
 			data: Buffer.from(data, "hex"),
-			recipient: consensusContractAddress,
+			to: consensusContractAddress,
 			specId: evmSpec,
 		});
 
@@ -111,9 +111,9 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 		const data = iface.encodeFunctionData("getVotesCount").slice(2);
 
 		const result = await this.evm.view({
-			caller: deployerAddress,
+			from: deployerAddress,
 			data: Buffer.from(data, "hex"),
-			recipient: consensusContractAddress,
+			to: consensusContractAddress,
 			specId: evmSpec,
 		});
 

@@ -20,11 +20,11 @@ export class ReceiptResource {
 			cumulativeGasUsed: "0x0", // The sum of the base fee and tip paid per unit of gas.
 			effectiveGasUsed: "0x0", // The total amount of gas used when this transaction was executed in the block.
 			gasUsed: `0x${receipt.gasUsed.toString(16)}`,
-			contractAddress: receipt.deployedContractAddress,
+			contractAddress: receipt.contractAddress,
 			logs: receipt.logs,
 			logsBloom: `0x${header.logsBloom}`,
 			type: "0x2",
-			status: receipt.success ? "0x1" : "0x0",
+			status: receipt.status ? "0x1" : "0x0",
 		};
 		/* eslint-enable sort-keys-fix/sort-keys-fix */
 	}
