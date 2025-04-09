@@ -59,8 +59,8 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 
 		return this.app.resolve<Proposal>(Proposal).initialize({
 			...proposalData,
-			dataSerialized: proposalData.data.serialized,
 			blockNumber: header.number,
+			dataSerialized: proposalData.data.serialized,
 			serialized,
 		});
 	}

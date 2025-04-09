@@ -46,8 +46,8 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				blocks: state ? medianPeerBlockNumber - ownBlockNumber : 0,
 				blockNumber: ownBlockNumber,
+				blocks: state ? medianPeerBlockNumber - ownBlockNumber : 0,
 				id: state?.id ?? 0,
 				syncing: ownBlockNumber < medianPeerBlockNumber,
 			},

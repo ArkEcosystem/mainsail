@@ -104,8 +104,8 @@ export class Proposal implements Contracts.Crypto.Proposal {
 
 	public toData(): Contracts.Crypto.ProposalData {
 		return {
-			data: { serialized: this.#dataSerialized },
 			blockNumber: this.#blockNumber,
+			data: { serialized: this.#dataSerialized },
 			round: this.#round,
 			signature: this.#signature,
 			validRound: this.#validRound,

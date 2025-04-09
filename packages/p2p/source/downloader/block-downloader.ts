@@ -73,9 +73,9 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		}
 
 		const downloadJob: DownloadJob = {
-			blocks: [],
 			blockNumberFrom: this.#getLastRequestedBlockNumber() + 1,
 			blockNumberTo: this.#calculateBlockNumberTo(peer),
+			blocks: [],
 			peer,
 			peerBlockNumber: peer.header.blockNumber - 1,
 			status: JobStatus.Downloading,
@@ -266,9 +266,9 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		}
 
 		const newJob: DownloadJob = {
-			blocks: [],
 			blockNumberFrom,
 			blockNumberTo,
+			blocks: [],
 			peer,
 			peerBlockNumber: peer.header.blockNumber - 1,
 			status: JobStatus.Downloading,
