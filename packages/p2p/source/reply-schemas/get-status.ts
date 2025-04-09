@@ -95,12 +95,12 @@ export const getStatus = {
 		headers,
 		state: {
 			properties: {
+				blockHash: {
+					$ref: "blockHash",
+				},
 				blockNumber: {
 					minimum: 0,
 					type: "integer",
-				},
-				blockHash: {
-					$ref: "blockHash",
 				},
 			},
 			required: ["blockHash", "blockNumber"],
