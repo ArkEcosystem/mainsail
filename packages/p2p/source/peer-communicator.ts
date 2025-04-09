@@ -184,7 +184,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 		if (!this.validateReply(peer, parsedResponsePayload, event)) {
 			const validationError = new Error(
-				`Response validation failed from peer ${peer.ip} : ${JSON.stringify(parsedResponsePayload)}`,
+				`Response validation failed for ${event} from peer ${peer.ip}: ${JSON.stringify(parsedResponsePayload)}`,
 			);
 			validationError.name = SocketErrors.Validation;
 			throw validationError;

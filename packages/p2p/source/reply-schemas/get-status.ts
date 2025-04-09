@@ -95,15 +95,15 @@ export const getStatus = {
 		headers,
 		state: {
 			properties: {
-				height: {
+				blockNumber: {
 					minimum: 0,
 					type: "integer",
 				},
-				id: {
+				blockHash: {
 					$ref: "blockHash",
 				},
 			},
-			required: ["id", "height"],
+			required: ["blockHash", "blockNumber"],
 			type: "object",
 		},
 	},

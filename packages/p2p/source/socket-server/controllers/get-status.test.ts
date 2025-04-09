@@ -39,7 +39,7 @@ describe<{
 			config: {},
 			state: {
 				blockNumber: number,
-				id: hash,
+				blockHash: hash,
 			},
 		});
 	});

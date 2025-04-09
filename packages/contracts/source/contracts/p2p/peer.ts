@@ -46,7 +46,7 @@ export interface PeerBroadcast {
 
 export interface PeerState {
 	blockNumber: number;
-	id: string;
+	blockHash: string;
 }
 
 export interface PeerData {
