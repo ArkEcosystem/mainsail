@@ -19,27 +19,24 @@ export class BlockResource implements Contracts.Api.Resource {
 			confirmations: +resource.state.blockNumber
 				? Number(resource.state.blockNumber) - Number(resource.number)
 				: 0,
-			forged: {
-				amount: BigNumber.make(resource.amount),
-				fee: resource.fee,
-				reward: resource.reward,
-				total: BigNumber.make(resource.reward).plus(resource.fee).toFixed(),
-			},
-			generator: {
-				address: resource.generator.address,
-				publicKey: resource.generator.publicKey,
-				username: resource.generator.attributes?.["username"] ?? undefined,
-			},
+			amount: BigNumber.make(resource.amount),
+			fee: resource.fee,
+			gasUsed: resource.gasUsed,
+			reward: resource.reward,
+			total: BigNumber.make(resource.reward).plus(resource.fee).toFixed(),
+			proposer: resource.proposer,
+			publicKey: resource.generator.publicKey,
+			username: resource.generator.attributes?.["username"] ?? undefined,
 			hash: resource.hash,
-			height: +resource.number,
-			payload: {
-				hash: resource.transactionsRoot,
-				length: resource.payloadSize,
-			},
-			previous: resource.parentHash,
+			number: +resource.number,
+			round: resource.round,
+			validatorSet: resource.validatorSet,
+			transactionsRoot: resource.transactionsRoot,
+			payloadSize: resource.payloadSize,
+			parentHash: resource.parentHash,
 			signature: resource.signature,
-			timestamp: +resource.timestamp,
-			transactions: resource.transactionsCount,
+			timestamp: resource.timestamp,
+			transactionsCount: resource.transactionsCount,
 
 			version: resource.version,
 		};
