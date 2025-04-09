@@ -12,23 +12,23 @@ export interface DatabaseService extends CommitHandler {
 
 	getState(): State;
 
-	getCommit(height: number): Promise<Commit | undefined>;
-	getCommitById(id: string): Promise<Commit | undefined>;
+	getCommit(blockNumber: number): Promise<Commit | undefined>;
+	getCommitByHash(blockHash: string): Promise<Commit | undefined>;
 	getLastCommit(): Promise<Commit>;
-	hasCommitById(id: string): Promise<boolean>;
+	hasCommitByHash(blockHash: string): Promise<boolean>;
 	findCommitBuffers(start: number, end: number): Promise<Buffer[]>;
 	readCommits(start: number, end: number): AsyncGenerator<Commit>;
 
-	getBlock(height: number): Promise<Block | undefined>;
-	getBlockById(id: string): Promise<Block | undefined>;
+	getBlock(blockNumber: number): Promise<Block | undefined>;
+	getBlockByHash(blockHash: string): Promise<Block | undefined>;
 	findBlocks(start: number, end: number): Promise<Block[]>;
 
-	getBlockHeader(height: number): Promise<BlockHeader | undefined>;
-	getBlockHeaderById(id: string): Promise<BlockHeader | undefined>;
+	getBlockHeader(blockNumber: number): Promise<BlockHeader | undefined>;
+	getBlockHeaderByHash(blockHash: string): Promise<BlockHeader | undefined>;
 
-	getTransactionById(id: string): Promise<Transaction | undefined>;
-	getTransactionByBlockIdAndIndex(blockId: string, index: number): Promise<Transaction | undefined>;
-	getTransactionByBlockHeightAndIndex(height: number, index: number): Promise<Transaction | undefined>;
+	getTransactionByHash(transactionHash: string): Promise<Transaction | undefined>;
+	getTransactionByBlockHashAndIndex(blockHash: string, index: number): Promise<Transaction | undefined>;
+	getTransactionByBlockNumberAndIndex(blockNumber: number, index: number): Promise<Transaction | undefined>;
 
 	onCommit(unit: ProcessableUnit): Promise<void>;
 }

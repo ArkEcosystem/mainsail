@@ -9,19 +9,19 @@ export enum MessageType {
 
 export interface SignatureMessageData {
 	readonly type: MessageType;
-	readonly height: number;
+	readonly blockNumber: number;
 	readonly round: number;
-	readonly blockId: string;
+	readonly blockHash: string;
 }
 
-export type HasBlockId = { blockId: string };
-export type WithoutBlockId<T> = Omit<T, "blockId">;
-export type WithOptionalBlockId<T extends HasBlockId> = WithoutBlockId<T> & Partial<Pick<T, "blockId">>;
-export type SignaturePrevoteData = WithOptionalBlockId<SignatureMessageData>;
-export type SignaturePrecommitData = WithOptionalBlockId<SignatureMessageData>;
+export type HasBlockHash = { blockHash: string };
+export type WithoutBlockHash<T> = Omit<T, "blockHash">;
+export type WithOptionalBlockHash<T extends HasBlockHash> = WithoutBlockHash<T> & Partial<Pick<T, "blockHash">>;
+export type SignaturePrevoteData = WithOptionalBlockHash<SignatureMessageData>;
+export type SignaturePrecommitData = WithOptionalBlockHash<SignatureMessageData>;
 
 export interface ProposalData {
-	readonly height: number;
+	readonly blockNumber: number;
 	readonly round: number;
 	readonly data: { serialized: string };
 	readonly validatorIndex: number;
@@ -52,9 +52,9 @@ export interface Proposal extends Omit<ProposalData, "data"> {
 
 export interface PrevoteData {
 	readonly type: MessageType;
-	readonly height: number;
+	readonly blockNumber: number;
 	readonly round: number;
-	readonly blockId?: string;
+	readonly blockHash?: string;
 	readonly validatorIndex: number;
 	readonly signature: string;
 }
@@ -69,9 +69,9 @@ export interface Prevote extends PrevoteData {
 
 export interface PrecommitData {
 	readonly type: MessageType;
-	readonly height: number;
+	readonly blockNumber: number;
 	readonly round: number;
-	readonly blockId?: string;
+	readonly blockHash?: string;
 	readonly validatorIndex: number;
 	readonly signature: string;
 }
