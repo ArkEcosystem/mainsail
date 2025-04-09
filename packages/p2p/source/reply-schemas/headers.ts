@@ -1,11 +1,11 @@
 export const headers = {
 	additionalProperties: false,
 	properties: {
-		height: {
+		blockNumber: {
 			minimum: 1,
 			type: "integer",
 		},
-		proposedBlockId: {
+		proposedBlockHash: {
 			$ref: "blockHash",
 		},
 		round: {
@@ -37,8 +37,8 @@ export const headers = {
 		},
 	},
 	required: [
-		"height",
-		// "proposedBlockId",
+		"blockNumber",
+		// "proposedBlockHash",
 		"round",
 		"step",
 		"validatorsSignedPrecommit",

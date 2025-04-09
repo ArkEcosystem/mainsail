@@ -1,5 +1,5 @@
-import * as $protobuf from "protobufjs/minimal.js";
-import Long from "long";
+import * as $protobuf from "protobufjs";
+import Long = require("long");
 /** Namespace getApiNodes. */
 export namespace getApiNodes {
 
@@ -307,8 +307,8 @@ export namespace getBlocks {
     /** Properties of a GetBlocksRequest. */
     interface IGetBlocksRequest {
 
-        /** GetBlocksRequest fromHeight */
-        fromHeight?: (number|null);
+        /** GetBlocksRequest fromBlockNumber */
+        fromBlockNumber?: (number|null);
 
         /** GetBlocksRequest limit */
         limit?: (number|null);
@@ -326,8 +326,8 @@ export namespace getBlocks {
          */
         constructor(properties?: getBlocks.IGetBlocksRequest);
 
-        /** GetBlocksRequest fromHeight. */
-        public fromHeight: number;
+        /** GetBlocksRequest fromBlockNumber. */
+        public fromBlockNumber: number;
 
         /** GetBlocksRequest limit. */
         public limit: number;
@@ -1349,8 +1349,8 @@ export namespace getStatus {
         /** Properties of a State. */
         interface IState {
 
-            /** State height */
-            height?: (number|null);
+            /** State blockNumber */
+            blockNumber?: (number|null);
 
             /** State id */
             id?: (string|null);
@@ -1365,8 +1365,8 @@ export namespace getStatus {
              */
             constructor(properties?: getStatus.GetStatusResponse.IState);
 
-            /** State height. */
-            public height: number;
+            /** State blockNumber. */
+            public blockNumber: number;
 
             /** State id. */
             public id: string;
@@ -2520,8 +2520,8 @@ export namespace shared {
         /** Headers version */
         version?: (string|null);
 
-        /** Headers height */
-        height?: (number|null);
+        /** Headers blockNumber */
+        blockNumber?: (number|null);
 
         /** Headers round */
         round?: (number|null);
@@ -2529,8 +2529,8 @@ export namespace shared {
         /** Headers step */
         step?: (number|null);
 
-        /** Headers proposedBlockId */
-        proposedBlockId?: (string|null);
+        /** Headers proposedBlockHash */
+        proposedBlockHash?: (string|null);
 
         /** Headers validatorsSignedPrevote */
         validatorsSignedPrevote?: (boolean[]|null);
@@ -2551,8 +2551,8 @@ export namespace shared {
         /** Headers version. */
         public version: string;
 
-        /** Headers height. */
-        public height: number;
+        /** Headers blockNumber. */
+        public blockNumber: number;
 
         /** Headers round. */
         public round: number;
@@ -2560,17 +2560,14 @@ export namespace shared {
         /** Headers step. */
         public step: number;
 
-        /** Headers proposedBlockId. */
-        public proposedBlockId?: (string|null);
+        /** Headers proposedBlockHash. */
+        public proposedBlockHash?: (string|null);
 
         /** Headers validatorsSignedPrevote. */
         public validatorsSignedPrevote: boolean[];
 
         /** Headers validatorsSignedPrecommit. */
         public validatorsSignedPrecommit: boolean[];
-
-        /** Headers _proposedBlockId. */
-        public _proposedBlockId?: "proposedBlockId";
 
         /**
          * Creates a new Headers instance using the specified properties.

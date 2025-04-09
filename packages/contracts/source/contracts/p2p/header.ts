@@ -2,16 +2,16 @@ import { Proposal } from "../crypto/messages.js";
 
 export type HeaderData = {
 	version: string;
-	height: number;
+	blockNumber: number;
 	round: number;
 	step: number;
-	proposedBlockId?: string;
+	proposedBlockHash?: string;
 	validatorsSignedPrevote: readonly boolean[];
 	validatorsSignedPrecommit: readonly boolean[];
 };
 
 export interface Header {
-	height: number;
+	blockNumber: number;
 	round: number;
 	proposal?: Proposal;
 	validatorsSignedPrecommit: readonly boolean[];

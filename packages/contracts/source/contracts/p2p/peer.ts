@@ -45,7 +45,7 @@ export interface PeerBroadcast {
 }
 
 export interface PeerState {
-	height: number;
+	blockNumber: number;
 	id: string;
 }
 
@@ -75,9 +75,9 @@ export interface PeerPingResponse {
 }
 
 export interface PeerVerificationResult {
-	readonly myHeight: number;
-	readonly hisHeight: number;
-	readonly highestCommonHeight: number;
+	readonly myBlockNumber: number;
+	readonly hisBlockNumber: number;
+	readonly highestCommonBlockNumber: number;
 }
 
 export type PeerFactory = (ip: string) => Peer;

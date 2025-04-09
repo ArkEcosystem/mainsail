@@ -1,6 +1,6 @@
 export const headers = {
-	height: 1,
-	proposedBlockId: "a".repeat(64),
+	blockNumber: 1,
+	proposedBlockHash: "a".repeat(64),
 	round: 0,
 	step: 0,
 	validatorsSignedPrecommit: Array(53).fill(true),

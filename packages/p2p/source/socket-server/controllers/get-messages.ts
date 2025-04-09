@@ -11,14 +11,14 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 		request: Contracts.P2P.GetMessagesRequest,
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.GetMessagesResponse> {
-		const { height, round, validatorsSignedPrevote, validatorsSignedPrecommit } = request.payload.headers;
+		const { blockNumber, round, validatorsSignedPrevote, validatorsSignedPrecommit } = request.payload.headers;
 
 		const consensus = this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
 		const roundStateRepo = this.app.get<Contracts.Consensus.RoundStateRepository>(
 			Identifiers.Consensus.RoundStateRepository,
 		);
 
-		if (height !== consensus.getHeight() || round > consensus.getRound()) {
+		if (blockNumber !== consensus.getBlockNumber() || round > consensus.getRound()) {
 			return {
 				precommits: [],
 				prevotes: [],
@@ -26,9 +26,9 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 		}
 
 		// Use the highest round with minority prevotes
-		let roundState = roundStateRepo.getRoundState(height, consensus.getRound());
+		let roundState = roundStateRepo.getRoundState(blockNumber, consensus.getRound());
 		if (roundState.round >= 1 && roundState.round > round && !roundState.hasMinorityPrevotesOrPrecommits()) {
-			roundState = roundStateRepo.getRoundState(height, consensus.getRound() - 1);
+			roundState = roundStateRepo.getRoundState(blockNumber, consensus.getRound() - 1);
 		}
 
 		if (round === roundState.round) {

@@ -5,9 +5,9 @@ export const makeHeaders = (configuration: Contracts.Crypto.Configuration) => {
 	const activeValidators = configuration.getMaxActiveValidators();
 
 	return Joi.object({
-		height: Joi.number().integer().min(1).required(),
+		blockNumber: Joi.number().integer().min(1).required(),
 		// eslint-disable-next-line unicorn/no-null
-		proposedBlockId: Joi.string().allow(null).required(),
+		proposedBlockHash: Joi.string().allow(null).required(),
 		round: Joi.number().integer().min(0).required(),
 		step: Joi.number().integer().min(0).max(2).required(),
 		validatorsSignedPrecommit: Joi.array().items(Joi.boolean()).max(activeValidators).required(),

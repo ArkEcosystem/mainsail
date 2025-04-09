@@ -4,10 +4,10 @@ package shared;
 
 message Headers {
     string version = 1;
-    uint32 height = 2;
+    uint32 blockNumber = 2;
     uint32 round = 3;
     uint32 step = 4;
-	optional string proposedBlockId = 5;
+	optional string proposedBlockHash = 5;
 	repeated bool validatorsSignedPrevote = 6;
 	repeated bool validatorsSignedPrecommit = 7;
 }

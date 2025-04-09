@@ -8,7 +8,7 @@ message GetStatusRequest {
 
 message GetStatusResponse {
     message State {
-        uint32 height = 1;
+        uint32 blockNumber = 1;
 		string id = 2;
     }
 

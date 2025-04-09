@@ -12,7 +12,7 @@ export class Header implements Contracts.P2P.Header {
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;
 
-	public height!: number;
+	public blockNumber!: number;
 	public round!: number;
 	public step!: Contracts.Consensus.Step;
 	public validatorsSignedPrecommit!: readonly boolean[];
@@ -21,11 +21,11 @@ export class Header implements Contracts.P2P.Header {
 
 	@postConstruct()
 	public init() {
-		this.height = this.consensus.getHeight();
+		this.blockNumber = this.consensus.getBlockNumber();
 		this.round = this.consensus.getRound();
 		this.step = this.consensus.getStep();
 
-		const roundState = this.roundStateRepo.getRoundState(this.height, this.round);
+		const roundState = this.roundStateRepo.getRoundState(this.blockNumber, this.round);
 		this.validatorsSignedPrecommit = roundState.getValidatorsSignedPrecommit();
 		this.validatorsSignedPrevote = roundState.getValidatorsSignedPrevote();
 		this.proposal = roundState.getProposal();
@@ -33,8 +33,8 @@ export class Header implements Contracts.P2P.Header {
 
 	public toData(): Contracts.P2P.HeaderData {
 		return {
-			height: this.height,
-			proposedBlockId:
+			blockNumber: this.blockNumber,
+			proposedBlockHash:
 				this.proposal && this.proposal.isDataDeserialized ? this.proposal.getData().block.data.hash : undefined,
 			round: this.round,
 			step: this.step,

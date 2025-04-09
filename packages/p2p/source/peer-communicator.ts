@@ -106,14 +106,14 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	public async getBlocks(
 		peer: Contracts.P2P.Peer,
-		{ fromHeight, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromHeight: number; limit?: number },
+		{ fromBlockNumber, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromBlockNumber: number; limit?: number },
 		options: Partial<Contracts.P2P.EmitOptions> = {},
 	): Promise<Contracts.P2P.GetBlocksResponse> {
 		const result = await this.emit<Contracts.P2P.GetBlocksResponse>(
 			peer,
 			Routes.GetBlocks,
 			{
-				fromHeight,
+				fromBlockNumber,
 				limit,
 			},
 			{
@@ -123,7 +123,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		);
 
 		if (result.blocks.length === 0) {
-			this.logger.debug(`Peer ${peer.ip} did not return any blocks via height ${fromHeight.toLocaleString()}.`);
+			this.logger.debug(
+				`Peer ${peer.ip} did not return any blocks via block number ${fromBlockNumber.toLocaleString()}.`,
+			);
 		}
 
 		return result;

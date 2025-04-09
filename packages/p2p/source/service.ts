@@ -153,11 +153,11 @@ export class Service implements Contracts.P2P.Service {
 		}
 	}
 
-	public getNetworkHeight(): number {
+	public getNetworkBlockNumber(): number {
 		const medians = this.repository
 			.getPeers()
-			.filter((peer) => peer.header.height)
-			.map((peer) => peer.header.height)
+			.filter((peer) => peer.header.blockNumber)
+			.map((peer) => peer.header.blockNumber)
 			.sort((a, b) => a - b);
 
 		return medians[Math.floor(medians.length / 2)] || 0;

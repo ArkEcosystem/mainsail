@@ -32,11 +32,11 @@ describe<Context>("Headers Schema", ({ it, assert, beforeEach, each }) => {
 	});
 
 	each(
-		"height - should fail if not integer min 1",
+		"blockNumber - should fail if not integer min 1",
 		({ context: { validator }, dataset }: { context: Context; dataset: any }) => {
 			const result = validator.validate(headers, {
 				...data,
-				height: dataset,
+				blockNumber: dataset,
 			});
 
 			assert.defined(result.error);
@@ -45,11 +45,11 @@ describe<Context>("Headers Schema", ({ it, assert, beforeEach, each }) => {
 	);
 
 	each(
-		"proposedBlockId - should pass if blockId or undefined",
+		"proposedBlockHash - should pass if blockHash or undefined",
 		({ context: { validator }, dataset }: { context: Context; dataset: any }) => {
 			const result = validator.validate(headers, {
 				...data,
-				proposedBlockId: dataset,
+				proposedBlockHash: dataset,
 			});
 
 			assert.undefined(result.error);
@@ -58,11 +58,11 @@ describe<Context>("Headers Schema", ({ it, assert, beforeEach, each }) => {
 	);
 
 	each(
-		"proposedBlockId - fail if not blockId or undefined",
+		"proposedBlockHash - fail if not blockHash or undefined",
 		({ context: { validator }, dataset }: { context: Context; dataset: any }) => {
 			const result = validator.validate(headers, {
 				...data,
-				proposedBlockId: dataset,
+				proposedBlockHash: dataset,
 			});
 
 			assert.defined(result.error);

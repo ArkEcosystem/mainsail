@@ -25,7 +25,7 @@ export interface PeerCommunicator {
 	getProposal(peer: Peer): Promise<GetProposalResponse>;
 	getBlocks(
 		peer: Peer,
-		{ fromHeight, limit }: { fromHeight: number; limit?: number },
+		{ fromBlockNumber, limit }: { fromBlockNumber: number; limit?: number },
 		options?: Partial<EmitOptions>,
 	): Promise<GetBlocksResponse>;
 	getStatus(peer: Peer, options?: Partial<EmitOptions>): Promise<GetStatusResponse>;

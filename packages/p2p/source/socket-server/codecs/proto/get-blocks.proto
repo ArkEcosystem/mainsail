@@ -3,7 +3,7 @@ syntax = "proto3";
 package getBlocks;
 
 message GetBlocksRequest {
-    uint32 fromHeight = 1;
+    uint32 fromBlockNumber = 1;
     uint32 limit = 2;
     shared.Headers headers = 3;
 }
