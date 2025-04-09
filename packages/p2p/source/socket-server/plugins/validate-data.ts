@@ -47,12 +47,17 @@ export class ValidateDataPlugin extends BasePlugin {
 			method: async (request: Contracts.P2P.Request, h: ResponseToolkit) => {
 				const version = request.payload?.headers?.version;
 				if (version && !isValidVersion(this.app, version)) {
-					return this.disposeAndReturnBadRequest(request, h, "Validation failed (invalid version)");
+					return this.disposeAndReturnBadRequest(
+						request,
+						h,
+						`[${request.path}] Validation failed (invalid version)`,
+					);
 				}
 
 				const result = allRoutesConfigByPath[request.path]?.validation?.validate(request.payload);
 				if (result && result.error) {
-					return this.banAndReturnBadRequest(request, h, "Validation failed (bad payload)");
+					console.log(request.path, request.payload);
+					return this.banAndReturnBadRequest(request, h, `[${request.path}] Validation failed (bad payload)`);
 				}
 				return h.continue;
 			},
