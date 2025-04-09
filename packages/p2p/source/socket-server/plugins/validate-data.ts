@@ -56,7 +56,6 @@ export class ValidateDataPlugin extends BasePlugin {
 
 				const result = allRoutesConfigByPath[request.path]?.validation?.validate(request.payload);
 				if (result && result.error) {
-					console.log(request.path, request.payload);
 					return this.banAndReturnBadRequest(request, h, `[${request.path}] Validation failed (bad payload)`);
 				}
 				return h.continue;

@@ -19,7 +19,7 @@ export interface Response {
 export interface GetBlocksRequest extends Request {
 	payload: {
 		headers: HeaderData;
-		fromHeight: number;
+		fromBlockNumber: number;
 		limit: number;
 	};
 }
@@ -57,7 +57,7 @@ export interface GetProposalRequest extends Request {
 export interface GetApiNodesRequest extends Request {
 	payload: {
 		headers: HeaderData;
-		fromHeight: number;
+		fromBlockNumber: number;
 		limit: number;
 	};
 }

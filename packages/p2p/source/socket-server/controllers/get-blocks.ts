@@ -21,17 +21,17 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 		request: Contracts.P2P.GetBlocksRequest,
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.GetBlocksResponse> {
-		const requestBlockHeight: number = request.payload.fromHeight;
+		const requestBlockNumber: number = request.payload.fromBlockNumber;
 		const requestBlockLimit: number = request.payload.limit;
 
-		const lastHeight: number = this.stateStore.getHeight();
-		if (requestBlockHeight > lastHeight) {
+		const lastBlockNumber: number = this.stateStore.getHeight();
+		if (requestBlockNumber > lastBlockNumber) {
 			return { blocks: [] };
 		}
 
 		const commits: Buffer[] = await this.database.findCommitBuffers(
-			requestBlockHeight,
-			requestBlockHeight + requestBlockLimit - 1,
+			requestBlockNumber,
+			requestBlockNumber + requestBlockLimit - 1,
 		);
 
 		// Only return the blocks fetched while we are below the p2p maxPayload limit
@@ -53,7 +53,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 				"block",
 				blocksToReturn.length,
 				true,
-			)} from height ${requestBlockHeight.toLocaleString()}`,
+			)} from block number ${requestBlockNumber.toLocaleString()}`,
 		);
 
 		return { blocks: blocksToReturn };

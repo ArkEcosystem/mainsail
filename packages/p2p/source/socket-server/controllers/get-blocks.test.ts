@@ -31,7 +31,7 @@ describe<{
 		const spyGetBlocksForDownload = stub(database, "findCommitBuffers").returnValue(mockBlocks);
 
 		const payload = {
-			fromHeight: 1,
+			fromBlockNumber: 1,
 			limit: 100,
 		};
 		const ip = "187.55.33.22";
@@ -40,6 +40,6 @@ describe<{
 
 		assert.equal(response, { blocks: mockBlocks });
 		spyGetBlocksForDownload.calledOnce();
-		spyGetBlocksForDownload.calledWith(payload.fromHeight, payload.fromHeight + payload.limit - 1);
+		spyGetBlocksForDownload.calledWith(payload.fromBlockNumber, payload.fromBlockNumber + payload.limit - 1);
 	});
 });
