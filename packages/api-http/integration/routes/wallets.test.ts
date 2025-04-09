@@ -5,14 +5,14 @@ import { request } from "../../test/helpers/request";
 import wallets from "../../test/fixtures/wallets.json";
 import transactions from "../../test/fixtures/transactions.json";
 import walletTransactions from "../../test/fixtures/wallet_transactions.json";
+import walletTransactionsResponse from "../../test/fixtures/wallet_transactions.response.json";
 
 describe<{
 	sandbox: Sandbox;
 }>("Wallets", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 
-	// TODO:
-	let options = { transform: false };
+	let options = {};
 
 	beforeAll(async (context) => {
 		nock.enableNetConnect();
@@ -164,7 +164,7 @@ describe<{
 
 		({ statusCode, data } = await request(`/wallets/${wallet.address}/transactions`, options));
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, walletTransactions.slice(1));
+		assert.equal(data.data, walletTransactionsResponse.slice(1));
 	});
 
 	it("/wallets/{id}/transactions/sent", async () => {
@@ -175,7 +175,7 @@ describe<{
 
 		const { statusCode, data } = await request(`/wallets/${wallet.address}/transactions/sent`, options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, walletTransactions.slice(1));
+		assert.equal(data.data, walletTransactionsResponse.slice(1));
 	});
 
 	it("/wallets/{id}/transactions/received", async () => {
@@ -186,6 +186,6 @@ describe<{
 
 		const { statusCode, data } = await request(`/wallets/${recipient}/transactions/received`, options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, walletTransactions);
+		assert.equal(data.data, walletTransactionsResponse);
 	});
 });

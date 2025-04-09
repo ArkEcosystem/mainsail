@@ -1,7 +1,9 @@
 import { describe, Sandbox } from "../../../test-framework/source";
 import receipts from "../../test/fixtures/receipts.json";
 import receiptTransactions from "../../test/fixtures/receipt_transactions.json";
+import receiptTransactionsResponse from "../../test/fixtures/receipt_transactions.response.json";
 import transactions from "../../test/fixtures/transactions.json";
+import transactionsResponse from "../../test/fixtures/transactions.response.json";
 import transactionSchemas from "../../test/fixtures/transactions_schemas.json";
 import transactionTypes from "../../test/fixtures/transactions_types.json";
 import wallets from "../../test/fixtures/wallets.json";
@@ -13,7 +15,7 @@ describe<{
 }>("Transactions", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 
-	const options = { transform: false };
+	const options = {};
 
 	beforeAll(async (context) => {
 		nock.enableNetConnect();
@@ -38,10 +40,7 @@ describe<{
 
 		const { statusCode, data } = await request("/transactions", options);
 		assert.equal(statusCode, 200);
-		assert.equal(
-			data.data,
-			[...transactions].sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
-		);
+		assert.equal(data.data, transactionsResponse);
 	});
 
 	it("/transactions?data", async () => {
@@ -50,22 +49,16 @@ describe<{
 		const testCases = [
 			{
 				path: "/transactions?data=0x",
-				result: [...transactions]
-					.filter((tx) => tx.data === "")
-					.sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
+				result: [...transactionsResponse].filter((tx) => tx.data === ""),
 			},
 			{
 				path: "/transactions?data=",
-				result: [...transactions]
-					.filter((tx) => tx.data === "")
-					.sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
+				result: [...transactionsResponse].filter((tx) => tx.data === ""),
 			},
 			{ path: "/transactions?data=88888888", result: [] },
 			{
 				path: "/transactions?data=6dd7d8ea",
-				result: [...transactions]
-					.filter((tx) => tx.data.startsWith("0x6dd7d8ea"))
-					.sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
+				result: [...transactionsResponse].filter((tx) => tx.data.startsWith("0x6dd7d8ea")),
 			},
 		];
 
@@ -84,21 +77,15 @@ describe<{
 		const testCases = [
 			{
 				path: `/transactions?from=${transaction.from}`,
-				result: [...transactions]
-					.filter((tx) => tx.from === transaction.from)
-					.sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
+				result: [...transactionsResponse].filter((tx) => tx.from === transaction.from),
 			},
 			{
 				path: `/transactions?senderId=${transaction.from}`,
-				result: [...transactions]
-					.filter((tx) => tx.from === transaction.from)
-					.sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
+				result: [...transactionsResponse].filter((tx) => tx.from === transaction.from),
 			},
 			{
 				path: `/transactions?address=${transaction.to}`,
-				result: [...transactions]
-					.filter((tx) => tx.to === transaction.to)
-					.sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
+				result: [...transactionsResponse].filter((tx) => tx.to === transaction.to),
 			},
 		];
 
@@ -112,10 +99,10 @@ describe<{
 	it("/transactions/{hash}", async () => {
 		await apiContext.transactionRepository.save(transactions);
 
-		const hash = transactions.at(-1)?.hash;
+		const hash = transactionsResponse.at(-1)?.hash;
 		const { statusCode, data } = await request(`/transactions/${hash}`, options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, transactions.at(-1));
+		assert.equal(data.data, transactionsResponse.at(-1));
 	});
 
 	it("/transactions/schemas", async () => {
@@ -132,9 +119,6 @@ describe<{
 
 		const { statusCode, data } = await request("/transactions", options);
 		assert.equal(statusCode, 200);
-		assert.equal(
-			data.data,
-			[...receiptTransactions].sort((a, b) => Number(b.blockNumber) - Number(a.blockNumber)),
-		);
+		assert.equal(data.data, receiptTransactionsResponse);
 	});
 });

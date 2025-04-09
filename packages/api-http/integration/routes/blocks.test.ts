@@ -3,7 +3,9 @@ import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
 import blocks from "../../test/fixtures/blocks.json";
+import blocksResponse from "../../test/fixtures/blocks.response.json";
 import blockTransactions from "../../test/fixtures/block_transactions.json";
+import blockTransactionsResponse from "../../test/fixtures/block_transactions.response.json";
 import wallets from "../../test/fixtures/wallets.json";
 
 describe<{
@@ -11,7 +13,7 @@ describe<{
 }>("Blocks", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 
-	let options = { transform: false };
+	let options = {};
 
 	beforeAll(async (context) => {
 		nock.enableNetConnect();
@@ -42,7 +44,7 @@ describe<{
 
 		const { statusCode, data } = await request("/blocks/first", options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, blocks[blocks.length - 1]);
+		assert.equal(data.data, blocksResponse[0]);
 	});
 
 	it("/blocks/last", async () => {
@@ -50,7 +52,7 @@ describe<{
 
 		const { statusCode, data } = await request("/blocks/last", options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, blocks[0]);
+		assert.equal(data.data, blocksResponse[blocksResponse.length - 1]);
 	});
 
 	it("/blocks/{height}", async () => {
@@ -58,16 +60,16 @@ describe<{
 
 		const { statusCode, data } = await request("/blocks/1", options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, blocks[blocks.length - 2]);
+		assert.equal(data.data, blocksResponse[1]);
 	});
 
 	it("/blocks/{id}", async () => {
 		await apiContext.blockRepository.save(blocks);
 
-		const id = blocks[blocks.length - 1].hash;
+		const id = blocksResponse[blocksResponse.length - 1].hash;
 		const { statusCode, data } = await request(`/blocks/${id}`, options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, blocks[blocks.length - 1]);
+		assert.equal(data.data, blocksResponse[blocksResponse.length - 1]);
 	});
 
 	it("/blocks/{id}/transactions", async () => {
@@ -76,7 +78,7 @@ describe<{
 
 		const { statusCode, data } = await request(`/blocks/1/transactions`, options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, blockTransactions);
+		assert.equal(data.data, blockTransactionsResponse);
 	});
 
 	it("/blocks/{id}/transactions - 404 (Not Found)", async () => {

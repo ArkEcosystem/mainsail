@@ -4,14 +4,14 @@ import { request } from "../../test/helpers/request";
 
 import transactions from "../../test/fixtures/transactions.json";
 import votes from "../../test/fixtures/votes.json";
+import votesResponse from "../../test/fixtures/votes.response.json";
 
 describe<{
 	sandbox: Sandbox;
 }>("Votes", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 
-	// TODO:
-	let options = { transform: false };
+	let options = {};
 
 	beforeAll(async (context) => {
 		nock.enableNetConnect();
@@ -37,7 +37,7 @@ describe<{
 
 		const { statusCode, data } = await request("/votes", options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, votes);
+		assert.equal(data.data, votesResponse);
 	});
 
 	it("/votes/{hash}", async () => {
@@ -46,6 +46,6 @@ describe<{
 		const hash = votes[votes.length - 1].hash;
 		const { statusCode, data } = await request(`/votes/${hash}`, options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, votes[votes.length - 1]);
+		assert.equal(data.data, votesResponse[votesResponse.length - 1]);
 	});
 });

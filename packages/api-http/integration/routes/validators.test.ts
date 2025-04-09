@@ -6,6 +6,7 @@ import validators from "../../test/fixtures/validators.json";
 import wallets from "../../test/fixtures/wallets.json";
 import blocks from "../../test/fixtures/blocks.json";
 import validatorBlocks from "../../test/fixtures/validator_blocks.json";
+import validatorBlocksResponse from "../../test/fixtures/validator_blocks.response.json";
 
 describe<{
 	sandbox: Sandbox;
@@ -108,8 +109,8 @@ describe<{
 
 		const validator = validators[0];
 
-		const { statusCode, data } = await request(`/validators/${validator.address}/blocks`, { transform: false });
+		const { statusCode, data } = await request(`/validators/${validator.address}/blocks`, {});
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, validatorBlocks);
+		assert.equal(data.data, validatorBlocksResponse);
 	});
 });
