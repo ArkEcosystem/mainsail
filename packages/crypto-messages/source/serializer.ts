@@ -64,25 +64,25 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 		return this.serializer.serialize<Contracts.Crypto.PrecommitData>(precommit, {
 			length:
 				1 + // type
-				4 + // height
+				4 + // blockNumber
 				4 + // round
 				1 + // validatorIndex
 				1 +
-				(precommit.blockId ? this.hashSize : 0) + // blockId
+				(precommit.blockHash ? this.hashSize : 0) + // blockHash
 				this.signatureSize, // signature
 			skip: 0,
 			schema: {
 				type: {
 					type: "uint8",
 				},
-				height: {
+				blockNumber: {
 					type: "uint32",
 				},
 				round: {
 					type: "uint32",
 				},
-				blockId: {
-					type: "blockId",
+				blockHash: {
+					type: "blockHash",
 					optional: true,
 				},
 				validatorIndex: {
@@ -99,23 +99,23 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 		return this.serializer.serialize<Contracts.Crypto.SignaturePrecommitData>(precommit, {
 			length:
 				1 + // type
-				4 + // height
+				4 + // blockNumber
 				4 + // round
 				1 +
-				(precommit.blockId ? this.hashSize : 0), // blockId
+				(precommit.blockHash ? this.hashSize : 0), // blockHash
 			skip: 0,
 			schema: {
 				type: {
 					type: "uint8",
 				},
-				height: {
+				blockNumber: {
 					type: "uint32",
 				},
 				round: {
 					type: "uint32",
 				},
-				blockId: {
-					type: "blockId",
+				blockHash: {
+					type: "blockHash",
 					optional: true,
 				},
 			},
@@ -126,23 +126,23 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 		return this.serializer.serialize<Contracts.Crypto.SignaturePrevoteData>(prevote, {
 			length:
 				1 + // type
-				4 + // height
+				4 + // blockNumber
 				4 + // round
 				1 +
-				(prevote.blockId ? this.hashSize : 0), // blockId
+				(prevote.blockHash ? this.hashSize : 0), // blockHash
 			skip: 0,
 			schema: {
 				type: {
 					type: "uint8",
 				},
-				height: {
+				blockNumber: {
 					type: "uint32",
 				},
 				round: {
 					type: "uint32",
 				},
-				blockId: {
-					type: "blockId",
+				blockHash: {
+					type: "blockHash",
 					optional: true,
 				},
 			},
@@ -153,10 +153,10 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 		return this.serializer.serialize<Contracts.Crypto.PrevoteData>(prevote, {
 			length:
 				1 + // type
-				4 + // height
+				4 + // blockNumber
 				4 + // round
 				1 +
-				(prevote.blockId ? this.hashSize : 0) + // blockId
+				(prevote.blockHash ? this.hashSize : 0) + // blockHash
 				1 + // validatorIndex
 				this.signatureSize, // signature
 			skip: 0,
@@ -164,14 +164,14 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 				type: {
 					type: "uint8",
 				},
-				height: {
+				blockNumber: {
 					type: "uint32",
 				},
 				round: {
 					type: "uint32",
 				},
-				blockId: {
-					type: "blockId",
+				blockHash: {
+					type: "blockHash",
 					optional: true,
 				},
 				validatorIndex: {

@@ -54,11 +54,11 @@ export class Worker implements Contracts.TransactionPool.Worker {
 			sendersAddresses.add(transaction.data.from);
 		}
 
-		await this.ipcSubprocess.sendRequest("commit", unit.height, [...sendersAddresses.keys()]);
+		await this.ipcSubprocess.sendRequest("commit", unit.blockNumber, [...sendersAddresses.keys()]);
 	}
 
-	public async start(height: number): Promise<void> {
-		await this.ipcSubprocess.sendRequest("start", height);
+	public async start(blockNumber: number): Promise<void> {
+		await this.ipcSubprocess.sendRequest("start", blockNumber);
 	}
 
 	public async getTransactionBytes(): Promise<Buffer[]> {

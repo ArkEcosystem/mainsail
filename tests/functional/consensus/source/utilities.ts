@@ -52,7 +52,7 @@ export const getValidators = async (sandbox: Sandbox, validators: ValidatorsJson
 export const makeProposal = async (
 	node: Sandbox,
 	validator: Validator,
-	height: number,
+	blockNumber: number,
 	round: number,
 	timestamp: number,
 ): Promise<Contracts.Crypto.Proposal> => {
@@ -83,9 +83,9 @@ export const makeProposal = async (
 export const makePrevote = async (
 	node: Sandbox,
 	validator: Validator,
-	height: number,
+	blockNumber: number,
 	round: number,
-	blockId?: string,
+	blockHash?: string,
 ): Promise<Contracts.Crypto.Prevote> => {
 	const proposer = node.app
 		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
@@ -99,18 +99,18 @@ export const makePrevote = async (
 		node.app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
 			.getValidatorIndexByWalletPublicKey(validator.publicKey),
-		height,
+		blockNumber,
 		round,
-		blockId,
+		blockHash,
 	);
 };
 
 export const makePrecommit = async (
 	node: Sandbox,
 	validator: Validator,
-	height: number,
+	blockNumber: number,
 	round: number,
-	blockId?: string,
+	blockHash?: string,
 ): Promise<Contracts.Crypto.Precommit> => {
 	const proposer = node.app
 		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
@@ -124,13 +124,13 @@ export const makePrecommit = async (
 		node.app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
 			.getValidatorIndexByWalletPublicKey(validator.publicKey),
-		height,
+		blockNumber,
 		round,
-		blockId,
+		blockHash,
 	);
 };
 
-export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], height?: number): Promise<void> => {
+export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], blockNumber?: number): Promise<void> => {
 	const function_ = async (sandbox: Sandbox): Promise<void> =>
 		new Promise((resolve) => {
 			const event = Events.BlockEvent.Applied;
@@ -140,7 +140,7 @@ export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], height?: numb
 
 			const listener = {
 				handle: ({ data }: { data: Contracts.Crypto.BlockData }) => {
-					if (!height || data.height >= height) {
+					if (!blockNumber || data.number >= blockNumber) {
 						eventDispatcher.forget(event, listener);
 						resolve();
 					}
@@ -188,11 +188,11 @@ export interface InvalidBlock {
 	block: Contracts.Crypto.BlockData;
 	error: Error;
 }
-export async function snoozeForInvalidBlock(sandbox: Sandbox, height?: number): Promise<InvalidBlock>;
-export async function snoozeForInvalidBlock(sandbox: Sandbox[], height?: number): Promise<InvalidBlock[]>;
+export async function snoozeForInvalidBlock(sandbox: Sandbox, blockNumber?: number): Promise<InvalidBlock>;
+export async function snoozeForInvalidBlock(sandbox: Sandbox[], blockNumber?: number): Promise<InvalidBlock[]>;
 export async function snoozeForInvalidBlock(
 	sandbox: Sandbox | Sandbox[],
-	height?: number,
+	blockNumber?: number,
 ): Promise<InvalidBlock | InvalidBlock[]> {
 	const function_ = async (sandbox: Sandbox): Promise<InvalidBlock> =>
 		new Promise((resolve) => {
@@ -203,7 +203,7 @@ export async function snoozeForInvalidBlock(
 
 			const listener = {
 				handle: ({ data: { block, error } }: { data: InvalidBlock }) => {
-					if (!height || block.height >= height) {
+					if (!blockNumber || block.number >= blockNumber) {
 						eventDispatcher.forget(event, listener);
 						resolve({ block, error });
 					}

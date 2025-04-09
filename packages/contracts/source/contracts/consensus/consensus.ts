@@ -44,7 +44,7 @@ export interface Verifier {
 }
 
 export interface StateData {
-	readonly height: number;
+	readonly blockNumber: number;
 	readonly round: number;
 	readonly step: Step;
 	readonly validRound?: number;
@@ -52,23 +52,23 @@ export interface StateData {
 }
 
 export interface RoundStateRepository {
-	getRoundState(height: number, round: number): RoundState;
+	getRoundState(blockNumber: number, round: number): RoundState;
 	getRoundStates(): RoundState[];
 	clear(): void;
 }
 
 export interface Service {
 	run(): Promise<void>;
-	getHeight(): number;
+	getBlockNumber(): number;
 	getRound(): number;
 	getStep(): Step;
 	getState(): State;
 	handle(roundState: RoundState): Promise<void>;
 	handleCommitState(commitState: ProcessableUnit): Promise<void>;
 	onTimeoutStartRound(): Promise<void>;
-	onTimeoutPropose(height: number, round: number): Promise<void>;
-	onTimeoutPrevote(height: number, round: number): Promise<void>;
-	onTimeoutPrecommit(height: number, round: number): Promise<void>;
+	onTimeoutPropose(blockNumber: number, round: number): Promise<void>;
+	onTimeoutPrevote(blockNumber: number, round: number): Promise<void>;
+	onTimeoutPrecommit(blockNumber: number, round: number): Promise<void>;
 	dispose(): Promise<void>;
 }
 
@@ -84,8 +84,8 @@ export interface Bootstrapper {
 export interface Scheduler {
 	getNextBlockTimestamp(commitTime: number): number;
 	scheduleTimeoutBlockPrepare(timestamp: number): boolean;
-	scheduleTimeoutPropose(height: number, round: number): boolean;
-	scheduleTimeoutPrevote(height: number, round: number): boolean;
-	scheduleTimeoutPrecommit(height: number, round: number): boolean;
+	scheduleTimeoutPropose(blockNumber: number, round: number): boolean;
+	scheduleTimeoutPrevote(blockNumber: number, round: number): boolean;
+	scheduleTimeoutPrecommit(blockNumber: number, round: number): boolean;
 	clear(): void;
 }

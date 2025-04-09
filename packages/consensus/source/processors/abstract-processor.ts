@@ -16,8 +16,11 @@ export class AbstractProcessor {
 	@inject(Identifiers.BlockchainUtils.TimestampCalculator)
 	private readonly timestampCalculator!: Contracts.BlockchainUtils.TimestampCalculator;
 
-	protected hasValidHeightOrRound(message: { height: number; round: number }): boolean {
-		return message.height === this.getConsensus().getHeight() && message.round >= this.getConsensus().getRound();
+	protected hasValidBlockNumberOrRound(message: { blockNumber: number; round: number }): boolean {
+		return (
+			message.blockNumber === this.getConsensus().getBlockNumber() &&
+			message.round >= this.getConsensus().getRound()
+		);
 	}
 
 	protected isRoundInBounds(message: { round: number }): boolean {

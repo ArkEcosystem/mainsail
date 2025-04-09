@@ -1,9 +1,9 @@
 const assertPrecommitOrPrevote = (assert, data1, data2) => {
-	const fields = ["height", "round", "blockId", "validatorIndex", "signature"];
+	const fields = ["blockNumber", "round", "blockHash", "validatorIndex", "signature"];
 	for (const field of fields) {
 		const v1 = data1[field];
 		const v2 = data2[field];
-		if (field === "blockId" && (v1 === undefined || v2 === undefined)) {
+		if (field === "blockHash" && (v1 === undefined || v2 === undefined)) {
 			assert.equal(v1, v2);
 			continue;
 		}

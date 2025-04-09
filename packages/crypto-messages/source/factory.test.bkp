@@ -125,7 +125,7 @@ describe<{
 	it("#makePrecommit - should correctly make signed precommit no block", async ({ factory, identity }) => {
 		const precommit = await factory.makePrecommit(
 			{
-				blockId: undefined,
+				blockHash: undefined,
 				height: 1,
 				round: 1,
 				type: Contracts.Crypto.MessageType.Precommit,
@@ -149,7 +149,7 @@ describe<{
 	it("#makePrevote - should correctly make signed prevote no block", async ({ factory, identity }) => {
 		const prevote = await factory.makePrevote(
 			{
-				blockId: undefined,
+				blockHash: undefined,
 				height: 1,
 				round: 1,
 				type: Contracts.Crypto.MessageType.Prevote,

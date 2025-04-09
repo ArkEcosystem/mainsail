@@ -9,11 +9,11 @@ export class RoundStateRepository implements Contracts.Consensus.RoundStateRepos
 
 	#roundStates = new Map<string, Contracts.Consensus.RoundState>();
 
-	public getRoundState(height: number, round: number): Contracts.Consensus.RoundState {
-		const key = `${height}-${round}`;
+	public getRoundState(blockNumber: number, round: number): Contracts.Consensus.RoundState {
+		const key = `${blockNumber}-${round}`;
 
 		if (!this.#roundStates.has(key)) {
-			this.#roundStates.set(key, this.#createRoundState(height, round));
+			this.#roundStates.set(key, this.#createRoundState(blockNumber, round));
 		}
 
 		return this.#roundStates.get(key)!;
@@ -27,7 +27,7 @@ export class RoundStateRepository implements Contracts.Consensus.RoundStateRepos
 		this.#roundStates.clear();
 	}
 
-	#createRoundState(height: number, round: number): Contracts.Consensus.RoundState {
-		return this.app.resolve(RoundState).configure(height, round);
+	#createRoundState(blockNumber: number, round: number): Contracts.Consensus.RoundState {
+		return this.app.resolve(RoundState).configure(blockNumber, round);
 	}
 }

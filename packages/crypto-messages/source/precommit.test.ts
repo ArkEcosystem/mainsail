@@ -7,16 +7,16 @@ describe<{
 }>("Precommit", ({ it, assert }) => {
 	const precommit = new Precommit({ ...precommitData, serialized: Buffer.from("dead", "hex") });
 
-	it("#height", async () => {
-		assert.equal(precommit.height, 1);
+	it("#blockNumber", async () => {
+		assert.equal(precommit.blockNumber, 1);
 	});
 
 	it("#round", async () => {
 		assert.equal(precommit.round, 1);
 	});
 
-	it("#blockId", async () => {
-		assert.equal(precommit.blockId, precommitData.blockId);
+	it("#blockHash", async () => {
+		assert.equal(precommit.blockHash, precommitData.blockHash);
 	});
 
 	it("#validatorIndex", async () => {
@@ -34,7 +34,7 @@ describe<{
 	it("#toString", async () => {
 		assert.equal(
 			precommit.toString(),
-			`{"blockId":"${precommitData.blockId}","height":1,"round":1,"signature":"${precommitData.signature}","validatorIndex":0}`,
+			`{"blockHash":"${precommitData.blockHash}","blockNumber":1,"round":1,"signature":"${precommitData.signature}","validatorIndex":0}`,
 		);
 	});
 

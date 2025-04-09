@@ -2,7 +2,7 @@ import { describe, Sandbox } from "@mainsail/test-framework";
 
 import crypto from "../config/crypto.json";
 import validators from "../config/validators.json";
-import { assertBlockId, assertBockHeight } from "./asserts.js";
+import { assertBlockHash, assertBockNumber } from "./asserts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import { getLastCommit, prepareNodeValidators, snoozeForBlock } from "./utilities.js";
@@ -37,8 +37,8 @@ describe<{
 
 		const commit = await getLastCommit(nodes[0]);
 
-		await assertBockHeight(nodes, 1);
-		await assertBlockId(nodes, commit.block.data.id);
+		await assertBockNumber(nodes, 1);
+		await assertBlockHash(nodes, commit.block.data.hash);
 	});
 
 	it("should create 3 new block", async ({ nodes }) => {
@@ -46,7 +46,7 @@ describe<{
 
 		const commit = await getLastCommit(nodes[0]);
 
-		await assertBockHeight(nodes, 3);
-		await assertBlockId(nodes, commit.block.data.id);
+		await assertBockNumber(nodes, 3);
+		await assertBlockHash(nodes, commit.block.data.hash);
 	});
 });

@@ -26,7 +26,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (this.roundCalculator.isNewRound(unit.height + 1)) {
+		if (this.roundCalculator.isNewRound(unit.blockNumber + 1)) {
 			await this.#buildActiveValidators();
 		}
 

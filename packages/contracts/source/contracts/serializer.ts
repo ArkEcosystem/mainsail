@@ -18,7 +18,7 @@ export type OptionalPropertyType =
 	| "uint256"
 	| "address"
 	| "bigint"
-	| "blockId";
+	| "blockHash";
 
 export type SerializationSchema = { type: MandatoryPropertyType } | { type: OptionalPropertyType; optional?: true };
 

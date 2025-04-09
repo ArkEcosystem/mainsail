@@ -8,8 +8,8 @@ export type WorkerFlags = KeyValuePair;
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
 	setPeerCount(peerCount: number): Promise<void>;
-	commit(height: number): Promise<void>;
-	start(height: number): Promise<void>;
+	commit(blockNumber: number): Promise<void>;
+	start(blockNumber: number): Promise<void>;
 }
 
 export type WorkerFactory = () => Worker;

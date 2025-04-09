@@ -60,7 +60,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		return this.app.resolve<Proposal>(Proposal).initialize({
 			...proposalData,
 			dataSerialized: proposalData.data.serialized,
-			height: header.number,
+			blockNumber: header.number,
 			serialized,
 		});
 	}
@@ -91,8 +91,8 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		const worker = await this.workerPool.getWorker();
 
 		const bytes = await this.serializer.serializePrevoteForSignature({
-			blockId: data.blockId,
-			height: data.height,
+			blockHash: data.blockHash,
+			blockNumber: data.blockNumber,
 			round: data.round,
 			type: data.type,
 		});
@@ -126,8 +126,8 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		const worker = await this.workerPool.getWorker();
 
 		const bytes = await this.serializer.serializePrecommitForSignature({
-			blockId: data.blockId,
-			height: data.height,
+			blockHash: data.blockHash,
+			blockNumber: data.blockNumber,
 			round: data.round,
 			type: data.type,
 		});

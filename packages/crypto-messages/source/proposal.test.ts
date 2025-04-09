@@ -38,7 +38,7 @@ describe<{
 		context.proposal = context.sandbox.app.resolve(Proposal).initialize({
 			...proposalData,
 			dataSerialized: data.serialized,
-			height: data.block.data.height,
+			blockNumber: data.block.data.number,
 			serialized: Buffer.from("dead", "hex"),
 		});
 	});
@@ -47,8 +47,8 @@ describe<{
 		assert.equal(proposal.isDataDeserialized, false);
 	});
 
-	it("#height", ({ proposal }) => {
-		assert.equal(proposal.height, 2);
+	it("#blockNumber", ({ proposal }) => {
+		assert.equal(proposal.blockNumber, 2);
 	});
 
 	it("#round", ({ proposal }) => {
@@ -82,7 +82,7 @@ describe<{
 	});
 
 	it("#toString - should be ok", ({ proposal }) => {
-		assert.equal(proposal.toString(), `{"height":2,"round":1,"validatorIndex":0}`);
+		assert.equal(proposal.toString(), `{"blockNumber":2,"round":1,"validatorIndex":0}`);
 	});
 
 	// TODO: update fixture
@@ -91,7 +91,7 @@ describe<{
 
 		assert.equal(
 			proposal.toString(),
-			`{"block":"3b76ae07ded37bbab2d56302f7ab09f302ec1a815a53c80ee9805d9c8c8eca19","height":2,"round":1,"validatorIndex":0}`,
+			`{"block":"3b76ae07ded37bbab2d56302f7ab09f302ec1a815a53c80ee9805d9c8c8eca19","blockNumber":2,"round":1,"validatorIndex":0}`,
 		);
 	});
 
@@ -111,7 +111,7 @@ describe<{
 		const proposalWithValidRound = sandbox.app.resolve(Proposal).initialize({
 			...proposalDataWithValidRound,
 			dataSerialized: data.serialized,
-			height: data.block.data.height,
+			blockNumber: data.block.data.number,
 			serialized: Buffer.from("dead", "hex"),
 		});
 

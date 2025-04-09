@@ -23,7 +23,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	#height = 0;
+	#blockNumber = 0;
 	#round = 0;
 	#proposal?: Contracts.Crypto.Proposal;
 	#processorResult?: Contracts.Processor.BlockProcessorResult;
@@ -39,8 +39,8 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 	#commit: Contracts.Crypto.Commit | undefined;
 
-	public get height(): number {
-		return this.#height;
+	public get blockNumber(): number {
+		return this.#blockNumber;
 	}
 
 	public get round(): number {
@@ -59,8 +59,8 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#proposer;
 	}
 
-	public configure(height: number, round: number): RoundState {
-		this.#height = height;
+	public configure(blockNumber: number, round: number): RoundState {
+		this.#blockNumber = blockNumber;
 		this.#round = round;
 
 		const validators = this.validatorSet.getActiveValidators();
@@ -172,7 +172,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 		this.#prevotes.set(prevote.validatorIndex, prevote);
 		this.#validatorsSignedPrevote[prevote.validatorIndex] = true;
-		this.#increasePrevoteCount(prevote.blockId);
+		this.#increasePrevoteCount(prevote.blockHash);
 	}
 
 	public hasPrecommit(validatorIndex: number): boolean {
@@ -186,7 +186,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 		this.#precommits.set(precommit.validatorIndex, precommit);
 		this.#validatorsSignedPrecommit[precommit.validatorIndex] = true;
-		this.#increasePrecommitCount(precommit.blockId);
+		this.#increasePrecommitCount(precommit.blockHash);
 	}
 
 	public hasMajorityPrevotes(): boolean {
@@ -246,19 +246,19 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	}
 
 	public async aggregatePrevotes(): Promise<Contracts.Crypto.AggregatedSignature> {
-		const { activeValidators } = this.configuration.getMilestone(this.#height);
+		const { activeValidators } = this.configuration.getMilestone(this.#blockNumber);
 		return this.aggregator.aggregate(this.#getSignatures(this.#prevotes), activeValidators);
 	}
 
 	public async aggregatePrecommits(): Promise<Contracts.Crypto.AggregatedSignature> {
-		const { activeValidators } = this.configuration.getMilestone(this.#height);
+		const { activeValidators } = this.configuration.getMilestone(this.#blockNumber);
 		return this.aggregator.aggregate(this.#getSignatures(this.#precommits), activeValidators);
 	}
 
 	public logPrevotes(): void {
 		for (const key of this.#prevotesCount.keys()) {
 			const voters = [...this.#prevotes.values()]
-				.filter((prevote) => prevote.blockId === key)
+				.filter((prevote) => prevote.blockHash === key)
 				.map((prevote) => this.validatorSet.getValidator(prevote.validatorIndex).address);
 
 			this.logger.debug(`Block ${key ?? "null"} prevoted by: ${voters.join(", ")}`);
@@ -268,7 +268,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	public logPrecommits(): void {
 		for (const key of this.#precommitsCount.keys()) {
 			const voters = [...this.#precommits.values()]
-				.filter((precommit) => precommit.blockId === key)
+				.filter((precommit) => precommit.blockHash === key)
 				.map((precommit) => this.validatorSet.getValidator(precommit.validatorIndex).address);
 
 			this.logger.debug(`Block ${key ?? "null"} precommitted by: ${voters.join(", ")}`);
@@ -284,39 +284,39 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	}
 
 	#isMajority(size: number): boolean {
-		const { activeValidators } = this.configuration.getMilestone(this.#height);
+		const { activeValidators } = this.configuration.getMilestone(this.#blockNumber);
 		return isMajority(size, activeValidators);
 	}
 
 	#isMinority(size: number): boolean {
-		const { activeValidators } = this.configuration.getMilestone(this.#height);
+		const { activeValidators } = this.configuration.getMilestone(this.#blockNumber);
 		return isMinority(size, activeValidators);
 	}
 
-	#increasePrevoteCount(blockId?: string): void {
-		this.#prevotesCount.set(blockId, this.#getPrevoteCount(blockId) + 1);
+	#increasePrevoteCount(blockHash?: string): void {
+		this.#prevotesCount.set(blockHash, this.#getPrevoteCount(blockHash) + 1);
 	}
 
-	#getPrevoteCount(blockId?: string): number {
-		return this.#prevotesCount.get(blockId) ?? 0;
+	#getPrevoteCount(blockHash?: string): number {
+		return this.#prevotesCount.get(blockHash) ?? 0;
 	}
 
-	#increasePrecommitCount(blockId?: string): void {
-		this.#precommitsCount.set(blockId, this.#getPrecommitCount(blockId) + 1);
+	#increasePrecommitCount(blockHash?: string): void {
+		this.#precommitsCount.set(blockHash, this.#getPrecommitCount(blockHash) + 1);
 	}
 
-	#getPrecommitCount(blockId?: string): number {
-		return this.#precommitsCount.get(blockId) ?? 0;
+	#getPrecommitCount(blockHash?: string): number {
+		return this.#precommitsCount.get(blockHash) ?? 0;
 	}
 
-	#getSignatures(s: Map<number, { signature: string; blockId?: string }>): Map<number, { signature: string }> {
+	#getSignatures(s: Map<number, { signature: string; blockHash?: string }>): Map<number, { signature: string }> {
 		assert.defined(this.#proposal);
 		const filtered: Map<number, { signature: string }> = new Map();
 
 		const block = this.#proposal.getData().block;
 
 		for (const [key, value] of s) {
-			if (value.blockId === block.header.hash) {
+			if (value.blockHash === block.header.hash) {
 				filtered.set(key, value);
 			}
 		}

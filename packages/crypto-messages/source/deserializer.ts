@@ -50,14 +50,14 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 				type: {
 					type: "uint8",
 				},
-				height: {
+				blockNumber: {
 					type: "uint32",
 				},
 				round: {
 					type: "uint32",
 				},
-				blockId: {
-					type: "blockId",
+				blockHash: {
+					type: "blockHash",
 					optional: true,
 				},
 				validatorIndex: {
@@ -82,14 +82,14 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 				type: {
 					type: "uint8",
 				},
-				height: {
+				blockNumber: {
 					type: "uint32",
 				},
 				round: {
 					type: "uint32",
 				},
-				blockId: {
-					type: "blockId",
+				blockHash: {
+					type: "blockHash",
 					optional: true,
 				},
 				validatorIndex: {

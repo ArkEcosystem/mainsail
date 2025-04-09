@@ -103,7 +103,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	public async commit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (this.apiSync && unit.height > this.configuration.getGenesisHeight()) {
+		if (this.apiSync && unit.blockNumber > this.configuration.getGenesisHeight()) {
 			await this.apiSync.beforeCommit();
 		}
 
@@ -116,7 +116,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.txPoolWorker.onCommit(unit);
 		await this.evmWorker.onCommit(unit);
 
-		if (this.apiSync && unit.height > this.configuration.getGenesisHeight()) {
+		if (this.apiSync && unit.blockNumber > this.configuration.getGenesisHeight()) {
 			await this.apiSync.onCommit(unit);
 		}
 
@@ -134,19 +134,19 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		if (!this.state.isBootstrap()) {
 			const block = unit.getBlock();
 			this.logger.info(
-				`Block ${unit.height.toLocaleString()}/${unit.round.toLocaleString()} with ${block.data.transactionsCount.toLocaleString()} tx(s) committed (gasUsed=${block.data.gasUsed.toLocaleString()})`,
+				`Block ${unit.blockNumber.toLocaleString()}/${unit.round.toLocaleString()} with ${block.data.transactionsCount.toLocaleString()} tx(s) committed (gasUsed=${block.data.gasUsed.toLocaleString()})`,
 			);
 		}
 	}
 
 	#logNewRound(unit: Contracts.Processor.ProcessableUnit): void {
-		const height = unit.getBlock().data.number;
-		if (this.roundCalculator.isNewRound(height + 1)) {
-			const roundInfo = this.roundCalculator.calculateRound(height + 1);
+		const blockNumber = unit.getBlock().data.number;
+		if (this.roundCalculator.isNewRound(blockNumber + 1)) {
+			const roundInfo = this.roundCalculator.calculateRound(blockNumber + 1);
 
 			if (!this.state.isBootstrap()) {
 				this.logger.debug(
-					`Starting validator round ${roundInfo.round} at height ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
+					`Starting validator round ${roundInfo.round} at block number ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
 				);
 			}
 		}
@@ -261,11 +261,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #calculateActiveValidators(unit: Contracts.Processor.ProcessableUnit) {
-		if (!this.roundCalculator.isNewRound(unit.height + 1)) {
+		if (!this.roundCalculator.isNewRound(unit.blockNumber + 1)) {
 			return;
 		}
 
-		const { activeValidators, evmSpec } = this.configuration.getMilestone(unit.height + 1);
+		const { activeValidators, evmSpec } = this.configuration.getMilestone(unit.blockNumber + 1);
 
 		const block = unit.getBlock();
 

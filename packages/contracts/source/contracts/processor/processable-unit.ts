@@ -4,7 +4,7 @@ import { AccountUpdate } from "../evm/evm.js";
 import { BlockProcessorResult } from "./block-processor-result.js";
 
 export interface ProcessableUnit {
-	readonly height: number;
+	readonly blockNumber: number;
 	readonly round: number;
 	hasProcessorResult(): boolean;
 	getProcessorResult(): BlockProcessorResult;

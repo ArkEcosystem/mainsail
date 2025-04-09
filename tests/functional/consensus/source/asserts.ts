@@ -5,17 +5,17 @@ import { assert } from "@mainsail/test-runner";
 
 import { getLastCommit, snoozeForInvalidBlock } from "./utilities.js";
 
-export const assertBockHeight = async (sandbox: Sandbox | Sandbox[], height: number): Promise<void> => {
+export const assertBlockNumber = async (sandbox: Sandbox | Sandbox[], blockNumber: number): Promise<void> => {
 	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
 
 	for (const node of nodes) {
 		const commit = await getLastCommit(node);
 		assert.defined(commit);
-		assert.equal(commit.block.data.height, height);
+		assert.equal(commit.block.data.number, blockNumber);
 	}
 };
 
-export const assertBockRound = async (sandbox: Sandbox | Sandbox[], round: number): Promise<void> => {
+export const assertBlockRound = async (sandbox: Sandbox | Sandbox[], round: number): Promise<void> => {
 	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
 
 	for (const node of nodes) {
@@ -35,34 +35,34 @@ export const assertCommitRound = async (sandbox: Sandbox | Sandbox[], round: num
 	}
 };
 
-export const assertBlockId = async (sandbox: Sandbox | Sandbox[], id?: string): Promise<void> => {
+export const assertBlockHash = async (sandbox: Sandbox | Sandbox[], id?: string): Promise<void> => {
 	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
 
 	if (id === undefined) {
 		const commit = await getLastCommit(nodes[0]);
-		id = commit.block.data.id;
+		id = commit.block.data.hash;
 	}
 
 	for (const node of nodes) {
 		const commit = await getLastCommit(node);
 		assert.defined(commit);
-		assert.equal(commit.block!.data.id, id);
+		assert.equal(commit.block!.data.hash, id);
 	}
 };
 
 export const assertInvalidBlock = async (
 	exception: interfaces.Newable<Exceptions.Exception>,
 	sandbox: Sandbox | Sandbox[],
-	height: number,
+	blockNumber: number,
 	round: number = 0,
 ): Promise<void> => {
 	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
-	const invalidBlocks = await snoozeForInvalidBlock(nodes, height);
+	const invalidBlocks = await snoozeForInvalidBlock(nodes, blockNumber);
 
 	assert.length(nodes, invalidBlocks.length);
 
 	for (const { block, error } of invalidBlocks) {
-		assert.equal(block.height, height);
+		assert.equal(block.number, blockNumber);
 		assert.equal(block.round, round);
 
 		if (!(error instanceof exception)) {

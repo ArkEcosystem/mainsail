@@ -8,27 +8,27 @@ export const schemas: Record<
 	precommit: {
 		$id: "precommit",
 		properties: {
-			blockId: { $ref: "blockHash" },
-			height: { minimum: 1, type: "integer" },
+			blockHash: { $ref: "blockHash" },
+			blockNumber: { minimum: 1, type: "integer" },
 			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
 			type: { enum: [Contracts.Crypto.MessageType.Precommit] },
 			validatorIndex: { isValidatorIndex: {} },
 		},
-		required: ["type", "height", "round", "validatorIndex", "signature"],
+		required: ["type", "blockNumber", "round", "validatorIndex", "signature"],
 		type: "object",
 	},
 	prevote: {
 		$id: "prevote",
 		properties: {
-			blockId: { $ref: "blockHash" },
-			height: { minimum: 1, type: "integer" },
+			blockHash: { $ref: "blockHash" },
+			blockNumber: { minimum: 1, type: "integer" },
 			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
 			type: { enum: [Contracts.Crypto.MessageType.Prevote] },
 			validatorIndex: { isValidatorIndex: {} },
 		},
-		required: ["type", "height", "round", "validatorIndex", "signature"],
+		required: ["type", "blockNumber", "round", "validatorIndex", "signature"],
 		type: "object",
 	},
 	proposal: {

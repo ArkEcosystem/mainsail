@@ -1,24 +1,24 @@
 import { Contracts } from "@mainsail/contracts";
 
 export class Prevote implements Contracts.Crypto.Prevote {
-	#height: number;
+	#blockNumber: number;
 	#round: number;
-	#blockId: string | undefined;
+	#blockHash: string | undefined;
 	#validatorIndex: number;
 	#signature: string;
 	#serialized: Buffer;
 
 	constructor({
-		height,
+		blockNumber,
 		round,
-		blockId,
+		blockHash,
 		validatorIndex,
 		signature,
 		serialized,
 	}: Contracts.Crypto.PrevoteData & { serialized: Buffer }) {
-		this.#height = height;
+		this.#blockNumber = blockNumber;
 		this.#round = round;
-		this.#blockId = blockId;
+		this.#blockHash = blockHash;
 		this.#validatorIndex = validatorIndex;
 		this.#signature = signature;
 		this.#serialized = serialized;
@@ -28,16 +28,16 @@ export class Prevote implements Contracts.Crypto.Prevote {
 		return Contracts.Crypto.MessageType.Prevote;
 	}
 
-	get height(): number {
-		return this.#height;
+	get blockNumber(): number {
+		return this.#blockNumber;
 	}
 
 	get round(): number {
 		return this.#round;
 	}
 
-	get blockId(): string | undefined {
-		return this.#blockId;
+	get blockHash(): string | undefined {
+		return this.#blockHash;
 	}
 
 	get validatorIndex(): number {
@@ -54,8 +54,8 @@ export class Prevote implements Contracts.Crypto.Prevote {
 
 	toString(): string {
 		return JSON.stringify({
-			blockId: this.#blockId,
-			height: this.#height,
+			blockHash: this.#blockHash,
+			blockNumber: this.#blockNumber,
 			round: this.#round,
 			signature: this.#signature,
 			validatorIndex: this.#validatorIndex,
@@ -64,8 +64,8 @@ export class Prevote implements Contracts.Crypto.Prevote {
 
 	toSignatureData(): Contracts.Crypto.SignaturePrevoteData {
 		return {
-			blockId: this.#blockId,
-			height: this.#height,
+			blockHash: this.#blockHash,
+			blockNumber: this.#blockNumber,
 			round: this.#round,
 			type: this.type,
 		};
@@ -73,8 +73,8 @@ export class Prevote implements Contracts.Crypto.Prevote {
 
 	toData(): Contracts.Crypto.PrevoteData {
 		return {
-			blockId: this.#blockId,
-			height: this.#height,
+			blockHash: this.#blockHash,
+			blockNumber: this.#blockNumber,
 			round: this.#round,
 			signature: this.#signature,
 			type: this.type,

@@ -5,9 +5,9 @@ export const validatorMnemonic =
 	"sudden head royal retire duck discover danger then basic rice wish left whip chronic enrich sun behind idea remind retire coyote select goddess exile";
 
 export const blockData: Contracts.Crypto.BlockData = {
-	id: "3b76ae07ded37bbab2d56302f7ab09f302ec1a815a53c80ee9805d9c8c8eca19",
+	hash: "3b76ae07ded37bbab2d56302f7ab09f302ec1a815a53c80ee9805d9c8c8eca19",
 	generatorAddress: "2a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d",
-	height: 2,
+	number: 2,
 	round: 1,
 	numberOfTransactions: 2,
 	payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -63,7 +63,7 @@ export const proposalData: Contracts.Crypto.ProposalData = {
 	data: {
 		serialized: serializedBlock,
 	},
-	height: 2,
+	blockNumber: 2,
 	round: 1,
 	signature:
 		"00b25fd16693a2246d3e9dff3d7ae3da1473c1b24f6ef8b33c69e38e21e32c9ca307ae5f7d4573e2679ec48ecc2f1ff89d16115d8e7f6ffcba72cc9a746bcc40cdd0f9120d87c20addb55baceea2cb8cdb75faaf036e6a4221d28dc8f6558d8c",
@@ -84,7 +84,7 @@ export const proposalDataWithValidRound: Contracts.Crypto.ProposalData = {
 	data: {
 		serialized: serializedBlockWithLockProof,
 	},
-	height: 2,
+	blockNumber: 2,
 	round: 1,
 	signature:
 		"00b25fd16693a2246d3e9dff3d7ae3da1473c1b24f6ef8b33c69e38e21e32c9ca307ae5f7d4573e2679ec48ecc2f1ff89d16115d8e7f6ffcba72cc9a746bcc40cdd0f9120d87c20addb55baceea2cb8cdb75faaf036e6a4221d28dc8f6558d8c",
@@ -99,8 +99,8 @@ export const serializedProposalDataWithValidRoundForSignature =
 	"01000000010000000012020000000174ba618a8c0102000000010000000000000000000000000000000000000000000000000000000000000000000000020002000000000000000200000000000000000000000000000084010000e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b8552a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9dba00ff011e0100000000000000000000000000287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac3701000000000000000001000000000000000000000005011d1f1d0e1d04181e0401140108090e051f07030c1a0b0c0f19111c100002031019011f020d0e00131c041719161615101b10ef4c4e285824ee65dee3f0652282fee31b02849cb221b6de18f28c648a7c5dcba2a97a1d210974cd4129cc925657993e12cdfe0b36a487cc4d2f886a09e33a5cba00ff011e0100000000000000000000000000287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac3701000000000000000001000000000000000000000005011d1f1d0e1d04181e0401140108090e051f07030c1a0b0c0f19111c100002031019011f020d0e00131c041719161615101b10ff8e1b3862ebde59bc77394ea7c0e4afe20b1129faa3afa86fc936c8d172a3bff17034515e5b286dac0f27475b69808aff39ce6a0683a8768db088609a0bffd800000000000000000000000000";
 
 export const precommitData: Contracts.Crypto.PrecommitData = {
-	blockId: blockData.id,
-	height: 1,
+	blockHash: blockData.hash,
+	blockNumber: 1,
 	round: 1,
 	signature:
 		"a932d881247d69714e97959b168a09d28dcc9117a53542827304b0625648e613a72b65096789bef38946413079bd254e0cc69cbc0f25c013dc4925f932bbcb3eaf5f40e3356912020059bac0dc5782726a60c58d51ae341456cacd0d93370391",
@@ -115,8 +115,8 @@ export const serializedPrecommitForSignature =
 	"020100000001000000013b76ae07ded37bbab2d56302f7ab09f302ec1a815a53c80ee9805d9c8c8eca19";
 
 export const precommitDataNoBlock: Contracts.Crypto.PrecommitData = {
-	blockId: undefined,
-	height: 1,
+	blockHash: undefined,
+	blockNumber: 1,
 	round: 1,
 	signature:
 		"904c8055242bd7736a1cf7ce20c8fedeee5f2f8fe3f6cab6a166c36c1be0f616c2b7a333912becfa3ecb799c8cd420a012bf41018f5c52f67a2858a6d5bd016e8ef6f56a84d8a734ba6ce5f9a5260201fd9d73ce8688ff0019df2c07a1c33c4d",
@@ -128,8 +128,8 @@ export const serializedPrecommitNoBlock =
 	"0201000000010000000000904c8055242bd7736a1cf7ce20c8fedeee5f2f8fe3f6cab6a166c36c1be0f616c2b7a333912becfa3ecb799c8cd420a012bf41018f5c52f67a2858a6d5bd016e8ef6f56a84d8a734ba6ce5f9a5260201fd9d73ce8688ff0019df2c07a1c33c4d";
 
 export const prevoteData: Contracts.Crypto.PrevoteData = {
-	blockId: blockData.id,
-	height: 1,
+	blockHash: blockData.hash,
+	blockNumber: 1,
 	round: 1,
 	signature:
 		"a0d604c91f8aca401fd0408d441b1243b2f9a2a242a786a2a576134886d5d5d7a2a5ddefbe4db45409b5f9284b28a3380d9a42cdd3bea5e7b3d4d67360ccdf17b9b38e9038af8d9b4087e64cf81df374ee3fa29e62bcc8a37c6e12210d3d2824",
@@ -144,8 +144,8 @@ export const serializedPrevoteForSignature =
 	"010100000001000000013b76ae07ded37bbab2d56302f7ab09f302ec1a815a53c80ee9805d9c8c8eca19";
 
 export const prevoteDataNoBlock: Contracts.Crypto.PrevoteData = {
-	blockId: undefined,
-	height: 1,
+	blockHash: undefined,
+	blockNumber: 1,
 	round: 1,
 	signature:
 		"927628d67c385fe216aa800def9cce0c09f5f9fbf836583d7c07ab6a98e1b5681802c92f81ad54984236a07fa389dbab1519f3c91ad39a505a61c3624a88c65da71fe721d7af0ed452516771b94d027be713dba68e14fa2c9680e35b63f0e038",

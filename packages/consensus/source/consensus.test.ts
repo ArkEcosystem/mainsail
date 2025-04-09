@@ -41,7 +41,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.cryptoConfiguration = {
 			getMilestoneDiff: () => ({}),
 			isNewMilestone: () => false,
-			setHeight: () => {},
+			setblockNumber: () => {},
 		};
 
 		context.proposalProcessor = {
@@ -99,7 +99,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.block = {
 			data: {
 				number: 1,
-				hash: "blockId",
+				hash: "blockHash",
 			},
 		};
 
@@ -107,7 +107,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			getData: () => ({
 				block: context.block,
 			}),
-			height: 1,
+			blockNumber: 1,
 			round: 0,
 			serialized: Buffer.from(""),
 			validRound: undefined,
@@ -125,7 +125,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			hasPrevote: () => false,
 			hasProcessorResult: () => false,
 			hasProposal: () => false,
-			height: 1,
+			blockNumber: 1,
 			logPrecommits: () => {},
 			logPrevotes: () => {},
 			proposer: context.proposer,
@@ -158,8 +158,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.consensus = context.sandbox.app.resolve(Consensus);
 	});
 
-	it("#getHeight - should return initial value", async ({ consensus }) => {
-		assert.equal(consensus.getHeight(), 1);
+	it("#getBlockNumber - should return initial value", async ({ consensus }) => {
+		assert.equal(consensus.getBlockNumber(), 1);
 	});
 
 	it("#getRound - should return initial value", async ({ consensus }) => {
@@ -180,7 +180,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#getState - should return initial value", async ({ consensus }) => {
 		assert.equal(consensus.getState(), {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: undefined,
 			round: 0,
 			step: Contracts.Consensus.Step.Propose,
@@ -219,7 +219,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyLoggerInfo.calledWith(`>> Starting new round: ${1}/${0} with proposer: ${proposer.address}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.RoundStarted, {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: undefined,
 			round: 0,
 			step: Contracts.Consensus.Step.Propose,
@@ -276,7 +276,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyLoggerInfo.calledWith(`>> Starting new round: ${1}/${0} with proposer: ${proposer.address}`);
 		spyDispatch.called();
 		spyDispatch.calledWith(Events.ConsensusEvent.RoundStarted, {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: undefined,
 			round: 0,
 			step: Contracts.Consensus.Step.Propose,
@@ -348,7 +348,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyLoggerInfo.calledWith(`Proposing valid block ${1}/${1} from round ${0} with block hash: ${block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.RoundStarted, {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: undefined,
 			round: 1,
 			step: Contracts.Consensus.Step.Propose,
@@ -403,10 +403,14 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
 	});
 
-	it("#onProposal - should return if height doesn't match", async ({ consensus, blockProcessor, roundState }) => {
+	it("#onProposal - should return if blockNumber doesn't match", async ({
+		consensus,
+		blockProcessor,
+		roundState,
+	}) => {
 		const spyBlockProcessorProcess = spy(blockProcessor, "process");
 
-		roundState = { ...roundState, height: 3 };
+		roundState = { ...roundState, blockNumber: 3 };
 		await consensus.onProposal(roundState);
 
 		spyBlockProcessorProcess.neverCalled();
@@ -464,7 +468,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue({ success: true });
 
 		const prevote = {
-			height: 1,
+			blockNumber: 1,
 			round: 0,
 		};
 
@@ -491,12 +495,12 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyGetProcessorResult.calledOnce();
 		getValidatorIndexByWalletAddress.calledOnce();
 		spyValidatorPrevote.calledOnce();
-		spyValidatorPrevote.calledWith(1, 1, 0, block.data.hash); // validatorIndex, height, round, blockId
+		spyValidatorPrevote.calledWith(1, 1, 0, block.data.hash); // validatorIndex, blockNumber, round, blockHash
 
 		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} block hash: ${proposal.getData().block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: undefined,
 			round: 0,
 			step: Contracts.Consensus.Step.Prevote,
@@ -519,7 +523,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue({ success: false });
 
 		const prevote = {
-			height: 2,
+			blockNumber: 2,
 			round: 0,
 			serialized: Buffer.from(""),
 		};
@@ -552,7 +556,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} block hash: ${proposal.getData().block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: undefined,
 			round: 0,
 			step: Contracts.Consensus.Step.Prevote,
@@ -576,7 +580,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue({ success: true });
 
 		const prevote = {
-			height: 2,
+			blockNumber: 2,
 			round: 0,
 		};
 
@@ -607,7 +611,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} block hash: ${proposal.getData().block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: undefined,
 			round: 0,
 			step: Contracts.Consensus.Step.Prevote,
@@ -637,7 +641,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue({ success: true });
 
 		const prevote = {
-			height: 1,
+			blockNumber: 1,
 			round: 0,
 		};
 
@@ -675,7 +679,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			`Received proposal ${1}/${1} with locked block hash: ${proposal.getData().block.data.hash}`,
 		);
 		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: undefined,
 			round: 1,
 			step: Contracts.Consensus.Step.Prevote,
@@ -701,7 +705,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue({ success: true });
 
 		const prevote = {
-			height: 1,
+			blockNumber: 1,
 			round: 0,
 			serialized: Buffer.from(""),
 		};
@@ -738,7 +742,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: undefined,
 			round: 1,
 			step: Contracts.Consensus.Step.Prevote,
@@ -770,11 +774,15 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Precommit);
 	});
 
-	it("#onProposalLocked - should return if height doesn't match", async ({ consensus, roundState, proposal }) => {
+	it("#onProposalLocked - should return if blockNumber doesn't match", async ({
+		consensus,
+		roundState,
+		proposal,
+	}) => {
 		proposal.validRound = 0;
 		roundState = { ...roundState, round: 1 };
 		consensus.setRound(1);
-		roundState = { ...roundState, height: 3 };
+		roundState = { ...roundState, blockNumber: 3 };
 		await consensus.onProposalLocked(roundState);
 
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
@@ -849,7 +857,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const precommit = {
-			height: 1,
+			blockNumber: 1,
 			round: 0,
 			serialized: Buffer.from(""),
 		};
@@ -884,7 +892,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.PrevotedProposal, {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: 0,
 			round: 0,
 			step: Contracts.Consensus.Step.Precommit,
@@ -919,7 +927,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.PrevotedProposal, {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: undefined,
 			round: 0,
 			step: Contracts.Consensus.Step.Precommit,
@@ -941,7 +949,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const precommit = {
-			height: 1,
+			blockNumber: 1,
 			round: 0,
 			serialized: Buffer.from(""),
 		};
@@ -1003,7 +1011,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const precommit = {
-			height: 2,
+			blockNumber: 2,
 			round: 0,
 			serialized: Buffer.from(""),
 		};
@@ -1037,8 +1045,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.undefined(consensus.getValidRound());
 	});
 
-	it("#onMajorityPrevote - should return if height doesn't match", async ({ consensus, roundState }) => {
-		roundState = { ...roundState, height: 3 };
+	it("#onMajorityPrevote - should return if blockNumber doesn't match", async ({ consensus, roundState }) => {
+		roundState = { ...roundState, blockNumber: 3 };
 		consensus.setStep(Contracts.Consensus.Step.Prevote);
 		await consensus.onMajorityPrevote(roundState);
 
@@ -1091,7 +1099,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.PrevotedAny, {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: undefined,
 			round: 0,
 			step: Contracts.Consensus.Step.Prevote,
@@ -1116,7 +1124,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
-	it("#onMajorityPrevoteAny - should return if height doesn't match", async ({
+	it("#onMajorityPrevoteAny - should return if blockNumber doesn't match", async ({
 		consensus,
 		scheduler,
 		roundState,
@@ -1125,7 +1133,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
-		roundState = { ...roundState, height: 3 };
+		roundState = { ...roundState, blockNumber: 3 };
 		consensus.setStep(Contracts.Consensus.Step.Prevote);
 		await consensus.onMajorityPrevoteAny(roundState);
 
@@ -1185,7 +1193,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const precommit = {
-			height: 1,
+			blockNumber: 1,
 			round: 0,
 			serialized: Buffer.from(""),
 		};
@@ -1214,7 +1222,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.PrevotedNull, {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: undefined,
 			round: 0,
 			step: Contracts.Consensus.Step.Precommit,
@@ -1231,8 +1239,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Precommit);
 	});
 
-	it("#onMajorityPrevoteNull - should return if height doesn't match", async ({ consensus, roundState }) => {
-		roundState = { ...roundState, height: 3 };
+	it("#onMajorityPrevoteNull - should return if blockNumber doesn't match", async ({ consensus, roundState }) => {
+		roundState = { ...roundState, blockNumber: 3 };
 		consensus.setStep(Contracts.Consensus.Step.Prevote);
 		await consensus.onMajorityPrevoteNull(roundState);
 
@@ -1265,7 +1273,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.PrecommitedAny, {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: undefined,
 			round: 0,
 			step: Contracts.Consensus.Step.Propose,
@@ -1274,7 +1282,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
-	it("#onMajorityPrecommitAny - should return if height doesn't match", async ({
+	it("#onMajorityPrecommitAny - should return if blockNumber doesn't match", async ({
 		consensus,
 		scheduler,
 		roundState,
@@ -1285,7 +1293,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 
-		roundState = { ...roundState, height: 3 };
+		roundState = { ...roundState, blockNumber: 3 };
 		await consensus.onMajorityPrecommitAny(roundState);
 
 		spyScheduleTimeout.neverCalled();
@@ -1328,7 +1336,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyDispatch.neverCalled();
 	});
 
-	it("#onMajorityPrecommit - should commit & increase height", async ({
+	it("#onMajorityPrecommit - should commit & increase blockNumber", async ({
 		consensus,
 		blockProcessor,
 		roundState,
@@ -1348,7 +1356,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		roundState.getProcessorResult = () => ({ success: true });
 
-		assert.equal(consensus.getHeight(), 1);
+		assert.equal(consensus.getBlockNumber(), 1);
 		void consensus.onMajorityPrecommit(roundState);
 		await fakeTimers.nextAsync();
 
@@ -1363,13 +1371,13 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.PrecommitedProposal, {
-			height: 1,
+			blockNumber: 1,
 			lockedRound: undefined,
 			round: 0,
 			step: Contracts.Consensus.Step.Propose,
 			validRound: undefined,
 		});
-		assert.equal(consensus.getHeight(), 2);
+		assert.equal(consensus.getBlockNumber(), 2);
 	});
 
 	it("#onMajorityPrecommit - should terminate if processor throws", async ({
@@ -1388,7 +1396,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		roundState.getProcessorResult = () => ({ success: true });
 
-		assert.equal(consensus.getHeight(), 1);
+		assert.equal(consensus.getBlockNumber(), 1);
 		void consensus.onMajorityPrecommit(roundState);
 		await fakeTimers.nextAsync();
 
@@ -1418,7 +1426,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		roundState.getProcessorResult = () => ({ success: false });
 
-		assert.equal(consensus.getHeight(), 1);
+		assert.equal(consensus.getBlockNumber(), 1);
 		void consensus.onMajorityPrecommit(roundState);
 		await fakeTimers.nextAsync();
 
@@ -1426,8 +1434,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyBlockProcessorCommit.neverCalled();
 		spyConsensusStartRound.neverCalled();
 		spyRoundStateRepositoryClear.neverCalled();
-		spyLoggerInfo.calledWith(`Block ${block.data.hash} on height ${1} received +2/3 precommits but is invalid`);
-		assert.equal(consensus.getHeight(), 1);
+		spyLoggerInfo.calledWith(
+			`Block ${block.data.hash} on block number ${1} received +2/3 precommits but is invalid`,
+		);
+		assert.equal(consensus.getBlockNumber(), 1);
 	});
 
 	it("#onMajorityPrecommit - should be called only once", async ({
@@ -1444,23 +1454,23 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		roundState.getProcessorResult = () => ({ success: true });
 
-		assert.equal(consensus.getHeight(), 1);
+		assert.equal(consensus.getBlockNumber(), 1);
 		void consensus.onMajorityPrecommit(roundState);
 		await fakeTimers.nextAsync();
 
 		spyBlockProcessorCommit.calledOnce();
 		spyConsensusStartRound.calledOnce();
-		assert.equal(consensus.getHeight(), 2);
+		assert.equal(consensus.getBlockNumber(), 2);
 
 		await consensus.onMajorityPrecommit(roundState);
 
 		spyRoundStateGetBlock.calledOnce();
 		spyBlockProcessorCommit.calledOnce();
 		spyConsensusStartRound.calledOnce();
-		assert.equal(consensus.getHeight(), 2);
+		assert.equal(consensus.getBlockNumber(), 2);
 	});
 
-	it("#onMajorityPrecommit - should return if height doesn't match", async ({
+	it("#onMajorityPrecommit - should return if blockNumber doesn't match", async ({
 		consensus,
 		blockProcessor,
 		roundState,
@@ -1470,7 +1480,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		roundState.getProcessorResult = () => ({ success: true });
 
-		roundState = { ...roundState, height: 2 };
+		roundState = { ...roundState, blockNumber: 2 };
 		await consensus.onMajorityPrecommit(roundState);
 
 		spyBlockProcessorCommit.neverCalled();
@@ -1506,11 +1516,11 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyConsensusStartRound.calledWith(roundState.round);
 	});
 
-	it("#onMinorityWithHigherRound - should return if height doesn't match", async ({ consensus, roundState }) => {
+	it("#onMinorityWithHigherRound - should return if blockNumber doesn't match", async ({ consensus, roundState }) => {
 		const fakeTimers = clock();
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 
-		roundState = { ...roundState, height: 3 };
+		roundState = { ...roundState, blockNumber: 3 };
 		void consensus.onMinorityWithHigherRound(roundState);
 		await fakeTimers.nextAsync();
 
@@ -1535,7 +1545,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		proposer,
 	}) => {
 		const prevote = {
-			height: 1,
+			blockNumber: 1,
 			round: 0,
 			serialized: Buffer.from(""),
 		};
@@ -1585,7 +1595,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Precommit);
 	});
 
-	it("#onTimeoutPropose - should return if height doesn't match", async ({ consensus, prevoteProcessor }) => {
+	it("#onTimeoutPropose - should return if blockNumber doesn't match", async ({ consensus, prevoteProcessor }) => {
 		const spyPrevoteProcess = spy(prevoteProcessor, "process");
 
 		await consensus.onTimeoutPropose(2, 0);
@@ -1615,7 +1625,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const precommit = {
-			height: 1,
+			blockNumber: 1,
 			round: 0,
 		};
 
@@ -1663,7 +1673,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Precommit);
 	});
 
-	it("#onTimeoutPrevote - should return if height doesn't match", async ({ consensus, precommitProcessor }) => {
+	it("#onTimeoutPrevote - should return if blockNumber doesn't match", async ({ consensus, precommitProcessor }) => {
 		const spyPrecommitProcess = spy(precommitProcessor, "process");
 
 		consensus.setStep(Contracts.Consensus.Step.Prevote);
@@ -1699,7 +1709,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		[Contracts.Consensus.Step.Propose, Contracts.Consensus.Step.Prevote, Contracts.Consensus.Step.Precommit],
 	);
 
-	it("#onTimeoutPrecommit - should return if height doesn't match", async ({ consensus }) => {
+	it("#onTimeoutPrecommit - should return if blockNumber doesn't match", async ({ consensus }) => {
 		const fakeTimers = clock();
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 

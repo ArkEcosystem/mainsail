@@ -7,16 +7,16 @@ describe<{
 }>("Prevote", ({ it, assert }) => {
 	const prevote = new Prevote({ ...prevoteData, serialized: Buffer.from("dead", "hex") });
 
-	it("#height", async () => {
-		assert.equal(prevote.height, 1);
+	it("#blockNumber", async () => {
+		assert.equal(prevote.blockNumber, 1);
 	});
 
 	it("#round", async () => {
 		assert.equal(prevote.round, 1);
 	});
 
-	it("#blockId", async () => {
-		assert.equal(prevote.blockId, prevoteData.blockId);
+	it("#blockHash", async () => {
+		assert.equal(prevote.blockHash, prevoteData.blockHash);
 	});
 
 	it("#validatorIndex", async () => {
@@ -34,7 +34,7 @@ describe<{
 	it("#toString", async () => {
 		assert.equal(
 			prevote.toString(),
-			`{"blockId":"${prevoteData.blockId}","height":1,"round":1,"signature":"${prevoteData.signature}","validatorIndex":0}`,
+			`{"blockHash":"${prevoteData.blockHash}","blockNumber":1,"round":1,"signature":"${prevoteData.signature}","validatorIndex":0}`,
 		);
 	});
 

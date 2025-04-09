@@ -11,7 +11,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 	#validators = new Map<string, Contracts.State.ValidatorWallet>();
 	#accountUpdates: Array<Contracts.Evm.AccountUpdate> = [];
 
-	public get height(): number {
+	public get blockNumber(): number {
 		return this.#commit.block.data.number;
 	}
 

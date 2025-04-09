@@ -16,8 +16,18 @@ export interface Validator {
 		block: Block,
 		lockProof?: AggregatedSignature,
 	): Promise<Proposal>;
-	prevote(validatorIndex: number, height: number, round: number, blockId: string | undefined): Promise<Prevote>;
-	precommit(validatorIndex: number, height: number, round: number, blockId: string | undefined): Promise<Precommit>;
+	prevote(
+		validatorIndex: number,
+		blockHeight: number,
+		round: number,
+		blockHash: string | undefined,
+	): Promise<Prevote>;
+	precommit(
+		validatorIndex: number,
+		blockHeight: number,
+		round: number,
+		blockHash: string | undefined,
+	): Promise<Precommit>;
 }
 
 export interface ValidatorRepository {

@@ -22,7 +22,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 	private readonly commitStateFactory!: Contracts.Consensus.CommitStateFactory;
 
 	async process(commit: Contracts.Crypto.Commit): Promise<Contracts.Consensus.ProcessorResult> {
-		if (!this.#hasValidHeight(commit)) {
+		if (!this.#hasValidBlockNumber(commit)) {
 			return Contracts.Consensus.ProcessorResult.Skipped;
 		}
 
@@ -54,8 +54,8 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 		}
 
 		const precommit = await this.serializer.serializePrecommitForSignature({
-			blockId: block.data.hash,
-			height: block.data.number,
+			blockHash: block.data.hash,
+			blockNumber: block.data.number,
 			round: proof.round,
 			type: Contracts.Crypto.MessageType.Precommit,
 		});
@@ -63,7 +63,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 		return this.aggregator.verify(proof, precommit, activeValidators);
 	}
 
-	#hasValidHeight(commit: Contracts.Crypto.Commit): boolean {
-		return commit.block.data.number === this.getConsensus().getHeight();
+	#hasValidBlockNumber(commit: Contracts.Crypto.Commit): boolean {
+		return commit.block.data.number === this.getConsensus().getBlockNumber();
 	}
 }

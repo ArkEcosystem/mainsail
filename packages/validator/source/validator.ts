@@ -102,14 +102,14 @@ export class Validator implements Contracts.Validator.Validator {
 
 	public async prevote(
 		validatorIndex: number,
-		height: number,
+		blockNumber: number,
 		round: number,
-		blockId: string | undefined,
+		blockHash: string | undefined,
 	): Promise<Contracts.Crypto.Prevote> {
 		return this.messagesFactory.makePrevote(
 			{
-				blockId,
-				height,
+				blockHash,
+				blockNumber,
 				round,
 				type: Contracts.Crypto.MessageType.Prevote,
 				validatorIndex,
@@ -120,14 +120,14 @@ export class Validator implements Contracts.Validator.Validator {
 
 	public async precommit(
 		validatorIndex: number,
-		height: number,
+		blockNumber: number,
 		round: number,
-		blockId: string | undefined,
+		blockHash: string | undefined,
 	): Promise<Contracts.Crypto.Precommit> {
 		return this.messagesFactory.makePrecommit(
 			{
-				blockId,
-				height,
+				blockHash,
+				blockNumber,
 				round,
 				type: Contracts.Crypto.MessageType.Precommit,
 				validatorIndex,

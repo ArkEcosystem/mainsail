@@ -194,7 +194,7 @@ const bootstrap = async (sandbox: Sandbox) => {
 
 	await evm.prepareNextCommit({
 		commitKey: {
-			blockNumber: BigInt(commitState.height),
+			blockNumber: BigInt(commitState.blockNumber),
 			round: BigInt(commitState.round),
 			blockHash: commitState.getBlock().header.hash,
 		},

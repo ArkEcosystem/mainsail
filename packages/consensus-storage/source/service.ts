@@ -30,7 +30,7 @@ export class Service implements Contracts.ConsensusStorage.Service {
 		const data = await this.stateStorage.get("consensus-state");
 
 		return {
-			height: data.height,
+			blockNumber: data.blockNumber,
 			lockedRound: data.lockedRound,
 			round: data.round,
 			step: data.step,
@@ -41,7 +41,7 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	public async saveState(state: Contracts.Consensus.State): Promise<void> {
 		// always overwrite existing state; we only care about state for uncommitted blocks
 		const data: Contracts.Consensus.StateData = {
-			height: state.height,
+			blockNumber: state.blockNumber,
 			lockedRound: state.lockedRound,
 			round: state.round,
 			step: state.step,

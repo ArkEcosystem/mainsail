@@ -49,12 +49,12 @@ export class Worker implements Contracts.Evm.Worker {
 		return this.ipcSubprocess.getQueueSize();
 	}
 
-	public async start(height: number): Promise<void> {
-		await this.ipcSubprocess.sendRequest("start", height);
+	public async start(blockNumber: number): Promise<void> {
+		await this.ipcSubprocess.sendRequest("start", blockNumber);
 	}
 
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		await this.ipcSubprocess.sendRequest("commit", unit.height);
+		await this.ipcSubprocess.sendRequest("commit", unit.blockNumber);
 	}
 
 	public async setPeerCount(peerCount: number): Promise<void> {

@@ -83,7 +83,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 				continue;
 			}
 
-			if (schema.type === "blockId") {
+			if (schema.type === "blockHash") {
 				this.#writeOptional(schema, result, value, () => result.writeBytes(Buffer.from(value, "hex")));
 				continue;
 			}
@@ -196,7 +196,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 				continue;
 			}
 
-			if (schema.type === "blockId") {
+			if (schema.type === "blockHash") {
 				target[property] = this.#readOptional<string>(schema, source, () =>
 					source.readBytes(this.hashSize).toString("hex"),
 				);
