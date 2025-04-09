@@ -22,44 +22,24 @@ export class BlocksController extends Controller {
 		);
 		blocks.reverse();
 
-		if (request.query.transform) {
-			return this.toPagination(
-				{
-					results: blocks,
-					totalCount: lastBlock.data.number,
-				},
-				BlockResource,
-				true,
-			);
-		} else {
-			return this.toPagination(
-				{
-					results: blocks.map((block) => block.data),
-					totalCount: lastBlock.data.number,
-				},
-				BlockResource,
-				false,
-			);
-		}
+		return this.toPagination(
+			{
+				results: blocks,
+				totalCount: lastBlock.data.number,
+			},
+			BlockResource,
+		);
 	}
 
 	public async first(request: Hapi.Request) {
 		const commit = this.stateStore.getGenesisCommit();
 
-		if (request.query.transform) {
-			return this.respondWithResource(commit.block, BlockResource, true);
-		} else {
-			return this.respondWithResource(commit.block.data, BlockResource, false);
-		}
+		return this.respondWithResource(commit.block, BlockResource);
 	}
 
 	public async last(request: Hapi.Request) {
 		const block = this.stateStore.getLastBlock();
-		if (request.query.transform) {
-			return this.respondWithResource(block, BlockResource, true);
-		} else {
-			return this.respondWithResource(block.data, BlockResource, false);
-		}
+		return this.respondWithResource(block, BlockResource);
 	}
 
 	public async show(request: Hapi.Request) {
@@ -69,11 +49,7 @@ export class BlocksController extends Controller {
 			return notFound("Block not found");
 		}
 
-		if (request.query.transform) {
-			return this.respondWithResource(block, BlockResource, true);
-		} else {
-			return this.respondWithResource(block.data, BlockResource, false);
-		}
+		return this.respondWithResource(block, BlockResource);
 	}
 
 	public async transactions(request: Hapi.Request) {
@@ -93,12 +69,11 @@ export class BlocksController extends Controller {
 				totalCount: block.transactions.length,
 			},
 			TransactionResource,
-			request.query.transform,
 		);
 	}
 
-	// TODO: Support height only
-	private async getBlock(idOrHeight: string): Promise<Contracts.Crypto.Block | undefined> {
-		return await this.database.getBlock(Number.parseInt(idOrHeight));
+	// TODO: Support block number only
+	private async getBlock(idOrBlockNumber: string): Promise<Contracts.Crypto.Block | undefined> {
+		return await this.database.getBlock(Number.parseInt(idOrBlockNumber));
 	}
 }

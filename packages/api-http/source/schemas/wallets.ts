@@ -35,5 +35,4 @@ export const walletCriteriaSchema = Schemas.createCriteriaSchema({
 export const walletSortingSchema = Schemas.createSortingSchema(
 	{ ...walletCriteriaSchemaObject, address: walletAddressSchema },
 	["attributes"],
-	false,
 );

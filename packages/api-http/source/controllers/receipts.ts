@@ -52,7 +52,6 @@ export class ReceiptsController extends Controller {
 				totalCount,
 			},
 			ReceiptResource,
-			false,
 		);
 	}
 
@@ -67,7 +66,7 @@ export class ReceiptsController extends Controller {
 			return Boom.notFound();
 		}
 
-		return this.toResource(receipt, ReceiptResource, false);
+		return this.toResource(receipt, ReceiptResource);
 	}
 
 	public async contracts(request: Hapi.Request) {
@@ -105,7 +104,6 @@ export class ReceiptsController extends Controller {
 				totalCount,
 			},
 			ReceiptResource,
-			false,
 		);
 	}
 

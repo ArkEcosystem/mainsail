@@ -80,7 +80,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				query: Joi.object({
 					...server.app.schemas.blockCriteriaSchemas,
 					orderBy: server.app.schemas.blocksOrderBy,
-					transform: Joi.bool().default(true),
 				})
 					.concat(blockSortingSchema)
 					.concat(Schemas.pagination),

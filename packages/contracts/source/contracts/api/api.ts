@@ -42,6 +42,5 @@ export type ResultsPage<T> = {
 };
 
 export interface Resource {
-	raw(resource): object;
 	transform(resource): object;
 }

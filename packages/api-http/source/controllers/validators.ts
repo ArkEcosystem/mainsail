@@ -33,7 +33,7 @@ export class ValidatorsController extends Controller {
 			options,
 		);
 
-		return this.toPagination(wallets, ValidatorResource, request.query.transform);
+		return this.toPagination(wallets, ValidatorResource);
 	}
 
 	public async show(request: Hapi.Request) {
@@ -44,7 +44,7 @@ export class ValidatorsController extends Controller {
 			return Boom.notFound("Validator not found");
 		}
 
-		return this.respondWithResource(validator, ValidatorResource, request.params.transform);
+		return this.respondWithResource(validator, ValidatorResource);
 	}
 
 	public async voters(request: Hapi.Request) {
@@ -75,7 +75,7 @@ export class ValidatorsController extends Controller {
 			options,
 		);
 
-		return this.toPagination(wallets, WalletResource, request.query.transform);
+		return this.toPagination(wallets, WalletResource);
 	}
 
 	public async blocks(request: Hapi.Request) {
@@ -101,7 +101,6 @@ export class ValidatorsController extends Controller {
 		return this.toPagination(
 			await this.enrichBlockResult(blocks, { generators: { [validator.address]: validator }, state }),
 			BlockResource,
-			request.query.transform,
 		);
 	}
 

@@ -27,7 +27,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			validate: {
 				query: Joi.object({
 					...walletCriteriaSchemaObject,
-					transform: Joi.bool().default(true),
 				})
 					.concat(walletSortingSchema)
 					.concat(Schemas.pagination),
@@ -46,7 +45,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			validate: {
 				query: Joi.object({
 					...walletCriteriaSchemaObject,
-					transform: Joi.bool().default(true),
 				})
 					.concat(walletSortingSchema)
 					.concat(Schemas.pagination),
@@ -63,9 +61,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				params: Joi.object({
 					id: walletParameterSchema,
 				}),
-				query: Joi.object({
-					transform: Joi.bool().default(true),
-				}),
+				query: Joi.object({}),
 			},
 		},
 		path: "/wallets/{id}",
@@ -88,7 +84,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					...server.app.schemas.transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
 					orderBy: server.app.schemas.transactionsOrderBy,
-					transform: Joi.bool().default(true),
 				})
 					.concat(transactionSortingSchema)
 					.concat(Schemas.pagination),
@@ -114,7 +109,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					...server.app.schemas.transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
 					orderBy: server.app.schemas.transactionsOrderBy,
-					transform: Joi.bool().default(true),
 				})
 					.concat(transactionSortingSchema)
 					.concat(Schemas.pagination),
@@ -140,7 +134,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					...server.app.schemas.transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
 					orderBy: server.app.schemas.transactionsOrderBy,
-					transform: Joi.bool().default(true),
 				})
 					.concat(transactionSortingSchema)
 					.concat(Schemas.pagination),
@@ -166,7 +159,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					...server.app.schemas.transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
 					orderBy: server.app.schemas.transactionsOrderBy,
-					transform: Joi.bool().default(true),
 				})
 					.concat(transactionSortingSchema)
 					.concat(Schemas.pagination),

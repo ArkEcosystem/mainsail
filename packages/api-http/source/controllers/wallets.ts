@@ -26,7 +26,7 @@ export class WalletsController extends Controller {
 
 		const wallets = await this.walletRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 
-		return this.toPagination(wallets, WalletResource, request.query.transform);
+		return this.toPagination(wallets, WalletResource);
 	}
 
 	public async top(request: Hapi.Request) {
@@ -37,7 +37,7 @@ export class WalletsController extends Controller {
 
 		const wallets = await this.walletRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 
-		return this.toPagination(wallets, WalletResource, request.query.transform);
+		return this.toPagination(wallets, WalletResource);
 	}
 
 	public async show(request: Hapi.Request) {
@@ -45,7 +45,7 @@ export class WalletsController extends Controller {
 
 		const wallet = await this.getWallet(walletId);
 
-		return this.respondWithResource(wallet, WalletResource, request.params.transform);
+		return this.respondWithResource(wallet, WalletResource);
 	}
 
 	public async transactions(request: Hapi.Request) {
@@ -122,7 +122,6 @@ export class WalletsController extends Controller {
 		return this.toPagination(
 			await this.enrichTransactionResult(transactions, { fullReceipt: request.query.fullReceipt }),
 			TransactionResource,
-			request.query.transform,
 		);
 	}
 

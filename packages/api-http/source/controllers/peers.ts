@@ -24,7 +24,7 @@ export class PeersController extends Controller {
 
 		const peers = await this.peerRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 
-		return this.toPagination(peers, PeerResource, request.query.transform);
+		return this.toPagination(peers, PeerResource);
 	}
 
 	public async show(request: Hapi.Request) {
@@ -40,7 +40,7 @@ export class PeersController extends Controller {
 			return Boom.notFound("Peer not found");
 		}
 
-		return this.respondWithResource(peer, PeerResource, request.query.transform);
+		return this.respondWithResource(peer, PeerResource);
 	}
 
 	protected getListingOptions(): Contracts.Api.Options {

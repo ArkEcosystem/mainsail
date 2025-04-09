@@ -39,5 +39,4 @@ export const validatorSortingSchema = Schemas.createSortingSchema(
 		address: walletAddressSchema,
 	},
 	["attributes"],
-	false,
 );

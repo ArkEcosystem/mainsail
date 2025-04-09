@@ -18,4 +18,4 @@ export const transactionCriteriaSchemaObject = {
 };
 
 export const transactionParamSchema = transactionHashSchema;
-export const transactionSortingSchema = Schemas.createSortingSchema(transactionCriteriaSchemas, [], false);
+export const transactionSortingSchema = Schemas.createSortingSchema(transactionCriteriaSchemas, []);

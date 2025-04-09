@@ -28,7 +28,7 @@ export class ApiNodesController extends Controller {
 			options,
 		);
 
-		return this.toPagination(apiNodes, ApiNodeResource, request.query.transform);
+		return this.toPagination(apiNodes, ApiNodeResource);
 	}
 
 	protected getListingOptions(): Contracts.Api.Options {

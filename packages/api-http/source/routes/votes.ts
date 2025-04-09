@@ -24,7 +24,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					...server.app.schemas.transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
 					orderBy: server.app.schemas.transactionsOrderBy,
-					transform: Joi.bool().default(true),
 				})
 					.concat(transactionSortingSchema)
 					.concat(Schemas.pagination),
@@ -44,7 +43,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				}),
 				query: Joi.object({
 					fullReceipt: Joi.bool().default(false),
-					transform: Joi.bool().default(true),
 				}),
 			},
 		},

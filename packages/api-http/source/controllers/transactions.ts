@@ -37,7 +37,6 @@ export class TransactionsController extends Controller {
 		return this.toPagination(
 			await this.enrichTransactionResult(transactions, { fullReceipt: request.query.fullReceipt }),
 			TransactionResource,
-			request.query.transform,
 		);
 	}
 
@@ -75,7 +74,6 @@ export class TransactionsController extends Controller {
 		return this.respondWithResource(
 			await this.enrichTransaction(transaction, undefined, undefined, request.query.fullReceipt),
 			TransactionResource,
-			request.query.transform,
 		);
 	}
 }

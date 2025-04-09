@@ -47,12 +47,7 @@ describe<{}>("Schemas", ({ it, assert }) => {
 
 			assert.equal(result, {
 				value: {
-					orderBy: [
-						{
-							property: "username",
-							direction: "asc",
-						},
-					],
+					orderBy: "username",
 				},
 			});
 		});
@@ -64,12 +59,7 @@ describe<{}>("Schemas", ({ it, assert }) => {
 
 			assert.equal(result, {
 				value: {
-					orderBy: [
-						{
-							property: "username",
-							direction: "desc",
-						},
-					],
+					orderBy: "username:desc",
 				},
 			});
 		});
@@ -109,12 +99,7 @@ describe<{}>("Schemas", ({ it, assert }) => {
 
 			assert.equal(result, {
 				value: {
-					orderBy: [
-						{
-							property: "invalid.username",
-							direction: "asc",
-						},
-					],
+					orderBy: "invalid.username:asc",
 				},
 			});
 		});

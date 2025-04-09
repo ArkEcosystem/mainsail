@@ -22,7 +22,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				query: Joi.object({
 					ip: Joi.string().ip({ version: ["ipv4", "ipV6"] }),
 					orderBy: server.app.schemas.orderBy,
-					transform: Joi.bool().default(true),
 					version: Joi.string(),
 				}).concat(Schemas.pagination),
 			},
@@ -37,7 +36,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			validate: {
 				params: Joi.object({
 					ip: Joi.string().ip({ version: ["ipv4", "ipV6"] }),
-					transform: Joi.bool().default(true),
 				}),
 			},
 		},

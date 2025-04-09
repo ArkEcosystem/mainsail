@@ -28,7 +28,7 @@ export class BlocksController extends Controller {
 
 		const blocks = await this.blockRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 		if (blocks.results.length === 0) {
-			return this.toPagination(blocks, BlockResource, request.query.transform);
+			return this.toPagination(blocks, BlockResource);
 		}
 
 		const generatorAddresses = blocks.results.map(({ proposer }) => proposer);
@@ -47,7 +47,6 @@ export class BlocksController extends Controller {
 				}, {}),
 			}),
 			BlockResource,
-			request.query.transform,
 		);
 	}
 
@@ -94,7 +93,6 @@ export class BlocksController extends Controller {
 		const options = this.getListingOptions();
 
 		const walletRepository = this.walletRepositoryFactory();
-		// TODO: Check
 		const criteria: Search.Criteria.TransactionCriteria = { ...request.query, blockHash: block.hash };
 
 		const transactions = await this.transactionRepositoryFactory().findManyByCriteria(
@@ -108,11 +106,10 @@ export class BlocksController extends Controller {
 		return this.toPagination(
 			await this.enrichTransactionResult(transactions, { fullReceipt: request.query.fullReceipt }),
 			TransactionResource,
-			request.query.transform,
 		);
 	}
 
 	private async respondEnrichedBlock(block: Models.Block | null, request: Hapi.Request) {
-		return this.respondWithResource(await this.enrichBlock(block), BlockResource, request.query.transform);
+		return this.respondWithResource(await this.enrichBlock(block), BlockResource);
 	}
 }

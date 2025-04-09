@@ -43,7 +43,7 @@ export class TransactionsController extends AbstractController {
 			totalCount: all.length,
 		};
 
-		return super.toPagination(resultsPage, TransactionResource, !!request.query.transform);
+		return super.toPagination(resultsPage, TransactionResource);
 	}
 
 	public async showUnconfirmed(request: Hapi.Request) {
@@ -57,6 +57,6 @@ export class TransactionsController extends AbstractController {
 
 		const transaction: Contracts.Crypto.Transaction = await transactionQuery.first();
 
-		return super.respondWithResource(transaction.data, TransactionResource, !!request.query.transform);
+		return super.respondWithResource(transaction.data, TransactionResource);
 	}
 }

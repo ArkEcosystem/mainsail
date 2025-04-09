@@ -7,18 +7,12 @@ export const request = async <T = Record<string, any>>(
 ): Promise<{ statusCode: number; data: T; headers: IncomingHttpHeaders }> => {
 	path = path.startsWith("/") ? path.slice(1) : path;
 
-	let transform = "";
-	if (options?.transform === false) {
-		transform += path.includes("?") ? "&transform=false" : "?transform=false";
-	}
-
 	let fullReceipt = "";
 	if (options?.fullReceipt !== undefined) {
-		fullReceipt +=
-			(path.includes("?") || transform.includes("?") ? "&" : "?") + `fullReceipt=${options.fullReceipt}`;
+		fullReceipt += (path.includes("?") ? "&" : "?") + `fullReceipt=${options.fullReceipt}`;
 	}
 
-	const response = await got(`http://localhost:4003/api/${path}${transform}${fullReceipt}`);
+	const response = await got(`http://localhost:4003/api/${path}${fullReceipt}`);
 	const { statusCode, headers, body } = response;
 	return { data: JSON.parse(body) as T, headers, statusCode };
 };

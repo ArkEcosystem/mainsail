@@ -30,7 +30,6 @@ export class ValidatorRoundsController extends Controller {
 				totalCount,
 			},
 			ValidatorRoundResource,
-			false,
 		);
 	}
 
@@ -45,7 +44,7 @@ export class ValidatorRoundsController extends Controller {
 			return Boom.notFound("Round not found");
 		}
 
-		return this.respondWithResource(validatorRounds, ValidatorRoundResource, false);
+		return this.respondWithResource(validatorRounds, ValidatorRoundResource);
 	}
 
 	public async validators(request: Hapi.Request) {

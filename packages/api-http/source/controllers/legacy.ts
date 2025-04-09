@@ -28,7 +28,6 @@ export class LegacyController extends Controller {
 				totalCount,
 			},
 			LegacyColdWalletResource,
-			false,
 		);
 	}
 }

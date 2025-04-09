@@ -27,7 +27,7 @@ export const blockCriteriaSchemaObject = {
 };
 
 export const blockParamSchema = Joi.alternatives(blockHashSchema, blockNumberSchema);
-export const blockSortingSchema = Schemas.createSortingSchema(blockCriteriaSchemas, [], false);
+export const blockSortingSchema = Schemas.createSortingSchema(blockCriteriaSchemas, []);
 
 export const blockQueryLevelOptions = [
 	{ allowSecondOrderBy: false, asc: true, desc: true, diverse: false, field: "version" },
