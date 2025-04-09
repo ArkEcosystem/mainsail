@@ -4,8 +4,8 @@ import express from "express";
 const app = express();
 app.use(express.json());
 
-// Listen for blocks until reaching TARGET_HEIGHT
-const TARGET_HEIGHT = 15; // ~ 4 minutes
+// Listen for blocks until reaching TARGET_BLOCK_NUMBER
+const TARGET_BLOCK_NUMBER = 15; // ~ 4 minutes
 const EXPECTED_NUMBER_OF_PEERS = 5;
 
 let webhookTarget;
@@ -61,12 +61,12 @@ async function setupWebhook() {
 		console.log(`got block ${number} from ${req.ip}`);
 		peerBlockNumberMap.set(req.ip, number);
 
-		if (number >= TARGET_HEIGHT && peerBlockNumberMap.has(req.ip)) {
-			console.log(`received target ${TARGET_HEIGHT} from ${req.ip}`);
+		if (number >= TARGET_BLOCK_NUMBER && peerBlockNumberMap.has(req.ip)) {
+			console.log(`received target ${TARGET_BLOCK_NUMBER} from ${req.ip}`);
 			peerBlockNumberMap.delete(req.ip);
 
 			if (peerBlockNumberMap.size === 0) {
-				console.log(`successfully reached target height on all peers, exiting.`);
+				console.log(`successfully reached target block number on all peers, exiting.`);
 				process.exit(0);
 			}
 		}
