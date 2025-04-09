@@ -9,7 +9,7 @@ message GetStatusRequest {
 message GetStatusResponse {
     message State {
         uint32 blockNumber = 1;
-		string id = 2;
+		string blockHash = 2;
     }
 
     message Config {

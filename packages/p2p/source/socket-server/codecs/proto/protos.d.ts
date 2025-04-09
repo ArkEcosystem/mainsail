@@ -1,5 +1,5 @@
-import * as $protobuf from "protobufjs";
-import Long = require("long");
+import * as $protobuf from "protobufjs/minimal.js";
+import Long from "long";
 /** Namespace getApiNodes. */
 export namespace getApiNodes {
 
@@ -1352,8 +1352,8 @@ export namespace getStatus {
             /** State blockNumber */
             blockNumber?: (number|null);
 
-            /** State id */
-            id?: (string|null);
+            /** State blockHash */
+            blockHash?: (string|null);
         }
 
         /** Represents a State. */
@@ -1368,8 +1368,8 @@ export namespace getStatus {
             /** State blockNumber. */
             public blockNumber: number;
 
-            /** State id. */
-            public id: string;
+            /** State blockHash. */
+            public blockHash: string;
 
             /**
              * Creates a new State instance using the specified properties.

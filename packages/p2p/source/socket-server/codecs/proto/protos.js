@@ -3138,7 +3138,7 @@ $root.getStatus = (function() {
              * @memberof getStatus.GetStatusResponse
              * @interface IState
              * @property {number|null} [blockNumber] State blockNumber
-             * @property {string|null} [id] State id
+             * @property {string|null} [blockHash] State blockHash
              */
 
             /**
@@ -3165,12 +3165,12 @@ $root.getStatus = (function() {
             State.prototype.blockNumber = 0;
 
             /**
-             * State id.
-             * @member {string} id
+             * State blockHash.
+             * @member {string} blockHash
              * @memberof getStatus.GetStatusResponse.State
              * @instance
              */
-            State.prototype.id = "";
+            State.prototype.blockHash = "";
 
             /**
              * Creates a new State instance using the specified properties.
@@ -3198,8 +3198,8 @@ $root.getStatus = (function() {
                     writer = $Writer.create();
                 if (message.blockNumber != null && Object.hasOwnProperty.call(message, "blockNumber"))
                     writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.blockNumber);
-                if (message.id != null && Object.hasOwnProperty.call(message, "id"))
-                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.id);
+                if (message.blockHash != null && Object.hasOwnProperty.call(message, "blockHash"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.blockHash);
                 return writer;
             };
 
@@ -3239,7 +3239,7 @@ $root.getStatus = (function() {
                             break;
                         }
                     case 2: {
-                            message.id = reader.string();
+                            message.blockHash = reader.string();
                             break;
                         }
                     default:
@@ -3280,9 +3280,9 @@ $root.getStatus = (function() {
                 if (message.blockNumber != null && message.hasOwnProperty("blockNumber"))
                     if (!$util.isInteger(message.blockNumber))
                         return "blockNumber: integer expected";
-                if (message.id != null && message.hasOwnProperty("id"))
-                    if (!$util.isString(message.id))
-                        return "id: string expected";
+                if (message.blockHash != null && message.hasOwnProperty("blockHash"))
+                    if (!$util.isString(message.blockHash))
+                        return "blockHash: string expected";
                 return null;
             };
 
@@ -3300,8 +3300,8 @@ $root.getStatus = (function() {
                 var message = new $root.getStatus.GetStatusResponse.State();
                 if (object.blockNumber != null)
                     message.blockNumber = object.blockNumber >>> 0;
-                if (object.id != null)
-                    message.id = String(object.id);
+                if (object.blockHash != null)
+                    message.blockHash = String(object.blockHash);
                 return message;
             };
 
@@ -3320,12 +3320,12 @@ $root.getStatus = (function() {
                 var object = {};
                 if (options.defaults) {
                     object.blockNumber = 0;
-                    object.id = "";
+                    object.blockHash = "";
                 }
                 if (message.blockNumber != null && message.hasOwnProperty("blockNumber"))
                     object.blockNumber = message.blockNumber;
-                if (message.id != null && message.hasOwnProperty("id"))
-                    object.id = message.id;
+                if (message.blockHash != null && message.hasOwnProperty("blockHash"))
+                    object.blockHash = message.blockHash;
                 return object;
             };
 
