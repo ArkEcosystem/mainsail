@@ -35,7 +35,7 @@ export class ConsensusController extends Controller {
 
 			for (const message of messages) {
 				const validator = validators[message.validatorIndex];
-				const key = `b/${message.height}/${message.round}/${message.blockId}`;
+				const key = `b/${message.blockNumber}/${message.round}/${message.blockHash}`;
 				if (!collected[key]) {
 					collected[key] = {};
 				}
@@ -50,7 +50,7 @@ export class ConsensusController extends Controller {
 
 		return {
 			data: {
-				height: state.height,
+				blockNumber: state.blockNumber,
 				round: state.round,
 				step: state.step,
 				// eslint-disable-next-line sort-keys-fix/sort-keys-fix

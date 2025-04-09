@@ -24,7 +24,7 @@ export class EthGetTransactionByHash implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: [string]): Promise<any> {
-		const transaction = await this.databaseService.getTransactionById(parameters[0].slice(2));
+		const transaction = await this.databaseService.getTransactionByHash(parameters[0].slice(2));
 
 		if (!transaction) {
 			return null;

@@ -14,7 +14,7 @@ describe<{
 }>("EthGetBlockTransactionCountByHash", ({ beforeEach, it, assert, stub }) => {
 	beforeEach(async (context) => {
 		context.database = {
-			getBlockHeaderById: async () => undefined,
+			getBlockHeaderByHash: async () => undefined,
 		};
 
 		context.sandbox = new Sandbox();
@@ -54,26 +54,26 @@ describe<{
 	});
 
 	it("should return 0x0", async ({ action, database }) => {
-		const spyGetBlockHeaderById = stub(database, "getBlockHeaderById").returnValue({ transactionsCount: 0 });
+		const spyGetBlockHeaderByHash = stub(database, "getBlockHeaderByHash").returnValue({ transactionsCount: 0 });
 
 		assert.equal(
 			await action.handle(["0x0000000000000000000000000000000000000000000000000000000000000000"]),
 			"0x0",
 		);
 
-		spyGetBlockHeaderById.calledOnce();
-		spyGetBlockHeaderById.calledWith("0000000000000000000000000000000000000000000000000000000000000000");
+		spyGetBlockHeaderByHash.calledOnce();
+		spyGetBlockHeaderByHash.calledWith("0000000000000000000000000000000000000000000000000000000000000000");
 	});
 
 	it("should return 0x14", async ({ action, database }) => {
-		const spyGetBlockHeaderById = stub(database, "getBlockHeaderById").returnValue({ transactionsCount: 20 });
+		const spyGetBlockHeaderByHash = stub(database, "getBlockHeaderByHash").returnValue({ transactionsCount: 20 });
 
 		assert.equal(
 			await action.handle(["0x0000000000000000000000000000000000000000000000000000000000000000"]),
 			"0x14",
 		);
 
-		spyGetBlockHeaderById.calledOnce();
-		spyGetBlockHeaderById.calledWith("0000000000000000000000000000000000000000000000000000000000000000");
+		spyGetBlockHeaderByHash.calledOnce();
+		spyGetBlockHeaderByHash.calledWith("0000000000000000000000000000000000000000000000000000000000000000");
 	});
 });

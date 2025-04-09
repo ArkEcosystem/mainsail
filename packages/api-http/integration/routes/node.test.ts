@@ -47,7 +47,7 @@ describe<{
 		assert.equal(statusCode, 200);
 		assert.equal(data.data, {
 			blocks: 0,
-			height: 0,
+			blockNumber: 0,
 			id: 0,
 			syncing: false,
 		});

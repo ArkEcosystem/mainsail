@@ -26,14 +26,14 @@ export class NodeController extends Controller {
 
 	public async status(request: Hapi.Request) {
 		const state = await this.getState();
-		const medianPeerHeight = await this.peerRepositoryFactory().getMedianPeerHeight();
-		const ownHeight = Number(state?.blockNumber ?? 0);
+		const medianPeerBlockNumber = await this.peerRepositoryFactory().getMedianPeerBlockNumber();
+		const ownBlockNumber = Number(state?.blockNumber ?? 0);
 
 		return {
 			data: {
-				blocksCount: state ? medianPeerHeight - ownHeight : 0,
-				now: ownHeight,
-				synced: ownHeight >= medianPeerHeight,
+				blocksCount: state ? medianPeerBlockNumber - ownBlockNumber : 0,
+				now: ownBlockNumber,
+				synced: ownBlockNumber >= medianPeerBlockNumber,
 				timestamp: dayjs().unix(),
 			},
 		};
@@ -41,15 +41,15 @@ export class NodeController extends Controller {
 
 	public async syncing(request: Hapi.Request) {
 		const state = await this.getState();
-		const medianPeerHeight = await this.peerRepositoryFactory().getMedianPeerHeight();
-		const ownHeight = Number(state?.blockNumber ?? 0);
+		const medianPeerBlockNumber = await this.peerRepositoryFactory().getMedianPeerBlockNumber();
+		const ownBlockNumber = Number(state?.blockNumber ?? 0);
 
 		return {
 			data: {
-				blocks: state ? medianPeerHeight - ownHeight : 0,
-				height: ownHeight,
+				blocks: state ? medianPeerBlockNumber - ownBlockNumber : 0,
+				blockNumber: ownBlockNumber,
 				id: state?.id ?? 0,
-				syncing: ownHeight < medianPeerHeight,
+				syncing: ownBlockNumber < medianPeerBlockNumber,
 			},
 		};
 	}

@@ -3,7 +3,7 @@
 		"ip": "192.168.3.1",
 		"port": 4002,
 		"version": "0.0.1",
-		"height": 7,
+		"blockNumber": 7,
 		"latency": 33,
 		"ports": {
 			"@mainsail/webhooks": -1,
@@ -24,7 +24,7 @@
 		"ip": "192.168.2.1",
 		"port": 4002,
 		"version": "0.0.1",
-		"height": 4,
+		"blockNumber": 4,
 		"latency": 22,
 		"ports": {
 			"@mainsail/webhooks": -1,
@@ -45,7 +45,7 @@
 		"ip": "192.168.3.2",
 		"port": 4002,
 		"version": "0.0.1",
-		"height": 6,
+		"blockNumber": 6,
 		"latency": 1,
 		"ports": {
 			"@mainsail/webhooks": -1,

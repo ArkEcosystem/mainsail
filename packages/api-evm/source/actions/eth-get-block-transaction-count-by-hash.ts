@@ -19,7 +19,7 @@ export class EthGetBlockTransactionCountByHash implements Contracts.Api.RPC.Acti
 	};
 
 	public async handle(parameters: [string]): Promise<string | null> {
-		const block = await this.databaseService.getBlockHeaderById(parameters[0].slice(2));
+		const block = await this.databaseService.getBlockHeaderByHash(parameters[0].slice(2));
 
 		if (!block) {
 			// eslint-disable-next-line unicorn/no-null

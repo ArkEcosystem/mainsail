@@ -27,7 +27,7 @@ export class Peer {
 		nullable: true,
 		type: "integer",
 	})
-	public height!: number;
+	public blockNumber!: number;
 
 	@Column({
 		nullable: true,

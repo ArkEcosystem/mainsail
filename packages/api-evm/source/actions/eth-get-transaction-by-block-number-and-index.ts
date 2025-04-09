@@ -24,7 +24,7 @@ export class EthGetTransactionByBlockNumberAndIndex implements Contracts.Api.RPC
 	};
 
 	public async handle(parameters: [string, string]): Promise<any> {
-		const transaction = await this.databaseService.getTransactionByBlockHeightAndIndex(
+		const transaction = await this.databaseService.getTransactionByBlockNumberAndIndex(
 			Number.parseInt(parameters[0]),
 			Number.parseInt(parameters[1]),
 		);

@@ -10,7 +10,7 @@ export class PeerResource implements Contracts.Api.Resource {
 
 	public transform(resource: Models.Peer): object {
 		return {
-			height: resource.height,
+			blockNumber: resource.blockNumber,
 			ip: resource.ip,
 			latency: resource.latency,
 			plugins: resource.plugins,

@@ -26,7 +26,7 @@ export class EthGetBlockByHashAction implements Contracts.Api.RPC.Action {
 	public async handle(parameters: [string, boolean]): Promise<object | null> {
 		const transactionObject = parameters[1];
 
-		const block = await this.databaseService.getBlockById(parameters[0].slice(2));
+		const block = await this.databaseService.getBlockByHash(parameters[0].slice(2));
 
 		if (!block) {
 			// eslint-disable-next-line unicorn/no-null

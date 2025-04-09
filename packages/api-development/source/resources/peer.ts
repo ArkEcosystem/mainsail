@@ -9,7 +9,7 @@ export class PeerResource implements Contracts.Api.Resource {
 
 	public transform(resource: Contracts.P2P.Peer): object {
 		return {
-			height: resource.header ? resource.header.height : undefined,
+			blockNumber: resource.header ? resource.header.blockNumber : undefined,
 			ip: resource.ip,
 			latency: resource.latency,
 			plugins: resource.plugins,

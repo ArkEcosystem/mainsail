@@ -30,7 +30,7 @@ export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action {
 
 	// https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_gettransactionreceipt
 	public async handle(parameters: [string, boolean]): Promise<object | null> {
-		const transaction = await this.databaseService.getTransactionById(parameters[0].slice(2));
+		const transaction = await this.databaseService.getTransactionByHash(parameters[0].slice(2));
 
 		if (!transaction) {
 			// eslint-disable-next-line unicorn/no-null
