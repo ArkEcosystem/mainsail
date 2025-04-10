@@ -36,12 +36,13 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		context.state = {
 			getLastBlock: () => {},
+			getHeight: () => 1,
 		};
 
 		context.cryptoConfiguration = {
 			getMilestoneDiff: () => ({}),
 			isNewMilestone: () => false,
-			setblockNumber: () => {},
+			setBlockNumber: () => {},
 		};
 
 		context.proposalProcessor = {

@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
@@ -66,6 +66,11 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	// Handler lock is different than commit lock. It is used to prevent parallel processing and it is similar to queue.
 	readonly #handlerLock = new Lock();
+
+	@postConstruct()
+	public initialize(): void {
+		this.#blockNumber = this.stateStore.getHeight();
+	}
 
 	public getBlockNumber(): number {
 		return this.#blockNumber;
@@ -548,10 +553,6 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	async #bootstrap(): Promise<void> {
-		if (this.#blockNumber === 0) {
-			this.#blockNumber = this.stateStore.getHeight();
-		}
-
 		const state = await this.bootstrapper.run();
 
 		if (state && state.blockNumber === this.stateStore.getLastBlock().data.number + 1) {
