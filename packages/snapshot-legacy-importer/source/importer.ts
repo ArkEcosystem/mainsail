@@ -116,7 +116,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		}
 
 		const result = await this.import({
-			commitKey: { blockNumber: BigInt(header.number), round: BigInt(header.round) },
+			commitKey: { blockNumber: BigInt(header.number), round: BigInt(header.round), blockHash: header.hash },
 			timestamp: header.timestamp,
 		});
 
@@ -238,7 +238,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	public async import(
 		options: Contracts.Snapshot.LegacyImportOptions,
 	): Promise<Contracts.Snapshot.LegacyImportResult> {
-		await this.evm.prepareNextCommit({ commitKey: { blockNumber: options.commitKey.blockNumber, round: 0n } });
+		await this.evm.prepareNextCommit({ commitKey: options.commitKey });
 
 		const deployerAccount = await this.evm.getAccountInfo(this.deployerAddress);
 		this.#nonce = deployerAccount.nonce;

@@ -428,12 +428,14 @@ impl EvmInner {
         &mut self,
         info: AccountInfoExtended,
     ) -> std::result::Result<(), EVMError<String>> {
-        assert_eq!(self.pending_commits.len(), 1);
-
         let genesis_block_number = self.genesis_block_number();
 
-        let (_, pending) = self.pending_commits.iter_mut().next().expect("ok");
-        assert_eq!(pending.key.0, genesis_block_number);
+        let (_, pending) = self
+            .pending_commits
+            .iter_mut()
+            .find(|(key, _)| key.0 == genesis_block_number)
+            .expect("genesis commit");
+
         assert!(!pending.cache.accounts.contains_key(&info.address));
 
         let (address, info, legacy_attributes) = info.into_parts();
@@ -446,12 +448,13 @@ impl EvmInner {
         &mut self,
         wallet: LegacyColdWallet,
     ) -> std::result::Result<(), EVMError<String>> {
-        assert_eq!(self.pending_commits.len(), 1);
-
         let genesis_block_number = self.genesis_block_number();
 
-        let (_, pending) = self.pending_commits.iter_mut().next().expect("ok");
-        assert_eq!(pending.key.0, genesis_block_number);
+        let (_, pending) = self
+            .pending_commits
+            .iter_mut()
+            .find(|(key, _)| key.0 == genesis_block_number)
+            .expect("genesis commit");
 
         assert!(!pending.legacy_cold_wallets.contains_key(&wallet.address));
         pending.legacy_cold_wallets.insert(wallet.address, wallet);
