@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
@@ -50,7 +50,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	#blockNumber = 0;
+	#blockNumber = 1;
 	#round = 0;
 	#step: Contracts.Consensus.Step = Contracts.Consensus.Step.Propose;
 	#lockedValue?: Contracts.Consensus.RoundState;
@@ -66,11 +66,6 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	// Handler lock is different than commit lock. It is used to prevent parallel processing and it is similar to queue.
 	readonly #handlerLock = new Lock();
-
-	@postConstruct()
-	public initialize(): void {
-		this.#blockNumber = this.stateStore.getHeight();
-	}
 
 	public getBlockNumber(): number {
 		return this.#blockNumber;
@@ -553,27 +548,23 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	async #bootstrap(): Promise<void> {
+		this.#blockNumber = this.stateStore.getLastBlock().data.number + 1;
+
 		const state = await this.bootstrapper.run();
 
-		if (state && state.blockNumber === this.stateStore.getLastBlock().data.number + 1) {
-			this.#step = state.step;
-			this.#blockNumber = state.blockNumber;
-			this.#round = state.round;
-			this.#lockedValue = state.lockedValue;
-			this.#validValue = state.validValue;
-		} else {
-			if (state) {
+		if (state) {
+			if (state.blockNumber === this.#blockNumber) {
+				this.#step = state.step;
+				this.#round = state.round;
+				this.#lockedValue = state.lockedValue;
+				this.#validValue = state.validValue;
+			} else {
 				this.logger.warning(
-					`Skipping state restore, because stored block number is ${state.blockNumber}, but should be ${
-						this.stateStore.getLastBlock().data.number + 1
-					}`,
+					`Skipping state restore, because stored block number is ${state.blockNumber}, but should be ${this.#blockNumber}`,
 				);
 
 				this.roundStateRepository.clear();
 			}
-
-			const lastBlock = this.stateStore.getLastBlock();
-			this.#blockNumber = lastBlock.data.number + 1;
 		}
 
 		if (this.#blockNumber !== this.configuration.getHeight()) {
