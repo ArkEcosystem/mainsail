@@ -116,7 +116,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		}
 
 		const result = await this.import({
-			commitKey: { blockNumber: BigInt(header.number), round: BigInt(header.round), blockHash: header.hash },
+			commitKey: { blockHash: header.hash, blockNumber: BigInt(header.number), round: BigInt(header.round) },
 			timestamp: header.timestamp,
 		});
 
