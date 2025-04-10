@@ -50,7 +50,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	#blockNumber = 1;
+	#blockNumber = 0;
 	#round = 0;
 	#step: Contracts.Consensus.Step = Contracts.Consensus.Step.Propose;
 	#lockedValue?: Contracts.Consensus.RoundState;
@@ -548,6 +548,10 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	async #bootstrap(): Promise<void> {
+		if (this.#blockNumber === 0) {
+			this.#blockNumber = this.stateStore.getHeight();
+		}
+
 		const state = await this.bootstrapper.run();
 
 		if (state && state.blockNumber === this.stateStore.getLastBlock().data.number + 1) {
