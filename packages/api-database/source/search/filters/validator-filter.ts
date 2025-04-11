@@ -177,8 +177,8 @@ export class ValidatorFilter {
 			);
 
 		for (const item of criteria as ValidatorResourceLastBlock[]) {
-			if (item.id) {
-				addExpression(item.id, "validatorLastBlock.id");
+			if (item.hash) {
+				addExpression(item.hash, "validatorLastBlock.hash");
 			}
 
 			if (item.number) {

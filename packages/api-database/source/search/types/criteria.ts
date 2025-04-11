@@ -65,7 +65,7 @@ export type WalletCriteria = {
 export type OrWalletCriteria = OrCriteria<WalletCriteria>;
 
 export type ValidatorResourceLastBlock = {
-	id?: OrEqualCriteria<string>;
+	hash?: OrEqualCriteria<string>;
 	number?: OrNumericCriteria<number>;
 };
 
