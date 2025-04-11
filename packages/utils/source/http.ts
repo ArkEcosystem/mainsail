@@ -1,6 +1,9 @@
-import { ClientRequest, globalAgent, IncomingMessage, request, RequestOptions } from "http";
+import { ClientRequest, IncomingMessage, RequestOptions } from "http";
+import * as httpClient from "http";
+import * as httpsClient from "https";
+import { URL } from "url";
+
 import { JsonArray, JsonObject, Primitive } from "type-fest";
-import { parse } from "url";
 
 import { isObject } from "./is-object.js";
 import { isUndefined } from "./is-undefined.js";
@@ -11,10 +14,30 @@ const sendRequest = (method: string, url: string, options?: HttpOptions): Promis
 			options = {};
 		}
 
-		options = { ...options, ...parse(url) };
+		const parsedUrl = new URL(url);
+		if (!parsedUrl) {
+			throw new Error("failed to parseURL");
+		}
+
+		const client = parsedUrl.protocol === "https:" ? httpsClient : httpClient;
+		const { globalAgent, request } = client;
+
+		options = { ...options };
+		options.host = parsedUrl.host;
+		options.hostname = parsedUrl.hostname;
+		options.port = parsedUrl.port;
+		options.protocol = parsedUrl.protocol;
 		options.method = method.toLowerCase();
 
-		if (options.protocol === "http:") {
+		if (parsedUrl.pathname) {
+			options.path = parsedUrl.pathname;
+		}
+
+		if (parsedUrl.search) {
+			options.path += parsedUrl.search;
+		}
+
+		if (options.protocol === "http:" || options.protocol === "https:") {
 			options.agent = globalAgent;
 		}
 
