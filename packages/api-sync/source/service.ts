@@ -192,7 +192,7 @@ export class Sync implements Contracts.ApiSync.Service {
 							validatorForgedRewards: header.amount.toFixed(),
 							validatorForgedTotal: header.fee.plus(header.amount).toFixed(),
 							validatorLastBlock: {
-								id: header.hash,
+								hash: header.hash,
 								number: header.number,
 								timestamp: header.timestamp,
 							},

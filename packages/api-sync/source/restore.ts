@@ -393,7 +393,7 @@ export class Restore {
 										.toFixed(),
 									validatorLastBlock: validatorAttributes.lastBlock
 										? {
-												id: validatorAttributes.lastBlock.hash,
+												hash: validatorAttributes.lastBlock.hash,
 												number: validatorAttributes.lastBlock.number,
 												timestamp: validatorAttributes.lastBlock.timestamp,
 											}
