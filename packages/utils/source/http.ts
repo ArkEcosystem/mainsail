@@ -1,9 +1,8 @@
 import { ClientRequest, IncomingMessage, RequestOptions } from "http";
 import * as httpClient from "http";
 import * as httpsClient from "https";
-import { URL } from "url";
-
 import { JsonArray, JsonObject, Primitive } from "type-fest";
+import { URL } from "url";
 
 import { isObject } from "./is-object.js";
 import { isUndefined } from "./is-undefined.js";
