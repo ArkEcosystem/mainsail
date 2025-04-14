@@ -7,7 +7,7 @@ import { execa } from "../execa.js";
 export class Setup {
 	public isGlobal(): boolean {
 		try {
-			return this.getEntrypoint().startsWith(this.getGlobalRootDir());
+			return this.getEntrypoint().startsWith(this.getGlobalRootDir().replace("node_modules", ""));
 		} catch {
 			return false;
 		}
