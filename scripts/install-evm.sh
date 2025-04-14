@@ -100,8 +100,8 @@ heading "Installing node.js & npm..."
     sudo rm -rf /usr/local/{lib/node{,/.npm,_modules},bin,share/man}/{npm*,node*,man1/node*}
     sudo rm -rf ~/{.npm,.forever,.node*,.cache,.nvm}
     (echo -e "Package: nodejs\nPin: origin deb.nodesource.com\nPin-Priority: 999" | sudo tee /etc/apt/preferences.d/nodesource)
-    curl -sL  https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor | sudo tee /usr/share/keyrings/nodesource.gpg >/dev/null
-    (echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x ${OS_CODENAME} main" | sudo tee /etc/apt/sources.list.d/nodesource.list)
+	curl -sL  https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor | sudo tee /usr/share/keyrings/nodesource.gpg >/dev/null
+    (echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/22.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list)
     sudo apt-get update
     sudo $APT_ENV apt-get install nodejs -yq
 
