@@ -81,7 +81,7 @@ export const schemas: Record<
 		$id: "prefixedBlockHash",
 		allOf: [
 			{
-				$ref: "prefixedHex",
+				$ref: "quantityHex",
 				maxLength: 66,
 				minLength: 66,
 			},

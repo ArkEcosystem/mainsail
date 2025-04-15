@@ -15,7 +15,7 @@ export class EthSendRawTransactionAction implements Contracts.Api.RPC.Action {
 		maxItems: 1,
 		minItems: 1,
 
-		prefixItems: [{ $ref: "prefixedHex" }],
+		prefixItems: [{ $ref: "quantityHex" }],
 		type: "array",
 	};
 
