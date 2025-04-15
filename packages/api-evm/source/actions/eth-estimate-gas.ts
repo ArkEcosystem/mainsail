@@ -12,6 +12,12 @@ type TxData = {
 	value?: string;
 };
 
+interface EstimateOutcome {
+	receipt?: Contracts.Evm.TransactionReceipt;
+	success: boolean;
+	executionError?: string;
+}
+
 @injectable()
 export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.Evm.Instance)
@@ -169,10 +175,4 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 			return { executionError: error.message, success: false };
 		}
 	}
-}
-
-interface EstimateOutcome {
-	receipt?: Contracts.Evm.TransactionReceipt;
-	success: boolean;
-	executionError?: string;
 }
