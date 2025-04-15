@@ -11,7 +11,7 @@ export class Web3Sha3 implements Contracts.Api.RPC.Action {
 		maxItems: 1,
 		minItems: 1,
 
-		prefixItems: [{ $ref: "quantityHex" }],
+		prefixItems: [{ $ref: "prefixedQuantityHex" }],
 		type: "array",
 	};
 

@@ -39,12 +39,12 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 			{
 				additionalProperties: false,
 				properties: {
-					data: { $ref: "dataHex" },
+					data: { $ref: "prefixedDataHex" },
 					from: { $ref: "address" },
-					gas: { $ref: "quantityHex" },
-					gasPrice: { $ref: "quantityHex" },
+					gas: { $ref: "prefixedQuantityHex" },
+					gasPrice: { $ref: "prefixedQuantityHex" },
 					to: { $ref: "address" },
-					value: { $ref: "quantityHex" },
+					value: { $ref: "prefixedQuantityHex" },
 				},
 				required: ["from", "to"],
 				type: "object",

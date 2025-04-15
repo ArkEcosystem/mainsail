@@ -14,7 +14,7 @@ export class EthGetBlockTransactionCountByNumber implements Contracts.Api.RPC.Ac
 		maxItems: 1,
 		minItems: 1,
 
-		prefixItems: [{ $ref: "quantityHex" }],
+		prefixItems: [{ $ref: "prefixedQuantityHex" }],
 		type: "array",
 	};
 

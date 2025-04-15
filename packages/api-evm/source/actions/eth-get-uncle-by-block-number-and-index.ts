@@ -13,7 +13,7 @@ export class EthGetUncleByBlockNumberAndIndex implements Contracts.Api.RPC.Actio
 		maxItems: 2,
 		minItems: 2,
 
-		prefixItems: [{ $ref: "quantityHex" }, { $ref: "quantityHex" }],
+		prefixItems: [{ $ref: "prefixedQuantityHex" }, { $ref: "prefixedQuantityHex" }],
 		type: "array",
 	};
 
