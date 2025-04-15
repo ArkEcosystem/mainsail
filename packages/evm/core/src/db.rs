@@ -1,6 +1,11 @@
 use std::{
-    borrow::Cow, cell::RefCell, cmp::Ordering, collections::BTreeMap, convert::Infallible,
+    borrow::Cow,
+    cell::RefCell,
+    cmp::Ordering,
+    collections::BTreeMap,
+    convert::Infallible,
     path::PathBuf,
+    sync::{LazyLock, RwLock},
 };
 
 use heed::{Comparator, EnvFlags, EnvOpenOptions};
@@ -137,7 +142,7 @@ impl heed::BytesDecode<'_> for StorageEntryWrapper {
     }
 }
 
-enum StorageEntryDupSortCmp {}
+pub enum StorageEntryDupSortCmp {}
 
 impl Comparator for StorageEntryDupSortCmp {
     fn compare(a: &[u8], b: &[u8]) -> Ordering {
@@ -170,7 +175,12 @@ pub(crate) struct InnerStorage {
         heed::Database<AddressWrapper, heed::types::SerdeBincode<LegacyAccountAttributes>>,
     pub legacy_cold_wallets:
         heed::Database<LegacyAddressWrapper, heed::types::SerdeBincode<LegacyColdWallet>>,
-    pub storage: heed::Database<AddressWrapper, StorageEntryWrapper>,
+    pub storage: heed::Database<
+        AddressWrapper,
+        StorageEntryWrapper,
+        heed::DefaultComparator,
+        StorageEntryDupSortCmp,
+    >,
     // Carried over from previous database-service.ts lmdb backend
     pub state: heed::Database<StaticStringWrapper, heed::types::SerdeBincode<Bytes>>,
     pub proofs: heed::Database<HeedBlockNumber, heed::types::SerdeBincode<Bytes>>,
@@ -273,9 +283,13 @@ pub enum Error {
     Bincode(#[from] bincode::Error),
     #[error("infallible error")]
     Infallible(#[from] Infallible),
+    #[error("Lock error")]
+    Lock,
 }
 
 impl DBErrorMarker for Error {}
+
+static ENV: LazyLock<RwLock<HashMap<PathBuf, heed::Env>>> = LazyLock::new(RwLock::default);
 
 impl PersistentDB {
     const MAX_DBS: u32 = 12;
@@ -283,18 +297,28 @@ impl PersistentDB {
     pub fn new(opts: PersistentDBOptions) -> Result<Self, Error> {
         std::fs::create_dir_all(&opts.path)?;
 
-        let mut env_builder = EnvOpenOptions::new();
+        let mut lock = ENV.write().map_err(|_| Error::Lock)?;
 
-        let mut max_dbs = Self::MAX_DBS;
-        if opts.history_size.is_some() {
-            max_dbs += 1;
-        }
+        let env = match lock.get(&opts.path) {
+            Some(env) => env.clone(),
+            None => {
+                let mut env_builder = EnvOpenOptions::new();
 
-        env_builder.max_dbs(max_dbs);
-        env_builder.map_size(1 * MAP_SIZE_UNIT);
-        unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
+                let mut max_dbs = Self::MAX_DBS;
+                if opts.history_size.is_some() {
+                    max_dbs += 1;
+                }
 
-        let env = unsafe { env_builder.open(opts.path.join("evm.mdb")) }?;
+                env_builder.max_dbs(max_dbs);
+                env_builder.map_size(1 * MAP_SIZE_UNIT);
+                unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
+
+                let env = unsafe { env_builder.open(opts.path.join("evm.mdb")) }?;
+                lock.insert(opts.path.clone(), env.clone());
+
+                env
+            }
+        };
 
         Self::new_with_env(env, opts)
     }
