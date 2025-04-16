@@ -11,7 +11,7 @@ use logger::JsLogger;
 use mainsail_evm_core::{
     account::AccountInfoExtended,
     db::{CommitData, CommitKey, GenesisInfo, PendingCommit, PersistentDB, PersistentDBOptions},
-    legacy::{LegacyAddress, LegacyColdWallet},
+    legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
     logs_bloom,
     receipt::{TxReceipt, map_execution_result},
@@ -21,7 +21,8 @@ use mainsail_evm_core::{
 use napi::{JsBigInt, JsObject, JsString, bindgen_prelude::*};
 use napi_derive::napi;
 use result::{
-    CommitResult, JsAccountInfoExtended, JsLegacyColdWallet, PreverifyTxResult, TxViewResult,
+    CommitResult, JsAccountInfoExtended, JsLegacyAttributes, JsLegacyColdWallet, PreverifyTxResult,
+    TxViewResult,
 };
 use revm::{
     Database, DatabaseCommit, ExecuteEvm, MainBuilder, MainContext,
@@ -471,6 +472,18 @@ impl EvmInner {
             Ok((next_offset, accounts)) => Ok((next_offset, accounts)),
             Err(err) => Err(EVMError::Database(
                 format!("failed reading accounts: {}", err).into(),
+            )),
+        }
+    }
+
+    pub fn get_legacy_attributes(
+        &mut self,
+        address: Address,
+    ) -> std::result::Result<Option<LegacyAccountAttributes>, EVMError<String>> {
+        match self.persistent_db.get_legacy_attributes(address) {
+            Ok(attributes) => Ok(attributes),
+            Err(err) => Err(EVMError::Database(
+                format!("failed reading legacy attributes: {}", err).into(),
             )),
         }
     }
@@ -1202,6 +1215,21 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<JsLegacyAttributes | null>")]
+    pub fn get_legacy_attributes(&mut self, node_env: Env, address: JsString) -> Result<JsObject> {
+        let address = utils::create_address_from_js_string(address)?;
+
+        node_env.execute_tokio_future(
+            Self::get_legacy_attributes_async(self.evm.clone(), address),
+            |&mut node_env, result| {
+                Ok(match result {
+                    Some(result) => Some(JsLegacyAttributes::new(&node_env, result)?),
+                    None => None,
+                })
+            },
+        )
+    }
+
     #[napi(ts_return_type = "Promise<JsGetLegacyColdWallets>")]
     pub fn get_legacy_cold_wallets(
         &mut self,
@@ -1664,6 +1692,19 @@ impl JsEvmWrapper {
     ) -> Result<(Option<u64>, Vec<AccountInfoExtended>)> {
         let mut lock = evm.lock().await;
         let result = lock.get_accounts(offset, limit);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_legacy_attributes_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        address: Address,
+    ) -> Result<Option<LegacyAccountAttributes>> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_legacy_attributes(address);
 
         match result {
             Ok(result) => Result::Ok(result),
