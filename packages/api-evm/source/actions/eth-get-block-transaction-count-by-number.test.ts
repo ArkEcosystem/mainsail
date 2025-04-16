@@ -29,7 +29,7 @@ describe<{
 	});
 
 	it("schema should be array with 0 parameters", ({ action, validator }) => {
-		validator.addSchema(cryptoValidationSchemas.prefixedHex);
+		validator.addSchema(cryptoValidationSchemas.prefixedQuantityHex);
 		validator.addSchema(action.schema);
 
 		assert.undefined(validator.validate("jsonRpc_eth_getBlockTransactionCountByNumber", ["0x0"]).errors);

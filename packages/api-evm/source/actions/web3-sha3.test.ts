@@ -26,14 +26,14 @@ describe<{
 	});
 
 	it("schema should be ok", ({ action, validator }) => {
-		validator.addSchema(cryptoValidationSchemas.prefixedHex);
+		validator.addSchema(cryptoValidationSchemas.prefixedQuantityHex);
 
 		assert.equal(action.schema, {
 			$id: `jsonRpc_web3_sha3`,
 			maxItems: 1,
 			minItems: 1,
 
-			prefixItems: [{ $ref: "prefixedHex" }],
+			prefixItems: [{ $ref: "prefixedQuantityHex" }],
 			type: "array",
 		});
 
