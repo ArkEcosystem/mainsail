@@ -40,7 +40,7 @@ export class Command extends Commands.Command {
 			description: "The name of the network.",
 			schema: Joi.string(),
 			promptType: "text",
-			default: "testnet",
+			default: "devnet",
 		},
 		{
 			name: "premine",

@@ -24,7 +24,7 @@ describe<{
 
 		spyStart.calledWith(
 			{
-				args: "api:run --network='testnet' --token='ark' --v=0 --env='production' --skipPrompts=false",
+				args: "api:run --network='devnet' --token='ark' --v=0 --env='production' --skipPrompts=false",
 				env: {
 					CORE_ENV: "production",
 					NODE_ENV: "production",

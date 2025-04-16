@@ -15,7 +15,6 @@ export type NetworkConfigPartial = {
 
 export type Network = {
 	name: string;
-	messagePrefix: string;
 	pubKeyHash: number;
 	nethash: string;
 	chainId: number;

@@ -13,7 +13,7 @@ async function run() {
 	const generator = app.get(Identifiers.ConfigurationGenerator);
 
 	await generator.generate({
-		network: "testnet",
+		network: "devnet",
 		symbol: "TѦ",
 		token: "ARK",
 		distribute: true,

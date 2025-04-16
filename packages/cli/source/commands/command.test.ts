@@ -13,7 +13,7 @@ class StubCommand extends Command {
 		this.definition.setArgument("lastName", "description", Joi.string());
 
 		this.definition.setFlag("token", "description", Joi.string());
-		this.definition.setFlag("network", "description", Joi.string().default("testnet"));
+		this.definition.setFlag("network", "description", Joi.string().default("devnet"));
 		this.definition.setFlag("hello", "description", Joi.string());
 	}
 
@@ -103,7 +103,7 @@ describe<{
 
 	it("#run - should run the command", async ({ cmd }) => {
 		cmd.setFlag("token", "ark");
-		cmd.setFlag("network", "testnet");
+		cmd.setFlag("network", "devnet");
 
 		await cmd.run();
 
@@ -176,7 +176,7 @@ describe<{
 	});
 
 	it("#getFlags - should get all flags", ({ cmd }) => {
-		assert.equal(cmd.getFlags(), { hello: "world", network: "testnet", v: 0 });
+		assert.equal(cmd.getFlags(), { hello: "world", network: "devnet", v: 0 });
 	});
 
 	it("#getFlag - should get the value of a flag", ({ cmd }) => {

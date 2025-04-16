@@ -15,7 +15,7 @@
 		"/distribution"
 	],
 	"scripts": {
-		"api:testnet": "cross-env-shell CORE_PATH_CONFIG=./bin/config pnpm run mainsail-api api:run",
+		"api:devnet": "cross-env-shell CORE_PATH_CONFIG=./bin/config pnpm run mainsail-api api:run",
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
