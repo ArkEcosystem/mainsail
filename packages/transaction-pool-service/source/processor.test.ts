@@ -3,7 +3,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { BigNumber } from "@mainsail/utils";
 
-import crypto from "../../core/bin/config/testnet/core/crypto.json";
+import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "../../test-framework/source";
 import { Processor } from "./processor";
 

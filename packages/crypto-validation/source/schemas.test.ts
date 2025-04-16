@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { Validator } from "@mainsail/validation/source/validator";
 
-import cryptoJson from "../../core/bin/config/testnet/core/crypto.json";
+import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { describe, Sandbox } from "../../test-framework/source";
 import { makeKeywords } from "./keywords";
 import { schemas } from "./schemas";

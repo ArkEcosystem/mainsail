@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 
-import crypto from "../../core/bin/config/testnet/core/crypto.json";
+import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { describeSkip } from "../../test-framework/source";
 import { SenderState } from ".";
 

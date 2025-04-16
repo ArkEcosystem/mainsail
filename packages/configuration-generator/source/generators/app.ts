@@ -9,7 +9,7 @@ export class AppGenerator {
 		packageName = packageName.replace("@mainsail/", "");
 
 		return readJSONSync(
-			resolve(new URL(".", import.meta.url).pathname, `../../../${packageName}/bin/config/testnet/core/app.json`),
+			resolve(new URL(".", import.meta.url).pathname, `../../../${packageName}/bin/config/devnet/core/app.json`),
 		);
 	}
 
