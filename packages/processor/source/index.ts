@@ -12,6 +12,7 @@ import { VersionVerifier } from "./verifiers/version-verifier.js";
 import { RewardVerifier } from "./verifiers/reward-verifier.js";
 import { TransactionLengthVerifier } from "./verifiers/transaction-length-verifier.js";
 import { GasLimitVerifier } from "./verifiers/gas-limit-verifier.js";
+import { LegacyAttributeVerifier } from "./verifiers/legacy-attribute-verifier.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -25,6 +26,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			RewardVerifier,
 			TransactionLengthVerifier,
 			GasLimitVerifier,
+			LegacyAttributeVerifier,
 		]) {
 			this.app.bind(Identifiers.Processor.BlockVerifierHandlers).to(handler);
 		}

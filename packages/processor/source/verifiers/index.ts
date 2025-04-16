@@ -5,3 +5,4 @@ export * from "./reward-verifier.js";
 export * from "./timestamp-verifier.js";
 export * from "./transaction-length-verifier.js";
 export * from "./version-verifier.js";
+export * from "./legacy-attribute-verifier.js";
