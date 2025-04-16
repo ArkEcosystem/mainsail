@@ -120,8 +120,11 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 		return this.#evm.getAccounts(offset, limit);
 	}
 
-	public async getLegacyAttributes(address: string): Promise<Contracts.Evm.LegacyAttributes | null> {
-		return this.#evm.getLegacyAttributes(address);
+	public async getLegacyAttributes(
+		address: string,
+		legacyAddress?: string,
+	): Promise<Contracts.Evm.LegacyAttributes | null> {
+		return this.#evm.getLegacyAttributes(address, legacyAddress);
 	}
 
 	public async getLegacyColdWallets(

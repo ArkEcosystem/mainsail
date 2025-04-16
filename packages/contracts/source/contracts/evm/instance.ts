@@ -32,7 +32,7 @@ export interface Instance extends CommitHandler {
 	importAccountInfo(info: AccountInfoExtended): Promise<void>;
 	importLegacyColdWallet(wallet: ImportLegacyColdWallet): Promise<void>;
 	getAccounts(offset: bigint, limit: bigint): Promise<GetAccountsResult>;
-	getLegacyAttributes(address: string): Promise<LegacyAttributes | null>;
+	getLegacyAttributes(address: string, legacyAddress?: string): Promise<LegacyAttributes | null>;
 	getLegacyColdWallets(offset: bigint, limit: bigint): Promise<GetLegacyColdWalletsResult>;
 	getReceipts(offset: bigint, limit: bigint): Promise<GetReceiptsResult>;
 	getReceipt(height: bigint, txHash: string): Promise<GetReceiptResult>;

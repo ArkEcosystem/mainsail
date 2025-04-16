@@ -479,13 +479,37 @@ impl EvmInner {
     pub fn get_legacy_attributes(
         &mut self,
         address: Address,
+        legacy_address: Option<LegacyAddress>,
     ) -> std::result::Result<Option<LegacyAccountAttributes>, EVMError<String>> {
-        match self.persistent_db.get_legacy_attributes(address) {
-            Ok(attributes) => Ok(attributes),
-            Err(err) => Err(EVMError::Database(
-                format!("failed reading legacy attributes: {}", err).into(),
-            )),
+        if let Some(legacy_attributes) =
+            self.persistent_db
+                .get_legacy_attributes(address)
+                .map_err(|err| {
+                    EVMError::Database(format!("failed reading legacy attributes: {}", err).into())
+                })?
+        {
+            return Ok(Some(legacy_attributes));
         }
+
+        // Try fallback to legacy attributes from cold wallets
+        let legacy_attributes = match legacy_address {
+            Some(legacy_address) => {
+                match self
+                    .persistent_db
+                    .get_legacy_cold_wallet(legacy_address)
+                    .map_err(|err| {
+                        EVMError::Database(
+                            format!("legacy cold wallet attributes lookup failed: {}", err).into(),
+                        )
+                    })? {
+                    Some(legacy_cold_wallet) => Some(legacy_cold_wallet.legacy_attributes),
+                    None => None,
+                }
+            }
+            None => None,
+        };
+
+        Ok(legacy_attributes)
     }
 
     pub fn get_legacy_cold_wallets(
@@ -1216,11 +1240,21 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<JsLegacyAttributes | null>")]
-    pub fn get_legacy_attributes(&mut self, node_env: Env, address: JsString) -> Result<JsObject> {
+    pub fn get_legacy_attributes(
+        &mut self,
+        node_env: Env,
+        address: JsString,
+        legacy_address: Option<JsString>,
+    ) -> Result<JsObject> {
         let address = utils::create_address_from_js_string(address)?;
+        let legacy_address = if let Some(legacy_address) = legacy_address {
+            Some(utils::create_legacy_address_from_js_string(legacy_address)?)
+        } else {
+            None
+        };
 
         node_env.execute_tokio_future(
-            Self::get_legacy_attributes_async(self.evm.clone(), address),
+            Self::get_legacy_attributes_async(self.evm.clone(), address, legacy_address),
             |&mut node_env, result| {
                 Ok(match result {
                     Some(result) => Some(JsLegacyAttributes::new(&node_env, result)?),
@@ -1702,9 +1736,10 @@ impl JsEvmWrapper {
     async fn get_legacy_attributes_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         address: Address,
+        legacy_address: Option<LegacyAddress>,
     ) -> Result<Option<LegacyAccountAttributes>> {
         let mut lock = evm.lock().await;
-        let result = lock.get_legacy_attributes(address);
+        let result = lock.get_legacy_attributes(address, legacy_address);
 
         match result {
             Ok(result) => Result::Ok(result),

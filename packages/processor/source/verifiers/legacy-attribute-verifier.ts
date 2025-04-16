@@ -14,9 +14,9 @@ export class LegacyAttributeVerifier implements Contracts.Processor.Handler {
 		const senders = new Map<string, Contracts.Evm.LegacyAttributes | null>();
 
 		for (const transaction of unit.getBlock().transactions) {
-			const { from, legacySecondSignature } = transaction.data;
+			const { from, legacySecondSignature, senderLegacyAddress } = transaction.data;
 			if (!senders.has(from)) {
-				senders[from] = await this.evm.getLegacyAttributes(from);
+				senders[from] = await this.evm.getLegacyAttributes(from, senderLegacyAddress);
 			}
 
 			const legacyAttributes = senders.get(from);
