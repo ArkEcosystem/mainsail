@@ -10,7 +10,7 @@ export const response: Contracts.P2P.PeerPingResponse = {
 	config: {
 		network: {
 			explorer: "https://explorer.ark.io",
-			name: "testnet",
+			name: "devnet",
 			nethash: "ac4279c60e87b4b788475bd86f2cc461f4ea2b786cb5f25f8c3c0fc292524982",
 			token: { name: "ARK", symbol: "TѦ" },
 			version: 30,

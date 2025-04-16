@@ -22,7 +22,7 @@ export const defaults = {
 	remoteAccess: ["127.0.0.1", "::ffff:127.0.0.1", "::1"],
 	server: {
 		hostname: Environment.get(Constants.EnvironmentVariables.CORE_P2P_HOST, "0.0.0.0"),
-		logLevel: Environment.get(Constants.EnvironmentVariables.CORE_NETWORK_NAME) === "testnet" ? 1 : 0,
+		logLevel: Environment.get(Constants.EnvironmentVariables.CORE_NETWORK_NAME) === "devnet" ? 1 : 0,
 		port: Environment.get(Constants.EnvironmentVariables.CORE_P2P_PORT, 4002),
 	},
 	txPoolPort: Environment.get(Constants.EnvironmentVariables.CORE_API_TRANSACTION_POOL_PORT, 4007),

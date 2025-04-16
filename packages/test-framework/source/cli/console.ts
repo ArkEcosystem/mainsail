@@ -58,13 +58,13 @@ export class Console {
 
 	#reset(): void {
 		this.args = [];
-		this.flags = this.#useDefaultFlags ? { network: "testnet", token: "ark" } : {};
+		this.flags = this.#useDefaultFlags ? { network: "devnet", token: "ark" } : {};
 	}
 
 	#createApplication(): Application {
 		const app = ApplicationFactory.make(new Container(), this.pkg);
 
-		this.flags = this.#useDefaultFlags ? { network: "testnet", token: "ark" } : {};
+		this.flags = this.#useDefaultFlags ? { network: "devnet", token: "ark" } : {};
 
 		return app;
 	}

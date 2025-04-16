@@ -27,7 +27,7 @@ services:
         command:
             - /bin/sh
             - -c
-            - /mainsail/packages/core/bin/run.js core:run --network=testnet
+            - /mainsail/packages/core/bin/run.js core:run --network=devnet
         environment: &nodeEnvironment
             CORE_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node0
             CORE_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node0

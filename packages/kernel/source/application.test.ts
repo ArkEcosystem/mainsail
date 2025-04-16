@@ -61,7 +61,7 @@ describe<{
 		await context.app.bootstrap({
 			flags: {
 				name: "local",
-				network: "testnet",
+				network: "devnet",
 				paths: { config: join(import.meta.dirname, "../test/stubs/config/local") },
 				token: "ark",
 			},
@@ -74,7 +74,7 @@ describe<{
 		context.app.unbind(Identifiers.Services.Filesystem.Service);
 
 		await context.app.bootstrap({
-			flags: { name: "local", network: "testnet", token: "ark" },
+			flags: { name: "local", network: "devnet", token: "ark" },
 		});
 
 		assert.is(context.app.configPath(), process.env.CORE_PATH_CONFIG);

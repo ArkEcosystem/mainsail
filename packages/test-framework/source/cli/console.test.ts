@@ -68,7 +68,7 @@ describe("Console", ({ beforeEach, it, assert, spyFn }) => {
 		await assert.resolves(() => console.execute(Command));
 		spyOnGetFlag.calledWith("flagValue");
 		spyOnGetFlagToken.calledWith("ark");
-		spyOnGetFlagNetwork.calledWith("testnet");
+		spyOnGetFlagNetwork.calledWith("devnet");
 		spyOnGetArgument.calledWith("argumentValue");
 	});
 
@@ -78,7 +78,7 @@ describe("Console", ({ beforeEach, it, assert, spyFn }) => {
 		await assert.resolves(() => console.withFlags({ flagName: "flag_test" }).execute(Command));
 		spyOnGetFlag.calledWith("flag_test");
 		spyOnGetFlagToken.calledWith("ark");
-		spyOnGetFlagNetwork.calledWith("testnet");
+		spyOnGetFlagNetwork.calledWith("devnet");
 		spyOnGetArgument.calledWith("argumentValue");
 	});
 
@@ -88,7 +88,7 @@ describe("Console", ({ beforeEach, it, assert, spyFn }) => {
 		await assert.resolves(() => console.withArgs(["test_arg"]).execute(Command));
 		spyOnGetFlag.calledWith("flagValue");
 		spyOnGetFlagToken.calledWith("ark");
-		spyOnGetFlagNetwork.calledWith("testnet");
+		spyOnGetFlagNetwork.calledWith("devnet");
 		spyOnGetArgument.calledWith("test_arg");
 	});
 

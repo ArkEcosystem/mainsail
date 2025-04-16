@@ -187,8 +187,8 @@ describe<{
 		assert.equal(result.error?.message, '"server.port" must be a number');
 	});
 
-	it("should return logLevel = 1 if process.env.CORE_NETWORK_NAME is testnet", async ({ serviceProvider }) => {
-		process.env.CORE_NETWORK_NAME = "testnet";
+	it("should return logLevel = 1 if process.env.CORE_NETWORK_NAME is devnet", async ({ serviceProvider }) => {
+		process.env.CORE_NETWORK_NAME = "devnet";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -196,8 +196,8 @@ describe<{
 		assert.equal(result.value.server.logLevel, 1);
 	});
 
-	it("should return logLevel = 0 if process.env.CORE_NETWORK_NAME is not testnet", async ({ serviceProvider }) => {
-		process.env.CORE_NETWORK_NAME = "devnet";
+	it("should return logLevel = 0 if process.env.CORE_NETWORK_NAME is not devnet", async ({ serviceProvider }) => {
+		process.env.CORE_NETWORK_NAME = "testnet";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 

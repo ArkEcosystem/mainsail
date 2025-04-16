@@ -2619,8 +2619,7 @@
 			"symbol": "TѦ",
 			"token": "ARK"
 		},
-		"messagePrefix": "testnet message:\n",
-		"name": "testnet",
+		"name": "devnet",
 		"nethash": "a7206fa9d82a0896ddb26839e36eb75d4bb6da64a5e85eaf5d46a5435bef1fa5",
 		"pubKeyHash": 30,
 		"slip44": 1,

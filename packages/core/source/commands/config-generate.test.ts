@@ -11,7 +11,7 @@ describe<{
 	cli: Console;
 }>("ConfigGenerateCommand", ({ beforeEach, it, stub, assert, match }) => {
 	const paths = envPaths("myn", { suffix: "core" });
-	const configCore = join(paths.config, "testnet");
+	const configCore = join(paths.config, "devnet");
 	const configCrypto = join(configCore, "crypto");
 
 	beforeEach((context) => {
@@ -32,7 +32,7 @@ describe<{
 				explorer: "myex.io",
 				maxBlockPayload: "123444",
 				maxTxPerBlock: "122",
-				network: "testnet",
+				network: "devnet",
 				premine: "12500000000000000",
 				pubKeyHash: "168",
 				rewardAmount: "200000000",
@@ -94,8 +94,7 @@ describe<{
 				],
 				network: {
 					client: { explorer: "myex.io", symbol: "my", token: "myn" },
-					messagePrefix: "testnet message:\n",
-					name: "testnet",
+					name: "devnet",
 					nethash: match.string,
 					pubKeyHash: 168,
 					slip44: 1,
@@ -119,7 +118,7 @@ describe<{
 						explorer: "myex.io",
 						maxBlockPayload: "123444",
 						maxTxPerBlock: "122",
-						network: "testnet",
+						network: "devnet",
 						premine: "12500000000000000",
 						pubKeyHash: "168",
 						rewardAmount: "200000000",
@@ -149,7 +148,7 @@ describe<{
 						explorer: "myex.io",
 						maxBlockPayload: "123444",
 						maxTxPerBlock: "122",
-						network: "testnet",
+						network: "devnet",
 						premine: "120000000000",
 						pubKeyHash: "168",
 						rewardAmount: "66000",
@@ -165,7 +164,7 @@ describe<{
 
 	it("should throw if the properties are not confirmed", async ({ cli }) => {
 		prompts.inject([
-			"testnet",
+			"devnet",
 			"120000000000",
 			"47",
 			"9",
@@ -209,7 +208,7 @@ describe<{
 
 	it("should throw if numeric property is Nan", async ({ cli }) => {
 		prompts.inject([
-			"testnet",
+			"devnet",
 			"120000000000",
 			"47",
 			"9",
@@ -237,7 +236,7 @@ describe<{
 		const writeFileSync = stub(fs, "writeFileSync");
 
 		prompts.inject([
-			"testnet",
+			"devnet",
 			"12500000000000000",
 			"51",
 			"9",
@@ -272,7 +271,7 @@ describe<{
 		const writeFileSync = stub(fs, "writeFileSync");
 
 		prompts.inject([
-			"testnet",
+			"devnet",
 			"120000000000",
 			"47",
 			"9",
@@ -331,7 +330,7 @@ describe<{
 				feeStaticVote: 4,
 				maxBlockPayload: "123444",
 				maxTxPerBlock: "122",
-				network: "testnet",
+				network: "devnet",
 				peers: "127.0.0.1:4444,127.0.0.2",
 				premine: "120000000000",
 				pubKeyHash: "168",
@@ -393,8 +392,7 @@ describe<{
 				],
 				network: {
 					client: { explorer: "myex.io", symbol: "my", token: "myn" },
-					messagePrefix: "testnet message:\n",
-					name: "testnet",
+					name: "devnet",
 					nethash: match.string,
 					pubKeyHash: 168,
 					slip44: 1,
@@ -439,7 +437,7 @@ describe<{
 				explorer: "myex.io",
 				maxBlockPayload: "123444",
 				maxTxPerBlock: "122",
-				network: "testnet",
+				network: "devnet",
 				overwriteConfig: "true",
 				premine: "12500000000000000",
 				pubKeyHash: "168",
@@ -473,7 +471,7 @@ describe<{
 				explorer: "myex.io",
 				maxBlockPayload: "123444",
 				maxTxPerBlock: "122",
-				network: "testnet",
+				network: "devnet",
 				premine: "12500000000000000",
 				pubKeyHash: "168",
 				rewardAmount: "200000000",
@@ -485,8 +483,8 @@ describe<{
 			})
 			.execute(Command);
 
-		existsSync.calledWith("/path/to/config/testnet");
-		ensureDirSync.calledWith("/path/to/config/testnet");
+		existsSync.calledWith("/path/to/config/devnet");
+		ensureDirSync.calledWith("/path/to/config/devnet");
 		writeJSONSync.calledTimes(5);
 		writeFileSync.calledOnce();
 	});
@@ -505,7 +503,7 @@ describe<{
 				explorer: "myex.io",
 				maxBlockPayload: "123444",
 				maxTxPerBlock: "122",
-				network: "testnet",
+				network: "devnet",
 				peers: "",
 				premine: "12500000000000000",
 				pubKeyHash: "168",
@@ -518,8 +516,8 @@ describe<{
 			})
 			.execute(Command);
 
-		existsSync.calledWith("/path/to/config/testnet");
-		ensureDirSync.calledWith("/path/to/config/testnet");
+		existsSync.calledWith("/path/to/config/devnet");
+		ensureDirSync.calledWith("/path/to/config/devnet");
 		writeJSONSync.calledTimes(5);
 		writeFileSync.calledOnce();
 	});

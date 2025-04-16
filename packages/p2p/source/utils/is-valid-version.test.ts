@@ -9,7 +9,7 @@ describe<{
 	sandbox: Sandbox;
 }>("isValidVersion", ({ it, assert, each, beforeEach }) => {
 	const configuration = {
-		get: () => "testnet",
+		get: () => "devnet",
 		getMilestone: () => ({
 			p2p: {
 				minimumVersions: ["^2.6.0"],
