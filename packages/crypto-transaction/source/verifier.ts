@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class Verifier implements Contracts.Crypto.TransactionVerifier {
@@ -109,17 +109,23 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 		const { legacySecondSignature } = data;
 
 		if (!legacySecondSignature) {
-			return false;
+			throw new Exceptions.MissingLegacySecondSignatureError();
 		}
 
 		const hash: Buffer = await this.utils.toHash(data, {
 			excludeSignature: true,
 		});
 
-		return this.signatureFactory.verify(
-			Buffer.from(legacySecondSignature, "hex"),
-			hash,
-			Buffer.from(legacySecondPublicKey, "hex"),
-		);
+		if (
+			!(await this.signatureFactory.verify(
+				Buffer.from(legacySecondSignature, "hex"),
+				hash,
+				Buffer.from(legacySecondPublicKey, "hex"),
+			))
+		) {
+			throw new Exceptions.InvalidLegacySecondSignatureError();
+		}
+
+		return true;
 	}
 }

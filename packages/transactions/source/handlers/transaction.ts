@@ -48,15 +48,8 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		}
 
 		// Legacy
-		// TODO: move check
 		if (sender.hasLegacySecondPublicKey()) {
-			if (!transaction.data.legacySecondSignature) {
-				throw new Exceptions.MissingLegacySecondSignatureError();
-			}
-
-			if (!(await this.verifier.verifyLegacySecondSignature(transaction.data, sender.legacySecondPublicKey()))) {
-				throw new Exceptions.InvalidLegacySecondSignatureError();
-			}
+			await this.verifier.verifyLegacySecondSignature(transaction.data, sender.legacySecondPublicKey());
 		} else {
 			if (transaction.data.legacySecondSignature) {
 				throw new Exceptions.UnexpectedLegacySecondSignatureError();
