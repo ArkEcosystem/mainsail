@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
 
-import { Providers } from "@mainsail/kernel";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
