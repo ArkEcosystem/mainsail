@@ -423,3 +423,80 @@ jobs:
             - name: Show logs
               if: always()
               run: docker logs mainsail
+
+    e2e-snapshot:
+        name: "E2E Snapshot"
+        needs:
+            - build
+        concurrency:
+            cancel-in-progress: true
+            group: ${{ github.head_ref }}-e2e-${{ matrix.name }}
+        runs-on: ubuntu-latest
+
+        timeout-minutes: 10
+
+        strategy:
+            matrix:
+                node-version: [22.x]
+                name: ["snapshot"]
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  run_install: false
+                  version: latest
+            - name: Get pnpm store directory
+              id: pnpm-cache
+              run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+              shell: bash
+            - name: Cache pnpm modules
+              uses: actions/cache@v4
+              with:
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+            - name: Cache lerna
+              uses: actions/cache@v4
+              with:
+                  key: lerna-${{ runner.os }}
+                  path: ./.cache
+                  restore-keys: lerna-${{ runner.os }}-
+            - name: Install dependencies
+              run: pnpm install
+            - name: Build
+              run: pnpm run build
+
+            - name: Docker ${{ matrix.name }}
+              run: sudo chmod -R 777 tests/e2e/${{ matrix.name }}/nodes && cd tests/e2e/${{ matrix.name }} && docker compose up -d
+
+            - name: Running checks for ${{ matrix.name }}
+              run: |
+                  container_id=$(docker ps -a | grep 'snapshot-checks' | awk '{print $1}')
+                  while docker ps | grep -q $container_id; do echo "checks running..."; sleep 5; done
+                  exit_code=$(docker container inspect $container_id --format='{{.State.ExitCode}}')
+                  if [ "$exit_code" != "0" ]; then
+                    echo "Error: checks exited with code $exit_code"
+                    exit 1
+                  fi
+            - name: Show logs - node0
+              if: always()
+              run: docker logs snapshot-node0-1
+            - name: Show logs - node1
+              if: always()
+              run: docker logs snapshot-node1-1
+            - name: Show logs - node2
+              if: always()
+              run: docker logs snapshot-node2-1
+            - name: Show logs - node3
+              if: always()
+              run: docker logs snapshot-node3-1
+            - name: Show logs - node4
+              if: always()
+              run: docker logs snapshot-node4-1
