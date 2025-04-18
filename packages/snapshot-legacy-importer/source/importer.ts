@@ -114,7 +114,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		this.logger.info(`Importing genesis snapshot: ${milestone.snapshot.snapshotHash}`);
 
 		// TODO: fix hardcoded path
-		await this.prepare(`./snapshot-${milestone.snapshot.snapshotHash}.json`);
+		await this.prepare(`./tests/e2e/snapshot/snapshot-${milestone.snapshot.snapshotHash}.json`);
 
 		if (this.snapshotHash !== milestone.snapshot.snapshotHash) {
 			throw new Error("imported snapshot hash mismatch");
