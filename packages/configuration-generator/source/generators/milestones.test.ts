@@ -23,7 +23,7 @@ describe<{
 				.setInitial({
 					blockTime: 8000,
 					epoch: date,
-					initialHeight: 0,
+					initialBlockNumber: 0,
 					maxBlockGasLimit: 1000,
 					maxBlockPayload: 2000,
 					maxTxPerBlock: 100,
