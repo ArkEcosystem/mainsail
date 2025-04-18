@@ -164,7 +164,7 @@ export class ConfigurationGenerator {
 							snapshotHash: importer.snapshotHash,
 						};
 
-						if (importer.validators) {
+						if (importer.validators && options.mockFakeValidatorBlsKeys) {
 							const importedValidatorMnemonics: string[] = [];
 							// create fake mnemonics for testing
 							const consensusKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(

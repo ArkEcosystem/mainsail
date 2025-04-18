@@ -60,5 +60,5 @@ export interface ImportedLegacyValidator {
 	readonly isResigned: boolean;
 
 	username: string;
-	blsPublicKey: string;
+	blsPublicKey?: string;
 }

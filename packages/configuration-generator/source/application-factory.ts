@@ -16,7 +16,7 @@ import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-valida
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreEvmConsensus } from "@mainsail/evm-consensus";
 import { ServiceProvider as EvmService } from "@mainsail/evm-service";
-import { Application } from "@mainsail/kernel";
+import { Application, Providers } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreSnapshotLegacyImporter } from "@mainsail/snapshot-legacy-importer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
@@ -57,6 +57,8 @@ export const makeApplication = async (configurationPath: string, options: Record
 	});
 	setGracefulCleanup();
 	app.rebind("path.data").toConstantValue(dirSync().name);
+
+	app.bind(Identifiers.ServiceProvider.Configuration).to(Providers.PluginConfiguration).inSingletonScope();
 
 	await app.resolve(CoreSerializer).register();
 	await app.resolve(CoreValidation).register();

@@ -8,7 +8,7 @@ import { DataSource } from "typeorm";
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
 
 import { Identifiers as InternalIdentifiers } from "../identifiers.js";
-import { LegacySnapshot, LegacyWallet } from "../interfaces.js";
+import { LegacyChainTip, LegacySnapshot, LegacyWallet } from "../interfaces.js";
 
 interface DatabaseOptions extends PostgresConnectionOptions {
 	readonly v3: {
