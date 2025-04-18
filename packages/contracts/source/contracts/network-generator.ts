@@ -41,6 +41,7 @@ export type GenesisBlockOptions = {
 	epoch: Date;
 	snapshot?: SnapshotOptions;
 	initialHeight: number;
+	mockFakeValidatorBlsKeys?: boolean;
 };
 
 export type SnapshotOptions = {

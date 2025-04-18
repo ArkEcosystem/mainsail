@@ -19,6 +19,7 @@ export interface LegacyImporter {
 export interface LegacyImportOptions {
 	readonly timestamp: number;
 	readonly commitKey: CommitKey;
+	readonly mockFakeValidatorBlsKeys?: boolean;
 }
 
 export interface LegacyImportResult {

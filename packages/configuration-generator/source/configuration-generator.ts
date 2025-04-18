@@ -257,7 +257,7 @@ export class ConfigurationGenerator {
 		logger?.info(`Configuration generated on location: ${this.configurationPath}`);
 	}
 
-	#preparteEnvironmentOptions(options: Contracts.NetworkGenerator.EnvironmentOptions): EnvironmentData {
+	#preparteEnvironmentOptions(options: Contracts.NetworkGenerator.InternalOptions): EnvironmentData {
 		const data: EnvironmentData = {
 			CORE_API_EVM_ENABLED: "1",
 
@@ -275,6 +275,10 @@ export class ConfigurationGenerator {
 			CORE_P2P_PORT: options.coreP2PPort,
 			CORE_WEBHOOKS_PORT: options.coreWebhooksPort,
 		};
+
+		if (options.mockFakeValidatorBlsKeys) {
+			data.CORE_SNAPSHOT_MOCK_FAKE_VALIDATOR_BLS_KEYS = "1";
+		}
 
 		// if (options.coreDBDatabase) {
 		// 	data.CORE_DB_DATABASE = options.coreDBDatabase;

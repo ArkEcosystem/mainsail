@@ -133,6 +133,9 @@ export const EnvironmentVariableNames = [
 	"CORE_API_EVM_SSL_CERT",
 	"CORE_API_EVM_SSL_KEY",
 
+	// SNAPSHOT
+	"CORE_SNAPSHOT_MOCK_FAKE_VALIDATOR_BLS_KEYS",
+
 	// Other
 	"CORE_NETWORK_NAME",
 	"CORE_TOKEN",
