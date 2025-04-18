@@ -14,6 +14,15 @@ export class AppGenerator {
 	}
 
 	generate(options: Contracts.NetworkGenerator.InternalOptions): Contracts.Types.JsonObject {
-		return this.generateDefault(options.packageName);
+		const appJson = this.generateDefault(options.packageName);
+
+		if (options.snapshot) {
+			// @ts-ignore
+			const index = appJson.main.findIndex((p) => p.package === "@mainsail/state");
+			// @ts-ignore
+			appJson.main.splice(index, 0, { package: "@mainsail/snapshot-legacy-importer" });
+		}
+
+		return appJson;
 	}
 }
