@@ -22,15 +22,18 @@ services:
         image: mainsail
         volumes:
             - ./../../../:/mainsail
+        working_dir: /mainsail
         depends_on:
             - peerdiscovery
         command:
             - /bin/sh
             - -c
-            - /mainsail/packages/core/bin/run.js core:run --network=testnet
+            - packages/core/bin/run.js core:run --network=testnet
         environment: &nodeEnvironment
-            CORE_PATH_CONFIG: /mainsail/tests/e2e/snapshot/nodes/node0
-            CORE_PATH_DATA: /mainsail/tests/e2e/snapshot/nodes/node0
+            CORE_P2P_PEER_LOG_EXTRA: true
+            CORE_P2P_MIN_NETWORK_REACH: 2
+            CORE_PATH_CONFIG: tests/e2e/snapshot/nodes/node0
+            CORE_PATH_DATA: tests/e2e/snapshot/nodes/node0
 
     node1:
         <<: *nodeDefinition
@@ -38,8 +41,8 @@ services:
             - peerdiscovery
         environment:
             <<: *nodeEnvironment
-            CORE_PATH_CONFIG: /mainsail/tests/e2e/snapshot/nodes/node1
-            CORE_PATH_DATA: /mainsail/tests/e2e/snapshot/nodes/node1
+            CORE_PATH_CONFIG: tests/e2e/snapshot/nodes/node1
+            CORE_PATH_DATA: tests/e2e/snapshot/nodes/node1
 
     node2:
         <<: *nodeDefinition
@@ -47,8 +50,8 @@ services:
             - peerdiscovery
         environment:
             <<: *nodeEnvironment
-            CORE_PATH_CONFIG: /mainsail/tests/e2e/snapshot/nodes/node2
-            CORE_PATH_DATA: /mainsail/tests/e2e/snapshot/nodes/node2
+            CORE_PATH_CONFIG: tests/e2e/snapshot/nodes/node2
+            CORE_PATH_DATA: tests/e2e/snapshot/nodes/node2
 
     node3:
         <<: *nodeDefinition
@@ -56,8 +59,8 @@ services:
             - peerdiscovery
         environment:
             <<: *nodeEnvironment
-            CORE_PATH_CONFIG: /mainsail/tests/e2e/snapshot/nodes/node3
-            CORE_PATH_DATA: /mainsail/tests/e2e/snapshot/nodes/node3
+            CORE_PATH_CONFIG: tests/e2e/snapshot/nodes/node3
+            CORE_PATH_DATA: tests/e2e/snapshot/nodes/node3
 
     node4:
         <<: *nodeDefinition
@@ -65,5 +68,5 @@ services:
             - peerdiscovery
         environment:
             <<: *nodeEnvironment
-            CORE_PATH_CONFIG: /mainsail/tests/e2e/snapshot/nodes/node4
-            CORE_PATH_DATA: /mainsail/tests/e2e/snapshot/nodes/node4
+            CORE_PATH_CONFIG: tests/e2e/snapshot/nodes/node4
+            CORE_PATH_DATA: tests/e2e/snapshot/nodes/node4
