@@ -71,7 +71,7 @@ export class ConfigurationGenerator {
 			epoch: new Date(),
 			explorer: "",
 			force: false,
-			initialHeight: 0,
+			initialBlockNumber: 0,
 			maxBlockGasLimit: 10_000_000,
 			maxBlockPayload: 2_097_152,
 			maxTxPerBlock: 150,
@@ -132,13 +132,13 @@ export class ConfigurationGenerator {
 							Identifiers.Snapshot.Legacy.Importer,
 						);
 						await importer.prepare(options.snapshot.path);
-						internalOptions.initialHeight = Number(importer.genesisHeight);
+						internalOptions.initialBlockNumber = Number(importer.genesisBlockNumber);
 					}
 
 					const milestones = this.milestonesGenerator
 						.setInitial(internalOptions)
 						.setReward(
-							internalOptions.initialHeight + internalOptions.rewardHeight,
+							internalOptions.initialBlockNumber + internalOptions.rewardHeight,
 							internalOptions.rewardAmount,
 						)
 						.generate();
@@ -147,7 +147,7 @@ export class ConfigurationGenerator {
 						genesisBlock: {
 							// @ts-ignore
 							block: {
-								number: internalOptions.initialHeight,
+								number: internalOptions.initialBlockNumber,
 							},
 						},
 						milestones,

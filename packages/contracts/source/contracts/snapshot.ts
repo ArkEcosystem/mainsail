@@ -10,7 +10,7 @@ export interface LegacyImporter {
 	validators: ImportedLegacyValidator[];
 	voters: ImportedLegacyVoter[];
 	snapshotHash: string;
-	genesisHeight: bigint;
+	genesisBlockNumber: bigint;
 	previousGenesisBlockHash: string;
 	totalSupply: bigint;
 	result: LegacyImportResult | undefined;

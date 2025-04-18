@@ -45,12 +45,12 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		voters: Contracts.Snapshot.ImportedLegacyVoter[];
 		validators: Contracts.Snapshot.ImportedLegacyValidator[];
 		snapshotHash: string;
-		genesisHeight: bigint;
+		genesisBlockNumber: bigint;
 		previousGenesisBlockHash: string;
 		totalSupply: bigint;
 		result: Contracts.Snapshot.LegacyImportResult | undefined;
 	} = {
-		genesisHeight: 0n,
+		genesisBlockNumber: 0n,
 		previousGenesisBlockHash: "",
 		result: undefined,
 		snapshotHash: "",
@@ -76,8 +76,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		return this.#data.snapshotHash;
 	}
 
-	public get genesisHeight(): bigint {
-		return this.#data.genesisHeight;
+	public get genesisBlockNumber(): bigint {
+		return this.#data.genesisBlockNumber;
 	}
 
 	public get previousGenesisBlockHash(): string {
@@ -210,12 +210,15 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			throw new Error(`failed to verify snapshot integrity: ${snapshot.hash} - ${calculatedHash}`);
 		}
 
-		const genesisHeight = BigInt(snapshot.chainTip.height) + 1n;
+		let genesisBlockNumber = BigInt(snapshot.chainTip.number);
+		if (genesisBlockNumber > 0n) {
+			genesisBlockNumber += 1n;
+		}
 
 		this.logger.info(
 			`snapshot stats: ${JSON.stringify({
 				coldWallets: foundColdWallets,
-				genesisHeight: genesisHeight.toString(),
+				genesisBlockNumber: genesisBlockNumber.toString(),
 				totalSupply: totalSupply.toString(),
 				validators: validators.length,
 				voters: voters.length,
@@ -224,8 +227,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		);
 
 		this.#data = {
-			genesisHeight,
-			previousGenesisBlockHash: snapshot.chainTip.id,
+			genesisBlockNumber,
+			previousGenesisBlockHash: snapshot.chainTip.hash,
 			result: undefined,
 			snapshotHash: calculatedHash,
 			totalSupply,
