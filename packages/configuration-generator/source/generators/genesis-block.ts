@@ -372,8 +372,8 @@ export class GenesisBlockGenerator extends Generator {
 				blockNumber: this.snapshotLegacyImporter.genesisBlockNumber,
 				round: 0n,
 			},
-			timestamp: dayjs(options.epoch).valueOf(),
 			mockFakeValidatorBlsKeys: options.mockFakeValidatorBlsKeys,
+			timestamp: dayjs(options.epoch).valueOf(),
 		});
 
 		options.initialBlockNumber = Number(this.snapshotLegacyImporter.genesisBlockNumber);

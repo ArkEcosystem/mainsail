@@ -1,10 +1,10 @@
 import { createHash } from "node:crypto";
 
-import { Providers } from "@mainsail/kernel";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
+import { Providers } from "@mainsail/kernel";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, BigNumber } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
