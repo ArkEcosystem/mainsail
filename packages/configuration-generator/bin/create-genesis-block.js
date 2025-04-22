@@ -19,10 +19,12 @@ async function run() {
 		distribute: true,
 		premine: "125000000000000000000000000",
 		chainId: 10000,
+		validators: 5,
 		initialHeight: 0,
-		// snapshot: {
-		// 	path: "../../snapshot-19a87c96dbe8ad1be06d33e97cd17f5662eb952c29efd3d8bb00c9c75e7582bc.json",
-		// },
+		mockFakeValidatorBlsKeys: true,
+		snapshot: {
+			path: "../../snapshot-9ad6cc2a48daa4dfb1eeb267b7785b19345bbab865051d420ad121fd966266e4.json",
+		},
 	});
 
 	for (const tag of ["evm", "validator", "transaction-pool", "rpc"]) {
