@@ -7,6 +7,8 @@ export class BlockVerifier implements Contracts.Processor.Verifier {
 	private readonly handlers!: Contracts.Processor.Handler[];
 
 	public async verify(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		await Promise.all(this.handlers.map((handler) => handler.execute(unit)));
+		for (const handler of this.handlers) {
+			await handler.execute(unit);
+		}
 	}
 }
