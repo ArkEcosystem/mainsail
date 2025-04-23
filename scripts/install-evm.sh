@@ -101,7 +101,7 @@ heading "Installing node.js & npm..."
     sudo rm -rf ~/{.npm,.forever,.node*,.cache,.nvm}
     (echo -e "Package: nodejs\nPin: origin deb.nodesource.com\nPin-Priority: 999" | sudo tee /etc/apt/preferences.d/nodesource)
 	curl -sL  https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor | sudo tee /usr/share/keyrings/nodesource.gpg >/dev/null
-    (echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list)
+    (echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list)
     sudo apt-get update
     sudo $APT_ENV apt-get install nodejs -yq
 
@@ -134,7 +134,7 @@ success "Installed PM2!"
 
 heading "Installing program dependencies..."
 
-    sudo $APT_ENV apt-get install build-essential pkg-config libtool autoconf automake libpq-dev jq libjemalloc-dev -yq
+    sudo $APT_ENV apt-get install build-essential python-is-python3 pkg-config libtool autoconf automake libpq-dev jq libjemalloc-dev -yq
 
 success "Installed program dependencies!"
 
@@ -164,8 +164,21 @@ if [ ! -z "$MAINSAIL" ] ; then
     pnpm rm -g @mainsail/core > /dev/null 2>&1 || true
 fi
 
+allowBuild() {
+    packages=("@chainsafe/blst" "bcrypto" "better-sqlite3" "bstring" "lmdb" "msgpackr-extract" "nsfw" "protobufjs")
+    params=""
+       for package in "${packages[@]}"; do
+          params+="--allow-build \"${package}\" "
+       done
+}
+
 addCore() {
-    while ! pnpm i -g @mainsail/core@${channel:-evm} ; do
+    packages=(@chainsafe/blst bcrypto better-sqlite3 bstring lmdb msgpackr-extract nsfw protobufjs)
+        params=""
+       for package in "${packages[@]}"; do
+          params+="--allow-build ${package} "
+       done
+    while ! pnpm add -g @mainsail/core@${channel:-evm} ${params} ; do
         read -p "Installing Mainsail Core failed, do you want to retry? [y/N]: " choice
             if [[ ! "$choice" =~ ^(yes|y|Y) ]] ; then
                  exit 1
@@ -175,7 +188,7 @@ addCore() {
 
 heading "Configuring for custom TestNet ..."
 
-    channel=evm addCore ${channel} && rm -rf ~/.config/mainsail/core/ &&  rm -rf ~/.local/state/mainsail/core/ &&  rm -rf ~/.local/share/mainsail/core/  && mainsail config:publish:custom --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/peers.json --reset && mainsail env:set --key=CORE_P2P_PORT --value=4000 && mainsail env:set --key=CORE_API_DEV_ENABLED --value=true
+    channel=evm addCore ${channel} && rm -rf ~/.config/mainsail/core/ &&  rm -rf ~/.local/state/mainsail/core/ &&  rm -rf ~/.local/share/mainsail/core/  && mainsail config:publish:custom --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/peers.json --reset && mainsail env:set --key=CORE_P2P_PORT --value=4000 && mainsail env:set --key=CORE_API_DEV_ENABLED --value=true
 
 warning "Cleaning up Pnpm cache .."
     pnpm store prune
@@ -194,7 +207,7 @@ if [ -z "$NPM" ] ; then
 fi
 
 addApi() {
-    while ! pnpm i -g @mainsail/api@${channel:-evm} ; do
+    while ! pnpm add -g @mainsail/api@${channel:-evm} ; do
         read -p "Installing Mainsail API failed, do you want to retry? [y/N]: " choice
             if [[ ! "$choice" =~ ^(yes|y|Y) ]] ; then
                  exit 1
@@ -316,7 +329,7 @@ if [[ "$choice" =~ ^(yes|y|Y) ]]; then
         fi
 heading "Configuring ..."
 
-        rm -rf ~/.config/mainsail/core/ && rm -rf ~/.local/state/mainsail/core/ && rm -rf ~/.local/share/mainsail/core/ && mainsail config:publish:custom --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/api-app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/peers.json --reset
+        rm -rf ~/.config/mainsail/core/ && rm -rf ~/.local/state/mainsail/core/ && rm -rf ~/.local/share/mainsail/core/ && mainsail config:publish:custom --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/api-app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/peers.json --reset
 	mainsail env:set --key=CORE_P2P_PORT --value=4000
 	mainsail env:set --key=CORE_API_DEV_ENABLED --value=true
 	mainsail env:set --key=CORE_DB_USERNAME --value="${databaseUsername}"
@@ -361,4 +374,3 @@ handle_flags "$@"
 coreServer
 
 exec "$BASH"
-
