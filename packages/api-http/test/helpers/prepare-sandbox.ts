@@ -132,6 +132,7 @@ const setupDatabase = async (app: Application): Promise<CoreApiDatabase> => {
 		.discover("@mainsail/api-database", "@mainsail/api-database");
 
 	pluginConfiguration.merge({
+		enabled: true,
 		database: {
 			...databaseOptions,
 			applicationName: "mainsail/api-database-test",
@@ -155,6 +156,7 @@ const setupHttp = async (app: Application): Promise<CoreApiHttp> => {
 		.discover("@mainsail/api-http", "@mainsail/api-http");
 
 	pluginConfiguration.merge({
+		enabled: false,
 		database: {
 			...databaseOptions,
 			applicationName: "mainsail/api-http-test",
