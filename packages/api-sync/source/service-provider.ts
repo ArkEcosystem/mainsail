@@ -7,6 +7,10 @@ import { Sync } from "./service.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
+		if (!this.#isEnabled()) {
+			return;
+		}
+
 		this.app.bind(Identifiers.ApiSync.Listener).to(Listeners).inSingletonScope();
 		this.app.bind(Identifiers.ApiSync.Service).to(Sync).inSingletonScope();
 
@@ -15,6 +19,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async dispose(): Promise<void> {
+		if (!this.#isEnabled()) {
+			return;
+		}
+
 		await this.app.get<Listeners>(Identifiers.ApiSync.Listener).dispose();
 	}
 
@@ -22,5 +30,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return Joi.object({
 			syncInterval: Joi.number().required(),
 		}).unknown(true);
+	}
+
+	#isEnabled(): boolean {
+		return this.config().getRequired<boolean>("enabled") === true && !this.app.isWorker();
 	}
 }

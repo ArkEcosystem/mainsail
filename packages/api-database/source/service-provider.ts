@@ -40,6 +40,10 @@ import { SnakeNamingStrategy } from "./utils/snake-naming-strategy.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
+		if (!this.#isEnabled()) {
+			return;
+		}
+
 		await this.#configureDatabase();
 	}
 
@@ -185,5 +189,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		} catch (error) {
 			await this.app.terminate("Failed to configure database!", error);
 		}
+	}
+
+	#isEnabled(): boolean {
+		return this.config().getRequired<boolean>("enabled") === true && !this.app.isWorker();
 	}
 }
