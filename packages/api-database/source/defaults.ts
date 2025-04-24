@@ -2,7 +2,6 @@ import { Constants } from "@mainsail/contracts";
 import { Environment } from "@mainsail/kernel";
 
 export const defaults = {
-	enabled: Environment.isTrue(Constants.EnvironmentVariables.CORE_API_SYNC_ENABLED),
 	database: {
 		applicationName: "mainsail/api-http",
 		database:
@@ -29,4 +28,5 @@ export const defaults = {
 			Environment.get(Constants.EnvironmentVariables.CORE_DB_USERNAME) ??
 			Environment.get(Constants.EnvironmentVariables.CORE_TOKEN),
 	},
+	enabled: Environment.isTrue(Constants.EnvironmentVariables.CORE_API_SYNC_ENABLED),
 };
