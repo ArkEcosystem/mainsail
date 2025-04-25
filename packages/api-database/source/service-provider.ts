@@ -192,6 +192,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#isEnabled(): boolean {
-		return this.config().getRequired<boolean>("enabled") === true && !this.app.isWorker();
+		return (
+			this.app.name() === "api" ||
+			(this.config().getRequired<boolean>("enabled") === true && !this.app.isWorker())
+		);
 	}
 }
