@@ -6,8 +6,8 @@ import {
 import { Identifiers } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
 
-import { Sandbox } from "../../../test-framework/source";
-import { ServiceProvider as CoreApiHttp } from "../../source/service-provider";
+import { Sandbox } from "../../../test-framework/source/index.js";
+import { ServiceProvider as CoreApiHttp } from "../../source/service-provider.js";
 
 export class ApiContext {
 	public constructor(
@@ -99,6 +99,8 @@ export class ApiContext {
 
 export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<ApiContext> => {
 	context.sandbox = new Sandbox();
+
+	context.sandbox.app.bind(Identifiers.Application.Name).toConstantValue("api-http-integration");
 
 	context.sandbox.app
 		.bind(Identifiers.ServiceProvider.Configuration)
