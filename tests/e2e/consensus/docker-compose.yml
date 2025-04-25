@@ -29,8 +29,8 @@ services:
             - -c
             - /mainsail/packages/core/bin/run.js core:run --network=devnet
         environment: &nodeEnvironment
-            CORE_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node0
-            CORE_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node0
+            MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node0
+            MAINSAIL_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node0
 
     node1:
         <<: *nodeDefinition
@@ -38,8 +38,8 @@ services:
             - peerdiscovery
         environment:
             <<: *nodeEnvironment
-            CORE_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node1
-            CORE_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node1
+            MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node1
+            MAINSAIL_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node1
 
     node2:
         <<: *nodeDefinition
@@ -47,8 +47,8 @@ services:
             - peerdiscovery
         environment:
             <<: *nodeEnvironment
-            CORE_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node2
-            CORE_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node2
+            MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node2
+            MAINSAIL_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node2
 
     node3:
         <<: *nodeDefinition
@@ -56,8 +56,8 @@ services:
             - peerdiscovery
         environment:
             <<: *nodeEnvironment
-            CORE_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node3
-            CORE_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node3
+            MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node3
+            MAINSAIL_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node3
 
     node4:
         <<: *nodeDefinition
@@ -65,5 +65,5 @@ services:
             - peerdiscovery
         environment:
             <<: *nodeEnvironment
-            CORE_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node4
-            CORE_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node4
+            MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node4
+            MAINSAIL_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node4

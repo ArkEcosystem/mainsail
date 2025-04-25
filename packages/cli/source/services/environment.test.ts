@@ -17,12 +17,12 @@ describe<{
 		assert.equal(Object.keys(environment.getPaths()), ["data", "config", "cache", "log", "temp"]);
 	});
 
-	it("should respect the CORE_PATH_CONFIG environment variable", async ({ environment }) => {
-		process.env.CORE_PATH_CONFIG = "something";
+	it("should respect the MAINSAIL_PATH_CONFIG environment variable", async ({ environment }) => {
+		process.env.MAINSAIL_PATH_CONFIG = "something";
 
 		assert.true(environment.getPaths().config.endsWith("/something/core"));
 
-		delete process.env.CORE_PATH_CONFIG;
+		delete process.env.MAINSAIL_PATH_CONFIG;
 	});
 
 	it("should fail to update the variables if the file doesn't exist", async ({ environment }) => {
@@ -30,7 +30,7 @@ describe<{
 	});
 
 	it("should update the variables", async ({ environment }) => {
-		const environmentFile = `${process.env.CORE_PATH_CONFIG}/mainsail/.env`;
+		const environmentFile = `${process.env.MAINSAIL_PATH_CONFIG}/mainsail/.env`;
 
 		removeSync(environmentFile);
 		ensureFileSync(environmentFile);

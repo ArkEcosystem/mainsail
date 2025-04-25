@@ -9,7 +9,7 @@ describe<{
 	cli: Console;
 }>("ConfigPublishCommand", ({ beforeEach, afterAll, it, assert, stub, spy }) => {
 	beforeEach((context) => {
-		process.env.CORE_PATH_CONFIG = dirSync().name;
+		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
 		context.cli = new Console();
 	});

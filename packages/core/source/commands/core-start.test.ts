@@ -10,9 +10,9 @@ describe<{
 	processManager: Services.ProcessManager;
 }>("CoreStartCommand", ({ beforeEach, afterAll, it, assert, stub, match }) => {
 	beforeEach((context) => {
-		process.env.CORE_PATH_CONFIG = dirSync().name;
+		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
-		writeJSONSync(`${process.env.CORE_PATH_CONFIG}/delegates.json`, { secrets: ["bip39"] });
+		writeJSONSync(`${process.env.MAINSAIL_PATH_CONFIG}/delegates.json`, { secrets: ["bip39"] });
 
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Identifiers.ProcessManager);
@@ -29,7 +29,7 @@ describe<{
 			{
 				args: "core:run --network='devnet' --token='ark' --v=0 --env='production' --skipPrompts=false",
 				env: {
-					CORE_ENV: "production",
+					MAINSAIL_ENV: "production",
 					NODE_ENV: "production",
 				},
 				name: "mainsail",

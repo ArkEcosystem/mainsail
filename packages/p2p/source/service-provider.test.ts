@@ -108,7 +108,7 @@ describe<{
 		context.serviceProvider = context.sandbox.app.resolve(ServiceProvider);
 
 		for (const key of Object.keys(process.env)) {
-			if (key.includes("CORE_P2P_")) {
+			if (key.includes("MAINSAIL_P2P_")) {
 				delete process.env[key];
 			}
 		}
@@ -148,8 +148,8 @@ describe<{
 		assert.equal(result.value.customField, "dummy");
 	});
 
-	it("should parse process.env.CORE_P2P_HOST", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_HOST = "127.0.0.1";
+	it("should parse process.env.MAINSAIL_P2P_HOST", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_HOST = "127.0.0.1";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -157,8 +157,8 @@ describe<{
 		assert.equal(result.value.server.hostname, "127.0.0.1");
 	});
 
-	it("should throw if process.env.CORE_P2P_HOST is not ipv4 or ipv6 address", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_HOST = "123";
+	it("should throw if process.env.MAINSAIL_P2P_HOST is not ipv4 or ipv6 address", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_HOST = "123";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -169,8 +169,8 @@ describe<{
 		);
 	});
 
-	it("should parse process.env.CORE_P2P_PORT", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_PORT = "5000";
+	it("should parse process.env.MAINSAIL_P2P_PORT", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_PORT = "5000";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -178,8 +178,8 @@ describe<{
 		assert.equal(result.value.server.port, 5000);
 	});
 
-	it("should throw if process.env.CORE_P2P_PORT is not number", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_PORT = "false";
+	it("should throw if process.env.MAINSAIL_P2P_PORT is not number", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_PORT = "false";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -187,8 +187,8 @@ describe<{
 		assert.equal(result.error?.message, '"server.port" must be a number');
 	});
 
-	it("should return logLevel = 1 if process.env.CORE_NETWORK_NAME is devnet", async ({ serviceProvider }) => {
-		process.env.CORE_NETWORK_NAME = "devnet";
+	it("should return logLevel = 1 if process.env.MAINSAIL_NETWORK_NAME is devnet", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_NETWORK_NAME = "devnet";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -196,8 +196,8 @@ describe<{
 		assert.equal(result.value.server.logLevel, 1);
 	});
 
-	it("should return logLevel = 0 if process.env.CORE_NETWORK_NAME is not devnet", async ({ serviceProvider }) => {
-		process.env.CORE_NETWORK_NAME = "testnet";
+	it("should return logLevel = 0 if process.env.MAINSAIL_NETWORK_NAME is not devnet", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_NETWORK_NAME = "testnet";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -205,8 +205,8 @@ describe<{
 		assert.equal(result.value.server.logLevel, 0);
 	});
 
-	it("should parse process.env.CORE_P2P_MIN_NETWORK_REACH", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_MIN_NETWORK_REACH = "10";
+	it("should parse process.env.MAINSAIL_P2P_MIN_NETWORK_REACH", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_MIN_NETWORK_REACH = "10";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -214,8 +214,8 @@ describe<{
 		assert.equal(result.value.minimumNetworkReach, 10);
 	});
 
-	it("should throw if process.env.CORE_P2P_MIN_NETWORK_REACH is not number", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_MIN_NETWORK_REACH = "false";
+	it("should throw if process.env.MAINSAIL_P2P_MIN_NETWORK_REACH is not number", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_MIN_NETWORK_REACH = "false";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -223,8 +223,8 @@ describe<{
 		assert.equal(result.error?.message, '"minimumNetworkReach" must be a number');
 	});
 
-	it("should parse process.env.CORE_P2P_MAX_PEERS_SAME_SUBNET", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_MAX_PEERS_SAME_SUBNET = "5000";
+	it("should parse process.env.MAINSAIL_P2P_MAX_PEERS_SAME_SUBNET", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_MAX_PEERS_SAME_SUBNET = "5000";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -232,8 +232,8 @@ describe<{
 		assert.equal(result.value.maxSameSubnetPeers, 5000);
 	});
 
-	it("should throw if process.env.CORE_P2P_MAX_PEERS_SAME_SUBNET is not number", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_MAX_PEERS_SAME_SUBNET = "false";
+	it("should throw if process.env.MAINSAIL_P2P_MAX_PEERS_SAME_SUBNET is not number", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_MAX_PEERS_SAME_SUBNET = "false";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -241,8 +241,8 @@ describe<{
 		assert.equal(result.error?.message, '"maxSameSubnetPeers" must be a number');
 	});
 
-	it("should parse process.env.CORE_P2P_MAX_PEERS_BROADCAST", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_MAX_PEERS_BROADCAST = "10";
+	it("should parse process.env.MAINSAIL_P2P_MAX_PEERS_BROADCAST", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_MAX_PEERS_BROADCAST = "10";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -250,8 +250,8 @@ describe<{
 		assert.equal(result.value.maxPeersBroadcast, 10);
 	});
 
-	it("should throw if process.env.CORE_P2P_MAX_PEERS_BROADCAST is not number", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_MAX_PEERS_BROADCAST = "false";
+	it("should throw if process.env.MAINSAIL_P2P_MAX_PEERS_BROADCAST is not number", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_MAX_PEERS_BROADCAST = "false";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -259,8 +259,8 @@ describe<{
 		assert.equal(result.error?.message, '"maxPeersBroadcast" must be a number');
 	});
 
-	it("should parse process.env.CORE_P2P_RATE_LIMIT", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_RATE_LIMIT = "5000";
+	it("should parse process.env.MAINSAIL_P2P_RATE_LIMIT", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_RATE_LIMIT = "5000";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -268,8 +268,8 @@ describe<{
 		assert.equal(result.value.rateLimit, 5000);
 	});
 
-	it("should throw if process.env.CORE_P2P_RATE_LIMIT is not number", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_RATE_LIMIT = "false";
+	it("should throw if process.env.MAINSAIL_P2P_RATE_LIMIT is not number", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_RATE_LIMIT = "false";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -277,8 +277,8 @@ describe<{
 		assert.equal(result.error?.message, '"rateLimit" must be a number');
 	});
 
-	it("should parse process.env.CORE_P2P_PEER_BAN_TIME", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_PEER_BAN_TIME = "5000";
+	it("should parse process.env.MAINSAIL_P2P_PEER_BAN_TIME", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_PEER_BAN_TIME = "5000";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -286,8 +286,8 @@ describe<{
 		assert.equal(result.value.peerBanTime, 5000);
 	});
 
-	it("should throw if process.env.CORE_P2P_PEER_BAN_TIME is not number", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_PEER_BAN_TIME = "false";
+	it("should throw if process.env.MAINSAIL_P2P_PEER_BAN_TIME is not number", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_PEER_BAN_TIME = "false";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -295,8 +295,8 @@ describe<{
 		assert.equal(result.error?.message, '"peerBanTime" must be a number');
 	});
 
-	it("should parse CORE_P2P_DEVELOPMENT_MODE_ENABLED", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_DEVELOPMENT_MODE_ENABLED = "true";
+	it("should parse MAINSAIL_P2P_DEVELOPMENT_MODE_ENABLED", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_DEVELOPMENT_MODE_ENABLED = "true";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -304,8 +304,8 @@ describe<{
 		assert.equal(result.value.developmentMode.enabled, true);
 	});
 
-	it("should parse process.env.CORE_P2P_API_NODES_MAX_CONTENT_LENGTH", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_API_NODES_MAX_CONTENT_LENGTH = "25000";
+	it("should parse process.env.MAINSAIL_P2P_API_NODES_MAX_CONTENT_LENGTH", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_API_NODES_MAX_CONTENT_LENGTH = "25000";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 

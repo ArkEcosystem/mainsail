@@ -15,10 +15,10 @@ describe<{
 	const bip39Prompt = "craft imitate step mixture patch forest volcano business charge around girl confirm";
 
 	beforeEach((context) => {
-		process.env.CORE_PATH_CONFIG = dirSync().name;
+		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
-		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/core/`);
-		writeJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`, {});
+		ensureDirSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/`);
+		writeJSONSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/validators.json`, {});
 
 		context.cli = new Console();
 	});
@@ -28,7 +28,7 @@ describe<{
 	it("should configure from flags", async ({ cli }) => {
 		await cli.withFlags({ bip39: bip39Flags, password: "password" }).execute(Command);
 
-		const config = readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`);
+		const config = readJSONSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/validators.json`);
 		assert.equal(config.secrets, []);
 
 		const keystore = Keystore.parse(config.keystore);
@@ -40,7 +40,7 @@ describe<{
 
 		await cli.execute(Command);
 
-		const config = readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`);
+		const config = readJSONSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/validators.json`);
 		assert.equal(config.secrets, []);
 
 		const keystore = Keystore.parse(config.keystore);
@@ -54,7 +54,7 @@ describe<{
 
 		await assert.rejects(() => cli.execute(Command), "Failed to verify the given passphrase as BIP39 compliant.");
 
-		assert.equal(readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [bip39] });
+		assert.equal(readJSONSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/validators.json`), { secrets: [bip39] });
 	});
 
 	it("should fail to configure from a prompt if it doesn't receive a bip39", async ({ cli }) => {

@@ -79,7 +79,7 @@ describe<Context>("ServiceProvider.configSchema", ({ beforeEach, assert, it }) =
 		init(context);
 
 		for (const key of Object.keys(process.env)) {
-			if (key.includes("CORE_WEBHOOKS_")) {
+			if (key.includes("MAINSAIL_WEBHOOKS_")) {
 				delete process.env[key];
 			}
 		}
@@ -110,8 +110,8 @@ describe<Context>("ServiceProvider.configSchema", ({ beforeEach, assert, it }) =
 		assert.equal(result.value.customField, "dummy");
 	});
 
-	it("should return true if process.env.CORE_WEBHOOKS_ENABLED is defined", async ({ serviceProvider }) => {
-		process.env.CORE_WEBHOOKS_ENABLED = "true";
+	it("should return true if process.env.MAINSAIL_WEBHOOKS_ENABLED is defined", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_WEBHOOKS_ENABLED = "true";
 
 		const result = (serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
@@ -119,8 +119,8 @@ describe<Context>("ServiceProvider.configSchema", ({ beforeEach, assert, it }) =
 		assert.true(result.value.enabled);
 	});
 
-	it("should return value of process.env.CORE_WEBHOOKS_HOST if defined", async ({ serviceProvider }) => {
-		process.env.CORE_WEBHOOKS_HOST = "127.0.0.1";
+	it("should return value of process.env.MAINSAIL_WEBHOOKS_HOST if defined", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_WEBHOOKS_HOST = "127.0.0.1";
 
 		const result = (serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
@@ -128,8 +128,8 @@ describe<Context>("ServiceProvider.configSchema", ({ beforeEach, assert, it }) =
 		assert.equal(result.value.server.http.host, "127.0.0.1");
 	});
 
-	it("should return value of process.env.CORE_WEBHOOKS_PORT if number", async ({ serviceProvider }) => {
-		process.env.CORE_WEBHOOKS_PORT = "200";
+	it("should return value of process.env.MAINSAIL_WEBHOOKS_PORT if number", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_WEBHOOKS_PORT = "200";
 
 		const result = (serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
@@ -137,8 +137,8 @@ describe<Context>("ServiceProvider.configSchema", ({ beforeEach, assert, it }) =
 		assert.equal(result.value.server.http.port, 200);
 	});
 
-	it("should return value of process.env.CORE_WEBHOOKS_TIMEOUT if defined", async ({ serviceProvider }) => {
-		process.env.CORE_WEBHOOKS_TIMEOUT = "5000";
+	it("should return value of process.env.MAINSAIL_WEBHOOKS_TIMEOUT if defined", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_WEBHOOKS_TIMEOUT = "5000";
 
 		const result = (serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 

@@ -88,8 +88,8 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 		assert.equal(result.value.customField, "dummy");
 	});
 
-	it("should return value of process.env.CORE_LOG_LEVEL if defined", async (context) => {
-		process.env.CORE_LOG_LEVEL = "dummy";
+	it("should return value of process.env.MAINSAIL_LOG_LEVEL if defined", async (context) => {
+		process.env.MAINSAIL_LOG_LEVEL = "dummy";
 
 		const result = (context.serviceProvider.configSchema() as AnySchema).validate(await loadDefaults());
 
@@ -97,8 +97,8 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 		assert.equal(result.value.levels.console, "dummy");
 	});
 
-	it("should return value of process.env.CORE_LOG_LEVEL_FILE if defined", async (context) => {
-		process.env.CORE_LOG_LEVEL_FILE = "dummy";
+	it("should return value of process.env.MAINSAIL_LOG_LEVEL_FILE if defined", async (context) => {
+		process.env.MAINSAIL_LOG_LEVEL_FILE = "dummy";
 
 		const result = (context.serviceProvider.configSchema() as AnySchema).validate(await loadDefaults());
 

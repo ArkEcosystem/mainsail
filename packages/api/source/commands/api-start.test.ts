@@ -9,7 +9,7 @@ describe<{
 	processManager: Services.ProcessManager;
 }>("ApiStartCommand", ({ beforeEach, afterAll, it, assert, stub, match }) => {
 	beforeEach((context) => {
-		process.env.CORE_PATH_CONFIG = dirSync().name;
+		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Identifiers.ProcessManager);
@@ -26,7 +26,7 @@ describe<{
 			{
 				args: "api:run --network='devnet' --token='ark' --v=0 --env='production' --skipPrompts=false",
 				env: {
-					CORE_ENV: "production",
+					MAINSAIL_ENV: "production",
 					NODE_ENV: "production",
 				},
 				name: "mainsail-api",

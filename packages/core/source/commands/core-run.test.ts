@@ -10,9 +10,9 @@ describe<{
 	cli: Console;
 }>("CoreRunCommand", ({ beforeEach, afterAll, it, stub, assert }) => {
 	beforeEach((context) => {
-		process.env.CORE_PATH_CONFIG = dirSync().name;
+		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
-		writeJSONSync(`${process.env.CORE_PATH_CONFIG}/validators.json`, { secrets: ["bip39"] });
+		writeJSONSync(`${process.env.MAINSAIL_PATH_CONFIG}/validators.json`, { secrets: ["bip39"] });
 
 		context.cli = new Console();
 	});

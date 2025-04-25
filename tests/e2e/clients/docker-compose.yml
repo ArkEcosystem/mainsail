@@ -13,4 +13,4 @@ services:
             - -c
             - /mainsail/packages/core/bin/run.js core:run --network=devnet
         environment: &nodeEnvironment
-            CORE_PATH_CONFIG: /mainsail/tests/e2e/clients/config
+            MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/clients/config

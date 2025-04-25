@@ -38,8 +38,8 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 				interval: "1d",
 			},
 			levels: {
-				console: process.env.CORE_LOG_LEVEL || "debug",
-				file: process.env.CORE_LOG_LEVEL_FILE || "debug",
+				console: process.env.MAINSAIL_LOG_LEVEL || "debug",
+				file: process.env.MAINSAIL_LOG_LEVEL_FILE || "debug",
 			},
 		});
 	});
@@ -146,7 +146,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 			},
 			levels: {
 				console: "invalid",
-				file: process.env.CORE_LOG_LEVEL_FILE || "debug",
+				file: process.env.MAINSAIL_LOG_LEVEL_FILE || "debug",
 			},
 		});
 
@@ -175,8 +175,8 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 				interval: "1s",
 			},
 			levels: {
-				console: process.env.CORE_LOG_LEVEL || "emergency",
-				file: process.env.CORE_LOG_LEVEL_FILE || "emergency",
+				console: process.env.MAINSAIL_LOG_LEVEL || "emergency",
+				file: process.env.MAINSAIL_LOG_LEVEL_FILE || "emergency",
 			},
 		});
 
@@ -200,7 +200,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 				interval: "1d",
 			},
 			levels: {
-				console: process.env.CORE_LOG_LEVEL || "debug",
+				console: process.env.MAINSAIL_LOG_LEVEL || "debug",
 				file: "invalid",
 			},
 		});
