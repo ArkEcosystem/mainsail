@@ -259,37 +259,37 @@ export class ConfigurationGenerator {
 
 	#preparteEnvironmentOptions(options: Contracts.NetworkGenerator.InternalOptions): EnvironmentData {
 		const data: EnvironmentData = {
-			CORE_API_EVM_ENABLED: "1",
+			MAINSAIL_API_EVM_ENABLED: "1",
 
-			CORE_API_EVM_HOST: "127.0.0.1",
+			MAINSAIL_API_EVM_HOST: "127.0.0.1",
 
-			CORE_API_EVM_PORT: 4008,
+			MAINSAIL_API_EVM_PORT: 4008,
 
-			CORE_API_TRANSACTION_POOL_HOST: "127.0.0.1",
+			MAINSAIL_API_TRANSACTION_POOL_HOST: "127.0.0.1",
 
-			CORE_API_TRANSACTION_POOL_PORT: 4007,
+			MAINSAIL_API_TRANSACTION_POOL_PORT: 4007,
 
-			CORE_CRYPTO_WORKER_COUNT: 2,
-			// CORE_DB_HOST: options.coreDBHost,
-			// CORE_DB_PORT: options.coreDBPort,
-			CORE_P2P_PORT: options.coreP2PPort,
-			CORE_WEBHOOKS_PORT: options.coreWebhooksPort,
+			MAINSAIL_CRYPTO_WORKER_COUNT: 2,
+			// MAINSAIL_DB_HOST: options.coreDBHost,
+			// MAINSAIL_DB_PORT: options.coreDBPort,
+			MAINSAIL_P2P_PORT: options.coreP2PPort,
+			MAINSAIL_WEBHOOKS_PORT: options.coreWebhooksPort,
 		};
 
 		if (options.mockFakeValidatorBlsKeys) {
-			data.CORE_SNAPSHOT_MOCK_FAKE_VALIDATOR_BLS_KEYS = "1";
+			data.MAINSAIL_SNAPSHOT_MOCK_FAKE_VALIDATOR_BLS_KEYS = "1";
 		}
 
 		// if (options.coreDBDatabase) {
-		// 	data.CORE_DB_DATABASE = options.coreDBDatabase;
+		// 	data.MAINSAIL_DB_DATABASE = options.coreDBDatabase;
 		// }
 
 		// if (options.coreDBUsername) {
-		// 	data.CORE_DB_USERNAME = options.coreDBUsername;
+		// 	data.MAINSAIL_DB_USERNAME = options.coreDBUsername;
 		// }
 
 		// if (options.coreDBPassword) {
-		// 	data.CORE_DB_PASSWORD = options.coreDBDatabase;
+		// 	data.MAINSAIL_DB_PASSWORD = options.coreDBDatabase;
 		// }
 
 		return data;

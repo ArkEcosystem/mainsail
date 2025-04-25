@@ -38,7 +38,8 @@ export class NPM extends AbstractSource {
 	}
 
 	async #getPackage(value: string, version?: string): Promise<{ name: string; tarball: string }> {
-		const registry = process.env[Constants.EnvironmentVariables.CORE_NPM_REGISTRY] || "https://registry.npmjs.org";
+		const registry =
+			process.env[Constants.EnvironmentVariables.MAINSAIL_NPM_REGISTRY] || "https://registry.npmjs.org";
 		const { body } = await got(`${registry}/${value}`);
 
 		const response: {

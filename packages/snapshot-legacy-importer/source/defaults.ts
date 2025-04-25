@@ -3,6 +3,6 @@ import { Environment } from "@mainsail/kernel";
 
 export const defaults = {
 	mockFakeValidatorBlsKeys: Environment.isTrue(
-		Constants.EnvironmentVariables.CORE_SNAPSHOT_MOCK_FAKE_VALIDATOR_BLS_KEYS,
+		Constants.EnvironmentVariables.MAINSAIL_SNAPSHOT_MOCK_FAKE_VALIDATOR_BLS_KEYS,
 	),
 };
