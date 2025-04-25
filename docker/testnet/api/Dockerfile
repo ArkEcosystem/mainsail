@@ -1,10 +1,10 @@
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /home/node
 
 ADD entrypoint.sh /entrypoint.sh
 
-ARG mainsail_channel=alpha
+ARG mainsail_channel=evm
 
 ENV PNPM_HOME=/home/node/.pnpm/bin
 ENV PATH="${PATH}:${PNPM_HOME}"

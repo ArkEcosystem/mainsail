@@ -1,21 +1,21 @@
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /home/node
 
 ADD entrypoint.sh /entrypoint.sh
 
-ARG mainsail_channel=alpha
+ARG mainsail_channel=evm
 
 ENV PNPM_HOME=/home/node/.pnpm/bin
 ENV PATH="${PATH}:${PNPM_HOME}"
 
-RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 git \
+RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 py3-setuptools git \
     && apk add --no-cache bash sudo git openntpd openssl jemalloc \
     && echo "servers pool.ntp.org" > /etc/ntpd.conf \
     && echo "servers time.google.com" >> /etc/ntpd.conf \
     && npm install -g npm@latest \
     && su node -c "npm install --prefix=/home/node/.pnpm -g pnpm" \
-    && su node -c "pnpm i -g @mainsail/core@${mainsail_channel}" \
+    && su node -c "pnpm add -g @mainsail/core@${mainsail_channel} --allow-build @chainsafe/blst --allow-build bcrypto --allow-build better-sqlite3 --allow-build bstring --allow-build lmdb --allow-build msgpackr-extract --allow-build nsfw --allow-build protobufjs" \
     && su node -c "export PNPM_HOME=/home/node/.pnpm/bin" \
     && su node -c "pnpm store prune" \
     && su node -c "rm -rf ~/.cache/node-gyp" \
