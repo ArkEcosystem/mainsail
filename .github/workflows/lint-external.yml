@@ -1,4 +1,4 @@
-name: Circular dependencies
+name: Linting (External)
 
 on:
     push:
@@ -8,9 +8,14 @@ on:
     pull_request:
         types: [ready_for_review, synchronize, opened]
 
+permissions:
+    contents: read
+    pull-requests: write
+
 jobs:
     source:
         runs-on: ubuntu-latest
+        if: github.event.pull_request.head.repo.full_name != github.repository
 
         strategy:
             matrix:
@@ -20,6 +25,7 @@ jobs:
             - uses: actions/checkout@v4
               with:
                   ref: ${{ github.head_ref }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v4
@@ -52,5 +58,28 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
-            - name: Check for circular dependencies
-              run: pnpm run madge:circular
+            - name: Sort
+              run: pnpm run sort:dry
+
+            - name: Lint
+              run: pnpm run lint:dry
+
+            - name: Prettier
+              run: pnpm run prettier:dry
+
+            - name: Forge Format
+              working-directory: contracts
+              run: |
+                  forge fmt --check
+
+            - name: Post comment if checks failed
+              if: failure()
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      github.rest.issues.createComment({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: context.issue.number,
+                        body: "🚨 **Linting/Formatting issues were detected.**\n\nPlease run the following commands to fix:\n\n```bash\npnpm run sort\npnpm run lint\npnpm run prettier\nforge fmt\n```\n\nThen update your PR. 🚀"
+                      });
