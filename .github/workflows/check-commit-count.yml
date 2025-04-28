@@ -5,8 +5,8 @@ on:
         types: [opened, synchronize]
 
 permissions:
-  pull-requests: write
-  contents: read
+    pull-requests: write
+    contents: read
 
 jobs:
     check-commits:
