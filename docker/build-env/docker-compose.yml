@@ -1,0 +1,56 @@
+version: '3.5'
+services:
+  postgres:
+    image: "postgres:alpine"
+    container_name: postgres-api
+    restart: unless-stopped
+    ports:
+     - "5454:5432" 
+    volumes:
+      - 'postgres:/var/lib/postgresql/data'
+    networks:
+      - core
+    environment:
+     POSTGRES_PASSWORD: password
+     POSTGRES_DB: api_testnet
+     POSTGRES_USER: node
+  core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mainsail-build-env
+    env_file: build.env
+    environment:
+      - MAINSAIL_API_SYNC_ENABLED=${API:-false}
+    container_name: mainsail-build
+    extra_hosts:
+      host.docker.internal: host-gateway
+    restart: unless-stopped 
+    ports:
+     - "4000:4000"
+     - "4003:4003"
+     - "4004:4004"
+     - "4006:4006"
+     - "4007:4007"
+    cap_add:
+      - SYS_NICE
+      - SYS_RESOURCE
+      - SYS_TIME
+    volumes:
+     - "${PWD}/../../:/home/node/mainsail"
+     - ~/.config/mainsail:/home/node/.config/mainsail
+     - ~/.local/share/mainsail:/home/node/.local/share/mainsail
+     - ~/.local/state/mainsail:/home/node/.local/state/mainsail
+     - /etc/localtime:/etc/localtime:ro
+    networks:
+      - core
+    tty: true
+    links:
+     - postgres
+    depends_on:
+      - postgres
+volumes:
+  postgres:
+  mainsail:
+networks:
+  core:
