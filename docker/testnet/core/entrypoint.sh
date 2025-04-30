@@ -10,7 +10,8 @@ sudo chown node:node -R /home/node/.config
 sudo chown node:node -R /home/node/.local
 #mainsail config:publish --token=$TOKEN --network=$NETWORK
 if [ "$API" = "true" ]; then
-  mainsail config:publish:custom --token=$TOKEN --network=$NETWORK --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/api-app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/peers.json --reset
+  mainsail config:publish:custom --token=$TOKEN --network=$NETWORK --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/peers.json --reset
+  mainsail env:set --key=MAINSAIL_API_SYNC_ENABLED --value=true
 else
   mainsail config:publish:custom --token=$TOKEN --network=$NETWORK --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/peers.json --reset
 fi
