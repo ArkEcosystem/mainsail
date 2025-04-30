@@ -1,7 +1,11 @@
 name: CI
 
 on:
-    pull_request_target:
+    push:
+        branches:
+            - "main"
+            - "develop"
+    pull_request:
         types: [opened, synchronize]
 
 permissions:
@@ -17,27 +21,34 @@ jobs:
               uses: actions/github-script@v6
               with:
                   script: |
-                      const payload = await github.rest.pulls.listCommits({
+                      const pr = context.payload.pull_request;
+                      const commits = await github.rest.pulls.listCommits({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
-                        pull_number: context.issue.number
+                        pull_number: pr.number,
                       });
-                      return payload.data.length;
+                      core.setOutput("count", commits.data.length);
+                      core.setOutput("from_fork", pr.head.repo.full_name !== pr.base.repo.full_name);
 
-            - name: Post comment if commits are fewer than 2
-              if: steps.commits.outputs.result < 2
+            - name: Comment for internal PRs
+              if: steps.commits.outputs.count < 2 && steps.commits.outputs.from_fork == 'false'
               uses: actions/github-script@v6
               with:
                   script: |
                       github.rest.issues.createComment({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
-                        issue_number: context.issue.number,
-                        body: 'This pull request does not contain the minimum required number of commits (2). Please add more commits.'
+                        issue_number: context.payload.pull_request.number,
+                        body: '❗ This pull request has fewer than 2 commits.\n\nYou can add an empty commit with the following command:\n\n```bash\ngit commit -m "Empty commit" --allow-empty\ngit push\n```\n\nPlease update the PR accordingly.'
                       });
 
-            - name: Fail the job if fewer than 2 commits
-              if: steps.commits.outputs.result < 2
+            - name: Echo warning for external PRs
+              if: steps.commits.outputs.count < 2 && steps.commits.outputs.from_fork == 'true'
               run: |
-                  echo "Failing the job because there are fewer than 2 commits."
+                  echo "⚠️ External PR detected with fewer than 2 commits. To add a commit, run: git commit -m \"Empty commit\" --allow-empty && git push."
+
+            - name: Fail the job if fewer than 2 commits
+              if: steps.commits.outputs.count < 2
+              run: |
+                  echo "❌ Failing the job because there are fewer than 2 commits."
                   exit 1

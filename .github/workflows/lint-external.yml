@@ -72,14 +72,16 @@ jobs:
               run: |
                   forge fmt --check
 
-            - name: Post comment if checks failed
+            - name: Print linting instructions on failure
               if: failure()
-              uses: actions/github-script@v6
-              with:
-                  script: |
-                      github.rest.issues.createComment({
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        issue_number: context.issue.number,
-                        body: "🚨 **Linting/Formatting issues were detected.**\n\nPlease run the following commands to fix:\n\n```bash\npnpm run sort\npnpm run lint\npnpm run prettier\nforge fmt\n```\n\nThen update your PR. 🚀"
-                      });
+              run: |
+                  echo "🚨 Linting/Formatting issues were detected."
+                  echo ""
+                  echo "Please run the following commands locally to fix them:"
+                  echo ""
+                  echo "  pnpm run sort"
+                  echo "  pnpm run lint"
+                  echo "  pnpm run prettier"
+                  echo "  cd contracts && forge fmt"
+                  echo ""
+                  echo "Then update your PR. 🚀"

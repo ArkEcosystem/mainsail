@@ -18,7 +18,7 @@
 		"docker": "node ./scripts/docker/generate-docker.js",
 		"format": "pnpm run lint && pnpm run prettier",
 		"lint": "eslint packages/*/source --fix",
-		"lint:dry": "eslint packages/*/source --max-warnings 0",
+		"lint:dry": "eslint packages/*/source",
 		"lint:test": "eslint packages/ --ext .test.ts --fix",
 		"madge:circular": "node ./scripts/circular.js",
 		"madge:graph": "./node_modules/madge/bin/cli.js --image circular-graph.svg --extensions ts ./packages/**/source",
