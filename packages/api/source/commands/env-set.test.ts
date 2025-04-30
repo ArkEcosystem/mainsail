@@ -12,7 +12,7 @@ describe<{
 	cli: Console;
 }>("EnvSetCommand", ({ beforeEach, afterAll, it, assert }) => {
 	beforeEach((context) => {
-		process.env.CORE_PATH_CONFIG = dirSync().name;
+		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
 		context.cli = new Console();
 		context.cli.app.rebind(Identifiers.Application.Name).toConstantValue("core");
@@ -21,7 +21,7 @@ describe<{
 	afterAll(() => setGracefulCleanup());
 
 	it("should set the value of an environment variable", async ({ cli }) => {
-		const environmentFile = `${process.env.CORE_PATH_CONFIG}/core/.env`;
+		const environmentFile = `${process.env.MAINSAIL_PATH_CONFIG}/core/.env`;
 
 		removeSync(environmentFile);
 		ensureFileSync(environmentFile);

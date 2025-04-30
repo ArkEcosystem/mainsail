@@ -9,11 +9,20 @@ export class AppGenerator {
 		packageName = packageName.replace("@mainsail/", "");
 
 		return readJSONSync(
-			resolve(new URL(".", import.meta.url).pathname, `../../../${packageName}/bin/config/testnet/core/app.json`),
+			resolve(new URL(".", import.meta.url).pathname, `../../../${packageName}/bin/config/devnet/core/app.json`),
 		);
 	}
 
 	generate(options: Contracts.NetworkGenerator.InternalOptions): Contracts.Types.JsonObject {
-		return this.generateDefault(options.packageName);
+		const appJson = this.generateDefault(options.packageName);
+
+		if (options.snapshot) {
+			// @ts-ignore
+			const index = appJson.main.findIndex((p) => p.package === "@mainsail/state");
+			// @ts-ignore
+			appJson.main.splice(index, 0, { package: "@mainsail/snapshot-legacy-importer" });
+		}
+
+		return appJson;
 	}
 }

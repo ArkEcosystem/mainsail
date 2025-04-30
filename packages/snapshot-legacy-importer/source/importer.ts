@@ -4,6 +4,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
+import { Providers } from "@mainsail/kernel";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, BigNumber } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
@@ -27,8 +28,16 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	@tagged("type", "consensus")
 	private readonly consensusKeyPairFactory!: Contracts.Crypto.KeyPairFactory;
 
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Factory)
+	@tagged("type", "consensus")
+	private readonly consensusPublicKeyFactory!: Contracts.Crypto.PublicKeyFactory;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
+
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "snapshot-legacy-importer")
+	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
@@ -45,12 +54,12 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		voters: Contracts.Snapshot.ImportedLegacyVoter[];
 		validators: Contracts.Snapshot.ImportedLegacyValidator[];
 		snapshotHash: string;
-		genesisHeight: bigint;
+		genesisBlockNumber: bigint;
 		previousGenesisBlockHash: string;
 		totalSupply: bigint;
 		result: Contracts.Snapshot.LegacyImportResult | undefined;
 	} = {
-		genesisHeight: 0n,
+		genesisBlockNumber: 0n,
 		previousGenesisBlockHash: "",
 		result: undefined,
 		snapshotHash: "",
@@ -76,8 +85,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		return this.#data.snapshotHash;
 	}
 
-	public get genesisHeight(): bigint {
-		return this.#data.genesisHeight;
+	public get genesisBlockNumber(): bigint {
+		return this.#data.genesisBlockNumber;
 	}
 
 	public get previousGenesisBlockHash(): string {
@@ -166,18 +175,18 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				balance,
 				ethAddress,
 				legacyAttributes: {
-					multiSignature: wallet.attributes["multiSignature"]?.["publicKeys"]
-						? wallet.attributes["multiSignature"]
+					multiSignature: wallet.attributes?.["multiSignature"]?.["publicKeys"]
+						? wallet.attributes?.["multiSignature"]
 						: undefined,
-					secondPublicKey: wallet.attributes["secondPublicKey"] ?? undefined,
+					secondPublicKey: wallet.attributes?.["secondPublicKey"] ?? undefined,
 				},
 				publicKey: wallet.publicKey,
 			});
 
-			if (wallet.attributes["vote"]) {
+			if (wallet.attributes?.["vote"]) {
 				assert.string(wallet.publicKey);
 
-				const vote = await this.addressFactory.fromPublicKey(wallet.attributes["vote"]);
+				const vote = await this.addressFactory.fromPublicKey(wallet.attributes?.["vote"]);
 
 				voters.push({
 					arkAddress: wallet.address,
@@ -187,18 +196,18 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				});
 			}
 
-			if (wallet.attributes["delegate"]) {
+			if (wallet.attributes?.["delegate"]) {
 				if (!wallet.publicKey) {
 					throw new Error("delegate is missing public key");
 				}
 
 				validators.push({
 					arkAddress: wallet.address,
-					blsPublicKey: "TODO", // TODO: get actual bls key; for now it gets replaced by the genesis block generator
+					blsPublicKey: wallet.attributes?.["delegate"]["blsPublicKey"],
 					ethAddress,
-					isResigned: wallet.attributes["delegate"]["isResigned"] ?? false,
+					isResigned: wallet.attributes?.["delegate"]["isResigned"] ?? false,
 					publicKey: wallet.publicKey,
-					username: wallet.attributes["delegate"]["username"],
+					username: wallet.attributes?.["delegate"]["username"],
 				});
 			}
 
@@ -210,12 +219,15 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			throw new Error(`failed to verify snapshot integrity: ${snapshot.hash} - ${calculatedHash}`);
 		}
 
-		const genesisHeight = BigInt(snapshot.chainTip.height) + 1n;
+		let genesisBlockNumber = BigInt(snapshot.chainTip.number);
+		if (genesisBlockNumber > 0n) {
+			genesisBlockNumber += 1n;
+		}
 
 		this.logger.info(
 			`snapshot stats: ${JSON.stringify({
 				coldWallets: foundColdWallets,
-				genesisHeight: genesisHeight.toString(),
+				genesisBlockNumber: genesisBlockNumber.toString(),
 				totalSupply: totalSupply.toString(),
 				validators: validators.length,
 				voters: voters.length,
@@ -224,8 +236,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		);
 
 		this.#data = {
-			genesisHeight,
-			previousGenesisBlockHash: snapshot.chainTip.id,
+			genesisBlockNumber,
+			previousGenesisBlockHash: snapshot.chainTip.hash,
 			result: undefined,
 			snapshotHash: calculatedHash,
 			totalSupply,
@@ -238,6 +250,13 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	public async import(
 		options: Contracts.Snapshot.LegacyImportOptions,
 	): Promise<Contracts.Snapshot.LegacyImportResult> {
+		options = {
+			...options,
+			mockFakeValidatorBlsKeys:
+				options.mockFakeValidatorBlsKeys ??
+				this.pluginConfiguration.getOptional<boolean>("mockFakeValidatorBlsKeys", false),
+		};
+
 		await this.evm.prepareNextCommit({ commitKey: options.commitKey });
 
 		const deployerAccount = await this.evm.getAccountInfo(this.deployerAddress);
@@ -307,19 +326,36 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		for (const validator of this.#data.validators) {
 			assert.defined(validator.ethAddress);
 
-			// TODO: remove this once the actual BLS keys are available
-			if (validator.blsPublicKey === "TODO") {
+			let blsPublicKey: string | undefined = validator.blsPublicKey;
+
+			if (!blsPublicKey) {
+				if (!options.mockFakeValidatorBlsKeys) {
+					this.logger.info(
+						`skipping legacy delegate ${validator.arkAddress} (${validator.username}) without registered blsPublicKey`,
+					);
+					continue;
+				}
+
 				const entropy = sha256(Buffer.from(validator.username, "utf8")).slice(2, 34);
 				const mnemonic = entropyToMnemonic(Buffer.from(entropy, "hex"));
 
 				const consensusKeyPair = await this.consensusKeyPairFactory.fromMnemonic(mnemonic);
-				validator.blsPublicKey = consensusKeyPair.publicKey;
+				blsPublicKey = consensusKeyPair.publicKey;
+			} else {
+				if (!(await this.consensusPublicKeyFactory.verify(blsPublicKey))) {
+					this.logger.info(
+						`skipping legacy delegate ${validator.arkAddress} (${validator.username}) with invalid blsPublicKey ${blsPublicKey}`,
+					);
+					continue;
+				}
 			}
+
+			assert.defined<string>(blsPublicKey);
 
 			const data = iface
 				.encodeFunctionData("addValidator", [
 					validator.ethAddress,
-					Buffer.from(validator.blsPublicKey, "hex"),
+					Buffer.from(blsPublicKey, "hex"),
 					validator.isResigned,
 				])
 				.slice(2);

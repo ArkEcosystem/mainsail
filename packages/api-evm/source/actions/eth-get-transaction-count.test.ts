@@ -38,7 +38,7 @@ describe<{
 
 	it("schema should be array with 0 parameters", ({ action, validator }) => {
 		validator.addSchema(keccak256Schemas.address);
-		validator.addSchema(validationSchemas.prefixedHex);
+		validator.addSchema(validationSchemas.prefixedQuantityHex);
 		validator.addSchema(schemas.blockTag);
 		validator.addSchema(action.schema);
 

@@ -1,4 +1,4 @@
-import cryptoJson from "../../core/bin/config/testnet/core/crypto.json";
+import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "../../test-framework/source";
 import { Configuration } from "./configuration";
 

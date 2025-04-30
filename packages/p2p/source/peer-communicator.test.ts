@@ -62,7 +62,7 @@ describeSkip<{
 
 		context.peerCommunicator = context.sandbox.app.resolve(PeerCommunicatorProxy);
 
-		process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA = "true";
+		process.env.MAINSAIL_P2P_PEER_VERIFIER_DEBUG_EXTRA = "true";
 	});
 
 	it("#postBlock - should use connector to emit p2p.blocks.postBlock", async ({ peerCommunicator }) => {

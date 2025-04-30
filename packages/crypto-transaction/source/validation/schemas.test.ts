@@ -7,7 +7,7 @@ import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mains
 import { BigNumber } from "@mainsail/utils";
 import { Validator } from "@mainsail/validation/source/validator";
 
-import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
+import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json";
 import { describe, Sandbox } from "../../../test-framework/source";
 import { makeKeywords } from "./keywords";
 import { schemas, transactionBaseSchema } from "./schemas";

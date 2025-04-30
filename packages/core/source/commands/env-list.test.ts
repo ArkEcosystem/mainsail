@@ -10,7 +10,7 @@ describe<{
 	cli: Console;
 }>("EnvListCommand", ({ beforeEach, afterAll, it, assert, stub }) => {
 	beforeEach((context) => {
-		process.env.CORE_PATH_CONFIG = dirSync().name;
+		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
 		context.cli = new Console();
 	});
@@ -20,7 +20,7 @@ describe<{
 	it("should fail if the environment configuration doesn't exist", async ({ cli }) => {
 		await assert.rejects(
 			() => cli.execute(Command),
-			`No environment file found at ${process.env.CORE_PATH_CONFIG}/core/.env`,
+			`No environment file found at ${process.env.MAINSAIL_PATH_CONFIG}/core/.env`,
 		);
 	});
 
@@ -28,9 +28,9 @@ describe<{
 		let message: string;
 		stub(console, "log").callsFake((m) => (message = m));
 
-		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/core`);
+		ensureDirSync(`${process.env.MAINSAIL_PATH_CONFIG}/core`);
 
-		const environmentFile = `${process.env.CORE_PATH_CONFIG}/core/.env`;
+		const environmentFile = `${process.env.MAINSAIL_PATH_CONFIG}/core/.env`;
 		removeSync(environmentFile);
 		writeFileSync(environmentFile, "someKey=someValue", { flag: "w" });
 

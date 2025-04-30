@@ -23,7 +23,7 @@ export class MilestonesGenerator {
 					minimumGasLimit: 21_000,
 					minimumGasPrice: 5 * 1e9,
 				},
-				height: options.initialHeight,
+				height: options.initialBlockNumber,
 				reward: "0",
 				satoshi: {
 					decimals: 18,
@@ -40,7 +40,7 @@ export class MilestonesGenerator {
 			},
 			{
 				activeValidators: options.validators,
-				height: options.initialHeight + 1,
+				height: options.initialBlockNumber + 1,
 			},
 		];
 

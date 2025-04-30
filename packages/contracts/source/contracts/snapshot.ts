@@ -10,7 +10,7 @@ export interface LegacyImporter {
 	validators: ImportedLegacyValidator[];
 	voters: ImportedLegacyVoter[];
 	snapshotHash: string;
-	genesisHeight: bigint;
+	genesisBlockNumber: bigint;
 	previousGenesisBlockHash: string;
 	totalSupply: bigint;
 	result: LegacyImportResult | undefined;
@@ -19,6 +19,7 @@ export interface LegacyImporter {
 export interface LegacyImportOptions {
 	readonly timestamp: number;
 	readonly commitKey: CommitKey;
+	readonly mockFakeValidatorBlsKeys?: boolean;
 }
 
 export interface LegacyImportResult {
@@ -59,5 +60,5 @@ export interface ImportedLegacyValidator {
 	readonly isResigned: boolean;
 
 	username: string;
-	blsPublicKey: string;
+	blsPublicKey?: string;
 }

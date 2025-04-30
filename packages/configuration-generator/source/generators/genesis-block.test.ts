@@ -62,7 +62,7 @@ describe<{
 				chainId: 123,
 				distribute: true,
 				epoch: new Date(),
-				initialHeight: 0,
+				initialBlockNumber: 0,
 				premine: "2000000000",
 				validators: 53,
 			} as Contracts.NetworkGenerator.InternalOptions),

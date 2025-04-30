@@ -31,7 +31,7 @@ describe<{
 	logger: Record<string, Function>;
 }>("Application", ({ afterEach, assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
-		delete process.env.CORE_PATH_CONFIG;
+		delete process.env.MAINSAIL_PATH_CONFIG;
 
 		// TODO
 		setMaxListeners(1000);
@@ -52,7 +52,7 @@ describe<{
 	});
 
 	afterEach(() => {
-		delete process.env.CORE_PATH_CONFIG;
+		delete process.env.MAINSAIL_PATH_CONFIG;
 	});
 
 	it("should bootstrap the application", async (context) => {
@@ -61,7 +61,7 @@ describe<{
 		await context.app.bootstrap({
 			flags: {
 				name: "local",
-				network: "testnet",
+				network: "devnet",
 				paths: { config: join(import.meta.dirname, "../test/stubs/config/local") },
 				token: "ark",
 			},
@@ -69,15 +69,15 @@ describe<{
 	});
 
 	it("should bootstrap the application with a config path from process.env", async (context) => {
-		process.env.CORE_PATH_CONFIG = join(import.meta.dirname, "../test/stubs/config");
+		process.env.MAINSAIL_PATH_CONFIG = join(import.meta.dirname, "../test/stubs/config");
 
 		context.app.unbind(Identifiers.Services.Filesystem.Service);
 
 		await context.app.bootstrap({
-			flags: { name: "local", network: "testnet", token: "ark" },
+			flags: { name: "local", network: "devnet", token: "ark" },
 		});
 
-		assert.is(context.app.configPath(), process.env.CORE_PATH_CONFIG);
+		assert.is(context.app.configPath(), process.env.MAINSAIL_PATH_CONFIG);
 	});
 
 	it("should boot the application", async (context) => {

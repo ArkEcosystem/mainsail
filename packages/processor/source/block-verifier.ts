@@ -1,34 +1,14 @@
-import { inject, injectable } from "@mainsail/container";
+import { injectable, multiInject } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-
-import {
-	ChainedVerifier,
-	GasLimitVerifier,
-	GeneratorVerifier,
-	RewardVerifier,
-	TimestampVerifier,
-	TransactionLengthVerifier,
-	VersionVerifier,
-} from "./verifiers/index.js";
 
 @injectable()
 export class BlockVerifier implements Contracts.Processor.Verifier {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
+	@multiInject(Identifiers.Processor.BlockVerifierHandlers)
+	private readonly handlers!: Contracts.Processor.Handler[];
 
 	public async verify(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		await this.app.resolve(ChainedVerifier).execute(unit);
-
-		await this.app.resolve(TimestampVerifier).execute(unit);
-
-		await this.app.resolve(GeneratorVerifier).execute(unit);
-
-		await this.app.resolve(VersionVerifier).execute(unit);
-
-		await this.app.resolve(RewardVerifier).execute(unit);
-
-		await this.app.resolve(TransactionLengthVerifier).execute(unit);
-
-		await this.app.resolve(GasLimitVerifier).execute(unit);
+		for (const handler of this.handlers) {
+			await handler.execute(unit);
+		}
 	}
 }

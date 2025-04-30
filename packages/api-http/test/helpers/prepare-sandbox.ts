@@ -6,8 +6,8 @@ import {
 import { Identifiers } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
 
-import { Sandbox } from "../../../test-framework/source";
-import { ServiceProvider as CoreApiHttp } from "../../source/service-provider";
+import { Sandbox } from "../../../test-framework/source/index.js";
+import { ServiceProvider as CoreApiHttp } from "../../source/service-provider.js";
 
 export class ApiContext {
 	public constructor(
@@ -100,6 +100,8 @@ export class ApiContext {
 export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<ApiContext> => {
 	context.sandbox = new Sandbox();
 
+	context.sandbox.app.bind(Identifiers.Application.Name).toConstantValue("api-http-integration");
+
 	context.sandbox.app
 		.bind(Identifiers.ServiceProvider.Configuration)
 		.to(Providers.PluginConfiguration)
@@ -132,6 +134,7 @@ const setupDatabase = async (app: Application): Promise<CoreApiDatabase> => {
 		.discover("@mainsail/api-database", "@mainsail/api-database");
 
 	pluginConfiguration.merge({
+		enabled: true,
 		database: {
 			...databaseOptions,
 			applicationName: "mainsail/api-database-test",
@@ -155,6 +158,7 @@ const setupHttp = async (app: Application): Promise<CoreApiHttp> => {
 		.discover("@mainsail/api-http", "@mainsail/api-http");
 
 	pluginConfiguration.merge({
+		enabled: false,
 		database: {
 			...databaseOptions,
 			applicationName: "mainsail/api-http-test",

@@ -105,7 +105,7 @@ describe<{
 		spyOnStart.calledWith(
 			{
 				args: "core:run",
-				env: { CORE_ENV: undefined, NODE_ENV: "production" },
+				env: { MAINSAIL_ENV: undefined, NODE_ENV: "production" },
 				name: "ark-core",
 				node_args: undefined,
 				script: "script",
@@ -132,7 +132,7 @@ describe<{
 		spyOnStart.calledWith(
 			{
 				args: "core:run --daemon",
-				env: { CORE_ENV: undefined, NODE_ENV: "production" },
+				env: { MAINSAIL_ENV: undefined, NODE_ENV: "production" },
 				name: "ark-core",
 				node_args: undefined,
 				script: "script",
@@ -159,7 +159,7 @@ describe<{
 		spyOnStart.calledWith(
 			{
 				args: "core:run --daemon",
-				env: { CORE_ENV: undefined, NODE_ENV: "production" },
+				env: { MAINSAIL_ENV: undefined, NODE_ENV: "production" },
 				name: "ark-core",
 				node_args: undefined,
 				script: "script",
@@ -190,7 +190,7 @@ describe<{
 			{
 				args: "core:run --daemon",
 				env: {
-					CORE_ENV: undefined,
+					MAINSAIL_ENV: undefined,
 					NODE_ENV: "production",
 				},
 				name: "ark-core",

@@ -10,9 +10,9 @@ describe<{
 	envFile: string;
 }>("ConfigDatabaseCommand", ({ beforeEach, afterAll, it, stub, assert }) => {
 	beforeEach((context) => {
-		process.env.CORE_PATH_CONFIG = dirSync().name;
+		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
-		context.envFile = `${process.env.CORE_PATH_CONFIG}/core/.env`;
+		context.envFile = `${process.env.MAINSAIL_PATH_CONFIG}/core/.env`;
 
 		context.cli = new Console();
 	});
@@ -25,7 +25,7 @@ describe<{
 		await cli.withFlags({ host: "localhost" }).execute(Command);
 
 		spyOnUpdateVariables.calledOnce();
-		spyOnUpdateVariables.calledWith(envFile, { CORE_DB_HOST: "localhost" });
+		spyOnUpdateVariables.calledWith(envFile, { MAINSAIL_DB_HOST: "localhost" });
 	});
 
 	it("#Flags - should set the database port", async ({ cli, envFile }) => {
@@ -34,7 +34,7 @@ describe<{
 		await cli.withFlags({ port: "5432" }).execute(Command);
 
 		spyOnUpdateVariables.calledOnce();
-		spyOnUpdateVariables.calledWith(envFile, { CORE_DB_PORT: 5432 });
+		spyOnUpdateVariables.calledWith(envFile, { MAINSAIL_DB_PORT: 5432 });
 	});
 
 	it("#Flags - should set the database name", async ({ cli, envFile }) => {
@@ -43,7 +43,7 @@ describe<{
 		await cli.withFlags({ database: "ark_mainnet" }).execute(Command);
 
 		spyOnUpdateVariables.calledOnce();
-		spyOnUpdateVariables.calledWith(envFile, { CORE_DB_DATABASE: "ark_mainnet" });
+		spyOnUpdateVariables.calledWith(envFile, { MAINSAIL_DB_DATABASE: "ark_mainnet" });
 	});
 
 	it("#Flags - should set the database user", async ({ cli, envFile }) => {
@@ -52,7 +52,7 @@ describe<{
 		await cli.withFlags({ username: "ark" }).execute(Command);
 
 		spyOnUpdateVariables.calledOnce();
-		spyOnUpdateVariables.calledWith(envFile, { CORE_DB_USERNAME: "ark" });
+		spyOnUpdateVariables.calledWith(envFile, { MAINSAIL_DB_USERNAME: "ark" });
 	});
 
 	it("#Flags - should set the database password", async ({ cli, envFile }) => {
@@ -61,7 +61,7 @@ describe<{
 		await cli.withFlags({ password: "password" }).execute(Command);
 
 		spyOnUpdateVariables.calledOnce();
-		spyOnUpdateVariables.calledWith(envFile, { CORE_DB_PASSWORD: "password" });
+		spyOnUpdateVariables.calledWith(envFile, { MAINSAIL_DB_PASSWORD: "password" });
 	});
 
 	it("#Prompts - should set the database host", async ({ cli, envFile }) => {
@@ -72,11 +72,11 @@ describe<{
 
 		spyOnUpdateVariables.calledOnce();
 		spyOnUpdateVariables.calledWith(envFile, {
-			CORE_DB_DATABASE: "mainsail-db",
-			CORE_DB_HOST: "dummy",
-			CORE_DB_PASSWORD: "password",
-			CORE_DB_PORT: 5432,
-			CORE_DB_USERNAME: "mainsail",
+			MAINSAIL_DB_DATABASE: "mainsail-db",
+			MAINSAIL_DB_HOST: "dummy",
+			MAINSAIL_DB_PASSWORD: "password",
+			MAINSAIL_DB_PORT: 5432,
+			MAINSAIL_DB_USERNAME: "mainsail",
 		});
 	});
 
@@ -88,11 +88,11 @@ describe<{
 
 		spyOnUpdateVariables.calledOnce();
 		spyOnUpdateVariables.calledWith(envFile, {
-			CORE_DB_DATABASE: "mainsail-db",
-			CORE_DB_HOST: "localhost",
-			CORE_DB_PASSWORD: "password",
-			CORE_DB_PORT: 5000,
-			CORE_DB_USERNAME: "mainsail",
+			MAINSAIL_DB_DATABASE: "mainsail-db",
+			MAINSAIL_DB_HOST: "localhost",
+			MAINSAIL_DB_PASSWORD: "password",
+			MAINSAIL_DB_PORT: 5000,
+			MAINSAIL_DB_USERNAME: "mainsail",
 		});
 	});
 
@@ -104,11 +104,11 @@ describe<{
 
 		spyOnUpdateVariables.calledOnce();
 		spyOnUpdateVariables.calledWith(envFile, {
-			CORE_DB_DATABASE: "dummy",
-			CORE_DB_HOST: "localhost",
-			CORE_DB_PASSWORD: "password",
-			CORE_DB_PORT: 5432,
-			CORE_DB_USERNAME: "mainsail",
+			MAINSAIL_DB_DATABASE: "dummy",
+			MAINSAIL_DB_HOST: "localhost",
+			MAINSAIL_DB_PASSWORD: "password",
+			MAINSAIL_DB_PORT: 5432,
+			MAINSAIL_DB_USERNAME: "mainsail",
 		});
 	});
 
@@ -120,11 +120,11 @@ describe<{
 
 		spyOnUpdateVariables.calledOnce();
 		spyOnUpdateVariables.calledWith(envFile, {
-			CORE_DB_DATABASE: "mainsail-db",
-			CORE_DB_HOST: "localhost",
-			CORE_DB_PASSWORD: "password",
-			CORE_DB_PORT: 5432,
-			CORE_DB_USERNAME: "dummy",
+			MAINSAIL_DB_DATABASE: "mainsail-db",
+			MAINSAIL_DB_HOST: "localhost",
+			MAINSAIL_DB_PASSWORD: "password",
+			MAINSAIL_DB_PORT: 5432,
+			MAINSAIL_DB_USERNAME: "dummy",
 		});
 	});
 
@@ -136,11 +136,11 @@ describe<{
 
 		spyOnUpdateVariables.calledOnce();
 		spyOnUpdateVariables.calledWith(envFile, {
-			CORE_DB_DATABASE: "mainsail-db",
-			CORE_DB_HOST: "localhost",
-			CORE_DB_PASSWORD: "dummy",
-			CORE_DB_PORT: 5432,
-			CORE_DB_USERNAME: "mainsail",
+			MAINSAIL_DB_DATABASE: "mainsail-db",
+			MAINSAIL_DB_HOST: "localhost",
+			MAINSAIL_DB_PASSWORD: "dummy",
+			MAINSAIL_DB_PORT: 5432,
+			MAINSAIL_DB_USERNAME: "mainsail",
 		});
 	});
 

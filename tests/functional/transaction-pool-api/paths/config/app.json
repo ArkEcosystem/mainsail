@@ -292,6 +292,12 @@
 			"package": "@mainsail/database"
 		},
 		{
+			"package": "@mainsail/api-database"
+		},
+		{
+			"package": "@mainsail/api-sync"
+		},
+		{
 			"package": "@mainsail/evm-service"
 		},
 		{

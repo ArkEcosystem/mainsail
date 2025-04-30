@@ -14,7 +14,7 @@ describe<{
 			generator.generate({
 				chainId: 1,
 				explorer: "http://myn.com",
-				network: "testnet",
+				network: "devnet",
 				pubKeyHash: 123,
 				symbol: "my",
 				token: "myn",
@@ -27,8 +27,7 @@ describe<{
 					symbol: "my",
 					token: "myn",
 				},
-				messagePrefix: `testnet message:\n`,
-				name: "testnet",
+				name: "devnet",
 				nethash: "5af6dc1dd8714713cf69dd13fbb4ffb1fc1836cb009682303248cbfede600d39",
 				pubKeyHash: 123,
 				slip44: 1,

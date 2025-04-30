@@ -14,7 +14,7 @@ describe<{
 	generator: ConfigurationGenerator;
 }>("NetworkGenerator", ({ beforeEach, it, assert, stub, match }) => {
 	const paths = envPaths("myn", { suffix: "core" });
-	const configCore = join(paths.config, "testnet");
+	const configCore = join(paths.config, "devnet");
 
 	beforeEach(async (context) => {
 		context.app = await makeApplication(configCore);
@@ -29,7 +29,7 @@ describe<{
 		const writeFileSync = stub(fs, "writeFileSync");
 
 		await generator.generate({
-			network: "testnet",
+			network: "devnet",
 			symbol: "my",
 			token: "myn",
 		});
@@ -85,8 +85,7 @@ describe<{
 				network: {
 					chainId: match.number,
 					client: { explorer: "", symbol: "my", token: "myn" },
-					messagePrefix: "testnet message:\n",
-					name: "testnet",
+					name: "devnet",
 					nethash: match.string,
 					pubKeyHash: 30,
 					slip44: 1,
@@ -112,7 +111,7 @@ describe<{
 		const writeFileSync = stub(fs, "writeFileSync");
 
 		await generator.generate({
-			network: "testnet",
+			network: "devnet",
 			symbol: "my",
 			token: "myn",
 		});
@@ -131,7 +130,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				generator.generate({
-					network: "testnet",
+					network: "devnet",
 					symbol: "my",
 					token: "myn",
 				}),
@@ -161,7 +160,7 @@ describe<{
 			force: false,
 			maxBlockPayload: 123_444,
 			maxTxPerBlock: 122,
-			network: "testnet",
+			network: "devnet",
 			overwriteConfig: false,
 			peers: ["127.0.0.1"],
 			premine: "12500000000000000",
@@ -226,8 +225,7 @@ describe<{
 				network: {
 					chainId: match.number,
 					client: { explorer: "myex.io", symbol: "my", token: "myn" },
-					messagePrefix: "testnet message:\n",
-					name: "testnet",
+					name: "devnet",
 					nethash: match.string,
 
 					pubKeyHash: 168,

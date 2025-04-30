@@ -211,6 +211,7 @@ export const Identifiers = {
 	Processor: {
 		BlockProcessor: Symbol("Processor<Block.Processor>"),
 		BlockVerifier: Symbol("Processor<Block.Verifier>"),
+		BlockVerifierHandlers: Symbol("Processor<Block.Verifier.Handlers>"),
 		TransactionProcessor: Symbol("Processor<Transaction.Processor>"),
 	},
 	ServiceProvider: {

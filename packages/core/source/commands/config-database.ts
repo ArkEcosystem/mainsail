@@ -84,7 +84,7 @@ export class Command extends Commands.Command {
 
 		for (const option of this.#validFlags) {
 			if (flags[option] !== undefined) {
-				variables[`CORE_DB_${option.toUpperCase()}`] = flags[option];
+				variables[`MAINSAIL_DB_${option.toUpperCase()}`] = flags[option];
 			}
 		}
 

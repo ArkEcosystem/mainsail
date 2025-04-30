@@ -6,7 +6,7 @@ import { schemas as transactionSchemas } from "@mainsail/crypto-transaction";
 import { makeKeywords, schemas as sharedSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation/source/validator";
 
-import cryptoJson from "../../core/bin/config/testnet/core/crypto.json";
+import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { describe, Sandbox } from "../../test-framework/source";
 import { schemas } from "./schemas";
 

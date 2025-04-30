@@ -40,8 +40,8 @@ export class Service implements Contracts.TransactionPool.Service {
 
 	public async boot(): Promise<void> {
 		if (
-			process.env[Constants.EnvironmentVariables.CORE_RESET_DATABASE] ||
-			process.env[Constants.EnvironmentVariables.CORE_RESET_POOL]
+			process.env[Constants.EnvironmentVariables.MAINSAIL_RESET_DATABASE] ||
+			process.env[Constants.EnvironmentVariables.MAINSAIL_RESET_POOL]
 		) {
 			await this.flush();
 		}

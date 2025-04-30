@@ -20,17 +20,17 @@ export class Environment {
 			paths[key] = path.join(value, this.appName);
 		}
 
-		if (process.env[Constants.EnvironmentVariables.CORE_PATH_CONFIG]) {
+		if (process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_CONFIG]) {
 			paths = {
 				...paths,
-				config: path.resolve(process.env[Constants.EnvironmentVariables.CORE_PATH_CONFIG]!, this.appName),
+				config: path.resolve(process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_CONFIG]!, this.appName),
 			};
 		}
 
-		if (process.env[Constants.EnvironmentVariables.CORE_PATH_DATA]) {
+		if (process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_DATA]) {
 			paths = {
 				...paths,
-				data: path.resolve(process.env[Constants.EnvironmentVariables.CORE_PATH_DATA]!, this.appName),
+				data: path.resolve(process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_DATA]!, this.appName),
 			};
 		}
 

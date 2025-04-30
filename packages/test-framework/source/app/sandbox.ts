@@ -65,7 +65,7 @@ export class Sandbox {
 		}
 
 		// Configure Application
-		process.env[Constants.EnvironmentVariables.CORE_PATH_CONFIG] = this.getConfigurationPath();
+		process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_CONFIG] = this.getConfigurationPath();
 
 		if (callback) {
 			callback({

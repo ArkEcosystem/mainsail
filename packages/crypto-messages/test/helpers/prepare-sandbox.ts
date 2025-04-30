@@ -14,7 +14,7 @@ import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
-import crypto from "../../../core/bin/config/testnet/core/crypto.json";
+import crypto from "../../../core/bin/config/devnet/core/crypto.json";
 import { Sandbox } from "../../../test-framework/source";
 import { Deserializer } from "../../source/deserializer";
 import { MessageFactory } from "../../source/factory";

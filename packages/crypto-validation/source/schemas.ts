@@ -1,6 +1,6 @@
 import { SchemaObject } from "ajv";
 
-export const schemas: Record<"alphanumeric" | "hex" | "prefixedHex" | "prefixedNullableHex", SchemaObject> = {
+export const schemas: Record<"alphanumeric" | "hex" | "prefixedQuantityHex" | "prefixedDataHex", SchemaObject> = {
 	alphanumeric: {
 		$id: "alphanumeric",
 		pattern: "^[a-z0-9]+$",
@@ -11,14 +11,14 @@ export const schemas: Record<"alphanumeric" | "hex" | "prefixedHex" | "prefixedN
 		pattern: "^[0123456789a-f]+$",
 		type: "string",
 	},
-	prefixedHex: {
-		$id: "prefixedHex",
-		pattern: "^0x[0-9a-f]+$",
+	prefixedDataHex: {
+		$id: "prefixedDataHex",
+		pattern: "^0x([0-9a-f]{2})*$",
 		type: "string",
 	},
-	prefixedNullableHex: {
-		$id: "prefixedNullableHex",
-		pattern: "^0x[0-9a-f]*$",
+	prefixedQuantityHex: {
+		$id: "prefixedQuantityHex",
+		pattern: "^0x[0-9a-f]+$",
 		type: "string",
 	},
 };

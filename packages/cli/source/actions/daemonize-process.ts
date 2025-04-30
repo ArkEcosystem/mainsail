@@ -48,7 +48,7 @@ export class DaemonizeProcess {
 					...options,
 
 					env: {
-						CORE_ENV: flags.env,
+						MAINSAIL_ENV: flags.env,
 						NODE_ENV: "production",
 					},
 					node_args: potato ? { max_old_space_size: 500 } : undefined,

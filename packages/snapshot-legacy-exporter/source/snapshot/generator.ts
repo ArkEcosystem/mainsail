@@ -8,7 +8,7 @@ import { DataSource } from "typeorm";
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
 
 import { Identifiers as InternalIdentifiers } from "../identifiers.js";
-import { LegacySnapshot, LegacyWallet } from "../interfaces.js";
+import { LegacyChainTip, LegacySnapshot, LegacyWallet } from "../interfaces.js";
 
 interface DatabaseOptions extends PostgresConnectionOptions {
 	readonly v3: {
@@ -50,17 +50,18 @@ export class Generator {
 		return dataSource;
 	}
 
+	public async generateStatic(chainTip: LegacyChainTip, wallets: LegacyWallet[]): Promise<void> {
+		await this.#writeSnapshot(chainTip, wallets);
+	}
+
 	public async generate(): Promise<void> {
 		// Connect to V3 database
 		const dataSource = await this.#connect();
 		console.log("connected!");
 
-		const hash = createHash("sha256");
-
 		const [chainTip] = await dataSource.query(
 			"SELECT * FROM dblink('v3_db', 'SELECT id, height FROM blocks ORDER BY height DESC LIMIT 1') AS blocks(id varchar, height bigint);",
 		);
-		hash.update(JSON.stringify(chainTip));
 
 		// Loop all wallets
 		const limit = 1000;
@@ -72,24 +73,23 @@ export class Generator {
 				SELECT * FROM dblink(
 					'v3_db',
 					'
-						SELECT address, public_key, balance, nonce, attributes FROM wallets -- WHERE attributes ?| array[''vote'', ''delegate'', ''username'']
+						SELECT address, public_key, balance, attributes FROM wallets -- WHERE attributes ?| array[''vote'', ''delegate'', ''username'']
 						ORDER BY balance DESC, address ASC LIMIT ${limit} OFFSET ${offset}
 					'
-				) AS wallets(address varchar, "publicKey" varchar, balance bigint, nonce bigint, attributes jsonb);
+				) AS wallets(address varchar, "publicKey" varchar, balance bigint, attributes jsonb);
 			`);
 
 			for (const wallet of chunk) {
 				// sanitize
-				if (wallet.attributes["delegate"]) {
-					delete wallet.attributes["delegate"]["lastBlock"];
+				if (wallet.attributes?.["delegate"]) {
+					delete wallet.attributes?.["delegate"]["lastBlock"];
 				}
 
-				delete wallet.attributes["ipfs"]; // ?
-				delete wallet.attributes["business"]; // ?
-				delete wallet.attributes["htlc"]; // ?
-				delete wallet.attributes["entities"]; // ?
+				delete wallet.attributes?.["ipfs"]; // ?
+				delete wallet.attributes?.["business"]; // ?
+				delete wallet.attributes?.["htlc"]; // ?
+				delete wallet.attributes?.["entities"]; // ?
 
-				hash.update(JSON.stringify(wallet));
 				wallets.push(wallet);
 			}
 
@@ -100,7 +100,21 @@ export class Generator {
 			}
 		}
 
-		// Write snapshot
+		try {
+			await this.#writeSnapshot(chainTip, wallets);
+		} finally {
+			await dataSource.destroy();
+		}
+	}
+
+	async #writeSnapshot(chainTip: LegacyChainTip, wallets: LegacyWallet[]): Promise<void> {
+		const hash = createHash("sha256");
+		hash.update(JSON.stringify(chainTip));
+
+		for (const wallet of wallets) {
+			hash.update(JSON.stringify(wallet));
+		}
+
 		const snapshot: LegacySnapshot = {
 			chainTip,
 			hash: hash.digest("hex"),
@@ -114,8 +128,6 @@ export class Generator {
 		await writeFile(path, JSON.stringify(snapshot, undefined, 2));
 
 		console.log(`Wrote ${wallets.length} wallets to '${path}'`);
-
-		await dataSource.destroy();
 	}
 }
 

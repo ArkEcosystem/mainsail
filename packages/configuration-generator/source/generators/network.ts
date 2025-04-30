@@ -12,7 +12,6 @@ export class NetworkGenerator {
 				symbol: options.symbol,
 				token: options.token,
 			},
-			messagePrefix: `${options.network} message:\n`,
 			name: options.network,
 			nethash: sha256(Buffer.from(options.chainId.toString(16) + options.token)).slice(2),
 			pubKeyHash: options.pubKeyHash,

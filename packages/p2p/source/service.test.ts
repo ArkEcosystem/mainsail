@@ -223,7 +223,7 @@ describeSkip<{
 	// it("#updateNetworkStatus - should not do anything, when process.env.NODE_ENV === 'test'", async ({
 	// 	networkMonitor,
 	// }) => {
-	// 	process.env.CORE_ENV = "test";
+	// 	process.env.MAINSAIL_ENV = "test";
 
 	// 	const spyDiscoverPeers = spy(networkMonitor, "discoverPeers");
 
@@ -231,7 +231,7 @@ describeSkip<{
 
 	// 	spyDiscoverPeers.neverCalled();
 
-	// 	delete process.env.CORE_ENV;
+	// 	delete process.env.MAINSAIL_ENV;
 	// });
 
 	it("#updateNetworkStatus - should log a warning message and not discover peers, when in 'disable discovery' mode", async ({
@@ -512,7 +512,7 @@ describeSkip<{
 	it("#getNetworkState - should call cleansePeers with {fast, forcePing} and return network state from NetworkState.analyze", async ({
 		networkMonitor,
 	}) => {
-		process.env.CORE_ENV = "test"; // for NetworkState analyze
+		process.env.MAINSAIL_ENV = "test"; // for NetworkState analyze
 
 		const block = {
 			data: {
@@ -543,7 +543,7 @@ describeSkip<{
 		spyCleansePeers.calledOnce();
 		spyCleansePeers.calledWith({ fast: true, forcePing: true });
 
-		delete process.env.CORE_ENV;
+		delete process.env.MAINSAIL_ENV;
 	});
 
 	it.skip("#refreshPeersAfterFork - should call cleansePeers with {forcePing}", async ({ networkMonitor }) => {

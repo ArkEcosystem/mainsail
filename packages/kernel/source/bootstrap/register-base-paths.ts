@@ -23,7 +23,7 @@ export class RegisterBasePaths implements Contracts.Kernel.Bootstrapper {
 		for (let [type, path] of paths) {
 			path = join(path, this.app.name());
 
-			const configKey = `CORE_PATH_${type.toUpperCase()}`;
+			const configKey = `MAINSAIL_PATH_${type.toUpperCase()}`;
 
 			const processPath: string | undefined = process.env[configKey];
 

@@ -103,8 +103,8 @@ export class GenesisBlockGenerator extends Generator {
 		await this.app.resolve(Deployer).deploy({
 			generatorAddress: genesisWalletAddress,
 			initialBlockNumber: options.snapshot
-				? Number(this.snapshotLegacyImporter!.genesisHeight)
-				: options.initialHeight,
+				? Number(this.snapshotLegacyImporter!.genesisBlockNumber)
+				: options.initialBlockNumber,
 			timestamp: dayjs(options.epoch).valueOf(),
 			totalAmount: (options.distribute
 				? // Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`)
@@ -243,7 +243,7 @@ export class GenesisBlockGenerator extends Generator {
 
 		const payloadBuffers: Buffer[] = [];
 		const commitKey = {
-			blockNumber: BigInt(options.initialHeight),
+			blockNumber: BigInt(options.initialBlockNumber),
 			round: BigInt(0),
 		};
 		const timestamp = BigInt(dayjs(options.epoch).valueOf());
@@ -318,7 +318,7 @@ export class GenesisBlockGenerator extends Generator {
 					fee: totals.fee,
 					gasUsed: totals.gasUsed,
 					logsBloom: await this.evm.logsBloom(commitKey),
-					number: options.initialHeight ?? 0,
+					number: options.initialBlockNumber ?? 0,
 					parentHash:
 						options.snapshot?.previousGenesisBlockHash ??
 						"0000000000000000000000000000000000000000000000000000000000000000",
@@ -369,13 +369,14 @@ export class GenesisBlockGenerator extends Generator {
 		// Load snapshot into EVM
 		const result = await this.snapshotLegacyImporter.import({
 			commitKey: {
-				blockNumber: this.snapshotLegacyImporter.genesisHeight,
+				blockNumber: this.snapshotLegacyImporter.genesisBlockNumber,
 				round: 0n,
 			},
+			mockFakeValidatorBlsKeys: options.mockFakeValidatorBlsKeys,
 			timestamp: dayjs(options.epoch).valueOf(),
 		});
 
-		options.initialHeight = Number(this.snapshotLegacyImporter.genesisHeight);
+		options.initialBlockNumber = Number(this.snapshotLegacyImporter.genesisBlockNumber);
 
 		options.snapshot.snapshotHash = this.snapshotLegacyImporter.snapshotHash;
 		options.snapshot.previousGenesisBlockHash = this.snapshotLegacyImporter.previousGenesisBlockHash;
@@ -383,7 +384,7 @@ export class GenesisBlockGenerator extends Generator {
 
 		this.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-			.set("genesisBlock.block.height", options.initialHeight);
+			.set("genesisBlock.block.number", options.initialBlockNumber);
 
 		console.log(result);
 	}

@@ -11,7 +11,7 @@ use logger::JsLogger;
 use mainsail_evm_core::{
     account::AccountInfoExtended,
     db::{CommitData, CommitKey, GenesisInfo, PendingCommit, PersistentDB, PersistentDBOptions},
-    legacy::{LegacyAddress, LegacyColdWallet},
+    legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
     logs_bloom,
     receipt::{TxReceipt, map_execution_result},
@@ -21,7 +21,8 @@ use mainsail_evm_core::{
 use napi::{JsBigInt, JsObject, JsString, bindgen_prelude::*};
 use napi_derive::napi;
 use result::{
-    CommitResult, JsAccountInfoExtended, JsLegacyColdWallet, PreverifyTxResult, TxViewResult,
+    CommitResult, JsAccountInfoExtended, JsLegacyAttributes, JsLegacyColdWallet, PreverifyTxResult,
+    TxViewResult,
 };
 use revm::{
     Database, DatabaseCommit, ExecuteEvm, MainBuilder, MainContext,
@@ -473,6 +474,42 @@ impl EvmInner {
                 format!("failed reading accounts: {}", err).into(),
             )),
         }
+    }
+
+    pub fn get_legacy_attributes(
+        &mut self,
+        address: Address,
+        legacy_address: Option<LegacyAddress>,
+    ) -> std::result::Result<Option<LegacyAccountAttributes>, EVMError<String>> {
+        if let Some(legacy_attributes) =
+            self.persistent_db
+                .get_legacy_attributes(address)
+                .map_err(|err| {
+                    EVMError::Database(format!("failed reading legacy attributes: {}", err).into())
+                })?
+        {
+            return Ok(Some(legacy_attributes));
+        }
+
+        // Try fallback to legacy attributes from cold wallets
+        let legacy_attributes = match legacy_address {
+            Some(legacy_address) => {
+                match self
+                    .persistent_db
+                    .get_legacy_cold_wallet(legacy_address)
+                    .map_err(|err| {
+                        EVMError::Database(
+                            format!("legacy cold wallet attributes lookup failed: {}", err).into(),
+                        )
+                    })? {
+                    Some(legacy_cold_wallet) => Some(legacy_cold_wallet.legacy_attributes),
+                    None => None,
+                }
+            }
+            None => None,
+        };
+
+        Ok(legacy_attributes)
     }
 
     pub fn get_legacy_cold_wallets(
@@ -1202,6 +1239,31 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<JsLegacyAttributes | null>")]
+    pub fn get_legacy_attributes(
+        &mut self,
+        node_env: Env,
+        address: JsString,
+        legacy_address: Option<JsString>,
+    ) -> Result<JsObject> {
+        let address = utils::create_address_from_js_string(address)?;
+        let legacy_address = if let Some(legacy_address) = legacy_address {
+            Some(utils::create_legacy_address_from_js_string(legacy_address)?)
+        } else {
+            None
+        };
+
+        node_env.execute_tokio_future(
+            Self::get_legacy_attributes_async(self.evm.clone(), address, legacy_address),
+            |&mut node_env, result| {
+                Ok(match result {
+                    Some(result) => Some(JsLegacyAttributes::new(&node_env, result)?),
+                    None => None,
+                })
+            },
+        )
+    }
+
     #[napi(ts_return_type = "Promise<JsGetLegacyColdWallets>")]
     pub fn get_legacy_cold_wallets(
         &mut self,
@@ -1664,6 +1726,20 @@ impl JsEvmWrapper {
     ) -> Result<(Option<u64>, Vec<AccountInfoExtended>)> {
         let mut lock = evm.lock().await;
         let result = lock.get_accounts(offset, limit);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_legacy_attributes_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        address: Address,
+        legacy_address: Option<LegacyAddress>,
+    ) -> Result<Option<LegacyAccountAttributes>> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_legacy_attributes(address, legacy_address);
 
         match result {
             Ok(result) => Result::Ok(result),

@@ -6,8 +6,8 @@ import { ensureDirSync, removeSync } from "fs-extra/esm";
 import Joi from "joi";
 import { join } from "path";
 
-const ENV = `CORE_LOG_LEVEL=info
-CORE_LOG_LEVEL_FILE=debug`;
+const ENV = `MAINSAIL_LOG_LEVEL=info
+MAINSAIL_LOG_LEVEL_FILE=debug`;
 
 const PEERS = {
 	list: [

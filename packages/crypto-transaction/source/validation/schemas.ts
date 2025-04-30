@@ -8,7 +8,7 @@ const transactionId: SchemaObject = {
 
 const prefixedTransactionId: SchemaObject = {
 	$id: "prefixedTransactionId",
-	allOf: [{ maxLength: 66, minLength: 66 }, { $ref: "prefixedHex" }],
+	allOf: [{ maxLength: 66, minLength: 66 }, { $ref: "prefixedQuantityHex" }],
 	type: "string",
 };
 
