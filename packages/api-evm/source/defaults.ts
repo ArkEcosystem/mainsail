@@ -23,7 +23,7 @@ export const defaults = {
 	},
 	server: {
 		http: {
-			enabled: Environment.isTrue(Constants.EnvironmentVariables.MAINSAIL_API_EVM_ENABLED),
+			enabled: !Environment.isTrue(Constants.EnvironmentVariables.MAINSAIL_API_EVM_DISABLED),
 			host: Environment.get(Constants.EnvironmentVariables.MAINSAIL_API_EVM_HOST, "127.0.0.1"),
 			port: Environment.get(Constants.EnvironmentVariables.MAINSAIL_API_EVM_PORT, 4008),
 		},

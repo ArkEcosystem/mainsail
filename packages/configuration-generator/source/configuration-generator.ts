@@ -259,8 +259,6 @@ export class ConfigurationGenerator {
 
 	#preparteEnvironmentOptions(options: Contracts.NetworkGenerator.InternalOptions): EnvironmentData {
 		const data: EnvironmentData = {
-			MAINSAIL_API_EVM_ENABLED: "1",
-
 			MAINSAIL_API_EVM_HOST: "127.0.0.1",
 
 			MAINSAIL_API_EVM_PORT: 4008,
