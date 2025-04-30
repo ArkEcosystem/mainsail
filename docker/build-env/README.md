@@ -14,10 +14,6 @@ Run the build environment using [Docker Compose](https://docs.docker.com/compose
 
 ## Mainsail Build Environment  
 
-```bash
-cd ~/mainsail/docker/build-env
-```
-
 > [!NOTE]
 > Please pay attention to the following option in your [`build.env`](./build.env) file!
 
@@ -82,5 +78,3 @@ pnpm run api:devnet
 ```bash
 docker-compose down --remove-orphans -v --rmi all 
 ```
-
-
