@@ -75,13 +75,13 @@ jobs:
             - name: Print linting instructions on failure
               if: failure()
               run: |
-                echo "🚨 Linting/Formatting issues were detected."
-                echo ""
-                echo "Please run the following commands locally to fix them:"
-                echo ""
-                echo "  pnpm run sort"
-                echo "  pnpm run lint"
-                echo "  pnpm run prettier"
-                echo "  cd contracts && forge fmt"
-                echo ""
-                echo "Then update your PR. 🚀"
+                  echo "🚨 Linting/Formatting issues were detected."
+                  echo ""
+                  echo "Please run the following commands locally to fix them:"
+                  echo ""
+                  echo "  pnpm run sort"
+                  echo "  pnpm run lint"
+                  echo "  pnpm run prettier"
+                  echo "  cd contracts && forge fmt"
+                  echo ""
+                  echo "Then update your PR. 🚀"
