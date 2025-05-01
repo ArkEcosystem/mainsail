@@ -2,6 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 import { ensureDirSync, pathExistsSync } from "fs-extra/esm";
+import { join } from "path";
 
 import { ConfigurationWriter } from "./configuration-writer.js";
 import { EnvironmentData } from "./contracts.js";
@@ -16,7 +17,6 @@ import {
 	WalletGenerator,
 } from "./generators/index.js";
 import { Identifiers as InternalIdentifiers } from "./identifiers.js";
-import { join } from "path";
 
 type Task = {
 	task: () => Promise<void>;
@@ -94,8 +94,8 @@ export class ConfigurationGenerator {
 			writeEnvironment: true,
 			writeGenesisBlock: true,
 			writePeers: true,
-			writeValidators: true,
 			writeSnapshot: !!options.snapshot,
+			writeValidators: true,
 			...writeOptions,
 		};
 
