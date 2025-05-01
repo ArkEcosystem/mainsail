@@ -9,6 +9,7 @@ import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, BigNumber } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
 import { ethers, sha256 } from "ethers";
+import path from "path";
 
 @injectable()
 export class Importer implements Contracts.Snapshot.LegacyImporter {
@@ -111,10 +112,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const milestone = this.configuration.getMilestone(this.configuration.getGenesisHeight());
 		assert.defined(milestone.snapshot);
 
-		this.logger.info(`Importing genesis snapshot: ${milestone.snapshot.snapshotHash}`);
+		const snapshotPath = path.join(this.app.configPath("snapshot"), `${milestone.snapshot.snapshotHash}.json`);
+		this.logger.info(`Importing genesis snapshot: ${snapshotPath}`);
 
-		// TODO: fix hardcoded path
-		await this.prepare(`./snapshot-${milestone.snapshot.snapshotHash}.json`);
+		await this.prepare(snapshotPath);
 
 		if (this.snapshotHash !== milestone.snapshot.snapshotHash) {
 			throw new Error("imported snapshot hash mismatch");
