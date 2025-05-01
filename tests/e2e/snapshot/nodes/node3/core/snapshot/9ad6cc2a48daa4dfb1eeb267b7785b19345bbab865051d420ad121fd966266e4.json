@@ -1,0 +1,68 @@
+{
+  "chainTip": {
+    "hash": "a1b8d3f6e9c2a0b4d7e1f0c8a3b5d6e7f9a0b1c3d4e5f6a7b8c9d0e1f2a3b4c5",
+    "number": 0
+  },
+  "hash": "9ad6cc2a48daa4dfb1eeb267b7785b19345bbab865051d420ad121fd966266e4",
+  "wallets": [
+    {
+      "address": "DFF4dzL2ZoFeGdcCbER4gfmuWBEVbEnU5f",
+      "publicKey": "034b7f14dd621010d9719a027971dac8e00e00467b3c6d5945e0a5ced797b13b2d",
+      "balance": "10000000000",
+      "attributes": {
+        "delegate": {
+          "username": "valdiator_1"
+        }
+      }
+    },
+    {
+      "address": "DFf62eynQTZDoTLADQdxW7EJEGV4xcGT1f",
+      "publicKey": "03b36b275ef33b7527d08fa5cf29c04ff142a427f228f1c4d02161c76a7404bef5",
+      "balance": "20000000000",
+      "attributes": {
+        "delegate": {
+          "username": "valdiator_2"
+        }
+      }
+    },
+    {
+      "address": "DFFDDbGwiuPMMYvcnzJhLrZdjnuUPwEVRS",
+      "publicKey": "020074030f3577eb683bb215340c5994654f4634556a33744bf81f15d92815c99d",
+      "balance": "30000000000",
+      "attributes": {
+        "delegate": {
+          "username": "valdiator_3"
+        }
+      }
+    },
+    {
+      "address": "DFfemTprUzXAh6E9f1hzchbnNgk4QBSsRg",
+      "publicKey": "0244cb74943034d85e4a18e0b60a58d535ae9f94cf170ec16e94ca283a2c0eb712",
+      "balance": "40000000000",
+      "attributes": {
+        "delegate": {
+          "username": "valdiator_4"
+        }
+      }
+    },
+    {
+      "address": "DFfEqb9Caqi7jmdkeg861eURxL8DS3pK8x",
+      "publicKey": "0269051b0fe83c5bfc5e343ccb63c40d575666cf9476057bb2b66b1ae3827cb08a",
+      "balance": "50000000000",
+      "attributes": {
+        "delegate": {
+          "username": "valdiator_5"
+        }
+      }
+    },
+    {
+      "address": "DFfFDrrppKzVTK5frHYh6JJP73UeD2MZnC",
+      "publicKey": "02a1a95d0445074b2ef84c66ffcb203ef838c398a8b802ef7441d6ffc88b326d1e",
+      "balance": "10"
+    },
+    {
+      "address": "DFFgVGsEoVQtnVoaBoHHZJyqWEX8tsxzwP",
+      "balance": "20"
+    }
+  ]
+}
