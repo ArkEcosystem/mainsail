@@ -1,9 +1,9 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { stringify } from "envfile";
-import { writeFileSync } from "fs";
+import { writeFileSync, copyFileSync } from "fs";
 import { writeJSONSync } from "fs-extra/esm";
-import path from "path";
+import path, { resolve } from "path";
 
 import { EnvironmentData, Wallet } from "./contracts.js";
 import { Identifiers } from "./identifiers.js";
@@ -67,5 +67,10 @@ export class ConfigurationWriter {
 				spaces: 4,
 			},
 		);
+	}
+
+	writeSnapshot(snapshotPath: string, snapshotHash: string): void {
+		snapshotPath = resolve(snapshotPath);
+		copyFileSync(snapshotPath, path.join(this.configurationPath, "snapshot", `${snapshotHash}.json`));
 	}
 }

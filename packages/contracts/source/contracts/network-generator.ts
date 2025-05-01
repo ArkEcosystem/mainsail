@@ -79,4 +79,5 @@ export type WriteOptions = {
 	writeValidators: boolean;
 	writeGenesisBlock: boolean;
 	writeCrypto: boolean;
+	writeSnapshot: boolean;
 };

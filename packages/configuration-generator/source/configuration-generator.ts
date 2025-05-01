@@ -16,6 +16,7 @@ import {
 	WalletGenerator,
 } from "./generators/index.js";
 import { Identifiers as InternalIdentifiers } from "./identifiers.js";
+import { join } from "path";
 
 type Task = {
 	task: () => Promise<void>;
@@ -94,6 +95,7 @@ export class ConfigurationGenerator {
 			writeGenesisBlock: true,
 			writePeers: true,
 			writeValidators: true,
+			writeSnapshot: !!options.snapshot,
 			...writeOptions,
 		};
 
@@ -199,6 +201,20 @@ export class ConfigurationGenerator {
 					this.configurationWriter.writeCrypto(genesisBlock, milestones, network);
 				},
 				title: "Writing crypto.json in core config path.",
+			});
+		}
+
+		if (writeOptions.writeSnapshot) {
+			tasks.push({
+				task: async () => {
+					if (!options.snapshot || !options.snapshot.snapshotHash) {
+						throw new Error("missing snapshot config");
+					}
+
+					ensureDirSync(join(this.configurationPath, "snapshot"));
+					this.configurationWriter.writeSnapshot(options.snapshot.path, options.snapshot.snapshotHash);
+				},
+				title: `Writing snapshot.json in core config path.`,
 			});
 		}
 
