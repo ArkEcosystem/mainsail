@@ -1,26 +1,75 @@
 import got from "got";
 import express from "express";
 
+import { makeEvmCall } from "./tx.mjs";
+import { getApiHttp, postTransaction } from "./client.mjs";
+import { config } from "./config.mjs";
+
 const app = express();
 app.use(express.json());
 
 // Listen for blocks until reaching TARGET_BLOCK_NUMBER
 const TARGET_BLOCK_NUMBER = 15; // ~ 4 minutes
-const EXPECTED_NUMBER_OF_PEERS = 5;
+const EXPECTED_NUMBER_OF_PEERS = 6;
 
 let webhookTarget;
 let peers = [];
+
+let broadcastedTransactions = [];
+
+// Results
+let allPeersReachedTargetBlockNumber = false;
+let allTransactionsReportedByApi = true;
 
 const peerBlockNumberMap = new Map();
 
 (async () => {
 	await discoverPeers();
 	await setupWebhook();
-
+	await broadcastTransactions();
+	
 	app.listen(3001, function () {
 		console.log("Block listener port 3001!");
 	});
+
+	await waitForResults();
 })();
+
+async function waitForResults() {
+	do {
+		await sleep(1000);
+		console.log("waiting for results...", { allPeersReachedTargetBlockNumber, allTransactionsReportedByApi });
+
+		if (!allTransactionsReportedByApi) {
+			try { 
+			   let allFound = true;
+			   for (const hash of broadcastedTransactions) {
+				   const transaction = await getApiHttp(config.peer, `/transactions/${hash}`);
+				   if (!transaction) {
+					   allFound = false;
+					   break;
+				   }
+			   }
+   
+			   if (allFound) {
+				   allTransactionsReportedByApi = true;
+			   }
+		   } catch {}
+		}
+
+	} while (!allPeersReachedTargetBlockNumber || !allTransactionsReportedByApi);
+
+	console.log(`checks successful. exiting`);
+
+	process.exit(0);
+}
+
+async function broadcastTransactions() {
+	const tx = await makeEvmCall(`${config.to}`, "100000000");
+	const response = await postTransaction(config.peer, tx.serialized.toString("hex"));
+	console.log("broadcastTransactions", { hash: tx.hash, response: JSON.stringify(response) });
+	broadcastedTransactions.push(tx.hash);
+}
 
 async function discoverPeers() {
 	do {
@@ -66,8 +115,8 @@ async function setupWebhook() {
 			peerBlockNumberMap.delete(req.ip);
 
 			if (peerBlockNumberMap.size === 0) {
-				console.log(`successfully reached target block number on all peers, exiting.`);
-				process.exit(0);
+				console.log(`successfully reached target block number on all peers.`);
+				allPeersReachedTargetBlockNumber = true;
 			}
 		}
 	});
