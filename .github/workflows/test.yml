@@ -349,6 +349,9 @@ jobs:
                     echo "Error: checks exited with code $exit_code"
                     exit 1
                   fi
+            - name: Show logs - checks
+              if: always()
+              run: docker logs consensus-checks-1
             - name: Show logs - node0
               if: always()
               run: docker logs consensus-node0-1
@@ -364,6 +367,12 @@ jobs:
             - name: Show logs - node4
               if: always()
               run: docker logs consensus-node4-1
+            - name: Show logs - api-node
+              if: always()
+              run: docker logs consensus-api-node-1
+            - name: Show logs - api-http
+              if: always()
+              run: docker logs consensus-api-http-1
 
     e2e-clients:
         name: "E2E Clients"
