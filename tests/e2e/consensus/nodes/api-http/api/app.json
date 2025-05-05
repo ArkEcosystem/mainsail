@@ -1,0 +1,16 @@
+{
+    "main": [
+        {
+            "package": "@mainsail/logger-pino"
+        },
+        {
+            "package": "@mainsail/validation"
+        },
+        {
+            "package": "@mainsail/api-database"
+        },
+        {
+            "package": "@mainsail/api-http"
+        }
+    ]
+}

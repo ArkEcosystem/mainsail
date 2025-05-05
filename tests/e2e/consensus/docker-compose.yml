@@ -1,4 +1,15 @@
 version: "3.8"
+
+x-node-env: &nodeEnvironment
+    MAINSAIL_CRYPTO_WORKER_COUNT: 2
+
+x-postgres-env: &postgresEnvironment
+    MAINSAIL_DB_HOST: postgres-api
+    MAINSAIL_DB_PORT: 5432
+    MAINSAIL_DB_DATABASE: test_db
+    MAINSAIL_DB_USERNAME: test_db
+    MAINSAIL_DB_PASSWORD: password
+
 services:
     peerdiscovery:
         build: ./peer-discovery
@@ -7,6 +18,8 @@ services:
     checks:
         build: ./checks
         image: checks
+        volumes:
+            - ./../../../:/mainsail
         depends_on:
             - peerdiscovery
 
@@ -16,6 +29,20 @@ services:
             - ./nginx/nginx.conf:/etc/nginx/nginx.conf
         ports:
             - 4900:4900
+
+    postgres:
+        image: "postgres:16.8-alpine3.20"
+        container_name: postgres-api
+        tmpfs: /pgtmpfs
+        logging:
+            driver: "none"
+        ports:
+            - "5454:5432"
+        environment:
+            POSTGRES_DB: test_db
+            POSTGRES_USER: test_db
+            POSTGRES_PASSWORD: password
+            PGDATA: /pgtmpfs
 
     node0: &nodeDefinition
         build: ./nodes
@@ -28,7 +55,8 @@ services:
             - /bin/sh
             - -c
             - /mainsail/packages/core/bin/run.js core:run --network=devnet
-        environment: &nodeEnvironment
+        environment:
+            <<: *nodeEnvironment
             MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node0
             MAINSAIL_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node0
 
@@ -67,3 +95,31 @@ services:
             <<: *nodeEnvironment
             MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node4
             MAINSAIL_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node4
+
+    api-http:
+        <<: *nodeDefinition
+        depends_on:
+            - peerdiscovery
+            - postgres
+        command:
+            - /bin/sh
+            - -c
+            - /mainsail/packages/api/bin/run.js api:run --network=devnet
+        environment:
+            <<: *postgresEnvironment
+            MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/api-http
+            MAINSAIL_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/api-http
+
+    api-node:
+        <<: *nodeDefinition
+        depends_on:
+            - peerdiscovery
+            - postgres
+        environment:
+            <<: [*postgresEnvironment, *nodeEnvironment]
+            MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/api-node
+            MAINSAIL_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/api-node
+            MAINSAIL_API_SYNC_ENABLED: "1"
+            MAINSAIL_API_EVM_DISABLED: "0"
+            MAINSAIL_API_EVM_HOST: 0.0.0.0
+            MAINSAIL_API_EVM_PORT: 4008

@@ -3,7 +3,8 @@
 	"type": "module",
 	"dependencies": {
 		"express": "4.19.2",
-		"got": "14.2.1"
+		"got": "14.2.1",
+		"viem": "2.28.2"
 	},
 	"engines": {
 		"node": ">=16"
