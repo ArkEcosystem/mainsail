@@ -7,7 +7,7 @@ import { Serializer } from "./serializer.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.Cryptography.Commit.ProofSize).toFunction(
+		this.app.bind(Identifiers.Cryptography.Commit.ProofSize).toConstantValue(
 			() =>
 				4 + // round
 				this.app.getTagged<number>(Identifiers.Cryptography.Signature.Size, "type", "consensus") + // signature

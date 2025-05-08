@@ -1,5 +1,6 @@
 import { Commands } from "@mainsail/cli";
-import { injectable, interfaces } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { Command as BIP38Command } from "./config-forger-bip38.js";
@@ -52,7 +53,9 @@ export class Command extends Commands.Command {
 		}
 	}
 
-	private async initializeAndExecute(commandSignature: interfaces.Newable<Commands.Command>): Promise<void> {
+	private async initializeAndExecute(
+		commandSignature: Contracts.Kernel.Container.Newable<Commands.Command>,
+	): Promise<void> {
 		const cmd = this.app.resolve(commandSignature);
 
 		const flags = this.getFlags();

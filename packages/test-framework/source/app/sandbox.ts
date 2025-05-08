@@ -1,5 +1,5 @@
 import { ConfigurationGenerator, makeApplication } from "@mainsail/configuration-generator";
-import { Container, interfaces } from "@mainsail/container";
+import { Container } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
 import { readJSONSync, removeSync } from "fs-extra/esm";
@@ -10,7 +10,7 @@ import { SandboxCallback } from "./contracts.js";
 
 export class Sandbox {
 	public readonly app: Application;
-	readonly #container: interfaces.Container;
+	readonly #container: Container;
 
 	#configApp?: Application;
 	#path = dirSync().name;

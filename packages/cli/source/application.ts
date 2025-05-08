@@ -21,7 +21,7 @@ export class Application {
 		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
 	): Contracts.Kernel.Container.BindToFluentSyntax<T> {
 		if (this.container.isBound(serviceIdentifier)) {
-			this.container.unbind(serviceIdentifier);
+			this.container.unbindSync(serviceIdentifier);
 		}
 
 		return this.container.bind(serviceIdentifier);
