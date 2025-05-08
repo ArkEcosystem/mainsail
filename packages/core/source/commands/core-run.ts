@@ -1,6 +1,6 @@
 import { Keystore } from "@chainsafe/bls-keystore";
 import { Commands, Contracts, Utils } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
+import { injectable, injectFromBase } from "@mainsail/container";
 import { assert } from "@mainsail/utils";
 import { existsSync } from "fs";
 import { readJSONSync } from "fs-extra/esm";
@@ -9,6 +9,7 @@ import path from "path";
 import { URL } from "url";
 
 @injectable()
+@injectFromBase()
 export class Command extends Commands.Command {
 	public signature = "core:run";
 

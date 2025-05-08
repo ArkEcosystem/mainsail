@@ -1,10 +1,11 @@
 import { Commands, Identifiers, Services } from "@mainsail/cli";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 import { Constants } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
 
 @injectable()
+@injectFromBase()
 export class Command extends Commands.Command {
 	@inject(Identifiers.Installer)
 	private readonly installer!: Services.Installer;

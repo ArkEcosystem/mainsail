@@ -1,6 +1,6 @@
 import { Commands, Contracts, Identifiers as CliIdentifiers, Services } from "@mainsail/cli";
 import { ConfigurationGenerator, Identifiers, makeApplication } from "@mainsail/configuration-generator";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 import { Contracts as AppContracts, Identifiers as AppIdentifiers } from "@mainsail/contracts";
 import envPaths from "env-paths";
 import Joi from "joi";
@@ -25,6 +25,7 @@ type Flags = Omit<AppContracts.NetworkGenerator.Options, "peers" | "rewardAmount
 };
 
 @injectable()
+@injectFromBase()
 export class Command extends Commands.Command {
 	@inject(CliIdentifiers.Logger)
 	private readonly logger!: Services.Logger;

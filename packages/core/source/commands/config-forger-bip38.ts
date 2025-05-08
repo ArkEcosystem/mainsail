@@ -1,6 +1,6 @@
 import { Keystore } from "@chainsafe/bls-keystore";
 import { Commands, Contracts } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
+import { injectable, injectFromBase } from "@mainsail/container";
 import { ServiceProvider as CryptoServiceProvider } from "@mainsail/crypto-config";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-bls12-381";
 import { validateMnemonic } from "bip39";
@@ -8,6 +8,7 @@ import { writeJSONSync } from "fs-extra/esm";
 import Joi from "joi";
 
 @injectable()
+@injectFromBase()
 export class Command extends Commands.Command {
 	public signature = "config:forger:bip38";
 

@@ -1,11 +1,12 @@
 /* eslint-disable unicorn/prevent-abbreviations */
 import { Commands } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
+import { injectable, injectFromBase } from "@mainsail/container";
 import { parse } from "envfile";
 import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
 
 @injectable()
+@injectFromBase()
 export class Command extends Commands.Command {
 	public signature = "env:get";
 
