@@ -1,11 +1,12 @@
 import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 import { existsSync } from "fs";
 import { copySync, ensureDirSync, removeSync } from "fs-extra/esm";
 import Joi from "joi";
 import { resolve } from "path";
 
 @injectable()
+@injectFromBase()
 export class Command extends Commands.Command {
 	@inject(Identifiers.Environment)
 	private readonly environment!: Services.Environment;

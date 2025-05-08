@@ -1,7 +1,8 @@
 import { Commands } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
+import { injectable, injectFromBase } from "@mainsail/container";
 
 @injectable()
+@injectFromBase()
 export class Command extends Commands.Command {
 	public signature = "uninstall";
 
