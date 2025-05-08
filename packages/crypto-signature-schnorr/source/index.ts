@@ -1,4 +1,3 @@
-import { Selectors } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
@@ -11,12 +10,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind(Identifiers.Cryptography.Signature.Size)
 			.toConstantValue(64)
-			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "wallet"));
+			.whenAnyAncestorTagged("type", "wallet");
 
 		this.app
 			.bind(Identifiers.Cryptography.Signature.Instance)
 			.to(Signature)
 			.inSingletonScope()
-			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "wallet"));
+			.whenAnyAncestorTagged("type", "wallet");
 	}
 }

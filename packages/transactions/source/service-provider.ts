@@ -1,6 +1,7 @@
 import { interfaces } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 
 import { TransactionHandlerRegistry } from "./handlers/handler-registry.js";
 import { TransactionHandlerConstructor, TransactionHandlerProvider } from "./handlers/index.js";
@@ -8,25 +9,39 @@ import { TransactionValidator } from "./transaction-validator.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public static getTransactionHandlerConstructorsBinding(): (
-		context: interfaces.Context,
+		context: Contracts.Kernel.Container.ResolutionContext,
 	) => TransactionHandlerConstructor[] {
-		return (context: interfaces.Context) => {
+		return (context: Contracts.Kernel.Container.ResolutionContext) => {
 			type BindingDictionary = interfaces.Lookup<interfaces.Binding<unknown>>;
 			const handlerConstructors: TransactionHandlerConstructor[] = [];
-			let container: interfaces.Container | null = context.container;
+			let container: Contracts.Kernel.Container.Container | null = context.container;
 
-			do {
-				const bindingDictionary = container["_bindingDictionary"] as BindingDictionary;
-				const handlerBindings = bindingDictionary.getMap().get(Identifiers.Transaction.Handler.Instances) ?? [];
+			assert.defined(container);
 
-				for (const handlerBinding of handlerBindings) {
-					if (handlerBinding.implementationType) {
-						handlerConstructors.push(handlerBinding.implementationType as TransactionHandlerConstructor);
-					}
+			// do {
+			// 	const bindingDictionary = container["_bindingDictionary"] as BindingDictionary;
+			// 	const handlerBindings = bindingDictionary.getMap().get(Identifiers.Transaction.Handler.Instances) ?? [];
+
+			// 	for (const handlerBinding of handlerBindings) {
+			// 		if (handlerBinding.implementationType) {
+			// 			handlerConstructors.push(handlerBinding.implementationType as TransactionHandlerConstructor);
+			// 		}
+			// 	}
+
+			// 	container = container.parent;
+			// } while (container);
+			// do {
+			const bindingDictionary = container["_bindingDictionary"] as BindingDictionary;
+			const handlerBindings = bindingDictionary.getMap().get(Identifiers.Transaction.Handler.Instances) ?? [];
+
+			for (const handlerBinding of handlerBindings) {
+				if (handlerBinding.implementationType) {
+					handlerConstructors.push(handlerBinding.implementationType as TransactionHandlerConstructor);
 				}
+			}
 
-				container = container.parent;
-			} while (container);
+			// 	container = container.parent;
+			// } while (container);
 
 			return handlerConstructors;
 		};
@@ -43,8 +58,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.Transaction.Validator.Instance).to(TransactionValidator);
 		this.app
-			.bind(Identifiers.Transaction.Validator.Factory)
-			.toAutoFactory(Identifiers.Transaction.Validator.Instance);
+			.bind<() => TransactionValidator>(Identifiers.Transaction.Validator.Factory)
+			.toFactory(
+				(context: Contracts.Kernel.Container.ResolutionContext) => () =>
+					context.get(Identifiers.Transaction.Validator.Instance),
+			);
 	}
 
 	public async required(): Promise<boolean> {

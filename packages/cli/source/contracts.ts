@@ -107,11 +107,11 @@ export type ProcessFactory = (name: string) => Process;
 export interface Application {
 	bind<T>(
 		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
-	): Contracts.Kernel.Container.BindInFluentSyntax<T>;
+	): Contracts.Kernel.Container.BindToFluentSyntax<T>;
 
 	rebind<T>(
 		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
-	): Contracts.Kernel.Container.BindInFluentSyntax<T>;
+	): Contracts.Kernel.Container.BindToFluentSyntax<T>;
 
 	unbind<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): void;
 
