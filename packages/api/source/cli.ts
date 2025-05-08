@@ -118,7 +118,7 @@ export class CommandLineInterface {
 			commands[key] = value;
 		}
 
-		this.#app.bind(Identifiers.Commands).toConstantValue(commands);
+		this.#app.bind<CliContracts.CommandList>(Identifiers.Commands).toConstantValue(commands);
 		return commands;
 	}
 }

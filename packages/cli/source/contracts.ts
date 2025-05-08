@@ -1,4 +1,4 @@
-import { interfaces } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { AnySchema } from "joi";
 export type { Paths } from "env-paths";
 
@@ -105,17 +105,21 @@ export type ProcessFactory = (name: string) => Process;
 
 // APPLICATION
 export interface Application {
-	bind<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>): interfaces.BindingToSyntax<T>;
+	bind<T>(
+		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
+	): Contracts.Kernel.Container.BindInFluentSyntax<T>;
 
-	rebind<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>): interfaces.BindingToSyntax<T>;
+	rebind<T>(
+		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
+	): Contracts.Kernel.Container.BindInFluentSyntax<T>;
 
-	unbind<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>): void;
+	unbind<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): void;
 
-	get<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>): T;
+	get<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): T;
 
-	isBound<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>): boolean;
+	isBound<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): boolean;
 
-	resolve<T>(constructorFunction: interfaces.Newable<T>): T;
+	resolve<T>(constructorFunction: Contracts.Kernel.Container.Newable<T>): T;
 
 	getCorePath(type: string, file?: string): string;
 

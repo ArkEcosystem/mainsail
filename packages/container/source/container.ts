@@ -1,3 +1,3 @@
-import { Container, interfaces } from "./ioc.js";
+import { Container } from "./ioc.js";
 
-export const container: interfaces.Container = new Container();
+export const container = new Container();

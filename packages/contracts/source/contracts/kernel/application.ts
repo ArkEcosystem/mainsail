@@ -1,8 +1,8 @@
 import { JsonObject } from "../types/index.js";
-import { Container } from "./container.js";
+import { BindToFluentSyntax, Container, Newable, ServiceIdentifier } from "./container.js";
 
 export interface Application {
-	readonly container: Container.Container;
+	readonly container: Container;
 
 	bootstrap({ flags, plugins }: { flags: JsonObject; plugins?: JsonObject }): Promise<void>;
 
@@ -56,25 +56,21 @@ export interface Application {
 
 	terminate(reason?: string, error?: Error): Promise<never>;
 
-	bind<T>(serviceIdentifier: Container.ServiceIdentifier<T>): Container.BindingToSyntax<T>;
+	bind<T>(serviceIdentifier: ServiceIdentifier<T>): BindToFluentSyntax<T>;
 
-	rebind<T>(serviceIdentifier: Container.ServiceIdentifier<T>): Container.BindingToSyntax<T>;
+	rebind<T>(serviceIdentifier: ServiceIdentifier<T>): BindToFluentSyntax<T>;
 
-	unbind<T>(serviceIdentifier: Container.ServiceIdentifier<T>): void;
+	unbind<T>(serviceIdentifier: ServiceIdentifier<T>): void;
 
-	get<T>(serviceIdentifier: Container.ServiceIdentifier<T>): T;
+	get<T>(serviceIdentifier: ServiceIdentifier<T>): T;
 
-	getTagged<T>(serviceIdentifier: Container.ServiceIdentifier<T>, key: string | number | symbol, value: any): T;
+	getTagged<T>(serviceIdentifier: ServiceIdentifier<T>, key: string | number | symbol, value: any): T;
 
-	isBound<T>(serviceIdentifier: Container.ServiceIdentifier<T>): boolean;
+	isBound<T>(serviceIdentifier: ServiceIdentifier<T>): boolean;
 
-	isBoundTagged<T>(
-		serviceIdentifier: Container.ServiceIdentifier<T>,
-		key: string | number | symbol,
-		value: any,
-	): boolean;
+	isBoundTagged<T>(serviceIdentifier: ServiceIdentifier<T>, key: string | number | symbol, value: any): boolean;
 
-	resolve<T>(constructorFunction: Container.Newable<T>): T;
+	resolve<T>(constructorFunction: Newable<T>): T;
 }
 
 export interface PluginDependency {

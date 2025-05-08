@@ -1,1 +1,1 @@
-export { interfaces as Container } from "inversify";
+export type * from "inversify";

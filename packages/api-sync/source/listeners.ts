@@ -1,4 +1,4 @@
-import { inject, injectable, interfaces } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import * as ApiSyncContracts from "./contracts.js";
@@ -17,7 +17,9 @@ export class Listeners implements ApiSyncContracts.Listeners {
 	public async register(): Promise<void> {
 		// Listen to events before bootstrap, so we can catch all boot events.
 		for (const constructor of [ApiNodes, DeployerContracts, Peers, Plugins]) {
-			const listener = this.app.resolve(constructor as interfaces.Newable<ApiSyncContracts.EventListener>);
+			const listener = this.app.resolve(
+				constructor as Contracts.Kernel.Container.Newable<ApiSyncContracts.EventListener>,
+			);
 			await listener.register();
 			this.#listeners.push(listener);
 		}

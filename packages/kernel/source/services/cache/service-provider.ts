@@ -1,4 +1,3 @@
-import { interfaces } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers/index.js";
@@ -9,11 +8,13 @@ export class ServiceProvider extends BaseServiceProvider {
 		this.app.bind<CacheManager>(Identifiers.Services.Cache.Manager).to(CacheManager).inSingletonScope();
 
 		this.app
-			.bind(Identifiers.Services.Cache.Factory)
+			.bind<
+				<K, T>(name?: string) => Promise<Contracts.Kernel.CacheStore<K, T>>
+			>(Identifiers.Services.Cache.Factory)
 			.toFactory(
-				(context: interfaces.Context) =>
+				(context: Contracts.Kernel.Container.ResolutionContext) =>
 					async <K, T>(name?: string): Promise<Contracts.Kernel.CacheStore<K, T>> => {
-						const cacheManager: CacheManager = context.container.get<CacheManager>(
+						const cacheManager: CacheManager = context.get<CacheManager>(
 							Identifiers.Services.Cache.Manager,
 						);
 

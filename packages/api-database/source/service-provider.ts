@@ -3,7 +3,23 @@ import { assert } from "@mainsail/utils";
 import { DataSource } from "typeorm";
 import { URL } from "url";
 
-import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts.js";
+import {
+	ApiNodeRepository,
+	BlockRepository,
+	ConfigurationRepository,
+	ContractRepository,
+	LegacyColdWalletRepository,
+	PeerRepository,
+	PluginRepository,
+	PostgresConnectionOptions,
+	ReceiptRepository,
+	RepositoryDataSource,
+	StateRepository,
+	TransactionRepository,
+	TransactionTypeRepository,
+	ValidatorRoundRepository,
+	WalletRepository,
+} from "./contracts.js";
 import { Identifiers } from "./identifiers.js";
 import { Migrations } from "./migrations.js";
 import {
@@ -97,91 +113,91 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 			// Bind factories to allow creating repositories in a transaction context
 			this.app
-				.bind(Identifiers.ApiNodeRepositoryFactory)
+				.bind<() => ApiNodeRepository>(Identifiers.ApiNodeRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeApiNodeRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
-				.bind(Identifiers.BlockRepositoryFactory)
+				.bind<() => BlockRepository>(Identifiers.BlockRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeBlockRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
-				.bind(Identifiers.ConfigurationRepositoryFactory)
+				.bind<() => ConfigurationRepository>(Identifiers.ConfigurationRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeConfigurationRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
-				.bind(Identifiers.ContractRepositoryFactory)
+				.bind<() => ContractRepository>(Identifiers.ContractRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeContractRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
-				.bind(Identifiers.PeerRepositoryFactory)
+				.bind<() => PeerRepository>(Identifiers.PeerRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makePeerRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
-				.bind(Identifiers.PluginRepositoryFactory)
+				.bind<() => PluginRepository>(Identifiers.PluginRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makePluginRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
-				.bind(Identifiers.ReceiptRepositoryFactory)
+				.bind<() => ReceiptRepository>(Identifiers.ReceiptRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeReceiptRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
-				.bind(Identifiers.StateRepositoryFactory)
+				.bind<() => StateRepository>(Identifiers.StateRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeStateRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
-				.bind(Identifiers.TransactionRepositoryFactory)
+				.bind<() => TransactionRepository>(Identifiers.TransactionRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeTransactionRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
-				.bind(Identifiers.TransactionTypeRepositoryFactory)
+				.bind<() => TransactionTypeRepository>(Identifiers.TransactionTypeRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeTransactionTypeRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
-				.bind(Identifiers.ValidatorRoundRepositoryFactory)
+				.bind<() => ValidatorRoundRepository>(Identifiers.ValidatorRoundRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeValidatorRoundRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
-				.bind(Identifiers.WalletRepositoryFactory)
+				.bind<() => WalletRepository>(Identifiers.WalletRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeWalletRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
-				.bind(Identifiers.LegacyColdWalletRepositoryFactory)
+				.bind<() => LegacyColdWalletRepository>(Identifiers.LegacyColdWalletRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeLegacyColdWalletRepository(customDataSource ?? dataSource),

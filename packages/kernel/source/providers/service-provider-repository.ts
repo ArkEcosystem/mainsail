@@ -89,7 +89,7 @@ export class ServiceProviderRepository {
 		this.app
 			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(serviceProvider.config())
-			.whenTargetTagged("plugin", name.split("/")[1]);
+			.whenTagged("plugin", name.split("/")[1]);
 
 		await serviceProvider.register();
 		await this.eventDispatcher.dispatch(Events.KernelEvent.ServiceProviderRegistered, { name });

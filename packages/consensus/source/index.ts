@@ -1,4 +1,3 @@
-import { interfaces } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { Lock } from "@mainsail/utils";
@@ -23,10 +22,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Lock());
 
 		this.app
-			.bind(Identifiers.Consensus.CommitState.Factory)
+			.bind<(commit: Contracts.Crypto.Commit) => CommitState>(Identifiers.Consensus.CommitState.Factory)
 			.toFactory(
-				(context: interfaces.Context) => (commit: Contracts.Crypto.Commit) =>
-					context.container.resolve(CommitState).configure(commit),
+				(context: Contracts.Kernel.Container.ResolutionContext) => (commit: Contracts.Crypto.Commit) =>
+					context.get(CommitState, { autobind: true }).configure(commit),
 			);
 
 		this.app.bind(Identifiers.Consensus.Bootstrapper).to(Bootstrapper).inSingletonScope();

@@ -1,3 +1,3 @@
-import { Container, interfaces } from "@mainsail/container";
+import { Container } from "@mainsail/container";
 
-export const container: interfaces.Container = new Container();
+export const container = new Container();

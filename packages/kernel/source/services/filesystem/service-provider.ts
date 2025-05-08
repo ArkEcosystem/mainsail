@@ -1,5 +1,4 @@
-import { interfaces } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers/index.js";
 import { FilesystemManager } from "./manager.js";
@@ -15,8 +14,8 @@ export class ServiceProvider extends BaseServiceProvider {
 
 		this.app
 			.bind(Identifiers.Services.Filesystem.Service)
-			.toDynamicValue((context: interfaces.Context) =>
-				context.container.get<FilesystemManager>(Identifiers.Services.Filesystem.Manager).driver(),
+			.toDynamicValue((context: Contracts.Kernel.Container.ResolutionContext) =>
+				context.get<FilesystemManager>(Identifiers.Services.Filesystem.Manager).driver(),
 			);
 	}
 }

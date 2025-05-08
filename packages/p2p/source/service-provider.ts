@@ -97,33 +97,31 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerFactories(): void {
-		this.app.bind(Identifiers.P2P.Peer.Factory).toFactory<Peer, [string]>(() => (ip: string) => {
+		this.app.bind<(ip: string) => Peer>(Identifiers.P2P.Peer.Factory).toFactory(() => (ip: string) => {
 			const sanitizedIp = sanitizeRemoteAddress(ip);
 			assert.string(sanitizedIp);
 
 			return this.app.resolve(Peer).init(sanitizedIp, Number(this.config().getRequired<number>("server.port")));
 		});
 
-		this.app.bind(Identifiers.P2P.ApiNode.Factory).toFactory<ApiNode, [string]>(() => (url: string) => {
+		this.app.bind<(url: string) => ApiNode>(Identifiers.P2P.ApiNode.Factory).toFactory(() => (url: string) => {
 			const normalizedUrl = normalizeUrl(url);
 			return this.app.resolve(ApiNode).init(normalizedUrl);
 		});
 
-		this.app.bind(Identifiers.P2P.TxPoolNode.Factory).toFactory<TxPoolNode, [string]>(() => (ip: string) => {
+		this.app.bind<(ip: string) => TxPoolNode>(Identifiers.P2P.TxPoolNode.Factory).toFactory(() => (ip: string) => {
 			const sanitizedIp = sanitizeRemoteAddress(ip);
 			assert.string(sanitizedIp);
 
 			return this.app.resolve(TxPoolNode).init(sanitizedIp, this.config().getRequired<number>("txPoolPort"));
 		});
 
-		this.app
-			.bind(Identifiers.P2P.Header.Factory)
-			.toFactory<Contracts.P2P.Header>(() => () => this.app.resolve(Header));
+		this.app.bind<() => Header>(Identifiers.P2P.Header.Factory).toFactory(() => () => this.app.resolve(Header));
 	}
 
 	#registerServices(): void {
 		this.app
-			.bind(Identifiers.P2P.Throttle.Factory)
+			.bind<() => Promise<Throttle>>(Identifiers.P2P.Throttle.Factory)
 			.toFactory(() => async () => await this.app.resolve(Throttle).initialize());
 
 		this.app.bind(Identifiers.P2P.Logger).to(Logger).inSingletonScope();

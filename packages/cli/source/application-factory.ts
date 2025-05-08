@@ -1,4 +1,4 @@
-import { Container, interfaces } from "@mainsail/container";
+import { Container } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
@@ -81,12 +81,15 @@ export class ApplicationFactory {
 
 		app.bind(Identifiers.ComponentFactory).to(ComponentFactory).inSingletonScope();
 
-		app.bind(Identifiers.ProcessFactory).toFactory((context: interfaces.Context) => (type: string): Process => {
-			const process: Process = context.container.resolve(Process);
-			process.initialize(type);
+		app.bind<(type: string) => Process>(Identifiers.ProcessFactory).toFactory(
+			(context: Contracts.Kernel.Container.ResolutionContext) =>
+				(type: string): Process => {
+					const process: Process = container.get(Process, { autobind: true });
+					process.initialize(type);
 
-			return process;
-		});
+					return process;
+				},
+		);
 
 		// Services
 		app.bind(Identifiers.Output).to(Output).inSingletonScope();
