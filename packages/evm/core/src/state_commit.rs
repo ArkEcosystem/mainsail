@@ -138,7 +138,7 @@ fn collect_dirty_accounts(
                         match log.address {
                             _ if log.address == info.validator_contract => {
                                 // Attempt to decode the log as a Voted event
-                                if let Ok(event) = crate::events::Voted::decode_log(&log, true) {
+                                if let Ok(event) = crate::events::Voted::decode_log(&log) {
                                     // println!(
                                     //     "Voted event (from={:?} to={:?})",
                                     //     event.data.voter, event.data.validator,
@@ -154,7 +154,7 @@ fn collect_dirty_accounts(
                                 }
 
                                 // Attempt to decode the log as a Unvoted event
-                                if let Ok(event) = crate::events::Unvoted::decode_log(&log, true) {
+                                if let Ok(event) = crate::events::Unvoted::decode_log(&log) {
                                     // println!(
                                     //     "Unvoted event (from={:?} removed vote={:?})",
                                     //     event.data.voter, event.data.validator,
@@ -172,7 +172,7 @@ fn collect_dirty_accounts(
                             _ if log.address == info.username_contract => {
                                 // Attempt to decode log as a UsernameRegistered event
                                 if let Ok(event) =
-                                    crate::events::UsernameRegistered::decode_log(&log, true)
+                                    crate::events::UsernameRegistered::decode_log(&log)
                                 {
                                     dirty_accounts.get_mut(&event.addr).and_then(|account| {
                                         account.username = Some(event.username.clone());
@@ -183,8 +183,7 @@ fn collect_dirty_accounts(
                                 }
 
                                 // Attempt to decode log as a UsernameResigned event
-                                if let Ok(event) =
-                                    crate::events::UsernameResigned::decode_log(&log, true)
+                                if let Ok(event) = crate::events::UsernameResigned::decode_log(&log)
                                 {
                                     dirty_accounts.get_mut(&event.addr).and_then(|account| {
                                         account.username = None; // cancel out any previous registration if one happened in same commit
