@@ -14,19 +14,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
-		const consensusKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(
-			Identifiers.Cryptography.Identity.KeyPair.Factory,
-			"type",
-			"consensus",
-		);
-
 		const validators: Contracts.Validator.Validator[] = [];
 		const validatorConfig = this.app.config<{ secrets: string[]; keystore?: string }>("validators");
 		assert.defined(validatorConfig);
 		const { secrets, keystore } = validatorConfig;
 
 		for (const secret of secrets.values()) {
-			const consensusKeyPair = await consensusKeyPairFactory.fromMnemonic(secret);
+			const consensusKeyPair = await this.#getConsensusKeyPairFromSecret(secret);
 
 			validators.push(
 				this.app
@@ -62,5 +56,32 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return Joi.object({
 			txCollatorFactor: Joi.number().min(0).max(1).required(),
 		}).unknown(true);
+	}
+
+	#getConsensusKeyPairFromSecret(secret: string): Promise<Contracts.Crypto.KeyPair> {
+		const consensusKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(
+			Identifiers.Cryptography.Identity.KeyPair.Factory,
+			"type",
+			"consensus",
+		);
+
+		if (this.#isMnemonic(secret)) {
+			return consensusKeyPairFactory.fromMnemonic(secret);
+		}
+
+		if (this.#isHexPrivateKey(secret)) {
+			return consensusKeyPairFactory.fromPrivateKey(Buffer.from(secret, "hex"));
+		}
+
+		throw new Error("invalid validator secret, neither mnemonic nor private key ");
+	}
+
+	#isMnemonic(secret: string): boolean {
+		const words = secret.split(/\s+/);
+		return words.length >= 12 && words.length <= 24;
+	}
+
+	#isHexPrivateKey(secret: string): boolean {
+		return /^[0-9a-fA-F]{64}$/.test(secret);
 	}
 }
