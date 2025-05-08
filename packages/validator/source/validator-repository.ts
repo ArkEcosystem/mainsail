@@ -11,7 +11,7 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 
 	#validators!: Map<string, Contracts.Validator.Validator>;
 
-	configure(validators: Contracts.Validator.Validator[]): ValidatorRepository {
+	public configure(validators: Contracts.Validator.Validator[]): ValidatorRepository {
 		this.#validators = new Map(validators.map((validator) => [validator.getConsensusPublicKey(), validator]));
 
 		return this;
