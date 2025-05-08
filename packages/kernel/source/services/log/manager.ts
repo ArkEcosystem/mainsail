@@ -1,8 +1,11 @@
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
 import { InstanceManager } from "../../support/instance-manager.js";
 import { MemoryLogger } from "./drivers/memory.js";
 
+@injectable()
+@injectFromBase()
 export class LogManager extends InstanceManager<Contracts.Kernel.Logger> {
 	protected async createMemoryDriver(): Promise<Contracts.Kernel.Logger> {
 		return this.app.resolve(MemoryLogger).make({});

@@ -1,9 +1,12 @@
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { PinoLogger } from "./driver.js";
 
+@injectable()
+@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		const logManager: Services.Log.LogManager = this.app.get<Services.Log.LogManager>(

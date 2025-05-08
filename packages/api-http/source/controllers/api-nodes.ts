@@ -4,13 +4,14 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Search,
 } from "@mainsail/api-database";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
 import { ApiNodeResource } from "../resources/index.js";
 import { Controller } from "./controller.js";
 
 @injectable()
+@injectFromBase()
 export class ApiNodesController extends Controller {
 	@inject(ApiDatabaseIdentifiers.ApiNodeRepositoryFactory)
 	private readonly apiNodeRepositoryFactory!: ApiDatabaseContracts.ApiNodeRepositoryFactory;

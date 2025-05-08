@@ -1,8 +1,11 @@
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services } from "@mainsail/kernel";
 
 import { ApiNodeProcessor } from "../api-node-processor.js";
 
+@injectable()
+@injectFromBase()
 export class RevalidateApiNodeAction extends Services.Triggers.Action {
 	#app: Contracts.Kernel.Application;
 

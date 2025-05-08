@@ -1,6 +1,6 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { get, orderBy } from "@mainsail/utils";
 import semver from "semver";
@@ -9,6 +9,7 @@ import { BannedPeerResource, PeerResource } from "../resources/index.js";
 import { Controller } from "./controller.js";
 
 @injectable()
+@injectFromBase()
 export class PeersController extends Controller {
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;

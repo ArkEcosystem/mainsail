@@ -1,9 +1,10 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { Controller } from "./controller.js";
 
 @injectable()
+@injectFromBase()
 export class BlockchainController extends Controller {
 	@inject(Identifiers.BlockchainUtils.SupplyCalculator)
 	private readonly supplyCalculator!: Contracts.BlockchainUtils.SupplyCalculator;

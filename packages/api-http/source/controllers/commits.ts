@@ -1,12 +1,13 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 import { BigNumber, validatorSetUnpack } from "@mainsail/utils";
 
 import { Controller } from "./controller.js";
 
 @injectable()
+@injectFromBase()
 export class CommitsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;

@@ -1,5 +1,5 @@
 import Hapi from "@hapi/hapi";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Handlers } from "@mainsail/transactions";
 import { assert } from "@mainsail/utils";
@@ -7,6 +7,7 @@ import { assert } from "@mainsail/utils";
 import { Controller } from "./controller.js";
 
 @injectable()
+@injectFromBase()
 export class TransactionsController extends Controller {
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly nullHandlerRegistry!: Handlers.Registry;

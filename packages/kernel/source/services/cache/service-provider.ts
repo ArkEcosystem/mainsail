@@ -1,8 +1,11 @@
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers/index.js";
 import { CacheManager } from "./manager.js";
 
+@injectable()
+@injectFromBase()
 export class ServiceProvider extends BaseServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind<CacheManager>(Identifiers.Services.Cache.Manager).to(CacheManager).inSingletonScope();

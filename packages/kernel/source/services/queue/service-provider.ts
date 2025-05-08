@@ -1,8 +1,11 @@
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers/index.js";
 import { QueueManager } from "./manager.js";
 
+@injectable()
+@injectFromBase()
 export class ServiceProvider extends BaseServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind<QueueManager>(Identifiers.Services.Queue.Manager).to(QueueManager).inSingletonScope();

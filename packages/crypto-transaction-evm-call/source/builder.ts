@@ -1,9 +1,10 @@
-import { injectable, postConstruct } from "@mainsail/container";
+import { injectable, injectFromBase, postConstruct } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
+@injectFromBase()
 export class EvmCallBuilder extends TransactionBuilder<EvmCallBuilder> {
 	@postConstruct()
 	public postConstruct() {

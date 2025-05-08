@@ -1,3 +1,4 @@
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
@@ -37,6 +38,8 @@ import { TxPoolNodeVerifier } from "./tx-pool-node-verifier.js";
 import { normalizeUrl } from "./utils/index.js";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation/index.js";
 
+@injectable()
+@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.#registerValidation();

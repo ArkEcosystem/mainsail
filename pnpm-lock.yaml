@@ -1720,6 +1720,9 @@ importers:
 
   packages/crypto-validation:
     dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts

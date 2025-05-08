@@ -1,3 +1,4 @@
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import {
 	KeyPairFactory,
@@ -11,6 +12,8 @@ import { Providers } from "@mainsail/kernel";
 import { schemas } from "./schemas.js";
 export * from "./schemas.js";
 
+@injectable()
+@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app

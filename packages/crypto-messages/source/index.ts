@@ -1,3 +1,4 @@
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
@@ -9,6 +10,8 @@ import { Serializer } from "./serializer.js";
 
 export { Proposal } from "./proposal.js";
 
+@injectable()
+@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Cryptography.Message.Serializer).to(Serializer).inSingletonScope();

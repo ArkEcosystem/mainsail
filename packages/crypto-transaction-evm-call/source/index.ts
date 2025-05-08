@@ -1,4 +1,4 @@
-import { injectable } from "@mainsail/container";
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { TransactionRegistry } from "@mainsail/crypto-transaction";
 import { Providers } from "@mainsail/kernel";
@@ -10,6 +10,7 @@ export * from "./builder.js";
 export * from "./versions/index.js";
 
 @injectable()
+@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.#registerType();

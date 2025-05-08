@@ -1,3 +1,4 @@
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
@@ -7,6 +8,8 @@ import { PublicKeyFactory } from "./public.js";
 import { schemas } from "./schemas.js";
 import { PublicKeySerializer } from "./serializer.js";
 
+@injectable()
+@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app

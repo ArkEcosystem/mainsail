@@ -6,13 +6,14 @@ import {
 	Models,
 	Search,
 } from "@mainsail/api-database";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 import { assert } from "@mainsail/utils";
 
 import { BlockResource, TransactionResource } from "../resources/index.js";
 import { Controller } from "./controller.js";
 
 @injectable()
+@injectFromBase()
 export class BlocksController extends Controller {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;

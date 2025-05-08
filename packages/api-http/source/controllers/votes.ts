@@ -5,13 +5,14 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Search,
 } from "@mainsail/api-database";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 import { FunctionSigs } from "@mainsail/evm-contracts";
 
 import { TransactionResource } from "../resources/index.js";
 import { Controller } from "./controller.js";
 
 @injectable()
+@injectFromBase()
 export class VotesController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;

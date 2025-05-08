@@ -1,10 +1,11 @@
 import Hapi from "@hapi/hapi";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { Controller } from "./controller.js";
 
 @injectable()
+@injectFromBase()
 export class ConsensusController extends Controller {
 	@inject(Identifiers.Consensus.Service)
 	private readonly consensus!: Contracts.Consensus.Service;

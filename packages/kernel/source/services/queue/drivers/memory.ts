@@ -1,4 +1,4 @@
-import { decorateInjectable, inject, injectable } from "@mainsail/container";
+import { decorateInjectable, inject, injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
@@ -6,6 +6,7 @@ import { performance } from "perf_hooks";
 decorateInjectable(EventEmitter);
 
 @injectable()
+@injectFromBase()
 export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;

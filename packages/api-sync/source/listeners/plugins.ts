@@ -3,7 +3,7 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 } from "@mainsail/api-database";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
@@ -12,6 +12,7 @@ import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstrac
 type Event = { name: string };
 
 @injectable()
+@injectFromBase()
 export class Plugins extends AbstractListener<Event, Models.Plugin> {
 	@inject(ApiDatabaseIdentifiers.PluginRepositoryFactory)
 	private readonly pluginRepositoryFactory!: ApiDatabaseContracts.PluginRepositoryFactory;

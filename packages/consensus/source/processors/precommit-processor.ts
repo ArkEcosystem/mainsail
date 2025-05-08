@@ -1,9 +1,10 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 
 @injectable()
+@injectFromBase()
 export class PrecommitProcessor extends AbstractProcessor implements Contracts.Consensus.PrecommitProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer!: Contracts.Crypto.MessageSerializer;

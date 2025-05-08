@@ -1,9 +1,12 @@
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { TransactionHandlerRegistry } from "./handlers/handler-registry.js";
 import { TransactionValidator } from "./transaction-validator.js";
 
+@injectable()
+@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Transaction.Handler.Registry).to(TransactionHandlerRegistry);

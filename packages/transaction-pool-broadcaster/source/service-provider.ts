@@ -7,6 +7,10 @@ import { Peer } from "./peer.js";
 import { PeerCommunicator } from "./peer-communicator.js";
 import { PeerRepository } from "./peer-repository.js";
 
+import { injectable, injectFromBase } from "@mainsail/container";
+
+@injectable()
+@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.TransactionPool.Peer.Repository).to(PeerRepository).inSingletonScope();

@@ -1,4 +1,4 @@
-import { injectable } from "@mainsail/container";
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
@@ -11,6 +11,7 @@ import { ValidatorSet } from "./validator-set.js";
 export { Identifiers } from "./identifiers.js";
 
 @injectable()
+@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.ValidatorSet.Service).to(ValidatorSet).inSingletonScope();

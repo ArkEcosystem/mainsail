@@ -1,10 +1,11 @@
 import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 
 import { Controller } from "./controller.js";
 
 @injectable()
+@injectFromBase()
 export class BlockchainController extends Controller {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;

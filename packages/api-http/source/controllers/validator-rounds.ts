@@ -1,13 +1,14 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 
 import { ValidatorRoundResource } from "../resources/index.js";
 import { RoundResource } from "../resources/round.js";
 import { Controller } from "./controller.js";
 
 @injectable()
+@injectFromBase()
 export class ValidatorRoundsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
 	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.ValidatorRoundRepositoryFactory;

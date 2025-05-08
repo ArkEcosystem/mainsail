@@ -1,9 +1,10 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, injectFromBase, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 
 @injectable()
+@injectFromBase()
 export class ProposalProcessor extends AbstractProcessor implements Contracts.Consensus.ProposalProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly messageSerializer!: Contracts.Crypto.MessageSerializer;

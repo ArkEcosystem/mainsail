@@ -1,5 +1,5 @@
 import { ResponseToolkit } from "@hapi/hapi";
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, injectFromBase, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
@@ -7,6 +7,7 @@ import { getPeerIp } from "../../utils/index.js";
 import { BasePlugin } from "./base-plugin.js";
 
 @injectable()
+@injectFromBase()
 export class ValidateIpPlugin extends BasePlugin {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;

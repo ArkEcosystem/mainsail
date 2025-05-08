@@ -1,9 +1,10 @@
 import Hapi from "@hapi/hapi";
-import { injectable } from "@mainsail/container";
+import { injectable, injectFromBase } from "@mainsail/container";
 
 import { Controller } from "./controller.js";
 
 @injectable()
+@injectFromBase()
 export class ValidatorsController extends Controller {
 	public index(request: Hapi.Request) {
 		// const wallets = this.getWalletRepository().allValidators();

@@ -1,10 +1,11 @@
 import Hapi from "@hapi/hapi";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, injectFromBase } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { Controller } from "./controller.js";
 
 @injectable()
+@injectFromBase()
 export class NodeController extends Controller {
 	@inject(Identifiers.P2P.Service)
 	private readonly p2pService!: Contracts.P2P.Service;

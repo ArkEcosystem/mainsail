@@ -1,8 +1,11 @@
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { Signature } from "./signature.js";
 
+@injectable()
+@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app

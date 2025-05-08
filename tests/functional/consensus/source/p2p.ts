@@ -1,5 +1,8 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
+const isApp = (node: Contracts.Kernel.Application | undefined): node is Contracts.Kernel.Application =>
+	node !== undefined;
+
 export type Message = Contracts.Crypto.Proposal | Contracts.Crypto.Prevote | Contracts.Crypto.Precommit;
 
 export class Messages<T extends Message> {
@@ -162,6 +165,3 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 		return this.#p2p.getOtherNodes(this.#id);
 	}
 }
-
-const isApp = (node: Contracts.Kernel.Application | undefined): node is Contracts.Kernel.Application =>
-	node !== undefined;

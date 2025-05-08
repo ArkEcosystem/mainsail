@@ -1,3 +1,4 @@
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 import { DataSource } from "typeorm";
@@ -54,6 +55,8 @@ import {
 } from "./repositories/index.js";
 import { SnakeNamingStrategy } from "./utils/snake-naming-strategy.js";
 
+@injectable()
+@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		if (!this.#isEnabled()) {

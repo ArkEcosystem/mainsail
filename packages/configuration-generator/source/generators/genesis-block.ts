@@ -1,4 +1,4 @@
-import { inject, injectable, optional, tagged } from "@mainsail/container";
+import { inject, injectable, injectFromBase, optional, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
@@ -11,6 +11,7 @@ import { Wallet } from "../contracts.js";
 import { Generator } from "./generator.js";
 
 @injectable()
+@injectFromBase()
 export class GenesisBlockGenerator extends Generator {
 	@inject(Identifiers.Cryptography.Commit.Serializer)
 	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
