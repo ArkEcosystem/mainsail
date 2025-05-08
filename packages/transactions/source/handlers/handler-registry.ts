@@ -1,24 +1,13 @@
-import { inject, injectable, multiInject, postConstruct } from "@mainsail/container";
+import { injectable, multiInject } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
-import { TransactionHandlerProvider } from "./handler-provider.js";
 import { TransactionHandler } from "./transaction.js";
 
 @injectable()
 export class TransactionHandlerRegistry implements Contracts.Transactions.TransactionHandlerRegistry {
-	@inject(Identifiers.Transaction.Handler.Provider)
-	private readonly provider!: TransactionHandlerProvider;
-
 	@multiInject(Identifiers.Transaction.Handler.Instances)
 	private readonly handlers!: TransactionHandler[];
-
-	@postConstruct()
-	public initialize(): void {
-		if (this.provider.isRegistrationRequired()) {
-			this.provider.registerHandlers();
-		}
-	}
 
 	public getRegisteredHandlers(): TransactionHandler[] {
 		return this.handlers;

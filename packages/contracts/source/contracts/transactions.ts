@@ -35,8 +35,6 @@ export interface TransactionHandler {
 }
 
 export interface TransactionHandlerRegistry {
-	initialize(): void;
-
 	getRegisteredHandlers(): TransactionHandler[];
 
 	getRegisteredHandlerByType(type: number, version?: number): TransactionHandler;
