@@ -204,7 +204,7 @@ pub struct CommitData {
     pub transactions: Vec<Bytes>,
 }
 
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct PendingCommit {
     pub key: CommitKey,
     pub cache: CacheState,

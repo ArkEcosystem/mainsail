@@ -211,6 +211,14 @@ export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.E
 		return this.#evm.isEmpty();
 	}
 
+	public async snapshot(commitKey: Contracts.Evm.CommitKey): Promise<void> {
+		await this.#evm.snapshot(commitKey);
+	}
+
+	public async rollback(commitKey: Contracts.Evm.CommitKey): Promise<void> {
+		await this.#evm.rollback(commitKey);
+	}
+
 	async #prepareCommitData(unit: Contracts.Processor.ProcessableUnit): Promise<JsCommitData | undefined> {
 		if (!("getCommit" in unit)) {
 			return undefined;

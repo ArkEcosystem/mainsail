@@ -12,7 +12,7 @@ use crate::{
     state_changes::{self, AccountMergeInfo, AccountUpdate},
 };
 
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct StateCommit {
     pub key: CommitKey,
     pub change_set: state_changes::StateChangeset,

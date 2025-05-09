@@ -49,6 +49,8 @@ pub struct EvmInner {
     //pending_commit: Option<PendingCommit>,
     pending_commits: HashMap<CommitKey, PendingCommit>,
 
+    snapshot: Option<PendingCommit>,
+
     logger: JsLogger,
 }
 
@@ -72,6 +74,7 @@ impl EvmInner {
         EvmInner {
             persistent_db,
             pending_commits: Default::default(),
+            snapshot: None,
             logger,
         }
     }
@@ -903,6 +906,46 @@ impl EvmInner {
         }
     }
 
+    pub fn snapshot(&mut self, commit_key: CommitKey) -> std::result::Result<(), EVMError<String>> {
+        self.logger.inner().log(
+            LogLevel::Debug,
+            format!("taking snapshot of commit {:?}", commit_key),
+        );
+
+        let _ = std::mem::replace(
+            &mut self.snapshot,
+            self.pending_commits.get(&commit_key).cloned(),
+        );
+
+        Ok(())
+    }
+
+    pub fn rollback(&mut self, commit_key: CommitKey) -> std::result::Result<(), EVMError<String>> {
+        self.logger.inner().log(
+            LogLevel::Debug,
+            format!("rolling back to commit {:?}", commit_key),
+        );
+
+        match self.snapshot.take() {
+            Some(commit) if commit.key == commit_key => {
+                assert!(self.pending_commits.contains_key(&commit_key));
+                self.pending_commits.insert(commit_key, commit);
+
+                Ok(())
+            }
+            Some(commit) => Err(EVMError::Custom(
+                format!(
+                    "rollback commit key mismatch ({:?}, {:?})",
+                    commit.key, commit_key
+                )
+                .into(),
+            )),
+            None => Err(EVMError::Custom(
+                format!("rollback to non-existent commit ({:?})", commit_key).into(),
+            )),
+        }
+    }
+
     pub fn dispose(&mut self) -> std::result::Result<(), EVMError<String>> {
         // replace to drop any reference to logging hook
         self.logger = JsLogger::new(None)
@@ -1036,6 +1079,7 @@ impl EvmInner {
         }
 
         self.pending_commits.clear();
+        self.snapshot.take();
 
         pending_commit
     }
@@ -1502,6 +1546,24 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<void>")]
+    pub fn snapshot(&mut self, node_env: Env, commit_key: JsCommitKey) -> Result<JsObject> {
+        let commit_key = CommitKey::try_from(commit_key)?;
+        node_env.execute_tokio_future(
+            Self::snapshot_async(self.evm.clone(), commit_key),
+            |_, _| Ok(()),
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<void>")]
+    pub fn rollback(&mut self, node_env: Env, commit_key: JsCommitKey) -> Result<JsObject> {
+        let commit_key = CommitKey::try_from(commit_key)?;
+        node_env.execute_tokio_future(
+            Self::rollback_async(self.evm.clone(), commit_key),
+            |_, _| Ok(()),
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<void>")]
     pub fn dispose(&mut self, node_env: Env) -> Result<JsObject> {
         node_env.execute_tokio_future(Self::dispose_async(self.evm.clone()), |_, _| Ok(()))
     }
@@ -1867,6 +1929,32 @@ impl JsEvmWrapper {
     ) -> Result<Option<String>> {
         let mut lock = evm.lock().await;
         let result = lock.get_transaction_key_by_hash(tx_hash);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn snapshot_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        commit_key: CommitKey,
+    ) -> Result<()> {
+        let mut lock = evm.lock().await;
+        let result = lock.snapshot(commit_key);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn rollback_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        commit_key: CommitKey,
+    ) -> Result<()> {
+        let mut lock = evm.lock().await;
+        let result = lock.rollback(commit_key);
 
         match result {
             Ok(result) => Result::Ok(result),

@@ -42,5 +42,7 @@ export interface Instance extends CommitHandler {
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
 	codeAt(address: string, height?: bigint): Promise<string>;
 	storageAt(address: string, slot: bigint): Promise<string>;
+	snapshot(commitKey: CommitKey): Promise<void>;
+	rollback(commitKey: CommitKey): Promise<void>;
 	dispose(): Promise<void>;
 }
