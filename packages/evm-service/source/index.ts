@@ -8,21 +8,17 @@ import { MainEvm, RpcEvm, TransactionPoolEvm, ValidatorEvm } from "./instances/i
 @injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.Evm.Instance).to(MainEvm).inSingletonScope().whenAnyAncestorTagged("instance", "evm");
+		this.app.bind(Identifiers.Evm.Instance).to(MainEvm).inSingletonScope().whenTagged("instance", "evm");
 
-		this.app
-			.bind(Identifiers.Evm.Instance)
-			.to(ValidatorEvm)
-			.inRequestScope()
-			.whenAnyAncestorTagged("instance", "validator");
+		this.app.bind(Identifiers.Evm.Instance).to(ValidatorEvm).inRequestScope().whenTagged("instance", "validator");
 
 		this.app
 			.bind(Identifiers.Evm.Instance)
 			.to(TransactionPoolEvm)
 			.inSingletonScope()
-			.whenAnyAncestorTagged("instance", "transaction-pool");
+			.whenTagged("instance", "transaction-pool");
 
-		this.app.bind(Identifiers.Evm.Instance).to(RpcEvm).inSingletonScope().whenAnyAncestorTagged("instance", "rpc");
+		this.app.bind(Identifiers.Evm.Instance).to(RpcEvm).inSingletonScope().whenTagged("instance", "rpc");
 	}
 
 	public async boot(): Promise<void> {}
