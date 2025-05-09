@@ -144,10 +144,11 @@ export class Validator implements Contracts.Validator.Validator {
 		const transactionBytes = await this.txPoolWorker.getTransactionBytes();
 
 		const validator = this.createTransactionValidator();
+		const evm = validator.getEvm();
 
 		try {
-			await validator.getEvm().initializeGenesis(this.genesisInfo);
-			await validator.getEvm().prepareNextCommit({ commitKey });
+			await evm.initializeGenesis(this.genesisInfo);
+			await evm.prepareNextCommit({ commitKey });
 
 			const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 			const failedSenders: Set<string> = new Set();
@@ -174,10 +175,25 @@ export class Validator implements Contracts.Validator.Validator {
 				}
 
 				try {
-					const gas = transaction.data.gas;
-
-					if (gasLeft - gas < 0) {
+					if (gasLeft < 21000) {
 						break;
+					}
+
+					let optimisticExecution = false;
+
+					const gas = transaction.data.gas;
+					if (gasLeft - gas < 0) {
+						// Optimistically execute transaction even if the gas limit exceeds the remaining
+						// block space since there's possibly still space to fit the actual gas consumed.
+
+						// If the consumed gas exceeds the remaining block space, we ignore the transaction and
+						// calculate the root from the previous state (rollback).
+						optimisticExecution = true;
+						this.logger.info(
+							`attempting optimistic execution of tx ${transaction.hash} (tx.gas=${gas} gasLeft=${gasLeft})`,
+						);
+
+						await evm.snapshot(commitKey);
 					}
 
 					const result = await validator.validate(
@@ -186,6 +202,19 @@ export class Validator implements Contracts.Validator.Validator {
 					);
 
 					gasLeft -= Number(result.gasUsed);
+
+					// Ignore transaction if it uses more than what's left.
+					if (gasLeft < 0) {
+						this.logger.warning(
+							`skipping tx ${transaction.hash} due to insufficient block space (tx.gasUsed=${Number(result.gasUsed)} gasLeft=${gasLeft} optimistic=${optimisticExecution})`,
+						);
+
+						if (optimisticExecution) {
+							await evm.rollback(commitKey);
+						}
+
+						break;
+					}
 
 					transaction.data.gasUsed = Number(result.gasUsed);
 					candidateTransactions.push(transaction);
@@ -200,7 +229,7 @@ export class Validator implements Contracts.Validator.Validator {
 				}
 			}
 
-			await validator.getEvm().updateRewardsAndVotes({
+			await evm.updateRewardsAndVotes({
 				blockReward: BigNumber.make(milestone.reward).toBigInt(),
 				commitKey,
 				specId: milestone.evmSpec,
@@ -211,7 +240,7 @@ export class Validator implements Contracts.Validator.Validator {
 			if (this.roundCalculator.isNewRound(previousBlock.header.number + 2)) {
 				const { activeValidators } = this.cryptoConfiguration.getMilestone(previousBlock.header.number + 2);
 
-				await validator.getEvm().calculateActiveValidators({
+				await evm.calculateActiveValidators({
 					activeValidators: BigNumber.make(activeValidators).toBigInt(),
 					commitKey,
 					specId: milestone.evmSpec,
@@ -220,8 +249,8 @@ export class Validator implements Contracts.Validator.Validator {
 				});
 			}
 
-			const logsBloom = await validator.getEvm().logsBloom(commitKey);
-			const stateRoot = await validator.getEvm().stateHash(commitKey, previousBlock.header.stateRoot);
+			const logsBloom = await evm.logsBloom(commitKey);
+			const stateRoot = await evm.stateHash(commitKey, previousBlock.header.stateRoot);
 
 			return {
 				logsBloom,
@@ -229,7 +258,7 @@ export class Validator implements Contracts.Validator.Validator {
 				transactions: candidateTransactions,
 			};
 		} finally {
-			await validator.getEvm().dispose();
+			await evm.dispose();
 		}
 	}
 
