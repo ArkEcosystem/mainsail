@@ -1,24 +1,35 @@
-import { BindingConstraints } from "inversify";
+import { BindingConstraints, MetadataTag } from "inversify";
 
-export const anyAncestorOrTargetTaggedFirst =
-	(key: string | number | symbol, value: any) =>
-	(request: BindingConstraints) =>
-	(name: string) =>
-	(bindingconstraints: BindingConstraints): boolean =>
-		bindingconstraints.name === name;
+// https://github.com/inversify/monorepo/blob/main/packages/container/libraries/container/src/binding/calculations/isBindingConstraintsWithTag.ts#L9-L10
+function isBindingConstraintsWithTag(tag: MetadataTag, value: unknown): (constraints: BindingConstraints) => boolean {
+	return (constraints: BindingConstraints): boolean =>
+		constraints.tags.has(tag) && constraints.tags.get(tag) === value;
+}
 
-// {
-// for (;;) {
-// 	const targetTags = request.target.getCustomTags();
-// 	if (targetTags) {
-// 		const targetTag = targetTags.find((t) => t.key === key);
-// 		if (targetTag) {
-// 			return targetTag.value === value;
-// 		}
-// 	}
-// 	if (!request.parentRequest) {
-// 		return false;
-// 	}
-// 	request = request.parentRequest;
-// }
-// };
+// https://github.com/inversify/monorepo/blob/main/packages/container/libraries/container/src/binding/calculations/isAnyAncestorBindingConstraints.ts
+function isAnyAncestorBindingConstraints(
+	condition: (constraints: BindingConstraints) => boolean,
+): (constraints: BindingConstraints) => boolean {
+	return (constraints: BindingConstraints): boolean => {
+		for (
+			let ancestorMetadata: BindingConstraints | undefined = constraints.getAncestor();
+			ancestorMetadata !== undefined;
+			ancestorMetadata = ancestorMetadata.getAncestor()
+		) {
+			if (condition(ancestorMetadata)) {
+				return true;
+			}
+		}
+
+		return false;
+	};
+}
+
+export function anyAncestorOrTargetTagged(
+	tag: MetadataTag,
+	value: unknown,
+): (constraints: BindingConstraints) => boolean {
+	return (constraints: BindingConstraints): boolean =>
+		isBindingConstraintsWithTag(tag, value)(constraints) ||
+		isAnyAncestorBindingConstraints(isBindingConstraintsWithTag(tag, value))(constraints);
+}

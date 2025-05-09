@@ -1,4 +1,4 @@
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable, injectFromBase, Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
@@ -18,28 +18,31 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind(Identifiers.Cryptography.Identity.PublicKey.Size)
 			.toConstantValue(33)
-			.whenAnyAncestorTagged("type", "wallet");
+			.when(Selectors.anyAncestorOrTargetTagged("type", "wallet"));
 
 		this.app
 			.bind(Identifiers.Cryptography.Identity.KeyPair.Factory)
 			.to(KeyPairFactory)
 			.inSingletonScope()
-			.whenAnyAncestorTagged("type", "wallet");
+			.when(Selectors.anyAncestorOrTargetTagged("type", "wallet"));
+
 		this.app
 			.bind(Identifiers.Cryptography.Identity.PrivateKey.Factory)
 			.to(PrivateKeyFactory)
 			.inSingletonScope()
-			.whenAnyAncestorTagged("type", "wallet");
+			.when(Selectors.anyAncestorOrTargetTagged("type", "wallet"));
+
 		this.app
 			.bind(Identifiers.Cryptography.Identity.PublicKey.Factory)
 			.to(PublicKeyFactory)
 			.inSingletonScope()
-			.whenAnyAncestorTagged("type", "wallet");
+			.when(Selectors.anyAncestorOrTargetTagged("type", "wallet"));
+
 		this.app
 			.bind(Identifiers.Cryptography.Identity.PublicKey.Serializer)
 			.to(PublicKeySerializer)
 			.inSingletonScope()
-			.whenAnyAncestorTagged("type", "wallet");
+			.when(Selectors.anyAncestorOrTargetTagged("type", "wallet"));
 
 		this.#registerSchemas();
 	}

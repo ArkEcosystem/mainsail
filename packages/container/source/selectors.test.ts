@@ -1,7 +1,7 @@
 import { Container, inject, injectable, tagged } from "inversify";
 
 import { describe } from "../../test-framework/source";
-import { anyAncestorOrTargetTaggedFirst } from "./selectors";
+import { anyAncestorOrTargetTagged } from "./selectors";
 
 interface WalletRepository {}
 
@@ -57,28 +57,28 @@ describe<{
 		context.container
 			.bind("WalletRepository")
 			.to(BlockchainWalletRepository)
-			.when(anyAncestorOrTargetTaggedFirst("state", "blockchain"));
+			.when(anyAncestorOrTargetTagged("state", "blockchain"));
 		context.container
 			.bind("WalletRepository")
 			.to(PoolWalletRepository)
-			.when(anyAncestorOrTargetTaggedFirst("state", "pool"));
+			.when(anyAncestorOrTargetTagged("state", "pool"));
 		context.container.bind("TransactionHandler").to(TransactionHandler);
 	});
 
 	it("should match tag on target", (context) => {
-		const poolWalletRepository = context.container.resolve(PoolWalletRepository);
+		const poolWalletRepository = context.container.get(PoolWalletRepository, { autobind: true });
 
 		assert.instance(poolWalletRepository.blockchainWalletRepository, BlockchainWalletRepository);
 	});
 
 	it("should match tag on ancestor", (context) => {
-		const blockchainState = context.container.resolve(BlockchainState);
+		const blockchainState = context.container.get(BlockchainState, { autobind: true });
 
 		assert.instance(blockchainState.blockchainTransactionHandler.walletRepository, BlockchainWalletRepository);
 	});
 
 	it("should match first tag", (context) => {
-		const poolState = context.container.resolve(PoolState);
+		const poolState = context.container.get(PoolState, { autobind: true });
 		const poolWalletRepository = poolState.poolTransactionHandler.walletRepository as PoolWalletRepository;
 
 		assert.instance(poolWalletRepository, PoolWalletRepository);
@@ -86,14 +86,14 @@ describe<{
 	});
 
 	it("should not match when attempting to load without tag", (context) => {
-		assert.rejects(() => context.container.resolve(TransactionHandler));
+		assert.rejects(() => context.container.get(TransactionHandler, { autobind: true }));
 	});
 
 	it("should not match when attempting to load with unknown key tag", (context) => {
-		assert.rejects(() => context.container.resolve(TransactionHandlerUnknownKey));
+		assert.rejects(() => context.container.get(TransactionHandlerUnknownKey, { autobind: true }));
 	});
 
 	it("should not match when attempting to load with unknown value tag", (context) => {
-		assert.rejects(() => context.container.resolve(TransactionHandlerUnknownValue));
+		assert.rejects(() => context.container.get(TransactionHandlerUnknownValue, { autobind: true }));
 	});
 });
