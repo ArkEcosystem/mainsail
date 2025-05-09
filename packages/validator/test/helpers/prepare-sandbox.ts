@@ -77,6 +77,8 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 			prepareNextCommit: async () => {},
 			stateHash: async () => "0000000000000000000000000000000000000000000000000000000000000000",
 			updateRewardsAndVotes: async () => {},
+			snapshot: async () => {},
+			rollback: async () => {},
 		}),
 		validate: async () => true,
 	};

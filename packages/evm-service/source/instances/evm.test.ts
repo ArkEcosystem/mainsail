@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 import { Evm } from "@mainsail/evm";
-import { BigNumberish, ethers, randomBytes } from "ethers";
+import { BigNumberish, ethers, randomBytes, ZeroAddress } from "ethers";
 
 import { describe, Sandbox } from "../../../test-framework/distribution";
 import * as MainsailERC20 from "../../test/fixtures/MainsailERC20.json";
@@ -931,6 +931,118 @@ describe<{
 			error: "preverify failed: call gas cost (137330) exceeds the gas limit (21000)",
 		});
 	});
+
+	it("should rollback contract deployment ", async ({ instance }) => {
+		const [sender] = wallets;
+
+		let commitKey = { blockNumber: BigInt(1), round: BigInt(0) };
+
+		await instance.prepareNextCommit({ commitKey });
+
+		await instance.snapshot(commitKey);
+
+		let { receipt } = await instance.process({
+			from: sender.address,
+			value: 0n,
+			nonce: 0n,
+			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
+			txHash: getRandomTxHash(),
+			blockContext: { ...blockContext, commitKey },
+			...deployConfig,
+		});
+
+		assert.equal(receipt.status, 1);
+		assert.equal(receipt.gasUsed, 964_156n);
+		assert.equal(receipt.contractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
+
+		await instance.rollback(commitKey);
+
+		await instance.onCommit({
+			blockNumber: BigInt(0),
+			round: BigInt(0),
+			getBlock: () => ({
+				header: { number: BigInt(1), round: BigInt(0) },
+			}),
+			setAccountUpdates: () => {},
+		} as any);
+
+		const contractAddress = receipt.contractAddress;
+		assert.defined(contractAddress);
+
+		// Contract not deployed due to rollback
+		assert.equal(await instance.codeAt(contractAddress!), "0x");
+	});
+
+	it("should snapshot and rollback pending commit ", async ({ instance }) => {
+		const [sender, recipient] = wallets;
+
+		let commitKey = { blockNumber: BigInt(1), round: BigInt(0) };
+
+		await instance.initializeGenesis({
+			account: sender.address,
+			initialSupply: 1000000n,
+			initialBlockNumber: 0n,
+			deployerAccount: ethers.ZeroAddress,
+			usernameContract: ethers.ZeroAddress,
+			validatorContract: ethers.ZeroAddress,
+		});
+
+		const senderAccountBefore = await instance.getAccountInfo(sender.address);
+		const recipientAccountBefore = await instance.getAccountInfo(recipient.address);
+		const zeroAccountBefore = await instance.getAccountInfo(ZeroAddress);
+
+		await instance.prepareNextCommit({ commitKey });
+
+		// TX 1: Send funds to `recipient`
+		// - snapshot -
+		// TX 2: Move funds from `recipient` to third wallet
+		// - rollback to TX 1 -
+
+		await instance.process({
+			from: sender.address,
+			to: recipient.address,
+			value: 100n,
+			nonce: 0n,
+			data: Buffer.alloc(0),
+			txHash: getRandomTxHash(),
+			blockContext: { ...blockContext, commitKey },
+			...deployConfig,
+		});
+		await instance.snapshot(commitKey);
+
+		await instance.process({
+			from: recipient.address,
+			to: ZeroAddress,
+			value: 50n,
+			nonce: 0n,
+			data: Buffer.alloc(0),
+			txHash: getRandomTxHash(),
+			blockContext: { ...blockContext, commitKey },
+			...deployConfig,
+		});
+
+		await instance.rollback(commitKey);
+
+		await instance.onCommit({
+			blockNumber: BigInt(0),
+			round: BigInt(0),
+			getBlock: () => ({
+				header: { number: BigInt(1), round: BigInt(0) },
+			}),
+			setAccountUpdates: () => {},
+		} as any);
+
+		//
+		const senderAccountAfter = await instance.getAccountInfo(sender.address);
+		const recipientAccountAfter = await instance.getAccountInfo(recipient.address);
+		const zeroAccountAfter = await instance.getAccountInfo(ZeroAddress);
+
+		//console.log(senderAccountAfter, recipientAccountAfter, zeroAccountAfter);
+
+		assert.equal(senderAccountAfter.balance, senderAccountBefore.balance - 100n);
+		assert.equal(recipientAccountAfter.balance, recipientAccountBefore.balance + 100n);
+		assert.equal(zeroAccountBefore.balance, zeroAccountAfter.balance);
+	});
 });
 
 const getRandomTxHash = () => Buffer.from(randomBytes(32)).toString("hex");
@@ -949,6 +1061,10 @@ const getBalance = async (
 		to: contractAddress!,
 		specId: Contracts.Evm.SpecId.SHANGHAI,
 	});
+
+	if (output?.byteLength === 0) {
+		return 0n;
+	}
 
 	const [balance] = iface.decodeFunctionResult("balanceOf", output!);
 	return balance;
