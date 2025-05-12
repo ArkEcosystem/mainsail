@@ -1,3 +1,4 @@
+import { injectable, injectFromBase } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
@@ -6,8 +7,6 @@ import { Broadcaster } from "./broadcaster.js";
 import { Peer } from "./peer.js";
 import { PeerCommunicator } from "./peer-communicator.js";
 import { PeerRepository } from "./peer-repository.js";
-
-import { injectable, injectFromBase } from "@mainsail/container";
 
 @injectable()
 @injectFromBase()
