@@ -4,7 +4,7 @@ import { Evm, JsCommitData, LogLevel } from "@mainsail/evm";
 import { assert, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
-export abstract class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storage {
+export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storage {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
