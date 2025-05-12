@@ -32,7 +32,7 @@ describe<{
 		assert.is(container.get("key"), "value");
 		assert.true(container.isBound("key"));
 
-		container.rebind("key").toConstantValue("value-new");
+		container.rebindSync("key").toConstantValue("value-new");
 
 		assert.is(container.get("key"), "value-new");
 	});

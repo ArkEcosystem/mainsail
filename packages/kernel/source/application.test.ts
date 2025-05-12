@@ -1,4 +1,4 @@
-import { Container, injectable, interfaces } from "@mainsail/container";
+import { Container, injectable } from "@mainsail/container";
 import { Exceptions, Identifiers } from "@mainsail/contracts";
 import { setMaxListeners } from "events";
 import { join } from "path";
@@ -27,9 +27,9 @@ class StubServiceProvider extends ServiceProvider {
 
 describe<{
 	app: Application;
-	container: interfaces.Container;
+	container: Container;
 	logger: Record<string, Function>;
-}>("Application", ({ afterEach, assert, beforeEach, it, spy }) => {
+}>("Application", ({ afterEach, assert, beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		delete process.env.MAINSAIL_PATH_CONFIG;
 
@@ -149,7 +149,9 @@ describe<{
 	});
 
 	it("should fail to set a path if it does not exist", (context) => {
-		context.app.bind("path.data").toConstantValue();
+		context.app.bind("path.data").toConstantValue("");
+
+		stub(context.app.get(Identifiers.Services.Filesystem.Service), "existsSync").returnValue(false);
 
 		assert.throws(() => context.app.dataPath(), new Exceptions.DirectoryCannotBeFound());
 
@@ -360,7 +362,7 @@ describe<{
 		assert.false(context.app.isBoundTagged("key", "a", "b"));
 		assert.false(context.app.isBoundTagged("key", "a", "c"));
 
-		context.app.bind("key").toConstantValue("value").whenTargetTagged("a", "b");
+		context.app.bind("key").toConstantValue("value").whenTagged("a", "b");
 
 		assert.true(context.app.isBoundTagged("key", "a", "b"));
 		assert.false(context.app.isBoundTagged("key", "a", "c"));
@@ -378,8 +380,8 @@ describe<{
 	});
 
 	it("should get tagged value from the IoC container", async (context) => {
-		context.app.bind("animal").toConstantValue("bear").whenTargetTagged("order", "carnivora");
-		context.app.bind("animal").toConstantValue("dolphin").whenTargetTagged("order", "cetacea");
+		context.app.bind("animal").toConstantValue("bear").whenTagged("order", "carnivora");
+		context.app.bind("animal").toConstantValue("dolphin").whenTagged("order", "cetacea");
 
 		assert.throws(() => context.app.get("animal"));
 		assert.is(context.app.getTagged("animal", "order", "carnivora"), "bear");
