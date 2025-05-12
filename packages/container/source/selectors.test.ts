@@ -3,50 +3,38 @@ import { Container, inject, injectable, tagged } from "inversify";
 import { describe } from "../../test-framework/source";
 import { anyAncestorOrTargetTagged } from "./selectors";
 
-interface WalletRepository {}
+const Identifiers = {
+	IdentityName: Symbol.for("IdentityName"),
+	KeyPairFactory: Symbol.for("KeyPairFactory"),
+	PublicKeyFactory: Symbol.for("PublicKeyFactory"),
+};
 
-@injectable()
-class BlockchainWalletRepository implements WalletRepository {}
+interface IKeyPair {
+	getPublicKey(): string;
+}
 
-@injectable()
-class PoolWalletRepository implements WalletRepository {
-	@inject("WalletRepository")
-	@tagged("state", "blockchain")
-	public readonly blockchainWalletRepository!: WalletRepository;
+interface IPublicKey {
+	getPublicKey(): string;
 }
 
 @injectable()
-class TransactionHandler {
-	@inject("WalletRepository")
-	public readonly walletRepository!: WalletRepository;
+class KeyPair implements IKeyPair {
+	@inject(Identifiers.IdentityName)
+	private identityName!: string;
+
+	getPublicKey(): string {
+		return this.identityName + " Public Key";
+	}
 }
 
 @injectable()
-class TransactionHandlerUnknownKey {
-	@inject("WalletRepository")
-	@tagged("undefined", "blockchain")
-	public readonly walletRepository!: WalletRepository;
-}
+class PublicKey implements IPublicKey {
+	@inject(Identifiers.KeyPairFactory)
+	keyPairFactory!: IKeyPair;
 
-@injectable()
-class TransactionHandlerUnknownValue {
-	@inject("WalletRepository")
-	@tagged("state", "undefined")
-	public readonly walletRepository!: WalletRepository;
-}
-
-@injectable()
-class BlockchainState {
-	@inject("TransactionHandler")
-	@tagged("state", "blockchain")
-	public readonly blockchainTransactionHandler!: TransactionHandler;
-}
-
-@injectable()
-class PoolState {
-	@inject("TransactionHandler")
-	@tagged("state", "pool")
-	public readonly poolTransactionHandler!: TransactionHandler;
+	getPublicKey(): string {
+		return "Public: " + this.keyPairFactory.getPublicKey();
+	}
 }
 
 describe<{
@@ -54,46 +42,124 @@ describe<{
 }>("anyAncestorOrTargetTaggedFirst", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.container = new Container();
-		context.container
-			.bind("WalletRepository")
-			.to(BlockchainWalletRepository)
-			.when(anyAncestorOrTargetTagged("state", "blockchain"));
-		context.container
-			.bind("WalletRepository")
-			.to(PoolWalletRepository)
-			.when(anyAncestorOrTargetTagged("state", "pool"));
-		context.container.bind("TransactionHandler").to(TransactionHandler);
+		const container = context.container;
+		container
+			.bind<string>(Identifiers.IdentityName)
+			.toConstantValue("ECDSA")
+			.when(anyAncestorOrTargetTagged("key", "ecdsa"));
+		container
+			.bind<IKeyPair>(Identifiers.KeyPairFactory)
+			.to(KeyPair)
+			.inSingletonScope()
+			.when(anyAncestorOrTargetTagged("key", "ecdsa"));
+
+		container
+			.bind<IPublicKey>(Identifiers.PublicKeyFactory)
+			.to(PublicKey)
+			.inSingletonScope()
+			.when(anyAncestorOrTargetTagged("key", "ecdsa"));
+
+		container
+			.bind<string>(Identifiers.IdentityName)
+			.toConstantValue("BLS")
+			.when(anyAncestorOrTargetTagged("key", "bls"));
+		container
+			.bind<IKeyPair>(Identifiers.KeyPairFactory)
+			.to(KeyPair)
+			.inSingletonScope()
+			.when(anyAncestorOrTargetTagged("key", "bls"));
+
+		container
+			.bind<IPublicKey>(Identifiers.PublicKeyFactory)
+			.to(PublicKey)
+			.inSingletonScope()
+			.when(anyAncestorOrTargetTagged("key", "bls"));
+	});
+
+	it("should be bound", ({ container }) => {
+		assert.true(container.isBound(Identifiers.IdentityName, { tag: { key: "key", value: "ecdsa" } }));
+		assert.true(container.isBound(Identifiers.KeyPairFactory, { tag: { key: "key", value: "ecdsa" } }));
+		assert.true(container.isBound(Identifiers.PublicKeyFactory, { tag: { key: "key", value: "ecdsa" } }));
+
+		assert.true(container.isBound(Identifiers.IdentityName, { tag: { key: "key", value: "bls" } }));
+		assert.true(container.isBound(Identifiers.KeyPairFactory, { tag: { key: "key", value: "bls" } }));
+		assert.true(container.isBound(Identifiers.PublicKeyFactory, { tag: { key: "key", value: "bls" } }));
+	});
+
+	it("should not be bound", ({ container }) => {
+		assert.false(container.isBound(Identifiers.IdentityName));
+		assert.false(container.isBound(Identifiers.KeyPairFactory));
+		assert.false(container.isBound(Identifiers.PublicKeyFactory));
+
+		assert.false(container.isBound(Identifiers.IdentityName, { tag: { key: "key", value: "test" } }));
+		assert.false(container.isBound(Identifiers.KeyPairFactory, { tag: { key: "key", value: "test" } }));
+		assert.false(container.isBound(Identifiers.PublicKeyFactory, { tag: { key: "key", value: "test" } }));
+
+		assert.false(container.isBound(Identifiers.IdentityName, { tag: { key: "test", value: "bls" } }));
+		assert.false(container.isBound(Identifiers.KeyPairFactory, { tag: { key: "test", value: "bls" } }));
+		assert.false(container.isBound(Identifiers.PublicKeyFactory, { tag: { key: "test", value: "bls" } }));
 	});
 
 	it("should match tag on target", (context) => {
-		const poolWalletRepository = context.container.get(PoolWalletRepository, { autobind: true });
+		const identityNameEcdsa = context.container.get<string>(Identifiers.IdentityName, {
+			tag: { key: "key", value: "ecdsa" },
+		});
+		assert.equal(identityNameEcdsa, "ECDSA");
+		const identityNameBls = context.container.get<string>(Identifiers.IdentityName, {
+			tag: { key: "key", value: "bls" },
+		});
+		assert.equal(identityNameBls, "BLS");
+	});
 
-		assert.instance(poolWalletRepository.blockchainWalletRepository, BlockchainWalletRepository);
+	it("should match tag on parent", (context) => {
+		const keyPairEcdsa = context.container.get<IKeyPair>(Identifiers.KeyPairFactory, {
+			tag: { key: "key", value: "ecdsa" },
+		});
+		assert.equal(keyPairEcdsa.getPublicKey(), "ECDSA Public Key");
+		assert.instance(keyPairEcdsa, KeyPair);
+
+		const keyPairBls = context.container.get<IKeyPair>(Identifiers.KeyPairFactory, {
+			tag: { key: "key", value: "bls" },
+		});
+		assert.equal(keyPairBls.getPublicKey(), "BLS Public Key");
+		assert.instance(keyPairBls, KeyPair);
+	});
+
+	it("should not match when attempting to load parent with invalid tag values", (context) => {
+		assert.throws(() => context.container.get<string>(Identifiers.KeyPairFactory));
+
+		assert.throws(() =>
+			context.container.get<string>(Identifiers.KeyPairFactory, { tag: { key: "key", value: "test" } }),
+		);
+
+		assert.throws(() =>
+			context.container.get<string>(Identifiers.KeyPairFactory, { tag: { key: "test", value: "bls" } }),
+		);
 	});
 
 	it("should match tag on ancestor", (context) => {
-		const blockchainState = context.container.get(BlockchainState, { autobind: true });
+		const publicKeyEcdsa = context.container.get<IPublicKey>(Identifiers.PublicKeyFactory, {
+			tag: { key: "key", value: "ecdsa" },
+		});
+		assert.equal(publicKeyEcdsa.getPublicKey(), "Public: ECDSA Public Key");
+		assert.instance(publicKeyEcdsa, PublicKey);
 
-		assert.instance(blockchainState.blockchainTransactionHandler.walletRepository, BlockchainWalletRepository);
+		const publicKeyBls = context.container.get<IPublicKey>(Identifiers.PublicKeyFactory, {
+			tag: { key: "key", value: "bls" },
+		});
+		assert.equal(publicKeyBls.getPublicKey(), "Public: BLS Public Key");
+		assert.instance(publicKeyBls, PublicKey);
 	});
 
-	it("should match first tag", (context) => {
-		const poolState = context.container.get(PoolState, { autobind: true });
-		const poolWalletRepository = poolState.poolTransactionHandler.walletRepository as PoolWalletRepository;
+	it("should not match when attempting to load ancestors with invalid tag values", (context) => {
+		assert.throws(() => context.container.get<string>(Identifiers.PublicKeyFactory));
 
-		assert.instance(poolWalletRepository, PoolWalletRepository);
-		assert.instance(poolWalletRepository.blockchainWalletRepository, BlockchainWalletRepository);
-	});
+		assert.throws(() =>
+			context.container.get<string>(Identifiers.PublicKeyFactory, { tag: { key: "key", value: "test" } }),
+		);
 
-	it("should not match when attempting to load without tag", (context) => {
-		assert.rejects(() => context.container.get(TransactionHandler, { autobind: true }));
-	});
-
-	it("should not match when attempting to load with unknown key tag", (context) => {
-		assert.rejects(() => context.container.get(TransactionHandlerUnknownKey, { autobind: true }));
-	});
-
-	it("should not match when attempting to load with unknown value tag", (context) => {
-		assert.rejects(() => context.container.get(TransactionHandlerUnknownValue, { autobind: true }));
+		assert.throws(() =>
+			context.container.get<string>(Identifiers.PublicKeyFactory, { tag: { key: "test", value: "bls" } }),
+		);
 	});
 });
