@@ -68,7 +68,7 @@ describeSkip<{
 			id: "transaction2-id",
 		} as Contracts.Crypto.Transaction;
 
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		await memory.addTransaction(transaction1);
 		await memory.addTransaction(transaction2);
 		const size = memory.getSize();
@@ -89,7 +89,7 @@ describeSkip<{
 			id: "transaction-id",
 		} as Contracts.Crypto.Transaction;
 
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		await memory.addTransaction(transaction);
 		const has = memory.hasSenderMempool(transaction.data.senderPublicKey);
 
@@ -109,7 +109,7 @@ describeSkip<{
 			id: "transaction-id",
 		} as Contracts.Crypto.Transaction;
 
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		await memory.addTransaction(transaction);
 		const has = memory.hasSenderMempool(await context.createPublicKey("not sender"));
 
@@ -129,7 +129,7 @@ describeSkip<{
 			id: "transaction-id",
 		} as Contracts.Crypto.Transaction;
 
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		await memory.addTransaction(transaction);
 
 		assert.equal(memory.getSenderMempool(transaction.data.senderPublicKey), senderMempool);
@@ -150,7 +150,7 @@ describeSkip<{
 
 		const key = await context.createPublicKey("not sender");
 
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		await memory.addTransaction(transaction);
 		const callback = () => memory.getSenderMempool(key);
 
@@ -180,7 +180,7 @@ describeSkip<{
 			id: "transaction2-id",
 		} as Contracts.Crypto.Transaction;
 
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		await memory.addTransaction(transaction1);
 		await memory.addTransaction(transaction2);
 		const senderMempools = memory.getSenderMempools();
@@ -205,7 +205,7 @@ describeSkip<{
 
 		const loggerSpy = spy(context.logger, "debug");
 
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		await memory.addTransaction(transaction);
 
 		addTransactionSpy.calledWith(transaction);
@@ -231,7 +231,7 @@ describeSkip<{
 
 		const loggerSpy = spy(context.logger, "debug");
 
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		const promise = memory.addTransaction(transaction);
 
 		await assert.rejects(() => promise, "Something went horribly wrong");
@@ -248,7 +248,7 @@ describeSkip<{
 			id: "transaction-id",
 		} as Contracts.Crypto.Transaction;
 
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		const removedTransactions = await memory.removeTransaction(transaction.data.senderPublicKey, transaction.id);
 
 		assert.equal(removedTransactions, []);
@@ -272,7 +272,7 @@ describeSkip<{
 
 		const loggerSpy = spy(context.logger, "debug");
 
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		await memory.addTransaction(transaction);
 		const removedTransactions = await memory.removeTransaction(transaction.data.senderPublicKey, transaction.id);
 
@@ -301,7 +301,7 @@ describeSkip<{
 
 		const loggerSpy = spy(context.logger, "debug");
 
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		await memory.addTransaction(transaction);
 		const promise = memory.removeTransaction(transaction.data.senderPublicKey, transaction.id);
 
@@ -314,7 +314,7 @@ describeSkip<{
 	});
 
 	it("removeForgedTransaction - should return empty array when accepting transaction of sender that wasn't previously added", async (context) => {
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		const removedTransactions = await memory.removeForgedTransaction(
 			await context.createPublicKey("sender1"),
 			"none",
@@ -341,7 +341,7 @@ describeSkip<{
 
 		const loggerSpy = spy(context.logger, "debug");
 
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		await memory.addTransaction(transaction);
 		const removedTransactions = await memory.removeForgedTransaction(
 			transaction.data.senderPublicKey,
@@ -373,7 +373,7 @@ describeSkip<{
 
 		const loggerSpy = spy(context.logger, "debug");
 
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		await memory.addTransaction(transaction);
 		const promise = memory.removeForgedTransaction(transaction.data.senderPublicKey, transaction.id);
 
@@ -398,7 +398,7 @@ describeSkip<{
 			id: "transaction-id",
 		} as Contracts.Crypto.Transaction;
 
-		const memory = context.container.resolve(Mempool);
+		const memory = context.container.get(Mempool, { autobind: true });
 		await memory.addTransaction(transaction);
 		memory.flush();
 		const has = memory.hasSenderMempool(transaction.data.senderPublicKey);

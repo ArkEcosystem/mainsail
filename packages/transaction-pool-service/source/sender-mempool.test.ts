@@ -76,7 +76,7 @@ describeSkip<{
 	});
 
 	it("isDisposable - should return true initially", (context) => {
-		const senderMempool = context.container.resolve(SenderMempool);
+		const senderMempool = context.container.get(SenderMempool, { autobind: true });
 		const empty = senderMempool.isDisposable();
 
 		assert.true(empty);
@@ -85,7 +85,7 @@ describeSkip<{
 	it("isDisposable - should return false after transaction was added", async (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(10); // maxTransactionsPerSender
 
-		const senderMempool = context.container.resolve(SenderMempool);
+		const senderMempool = context.container.get(SenderMempool, { autobind: true });
 		await senderMempool.addTransaction(context.transactions[0]);
 		const empty = senderMempool.isDisposable();
 
@@ -95,7 +95,7 @@ describeSkip<{
 	it("getSize - should return added transactions count", async (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(10); // maxTransactionsPerSender
 
-		const senderMempool = context.container.resolve(SenderMempool);
+		const senderMempool = context.container.get(SenderMempool, { autobind: true });
 		await senderMempool.addTransaction(context.transactions[0]);
 		await senderMempool.addTransaction(context.transactions[1]);
 		await senderMempool.addTransaction(context.transactions[2]);
@@ -107,7 +107,7 @@ describeSkip<{
 	it("getFromEarliest - should return transactions in order they were added", async (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(10); // maxTransactionsPerSender
 
-		const senderMempool = context.container.resolve(SenderMempool);
+		const senderMempool = context.container.get(SenderMempool, { autobind: true });
 		await senderMempool.addTransaction(context.transactions[0]);
 		await senderMempool.addTransaction(context.transactions[1]);
 		await senderMempool.addTransaction(context.transactions[2]);
@@ -119,7 +119,7 @@ describeSkip<{
 	it("getFromLatest - should return transactions in reverse order they were added", async (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(10); // maxTransactionsPerSender
 
-		const senderMempool = context.container.resolve(SenderMempool);
+		const senderMempool = context.container.get(SenderMempool, { autobind: true });
 		await senderMempool.addTransaction(context.transactions[0]);
 		await senderMempool.addTransaction(context.transactions[1]);
 		await senderMempool.addTransaction(context.transactions[2]);
@@ -132,7 +132,7 @@ describeSkip<{
 		stub(context.configuration, "getRequired").returnValueOnce(10); // maxTransactionsPerSender
 		const applySpy = spy(context.senderState, "apply");
 
-		const senderMempool = context.container.resolve(SenderMempool);
+		const senderMempool = context.container.get(SenderMempool, { autobind: true });
 		await senderMempool.addTransaction(context.transactions[0]);
 
 		applySpy.calledWith(context.transactions[0]);
@@ -142,7 +142,7 @@ describeSkip<{
 		stub(context.configuration, "getRequired").returnValueOnce(0); // maxTransactionsPerSender
 		stub(context.configuration, "getOptional").returnValueOnce([]); // allowedSenders
 
-		const senderMempool = context.container.resolve(SenderMempool);
+		const senderMempool = context.container.get(SenderMempool, { autobind: true });
 		const promise = senderMempool.addTransaction(context.transactions[0]);
 
 		await assert.rejects(() => promise);
@@ -158,7 +158,7 @@ describeSkip<{
 		stub(context.configuration, "getOptional").returnValueOnce(["dummy-sender-key"]); // allowedSenders
 		const applySpy = spy(context.senderState, "apply");
 
-		const senderMempool = context.container.resolve(SenderMempool);
+		const senderMempool = context.container.get(SenderMempool, { autobind: true });
 		await senderMempool.addTransaction(context.transactions[0]);
 
 		applySpy.calledWith(context.transactions[0]);
@@ -168,7 +168,7 @@ describeSkip<{
 		stub(context.configuration, "getRequired").returnValueOnce(10); // maxTransactionsPerSender
 		const revertSpy = spy(context.senderState, "revert");
 
-		const senderMempool = context.container.resolve(SenderMempool);
+		const senderMempool = context.container.get(SenderMempool, { autobind: true });
 		await senderMempool.addTransaction(context.transactions[0]);
 		await senderMempool.removeTransaction(context.transactions[0].id);
 
@@ -178,7 +178,7 @@ describeSkip<{
 	it("removeTransaction - should return empty array when removing transaction that wasn't previously added", async (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(10); // maxTransactionsPerSender
 
-		const senderMempool = context.container.resolve(SenderMempool);
+		const senderMempool = context.container.get(SenderMempool, { autobind: true });
 		await senderMempool.addTransaction(context.transactions[0]);
 		const removedTransactions = await senderMempool.removeTransaction(context.transactions[1].id);
 		const remainingTransactions = senderMempool.getFromEarliest();
@@ -190,7 +190,7 @@ describeSkip<{
 	it("removeTransaction - should return all transactions that were added after one being removed", async (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(10); // maxTransactionsPerSender
 
-		const senderMempool = context.container.resolve(SenderMempool);
+		const senderMempool = context.container.get(SenderMempool, { autobind: true });
 		await senderMempool.addTransaction(context.transactions[0]);
 		await senderMempool.addTransaction(context.transactions[1]);
 		await senderMempool.addTransaction(context.transactions[2]);
@@ -206,7 +206,7 @@ describeSkip<{
 		stub(context.configuration, "getRequired").returnValueOnce(10); // maxTransactionsPerSender
 		stub(context.senderState, "revert").rejectedValue(new Error("Something wrong"));
 
-		const senderMempool = context.container.resolve(SenderMempool);
+		const senderMempool = context.container.get(SenderMempool, { autobind: true });
 		await senderMempool.addTransaction(context.transactions[0]);
 		await senderMempool.addTransaction(context.transactions[1]);
 		await senderMempool.addTransaction(context.transactions[2]);
@@ -221,7 +221,7 @@ describeSkip<{
 	it("removeForgedTransaction - should return all transactions that were added before transaction being accepted", async (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(10); // maxTransactionsPerSender
 
-		const senderMempool = context.container.resolve(SenderMempool);
+		const senderMempool = context.container.get(SenderMempool, { autobind: true });
 		await senderMempool.addTransaction(context.transactions[0]);
 		await senderMempool.addTransaction(context.transactions[1]);
 		await senderMempool.addTransaction(context.transactions[2]);
@@ -236,7 +236,7 @@ describeSkip<{
 	it("removeForgedTransaction - should return no transactions when accepting unknown transaction", async (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(10); // maxTransactionsPerSender
 
-		const senderMempool = context.container.resolve(SenderMempool);
+		const senderMempool = context.container.get(SenderMempool, { autobind: true });
 		await senderMempool.addTransaction(context.transactions[0]);
 		await senderMempool.addTransaction(context.transactions[1]);
 

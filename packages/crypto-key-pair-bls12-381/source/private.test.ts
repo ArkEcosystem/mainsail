@@ -18,7 +18,7 @@ describe<{ container: Container }>("PrivateKeyFactory", ({ assert, beforeEach, i
 
 	it("should derive from an mnemonic", async (context) => {
 		assert.is(
-			await context.container.resolve(PrivateKeyFactory).fromMnemonic(mnemonic),
+			await context.container.get(PrivateKeyFactory, { autobind: true }).fromMnemonic(mnemonic),
 			"6a0f42158b2412bc038076a9006acca5fd28f5a495479cdbe4117da0c2e18faf",
 		);
 	});
@@ -26,7 +26,7 @@ describe<{ container: Container }>("PrivateKeyFactory", ({ assert, beforeEach, i
 	it("should derive from a WIF", async (context) => {
 		assert.is(
 			await context.container
-				.resolve(PrivateKeyFactory)
+				.get(PrivateKeyFactory, { autobind: true })
 				.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn", 128),
 			"0000000000000000000000000000000000000000000000000000000000000001",
 		);

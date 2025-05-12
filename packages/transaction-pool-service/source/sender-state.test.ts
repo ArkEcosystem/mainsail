@@ -63,7 +63,7 @@ describeSkip<{
 
 		context.config = context.container.get(Identifiers.Cryptography.Configuration);
 
-		context.senderState = context.container.resolve(SenderState);
+		context.senderState = context.container.get(SenderState, { autobind: true });
 		await context.senderState.configure("sender's public key");
 
 		// @ts-ignore
@@ -118,7 +118,7 @@ describeSkip<{
 	});
 
 	it.skip("apply - should throw when transaction is from future", async (context) => {
-		const senderState = context.container.resolve(SenderState);
+		const senderState = context.container.get(SenderState, { autobind: true });
 
 		stub(context.configuration, "get").returnValue(123); // network.pubKeyHash
 		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
@@ -192,7 +192,7 @@ describeSkip<{
 	});
 
 	it.skip("apply - should throw when state is corrupted", async (context) => {
-		const senderState = context.container.resolve(SenderState);
+		const senderState = context.container.get(SenderState, { autobind: true });
 		const handler = {};
 
 		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
@@ -321,7 +321,7 @@ describeSkip<{
 	});
 
 	it.skip("revert - should call handler to revert transaction", async (context) => {
-		const senderState = context.container.resolve(SenderState);
+		const senderState = context.container.get(SenderState, { autobind: true });
 		const handler = {};
 
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValue(handler);

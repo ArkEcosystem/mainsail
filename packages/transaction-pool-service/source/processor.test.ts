@@ -108,7 +108,7 @@ describe<{
 
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
 
-		const processor = context.container.resolve(Processor);
+		const processor = context.container.get(Processor, { autobind: true });
 		const result = await processor.process([context.transaction1.data, context.transaction2.data]);
 
 		poolSpy.calledTimes(2);
@@ -136,7 +136,7 @@ describe<{
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
 		// const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
 
-		const processor = context.container.resolve(Processor);
+		const processor = context.container.get(Processor, { autobind: true });
 		const result = await processor.process([context.transaction1.data, context.transaction2.data]);
 
 		poolStub.calledTimes(2);
@@ -166,7 +166,7 @@ describe<{
 
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
 
-		const processor = context.container.resolve(Processor);
+		const processor = context.container.get(Processor, { autobind: true });
 		const result = await processor.process([context.transaction1.data, context.transaction2.data]);
 
 		poolSpy.calledTimes(2);
@@ -188,7 +188,7 @@ describe<{
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
 		const spiedBroadcaster = spy(context.broadcaster, "broadcastTransactions");
 
-		const processor = context.container.resolve(Processor);
+		const processor = context.container.get(Processor, { autobind: true });
 		const promise = processor.process([context.transaction1.data, context.transaction2.data]);
 
 		await assert.rejects(() => promise);
@@ -209,7 +209,7 @@ describe<{
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
 		const spiedBroadcaster = spy(context.broadcaster, "broadcastTransactions");
 
-		const processor = context.container.resolve(Processor);
+		const processor = context.container.get(Processor, { autobind: true });
 		const result = await processor.process([context.transaction1.data]);
 
 		poolStub.calledOnce();

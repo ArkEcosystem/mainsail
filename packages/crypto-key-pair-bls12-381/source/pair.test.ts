@@ -15,7 +15,7 @@ describe<{ container: Container }>("KeyPairFactory", ({ assert, beforeEach, it }
 	});
 
 	it("should derive a key pair from an mnemonic", async (context) => {
-		assert.equal(await context.container.resolve(KeyPairFactory).fromMnemonic(mnemonic), {
+		assert.equal(await context.container.get(KeyPairFactory, { autobind: true }).fromMnemonic(mnemonic), {
 			compressed: true,
 			privateKey: "3e99d30b3816f60077b1fdb4535ce0e9f9c715e42d1647edc3361fc531fb618f",
 			publicKey:
@@ -26,7 +26,7 @@ describe<{ container: Container }>("KeyPairFactory", ({ assert, beforeEach, it }
 	it("should derive a key pair from an mnemonic", async (context) => {
 		assert.equal(
 			await context.container
-				.resolve(KeyPairFactory)
+				.get(KeyPairFactory, { autobind: true })
 				.fromPrivateKey(Buffer.from("3e99d30b3816f60077b1fdb4535ce0e9f9c715e42d1647edc3361fc531fb618f", "hex")),
 			{
 				compressed: true,
@@ -40,7 +40,7 @@ describe<{ container: Container }>("KeyPairFactory", ({ assert, beforeEach, it }
 	it("should derive from a WIF", async (context) => {
 		assert.equal(
 			await context.container
-				.resolve(KeyPairFactory)
+				.get(KeyPairFactory, { autobind: true })
 				.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn", 128),
 			{
 				compressed: true,

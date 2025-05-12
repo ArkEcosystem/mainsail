@@ -54,6 +54,6 @@ describe<{
 	});
 
 	it("should resolve a value from the IoC container", () => {
-		assert.instance(container.resolve(StubClass), StubClass);
+		assert.instance(container.get(StubClass, { autobind: true }), StubClass);
 	});
 });

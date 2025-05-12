@@ -18,7 +18,7 @@ describe<{
 		context.cli.app
 			.rebind(Identifiers.ProcessFactory)
 			.toFactory((context: interfaces.Context) => (token: string, type: string): Process => {
-				const process: Process = context.container.resolve(Process);
+				const process: Process = context.container.get(Process, { autobind: true });
 				process.initialize(token, type);
 
 				return process;

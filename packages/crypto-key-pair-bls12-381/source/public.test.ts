@@ -18,7 +18,7 @@ describe<{ container: Container }>("PublicKeyFactory", ({ assert, beforeEach, ea
 
 	it("should derive a key pair from an mnemonic", async (context) => {
 		assert.is(
-			await context.container.resolve(PublicKeyFactory).fromMnemonic(mnemonic),
+			await context.container.get(PublicKeyFactory, { autobind: true }).fromMnemonic(mnemonic),
 			"95af988701a6fb60e09da41d2ca1a9e0b49e43501bda4255b3ca01073f490c34102b6bbcafde6333185e9980745d72cb",
 		);
 	});
@@ -26,7 +26,7 @@ describe<{ container: Container }>("PublicKeyFactory", ({ assert, beforeEach, ea
 	it("should derive from a WIF", async (context) => {
 		assert.is(
 			await context.container
-				.resolve(PublicKeyFactory)
+				.get(PublicKeyFactory, { autobind: true })
 				.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn", 128),
 			"97f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb",
 		);
@@ -34,7 +34,7 @@ describe<{ container: Container }>("PublicKeyFactory", ({ assert, beforeEach, ea
 
 	it("should throw not implemented exception when deriving from a musig", async (context) => {
 		await assert.rejects(
-			async () => context.container.resolve(PublicKeyFactory).fromMultiSignatureAsset({} as any),
+			async () => context.container.get(PublicKeyFactory, { autobind: true }).fromMultiSignatureAsset({} as any),
 			Exceptions.NotImplemented,
 		);
 	});
@@ -42,7 +42,7 @@ describe<{ container: Container }>("PublicKeyFactory", ({ assert, beforeEach, ea
 	each(
 		"should pass with valid public keys",
 		async ({ context, dataset }) => {
-			assert.true(await context.container.resolve(PublicKeyFactory).verify(dataset));
+			assert.true(await context.container.get(PublicKeyFactory, { autobind: true }).verify(dataset));
 		},
 		[
 			"95af988701a6fb60e09da41d2ca1a9e0b49e43501bda4255b3ca01073f490c34102b6bbcafde6333185e9980745d72cb",
@@ -53,7 +53,7 @@ describe<{ container: Container }>("PublicKeyFactory", ({ assert, beforeEach, ea
 	each(
 		"should fail with invalid public keys",
 		async ({ context, dataset }) => {
-			assert.false(await context.container.resolve(PublicKeyFactory).verify(dataset));
+			assert.false(await context.container.get(PublicKeyFactory, { autobind: true }).verify(dataset));
 		},
 		[
 			"0",

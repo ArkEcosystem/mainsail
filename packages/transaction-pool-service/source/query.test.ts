@@ -96,7 +96,7 @@ describe<{
 			{ getFromLatest: () => [context.sender2Transaction100, context.sender2Transaction200] },
 		]);
 
-		const query = context.container.resolve(Query);
+		const query = context.container.get(Query, { autobind: true });
 		const result = await query.getAll().all();
 
 		assert.equal(result, [
@@ -113,7 +113,7 @@ describe<{
 			getFromEarliest: () => [context.sender1Transaction100, context.sender1Transaction200],
 		});
 
-		const query = context.container.resolve(Query);
+		const query = context.container.get(Query, { autobind: true });
 		const result = await query.getAllBySender("sender public key").all();
 
 		assert.equal(result, [context.sender1Transaction100, context.sender1Transaction200]);
@@ -127,7 +127,7 @@ describe<{
 			{ getFromLatest: () => [context.sender2Transaction200, context.sender2Transaction100] },
 		]);
 
-		const query = context.container.resolve(Query);
+		const query = context.container.get(Query, { autobind: true });
 		const result = await query.getFromLowestPriority().all();
 
 		assert.equal(result, [
@@ -144,7 +144,7 @@ describe<{
 			{ getFromEarliest: () => [context.sender2Transaction100, context.sender2Transaction200] },
 		]);
 
-		const query = context.container.resolve(Query);
+		const query = context.container.get(Query, { autobind: true });
 		const result = await query.getFromHighestPriority().all();
 
 		assert.equal(result, [
