@@ -24,7 +24,7 @@ import { Serializer } from "../../source/serializer.js";
 export const prepareSandbox = async (context) => {
 	context.sandbox = new Sandbox();
 
-	context.sandbox.app.bind(Identifiers.Cryptography.Block.HeaderSize).toFunction(() => {
+	context.sandbox.app.bind(Identifiers.Cryptography.Block.HeaderSize).toConstantValue(() => {
 		const hashByteLength = context.sandbox.app.get<number>(Identifiers.Cryptography.Hash.Size.SHA256);
 		const generatorAddressByteLength = context.sandbox.app.get<number>(
 			Identifiers.Cryptography.Identity.Address.Size,

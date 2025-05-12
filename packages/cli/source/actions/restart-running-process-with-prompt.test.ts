@@ -32,12 +32,12 @@ describe<{
 	beforeEach((context) => {
 		spyOnExecute = spy(restartProcess, "execute");
 
-		const app = new Container();
-		app.bind(Identifiers.Application.Instance).toConstantValue(app);
-		app.bind(Identifiers.ProcessManager).toConstantValue(processManager);
-		app.bind(Identifiers.RestartProcess).toConstantValue(restartProcess);
-		app.bind(Identifiers.Prompt).toConstantValue(prompt);
-		context.action = app.resolve(RestartRunningProcessWithPrompt);
+		const container = new Container();
+		container.bind(Identifiers.Application.Instance).toConstantValue(container);
+		container.bind(Identifiers.ProcessManager).toConstantValue(processManager);
+		container.bind(Identifiers.RestartProcess).toConstantValue(restartProcess);
+		container.bind(Identifiers.Prompt).toConstantValue(prompt);
+		context.action = container.get(RestartRunningProcessWithPrompt, { autobind: true });
 	});
 
 	it("should not restart the process if it is not online", async ({ action }) => {

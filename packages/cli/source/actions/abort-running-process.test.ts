@@ -16,9 +16,9 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		const app = new Container();
-		app.bind(Identifiers.ProcessManager).toConstantValue(processManager);
-		context.action = app.resolve(AbortRunningProcess);
+		const container = new Container();
+		container.bind(Identifiers.ProcessManager).toConstantValue(processManager);
+		context.action = container.get(AbortRunningProcess, { autobind: true });
 	});
 
 	it("should not throw if the process is not online", ({ action }) => {

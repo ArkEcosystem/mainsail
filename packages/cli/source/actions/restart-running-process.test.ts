@@ -21,11 +21,11 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		const app = new Container();
-		app.bind(Identifiers.Application.Instance).toConstantValue(app);
-		app.bind(Identifiers.ProcessManager).toConstantValue(processManager);
-		app.bind(Identifiers.RestartProcess).toConstantValue(restartProcess);
-		context.action = app.resolve(RestartRunningProcess);
+		const container = new Container();
+		container.bind(Identifiers.Application.Instance).toConstantValue(container);
+		container.bind(Identifiers.ProcessManager).toConstantValue(processManager);
+		container.bind(Identifiers.RestartProcess).toConstantValue(restartProcess);
+		context.action = container.get(RestartRunningProcess, { autobind: true });
 	});
 
 	it("should not restart the process if it is not online", ({ action }) => {

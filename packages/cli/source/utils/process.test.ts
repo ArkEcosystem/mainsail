@@ -1,8 +1,9 @@
 import Tail from "nodejs-tail";
 import { fileSync, setGracefulCleanup } from "tmp";
 
+import { Contracts } from "@mainsail/contracts";
 import { Console, describe } from "../../../test-framework/source";
-import { Identifiers, interfaces } from "../ioc";
+import { Identifiers } from "../ioc";
 import { ProcessManager } from "../services";
 import { Process } from "./process";
 
@@ -16,13 +17,16 @@ describe<{
 		context.processManager = context.cli.app.get(Identifiers.ProcessManager);
 
 		context.cli.app
-			.rebind(Identifiers.ProcessFactory)
-			.toFactory((context: interfaces.Context) => (token: string, type: string): Process => {
-				const process: Process = context.container.get(Process, { autobind: true });
-				process.initialize(token, type);
+			.rebind<(token: string, type: string) => Process>(Identifiers.ProcessFactory)
+			.toFactory(
+				(context: Contracts.Kernel.Container.ResolutionContext) =>
+					(token: string, type: string): Process => {
+						const process: Process = context.get(Process, { autobind: true });
+						process.initialize(token, type);
 
-				return process;
-			});
+						return process;
+					},
+			);
 
 		context.process = context.cli.app.get(Identifiers.ProcessFactory)("mainsail");
 	});

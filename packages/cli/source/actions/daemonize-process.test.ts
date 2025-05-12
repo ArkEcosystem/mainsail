@@ -54,13 +54,13 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		const app = new Container();
-		app.bind(Identifiers.Application.Instance).toConstantValue(app);
-		app.bind(Identifiers.ProcessManager).toConstantValue(processManager);
-		app.bind(Identifiers.AbortUnknownProcess).toConstantValue(abortUnknownProcess);
-		app.bind(Identifiers.AbortRunningProcess).toConstantValue(abortRunningProcess);
-		app.bind(Identifiers.Spinner).toConstantValue(spinner);
-		context.action = app.resolve(DaemonizeProcessProxy);
+		const container = new Container();
+		container.bind(Identifiers.Application.Instance).toConstantValue(container);
+		container.bind(Identifiers.ProcessManager).toConstantValue(processManager);
+		container.bind(Identifiers.AbortUnknownProcess).toConstantValue(abortUnknownProcess);
+		container.bind(Identifiers.AbortRunningProcess).toConstantValue(abortRunningProcess);
+		container.bind(Identifiers.Spinner).toConstantValue(spinner);
+		context.action = container.get(DaemonizeProcessProxy, { autobind: true });
 	});
 
 	it("should throw if the process has entered an unknown state", ({ action }) => {

@@ -32,11 +32,11 @@ describe<{
 		spyOnSpinnerRender = spy(spinner, "render");
 		spyOnSpinnerStop = spy(ora, "stop");
 
-		const app = new Container();
-		app.bind(Identifiers.Application.Instance).toConstantValue(app);
-		app.bind(Identifiers.ProcessManager).toConstantValue(processManager);
-		app.bind(Identifiers.Spinner).toConstantValue(spinner);
-		context.action = app.resolve(RestartProcess);
+		const container = new Container();
+		container.bind(Identifiers.Application.Instance).toConstantValue(container);
+		container.bind(Identifiers.ProcessManager).toConstantValue(processManager);
+		container.bind(Identifiers.Spinner).toConstantValue(spinner);
+		context.action = container.get(RestartProcess, { autobind: true });
 	});
 
 	it("should restart process", ({ action }) => {

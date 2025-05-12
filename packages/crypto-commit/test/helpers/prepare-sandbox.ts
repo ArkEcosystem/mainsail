@@ -22,7 +22,7 @@ import { Serializer } from "../../source/serializer";
 export const prepareSandbox = async (context) => {
 	context.sandbox = new Sandbox();
 
-	context.sandbox.app.bind(Identifiers.Cryptography.Commit.ProofSize).toFunction(
+	context.sandbox.app.bind(Identifiers.Cryptography.Commit.ProofSize).toConstantValue(
 		() =>
 			4 + // round
 			context.sandbox.app.getTagged<number>(Identifiers.Cryptography.Signature.Size, "type", "consensus") + // signature

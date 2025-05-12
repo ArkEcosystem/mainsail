@@ -16,9 +16,9 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		const app = new Container();
-		app.bind(Identifiers.ProcessManager).toConstantValue(processManager);
-		context.action = app.resolve(AbortStoppedProcess);
+		const container = new Container();
+		container.bind(Identifiers.ProcessManager).toConstantValue(processManager);
+		context.action = container.get(AbortStoppedProcess, { autobind: true });
 	});
 
 	it("should not throw if the process is running", ({ action }) => {
