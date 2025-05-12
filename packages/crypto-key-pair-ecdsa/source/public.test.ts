@@ -9,7 +9,7 @@ import { PublicKeyFactory } from "./public";
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
-describe<{ container: Container.Container }>("PrivateKeyFactory", ({ assert, beforeEach, each, it }) => {
+describe<{ container: Container }>("PrivateKeyFactory", ({ assert, beforeEach, each, it }) => {
 	beforeEach((context) => {
 		context.container = new Container();
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();

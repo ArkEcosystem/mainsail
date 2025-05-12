@@ -8,7 +8,7 @@ import { KeyPairFactory } from "./pair";
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
-describe<{ container: Container.Container }>("KeyPairFactory", ({ assert, beforeEach, it }) => {
+describe<{ container: Container }>("KeyPairFactory", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.container = new Container();
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
