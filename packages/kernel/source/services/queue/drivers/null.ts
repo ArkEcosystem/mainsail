@@ -1,8 +1,6 @@
-import { decorateInjectable, injectable } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { EventEmitter } from "events";
-
-decorateInjectable(EventEmitter);
 
 @injectable()
 export class NullQueue extends EventEmitter implements Contracts.Kernel.Queue {
