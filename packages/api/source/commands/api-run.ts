@@ -1,5 +1,5 @@
 import { Commands, Contracts, Utils } from "@mainsail/cli";
-import { injectable, injectFromBase, postConstruct } from "@mainsail/container";
+import { injectable, postConstruct } from "@mainsail/container";
 import { assert } from "@mainsail/utils";
 import { readJSONSync } from "fs-extra/esm";
 import Joi from "joi";
@@ -7,7 +7,6 @@ import path from "path";
 import { URL } from "url";
 
 @injectable()
-@injectFromBase()
 export class Command extends Commands.Command {
 	public signature = "api:run";
 

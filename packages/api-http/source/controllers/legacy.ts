@@ -1,12 +1,11 @@
 import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 
 import { LegacyColdWalletResource } from "../resources/index.js";
 import { Controller } from "./controller.js";
 
 @injectable()
-@injectFromBase()
 export class LegacyController extends Controller {
 	@inject(ApiDatabaseIdentifiers.LegacyColdWalletRepositoryFactory)
 	private readonly legacyColdWalletRepositoryFactory!: ApiDatabaseContracts.LegacyColdWalletRepositoryFactory;

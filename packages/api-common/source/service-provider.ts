@@ -1,4 +1,4 @@
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
@@ -9,7 +9,6 @@ import { Schemas } from "./validation/index.js";
 export type ServerConstructor<T extends AbstractServer> = new (...arguments_: any[]) => T;
 
 @injectable()
-@injectFromBase()
 export abstract class AbstractServiceProvider<T extends AbstractServer> extends Providers.ServiceProvider {
 	protected abstract httpIdentifier(): symbol;
 	protected abstract httpsIdentifier(): symbol;

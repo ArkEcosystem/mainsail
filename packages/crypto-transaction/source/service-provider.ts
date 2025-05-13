@@ -1,4 +1,4 @@
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
@@ -13,7 +13,6 @@ import { makeFormats, makeKeywords, schemas } from "./validation/index.js";
 import { Verifier } from "./verifier.js";
 
 @injectable()
-@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Cryptography.Transaction.TypeFactory).to(TransactionTypeFactory).inSingletonScope();

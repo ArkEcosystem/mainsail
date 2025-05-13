@@ -1,14 +1,13 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Models, Search } from "@mainsail/api-database";
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
 import { ReceiptResource } from "../resources/index.js";
 import { Controller } from "./controller.js";
 
 @injectable()
-@injectFromBase()
 export class ReceiptsController extends Controller {
 	public async index(request: Hapi.Request) {
 		const pagination = this.getQueryPagination(request.query);

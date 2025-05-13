@@ -1,10 +1,9 @@
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 
 import { Bootstrapper } from "./bootstrapper.js";
 
 @injectable()
-@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {}
 

@@ -1,4 +1,4 @@
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Ipc, Providers } from "@mainsail/kernel";
 import Joi from "joi";
@@ -7,7 +7,6 @@ import { Worker } from "worker_threads";
 import { Worker as WorkerInstance } from "./worker.js";
 
 @injectable()
-@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	@inject(Identifiers.Config.Flags)
 	private readonly flags!: Contracts.Types.KeyValuePair;

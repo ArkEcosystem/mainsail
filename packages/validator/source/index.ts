@@ -1,5 +1,5 @@
 import { Keystore } from "@chainsafe/bls-keystore";
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
@@ -10,7 +10,6 @@ import { Validator } from "./validator.js";
 import { ValidatorRepository } from "./validator-repository.js";
 
 @injectable()
-@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Validator.Repository).toConstantValue(this.app.resolve(ValidatorRepository));

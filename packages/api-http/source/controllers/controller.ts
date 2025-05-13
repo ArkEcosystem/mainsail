@@ -5,7 +5,7 @@ import {
 	Models,
 	Search,
 } from "@mainsail/api-database";
-import { inject, injectable, injectFromBase, tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
@@ -13,7 +13,6 @@ import { assert } from "@mainsail/utils";
 import { EnrichedBlock, EnrichedTransaction } from "../resources/index.js";
 
 @injectable()
-@injectFromBase()
 export class Controller extends AbstractController {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-http")

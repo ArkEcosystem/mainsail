@@ -1,4 +1,4 @@
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { Handlers } from "@mainsail/transactions";
@@ -7,7 +7,6 @@ import { assert } from "@mainsail/utils";
 import { EvmCallTransaction } from "../versions/index.js";
 
 @injectable()
-@injectFromBase()
 export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;

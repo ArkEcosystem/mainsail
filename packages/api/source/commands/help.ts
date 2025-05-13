@@ -1,10 +1,9 @@
 import { Commands, Contracts, Identifiers } from "@mainsail/cli";
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import boxen from "boxen";
 import { blue, bold, cyan } from "kleur/colors";
 
 @injectable()
-@injectFromBase()
 export class Command extends Commands.Command {
 	public signature = "help";
 

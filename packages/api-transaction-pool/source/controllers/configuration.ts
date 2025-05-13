@@ -1,11 +1,10 @@
 import Hapi from "@hapi/hapi";
 import { AbstractController } from "@mainsail/api-common";
-import { inject, injectable, injectFromBase, tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 @injectable()
-@injectFromBase()
 export class ConfigurationController extends AbstractController {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool-service")

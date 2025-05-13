@@ -1,4 +1,4 @@
-import { inject, injectable, injectFromBase, tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
@@ -16,7 +16,6 @@ import {
 import { BasePlugin } from "./base-plugin.js";
 
 @injectable()
-@injectFromBase()
 export class CodecPlugin extends BasePlugin {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;

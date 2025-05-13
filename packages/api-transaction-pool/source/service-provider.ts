@@ -1,12 +1,11 @@
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 
 import Handlers from "./handlers.js";
 import { Server } from "./server.js";
 
 @injectable()
-@injectFromBase()
 export class ServiceProvider extends AbstractServiceProvider<Server> {
 	protected httpIdentifier(): symbol {
 		return Identifiers.TransactionPool.API.HTTP;

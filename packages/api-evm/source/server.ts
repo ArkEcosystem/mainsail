@@ -1,11 +1,10 @@
 import { badData } from "@hapi/boom";
 import { AbstractServer } from "@mainsail/api-common";
-import { inject, injectable, injectFromBase, tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 @injectable()
-@injectFromBase()
 export class Server extends AbstractServer {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-evm")

@@ -1,10 +1,9 @@
 import Hapi from "@hapi/hapi";
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 
 import { Controller } from "./controller.js";
 
 @injectable()
-@injectFromBase()
 export class WalletsController extends Controller {
 	public index(request: Hapi.Request) {
 		// const wallets = this.getWalletRepository().allByAddress();

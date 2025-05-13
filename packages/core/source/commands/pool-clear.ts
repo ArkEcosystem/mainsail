@@ -1,9 +1,8 @@
 import { Commands } from "@mainsail/cli";
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import { removeSync } from "fs-extra/esm";
 
 @injectable()
-@injectFromBase()
 export class Command extends Commands.Command {
 	public signature = "pool:clear";
 

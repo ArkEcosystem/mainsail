@@ -4,14 +4,13 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 } from "@mainsail/api-database";
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import dayjs from "dayjs";
 
 import { Controller } from "./controller.js";
 
 @injectable()
-@injectFromBase()
 export class NodeController extends Controller {
 	@inject(ApiDatabaseIdentifiers.PluginRepositoryFactory)
 	private readonly pluginRepositoryFactory!: ApiDatabaseContracts.PluginRepositoryFactory;

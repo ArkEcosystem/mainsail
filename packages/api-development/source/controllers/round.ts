@@ -1,11 +1,10 @@
 import Hapi from "@hapi/hapi";
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { Controller } from "./controller.js";
 
 @injectable()
-@injectFromBase()
 export class RoundController extends Controller {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;

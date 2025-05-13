@@ -1,9 +1,8 @@
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/crypto-transaction";
 
 @injectable()
-@injectFromBase()
 export class EvmCallTransaction extends Transaction {
 	public static type: number = 0;
 	public static key = "evmCall";

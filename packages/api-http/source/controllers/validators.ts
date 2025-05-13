@@ -6,14 +6,13 @@ import {
 	Models,
 	Search,
 } from "@mainsail/api-database";
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 
 import { BlockResource, ValidatorResource, WalletResource } from "../resources/index.js";
 import { validatorCriteriaSchemaObject, walletCriteriaSchemaObject } from "../schemas/index.js";
 import { Controller } from "./controller.js";
 
 @injectable()
-@injectFromBase()
 export class ValidatorsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;

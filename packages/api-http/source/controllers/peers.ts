@@ -5,14 +5,13 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Search,
 } from "@mainsail/api-database";
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
 import { PeerResource } from "../resources/peer.js";
 import { Controller } from "./controller.js";
 
 @injectable()
-@injectFromBase()
 export class PeersController extends Controller {
 	@inject(ApiDatabaseIdentifiers.PeerRepositoryFactory)
 	private readonly peerRepositoryFactory!: ApiDatabaseContracts.PeerRepositoryFactory;

@@ -1,4 +1,4 @@
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 
@@ -16,7 +16,6 @@ import { TransactionLengthVerifier } from "./verifiers/transaction-length-verifi
 import { VersionVerifier } from "./verifiers/version-verifier.js";
 
 @injectable()
-@injectFromBase()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Processor.BlockVerifier).to(BlockVerifier).inSingletonScope();

@@ -1,11 +1,10 @@
 import { isMajority } from "@mainsail/blockchain-utils";
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 
 @injectable()
-@injectFromBase()
 export class CommitProcessor extends AbstractProcessor implements Contracts.Consensus.CommitProcessor {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;

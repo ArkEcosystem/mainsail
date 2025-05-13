@@ -1,9 +1,8 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
 import { Commands, Contracts, Identifiers } from "@mainsail/cli";
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 
 @injectable()
-@injectFromBase()
 export class Command extends Commands.Command {
 	public signature = "env:paths";
 

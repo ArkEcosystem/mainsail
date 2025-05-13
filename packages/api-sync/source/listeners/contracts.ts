@@ -3,13 +3,12 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 } from "@mainsail/api-database";
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events } from "@mainsail/contracts";
 
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";
 
 @injectable()
-@injectFromBase()
 export class DeployerContracts extends AbstractListener<Contracts.Evm.DeployerContract, Models.Contract> {
 	@inject(ApiDatabaseIdentifiers.ContractRepositoryFactory)
 	private readonly contractRepositoryFactory!: ApiDatabaseContracts.ContractRepositoryFactory;

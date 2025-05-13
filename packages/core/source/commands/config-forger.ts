@@ -1,5 +1,5 @@
 import { Commands } from "@mainsail/cli";
-import { injectable, injectFromBase, postConstruct } from "@mainsail/container";
+import { injectable, postConstruct } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
@@ -7,7 +7,6 @@ import { Command as BIP38Command } from "./config-forger-bip38.js";
 import { Command as BIP39Command } from "./config-forger-bip39.js";
 
 @injectable()
-@injectFromBase()
 export class Command extends Commands.Command {
 	public signature = "config:forger";
 

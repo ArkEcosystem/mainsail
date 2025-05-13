@@ -1,10 +1,9 @@
 import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { prettyBytes, prettyTime } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 @injectable()
-@injectFromBase()
 export class Command extends Commands.Command {
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: Services.ProcessManager;

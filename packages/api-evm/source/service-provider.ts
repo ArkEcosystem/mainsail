@@ -1,5 +1,5 @@
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import Joi from "joi";
 
@@ -37,7 +37,6 @@ import { Server } from "./server.js";
 import { makeKeywords, schemas } from "./validation/index.js";
 
 @injectable()
-@injectFromBase()
 export class ServiceProvider extends AbstractServiceProvider<Server> {
 	public async register(): Promise<void> {
 		for (const keyword of Object.values(

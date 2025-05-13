@@ -1,13 +1,12 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
 import { Commands, Contracts, Identifiers } from "@mainsail/cli";
-import { injectable, injectFromBase, postConstruct } from "@mainsail/container";
+import { injectable, postConstruct } from "@mainsail/container";
 import { existsSync, readdirSync } from "fs";
 import { emptyDirSync } from "fs-extra/esm";
 import Joi from "joi";
 import { join } from "path";
 
 @injectable()
-@injectFromBase()
 export class Command extends Commands.Command {
 	public signature = "env:paths:clear";
 
