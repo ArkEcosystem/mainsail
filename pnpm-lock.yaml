@@ -2743,9 +2743,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
