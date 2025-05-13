@@ -1,5 +1,5 @@
 import { Commands } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
+import { injectable, injectFromBase, postConstruct } from "@mainsail/container";
 import Joi from "joi";
 
 import { describe } from "../index";
@@ -12,6 +12,7 @@ describe("Console", ({ beforeEach, it, assert, spyFn }) => {
 	let spyOnGetArgument;
 
 	@injectable()
+	@injectFromBase()
 	class Command extends Commands.Command {
 		/**
 		 * The console command signature.
@@ -35,6 +36,7 @@ describe("Console", ({ beforeEach, it, assert, spyFn }) => {
 		 * @returns {void}
 		 * @memberof Command
 		 */
+		@postConstruct()
 		public configure(): void {
 			this.definition.setFlag("flagName", "The test message.", Joi.string().default("flagValue"));
 
