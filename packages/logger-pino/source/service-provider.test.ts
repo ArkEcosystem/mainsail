@@ -55,12 +55,11 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 
 		context.app
 			.bind(Identifiers.Services.Log.Service)
-			.toDynamicValue((context: Container.interfaces.Context) =>
-				context.container.get<Services.Log.LogManager>(Identifiers.Services.Log.Manager).driver(),
+			.toDynamicValue((context: Contracts.Kernel.Container.ResolutionContext) =>
+				context.get<LogManager>(Identifiers.Services.Log.Manager).driver(),
 			);
 
 		await assert.resolves(() => context.serviceProvider.register());
-
 		await assert.resolves(() => context.serviceProvider.dispose());
 	});
 
