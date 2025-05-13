@@ -1,5 +1,5 @@
 import { Commands, Contracts, Identifiers } from "@mainsail/cli";
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable, injectFromBase, postConstruct } from "@mainsail/container";
 import Joi from "joi";
 
 @injectable()
@@ -9,6 +9,7 @@ export class Command extends Commands.Command {
 
 	public description = "Stop the Core process.";
 
+	@postConstruct()
 	public configure(): void {
 		this.definition.setFlag("daemon", "Stop the Core process or daemon.", Joi.boolean());
 	}

@@ -1,6 +1,6 @@
 import { Commands, Contracts, Identifiers as CliIdentifiers, Services } from "@mainsail/cli";
 import { ConfigurationGenerator, Identifiers, makeApplication } from "@mainsail/configuration-generator";
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable, injectFromBase, postConstruct } from "@mainsail/container";
 import { Contracts as AppContracts, Identifiers as AppIdentifiers } from "@mainsail/contracts";
 import envPaths from "env-paths";
 import Joi from "joi";
@@ -189,6 +189,7 @@ export class Command extends Commands.Command {
 	];
 	/*eslint-enable */
 
+	@postConstruct()
 	public configure(): void {
 		for (const flag of this.#flagSettings) {
 			const flagSchema: Joi.Schema = flag.schema;

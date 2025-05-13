@@ -1,5 +1,5 @@
 import { Commands } from "@mainsail/cli";
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable, injectFromBase, postConstruct } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
@@ -13,6 +13,7 @@ export class Command extends Commands.Command {
 
 	public description = "Configure the forging validator.";
 
+	@postConstruct()
 	public configure(): void {
 		this.definition
 			.setFlag("bip39", "A validator plain text passphrase. Referred to as BIP39.", Joi.string())

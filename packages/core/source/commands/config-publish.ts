@@ -1,5 +1,5 @@
 import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable, injectFromBase, postConstruct } from "@mainsail/container";
 import { existsSync } from "fs";
 import { copySync, ensureDirSync, removeSync } from "fs-extra/esm";
 import Joi from "joi";
@@ -15,6 +15,7 @@ export class Command extends Commands.Command {
 
 	public description = "Publish the configuration.";
 
+	@postConstruct()
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string())

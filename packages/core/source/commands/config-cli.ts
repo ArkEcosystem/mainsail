@@ -1,5 +1,5 @@
 import { Commands, Identifiers, Services } from "@mainsail/cli";
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable, injectFromBase, postConstruct } from "@mainsail/container";
 import { Constants } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
@@ -14,6 +14,7 @@ export class Command extends Commands.Command {
 
 	public description = "Update the CLI configuration.";
 
+	@postConstruct()
 	public configure(): void {
 		this.definition.setFlag(
 			"channel",

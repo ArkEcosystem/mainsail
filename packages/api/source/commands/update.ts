@@ -1,5 +1,5 @@
 import { Commands, Contracts, Identifiers } from "@mainsail/cli";
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable, injectFromBase, postConstruct } from "@mainsail/container";
 import Joi from "joi";
 
 @injectable()
@@ -12,6 +12,7 @@ export class Command extends Commands.Command {
 
 	public description = "Update the Core installation.";
 
+	@postConstruct()
 	public configure(): void {
 		this.definition
 			.setFlag("updateProcessManager", "Update process manager.", Joi.boolean().default(false))

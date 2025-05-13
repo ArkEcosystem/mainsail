@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/prevent-abbreviations */
 import { Commands } from "@mainsail/cli";
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable, injectFromBase, postConstruct } from "@mainsail/container";
 import { parse } from "envfile";
 import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
@@ -12,6 +12,7 @@ export class Command extends Commands.Command {
 
 	public description = "Get the value of an environment variable.";
 
+	@postConstruct()
 	public configure(): void {
 		this.definition.setFlag(
 			"key",

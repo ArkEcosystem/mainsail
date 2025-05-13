@@ -1,5 +1,5 @@
 import { Commands, Identifiers, Services } from "@mainsail/cli";
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable, injectFromBase, postConstruct } from "@mainsail/container";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
 
@@ -16,6 +16,7 @@ export class Command extends Commands.Command {
 
 	public description = "Reinstall the Core installation";
 
+	@postConstruct()
 	public configure(): void {
 		this.definition.setFlag("force", "Force a reinstall.", Joi.boolean());
 	}

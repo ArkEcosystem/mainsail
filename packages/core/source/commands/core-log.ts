@@ -1,5 +1,5 @@
 import { Commands, Contracts, Identifiers } from "@mainsail/cli";
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable, injectFromBase, postConstruct } from "@mainsail/container";
 import Joi from "joi";
 
 @injectable()
@@ -9,6 +9,7 @@ export class Command extends Commands.Command {
 
 	public description = "Display the Core process log.";
 
+	@postConstruct()
 	public configure(): void {
 		this.definition
 			.setFlag("error", "Only display the error output.", Joi.boolean())

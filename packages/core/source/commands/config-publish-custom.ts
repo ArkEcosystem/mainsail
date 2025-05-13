@@ -1,5 +1,5 @@
 import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
-import { inject, injectable, injectFromBase } from "@mainsail/container";
+import { inject, injectable, injectFromBase, postConstruct } from "@mainsail/container";
 import { http } from "@mainsail/utils";
 import { existsSync, writeFileSync } from "fs";
 import { ensureDirSync, removeSync } from "fs-extra/esm";
@@ -32,6 +32,7 @@ export class Command extends Commands.Command {
 
 	public description = "Publish the configuration from online sources.";
 
+	@postConstruct()
 	public configure(): void {
 		this.definition
 			.setFlag("app", "The link to the app.json file.", Joi.string().uri())

@@ -1,6 +1,6 @@
 import { Keystore } from "@chainsafe/bls-keystore";
 import { Commands, Contracts } from "@mainsail/cli";
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable, injectFromBase, postConstruct } from "@mainsail/container";
 import { ServiceProvider as CryptoServiceProvider } from "@mainsail/crypto-config";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-bls12-381";
 import { validateMnemonic } from "bip39";
@@ -16,6 +16,7 @@ export class Command extends Commands.Command {
 
 	public isHidden = true;
 
+	@postConstruct()
 	public configure(): void {
 		this.definition
 			.setFlag("bip39", "A validator plain text passphrase. Referred to as BIP39.", Joi.string())

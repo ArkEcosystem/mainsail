@@ -1,6 +1,6 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
 import { Commands, Contracts, Identifiers } from "@mainsail/cli";
-import { injectable, injectFromBase } from "@mainsail/container";
+import { injectable, injectFromBase, postConstruct } from "@mainsail/container";
 import { existsSync, readdirSync } from "fs";
 import { emptyDirSync } from "fs-extra/esm";
 import Joi from "joi";
@@ -13,6 +13,7 @@ export class Command extends Commands.Command {
 
 	public description = "Clear data on environment paths.";
 
+	@postConstruct()
 	public configure(): void {
 		this.definition.setFlag("state-export", "Clear state exports.", Joi.boolean());
 		this.definition.setFlag("plugins", "Clear installed plugins.", Joi.boolean());
