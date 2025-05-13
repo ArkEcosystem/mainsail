@@ -1,4 +1,4 @@
-import { injectable, postConstruct, injectFromBase } from "@mainsail/container";
+import { injectable, postConstruct } from "@mainsail/container";
 import Joi from "joi";
 
 import { Console, describe } from "../../../test-framework/source";
@@ -7,7 +7,6 @@ import { Output } from "../output";
 import { Command } from "./command";
 
 @injectable()
-@injectFromBase()
 class StubCommand extends Command {
 	@postConstruct()
 	public configure(): void {

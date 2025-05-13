@@ -1,5 +1,5 @@
 import { Commands } from "@mainsail/cli";
-import { injectable, injectFromBase, postConstruct } from "@mainsail/container";
+import { injectable, postConstruct } from "@mainsail/container";
 import Joi from "joi";
 
 import { describe } from "../index";
@@ -12,7 +12,6 @@ describe("Console", ({ beforeEach, it, assert, spyFn }) => {
 	let spyOnGetArgument;
 
 	@injectable()
-	@injectFromBase()
 	class Command extends Commands.Command {
 		/**
 		 * The console command signature.
