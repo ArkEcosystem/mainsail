@@ -114,7 +114,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const milestone = this.configuration.getMilestone(this.configuration.getGenesisHeight());
 		assert.defined(milestone.snapshot);
 
-		const snapshotPath = path.join(this.app.configPath("snapshot"), `${milestone.snapshot.snapshotHash}.json`);
+		const snapshotPath = path.join(
+			this.app.configPath("snapshot"),
+			`${milestone.snapshot.snapshotHash}.compressed`,
+		);
 		this.logger.info(`Importing genesis snapshot: ${snapshotPath}`);
 
 		await this.prepare(snapshotPath);
