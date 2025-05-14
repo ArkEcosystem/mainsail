@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
 import { writeFile } from "node:fs/promises";
+import { promisify } from "node:util";
+import { brotliCompress } from "node:zlib";
 
 import { inject, injectable } from "@mainsail/container";
 import { Application, Providers } from "@mainsail/kernel";
@@ -121,14 +123,15 @@ export class Generator {
 			wallets,
 		};
 
-		const path = `distribution/snapshot/snapshot-${snapshot.hash}.json`;
+		await this.#compressToBrotli(snapshot, `distribution/snapshot/${snapshot.hash}.compressed`);
+	}
 
-		// TODO: to reduce size we can compress it
-
-		await writeFile(path, JSON.stringify(snapshot, undefined, 2));
-
-		console.log(`Wrote ${wallets.length} wallets to '${path}'`);
+	async #compressToBrotli(snapshot: LegacySnapshot, path: string): Promise<void> {
+		const jsonString = JSON.stringify(snapshot);
+		const compressedBuffer = await promisify(brotliCompress)(jsonString);
+		await writeFile(path, compressedBuffer);
+		console.log(`Wrote ${snapshot.wallets.length} wallets to '${path}'`);
 	}
 }
 
-// Wrote 207659 wallets to 'distribution/snapshot/snapshot-19a87c96dbe8ad1be06d33e97cd17f5662eb952c29efd3d8bb00c9c75e7582bc.json'
+// Wrote 207659 wallets to 'distribution/snapshot/19a87c96dbe8ad1be06d33e97cd17f5662eb952c29efd3d8bb00c9c75e7582bc.compressed'
