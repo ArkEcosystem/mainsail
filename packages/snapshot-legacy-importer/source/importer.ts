@@ -1,4 +1,6 @@
 import { createHash } from "node:crypto";
+import { promisify } from "node:util";
+import { brotliDecompress } from "node:zlib";
 
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
@@ -9,8 +11,6 @@ import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, BigNumber } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
 import { ethers, sha256 } from "ethers";
-import { promisify } from "node:util";
-import { brotliDecompress } from "node:zlib";
 import path from "path";
 
 @injectable()
@@ -483,9 +483,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			const compressedData = await this.fileSystem.get(inputPath);
 			const decompressed = await promisify(brotliDecompress)(compressedData);
 			return JSON.parse(decompressed.toString()) as Interfaces.LegacySnapshot;
-		} catch (err) {
-			console.error("Error decompressing snapshot", err);
-			throw err;
+		} catch (error) {
+			console.error("Error decompressing snapshot", error);
+			throw error;
 		}
 	}
 }
