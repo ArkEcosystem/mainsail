@@ -15,6 +15,7 @@
 		"prepublishOnly": "napi prepublish -t pnpm",
 		"release": "pnpm publish --access public",
 		"test": "cargo test --release",
+		"test:coverage": "cargo llvm-cov --no-cfg-coverage",
 		"version": "napi version "
 	},
 	"devDependencies": {

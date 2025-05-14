@@ -53,6 +53,13 @@ jobs:
                   key: lerna-${{ runner.os }}-${{ github.run_id }}
                   path: ./.cache
 
+            - uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  components: llvm-tools-preview
+                  profile: minimal
+                  override: true
+
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -96,6 +103,16 @@ jobs:
                   key: lerna-${{ runner.os }}
                   path: ./.cache
                   restore-keys: lerna-${{ runner.os }}-
+            - uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  components: llvm-tools-preview
+                  profile: minimal
+                  override: true
+            - name: Install cargo-llvm-cov
+              run: cargo install cargo-llvm-cov
+            - name: Check rustc version
+              run: rustc --version
             - name: Install dependencies
               run: pnpm install
             - name: Build
