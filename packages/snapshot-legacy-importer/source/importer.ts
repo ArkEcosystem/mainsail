@@ -9,6 +9,8 @@ import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, BigNumber } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
 import { ethers, sha256 } from "ethers";
+import { promisify } from "node:util";
+import { brotliDecompress } from "node:zlib";
 import path from "path";
 
 @injectable()
@@ -136,7 +138,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	}
 
 	public async prepare(snapshotPath: string): Promise<void> {
-		const snapshot = this.fileSystem.readJSONSync<Interfaces.LegacySnapshot>(snapshotPath);
+		const snapshot = await this.#readSnapshot(snapshotPath);
 
 		const hash = createHash("sha256");
 
@@ -464,4 +466,23 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	}
 
 	#generateTxHash = () => sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
+
+	async #readSnapshot(snapshotPath: string): Promise<Interfaces.LegacySnapshot> {
+		if (snapshotPath.endsWith(".compressed")) {
+			return this.#decompressBrotli(snapshotPath);
+		}
+
+		return this.fileSystem.readJSONSync<Interfaces.LegacySnapshot>(snapshotPath);
+	}
+
+	async #decompressBrotli(inputPath: string): Promise<Interfaces.LegacySnapshot> {
+		try {
+			const compressedData = await this.fileSystem.get(inputPath);
+			const decompressed = await promisify(brotliDecompress)(compressedData);
+			return JSON.parse(decompressed.toString()) as Interfaces.LegacySnapshot;
+		} catch (err) {
+			console.error("Error decompressing snapshot", err);
+			throw err;
+		}
+	}
 }
