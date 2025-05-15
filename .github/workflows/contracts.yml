@@ -39,4 +39,4 @@ jobs:
 
             - name: Run coverage
               run: |
-                  sh ./coverage.sh
+                  bash ./coverage.sh
