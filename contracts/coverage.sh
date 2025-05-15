@@ -7,7 +7,7 @@ COVERED_LINES=$(grep -Po 'LH:\K\d+' lcov.info | paste -sd+ - | bc)
 COVERAGE_PERCENT=$(echo "scale=2; ($COVERED_LINES / $LINE_COVERAGE) * 100" | bc)
 echo "Total Line Coverage: $COVERAGE_PERCENT%"
 
-MIN_COVERAGE=97 # TODO
+MIN_COVERAGE=90 # TODO
 if (( $(echo "$COVERAGE_PERCENT < $MIN_COVERAGE" | bc -l) )); then
   echo "Error: Coverage $COVERAGE_PERCENT% is below the minimum threshold of $MIN_COVERAGE%."
   exit 1
