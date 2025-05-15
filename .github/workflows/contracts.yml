@@ -18,6 +18,9 @@ jobs:
     check:
         name: contracts
         runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: contracts
         steps:
             - uses: actions/checkout@v4
 
@@ -27,11 +30,13 @@ jobs:
                   version: nightly
 
             - name: Build
-              working-directory: contracts
               run: |
                   forge build
 
             - name: Run tests
-              working-directory: contracts
               run: |
                   forge test -vvv
+
+            - name: Run coverage
+              run: |
+                  sh ./coverage.sh
