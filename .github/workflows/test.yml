@@ -254,9 +254,9 @@ jobs:
             - name: Upload coverage reports to Codecov
               uses: codecov/codecov-action@v5
               with:
-                files: ./merged-lcov.info
-                token: ${{ secrets.CODECOV_TOKEN }}
-                slug: ArkEcosystem/mainsail
+                  files: ./merged-lcov.info
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  slug: ArkEcosystem/mainsail
 
     integration:
         needs:
