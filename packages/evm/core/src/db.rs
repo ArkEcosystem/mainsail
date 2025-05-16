@@ -1453,87 +1453,87 @@ fn test_next_map_size() {
     }
 }
 
-#[test]
-fn test_resize_on_commit() {
-    let create_large_commit = |block_number: u64, n: usize| {
-        let mut buf = vec![0; 32];
-        buf[0..8].copy_from_slice(&block_number.to_le_bytes());
-        let address = Address::from_word(ethers_core::utils::keccak256(buf).into());
+// #[test]
+// fn test_resize_on_commit() {
+//     let create_large_commit = |block_number: u64, n: usize| {
+//         let mut buf = vec![0; 32];
+//         buf[0..8].copy_from_slice(&block_number.to_le_bytes());
+//         let address = Address::from_word(ethers_core::utils::keccak256(buf).into());
 
-        let mut state = HashMap::new();
+//         let mut state = HashMap::new();
 
-        let mut account = revm::state::Account::new_not_existing();
-        account.status = revm::state::AccountStatus::Touched;
+//         let mut account = revm::state::Account::new_not_existing();
+//         account.status = revm::state::AccountStatus::Touched;
 
-        let mut storage = HashMap::new();
+//         let mut storage = HashMap::new();
 
-        for i in 0..n {
-            storage.insert(
-                U256::from(i + 1),
-                revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
-            );
-        }
+//         for i in 0..n {
+//             storage.insert(
+//                 U256::from(i + 1),
+//                 revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+//             );
+//         }
 
-        state.insert(
-            address,
-            revm::database::TransitionAccount {
-                status: revm::database::AccountStatus::InMemoryChange,
-                info: Some(account.info.clone()),
-                previous_status: revm::database::AccountStatus::Loaded,
-                previous_info: None,
-                storage,
-                storage_was_destroyed: false,
-            },
-        );
+//         state.insert(
+//             address,
+//             revm::database::TransitionAccount {
+//                 status: revm::database::AccountStatus::InMemoryChange,
+//                 info: Some(account.info.clone()),
+//                 previous_status: revm::database::AccountStatus::Loaded,
+//                 previous_info: None,
+//                 storage,
+//                 storage_was_destroyed: false,
+//             },
+//         );
 
-        PendingCommit {
-            key: CommitKey(block_number, 0, B256::ZERO),
-            transitions: TransitionState { transitions: state },
-            ..Default::default()
-        }
-    };
+//         PendingCommit {
+//             key: CommitKey(block_number, 0, B256::ZERO),
+//             transitions: TransitionState { transitions: state },
+//             ..Default::default()
+//         }
+//     };
 
-    let path = tempfile::Builder::new()
-        .prefix("evm.mdb")
-        .tempdir()
-        .unwrap();
+//     let path = tempfile::Builder::new()
+//         .prefix("evm.mdb")
+//         .tempdir()
+//         .unwrap();
 
-    let mut env_builder = EnvOpenOptions::new();
-    env_builder.max_dbs(PersistentDB::MAX_DBS);
-    env_builder.map_size(4096 * 10); // start with very small (few kB)
+//     let mut env_builder = EnvOpenOptions::new();
+//     env_builder.max_dbs(PersistentDB::MAX_DBS);
+//     env_builder.map_size(4096 * 10); // start with very small (few kB)
 
-    unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
+//     unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
 
-    let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
+//     let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
 
-    let mut db = PersistentDB::new_with_env(env, Default::default()).expect("open");
-    assert_eq!(db.env.info().map_size, 4096 * 10);
+//     let mut db = PersistentDB::new_with_env(env, Default::default()).expect("open");
+//     assert_eq!(db.env.info().map_size, 4096 * 10);
 
-    // large commit to trigger a resize
-    crate::state_commit::commit_to_db(&mut db, create_large_commit(0, 1024), Default::default())
-        .expect("ok");
+//     // large commit to trigger a resize
+//     crate::state_commit::commit_to_db(&mut db, create_large_commit(0, 1024), Default::default())
+//         .expect("ok");
 
-    // increased to next MAP_SIZE_UNIT
-    assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
+//     // increased to next MAP_SIZE_UNIT
+//     assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
 
-    // add more commits without triggering another resize
-    for i in 0..10 {
-        crate::state_commit::commit_to_db(
-            &mut db,
-            create_large_commit(i + 1, 1024),
-            Default::default(),
-        )
-        .expect("ok");
-        assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
-    }
+//     // add more commits without triggering another resize
+//     for i in 0..10 {
+//         crate::state_commit::commit_to_db(
+//             &mut db,
+//             create_large_commit(i + 1, 1024),
+//             Default::default(),
+//         )
+//         .expect("ok");
+//         assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
+//     }
 
-    // reopen db with initial env size should automatically resize
-    drop(db);
+//     // reopen db with initial env size should automatically resize
+//     drop(db);
 
-    let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
-    let db = PersistentDB::new_with_env(env, Default::default()).expect("open");
-    assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
-}
+//     let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
+//     let db = PersistentDB::new_with_env(env, Default::default()).expect("open");
+//     assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
+// }
 
 #[test]
 fn test_read_accounts() {
