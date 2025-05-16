@@ -15,7 +15,7 @@
 		"prepublishOnly": "napi prepublish -t pnpm",
 		"release": "pnpm publish --access public",
 		"test": "cargo test --release",
-		"test:coverage": "mkdir coverage && cargo llvm-cov --workspace --lcov --output-path coverage/lcov.info",
+		"test:coverage": "mkdir -p coverage && cargo llvm-cov --workspace --lcov --output-path coverage/lcov.info",
 		"version": "napi version "
 	},
 	"devDependencies": {

@@ -33,6 +33,8 @@
 		"sort:dry": "sort-package-json --check \"package.json\" \"packages/*/package.json\"",
 		"test:integration": "lerna run test:integration --parallel",
 		"test:unit": "lerna run test --parallel",
+		"test:unit:coverage": "lerna run test:coverage --parallel",
+		"test:unit:merge": "lcov-result-merger 'packages/*/coverage/lcov.info' > merged-lcov.info",
 		"version": "lerna version --no-git-tag-version --yes",
 		"workflows:unit": "node scripts/generate-unit-workflow.js"
 	},
