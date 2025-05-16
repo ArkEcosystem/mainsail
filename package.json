@@ -34,6 +34,7 @@
 		"test:integration": "lerna run test:integration --parallel",
 		"test:unit": "lerna run test --parallel",
 		"test:unit:coverage": "lerna run test:coverage --parallel",
+		"test:contracts:coverage": "cd contracts && bash coverage.sh",
 		"test:unit:merge": "lcov-result-merger 'packages/*/coverage/lcov.info' > merged-lcov.info",
 		"version": "lerna version --no-git-tag-version --yes",
 		"workflows:unit": "node scripts/generate-unit-workflow.js"
