@@ -18,6 +18,7 @@ lib-cov
 .coverage
 **/coverage
 lcov.info
+merged-lcov.info
 
 # nyc test coverage
 .nyc_output
