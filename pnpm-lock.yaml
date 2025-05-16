@@ -65,6 +65,9 @@ importers:
       husky:
         specifier: 9.1.7
         version: 9.1.7
+      lcov-result-merger:
+        specifier: 5.0.1
+        version: 5.0.1
       lerna:
         specifier: 6.6.2
         version: 6.6.2(encoding@0.1.13)
@@ -7331,6 +7334,11 @@ packages:
   lazy@1.0.11:
     resolution: {integrity: sha512-Y+CjUfLmIpoUCCRl0ub4smrYtGGr5AOa2AKOaWelGHOGz33X/Y/KizefGqbkwfz44+cnq/+9habclf8vOmu2LA==}
     engines: {node: '>=0.2.0'}
+
+  lcov-result-merger@5.0.1:
+    resolution: {integrity: sha512-i53RjTYfqbHgerqGtuJjDfARDU340zNxXrJudQZU3o8ak9rrx8FDQUKf38Cjm6MtbqonqiDFmoKuUe++uZbvOg==}
+    engines: {node: '>=14'}
+    hasBin: true
 
   lerna@6.6.2:
     resolution: {integrity: sha512-W4qrGhcdutkRdHEaDf9eqp7u4JvI+1TwFy5woX6OI8WPe4PYBdxuILAsvhp614fUG41rKSGDKlOh+AWzdSidTg==}
@@ -14887,6 +14895,11 @@ snapshots:
       package-json: 10.0.1
 
   lazy@1.0.11: {}
+
+  lcov-result-merger@5.0.1:
+    dependencies:
+      fast-glob: 3.3.3
+      yargs: 16.2.0
 
   lerna@6.6.2(encoding@0.1.13):
     dependencies:
