@@ -29,14 +29,14 @@ jobs:
               with:
                   version: nightly
 
-            - name: Build
-              run: |
-                  forge build
-
-            - name: Run tests
-              run: |
-                  forge test -vvv
-
-            - name: Run coverage
+            - name: Run test with coverage
               run: |
                   bash ./coverage.sh
+
+            - name: Upload coverage reports to Codecov
+              uses: codecov/codecov-action@v5
+              with:
+                  files: ./lcov.info
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  slug: ArkEcosystem/mainsail
+                  flags: contracts

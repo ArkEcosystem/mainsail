@@ -257,6 +257,7 @@ jobs:
                   files: ./merged-lcov.info
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: ArkEcosystem/mainsail
+                  flags: packages
 
     integration:
         needs:

@@ -16,12 +16,4 @@ for pkg in packages/*; do
   fi
 done
 
-# Handle contracts/lcov.info
-CONTRACTS_LCOV="contracts/lcov.info"
-
-if [ -f "$CONTRACTS_LCOV" ]; then
-  echo "Merging $CONTRACTS_LCOV"
-  sed "s|^SF:|SF:contracts/|" "$CONTRACTS_LCOV" >> "$MERGED_FILE"
-fi
-
 echo "✅ Merged LCOV written to $MERGED_FILE"
