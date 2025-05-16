@@ -3,23 +3,25 @@
 # Output file for the merged result
 MERGED_FILE="merged-lcov.info"
 
-# Create or empty the merged file
-mkdir -p coverage
+# Ensure output directory exists and clear previous file
 > "$MERGED_FILE"
 
-# Process each package
+# Handle packages/*
 for pkg in packages/*; do
   LCOV_IN="$pkg/coverage/lcov.info"
-  LCOV_FIXED="$pkg/coverage/lcov-fixed.info"
 
   if [ -f "$LCOV_IN" ]; then
-    echo "Fixing paths in $pkg"
-    # Prefix SF paths with the package path and save to fixed file
-    sed "s|^SF:|SF:$pkg/|" "$LCOV_IN" > "$LCOV_FIXED"
-
-    # Append to the merged file
-    cat "$LCOV_FIXED" >> "$MERGED_FILE"
+    echo "Merging $LCOV_IN"
+    sed "s|^SF:|SF:$pkg/|" "$LCOV_IN" >> "$MERGED_FILE"
   fi
 done
+
+# Handle contracts/lcov.info
+CONTRACTS_LCOV="contracts/lcov.info"
+
+if [ -f "$CONTRACTS_LCOV" ]; then
+  echo "Merging $CONTRACTS_LCOV"
+  sed "s|^SF:|SF:contracts/|" "$CONTRACTS_LCOV" >> "$MERGED_FILE"
+fi
 
 echo "✅ Merged LCOV written to $MERGED_FILE"
