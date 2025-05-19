@@ -63,4 +63,26 @@ contract ConsensusTest is Base {
         vm.expectRevert(ConsensusV1.BlsKeyIsInvalid.selector);
         consensus.registerValidator(new bytes(0));
     }
+
+    function test_is_validator_registered() public {
+        assertEq(consensus.isValidatorRegistered(address(0)), false);
+        assertEq(consensus.isValidatorRegistered(address(1)), false);
+
+        address addr = address(1);
+        registerValidator(addr);
+
+        assertEq(consensus.isValidatorRegistered(address(1)), true);
+    }
+
+    function test_get_validator() public {
+        address addr = address(1);
+
+        vm.expectRevert(ConsensusV1.ValidatorNotRegistered.selector);
+        consensus.getValidator(addr);
+
+        registerValidator(addr);
+
+        ConsensusV1.Validator memory validator = consensus.getValidator(addr);
+        assertEq(validator.addr, addr);
+    }
 }

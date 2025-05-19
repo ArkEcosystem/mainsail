@@ -7,10 +7,6 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract RejectPayments {
-    fallback() external payable {
-        revert("Recipient always reverts");
-    }
-
     receive() external payable {
         revert("Recipient always reverts");
     }
