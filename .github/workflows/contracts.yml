@@ -18,6 +18,9 @@ jobs:
     check:
         name: contracts
         runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: contracts
         steps:
             - uses: actions/checkout@v4
 
@@ -26,12 +29,15 @@ jobs:
               with:
                   version: nightly
 
-            - name: Build
-              working-directory: contracts
+            - name: Run test with coverage
               run: |
-                  forge build
+                  bash ./coverage.sh
 
-            - name: Run tests
-              working-directory: contracts
-              run: |
-                  forge test -vvv
+            - name: Upload coverage reports to Codecov
+              uses: codecov/codecov-action@v5
+              if: ${{ secrets.CODECOV_TOKEN != '' }}
+              with:
+                  files: ./lcov.info
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  slug: ArkEcosystem/mainsail
+                  flags: contracts

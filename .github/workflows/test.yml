@@ -53,6 +53,13 @@ jobs:
                   key: lerna-${{ runner.os }}-${{ github.run_id }}
                   path: ./.cache
 
+            - uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  components: llvm-tools-preview
+                  profile: minimal
+                  override: true
+
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -96,140 +103,162 @@ jobs:
                   key: lerna-${{ runner.os }}
                   path: ./.cache
                   restore-keys: lerna-${{ runner.os }}-
+            - uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  components: llvm-tools-preview
+                  profile: minimal
+                  override: true
+            - name: Install cargo-llvm-cov
+              run: cargo install cargo-llvm-cov
+            - name: Check rustc version
+              run: rustc --version
             - name: Install dependencies
               run: pnpm install
             - name: Build
               run: pnpm run build
             - name: Test api
-              run: cd packages/api && pnpm run test
+              run: cd packages/api && pnpm run test:coverage
             - name: Test api-common
-              run: cd packages/api-common && pnpm run test
+              run: cd packages/api-common && pnpm run test:coverage
             - name: Test api-database
-              run: cd packages/api-database && pnpm run test
+              run: cd packages/api-database && pnpm run test:coverage
             - name: Test api-development
-              run: cd packages/api-development && pnpm run test
+              run: cd packages/api-development && pnpm run test:coverage
             - name: Test api-evm
-              run: cd packages/api-evm && pnpm run test
+              run: cd packages/api-evm && pnpm run test:coverage
             - name: Test api-http
-              run: cd packages/api-http && pnpm run test
+              run: cd packages/api-http && pnpm run test:coverage
             - name: Test api-sync
-              run: cd packages/api-sync && pnpm run test
+              run: cd packages/api-sync && pnpm run test:coverage
             - name: Test api-transaction-pool
-              run: cd packages/api-transaction-pool && pnpm run test
+              run: cd packages/api-transaction-pool && pnpm run test:coverage
             - name: Test blockchain-utils
-              run: cd packages/blockchain-utils && pnpm run test
+              run: cd packages/blockchain-utils && pnpm run test:coverage
             - name: Test bootstrap
-              run: cd packages/bootstrap && pnpm run test
+              run: cd packages/bootstrap && pnpm run test:coverage
             - name: Test cli
-              run: cd packages/cli && pnpm run test
+              run: cd packages/cli && pnpm run test:coverage
             - name: Test configuration-generator
-              run: cd packages/configuration-generator && pnpm run test
+              run: cd packages/configuration-generator && pnpm run test:coverage
             - name: Test consensus
-              run: cd packages/consensus && pnpm run test
+              run: cd packages/consensus && pnpm run test:coverage
             - name: Test consensus-storage
-              run: cd packages/consensus-storage && pnpm run test
+              run: cd packages/consensus-storage && pnpm run test:coverage
             - name: Test container
-              run: cd packages/container && pnpm run test
+              run: cd packages/container && pnpm run test:coverage
             - name: Test contracts
-              run: cd packages/contracts && pnpm run test
+              run: cd packages/contracts && pnpm run test:coverage
             - name: Test core
-              run: cd packages/core && pnpm run test
+              run: cd packages/core && pnpm run test:coverage
             - name: Test crypto-address-base58
-              run: cd packages/crypto-address-base58 && pnpm run test
+              run: cd packages/crypto-address-base58 && pnpm run test:coverage
             - name: Test crypto-address-keccak256
-              run: cd packages/crypto-address-keccak256 && pnpm run test
+              run: cd packages/crypto-address-keccak256 && pnpm run test:coverage
             - name: Test crypto-block
-              run: cd packages/crypto-block && pnpm run test
+              run: cd packages/crypto-block && pnpm run test:coverage
             - name: Test crypto-commit
-              run: cd packages/crypto-commit && pnpm run test
+              run: cd packages/crypto-commit && pnpm run test:coverage
             - name: Test crypto-config
-              run: cd packages/crypto-config && pnpm run test
+              run: cd packages/crypto-config && pnpm run test:coverage
             - name: Test crypto-consensus-bls12-381
-              run: cd packages/crypto-consensus-bls12-381 && pnpm run test
+              run: cd packages/crypto-consensus-bls12-381 && pnpm run test:coverage
             - name: Test crypto-hash-bcrypto
-              run: cd packages/crypto-hash-bcrypto && pnpm run test
+              run: cd packages/crypto-hash-bcrypto && pnpm run test:coverage
             - name: Test crypto-key-pair-bls12-381
-              run: cd packages/crypto-key-pair-bls12-381 && pnpm run test
+              run: cd packages/crypto-key-pair-bls12-381 && pnpm run test:coverage
             - name: Test crypto-key-pair-ecdsa
-              run: cd packages/crypto-key-pair-ecdsa && pnpm run test
+              run: cd packages/crypto-key-pair-ecdsa && pnpm run test:coverage
             - name: Test crypto-key-pair-ed25519
-              run: cd packages/crypto-key-pair-ed25519 && pnpm run test
+              run: cd packages/crypto-key-pair-ed25519 && pnpm run test:coverage
             - name: Test crypto-key-pair-schnorr
-              run: cd packages/crypto-key-pair-schnorr && pnpm run test
+              run: cd packages/crypto-key-pair-schnorr && pnpm run test:coverage
             - name: Test crypto-messages
-              run: cd packages/crypto-messages && pnpm run test
+              run: cd packages/crypto-messages && pnpm run test:coverage
             - name: Test crypto-signature-bls12-381
-              run: cd packages/crypto-signature-bls12-381 && pnpm run test
+              run: cd packages/crypto-signature-bls12-381 && pnpm run test:coverage
             - name: Test crypto-signature-ecdsa
-              run: cd packages/crypto-signature-ecdsa && pnpm run test
+              run: cd packages/crypto-signature-ecdsa && pnpm run test:coverage
             - name: Test crypto-signature-schnorr
-              run: cd packages/crypto-signature-schnorr && pnpm run test
+              run: cd packages/crypto-signature-schnorr && pnpm run test:coverage
             - name: Test crypto-transaction
-              run: cd packages/crypto-transaction && pnpm run test
+              run: cd packages/crypto-transaction && pnpm run test:coverage
             - name: Test crypto-transaction-evm-call
-              run: cd packages/crypto-transaction-evm-call && pnpm run test
+              run: cd packages/crypto-transaction-evm-call && pnpm run test:coverage
             - name: Test crypto-validation
-              run: cd packages/crypto-validation && pnpm run test
+              run: cd packages/crypto-validation && pnpm run test:coverage
             - name: Test crypto-wif
-              run: cd packages/crypto-wif && pnpm run test
+              run: cd packages/crypto-wif && pnpm run test:coverage
             - name: Test crypto-worker
-              run: cd packages/crypto-worker && pnpm run test
+              run: cd packages/crypto-worker && pnpm run test:coverage
             - name: Test database
-              run: cd packages/database && pnpm run test
-            # - name: Test evm
-            #   run: cd packages/evm && pnpm run test
+              run: cd packages/database && pnpm run test:coverage
+            - name: Test evm
+              run: cd packages/evm && pnpm run test:coverage
             - name: Test evm-api-worker
-              run: cd packages/evm-api-worker && pnpm run test
+              run: cd packages/evm-api-worker && pnpm run test:coverage
             - name: Test evm-consensus
-              run: cd packages/evm-consensus && pnpm run test
+              run: cd packages/evm-consensus && pnpm run test:coverage
             - name: Test evm-service
-              run: cd packages/evm-service && pnpm run test
+              run: cd packages/evm-service && pnpm run test:coverage
             - name: Test evm-state
-              run: cd packages/evm-state && pnpm run test
+              run: cd packages/evm-state && pnpm run test:coverage
             - name: Test kernel
-              run: cd packages/kernel && pnpm run test
+              run: cd packages/kernel && pnpm run test:coverage
             - name: Test logger-pino
-              run: cd packages/logger-pino && pnpm run test
+              run: cd packages/logger-pino && pnpm run test:coverage
             - name: Test logger-winston
-              run: cd packages/logger-winston && pnpm run test
+              run: cd packages/logger-winston && pnpm run test:coverage
             - name: Test networking-dns
-              run: cd packages/networking-dns && pnpm run test
+              run: cd packages/networking-dns && pnpm run test:coverage
             - name: Test networking-ntp
-              run: cd packages/networking-ntp && pnpm run test
+              run: cd packages/networking-ntp && pnpm run test:coverage
             - name: Test p2p
-              run: cd packages/p2p && pnpm run test
+              run: cd packages/p2p && pnpm run test:coverage
             - name: Test processor
-              run: cd packages/processor && pnpm run test
+              run: cd packages/processor && pnpm run test:coverage
             - name: Test serializer
-              run: cd packages/serializer && pnpm run test
+              run: cd packages/serializer && pnpm run test:coverage
             - name: Test snapshot-legacy-exporter
-              run: cd packages/snapshot-legacy-exporter && pnpm run test
+              run: cd packages/snapshot-legacy-exporter && pnpm run test:coverage
             - name: Test snapshot-legacy-importer
-              run: cd packages/snapshot-legacy-importer && pnpm run test
+              run: cd packages/snapshot-legacy-importer && pnpm run test:coverage
             - name: Test state
-              run: cd packages/state && pnpm run test
+              run: cd packages/state && pnpm run test:coverage
             - name: Test test-framework
-              run: cd packages/test-framework && pnpm run test
+              run: cd packages/test-framework && pnpm run test:coverage
             - name: Test test-runner
-              run: cd packages/test-runner && pnpm run test
+              run: cd packages/test-runner && pnpm run test:coverage
             - name: Test test-transaction-builders
-              run: cd packages/test-transaction-builders && pnpm run test
+              run: cd packages/test-transaction-builders && pnpm run test:coverage
             - name: Test transaction-pool-broadcaster
-              run: cd packages/transaction-pool-broadcaster && pnpm run test
+              run: cd packages/transaction-pool-broadcaster && pnpm run test:coverage
             - name: Test transaction-pool-service
-              run: cd packages/transaction-pool-service && pnpm run test
+              run: cd packages/transaction-pool-service && pnpm run test:coverage
             - name: Test transaction-pool-worker
-              run: cd packages/transaction-pool-worker && pnpm run test
+              run: cd packages/transaction-pool-worker && pnpm run test:coverage
             - name: Test transactions
-              run: cd packages/transactions && pnpm run test
+              run: cd packages/transactions && pnpm run test:coverage
             - name: Test utils
-              run: cd packages/utils && pnpm run test
+              run: cd packages/utils && pnpm run test:coverage
             - name: Test validation
-              run: cd packages/validation && pnpm run test
+              run: cd packages/validation && pnpm run test:coverage
             - name: Test validator
-              run: cd packages/validator && pnpm run test
+              run: cd packages/validator && pnpm run test:coverage
             - name: Test webhooks
-              run: cd packages/webhooks && pnpm run test
+              run: cd packages/webhooks && pnpm run test:coverage
+
+            - name: Merge test coverage reports
+              run: pnpm run test:unit:merge
+
+            - name: Upload coverage reports to Codecov
+              uses: codecov/codecov-action@v5
+              if: ${{ secrets.CODECOV_TOKEN != '' }}
+              with:
+                  files: ./merged-lcov.info
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  slug: ArkEcosystem/mainsail
+                  flags: packages
 
     integration:
         needs:
