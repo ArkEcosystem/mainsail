@@ -376,10 +376,6 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function isValidatorRegistered(address addr) public view returns (bool) {
-        if (addr == address(0)) {
-            return false;
-        }
-
         return _hasValidator[addr];
     }
 
