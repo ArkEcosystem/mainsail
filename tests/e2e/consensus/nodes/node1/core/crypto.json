@@ -291,10 +291,10 @@
 				"denomination": 1000000000000000000
 			},
 			"timeouts": {
-				"blockPrepareTime": 4000,
-				"blockTime": 8000,
-				"stageTimeout": 2000,
-				"stageTimeoutIncrease": 2000,
+				"blockPrepareTime": 500,
+				"blockTime": 500,
+				"stageTimeout": 500,
+				"stageTimeoutIncrease": 500,
 				"tolerance": 100
 			},
 			"vendorFieldLength": 255
