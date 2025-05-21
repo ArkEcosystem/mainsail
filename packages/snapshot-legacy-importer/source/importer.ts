@@ -414,15 +414,25 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		this.logger.info(`seeding ${this.#data.voters.length} voters`);
 
-		for (const voter of this.#data.voters) {
-			assert.defined(voter.ethAddress);
+		for (const voters of chunk(this.#data.voters, 1000)) {
+			const voterAddresses: string[] = [];
+			const validatorAddresses: string[] = [];
 
-			if (!validatorLookup[voter.vote]) {
-				this.logger.warning(`!!! skipping voter ${voter.arkAddress} for non-existent validator: ${voter.vote}`);
-				continue;
+			for (const voter of voters) {
+				assert.defined(voter.ethAddress);
+
+				if (!validatorLookup[voter.vote]) {
+					this.logger.warning(
+						`!!! skipping voter ${voter.arkAddress} for non-existent validator: ${voter.vote}`,
+					);
+					continue;
+				}
+
+				voterAddresses.push(voter.ethAddress);
+				validatorAddresses.push(voter.vote);
 			}
 
-			const data = iface.encodeFunctionData("addVote", [voter.ethAddress, voter.vote]).slice(2);
+			const data = iface.encodeFunctionData("addVotes", [voterAddresses, validatorAddresses]).slice(2);
 
 			const result = await this.evm.process(
 				this.#getTransactionContext({
@@ -433,7 +443,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			);
 
 			if (!result.receipt.status) {
-				throw new Error("failed to add vote");
+				console.log(result.receipt);
+				throw new Error("failed to add votes");
 			}
 		}
 	}
@@ -476,13 +487,13 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		return {
 			blockContext: {
 				commitKey: options.commitKey,
-				gasLimit: BigInt(10_000_000),
+				gasLimit: BigInt(250_000_000),
 				timestamp: BigInt(options.timestamp),
 				validatorAddress: this.deployerAddress,
 			},
 			data: Buffer.from(options.data, "hex"),
 			from: this.deployerAddress,
-			gasLimit: BigInt(10_000_000),
+			gasLimit: BigInt(200_000_000),
 			gasPrice: BigInt(0),
 			nonce,
 			specId: evmSpec,
