@@ -150,7 +150,15 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         emit ValidatorRegistered(addr, blsPublicKey);
     }
 
-    function addVote(address voter, address validator) external onlyOwner {
+    function addVotes(address[] calldata voters, address[] calldata validators) external onlyOwner {
+        require(voters.length == validators.length, "input length mismatch");
+
+        for (uint256 i = 0; i < voters.length; i++) {
+            _addVote(voters[i], validators[i]);
+        }
+    }
+
+    function _addVote(address voter, address validator) internal {
         if (_rounds.length > 0) {
             revert ImportIsNotAllowed();
         }

@@ -25,7 +25,12 @@ contract ConsensusTest is Base {
         // Vote
         vm.expectEmit(address(consensus));
         emit ConsensusV1.Voted(voterAddr, addr);
-        consensus.addVote(voterAddr, addr);
+        address[] memory voters = new address[](1);
+        voters[0] = voterAddr;
+        address[] memory validators = new address[](1);
+        validators[0] = addr;
+
+        consensus.addVotes(voters, validators);
 
         // Assert validator
         ConsensusV1.Validator memory validator = consensus.getValidator(addr);
@@ -60,7 +65,11 @@ contract ConsensusTest is Base {
         // Vote
         vm.expectEmit(address(consensus));
         emit ConsensusV1.Voted(voterAddr, addr);
-        consensus.addVote(voterAddr, addr);
+        address[] memory voters = new address[](1);
+        voters[0] = voterAddr;
+        address[] memory validators = new address[](1);
+        validators[0] = addr;
+        consensus.addVotes(voters, validators);
 
         // Assert validator
         ConsensusV1.Validator memory validator = consensus.getValidator(addr);
@@ -95,7 +104,11 @@ contract ConsensusTest is Base {
         // Vote
         vm.expectEmit(address(consensus));
         emit ConsensusV1.Voted(voterAddr, addr);
-        consensus.addVote(voterAddr, addr);
+        address[] memory voters = new address[](1);
+        voters[0] = voterAddr;
+        address[] memory validators = new address[](1);
+        validators[0] = addr;
+        consensus.addVotes(voters, validators);
 
         // Assert validator
         ConsensusV1.Validator memory validator = consensus.getValidator(addr);
@@ -115,19 +128,30 @@ contract ConsensusTest is Base {
 
     function test_add_vote_revert_if_caller_is_not_owner() public {
         address addr = address(1);
+        address[] memory voters = new address[](1);
+        voters[0] = addr;
+        address[] memory validators = new address[](1);
+        validators[0] = addr;
+
         vm.startPrank(addr);
         vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, addr));
-        consensus.addVote(addr, addr);
+        consensus.addVotes(voters, validators);
     }
 
     function test_add_vote_revert_if_round_already_calculated() public {
         address addr = address(1);
+        address[] memory voters = new address[](1);
+        voters[0] = addr;
+        address[] memory validators = new address[](1);
+        validators[0] = addr;
+
         consensus.addValidator(addr, prepareBLSKey(addr), false);
 
         consensus.calculateActiveValidators(1);
 
         vm.expectRevert(ConsensusV1.ImportIsNotAllowed.selector);
-        consensus.addVote(addr, addr);
+
+        consensus.addVotes(voters, validators);
     }
 
     function test_add_vote_allow_self_vote() public {
@@ -147,7 +171,12 @@ contract ConsensusTest is Base {
         // Vote
         vm.expectEmit(address(consensus));
         emit ConsensusV1.Voted(voterAddr, addr);
-        consensus.addVote(voterAddr, addr);
+
+        address[] memory voters = new address[](1);
+        voters[0] = voterAddr;
+        address[] memory validators = new address[](1);
+        validators[0] = addr;
+        consensus.addVotes(voters, validators);
         vm.stopPrank();
 
         // Assert voteBalance
@@ -173,19 +202,30 @@ contract ConsensusTest is Base {
         // Prepare voter
         address voterAddr = address(2);
 
+        address[] memory voters = new address[](1);
+        voters[0] = voterAddr;
+        address[] memory validators = new address[](1);
+        validators[0] = addr;
+
         vm.expectEmit(address(consensus));
         emit ConsensusV1.Voted(voterAddr, addr);
-        consensus.addVote(voterAddr, addr);
+
+        consensus.addVotes(voters, validators);
 
         vm.expectRevert(ConsensusV1.AlreadyVoted.selector);
-        consensus.addVote(voterAddr, addr);
+        consensus.addVotes(voters, validators);
     }
 
     function test_add_vote_prevent_vote_for_unregistered_validator() public {
         address addr = address(1);
 
+        address[] memory voters = new address[](1);
+        voters[0] = addr;
+        address[] memory validators = new address[](1);
+        validators[0] = addr;
+
         vm.expectRevert(ConsensusV1.ValidatorNotRegistered.selector);
-        consensus.addVote(addr, addr);
+        consensus.addVotes(voters, validators);
     }
 
     function test_multiple_voted_different_validators() public {
@@ -205,17 +245,24 @@ contract ConsensusTest is Base {
         // Vote 1
         address voterAddr1 = address(11);
         vm.deal(voterAddr1, 100 ether);
-        consensus.addVote(voterAddr1, validatorAddr1);
 
         // Vote 2
         address voterAddr2 = address(12);
         vm.deal(voterAddr2, 100 ether);
-        consensus.addVote(voterAddr2, validatorAddr2);
 
         // Vote 3
         address voterAddr3 = address(13);
         vm.deal(voterAddr3, 100 ether);
-        consensus.addVote(voterAddr3, validatorAddr3);
+
+        address[] memory voters = new address[](3);
+        voters[0] = voterAddr1;
+        voters[1] = voterAddr2;
+        voters[2] = voterAddr3;
+        address[] memory validators = new address[](3);
+        validators[0] = validatorAddr1;
+        validators[1] = validatorAddr2;
+        validators[2] = validatorAddr3;
+        consensus.addVotes(voters, validators);
 
         // Assert validators 1
         ConsensusV1.Validator memory validator1 = consensus.getValidator(validatorAddr1);
@@ -258,17 +305,24 @@ contract ConsensusTest is Base {
         // Vote 1
         address voterAddr1 = address(11);
         vm.deal(voterAddr1, 100 ether);
-        consensus.addVote(voterAddr1, validatorAddr1);
 
         // Vote 2
         address voterAddr2 = address(12);
         vm.deal(voterAddr2, 100 ether);
-        consensus.addVote(voterAddr2, validatorAddr1);
 
         // Vote 3
         address voterAddr3 = address(13);
         vm.deal(voterAddr3, 100 ether);
-        consensus.addVote(voterAddr3, validatorAddr1);
+
+        address[] memory voters = new address[](3);
+        voters[0] = voterAddr1;
+        voters[1] = voterAddr2;
+        voters[2] = voterAddr3;
+        address[] memory validators = new address[](3);
+        validators[0] = validatorAddr1;
+        validators[1] = validatorAddr1;
+        validators[2] = validatorAddr1;
+        consensus.addVotes(voters, validators);
 
         // Assert validators 1
         ConsensusV1.Validator memory validator1 = consensus.getValidator(validatorAddr1);
