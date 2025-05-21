@@ -29,8 +29,8 @@ export interface Instance extends CommitHandler {
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
 	getAccountInfo(address: string, height?: bigint): Promise<AccountInfo>;
 	getAccountInfoExtended(address: string, legacyAddress?: string): Promise<AccountInfoExtended>;
-	importAccountInfo(info: AccountInfoExtended): Promise<void>;
-	importLegacyColdWallet(wallet: ImportLegacyColdWallet): Promise<void>;
+	importAccountInfos(infos: AccountInfoExtended[]): Promise<void>;
+	importLegacyColdWallets(wallets: ImportLegacyColdWallet[]): Promise<void>;
 	getAccounts(offset: bigint, limit: bigint): Promise<GetAccountsResult>;
 	getLegacyAttributes(address: string, legacyAddress?: string): Promise<LegacyAttributes | null>;
 	getLegacyColdWallets(offset: bigint, limit: bigint): Promise<GetLegacyColdWalletsResult>;

@@ -108,12 +108,12 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return this.#evm.getAccountInfoExtended(address, legacyAddress);
 	}
 
-	public async importAccountInfo(info: Contracts.Evm.AccountInfoExtended): Promise<void> {
-		return this.#evm.importAccountInfo(info);
+	public async importAccountInfos(infos: Contracts.Evm.AccountInfoExtended[]): Promise<void> {
+		return this.#evm.importAccountInfos(infos);
 	}
 
-	public async importLegacyColdWallet(wallet: Contracts.Evm.ImportLegacyColdWallet): Promise<void> {
-		return this.#evm.importLegacyColdWallet({ ...wallet, mergeInfo: undefined });
+	public async importLegacyColdWallets(wallets: Contracts.Evm.ImportLegacyColdWallet[]): Promise<void> {
+		return this.#evm.importLegacyColdWallets(wallets);
 	}
 
 	public async getAccounts(offset: bigint, limit: bigint): Promise<Contracts.Evm.GetAccountsResult> {

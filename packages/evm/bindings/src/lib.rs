@@ -428,9 +428,9 @@ impl EvmInner {
         })
     }
 
-    pub fn import_account_info(
+    pub fn import_account_infos(
         &mut self,
-        info: AccountInfoExtended,
+        infos: Vec<AccountInfoExtended>,
     ) -> std::result::Result<(), EVMError<String>> {
         let genesis_block_number = self.genesis_block_number();
 
@@ -440,17 +440,19 @@ impl EvmInner {
             .find(|(key, _)| key.0 == genesis_block_number)
             .expect("genesis commit");
 
-        assert!(!pending.cache.accounts.contains_key(&info.address));
+        for info in infos {
+            assert!(!pending.cache.accounts.contains_key(&info.address));
 
-        let (address, info, legacy_attributes) = info.into_parts();
-        pending.import_account(address, info, legacy_attributes);
+            let (address, info, legacy_attributes) = info.into_parts();
+            pending.import_account(address, info, legacy_attributes);
+        }
 
         Ok(())
     }
 
-    pub fn import_legacy_cold_wallet(
+    pub fn import_legacy_cold_wallets(
         &mut self,
-        wallet: LegacyColdWallet,
+        wallets: Vec<LegacyColdWallet>,
     ) -> std::result::Result<(), EVMError<String>> {
         let genesis_block_number = self.genesis_block_number();
 
@@ -460,8 +462,10 @@ impl EvmInner {
             .find(|(key, _)| key.0 == genesis_block_number)
             .expect("genesis commit");
 
-        assert!(!pending.legacy_cold_wallets.contains_key(&wallet.address));
-        pending.legacy_cold_wallets.insert(wallet.address, wallet);
+        for wallet in wallets {
+            assert!(!pending.legacy_cold_wallets.contains_key(&wallet.address));
+            pending.legacy_cold_wallets.insert(wallet.address, wallet);
+        }
 
         Ok(())
     }
@@ -1240,29 +1244,35 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<void>")]
-    pub fn import_account_info(
+    pub fn import_account_infos(
         &mut self,
         node_env: Env,
-        info: JsAccountInfoExtended,
+        infos: Vec<JsAccountInfoExtended>,
     ) -> Result<JsObject> {
-        let info: AccountInfoExtended = info.try_into()?;
+        let mut accounts: Vec<AccountInfoExtended> = Vec::with_capacity(infos.len());
+        for info in infos {
+            accounts.push(info.try_into()?);
+        }
 
         node_env.execute_tokio_future(
-            Self::import_account_info_async(self.evm.clone(), info),
+            Self::import_account_infos_async(self.evm.clone(), accounts),
             |_, _| Ok(()),
         )
     }
 
     #[napi(ts_return_type = "Promise<void>")]
-    pub fn import_legacy_cold_wallet(
+    pub fn import_legacy_cold_wallets(
         &mut self,
         node_env: Env,
-        info: JsLegacyColdWallet,
+        infos: Vec<JsLegacyColdWallet>,
     ) -> Result<JsObject> {
-        let info: LegacyColdWallet = info.try_into()?;
+        let mut cold_wallets: Vec<LegacyColdWallet> = Vec::with_capacity(infos.len());
+        for info in infos {
+            cold_wallets.push(info.try_into()?);
+        }
 
         node_env.execute_tokio_future(
-            Self::import_legacy_cold_wallet_async(self.evm.clone(), info),
+            Self::import_legacy_cold_wallets_async(self.evm.clone(), cold_wallets),
             |_, _| Ok(()),
         )
     }
@@ -1630,12 +1640,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn import_account_info_async(
+    async fn import_account_infos_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        info: AccountInfoExtended,
+        infos: Vec<AccountInfoExtended>,
     ) -> Result<()> {
         let mut lock = evm.lock().await;
-        let result = lock.import_account_info(info);
+        let result = lock.import_account_infos(infos);
 
         match result {
             Ok(_) => Result::Ok(()),
@@ -1643,12 +1653,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn import_legacy_cold_wallet_async(
+    async fn import_legacy_cold_wallets_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        wallet: LegacyColdWallet,
+        wallets: Vec<LegacyColdWallet>,
     ) -> Result<()> {
         let mut lock = evm.lock().await;
-        let result = lock.import_legacy_cold_wallet(wallet);
+        let result = lock.import_legacy_cold_wallets(wallets);
 
         match result {
             Ok(_) => Result::Ok(()),

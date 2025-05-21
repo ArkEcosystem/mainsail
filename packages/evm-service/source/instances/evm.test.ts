@@ -253,11 +253,13 @@ describe<{
 
 		// Import legacy cold wallet with 10n balance
 		await instance.prepareNextCommit({ commitKey });
-		await instance.importLegacyColdWallet({
-			address: legacyAddress,
-			balance: 10n,
-			legacyAttributes: {},
-		});
+		await instance.importLegacyColdWallets([
+			{
+				address: legacyAddress,
+				balance: 10n,
+				legacyAttributes: {},
+			},
+		]);
 		await commit(commitKey);
 
 		assert.undefined((await instance.getLegacyColdWallets(0n, 100n)).wallets[0].mergeInfo);
@@ -358,11 +360,13 @@ describe<{
 			} as any);
 
 		await instance.prepareNextCommit({ commitKey });
-		await instance.importLegacyColdWallet({
-			address: legacyAddress,
-			balance: 999n,
-			legacyAttributes: {},
-		});
+		await instance.importLegacyColdWallets([
+			{
+				address: legacyAddress,
+				balance: 999n,
+				legacyAttributes: {},
+			},
+		]);
 		await commit(commitKey);
 
 		let { wallets } = await instance.getLegacyColdWallets(0n, 100n);

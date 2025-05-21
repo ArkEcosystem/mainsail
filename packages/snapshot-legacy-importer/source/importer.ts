@@ -8,7 +8,7 @@ import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus"
 import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { Providers } from "@mainsail/kernel";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
-import { assert, BigNumber } from "@mainsail/utils";
+import { assert, BigNumber, chunk } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
 import { ethers, sha256 } from "ethers";
 import path from "path";
@@ -315,16 +315,19 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		this.logger.info(`seeding ${this.#data.wallets.length} wallets`);
 
+		const wallets: Contracts.Evm.AccountInfoExtended[] = [];
+		const coldWallets: Contracts.Evm.ImportLegacyColdWallet[] = [];
+
 		for (const wallet of this.#data.wallets) {
 			if (wallet.ethAddress) {
-				await this.evm.importAccountInfo({
+				wallets.push({
 					address: wallet.ethAddress,
 					balance: wallet.balance,
 					legacyAttributes: wallet.legacyAttributes,
 					nonce: 0n,
 				});
 			} else {
-				await this.evm.importLegacyColdWallet({
+				coldWallets.push({
 					address: wallet.arkAddress,
 					balance: wallet.balance,
 					legacyAttributes: wallet.legacyAttributes,
@@ -332,6 +335,14 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			}
 
 			totalSupply += wallet.balance;
+		}
+
+		for (const batch of chunk(wallets, 1000)) {
+			await this.evm.importAccountInfos(batch);
+		}
+
+		for (const batch of chunk(coldWallets, 1000)) {
+			await this.evm.importLegacyColdWallets(batch);
 		}
 
 		return totalSupply;
