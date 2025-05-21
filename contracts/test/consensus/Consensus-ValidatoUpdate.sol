@@ -6,9 +6,17 @@ import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract ConsensusTest is Base {
-    function test_updateBlsPublicKey_revert_if_caller_is_not_validator() public {
+    function test_resign_revert_if_caller_is_not_validator() public {
         vm.expectRevert(ConsensusV1.CallerIsNotValidator.selector);
         consensus.resignValidator();
+    }
+
+    function test_updateBlsPublicKey_revert_if_caller_is_not_validator() public {
+        address addr = address(1);
+        vm.startPrank(addr);
+
+        vm.expectRevert(ConsensusV1.ValidatorNotRegistered.selector);
+        consensus.updateValidator(prepareBLSKey(addr));
     }
 
     function test_updateBlsPublicKey_revert_if_bls_key_is_already_registered() public {
