@@ -156,7 +156,6 @@ export class Generator {
 	}
 
 	async #compressToBrotli(snapshot: LegacySnapshot, path: string): Promise<void> {
-		console.log(snapshot);
 		const jsonString = JSON.stringify(snapshot);
 		const compressedBuffer = await promisify(brotliCompress)(jsonString);
 		await writeFile(path, compressedBuffer);
