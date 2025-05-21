@@ -51,9 +51,11 @@ export const makeApplication = async (configurationPath: string, options: Record
 	});
 	// Used for evm instance
 	const fsExtra = await import("fs-extra/esm");
+	const fs = await import("fs");
 	app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({
 		existsSync: () => true,
 		readJSONSync: (file: string, options?: Record<string, any>) => fsExtra.readJSONSync(file, options),
+		get: (path: string) => fs.readFileSync(path),
 	});
 	setGracefulCleanup();
 	app.rebind("path.data").toConstantValue(dirSync().name);

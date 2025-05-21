@@ -69,8 +69,8 @@ export class ConfigurationWriter {
 		);
 	}
 
-	writeSnapshot(snapshotPath: string, snapshotHash: string): void {
+	writeSnapshot(snapshotPath: string): void {
 		snapshotPath = resolve(snapshotPath);
-		copyFileSync(snapshotPath, path.join(this.configurationPath, "snapshot", `${snapshotHash}.json`));
+		copyFileSync(snapshotPath, path.join(this.configurationPath, "snapshot", path.basename(snapshotPath)));
 	}
 }
