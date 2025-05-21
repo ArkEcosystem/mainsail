@@ -24,11 +24,11 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"pg": "8.14.0",
 		"tmp": "0.2.3",

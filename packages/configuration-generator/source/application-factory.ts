@@ -54,8 +54,8 @@ export const makeApplication = async (configurationPath: string, options: Record
 	const fs = await import("fs");
 	app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({
 		existsSync: () => true,
-		readJSONSync: (file: string, options?: Record<string, any>) => fsExtra.readJSONSync(file, options),
 		get: (path: string) => fs.readFileSync(path),
+		readJSONSync: (file: string, options?: Record<string, any>) => fsExtra.readJSONSync(file, options),
 	});
 	setGracefulCleanup();
 	app.rebind("path.data").toConstantValue(dirSync().name);

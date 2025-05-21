@@ -1,10 +1,10 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
-import { Application } from "@mainsail/kernel";
-import { ServiceProvider as Validation } from "@mainsail/validation";
 import { ServiceProvider as CryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CryptoValidation } from "@mainsail/crypto-validation";
+import { Application } from "@mainsail/kernel";
+import { ServiceProvider as Validation } from "@mainsail/validation";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Identifiers as InternalIdentifiers } from "./identifiers.js";

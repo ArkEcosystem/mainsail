@@ -153,12 +153,12 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		let totalSupply = 0n;
 
 		const publicKeyLookup: Record<string, Contracts.Snapshot.ImportedLegacyWallet> = snapshot.wallets.reduce(
-			(acc, curr) => {
-				if (curr.publicKey) {
-					acc[curr.publicKey] = curr;
+			(accumulator, current) => {
+				if (current.publicKey) {
+					accumulator[current.publicKey] = current;
 				}
 
-				return acc;
+				return accumulator;
 			},
 			{},
 		);
