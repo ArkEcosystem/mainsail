@@ -11,6 +11,9 @@ on:
             - main
             - develop
 
+env:
+    CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
 jobs:
     build:
         strategy:
@@ -252,11 +255,11 @@ jobs:
               run: pnpm run test:unit:merge
 
             - name: Upload coverage reports to Codecov
+              if: ${{ env.CODECOV_TOKEN != '' }}
               uses: codecov/codecov-action@v5
-              if: ${{ secrets.CODECOV_TOKEN != '' }}
               with:
                   files: ./merged-lcov.info
-                  token: ${{ secrets.CODECOV_TOKEN }}
+                  token: ${{ env.CODECOV_TOKEN }}
                   slug: ArkEcosystem/mainsail
                   flags: packages
 

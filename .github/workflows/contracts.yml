@@ -13,6 +13,7 @@ on:
 
 env:
     FOUNDRY_PROFILE: ci
+    CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
     check:
@@ -34,10 +35,10 @@ jobs:
                   bash ./coverage.sh
 
             - name: Upload coverage reports to Codecov
+              if: ${{ env.CODECOV_TOKEN != '' }}
               uses: codecov/codecov-action@v5
-              if: ${{ secrets.CODECOV_TOKEN != '' }}
               with:
                   files: ./lcov.info
-                  token: ${{ secrets.CODECOV_TOKEN }}
+                  token: ${{ env.CODECOV_TOKEN }}
                   slug: ArkEcosystem/mainsail
                   flags: contracts
