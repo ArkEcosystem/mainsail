@@ -54,7 +54,24 @@ export class Generator {
 	}
 
 	public async generateStatic(chainTip: LegacyChainTip, wallets: LegacyWallet[]): Promise<void> {
-		await this.#writeSnapshot(chainTip, wallets);
+		const addressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
+			Identifiers.Cryptography.Identity.Address.Factory,
+		);
+
+		await this.#writeSnapshot(
+			chainTip,
+			await Promise.all(
+				wallets.map(async (wallet) => ({
+					...wallet,
+
+					...(wallet.publicKey
+						? {
+								ethAddress: await addressFactory.fromPublicKey(wallet.publicKey),
+							}
+						: {}),
+				})),
+			),
+		);
 	}
 
 	public async generate(): Promise<void> {
@@ -139,6 +156,7 @@ export class Generator {
 	}
 
 	async #compressToBrotli(snapshot: LegacySnapshot, path: string): Promise<void> {
+		console.log(snapshot);
 		const jsonString = JSON.stringify(snapshot);
 		const compressedBuffer = await promisify(brotliCompress)(jsonString);
 		await writeFile(path, compressedBuffer);
