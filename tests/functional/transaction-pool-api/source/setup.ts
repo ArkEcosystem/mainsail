@@ -202,9 +202,7 @@ const bootstrap = async (sandbox: Sandbox) => {
 
 	// Import some legacy cold wallets
 	const legacyColdWallets = await getLegacyColdWallets(sandbox);
-	for (const { legacyColdWallet } of legacyColdWallets) {
-		await evm.importLegacyColdWallet(legacyColdWallet);
-	}
+	await evm.importLegacyColdWallets(legacyColdWallets.map(({ legacyColdWallet }) => legacyColdWallet));
 	//
 
 	const result = await blockProcessor.process(commitState);
