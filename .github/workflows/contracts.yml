@@ -36,7 +36,7 @@ jobs:
 
             - name: Run test with coverage
               run: |
-                  bash ./coverage.sh
+                  forge coverage --report lcov
 
             - name: Upload coverage reports to Codecov
               if: ${{ env.CODECOV_TOKEN != '' }}
