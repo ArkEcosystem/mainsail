@@ -71,6 +71,16 @@ contract ConsensusTest is Base {
         consensus.unvote();
     }
 
+    function test_update_voters_revert_if_did_not_vote() public {
+        vm.expectRevert(ConsensusV1.MissingVote.selector);
+
+        address nonVoterAddr = address(2);
+
+        address[] memory voters = new address[](1);
+        voters[0] = nonVoterAddr;
+        consensus.updateVoters(voters);
+    }
+
     function test_get_voters_revert_if_caller_is_not_owner() public {
         vm.startPrank(address(1));
 
@@ -114,7 +124,7 @@ contract ConsensusTest is Base {
         assertEq(allVoters[0].validator, voterAddr);
 
         // Update vote should correctly update the vote balance
-        // Let say voter has 90 eth at the end of the block
+        // 10 ETH less than on Vote struct.
         vm.deal(voterAddr, 90 ether);
 
         address[] memory voters = new address[](1);
@@ -128,6 +138,25 @@ contract ConsensusTest is Base {
         assertEq(validator.data.votersCount, 1);
         // Assert voter balance
         assertEq(voterAddr.balance, 90 ether);
+        // Assert voters
+        assertEq(consensus.getVotesCount(), 1);
+        allVoters = consensus.getVotes(address(0), 10);
+        assertEq(allVoters.length, 1);
+        assertEq(allVoters[0].voter, voterAddr);
+        assertEq(allVoters[0].validator, voterAddr);
+
+        // Update vote should correctly update the vote balance
+        // 10 ETH more than on Vote struct.
+        vm.deal(voterAddr, 110 ether);
+        consensus.updateVoters(voters);
+
+        // Assert validator
+        validator = consensus.getValidator(addr);
+        assertEq(validator.addr, addr);
+        assertEq(validator.data.voteBalance, 110 ether);
+        assertEq(validator.data.votersCount, 1);
+        // Assert voter balance
+        assertEq(voterAddr.balance, 110 ether);
         // Assert voters
         assertEq(consensus.getVotesCount(), 1);
         allVoters = consensus.getVotes(address(0), 10);

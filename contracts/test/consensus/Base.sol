@@ -8,6 +8,9 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 contract Base is Test {
     ConsensusV1 public consensus;
 
+    // Marker to ignore coverage for this contract
+    function test() public {}
+
     function setUp() public {
         bytes memory data = abi.encode(ConsensusV1.initialize.selector);
         address proxy = address(new ERC1967Proxy(address(new ConsensusV1()), data));

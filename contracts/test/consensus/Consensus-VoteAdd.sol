@@ -308,4 +308,26 @@ contract ConsensusTest is Base {
         assertEq(allVoters[1].voter, voterAddr3);
         assertEq(allVoters[1].validator, validatorAddr1);
     }
+
+    function test_add_vote_unvote() public {
+        // Register validator
+        address addr = address(1);
+        registerValidator(addr);
+
+        // Prepare voter
+        address voterAddr = address(2);
+
+        vm.expectEmit(address(consensus));
+        emit ConsensusV1.Voted(addr, addr);
+        consensus.addVote(addr, addr);
+
+        consensus.addVote(voterAddr, addr);
+
+        // Unvote
+        vm.prank(addr);
+
+        vm.expectEmit(address(consensus));
+        emit ConsensusV1.Unvoted(addr, addr);
+        consensus.unvote();
+    }
 }
