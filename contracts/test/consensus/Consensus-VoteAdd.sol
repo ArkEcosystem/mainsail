@@ -368,14 +368,20 @@ contract ConsensusTest is Base {
         address addr = address(1);
         registerValidator(addr);
 
-        // Prepare voter
         address voterAddr = address(2);
 
-        vm.expectEmit(address(consensus));
-        emit ConsensusV1.Voted(addr, addr);
-        consensus.addVote(addr, addr);
+        address[] memory voters = new address[](2);
+        voters[0] = voterAddr;
+        voters[1] = addr;
 
-        consensus.addVote(voterAddr, addr);
+        address[] memory validators = new address[](2);
+        validators[0] = addr;
+        validators[1] = addr;
+
+        vm.expectEmit(address(consensus));
+        emit ConsensusV1.Voted(voterAddr, addr);
+        emit ConsensusV1.Voted(addr, addr);
+        consensus.addVotes(voters, validators);
 
         // Unvote
         vm.prank(addr);
