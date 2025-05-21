@@ -30,6 +30,10 @@ jobs:
               with:
                   version: nightly
 
+            - name: Build
+              run: |
+                  forge build
+
             - name: Run test with coverage
               run: |
                   bash ./coverage.sh
