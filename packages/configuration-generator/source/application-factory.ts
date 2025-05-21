@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
@@ -20,9 +22,8 @@ import { Application, Providers } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreSnapshotLegacyImporter } from "@mainsail/snapshot-legacy-importer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
-import { dirSync, setGracefulCleanup } from "tmp";
-import { readFileSync } from "node:fs";
 import { readJSONSync } from "fs-extra/esm";
+import { dirSync, setGracefulCleanup } from "tmp";
 
 import { ConfigurationGenerator } from "./configuration-generator.js";
 import { ConfigurationWriter } from "./configuration-writer.js";
