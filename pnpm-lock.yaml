@@ -2359,12 +2359,24 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-address-keccak256':
+        specifier: workspace:*
+        version: link:../crypto-address-keccak256
+      '@mainsail/crypto-key-pair-ecdsa':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../crypto-validation
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       pg:
         specifier: 8.14.0
         version: 8.14.0

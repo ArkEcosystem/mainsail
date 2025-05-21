@@ -26,6 +26,10 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
+		"@mainsail/crypto-address-keccak256": "workspace:*",
+		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"pg": "8.14.0",
 		"tmp": "0.2.3",
 		"typeorm": "0.3.21"

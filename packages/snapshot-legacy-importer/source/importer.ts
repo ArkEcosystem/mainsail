@@ -24,9 +24,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Cryptography.Identity.Address.Factory)
-	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
-
 	@inject(Identifiers.Cryptography.Identity.KeyPair.Factory)
 	@tagged("type", "consensus")
 	private readonly consensusKeyPairFactory!: Contracts.Crypto.KeyPairFactory;
@@ -155,6 +152,17 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		let totalSupply = 0n;
 
+		const publicKeyLookup: Record<string, Contracts.Snapshot.ImportedLegacyWallet> = snapshot.wallets.reduce(
+			(acc, curr) => {
+				if (curr.publicKey) {
+					acc[curr.publicKey] = curr;
+				}
+
+				return acc;
+			},
+			{},
+		);
+
 		for (const wallet of snapshot.wallets) {
 			hash.update(JSON.stringify(wallet));
 
@@ -163,7 +171,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 			if (balance < 0) {
 				// skip OG genesis wallet
-				this.logger.debug(`>> skipping wallet ${wallet.address} with negative balance ${balance.toString()}`);
+				this.logger.debug(
+					`>> skipping wallet ${wallet.arkAddress} with negative balance ${balance.toString()}`,
+				);
 				continue;
 			}
 
@@ -173,11 +183,12 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 			let ethAddress: string | undefined;
 			if (wallet.publicKey) {
-				ethAddress = await this.addressFactory.fromPublicKey(wallet.publicKey);
+				assert.defined(wallet.ethAddress);
+				ethAddress = wallet.ethAddress;
 			}
 
 			wallets.push({
-				arkAddress: wallet.address,
+				arkAddress: wallet.arkAddress,
 				balance,
 				ethAddress,
 				legacyAttributes: {
@@ -192,13 +203,15 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			if (wallet.attributes?.["vote"]) {
 				assert.string(wallet.publicKey);
 
-				const vote = await this.addressFactory.fromPublicKey(wallet.attributes?.["vote"]);
+				const votedWallet = publicKeyLookup[wallet.attributes?.["vote"]];
+				assert.defined(votedWallet);
+				assert.defined(votedWallet.ethAddress);
 
 				voters.push({
-					arkAddress: wallet.address,
+					arkAddress: wallet.arkAddress,
 					ethAddress,
 					publicKey: wallet.publicKey,
-					vote,
+					vote: votedWallet.ethAddress,
 				});
 			}
 
@@ -208,7 +221,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				}
 
 				validators.push({
-					arkAddress: wallet.address,
+					arkAddress: wallet.arkAddress,
 					blsPublicKey: wallet.attributes?.["delegate"]["blsPublicKey"],
 					ethAddress,
 					isResigned: wallet.attributes?.["delegate"]["isResigned"] ?? false,

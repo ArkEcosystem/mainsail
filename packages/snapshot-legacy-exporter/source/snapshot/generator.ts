@@ -4,6 +4,7 @@ import { promisify } from "node:util";
 import { brotliCompress } from "node:zlib";
 
 import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 import { DataSource } from "typeorm";
@@ -62,7 +63,11 @@ export class Generator {
 		console.log("connected!");
 
 		const [chainTip] = await dataSource.query(
-			"SELECT * FROM dblink('v3_db', 'SELECT id, height FROM blocks ORDER BY height DESC LIMIT 1') AS blocks(id varchar, height bigint);",
+			"SELECT * FROM dblink('v3_db', 'SELECT id, height FROM blocks ORDER BY height DESC LIMIT 1') AS blocks(hash varchar, number bigint);",
+		);
+
+		const addressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
+			Identifiers.Cryptography.Identity.Address.Factory,
 		);
 
 		// Loop all wallets
@@ -78,7 +83,7 @@ export class Generator {
 						SELECT address, public_key, balance, attributes FROM wallets -- WHERE attributes ?| array[''vote'', ''delegate'', ''username'']
 						ORDER BY balance DESC, address ASC LIMIT ${limit} OFFSET ${offset}
 					'
-				) AS wallets(address varchar, "publicKey" varchar, balance bigint, attributes jsonb);
+				) AS wallets("arkAddress" varchar, "publicKey" varchar, balance bigint, attributes jsonb);
 			`);
 
 			for (const wallet of chunk) {
@@ -92,7 +97,14 @@ export class Generator {
 				delete wallet.attributes?.["htlc"]; // ?
 				delete wallet.attributes?.["entities"]; // ?
 
-				wallets.push(wallet);
+				wallets.push({
+					...wallet,
+					...(wallet.publicKey
+						? {
+								ethAddress: await addressFactory.fromPublicKey(wallet.publicKey),
+							}
+						: {}),
+				});
 			}
 
 			offset += limit;
