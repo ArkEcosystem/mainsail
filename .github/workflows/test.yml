@@ -48,7 +48,6 @@ jobs:
               with:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Cache lerna
               uses: actions/cache@v4
@@ -99,13 +98,11 @@ jobs:
               with:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-                  restore-keys: ${{ runner.os }}-pnpm-
             - name: Cache lerna
               uses: actions/cache@v4
               with:
                   key: lerna-${{ runner.os }}
                   path: ./.cache
-                  restore-keys: lerna-${{ runner.os }}-
             - uses: actions-rs/toolchain@v1
               with:
                   toolchain: stable
@@ -305,13 +302,11 @@ jobs:
               with:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-                  restore-keys: ${{ runner.os }}-pnpm-
             - name: Cache lerna
               uses: actions/cache@v4
               with:
                   key: lerna-${{ runner.os }}
                   path: ./.cache
-                  restore-keys: lerna-${{ runner.os }}-
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -357,13 +352,11 @@ jobs:
               with:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-                  restore-keys: ${{ runner.os }}-pnpm-
             - name: Cache lerna
               uses: actions/cache@v4
               with:
                   key: lerna-${{ runner.os }}
                   path: ./.cache
-                  restore-keys: lerna-${{ runner.os }}-
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -443,13 +436,11 @@ jobs:
               with:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-                  restore-keys: ${{ runner.os }}-pnpm-
             - name: Cache lerna
               uses: actions/cache@v4
               with:
                   key: lerna-${{ runner.os }}
                   path: ./.cache
-                  restore-keys: lerna-${{ runner.os }}-
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -502,13 +493,11 @@ jobs:
               with:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-                  restore-keys: ${{ runner.os }}-pnpm-
             - name: Cache lerna
               uses: actions/cache@v4
               with:
                   key: lerna-${{ runner.os }}
                   path: ./.cache
-                  restore-keys: lerna-${{ runner.os }}-
             - name: Install dependencies
               run: pnpm install
             - name: Build
