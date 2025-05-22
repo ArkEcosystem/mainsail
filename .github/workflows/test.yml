@@ -540,7 +540,6 @@ jobs:
             group: ${{ github.head_ref }}-functional-${{matrix.name}}
         runs-on: ubuntu-latest
 
-
         strategy:
             matrix:
                 node-version: [22.x]
