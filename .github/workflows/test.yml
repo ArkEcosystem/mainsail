@@ -11,14 +11,15 @@ on:
             - main
             - develop
 
+permissions:
+    contents: read
+
 env:
     CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
     build:
         name: "Build"
-        permissions:
-            contents: read
         strategy:
             matrix:
                 node-version: [22.x]
@@ -73,8 +74,6 @@ jobs:
 
     unit:
         name: "Unit"
-        permissions:
-            contents: read
         needs:
             - build
         strategy:
@@ -259,8 +258,6 @@ jobs:
 
     integration:
         name: "Integration"
-        permissions:
-            contents: read
         needs:
             - build
         strategy:
@@ -317,8 +314,6 @@ jobs:
 
     e2e-consensus:
         name: "E2E Consensus"
-        permissions:
-            contents: read
         needs:
             - build
         concurrency:
@@ -403,8 +398,6 @@ jobs:
 
     e2e-clients:
         name: "E2E Clients"
-        permissions:
-            contents: read
         needs:
             - build
         concurrency:
@@ -462,8 +455,6 @@ jobs:
 
     e2e-snapshot:
         name: "E2E Snapshot"
-        permissions:
-            contents: read
         needs:
             - build
         concurrency:
@@ -542,8 +533,6 @@ jobs:
 
     functional:
         name: "Functional - ${{matrix.name}}"
-        permissions:
-            contents: read
         needs:
             - build
         concurrency:
