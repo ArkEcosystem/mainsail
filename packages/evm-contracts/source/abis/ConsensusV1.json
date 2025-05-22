@@ -4,23 +4,47 @@
 			"type": "function",
 			"name": "UPGRADE_INTERFACE_VERSION",
 			"inputs": [],
-			"outputs": [{ "name": "", "type": "string", "internalType": "string" }],
+			"outputs": [
+				{
+					"name": "",
+					"type": "string",
+					"internalType": "string"
+				}
+			],
 			"stateMutability": "view"
 		},
 		{
 			"type": "function",
 			"name": "activeValidatorsCount",
 			"inputs": [],
-			"outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+			"outputs": [
+				{
+					"name": "",
+					"type": "uint256",
+					"internalType": "uint256"
+				}
+			],
 			"stateMutability": "view"
 		},
 		{
 			"type": "function",
 			"name": "addValidator",
 			"inputs": [
-				{ "name": "addr", "type": "address", "internalType": "address" },
-				{ "name": "blsPublicKey", "type": "bytes", "internalType": "bytes" },
-				{ "name": "isResigned", "type": "bool", "internalType": "bool" }
+				{
+					"name": "addr",
+					"type": "address",
+					"internalType": "address"
+				},
+				{
+					"name": "blsPublicKey",
+					"type": "bytes",
+					"internalType": "bytes"
+				},
+				{
+					"name": "isResigned",
+					"type": "bool",
+					"internalType": "bool"
+				}
 			],
 			"outputs": [],
 			"stateMutability": "nonpayable"
@@ -29,8 +53,16 @@
 			"type": "function",
 			"name": "addVotes",
 			"inputs": [
-				{ "name": "voters", "type": "address[]", "internalType": "address[]" },
-				{ "name": "validators", "type": "address[]", "internalType": "address[]" }
+				{
+					"name": "voters",
+					"type": "address[]",
+					"internalType": "address[]"
+				},
+				{
+					"name": "validators",
+					"type": "address[]",
+					"internalType": "address[]"
+				}
 			],
 			"outputs": [],
 			"stateMutability": "nonpayable"
@@ -38,7 +70,13 @@
 		{
 			"type": "function",
 			"name": "calculateActiveValidators",
-			"inputs": [{ "name": "n", "type": "uint8", "internalType": "uint8" }],
+			"inputs": [
+				{
+					"name": "n",
+					"type": "uint8",
+					"internalType": "uint8"
+				}
+			],
 			"outputs": [],
 			"stateMutability": "nonpayable"
 		},
@@ -52,16 +90,36 @@
 					"type": "tuple[]",
 					"internalType": "struct ConsensusV1.Validator[]",
 					"components": [
-						{ "name": "addr", "type": "address", "internalType": "address" },
+						{
+							"name": "addr",
+							"type": "address",
+							"internalType": "address"
+						},
 						{
 							"name": "data",
 							"type": "tuple",
 							"internalType": "struct ConsensusV1.ValidatorData",
 							"components": [
-								{ "name": "votersCount", "type": "uint256", "internalType": "uint256" },
-								{ "name": "voteBalance", "type": "uint256", "internalType": "uint256" },
-								{ "name": "isResigned", "type": "bool", "internalType": "bool" },
-								{ "name": "blsPublicKey", "type": "bytes", "internalType": "bytes" }
+								{
+									"name": "votersCount",
+									"type": "uint256",
+									"internalType": "uint256"
+								},
+								{
+									"name": "voteBalance",
+									"type": "uint256",
+									"internalType": "uint256"
+								},
+								{
+									"name": "isResigned",
+									"type": "bool",
+									"internalType": "bool"
+								},
+								{
+									"name": "blsPublicKey",
+									"type": "bytes",
+									"internalType": "bytes"
+								}
 							]
 						}
 					]
@@ -79,16 +137,36 @@
 					"type": "tuple[]",
 					"internalType": "struct ConsensusV1.Validator[]",
 					"components": [
-						{ "name": "addr", "type": "address", "internalType": "address" },
+						{
+							"name": "addr",
+							"type": "address",
+							"internalType": "address"
+						},
 						{
 							"name": "data",
 							"type": "tuple",
 							"internalType": "struct ConsensusV1.ValidatorData",
 							"components": [
-								{ "name": "votersCount", "type": "uint256", "internalType": "uint256" },
-								{ "name": "voteBalance", "type": "uint256", "internalType": "uint256" },
-								{ "name": "isResigned", "type": "bool", "internalType": "bool" },
-								{ "name": "blsPublicKey", "type": "bytes", "internalType": "bytes" }
+								{
+									"name": "votersCount",
+									"type": "uint256",
+									"internalType": "uint256"
+								},
+								{
+									"name": "voteBalance",
+									"type": "uint256",
+									"internalType": "uint256"
+								},
+								{
+									"name": "isResigned",
+									"type": "bool",
+									"internalType": "bool"
+								},
+								{
+									"name": "blsPublicKey",
+									"type": "bytes",
+									"internalType": "bytes"
+								}
 							]
 						}
 					]
@@ -100,8 +178,16 @@
 			"type": "function",
 			"name": "getRounds",
 			"inputs": [
-				{ "name": "offset", "type": "uint256", "internalType": "uint256" },
-				{ "name": "count", "type": "uint256", "internalType": "uint256" }
+				{
+					"name": "offset",
+					"type": "uint256",
+					"internalType": "uint256"
+				},
+				{
+					"name": "count",
+					"type": "uint256",
+					"internalType": "uint256"
+				}
 			],
 			"outputs": [
 				{
@@ -109,14 +195,26 @@
 					"type": "tuple[]",
 					"internalType": "struct ConsensusV1.Round[]",
 					"components": [
-						{ "name": "round", "type": "uint256", "internalType": "uint256" },
+						{
+							"name": "round",
+							"type": "uint256",
+							"internalType": "uint256"
+						},
 						{
 							"name": "validators",
 							"type": "tuple[]",
 							"internalType": "struct ConsensusV1.RoundValidator[]",
 							"components": [
-								{ "name": "addr", "type": "address", "internalType": "address" },
-								{ "name": "voteBalance", "type": "uint256", "internalType": "uint256" }
+								{
+									"name": "addr",
+									"type": "address",
+									"internalType": "address"
+								},
+								{
+									"name": "voteBalance",
+									"type": "uint256",
+									"internalType": "uint256"
+								}
 							]
 						}
 					]
@@ -128,29 +226,61 @@
 			"type": "function",
 			"name": "getRoundsCount",
 			"inputs": [],
-			"outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+			"outputs": [
+				{
+					"name": "",
+					"type": "uint256",
+					"internalType": "uint256"
+				}
+			],
 			"stateMutability": "view"
 		},
 		{
 			"type": "function",
 			"name": "getValidator",
-			"inputs": [{ "name": "addr", "type": "address", "internalType": "address" }],
+			"inputs": [
+				{
+					"name": "addr",
+					"type": "address",
+					"internalType": "address"
+				}
+			],
 			"outputs": [
 				{
 					"name": "",
 					"type": "tuple",
 					"internalType": "struct ConsensusV1.Validator",
 					"components": [
-						{ "name": "addr", "type": "address", "internalType": "address" },
+						{
+							"name": "addr",
+							"type": "address",
+							"internalType": "address"
+						},
 						{
 							"name": "data",
 							"type": "tuple",
 							"internalType": "struct ConsensusV1.ValidatorData",
 							"components": [
-								{ "name": "votersCount", "type": "uint256", "internalType": "uint256" },
-								{ "name": "voteBalance", "type": "uint256", "internalType": "uint256" },
-								{ "name": "isResigned", "type": "bool", "internalType": "bool" },
-								{ "name": "blsPublicKey", "type": "bytes", "internalType": "bytes" }
+								{
+									"name": "votersCount",
+									"type": "uint256",
+									"internalType": "uint256"
+								},
+								{
+									"name": "voteBalance",
+									"type": "uint256",
+									"internalType": "uint256"
+								},
+								{
+									"name": "isResigned",
+									"type": "bool",
+									"internalType": "bool"
+								},
+								{
+									"name": "blsPublicKey",
+									"type": "bytes",
+									"internalType": "bytes"
+								}
 							]
 						}
 					]
@@ -162,8 +292,16 @@
 			"type": "function",
 			"name": "getVotes",
 			"inputs": [
-				{ "name": "addr", "type": "address", "internalType": "address" },
-				{ "name": "count", "type": "uint256", "internalType": "uint256" }
+				{
+					"name": "addr",
+					"type": "address",
+					"internalType": "address"
+				},
+				{
+					"name": "count",
+					"type": "uint256",
+					"internalType": "uint256"
+				}
 			],
 			"outputs": [
 				{
@@ -171,8 +309,16 @@
 					"type": "tuple[]",
 					"internalType": "struct ConsensusV1.VoteResult[]",
 					"components": [
-						{ "name": "voter", "type": "address", "internalType": "address" },
-						{ "name": "validator", "type": "address", "internalType": "address" }
+						{
+							"name": "voter",
+							"type": "address",
+							"internalType": "address"
+						},
+						{
+							"name": "validator",
+							"type": "address",
+							"internalType": "address"
+						}
 					]
 				}
 			],
@@ -182,35 +328,77 @@
 			"type": "function",
 			"name": "getVotesCount",
 			"inputs": [],
-			"outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+			"outputs": [
+				{
+					"name": "",
+					"type": "uint256",
+					"internalType": "uint256"
+				}
+			],
 			"stateMutability": "view"
 		},
-		{ "type": "function", "name": "initialize", "inputs": [], "outputs": [], "stateMutability": "nonpayable" },
+		{
+			"type": "function",
+			"name": "initialize",
+			"inputs": [],
+			"outputs": [],
+			"stateMutability": "nonpayable"
+		},
 		{
 			"type": "function",
 			"name": "isValidatorRegistered",
-			"inputs": [{ "name": "addr", "type": "address", "internalType": "address" }],
-			"outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
+			"inputs": [
+				{
+					"name": "addr",
+					"type": "address",
+					"internalType": "address"
+				}
+			],
+			"outputs": [
+				{
+					"name": "",
+					"type": "bool",
+					"internalType": "bool"
+				}
+			],
 			"stateMutability": "view"
 		},
 		{
 			"type": "function",
 			"name": "owner",
 			"inputs": [],
-			"outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+			"outputs": [
+				{
+					"name": "",
+					"type": "address",
+					"internalType": "address"
+				}
+			],
 			"stateMutability": "view"
 		},
 		{
 			"type": "function",
 			"name": "proxiableUUID",
 			"inputs": [],
-			"outputs": [{ "name": "", "type": "bytes32", "internalType": "bytes32" }],
+			"outputs": [
+				{
+					"name": "",
+					"type": "bytes32",
+					"internalType": "bytes32"
+				}
+			],
 			"stateMutability": "view"
 		},
 		{
 			"type": "function",
 			"name": "registerValidator",
-			"inputs": [{ "name": "blsPublicKey", "type": "bytes", "internalType": "bytes" }],
+			"inputs": [
+				{
+					"name": "blsPublicKey",
+					"type": "bytes",
+					"internalType": "bytes"
+				}
+			],
 			"outputs": [],
 			"stateMutability": "nonpayable"
 		},
@@ -218,7 +406,13 @@
 			"type": "function",
 			"name": "registeredValidatorsCount",
 			"inputs": [],
-			"outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+			"outputs": [
+				{
+					"name": "",
+					"type": "uint256",
+					"internalType": "uint256"
+				}
+			],
 			"stateMutability": "view"
 		},
 		{
@@ -228,33 +422,69 @@
 			"outputs": [],
 			"stateMutability": "nonpayable"
 		},
-		{ "type": "function", "name": "resignValidator", "inputs": [], "outputs": [], "stateMutability": "nonpayable" },
+		{
+			"type": "function",
+			"name": "resignValidator",
+			"inputs": [],
+			"outputs": [],
+			"stateMutability": "nonpayable"
+		},
 		{
 			"type": "function",
 			"name": "resignedValidatorsCount",
 			"inputs": [],
-			"outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+			"outputs": [
+				{
+					"name": "",
+					"type": "uint256",
+					"internalType": "uint256"
+				}
+			],
 			"stateMutability": "view"
 		},
 		{
 			"type": "function",
 			"name": "transferOwnership",
-			"inputs": [{ "name": "newOwner", "type": "address", "internalType": "address" }],
+			"inputs": [
+				{
+					"name": "newOwner",
+					"type": "address",
+					"internalType": "address"
+				}
+			],
 			"outputs": [],
 			"stateMutability": "nonpayable"
 		},
-		{ "type": "function", "name": "unvote", "inputs": [], "outputs": [], "stateMutability": "nonpayable" },
+		{
+			"type": "function",
+			"name": "unvote",
+			"inputs": [],
+			"outputs": [],
+			"stateMutability": "nonpayable"
+		},
 		{
 			"type": "function",
 			"name": "updateValidator",
-			"inputs": [{ "name": "blsPublicKey", "type": "bytes", "internalType": "bytes" }],
+			"inputs": [
+				{
+					"name": "blsPublicKey",
+					"type": "bytes",
+					"internalType": "bytes"
+				}
+			],
 			"outputs": [],
 			"stateMutability": "nonpayable"
 		},
 		{
 			"type": "function",
 			"name": "updateVoters",
-			"inputs": [{ "name": "voters", "type": "address[]", "internalType": "address[]" }],
+			"inputs": [
+				{
+					"name": "voters",
+					"type": "address[]",
+					"internalType": "address[]"
+				}
+			],
 			"outputs": [],
 			"stateMutability": "nonpayable"
 		},
@@ -262,8 +492,16 @@
 			"type": "function",
 			"name": "upgradeToAndCall",
 			"inputs": [
-				{ "name": "newImplementation", "type": "address", "internalType": "address" },
-				{ "name": "data", "type": "bytes", "internalType": "bytes" }
+				{
+					"name": "newImplementation",
+					"type": "address",
+					"internalType": "address"
+				},
+				{
+					"name": "data",
+					"type": "bytes",
+					"internalType": "bytes"
+				}
 			],
 			"outputs": [],
 			"stateMutability": "payable"
@@ -272,28 +510,57 @@
 			"type": "function",
 			"name": "version",
 			"inputs": [],
-			"outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+			"outputs": [
+				{
+					"name": "",
+					"type": "uint256",
+					"internalType": "uint256"
+				}
+			],
 			"stateMutability": "pure"
 		},
 		{
 			"type": "function",
 			"name": "vote",
-			"inputs": [{ "name": "addr", "type": "address", "internalType": "address" }],
+			"inputs": [
+				{
+					"name": "addr",
+					"type": "address",
+					"internalType": "address"
+				}
+			],
 			"outputs": [],
 			"stateMutability": "nonpayable"
 		},
 		{
 			"type": "event",
 			"name": "Initialized",
-			"inputs": [{ "name": "version", "type": "uint64", "indexed": false, "internalType": "uint64" }],
+			"inputs": [
+				{
+					"name": "version",
+					"type": "uint64",
+					"indexed": false,
+					"internalType": "uint64"
+				}
+			],
 			"anonymous": false
 		},
 		{
 			"type": "event",
 			"name": "OwnershipTransferred",
 			"inputs": [
-				{ "name": "previousOwner", "type": "address", "indexed": true, "internalType": "address" },
-				{ "name": "newOwner", "type": "address", "indexed": true, "internalType": "address" }
+				{
+					"name": "previousOwner",
+					"type": "address",
+					"indexed": true,
+					"internalType": "address"
+				},
+				{
+					"name": "newOwner",
+					"type": "address",
+					"indexed": true,
+					"internalType": "address"
+				}
 			],
 			"anonymous": false
 		},
@@ -301,38 +568,82 @@
 			"type": "event",
 			"name": "Unvoted",
 			"inputs": [
-				{ "name": "voter", "type": "address", "indexed": false, "internalType": "address" },
-				{ "name": "validator", "type": "address", "indexed": false, "internalType": "address" }
+				{
+					"name": "voter",
+					"type": "address",
+					"indexed": false,
+					"internalType": "address"
+				},
+				{
+					"name": "validator",
+					"type": "address",
+					"indexed": false,
+					"internalType": "address"
+				}
 			],
 			"anonymous": false
 		},
 		{
 			"type": "event",
 			"name": "Upgraded",
-			"inputs": [{ "name": "implementation", "type": "address", "indexed": true, "internalType": "address" }],
+			"inputs": [
+				{
+					"name": "implementation",
+					"type": "address",
+					"indexed": true,
+					"internalType": "address"
+				}
+			],
 			"anonymous": false
 		},
 		{
 			"type": "event",
 			"name": "ValidatorRegistered",
 			"inputs": [
-				{ "name": "addr", "type": "address", "indexed": false, "internalType": "address" },
-				{ "name": "blsPublicKey", "type": "bytes", "indexed": false, "internalType": "bytes" }
+				{
+					"name": "addr",
+					"type": "address",
+					"indexed": false,
+					"internalType": "address"
+				},
+				{
+					"name": "blsPublicKey",
+					"type": "bytes",
+					"indexed": false,
+					"internalType": "bytes"
+				}
 			],
 			"anonymous": false
 		},
 		{
 			"type": "event",
 			"name": "ValidatorResigned",
-			"inputs": [{ "name": "addr", "type": "address", "indexed": false, "internalType": "address" }],
+			"inputs": [
+				{
+					"name": "addr",
+					"type": "address",
+					"indexed": false,
+					"internalType": "address"
+				}
+			],
 			"anonymous": false
 		},
 		{
 			"type": "event",
 			"name": "ValidatorUpdated",
 			"inputs": [
-				{ "name": "addr", "type": "address", "indexed": false, "internalType": "address" },
-				{ "name": "blsPublicKey", "type": "bytes", "indexed": false, "internalType": "bytes" }
+				{
+					"name": "addr",
+					"type": "address",
+					"indexed": false,
+					"internalType": "address"
+				},
+				{
+					"name": "blsPublicKey",
+					"type": "bytes",
+					"indexed": false,
+					"internalType": "bytes"
+				}
 			],
 			"anonymous": false
 		},
@@ -340,64 +651,192 @@
 			"type": "event",
 			"name": "Voted",
 			"inputs": [
-				{ "name": "voter", "type": "address", "indexed": false, "internalType": "address" },
-				{ "name": "validator", "type": "address", "indexed": false, "internalType": "address" }
+				{
+					"name": "voter",
+					"type": "address",
+					"indexed": false,
+					"internalType": "address"
+				},
+				{
+					"name": "validator",
+					"type": "address",
+					"indexed": false,
+					"internalType": "address"
+				}
 			],
 			"anonymous": false
 		},
 		{
 			"type": "error",
 			"name": "AddressEmptyCode",
-			"inputs": [{ "name": "target", "type": "address", "internalType": "address" }]
+			"inputs": [
+				{
+					"name": "target",
+					"type": "address",
+					"internalType": "address"
+				}
+			]
 		},
-		{ "type": "error", "name": "AlreadyVoted", "inputs": [] },
-		{ "type": "error", "name": "BellowMinValidators", "inputs": [] },
-		{ "type": "error", "name": "BlsKeyAlreadyRegistered", "inputs": [] },
-		{ "type": "error", "name": "BlsKeyIsInvalid", "inputs": [] },
-		{ "type": "error", "name": "CallerIsNotValidator", "inputs": [] },
+		{
+			"type": "error",
+			"name": "AlreadyVoted",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "BellowMinValidators",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "BlsKeyAlreadyRegistered",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "BlsKeyIsInvalid",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "CallerIsNotValidator",
+			"inputs": []
+		},
 		{
 			"type": "error",
 			"name": "ERC1967InvalidImplementation",
-			"inputs": [{ "name": "implementation", "type": "address", "internalType": "address" }]
+			"inputs": [
+				{
+					"name": "implementation",
+					"type": "address",
+					"internalType": "address"
+				}
+			]
 		},
-		{ "type": "error", "name": "ERC1967NonPayable", "inputs": [] },
-		{ "type": "error", "name": "FailedCall", "inputs": [] },
-		{ "type": "error", "name": "ImportIsNotAllowed", "inputs": [] },
-		{ "type": "error", "name": "InvalidInitialization", "inputs": [] },
-		{ "type": "error", "name": "InvalidParameters", "inputs": [] },
+		{
+			"type": "error",
+			"name": "ERC1967NonPayable",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "FailedCall",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "ImportIsNotAllowed",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "InvalidInitialization",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "InvalidParameters",
+			"inputs": []
+		},
 		{
 			"type": "error",
 			"name": "InvalidRange",
 			"inputs": [
-				{ "name": "min", "type": "uint256", "internalType": "uint256" },
-				{ "name": "max", "type": "uint256", "internalType": "uint256" }
+				{
+					"name": "min",
+					"type": "uint256",
+					"internalType": "uint256"
+				},
+				{
+					"name": "max",
+					"type": "uint256",
+					"internalType": "uint256"
+				}
 			]
 		},
-		{ "type": "error", "name": "MissingVote", "inputs": [] },
-		{ "type": "error", "name": "NoActiveValidators", "inputs": [] },
-		{ "type": "error", "name": "NotInitializing", "inputs": [] },
+		{
+			"type": "error",
+			"name": "MissingVote",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "NoActiveValidators",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "NotInitializing",
+			"inputs": []
+		},
 		{
 			"type": "error",
 			"name": "OwnableInvalidOwner",
-			"inputs": [{ "name": "owner", "type": "address", "internalType": "address" }]
+			"inputs": [
+				{
+					"name": "owner",
+					"type": "address",
+					"internalType": "address"
+				}
+			]
 		},
 		{
 			"type": "error",
 			"name": "OwnableUnauthorizedAccount",
-			"inputs": [{ "name": "account", "type": "address", "internalType": "address" }]
+			"inputs": [
+				{
+					"name": "account",
+					"type": "address",
+					"internalType": "address"
+				}
+			]
 		},
-		{ "type": "error", "name": "UUPSUnauthorizedCallContext", "inputs": [] },
+		{
+			"type": "error",
+			"name": "UUPSUnauthorizedCallContext",
+			"inputs": []
+		},
 		{
 			"type": "error",
 			"name": "UUPSUnsupportedProxiableUUID",
-			"inputs": [{ "name": "slot", "type": "bytes32", "internalType": "bytes32" }]
+			"inputs": [
+				{
+					"name": "slot",
+					"type": "bytes32",
+					"internalType": "bytes32"
+				}
+			]
 		},
-		{ "type": "error", "name": "ValidatorAlreadyRegistered", "inputs": [] },
-		{ "type": "error", "name": "ValidatorAlreadyResigned", "inputs": [] },
-		{ "type": "error", "name": "ValidatorNotRegistered", "inputs": [] },
-		{ "type": "error", "name": "VoteResignedValidator", "inputs": [] },
-		{ "type": "error", "name": "VoteSameValidator", "inputs": [] },
-		{ "type": "error", "name": "VoteValidatorWithoutBlsPublicKey", "inputs": [] }
+		{
+			"type": "error",
+			"name": "ValidatorAlreadyRegistered",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "ValidatorAlreadyResigned",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "ValidatorNotRegistered",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "VoteResignedValidator",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "VoteSameValidator",
+			"inputs": []
+		},
+		{
+			"type": "error",
+			"name": "VoteValidatorWithoutBlsPublicKey",
+			"inputs": []
+		}
 	],
 	"bytecode": {
 		"object": "0x60a0604052306080523480156012575f5ffd5b506080516139856100395f395f81816120d4015281816120fd015261223c01526139855ff3fe6080604052600436106101af575f3560e01c80637c8a92c3116100e7578063b85f5da211610087578063eb9019d411610062578063eb9019d4146104a2578063f1bd0b37146104ce578063f2fde38b146104e2578063f3513a3714610501575f5ffd5b8063b85f5da214610440578063d04a68c714610454578063e9257dc814610483575f5ffd5b80638da5cb5b116100c25780638da5cb5b146103885780639de70258146103ce578063a09686c4146103ef578063ad3cb1cc14610403575f5ffd5b80637c8a92c3146103365780638129fc1c14610355578063857861db14610369575f5ffd5b80634f1ef286116101525780635a8eed731161012d5780635a8eed73146102c5578063602a9eee146102e45780636dd7d8ea14610303578063715018a614610322575f5ffd5b80634f1ef2861461028b57806352d1902d1461029e57806354fd4d50146102b2575f5ffd5b80631b605b861161018d5780631b605b86146102165780632bdf6d431461022a5780633174b6891461024b57806340f74f471461025f575f5ffd5b80630777cbef146101b35780630d2bd909146101d65780631904bb2e146101ea575b5f5ffd5b3480156101be575f5ffd5b506005545b6040519081526020015b60405180910390f35b3480156101e1575f5ffd5b50600d546101c3565b3480156101f5575f5ffd5b506102096102043660046130df565b610515565b6040516101cd919061319e565b348015610221575f5ffd5b506009546101c3565b348015610235575f5ffd5b506102496102443660046131f7565b610630565b005b348015610256575f5ffd5b5061024961067e565b34801561026a575f5ffd5b5061027e610279366004613235565b6106cd565b6040516101cd9190613255565b610249610299366004613322565b610860565b3480156102a9575f5ffd5b506101c361087f565b3480156102bd575f5ffd5b5060016101c3565b3480156102d0575f5ffd5b506102496102df366004613420565b61089a565b3480156102ef575f5ffd5b506102496102fe366004613420565b610926565b34801561030e575f5ffd5b5061024961031d3660046130df565b610ab4565b34801561032d575f5ffd5b50610249610d32565b348015610341575f5ffd5b50610249610350366004613452565b610d45565b348015610360575f5ffd5b50610249610f84565b348015610374575f5ffd5b506102496103833660046134b7565b61107b565b348015610393575f5ffd5b507f9016d09d72d40fdae2fd8ceac6b6234c7706214fd39c1cd1e609a0528c199300546040516001600160a01b0390911681526020016101cd565b3480156103d9575f5ffd5b506103e2611614565b6040516101cd91906134d7565b3480156103fa575f5ffd5b50600f546101c3565b34801561040e575f5ffd5b50610433604051806040016040528060058152602001640352e302e360dc1b81525081565b6040516101cd919061352e565b34801561044b575f5ffd5b506102496117b4565b34801561045f575f5ffd5b5061047361046e3660046130df565b61189d565b60405190151581526020016101cd565b34801561048e575f5ffd5b5061024961049d366004613540565b6118ba565b3480156104ad575f5ffd5b506104c16104bc3660046135aa565b611976565b6040516101cd91906135d2565b3480156104d9575f5ffd5b506004546101c3565b3480156104ed575f5ffd5b506102496104fc3660046130df565b611b77565b34801561050c575f5ffd5b506103e2611bb4565b61051d612fe9565b6105268261189d565b6105435760405163510b8aad60e11b815260040160405180910390fd5b6040805180820182526001600160a01b0384168082525f908152602081815290839020835160808101855281548152600182015481840152600282015460ff161515948101949094526003810180549394928501936060840191906105a79061362c565b80601f01602080910402602001604051908101604052809291908181526020018280546105d39061362c565b801561061e5780601f106105f55761010080835404028352916020019161061e565b820191905f5260205f20905b81548152906001019060200180831161060157829003601f168201915b50505091909252505050905292915050565b610638611d4e565b5f5b81811015610679576106718383838181106106575761065761365e565b905060200201602081019061066c91906130df565b611da9565b60010161063a565b505050565b7f6572af8bf9a0a86efb88dcc30011626a15c9c4603503aa4466a3f87a1867deef336106a8611e9e565b604080516001600160a01b0393841681529290911660208301520160405180910390a1565b60606106d7611d4e565b600f54829084106106e957505f61070d565b600f546106f68486613686565b111561070d57600f5461070a908590613699565b90505b5f816001600160401b038111156107265761072661330e565b60405190808252806020026020018201604052801561076b57816020015b604080518082019091525f8152606060208201528152602001906001900390816107445790505b5090505f5b82811015610855576040518060400160405280828861078f9190613686565b61079a906001613686565b8152602001600f6107ab848a613686565b815481106107bb576107bb61365e565b905f5260205f2001805480602002602001604051908101604052809291908181526020015f905b82821015610829575f848152602090819020604080518082019091526002850290910180546001600160a01b031682526001908101548284015290835290920191016107e2565b505050508152508282815181106108425761084261365e565b6020908102919091010152600101610770565b509150505b92915050565b6108686120c9565b6108718261216d565b61087b8282612175565b5050565b5f610888612231565b505f5160206139305f395f51905f5290565b6108a33361189d565b6108c05760405163510b8aad60e11b815260040160405180910390fd5b6108ca828261227a565b335f9081526020819052604090206003016108e68284836136f0565b507f4af0b5984c9f88659d661fb64dcb63a5b946809cf1c78a8c6e0f6ef93c91703233838360405161091a939291906137a9565b60405180910390a15050565b335f9081526001602052604090205460ff16156109565760405163132e7efb60e31b815260040160405180910390fd5b610960828261227a565b5f60405180608001604052805f81526020015f81526020015f1515815260200184848080601f0160208091040260200160405190810160405280939291908181526020018383808284375f9201829052509390945250506004805493945091506109c9836137e8565b9091555050335f908152600160208181526040808420805460ff19908116851790915584835293819020855181559185015192820192909255908301516002820180549093169015151790915560608201518291906003820190610a2d9082613800565b5050600380546001810182555f919091527fc2575a0e9e593c00f959f8c92f12db2869c3395a3b0502d05e2516446f71f85b0180546001600160a01b031916339081179091556040517f61809fa303a3a57f4d70552f533f3e0b003173d424590cd4bb22a2afe000990c9250610aa79190869086906137a9565b60405180910390a1505050565b610abd8161189d565b610ada5760405163510b8aad60e11b815260040160405180910390fd5b6001600160a01b0381165f908152602081905260409020600281015460ff1615610b175760405163510ae2bd60e11b815260040160405180910390fd5b806003018054610b269061362c565b90505f03610b475760405163970c784d60e01b815260040160405180910390fd5b335f90815260066020526040902080546001600160a01b03848116911603610b8257604051630d41c52760e01b815260040160405180910390fd5b80546001600160a01b031615610b9c57610b9a611e9e565b505b604080516080810182526001600160a01b03808616825233803160208085019182525f85870181815260608701828152948252600690925295909520935184549084166001600160a01b03199182161785559051600185015593516002840180549184169186169190911790555160039092018054928216929093169190911790915560075416610c4e5760078054336001600160a01b03199182168117909255600880549091169091179055610ca5565b600880546001600160a01b039081165f9081526006602052604080822060030180546001600160a01b0319908116339081179092558554828552929093206002018054841692909416919091179092558254161790555b60098054905f610cb4836137e8565b9190505550336001600160a01b031631826001015f828254610cd69190613686565b9091555050815460019083905f90610cef908490613686565b9091555050604080513381526001600160a01b03851660208201527fce0c7a2a940807f7dc2ce7a615c2532e915e6c0ac9a08bc4ed9d515a710a53e29101610aa7565b610d3a611d4e565b610d435f6122ee565b565b610d4d611d4e565b600f5415610d6e576040516349625b3b60e01b815260040160405180910390fd5b6001600160a01b0384165f9081526001602052604090205460ff1615610da75760405163132e7efb60e31b815260040160405180910390fd5b60025f8484604051610dba9291906138ba565b604080519182900390912082526020820192909252015f205460ff1615610df457604051637e4c066f60e01b815260040160405180910390fd5b8115610e0457610e04838361227a565b5f60405180608001604052805f81526020015f8152602001831515815260200185858080601f0160208091040260200160405190810160405280939291908181526020018383808284375f920182905250939094525050600480549394509150610e6d836137e8565b90915550506001600160a01b0385165f908152600160208181526040808420805460ff19908116851790915584835293819020855181559185015192820192909255908301516002820180549093169015151790915560608201518291906003820190610eda9082613800565b5050600380546001810182555f919091527fc2575a0e9e593c00f959f8c92f12db2869c3395a3b0502d05e2516446f71f85b0180546001600160a01b0319166001600160a01b038816179055508115610f425760058054905f610f3c836137e8565b91905055505b7f61809fa303a3a57f4d70552f533f3e0b003173d424590cd4bb22a2afe000990c858585604051610f75939291906137a9565b60405180910390a15050505050565b5f610f8d61235e565b805490915060ff600160401b82041615906001600160401b03165f81158015610fb35750825b90505f826001600160401b03166001148015610fce5750303b155b905081158015610fdc575080155b15610ffa5760405163f92ee8a960e01b815260040160405180910390fd5b845467ffffffffffffffff19166001178555831561102457845460ff60401b1916600160401b1785555b61102d33612386565b6001600e55831561107457845460ff60401b19168555604051600181527fc7f505b2f371ae2175ee4913f4499e1f2633a7b5936321eed1cdaeb6115181d290602001610f75565b5050505050565b611083611d4e565b8060ff165f036110a657604051630e52390960e41b815260040160405180910390fd5b60ff8116600e556110b76003612397565b6110bf6124e7565b600c80546001600160a01b03191690556005546004545f916110f19160ff85169184916110ec9190613699565b612538565b90508060ff165f03611116576040516367c0fced60e01b815260040160405180910390fd5b5f5b6003548110156113d8575f600382815481106111365761113661365e565b5f9182526020808320909101546001600160a01b031680835290829052604090912060028101549192509060ff168061117d57508060030180546111799061362c565b1590505b156111895750506113d0565b600c546001600160a01b03166111c45750600c80546001600160a01b0319166001600160a01b03929092169190911790556001600d556113d0565b8360ff16600d5410156111e2576111db828561258c565b50506113d0565b600c546001600160a01b039081165f9081526020818152604091829020825180840184529386168452825160808101845285548152600186015481840152600286015460ff1615159381019390935260038501805491946113bd949093840192909187916060840191906112559061362c565b80601f01602080910402602001604051908101604052809291908181526020018280546112819061362c565b80156112cc5780601f106112a3576101008083540402835291602001916112cc565b820191905f5260205f20905b8154815290600101906020018083116112af57829003601f168201915b505050919092525050509052604080518082018252600c546001600160a01b031681528151608081018352855481526001860154602082810191909152600287015460ff161515938201939093526003860180549293840192879160608401916113359061362c565b80601f01602080910402602001604051908101604052809291908181526020018280546113619061362c565b80156113ac5780601f10611383576101008083540402835291602001916113ac565b820191905f5260205f20905b81548152906001019060200180831161138f57829003601f168201915b505050505081525050815250612968565b156113cc576113cc838661258c565b5050505b600101611118565b50600d545f036113fb576040516367c0fced60e01b815260040160405180910390fd5b600c54600d546001600160a01b03909116905f906001600160401b038111156114265761142661330e565b60405190808252806020026020018201604052801561144f578160200160208202803683370190505b5090505f5b600d548110156114a957828282815181106114715761147161365e565b6001600160a01b039283166020918202929092018101919091529381165f908152600a90945260409093205490921691600101611454565b506114b3816129ac565b600f80546001810182555f9182527f8d1108e10bcb7c27dddfc02ed9d693a074039d026cf4ea4240b40f7d581ac80201906114f090600b90613032565b600e546001600160401b0381111561150a5761150a61330e565b604051908082528060200260200182016040528015611533578160200160208202803683370190505b50805161154891600b9160209091019061304d565b505f5b600e5481101561160c575f83600d548361156591906138c9565b815181106115755761157561365e565b6020026020010151905080600b83815481106115935761159361365e565b5f918252602080832090910180546001600160a01b039485166001600160a01b0319918216179091556040805180820182529585168087528452838352832060019081015486840190815288548083018a558986529390942095516002909302909501805492909416911617825551908201550161154b565b505050505050565b600b546060905f906001600160401b038111156116335761163361330e565b60405190808252806020026020018201604052801561166c57816020015b611659612fe9565b8152602001906001900390816116515790505b5090505f5b600b548110156117ae575f600b828154811061168f5761168f61365e565b5f9182526020808320909101546001600160a01b031680835282825260409283902083518085018552828152845160808101865282548152600183015481860152600283015460ff1615159581019590955260038201805493965091949093840192909185916060840191906117049061362c565b80601f01602080910402602001604051908101604052809291908181526020018280546117309061362c565b801561177b5780601f106117525761010080835404028352916020019161177b565b820191905f5260205f20905b81548152906001019060200180831161175e57829003601f168201915b5050505050815250508152508484815181106117995761179961365e565b60209081029190910101525050600101611671565b50919050565b6117bd3361189d565b6117da5760405163668191af60e11b815260040160405180910390fd5b335f908152602081905260409020600281015460ff161561180e57604051632d8b5c9760e21b815260040160405180910390fd5b600e546005546004546118219190613699565b1161183f57604051633b15f1f760e21b815260040160405180910390fd5b60028101805460ff19166001908117909155600580545f90611862908490613686565b90915550506040513381527f24250fc1ec78a1405ddd4cc8b75964858af228d05faa8d4bc1302966d8a541179060200160405180910390a150565b6001600160a01b03165f9081526001602052604090205460ff1690565b6118c2611d4e565b82811461190e5760405162461bcd60e51b81526020600482015260156024820152740d2dce0eae840d8cadccee8d040dad2e6dac2e8c6d605b1b60448201526064015b60405180910390fd5b5f5b838110156110745761196e85858381811061192d5761192d61365e565b905060200201602081019061194291906130df565b8484848181106119545761195461365e565b905060200201602081019061196991906130df565b612ac3565b600101611910565b6060611980611d4e565b5f61198e835f600954612538565b6001600160401b038111156119a5576119a561330e565b6040519080825280602002602001820160405280156119e957816020015b604080518082019091525f80825260208201528152602001906001900390816119c35790505b506007549091506001600160a01b0390811690851615611a2257506001600160a01b038085165f90815260066020526040902060030154165b5f5b6001600160a01b03821615801590611a3b57508481105b15611ab0576001600160a01b038083165f818152600660209081526040918290208251808401909352928252825490931692810192909252908483611a7f816137e8565b945081518110611a9157611a9161365e565b6020908102919091010152600301546001600160a01b03169150611a24565b80835103611ac35782935050505061085a565b5f816001600160401b03811115611adc57611adc61330e565b604051908082528060200260200182016040528015611b2057816020015b604080518082019091525f8082526020820152815260200190600190039081611afa5790505b5090505f5b82811015611b6c57848181518110611b3f57611b3f61365e565b6020026020010151828281518110611b5957611b5961365e565b6020908102919091010152600101611b25565b509695505050505050565b611b7f611d4e565b6001600160a01b038116611ba857604051631e4fbdf760e01b81525f6004820152602401611905565b611bb1816122ee565b50565b6003546060905f906001600160401b03811115611bd357611bd361330e565b604051908082528060200260200182016040528015611c0c57816020015b611bf9612fe9565b815260200190600190039081611bf15790505b5090505f5b6003548110156117ae575f60038281548110611c2f57611c2f61365e565b5f9182526020808320909101546001600160a01b031680835282825260409283902083518085018552828152845160808101865282548152600183015481860152600283015460ff161515958101959095526003820180549396509194909384019290918591606084019190611ca49061362c565b80601f0160208091040260200160405190810160405280929190818152602001828054611cd09061362c565b8015611d1b5780601f10611cf257610100808354040283529160200191611d1b565b820191905f5260205f20905b815481529060010190602001808311611cfe57829003601f168201915b505050505081525050815250848481518110611d3957611d3961365e565b60209081029190910101525050600101611c11565b33611d807f9016d09d72d40fdae2fd8ceac6b6234c7706214fd39c1cd1e609a0528c199300546001600160a01b031690565b6001600160a01b031614610d435760405163118cdaa760e01b8152336004820152602401611905565b6001600160a01b038082165f9081526006602052604090208054909116611de35760405163498ea63d60e01b815260040160405180910390fd5b60018101546001600160a01b03831631811015611e4457611e0e816001600160a01b03851631613699565b82546001600160a01b03165f9081526020819052604081206001018054909190611e39908490613686565b90915550611e899050565b611e586001600160a01b0384163182613699565b82546001600160a01b03165f9081526020819052604081206001018054909190611e83908490613699565b90915550505b506001600160a01b0390911631600190910155565b335f90815260066020526040812080546001600160a01b0316611ed45760405163498ea63d60e01b815260040160405180910390fd5b6008546007546001600160a01b03918216911603611f0d57600780546001600160a01b0319908116909155600880549091169055612020565b600854336001600160a01b0390911603611f66576002810180546001600160a01b039081165f90815260066020526040902060030180546001600160a01b03199081169091559154600880549093169116179055612020565b600754336001600160a01b0390911603611fca576008546001600160a01b039081165f9081526006602052604080822060020180546001600160a01b0319908116909155600780548086168552929093206003015491169216919091179055612020565b60038181018054600280850180546001600160a01b039081165f9081526006602052604080822090970180549583166001600160a01b031996871617905591549454811682529490200180549290931691161790555b80546001600160a01b03165f818152602081905260408120600180850154908201805492939192909190612055908490613699565b9091555050805460019082905f9061206e908490613699565b9091555050335f90815260066020526040812080546001600160a01b03199081168255600182018390556002820180548216905560039091018054909116905560098054916120bc836138e8565b9091555091949350505050565b306001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016148061214f57507f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03166121435f5160206139305f395f51905f52546001600160a01b031690565b6001600160a01b031614155b15610d435760405163703e46dd60e11b815260040160405180910390fd5b611bb1611d4e565b816001600160a01b03166352d1902d6040518163ffffffff1660e01b8152600401602060405180830381865afa9250505080156121cf575060408051601f3d908101601f191682019092526121cc918101906138fd565b60015b6121f757604051634c9c8ce360e01b81526001600160a01b0383166004820152602401611905565b5f5160206139305f395f51905f52811461222757604051632a87526960e21b815260048101829052602401611905565b6106798383612d06565b306001600160a01b037f00000000000000000000000000000000000000000000000000000000000000001614610d435760405163703e46dd60e11b815260040160405180910390fd5b5f828260405161228b9291906138ba565b60408051918290039091205f8181526002602052919091205490915060ff16156122c857604051637e4c066f60e01b815260040160405180910390fd5b6122d28383612d5b565b5f908152600260205260409020805460ff191660011790555050565b7f9016d09d72d40fdae2fd8ceac6b6234c7706214fd39c1cd1e609a0528c19930080546001600160a01b031981166001600160a01b03848116918217845560405192169182907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0905f90a3505050565b5f807ff0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a0061085a565b61238e612d7c565b611bb181612da1565b80545f8190036123a5575050565b5f6123b1600183613699565b90505b8015610679575f6123c6826001613686565b60408051426020820152908101849052606001604051602081830303815290604052805190602001205f1c6123fb91906138c9565b90505f8483815481106124105761241061365e565b5f9182526020909120015485546001600160a01b03909116915085908390811061243c5761243c61365e565b905f5260205f20015f9054906101000a90046001600160a01b03168584815481106124695761246961365e565b905f5260205f20015f6101000a8154816001600160a01b0302191690836001600160a01b03160217905550808583815481106124a7576124a761365e565b905f5260205f20015f6101000a8154816001600160a01b0302191690836001600160a01b03160217905550505080806124df906138e8565b9150506123b4565b600c546001600160a01b03165b6001600160a01b03811615612531576001600160a01b039081165f908152600a6020526040902080546001600160a01b03198116909155166124f4565b505f600d55565b5f8183111561256457604051632457cde760e01b81526004810184905260248101839052604401611905565b82841015612573575081612585565b81841115612582575080612585565b50825b9392505050565b6001600160a01b0382165f90815260208181526040808320815160808101835281548152600182015493810193909352600281015460ff161515918301919091526003810180546060840191906125e29061362c565b80601f016020809104026020016040519081016040528092919081815260200182805461260e9061362c565b80156126595780601f1061263057610100808354040283529160200191612659565b820191905f5260205f20905b81548152906001019060200180831161263c57829003601f168201915b505050919092525050604080518082018252600c546001600160a01b03168082525f908152602081815290839020835160808101855281548152600182015481840152600282015460ff16151594810194909452600381018054969750612778969395509185019392909160608401916126d29061362c565b80601f01602080910402602001604051908101604052809291908181526020018280546126fe9061362c565b80156127495780601f1061272057610100808354040283529160200191612749565b820191905f5260205f20905b81548152906001019060200180831161272c57829003601f168201915b5050505050815250508152506040518060400160405280866001600160a01b0316815260200184815250612968565b1561278b5761278683612da9565b612909565b600c546001600160a01b039081165f818152600a6020526040902054909116905b6001600160a01b0382166127c9576127c48186612dfa565b612906565b6040805180820182526001600160a01b0384168082525f908152602081815290839020835160808101855281548152600182015481840152600282015460ff161515948101949094526003810180546128d69593850193929160608401916128309061362c565b80601f016020809104026020016040519081016040528092919081815260200182805461285c9061362c565b80156128a75780601f1061287e576101008083540402835291602001916128a7565b820191905f5260205f20905b81548152906001019060200180831161288a57829003601f168201915b5050505050815250508152506040518060400160405280886001600160a01b0316815260200186815250612968565b156128e5576127c48186612dfa565b506001600160a01b038082165f908152600a602052604090205416906127ac565b50505b8160ff16600d54111561067957600c80546001600160a01b039081165f908152600a6020526040812080546001600160a01b03198082169092558454931692168217909255600d8054919261295d836138e8565b919050555050505050565b5f816020015160200151836020015160200151036129985750805182516001600160a01b0391821691161061085a565b506020908101518101519181015101511190565b80515f8190036129ba575050565b5f6129c6600183613699565b90505b8015610679575f6129db826001613686565b60408051426020820152908101849052606001604051602081830303815290604052805190602001205f1c612a1091906138c9565b90505f848381518110612a2557612a2561365e565b60200260200101519050848281518110612a4157612a4161365e565b6020026020010151858481518110612a5b57612a5b61365e565b60200260200101906001600160a01b031690816001600160a01b03168152505080858381518110612a8e57612a8e61365e565b60200260200101906001600160a01b031690816001600160a01b03168152505050508080612abb906138e8565b9150506129c9565b600f5415612ae4576040516349625b3b60e01b815260040160405180910390fd5b612aed8161189d565b612b0a5760405163510b8aad60e11b815260040160405180910390fd5b6001600160a01b038083165f908152600660205260409020805490911615612b4557604051637c9a1cf960e01b815260040160405180910390fd5b604080516080810182526001600160a01b038085168252858116803160208085019182525f85870181815260608701828152948252600690925295909520935184549084166001600160a01b03199182161785559051600185015593516002840180549184169186169190911790555160039092018054928216929093169190911790915560075416612c0257600780546001600160a01b0385166001600160a01b03199182168117909255600880549091169091179055612c5a565b600880546001600160a01b039081165f9081526006602052604080822060030180548489166001600160a01b031991821681179092558554828552929093206002018054841692909416919091179092558254161790555b60098054905f612c69836137e8565b90915550506001600160a01b038083165f9081526020819052604081206001810180549193871631929091612c9f908490613686565b9091555050805460019082905f90612cb8908490613686565b9091555050604080516001600160a01b038087168252851660208201527fce0c7a2a940807f7dc2ce7a615c2532e915e6c0ac9a08bc4ed9d515a710a53e2910160405180910390a150505050565b612d0f82612e58565b6040516001600160a01b038316907fbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b905f90a2805115612d53576106798282612ebb565b61087b612f2d565b6030811461087b576040516305db9dbd60e01b815260040160405180910390fd5b612d84612f4c565b610d4357604051631afcd79f60e31b815260040160405180910390fd5b611b7f612d7c565b600c80546001600160a01b038381165f818152600a602052604081208054939094166001600160a01b031993841617909355835490911617909155600d805491612df2836137e8565b919050555050565b6001600160a01b038281165f818152600a602052604080822080548686168085529284208054919096166001600160a01b03199182161790955592825282549093169092179055600d805491612e4f836137e8565b91905055505050565b806001600160a01b03163b5f03612e8d57604051634c9c8ce360e01b81526001600160a01b0382166004820152602401611905565b5f5160206139305f395f51905f5280546001600160a01b0319166001600160a01b0392909216919091179055565b60605f5f846001600160a01b031684604051612ed79190613914565b5f60405180830381855af49150503d805f8114612f0f576040519150601f19603f3d011682016040523d82523d5f602084013e612f14565b606091505b5091509150612f24858383612f65565b95945050505050565b3415610d435760405163b398979f60e01b815260040160405180910390fd5b5f612f5561235e565b54600160401b900460ff16919050565b606082612f7a57612f7582612fc1565b612585565b8151158015612f9157506001600160a01b0384163b155b15612fba57604051639996b31560e01b81526001600160a01b0385166004820152602401611905565b5080612585565b805115612fd057805160208201fd5b60405163d6bda27560e01b815260040160405180910390fd5b60405180604001604052805f6001600160a01b0316815260200161302d60405180608001604052805f81526020015f81526020015f15158152602001606081525090565b905290565b5080545f8255905f5260205f2090810190611bb191906130b0565b828054828255905f5260205f209081019282156130a0579160200282015b828111156130a057825182546001600160a01b0319166001600160a01b0390911617825560209092019160019091019061306b565b506130ac9291506130b0565b5090565b5b808211156130ac575f81556001016130b1565b80356001600160a01b03811681146130da575f5ffd5b919050565b5f602082840312156130ef575f5ffd5b612585826130c4565b5f5b838110156131125781810151838201526020016130fa565b50505f910152565b5f81518084526131318160208601602086016130f8565b601f01601f19169290920160200192915050565b60018060a01b0381511682525f602082015160406020850152805160408501526020810151606085015260408101511515608085015260608101519050608060a085015261319660c085018261311a565b949350505050565b602081525f6125856020830184613145565b5f5f83601f8401126131c0575f5ffd5b5081356001600160401b038111156131d6575f5ffd5b6020830191508360208260051b85010111156131f0575f5ffd5b9250929050565b5f5f60208385031215613208575f5ffd5b82356001600160401b0381111561321d575f5ffd5b613229858286016131b0565b90969095509350505050565b5f5f60408385031215613246575f5ffd5b50508035926020909101359150565b5f602082016020835280845180835260408501915060408160051b8601019250602086015f5b8281101561330257868503603f19018452815180518652602090810151604082880181905281519088018190529101905f9060608801905b808310156132ea57835180516001600160a01b031683526020908101518184015290930192600192909201916040909101906132b3565b5096505050602093840193919091019060010161327b565b50929695505050505050565b634e487b7160e01b5f52604160045260245ffd5b5f5f60408385031215613333575f5ffd5b61333c836130c4565b915060208301356001600160401b03811115613356575f5ffd5b8301601f81018513613366575f5ffd5b80356001600160401b0381111561337f5761337f61330e565b604051601f8201601f19908116603f011681016001600160401b03811182821017156133ad576133ad61330e565b6040528181528282016020018710156133c4575f5ffd5b816020840160208301375f602083830101528093505050509250929050565b5f5f83601f8401126133f3575f5ffd5b5081356001600160401b03811115613409575f5ffd5b6020830191508360208285010111156131f0575f5ffd5b5f5f60208385031215613431575f5ffd5b82356001600160401b03811115613446575f5ffd5b613229858286016133e3565b5f5f5f5f60608587031215613465575f5ffd5b61346e856130c4565b935060208501356001600160401b03811115613488575f5ffd5b613494878288016133e3565b909450925050604085013580151581146134ac575f5ffd5b939692955090935050565b5f602082840312156134c7575f5ffd5b813560ff81168114612585575f5ffd5b5f602082016020835280845180835260408501915060408160051b8601019250602086015f5b8281101561330257603f19878603018452613519858351613145565b945060209384019391909101906001016134fd565b602081525f612585602083018461311a565b5f5f5f5f60408587031215613553575f5ffd5b84356001600160401b03811115613568575f5ffd5b613574878288016131b0565b90955093505060208501356001600160401b03811115613592575f5ffd5b61359e878288016131b0565b95989497509550505050565b5f5f604083850312156135bb575f5ffd5b6135c4836130c4565b946020939093013593505050565b602080825282518282018190525f918401906040840190835b8181101561362157835180516001600160a01b0390811685526020918201511681850152909301926040909201916001016135eb565b509095945050505050565b600181811c9082168061364057607f821691505b6020821081036117ae57634e487b7160e01b5f52602260045260245ffd5b634e487b7160e01b5f52603260045260245ffd5b634e487b7160e01b5f52601160045260245ffd5b8082018082111561085a5761085a613672565b8181038181111561085a5761085a613672565b601f82111561067957805f5260205f20601f840160051c810160208510156136d15750805b601f840160051c820191505b81811015611074575f81556001016136dd565b6001600160401b038311156137075761370761330e565b61371b83613715835461362c565b836136ac565b5f601f84116001811461374c575f85156137355750838201355b5f19600387901b1c1916600186901b178355611074565b5f83815260208120601f198716915b8281101561377b578685013582556020948501946001909201910161375b565b5086821015613797575f1960f88860031b161c19848701351681555b505060018560011b0183555050505050565b6001600160a01b03841681526040602082018190528101829052818360608301375f818301606090810191909152601f909201601f1916010192915050565b5f600182016137f9576137f9613672565b5060010190565b81516001600160401b038111156138195761381961330e565b61382d81613827845461362c565b846136ac565b6020601f82116001811461385f575f83156138485750848201515b5f19600385901b1c1916600184901b178455611074565b5f84815260208120601f198516915b8281101561388e578785015182556020948501946001909201910161386e565b50848210156138ab57868401515f19600387901b60f8161c191681555b50505050600190811b01905550565b818382375f9101908152919050565b5f826138e357634e487b7160e01b5f52601260045260245ffd5b500690565b5f816138f6576138f6613672565b505f190190565b5f6020828403121561390d575f5ffd5b5051919050565b5f82516139258184602087016130f8565b919091019291505056fe360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbca264697066735822122065b5c5cd252d137da8de51f304405b251d85a6c733484cfd5ee2d21739254ec764736f6c634300081b0033",
@@ -410,9 +849,18 @@
 		"linkReferences": {},
 		"immutableReferences": {
 			"39840": [
-				{ "start": 8404, "length": 32 },
-				{ "start": 8445, "length": 32 },
-				{ "start": 8764, "length": 32 }
+				{
+					"start": 8404,
+					"length": 32
+				},
+				{
+					"start": 8445,
+					"length": 32
+				},
+				{
+					"start": 8764,
+					"length": 32
+				}
 			]
 		}
 	},
@@ -448,73 +896,210 @@
 	},
 	"rawMetadata": "{\"compiler\":{\"version\":\"0.8.27+commit.40a35a09\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"}],\"name\":\"AddressEmptyCode\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"AlreadyVoted\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"BellowMinValidators\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"BlsKeyAlreadyRegistered\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"BlsKeyIsInvalid\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"CallerIsNotValidator\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"ERC1967InvalidImplementation\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ERC1967NonPayable\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"FailedCall\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ImportIsNotAllowed\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidInitialization\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidParameters\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"min\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"max\",\"type\":\"uint256\"}],\"name\":\"InvalidRange\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"MissingVote\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NoActiveValidators\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotInitializing\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"OwnableInvalidOwner\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"OwnableUnauthorizedAccount\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"UUPSUnauthorizedCallContext\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"slot\",\"type\":\"bytes32\"}],\"name\":\"UUPSUnsupportedProxiableUUID\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ValidatorAlreadyRegistered\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ValidatorAlreadyResigned\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ValidatorNotRegistered\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"VoteResignedValidator\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"VoteSameValidator\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"VoteValidatorWithoutBlsPublicKey\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"version\",\"type\":\"uint64\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"voter\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"validator\",\"type\":\"address\"}],\"name\":\"Unvoted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"Upgraded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"blsPublicKey\",\"type\":\"bytes\"}],\"name\":\"ValidatorRegistered\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"ValidatorResigned\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"blsPublicKey\",\"type\":\"bytes\"}],\"name\":\"ValidatorUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"voter\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"validator\",\"type\":\"address\"}],\"name\":\"Voted\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"UPGRADE_INTERFACE_VERSION\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"activeValidatorsCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"blsPublicKey\",\"type\":\"bytes\"},{\"internalType\":\"bool\",\"name\":\"isResigned\",\"type\":\"bool\"}],\"name\":\"addValidator\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"voters\",\"type\":\"address[]\"},{\"internalType\":\"address[]\",\"name\":\"validators\",\"type\":\"address[]\"}],\"name\":\"addVotes\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint8\",\"name\":\"n\",\"type\":\"uint8\"}],\"name\":\"calculateActiveValidators\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getActiveValidators\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"votersCount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"voteBalance\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"isResigned\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"blsPublicKey\",\"type\":\"bytes\"}],\"internalType\":\"struct ConsensusV1.ValidatorData\",\"name\":\"data\",\"type\":\"tuple\"}],\"internalType\":\"struct ConsensusV1.Validator[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAllValidators\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"votersCount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"voteBalance\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"isResigned\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"blsPublicKey\",\"type\":\"bytes\"}],\"internalType\":\"struct ConsensusV1.ValidatorData\",\"name\":\"data\",\"type\":\"tuple\"}],\"internalType\":\"struct ConsensusV1.Validator[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"offset\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"count\",\"type\":\"uint256\"}],\"name\":\"getRounds\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"round\",\"type\":\"uint256\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"voteBalance\",\"type\":\"uint256\"}],\"internalType\":\"struct ConsensusV1.RoundValidator[]\",\"name\":\"validators\",\"type\":\"tuple[]\"}],\"internalType\":\"struct ConsensusV1.Round[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getRoundsCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"getValidator\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"votersCount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"voteBalance\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"isResigned\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"blsPublicKey\",\"type\":\"bytes\"}],\"internalType\":\"struct ConsensusV1.ValidatorData\",\"name\":\"data\",\"type\":\"tuple\"}],\"internalType\":\"struct ConsensusV1.Validator\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"count\",\"type\":\"uint256\"}],\"name\":\"getVotes\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"voter\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"validator\",\"type\":\"address\"}],\"internalType\":\"struct ConsensusV1.VoteResult[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getVotesCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"isValidatorRegistered\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"proxiableUUID\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"blsPublicKey\",\"type\":\"bytes\"}],\"name\":\"registerValidator\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"registeredValidatorsCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"resignValidator\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"resignedValidatorsCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"unvote\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"blsPublicKey\",\"type\":\"bytes\"}],\"name\":\"updateValidator\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"voters\",\"type\":\"address[]\"}],\"name\":\"updateVoters\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newImplementation\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"upgradeToAndCall\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"version\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"vote\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"errors\":{\"AddressEmptyCode(address)\":[{\"details\":\"There's no code at `target` (it is not a contract).\"}],\"ERC1967InvalidImplementation(address)\":[{\"details\":\"The `implementation` of the proxy is invalid.\"}],\"ERC1967NonPayable()\":[{\"details\":\"An upgrade function sees `msg.value > 0` that may be lost.\"}],\"FailedCall()\":[{\"details\":\"A call to an address target failed. The target may have reverted.\"}],\"InvalidInitialization()\":[{\"details\":\"The contract is already initialized.\"}],\"NotInitializing()\":[{\"details\":\"The contract is not initializing.\"}],\"OwnableInvalidOwner(address)\":[{\"details\":\"The owner is not a valid owner account. (eg. `address(0)`)\"}],\"OwnableUnauthorizedAccount(address)\":[{\"details\":\"The caller account is not authorized to perform an operation.\"}],\"UUPSUnauthorizedCallContext()\":[{\"details\":\"The call is from an unauthorized context.\"}],\"UUPSUnsupportedProxiableUUID(bytes32)\":[{\"details\":\"The storage `slot` is unsupported as a UUID.\"}]},\"events\":{\"Initialized(uint64)\":{\"details\":\"Triggered when the contract has been initialized or reinitialized.\"},\"Upgraded(address)\":{\"details\":\"Emitted when the implementation is upgraded.\"}},\"kind\":\"dev\",\"methods\":{\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"proxiableUUID()\":{\"details\":\"Implementation of the ERC-1822 {proxiableUUID} function. This returns the storage slot used by the implementation. It is used to validate the implementation's compatibility when performing an upgrade. IMPORTANT: A proxy pointing at a proxiable contract should not be considered proxiable itself, because this risks bricking a proxy that upgrades to it, by delegating to itself until out of gas. Thus it is critical that this function revert if invoked through a proxy. This is guaranteed by the `notDelegated` modifier.\"},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner.\"},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"},\"upgradeToAndCall(address,bytes)\":{\"custom:oz-upgrades-unsafe-allow-reachable\":\"delegatecall\",\"details\":\"Upgrade the implementation of the proxy to `newImplementation`, and subsequently execute the function call encoded in `data`. Calls {_authorizeUpgrade}. Emits an {Upgraded} event.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/consensus/ConsensusV1.sol\":\"ConsensusV1\"},\"evmVersion\":\"shanghai\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@contracts/=src/\",\":@forge-std/=lib/forge-std/src/\",\":@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/\",\":@openzeppelin/contracts/=lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/\",\":ds-test/=lib/openzeppelin-contracts-upgradeable/lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts-upgradeable/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":halmos-cheatcodes/=lib/openzeppelin-contracts-upgradeable/lib/halmos-cheatcodes/src/\",\":openzeppelin-contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/\",\":openzeppelin-foundry-upgrades/=lib/openzeppelin-foundry-upgrades/src/\",\":solidity-stringutils/=lib/openzeppelin-foundry-upgrades/lib/solidity-stringutils/\"]},\"sources\":{\"lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol\":{\"keccak256\":\"0xc163fcf9bb10138631a9ba5564df1fa25db9adff73bd9ee868a8ae1858fe093a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://9706d43a0124053d9880f6e31a59f31bc0a6a3dc1acd66ce0a16e1111658c5f6\",\"dweb:/ipfs/QmUFmfowzkRwGtDu36cXV9SPTBHJ3n7dG9xQiK5B28jTf2\"]},\"lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol\":{\"keccak256\":\"0xdb4d24ee2c087c391d587cd17adfe5b3f9d93b3110b1388c2ab6c7c0ad1dcd05\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ab7b6d5b9e2b88176312967fe0f0e78f3d9a1422fa5e4b64e2440c35869b5d08\",\"dweb:/ipfs/QmXKYWWyzcLg1B2k7Sb1qkEXgLCYfXecR9wYW5obRzWP1Q\"]},\"lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol\":{\"keccak256\":\"0x574a7451e42724f7de29e2855c392a8a5020acd695169466a18459467d719d63\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5bc189f63b639ee173dd7b6fecc39baf7113bf161776aea22b34c57fdd1872ec\",\"dweb:/ipfs/QmZAf2VtjDLRULqjJkde6LNsxAg12tUqpPqgUQQZbAjgtZ\"]},\"lib/openzeppelin-contracts-upgradeable/contracts/utils/ContextUpgradeable.sol\":{\"keccak256\":\"0xdbef5f0c787055227243a7318ef74c8a5a1108ca3a07f2b3a00ef67769e1e397\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://08e39f23d5b4692f9a40803e53a8156b72b4c1f9902a88cd65ba964db103dab9\",\"dweb:/ipfs/QmPKn6EYDgpga7KtpkA8wV2yJCYGMtc9K4LkJfhKX2RVSV\"]},\"lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/interfaces/IERC1967.sol\":{\"keccak256\":\"0xb25a4f11fa80c702bf5cd85adec90e6f6f507f32f4a8e6f5dbc31e8c10029486\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6917f8a323e7811f041aecd4d9fd6e92455a6fba38a797ac6f6e208c7912b79d\",\"dweb:/ipfs/QmShuYv55wYHGi4EFkDB8QfF7ZCHoKk2efyz3AWY1ExSq7\"]},\"lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/interfaces/draft-IERC1822.sol\":{\"keccak256\":\"0xc42facb5094f2f35f066a7155bda23545e39a3156faef3ddc00185544443ba7d\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d3b36282ab029b46bd082619a308a2ea11c309967b9425b7b7a6eb0b0c1c3196\",\"dweb:/ipfs/QmP2YVfDB2FoREax3vJu7QhDnyYRMw52WPrCD4vdT2kuDA\"]},\"lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol\":{\"keccak256\":\"0x8decfa54cec979c824b044b8128cd91d713f72c71fd7dfa54974624d8c949898\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://271f914261a19d87117a777e0924ada545c16191ef9b00cc40b0134fc14ebc70\",\"dweb:/ipfs/QmdvVNWHGHQrGGPonZJs5NuzTevTjZRM2zayKrDJf7WBA2\"]},\"lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/beacon/IBeacon.sol\":{\"keccak256\":\"0xc59a78b07b44b2cf2e8ab4175fca91e8eca1eee2df7357b8d2a8833e5ea1f64c\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5aa4f07e65444784c29cd7bfcc2341b34381e4e5b5da9f0c5bd00d7f430e66fa\",\"dweb:/ipfs/QmWRMh4Q9DpaU9GvsiXmDdoNYMyyece9if7hnfLz7uqzWM\"]},\"lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/Address.sol\":{\"keccak256\":\"0x06871a0948d0fed9316ae59ee4368527e144911f5e284755312b5bfcde8b27ea\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://3c30e46d061d8a450c561935a1236b1885aa76ffab93a19b26dcb8868c839843\",\"dweb:/ipfs/QmZbWbeDyixTyYkVtJvuiQYfkQz12pS7zxWZF3Ju9PYwGH\"]},\"lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/Errors.sol\":{\"keccak256\":\"0x6afa713bfd42cf0f7656efa91201007ac465e42049d7de1d50753a373648c123\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ba1d02f4847670a1b83dec9f7d37f0b0418d6043447b69f3a29a5f9efc547fcf\",\"dweb:/ipfs/QmQ7iH2keLNUKgq2xSWcRmuBE5eZ3F5whYAkAGzCNNoEWB\"]},\"lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol\":{\"keccak256\":\"0xcf74f855663ce2ae00ed8352666b7935f6cddea2932fdf2c3ecd30a9b1cd0e97\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://9f660b1f351b757dfe01438e59888f31f33ded3afcf5cb5b0d9bf9aa6f320a8b\",\"dweb:/ipfs/QmarDJ5hZEgBtCmmrVzEZWjub9769eD686jmzb2XpSU1cM\"]},\"src/consensus/ConsensusV1.sol\":{\"keccak256\":\"0x09bfded945bb94fefe95e398b7a52914720ce26c2d828c595073098688bdea98\",\"license\":\"GNU GENERAL PUBLIC LICENSE\",\"urls\":[\"bzz-raw://a4cc2e6ce3c88b51abfdd44bea29d152514d5510a5660163fb1a2c2bf025e358\",\"dweb:/ipfs/QmSfEm86Mg1iexyayQf4RakEd393rZKN38g6StWmjPCEVh\"]}},\"version\":1}",
 	"metadata": {
-		"compiler": { "version": "0.8.27+commit.40a35a09" },
+		"compiler": {
+			"version": "0.8.27+commit.40a35a09"
+		},
 		"language": "Solidity",
 		"output": {
 			"abi": [
 				{
-					"inputs": [{ "internalType": "address", "name": "target", "type": "address" }],
+					"inputs": [
+						{
+							"internalType": "address",
+							"name": "target",
+							"type": "address"
+						}
+					],
 					"type": "error",
 					"name": "AddressEmptyCode"
 				},
-				{ "inputs": [], "type": "error", "name": "AlreadyVoted" },
-				{ "inputs": [], "type": "error", "name": "BellowMinValidators" },
-				{ "inputs": [], "type": "error", "name": "BlsKeyAlreadyRegistered" },
-				{ "inputs": [], "type": "error", "name": "BlsKeyIsInvalid" },
-				{ "inputs": [], "type": "error", "name": "CallerIsNotValidator" },
 				{
-					"inputs": [{ "internalType": "address", "name": "implementation", "type": "address" }],
+					"inputs": [],
+					"type": "error",
+					"name": "AlreadyVoted"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "BellowMinValidators"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "BlsKeyAlreadyRegistered"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "BlsKeyIsInvalid"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "CallerIsNotValidator"
+				},
+				{
+					"inputs": [
+						{
+							"internalType": "address",
+							"name": "implementation",
+							"type": "address"
+						}
+					],
 					"type": "error",
 					"name": "ERC1967InvalidImplementation"
 				},
-				{ "inputs": [], "type": "error", "name": "ERC1967NonPayable" },
-				{ "inputs": [], "type": "error", "name": "FailedCall" },
-				{ "inputs": [], "type": "error", "name": "ImportIsNotAllowed" },
-				{ "inputs": [], "type": "error", "name": "InvalidInitialization" },
-				{ "inputs": [], "type": "error", "name": "InvalidParameters" },
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "ERC1967NonPayable"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "FailedCall"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "ImportIsNotAllowed"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "InvalidInitialization"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "InvalidParameters"
+				},
 				{
 					"inputs": [
-						{ "internalType": "uint256", "name": "min", "type": "uint256" },
-						{ "internalType": "uint256", "name": "max", "type": "uint256" }
+						{
+							"internalType": "uint256",
+							"name": "min",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "max",
+							"type": "uint256"
+						}
 					],
 					"type": "error",
 					"name": "InvalidRange"
 				},
-				{ "inputs": [], "type": "error", "name": "MissingVote" },
-				{ "inputs": [], "type": "error", "name": "NoActiveValidators" },
-				{ "inputs": [], "type": "error", "name": "NotInitializing" },
 				{
-					"inputs": [{ "internalType": "address", "name": "owner", "type": "address" }],
+					"inputs": [],
+					"type": "error",
+					"name": "MissingVote"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "NoActiveValidators"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "NotInitializing"
+				},
+				{
+					"inputs": [
+						{
+							"internalType": "address",
+							"name": "owner",
+							"type": "address"
+						}
+					],
 					"type": "error",
 					"name": "OwnableInvalidOwner"
 				},
 				{
-					"inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+					"inputs": [
+						{
+							"internalType": "address",
+							"name": "account",
+							"type": "address"
+						}
+					],
 					"type": "error",
 					"name": "OwnableUnauthorizedAccount"
 				},
-				{ "inputs": [], "type": "error", "name": "UUPSUnauthorizedCallContext" },
 				{
-					"inputs": [{ "internalType": "bytes32", "name": "slot", "type": "bytes32" }],
+					"inputs": [],
+					"type": "error",
+					"name": "UUPSUnauthorizedCallContext"
+				},
+				{
+					"inputs": [
+						{
+							"internalType": "bytes32",
+							"name": "slot",
+							"type": "bytes32"
+						}
+					],
 					"type": "error",
 					"name": "UUPSUnsupportedProxiableUUID"
 				},
-				{ "inputs": [], "type": "error", "name": "ValidatorAlreadyRegistered" },
-				{ "inputs": [], "type": "error", "name": "ValidatorAlreadyResigned" },
-				{ "inputs": [], "type": "error", "name": "ValidatorNotRegistered" },
-				{ "inputs": [], "type": "error", "name": "VoteResignedValidator" },
-				{ "inputs": [], "type": "error", "name": "VoteSameValidator" },
-				{ "inputs": [], "type": "error", "name": "VoteValidatorWithoutBlsPublicKey" },
 				{
-					"inputs": [{ "internalType": "uint64", "name": "version", "type": "uint64", "indexed": false }],
+					"inputs": [],
+					"type": "error",
+					"name": "ValidatorAlreadyRegistered"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "ValidatorAlreadyResigned"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "ValidatorNotRegistered"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "VoteResignedValidator"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "VoteSameValidator"
+				},
+				{
+					"inputs": [],
+					"type": "error",
+					"name": "VoteValidatorWithoutBlsPublicKey"
+				},
+				{
+					"inputs": [
+						{
+							"internalType": "uint64",
+							"name": "version",
+							"type": "uint64",
+							"indexed": false
+						}
+					],
 					"type": "event",
 					"name": "Initialized",
 					"anonymous": false
 				},
 				{
 					"inputs": [
-						{ "internalType": "address", "name": "previousOwner", "type": "address", "indexed": true },
-						{ "internalType": "address", "name": "newOwner", "type": "address", "indexed": true }
+						{
+							"internalType": "address",
+							"name": "previousOwner",
+							"type": "address",
+							"indexed": true
+						},
+						{
+							"internalType": "address",
+							"name": "newOwner",
+							"type": "address",
+							"indexed": true
+						}
 					],
 					"type": "event",
 					"name": "OwnershipTransferred",
@@ -522,8 +1107,18 @@
 				},
 				{
 					"inputs": [
-						{ "internalType": "address", "name": "voter", "type": "address", "indexed": false },
-						{ "internalType": "address", "name": "validator", "type": "address", "indexed": false }
+						{
+							"internalType": "address",
+							"name": "voter",
+							"type": "address",
+							"indexed": false
+						},
+						{
+							"internalType": "address",
+							"name": "validator",
+							"type": "address",
+							"indexed": false
+						}
 					],
 					"type": "event",
 					"name": "Unvoted",
@@ -531,7 +1126,12 @@
 				},
 				{
 					"inputs": [
-						{ "internalType": "address", "name": "implementation", "type": "address", "indexed": true }
+						{
+							"internalType": "address",
+							"name": "implementation",
+							"type": "address",
+							"indexed": true
+						}
 					],
 					"type": "event",
 					"name": "Upgraded",
@@ -539,23 +1139,50 @@
 				},
 				{
 					"inputs": [
-						{ "internalType": "address", "name": "addr", "type": "address", "indexed": false },
-						{ "internalType": "bytes", "name": "blsPublicKey", "type": "bytes", "indexed": false }
+						{
+							"internalType": "address",
+							"name": "addr",
+							"type": "address",
+							"indexed": false
+						},
+						{
+							"internalType": "bytes",
+							"name": "blsPublicKey",
+							"type": "bytes",
+							"indexed": false
+						}
 					],
 					"type": "event",
 					"name": "ValidatorRegistered",
 					"anonymous": false
 				},
 				{
-					"inputs": [{ "internalType": "address", "name": "addr", "type": "address", "indexed": false }],
+					"inputs": [
+						{
+							"internalType": "address",
+							"name": "addr",
+							"type": "address",
+							"indexed": false
+						}
+					],
 					"type": "event",
 					"name": "ValidatorResigned",
 					"anonymous": false
 				},
 				{
 					"inputs": [
-						{ "internalType": "address", "name": "addr", "type": "address", "indexed": false },
-						{ "internalType": "bytes", "name": "blsPublicKey", "type": "bytes", "indexed": false }
+						{
+							"internalType": "address",
+							"name": "addr",
+							"type": "address",
+							"indexed": false
+						},
+						{
+							"internalType": "bytes",
+							"name": "blsPublicKey",
+							"type": "bytes",
+							"indexed": false
+						}
 					],
 					"type": "event",
 					"name": "ValidatorUpdated",
@@ -563,8 +1190,18 @@
 				},
 				{
 					"inputs": [
-						{ "internalType": "address", "name": "voter", "type": "address", "indexed": false },
-						{ "internalType": "address", "name": "validator", "type": "address", "indexed": false }
+						{
+							"internalType": "address",
+							"name": "voter",
+							"type": "address",
+							"indexed": false
+						},
+						{
+							"internalType": "address",
+							"name": "validator",
+							"type": "address",
+							"indexed": false
+						}
 					],
 					"type": "event",
 					"name": "Voted",
@@ -575,20 +1212,44 @@
 					"stateMutability": "view",
 					"type": "function",
 					"name": "UPGRADE_INTERFACE_VERSION",
-					"outputs": [{ "internalType": "string", "name": "", "type": "string" }]
+					"outputs": [
+						{
+							"internalType": "string",
+							"name": "",
+							"type": "string"
+						}
+					]
 				},
 				{
 					"inputs": [],
 					"stateMutability": "view",
 					"type": "function",
 					"name": "activeValidatorsCount",
-					"outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }]
+					"outputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					]
 				},
 				{
 					"inputs": [
-						{ "internalType": "address", "name": "addr", "type": "address" },
-						{ "internalType": "bytes", "name": "blsPublicKey", "type": "bytes" },
-						{ "internalType": "bool", "name": "isResigned", "type": "bool" }
+						{
+							"internalType": "address",
+							"name": "addr",
+							"type": "address"
+						},
+						{
+							"internalType": "bytes",
+							"name": "blsPublicKey",
+							"type": "bytes"
+						},
+						{
+							"internalType": "bool",
+							"name": "isResigned",
+							"type": "bool"
+						}
 					],
 					"stateMutability": "nonpayable",
 					"type": "function",
@@ -596,15 +1257,29 @@
 				},
 				{
 					"inputs": [
-						{ "internalType": "address[]", "name": "voters", "type": "address[]" },
-						{ "internalType": "address[]", "name": "validators", "type": "address[]" }
+						{
+							"internalType": "address[]",
+							"name": "voters",
+							"type": "address[]"
+						},
+						{
+							"internalType": "address[]",
+							"name": "validators",
+							"type": "address[]"
+						}
 					],
 					"stateMutability": "nonpayable",
 					"type": "function",
 					"name": "addVotes"
 				},
 				{
-					"inputs": [{ "internalType": "uint8", "name": "n", "type": "uint8" }],
+					"inputs": [
+						{
+							"internalType": "uint8",
+							"name": "n",
+							"type": "uint8"
+						}
+					],
 					"stateMutability": "nonpayable",
 					"type": "function",
 					"name": "calculateActiveValidators"
@@ -620,16 +1295,36 @@
 							"name": "",
 							"type": "tuple[]",
 							"components": [
-								{ "internalType": "address", "name": "addr", "type": "address" },
+								{
+									"internalType": "address",
+									"name": "addr",
+									"type": "address"
+								},
 								{
 									"internalType": "struct ConsensusV1.ValidatorData",
 									"name": "data",
 									"type": "tuple",
 									"components": [
-										{ "internalType": "uint256", "name": "votersCount", "type": "uint256" },
-										{ "internalType": "uint256", "name": "voteBalance", "type": "uint256" },
-										{ "internalType": "bool", "name": "isResigned", "type": "bool" },
-										{ "internalType": "bytes", "name": "blsPublicKey", "type": "bytes" }
+										{
+											"internalType": "uint256",
+											"name": "votersCount",
+											"type": "uint256"
+										},
+										{
+											"internalType": "uint256",
+											"name": "voteBalance",
+											"type": "uint256"
+										},
+										{
+											"internalType": "bool",
+											"name": "isResigned",
+											"type": "bool"
+										},
+										{
+											"internalType": "bytes",
+											"name": "blsPublicKey",
+											"type": "bytes"
+										}
 									]
 								}
 							]
@@ -647,16 +1342,36 @@
 							"name": "",
 							"type": "tuple[]",
 							"components": [
-								{ "internalType": "address", "name": "addr", "type": "address" },
+								{
+									"internalType": "address",
+									"name": "addr",
+									"type": "address"
+								},
 								{
 									"internalType": "struct ConsensusV1.ValidatorData",
 									"name": "data",
 									"type": "tuple",
 									"components": [
-										{ "internalType": "uint256", "name": "votersCount", "type": "uint256" },
-										{ "internalType": "uint256", "name": "voteBalance", "type": "uint256" },
-										{ "internalType": "bool", "name": "isResigned", "type": "bool" },
-										{ "internalType": "bytes", "name": "blsPublicKey", "type": "bytes" }
+										{
+											"internalType": "uint256",
+											"name": "votersCount",
+											"type": "uint256"
+										},
+										{
+											"internalType": "uint256",
+											"name": "voteBalance",
+											"type": "uint256"
+										},
+										{
+											"internalType": "bool",
+											"name": "isResigned",
+											"type": "bool"
+										},
+										{
+											"internalType": "bytes",
+											"name": "blsPublicKey",
+											"type": "bytes"
+										}
 									]
 								}
 							]
@@ -665,8 +1380,16 @@
 				},
 				{
 					"inputs": [
-						{ "internalType": "uint256", "name": "offset", "type": "uint256" },
-						{ "internalType": "uint256", "name": "count", "type": "uint256" }
+						{
+							"internalType": "uint256",
+							"name": "offset",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "count",
+							"type": "uint256"
+						}
 					],
 					"stateMutability": "view",
 					"type": "function",
@@ -677,14 +1400,26 @@
 							"name": "",
 							"type": "tuple[]",
 							"components": [
-								{ "internalType": "uint256", "name": "round", "type": "uint256" },
+								{
+									"internalType": "uint256",
+									"name": "round",
+									"type": "uint256"
+								},
 								{
 									"internalType": "struct ConsensusV1.RoundValidator[]",
 									"name": "validators",
 									"type": "tuple[]",
 									"components": [
-										{ "internalType": "address", "name": "addr", "type": "address" },
-										{ "internalType": "uint256", "name": "voteBalance", "type": "uint256" }
+										{
+											"internalType": "address",
+											"name": "addr",
+											"type": "address"
+										},
+										{
+											"internalType": "uint256",
+											"name": "voteBalance",
+											"type": "uint256"
+										}
 									]
 								}
 							]
@@ -696,10 +1431,22 @@
 					"stateMutability": "view",
 					"type": "function",
 					"name": "getRoundsCount",
-					"outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }]
+					"outputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					]
 				},
 				{
-					"inputs": [{ "internalType": "address", "name": "addr", "type": "address" }],
+					"inputs": [
+						{
+							"internalType": "address",
+							"name": "addr",
+							"type": "address"
+						}
+					],
 					"stateMutability": "view",
 					"type": "function",
 					"name": "getValidator",
@@ -709,16 +1456,36 @@
 							"name": "",
 							"type": "tuple",
 							"components": [
-								{ "internalType": "address", "name": "addr", "type": "address" },
+								{
+									"internalType": "address",
+									"name": "addr",
+									"type": "address"
+								},
 								{
 									"internalType": "struct ConsensusV1.ValidatorData",
 									"name": "data",
 									"type": "tuple",
 									"components": [
-										{ "internalType": "uint256", "name": "votersCount", "type": "uint256" },
-										{ "internalType": "uint256", "name": "voteBalance", "type": "uint256" },
-										{ "internalType": "bool", "name": "isResigned", "type": "bool" },
-										{ "internalType": "bytes", "name": "blsPublicKey", "type": "bytes" }
+										{
+											"internalType": "uint256",
+											"name": "votersCount",
+											"type": "uint256"
+										},
+										{
+											"internalType": "uint256",
+											"name": "voteBalance",
+											"type": "uint256"
+										},
+										{
+											"internalType": "bool",
+											"name": "isResigned",
+											"type": "bool"
+										},
+										{
+											"internalType": "bytes",
+											"name": "blsPublicKey",
+											"type": "bytes"
+										}
 									]
 								}
 							]
@@ -727,8 +1494,16 @@
 				},
 				{
 					"inputs": [
-						{ "internalType": "address", "name": "addr", "type": "address" },
-						{ "internalType": "uint256", "name": "count", "type": "uint256" }
+						{
+							"internalType": "address",
+							"name": "addr",
+							"type": "address"
+						},
+						{
+							"internalType": "uint256",
+							"name": "count",
+							"type": "uint256"
+						}
 					],
 					"stateMutability": "view",
 					"type": "function",
@@ -739,8 +1514,16 @@
 							"name": "",
 							"type": "tuple[]",
 							"components": [
-								{ "internalType": "address", "name": "voter", "type": "address" },
-								{ "internalType": "address", "name": "validator", "type": "address" }
+								{
+									"internalType": "address",
+									"name": "voter",
+									"type": "address"
+								},
+								{
+									"internalType": "address",
+									"name": "validator",
+									"type": "address"
+								}
 							]
 						}
 					]
@@ -750,32 +1533,73 @@
 					"stateMutability": "view",
 					"type": "function",
 					"name": "getVotesCount",
-					"outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }]
+					"outputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					]
 				},
-				{ "inputs": [], "stateMutability": "nonpayable", "type": "function", "name": "initialize" },
 				{
-					"inputs": [{ "internalType": "address", "name": "addr", "type": "address" }],
+					"inputs": [],
+					"stateMutability": "nonpayable",
+					"type": "function",
+					"name": "initialize"
+				},
+				{
+					"inputs": [
+						{
+							"internalType": "address",
+							"name": "addr",
+							"type": "address"
+						}
+					],
 					"stateMutability": "view",
 					"type": "function",
 					"name": "isValidatorRegistered",
-					"outputs": [{ "internalType": "bool", "name": "", "type": "bool" }]
+					"outputs": [
+						{
+							"internalType": "bool",
+							"name": "",
+							"type": "bool"
+						}
+					]
 				},
 				{
 					"inputs": [],
 					"stateMutability": "view",
 					"type": "function",
 					"name": "owner",
-					"outputs": [{ "internalType": "address", "name": "", "type": "address" }]
+					"outputs": [
+						{
+							"internalType": "address",
+							"name": "",
+							"type": "address"
+						}
+					]
 				},
 				{
 					"inputs": [],
 					"stateMutability": "view",
 					"type": "function",
 					"name": "proxiableUUID",
-					"outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }]
+					"outputs": [
+						{
+							"internalType": "bytes32",
+							"name": "",
+							"type": "bytes32"
+						}
+					]
 				},
 				{
-					"inputs": [{ "internalType": "bytes", "name": "blsPublicKey", "type": "bytes" }],
+					"inputs": [
+						{
+							"internalType": "bytes",
+							"name": "blsPublicKey",
+							"type": "bytes"
+						}
+					],
 					"stateMutability": "nonpayable",
 					"type": "function",
 					"name": "registerValidator"
@@ -785,40 +1609,93 @@
 					"stateMutability": "view",
 					"type": "function",
 					"name": "registeredValidatorsCount",
-					"outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }]
+					"outputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					]
 				},
-				{ "inputs": [], "stateMutability": "nonpayable", "type": "function", "name": "renounceOwnership" },
-				{ "inputs": [], "stateMutability": "nonpayable", "type": "function", "name": "resignValidator" },
+				{
+					"inputs": [],
+					"stateMutability": "nonpayable",
+					"type": "function",
+					"name": "renounceOwnership"
+				},
+				{
+					"inputs": [],
+					"stateMutability": "nonpayable",
+					"type": "function",
+					"name": "resignValidator"
+				},
 				{
 					"inputs": [],
 					"stateMutability": "view",
 					"type": "function",
 					"name": "resignedValidatorsCount",
-					"outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }]
+					"outputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					]
 				},
 				{
-					"inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
+					"inputs": [
+						{
+							"internalType": "address",
+							"name": "newOwner",
+							"type": "address"
+						}
+					],
 					"stateMutability": "nonpayable",
 					"type": "function",
 					"name": "transferOwnership"
 				},
-				{ "inputs": [], "stateMutability": "nonpayable", "type": "function", "name": "unvote" },
 				{
-					"inputs": [{ "internalType": "bytes", "name": "blsPublicKey", "type": "bytes" }],
+					"inputs": [],
+					"stateMutability": "nonpayable",
+					"type": "function",
+					"name": "unvote"
+				},
+				{
+					"inputs": [
+						{
+							"internalType": "bytes",
+							"name": "blsPublicKey",
+							"type": "bytes"
+						}
+					],
 					"stateMutability": "nonpayable",
 					"type": "function",
 					"name": "updateValidator"
 				},
 				{
-					"inputs": [{ "internalType": "address[]", "name": "voters", "type": "address[]" }],
+					"inputs": [
+						{
+							"internalType": "address[]",
+							"name": "voters",
+							"type": "address[]"
+						}
+					],
 					"stateMutability": "nonpayable",
 					"type": "function",
 					"name": "updateVoters"
 				},
 				{
 					"inputs": [
-						{ "internalType": "address", "name": "newImplementation", "type": "address" },
-						{ "internalType": "bytes", "name": "data", "type": "bytes" }
+						{
+							"internalType": "address",
+							"name": "newImplementation",
+							"type": "address"
+						},
+						{
+							"internalType": "bytes",
+							"name": "data",
+							"type": "bytes"
+						}
 					],
 					"stateMutability": "payable",
 					"type": "function",
@@ -829,10 +1706,22 @@
 					"stateMutability": "pure",
 					"type": "function",
 					"name": "version",
-					"outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }]
+					"outputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					]
 				},
 				{
-					"inputs": [{ "internalType": "address", "name": "addr", "type": "address" }],
+					"inputs": [
+						{
+							"internalType": "address",
+							"name": "addr",
+							"type": "address"
+						}
+					],
 					"stateMutability": "nonpayable",
 					"type": "function",
 					"name": "vote"
@@ -841,7 +1730,9 @@
 			"devdoc": {
 				"kind": "dev",
 				"methods": {
-					"owner()": { "details": "Returns the address of the current owner." },
+					"owner()": {
+						"details": "Returns the address of the current owner."
+					},
 					"proxiableUUID()": {
 						"details": "Implementation of the ERC-1822 {proxiableUUID} function. This returns the storage slot used by the implementation. It is used to validate the implementation's compatibility when performing an upgrade. IMPORTANT: A proxy pointing at a proxiable contract should not be considered proxiable itself, because this risks bricking a proxy that upgrades to it, by delegating to itself until out of gas. Thus it is critical that this function revert if invoked through a proxy. This is guaranteed by the `notDelegated` modifier."
 					},
@@ -858,7 +1749,11 @@
 				},
 				"version": 1
 			},
-			"userdoc": { "kind": "user", "methods": {}, "version": 1 }
+			"userdoc": {
+				"kind": "user",
+				"methods": {},
+				"version": 1
+			}
 		},
 		"settings": {
 			"remappings": [
@@ -875,9 +1770,16 @@
 				"openzeppelin-foundry-upgrades/=lib/openzeppelin-foundry-upgrades/src/",
 				"solidity-stringutils/=lib/openzeppelin-foundry-upgrades/lib/solidity-stringutils/"
 			],
-			"optimizer": { "enabled": true, "runs": 200 },
-			"metadata": { "bytecodeHash": "ipfs" },
-			"compilationTarget": { "src/consensus/ConsensusV1.sol": "ConsensusV1" },
+			"optimizer": {
+				"enabled": true,
+				"runs": 200
+			},
+			"metadata": {
+				"bytecodeHash": "ipfs"
+			},
+			"compilationTarget": {
+				"src/consensus/ConsensusV1.sol": "ConsensusV1"
+			},
 			"evmVersion": "shanghai",
 			"libraries": {}
 		},
