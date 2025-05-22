@@ -17,9 +17,6 @@ on:
     pull_request:
         branches: ["develop", "main"]
 
-permissions:
-    contents: read
-
 jobs:
     analyze:
         name: Analyze (${{ matrix.language }})
