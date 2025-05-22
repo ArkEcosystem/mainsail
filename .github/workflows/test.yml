@@ -49,12 +49,6 @@ jobs:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
 
-            - name: Cache lerna
-              uses: actions/cache/save@v4
-              with:
-                  key: lerna-${{ github.sha }}
-                  path: ./.cache
-
             - uses: actions-rs/toolchain@v1
               with:
                   toolchain: stable
@@ -64,8 +58,15 @@ jobs:
 
             - name: Install dependencies
               run: pnpm install
+
             - name: Build
               run: pnpm run build
+
+            - name: Cache lerna
+              uses: actions/cache/save@v4
+              with:
+                  key: lerna-${{ github.sha }}
+                  path: ./.cache
 
     unit:
         needs:
