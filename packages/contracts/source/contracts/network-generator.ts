@@ -15,6 +15,13 @@ export type MilestoneOptions = {
 	maxBlockGasLimit: number;
 	maxTxPerBlock: number;
 	blockTime: number;
+	timeouts?: {
+		blockPrepareTime: number;
+		blockTime: number;
+		stageTimeout: number;
+		stageTimeoutIncrease: number;
+		tolerance: number;
+	};
 	epoch: Date;
 	vendorFieldLength: number;
 };

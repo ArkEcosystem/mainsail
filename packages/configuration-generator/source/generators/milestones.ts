@@ -29,7 +29,7 @@ export class MilestonesGenerator {
 					decimals: 18,
 					denomination: 1e18,
 				},
-				timeouts: {
+				timeouts: options.timeouts ?? {
 					blockPrepareTime: options.blockTime / 2,
 					blockTime: options.blockTime,
 					stageTimeout: 2000,
