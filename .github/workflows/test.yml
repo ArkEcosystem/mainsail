@@ -52,7 +52,7 @@ jobs:
             - name: Cache lerna
               uses: actions/cache@v4
               with:
-                  key: lerna-${{ runner.os }}-${{ github.run_id }}
+                  key: lerna-${{ github.sha }}
                   path: ./.cache
 
             - uses: actions-rs/toolchain@v1
