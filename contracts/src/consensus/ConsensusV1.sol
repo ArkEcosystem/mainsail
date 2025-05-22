@@ -607,7 +607,9 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     function _updateVoter(address addr) internal {
         Vote storage voter = _voters[addr];
         if (voter.validator == address(0)) {
-            revert MissingVote();
+            // can be called for potential non-voters because the caller doesn't have knowledge about voters
+            // and simply passes accounts.
+            return;
         }
 
         uint256 voterBalance = voter.balance;

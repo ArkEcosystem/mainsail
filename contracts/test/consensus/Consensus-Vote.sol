@@ -71,9 +71,7 @@ contract ConsensusTest is Base {
         consensus.unvote();
     }
 
-    function test_update_voters_revert_if_did_not_vote() public {
-        vm.expectRevert(ConsensusV1.MissingVote.selector);
-
+    function test_update_voters_no_op_if_did_not_vote() public {
         address nonVoterAddr = address(2);
 
         address[] memory voters = new address[](1);
