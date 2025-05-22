@@ -371,8 +371,8 @@ contract ConsensusTest is Base {
         address voterAddr = address(2);
 
         address[] memory voters = new address[](2);
-        voters[0] = voterAddr;
-        voters[1] = addr;
+        voters[0] = addr;
+        voters[1] = voterAddr;
 
         address[] memory validators = new address[](2);
         validators[0] = addr;
