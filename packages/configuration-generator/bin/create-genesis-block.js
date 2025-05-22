@@ -3,7 +3,7 @@ import path from "path";
 import { Identifiers as AppIdentifiers } from "@mainsail/contracts";
 import { makeApplication } from "../distribution/application-factory.js";
 import { Identifiers } from "../distribution/identifiers.js";
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from "url";
 import { copyFileSync } from "fs";
 import { readJSONSync, writeJSONSync } from "fs-extra/esm";
 
@@ -39,7 +39,7 @@ const configurations = [
 	// 		stageTimeout: 100,
 	// 		stageTimeoutIncrease: 100,
 	// 		tolerance: 100,
-	// 	},		
+	// 	},
 	// 	postGenerate: (location) => {
 	// 		// Functional tests run on single node
 	// 		const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -83,12 +83,12 @@ const configurations = [
 	// 		}
 
 	// 		// E2E Consensus
-			
+
 	// 		// Validator Node0 - Node4
 	// 		for (let i = 0; i < 5; i++) {
 	// 			const validators = readJSONSync(path.join(location, "validators.json"));
 	// 			validators.secrets = [validators.secrets[i]];
-				
+
 	// 			const targetPath = path.join(__dirname, "..", "..", "..", "tests", "e2e", "consensus", "nodes", `node${i}`, "core");
 	// 			writeJSONSync(path.join(targetPath, "validators.json"), validators, {
 	// 				spaces: 4,
@@ -134,7 +134,7 @@ const configurations = [
 	// 	postGenerate: (location) => {
 	// 		// E2E tests run multiple nodes (1 validator per node)
 	// 		const __dirname = path.dirname(fileURLToPath(import.meta.url));
-			
+
 	// 		// Validator Node0 - Node4 (only needs updated crypto.json)
 	// 		for (let i = 0; i < 5; i++) {
 	// 			const source = path.join(location, "crypto.json");
@@ -143,7 +143,7 @@ const configurations = [
 	// 		}
 	// 	}
 	// },
-]
+];
 
 async function run() {
 	const paths = envPaths("mainsail", { suffix: "" });
@@ -160,7 +160,7 @@ const generateConfiguration = async (path, configuration) => {
 	const generator = app.get(Identifiers.ConfigurationGenerator);
 
 	await generator.generate(configuration);
-	
+
 	if (configuration.postGenerate) {
 		configuration.postGenerate(generator.configurationPath);
 	}
@@ -170,6 +170,6 @@ const generateConfiguration = async (path, configuration) => {
 			await app.getTagged(AppIdentifiers.Evm.Instance, "instance", tag).dispose();
 		}
 	}
-}
+};
 
 run();
