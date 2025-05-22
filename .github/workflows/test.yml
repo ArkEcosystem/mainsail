@@ -46,7 +46,7 @@ jobs:
             - name: Cache pnpm modules
               uses: actions/cache@v4
               with:
-                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
 
             - name: Cache lerna
@@ -96,7 +96,7 @@ jobs:
             - name: Cache pnpm modules
               uses: actions/cache@v4
               with:
-                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
               uses: actions/cache@v4
@@ -300,7 +300,7 @@ jobs:
             - name: Cache pnpm modules
               uses: actions/cache@v4
               with:
-                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
               uses: actions/cache@v4
@@ -350,7 +350,7 @@ jobs:
             - name: Cache pnpm modules
               uses: actions/cache@v4
               with:
-                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
               uses: actions/cache@v4
@@ -434,7 +434,7 @@ jobs:
             - name: Cache pnpm modules
               uses: actions/cache@v4
               with:
-                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
               uses: actions/cache@v4
@@ -491,7 +491,7 @@ jobs:
             - name: Cache pnpm modules
               uses: actions/cache@v4
               with:
-                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
               uses: actions/cache@v4
