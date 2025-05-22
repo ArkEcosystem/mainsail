@@ -16,6 +16,9 @@ env:
 
 jobs:
     build:
+        name: "Build"
+        permissions:
+            contents: read
         strategy:
             matrix:
                 node-version: [22.x]
@@ -69,6 +72,9 @@ jobs:
                   path: ./.cache
 
     unit:
+        name: "Unit"
+        permissions:
+            contents: read
         needs:
             - build
         strategy:
@@ -252,6 +258,9 @@ jobs:
                   flags: packages
 
     integration:
+        name: "Integration"
+        permissions:
+            contents: read
         needs:
             - build
         strategy:
@@ -308,6 +317,8 @@ jobs:
 
     e2e-consensus:
         name: "E2E Consensus"
+        permissions:
+            contents: read
         needs:
             - build
         concurrency:
@@ -392,6 +403,8 @@ jobs:
 
     e2e-clients:
         name: "E2E Clients"
+        permissions:
+            contents: read
         needs:
             - build
         concurrency:
@@ -449,6 +462,8 @@ jobs:
 
     e2e-snapshot:
         name: "E2E Snapshot"
+        permissions:
+            contents: read
         needs:
             - build
         concurrency:
@@ -527,12 +542,15 @@ jobs:
 
     functional:
         name: "Functional - ${{matrix.name}}"
+        permissions:
+            contents: read
         needs:
             - build
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-functional-${{matrix.name}}
         runs-on: ubuntu-latest
+
 
         strategy:
             matrix:
