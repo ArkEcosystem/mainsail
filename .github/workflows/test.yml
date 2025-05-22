@@ -50,7 +50,7 @@ jobs:
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
 
             - name: Cache lerna
-              uses: actions/cache@v4
+              uses: actions/cache/save@v4
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.cache
@@ -94,12 +94,12 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache@v4
+              uses: actions/cache/restore@v4
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
-              uses: actions/cache@v4
+              uses: actions/cache/restore@v4
               with:
                   key: lerna-${{ runner.os }}
                   path: ./.cache
@@ -298,12 +298,12 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache@v4
+              uses: actions/cache/restore@v4
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
-              uses: actions/cache@v4
+              uses: actions/cache/restore@v4
               with:
                   key: lerna-${{ runner.os }}
                   path: ./.cache
@@ -348,12 +348,12 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache@v4
+              uses: actions/cache/restore@v4
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
-              uses: actions/cache@v4
+              uses: actions/cache/restore@v4
               with:
                   key: lerna-${{ runner.os }}
                   path: ./.cache
@@ -432,12 +432,12 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache@v4
+              uses: actions/cache/restore@v4
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
-              uses: actions/cache@v4
+              uses: actions/cache/restore@v4
               with:
                   key: lerna-${{ runner.os }}
                   path: ./.cache
@@ -489,12 +489,12 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache@v4
+              uses: actions/cache/restore@v4
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
-              uses: actions/cache@v4
+              uses: actions/cache/restore@v4
               with:
                   key: lerna-${{ runner.os }}
                   path: ./.cache
