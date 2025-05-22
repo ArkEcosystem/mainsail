@@ -109,6 +109,16 @@ jobs:
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.cache
+            - uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  components: llvm-tools-preview
+                  profile: minimal
+                  override: true
+            - name: Install cargo-llvm-cov
+              run: cargo install cargo-llvm-cov
+            - name: Check rustc version
+              run: rustc --version
             - name: Install dependencies
               run: pnpm install
             - name: Build
