@@ -1,12 +1,6 @@
 name: Circular dependencies
 
-on:
-    push:
-        branches:
-            - "main"
-            - "develop"
-    pull_request:
-        types: [ready_for_review, synchronize, opened]
+on: pull_request
 
 permissions:
     contents: read
