@@ -16,6 +16,7 @@ export const set = <T>(object: T, path: string | string[], value: unknown): bool
 			object[pathSegment] = {};
 		}
 
+		// Prototype pollution check is not needed here, because getPathSegments filters out
 		if (index === pathSegments.length - 1) {
 			object[pathSegment] = value;
 		}
