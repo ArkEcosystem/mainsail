@@ -15,6 +15,9 @@ export class CallAction implements Contracts.Api.RPC.Action {
 	@tagged("instance", "rpc")
 	private readonly evm!: Contracts.Evm.Instance;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	protected readonly configuration!: Contracts.Crypto.Configuration;
+
 	public readonly name: string = "eth_call";
 
 	public readonly schema = {
@@ -46,11 +49,22 @@ export class CallAction implements Contracts.Api.RPC.Action {
 	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<any> {
 		const [data] = parameters;
 
+		const {
+			block: { maxGasLimit },
+		} = this.configuration.getMilestone();
+
+		// Cap gas limit to block gas limit
+		let gasLimit = BigInt(maxGasLimit);
+		if (data.gas) {
+			const userGasLimit = BigInt(data.gas);
+			gasLimit = userGasLimit < gasLimit ? userGasLimit : gasLimit;
+		}
+
 		const { success, output } = await this.evm.view({
 			// default to zero address
 			data: Buffer.from(ethers.getBytes(data.data)),
 			from: data.from ?? "0x" + "0".repeat(40),
-			gasLimit: data.gas ? BigInt(data.gas) : undefined,
+			gasLimit,
 			specId: Contracts.Evm.SpecId.LATEST,
 			to: data.to,
 		});
