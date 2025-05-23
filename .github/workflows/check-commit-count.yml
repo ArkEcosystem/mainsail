@@ -1,12 +1,6 @@
 name: CI
 
-on:
-    push:
-        branches:
-            - "main"
-            - "develop"
-    pull_request:
-        types: [opened, synchronize]
+on: pull_request
 
 permissions:
     pull-requests: write
