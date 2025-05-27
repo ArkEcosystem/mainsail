@@ -188,11 +188,14 @@ export class Service implements Contracts.TransactionPool.Service {
 				hash,
 			);
 
-			for (const removedTransaction of removedTransactions) {
-				this.storage.removeTransaction(removedTransaction.hash);
-				this.logger.debug(`Removed old tx ${removedTransaction.hash}`);
+			const removedTransactionHashes = new Set(removedTransactions.map(({ hash }) => hash));
+			removedTransactionHashes.add(hash);
 
-				void this.events.dispatch(Events.TransactionEvent.Expired, removedTransaction.data);
+			for (const removedTransactionHash of removedTransactionHashes) {
+				this.storage.removeTransaction(removedTransactionHash);
+				this.logger.debug(`Removed old tx ${removedTransactionHash}`);
+
+				void this.events.dispatch(Events.TransactionEvent.Expired, removedTransactionHash);
 			}
 		}
 	}
