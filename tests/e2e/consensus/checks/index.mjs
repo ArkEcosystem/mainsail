@@ -20,7 +20,8 @@ let broadcastedTransactions = [];
 
 // Results
 let allPeersReachedTargetBlockNumber = false;
-let allTransactionsReportedByApi = true;
+let allTransactionsReportedByApi = false;
+let allTransactionsSuccessful = false;
 
 const peerBlockNumberMap = new Map();
 
@@ -39,30 +40,42 @@ const peerBlockNumberMap = new Map();
 async function waitForResults() {
 	do {
 		await sleep(1000);
-		console.log("waiting for results...", { allPeersReachedTargetBlockNumber, allTransactionsReportedByApi });
+		console.log("waiting for results...", { allPeersReachedTargetBlockNumber, allTransactionsReportedByApi, allTransactionsSuccessful });
 
 		if (!allTransactionsReportedByApi) {
 			try { 
 			   let allFound = true;
+			   let allSuccessful = true;
 			   for (const hash of broadcastedTransactions) {
 				   const transaction = await getApiHttp(config.peer, `/transactions/${hash}`);
 				   if (!transaction) {
-					   allFound = false;
-					   break;
+						allFound = false;
+						break;
+				   }
+
+				   if (transaction.receipt.status !== 1) {
+						console.log("transaction failed!!", transaction);
+						allSuccessful = false;
 				   }
 			   }
    
 			   if (allFound) {
 				   allTransactionsReportedByApi = true;
 			   }
-		   } catch {}
+
+			   if (allSuccessful) {
+				   allTransactionsSuccessful = true;
+			   }
+		   } catch (ex) {
+				console.log(ex);
+		   }
 		}
 
 	} while (!allPeersReachedTargetBlockNumber || !allTransactionsReportedByApi);
 
 	console.log(`checks successful. exiting`);
 
-	process.exit(0);
+	process.exit(allTransactionsSuccessful ? 0 : 1);
 }
 
 async function broadcastTransactions() {
