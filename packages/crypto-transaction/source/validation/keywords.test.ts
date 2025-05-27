@@ -137,7 +137,7 @@ describe<{
 		assert.undefined(context.validator.validate("test", "0x").error);
 		assert.undefined(context.validator.validate("test", "00").error);
 
-		const maxBytecodeLength = cryptoJson.milestones[0].gas!.maximumGasLimit / 2;
+		const maxBytecodeLength = cryptoJson.milestones[0].gas!.maximumGasLimit / 16;
 		const maxPayload = "0x" + "a".repeat(maxBytecodeLength);
 		assert.undefined(context.validator.validate("test", maxPayload).error);
 
