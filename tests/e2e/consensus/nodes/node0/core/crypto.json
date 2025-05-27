@@ -279,7 +279,7 @@
             "epoch": "2025-05-22T00:00:00.000Z",
             "evmSpec": "Shanghai",
             "gas": {
-                "maximumGasLimit": 2000000,
+                "maximumGasLimit": 5000000,
                 "maximumGasPrice": 10000000000000,
                 "minimumGasLimit": 21000,
                 "minimumGasPrice": 5000000000
