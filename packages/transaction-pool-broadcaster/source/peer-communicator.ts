@@ -13,6 +13,9 @@ export class PeerCommunicator implements Contracts.TransactionPool.PeerCommunica
 	@tagged("plugin", "transaction-pool-broadcaster")
 	protected readonly configuration!: Providers.PluginConfiguration;
 
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	public async postTransactions(
 		peer: Contracts.TransactionPool.Peer,
 		transactions: Contracts.Crypto.Transaction[],
@@ -30,6 +33,8 @@ export class PeerCommunicator implements Contracts.TransactionPool.PeerCommunica
 	}
 
 	private handleSocketError(peer: Contracts.TransactionPool.Peer, error: Error): void {
+		this.logger.debug(`socket error ${peer.ip}: ${error.message}`);
+
 		if (peer.errorCount++ > this.configuration.getRequired<number>("maxSequentialErrors")) {
 			this.repository.forgetPeer(peer.ip);
 			Ipc.emit("peer.removed", peer.ip);
