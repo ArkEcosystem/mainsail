@@ -33,6 +33,28 @@ export const makeEvmCall = async (
     return signed.build();
 };
 
+export const makeEvmDeploy = async (
+    abi,
+    nonceOffset = 0,
+) => {
+    const app = await getApplication(config);
+
+    const addressFactory = app.getTagged(Identifiers.Cryptography.Identity.Address.Factory, "type", "wallet");
+    const senderAddress = await addressFactory.fromMnemonic(config.senderPassphrase);
+    const walletNonce = await getWalletNonce(config.peer, senderAddress);
+
+    let builder = app
+        .resolve(EvmCallBuilder)
+        .gasPrice("5000000000")
+        .gasLimit(2_000_000)
+        .payload(abi.bytecode.object.slice(2))
+        .nonce((walletNonce + nonceOffset).toString());
+
+    const signed = await builder.sign(config.senderPassphrase);
+
+    return signed.build();
+};
+
 const getApplication = async (config) => {
     if (app) {
         return app;

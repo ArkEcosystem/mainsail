@@ -56,12 +56,12 @@ export const getApiHttp = async (peer, path) => {
     }
 };
 
-export const postTransaction = async (peer, transaction) => {
+export const postTransactions = async (peer, transactions) => {
     try {
         const response = await http.post(`${peer.apiTxPoolUrl}/api/transactions`, {
             headers: { "Content-Type": "application/json" },
             body: {
-                transactions: [transaction],
+                transactions,
             },
         });
 

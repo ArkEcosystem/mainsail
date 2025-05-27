@@ -1,8 +1,9 @@
 import got from "got";
 import express from "express";
 
-import { makeEvmCall } from "./tx.mjs";
-import { getApiHttp, postTransaction } from "./client.mjs";
+import { ConsensusAbi } from "/mainsail/packages/evm-contracts/distribution/index.js";
+import { makeEvmCall, makeEvmDeploy } from "./tx.mjs";
+import { getApiHttp, postTransactions } from "./client.mjs";
 import { config } from "./config.mjs";
 
 const app = express();
@@ -66,9 +67,14 @@ async function waitForResults() {
 
 async function broadcastTransactions() {
 	const tx = await makeEvmCall(`${config.to}`, "100000000");
-	const response = await postTransaction(config.peer, tx.serialized.toString("hex"));
-	console.log("broadcastTransactions", { hash: tx.hash, response: JSON.stringify(response) });
-	broadcastedTransactions.push(tx.hash);
+	const txDeploy = await makeEvmDeploy(ConsensusAbi, 1);
+	const response = await postTransactions(config.peer, [
+		tx.serialized.toString("hex"),
+		txDeploy.serialized.toString("hex"),
+	]);
+
+	console.log("broadcastTransactions", { txs: [tx.hash, txDeploy.hash], response: JSON.stringify(response) });
+	broadcastedTransactions.push(tx.hash, txDeploy.hash);
 }
 
 async function discoverPeers() {
