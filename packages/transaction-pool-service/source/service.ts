@@ -84,8 +84,8 @@ export class Service implements Contracts.TransactionPool.Service {
 			}
 
 			this.storage.addTransaction({
-				height: this.stateStore.getHeight(),
-				id: transaction.hash,
+				blockNumber: this.stateStore.getHeight(),
+				hash: transaction.hash,
 				senderPublicKey: transaction.data.senderPublicKey,
 				serialized: transaction.serialized,
 			});
@@ -121,11 +121,11 @@ export class Service implements Contracts.TransactionPool.Service {
 			let previouslyStoredFailures = 0;
 
 			const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
-			const lastHeight: number = this.stateStore.getHeight();
-			const expiredHeight: number = lastHeight - maxTransactionAge;
+			const lastBlockNumber: number = this.stateStore.getHeight();
+			const expiredBlockNumber: number = lastBlockNumber - maxTransactionAge;
 
-			for (const { height, id, serialized } of this.storage.getAllTransactions()) {
-				if (height > expiredHeight) {
+			for (const { blockNumber, hash, serialized } of this.storage.getAllTransactions()) {
+				if (blockNumber > expiredBlockNumber) {
 					try {
 						const previouslyStoredTransaction = await this.transactionFactory.fromBytes(serialized);
 						await this.#addTransactionToMempool(previouslyStoredTransaction);
@@ -137,14 +137,14 @@ export class Service implements Contracts.TransactionPool.Service {
 
 						previouslyStoredSuccesses++;
 					} catch (error) {
-						this.storage.removeTransaction(id);
-						this.logger.debug(`Failed to re-add previously stored tx ${id}: ${error.message}`);
+						this.storage.removeTransaction(hash);
+						this.logger.debug(`Failed to re-add previously stored tx ${hash}: ${error.message}`);
 
 						previouslyStoredFailures++;
 					}
 				} else {
-					this.storage.removeTransaction(id);
-					this.logger.debug(`Not re-adding previously stored expired tx ${id}`);
+					this.storage.removeTransaction(hash);
+					this.logger.debug(`Not re-adding previously stored expired tx ${hash}`);
 					previouslyStoredExpirations++;
 				}
 			}
@@ -179,13 +179,13 @@ export class Service implements Contracts.TransactionPool.Service {
 
 	async #removeOldTransactions(): Promise<void> {
 		const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
-		const lastHeight: number = this.stateStore.getHeight();
-		const expiredHeight: number = lastHeight - maxTransactionAge;
+		const lastBlockNumber: number = this.stateStore.getHeight();
+		const expiredBlockNumber: number = lastBlockNumber - maxTransactionAge;
 
-		for (const { senderPublicKey, id } of this.storage.getOldTransactions(expiredHeight)) {
+		for (const { senderPublicKey, hash } of this.storage.getOldTransactions(expiredBlockNumber)) {
 			const removedTransactions = await this.mempool.removeTransaction(
 				await this.addressFactory.fromPublicKey(senderPublicKey),
-				id,
+				hash,
 			);
 
 			for (const removedTransaction of removedTransactions) {

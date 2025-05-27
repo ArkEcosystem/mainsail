@@ -8,7 +8,7 @@ export interface SenderMempool {
 	getFromLatest(): Iterable<Transaction>;
 
 	addTransaction(transaction: Transaction): Promise<void>;
-	removeTransaction(id: string): Transaction[];
+	removeTransaction(hash: string): Transaction[];
 	reAddTransactions(): Promise<Transaction[]>;
 }
 

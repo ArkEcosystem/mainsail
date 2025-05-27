@@ -1,15 +1,15 @@
 export type StoredTransaction = {
-	height: number;
-	id: string;
+	blockNumber: number;
+	hash: string;
 	senderPublicKey: string;
 	serialized: Buffer;
 };
 
 export interface Storage {
 	addTransaction(storedTransaction: StoredTransaction): void;
-	hasTransaction(id: string): boolean;
+	hasTransaction(hash: string): boolean;
 	getAllTransactions(): Iterable<StoredTransaction>;
-	getOldTransactions(height: number): Iterable<StoredTransaction>;
-	removeTransaction(id: string): void;
+	getOldTransactions(blockNumber: number): Iterable<StoredTransaction>;
+	removeTransaction(hash: string): void;
 	flush(): void;
 }

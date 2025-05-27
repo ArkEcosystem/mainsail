@@ -67,13 +67,13 @@ describe<{
 
 		try {
 			storage.addTransaction({
-				height: 100,
-				id: "first-tx-id",
+				blockNumber: 100,
+				hash: "first-tx-hash",
 				senderPublicKey: "some-public-key",
 				serialized: Buffer.from("test"),
 			});
 
-			const has = storage.hasTransaction("first-tx-id");
+			const has = storage.hasTransaction("first-tx-hash");
 			assert.true(has);
 		} finally {
 			storage.dispose();
@@ -87,8 +87,8 @@ describe<{
 
 		try {
 			storage.addTransaction({
-				height: 100,
-				id: "first-tx-id",
+				blockNumber: 100,
+				hash: "first-tx-hash",
 				senderPublicKey: "some-public-key",
 				serialized: Buffer.from("test"),
 			});
@@ -107,15 +107,15 @@ describe<{
 
 		try {
 			const storedTransaction1 = {
-				height: 100,
-				id: "first-tx-id",
+				blockNumber: 100,
+				hash: "first-tx-hash",
 				senderPublicKey: "some-public-key",
 				serialized: Buffer.from("test"),
 			};
 
 			const storedTransaction2 = {
-				height: 100,
-				id: "second-tx-id",
+				blockNumber: 200,
+				hash: "second-tx-hash",
 				senderPublicKey: "second-public-key",
 				serialized: Buffer.from("second-serialized"),
 			};
@@ -137,15 +137,15 @@ describe<{
 
 		try {
 			const storedTransaction1 = {
-				height: 100,
-				id: "first-tx-id",
+				blockNumber: 100,
+				hash: "first-tx-hash",
 				senderPublicKey: "some-public-key",
 				serialized: Buffer.from("test"),
 			};
 
 			const storedTransaction2 = {
-				height: 200,
-				id: "second-tx-id",
+				blockNumber: 200,
+				hash: "second-tx-hash",
 				senderPublicKey: "second-public-key",
 				serialized: Buffer.from("second-serialized"),
 			};
@@ -167,15 +167,15 @@ describe<{
 
 		try {
 			const storedTransaction1 = {
-				height: 100,
-				id: "first-tx-id",
+				blockNumber: 100,
+				hash: "first-tx-hash",
 				senderPublicKey: "some-public-key",
 				serialized: Buffer.from("test"),
 			};
 
 			const storedTransaction2 = {
-				height: 200,
-				id: "second-tx-id",
+				blockNumber: 200,
+				hash: "second-tx-hash",
 				senderPublicKey: "second-public-key",
 				serialized: Buffer.from("second-serialized"),
 			};
@@ -197,13 +197,13 @@ describe<{
 
 		try {
 			storage.addTransaction({
-				height: 100,
-				id: "first-tx-id",
+				blockNumber: 100,
+				hash: "first-tx-hash",
 				senderPublicKey: "some-public-key",
 				serialized: Buffer.from("test"),
 			});
 
-			const has = storage.hasTransaction("first-tx-id");
+			const has = storage.hasTransaction("first-tx-hash");
 			assert.true(has);
 		} finally {
 			storage.dispose();
@@ -217,16 +217,16 @@ describe<{
 
 		try {
 			storage.addTransaction({
-				height: 100,
-				id: "first-tx-id",
+				blockNumber: 100,
+				hash: "first-tx-hash",
 				senderPublicKey: "some-public-key",
 				serialized: Buffer.from("test"),
 			});
 
 			assert.throws(() => {
 				storage.addTransaction({
-					height: 100,
-					id: "first-tx-id",
+					blockNumber: 100,
+					hash: "first-tx-hash",
 					senderPublicKey: "some-public-key",
 					serialized: Buffer.from("test"),
 				});
@@ -243,15 +243,15 @@ describe<{
 
 		try {
 			storage.addTransaction({
-				height: 100,
-				id: "first-tx-id",
+				blockNumber: 100,
+				hash: "first-tx-hash",
 				senderPublicKey: "some-public-key",
 				serialized: Buffer.from("test"),
 			});
 
-			storage.removeTransaction("first-tx-id");
+			storage.removeTransaction("first-tx-hash");
 
-			const has = storage.hasTransaction("first-tx-id");
+			const has = storage.hasTransaction("first-tx-hash");
 			assert.false(has);
 		} finally {
 			storage.dispose();
@@ -265,15 +265,15 @@ describe<{
 
 		try {
 			storage.addTransaction({
-				height: 100,
-				id: "first-tx-id",
+				blockNumber: 100,
+				hash: "first-tx-hash",
 				senderPublicKey: "dummy-sender-key-1",
 				serialized: Buffer.from("dummy-serialized-1"),
 			});
 
 			storage.addTransaction({
-				height: 100,
-				id: "second-tx-id",
+				blockNumber: 100,
+				hash: "second-tx-hash",
 				senderPublicKey: "dummy-sender-key-2",
 				serialized: Buffer.from("dummy-serialized-2"),
 			});

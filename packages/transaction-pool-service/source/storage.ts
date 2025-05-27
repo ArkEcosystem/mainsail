@@ -12,10 +12,10 @@ export class Storage implements Contracts.TransactionPool.Storage {
 
 	#database!: BetterSqlite3.Database;
 	#addTransactionStmt!: BetterSqlite3.Statement<Contracts.TransactionPool.StoredTransaction>;
-	#hasTransactionStmt!: BetterSqlite3.Statement<{ id: string }>;
+	#hasTransactionStmt!: BetterSqlite3.Statement<{ hash: string }>;
 	#getAllTransactionsStmt!: BetterSqlite3.Statement;
-	#getOldTransactionsStmt!: BetterSqlite3.Statement<{ height: number }>;
-	#removeTransactionStmt!: BetterSqlite3.Statement<{ id: string }>;
+	#getOldTransactionsStmt!: BetterSqlite3.Statement<{ blockNumber: number }>;
+	#removeTransactionStmt!: BetterSqlite3.Statement<{ hash: string }>;
 	#flushStmt!: BetterSqlite3.Statement;
 
 	public boot(): void {
@@ -36,31 +36,33 @@ export class Storage implements Contracts.TransactionPool.Storage {
 
             CREATE TABLE IF NOT EXISTS ${table}(
                 n                  INTEGER      PRIMARY KEY AUTOINCREMENT,
-                height             INTEGER      NOT NULL,
-                id                 VARCHAR(64)  NOT NULL,
+                blockNumber        INTEGER      NOT NULL,
+                hash               VARCHAR(64)  NOT NULL,
                 senderPublicKey    VARCHAR(66)  NOT NULL,
                 serialized         BLOB         NOT NULL
             );
 
-            CREATE UNIQUE INDEX IF NOT EXISTS ${table}_id ON ${table} (id);
-            CREATE INDEX IF NOT EXISTS ${table}_height ON ${table} (height);
+            CREATE UNIQUE INDEX IF NOT EXISTS ${table}_hash ON ${table} (hash);
+            CREATE INDEX IF NOT EXISTS ${table}_blockNumber ON ${table} (blockNumber);
         `);
 
 		this.#addTransactionStmt = this.#database.prepare(
-			`INSERT INTO ${table} (height, id, senderPublicKey, serialized) VALUES (:height, :id, :senderPublicKey, :serialized)`,
+			`INSERT INTO ${table} (blockNumber, hash, senderPublicKey, serialized) VALUES (:blockNumber, :hash, :senderPublicKey, :serialized)`,
 		);
 
-		this.#hasTransactionStmt = this.#database.prepare(`SELECT COUNT(*) FROM ${table} WHERE id = :id`).pluck(true);
+		this.#hasTransactionStmt = this.#database
+			.prepare(`SELECT COUNT(*) FROM ${table} WHERE hash = :hash`)
+			.pluck(true);
 
 		this.#getAllTransactionsStmt = this.#database.prepare(
-			`SELECT height, id, senderPublicKey, serialized FROM ${table} ORDER BY n`,
+			`SELECT blockNumber, hash, senderPublicKey, serialized FROM ${table} ORDER BY n`,
 		);
 
 		this.#getOldTransactionsStmt = this.#database.prepare(
-			`SELECT height, id, senderPublicKey, serialized FROM ${table} WHERE height <= :height ORDER BY n DESC`,
+			`SELECT blockNumber, hash, senderPublicKey, serialized FROM ${table} WHERE blockNumber <= :blockNumber ORDER BY n DESC`,
 		);
 
-		this.#removeTransactionStmt = this.#database.prepare(`DELETE FROM ${table} WHERE id = :id`);
+		this.#removeTransactionStmt = this.#database.prepare(`DELETE FROM ${table} WHERE hash = :hash`);
 
 		this.#flushStmt = this.#database.prepare(`DELETE FROM ${table}`);
 	}
@@ -73,20 +75,22 @@ export class Storage implements Contracts.TransactionPool.Storage {
 		this.#addTransactionStmt.run(storedTransaction);
 	}
 
-	public hasTransaction(id: string): boolean {
-		return !!this.#hasTransactionStmt.get({ id });
+	public hasTransaction(hash: string): boolean {
+		return !!this.#hasTransactionStmt.get({ hash });
 	}
 
 	public getAllTransactions(): Iterable<Contracts.TransactionPool.StoredTransaction> {
 		return this.#getAllTransactionsStmt.all() as Iterable<Contracts.TransactionPool.StoredTransaction>;
 	}
 
-	public getOldTransactions(height: number): Iterable<Contracts.TransactionPool.StoredTransaction> {
-		return this.#getOldTransactionsStmt.all({ height }) as Iterable<Contracts.TransactionPool.StoredTransaction>;
+	public getOldTransactions(blockNumber: number): Iterable<Contracts.TransactionPool.StoredTransaction> {
+		return this.#getOldTransactionsStmt.all({
+			blockNumber,
+		}) as Iterable<Contracts.TransactionPool.StoredTransaction>;
 	}
 
-	public removeTransaction(id: string): void {
-		this.#removeTransactionStmt.run({ id });
+	public removeTransaction(hash: string): void {
+		this.#removeTransactionStmt.run({ hash });
 	}
 
 	public flush(): void {

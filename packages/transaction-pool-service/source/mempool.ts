@@ -48,13 +48,13 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		}
 	}
 
-	public async removeTransaction(address: string, id: string): Promise<Contracts.Crypto.Transaction[]> {
+	public async removeTransaction(address: string, hash: string): Promise<Contracts.Crypto.Transaction[]> {
 		const senderMempool = this.#senderMempools.get(address);
 		if (!senderMempool) {
 			return [];
 		}
 
-		const transactions = senderMempool.removeTransaction(id);
+		const transactions = senderMempool.removeTransaction(hash);
 		this.#removeDisposableMempool(address);
 
 		return transactions;

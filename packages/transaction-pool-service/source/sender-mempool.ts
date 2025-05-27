@@ -64,8 +64,8 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		}
 	}
 
-	public removeTransaction(id: string): Contracts.Crypto.Transaction[] {
-		const index = this.#transactions.findIndex((t) => t.hash === id);
+	public removeTransaction(hash: string): Contracts.Crypto.Transaction[] {
+		const index = this.#transactions.findIndex((t) => t.hash === hash);
 		if (index === -1) {
 			return [];
 		}
