@@ -138,7 +138,8 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 				}
 
 				// The allowed bytecode length is relative to the maximum transaction gas limit
-				const maxBytecodeLength = maximumGasLimit / 2;
+				// and cost of non-zero calldata per gas (16 byte).
+				const maxBytecodeLength = maximumGasLimit / 16;
 				const minBytecodeLength = 0;
 
 				const regex = new RegExp(`^(0x)?[0-9a-fA-F]{${minBytecodeLength},${maxBytecodeLength}}$`);
