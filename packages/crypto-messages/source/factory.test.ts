@@ -50,7 +50,6 @@ describe<{
 		};
 
 		context.sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(validatorSet);
-		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
 		context.factory = context.sandbox.app.resolve(MessageFactory);
@@ -71,22 +70,20 @@ describe<{
 	});
 
 	it("#makeProposal - should correctly make signed proposal", async ({ blockFactory, factory, identity }) => {
-		const data: Contracts.Crypto.ProposedData = {
-			block: await blockFactory.fromData(blockData),
-			serialized: serializedBlock,
-		};
-
 		const proposal = await factory.makeProposal(
 			{
-				data,
+				data: {
+					serialized: serializedBlock,
+				},
 				round: 1,
 				validatorIndex: 0,
 			},
 			identity.keys,
 		);
+
 		assert.equal(
 			proposal.signature,
-			"b25fd16693a2246d3e9dff3d7ae3da1473c1b24f6ef8b33c69e38e21e32c9ca307ae5f7d4573e2679ec48ecc2f1ff89d16115d8e7f6ffcba72cc9a746bcc40cdd0f9120d87c20addb55baceea2cb8cdb75faaf036e6a4221d28dc8f6558d8cc1",
+			"82841e0f25ac4bd6745ea2b80c314742e0e4b98073fa78c45e648c0f36037255ce5c2eb588fe4f4078ed9079202b427e0dad5008a81abb51573cdd50eebfda7ce7342700b8c319ef6dbf6adcbe96067584fe408b9d17fdb82e9787e71dc823e7",
 		);
 	});
 
@@ -112,7 +109,7 @@ describe<{
 
 		assert.equal(
 			proposal.signature,
-			"88276dd41eb9fc2b5cde4320b1c6dfc12bf5d71de1d82b79b8d6d00e78d2abfe6f242a823502edfe34ada370e38be22d093f974a720e01cbe21e867f1fd93d0fbb234f75a5d4a42a54516d616917fed46d2d5c2088665d3207b352360c167b34",
+			"86c1fde96bb08ea505276c8db238ab95a8f463c325cfec7789a5f7891d62306f998b2698177d1cd1a2b0800fb628b88519ef65e2d54a017425be273be0ac8275ce1fa256b6592de55a0eacec9032b7ca1b3df98c115ec743669eb8ed30c721bb",
 		);
 	});
 
@@ -126,7 +123,7 @@ describe<{
 		const precommit = await factory.makePrecommit(
 			{
 				blockHash: undefined,
-				height: 1,
+				blockNumber: 1,
 				round: 1,
 				type: Contracts.Crypto.MessageType.Precommit,
 				validatorIndex: 0,
@@ -150,7 +147,7 @@ describe<{
 		const prevote = await factory.makePrevote(
 			{
 				blockHash: undefined,
-				height: 1,
+				blockNumber: 1,
 				round: 1,
 				type: Contracts.Crypto.MessageType.Prevote,
 				validatorIndex: 0,

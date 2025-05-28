@@ -1,9 +1,16 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { describe, Sandbox } from "../../test-framework/source";
-import { blockData, proposalData, proposalDataWithValidRound, serializedBlock } from "../test/fixtures/proposal";
+import {
+	blockData,
+	proposalData,
+	proposalDataWithValidRound,
+	serializedBlock,
+	serializedProposal,
+} from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Proposal } from "./proposal";
+import { assertProposedData } from "../test/helpers/asserts";
 
 describe<{
 	sandbox: Sandbox;
@@ -12,8 +19,8 @@ describe<{
 	const data: Contracts.Crypto.ProposedData = {
 		block: {
 			data: blockData,
-			header: { ...blockData, transactions: [] },
-			serialized: serializedBlock,
+			header: { ...blockData },
+			serialized: serializedBlock.slice(2),
 			transactions: [],
 		},
 		serialized: serializedBlock,
@@ -34,6 +41,12 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
+
+		const blockInstance = await context.sandbox.app
+			.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory)
+			.fromData(blockData);
+
+		(data.block as any).transactions = blockInstance.transactions;
 
 		context.proposal = context.sandbox.app.resolve(Proposal).initialize({
 			...proposalData,
@@ -76,22 +89,21 @@ describe<{
 	});
 
 	// User assert block data
-	it.skip("#getData - should be ok", async ({ proposal }) => {
+	it("#getData - should be ok", async ({ proposal }) => {
 		await proposal.deserializeData();
-		assert.equal(proposal.getData(), data);
+		assertProposedData(assert, proposal.getData(), data);
 	});
 
 	it("#toString - should be ok", ({ proposal }) => {
 		assert.equal(proposal.toString(), `{"blockNumber":2,"round":1,"validatorIndex":0}`);
 	});
 
-	// TODO: update fixture
-	it.skip("#toString - should include block id after deserialization", async ({ proposal }) => {
+	it("#toString - should include block id after deserialization", async ({ proposal }) => {
 		await proposal.deserializeData();
 
 		assert.equal(
 			proposal.toString(),
-			`{"block":"3b76ae07ded37bbab2d56302f7ab09f302ec1a815a53c80ee9805d9c8c8eca19","blockNumber":2,"round":1,"validatorIndex":0}`,
+			`{"block":"10ee5958aa6a97c60830a75f4c0f49ca02da76e5f13851567534a6837e0fa69d","blockNumber":2,"round":1,"validatorIndex":0}`,
 		);
 	});
 

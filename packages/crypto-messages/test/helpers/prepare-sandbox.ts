@@ -8,6 +8,7 @@ import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
+import { ServiceProvider as CoreCryptoTransactionEvmCall } from "@mainsail/crypto-transaction-evm-call";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
@@ -15,12 +16,12 @@ import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json";
-import { Sandbox } from "../../../test-framework/source";
-import { Deserializer } from "../../source/deserializer";
-import { MessageFactory } from "../../source/factory";
-import { makeKeywords } from "../../source/keywords";
-import { schemas } from "../../source/schemas";
-import { Serializer } from "../../source/serializer";
+import { Sandbox } from "../../../test-framework/source/index.js";
+import { Deserializer } from "../../source/deserializer.js";
+import { MessageFactory } from "../../source/factory.js";
+import { makeKeywords } from "../../source/keywords.js";
+import { schemas } from "../../source/schemas.js";
+import { Serializer } from "../../source/serializer.js";
 
 export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox = new Sandbox();
@@ -42,6 +43,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreCryptoWif).register();
 	await context.sandbox.app.resolve(CoreConsensusBls12381).register();
 	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
+	await context.sandbox.app.resolve(CoreCryptoTransactionEvmCall).register();
 	await context.sandbox.app.resolve(CoreTransactions).register();
 	await context.sandbox.app.resolve(CoreCryptoValidation).register();
 	await context.sandbox.app.resolve(CryptoBlock).register();

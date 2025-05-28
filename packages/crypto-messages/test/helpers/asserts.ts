@@ -19,6 +19,10 @@ export const assertProposal = (assert, data1, data2) => {
 	}
 };
 
+export const assertProposedData = (assert, data1, data2) => {
+	assert.true(deepEqual(data1, data2));
+};
+
 export const assertPrecommit = (assert, data1, data2) => {
 	assertPrecommitOrPrevote(assert, data1, data2);
 };
@@ -26,3 +30,21 @@ export const assertPrecommit = (assert, data1, data2) => {
 export const assertPrevote = (assert, data1, data2) => {
 	assertPrecommitOrPrevote(assert, data1, data2);
 };
+
+function deepEqual(obj1, obj2) {
+	if (obj1 === obj2) {
+		return true;
+	}
+
+	const keys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
+	for (const key of keys) {
+		const val1 = obj1.hasOwnProperty(key) ? obj1[key] : undefined;
+		const val2 = obj2.hasOwnProperty(key) ? obj2[key] : undefined;
+
+		if (!deepEqual(val1, val2)) {
+			return false;
+		}
+	}
+
+	return true;
+}
