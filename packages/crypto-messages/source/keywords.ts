@@ -11,16 +11,16 @@ const parseBlockNumber = (parentSchema): number | undefined => {
 		return parentSchema.parentData.blockNumber;
 	}
 
-	if (!parentSchema.parentData.block) {
+	if (!parentSchema.parentData.data) {
 		return undefined;
 	}
 
 	// Proposals contain the block only in serialized form (hex).
-	// We can extract the block numuber at a fixed offset here, without needing to deserialize the whole block.
+	// We can extract the block number at a fixed offset here, without needing to deserialize the whole block.
 
-	// See packages/crypto-block/source/serializer.ts#serializeProposed for reference.
+	// See packages/crypto-messages/source/serializer.ts#serializeProposed for reference.
 
-	const serialized = parentSchema.parentData.block.serialized;
+	const serialized = parentSchema.parentData.data.serialized;
 	if (!serialized) {
 		return undefined;
 	}

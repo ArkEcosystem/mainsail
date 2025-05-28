@@ -130,7 +130,7 @@ describe<{
 			$id: "test",
 			type: "object",
 			properties: {
-				block: {
+				data: {
 					type: "object",
 					properties: {
 						serialized: {
@@ -153,10 +153,10 @@ describe<{
 		};
 
 		for (let index = 0; index < activeValidators; index++) {
-			assert.undefined(context.validator.validate("test", { block: block1, validatorIndex: index }).error);
+			assert.undefined(context.validator.validate("test", { data: block1, validatorIndex: index }).error);
 		}
 
-		assert.defined(context.validator.validate("test", { block: block1, validatorIndex: activeValidators }).error);
+		assert.defined(context.validator.validate("test", { data: block1, validatorIndex: activeValidators }).error);
 
 		// change milestone to 15 validators at height 15
 		context.sandbox.app
@@ -173,16 +173,16 @@ describe<{
 		};
 
 		for (let index = 0; index < 15; index++) {
-			assert.undefined(context.validator.validate("test", { block: block2, validatorIndex: index }).error);
+			assert.undefined(context.validator.validate("test", { data: block2, validatorIndex: index }).error);
 		}
 
-		assert.defined(context.validator.validate("test", { block: block2, validatorIndex: 15 }).error);
+		assert.defined(context.validator.validate("test", { data: block2, validatorIndex: 15 }).error);
 
 		// block 1 still accepted
 		for (let index = 0; index < activeValidators; index++) {
-			assert.undefined(context.validator.validate("test", { block: block1, validatorIndex: index }).error);
+			assert.undefined(context.validator.validate("test", { data: block1, validatorIndex: index }).error);
 		}
 
-		assert.defined(context.validator.validate("test", { block: block1, validatorIndex: 53 }).error);
+		assert.defined(context.validator.validate("test", { data: block1, validatorIndex: 53 }).error);
 	});
 });
