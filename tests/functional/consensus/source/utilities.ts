@@ -70,7 +70,7 @@ export const makeProposal = async (
 	const proposal = await proposer.propose(
 		node.app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-			.getValidatorIndexByWalletPublicKey(validator.publicKey),
+			.getValidatorIndexByWalletAddress(validator.address),
 		round,
 		undefined,
 		block,
@@ -98,7 +98,7 @@ export const makePrevote = async (
 	return await proposer.prevote(
 		node.app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-			.getValidatorIndexByWalletPublicKey(validator.publicKey),
+			.getValidatorIndexByWalletAddress(validator.address),
 		blockNumber,
 		round,
 		blockHash,
@@ -123,7 +123,7 @@ export const makePrecommit = async (
 	return await proposer.precommit(
 		node.app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-			.getValidatorIndexByWalletPublicKey(validator.publicKey),
+			.getValidatorIndexByWalletAddress(validator.address),
 		blockNumber,
 		round,
 		blockHash,
