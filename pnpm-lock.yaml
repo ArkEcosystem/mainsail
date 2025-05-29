@@ -3039,15 +3039,30 @@ importers:
 
   tests/functional/consensus:
     devDependencies:
+      '@mainsail/api-database':
+        specifier: workspace:*
+        version: link:../../../packages/api-database
+      '@mainsail/api-sync':
+        specifier: workspace:*
+        version: link:../../../packages/api-sync
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../../../packages/blockchain-utils
       '@mainsail/consensus':
         specifier: workspace:*
         version: link:../../../packages/consensus
+      '@mainsail/consensus-storage':
+        specifier: workspace:*
+        version: link:../../../packages/consensus-storage
       '@mainsail/container':
         specifier: workspace:*
         version: link:../../../packages/container
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../../../packages/contracts
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-address-base58
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../../../packages/crypto-address-keccak256
@@ -3072,9 +3087,9 @@ importers:
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../../../packages/crypto-messages
-      '@mainsail/crypto-signature-schnorr':
+      '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
-        version: link:../../../packages/crypto-signature-schnorr
+        version: link:../../../packages/crypto-signature-ecdsa
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../../../packages/crypto-transaction
@@ -3096,6 +3111,9 @@ importers:
       '@mainsail/evm-api-worker':
         specifier: workspace:*
         version: link:../../../packages/evm-api-worker
+      '@mainsail/evm-consensus':
+        specifier: workspace:*
+        version: link:../../../packages/evm-consensus
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../../../packages/evm-service
@@ -3126,6 +3144,9 @@ importers:
       '@mainsail/transaction-pool-service':
         specifier: workspace:*
         version: link:../../../packages/transaction-pool-service
+      '@mainsail/transaction-pool-worker':
+        specifier: workspace:*
+        version: link:../../../packages/transaction-pool-worker
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../../../packages/transactions
@@ -3204,9 +3225,6 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../../../packages/crypto-key-pair-ecdsa
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-key-pair-schnorr
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../../../packages/crypto-messages
