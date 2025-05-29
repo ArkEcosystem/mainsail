@@ -51,18 +51,21 @@ describe<{
 	it("Block - should get latest block", async ({ localClient, clients }) => {
 		const lastBlock = await localClient.getBlock("latest");
 
+		// Chain moved
+		assert.true(parseInt(lastBlock.number) > 0);
+
 		for (const client of clients) {
-			const b = await client.getBlock("latest");
+			const b = await client.getBlock(lastBlock.number);
 			compareBlocks(assert, lastBlock, b);
 		}
 	});
 
 	it("Block - should get genesis block", async ({ localClient, clients }) => {
-		const lastBlock = await localClient.getBlock(0);
+		const genesisBlock = await localClient.getBlock(0);
 
 		for (const client of clients) {
 			const b = await client.getBlock(0);
-			compareBlocks(assert, lastBlock, b);
+			compareBlocks(assert, genesisBlock, b);
 		}
 	});
 
