@@ -204,6 +204,9 @@ const bootstrap = async (sandbox: Sandbox) => {
 
 	const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
 	await validatorSet.restore();
+
+	sandbox.app.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository).printLoadedValidators();
+
 	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 };
 
