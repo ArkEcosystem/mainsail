@@ -5,7 +5,6 @@ import { join } from "path";
 import { dirSync } from "tmp";
 
 import { ValidatorsJson } from "./contracts.js";
-import { MemoryDatabase } from "./database.js";
 import { TestLogger } from "./logger.js";
 import { P2PRegistry } from "./p2p.js";
 import { ProposerCalculator } from "./proposer-calculator.js";
@@ -18,6 +17,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 
 	// Basic binds and mocks
 	sandbox.app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
+	sandbox.app.bind(Identifiers.Application.Version).toConstantValue("1.0");
 	sandbox.app.bind(Identifiers.Config.Flags).toConstantValue({});
 	sandbox.app.bind(Identifiers.Config.Plugins).toConstantValue({});
 	sandbox.app
@@ -39,10 +39,6 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		saveProposals: async () => {},
 		saveState: async () => {},
 	});
-
-	sandbox.app.bind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
-
-	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
 		getTransactionBytes: async () => [],
@@ -83,34 +79,6 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	logManager.setDefaultDriver("test");
 
 	// Load packages
-	const packages = [
-		"@mainsail/validation",
-		"@mainsail/crypto-config",
-		"@mainsail/crypto-validation",
-		"@mainsail/crypto-hash-bcrypto",
-		"@mainsail/crypto-signature-schnorr",
-		"@mainsail/crypto-key-pair-ecdsa",
-		"@mainsail/crypto-consensus-bls12-381",
-		"@mainsail/crypto-address-keccak256",
-		"@mainsail/crypto-wif",
-		"@mainsail/serializer",
-		"@mainsail/crypto-block",
-		"@mainsail/fees",
-		"@mainsail/fees-static",
-		"@mainsail/evm-service",
-		"@mainsail/blockchain-utils",
-		"@mainsail/crypto-transaction",
-		"@mainsail/crypto-transaction-evm-call",
-		"@mainsail/state",
-		"@mainsail/transactions",
-		"@mainsail/crypto-messages",
-		"@mainsail/crypto-commit",
-		"@mainsail/processor",
-		"@mainsail/validator-set-static",
-		"@mainsail/validator",
-		"@mainsail/consensus",
-	];
-
 	const options = {
 		"@mainsail/state": {
 			snapshots: {
@@ -119,9 +87,43 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		},
 	};
 
+	const packages = [
+		"@mainsail/validation",
+		"@mainsail/crypto-config",
+		"@mainsail/crypto-validation",
+		"@mainsail/crypto-hash-bcrypto",
+		"@mainsail/crypto-signature-ecdsa",
+		"@mainsail/crypto-key-pair-ecdsa",
+		"@mainsail/crypto-consensus-bls12-381",
+		"@mainsail/crypto-address-base58",
+		"@mainsail/crypto-address-keccak256",
+		"@mainsail/crypto-wif",
+		"@mainsail/serializer",
+		"@mainsail/crypto-block",
+		"@mainsail/evm-service",
+		"@mainsail/database",
+		"@mainsail/api-database",
+		"@mainsail/api-sync",
+		"@mainsail/blockchain-utils",
+		"@mainsail/crypto-transaction",
+		"@mainsail/crypto-transaction-evm-call",
+		"@mainsail/state",
+		"@mainsail/transactions",
+		"@mainsail/transaction-pool-service",
+		"@mainsail/crypto-messages",
+		"@mainsail/crypto-commit",
+		"@mainsail/processor",
+		"@mainsail/evm-consensus",
+		"@mainsail/validator",
+		"@mainsail/consensus",
+	];
+
 	for (const packageId of packages) {
 		await loadPlugin(sandbox, packageId, options);
 	}
+
+	// Overwrite @mainsail/blockchain-utils
+	sandbox.app.rebind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
 
 	return sandbox;
 };
@@ -185,14 +187,8 @@ const bootstrap = async (sandbox: Sandbox) => {
 
 	const genesisCommit = await commitFactory.fromJson(genesisCommitJson);
 
-	const stateService = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
-	const store = stateService.getStore();
-
+	const store = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
 	store.setGenesisCommit(genesisCommit);
-	store.setLastBlock(genesisCommit.block);
-
-	const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
-	validatorSet.restore(store);
 
 	const commitState = sandbox.app.get<Contracts.Consensus.CommitStateFactory>(
 		Identifiers.Consensus.CommitState.Factory,
@@ -206,6 +202,8 @@ const bootstrap = async (sandbox: Sandbox) => {
 	}
 	await blockProcessor.commit(commitState);
 
+	const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
+	await validatorSet.restore();
 	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 };
 
@@ -227,8 +225,17 @@ const runMany = async (sandboxes: Sandbox[]) => {
 };
 
 const stop = async (sandbox: Sandbox) => {
-	const consensus = sandbox.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
-	await consensus.dispose();
+	const serviceProviders: Providers.ServiceProvider[] = sandbox.app
+		.get<Providers.ServiceProviderRepository>(Identifiers.ServiceProvider.Repository)
+		.allLoadedProviders();
+
+	for (const serviceProvider of serviceProviders.reverse()) {
+		try {
+			await serviceProvider.dispose();
+		} catch {
+			/* */
+		}
+	}
 };
 
 const stopMany = async (sandboxes: Sandbox[]) => {

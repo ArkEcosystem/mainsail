@@ -34,7 +34,6 @@ const setup = async () => {
 		saveState: async () => {},
 	});
 
-	// TODO:
 	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({
 		broadcastPrecommit: async () => {},
 		broadcastPrevote: async () => {},
@@ -58,7 +57,6 @@ const setup = async () => {
 
 	// RegisterBaseBindings
 	sandbox.app.bind("path.data").toConstantValue(dirSync({ unsafeCleanup: true }).name);
-	//sandbox.app.bind("path.data").toConstantValue(resolve(import.meta.dirname, "../paths/data"));
 	sandbox.app.bind("path.config").toConstantValue(resolve(import.meta.dirname, "../paths/config"));
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
@@ -74,9 +72,6 @@ const setup = async () => {
 			},
 		},
 		"@mainsail/transaction-pool-service": {
-			// bech32m addresses require more bytes than the default which assumes base58.
-			maxTransactionBytes: 50_000,
-
 			storage: ":memory:",
 		},
 		"@mainsail/api-sync": {
