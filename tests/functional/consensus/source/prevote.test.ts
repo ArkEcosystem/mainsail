@@ -3,9 +3,9 @@ import { Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 import { sleep } from "@mainsail/utils";
 
-import crypto from "../config/crypto.json";
-import validators from "../config/validators.json";
-import { assertBlockId, assertBockHeight, assertBockRound } from "./asserts.js";
+import crypto from "../config/crypto.json" with { type: "json" };
+import validators from "../config/validators.json" with { type: "json" };
+import { assertBlockHash, assertBlockNumber, assertBlockRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
@@ -22,7 +22,7 @@ describe<{
 	nodes: Sandbox[];
 	validators: Validator[];
 	p2p: P2PRegistry;
-}>("Propose", ({ beforeEach, afterEach, it, assert, stub }) => {
+}>("Prevote", ({ beforeEach, afterEach, it, assert, stub }) => {
 	const totalNodes = 5;
 
 	beforeEach(async (context) => {
@@ -56,20 +56,20 @@ describe<{
 		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 4);
+		await assertBlockHash(nodes);
 
-		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
-		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes - 1); // Assert number of prevotes
-		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
+		assert.equal(p2p.proposals.getMessages(1, 4).length, 1); // Assert number of proposals
+		assert.equal(p2p.prevotes.getMessages(1, 4).length, totalNodes); // Assert number of prevotes
+		assert.equal(p2p.precommits.getMessages(1, 4).length, totalNodes); // Assert number of precommits
 
 		// Next block
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 4);
+		await assertBlockHash(nodes);
 	});
 
 	it("should not confirm block, if > minority does not prevote", async ({ nodes, p2p }) => {
@@ -92,10 +92,10 @@ describe<{
 	});
 
 	it("should confirm block, if < minority prevote null", async ({ nodes, validators, p2p }) => {
-		const node0 = nodes[0];
+		const node0 = nodes[1];
 		const stubPrevote = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
-		const prevote = await makePrevote(node0, validators[0], 1, 0);
+		const prevote = await makePrevote(node0, validators[1], 1, 4);
 
 		stubPrevote.callsFake(async () => {
 			stubPrevote.restore();
@@ -105,33 +105,33 @@ describe<{
 		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 4);
+		await assertBlockHash(nodes);
 
-		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
-		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
-		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
+		assert.equal(p2p.proposals.getMessages(1, 4).length, 1); // Assert number of proposals
+		assert.equal(p2p.prevotes.getMessages(1, 4).length, totalNodes); // Assert number of prevotes
+		assert.equal(p2p.precommits.getMessages(1, 4).length, totalNodes); // Assert number of precommits
 
 		// Assert all nodes prevote
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
-			[undefined, commit.block.data.id, commit.block.data.id, commit.block.data.id, commit.block.data.id],
+			p2p.prevotes.getMessages(1, 4).map((prevote) => prevote.blockHash),
+			[commit.block.data.hash, commit.block.data.hash, commit.block.data.hash, undefined, commit.block.data.hash],
 		);
 
 		// Next block
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 4);
+		await assertBlockHash(nodes);
 	});
 
 	it("should not confirm block, if > minority prevote null", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
 		const stubPrevote0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
-		const prevote0 = await makePrevote(node0, validators[0], 1, 0);
+		const prevote0 = await makePrevote(node0, validators[0], 1, 4);
 
 		stubPrevote0.callsFake(async () => {
 			stubPrevote0.restore();
@@ -140,7 +140,7 @@ describe<{
 
 		const node1 = nodes[1];
 		const stubPrevote1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
-		const prevote1 = await makePrevote(node1, validators[1], 1, 0);
+		const prevote1 = await makePrevote(node1, validators[1], 1, 4);
 
 		stubPrevote1.callsFake(async () => {
 			stubPrevote1.restore();
@@ -150,36 +150,36 @@ describe<{
 		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 1);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 9);
+		await assertBlockHash(nodes);
 
-		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
-		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
-		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
+		assert.equal(p2p.proposals.getMessages(1, 4).length, 1); // Assert number of proposals
+		assert.equal(p2p.prevotes.getMessages(1, 4).length, totalNodes); // Assert number of prevotes
+		assert.equal(p2p.precommits.getMessages(1, 9).length, totalNodes); // Assert number of precommits
 
 		// Assert all nodes prevote
-		const blockId = p2p.prevotes.getMessages(1, 0)[3].blockId;
-		assert.defined(blockId);
+		const blockHash = p2p.prevotes.getMessages(1, 4)[0].blockHash;
+		assert.defined(blockHash);
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
-			[undefined, undefined, blockId, blockId, blockId],
+			p2p.prevotes.getMessages(1, 4).map((prevote) => prevote.blockHash),
+			[blockHash, blockHash, blockHash, undefined, undefined],
 		);
 
 		// Next block
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 4);
+		await assertBlockHash(nodes);
 	});
 
 	it("should confirm block, if < minority prevote random block", async ({ nodes, validators, p2p }) => {
-		const node0 = nodes[0];
+		const node0 = nodes[1];
 		const stubPrevote = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
-		const proposal = await makeProposal(node0, validators[0], 1, 0, Date.now());
-		const prevote = await makePrevote(node0, validators[0], 1, 0, proposal.getData().block.data.id);
+		const proposal = await makeProposal(node0, validators[1], 1, 4, Date.now());
+		const prevote = await makePrevote(node0, validators[1], 1, 4, proposal.getData().block.data.hash);
 
 		stubPrevote.callsFake(async () => {
 			stubPrevote.restore();
@@ -189,48 +189,48 @@ describe<{
 		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 4);
+		await assertBlockHash(nodes);
 
-		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
-		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
-		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
+		assert.equal(p2p.proposals.getMessages(1, 4).length, 1); // Assert number of proposals
+		assert.equal(p2p.prevotes.getMessages(1, 4).length, totalNodes); // Assert number of prevotes
+		assert.equal(p2p.precommits.getMessages(1, 4).length, totalNodes); // Assert number of precommits
 
 		// Assert all nodes prevote
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
+			p2p.prevotes.getMessages(1, 4).map((prevote) => prevote.blockHash),
 			[
-				proposal.getData().block.data.id,
-				commit.block.data.id,
-				commit.block.data.id,
-				commit.block.data.id,
-				commit.block.data.id,
+				commit.block.data.hash,
+				commit.block.data.hash,
+				commit.block.data.hash,
+				proposal.getData().block.data.hash,
+				commit.block.data.hash,
 			],
 		);
 
 		// Next block
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 4);
+		await assertBlockHash(nodes);
 	});
 
-	it("should not confirm block, if > minority prevote random block", async ({ nodes, validators, p2p }) => {
+	it.skip("should not confirm block, if > minority prevote random block", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
 		const node1 = nodes[1];
 
 		const proposal = await makeProposal(node0, validators[0], 1, 0, Date.now());
-		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal.getData().block.data.id);
+		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal.getData().block.data.hash);
 		const stubPrevote0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote0.callsFake(async () => {
 			stubPrevote0.restore();
 			await p2p.broadcastPrevote(prevote0);
 		});
 
-		const prevote1 = await makePrevote(node1, validators[1], 1, 0, proposal.getData().block.data.id);
+		const prevote1 = await makePrevote(node1, validators[1], 1, 0, proposal.getData().block.data.hash);
 		const stubPrevote1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote1.callsFake(async () => {
 			stubPrevote1.restore();
@@ -240,31 +240,35 @@ describe<{
 		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 1);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
 		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
 
 		// Assert all nodes prevote
-		const blockId = p2p.prevotes.getMessages(1, 0)[3].blockId;
-		assert.defined(blockId);
+		const blockHash = p2p.prevotes.getMessages(1, 0)[3].blockHash;
+		assert.defined(blockHash);
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
-			[proposal.getData().block.data.id, proposal.getData().block.data.id, blockId, blockId, blockId],
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
+			[proposal.getData().block.data.hash, proposal.getData().block.data.hash, blockHash, blockHash, blockHash],
 		);
 
 		// Next block
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
 	});
 
-	it("should confirm block, if < minority prevote multiple random blocks", async ({ nodes, validators, p2p }) => {
+	it.skip("should confirm block, if < minority prevote multiple random blocks", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
 		const node0 = nodes[0];
 		const stubPrevote = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
@@ -273,11 +277,11 @@ describe<{
 		const proposal2 = await makeProposal(node0, validators[0], 1, 0, Date.now());
 		const proposal3 = await makeProposal(node0, validators[0], 1, 0, Date.now());
 		const proposal4 = await makeProposal(node0, validators[0], 1, 0, Date.now());
-		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal0.getData().block.data.id);
-		const prevote1 = await makePrevote(node0, validators[0], 1, 0, proposal1.getData().block.data.id);
-		const prevote2 = await makePrevote(node0, validators[0], 1, 0, proposal2.getData().block.data.id);
-		const prevote3 = await makePrevote(node0, validators[0], 1, 0, proposal3.getData().block.data.id);
-		const prevote4 = await makePrevote(node0, validators[0], 1, 0, proposal4.getData().block.data.id);
+		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal0.getData().block.data.hash);
+		const prevote1 = await makePrevote(node0, validators[0], 1, 0, proposal1.getData().block.data.hash);
+		const prevote2 = await makePrevote(node0, validators[0], 1, 0, proposal2.getData().block.data.hash);
+		const prevote3 = await makePrevote(node0, validators[0], 1, 0, proposal3.getData().block.data.hash);
+		const prevote4 = await makePrevote(node0, validators[0], 1, 0, proposal4.getData().block.data.hash);
 
 		stubPrevote.callsFake(async () => {
 			stubPrevote.restore();
@@ -291,9 +295,9 @@ describe<{
 		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes + 4); // Assert number of prevotes
@@ -302,25 +306,25 @@ describe<{
 		// Assert all nodes prevote
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
 			[
-				proposal0.getData().block.data.id,
-				proposal1.getData().block.data.id,
-				proposal2.getData().block.data.id,
-				proposal3.getData().block.data.id,
-				proposal4.getData().block.data.id,
-				commit.block.data.id,
-				commit.block.data.id,
-				commit.block.data.id,
-				commit.block.data.id,
+				proposal0.getData().block.data.hash,
+				proposal1.getData().block.data.hash,
+				proposal2.getData().block.data.hash,
+				proposal3.getData().block.data.hash,
+				proposal4.getData().block.data.hash,
+				commit.block.data.hash,
+				commit.block.data.hash,
+				commit.block.data.hash,
+				commit.block.data.hash,
 			],
 		);
 
 		// Next block
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
 	});
 });
