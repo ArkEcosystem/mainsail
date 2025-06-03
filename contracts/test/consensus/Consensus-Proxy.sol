@@ -57,7 +57,7 @@ contract ConsensusTest is Base {
         consensus.vote(address(1));
 
         vm.stopPrank();
-        consensus.calculateActiveValidators(2);
+        consensus.calculateRoundValidators(2);
 
         assertEq(consensus.version(), 1);
         assertEq(consensus.registeredValidatorsCount(), 3);

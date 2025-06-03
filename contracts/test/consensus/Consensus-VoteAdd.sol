@@ -147,7 +147,7 @@ contract ConsensusTest is Base {
 
         consensus.addValidator(addr, prepareBLSKey(addr), false);
 
-        consensus.calculateActiveValidators(1);
+        consensus.calculateRoundValidators(1);
 
         vm.expectRevert(ConsensusV1.ImportIsNotAllowed.selector);
 

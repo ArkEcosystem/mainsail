@@ -93,7 +93,7 @@ contract ConsensusTest is Base {
         assertEq(consensus.registeredValidatorsCount(), 3);
 
         // Act - higher value
-        consensus.calculateActiveValidators(5);
+        consensus.calculateRoundValidators(5);
 
         // Test
         vm.startPrank(addr);
@@ -102,7 +102,7 @@ contract ConsensusTest is Base {
         vm.stopPrank();
 
         // Act - same value
-        consensus.calculateActiveValidators(3);
+        consensus.calculateRoundValidators(3);
 
         // Test
         vm.startPrank(addr);
@@ -111,7 +111,7 @@ contract ConsensusTest is Base {
         vm.stopPrank();
 
         // Act - bellow registered valdiators
-        consensus.calculateActiveValidators(2);
+        consensus.calculateRoundValidators(2);
 
         // Test
         vm.startPrank(addr);

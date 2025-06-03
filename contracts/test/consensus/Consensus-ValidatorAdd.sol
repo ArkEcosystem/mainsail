@@ -83,7 +83,7 @@ contract ConsensusTest is Base {
         address addr = address(1);
         consensus.addValidator(addr, prepareBLSKey(addr), false);
 
-        consensus.calculateActiveValidators(1);
+        consensus.calculateRoundValidators(1);
 
         vm.expectRevert(ConsensusV1.ImportIsNotAllowed.selector);
         consensus.addValidator(addr, prepareBLSKey(addr), false);

@@ -25,7 +25,7 @@ contract ConsensusTest is Base {
         consensus.registerValidator(prepareBLSKey(addr));
         vm.stopPrank();
 
-        consensus.calculateActiveValidators(1);
+        consensus.calculateRoundValidators(1);
 
         assertEq(consensus.getRoundsCount(), 1);
         ConsensusV1.Round[] memory rounds = consensus.getRounds(0, 10);
@@ -42,7 +42,7 @@ contract ConsensusTest is Base {
         vm.stopPrank();
 
         // ConsensusV1.Round 1
-        consensus.calculateActiveValidators(1);
+        consensus.calculateRoundValidators(1);
         assertEq(consensus.getRoundsCount(), 1);
         ConsensusV1.Round[] memory rounds = consensus.getRounds(0, 10);
         assertEq(rounds.length, 1);
@@ -59,7 +59,7 @@ contract ConsensusTest is Base {
         vm.stopPrank();
 
         // ConsensusV1.Round 2
-        consensus.calculateActiveValidators(1);
+        consensus.calculateRoundValidators(1);
         assertEq(consensus.getRoundsCount(), 2);
         rounds = consensus.getRounds(0, 10);
         assertEq(rounds.length, 2);
@@ -80,7 +80,7 @@ contract ConsensusTest is Base {
         vm.stopPrank();
 
         // ConsensusV1.Round 3
-        consensus.calculateActiveValidators(1);
+        consensus.calculateRoundValidators(1);
         assertEq(consensus.getRoundsCount(), 3);
         rounds = consensus.getRounds(0, 10);
         assertEq(rounds.length, 3);
@@ -105,9 +105,9 @@ contract ConsensusTest is Base {
         vm.stopPrank();
 
         // Create 3 rounds
-        consensus.calculateActiveValidators(1);
-        consensus.calculateActiveValidators(1);
-        consensus.calculateActiveValidators(1);
+        consensus.calculateRoundValidators(1);
+        consensus.calculateRoundValidators(1);
+        consensus.calculateRoundValidators(1);
 
         // Assert rounds count
         assertEq(consensus.getRoundsCount(), 3);

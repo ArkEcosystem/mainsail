@@ -298,7 +298,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         }
     }
 
-    function calculateActiveValidators(uint8 n) external onlyOwner {
+    function calculateRoundValidators(uint8 n) external onlyOwner {
         if (n == 0) {
             revert InvalidParameters();
         }
