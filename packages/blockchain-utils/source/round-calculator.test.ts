@@ -233,7 +233,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		}
 	});
 
-	it("dynamic delegate count - should throw if active delegates is not changed on new round", ({
+	it("dynamic validator count - should throw if round delegates is not changed on new round", ({
 		configuration,
 		roundCalculator,
 	}) => {
