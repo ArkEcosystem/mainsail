@@ -99,10 +99,10 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     address private _votersTail; // Default address(0)
     uint256 private _votersCount; // Default 0
 
-    mapping(address => address) private _activeValidatorsMap;
-    address[] private _activeValidators;
-    address private _activeValidatorsHead; // Default address(0)
-    uint256 private _activeValidatorsCount; // Default 0
+    mapping(address => address) private _roundValidatorsMap;
+    address[] private _roundValidators;
+    address private _roundValidatorsHead; // Default address(0)
+    uint256 private _roundValidatorsCount; // Default 0
     uint256 private _minValidators; // Default 1
 
     RoundValidator[][] private _rounds;
@@ -302,7 +302,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         _shuffle(_validators);
         _deleteActiveValidators();
 
-        _activeValidatorsHead = address(0);
+        _roundValidatorsHead = address(0);
         uint8 top = uint8(_clamp(n, 0, _validatorsCount - _resignedValidatorsCount));
 
         if (top == 0) {
@@ -318,50 +318,48 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
                 continue;
             }
 
-            if (_activeValidatorsHead == address(0)) {
-                _activeValidatorsHead = addr;
-                _activeValidatorsCount = 1;
+            if (_roundValidatorsHead == address(0)) {
+                _roundValidatorsHead = addr;
+                _roundValidatorsCount = 1;
                 continue;
             }
 
-            if (_activeValidatorsCount < top) {
+            if (_roundValidatorsCount < top) {
                 _insertValidator(addr, top);
                 continue;
             }
 
-            ValidatorData storage headData = _validatorsData[_activeValidatorsHead];
+            ValidatorData storage headData = _validatorsData[_roundValidatorsHead];
 
             if (
-                _isGreater(
-                    Validator({addr: addr, data: data}), Validator({addr: _activeValidatorsHead, data: headData})
-                )
+                _isGreater(Validator({addr: addr, data: data}), Validator({addr: _roundValidatorsHead, data: headData}))
             ) {
                 _insertValidator(addr, top);
             }
         }
 
-        if (_activeValidatorsCount == 0) {
+        if (_roundValidatorsCount == 0) {
             revert NoActiveValidators();
         }
 
-        // Prepare temp array. Used when _activeValidatorsCount < _minValidators
-        address next = _activeValidatorsHead;
-        address[] memory tmpValidators = new address[](_activeValidatorsCount);
+        // Prepare temp array. Used when _roundValidatorsCount < _minValidators
+        address next = _roundValidatorsHead;
+        address[] memory tmpValidators = new address[](_roundValidatorsCount);
 
-        for (uint256 i = 0; i < _activeValidatorsCount; i++) {
+        for (uint256 i = 0; i < _roundValidatorsCount; i++) {
             tmpValidators[i] = next;
-            next = _activeValidatorsMap[next];
+            next = _roundValidatorsMap[next];
         }
         _shuffleMem(tmpValidators);
 
-        // Fill round & _activeValidators
+        // Fill round & _roundValidators
         RoundValidator[] storage round = _rounds.push();
-        delete _activeValidators;
-        _activeValidators = new address[](_minValidators);
+        delete _roundValidators;
+        _roundValidators = new address[](_minValidators);
 
         for (uint256 i = 0; i < _minValidators; i++) {
-            address addr = tmpValidators[i % _activeValidatorsCount];
-            _activeValidators[i] = addr;
+            address addr = tmpValidators[i % _roundValidatorsCount];
+            _roundValidators[i] = addr;
             round.push(RoundValidator({addr: addr, voteBalance: _validatorsData[addr].voteBalance}));
         }
     }
@@ -380,7 +378,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function activeValidatorsCount() external view returns (uint256) {
-        return _activeValidatorsCount;
+        return _roundValidatorsCount;
     }
 
     function isValidatorRegistered(address addr) public view returns (bool) {
@@ -396,9 +394,9 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function getActiveValidators() external view returns (Validator[] memory) {
-        Validator[] memory result = new Validator[](_activeValidators.length);
-        for (uint256 i = 0; i < _activeValidators.length; i++) {
-            address addr = _activeValidators[i];
+        Validator[] memory result = new Validator[](_roundValidators.length);
+        for (uint256 i = 0; i < _roundValidators.length; i++) {
+            address addr = _roundValidators[i];
             ValidatorData storage data = _validatorsData[addr];
             result[i] = Validator({addr: addr, data: data});
         }
@@ -506,14 +504,14 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function _deleteActiveValidators() internal {
-        address next = _activeValidatorsHead;
+        address next = _roundValidatorsHead;
 
         while (next != address(0)) {
             address current = next;
-            next = _activeValidatorsMap[current];
-            delete _activeValidatorsMap[current];
+            next = _roundValidatorsMap[current];
+            delete _roundValidatorsMap[current];
         }
-        _activeValidatorsCount = 0;
+        _roundValidatorsCount = 0;
     }
 
     function _insertValidator(address addr, uint8 top) internal {
@@ -521,14 +519,14 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
         if (
             _isGreater(
-                Validator({addr: _activeValidatorsHead, data: _validatorsData[_activeValidatorsHead]}),
+                Validator({addr: _roundValidatorsHead, data: _validatorsData[_roundValidatorsHead]}),
                 Validator({addr: addr, data: data})
             )
         ) {
             _insertHead(addr);
         } else {
-            address current = _activeValidatorsMap[_activeValidatorsHead];
-            address previous = _activeValidatorsHead;
+            address current = _roundValidatorsMap[_roundValidatorsHead];
+            address previous = _roundValidatorsHead;
 
             while (true) {
                 if (current == address(0)) {
@@ -546,28 +544,28 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
                 }
 
                 previous = current;
-                current = _activeValidatorsMap[current];
+                current = _roundValidatorsMap[current];
             }
         }
 
-        if (_activeValidatorsCount > top) {
-            address next = _activeValidatorsMap[_activeValidatorsHead];
-            delete _activeValidatorsMap[_activeValidatorsHead];
-            _activeValidatorsHead = next;
-            _activeValidatorsCount--;
+        if (_roundValidatorsCount > top) {
+            address next = _roundValidatorsMap[_roundValidatorsHead];
+            delete _roundValidatorsMap[_roundValidatorsHead];
+            _roundValidatorsHead = next;
+            _roundValidatorsCount--;
         }
     }
 
     function _insertHead(address addr) internal {
-        _activeValidatorsMap[addr] = _activeValidatorsHead;
-        _activeValidatorsHead = addr;
-        _activeValidatorsCount++;
+        _roundValidatorsMap[addr] = _roundValidatorsHead;
+        _roundValidatorsHead = addr;
+        _roundValidatorsCount++;
     }
 
     function _insertAfter(address prev, address addr) internal {
-        _activeValidatorsMap[addr] = _activeValidatorsMap[prev];
-        _activeValidatorsMap[prev] = addr;
-        _activeValidatorsCount++;
+        _roundValidatorsMap[addr] = _roundValidatorsMap[prev];
+        _roundValidatorsMap[prev] = addr;
+        _roundValidatorsCount++;
     }
 
     function _unvote() internal returns (address) {
