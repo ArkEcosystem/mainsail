@@ -151,7 +151,7 @@ describe<{
 		const address = "0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1"; // Consensus contract PROXY
 		const data = encodeFunctionData({
 			abi: ConsensusAbi.abi,
-			functionName: "activeValidatorsCount",
+			functionName: "roundValidatorsCount",
 		});
 
 		const result = await localClient.call(address, data);

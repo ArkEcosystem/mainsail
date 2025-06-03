@@ -303,7 +303,7 @@ export class GenesisBlockGenerator extends Generator {
 			validatorAddress: proposer,
 		});
 
-		await this.evm.calculateActiveValidators({
+		await this.evm.calculateRoundValidators({
 			activeValidators: BigNumber.make(options.validators).toBigInt(),
 			commitKey,
 			specId: Contracts.Evm.SpecId.SHANGHAI,

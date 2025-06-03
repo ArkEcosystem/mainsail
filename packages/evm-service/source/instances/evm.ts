@@ -146,8 +146,8 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return this.#evm.updateRewardsAndVotes(context);
 	}
 
-	public async calculateActiveValidators(context: Contracts.Evm.CalculateActiveValidatorsContext): Promise<void> {
-		return this.#evm.calculateActiveValidators(context);
+	public async calculateRoundValidators(context: Contracts.Evm.CalculateRoundValidatorsContext): Promise<void> {
+		return this.#evm.calculateRoundValidators(context);
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {

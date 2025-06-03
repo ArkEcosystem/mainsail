@@ -1,8 +1,8 @@
 use std::{collections::HashMap, sync::Arc, u64};
 
 use ctx::{
-    BlockContext, CalculateActiveValidatorsContext, EvmOptions, ExecutionContext, GenesisContext,
-    JsCalculateActiveValidatorsContext, JsCommitData, JsCommitKey, JsEvmOptions, JsGenesisContext,
+    BlockContext, CalculateRoundValidatorsContext, EvmOptions, ExecutionContext, GenesisContext,
+    JsCalculateRoundValidatorsContext, JsCommitData, JsCommitKey, JsEvmOptions, JsGenesisContext,
     JsPrepareNextCommitContext, JsPreverifyTransactionContext, JsTransactionContext,
     JsTransactionViewContext, JsUpdateRewardsAndVotesContext, PrepareNextCommitContext,
     PreverifyTxContext, TxContext, TxViewContext, UpdateRewardsAndVotesContext,
@@ -197,13 +197,13 @@ impl EvmInner {
         Ok(())
     }
 
-    pub fn calculate_active_validators(
+    pub fn calculate_round_validators(
         &mut self,
-        ctx: CalculateActiveValidatorsContext,
+        ctx: CalculateRoundValidatorsContext,
     ) -> std::result::Result<(), EVMError<String>> {
         assert!(
             self.pending_commits.contains_key(&ctx.commit_key),
-            "calculate_active_validators is missing commit key {:?}",
+            "calculate_round_validators is missing commit key {:?}",
             ctx.commit_key
         );
 
@@ -215,14 +215,14 @@ impl EvmInner {
             .clone();
 
         let abi = ethers_contract::BaseContract::from(
-            ethers_core::abi::parse_abi(&["function calculateActiveValidators(uint8 n) external"])
+            ethers_core::abi::parse_abi(&["function calculateRoundValidators(uint8 n) external"])
                 .expect("encode abi"),
         );
 
         // encode abi into Bytes
         let calldata = abi
-            .encode("calculateActiveValidators", ctx.active_validators)
-            .expect("encode calculateActiveValidators");
+            .encode("calculateRoundValidators", ctx.active_validators)
+            .expect("encode calculateRoundValidators");
 
         let nonce = self
             .get_account_nonce(&ctx.commit_key, genesis_info.deployer_account)
@@ -249,19 +249,19 @@ impl EvmInner {
                 self.logger.log(
                     LogLevel::Debug,
                     format!(
-                        "calculate_active_validators {:?} {:?}",
+                        "calculate_round_validators {:?} {:?}",
                         ctx.commit_key, receipt
                     ),
                 );
 
                 assert!(
                     receipt.is_success(),
-                    "calculate_active_validators unsuccessful"
+                    "calculate_round_validators unsuccessful"
                 );
                 Ok(())
             }
             Err(err) => Err(EVMError::Database(
-                format!("calculate_active_validators failed: {}", err).into(),
+                format!("calculate_round_validators failed: {}", err).into(),
             )),
         }
     }
@@ -1178,14 +1178,14 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<void>")]
-    pub fn calculate_active_validators(
+    pub fn calculate_round_validators(
         &mut self,
         node_env: Env,
-        ctx: JsCalculateActiveValidatorsContext,
+        ctx: JsCalculateRoundValidatorsContext,
     ) -> Result<JsObject> {
-        let ctx = CalculateActiveValidatorsContext::try_from(ctx)?;
+        let ctx = CalculateRoundValidatorsContext::try_from(ctx)?;
         node_env.execute_tokio_future(
-            Self::calculate_active_validators_async(self.evm.clone(), ctx),
+            Self::calculate_round_validators_async(self.evm.clone(), ctx),
             |_, _| Ok(()),
         )
     }
@@ -1692,12 +1692,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn calculate_active_validators_async(
+    async fn calculate_round_validators_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        ctx: CalculateActiveValidatorsContext,
+        ctx: CalculateRoundValidatorsContext,
     ) -> Result<()> {
         let mut lock = evm.lock().await;
-        let result = lock.calculate_active_validators(ctx);
+        let result = lock.calculate_round_validators(ctx);
 
         match result {
             Ok(_) => Result::Ok(()),

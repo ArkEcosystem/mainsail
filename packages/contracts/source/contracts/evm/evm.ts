@@ -151,7 +151,7 @@ export interface BlockContext {
 	readonly validatorAddress: string;
 }
 
-export interface CalculateActiveValidatorsContext {
+export interface CalculateRoundValidatorsContext {
 	readonly commitKey: CommitKey;
 	readonly timestamp: bigint;
 	readonly validatorAddress: string;

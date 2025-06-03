@@ -2,7 +2,7 @@ import { CommitHandler } from "../crypto/commit-handler.js";
 import {
 	AccountInfo,
 	AccountInfoExtended,
-	CalculateActiveValidatorsContext,
+	CalculateRoundValidatorsContext,
 	CommitKey,
 	GenesisInfo,
 	GetAccountsResult,
@@ -36,7 +36,7 @@ export interface Instance extends CommitHandler {
 	getLegacyColdWallets(offset: bigint, limit: bigint): Promise<GetLegacyColdWalletsResult>;
 	getReceipts(offset: bigint, limit: bigint): Promise<GetReceiptsResult>;
 	getReceipt(height: bigint, txHash: string): Promise<GetReceiptResult>;
-	calculateActiveValidators(context: CalculateActiveValidatorsContext): Promise<void>;
+	calculateRoundValidators(context: CalculateRoundValidatorsContext): Promise<void>;
 	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;
 	logsBloom(commitKey: CommitKey): Promise<string>;
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
