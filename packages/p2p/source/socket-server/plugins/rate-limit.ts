@@ -33,9 +33,9 @@ export class RateLimitPlugin {
 
 	public register(server) {
 		this.rateLimiter = buildRateLimiter({
-			roundValidators: this.cryptoConfiguration.getRoundValidators(),
 			rateLimit: this.configuration.getRequired<number>("rateLimit"),
 			remoteAccess: this.configuration.getOptional<Array<string>>("remoteAccess", []),
+			roundValidators: this.cryptoConfiguration.getRoundValidators(),
 			whitelist: [],
 		});
 

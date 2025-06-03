@@ -270,12 +270,12 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const block = unit.getBlock();
 
 		await this.evm.calculateRoundValidators({
-			roundValidators: BigNumber.make(roundValidators).toBigInt(),
 			commitKey: {
 				blockHash: block.header.hash,
 				blockNumber: BigInt(block.header.number),
 				round: BigInt(block.header.round),
 			},
+			roundValidators: BigNumber.make(roundValidators).toBigInt(),
 			specId: evmSpec,
 			timestamp: BigInt(block.header.timestamp),
 			validatorAddress: block.header.proposer,
