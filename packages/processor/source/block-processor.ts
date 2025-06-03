@@ -265,12 +265,12 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			return;
 		}
 
-		const { activeValidators, evmSpec } = this.configuration.getMilestone(unit.blockNumber + 1);
+		const { roundValidators, evmSpec } = this.configuration.getMilestone(unit.blockNumber + 1);
 
 		const block = unit.getBlock();
 
 		await this.evm.calculateRoundValidators({
-			activeValidators: BigNumber.make(activeValidators).toBigInt(),
+			roundValidators: BigNumber.make(roundValidators).toBigInt(),
 			commitKey: {
 				blockHash: block.header.hash,
 				blockNumber: BigInt(block.header.number),

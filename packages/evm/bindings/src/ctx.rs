@@ -81,7 +81,7 @@ pub struct JsGenesisContext {
 pub struct JsCalculateRoundValidatorsContext {
     pub commit_key: JsCommitKey,
     pub timestamp: JsBigInt,
-    pub active_validators: JsBigInt,
+    pub round_validators: JsBigInt,
     pub validator_address: JsString,
     pub spec_id: JsString,
 }
@@ -185,7 +185,7 @@ pub struct GenesisContext {
 pub struct CalculateRoundValidatorsContext {
     pub commit_key: CommitKey,
     pub timestamp: u64,
-    pub active_validators: u8,
+    pub round_validators: u8,
     pub validator_address: Address,
     pub spec_id: SpecId,
 }
@@ -470,8 +470,8 @@ impl TryFrom<JsCalculateRoundValidatorsContext> for CalculateRoundValidatorsCont
             commit_key: value.commit_key.try_into()?,
             timestamp: value.timestamp.get_u64()?.0,
             validator_address: utils::create_address_from_js_string(value.validator_address)?,
-            active_validators: u8::try_from(match value.active_validators.get_u64() {
-                Ok(active_validators) => active_validators.0,
+            round_validators: u8::try_from(match value.round_validators.get_u64() {
+                Ok(round_validators) => round_validators.0,
                 Err(_) => 0 as u64,
             })?,
             spec_id: parse_spec_id(value.spec_id)?,

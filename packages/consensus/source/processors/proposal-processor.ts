@@ -97,8 +97,8 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			type: Contracts.Crypto.MessageType.Prevote,
 		});
 
-		const { activeValidators } = this.configuration.getMilestone(proposal.blockNumber);
-		const verified = await this.aggregator.verify(lockProof, data, activeValidators);
+		const { roundValidators } = this.configuration.getMilestone(proposal.blockNumber);
+		const verified = await this.aggregator.verify(lockProof, data, roundValidators);
 
 		if (!verified) {
 			this.logger.debug(`Received proposal ${proposal.blockNumber}/${proposal.round} with invalid lock proof`);

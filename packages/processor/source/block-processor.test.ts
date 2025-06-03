@@ -132,7 +132,7 @@
 // 		context.sandbox.app.bind(Identifiers.Services.Trigger.Service).to(Services.Triggers.Triggers).inSingletonScope();
 // 		context.sandbox.app
 // 			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-// 			.bind("getActiveDelegates", new Actions.GetActiveValidatorsAction(context.sandbox.app));
+// 			.bind("getActiveDelegates", new Actions.GetRoundValidatorsAction(context.sandbox.app));
 
 // 		context.baseBlock = {
 // 			data: {

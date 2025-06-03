@@ -246,13 +246,13 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	}
 
 	public async aggregatePrevotes(): Promise<Contracts.Crypto.AggregatedSignature> {
-		const { activeValidators } = this.configuration.getMilestone(this.#blockNumber);
-		return this.aggregator.aggregate(this.#getSignatures(this.#prevotes), activeValidators);
+		const { roundValidators } = this.configuration.getMilestone(this.#blockNumber);
+		return this.aggregator.aggregate(this.#getSignatures(this.#prevotes), roundValidators);
 	}
 
 	public async aggregatePrecommits(): Promise<Contracts.Crypto.AggregatedSignature> {
-		const { activeValidators } = this.configuration.getMilestone(this.#blockNumber);
-		return this.aggregator.aggregate(this.#getSignatures(this.#precommits), activeValidators);
+		const { roundValidators } = this.configuration.getMilestone(this.#blockNumber);
+		return this.aggregator.aggregate(this.#getSignatures(this.#precommits), roundValidators);
 	}
 
 	public logPrevotes(): void {
@@ -284,13 +284,13 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	}
 
 	#isMajority(size: number): boolean {
-		const { activeValidators } = this.configuration.getMilestone(this.#blockNumber);
-		return isMajority(size, activeValidators);
+		const { roundValidators } = this.configuration.getMilestone(this.#blockNumber);
+		return isMajority(size, roundValidators);
 	}
 
 	#isMinority(size: number): boolean {
-		const { activeValidators } = this.configuration.getMilestone(this.#blockNumber);
-		return isMinority(size, activeValidators);
+		const { roundValidators } = this.configuration.getMilestone(this.#blockNumber);
+		return isMinority(size, roundValidators);
 	}
 
 	#increasePrevoteCount(blockHash?: string): void {

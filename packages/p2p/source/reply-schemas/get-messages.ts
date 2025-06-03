@@ -7,14 +7,14 @@ export const getMessages = {
 			items: {
 				buffer: {},
 			},
-			limitToActiveValidators: { minimum: 0 },
+			limitToRoundValidators: { minimum: 0 },
 			type: "array",
 		},
 		prevotes: {
 			items: {
 				buffer: {},
 			},
-			limitToActiveValidators: { minimum: 0 },
+			limitToRoundValidators: { minimum: 0 },
 			type: "array",
 		},
 	},

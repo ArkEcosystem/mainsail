@@ -33,7 +33,7 @@ describe<{
 				.generate(),
 			[
 				{
-					activeValidators: 0,
+					roundValidators: 0,
 					block: {
 						maxGasLimit: 1000,
 						maxPayload: 2000,
@@ -64,7 +64,7 @@ describe<{
 					vendorFieldLength: 255,
 				},
 				{
-					activeValidators: 53,
+					roundValidators: 53,
 					height: 1,
 				},
 			],

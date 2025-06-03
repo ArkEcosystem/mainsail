@@ -73,7 +73,7 @@ describe<{
 				},
 				milestones: [
 					match({
-						activeValidators: 0,
+						roundValidators: 0,
 						address: match.object,
 						block: match.object,
 						blockTime: 9000,
@@ -85,7 +85,7 @@ describe<{
 					}),
 					match({
 						height: 1,
-						activeValidators: 51,
+						roundValidators: 51,
 					}),
 					match({
 						height: 23_000,
@@ -371,7 +371,7 @@ describe<{
 				},
 				milestones: [
 					match({
-						activeValidators: 0,
+						roundValidators: 0,
 						address: match.object,
 						block: match.object,
 						blockTime: 9000,
@@ -383,7 +383,7 @@ describe<{
 					}),
 					match({
 						height: 1,
-						activeValidators: 47,
+						roundValidators: 47,
 					}),
 					match({
 						height: 23_000,

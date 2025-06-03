@@ -166,9 +166,9 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			return peerHeader.round;
 		}
 
-		const { activeValidators } = this.cryptoConfiguration.getMilestone(ourHeader.blockNumber);
+		const { roundValidators } = this.cryptoConfiguration.getMilestone(ourHeader.blockNumber);
 
-		if (isMinority(peerHeader.validatorsSignedPrevote.filter(Boolean).length, activeValidators)) {
+		if (isMinority(peerHeader.validatorsSignedPrevote.filter(Boolean).length, roundValidators)) {
 			return peerHeader.round;
 		}
 
@@ -207,10 +207,10 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		if (!roundsByBlockNumber.has(round)) {
 			roundsByBlockNumber.set(round, {
 				precommits: Array.from<boolean>({
-					length: this.cryptoConfiguration.getMilestone(blockNumber).activeValidators,
+					length: this.cryptoConfiguration.getMilestone(blockNumber).roundValidators,
 				}).fill(false),
 				prevotes: Array.from<boolean>({
-					length: this.cryptoConfiguration.getMilestone(blockNumber).activeValidators,
+					length: this.cryptoConfiguration.getMilestone(blockNumber).roundValidators,
 				}).fill(false),
 			});
 		}
@@ -270,13 +270,13 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		precommits: Map<number, Contracts.Crypto.Precommit>,
 		job: DownloadJob,
 	) {
-		const { activeValidators } = this.cryptoConfiguration.getMilestone(job.blockNumber);
+		const { roundValidators } = this.cryptoConfiguration.getMilestone(job.blockNumber);
 
-		if (!isMajority(prevotes.size + job.ourHeader.getValidatorsSignedPrevoteCount(), activeValidators)) {
+		if (!isMajority(prevotes.size + job.ourHeader.getValidatorsSignedPrevoteCount(), roundValidators)) {
 			throw new Error(`Peer didn't return enough prevotes for +2/3 majority`);
 		}
 
-		if (!isMajority(precommits.size + job.ourHeader.getValidatorsSignedPrecommitCount(), activeValidators)) {
+		if (!isMajority(precommits.size + job.ourHeader.getValidatorsSignedPrecommitCount(), roundValidators)) {
 			throw new Error(`Peer didn't return enough precommits for +2/3 majority`);
 		}
 	}

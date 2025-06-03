@@ -35,8 +35,8 @@ export interface RoundState extends ProcessableUnit {
 export type CommitStateFactory = (commit: Commit) => ProcessableUnit;
 
 export interface Aggregator {
-	aggregate(signatures: Map<number, { signature: string }>, activeValidators: number): Promise<AggregatedSignature>;
-	verify(signature: AggregatedSignature, data: Buffer, activeValidators: number): Promise<boolean>;
+	aggregate(signatures: Map<number, { signature: string }>, roundValidators: number): Promise<AggregatedSignature>;
+	verify(signature: AggregatedSignature, data: Buffer, roundValidators: number): Promise<boolean>;
 }
 
 export interface Verifier {

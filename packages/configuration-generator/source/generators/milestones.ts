@@ -8,7 +8,7 @@ export class MilestonesGenerator {
 	setInitial(options: Contracts.NetworkGenerator.InternalOptions): MilestonesGenerator {
 		this.#data = [
 			{
-				activeValidators: 0,
+				roundValidators: 0,
 				block: {
 					maxGasLimit: options.maxBlockGasLimit,
 					maxPayload: options.maxBlockPayload,
@@ -39,7 +39,7 @@ export class MilestonesGenerator {
 				vendorFieldLength: options.vendorFieldLength,
 			},
 			{
-				activeValidators: options.validators,
+				roundValidators: options.validators,
 				height: options.initialBlockNumber + 1,
 			},
 		];

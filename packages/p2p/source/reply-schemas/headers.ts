@@ -21,14 +21,14 @@ export const headers = {
 			items: {
 				typeof: "boolean",
 			},
-			limitToActiveValidators: {},
+			limitToRoundValidators: {},
 			type: "array",
 		},
 		validatorsSignedPrevote: {
 			items: {
 				typeof: "boolean",
 			},
-			limitToActiveValidators: {},
+			limitToRoundValidators: {},
 			type: "array",
 		},
 		version: {

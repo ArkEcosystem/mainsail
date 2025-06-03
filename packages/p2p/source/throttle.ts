@@ -27,7 +27,7 @@ export class Throttle {
 
 	public async initialize(): Promise<Throttle> {
 		this.#outgoingRateLimiter = buildRateLimiter({
-			activeValidators: this.cryptoConfiguration.getMaxActiveValidators(),
+			roundValidators: this.cryptoConfiguration.getRoundValidators(),
 
 			rateLimit: this.configuration.getRequired<number>("rateLimit"),
 

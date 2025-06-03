@@ -173,7 +173,7 @@ export class InvalidMilestoneConfigurationError extends Exception {
 	}
 }
 
-export class InvalidNumberOfActiveValidatorsError extends Exception {
+export class InvalidNumberOfRoundValidatorsError extends Exception {
 	public constructor(message: string) {
 		super(message);
 	}

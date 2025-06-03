@@ -63,7 +63,7 @@ describe<{
 				},
 				milestones: [
 					match({
-						activeValidators: 0,
+						roundValidators: 0,
 						address: match.object,
 						block: match.object,
 						blockTime: 8000,
@@ -74,7 +74,7 @@ describe<{
 						vendorFieldLength: 255,
 					}),
 					match({
-						activeValidators: 53,
+						roundValidators: 53,
 						height: 1,
 					}),
 					match({
@@ -201,7 +201,7 @@ describe<{
 				},
 				milestones: [
 					match({
-						activeValidators: 0,
+						roundValidators: 0,
 						address: match.object,
 						block: match.object,
 						blockTime: 9000,
@@ -214,7 +214,7 @@ describe<{
 						vendorFieldLength: 255,
 					}),
 					match({
-						activeValidators: 53,
+						roundValidators: 53,
 						height: 1,
 					}),
 					match({

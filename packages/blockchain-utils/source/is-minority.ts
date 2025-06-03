@@ -1,1 +1,1 @@
-export const isMinority = (size: number, activeValidators: number): boolean => size > activeValidators / 3;
+export const isMinority = (size: number, roundValidators: number): boolean => size > roundValidators / 3;

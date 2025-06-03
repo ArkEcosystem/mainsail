@@ -100,7 +100,7 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
 			getMilestone: () => ({
-				activeValidators: 2,
+				roundValidators: 2,
 			}),
 		});
 		context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);

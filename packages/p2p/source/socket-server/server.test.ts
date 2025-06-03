@@ -33,9 +33,9 @@ describeSkip<{ sandbox: Sandbox; server: ServerProxy }>("Server", ({ it, assert,
 
 	const logger = { debug: () => {}, info: () => {}, warning: () => {} };
 	const config = {
-		getMaxActiveValidators: () => 51,
+		getRoundValidators: () => 51,
 		getMilestone: () => ({
-			activeValidators: 51,
+			roundValidators: 51,
 		}),
 	};
 

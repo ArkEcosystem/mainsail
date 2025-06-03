@@ -48,8 +48,8 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 			publicKeys.push(Buffer.from(validatorPublicKey, "hex"));
 		}
 
-		const { activeValidators } = this.configuration.getMilestone(block.header.number);
-		if (!isMajority(publicKeys.length, activeValidators)) {
+		const { roundValidators } = this.configuration.getMilestone(block.header.number);
+		if (!isMajority(publicKeys.length, roundValidators)) {
 			return false;
 		}
 
@@ -60,7 +60,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 			type: Contracts.Crypto.MessageType.Precommit,
 		});
 
-		return this.aggregator.verify(proof, precommit, activeValidators);
+		return this.aggregator.verify(proof, precommit, roundValidators);
 	}
 
 	#hasValidBlockNumber(commit: Contracts.Crypto.Commit): boolean {

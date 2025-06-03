@@ -19,7 +19,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#dirtyValidators: Contracts.State.ValidatorWallet[] = [];
 
 	public async restore(): Promise<void> {
-		await this.#buildActiveValidators();
+		await this.#buildRoundValidators();
 
 		const validators = await this.consensusContractService.getAllValidators();
 		this.#allValidators = new Map(validators.map((validator) => [validator.address, validator]));
@@ -27,7 +27,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (this.roundCalculator.isNewRound(unit.blockNumber + 1)) {
-			await this.#buildActiveValidators();
+			await this.#buildRoundValidators();
 		}
 
 		await this.#calculateChangedValidators();
@@ -42,13 +42,13 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	}
 
 	public getRoundValidators(): Contracts.State.ValidatorWallet[] {
-		const { activeValidators } = this.configuration.getMilestone();
+		const { roundValidators } = this.configuration.getMilestone();
 
-		if (this.#topValidators.length !== activeValidators) {
-			throw new Exceptions.NotEnoughRoundValidatorsError(this.#topValidators.length, activeValidators);
+		if (this.#topValidators.length !== roundValidators) {
+			throw new Exceptions.NotEnoughRoundValidatorsError(this.#topValidators.length, roundValidators);
 		}
 
-		return this.#topValidators.slice(0, activeValidators);
+		return this.#topValidators.slice(0, roundValidators);
 	}
 
 	public getValidator(index: number): Contracts.State.ValidatorWallet {
@@ -65,14 +65,14 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		return result;
 	}
 
-	async #buildActiveValidators(): Promise<void> {
-		const { activeValidators } = this.configuration.getMilestone();
+	async #buildRoundValidators(): Promise<void> {
+		const { roundValidators } = this.configuration.getMilestone();
 		const validators = await this.consensusContractService.getRoundValidators();
-		if (validators.length < activeValidators) {
-			throw new Exceptions.NotEnoughRoundValidatorsError(this.#topValidators.length, activeValidators);
+		if (validators.length < roundValidators) {
+			throw new Exceptions.NotEnoughRoundValidatorsError(this.#topValidators.length, roundValidators);
 		}
 
-		this.#topValidators = validators.slice(0, activeValidators);
+		this.#topValidators = validators.slice(0, roundValidators);
 		this.#indexByAddress = new Map(this.#topValidators.map((validator, index) => [validator.address, index]));
 	}
 

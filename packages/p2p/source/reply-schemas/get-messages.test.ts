@@ -49,7 +49,7 @@ describe<Context>("GetMessages Schema", ({ it, assert, beforeEach, each }) => {
 		assert.defined(result.error);
 	});
 
-	it("should not pass if precommits.len > activeValidators", ({ validator }) => {
+	it("should not pass if precommits.len > roundValidators", ({ validator }) => {
 		const result = validator.validate(getMessages, {
 			...data,
 			precommits: Array.from({ length: 55 }).fill(Buffer.from("a")),
@@ -67,7 +67,7 @@ describe<Context>("GetMessages Schema", ({ it, assert, beforeEach, each }) => {
 		assert.defined(result.error);
 	});
 
-	it("should not pass if prevotes.len > activeValidators", ({ validator }) => {
+	it("should not pass if prevotes.len > roundValidators", ({ validator }) => {
 		const result = validator.validate(getMessages, {
 			...data,
 			prevotes: Array.from({ length: 55 }).fill(Buffer.from("b")),

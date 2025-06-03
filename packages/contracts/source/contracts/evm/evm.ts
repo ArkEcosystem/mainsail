@@ -155,7 +155,7 @@ export interface CalculateRoundValidatorsContext {
 	readonly commitKey: CommitKey;
 	readonly timestamp: bigint;
 	readonly validatorAddress: string;
-	readonly activeValidators: bigint;
+	readonly roundValidators: bigint;
 	readonly specId: SpecId;
 }
 export interface UpdateRewardsAndVotesContext {

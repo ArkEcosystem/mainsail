@@ -221,7 +221,7 @@ impl EvmInner {
 
         // encode abi into Bytes
         let calldata = abi
-            .encode("calculateRoundValidators", ctx.active_validators)
+            .encode("calculateRoundValidators", ctx.round_validators)
             .expect("encode calculateRoundValidators");
 
         let nonce = self

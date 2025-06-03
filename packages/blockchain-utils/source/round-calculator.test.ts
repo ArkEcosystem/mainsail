@@ -29,9 +29,9 @@ describe<Context>("Round Calculator - calculateRoundInfoByRound", ({ assert, bef
 		roundCalculator,
 	}) => {
 		const milestones = [
-			{ activeValidators: 0, height: 0 },
-			{ activeValidators: 53, height: 1 },
-			{ activeValidators: 53, height: 54 },
+			{ roundValidators: 0, height: 0 },
+			{ roundValidators: 53, height: 1 },
+			{ roundValidators: 53, height: 54 },
 		];
 
 		const config = { ...crypto, milestones };
@@ -39,22 +39,22 @@ describe<Context>("Round Calculator - calculateRoundInfoByRound", ({ assert, bef
 
 		const testVector = [
 			// Round 0
-			{ activeValidators: 0, nextRound: 1, round: 0, roundHeight: 0 },
+			{ roundValidators: 0, nextRound: 1, round: 0, roundHeight: 0 },
 			// Round 1
-			{ activeValidators: 53, nextRound: 1, round: 1, roundHeight: 1 },
+			{ roundValidators: 53, nextRound: 1, round: 1, roundHeight: 1 },
 			// Round 2
-			{ activeValidators: 53, nextRound: 2, round: 2, roundHeight: 54 },
+			{ roundValidators: 53, nextRound: 2, round: 2, roundHeight: 54 },
 			// Round 3
-			{ activeValidators: 53, nextRound: 3, round: 3, roundHeight: 107 },
+			{ roundValidators: 53, nextRound: 3, round: 3, roundHeight: 107 },
 		];
 
-		for (const { round, roundHeight, nextRound, activeValidators } of testVector) {
+		for (const { round, roundHeight, nextRound, roundValidators } of testVector) {
 			const result = roundCalculator.calculateRoundInfoByRound(round);
 			assert.is(result.round, round);
 			assert.is(result.roundHeight, roundHeight);
 			assert.true(roundCalculator.isNewRound(result.roundHeight));
 			assert.is(result.nextRound, nextRound);
-			assert.is(result.maxValidators, activeValidators);
+			assert.is(result.maxValidators, roundValidators);
 		}
 	});
 });
@@ -66,9 +66,9 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		configuration,
 		roundCalculator,
 	}) => {
-		const { activeValidators } = configuration.getMilestone(1);
+		const { roundValidators } = configuration.getMilestone(1);
 
-		for (let index = 0, height = activeValidators; index < 1000; index++, height += activeValidators) {
+		for (let index = 0, height = roundValidators; index < 1000; index++, height += roundValidators) {
 			const { round, nextRound } = roundCalculator.calculateRound(height - 1);
 			assert.is(round, index + 1);
 			assert.is(nextRound, index + 1);
@@ -79,9 +79,9 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		configuration,
 		roundCalculator,
 	}) => {
-		const { activeValidators } = configuration.getMilestone(1);
+		const { roundValidators } = configuration.getMilestone(1);
 
-		for (let index = 0, height = activeValidators; index < 1000; index++, height += activeValidators) {
+		for (let index = 0, height = roundValidators; index < 1000; index++, height += roundValidators) {
 			const { round, nextRound } = roundCalculator.calculateRound(height);
 			assert.is(round, index + 1);
 			assert.is(nextRound, index + 2);
@@ -89,12 +89,12 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 	});
 
 	it("static delegate count - should calculate the correct round", ({ configuration, roundCalculator }) => {
-		const { activeValidators } = configuration.getMilestone(1);
+		const { roundValidators } = configuration.getMilestone(1);
 
 		for (let index = 0; index < 1000; index++) {
 			const { round, nextRound } = roundCalculator.calculateRound(index + 1);
-			assert.is(round, Math.floor(index / activeValidators) + 1);
-			assert.is(nextRound, Math.floor((index + 1) / activeValidators) + 1);
+			assert.is(round, Math.floor(index / roundValidators) + 1);
+			assert.is(nextRound, Math.floor((index + 1) / roundValidators) + 1);
 		}
 	});
 
@@ -102,29 +102,29 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		configuration,
 		roundCalculator,
 	}) => {
-		const milestones = [{ activeValidators: 4, height: 0 }];
+		const milestones = [{ roundValidators: 4, height: 0 }];
 
 		const config = { ...crypto, milestones };
 		configuration.setConfig(config);
 
 		const testVector = [
 			// Round 0
-			{ activeValidators: 0, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
+			{ roundValidators: 0, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
 			// Round 1
-			{ activeValidators: 4, height: 1, nextRound: 1, round: 1, roundHeight: 1 },
-			{ activeValidators: 4, height: 2, nextRound: 1, round: 1, roundHeight: 1 },
-			{ activeValidators: 4, height: 3, nextRound: 1, round: 1, roundHeight: 1 },
-			{ activeValidators: 4, height: 4, nextRound: 2, round: 1, roundHeight: 1 },
+			{ roundValidators: 4, height: 1, nextRound: 1, round: 1, roundHeight: 1 },
+			{ roundValidators: 4, height: 2, nextRound: 1, round: 1, roundHeight: 1 },
+			{ roundValidators: 4, height: 3, nextRound: 1, round: 1, roundHeight: 1 },
+			{ roundValidators: 4, height: 4, nextRound: 2, round: 1, roundHeight: 1 },
 			// Round 2
-			{ activeValidators: 4, height: 5, nextRound: 2, round: 2, roundHeight: 5 },
-			{ activeValidators: 4, height: 6, nextRound: 2, round: 2, roundHeight: 5 },
-			{ activeValidators: 4, height: 7, nextRound: 2, round: 2, roundHeight: 5 },
-			{ activeValidators: 4, height: 8, nextRound: 3, round: 2, roundHeight: 5 },
+			{ roundValidators: 4, height: 5, nextRound: 2, round: 2, roundHeight: 5 },
+			{ roundValidators: 4, height: 6, nextRound: 2, round: 2, roundHeight: 5 },
+			{ roundValidators: 4, height: 7, nextRound: 2, round: 2, roundHeight: 5 },
+			{ roundValidators: 4, height: 8, nextRound: 3, round: 2, roundHeight: 5 },
 			// Round 3
-			{ activeValidators: 4, height: 9, nextRound: 3, round: 3, roundHeight: 9 },
-			{ activeValidators: 4, height: 10, nextRound: 3, round: 3, roundHeight: 9 },
-			{ activeValidators: 4, height: 11, nextRound: 3, round: 3, roundHeight: 9 },
-			{ activeValidators: 4, height: 12, nextRound: 4, round: 3, roundHeight: 9 },
+			{ roundValidators: 4, height: 9, nextRound: 3, round: 3, roundHeight: 9 },
+			{ roundValidators: 4, height: 10, nextRound: 3, round: 3, roundHeight: 9 },
+			{ roundValidators: 4, height: 11, nextRound: 3, round: 3, roundHeight: 9 },
+			{ roundValidators: 4, height: 12, nextRound: 4, round: 3, roundHeight: 9 },
 		];
 
 		for (const item of testVector) {
@@ -133,7 +133,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 			assert.is(result.roundHeight, item.roundHeight);
 			assert.true(roundCalculator.isNewRound(result.roundHeight));
 			assert.is(result.nextRound, item.nextRound);
-			assert.is(result.maxValidators, item.activeValidators);
+			assert.is(result.maxValidators, item.roundValidators);
 		}
 	});
 
@@ -142,10 +142,10 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		roundCalculator,
 	}) => {
 		const milestones = [
-			{ activeValidators: 2, height: 0 },
-			{ activeValidators: 3, height: 3 },
-			{ activeValidators: 1, height: 9 },
-			{ activeValidators: 3, height: 12 },
+			{ roundValidators: 2, height: 0 },
+			{ roundValidators: 3, height: 3 },
+			{ roundValidators: 1, height: 9 },
+			{ roundValidators: 3, height: 12 },
 		];
 
 		const config = { ...crypto, milestones };
@@ -153,37 +153,37 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 
 		const testVector = [
 			// Round 0 - milestone
-			{ activeValidators: 0, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
+			{ roundValidators: 0, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
 			// Round 1 - milestone
-			{ activeValidators: 2, height: 1, nextRound: 1, round: 1, roundHeight: 1 },
-			{ activeValidators: 2, height: 2, nextRound: 2, round: 1, roundHeight: 1 },
+			{ roundValidators: 2, height: 1, nextRound: 1, round: 1, roundHeight: 1 },
+			{ roundValidators: 2, height: 2, nextRound: 2, round: 1, roundHeight: 1 },
 			// Round 2 - milestone change
-			{ activeValidators: 3, height: 3, nextRound: 2, round: 2, roundHeight: 3 },
-			{ activeValidators: 3, height: 4, nextRound: 2, round: 2, roundHeight: 3 },
-			{ activeValidators: 3, height: 5, nextRound: 3, round: 2, roundHeight: 3 },
+			{ roundValidators: 3, height: 3, nextRound: 2, round: 2, roundHeight: 3 },
+			{ roundValidators: 3, height: 4, nextRound: 2, round: 2, roundHeight: 3 },
+			{ roundValidators: 3, height: 5, nextRound: 3, round: 2, roundHeight: 3 },
 			// Round 3
-			{ activeValidators: 3, height: 6, nextRound: 3, round: 3, roundHeight: 6 },
-			{ activeValidators: 3, height: 7, nextRound: 3, round: 3, roundHeight: 6 },
-			{ activeValidators: 3, height: 8, nextRound: 4, round: 3, roundHeight: 6 },
+			{ roundValidators: 3, height: 6, nextRound: 3, round: 3, roundHeight: 6 },
+			{ roundValidators: 3, height: 7, nextRound: 3, round: 3, roundHeight: 6 },
+			{ roundValidators: 3, height: 8, nextRound: 4, round: 3, roundHeight: 6 },
 			// Round 4 - 6 - milestone change
-			{ activeValidators: 1, height: 9, nextRound: 5, round: 4, roundHeight: 9 },
-			{ activeValidators: 1, height: 10, nextRound: 6, round: 5, roundHeight: 10 },
-			{ activeValidators: 1, height: 11, nextRound: 7, round: 6, roundHeight: 11 },
+			{ roundValidators: 1, height: 9, nextRound: 5, round: 4, roundHeight: 9 },
+			{ roundValidators: 1, height: 10, nextRound: 6, round: 5, roundHeight: 10 },
+			{ roundValidators: 1, height: 11, nextRound: 7, round: 6, roundHeight: 11 },
 			// Round 7 - milestone change
-			{ activeValidators: 3, height: 12, nextRound: 7, round: 7, roundHeight: 12 },
-			{ activeValidators: 3, height: 13, nextRound: 7, round: 7, roundHeight: 12 },
-			{ activeValidators: 3, height: 14, nextRound: 8, round: 7, roundHeight: 12 },
+			{ roundValidators: 3, height: 12, nextRound: 7, round: 7, roundHeight: 12 },
+			{ roundValidators: 3, height: 13, nextRound: 7, round: 7, roundHeight: 12 },
+			{ roundValidators: 3, height: 14, nextRound: 8, round: 7, roundHeight: 12 },
 			// Round 8
-			{ activeValidators: 3, height: 15, nextRound: 8, round: 8, roundHeight: 15 },
+			{ roundValidators: 3, height: 15, nextRound: 8, round: 8, roundHeight: 15 },
 		];
 
-		for (const { height, round, roundHeight, nextRound, activeValidators } of testVector) {
+		for (const { height, round, roundHeight, nextRound, roundValidators } of testVector) {
 			const result = roundCalculator.calculateRound(height);
 			assert.is(result.round, round);
 			assert.is(result.roundHeight, roundHeight);
 			assert.true(roundCalculator.isNewRound(result.roundHeight));
 			assert.is(result.nextRound, nextRound);
-			assert.is(result.maxValidators, activeValidators);
+			assert.is(result.maxValidators, roundValidators);
 		}
 	});
 
@@ -192,10 +192,10 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		roundCalculator,
 	}) => {
 		const milestones = [
-			{ activeValidators: 3, height: 0 },
-			{ activeValidators: 7, height: 4 },
-			{ activeValidators: 4, height: 11 },
-			{ activeValidators: 53, height: 15 },
+			{ roundValidators: 3, height: 0 },
+			{ roundValidators: 7, height: 4 },
+			{ roundValidators: 4, height: 11 },
+			{ roundValidators: 53, height: 15 },
 		];
 
 		const config = { ...crypto, milestones };
@@ -203,24 +203,24 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 
 		const testVector = [
 			// Round 0
-			{ activeValidators: 0, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
+			{ roundValidators: 0, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
 			// Round 1
-			{ activeValidators: 3, height: 1, nextRound: 1, round: 1, roundHeight: 1 },
-			{ activeValidators: 3, height: 2, nextRound: 1, round: 1, roundHeight: 1 },
-			{ activeValidators: 3, height: 3, nextRound: 2, round: 1, roundHeight: 1 },
+			{ roundValidators: 3, height: 1, nextRound: 1, round: 1, roundHeight: 1 },
+			{ roundValidators: 3, height: 2, nextRound: 1, round: 1, roundHeight: 1 },
+			{ roundValidators: 3, height: 3, nextRound: 2, round: 1, roundHeight: 1 },
 			// Round 2
-			{ activeValidators: 7, height: 4, nextRound: 2, round: 2, roundHeight: 4 },
-			{ activeValidators: 7, height: 10, nextRound: 3, round: 2, roundHeight: 4 },
+			{ roundValidators: 7, height: 4, nextRound: 2, round: 2, roundHeight: 4 },
+			{ roundValidators: 7, height: 10, nextRound: 3, round: 2, roundHeight: 4 },
 			// Round 3
-			{ activeValidators: 4, height: 11, nextRound: 3, round: 3, roundHeight: 11 },
-			{ activeValidators: 4, height: 14, nextRound: 4, round: 3, roundHeight: 11 },
-			{ activeValidators: 53, height: 15, nextRound: 4, round: 4, roundHeight: 15 },
-			{ activeValidators: 53, height: 67, nextRound: 5, round: 4, roundHeight: 15 },
+			{ roundValidators: 4, height: 11, nextRound: 3, round: 3, roundHeight: 11 },
+			{ roundValidators: 4, height: 14, nextRound: 4, round: 3, roundHeight: 11 },
+			{ roundValidators: 53, height: 15, nextRound: 4, round: 4, roundHeight: 15 },
+			{ roundValidators: 53, height: 67, nextRound: 5, round: 4, roundHeight: 15 },
 			// Round 4
-			{ activeValidators: 53, height: 68, nextRound: 5, round: 5, roundHeight: 68 },
+			{ roundValidators: 53, height: 68, nextRound: 5, round: 5, roundHeight: 68 },
 		];
 
-		for (const { height, round, roundHeight, nextRound, activeValidators } of testVector) {
+		for (const { height, round, roundHeight, nextRound, roundValidators } of testVector) {
 			configuration.setHeight(height);
 
 			const result = roundCalculator.calculateRound(height);
@@ -229,7 +229,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 			assert.is(result.roundHeight, roundHeight);
 			assert.true(roundCalculator.isNewRound(result.roundHeight));
 			assert.is(result.nextRound, nextRound);
-			assert.is(result.maxValidators, activeValidators);
+			assert.is(result.maxValidators, roundValidators);
 		}
 	});
 
@@ -238,9 +238,9 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		roundCalculator,
 	}) => {
 		const milestones = [
-			{ activeValidators: 0, height: 0 },
-			{ activeValidators: 3, height: 1 },
-			{ activeValidators: 4, height: 4 },
+			{ roundValidators: 0, height: 0 },
+			{ roundValidators: 3, height: 1 },
+			{ roundValidators: 4, height: 4 },
 		];
 
 		const config = { ...crypto, milestones };
@@ -318,12 +318,12 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 
 	it("should be ok when changing delegate count", ({ configuration, roundCalculator }) => {
 		const milestones = [
-			{ activeValidators: 1, height: 0 }, // R0
-			{ activeValidators: 2, height: 1 }, // R1
-			{ activeValidators: 3, height: 3 }, // R2
-			{ activeValidators: 1, height: 6 }, // R3
-			{ activeValidators: 53, height: 10 }, // R7
-			{ activeValidators: 53, height: 62 }, // R8
+			{ roundValidators: 1, height: 0 }, // R0
+			{ roundValidators: 2, height: 1 }, // R1
+			{ roundValidators: 3, height: 3 }, // R2
+			{ roundValidators: 1, height: 6 }, // R3
+			{ roundValidators: 53, height: 10 }, // R7
+			{ roundValidators: 53, height: 62 }, // R8
 		];
 
 		configuration.set("milestones", milestones);
@@ -359,15 +359,15 @@ describe<Context>("RoundCalculator - getMilestonesWhichAffectActiveDelegateCount
 	it("should return milestones which changes delegate count", ({ configuration, roundCalculator }) => {
 		configuration.setConfig({
 			...crypto,
-			milestones: [{ activeValidators: 4, height: 1 }],
+			milestones: [{ roundValidators: 4, height: 1 }],
 		});
 
 		const milestones = [
-			{ activeValidators: 4, height: 0 },
-			{ activeValidators: 4, height: 1 },
-			{ activeValidators: 4, height: 5 },
-			{ activeValidators: 8, height: 9 },
-			{ activeValidators: 8, height: 15 },
+			{ roundValidators: 4, height: 0 },
+			{ roundValidators: 4, height: 1 },
+			{ roundValidators: 4, height: 5 },
+			{ roundValidators: 8, height: 9 },
+			{ roundValidators: 8, height: 15 },
 		];
 
 		const config = { ...crypto, milestones };

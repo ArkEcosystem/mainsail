@@ -35,7 +35,7 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 		const notRegistered: string[] = [];
 
 		const allValidators = this.validatorSet.getAllValidators();
-		const activeValidators = this.validatorSet.getRoundValidators();
+		const roundValidators = this.validatorSet.getRoundValidators();
 
 		for (const consensusPublicKey of this.#validators.keys()) {
 			const validator = allValidators.find((validator) => validator.blsPublicKey === consensusPublicKey);
@@ -43,7 +43,7 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 				if (validator.isResigned) {
 					resigned.push(validator.address);
 				}
-				if (activeValidators.some((activeValidator) => activeValidator.blsPublicKey === consensusPublicKey)) {
+				if (roundValidators.some((activeValidator) => activeValidator.blsPublicKey === consensusPublicKey)) {
 					active.push(validator.address);
 				} else {
 					standBy.push(validator.address);

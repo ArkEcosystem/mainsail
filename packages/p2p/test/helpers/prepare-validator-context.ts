@@ -25,7 +25,7 @@ export const prepareValidatorContext = (context: Context) => {
 
 	const configuration = context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
 	const messageKeywords = makeMessageKeywords(configuration);
-	context.validator.addKeyword(messageKeywords.limitToActiveValidators);
+	context.validator.addKeyword(messageKeywords.limitToRoundValidators);
 	context.validator.addKeyword(messageKeywords.isValidatorIndex);
 
 	context.validator.addSchema(cryptoValidationSchemas.hex);

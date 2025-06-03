@@ -25,21 +25,21 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 				continue;
 			}
 
-			if (!milestone || temporary.activeValidators === milestone.activeValidators) {
+			if (!milestone || temporary.roundValidators === milestone.roundValidators) {
 				milestone = temporary;
 			} else {
 				break;
 			}
 		}
 
-		return height === genesisHeight || (height - Math.max(milestone.height, 1)) % milestone.activeValidators === 0;
+		return height === genesisHeight || (height - Math.max(milestone.height, 1)) % milestone.roundValidators === 0;
 	}
 
 	public calculateRound(height: number): Contracts.Shared.RoundInfo {
 		const genesisHeight = this.configuration.getGenesisHeight();
 
-		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(genesisHeight, "activeValidators");
-		let activeValidators = this.configuration.getMilestone(genesisHeight).activeValidators;
+		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(genesisHeight, "roundValidators");
+		let roundValidators = this.configuration.getMilestone(genesisHeight).roundValidators;
 
 		// Genesis round requires special treatment
 		if (height === genesisHeight) {
@@ -62,32 +62,32 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 			}
 
 			const spanHeight = nextMilestone.height - milestoneHeight - 1;
-			if (milestoneHeight > genesisHeight && spanHeight % activeValidators !== 0) {
+			if (milestoneHeight > genesisHeight && spanHeight % roundValidators !== 0) {
 				throw new Exceptions.InvalidMilestoneConfigurationError(
 					`Bad milestone at height: ${height}. The number of validators can only be changed at the beginning of a new round.`,
 				);
 			}
 
-			result.round += spanHeight / Math.max(1, activeValidators);
+			result.round += spanHeight / Math.max(1, roundValidators);
 			result.roundHeight = nextMilestone.height;
 			assert.number(nextMilestone.data);
 			result.maxValidators = nextMilestone.data;
 
-			activeValidators = nextMilestone.data;
+			roundValidators = nextMilestone.data;
 			milestoneHeight = nextMilestone.height - 1;
 
-			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeValidators");
+			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "roundValidators");
 		}
 
-		const minActiveValidators = Math.max(1, activeValidators);
+		const minRoundValidators = Math.max(1, roundValidators);
 		const heightFromLastSpan = height - milestoneHeight - 1;
-		const roundIncrease = Math.floor(heightFromLastSpan / minActiveValidators);
-		const nextRoundIncrease = (heightFromLastSpan + 1) % minActiveValidators === 0 ? 1 : 0;
+		const roundIncrease = Math.floor(heightFromLastSpan / minRoundValidators);
+		const nextRoundIncrease = (heightFromLastSpan + 1) % minRoundValidators === 0 ? 1 : 0;
 
 		result.round += roundIncrease;
-		result.roundHeight += roundIncrease * minActiveValidators;
+		result.roundHeight += roundIncrease * minRoundValidators;
 		result.nextRound = result.round + nextRoundIncrease;
-		result.maxValidators = minActiveValidators;
+		result.maxValidators = minRoundValidators;
 
 		return result;
 	}
@@ -104,8 +104,8 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 		let maxValidators = 0;
 		for (let index = 1; index < milestones.length - 1; index++) {
 			const milestone = milestones[index];
-			maxValidators = milestone.activeValidators;
-			roundHeight += (round - 1) * milestone.activeValidators;
+			maxValidators = milestone.roundValidators;
+			roundHeight += (round - 1) * milestone.roundValidators;
 		}
 
 		return {
@@ -123,17 +123,17 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 
 		const milestones: Array<MilestoneSearchResult> = [
 			{
-				data: configuration.getMilestone(genesisHeight).activeValidators,
+				data: configuration.getMilestone(genesisHeight).roundValidators,
 				found: true,
 				height: genesisHeight,
 			},
 		];
 
-		let nextMilestone = configuration.getNextMilestoneWithNewKey(genesisHeight, "activeValidators");
+		let nextMilestone = configuration.getNextMilestoneWithNewKey(genesisHeight, "roundValidators");
 
 		while (nextMilestone.found) {
 			milestones.push(nextMilestone);
-			nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeValidators");
+			nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "roundValidators");
 		}
 
 		return milestones;

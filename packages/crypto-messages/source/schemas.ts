@@ -65,7 +65,7 @@ export const schemas: Record<
 		items: {
 			buffer: {},
 		},
-		limitToActiveValidators: {},
+		limitToRoundValidators: {},
 		type: "array",
 	},
 };

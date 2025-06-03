@@ -35,5 +35,5 @@ export interface Configuration {
 
 	getMilestones(): any;
 
-	getMaxActiveValidators(): number;
+	getRoundValidators(): number;
 }

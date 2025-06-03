@@ -59,7 +59,7 @@ export type MilestoneSnapshot = {
 
 export type Milestone = {
 	height: number;
-	activeValidators: number;
+	roundValidators: number;
 	address: Record<string, any>;
 	block: MilestoneBlock;
 	epoch: string;

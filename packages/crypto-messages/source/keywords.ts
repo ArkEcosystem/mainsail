@@ -38,7 +38,7 @@ const parseBlockNumber = (parentSchema): number | undefined => {
 };
 
 export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
-	const limitToActiveValidators: FuncKeywordDefinition = {
+	const limitToRoundValidators: FuncKeywordDefinition = {
 		// TODO: Check type (same as bignum)
 		// @ts-ignore
 		compile(schema) {
@@ -48,10 +48,10 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 				}
 
 				const blockNumber = parseBlockNumber(parentSchema);
-				const { activeValidators } = configuration.getMilestone(blockNumber);
-				const minimum = schema.minimum !== undefined ? schema.minimum : activeValidators;
+				const { roundValidators } = configuration.getMilestone(blockNumber);
+				const minimum = schema.minimum !== undefined ? schema.minimum : roundValidators;
 
-				if (data.length < minimum || data.length > activeValidators) {
+				if (data.length < minimum || data.length > roundValidators) {
 					return false;
 				}
 
@@ -59,7 +59,7 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 			};
 		},
 		errors: false,
-		keyword: "limitToActiveValidators",
+		keyword: "limitToRoundValidators",
 		metaSchema: {
 			properties: {
 				minimum: { type: "integer" },
@@ -74,13 +74,13 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 		compile() {
 			return (data, parentSchema: AnySchemaObject) => {
 				const blockNumber = parseBlockNumber(parentSchema);
-				const { activeValidators } = configuration.getMilestone(blockNumber);
+				const { roundValidators } = configuration.getMilestone(blockNumber);
 
 				if (!Number.isInteger(data)) {
 					return false;
 				}
 
-				return data >= 0 && data < activeValidators;
+				return data >= 0 && data < roundValidators;
 			};
 		},
 		errors: false,
@@ -92,6 +92,6 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 
 	return {
 		isValidatorIndex,
-		limitToActiveValidators,
+		limitToRoundValidators,
 	};
 };

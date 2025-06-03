@@ -12,15 +12,15 @@ export class Aggregator implements Contracts.Consensus.Aggregator {
 
 	public async aggregate(
 		majority: Map<number, { signature: string }>,
-		activeValidators: number,
+		roundValidators: number,
 	): Promise<Contracts.Crypto.AggregatedSignature> {
-		if (!isMajority(majority.size, activeValidators)) {
+		if (!isMajority(majority.size, roundValidators)) {
 			throw new Error("Failed to aggregate signatures, because the majority is not reached.");
 		}
 
 		const signatures: Buffer[] = [];
 
-		const validators: boolean[] = Array.from<boolean>({ length: activeValidators }).fill(false);
+		const validators: boolean[] = Array.from<boolean>({ length: roundValidators }).fill(false);
 
 		for (const [key, { signature }] of majority) {
 			signatures.push(Buffer.from(signature, "hex"));
@@ -39,13 +39,13 @@ export class Aggregator implements Contracts.Consensus.Aggregator {
 	async verify(
 		signature: Contracts.Crypto.AggregatedSignature,
 		data: Buffer,
-		activeValidators: number,
+		roundValidators: number,
 	): Promise<boolean> {
 		const validatorPublicKeys: Buffer[] = signature.validators
 			.map((v, index) => (v ? Buffer.from(this.validatorSet.getValidator(index).blsPublicKey, "hex") : undefined))
 			.filter((item): item is Buffer => !!item);
 
-		if (!isMajority(validatorPublicKeys.length, activeValidators)) {
+		if (!isMajority(validatorPublicKeys.length, roundValidators)) {
 			return false;
 		}
 

@@ -34,7 +34,7 @@ describe<{
 	it("should build milestones", ({ configManager }) => {
 		assert.equal(configManager.getMilestones(), [
 			{
-				activeValidators: 0,
+				roundValidators: 0,
 				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
 				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
@@ -52,7 +52,7 @@ describe<{
 				vendorFieldLength: 255,
 			},
 			{
-				activeValidators: 53,
+				roundValidators: 53,
 				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
 				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
@@ -70,7 +70,7 @@ describe<{
 				vendorFieldLength: 255,
 			},
 			{
-				activeValidators: 53,
+				roundValidators: 53,
 				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
 				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
@@ -130,13 +130,13 @@ describe<{
 		);
 	});
 
-	it("getNextMilestoneByKey - should throw an error if activeValidators is 0", ({ configManager }) => {
+	it("getNextMilestoneByKey - should throw an error if roundValidators is 0", ({ configManager }) => {
 		assert.not.throws(() =>
 			configManager.setConfig({
 				...cryptoJson,
 				milestones: [
 					{
-						activeValidators: 0,
+						roundValidators: 0,
 						height: 0,
 					},
 				],
@@ -149,7 +149,7 @@ describe<{
 					...cryptoJson,
 					milestones: [
 						{
-							activeValidators: 0,
+							roundValidators: 0,
 							height: 1,
 						},
 					],
@@ -163,11 +163,11 @@ describe<{
 					...cryptoJson,
 					milestones: [
 						{
-							activeValidators: 1,
+							roundValidators: 1,
 							height: 0,
 						},
 						{
-							activeValidators: 0,
+							roundValidators: 0,
 							height: 15,
 						},
 					],
@@ -231,52 +231,52 @@ describe<{
 		assert.equal(configManager.getNextMilestoneWithNewKey(8, "reward"), emptyMilestone);
 	});
 
-	it("getMaxActiveValidators - should return maximum round validators from all milestones", ({ configManager }) => {
+	it("getRoundValidators - should return maximum round validators from all milestones", ({ configManager }) => {
 		configManager.setConfig({
 			...cryptoJson,
-			milestones: [{ activeValidators: 1, height: 1 }],
+			milestones: [{ roundValidators: 1, height: 1 }],
 		});
 
-		assert.equal(configManager.getMaxActiveValidators(), 1);
-
-		configManager.setConfig({
-			...cryptoJson,
-			milestones: [
-				{ activeValidators: 1, height: 1 },
-				{ activeValidators: 5, height: 3 },
-				{ activeValidators: 2, height: 8 },
-			],
-		});
-
-		assert.equal(configManager.getMaxActiveValidators(), 5);
+		assert.equal(configManager.getRoundValidators(), 1);
 
 		configManager.setConfig({
 			...cryptoJson,
 			milestones: [
-				{ activeValidators: 5, height: 1 },
-				{ activeValidators: 1, height: 6 },
-				{ activeValidators: 10, height: 7 },
+				{ roundValidators: 1, height: 1 },
+				{ roundValidators: 5, height: 3 },
+				{ roundValidators: 2, height: 8 },
 			],
 		});
 
-		assert.equal(configManager.getMaxActiveValidators(), 10);
+		assert.equal(configManager.getRoundValidators(), 5);
 
 		configManager.setConfig({
 			...cryptoJson,
 			milestones: [
-				{ activeValidators: 5, height: 1 },
-				{ activeValidators: 1, height: 6 },
-				{ activeValidators: 1, height: 7 },
+				{ roundValidators: 5, height: 1 },
+				{ roundValidators: 1, height: 6 },
+				{ roundValidators: 10, height: 7 },
 			],
 		});
 
-		assert.equal(configManager.getMaxActiveValidators(), 5);
+		assert.equal(configManager.getRoundValidators(), 10);
 
 		configManager.setConfig({
 			...cryptoJson,
-			milestones: [{ activeValidators: 1, height: 7 }],
+			milestones: [
+				{ roundValidators: 5, height: 1 },
+				{ roundValidators: 1, height: 6 },
+				{ roundValidators: 1, height: 7 },
+			],
 		});
 
-		assert.equal(configManager.getMaxActiveValidators(), 1);
+		assert.equal(configManager.getRoundValidators(), 5);
+
+		configManager.setConfig({
+			...cryptoJson,
+			milestones: [{ roundValidators: 1, height: 7 }],
+		});
+
+		assert.equal(configManager.getRoundValidators(), 1);
 	});
 });

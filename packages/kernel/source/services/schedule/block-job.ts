@@ -58,6 +58,6 @@ export class BlockJob implements Job {
 
 	public everyRound(): this {
 		// TODO: rebuild on milestone change
-		return this.cron(this.configuration.getMilestone(1).activeValidators);
+		return this.cron(this.configuration.getMilestone(1).roundValidators);
 	}
 }
