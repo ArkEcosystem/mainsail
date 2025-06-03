@@ -9,10 +9,10 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 // - Active -> Top N validators with the highest vote balance, that participate in the consensus
 // - Resigned -> Validators that resigned from the consensus
 
-// Voter calls vote funtion
-// Vote function includes valdiator address and balance, whole balance is added to the validator voteBalance
+// Voter calls vote function
+// Vote function includes validator address and balance, whole balance is added to the validator voteBalance
 // Voter can unvote, whole balance is removed from validator voteBalance
-// Voter balance is changed (fee & send amount) - validator voteBalance is decreased (for sender) and i ncreased (for recipients)
+// Voter balance is changed (fee & send amount) - validator voteBalance is decreased (for sender) and increased (for recipients)
 
 // Scenario 1 - First evm transfer, then vote
 // Wallet balance: 100
