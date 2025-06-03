@@ -21,7 +21,7 @@ async function run() {
 		chainId: 10000,
 		initialHeight: 0,
 		// snapshot: {
-		// 	path: "../../snapshot-19a87c96dbe8ad1be06d33e97cd17f5662eb952c29efd3d8bb00c9c75e7582bc.json",
+		// 	path: "../../f07a7068c50e2e5591beaa572070933008744425d727c792d328d1d5e2fac306.compressed",
 		// },
 	});
 
