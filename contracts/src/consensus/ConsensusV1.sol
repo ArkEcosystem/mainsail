@@ -5,9 +5,15 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 // Validators:
-// - Registered -> All validators that are registered including resigned validators
-// - Active -> Top N validators with the highest vote balance, that participate in the consensus
-// - Resigned -> Validators that resigned from the consensus
+// - Registered validators -> All validators that are registered including resigned validators
+// - Round validators -> Top N validators with the highest vote balance, that participate in the consensus
+// - Resigned validators -> Validators that resigned from the consensus
+// - Active validators -> Round validators that are not resigned and have a valid BLS public key
+// - Inactive validators -> Validators that are resigned or do not have a valid BLS public key
+
+// Inclusions:
+// Round validators ⊆ Active validators ⊆ Registered validators
+// Resigned validators ⊆ Inactive validators ⊆ Registered validators
 
 // Voter calls vote function
 // Vote function includes validator address and balance, whole balance is added to the validator voteBalance
