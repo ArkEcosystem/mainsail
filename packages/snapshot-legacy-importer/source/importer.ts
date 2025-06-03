@@ -306,12 +306,12 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		}
 
 		return {
-			initialTotalSupply: totalSupply,
+			importedUsernames,
 			importedValidators,
 			importedVoters,
-			skippedVoters,
-			importedUsernames,
+			initialTotalSupply: totalSupply,
 			skippedValidators,
+			skippedVoters,
 		};
 	}
 

@@ -29,12 +29,12 @@ export const defaults = {
 			Environment.get(Constants.EnvironmentVariables.MAINSAIL_TOKEN),
 
 		v3: {
+			database: "ark_devnet",
 			// when using podman
 			// host: "host.containers.internal",
 			host: "localhost",
-			port: 5432,
-			database: "ark_devnet",
 			password: "test_db",
+			port: 5432,
 			user: "test_db",
 		},
 	},
