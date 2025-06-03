@@ -446,10 +446,22 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			for (const voter of voters) {
 				assert.defined(voter.ethAddress);
 
-				if (!validatorLookup[voter.vote]) {
-					this.logger.warning(
+				const validator = validatorLookup[voter.vote];
+				if (!validator) {
+					this.logger.debug(
 						`!!! skipping voter ${voter.arkAddress} for non-existent validator: ${voter.vote}`,
 					);
+
+					stats.skippedVoters++;
+					continue;
+				}
+
+				if (!validator.blsPublicKey) {
+					this.logger.debug(
+						`!!! skipping voter ${voter.arkAddress} for validator without registered BlsPublicKey: ${validator.arkAddress}`,
+					);
+
+					stats.skippedVoters++;
 					continue;
 				}
 
@@ -468,7 +480,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			);
 
 			if (!result.receipt.status) {
-				console.log(result.receipt);
+				console.log(result.receipt, result.receipt.output?.toString("hex"));
 				throw new Error("failed to add votes");
 			}
 
