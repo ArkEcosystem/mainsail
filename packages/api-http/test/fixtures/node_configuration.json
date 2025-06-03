@@ -12,7 +12,7 @@
 			"minimumGasPrice": 5000000000,
 			"maximumGasPrice": 10000000000000,
 			"minimumGasLimit": 21000,
-			"maximumGasLimit": 2000000
+			"maximumGasLimit": 5000000
 		},
 		"height": 0,
 		"reward": "0",
@@ -27,7 +27,7 @@
 			"stageTimeoutIncrease": 2000,
 			"tolerance": 100
 		},
-		"activeValidators": 0,
+		"roundValidators": 0,
 		"vendorFieldLength": 255
 	},
 	"core": {
