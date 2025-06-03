@@ -12,7 +12,7 @@ contract ConsensusTest is Base {
         registerValidator(addr);
 
         consensus.calculateRoundValidators(1);
-        ConsensusV1.Validator[] memory validators = consensus.getActiveValidators();
+        ConsensusV1.Validator[] memory validators = consensus.getRoundValidators();
         assertEq(validators.length, 1);
         assertEq(validators[0].addr, addr);
     }
@@ -58,7 +58,7 @@ contract ConsensusTest is Base {
         resignValidator(addr);
 
         consensus.calculateRoundValidators(2);
-        ConsensusV1.Validator[] memory validators = consensus.getActiveValidators();
+        ConsensusV1.Validator[] memory validators = consensus.getRoundValidators();
         assertEq(validators.length, 2);
         assertEq(validators[0].addr, address(2));
         assertEq(validators[1].addr, address(2)); // Second validator is duplicated
@@ -73,7 +73,7 @@ contract ConsensusTest is Base {
         resignValidator(address(2));
 
         consensus.calculateRoundValidators(2);
-        ConsensusV1.Validator[] memory validators = consensus.getActiveValidators();
+        ConsensusV1.Validator[] memory validators = consensus.getRoundValidators();
         assertEq(validators.length, 2);
         assertEq(validators[0].addr, addr);
         assertEq(validators[1].addr, addr); // Second validator is duplicated
@@ -86,7 +86,7 @@ contract ConsensusTest is Base {
         consensus.addValidator(address(2), new bytes(0), false);
 
         consensus.calculateRoundValidators(2);
-        ConsensusV1.Validator[] memory validators = consensus.getActiveValidators();
+        ConsensusV1.Validator[] memory validators = consensus.getRoundValidators();
         assertEq(validators.length, 2);
         assertEq(validators[0].addr, addr);
         assertEq(validators[1].addr, addr); // Second validator is duplicated
@@ -117,7 +117,7 @@ contract ConsensusTest is Base {
         uint160 activeValidators = 53;
 
         consensus.calculateRoundValidators(uint8(activeValidators));
-        ConsensusV1.Validator[] memory validators = consensus.getActiveValidators();
+        ConsensusV1.Validator[] memory validators = consensus.getRoundValidators();
 
         for (uint256 i = 0; i < activeValidators; i++) {
             ConsensusV1.Validator memory validator = validators[i];
@@ -174,7 +174,7 @@ contract ConsensusTest is Base {
         uint160 activeValidators = 53;
 
         consensus.calculateRoundValidators(uint8(activeValidators));
-        ConsensusV1.Validator[] memory validators = consensus.getActiveValidators();
+        ConsensusV1.Validator[] memory validators = consensus.getRoundValidators();
         assertEq(validators.length, activeValidators);
 
         assertEq(validators[activeValidators - 1].addr, address(0x1B)); // Shuffled address
@@ -185,7 +185,7 @@ contract ConsensusTest is Base {
         // Second attempt should return the same result
         consensus.calculateRoundValidators(uint8(activeValidators));
 
-        validators = consensus.getActiveValidators();
+        validators = consensus.getRoundValidators();
         assertEq(validators[activeValidators - 1].addr, address(0x1B)); // Shuffled address
         validators = sortValidators(validators);
         assertEq(validators.length, activeValidators);

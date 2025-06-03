@@ -399,7 +399,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         return Validator({addr: addr, data: _validatorsData[addr]});
     }
 
-    function getActiveValidators() external view returns (Validator[] memory) {
+    function getRoundValidators() external view returns (Validator[] memory) {
         Validator[] memory result = new Validator[](_roundValidators.length);
         for (uint256 i = 0; i < _roundValidators.length; i++) {
             address addr = _roundValidators[i];
