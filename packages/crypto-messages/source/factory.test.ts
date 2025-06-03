@@ -34,7 +34,7 @@ describe<{
 
 		const wallet = {};
 		const validatorSet = {
-			getActiveValidators: () => [wallet],
+			getRoundValidators: () => [wallet],
 		};
 
 		const workerPool = {

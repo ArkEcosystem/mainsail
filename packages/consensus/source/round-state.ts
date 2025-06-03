@@ -63,7 +63,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		this.#blockNumber = blockNumber;
 		this.#round = round;
 
-		const validators = this.validatorSet.getActiveValidators();
+		const validators = this.validatorSet.getRoundValidators();
 		for (const validator of validators) {
 			const consensusPublicKey = validator.blsPublicKey;
 			this.#validators.set(consensusPublicKey, validator);

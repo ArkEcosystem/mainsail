@@ -35,7 +35,7 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 		const notRegistered: string[] = [];
 
 		const allValidators = this.validatorSet.getAllValidators();
-		const activeValidators = this.validatorSet.getActiveValidators();
+		const activeValidators = this.validatorSet.getRoundValidators();
 
 		for (const consensusPublicKey of this.#validators.keys()) {
 			const validator = allValidators.find((validator) => validator.blsPublicKey === consensusPublicKey);

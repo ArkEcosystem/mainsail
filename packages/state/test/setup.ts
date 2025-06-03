@@ -174,7 +174,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		saveBlocks: () => {},
 	});
 	sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue({
-		getActiveValidators: () => {},
+		getRoundValidators: () => {},
 		initialize: () => {},
 	});
 	sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});

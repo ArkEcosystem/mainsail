@@ -511,7 +511,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async prevote(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#blockNumber, this.#round);
-		for (const validator of this.validatorSet.getActiveValidators()) {
+		for (const validator of this.validatorSet.getRoundValidators()) {
 			const localValidator = this.validatorsRepository.getValidator(validator.blsPublicKey);
 			if (localValidator === undefined) {
 				continue;
@@ -530,7 +530,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async precommit(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#blockNumber, this.#round);
-		for (const validator of this.validatorSet.getActiveValidators()) {
+		for (const validator of this.validatorSet.getRoundValidators()) {
 			const localValidator = this.validatorsRepository.getValidator(validator.blsPublicKey);
 			if (localValidator === undefined) {
 				continue;
