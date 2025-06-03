@@ -306,7 +306,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         _minValidators = n;
 
         _shuffle(_validators);
-        _deleteActiveValidators();
+        _deleteRoundValidators();
 
         _roundValidatorsHead = address(0);
         uint8 top = uint8(_clamp(n, 0, _validatorsCount - _resignedValidatorsCount));
@@ -383,7 +383,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         return _resignedValidatorsCount;
     }
 
-    function activeValidatorsCount() external view returns (uint256) {
+    function roundValidatorsCount() external view returns (uint256) {
         return _roundValidatorsCount;
     }
 
@@ -509,7 +509,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         }
     }
 
-    function _deleteActiveValidators() internal {
+    function _deleteRoundValidators() internal {
         address next = _roundValidatorsHead;
 
         while (next != address(0)) {
