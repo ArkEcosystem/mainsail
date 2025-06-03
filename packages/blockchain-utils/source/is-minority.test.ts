@@ -13,7 +13,7 @@ describe("isMajority", ({ assert, it }) => {
 
 	it("should be ok for n = 3f + 1", () => {
 		for (let f = 1; f < 10; f++) {
-			const n = 3 * f + 1; // n = active validators
+			const n = 3 * f + 1; // n = round validators
 			const minority = f + 1; // minority = f + 1
 
 			assert.true(isMinority(minority, n));

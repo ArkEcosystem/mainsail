@@ -231,7 +231,7 @@ describe<{
 		assert.equal(configManager.getNextMilestoneWithNewKey(8, "reward"), emptyMilestone);
 	});
 
-	it("getMaxActiveValidators - should return maximum active validators from all milestones", ({ configManager }) => {
+	it("getMaxActiveValidators - should return maximum round validators from all milestones", ({ configManager }) => {
 		configManager.setConfig({
 			...cryptoJson,
 			milestones: [{ activeValidators: 1, height: 1 }],

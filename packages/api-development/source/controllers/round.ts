@@ -28,7 +28,7 @@ export class RoundController extends Controller {
 		return {
 			height,
 			...this.roundCalculator.calculateRound(height),
-			// Map the active validator set (static, vote-weighted, etc.) to actual proposal order
+			// Map the round validator set (static, vote-weighted, etc.) to actual proposal order
 			validators: orderedValidators.map((validator) => ({
 				// rank: validator.getVoteBalance().toFixed(),
 				voteBalance: validator.voteBalance.toFixed(),

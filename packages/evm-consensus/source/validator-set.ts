@@ -45,7 +45,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const { activeValidators } = this.configuration.getMilestone();
 
 		if (this.#topValidators.length !== activeValidators) {
-			throw new Exceptions.NotEnoughActiveValidatorsError(this.#topValidators.length, activeValidators);
+			throw new Exceptions.NotEnoughRoundValidatorsError(this.#topValidators.length, activeValidators);
 		}
 
 		return this.#topValidators.slice(0, activeValidators);
@@ -69,7 +69,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const { activeValidators } = this.configuration.getMilestone();
 		const validators = await this.consensusContractService.getActiveValidators();
 		if (validators.length < activeValidators) {
-			throw new Exceptions.NotEnoughActiveValidatorsError(this.#topValidators.length, activeValidators);
+			throw new Exceptions.NotEnoughRoundValidatorsError(this.#topValidators.length, activeValidators);
 		}
 
 		this.#topValidators = validators.slice(0, activeValidators);

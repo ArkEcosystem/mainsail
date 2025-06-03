@@ -53,7 +53,7 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 			}
 		}
 
-		this.logger.info(`Active validators (${active.length}): [${active}]`);
+		this.logger.info(`Round validators (${active.length}): [${active}]`);
 		this.logger.info(`Stand by validators (${standBy.length}): [${standBy}]`);
 		this.logger.info(`Resigned validators (${resigned.length}): [${resigned}]`);
 		this.logger.info(`Undefined validators (${notRegistered.length}): [${notRegistered}]`);
