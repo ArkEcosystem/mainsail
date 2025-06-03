@@ -24,6 +24,11 @@ export interface LegacyImportOptions {
 
 export interface LegacyImportResult {
 	readonly initialTotalSupply: bigint;
+	readonly importedValidators: number;
+	readonly importedUsernames: number;
+	readonly importedVoters: number;
+	readonly skippedVoters: number;
+	readonly skippedValidators: number;
 }
 
 export interface ImportedLegacyWallet {
