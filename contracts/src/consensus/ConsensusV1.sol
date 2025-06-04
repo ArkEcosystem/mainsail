@@ -32,6 +32,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     struct ValidatorData {
         uint256 votersCount;
         uint256 voteBalance;
+        uint256 fee;
         bool isResigned;
         bytes blsPublicKey; // 96 bits
     }
@@ -111,6 +112,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     address private _roundValidatorsHead; // Default address(0)
     uint256 private _roundValidatorsCount; // Default 0
     uint256 private _minValidators; // Default 1
+    uint256 private _fee; // Validator registration fee: Default 0
 
     RoundValidator[][] private _rounds;
 
@@ -124,6 +126,10 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     // External functions
+    function setFee(uint256 fee) external onlyOwner {
+        _fee = fee;
+    }
+
     function addValidator(address addr, bytes calldata blsPublicKey, bool isResigned) external onlyOwner {
         if (_rounds.length > 0) {
             revert ImportIsNotAllowed();
@@ -383,6 +389,10 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     // External functions that are view
     function version() external pure returns (uint256) {
         return 1;
+    }
+
+    function fee() external view returns (uint256) {
+        return _fee;
     }
 
     function validatorsCount() external view returns (uint256) {
