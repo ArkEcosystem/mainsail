@@ -96,7 +96,8 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     mapping(address => ValidatorData) private _validatorsData;
     mapping(address => bool) private _hasValidator;
     mapping(bytes32 => bool) private _blsPublicKeys;
-    address[] private _validators;
+    address[] private _validators; // All registered validators including resigned
+    address[] private _activeValidators; // Has valid BLS public key and is not resigned
     uint256 private _validatorsCount; // Default 0
     uint256 private _resignedValidatorsCount; // Default 0
 
