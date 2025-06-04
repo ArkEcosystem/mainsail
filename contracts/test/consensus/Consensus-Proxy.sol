@@ -60,7 +60,7 @@ contract ConsensusTest is Base {
         consensus.calculateRoundValidators(2);
 
         assertEq(consensus.version(), 1);
-        assertEq(consensus.registeredValidatorsCount(), 3);
+        assertEq(consensus.validatorsCount(), 3);
         assertEq(consensus.resignedValidatorsCount(), 1);
         assertEq(consensus.roundValidatorsCount(), 2);
         assertEq(consensus.getVotesCount(), 1);
@@ -75,7 +75,7 @@ contract ConsensusTest is Base {
         ConsensusVTest consensusNew = ConsensusVTest(address(consensus));
         assertEq(consensusNew.versionv2(), 99);
         assertEq(consensusNew.version(), 1);
-        assertEq(consensusNew.registeredValidatorsCount(), 3);
+        assertEq(consensusNew.validatorsCount(), 3);
         assertEq(consensusNew.resignedValidatorsCount(), 1);
         assertEq(consensusNew.roundValidatorsCount(), 2);
         assertEq(consensusNew.getVotesCount(), 1);

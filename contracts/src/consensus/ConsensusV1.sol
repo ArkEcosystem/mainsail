@@ -376,7 +376,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         return 1;
     }
 
-    function registeredValidatorsCount() external view returns (uint256) {
+    function validatorsCount() external view returns (uint256) {
         return _validatorsCount;
     }
 

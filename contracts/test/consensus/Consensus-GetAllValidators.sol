@@ -8,7 +8,7 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 contract ConsensusTest is Base {
     function test_200_validators() public {
         vm.pauseGasMetering();
-        assertEq(consensus.registeredValidatorsCount(), 0);
+        assertEq(consensus.validatorsCount(), 0);
 
         uint256 n = 200;
         for (uint256 i = 0; i < n; i++) {

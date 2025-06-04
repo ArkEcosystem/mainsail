@@ -7,7 +7,7 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 
 contract ConsensusTest is Base {
     function test_validator_registration_pass() public {
-        assertEq(consensus.registeredValidatorsCount(), 0);
+        assertEq(consensus.validatorsCount(), 0);
         address addr = address(1);
 
         // Act
@@ -18,7 +18,7 @@ contract ConsensusTest is Base {
         vm.stopPrank();
 
         // Assert
-        assertEq(consensus.registeredValidatorsCount(), 1);
+        assertEq(consensus.validatorsCount(), 1);
         ConsensusV1.Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));

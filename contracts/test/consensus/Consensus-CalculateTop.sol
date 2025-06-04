@@ -94,7 +94,7 @@ contract ConsensusTest is Base {
 
     function test_consensus_sortedValidators_sameVoteCounts() public {
         vm.pauseGasMetering();
-        assertEq(consensus.registeredValidatorsCount(), 0);
+        assertEq(consensus.validatorsCount(), 0);
 
         uint256 n = 55;
         uint256 balance = 50;
@@ -140,7 +140,7 @@ contract ConsensusTest is Base {
 
     function test_consensus_200_topValidators() public {
         vm.pauseGasMetering();
-        assertEq(consensus.registeredValidatorsCount(), 0);
+        assertEq(consensus.validatorsCount(), 0);
 
         address highest = address(0);
         uint256 highestBalance = 0;

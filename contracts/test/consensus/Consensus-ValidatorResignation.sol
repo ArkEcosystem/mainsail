@@ -7,7 +7,7 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 
 contract ConsensusTest is Base {
     function test_validator_resignation_pass() public {
-        assertEq(consensus.registeredValidatorsCount(), 0);
+        assertEq(consensus.validatorsCount(), 0);
         address addr = address(1);
 
         // Act
@@ -15,7 +15,7 @@ contract ConsensusTest is Base {
         registerValidator(address(2)); // Add another validator to allow resign
 
         // Assert
-        assertEq(consensus.registeredValidatorsCount(), 2);
+        assertEq(consensus.validatorsCount(), 2);
         ConsensusV1.Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
@@ -30,7 +30,7 @@ contract ConsensusTest is Base {
         consensus.resignValidator();
         vm.stopPrank();
 
-        assertEq(consensus.registeredValidatorsCount(), 2);
+        assertEq(consensus.validatorsCount(), 2);
         validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
@@ -45,7 +45,7 @@ contract ConsensusTest is Base {
     }
 
     function test_validator_resignation_revert_if_resigned() public {
-        assertEq(consensus.registeredValidatorsCount(), 0);
+        assertEq(consensus.validatorsCount(), 0);
         address addr = address(1);
 
         // Act
@@ -53,7 +53,7 @@ contract ConsensusTest is Base {
         registerValidator(address(2)); // Add another validator to allow resign
 
         // Assert
-        assertEq(consensus.registeredValidatorsCount(), 2);
+        assertEq(consensus.validatorsCount(), 2);
 
         // Act
         vm.startPrank(addr);
@@ -66,14 +66,14 @@ contract ConsensusTest is Base {
     }
 
     function test_validator_resignation_revert_if_bellow_min_validators() public {
-        assertEq(consensus.registeredValidatorsCount(), 0);
+        assertEq(consensus.validatorsCount(), 0);
         address addr = address(1);
 
         // Act
         registerValidator(addr);
 
         // Assert
-        assertEq(consensus.registeredValidatorsCount(), 1);
+        assertEq(consensus.validatorsCount(), 1);
 
         // Act
         vm.startPrank(addr);
@@ -82,7 +82,7 @@ contract ConsensusTest is Base {
     }
 
     function test_calculate_active_valitors_should_reset_min_validators() public {
-        assertEq(consensus.registeredValidatorsCount(), 0);
+        assertEq(consensus.validatorsCount(), 0);
         address addr = address(1);
 
         // Act
@@ -90,7 +90,7 @@ contract ConsensusTest is Base {
         registerValidator(address(2)); // Add another validator to allow resign
         registerValidator(address(3)); // Add another validator to allow resign
 
-        assertEq(consensus.registeredValidatorsCount(), 3);
+        assertEq(consensus.validatorsCount(), 3);
 
         // Act - higher value
         consensus.calculateRoundValidators(5);
