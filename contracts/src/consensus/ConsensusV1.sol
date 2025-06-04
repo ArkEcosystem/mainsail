@@ -325,8 +325,8 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             revert NoActiveValidators();
         }
 
-        for (uint256 i = 0; i < _validators.length; i++) {
-            address addr = _validators[i];
+        for (uint256 i = 0; i < _activeValidators.length; i++) {
+            address addr = _activeValidators[i];
 
             ValidatorData storage data = _validatorsData[addr];
 
@@ -490,7 +490,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     // Internal functions
     function _shuffle() internal {
-        uint256 n = _validators.length;
+        uint256 n = _activeValidators.length;
         if (n == 0) {
             return;
         }
@@ -499,10 +499,35 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             // Get a random index between 0 and i (inclusive)
             uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, i))) % (i + 1);
 
+            if (i == j) {
+                continue; // No need to swap if indices are the same
+            }
+
+            /* Swap example
+            i = 0; j = 2;
+
+    		Initial state
+            A B C
+            A:0 B:1 C:2
+
+            Array SWAP
+            C B A
+            A:0 B:1 C:2
+
+            Index SWAP
+            C B A
+            A:2 B:1 C:0
+            */
+
             // Swap elements at index i and j
-            address temp = _validators[i];
-            _validators[i] = _validators[j];
-            _validators[j] = temp;
+            address addrA = _activeValidators[i];
+            address addrB = _activeValidators[j];
+
+            _activeValidators[i] = _activeValidators[j];
+            _activeValidators[j] = addrA;
+
+            _activeValidatorIndex[addrA] = j;
+            _activeValidatorIndex[addrB] = i;
         }
     }
 
