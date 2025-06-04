@@ -74,6 +74,8 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     event Unvoted(address voter, address validator);
 
+    error InvalidFee();
+    error RefundFailed();
     error CallerIsNotValidator();
     error ValidatorNotRegistered();
     error ValidatorAlreadyRegistered();
@@ -149,7 +151,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         }
 
         ValidatorData memory validator =
-            ValidatorData({votersCount: 0, voteBalance: 0, isResigned: isResigned, blsPublicKey: blsPublicKey});
+            ValidatorData({votersCount: 0, voteBalance: 0, fee: 0, isResigned: isResigned, blsPublicKey: blsPublicKey});
 
         _hasValidator[addr] = true;
         _validatorsData[addr] = validator;
@@ -207,7 +209,11 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         emit Voted(voter, validator);
     }
 
-    function registerValidator(bytes calldata blsPublicKey) external {
+    function registerValidator(bytes calldata blsPublicKey) external payable {
+        if (msg.value != _fee) {
+            revert InvalidFee();
+        }
+
         if (_hasValidator[msg.sender]) {
             revert ValidatorAlreadyRegistered();
         }
@@ -215,7 +221,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         _verifyAndRegisterBlsPublicKey(blsPublicKey);
 
         ValidatorData memory validator =
-            ValidatorData({votersCount: 0, voteBalance: 0, isResigned: false, blsPublicKey: blsPublicKey});
+            ValidatorData({votersCount: 0, voteBalance: 0, fee: _fee, isResigned: false, blsPublicKey: blsPublicKey});
 
         _hasValidator[msg.sender] = true;
         _validatorsData[msg.sender] = validator;
@@ -259,6 +265,15 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         _resignedValidatorsCount += 1;
 
         _removeActiveValidator(msg.sender);
+
+        // Refund the registration fee to the validator
+        if (validator.fee > 0) {
+            validator.fee = 0;
+            (bool success,) = payable(msg.sender).call{value: validator.fee}("");
+            if (!success) {
+                revert RefundFailed();
+            }
+        }
 
         emit ValidatorResigned(msg.sender);
     }
