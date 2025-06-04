@@ -245,7 +245,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             revert ValidatorAlreadyResigned();
         }
 
-        if (_validators.length - _resignedValidatorsCount <= _minValidators) {
+        if (_activeValidators.length <= _minValidators) {
             revert BellowMinValidators();
         }
 
@@ -319,7 +319,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         _deleteRoundValidators();
 
         _roundValidatorsHead = address(0);
-        uint8 top = uint8(_clamp(n, 0, _validators.length - _resignedValidatorsCount));
+        uint8 top = uint8(_clamp(n, 0, _activeValidators.length));
 
         if (top == 0) {
             revert NoActiveValidators();
