@@ -315,7 +315,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
         _minValidators = n;
 
-        _shuffle(_validators);
+        _shuffle();
         _deleteRoundValidators();
 
         _roundValidatorsHead = address(0);
@@ -489,8 +489,8 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     // Internal functions
-    function _shuffle(address[] storage array) internal {
-        uint256 n = array.length;
+    function _shuffle() internal {
+        uint256 n = _validators.length;
         if (n == 0) {
             return;
         }
@@ -500,9 +500,9 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, i))) % (i + 1);
 
             // Swap elements at index i and j
-            address temp = array[i];
-            array[i] = array[j];
-            array[j] = temp;
+            address temp = _validators[i];
+            _validators[i] = _validators[j];
+            _validators[j] = temp;
         }
     }
 
