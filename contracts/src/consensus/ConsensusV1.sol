@@ -98,7 +98,6 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     mapping(bytes32 => bool) private _blsPublicKeys;
     address[] private _validators; // All registered validators including resigned
     address[] private _activeValidators; // Has valid BLS public key and is not resigned
-    uint256 private _validatorsCount; // Default 0
     uint256 private _resignedValidatorsCount; // Default 0
 
     mapping(address => Vote) private _voters;
@@ -145,7 +144,6 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         ValidatorData memory validator =
             ValidatorData({votersCount: 0, voteBalance: 0, isResigned: isResigned, blsPublicKey: blsPublicKey});
 
-        _validatorsCount++;
         _hasValidator[addr] = true;
         _validatorsData[addr] = validator;
         _validators.push(addr);
@@ -208,7 +206,6 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         ValidatorData memory validator =
             ValidatorData({votersCount: 0, voteBalance: 0, isResigned: false, blsPublicKey: blsPublicKey});
 
-        _validatorsCount++;
         _hasValidator[msg.sender] = true;
         _validatorsData[msg.sender] = validator;
         _validators.push(msg.sender);
@@ -238,7 +235,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             revert ValidatorAlreadyResigned();
         }
 
-        if (_validatorsCount - _resignedValidatorsCount <= _minValidators) {
+        if (_validators.length - _resignedValidatorsCount <= _minValidators) {
             revert BellowMinValidators();
         }
 
@@ -310,7 +307,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         _deleteRoundValidators();
 
         _roundValidatorsHead = address(0);
-        uint8 top = uint8(_clamp(n, 0, _validatorsCount - _resignedValidatorsCount));
+        uint8 top = uint8(_clamp(n, 0, _validators.length - _resignedValidatorsCount));
 
         if (top == 0) {
             revert NoActiveValidators();
@@ -377,7 +374,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function validatorsCount() external view returns (uint256) {
-        return _validatorsCount;
+        return _validators.length;
     }
 
     function resignedValidatorsCount() external view returns (uint256) {
