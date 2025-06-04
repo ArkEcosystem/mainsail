@@ -98,6 +98,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     mapping(bytes32 => bool) private _blsPublicKeys;
     address[] private _validators; // All registered validators including resigned
     address[] private _activeValidators; // Has valid BLS public key and is not resigned
+    mapping(address => uint256) private _activeValidatorIndex; // Points to index in _activeValidators array
     uint256 private _resignedValidatorsCount; // Default 0
 
     mapping(address => Vote) private _voters;
@@ -150,6 +151,10 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
         if (isResigned) {
             _resignedValidatorsCount++;
+        }
+
+        if (_canBecomeActiveValidator(addr)) {
+            _addActiveValidator(addr);
         }
 
         emit ValidatorRegistered(addr, blsPublicKey);
@@ -209,6 +214,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         _hasValidator[msg.sender] = true;
         _validatorsData[msg.sender] = validator;
         _validators.push(msg.sender);
+        _addActiveValidator(msg.sender);
 
         emit ValidatorRegistered(msg.sender, blsPublicKey);
     }
@@ -221,6 +227,10 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         _verifyAndRegisterBlsPublicKey(blsPublicKey);
 
         _validatorsData[msg.sender].blsPublicKey = blsPublicKey;
+
+        if (_canBecomeActiveValidator(msg.sender) && !_isActiveValidator(msg.sender)) {
+            _addActiveValidator(msg.sender);
+        }
 
         emit ValidatorUpdated(msg.sender, blsPublicKey);
     }
@@ -241,6 +251,8 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
         validator.isResigned = true;
         _resignedValidatorsCount += 1;
+
+        _removeActiveValidator(msg.sender);
 
         emit ValidatorResigned(msg.sender);
     }
@@ -570,6 +582,51 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         _roundValidatorsMap[addr] = _roundValidatorsMap[prev];
         _roundValidatorsMap[prev] = addr;
         _roundValidatorsCount++;
+    }
+
+    function _addActiveValidator(address addr) internal {
+        _activeValidators.push(addr);
+        _activeValidatorIndex[addr] = _activeValidators.length - 1;
+    }
+
+    function _removeActiveValidator(address addr) internal {
+        if (!_isActiveValidator(addr)) {
+            return;
+        }
+
+        uint256 index = _activeValidatorIndex[addr];
+        uint256 lastIndex = _activeValidators.length - 1;
+
+        // Copy last address to the index of the removed address. This is not swap. Last validator occurs 2 times in the array.
+        if (index != lastIndex) {
+            address lastValidator = _activeValidators[lastIndex];
+            _activeValidators[index] = lastValidator;
+            _activeValidatorIndex[lastValidator] = index;
+        }
+
+        // Remove last address
+        _activeValidators.pop();
+        delete _activeValidatorIndex[addr];
+    }
+
+    function _canBecomeActiveValidator(address addr) internal view returns (bool) {
+        ValidatorData storage data = _validatorsData[addr];
+        return !data.isResigned && data.blsPublicKey.length != 0;
+    }
+
+    function _isActiveValidator(address addr) internal view returns (bool) {
+        uint256 index = _activeValidatorIndex[addr];
+        if (index == 0) {
+            if (_activeValidators.length == 0) {
+                return false; // No active validators
+            }
+
+            if (_activeValidators[0] != addr) {
+                return false; // Address is not the first in _activeValidators list
+            }
+        }
+
+        return true; // Address is in _activeValidators list
     }
 
     function _unvote() internal returns (address) {
