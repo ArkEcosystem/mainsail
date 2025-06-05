@@ -64,14 +64,11 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         address validator;
     }
 
+    event FeeUpdated(uint256 fee);
     event ValidatorRegistered(address addr, bytes blsPublicKey);
-
     event ValidatorUpdated(address addr, bytes blsPublicKey);
-
     event ValidatorResigned(address addr);
-
     event Voted(address voter, address validator);
-
     event Unvoted(address voter, address validator);
 
     error InvalidFee();
@@ -130,6 +127,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     // External functions
     function setFee(uint256 fee) external onlyOwner {
         _fee = fee;
+        emit FeeUpdated(fee);
     }
 
     function addValidator(address addr, bytes calldata blsPublicKey, bool isResigned) external onlyOwner {
