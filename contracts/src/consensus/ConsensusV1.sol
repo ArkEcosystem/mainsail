@@ -266,13 +266,14 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
         _removeActiveValidator(msg.sender);
 
+        // TODO: Check for reentrancy attack
         // Refund the registration fee to the validator
         if (validator.fee > 0) {
-            validator.fee = 0;
             (bool success,) = payable(msg.sender).call{value: validator.fee}("");
             if (!success) {
                 revert RefundFailed();
             }
+            validator.fee = 0;
         }
 
         emit ValidatorResigned(msg.sender);

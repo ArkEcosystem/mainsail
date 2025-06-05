@@ -6,7 +6,7 @@ import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract ConsensusTest is Base {
-    function test_validator_resignation_pass() public {
+    function test_validator_resignation_pass_with_default_fee() public {
         assertEq(consensus.validatorsCount(), 0);
         address addr = address(1);
 
@@ -37,6 +37,55 @@ contract ConsensusTest is Base {
         assertEq(validator.data.voteBalance, 0);
         assertEq(validator.data.votersCount, 0);
         assertEq(validator.data.isResigned, true);
+    }
+
+    function test_validator_resignation_pass_with_adjusted_fee() public {
+        assertEq(consensus.validatorsCount(), 0);
+
+        // Set a custom fee for validator registration
+        uint256 customFee = 40 ether;
+        consensus.setFee(customFee);
+
+        address payable addr = payable(address(1));
+        vm.deal(addr, 100 ether);
+
+        address payable addr2 = payable(address(2));
+        vm.deal(addr2, 100 ether);
+
+        // Act
+        vm.startPrank(addr2);
+        consensus.registerValidator{value: customFee}(prepareBLSKey(addr2)); // Add another validator to allow resign
+        vm.startPrank(addr);
+        consensus.registerValidator{value: customFee}(prepareBLSKey(addr));
+        vm.stopPrank();
+
+        // Assert
+        assertEq(consensus.validatorsCount(), 2);
+        ConsensusV1.Validator memory validator = consensus.getValidator(addr);
+        assertEq(validator.addr, addr);
+        assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
+        assertEq(validator.data.voteBalance, 0);
+        assertEq(validator.data.votersCount, 0);
+        assertEq(validator.data.fee, customFee);
+        assertEq(validator.data.isResigned, false);
+        assertEq(addr.balance, 60 ether);
+
+        // Act
+        vm.startPrank(addr);
+        vm.expectEmit(address(consensus));
+        emit ConsensusV1.ValidatorResigned(addr);
+        consensus.resignValidator();
+        vm.stopPrank();
+
+        assertEq(consensus.validatorsCount(), 2);
+        validator = consensus.getValidator(addr);
+        assertEq(validator.addr, addr);
+        assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
+        assertEq(validator.data.voteBalance, 0);
+        assertEq(validator.data.votersCount, 0);
+        assertEq(validator.data.fee, 0);
+        assertEq(validator.data.isResigned, true);
+        assertEq(addr.balance, 100 ether);
     }
 
     function test_validator_resignation_revert_if_caller_is_not_validator() public {
