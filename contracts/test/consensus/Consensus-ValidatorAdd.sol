@@ -26,6 +26,7 @@ contract ConsensusTest is Base {
         assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
         assertEq(validator.data.voteBalance, 0);
         assertEq(validator.data.votersCount, 0);
+        assertEq(validator.data.fee, 0);
         assertEq(validator.data.isResigned, false);
     }
 
@@ -47,6 +48,7 @@ contract ConsensusTest is Base {
         assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
         assertEq(validator.data.voteBalance, 0);
         assertEq(validator.data.votersCount, 0);
+        assertEq(validator.data.fee, 0);
         assertEq(validator.data.isResigned, true);
     }
 
@@ -69,6 +71,7 @@ contract ConsensusTest is Base {
         assertEq(validator.data.blsPublicKey, new bytes(0));
         assertEq(validator.data.voteBalance, 0);
         assertEq(validator.data.votersCount, 0);
+        assertEq(validator.data.fee, 0);
         assertEq(validator.data.isResigned, false);
     }
 
