@@ -9,6 +9,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 contract ConsensusTest is Base {
     function test_validator_add_pass() public {
         assertEq(consensus.validatorsCount(), 0);
+        assertEq(consensus.activeValidatorsCount(), 0);
         assertEq(consensus.resignedValidatorsCount(), 0);
         address addr = address(1);
 
@@ -19,6 +20,7 @@ contract ConsensusTest is Base {
 
         // Assert
         assertEq(consensus.validatorsCount(), 1);
+        assertEq(consensus.activeValidatorsCount(), 1);
         assertEq(consensus.resignedValidatorsCount(), 0);
 
         ConsensusV1.Validator memory validator = consensus.getValidator(addr);
@@ -32,6 +34,7 @@ contract ConsensusTest is Base {
 
     function test_validator_add_pass_if_resigned() public {
         assertEq(consensus.validatorsCount(), 0);
+        assertEq(consensus.activeValidatorsCount(), 0);
         assertEq(consensus.resignedValidatorsCount(), 0);
         address addr = address(1);
 
@@ -42,6 +45,7 @@ contract ConsensusTest is Base {
 
         // Assert
         assertEq(consensus.validatorsCount(), 1);
+        assertEq(consensus.activeValidatorsCount(), 0);
         assertEq(consensus.resignedValidatorsCount(), 1);
         ConsensusV1.Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
@@ -54,6 +58,7 @@ contract ConsensusTest is Base {
 
     function test_validator_add_pass_if_ble_key_is_zero() public {
         assertEq(consensus.validatorsCount(), 0);
+        assertEq(consensus.activeValidatorsCount(), 0);
         assertEq(consensus.resignedValidatorsCount(), 0);
         address addr = address(1);
 
@@ -64,6 +69,7 @@ contract ConsensusTest is Base {
 
         // Assert
         assertEq(consensus.validatorsCount(), 1);
+        assertEq(consensus.activeValidatorsCount(), 0);
         assertEq(consensus.resignedValidatorsCount(), 0);
 
         ConsensusV1.Validator memory validator = consensus.getValidator(addr);

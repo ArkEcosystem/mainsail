@@ -18,6 +18,9 @@ contract RejectingRefund {
 contract ConsensusTest is Base {
     function test_validator_resignation_pass_with_default_fee() public {
         assertEq(consensus.validatorsCount(), 0);
+        assertEq(consensus.activeValidatorsCount(), 0);
+        assertEq(consensus.resignedValidatorsCount(), 0);
+
         address addr = address(1);
 
         // Act
@@ -26,6 +29,8 @@ contract ConsensusTest is Base {
 
         // Assert
         assertEq(consensus.validatorsCount(), 2);
+        assertEq(consensus.activeValidatorsCount(), 2);
+        assertEq(consensus.resignedValidatorsCount(), 0);
         ConsensusV1.Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
@@ -41,6 +46,8 @@ contract ConsensusTest is Base {
         vm.stopPrank();
 
         assertEq(consensus.validatorsCount(), 2);
+        assertEq(consensus.activeValidatorsCount(), 1);
+        assertEq(consensus.resignedValidatorsCount(), 1);
         validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
@@ -51,6 +58,8 @@ contract ConsensusTest is Base {
 
     function test_validator_resignation_pass_with_adjusted_fee() public {
         assertEq(consensus.validatorsCount(), 0);
+        assertEq(consensus.activeValidatorsCount(), 0);
+        assertEq(consensus.resignedValidatorsCount(), 0);
 
         // Set a custom fee for validator registration
         uint256 customFee = 40 ether;
@@ -71,6 +80,8 @@ contract ConsensusTest is Base {
 
         // Assert
         assertEq(consensus.validatorsCount(), 2);
+        assertEq(consensus.activeValidatorsCount(), 2);
+        assertEq(consensus.resignedValidatorsCount(), 0);
         ConsensusV1.Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
@@ -88,6 +99,8 @@ contract ConsensusTest is Base {
         vm.stopPrank();
 
         assertEq(consensus.validatorsCount(), 2);
+        assertEq(consensus.activeValidatorsCount(), 1);
+        assertEq(consensus.resignedValidatorsCount(), 1);
         validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
@@ -100,6 +113,8 @@ contract ConsensusTest is Base {
 
     function test_validator_resignation_revert_if_receiver_rejected_fee_return() public {
         assertEq(consensus.validatorsCount(), 0);
+        assertEq(consensus.activeValidatorsCount(), 0);
+        assertEq(consensus.resignedValidatorsCount(), 0);
 
         // Set a custom fee for validator registration
         uint256 customFee = 40 ether;
@@ -120,6 +135,8 @@ contract ConsensusTest is Base {
 
         // Assert
         assertEq(consensus.validatorsCount(), 2);
+        assertEq(consensus.activeValidatorsCount(), 2);
+        assertEq(consensus.resignedValidatorsCount(), 0);
         ConsensusV1.Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
