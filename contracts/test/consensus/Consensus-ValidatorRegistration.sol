@@ -32,7 +32,7 @@ contract ConsensusTest is Base {
         assertEq(consensus.validatorsCount(), 0);
 
         // Set a custom fee for validator registration
-        uint256 customFee = 50 ether;
+        uint256 customFee = 40 ether;
         consensus.setFee(customFee);
 
         address payable addr = payable(address(1));
@@ -54,6 +54,7 @@ contract ConsensusTest is Base {
         assertEq(validator.data.votersCount, 0);
         assertEq(validator.data.fee, customFee);
         assertEq(validator.data.isResigned, false);
+        assertEq(addr.balance, 60 ether);
     }
 
     function test_validator_registration_revert_if_fee_is_invalid() public {
