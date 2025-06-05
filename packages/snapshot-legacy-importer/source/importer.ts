@@ -293,7 +293,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const totalSupply = await this.#seedWallets(options);
 
 		// 2) Seed validators
-		const { importedValidators, skippedValidators } = await this.#seedValidators(options);
+		const { importedValidatorsWithBlsKey, importedValidatorsWithoutBlsKey, skippedValidators } =
+			await this.#seedValidators(options);
 
 		// 3) Seed voters
 		const { importedVoters, skippedVoters } = await this.#seedVoters(options);
@@ -307,7 +308,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		return {
 			importedUsernames,
-			importedValidators,
+			importedValidatorsWithBlsKey,
+			importedValidatorsWithoutBlsKey,
 			importedVoters,
 			initialTotalSupply: totalSupply,
 			skippedValidators,
@@ -353,15 +355,18 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		return totalSupply;
 	}
 
-	async #seedValidators(
-		options: Contracts.Snapshot.LegacyImportOptions,
-	): Promise<{ importedValidators: number; skippedValidators: number }> {
+	async #seedValidators(options: Contracts.Snapshot.LegacyImportOptions): Promise<{
+		importedValidatorsWithBlsKey: number;
+		importedValidatorsWithoutBlsKey: number;
+		skippedValidators: number;
+	}> {
 		const iface = new ethers.Interface(ConsensusAbi.abi);
 
 		this.logger.info(`seeding ${this.#data.validators.length} validators`);
 
 		const stats = {
-			importedValidators: 0,
+			importedValidatorsWithBlsKey: 0,
+			importedValidatorsWithoutBlsKey: 0,
 			skippedValidators: 0,
 		};
 
@@ -371,18 +376,16 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			if (!validator.blsPublicKey) {
 				if (!options.mockFakeValidatorBlsKeys) {
 					this.logger.info(
-						`skipping legacy delegate ${validator.arkAddress} (${validator.username}) without registered blsPublicKey`,
+						`importing legacy delegate ${validator.arkAddress} (${validator.username}) without registered blsPublicKey`,
 					);
-					stats.skippedValidators++;
+					stats.importedValidatorsWithoutBlsKey++;
+				} else {
+					const entropy = sha256(Buffer.from(validator.username, "utf8")).slice(2, 34);
+					const mnemonic = entropyToMnemonic(Buffer.from(entropy, "hex"));
 
-					continue;
+					const consensusKeyPair = await this.consensusKeyPairFactory.fromMnemonic(mnemonic);
+					validator.blsPublicKey = consensusKeyPair.publicKey;
 				}
-
-				const entropy = sha256(Buffer.from(validator.username, "utf8")).slice(2, 34);
-				const mnemonic = entropyToMnemonic(Buffer.from(entropy, "hex"));
-
-				const consensusKeyPair = await this.consensusKeyPairFactory.fromMnemonic(mnemonic);
-				validator.blsPublicKey = consensusKeyPair.publicKey;
 			} else {
 				if (!(await this.consensusPublicKeyFactory.verify(validator.blsPublicKey))) {
 					this.logger.info(
@@ -391,14 +394,14 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 					stats.skippedValidators++;
 					continue;
 				}
-			}
 
-			assert.defined<string>(validator.blsPublicKey);
+				stats.importedValidatorsWithBlsKey++;
+			}
 
 			const data = iface
 				.encodeFunctionData("addValidator", [
 					validator.ethAddress,
-					Buffer.from(validator.blsPublicKey, "hex"),
+					validator.blsPublicKey ? Buffer.from(validator.blsPublicKey, "hex") : Buffer.alloc(0),
 					validator.isResigned,
 				])
 				.slice(2);
@@ -414,8 +417,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			if (!result.receipt.status) {
 				throw new Error("failed to add validator");
 			}
-
-			stats.importedValidators++;
 		}
 
 		return stats;
