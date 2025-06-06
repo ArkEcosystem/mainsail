@@ -218,8 +218,13 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
         _verifyAndRegisterBlsPublicKey(blsPublicKey);
 
-        ValidatorData memory validator =
-            ValidatorData({votersCount: 0, voteBalance: 0, fee: _fee, isResigned: false, blsPublicKey: blsPublicKey});
+        ValidatorData memory validator = ValidatorData({
+            votersCount: 0,
+            voteBalance: 0,
+            fee: msg.value,
+            isResigned: false,
+            blsPublicKey: blsPublicKey
+        });
 
         _hasValidator[msg.sender] = true;
         _validatorsData[msg.sender] = validator;
