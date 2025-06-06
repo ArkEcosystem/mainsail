@@ -3,8 +3,8 @@ import { Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CryptoValidation } from "@mainsail/crypto-validation";
-import { ServiceProvider as Logger } from "@mainsail/logger-pino";
 import { Application } from "@mainsail/kernel";
+import { ServiceProvider as Logger } from "@mainsail/logger-pino";
 import { ServiceProvider as Validation } from "@mainsail/validation";
 import { dirSync, setGracefulCleanup } from "tmp";
 
