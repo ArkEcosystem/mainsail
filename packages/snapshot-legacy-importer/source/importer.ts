@@ -297,11 +297,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const totalSupply = await this.#seedWallets(options);
 
 		// 2) Seed validators
-		const { importedValidatorsWithBlsKey, importedValidatorsWithoutBlsKey, skippedValidators } =
-			await this.#seedValidators(options);
+		const { importedValidatorsWithBlsKey, importedValidatorsWithoutBlsKey } = await this.#seedValidators(options);
 
 		// 3) Seed voters
-		const { importedVoters, skippedVoters } = await this.#seedVoters(options);
+		const { importedVoters } = await this.#seedVoters(options);
 
 		// 4) Seed usernames
 		const { importedUsernames } = await this.#seedUsernames(options);
@@ -316,8 +315,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			importedValidatorsWithoutBlsKey,
 			importedVoters,
 			initialTotalSupply: totalSupply,
-			skippedValidators,
-			skippedVoters,
 		};
 	}
 
@@ -362,7 +359,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	async #seedValidators(options: Contracts.Snapshot.LegacyImportOptions): Promise<{
 		importedValidatorsWithBlsKey: number;
 		importedValidatorsWithoutBlsKey: number;
-		skippedValidators: number;
 	}> {
 		const iface = new ethers.Interface(ConsensusAbi.abi);
 
@@ -371,7 +367,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const stats = {
 			importedValidatorsWithBlsKey: 0,
 			importedValidatorsWithoutBlsKey: 0,
-			skippedValidators: 0,
 		};
 
 		for (const validator of this.#data.validators) {
@@ -379,7 +374,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 			if (!validator.blsPublicKey) {
 				if (!options.mockFakeValidatorBlsKeys) {
-					this.logger.info(
+					this.logger.debug(
 						`importing legacy delegate ${validator.arkAddress} (${validator.username}) without registered blsPublicKey`,
 					);
 					stats.importedValidatorsWithoutBlsKey++;
@@ -391,12 +386,14 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 					validator.blsPublicKey = consensusKeyPair.publicKey;
 				}
 			} else {
-				if (!(await this.consensusPublicKeyFactory.verify(validator.blsPublicKey))) {
+				if (await this.consensusPublicKeyFactory.verify(validator.blsPublicKey)) {
 					this.logger.info(
-						`skipping legacy delegate ${validator.arkAddress} (${validator.username}) with invalid blsPublicKey ${validator.blsPublicKey}`,
+						`importing legacy delegate ${validator.arkAddress} (${validator.username}) with valid blsPublicKey '${validator.blsPublicKey}'`,
 					);
-					stats.skippedValidators++;
-					continue;
+				} else {
+					this.logger.warning(
+						`importing legacy delegate ${validator.arkAddress} (${validator.username}) with invalid blsPublicKey '${validator.blsPublicKey}'`,
+					);
 				}
 
 				stats.importedValidatorsWithBlsKey++;
@@ -426,14 +423,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		return stats;
 	}
 
-	async #seedVoters(
-		options: Contracts.Snapshot.LegacyImportOptions,
-	): Promise<{ importedVoters: number; skippedVoters: number }> {
+	async #seedVoters(options: Contracts.Snapshot.LegacyImportOptions): Promise<{ importedVoters: number }> {
 		const iface = new ethers.Interface(ConsensusAbi.abi);
 
 		const stats = {
 			importedVoters: 0,
-			skippedVoters: 0,
 		};
 
 		const validatorLookup: Record<string, Contracts.Snapshot.ImportedLegacyValidator> =
@@ -453,21 +447,13 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 				const validator = validatorLookup[voter.vote];
 				if (!validator) {
-					this.logger.debug(
-						`!!! skipping voter ${voter.arkAddress} for non-existent validator: ${voter.vote}`,
-					);
-
-					stats.skippedVoters++;
-					continue;
+					throw new Error(`encountered voter ${voter.arkAddress} for non-existent validator: ${voter.vote}`);
 				}
 
 				if (!validator.blsPublicKey) {
 					this.logger.debug(
-						`!!! skipping voter ${voter.arkAddress} for validator without registered BlsPublicKey: ${validator.arkAddress}`,
+						`!!! adding voter ${voter.arkAddress} for validator without registered BlsPublicKey: ${validator.arkAddress}`,
 					);
-
-					stats.skippedVoters++;
-					continue;
 				}
 
 				voterAddresses.push(voter.ethAddress);

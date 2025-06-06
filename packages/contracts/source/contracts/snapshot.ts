@@ -28,8 +28,6 @@ export interface LegacyImportResult {
 	readonly importedValidatorsWithoutBlsKey: number;
 	readonly importedUsernames: number;
 	readonly importedVoters: number;
-	readonly skippedVoters: number;
-	readonly skippedValidators: number;
 }
 
 export interface ImportedLegacyWallet {
