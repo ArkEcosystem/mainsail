@@ -7,8 +7,17 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract ConsensusTest is Base {
-    function test_default_fee_should_be_zero() public view {
+    function test_default_fee() public view {
         assertEq(consensus.fee(), 0);
+    }
+
+    function test_default_fee_custom() public {
+        uint256 initialFee = 10;
+        bytes memory data = abi.encodeWithSelector(ConsensusV1.initialize.selector, initialFee);
+        address proxy = address(new ERC1967Proxy(address(new ConsensusV1()), data));
+        ConsensusV1 consensusCustom = ConsensusV1(proxy);
+
+        assertEq(consensusCustom.fee(), initialFee);
     }
 
     function test_default_fee_should_be_adjustable() public {
