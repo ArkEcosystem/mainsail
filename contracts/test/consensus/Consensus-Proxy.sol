@@ -15,7 +15,7 @@ contract ConsensusVTest is ConsensusV1 {
 contract ConsensusTest is Base {
     function test_initialize_should_revert() public {
         vm.expectRevert(Initializable.InvalidInitialization.selector);
-        consensus.initialize();
+        consensus.initialize(0);
     }
 
     function test_shoudl_have_valid_UPGRADE_INTERFACE_VERSION() public view {
@@ -33,7 +33,7 @@ contract ConsensusTest is Base {
 
         // Should keep old data
         vm.expectRevert(Initializable.InvalidInitialization.selector);
-        consensusNew.initialize();
+        consensusNew.initialize(0);
     }
 
     function test_proxy_should_update_and_perserve_variables() public {

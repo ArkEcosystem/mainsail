@@ -116,18 +116,19 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     RoundValidator[][] private _rounds;
 
     // Initializers
-    function initialize() public initializer {
+    function initialize(uint256 registrationFee) public initializer {
         __Ownable_init(msg.sender);
         _minValidators = 1;
+        _fee = registrationFee;
     }
 
     // Overrides
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     // External functions
-    function setFee(uint256 fee) external onlyOwner {
-        _fee = fee;
-        emit FeeUpdated(fee);
+    function setFee(uint256 registrationFee) external onlyOwner {
+        _fee = registrationFee;
+        emit FeeUpdated(registrationFee);
     }
 
     function addValidator(address addr, bytes calldata blsPublicKey, bool isResigned) external onlyOwner {

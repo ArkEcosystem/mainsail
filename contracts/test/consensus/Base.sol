@@ -12,7 +12,7 @@ contract Base is Test {
     function test() public {}
 
     function setUp() public {
-        bytes memory data = abi.encode(ConsensusV1.initialize.selector);
+        bytes memory data = abi.encode(ConsensusV1.initialize.selector, 0);
         address proxy = address(new ERC1967Proxy(address(new ConsensusV1()), data));
         consensus = ConsensusV1(proxy);
     }
