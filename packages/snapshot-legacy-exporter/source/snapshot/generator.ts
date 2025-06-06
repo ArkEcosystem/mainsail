@@ -28,6 +28,9 @@ export class Generator {
 	@inject(InternalIdentifiers.Application)
 	private app!: Application;
 
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	public async generateStatic(chainTip: LegacyChainTip, wallets: LegacyWallet[]): Promise<void> {
 		const addressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
 			Identifiers.Cryptography.Identity.Address.Factory,
@@ -51,7 +54,7 @@ export class Generator {
 
 	public async generate(): Promise<void> {
 		await this.#runInTransaction(async (entityManager) => {
-			console.log("connected!");
+			this.logger.info("connected!");
 
 			const [chainTip] = await entityManager.query(
 				"SELECT * FROM dblink('v3_db', 'SELECT id, height FROM blocks ORDER BY height DESC LIMIT 1') AS blocks(hash varchar, number bigint);",
@@ -67,7 +70,7 @@ export class Generator {
 
 			const wallets: LegacyWallet[] = [];
 			for (;;) {
-				console.log(`Fetching wallets (offset: ${offset}, limit: ${limit})`);
+				this.logger.info(`Fetching wallets (offset: ${offset}, limit: ${limit})`);
 
 				const chunk: LegacyWallet[] = await entityManager.query(`
 					SELECT * FROM dblink(
@@ -140,7 +143,7 @@ export class Generator {
 				await callback(entityManager);
 			});
 		} catch (ex) {
-			console.log(ex);
+			this.logger.error(ex);
 		} finally {
 			await dataSource.destroy();
 		}
@@ -167,7 +170,7 @@ export class Generator {
 		const jsonString = JSON.stringify(snapshot);
 		const compressedBuffer = await promisify(brotliCompress)(jsonString);
 		await writeFile(path, compressedBuffer);
-		console.log(`Wrote ${snapshot.wallets.length} wallets to '${path}'`);
+		this.logger.info(`Wrote ${snapshot.wallets.length} wallets to '${path}'`);
 	}
 }
 

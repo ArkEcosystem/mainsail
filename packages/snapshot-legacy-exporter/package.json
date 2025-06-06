@@ -28,6 +28,7 @@
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
+		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"pg": "8.14.0",

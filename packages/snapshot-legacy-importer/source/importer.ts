@@ -134,6 +134,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		this.#data.result = result;
 
+		this.logger.info(
+			`snapshot import result: ${JSON.stringify({ ...result, initialTotalSupply: result.initialTotalSupply.toString() })}`,
+		);
+
 		return result;
 	}
 

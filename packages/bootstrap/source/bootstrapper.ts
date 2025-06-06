@@ -56,9 +56,6 @@ export class Bootstrapper {
 	@inject(Identifiers.Evm.Worker)
 	private readonly evmWorker!: Contracts.Evm.Worker;
 
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
-
 	public async bootstrap(): Promise<void> {
 		await this.#setGenesisCommit();
 		await this.#checkStoredGenesisCommit();
@@ -177,9 +174,6 @@ export class Bootstrapper {
 			throw new Error("snapshot importer not loaded");
 		}
 
-		const result = await this.snapshotImporter.run(genesisBlock);
-		this.logger.info(
-			`snapshot import result: ${JSON.stringify({ ...result, initialTotalSupply: result.initialTotalSupply.toString() })}`,
-		);
+		await this.snapshotImporter.run(genesisBlock);
 	}
 }
