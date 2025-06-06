@@ -669,17 +669,13 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     function _isActiveValidator(address addr) internal view returns (bool) {
         uint256 index = _activeValidatorIndex[addr];
-        if (index == 0) {
-            if (_activeValidators.length == 0) {
-                return false; // No active validators
-            }
-
-            if (_activeValidators[0] != addr) {
-                return false; // Address is not the first in _activeValidators list
-            }
+        // Support for empty array
+        if (index >= _activeValidators.length) {
+            return false;
         }
 
-        return true; // Address is in _activeValidators list
+        // Check if the address at the index matches the address. Required for the case when index is 0.
+        return _activeValidators[index] == addr;
     }
 
     function _unvote() internal returns (address) {
