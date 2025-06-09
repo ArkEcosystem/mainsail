@@ -62,7 +62,7 @@ contract ConsensusTest is Base {
         assertEq(consensus.resignedValidatorsCount(), 0);
 
         // Set a custom fee for validator registration
-        uint256 customFee = 40 ether;
+        uint128 customFee = 40 ether;
         consensus.setFee(customFee);
 
         address payable addr = payable(address(1));
@@ -117,7 +117,7 @@ contract ConsensusTest is Base {
         assertEq(consensus.resignedValidatorsCount(), 0);
 
         // Set a custom fee for validator registration
-        uint256 customFee = 40 ether;
+        uint128 customFee = 40 ether;
         consensus.setFee(customFee);
 
         address payable addr = payable(new RejectingRefund());

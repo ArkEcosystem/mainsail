@@ -111,12 +111,12 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     address private _roundValidatorsHead; // Default address(0)
     uint256 private _roundValidatorsCount; // Default 0
     uint256 private _minValidators; // Default 1
-    uint256 private _fee; // Validator registration fee: Default 0
+    uint128 private _fee; // Validator registration fee: Default 0
 
     RoundValidator[][] private _rounds;
 
     // Initializers
-    function initialize(uint256 registrationFee) public initializer {
+    function initialize(uint128 registrationFee) public initializer {
         __Ownable_init(msg.sender);
         _minValidators = 1;
         _fee = registrationFee;
@@ -126,7 +126,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     // External functions
-    function setFee(uint256 registrationFee) external onlyOwner {
+    function setFee(uint128 registrationFee) external onlyOwner {
         _fee = registrationFee;
         emit FeeUpdated(registrationFee);
     }

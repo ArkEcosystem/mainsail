@@ -23,7 +23,7 @@ contract ConsensusTest is Base {
     function test_default_fee_should_be_adjustable() public {
         assertEq(consensus.fee(), 0);
 
-        uint256 newFee = 1000;
+        uint128 newFee = 1000;
         vm.expectEmit(address(consensus));
         emit ConsensusV1.FeeUpdated(newFee);
         consensus.setFee(newFee);
