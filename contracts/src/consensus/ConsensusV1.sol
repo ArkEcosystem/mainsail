@@ -30,9 +30,9 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 
 contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     struct ValidatorData {
-        uint256 votersCount;
         uint256 voteBalance;
-        uint256 fee;
+        uint128 fee;
+        uint64 votersCount;
         bool isResigned;
         bytes blsPublicKey; // 96 bits
     }
@@ -222,7 +222,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         ValidatorData memory validator = ValidatorData({
             votersCount: 0,
             voteBalance: 0,
-            fee: msg.value,
+            fee: uint128(msg.value),
             isResigned: false,
             blsPublicKey: blsPublicKey
         });
