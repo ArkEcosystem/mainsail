@@ -133,7 +133,7 @@ export class Deployer {
 		// Logic contract initializer function ABI
 		const logicInterface = new ethers.Interface(ConsensusAbi.abi);
 		// Encode the initializer call
-		const initializerCalldata = logicInterface.encodeFunctionData("initialize");
+		const initializerCalldata = logicInterface.encodeFunctionData("initialize", [0]);
 		// Prepare the constructor arguments for the proxy contract
 		const proxyConstructorArguments = new ethers.AbiCoder()
 			.encode(["address", "bytes"], [consensusContractAddress, initializerCalldata])

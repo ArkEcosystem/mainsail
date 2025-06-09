@@ -24,5 +24,6 @@ export interface ValidatorWallet {
 	blsPublicKey: string;
 	voteBalance: BigNumber;
 	votersCount: number;
+	fee: number;
 	isResigned: boolean;
 }

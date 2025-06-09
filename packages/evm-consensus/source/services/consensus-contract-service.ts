@@ -43,11 +43,12 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
 		for (const [, validator] of validators.entries()) {
-			const [address, [votersCount, voteBalance, isResigned, blsPublicKey]] = validator;
+			const [address, [voteBalance, fee, votersCount, isResigned, blsPublicKey]] = validator;
 
 			const validatorWallet: Contracts.State.ValidatorWallet = {
 				address,
 				blsPublicKey: blsPublicKey.slice(2),
+				fee: Number(fee),
 				isResigned,
 				voteBalance: BigNumber.make(voteBalance),
 				votersCount: Number(votersCount),
@@ -82,11 +83,12 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
 		for (const [, validator] of validators.entries()) {
-			const [address, [votersCount, voteBalance, isResigned, blsPublicKey]] = validator;
+			const [address, [voteBalance, fee, votersCount, isResigned, blsPublicKey]] = validator;
 
 			const validatorWallet: Contracts.State.ValidatorWallet = {
 				address,
 				blsPublicKey: blsPublicKey.slice(2),
+				fee: Number(fee),
 				isResigned,
 				voteBalance: BigNumber.make(voteBalance),
 				votersCount: Number(votersCount),
