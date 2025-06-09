@@ -134,6 +134,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		this.#data.result = result;
 
+		this.logger.info(
+			`snapshot import result: ${JSON.stringify({ ...result, initialTotalSupply: result.initialTotalSupply.toString() })}`,
+		);
+
 		return result;
 	}
 
@@ -293,19 +297,23 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const totalSupply = await this.#seedWallets(options);
 
 		// 2) Seed validators
-		await this.#seedValidators(options);
+		const { importedValidatorsWithBlsKey, importedValidatorsWithoutBlsKey } = await this.#seedValidators(options);
 
 		// 3) Seed voters
-		await this.#seedVoters(options);
+		const importedVoters = await this.#seedVoters(options);
 
 		// 4) Seed usernames
-		await this.#seedUsernames(options);
+		const importedUsernames = await this.#seedUsernames(options);
 
 		if (totalSupply !== this.totalSupply) {
 			throw new Error("totalSupply mismatch");
 		}
 
 		return {
+			importedUsernames,
+			importedValidatorsWithBlsKey,
+			importedValidatorsWithoutBlsKey,
+			importedVoters,
 			initialTotalSupply: totalSupply,
 		};
 	}
@@ -348,44 +356,53 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		return totalSupply;
 	}
 
-	async #seedValidators(options: Contracts.Snapshot.LegacyImportOptions): Promise<void> {
+	async #seedValidators(options: Contracts.Snapshot.LegacyImportOptions): Promise<{
+		importedValidatorsWithBlsKey: number;
+		importedValidatorsWithoutBlsKey: number;
+	}> {
 		const iface = new ethers.Interface(ConsensusAbi.abi);
 
 		this.logger.info(`seeding ${this.#data.validators.length} validators`);
 
+		const stats = {
+			importedValidatorsWithBlsKey: 0,
+			importedValidatorsWithoutBlsKey: 0,
+		};
+
 		for (const validator of this.#data.validators) {
 			assert.defined(validator.ethAddress);
 
-			let blsPublicKey: string | undefined = validator.blsPublicKey;
-
-			if (!blsPublicKey) {
+			if (!validator.blsPublicKey) {
 				if (!options.mockFakeValidatorBlsKeys) {
-					this.logger.info(
-						`skipping legacy delegate ${validator.arkAddress} (${validator.username}) without registered blsPublicKey`,
+					this.logger.debug(
+						`importing legacy delegate ${validator.arkAddress} (${validator.username}) without registered blsPublicKey`,
 					);
-					continue;
+					stats.importedValidatorsWithoutBlsKey++;
+				} else {
+					const entropy = sha256(Buffer.from(validator.username, "utf8")).slice(2, 34);
+					const mnemonic = entropyToMnemonic(Buffer.from(entropy, "hex"));
+
+					const consensusKeyPair = await this.consensusKeyPairFactory.fromMnemonic(mnemonic);
+					validator.blsPublicKey = consensusKeyPair.publicKey;
 				}
-
-				const entropy = sha256(Buffer.from(validator.username, "utf8")).slice(2, 34);
-				const mnemonic = entropyToMnemonic(Buffer.from(entropy, "hex"));
-
-				const consensusKeyPair = await this.consensusKeyPairFactory.fromMnemonic(mnemonic);
-				blsPublicKey = consensusKeyPair.publicKey;
 			} else {
-				if (!(await this.consensusPublicKeyFactory.verify(blsPublicKey))) {
+				if (await this.consensusPublicKeyFactory.verify(validator.blsPublicKey)) {
 					this.logger.info(
-						`skipping legacy delegate ${validator.arkAddress} (${validator.username}) with invalid blsPublicKey ${blsPublicKey}`,
+						`importing legacy delegate ${validator.arkAddress} (${validator.username}) with valid blsPublicKey '${validator.blsPublicKey}'`,
 					);
-					continue;
+				} else {
+					this.logger.warning(
+						`importing legacy delegate ${validator.arkAddress} (${validator.username}) with invalid blsPublicKey '${validator.blsPublicKey}'`,
+					);
 				}
-			}
 
-			assert.defined<string>(blsPublicKey);
+				stats.importedValidatorsWithBlsKey++;
+			}
 
 			const data = iface
 				.encodeFunctionData("addValidator", [
 					validator.ethAddress,
-					Buffer.from(blsPublicKey, "hex"),
+					validator.blsPublicKey ? Buffer.from(validator.blsPublicKey, "hex") : Buffer.alloc(0),
 					validator.isResigned,
 				])
 				.slice(2);
@@ -402,15 +419,14 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				throw new Error("failed to add validator");
 			}
 		}
+
+		return stats;
 	}
 
-	async #seedVoters(options: Contracts.Snapshot.LegacyImportOptions): Promise<void> {
+	async #seedVoters(options: Contracts.Snapshot.LegacyImportOptions): Promise<number> {
 		const iface = new ethers.Interface(ConsensusAbi.abi);
 
-		const validatorLookup = this.#data.validators.reduce((accumulator, current) => {
-			accumulator[current.ethAddress!] = accumulator;
-			return accumulator;
-		}, {});
+		let importedVoters = 0;
 
 		this.logger.info(`seeding ${this.#data.voters.length} voters`);
 
@@ -420,13 +436,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 			for (const voter of voters) {
 				assert.defined(voter.ethAddress);
-
-				if (!validatorLookup[voter.vote]) {
-					this.logger.warning(
-						`!!! skipping voter ${voter.arkAddress} for non-existent validator: ${voter.vote}`,
-					);
-					continue;
-				}
 
 				voterAddresses.push(voter.ethAddress);
 				validatorAddresses.push(voter.vote);
@@ -443,16 +452,21 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			);
 
 			if (!result.receipt.status) {
-				console.log(result.receipt);
+				console.log(result.receipt, result.receipt.output?.toString("hex"));
 				throw new Error("failed to add votes");
 			}
+
+			importedVoters += voterAddresses.length;
 		}
+		return importedVoters;
 	}
 
-	async #seedUsernames(options: Contracts.Snapshot.LegacyImportOptions): Promise<void> {
+	async #seedUsernames(options: Contracts.Snapshot.LegacyImportOptions): Promise<number> {
 		const iface = new ethers.Interface(UsernamesAbi.abi);
 
 		this.logger.info(`seeding ${this.#data.validators.length} usernames`);
+
+		let importedUsernames = 0;
 
 		for (const validator of this.#data.validators) {
 			if (!validator.username) {
@@ -472,7 +486,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			if (!result.receipt.status) {
 				throw new Error("failed to add username");
 			}
+
+			importedUsernames++;
 		}
+
+		return importedUsernames;
 	}
 
 	#getTransactionContext(

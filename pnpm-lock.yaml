@@ -2374,6 +2374,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/logger-pino':
+        specifier: workspace:*
+        version: link:../logger-pino
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils

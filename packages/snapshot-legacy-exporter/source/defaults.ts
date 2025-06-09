@@ -30,7 +30,11 @@ export const defaults = {
 
 		v3: {
 			database: "ark_devnet",
+			// when using podman
+			// host: "host.containers.internal",
+			host: "localhost",
 			password: "test_db",
+			port: 5432,
 			user: "test_db",
 		},
 	},

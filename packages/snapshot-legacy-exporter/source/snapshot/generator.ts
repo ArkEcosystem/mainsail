@@ -7,7 +7,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
-import { DataSource } from "typeorm";
+import { DataSource, EntityManager } from "typeorm";
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
 
 import { Identifiers as InternalIdentifiers } from "../identifiers.js";
@@ -15,6 +15,8 @@ import { LegacyChainTip, LegacySnapshot, LegacyWallet } from "../interfaces.js";
 
 interface DatabaseOptions extends PostgresConnectionOptions {
 	readonly v3: {
+		readonly host: string;
+		readonly port: number;
 		readonly user: string;
 		readonly password: string;
 		readonly database: string;
@@ -26,32 +28,8 @@ export class Generator {
 	@inject(InternalIdentifiers.Application)
 	private app!: Application;
 
-	async #connect(): Promise<DataSource> {
-		const pluginConfig = await this.app
-			.resolve(Providers.PluginConfiguration)
-			.discover("@mainsail/snapshot-legacy-exporter", process.cwd());
-
-		const options = pluginConfig.get<DatabaseOptions>("database");
-		assert.defined(options);
-
-		const dataSource = new DataSource({
-			...options,
-			entities: [],
-			migrations: [],
-			migrationsRun: false,
-			synchronize: false,
-		});
-
-		await dataSource.initialize();
-
-		// Link v3 database
-		await dataSource.query(`
-			CREATE EXTENSION IF NOT EXISTS dblink;
-			SELECT dblink_connect('v3_db', 'dbname=${options.v3.database} user=${options.v3.user} password=${options.v3.password}');
-		`);
-
-		return dataSource;
-	}
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async generateStatic(chainTip: LegacyChainTip, wallets: LegacyWallet[]): Promise<void> {
 		const addressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
@@ -75,64 +53,97 @@ export class Generator {
 	}
 
 	public async generate(): Promise<void> {
-		// Connect to V3 database
-		const dataSource = await this.#connect();
-		console.log("connected!");
+		await this.#runInTransaction(async (entityManager) => {
+			this.logger.info("connected!");
 
-		const [chainTip] = await dataSource.query(
-			"SELECT * FROM dblink('v3_db', 'SELECT id, height FROM blocks ORDER BY height DESC LIMIT 1') AS blocks(hash varchar, number bigint);",
-		);
+			const [chainTip] = await entityManager.query(
+				"SELECT * FROM dblink('v3_db', 'SELECT id, height FROM blocks ORDER BY height DESC LIMIT 1') AS blocks(hash varchar, number bigint);",
+			);
 
-		const addressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
-			Identifiers.Cryptography.Identity.Address.Factory,
-		);
+			const addressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
+				Identifiers.Cryptography.Identity.Address.Factory,
+			);
 
-		// Loop all wallets
-		const limit = 1000;
-		let offset = 0;
+			// Loop all wallets
+			const limit = 1000;
+			let offset = 0;
 
-		const wallets: LegacyWallet[] = [];
-		for (;;) {
-			const chunk: LegacyWallet[] = await dataSource.query(`
-				SELECT * FROM dblink(
-					'v3_db',
-					'
-						SELECT address, public_key, balance, attributes FROM wallets -- WHERE attributes ?| array[''vote'', ''delegate'', ''username'']
-						ORDER BY balance DESC, address ASC LIMIT ${limit} OFFSET ${offset}
-					'
-				) AS wallets("arkAddress" varchar, "publicKey" varchar, balance bigint, attributes jsonb);
-			`);
+			const wallets: LegacyWallet[] = [];
+			for (;;) {
+				this.logger.info(`Fetching wallets (offset: ${offset}, limit: ${limit})`);
 
-			for (const wallet of chunk) {
-				// sanitize
-				if (wallet.attributes?.["delegate"]) {
-					delete wallet.attributes?.["delegate"]["lastBlock"];
+				const chunk: LegacyWallet[] = await entityManager.query(`
+					SELECT * FROM dblink(
+						'v3_db',
+						'
+							SELECT address, public_key, balance, attributes FROM wallets
+							ORDER BY balance DESC, address ASC LIMIT ${limit} OFFSET ${offset}
+						'
+					) AS wallets("arkAddress" varchar, "publicKey" varchar, balance bigint, attributes jsonb);
+				`);
+
+				for (const wallet of chunk) {
+					// sanitize
+					if (wallet.attributes?.["delegate"]) {
+						delete wallet.attributes?.["delegate"]["lastBlock"];
+					}
+
+					delete wallet.attributes?.["ipfs"]; // ?
+					delete wallet.attributes?.["business"]; // ?
+					delete wallet.attributes?.["htlc"]; // ?
+					delete wallet.attributes?.["entities"]; // ?
+
+					wallets.push({
+						...wallet,
+						...(wallet.publicKey
+							? {
+									ethAddress: await addressFactory.fromPublicKey(wallet.publicKey),
+								}
+							: {}),
+					});
 				}
 
-				delete wallet.attributes?.["ipfs"]; // ?
-				delete wallet.attributes?.["business"]; // ?
-				delete wallet.attributes?.["htlc"]; // ?
-				delete wallet.attributes?.["entities"]; // ?
+				offset += limit;
 
-				wallets.push({
-					...wallet,
-					...(wallet.publicKey
-						? {
-								ethAddress: await addressFactory.fromPublicKey(wallet.publicKey),
-							}
-						: {}),
-				});
+				if (chunk.length === 0) {
+					break;
+				}
 			}
 
-			offset += limit;
+			await this.#writeSnapshot(chainTip, wallets);
+		});
+	}
 
-			if (chunk.length === 0) {
-				break;
-			}
-		}
+	async #runInTransaction(callback: (entityManager: EntityManager) => Promise<void>): Promise<void> {
+		const pluginConfig = await this.app
+			.resolve(Providers.PluginConfiguration)
+			.discover("@mainsail/snapshot-legacy-exporter", process.cwd());
+
+		const options = pluginConfig.get<DatabaseOptions>("database");
+		assert.defined(options);
+
+		const dataSource = new DataSource({
+			...options,
+			entities: [],
+			migrations: [],
+			migrationsRun: false,
+			synchronize: false,
+		});
+
+		await dataSource.initialize();
 
 		try {
-			await this.#writeSnapshot(chainTip, wallets);
+			await dataSource.transaction("REPEATABLE READ", async (entityManager) => {
+				// Link v3 database
+				await entityManager.query(`
+							CREATE EXTENSION IF NOT EXISTS dblink;
+							SELECT dblink_connect('v3_db', 'host=${options.v3.host} port=${options.v3.port} dbname=${options.v3.database} user=${options.v3.user} password=${options.v3.password}');
+						`);
+
+				await callback(entityManager);
+			});
+		} catch (ex) {
+			this.logger.error(ex);
 		} finally {
 			await dataSource.destroy();
 		}
@@ -159,7 +170,7 @@ export class Generator {
 		const jsonString = JSON.stringify(snapshot);
 		const compressedBuffer = await promisify(brotliCompress)(jsonString);
 		await writeFile(path, compressedBuffer);
-		console.log(`Wrote ${snapshot.wallets.length} wallets to '${path}'`);
+		this.logger.info(`Wrote ${snapshot.wallets.length} wallets to '${path}'`);
 	}
 }
 
