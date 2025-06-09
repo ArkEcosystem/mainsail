@@ -300,10 +300,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const { importedValidatorsWithBlsKey, importedValidatorsWithoutBlsKey } = await this.#seedValidators(options);
 
 		// 3) Seed voters
-		const { importedVoters } = await this.#seedVoters(options);
+		const importedVoters = await this.#seedVoters(options);
 
 		// 4) Seed usernames
-		const { importedUsernames } = await this.#seedUsernames(options);
+		const importedUsernames = await this.#seedUsernames(options);
 
 		if (totalSupply !== this.totalSupply) {
 			throw new Error("totalSupply mismatch");
@@ -423,18 +423,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		return stats;
 	}
 
-	async #seedVoters(options: Contracts.Snapshot.LegacyImportOptions): Promise<{ importedVoters: number }> {
+	async #seedVoters(options: Contracts.Snapshot.LegacyImportOptions): Promise<number> {
 		const iface = new ethers.Interface(ConsensusAbi.abi);
 
-		const stats = {
-			importedVoters: 0,
-		};
-
-		const validatorLookup: Record<string, Contracts.Snapshot.ImportedLegacyValidator> =
-			this.#data.validators.reduce((accumulator, current) => {
-				accumulator[current.ethAddress!] = current;
-				return accumulator;
-			}, {});
+		let importedVoters = 0;
 
 		this.logger.info(`seeding ${this.#data.voters.length} voters`);
 
@@ -444,17 +436,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 			for (const voter of voters) {
 				assert.defined(voter.ethAddress);
-
-				const validator = validatorLookup[voter.vote];
-				if (!validator) {
-					throw new Error(`encountered voter ${voter.arkAddress} for non-existent validator: ${voter.vote}`);
-				}
-
-				if (!validator.blsPublicKey) {
-					this.logger.debug(
-						`!!! adding voter ${voter.arkAddress} for validator without registered BlsPublicKey: ${validator.arkAddress}`,
-					);
-				}
 
 				voterAddresses.push(voter.ethAddress);
 				validatorAddresses.push(voter.vote);
@@ -475,19 +456,17 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				throw new Error("failed to add votes");
 			}
 
-			stats.importedVoters += voterAddresses.length;
+			importedVoters += voterAddresses.length;
 		}
-		return stats;
+		return importedVoters;
 	}
 
-	async #seedUsernames(options: Contracts.Snapshot.LegacyImportOptions): Promise<{ importedUsernames: number }> {
+	async #seedUsernames(options: Contracts.Snapshot.LegacyImportOptions): Promise<number> {
 		const iface = new ethers.Interface(UsernamesAbi.abi);
 
 		this.logger.info(`seeding ${this.#data.validators.length} usernames`);
 
-		const stats = {
-			importedUsernames: 0,
-		};
+		let importedUsernames = 0;
 
 		for (const validator of this.#data.validators) {
 			if (!validator.username) {
@@ -508,10 +487,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				throw new Error("failed to add username");
 			}
 
-			stats.importedUsernames += 1;
+			importedUsernames++;
 		}
 
-		return stats;
+		return importedUsernames;
 	}
 
 	#getTransactionContext(
