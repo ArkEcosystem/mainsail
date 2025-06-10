@@ -70,6 +70,7 @@ export type Milestone = {
 	timeouts: MilestoneTimeouts;
 	snapshot?: MilestoneSnapshot;
 	vendorFieldLength: number;
+	validatorRegistrationFee: number;
 };
 
 export type MilestonePartial = Partial<Milestone> & {

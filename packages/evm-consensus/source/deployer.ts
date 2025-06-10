@@ -130,10 +130,14 @@ export class Deployer {
 	}
 
 	async #deployConsensusProxy(consensusContractAddress: string): Promise<void> {
+		const milestone = this.configuration.getMilestone();
+
 		// Logic contract initializer function ABI
 		const logicInterface = new ethers.Interface(ConsensusAbi.abi);
 		// Encode the initializer call
-		const initializerCalldata = logicInterface.encodeFunctionData("initialize", [0]);
+		const initializerCalldata = logicInterface.encodeFunctionData("initialize", [
+			milestone.validatorRegistrationFee,
+		]);
 		// Prepare the constructor arguments for the proxy contract
 		const proxyConstructorArguments = new ethers.AbiCoder()
 			.encode(["address", "bytes"], [consensusContractAddress, initializerCalldata])
