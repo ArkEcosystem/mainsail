@@ -36,7 +36,7 @@ export class MilestonesGenerator {
 					stageTimeoutIncrease: 2000,
 					tolerance: 100,
 				},
-				validatorRegistrationFee: 1,
+				validatorRegistrationFee: options.validatorRegistrationFee,
 				vendorFieldLength: options.vendorFieldLength,
 			},
 			{

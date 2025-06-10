@@ -74,7 +74,11 @@ export class GenesisBlockGenerator extends Generator {
 			}
 
 			const validatorTransactions = [
-				...(await this.#buildValidatorTransactions(validators, options.chainId)),
+				...(await this.#buildValidatorTransactions(
+					validators,
+					options.chainId,
+					options.validatorRegistrationFee,
+				)),
 				...(await this.#buildVoteTransactions(validators, options.chainId)),
 			];
 
@@ -156,7 +160,11 @@ export class GenesisBlockGenerator extends Generator {
 		return result;
 	}
 
-	async #buildValidatorTransactions(senders: Wallet[], chainId: number): Promise<Contracts.Crypto.Transaction[]> {
+	async #buildValidatorTransactions(
+		senders: Wallet[],
+		chainId: number,
+		value: number,
+	): Promise<Contracts.Crypto.Transaction[]> {
 		const result: Contracts.Crypto.Transaction[] = [];
 
 		const iface = new ethers.Interface(ConsensusAbi.abi);
@@ -173,6 +181,7 @@ export class GenesisBlockGenerator extends Generator {
 					.recipientAddress(this.#consensusProxyContractAddress)
 					.nonce("0") // validator registration tx is always the first one from sender
 					.payload(data)
+					.value(value.toString())
 					.gasPrice(0)
 					.gasLimit(500_000)
 					.sign(sender.passphrase)
