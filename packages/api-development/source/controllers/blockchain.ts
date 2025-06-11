@@ -1,13 +1,9 @@
-import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { injectable } from "@mainsail/container";
 
 import { Controller } from "./controller.js";
 
 @injectable()
 export class BlockchainController extends Controller {
-	@inject(Identifiers.BlockchainUtils.SupplyCalculator)
-	private readonly supplyCalculator!: Contracts.BlockchainUtils.SupplyCalculator;
-
 	public async index() {
 		const { data } = this.stateStore.getLastBlock();
 
@@ -17,7 +13,6 @@ export class BlockchainController extends Controller {
 					height: data.number,
 					id: data.hash,
 				},
-				supply: this.supplyCalculator.calculateSupply(data.number),
 			},
 		};
 	}
