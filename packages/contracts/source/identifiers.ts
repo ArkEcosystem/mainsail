@@ -14,7 +14,6 @@ export const Identifiers = {
 		FeeCalculator: Symbol("BlockchainUtils<FeeCalculator>"),
 		ProposerCalculator: Symbol("BlockchainUtils<ProposerCalculator>"),
 		RoundCalculator: Symbol("BlockchainUtils<RoundCalculator>"),
-		SupplyCalculator: Symbol("BlockchainUtils<SupplyCalculator>"),
 		TimestampCalculator: Symbol("BlockchainUtils<TimestampCalculator>"),
 	},
 	Config: {

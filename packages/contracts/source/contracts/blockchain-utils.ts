@@ -14,10 +14,6 @@ export interface RoundCalculator {
 	calculateRoundInfoByRound(round: number): RoundInfo;
 }
 
-export interface SupplyCalculator {
-	calculateSupply(height: number): BigNumber;
-}
-
 export interface TimestampCalculator {
 	calculateMinimalTimestamp(previousBlock: Block, round: number): number;
 }
