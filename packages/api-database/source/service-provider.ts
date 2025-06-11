@@ -109,6 +109,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			// Note: this only initializes the connection pool, etc. but does not run migrations.
 			// Migrations are handled during bootstrap elsewhere in the main process (see sync.ts)
 			await dataSource.initialize();
+			await dataSource.createQueryRunner().query("CREATE EXTENSION IF NOT EXISTS citext;");
 
 			this.app.bind(Identifiers.DataSource).toConstantValue(dataSource);
 			this.app.bind(Identifiers.Migrations).to(Migrations).inSingletonScope();
