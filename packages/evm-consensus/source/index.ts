@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { assert } from "@mainsail/utils";
+import { assert, BigNumber } from "@mainsail/utils";
 
 import { Deployer } from "./deployer.js";
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
@@ -33,9 +33,21 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		await this.app.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer).deploy({
 			generatorAddress: genesisBlock.block.proposer,
 			initialBlockNumber: genesisBlock.block.number,
+			initialSupply: this.#calculateInitialSupply(genesisBlock),
 			timestamp: genesisBlock.block.timestamp,
-			totalAmount: genesisBlock.block.amount,
 		});
+	}
+
+	#calculateInitialSupply(genesisBlock: Contracts.Crypto.CommitJson): string {
+		const generatorAddress = genesisBlock.block.proposer;
+
+		let supply = BigNumber.ZERO;
+
+		for (const transaction of genesisBlock.block.transactions.filter((tx) => tx.from === generatorAddress)) {
+			supply = supply.plus(transaction.value);
+		}
+
+		return supply.toString();
 	}
 }
 

@@ -109,12 +109,12 @@ export class GenesisBlockGenerator extends Generator {
 			initialBlockNumber: options.snapshot
 				? Number(this.snapshotLegacyImporter!.genesisBlockNumber)
 				: options.initialBlockNumber,
-			timestamp: dayjs(options.epoch).valueOf(),
-			totalAmount: (options.distribute
+			initialSupply: (options.distribute
 				? // Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`)
 					BigNumber.make(options.premine).dividedBy(validatorsCount).times(validatorsCount)
 				: BigNumber.make(options.premine)
 			).toString(),
+			timestamp: dayjs(options.epoch).valueOf(),
 		});
 
 		this.#consensusProxyContractAddress = this.app.get<string>(

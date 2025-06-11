@@ -8,7 +8,7 @@ import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
 
 export interface GenesisBlockInfo {
 	readonly timestamp: number;
-	readonly totalAmount: string;
+	readonly initialSupply: string;
 	readonly generatorAddress: string;
 	readonly initialBlockNumber: number;
 }
@@ -73,7 +73,7 @@ export class Deployer {
 			account: this.#genesisBlockInfo.generatorAddress,
 			deployerAccount: this.deployerAddress,
 			initialBlockNumber: BigNumber.make(this.#genesisBlockInfo.initialBlockNumber).toBigInt(),
-			initialSupply: BigNumber.make(this.#genesisBlockInfo.totalAmount).toBigInt(),
+			initialSupply: BigNumber.make(this.#genesisBlockInfo.initialSupply).toBigInt(),
 
 			usernameContract: ethers.getCreateAddress({ from: this.deployerAddress, nonce: 3 }), // PROXY Uses nonce 3
 			validatorContract: ethers.getCreateAddress({ from: this.deployerAddress, nonce: 1 }), // PROXY Uses nonce 1
