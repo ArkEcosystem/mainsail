@@ -6,14 +6,14 @@ import { Column, Entity } from "typeorm";
 export class Wallet {
 	@Column({
 		primary: true,
-		type: "varchar",
+		type: "citext",
 	})
 	public address!: string;
 
 	@Column({
 		default: undefined,
 		nullable: true,
-		type: "varchar",
+		type: "citext",
 	})
 	public publicKey!: string | undefined;
 

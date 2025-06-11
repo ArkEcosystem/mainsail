@@ -8,7 +8,7 @@ import { bufferTransformer } from "../transformers/buffer.js";
 export class Receipt {
 	@Column({
 		primary: true,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly transactionHash!: string;
 
@@ -39,7 +39,7 @@ export class Receipt {
 	@Column({
 		default: undefined,
 		nullable: true,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly contractAddress: string | undefined;
 

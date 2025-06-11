@@ -6,7 +6,7 @@ import { Column, Entity } from "typeorm";
 export class LegacyColdWallet {
 	@Column({
 		primary: true,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly address!: string;
 
@@ -26,14 +26,14 @@ export class LegacyColdWallet {
 	@Column({
 		default: undefined,
 		nullable: true,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly mergeInfoWalletAddress?: string | undefined;
 
 	@Column({
 		default: undefined,
 		nullable: true,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly mergeInfoTransactionHash?: string | undefined;
 }

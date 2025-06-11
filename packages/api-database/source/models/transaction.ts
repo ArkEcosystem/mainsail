@@ -8,13 +8,13 @@ import { bufferTransformer } from "../transformers/buffer.js";
 export class Transaction {
 	@Column({
 		primary: true,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly hash!: string;
 
 	@Column({
 		nullable: false,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly blockHash!: string;
 
@@ -44,20 +44,20 @@ export class Transaction {
 
 	@Column({
 		nullable: false,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly senderPublicKey!: string;
 
 	@Column({
 		nullable: false,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly from!: string;
 
 	@Column({
 		default: undefined,
 		nullable: true,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly to!: string | undefined;
 

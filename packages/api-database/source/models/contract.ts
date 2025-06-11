@@ -6,26 +6,26 @@ import { Column, Entity } from "typeorm";
 export class Contract {
 	@Column({
 		primary: true,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly name!: string;
 
 	@Column({
 		nullable: false,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly address!: string;
 
 	@Column({
 		default: undefined,
 		nullable: true,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly proxy!: string | undefined;
 
 	@Column({
 		nullable: false,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly activeImplementation!: string;
 

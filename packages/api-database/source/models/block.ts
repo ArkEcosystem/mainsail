@@ -9,7 +9,7 @@ import { Column, Entity, Unique } from "typeorm";
 export class Block {
 	@Column({
 		primary: true,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly hash!: string;
 
@@ -25,12 +25,12 @@ export class Block {
 	public readonly timestamp!: string;
 
 	@Column({
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly parentHash!: string;
 
 	@Column({
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly stateRoot!: string;
 
@@ -78,13 +78,13 @@ export class Block {
 
 	@Column({
 		nullable: false,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly transactionsRoot!: string;
 
 	@Column({
 		nullable: false,
-		type: "varchar",
+		type: "citext",
 	})
 	public readonly proposer!: string;
 
