@@ -64,10 +64,10 @@ const configurations = [
 		initialHeight: 0,
 		overwriteConfig: true,
 		timeouts: {
-			blockPrepareTime: 500,
-			blockTime: 500,
-			stageTimeout: 500,
-			stageTimeoutIncrease: 500,
+			blockPrepareTime: 2000,
+			blockTime: 2000,
+			stageTimeout: 2000,
+			stageTimeoutIncrease: 2000,
 			tolerance: 100,
 		},
 		postGenerate: (location) => {
@@ -153,10 +153,10 @@ const configurations = [
 		overwriteConfig: true,
 		mockFakeValidatorBlsKeys: true,
 		timeouts: {
-			blockPrepareTime: 500,
-			blockTime: 500,
-			stageTimeout: 500,
-			stageTimeoutIncrease: 500,
+			blockPrepareTime: 2000,
+			blockTime: 2000,
+			stageTimeout: 2000,
+			stageTimeoutIncrease: 2000,
 			tolerance: 100,
 		},
 		snapshot: {

@@ -29,6 +29,7 @@ describe<{
 					maxTxPerBlock: 100,
 					validators: 53,
 					vendorFieldLength: 255,
+					validatorRegistrationFee: "250",
 				})
 				.generate(),
 			[
@@ -61,6 +62,7 @@ describe<{
 						stageTimeoutIncrease: 2000,
 						tolerance: 100,
 					},
+					validatorRegistrationFee: "250",
 					vendorFieldLength: 255,
 				},
 				{

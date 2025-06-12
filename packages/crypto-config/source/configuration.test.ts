@@ -49,6 +49,7 @@ describe<{
 					stageTimeoutIncrease: 2000,
 					tolerance: 100,
 				},
+				validatorRegistrationFee: "250000000000000000000",
 				vendorFieldLength: 255,
 			},
 			{
@@ -67,6 +68,7 @@ describe<{
 					stageTimeoutIncrease: 2000,
 					tolerance: 100,
 				},
+				validatorRegistrationFee: "250000000000000000000",
 				vendorFieldLength: 255,
 			},
 			{
@@ -85,6 +87,7 @@ describe<{
 					stageTimeoutIncrease: 2000,
 					tolerance: 100,
 				},
+				validatorRegistrationFee: "250000000000000000000",
 				vendorFieldLength: 255,
 			},
 		]);

@@ -31,6 +31,7 @@ export class Sandbox {
 		symbol: "UѦ",
 		token: "UARK",
 		validators: 53,
+		validatorRegistrationFee: "0",
 		wif: 186,
 	};
 

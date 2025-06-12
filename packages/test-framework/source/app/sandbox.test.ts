@@ -40,6 +40,7 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 			symbol: "DѦ",
 			token: "DARK",
 			validators: 53,
+			validatorRegistrationFee: "0",
 			wif: 186,
 		};
 

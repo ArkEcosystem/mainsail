@@ -45,8 +45,8 @@ describe<{
 					},
 
 					height: 0,
-
 					reward: "0",
+					validatorRegistrationFee: "250",
 				},
 			],
 		});
@@ -65,6 +65,7 @@ describe<{
 				initialBlockNumber: 0,
 				premine: "2000000000",
 				validators: 53,
+				validatorRegistrationFee: "250",
 			} as Contracts.NetworkGenerator.InternalOptions),
 		);
 	});
