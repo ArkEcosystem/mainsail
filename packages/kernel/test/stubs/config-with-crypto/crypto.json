@@ -1835,8 +1835,7 @@
 			"satoshi": {
 				"decimals": 8,
 				"denomination": 100000000
-			},
-			"vendorFieldLength": 255
+			}
 		},
 		{
 			"activeValidators": 51,
@@ -1856,8 +1855,7 @@
 			"satoshi": {
 				"decimals": 8,
 				"denomination": 100000000
-			},
-			"vendorFieldLength": 255
+			}
 		}
 	],
 	"network": {

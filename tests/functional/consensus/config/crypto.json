@@ -296,8 +296,7 @@
 				"stageTimeout": 100,
 				"stageTimeoutIncrease": 100,
 				"tolerance": 100
-			},
-			"vendorFieldLength": 255
+			}
 		},
 		{
 			"activeValidators": 5,
