@@ -6,7 +6,7 @@ import { makeFormats } from "./formats";
 describe<{
 	validator: Validator;
 	sandbox: Sandbox;
-}>("format vendorField", ({ it, assert, beforeEach }) => {
+}>("format", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 		context.validator = context.sandbox.app.resolve(Validator);
