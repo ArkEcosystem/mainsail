@@ -81,7 +81,6 @@ describe<{
 						height: 0,
 						reward: "0",
 						satoshi: match.object,
-						vendorFieldLength: 255,
 					}),
 					match({
 						height: 1,
@@ -339,7 +338,6 @@ describe<{
 				symbol: "my",
 				token: "myn",
 				validators: "47",
-				vendorFieldLength: "64",
 				wif: "27",
 			})
 			.execute(Command);
@@ -379,7 +377,6 @@ describe<{
 						height: 0,
 						reward: "0", // TODO: Check
 						satoshi: match.object,
-						vendorFieldLength: 64,
 					}),
 					match({
 						height: 1,

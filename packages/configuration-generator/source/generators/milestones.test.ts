@@ -28,7 +28,6 @@ describe<{
 					maxBlockPayload: 2000,
 					maxTxPerBlock: 100,
 					validators: 53,
-					vendorFieldLength: 255,
 					validatorRegistrationFee: "250",
 				})
 				.generate(),
@@ -63,7 +62,6 @@ describe<{
 						tolerance: 100,
 					},
 					validatorRegistrationFee: "250",
-					vendorFieldLength: 255,
 				},
 				{
 					roundValidators: 53,

@@ -3,7 +3,7 @@ import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
 import { schemas as base58AddressSchemas } from "@mainsail/crypto-address-base58";
 import { Configuration } from "@mainsail/crypto-config";
 import { schemas as kayParSchemas } from "@mainsail/crypto-key-pair-ecdsa";
-import { makeFormats, makeKeywords, schemas as transactionSchemas } from "@mainsail/crypto-transaction";
+import { makeKeywords, schemas as transactionSchemas } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/crypto-validation";
 import { BigNumber } from "@mainsail/utils";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
@@ -27,12 +27,6 @@ describe<{
 		await context.sandbox.app.resolve(CryptoValidationServiceProvider).register();
 
 		context.validator = context.sandbox.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
-
-		for (const [name, format] of Object.entries({
-			...makeFormats(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
-		})) {
-			context.validator.addFormat(name, format);
-		}
 
 		for (const keyword of Object.values({
 			...makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),

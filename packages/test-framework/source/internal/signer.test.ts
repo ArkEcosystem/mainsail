@@ -16,7 +16,6 @@ describe<{
 			amount: "100",
 			gasPrice: 5 * 1e9,
 			passphrase: passphrases[0],
-			vendorField: "dummy",
 		};
 
 		const entity = await signer.makeTransfer(options);
@@ -24,7 +23,6 @@ describe<{
 		assert.defined(entity.data.v);
 		assert.defined(entity.data.r);
 		assert.defined(entity.data.s);
-		// assert.defined(entity.data.vendorField);
 	});
 
 	// it("should make validator", async ({ signer }) => {

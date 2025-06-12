@@ -50,7 +50,6 @@ describe<{
 					tolerance: 100,
 				},
 				validatorRegistrationFee: "250000000000000000000",
-				vendorFieldLength: 255,
 			},
 			{
 				roundValidators: 53,
@@ -69,7 +68,6 @@ describe<{
 					tolerance: 100,
 				},
 				validatorRegistrationFee: "250000000000000000000",
-				vendorFieldLength: 255,
 			},
 			{
 				roundValidators: 53,
@@ -88,7 +86,6 @@ describe<{
 					tolerance: 100,
 				},
 				validatorRegistrationFee: "250000000000000000000",
-				vendorFieldLength: 255,
 			},
 		]);
 	});

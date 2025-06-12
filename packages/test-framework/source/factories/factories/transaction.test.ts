@@ -25,14 +25,12 @@ describe<{
 			nonce: 1,
 			senderPublicKey: "a".repeat(33),
 			timestamp: 1,
-			vendorField: "Dummy Field",
 			version: 2,
 		};
 
 		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
 			.get("Transfer")
 			.withOptions(options)
-			.withStates("vendorField")
 			.make();
 
 		assert.undefined(transaction.data.v);

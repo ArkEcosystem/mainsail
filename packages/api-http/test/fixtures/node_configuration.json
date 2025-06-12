@@ -28,8 +28,7 @@
 			"tolerance": 100
 		},
 		"roundValidators": 0,
-		"validatorRegistrationFee": "250000000000000000000",
-		"vendorFieldLength": 255
+		"validatorRegistrationFee": "250000000000000000000"
 	},
 	"core": {
 		"version": "0.0.1"

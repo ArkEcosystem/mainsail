@@ -71,7 +71,6 @@ describe<{
 						height: 0,
 						reward: "0",
 						satoshi: match.object,
-						vendorFieldLength: 255,
 					}),
 					match({
 						roundValidators: 53,
@@ -170,7 +169,6 @@ describe<{
 			symbol: "my",
 			token: "myn",
 			validators: 53,
-			vendorFieldLength: 255,
 			wif: 27,
 		});
 
@@ -211,7 +209,6 @@ describe<{
 						satoshi: match.object,
 						stageTimeoutout: 2000,
 						stageTimeoutoutIncrease: 2000,
-						vendorFieldLength: 255,
 					}),
 					match({
 						roundValidators: 53,
