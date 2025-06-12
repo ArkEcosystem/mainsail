@@ -72,3 +72,17 @@ export class InvalidNonce extends ValidatorException {
 		super(`Block ${block.data.hash} contains invalid nonce for sender ${sender}.`);
 	}
 }
+
+export class MaxPayloadExceeded extends ValidatorException {
+	public constructor(block: Block, totalSize: number, maxPayload: number) {
+		super(`Block ${block.data.hash} payload is too large ${totalSize} > ${maxPayload}.`);
+	}
+}
+
+export class InvalidPayloadSize extends ValidatorException {
+	public constructor(block: Block, expectedSize: number, actualSize: number) {
+		super(
+			`Block ${block.data.hash} payload is invalid. Expected size is ${expectedSize}, but actual size is  ${actualSize}.`,
+		);
+	}
+}
