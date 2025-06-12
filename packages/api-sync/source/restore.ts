@@ -159,7 +159,7 @@ export class Restore {
 
 				stateRepository: this.stateRepositoryFactory(entityManager),
 
-				totalSupply: isEmpty ? this.stateStore.getGenesisCommit().block.data.amount : BigNumber.ZERO,
+				totalSupply: BigNumber.ZERO,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				transactionTypeRepository: this.transactionTypeRepositoryFactory(entityManager),
 				userAttributes: {},
@@ -300,7 +300,6 @@ export class Restore {
 				}
 
 				context.lastHeight = block.header.number;
-				context.totalSupply = context.totalSupply.plus(block.header.amount.plus(block.header.fee));
 			}
 
 			// too large queries are not good for postgres
@@ -445,10 +444,7 @@ export class Restore {
 			await context.walletRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 		}
 
-		// When restoring from a legacy snapshot, add the total account balance since the genesis block totalAmount does not take them into account.
-		if (this.snapshotImporter) {
-			context.totalSupply = context.totalSupply.plus(totalAccountBalance);
-		}
+		context.totalSupply = context.totalSupply.plus(totalAccountBalance);
 
 		const t1 = performance.now();
 		this.logger.info(`Restored ${accounts.length.toLocaleString()} wallets in ${t1 - t0}ms`);
@@ -461,6 +457,8 @@ export class Restore {
 		let offset: bigint | undefined = 0n;
 
 		const legacyColdWallets: Models.LegacyColdWallet[] = [];
+
+		let totalLegacyAccountBalance = 0n;
 
 		do {
 			const result = await this.evm.getLegacyColdWallets(offset ?? 0n, BATCH_SIZE);
@@ -484,6 +482,9 @@ export class Restore {
 							txHash: wallet.mergeInfo.txHash,
 						},
 					};
+				} else {
+					// Only add balance for total supply if unmerged, else it's already on the account info object.
+					totalLegacyAccountBalance += wallet.balance;
 				}
 			}
 
@@ -493,6 +494,8 @@ export class Restore {
 		for (const batch of chunk(legacyColdWallets, 256)) {
 			await context.legacyColdWalletRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 		}
+
+		context.totalSupply = context.totalSupply.plus(totalLegacyAccountBalance);
 
 		const t1 = performance.now();
 		this.logger.info(`Restored ${legacyColdWallets.length.toLocaleString()} legacy cold wallets in ${t1 - t0}ms`);
