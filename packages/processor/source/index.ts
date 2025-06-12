@@ -7,6 +7,7 @@ import { BlockProcessor } from "./block-processor.js";
 import { BlockVerifier } from "./block-verifier.js";
 import { TransactionProcessor } from "./transaction-processor.js";
 import {
+	AmountVerifier,
 	ChainedVerifier,
 	GasLimitVerifier,
 	GeneratorVerifier,
@@ -30,6 +31,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			GeneratorVerifier,
 			VersionVerifier,
 			RewardVerifier,
+			AmountVerifier,
 			TransactionLengthVerifier,
 			GasLimitVerifier,
 			LegacyAttributeVerifier,

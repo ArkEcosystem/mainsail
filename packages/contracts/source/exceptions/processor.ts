@@ -35,9 +35,23 @@ export class InvalidBlockVersion extends ValidatorException {
 	}
 }
 
-export class InvalidBlockTransactionLength extends ValidatorException {
+export class MaxTransactionsExceeded extends ValidatorException {
 	public constructor(block: Block) {
 		super(`Block ${block.data.hash} has exceeded max transactions limit.`);
+	}
+}
+
+export class InvalidTransactionsLength extends ValidatorException {
+	public constructor(block: Block) {
+		super(
+			`Block ${block.data.hash} has invalid transactions length. Expected ${block.data.transactionsCount}, but got ${block.transactions.length}.`,
+		);
+	}
+}
+
+export class InvalidAmount extends ValidatorException {
+	public constructor(block: Block, actualAmount: string) {
+		super(`Block ${block.data.hash} has invalid amount. Expected ${block.data.amount}, but got ${actualAmount}.`);
 	}
 }
 
