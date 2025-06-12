@@ -74,20 +74,6 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.instance();
 	}
 
-	public vendorField(vendorField: string): TBuilder {
-		// const limit: number = this.configuration.getMilestone().vendorFieldLength;
-
-		// if (vendorField) {
-		// 	if (Buffer.byteLength(vendorField, "utf8") > limit) {
-		// 		throw new Exceptions.VendorFieldLengthExceededError(limit);
-		// 	}
-
-		// 	this.data.vendorField = vendorField;
-		// }
-
-		return this.instance();
-	}
-
 	public async sign(passphrase: string): Promise<TBuilder> {
 		return this.#signWithKeyPair(await this.keyPairFactory.fromMnemonic(passphrase));
 	}

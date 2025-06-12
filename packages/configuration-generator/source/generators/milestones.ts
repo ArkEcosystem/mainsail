@@ -37,7 +37,6 @@ export class MilestonesGenerator {
 					tolerance: 100,
 				},
 				validatorRegistrationFee: options.validatorRegistrationFee,
-				vendorFieldLength: options.vendorFieldLength,
 			},
 			{
 				height: options.initialBlockNumber + 1,

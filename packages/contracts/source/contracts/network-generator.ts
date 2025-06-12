@@ -24,7 +24,6 @@ export type MilestoneOptions = {
 		tolerance: number;
 	};
 	epoch: Date;
-	vendorFieldLength: number;
 };
 
 export type NetworkOptions = {

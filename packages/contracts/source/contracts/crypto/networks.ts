@@ -69,7 +69,6 @@ export type Milestone = {
 	satoshi: MilestoneSatoshi;
 	timeouts: MilestoneTimeouts;
 	snapshot?: MilestoneSnapshot;
-	vendorFieldLength: number;
 	validatorRegistrationFee: string;
 };
 

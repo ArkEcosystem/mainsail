@@ -140,12 +140,6 @@ export class Command extends Commands.Command {
 			default: new Date(),
 		},
 		{
-			name: "vendorFieldLength",
-			description: "The maximum length of transaction's vendor field",
-			schema: Joi.number().min(0).max(255),
-			default: 255,
-		},
-		{
 			name: "address",
 			description: "The desired address format of the network.",
 			schema: Joi.valid("bech32m", "base58", "keccak256"),

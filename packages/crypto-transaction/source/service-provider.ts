@@ -9,7 +9,7 @@ import { Serializer } from "./serializer.js";
 import { Signer } from "./signer.js";
 import { TransactionTypeFactory } from "./types/index.js";
 import { Utils as Utilities } from "./utilities.js";
-import { makeFormats, makeKeywords, schemas } from "./validation/index.js";
+import { makeKeywords, schemas } from "./validation/index.js";
 import { Verifier } from "./verifier.js";
 
 @injectable()
@@ -28,12 +28,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerValidation(): void {
-		for (const [name, format] of Object.entries(
-			makeFormats(this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)),
-		)) {
-			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addFormat(name, format);
-		}
-
 		for (const keyword of Object.values(
 			makeKeywords(this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)),
 		)) {

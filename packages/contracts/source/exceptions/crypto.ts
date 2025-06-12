@@ -127,12 +127,6 @@ export class MinimumPaymentCountSubceededError extends Exception {
 	}
 }
 
-export class VendorFieldLengthExceededError extends Exception {
-	public constructor(limit: number) {
-		super(`Length of vendor field exceeded the allowed maximum ${limit}.`);
-	}
-}
-
 export class MissingTransactionSignatureError extends Exception {
 	public constructor() {
 		super(`Expected the transaction to be signed.`);

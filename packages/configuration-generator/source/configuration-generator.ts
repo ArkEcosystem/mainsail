@@ -84,7 +84,6 @@ export class ConfigurationGenerator {
 			rewardHeight: 75_600,
 			validatorRegistrationFee: "250000000000000000000",
 			validators: 53,
-			vendorFieldLength: 255,
 			wif: 186,
 			...options,
 		};
