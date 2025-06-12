@@ -24,7 +24,6 @@ export class TransactionResource implements Contracts.Api.Resource {
 			// timestamp: resource.timestamp,
 			// type: resource.type,
 			// typeGroup: resource.typeGroup,
-			// vendorField: resource.vendorField,
 			// version: resource.version,
 		};
 	}

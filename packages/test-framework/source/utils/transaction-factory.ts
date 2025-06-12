@@ -35,7 +35,6 @@ export class TransactionFactory {
 	#version: number | undefined;
 	#senderPublicKey: string | undefined;
 	#expiration: number | undefined;
-	#vendorField: string | undefined;
 
 	protected constructor(app?: Contracts.Kernel.Application) {
 		// @ts-ignore - this is only needed because of the "getNonce"
@@ -50,15 +49,10 @@ export class TransactionFactory {
 	// public async transfer(
 	// 	recipientId?: string,
 	// 	amount: BigNumber = BigNumber.WEI.times(2),
-	// 	vendorField?: string,
 	// ): Promise<TransactionFactory> {
 	// 	const builder = new TransferBuilder()
 	// 		.amount(amount.toFixed())
 	// 		.recipientId(recipientId || (await this.addressFactory.fromMnemonic(defaultPassphrase)));
-
-	// 	if (vendorField) {
-	// 		builder.vendorField(vendorField);
-	// 	}
 
 	// 	this.builder = builder;
 
@@ -159,12 +153,6 @@ export class TransactionFactory {
 		return this;
 	}
 
-	public withVendorField(vendorField: string): TransactionFactory {
-		this.#vendorField = vendorField;
-
-		return this;
-	}
-
 	public withPassphrase(passphrase: string): TransactionFactory {
 		this.#passphrase = passphrase;
 
@@ -234,16 +222,6 @@ export class TransactionFactory {
 		let nonce = await this.getNonce();
 
 		for (let index = 0; index < quantity; index++) {
-			if (this.builder.constructor.name === "TransferBuilder") {
-				// @FIXME: when we use any of the "withPassphrase*" methods the builder will
-				// always remember the previous vendor field instead generating a new one on each iteration
-				const vendorField: string = this.builder.data.vendorField;
-
-				if (!vendorField || (vendorField && vendorField.startsWith("Test Transaction"))) {
-					this.builder.vendorField(`Test Transaction ${index + 1}`);
-				}
-			}
-
 			// if (
 			// 	this.builder.constructor.name === "ValidatorRegistrationBuilder" && // @FIXME: when we use any of the "withPassphrase*" methods the builder will
 			// 	// always remember the previous username instead generating a new one on each iteration
@@ -267,10 +245,6 @@ export class TransactionFactory {
 
 			if (this.#expiration) {
 				this.builder.expiration(this.#expiration);
-			}
-
-			if (this.#vendorField) {
-				this.builder.vendorField(this.#vendorField);
 			}
 
 			this.builder.senderPublicKey(this.#senderPublicKey);

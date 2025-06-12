@@ -33,8 +33,4 @@ export abstract class Transaction implements Contracts.Crypto.Transaction {
 		data.nonce = BigNumber.make(data.nonce);
 		return data;
 	}
-
-	public hasVendorField(): boolean {
-		return false;
-	}
 }

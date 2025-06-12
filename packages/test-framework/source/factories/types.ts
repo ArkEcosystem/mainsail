@@ -19,7 +19,6 @@ export type TransactionOptions = {
 export type TransferOptions = TransactionOptions & {
 	amount?: string;
 	recipientId?: string;
-	vendorField?: string;
 };
 
 export type ValidatorRegistrationOptions = TransactionOptions & {

@@ -34,10 +34,6 @@ export class Signer {
 
 		const states = ["sign"];
 
-		if (options.vendorField) {
-			states.unshift("vendorField");
-		}
-
 		const builder = await this.#factoryBuilder
 			.get("Transfer")
 			.withOptions(options)

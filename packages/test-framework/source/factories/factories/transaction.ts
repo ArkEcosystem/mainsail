@@ -74,9 +74,7 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 		);
 	});
 
-	factory
-		.get("Transfer")
-		.state("vendorField", ({ entity, options }) => entity.vendorField(options.vendorField || "Hello World"));
+	factory.get("Transfer");
 
 	// @ts-ignore
 	factory.get("Transfer").state("sign", sign);
