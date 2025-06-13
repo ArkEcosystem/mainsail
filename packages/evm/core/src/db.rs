@@ -553,14 +553,14 @@ impl PersistentDB {
         &mut self,
         block_number: u64,
         address: Address,
-    ) -> Result<Option<AccountInfo>, Error> {
+    ) -> Result<(Option<AccountInfo>, bool), Error> {
         match self.inner.borrow().accounts_history {
             Some(db) => {
                 let tx_env = self.env.read_txn()?;
 
                 match self.accounts_history.as_ref() {
                     Some(accounts_history) => {
-                        let data = accounts_history.get_by_block_and_address(
+                        let (data, missing_fallback) = accounts_history.get_by_block_and_address(
                             &tx_env,
                             &db,
                             block_number,
@@ -568,19 +568,22 @@ impl PersistentDB {
                         )?;
 
                         match data {
-                            Some(data) => Ok(Some(AccountInfo {
-                                balance: data.balance,
-                                nonce: data.nonce,
-                                code_hash: data.code_hash,
-                                ..Default::default()
-                            })),
-                            None => Ok(None),
+                            Some(data) => Ok((
+                                Some(AccountInfo {
+                                    balance: data.balance,
+                                    nonce: data.nonce,
+                                    code_hash: data.code_hash,
+                                    ..Default::default()
+                                }),
+                                missing_fallback,
+                            )),
+                            None => Ok((None, missing_fallback)),
                         }
                     }
-                    None => Ok(None),
+                    None => Ok((None, false)),
                 }
             }
-            None => Ok(None),
+            None => Ok((None, false)),
         }
     }
 

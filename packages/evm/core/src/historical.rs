@@ -72,16 +72,20 @@ impl AccountHistory {
         >,
         block_number: u64,
         address: &Address,
-    ) -> Result<Option<HistoricalAccountData>, Error> {
+    ) -> Result<(Option<HistoricalAccountData>, bool), Error> {
         let mut iter = database.rev_range(txn, &..=block_number)?;
+
+        let mut missing_fallback = false;
 
         while let Some((_, history)) = iter.next().transpose()? {
             if let Some(data) = history.get(address) {
-                return Ok(Some(data.clone()));
+                return Ok((Some(data.clone()), false));
             }
+
+            missing_fallback = true;
         }
 
-        Ok(None)
+        Ok((None, missing_fallback))
     }
 }
 
@@ -229,12 +233,13 @@ fn test_account_history() {
             .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
 
-        assert!(account.is_some_and(|a| a
+        assert!(account.0.is_some_and(|a| a
             == HistoricalAccountData {
                 balance: balance,
                 nonce: nonce,
                 code_hash: revm::primitives::KECCAK_EMPTY,
             }));
+        assert_eq!(account.1, false);
     }
 
     // Assert Account 2 at respective block_numbers (1 - 5)
@@ -279,12 +284,13 @@ fn test_account_history() {
             .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
 
-        assert!(account.is_some_and(|a| a
+        assert!(account.0.is_some_and(|a| a
             == HistoricalAccountData {
                 balance: balance,
                 nonce: nonce,
                 code_hash: revm::primitives::KECCAK_EMPTY,
             }));
+        assert_eq!(account.1, false);
     }
 
     // Assert Account 3 at respective block_numbers (1 - 5)
@@ -298,7 +304,7 @@ fn test_account_history() {
         let account = history
             .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
-        assert!(account.is_none());
+        assert_eq!(account, (None, true));
     }
 
     for (block_number, address, balance, nonce) in vec![
@@ -335,12 +341,13 @@ fn test_account_history() {
             .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
 
-        assert!(account.is_some_and(|a| a
+        assert!(account.0.is_some_and(|a| a
             == HistoricalAccountData {
                 balance: balance,
                 nonce: nonce,
                 code_hash: revm::primitives::KECCAK_EMPTY,
             }));
+        assert_eq!(account.1, false);
     }
 
     // Assert Account 4 at respective block_numbers (1 - 5)
@@ -366,7 +373,8 @@ fn test_account_history() {
         let account = history
             .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
-        assert!(account.is_none());
+        assert!(account.0.is_none());
+        assert_eq!(account.1, true);
     }
 
     for (block_number, address, balance, nonce) in vec![
@@ -382,12 +390,13 @@ fn test_account_history() {
             .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
 
-        assert!(account.is_some_and(|a| a
+        assert!(account.0.is_some_and(|a| a
             == HistoricalAccountData {
                 balance: balance,
                 nonce: nonce,
                 code_hash: revm::primitives::KECCAK_EMPTY,
             }));
+        assert_eq!(account.1, false);
     }
 }
 
@@ -454,7 +463,7 @@ fn test_accounts_history_capacity() {
         let account = history
             .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
-        assert!(account.is_none());
+        assert_eq!(account, (None, false));
     }
 
     // Assert accounts found at respective block_numbers (2+)
@@ -503,12 +512,13 @@ fn test_accounts_history_capacity() {
             .get_by_block_and_address(&mut txn, history_db, block_number, &address)
             .unwrap();
 
-        assert!(account.is_some_and(|a| a
+        assert!(account.0.is_some_and(|a| a
             == HistoricalAccountData {
                 balance: balance,
                 nonce: nonce,
                 code_hash: revm::primitives::KECCAK_EMPTY,
             }));
+        assert!(account.1 == false);
     }
 
     // Write empty blocks until everything is evicted
@@ -528,7 +538,7 @@ fn test_accounts_history_capacity() {
             let account = history
                 .get_by_block_and_address(&mut txn, history_db, i, &address)
                 .unwrap();
-            assert!(account.is_none());
+            assert_eq!(account, (None, i >= 10 - history.capacity));
         }
     }
 }
