@@ -143,9 +143,20 @@ impl EvmInner {
     ) -> std::result::Result<Bytes, EVMError<String>> {
         let account = match block_number {
             None => self.persistent_db.basic(address),
-            Some(block_number) => self
-                .persistent_db
-                .get_historical_account_info(block_number, address),
+            Some(block_number) => {
+                let result = self
+                    .persistent_db
+                    .get_historical_account_info(block_number, address);
+
+                match result {
+                    Ok((historical, _)) if historical.is_some() => Ok(historical),
+                    Ok((_, missing_fallback)) if missing_fallback => {
+                        self.persistent_db.basic(address)
+                    } // fallback
+                    Ok(_) => Ok(None),
+                    Err(err) => Err(err),
+                }
+            }
         }
         .map_err(|err| EVMError::Database(format!("account lookup failed: {}", err).into()))?;
 
@@ -362,9 +373,20 @@ impl EvmInner {
     ) -> std::result::Result<AccountInfo, EVMError<String>> {
         let result = match block_number {
             None => self.persistent_db.basic(address),
-            Some(block_number) => self
-                .persistent_db
-                .get_historical_account_info(block_number, address),
+            Some(block_number) => {
+                let result = self
+                    .persistent_db
+                    .get_historical_account_info(block_number, address);
+
+                match result {
+                    Ok((historical, _)) if historical.is_some() => Ok(historical),
+                    Ok((_, missing_fallback)) if missing_fallback => {
+                        self.persistent_db.basic(address)
+                    } // fallback
+                    Ok(_) => Ok(None),
+                    Err(err) => Err(err),
+                }
+            }
         };
 
         match result {
