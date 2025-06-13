@@ -49,6 +49,12 @@ export class InvalidTransactionsLength extends ValidatorException {
 	}
 }
 
+export class DuplicatedTransaction extends ValidatorException {
+	public constructor(block: Block, hash: string) {
+		super(`Block ${block.data.hash} has duplicated transaction ${hash}.`);
+	}
+}
+
 export class InvalidAmount extends ValidatorException {
 	public constructor(block: Block, actualAmount: string) {
 		super(`Block ${block.data.hash} has invalid amount. Expected ${block.data.amount}, but got ${actualAmount}.`);

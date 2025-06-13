@@ -15,6 +15,7 @@ import {
 	RewardVerifier,
 	SizeVerifier,
 	TimestampVerifier,
+	TransactionDuplicatesVerifier,
 	TransactionLengthVerifier,
 	VersionVerifier,
 } from "./verifiers/index.js";
@@ -33,6 +34,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			RewardVerifier,
 			AmountVerifier,
 			TransactionLengthVerifier,
+			TransactionDuplicatesVerifier,
 			GasLimitVerifier,
 			LegacyAttributeVerifier,
 		]) {
