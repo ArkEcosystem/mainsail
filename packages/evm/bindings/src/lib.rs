@@ -16,7 +16,7 @@ use mainsail_evm_core::{
     logs_bloom,
     receipt::{TxReceipt, map_execution_result},
     state_changes::AccountUpdate,
-    state_commit, state_hash,
+    state_commit, state_root,
 };
 use napi::{JsBigInt, JsObject, JsString, bindgen_prelude::*};
 use napi_derive::napi;
@@ -801,7 +801,7 @@ impl EvmInner {
         }
     }
 
-    pub fn state_hash(
+    pub fn state_root(
         &mut self,
         commit_key: CommitKey,
         current_hash: B256,
@@ -811,12 +811,12 @@ impl EvmInner {
             .get_mut(&commit_key)
             .expect("pending commit exists");
 
-        let result = state_hash::calculate(&mut self.persistent_db, pending_commit, current_hash);
+        let result = state_root::calculate(&mut self.persistent_db, pending_commit, current_hash);
 
         match result {
             Ok(result) => Ok(result.encode_hex()),
             Err(err) => Err(EVMError::Database(
-                format!("state_hash failed: {}", err).into(),
+                format!("state_root failed: {}", err).into(),
             )),
         }
     }
@@ -1454,7 +1454,7 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<string>")]
-    pub fn state_hash(
+    pub fn state_root(
         &mut self,
         node_env: Env,
         commit_key: JsCommitKey,
@@ -1463,7 +1463,7 @@ impl JsEvmWrapper {
         let commit_key = CommitKey::try_from(commit_key)?;
         let current_hash = utils::convert_string_to_b256(current_hash)?;
         node_env.execute_tokio_future(
-            Self::state_hash_async(self.evm.clone(), commit_key, current_hash),
+            Self::state_root_async(self.evm.clone(), commit_key, current_hash),
             |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
         )
     }
@@ -1786,13 +1786,13 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn state_hash_async(
+    async fn state_root_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         commit_key: CommitKey,
         current_hash: B256,
     ) -> Result<String> {
         let mut lock = evm.lock().await;
-        let result = lock.state_hash(commit_key, current_hash);
+        let result = lock.state_root(commit_key, current_hash);
 
         match result {
             Ok(result) => Result::Ok(result),

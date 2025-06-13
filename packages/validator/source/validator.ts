@@ -70,15 +70,15 @@ export class Validator implements Contracts.Validator.Validator {
 		const previousBlock = this.stateStore.getLastBlock();
 		const blockNumber = previousBlock.header.number + 1;
 
-		const {
-			logsBloom,
-			stateRoot: stateHash,
-			transactions,
-		} = await this.#getTransactionsForForging(generatorAddress, timestamp, {
-			blockNumber: BigInt(blockNumber),
-			round: BigInt(round),
-		});
-		return this.#makeBlock(round, generatorAddress, logsBloom, stateHash, transactions, timestamp);
+		const { logsBloom, stateRoot, transactions } = await this.#getTransactionsForForging(
+			generatorAddress,
+			timestamp,
+			{
+				blockNumber: BigInt(blockNumber),
+				round: BigInt(round),
+			},
+		);
+		return this.#makeBlock(round, generatorAddress, logsBloom, stateRoot, transactions, timestamp);
 	}
 
 	public async propose(
@@ -250,7 +250,7 @@ export class Validator implements Contracts.Validator.Validator {
 			}
 
 			const logsBloom = await evm.logsBloom(commitKey);
-			const stateRoot = await evm.stateHash(commitKey, previousBlock.header.stateRoot);
+			const stateRoot = await evm.stateRoot(commitKey, previousBlock.header.stateRoot);
 
 			return {
 				logsBloom,

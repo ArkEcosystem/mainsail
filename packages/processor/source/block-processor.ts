@@ -90,7 +90,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			this.#verifyTotalFee(block);
 			await this.#updateRewardsAndVotes(unit);
 			await this.#calculateRoundValidators(unit);
-			await this.#verifyStateHash(block);
+			await this.#verifyStateRoot(block);
 			await this.#verifyLogsBloom(block);
 
 			processResult.success = true;
@@ -191,7 +191,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 	}
 
-	async #verifyStateHash(block: Contracts.Crypto.Block): Promise<void> {
+	async #verifyStateRoot(block: Contracts.Crypto.Block): Promise<void> {
 		let previousStateRoot;
 		if (block.header.number === this.configuration.getGenesisHeight()) {
 			// Assume snapshot is present if the previous block points to a non-zero hash
@@ -207,7 +207,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			previousStateRoot = previousBlock.header.stateRoot;
 		}
 
-		const stateRoot = await this.evm.stateHash(
+		const stateRoot = await this.evm.stateRoot(
 			{
 				blockHash: block.header.hash,
 				blockNumber: BigInt(block.header.number),

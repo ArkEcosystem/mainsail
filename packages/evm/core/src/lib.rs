@@ -8,4 +8,4 @@ pub mod logs_bloom;
 pub mod receipt;
 pub mod state_changes;
 pub mod state_commit;
-pub mod state_hash;
+pub mod state_root;

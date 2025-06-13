@@ -332,7 +332,7 @@ export class GenesisBlockGenerator extends Generator {
 					proposer,
 					reward: BigNumber.ZERO,
 					round: 0,
-					stateRoot: await this.evm.stateHash(
+					stateRoot: await this.evm.stateRoot(
 						commitKey,
 						options.snapshot?.snapshotHash ??
 							"0000000000000000000000000000000000000000000000000000000000000000",

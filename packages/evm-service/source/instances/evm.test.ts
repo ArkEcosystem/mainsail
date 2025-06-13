@@ -720,7 +720,7 @@ describe<{
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
 		await instance.prepareNextCommit({ commitKey });
 
-		const hash = await instance.stateHash(
+		const hash = await instance.stateRoot(
 			commitKey,
 			"0000000000000000000000000000000000000000000000000000000000000000",
 		);

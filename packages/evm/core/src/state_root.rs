@@ -20,7 +20,7 @@ pub fn calculate(
         pending_commit.built_commit.replace(state_commit);
     };
 
-    calculate_state_hash(
+    calculate_state_root(
         current_hash,
         pending_commit
             .built_commit
@@ -31,7 +31,7 @@ pub fn calculate(
     )
 }
 
-fn calculate_state_hash(
+fn calculate_state_root(
     current_hash: B256,
     state: &StateCommit,
     committed_hashes: Option<(B256, B256, B256)>,
@@ -122,8 +122,8 @@ fn prepare(state: &StateCommit) -> StateChangeset {
 }
 
 #[test]
-fn test_calculate_state_hash() {
-    let result = calculate_state_hash(B256::ZERO, &Default::default(), None, &None).expect("ok");
+fn test_calculate_state_root() {
+    let result = calculate_state_root(B256::ZERO, &Default::default(), None, &None).expect("ok");
     assert_eq!(
         result,
         revm::primitives::b256!("0722d8002560934d7004b8b849101024bf7ec2aaa2c3396f7292d4ac8cdae5ab")

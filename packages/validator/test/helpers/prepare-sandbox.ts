@@ -75,7 +75,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 			initializeGenesis: async () => {},
 			logsBloom: async () => "0".repeat(512),
 			prepareNextCommit: async () => {},
-			stateHash: async () => "0000000000000000000000000000000000000000000000000000000000000000",
+			stateRoot: async () => "0000000000000000000000000000000000000000000000000000000000000000",
 			updateRewardsAndVotes: async () => {},
 			snapshot: async () => {},
 			rollback: async () => {},

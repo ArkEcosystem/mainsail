@@ -39,7 +39,7 @@ export interface Instance extends CommitHandler {
 	calculateRoundValidators(context: CalculateRoundValidatorsContext): Promise<void>;
 	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;
 	logsBloom(commitKey: CommitKey): Promise<string>;
-	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
+	stateRoot(commitKey: CommitKey, currentHash: string): Promise<string>;
 	codeAt(address: string, height?: bigint): Promise<string>;
 	storageAt(address: string, slot: bigint): Promise<string>;
 	snapshot(commitKey: CommitKey): Promise<void>;

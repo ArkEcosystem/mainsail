@@ -100,15 +100,15 @@ export const makeCustomProposal = async (
 		payloadLength += serialized.length;
 	}
 
-	const stateHash = await transactionValidator.getEvm().stateHash(commitKey, previousBlock.header.stateHash);
+	const stateRoot = await transactionValidator.getEvm().stateRoot(commitKey, previousBlock.header.stateRoot);
 
 	const hashFactory = node.app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
 	const hashSize = node.app.get<number>(Identifiers.Cryptography.Hash.Size.SHA256);
 
 	let byteOffset = 1 + 6 + 4 + 4 + hashSize; // see headerSize
 
-	// stateHash
-	Buffer.from(stateHash, "hex").copy(blockBuffer, byteOffset);
+	// stateRoot
+	Buffer.from(stateRoot, "hex").copy(blockBuffer, byteOffset);
 	byteOffset += hashSize;
 
 	// numberOfTransactions

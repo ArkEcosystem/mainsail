@@ -27,7 +27,7 @@ use crate::{
     receipt::{TxReceipt, map_execution_result},
     state_changes,
     state_commit::StateCommit,
-    state_hash,
+    state_root,
 };
 
 #[derive(Debug)]
@@ -988,9 +988,9 @@ impl PersistentDB {
                 rwtxn,
                 &key.0,
                 &CommitReceipts {
-                    accounts_hash: state_hash::calculate_accounts_hash(&change_set)?,
-                    contracts_hash: state_hash::calculate_contracts_hash(&change_set)?,
-                    storage_hash: state_hash::calculate_storage_hash(&change_set)?,
+                    accounts_hash: state_root::calculate_accounts_hash(&change_set)?,
+                    contracts_hash: state_root::calculate_contracts_hash(&change_set)?,
+                    storage_hash: state_root::calculate_storage_hash(&change_set)?,
                     tx_receipts,
                 },
             )?;

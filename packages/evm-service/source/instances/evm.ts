@@ -169,8 +169,8 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return this.#evm.storageAt(address, slot);
 	}
 
-	public async stateHash(commitKey: Contracts.Evm.CommitKey, currentHash: string): Promise<string> {
-		return this.#evm.stateHash(commitKey, currentHash);
+	public async stateRoot(commitKey: Contracts.Evm.CommitKey, currentHash: string): Promise<string> {
+		return this.#evm.stateRoot(commitKey, currentHash);
 	}
 
 	public async logsBloom(commitKey: Contracts.Evm.CommitKey): Promise<string> {
