@@ -1,20 +1,54 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
-import { decodeRlp, ethers, getAddress } from "ethers";
+import { decodeRlp, ethers, getAddress, RlpStructuredData } from "ethers";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
 	public async deserialize(serialized: Buffer | string): Promise<Contracts.Crypto.Transaction> {
 		const data = {} as Contracts.Crypto.TransactionData;
 
-		const encodedRlp =
-			"0x" + (typeof serialized === "string" ? serialized.slice(2) : serialized.toString("hex").slice(2));
+		let rlpBuffer =
+			typeof serialized === "string"
+				? Buffer.from(serialized.startsWith("0x") ? serialized.slice(2) : serialized, "hex")
+				: serialized;
 
-		const decoded = decodeRlp(encodedRlp);
+		// Remove type prefix (e.g. 02) if it's a EIP1559 tx (`decodeRlp` expects input to be without)
+		const isPrefixed = rlpBuffer[0] < 0xc0;
+		if (isPrefixed) {
+			if (rlpBuffer[0] !== 0x02) {
+				throw new Error("expected EIP1559 transaction");
+			}
+
+			rlpBuffer = rlpBuffer.subarray(1);
+		}
+
+		const decoded = decodeRlp(new Uint8Array(rlpBuffer));
+
+		if (isPrefixed) {
+			this.#decodeEIP1559Transaction(decoded, data);
+		} else {
+			this.#decodeLegacyTransaction(decoded, data);
+		}
+
+		const instance: Contracts.Crypto.Transaction = this.transactionTypeFactory.create(data);
+
+		const eip1559Prefix = 0x02; // marker for Type 2 (EIP1559) transaction which is the standard nowadays
+		instance.serialized = isPrefixed ? Buffer.concat([Buffer.from([eip1559Prefix]), rlpBuffer]) : rlpBuffer;
+
+		return instance;
+	}
+
+	#decodeEIP1559Transaction(decoded: RlpStructuredData, data: Contracts.Crypto.TransactionData): void {
+		if (decoded.length < 9 || decoded.length > 13) {
+			throw new Error("RLP data out of range");
+		}
 
 		const recipientAddressRaw = this.#parseAddress(decoded[5].toString());
 
@@ -38,18 +72,48 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 			data.r = decoded[10].toString().slice(2);
 			data.s = decoded[11].toString().slice(2);
 
-			// Legacy second signature
+			// Legacy second signature is only supported for EIP-1559 transactions
 			if (decoded.length === 13) {
 				data.legacySecondSignature = decoded[12].toString().slice(2);
 			}
 		}
+	}
 
-		const instance: Contracts.Crypto.Transaction = this.transactionTypeFactory.create(data);
+	#decodeLegacyTransaction(decoded: RlpStructuredData, data: Contracts.Crypto.TransactionData): void {
+		if (decoded.length < 6 || decoded.length > 9) {
+			throw new Error("legacy RLP data out of range");
+		}
 
-		const eip1559Prefix = "02"; // marker for Type 2 (EIP1559) transaction which is the standard nowadays
-		instance.serialized = Buffer.from(`${eip1559Prefix}${encodedRlp.slice(2)}`, "hex");
+		// [nonce, gasPrice, gasLimit, to, value, data, v, r, s];
+		data.nonce = BigNumber.make(this.#parseNumber(decoded[0].toString()));
+		data.gasPrice = this.#parseNumber(decoded[1].toString());
+		data.gas = this.#parseNumber(decoded[2].toString());
 
-		return instance;
+		const recipientAddressRaw = this.#parseAddress(decoded[3].toString());
+		data.to = recipientAddressRaw ? getAddress(recipientAddressRaw) : undefined;
+
+		data.value = this.#parseBigNumber(decoded[4].toString());
+		data.data = this.#parseData(decoded[5].toString());
+
+		// NOTE:
+		// The chainId is encoded in 'v' which is part of the optional signature.
+		// In the case of absence default to the config for the chainId.
+
+		// Signature
+		if (decoded.length >= 9) {
+			const v = this.#parseNumber(decoded[6].toString());
+			const chainId = Math.floor((v - 35) / 2);
+
+			data.network = chainId;
+
+			const normalizedV = v >= 35 ? ((v - 1) % 2) + 27 : v;
+			data.v = normalizedV;
+
+			data.r = decoded[7].toString().slice(2);
+			data.s = decoded[8].toString().slice(2);
+		} else {
+			data.network = this.configuration.get("network.chainId");
+		}
 	}
 
 	#parseNumber(value: string): number {
