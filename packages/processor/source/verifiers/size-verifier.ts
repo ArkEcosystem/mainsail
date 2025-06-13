@@ -25,5 +25,14 @@ export class SizeVerifier implements Contracts.Processor.Handler {
 		if (totalSize !== actualSize) {
 			throw new Exceptions.InvalidPayloadSize(block, totalSize, actualSize);
 		}
+
+		let totalPayloadLength = block.transactions.length * 4;
+		for (const transaction of block.transactions) {
+			totalPayloadLength += transaction.serialized.byteLength;
+		}
+
+		if (totalPayloadLength !== block.data.payloadSize) {
+			throw new Exceptions.InvalidPayloadSize(block, totalSize, totalPayloadLength);
+		}
 	}
 }

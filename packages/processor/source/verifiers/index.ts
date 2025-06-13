@@ -8,4 +8,5 @@ export * from "./size-verifier.js";
 export * from "./timestamp-verifier.js";
 export * from "./transaction-duplicates-verifier.js";
 export * from "./transaction-length-verifier.js";
+export * from "./transaction-root-verifier.js";
 export * from "./version-verifier.js";

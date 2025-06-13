@@ -17,6 +17,7 @@ import {
 	TimestampVerifier,
 	TransactionDuplicatesVerifier,
 	TransactionLengthVerifier,
+	TransactionsRootVerifier,
 	VersionVerifier,
 } from "./verifiers/index.js";
 
@@ -35,6 +36,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			AmountVerifier,
 			TransactionLengthVerifier,
 			TransactionDuplicatesVerifier,
+			TransactionsRootVerifier,
 			GasLimitVerifier,
 			LegacyAttributeVerifier,
 		]) {

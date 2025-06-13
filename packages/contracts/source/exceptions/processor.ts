@@ -49,6 +49,14 @@ export class InvalidTransactionsLength extends ValidatorException {
 	}
 }
 
+export class InvalidTransactionsRoot extends ValidatorException {
+	public constructor(block: Block, actualTransactionRoot: string) {
+		super(
+			`Block ${block.data.hash} has invalid transactions root. Expected ${block.data.transactionsRoot}, but got ${actualTransactionRoot}.`,
+		);
+	}
+}
+
 export class DuplicatedTransaction extends ValidatorException {
 	public constructor(block: Block, hash: string) {
 		super(`Block ${block.data.hash} has duplicated transaction ${hash}.`);
