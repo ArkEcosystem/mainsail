@@ -3,12 +3,6 @@ import { BigNumber } from "@mainsail/utils";
 import { Mutable } from "../../utilities.js";
 import { Transaction, TransactionData, TransactionJson } from "./transactions.js";
 
-export interface BlockVerification {
-	readonly verified: boolean;
-	readonly errors: string[];
-	readonly containsMultiSignatures: boolean;
-}
-
 export type BlockTag = "latest" | "finalized" | "safe";
 export type BlockHeader = Exclude<BlockData, "transactions">;
 
@@ -94,8 +88,4 @@ export interface BlockDeserializer {
 	deserializeHeader(serialized: Buffer): Promise<BlockHeader>;
 
 	deserializeWithTransactions(serialized: Buffer): Promise<BlockWithTransactions>;
-}
-
-export interface BlockVerifier {
-	verify(block: Block): Promise<BlockVerification>;
 }

@@ -66,7 +66,6 @@ export const Identifiers = {
 			HashFactory: Symbol("Crypto<Block.HashFactory>"),
 			HeaderSize: Symbol("Crypto<Block.HeaderSize>"),
 			Serializer: Symbol("Crypto<Block.Serializer>"),
-			Verifier: Symbol("Crypto<Block.Verifier>"),
 		},
 		Commit: {
 			Deserializer: Symbol("Crypto<Commit.Deserializer>"),

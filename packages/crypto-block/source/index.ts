@@ -7,14 +7,12 @@ import { BlockFactory } from "./factory.js";
 import { HashFactory } from "./hash.factory.js";
 import { schemas } from "./schemas.js";
 import { Serializer } from "./serializer.js";
-import { Verifier } from "./verifier.js";
 
 export * from "./deserializer.js";
 export * from "./factory.js";
 export * from "./hash.factory.js";
 export * from "./schemas.js";
 export * from "./serializer.js";
-export * from "./verifier.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -46,7 +44,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Block.Factory).to(BlockFactory).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Block.HashFactory).to(HashFactory).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Block.Verifier).to(Verifier).inSingletonScope();
 
 		for (const schema of Object.values(schemas)) {
 			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);

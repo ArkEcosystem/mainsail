@@ -15,9 +15,6 @@ export class GenesisBlockGenerator extends Generator {
 	@inject(Identifiers.Cryptography.Commit.Serializer)
 	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
 
-	@inject(Identifiers.Cryptography.Block.Verifier)
-	private readonly blockVerifier!: Contracts.Crypto.BlockVerifier;
-
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly transactionVerifier!: Contracts.Crypto.TransactionVerifier;
 
@@ -363,11 +360,6 @@ export class GenesisBlockGenerator extends Generator {
 
 		if (verifiedTransactions.includes(false)) {
 			throw new Error("genesis block contains invalid transactions");
-		}
-
-		const verified = await this.blockVerifier.verify(genesis.block);
-		if (!verified.verified) {
-			throw new Error(`failed to generate genesis block: ${JSON.stringify(verified.errors)}`);
 		}
 	}
 
