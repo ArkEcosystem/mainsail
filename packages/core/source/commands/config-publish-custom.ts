@@ -1,10 +1,13 @@
 import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { http } from "@mainsail/utils";
-import { existsSync, writeFileSync } from "fs";
+import { createWriteStream, existsSync, writeFileSync } from "fs";
 import { ensureDirSync, removeSync } from "fs-extra/esm";
+import got from "got";
 import Joi from "joi";
 import { join } from "path";
+import stream from "stream";
+import { promisify } from "util";
 
 const ENV = `MAINSAIL_LOG_LEVEL=info
 MAINSAIL_LOG_LEVEL_FILE=debug`;
@@ -150,19 +153,22 @@ export class Command extends Commands.Command {
 						return true;
 					}
 
-					// if (existsSync(`${configDestination}/crypto.json`) && !flags.overwrite) {
-					// 	return true;
-					// }
+					if (
+						existsSync(`${configDestination}/snapshot/${this.#getFileName(flags.snapshot)}`) &&
+						!flags.overwrite
+					) {
+						return true;
+					}
 
 					return false;
 				},
 				task: async () => {
-					const snapshotDir = join(configDestination, "snapshot");
-					ensureDirSync(snapshotDir);
+					const snapshotDirectory = join(configDestination, "snapshot");
+					ensureDirSync(snapshotDirectory);
 
-					writeFileSync(
-						join(configDestination, "snapshot", this.#getAndVerifyFileName(flags.snapshot)),
-						await this.#getFile(flags.snapshot),
+					await this.#downloadFile(
+						flags.snapshot,
+						join(snapshotDirectory, this.#verifyFileName(this.#getFileName(flags.snapshot))),
 					);
 				},
 				title: "Publish snapshot (<hash>.compressed)",
@@ -183,7 +189,7 @@ export class Command extends Commands.Command {
 		}
 	}
 
-	#getAndVerifyFileName(url: string): string {
+	#getFileName(url: string): string {
 		const parts = url.split("/");
 		const fileName = parts.at(-1);
 
@@ -191,19 +197,23 @@ export class Command extends Commands.Command {
 			throw new Error("Invalid URL provided, cannot extract file name.");
 		}
 
-		this.#verifyFileName(fileName);
-
 		return fileName;
 	}
 
-	#verifyFileName(fileName: string): void {
+	#verifyFileName(fileName: string): string {
 		const validFileName = Joi.string()
 			.regex(/^[a-z0-9]+\.(compressed)$/)
 			.required();
 		const { error } = validFileName.validate(fileName);
 
 		if (error) {
-			throw new Error(`Invalid file name: ${fileName}. Expected format: <hash>.compressed`);
+			throw new Error(`Invalid file name: ${fileName}. Expected format: <hash>.compressed.`);
 		}
+
+		return fileName;
+	}
+
+	async #downloadFile(source: string, destination: string): Promise<void> {
+		await promisify(stream.pipeline)(got.stream(source), createWriteStream(destination));
 	}
 }
