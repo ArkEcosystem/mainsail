@@ -37,6 +37,7 @@ export class Command extends Commands.Command {
 			.setFlag("app", "The link to the app.json file.", Joi.string().uri())
 			.setFlag("peers", "The link to the peers.json file.", Joi.string().uri())
 			.setFlag("crypto", "The link to the app.json file.", Joi.string().uri())
+			.setFlag("snapshot", "The link to the <snapshot>.compressed file.", Joi.string().uri())
 			.setFlag("reset", "Using the --reset flag will remove existing configuration.", Joi.boolean())
 			.setFlag("overwrite", "Using the --overwrite will overwrite existing configuration.", Joi.boolean());
 	}
@@ -143,12 +144,66 @@ export class Command extends Commands.Command {
 				},
 				title: "Publish crypto (crypto.json)",
 			},
+			{
+				skip: () => {
+					if (!flags.snapshot) {
+						return true;
+					}
+
+					// if (existsSync(`${configDestination}/crypto.json`) && !flags.overwrite) {
+					// 	return true;
+					// }
+
+					return false;
+				},
+				task: async () => {
+					const snapshotDir = join(configDestination, "snapshot");
+					ensureDirSync(snapshotDir);
+
+					writeFileSync(
+						join(configDestination, "snapshot", this.#getAndVerifyFileName(flags.snapshot)),
+						await this.#getFile(flags.snapshot),
+					);
+				},
+				title: "Publish snapshot (<hash>.compressed)",
+			},
 		]);
 	}
 
 	async #getFile(url: string): Promise<string> {
-		const { data } = await http.get(url);
+		try {
+			const { data } = await http.get(url);
+			return data;
+		} catch (error) {
+			console.error(`Error fetching file from ${url}:`, error);
 
-		return data;
+			throw new Error(
+				`Failed to fetch file from ${url}: ${error instanceof Error ? error.message : String(error)}`,
+			);
+		}
+	}
+
+	#getAndVerifyFileName(url: string): string {
+		const parts = url.split("/");
+		const fileName = parts.at(-1);
+
+		if (!fileName) {
+			throw new Error("Invalid URL provided, cannot extract file name.");
+		}
+
+		this.#verifyFileName(fileName);
+
+		return fileName;
+	}
+
+	#verifyFileName(fileName: string): void {
+		const validFileName = Joi.string()
+			.regex(/^[a-z0-9]+\.(compressed)$/)
+			.required();
+		const { error } = validFileName.validate(fileName);
+
+		if (error) {
+			throw new Error(`Invalid file name: ${fileName}. Expected format: <hash>.compressed`);
+		}
 	}
 }
