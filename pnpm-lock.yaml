@@ -1003,6 +1003,9 @@ importers:
       fs-extra:
         specifier: 11.3.0
         version: 11.3.0
+      got:
+        specifier: 14.4.6
+        version: 14.4.6
       joi:
         specifier: 17.13.3
         version: 17.13.3
