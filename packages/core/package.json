@@ -85,11 +85,11 @@
 		"@mainsail/webhooks": "workspace:*",
 		"bip39": "3.1.0",
 		"boxen": "8.0.1",
-		"got": "14.4.6",
 		"dayjs": "1.11.13",
 		"env-paths": "3.0.0",
 		"envfile": "7.1.0",
 		"fs-extra": "11.3.0",
+		"got": "14.4.6",
 		"joi": "17.13.3",
 		"kleur": "4.1.5",
 		"prompts": "2.4.2"
