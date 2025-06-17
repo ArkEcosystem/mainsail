@@ -45,6 +45,7 @@ interface ValidatorAttributes {
 	producedBlocks: number;
 
 	voteBalance: BigNumber;
+	fee: BigNumber;
 	votersCount: number;
 	blsPublicKey: string;
 	isResigned: boolean;
@@ -336,6 +337,7 @@ export class Restore {
 				totalForgedRewards: BigNumber.ZERO,
 				voteBalance: validator.voteBalance,
 				votersCount: validator.votersCount,
+				fee: validator.fee,
 			};
 		}
 
@@ -401,6 +403,7 @@ export class Restore {
 									validatorPublicKey: validatorAttributes.blsPublicKey,
 									validatorResigned: validatorAttributes.isResigned,
 									validatorVoteBalance: validatorAttributes.voteBalance,
+									validatorFee: validatorAttributes.fee,
 									validatorVotersCount: validatorAttributes.votersCount,
 
 									// updated at end of db transaction
