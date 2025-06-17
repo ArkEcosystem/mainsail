@@ -85,6 +85,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			if (
 				!currentValidator ||
 				!currentValidator.voteBalance.isEqualTo(validator.voteBalance) ||
+				!currentValidator.fee.isEqualTo(validator.fee) ||
 				currentValidator.isResigned !== validator.isResigned ||
 				currentValidator.votersCount !== validator.votersCount ||
 				currentValidator.blsPublicKey !== validator.blsPublicKey
