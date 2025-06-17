@@ -170,7 +170,9 @@ export class Generator {
 		const jsonString = JSON.stringify(snapshot);
 		const compressedBuffer = await promisify(brotliCompress)(jsonString);
 		await writeFile(path, compressedBuffer);
-		this.logger.info(`Wrote ${snapshot.wallets.length} wallets to '${path}'`);
+		this.logger.info(
+			`Wrote ${JSON.stringify(snapshot.chainTip)} with ${snapshot.wallets.length} wallets to '${path}'`,
+		);
 	}
 }
 
