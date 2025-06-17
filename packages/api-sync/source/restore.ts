@@ -331,13 +331,13 @@ export class Restore {
 		for (const validator of validators) {
 			context.validatorAttributes[validator.address] = {
 				blsPublicKey: validator.blsPublicKey,
+				fee: validator.fee,
 				isResigned: validator.isResigned,
 				producedBlocks: 0,
 				totalForgedFees: BigNumber.ZERO,
 				totalForgedRewards: BigNumber.ZERO,
 				voteBalance: validator.voteBalance,
 				votersCount: validator.votersCount,
-				fee: validator.fee,
 			};
 		}
 
@@ -387,6 +387,7 @@ export class Restore {
 					attributes: {
 						...(validatorAttributes
 							? {
+									validatorFee: validatorAttributes.fee,
 									validatorForgedFees: validatorAttributes.totalForgedFees.toFixed(),
 									validatorForgedRewards: validatorAttributes.totalForgedRewards.toFixed(),
 									validatorForgedTotal: validatorAttributes.totalForgedFees
@@ -403,7 +404,6 @@ export class Restore {
 									validatorPublicKey: validatorAttributes.blsPublicKey,
 									validatorResigned: validatorAttributes.isResigned,
 									validatorVoteBalance: validatorAttributes.voteBalance,
-									validatorFee: validatorAttributes.fee,
 									validatorVotersCount: validatorAttributes.votersCount,
 
 									// updated at end of db transaction

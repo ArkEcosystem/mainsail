@@ -178,11 +178,11 @@ export class Sync implements Contracts.ApiSync.Service {
 			return {
 				...(dirtyValidator
 					? {
+							validatorFee: dirtyValidator.fee,
 							validatorPublicKey: dirtyValidator.blsPublicKey,
 							validatorResigned: dirtyValidator.isResigned,
 							validatorVoteBalance: dirtyValidator.voteBalance,
 							validatorVotersCount: dirtyValidator.votersCount,
-							validatorFee: dirtyValidator.fee,
 							// updated at end of db transaction
 							// - validatorRank
 							// - validatorApproval
