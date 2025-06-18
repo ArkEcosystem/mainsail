@@ -27,7 +27,6 @@ describe<{
 		assert.string(entity.block.data.parentHash);
 		assert.instance(entity.block.data.reward, BigNumber);
 		assert.number(entity.block.data.timestamp);
-		assert.instance(entity.block.data.amount, BigNumber);
 		assert.instance(entity.block.data.fee, BigNumber);
 		assert.number(entity.block.data.version);
 		assert.string(entity.block.serialized);
@@ -54,7 +53,6 @@ describe<{
 		assert.string(entity.block.data.parentHash);
 		assert.instance(entity.block.data.reward, BigNumber);
 		assert.number(entity.block.data.timestamp);
-		assert.instance(entity.block.data.amount, BigNumber);
 		assert.instance(entity.block.data.fee, BigNumber);
 		assert.number(entity.block.data.version);
 		assert.string(entity.block.serialized);
@@ -77,7 +75,6 @@ describe<{
 		assert.string(entity.block.data.parentHash);
 		assert.instance(entity.block.data.reward, BigNumber);
 		assert.number(entity.block.data.timestamp);
-		assert.instance(entity.block.data.amount, BigNumber);
 		assert.instance(entity.block.data.fee, BigNumber);
 		assert.number(entity.block.data.version);
 		assert.string(entity.block.serialized);
