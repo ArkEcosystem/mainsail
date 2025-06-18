@@ -31,7 +31,6 @@ export const schemas: Record<
 	blockHeader: {
 		$id: "blockHeader",
 		properties: {
-			amount: { bignumber: { minimum: 0 } },
 			fee: { bignumber: { minimum: 0 } },
 			gasUsed: { minimum: 0, type: "integer" },
 			hash: { $ref: "blockHash" },
@@ -48,7 +47,6 @@ export const schemas: Record<
 			version: { enum: [1] },
 		},
 		required: [
-			"amount",
 			"fee",
 			"gasUsed",
 			"hash",

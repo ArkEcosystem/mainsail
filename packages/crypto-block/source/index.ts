@@ -31,7 +31,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				256 + // logsBloom
 				2 + // transactionsCount
 				4 + // totalGasUsed
-				32 + // totalAmount
 				32 + // totalFee
 				32 + // reward
 				4 + // payloadLength

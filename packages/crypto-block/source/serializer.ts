@@ -46,9 +46,6 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				gasUsed: {
 					type: "uint32",
 				},
-				amount: {
-					type: "uint256",
-				},
 				fee: {
 					type: "uint256",
 				},
@@ -99,9 +96,6 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				},
 				gasUsed: {
 					type: "uint32",
-				},
-				amount: {
-					type: "uint256",
 				},
 				fee: {
 					type: "uint256",
