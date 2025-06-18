@@ -109,11 +109,11 @@ export class Controller extends AbstractController {
 						.where("address = :address", { address: block.proposer })
 						.getOne()) ?? {
 						address: block.proposer,
-						publicKey: "",
-						nonce: "0",
 						attributes: {},
-						updated_at: "0",
 						balance: "0",
+						nonce: "0",
+						publicKey: "",
+						updated_at: "0",
 					};
 				})(),
 			);
