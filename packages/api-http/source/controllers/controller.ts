@@ -103,11 +103,18 @@ export class Controller extends AbstractController {
 		if (!generator) {
 			promises.push(
 				(async () => {
-					generator = await this.walletRepositoryFactory()
+					generator = (await this.walletRepositoryFactory()
 						.createQueryBuilder()
 						.select()
 						.where("address = :address", { address: block.proposer })
-						.getOneOrFail();
+						.getOne()) ?? {
+						address: block.proposer,
+						publicKey: "",
+						nonce: "0",
+						attributes: {},
+						updated_at: "0",
+						balance: "0",
+					};
 				})(),
 			);
 		}
