@@ -35,7 +35,7 @@ describe<{
 		assert.equal(configManager.getMilestones(), [
 			{
 				roundValidators: 0,
-				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
+				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, version: 1 },
 				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
 				evmSpec: cryptoJson.milestones[0].evmSpec,
@@ -53,7 +53,7 @@ describe<{
 			},
 			{
 				roundValidators: 53,
-				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
+				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, version: 1 },
 				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
 				evmSpec: cryptoJson.milestones[0].evmSpec,
@@ -71,7 +71,7 @@ describe<{
 			},
 			{
 				roundValidators: 53,
-				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
+				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, version: 1 },
 				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
 				evmSpec: cryptoJson.milestones[0].evmSpec,

@@ -11,7 +11,6 @@ export class MilestonesGenerator {
 				block: {
 					maxGasLimit: options.maxBlockGasLimit,
 					maxPayload: options.maxBlockPayload,
-					maxTransactions: options.maxTxPerBlock,
 					version: 1,
 				},
 				epoch: options.epoch.toISOString().slice(0, 11) + "00:00:00.000Z",

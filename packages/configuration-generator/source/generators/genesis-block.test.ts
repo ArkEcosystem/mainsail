@@ -33,7 +33,7 @@ describe<{
 			milestones: [
 				{
 					address: { bech32m: "ark" },
-					block: { maxGasLimit: 30_000_000, maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
+					block: { maxGasLimit: 30_000_000, maxPayload: 2_097_152, version: 1 },
 					blockTime: 8000,
 					evmSpec: Contracts.Evm.SpecId.SHANGHAI,
 					// @ts-ignore
