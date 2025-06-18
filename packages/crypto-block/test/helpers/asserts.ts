@@ -7,7 +7,6 @@ export const assertBlockData = (assert, data1, data2) => {
 		"parentHash",
 		"transactionsCount",
 		"gasUsed",
-		"amount",
 		"fee",
 		"reward",
 		"payloadSize",

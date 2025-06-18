@@ -18,17 +18,18 @@ describe<{
 	});
 
 	it("#size - should return size", ({ serializer }) => {
-		assert.equal(serializer.headerSize(), 493);
+		assert.equal(serializer.headerSize(), 461);
 
-		assert.equal(serializer.totalSize(blockData), 493);
+		assert.equal(serializer.totalSize(blockData), 461);
 	});
 
 	it("#size - should return size with transactions", async ({ serializer, sandbox }) => {
-		assert.equal(serializer.totalSize(blockDataWithTransactions), 719);
+		assert.equal(serializer.totalSize(blockDataWithTransactions), 687);
 	});
 
 	it("#serialize - should serialize and deserialize block", async ({ serializer, deserializer }) => {
 		const serialized = await serializer.serializeHeader(blockData);
+
 		const deserialized = await deserializer.deserializeHeader(serialized);
 
 		assertBlockData(assert, deserialized, blockData);
@@ -39,6 +40,7 @@ describe<{
 		deserializer,
 	}) => {
 		const serialized = await serializer.serializeWithTransactions(blockDataWithTransactions);
+
 		const deserialized = await deserializer.deserializeWithTransactions(serialized);
 
 		assertBlockData(assert, deserialized.data, blockDataWithTransactions);

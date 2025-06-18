@@ -73,7 +73,6 @@ describe<{
 		stateRoot: "0".repeat(64),
 		logsBloom: "0".repeat(512),
 		timestamp: 0,
-		amount: 0,
 		fee: 0,
 		gasUsed: 0,
 		version: 1,
@@ -89,7 +88,6 @@ describe<{
 
 	it("blockHeader - should not be ok if any required field is missing", ({ validator }) => {
 		const requiredFields = [
-			"amount",
 			"fee",
 			"gasUsed",
 			"hash",
@@ -266,17 +264,6 @@ describe<{
 					timestamp: -1,
 				})
 				.error.includes("timestamp"),
-		);
-	});
-
-	it("blockHeader - amount should be bigNumber & min 0", ({ validator }) => {
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					amount: -1,
-				})
-				.error.includes("amount"),
 		);
 	});
 

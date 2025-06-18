@@ -139,10 +139,10 @@ describe<{
 	it("#fromData - should throw on invalid input data - block property has an unexpected value", async ({
 		factory,
 	}) => {
-		const b2 = Object.assign({}, blockData, { amount: "abcd" });
+		const b2 = Object.assign({}, blockData, { fee: "abcd" });
 		await assert.rejects(
 			() => factory.fromData(b2),
-			'Invalid data at /amount: must pass "bignumber" keyword validation: undefined',
+			'Invalid data at /fee: must pass "bignumber" keyword validation: undefined',
 		);
 	});
 

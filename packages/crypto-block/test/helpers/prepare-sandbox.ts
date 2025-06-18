@@ -40,7 +40,6 @@ export const prepareSandbox = async (context) => {
 			256 + // logsBloom
 			2 + // numberOfTransactions
 			4 + // totalGasUsed
-			32 + // totalAmount
 			32 + // totalFee
 			32 + // reward
 			4 + // payloadLength
