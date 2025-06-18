@@ -6,9 +6,6 @@ export class TransactionLengthVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.Configuration;
-
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const block = unit.getBlock();
 
