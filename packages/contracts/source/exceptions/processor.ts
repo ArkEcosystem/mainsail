@@ -63,12 +63,6 @@ export class DuplicatedTransaction extends ValidatorException {
 	}
 }
 
-export class InvalidAmount extends ValidatorException {
-	public constructor(block: Block, actualAmount: string) {
-		super(`Block ${block.data.hash} has invalid amount. Expected ${block.data.amount}, but got ${actualAmount}.`);
-	}
-}
-
 export class ExceededGasLimit extends ValidatorException {
 	public constructor(block: Block, maxGasLimit: number) {
 		super(`Block ${block.data.hash} with  gas used ${block.data.gasUsed} exceeds max gas limit of ${maxGasLimit}.`);

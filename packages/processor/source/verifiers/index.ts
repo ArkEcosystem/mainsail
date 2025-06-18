@@ -1,4 +1,3 @@
-export * from "./amount-verifier.js";
 export * from "./chained-verifier.js";
 export * from "./gas-limit-verifier.js";
 export * from "./generator-verifier.js";
