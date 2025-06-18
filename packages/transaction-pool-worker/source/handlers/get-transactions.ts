@@ -18,10 +18,6 @@ export class GetTransactionsHandler {
 
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		for (const transaction of await this.poolQuery.getFromHighestPriority().all()) {
-			if (candidateTransactions.length === milestone.block.maxTransactions) {
-				break;
-			}
-
 			if (bytesLeft - 4 - transaction.serialized.length < 0) {
 				break;
 			}
