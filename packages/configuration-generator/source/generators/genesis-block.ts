@@ -241,8 +241,7 @@ export class GenesisBlockGenerator extends Generator {
 		transactions: Contracts.Crypto.Transaction[],
 		options: Contracts.NetworkGenerator.InternalOptions,
 	): Promise<{ block: Contracts.Crypto.Block; transactions: Contracts.Crypto.TransactionData[] }> {
-		const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
-			amount: BigNumber.ZERO,
+		const totals: { fee: BigNumber; gasUsed: number } = {
 			fee: BigNumber.ZERO,
 			gasUsed: 0,
 		};
@@ -292,7 +291,6 @@ export class GenesisBlockGenerator extends Generator {
 				value: transaction.data.value.toBigInt(),
 			});
 
-			totals.amount = totals.amount.plus(data.value);
 			totals.fee = totals.fee.plus(data.gasPrice);
 			totals.gasUsed += Number(receipt.gasUsed);
 
@@ -320,7 +318,6 @@ export class GenesisBlockGenerator extends Generator {
 		return {
 			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
-					amount: options.snapshot ? BigNumber.make(options.premine) : totals.amount,
 					fee: totals.fee,
 					gasUsed: totals.gasUsed,
 					logsBloom: await this.evm.logsBloom(commitKey),
