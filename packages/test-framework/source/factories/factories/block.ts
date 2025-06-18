@@ -48,10 +48,9 @@ export const registerBlockFactory = async (
 			}
 		}
 
-		const totals: { value: BigNumber; gasPrice: BigNumber; gasUsed: number } = {
+		const totals: { gasPrice: BigNumber; gasUsed: number } = {
 			gasPrice: BigNumber.ZERO,
 			gasUsed: 0,
-			value: BigNumber.ZERO,
 		};
 		const payloadBuffers: Buffer[] = [];
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
@@ -61,7 +60,6 @@ export const registerBlockFactory = async (
 			const { data, serialized } = transaction;
 			assert.string(data.hash);
 
-			totals.value = totals.value.plus(data.value);
 			totals.gasPrice = totals.gasPrice.plus(data.gasPrice);
 			// TODO: calculate actual gas used
 			totals.gasUsed += data.gas;
@@ -76,7 +74,6 @@ export const registerBlockFactory = async (
 		const commit = {
 			block: await app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
-					amount: BigNumber.make(totals.value),
 					fee: BigNumber.make(totals.gasPrice),
 					gasUsed: totals.gasUsed,
 					logsBloom: "0".repeat(512),
