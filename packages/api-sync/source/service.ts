@@ -192,8 +192,8 @@ export class Sync implements Contracts.ApiSync.Service {
 					? {
 							// incrementally applied in UPSERT below
 							validatorForgedFees: header.fee.toFixed(),
-							validatorForgedRewards: header.amount.toFixed(),
-							validatorForgedTotal: header.fee.plus(header.amount).toFixed(),
+							validatorForgedRewards: header.reward.toFixed(),
+							validatorForgedTotal: header.fee.plus(header.reward).toFixed(),
 							validatorLastBlock: {
 								hash: header.hash,
 								number: header.number,
@@ -259,7 +259,6 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		const deferredSync: DeferredSync = {
 			block: {
-				amount: header.amount.toFixed(),
 				commitRound: proof.round,
 				fee: header.fee.toFixed(),
 				gasUsed: header.gasUsed,
@@ -490,7 +489,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			'validatorVotersCount',
 			COALESCE(EXCLUDED.attributes->'validatorVotersCount', "Wallet".attributes->'validatorVotersCount'),
 			'validatorFee',
-			COALESCE((EXCLUDED.attributes->>'validatorFee')::text, ("Wallet".attributes->>'validatorFee')::text),			
+			COALESCE((EXCLUDED.attributes->>'validatorFee')::text, ("Wallet".attributes->>'validatorFee')::text),
 			'validatorLastBlock',
 			COALESCE((EXCLUDED.attributes->>'validatorLastBlock')::jsonb, ("Wallet".attributes->>'validatorLastBlock')::jsonb),
 			'validatorForgedFees',

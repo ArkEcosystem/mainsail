@@ -274,8 +274,7 @@ export class Validator implements Contracts.Validator.Validator {
 		const number = previousBlock.header.number + 1;
 		const milestone = this.cryptoConfiguration.getMilestone(number);
 
-		const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
-			amount: BigNumber.ZERO,
+		const totals: { fee: BigNumber; gasUsed: number } = {
 			fee: BigNumber.ZERO,
 			gasUsed: 0,
 		};
@@ -291,7 +290,6 @@ export class Validator implements Contracts.Validator.Validator {
 			assert.string(data.hash);
 			assert.number(data.gasUsed);
 
-			totals.amount = totals.amount.plus(data.value);
 			assert.number(data.gasUsed);
 			totals.fee = totals.fee.plus(this.gasFeeCalculator.calculateConsumed(data.gasPrice, data.gasUsed));
 			totals.gasUsed += data.gasUsed;
@@ -303,7 +301,6 @@ export class Validator implements Contracts.Validator.Validator {
 
 		return this.blockFactory.make(
 			{
-				amount: totals.amount,
 				fee: totals.fee,
 				gasUsed: totals.gasUsed,
 				logsBloom,

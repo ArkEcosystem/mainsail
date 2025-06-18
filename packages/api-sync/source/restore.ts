@@ -236,7 +236,6 @@ export class Restore {
 
 			for await (const { proof, block } of commits) {
 				blocks.push({
-					amount: block.header.amount.toFixed(),
 					commitRound: proof.round,
 					fee: block.header.fee.toFixed(),
 					gasUsed: block.header.gasUsed,

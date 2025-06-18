@@ -56,12 +56,6 @@ export class Block {
 		nullable: false,
 		type: "numeric",
 	})
-	public readonly amount!: string;
-
-	@Column({
-		nullable: false,
-		type: "numeric",
-	})
 	public readonly fee!: string;
 
 	@Column({

@@ -25,7 +25,6 @@ export interface BlockData {
 	readonly logsBloom: string;
 	readonly transactionsCount: number;
 	readonly gasUsed: number;
-	readonly amount: BigNumber;
 	readonly fee: BigNumber;
 	readonly reward: BigNumber;
 	readonly payloadSize: number;
@@ -49,7 +48,6 @@ export interface BlockJson {
 	readonly logsBloom: string;
 	readonly transactionsCount: number;
 	readonly gasUsed: number;
-	readonly amount: string;
 	readonly fee: string;
 	readonly reward: string;
 	readonly payloadSize: number;
