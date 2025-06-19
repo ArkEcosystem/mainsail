@@ -1,14 +1,14 @@
 {
-    "address": "0x766FF343F34c0f615A0074D53Aade1fCD5b2533d",
+    "address": "0x2D6dD0E5ee115EC9EA0d45b1190fb62356708335",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "5c90bd69eb652d6dc208d1f00d81d596a1642ce98f6e3b2945fc886d257f2380",
-        "publicKey": "a14c14aa13757f69e57b6103343335c6d6fcd0483da5c5c53e7c8eab6d433aeeab9760cad7bf39c43184401f15bbf369"
+        "privateKey": "0d0d3acc899f6c975e4a3a262098e534111f16066796ffcb9d22950423f3aaa0",
+        "publicKey": "b8ece8b85bef5839b045eaf8fd9410836d691dc82a6f2e55a4fd8478e53c622746fcf72d33ecf81d6b689f74c8bb3a40"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "44cf7c11161b8a9cf8c75eb4829cf6d6ed2e2ee5514b4a754b6ee0be5d63c4bf",
-        "publicKey": "0298b2b8b537acccbe4cbcd8fa24676d76721a81fd28fe4b43baba6aab38254ba9"
+        "privateKey": "cf1befc8316cf807e1687dd80553d7e2ef62c1d89d519128bbe6491b103ad13f",
+        "publicKey": "027389b5bed9023d6b86ba7291aebfc08ca2e3a67aba272972f03566cadedbb56c"
     },
-    "passphrase": "rent floor between saddle thought small electric secret conduct actor rally firm hint mean relief museum supply steel soap fossil snake rice exhaust short"
+    "passphrase": "merit live awesome dash meat calm cool drink deliver midnight carbon crystal scissors globe love cover shoulder ahead chest castle produce truck ketchup wine"
 }
