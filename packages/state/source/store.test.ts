@@ -38,7 +38,7 @@ describe<{
 	});
 
 	it("#initialize - should set height and totalRound", ({ store }) => {
-		assert.equal(store.getHeight(), 0);
+		assert.equal(store.getBlockNumber(), 0);
 		assert.equal(store.getTotalRound(), 0);
 	});
 

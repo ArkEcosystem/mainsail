@@ -36,7 +36,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		context.state = {
 			getLastBlock: () => {},
-			getHeight: () => 1,
+			getBlockNumber: () => 1,
 		};
 
 		context.cryptoConfiguration = {
