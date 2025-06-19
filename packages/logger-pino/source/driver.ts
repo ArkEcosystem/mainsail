@@ -202,8 +202,14 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 	#getFileStream(options: { interval: string }): Writable {
 		return createStream(
 			(time: number | Date, index?: number): string => {
+				let prefix = this.app.name();
+
+				if (this.app.thread() !== "main") {
+					prefix += `-${this.app.thread()}`;
+				}
+
 				if (!time) {
-					return `${this.app.name()}-current.log`;
+					return `${prefix}-current.log`;
 				}
 
 				if (typeof time === "number") {
@@ -216,7 +222,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 					filename += `.${index}`;
 				}
 
-				return `${this.app.name()}-${filename}.log.gz`;
+				return `${prefix}-${filename}.log.gz`;
 			},
 			{
 				compress: "gzip",
