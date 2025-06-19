@@ -1,14 +1,14 @@
 {
-    "address": "0xD98D275d5e5616553420ED5816b1D590f43b83b1",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "5a507e31bbba2a7e07c49545eafe6853de372d83fb3b56297f7bc050a9fdf498",
-        "publicKey": "a3386baf44eef64a00921118fecc8c598da5b3cde439e08424f8feb7038814ad1d836e6cabe6c2e5af7f0d64b68b633b"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "734ba88cc1da5e780a9e724ed45d6926d1e16114acd5f67b9e7576d9e5ed23c9",
-        "publicKey": "02c92b2dfb77a03ff26a6d2661b48a3de29c310f5d21e4c5d6f9d6326b555795e6"
-    },
-    "passphrase": "canal region weasel such mind sample minimum unable tell struggle normal trumpet young quarter awkward glow clog game music never sort frown forest runway"
+	"address": "0xD98D275d5e5616553420ED5816b1D590f43b83b1",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "5a507e31bbba2a7e07c49545eafe6853de372d83fb3b56297f7bc050a9fdf498",
+		"publicKey": "a3386baf44eef64a00921118fecc8c598da5b3cde439e08424f8feb7038814ad1d836e6cabe6c2e5af7f0d64b68b633b"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "734ba88cc1da5e780a9e724ed45d6926d1e16114acd5f67b9e7576d9e5ed23c9",
+		"publicKey": "02c92b2dfb77a03ff26a6d2661b48a3de29c310f5d21e4c5d6f9d6326b555795e6"
+	},
+	"passphrase": "canal region weasel such mind sample minimum unable tell struggle normal trumpet young quarter awkward glow clog game music never sort frown forest runway"
 }
