@@ -1,12 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { describe, Sandbox } from "../../test-framework/source";
-import {
-	blockData,
-	proposalData,
-	proposalDataWithValidRound,
-	serializedBlock,
-} from "../test/fixtures/proposal";
+import { blockData, proposalData, proposalDataWithValidRound, serializedBlock } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Proposal } from "./proposal";
 import { assertProposedData } from "../test/helpers/asserts";

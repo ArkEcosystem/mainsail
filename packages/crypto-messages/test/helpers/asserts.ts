@@ -12,13 +12,12 @@ const assertPrecommitOrPrevote = (assert, data1, data2) => {
 	}
 };
 
-
 function deepEqual(object1, object2) {
 	if (object1 === object2) {
 		return true;
 	}
 
-	if(typeof object1 !== 'object' || typeof object2 !== 'object') {
+	if (typeof object1 !== "object" || typeof object2 !== "object") {
 		return false;
 	}
 
