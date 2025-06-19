@@ -6,7 +6,6 @@ import {
 	proposalData,
 	proposalDataWithValidRound,
 	serializedBlock,
-	serializedProposal,
 } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Proposal } from "./proposal";
@@ -103,7 +102,7 @@ describe<{
 
 		assert.equal(
 			proposal.toString(),
-			`{"block":"10ee5958aa6a97c60830a75f4c0f49ca02da76e5f13851567534a6837e0fa69d","blockNumber":2,"round":1,"validatorIndex":0}`,
+			`{"block":"82139a7708157c8e2b78f0db38216924c8a17f82e77d5997fb280b1435a6cc97","blockNumber":2,"round":1,"validatorIndex":0}`,
 		);
 	});
 
