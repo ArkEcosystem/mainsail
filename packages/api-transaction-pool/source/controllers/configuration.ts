@@ -19,7 +19,7 @@ export class ConfigurationController extends AbstractController {
 				core: {
 					version: this.app.version(),
 				},
-				height: this.stateStore.getHeight(),
+				blockNumber: this.stateStore.getBlockNumber(),
 				transactionPool: {
 					maxTransactionAge: this.pluginConfiguration.get("maxTransactionAge"),
 					maxTransactionBytes: this.pluginConfiguration.get("maxTransactionBytes"),

@@ -12,7 +12,7 @@ export const resolveBlockTag = async (
 		case "finalized":
 		case "latest":
 		case "safe": {
-			return stateStore.getHeight();
+			return stateStore.getBlockNumber();
 		}
 		default: {
 			throw new Error("invalid blockTag:" + tag);

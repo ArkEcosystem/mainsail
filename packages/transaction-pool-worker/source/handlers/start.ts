@@ -17,8 +17,8 @@ export class StartHandler {
 	@tagged("plugin", "api-transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	public async handle(height: number): Promise<void> {
-		this.store.setHeight(height);
+	public async handle(blockNumber: number): Promise<void> {
+		this.store.setBlockNumber(blockNumber);
 		await this.transactionPoolService.reAddTransactions();
 
 		if (this.configuration.get("server.http.enabled")) {

@@ -15,7 +15,7 @@ export class Store implements Contracts.State.Store {
 
 	#genesisCommit?: Contracts.Crypto.Commit;
 	#lastBlock?: Contracts.Crypto.Block;
-	#height = 0;
+	#blockNumber = 0;
 	#totalRound = 0;
 
 	public setGenesisCommit(block: Contracts.Crypto.Commit): void {
@@ -30,7 +30,7 @@ export class Store implements Contracts.State.Store {
 
 	public setLastBlock(block: Contracts.Crypto.Block): void {
 		this.#lastBlock = block;
-		this.setHeight(block.data.number);
+		this.setBlockNumber(block.data.number);
 	}
 
 	public getLastBlock(): Contracts.Crypto.Block {
@@ -38,10 +38,10 @@ export class Store implements Contracts.State.Store {
 		return this.#lastBlock;
 	}
 
-	// Set height is used on workers, because last block is not transferred
-	public setHeight(height: number): void {
-		this.#height = height;
-		this.configuration.setHeight(height + 1);
+	// Set blockNumber is used on workers, because last block is not transferred
+	public setBlockNumber(blockNumber: number): void {
+		this.#blockNumber = blockNumber;
+		this.configuration.setHeight(blockNumber + 1);
 
 		if (this.configuration.isNewMilestone()) {
 			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
@@ -49,8 +49,8 @@ export class Store implements Contracts.State.Store {
 		}
 	}
 
-	public getHeight(): number {
-		return this.#height;
+	public getBlockNumber(): number {
+		return this.#blockNumber;
 	}
 
 	public setTotalRound(totalRound: number): void {

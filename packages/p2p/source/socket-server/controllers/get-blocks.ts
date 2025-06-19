@@ -24,7 +24,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 		const requestBlockNumber: number = request.payload.fromBlockNumber;
 		const requestBlockLimit: number = request.payload.limit;
 
-		const lastBlockNumber: number = this.stateStore.getHeight();
+		const lastBlockNumber: number = this.stateStore.getBlockNumber();
 		if (requestBlockNumber > lastBlockNumber) {
 			return { blocks: [] };
 		}
