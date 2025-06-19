@@ -37,7 +37,6 @@ describe<{
 					block: {
 						maxGasLimit: 1000,
 						maxPayload: 2000,
-						maxTransactions: 100,
 						version: 1,
 					},
 					epoch: date.toISOString().slice(0, 11) + "00:00:00.000Z",

@@ -273,7 +273,6 @@
 			"block": {
 				"maxGasLimit": 10000000,
 				"maxPayload": 2097152,
-				"maxTransactions": 150,
 				"version": 1
 			},
 			"epoch": "2025-03-17T00:00:00.000Z",

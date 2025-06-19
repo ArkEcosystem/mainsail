@@ -163,13 +163,13 @@ export const addTransactionsToPool = async (
 export const waitBlock = async (sandbox: Sandbox, count: number = 1) => {
 	const state = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
 
-	let currentHeight = state.getHeight();
-	const targetHeight = currentHeight + count;
+	let currentBlockNumber = state.getBlockNumber();
+	const targetBlockNumber = currentBlockNumber + count;
 
 	do {
 		await sleep(200);
-		currentHeight = state.getHeight();
-	} while (currentHeight < targetHeight);
+		currentBlockNumber = state.getBlockNumber();
+	} while (currentBlockNumber < targetBlockNumber);
 };
 
 export const getRandomFundedWallet = async (

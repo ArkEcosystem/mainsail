@@ -69,8 +69,8 @@ export class Bootstrapper {
 		this.state.setBootstrap(false);
 
 		this.validatorRepository.printLoadedValidators();
-		await this.txPoolWorker.start(this.stateStore.getHeight());
-		await this.evmWorker.start(this.stateStore.getHeight());
+		await this.txPoolWorker.start(this.stateStore.getBlockNumber());
+		await this.evmWorker.start(this.stateStore.getBlockNumber());
 
 		void this.runConsensus();
 

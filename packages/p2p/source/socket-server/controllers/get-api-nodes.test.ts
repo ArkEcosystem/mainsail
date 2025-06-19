@@ -11,7 +11,7 @@ describe<{
 	const database = { findCommitBuffers: () => {} };
 	const store = {
 		getLastDownloadedBlock: () => {},
-		getHeight: () => {},
+		getBlockNumber: () => {},
 	};
 
 	beforeEach((context) => {

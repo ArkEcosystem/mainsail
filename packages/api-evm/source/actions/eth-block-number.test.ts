@@ -14,7 +14,7 @@ describe<{
 
 	beforeEach(async (context) => {
 		context.store = {
-			getHeight() {
+			getBlockNumber() {
 				return height;
 			},
 		};

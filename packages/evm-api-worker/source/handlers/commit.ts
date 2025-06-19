@@ -9,7 +9,7 @@ export class CommitHandler {
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	public async handle(height: number): Promise<void> {
-		this.stateStore.setHeight(height);
+	public async handle(blockNumber: number): Promise<void> {
+		this.stateStore.setBlockNumber(blockNumber);
 	}
 }

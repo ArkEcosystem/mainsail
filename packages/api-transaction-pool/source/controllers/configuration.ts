@@ -16,10 +16,10 @@ export class ConfigurationController extends AbstractController {
 	public async configuration(request: Hapi.Request) {
 		return {
 			data: {
+				blockNumber: this.stateStore.getBlockNumber(),
 				core: {
 					version: this.app.version(),
 				},
-				height: this.stateStore.getHeight(),
 				transactionPool: {
 					maxTransactionAge: this.pluginConfiguration.get("maxTransactionAge"),
 					maxTransactionBytes: this.pluginConfiguration.get("maxTransactionBytes"),

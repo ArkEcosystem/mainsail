@@ -18,7 +18,7 @@ export class EthGetUncleCountByBlockNumber implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: [string]): Promise<string> {
-		if (this.stateStore.getHeight() < Number(parameters[0])) {
+		if (this.stateStore.getBlockNumber() < Number(parameters[0])) {
 			throw new Exceptions.RpcError("Block not found");
 		}
 

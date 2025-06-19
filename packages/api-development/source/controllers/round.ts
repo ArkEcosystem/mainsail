@@ -23,11 +23,11 @@ export class RoundController extends Controller {
 			(_, index) => roundValidators[this.proposerCalculator.getValidatorIndex(index)],
 		);
 
-		const height = this.stateStore.getHeight();
+		const blockNumber = this.stateStore.getBlockNumber();
 
 		return {
-			height,
-			...this.roundCalculator.calculateRound(height),
+			blockNumber,
+			...this.roundCalculator.calculateRound(blockNumber),
 			// Map the round validator set (static, vote-weighted, etc.) to actual proposal order
 			validators: orderedValidators.map((validator) => ({
 				// rank: validator.getVoteBalance().toFixed(),

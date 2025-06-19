@@ -84,7 +84,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			}
 
 			this.storage.addTransaction({
-				blockNumber: this.stateStore.getHeight(),
+				blockNumber: this.stateStore.getBlockNumber(),
 				hash: transaction.hash,
 				senderPublicKey: transaction.data.senderPublicKey,
 				serialized: transaction.serialized,
@@ -121,7 +121,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			let previouslyStoredFailures = 0;
 
 			const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
-			const lastBlockNumber: number = this.stateStore.getHeight();
+			const lastBlockNumber: number = this.stateStore.getBlockNumber();
 			const expiredBlockNumber: number = lastBlockNumber - maxTransactionAge;
 
 			for (const { blockNumber, hash, serialized } of this.storage.getAllTransactions()) {
@@ -179,7 +179,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 	async #removeOldTransactions(): Promise<void> {
 		const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
-		const lastBlockNumber: number = this.stateStore.getHeight();
+		const lastBlockNumber: number = this.stateStore.getBlockNumber();
 		const expiredBlockNumber: number = lastBlockNumber - maxTransactionAge;
 
 		for (const { senderPublicKey, hash } of this.storage.getOldTransactions(expiredBlockNumber)) {

@@ -7,8 +7,8 @@ export interface Store extends CommitHandler {
 	getLastBlock(): Block;
 	setLastBlock(block: Block): void;
 
-	setHeight(height: number): void;
-	getHeight(): number;
+	setBlockNumber(blockNumber: number): void;
+	getBlockNumber(): number;
 
 	setTotalRound(totalRound: number): void;
 	getTotalRound(): number;

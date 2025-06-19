@@ -14,8 +14,8 @@ export class StartHandler {
 	@tagged("plugin", "api-evm")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	public async handle(height: number): Promise<void> {
-		this.store.setHeight(height);
+	public async handle(blockNumber: number): Promise<void> {
+		this.store.setBlockNumber(blockNumber);
 
 		if (this.configuration.get("server.http.enabled")) {
 			await this.app.get<Contracts.Api.Server>(Identifiers.Evm.API.HTTP).boot();

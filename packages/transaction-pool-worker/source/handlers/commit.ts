@@ -15,9 +15,9 @@ export class CommitHandler {
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	public async handle(height: number, sendersAddresses: string[]): Promise<void> {
+	public async handle(blockNumber: number, sendersAddresses: string[]): Promise<void> {
 		try {
-			this.stateStore.setHeight(height);
+			this.stateStore.setBlockNumber(blockNumber);
 
 			if (this.configuration.isNewMilestone()) {
 				void this.transactionPoolService.reAddTransactions();

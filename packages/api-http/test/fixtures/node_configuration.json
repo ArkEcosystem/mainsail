@@ -3,8 +3,7 @@
 		"block": {
 			"version": 1,
 			"maxPayload": 2097152,
-			"maxGasLimit": 10000000,
-			"maxTransactions": 150
+			"maxGasLimit": 10000000
 		},
 		"epoch": "2024-05-31T00:00:00.000Z",
 		"evmSpec": "Shanghai",
