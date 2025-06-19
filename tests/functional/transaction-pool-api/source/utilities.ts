@@ -103,18 +103,18 @@ export const waitBlock = async ({ sandbox }: { sandbox: Sandbox }, count: number
 
 	let remainingTransactions = await query.getAll().all();
 
-	let currentHeight = store.getHeight();
-	let targetHeight = currentHeight + count;
+	let currentBlockNumber = store.getBlockNumber();
+	let targetBlockNumber = currentBlockNumber + count;
 
 	do {
 		await sleep(100);
-		currentHeight = store.getHeight();
+		currentBlockNumber = store.getBlockNumber();
 		remainingTransactions = await query.getAll().all();
 
 		if (remainingTransactions.length > 0) {
-			targetHeight = Math.max(currentHeight, targetHeight) + 1;
+			targetBlockNumber = Math.max(currentBlockNumber, targetBlockNumber) + 1;
 		}
-	} while (currentHeight < targetHeight);
+	} while (currentBlockNumber < targetBlockNumber);
 };
 
 // export const hasVotedFor = async (
@@ -224,12 +224,12 @@ export const isTransactionCommitted = async (
 	{ hash }: Contracts.Crypto.Transaction,
 ): Promise<boolean> => {
 	const store = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
-	const currentHeight = store.getHeight();
+	const currentBlockNumber = store.getBlockNumber();
 
 	const database = sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
 	const forgedBlocks = await database.findBlocks(
-		currentHeight - 5,
-		currentHeight + 5 /* just a buffer in case tx got included after target height */,
+		currentBlockNumber - 5,
+		currentBlockNumber + 5 /* just a buffer in case tx got included after target height */,
 	);
 
 	let found = false;
@@ -248,10 +248,10 @@ export const getTransactionReceipt = async (
 	{ hash }: Contracts.Crypto.Transaction,
 ): Promise<Contracts.Evm.TransactionReceipt | undefined> => {
 	const store = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
-	const currentHeight = store.getHeight();
+	const currentBlockNumber = store.getBlockNumber();
 
 	const database = sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
-	const forgedBlocks = await database.findBlocks(0, currentHeight);
+	const forgedBlocks = await database.findBlocks(0, currentBlockNumber);
 
 	for (const block of forgedBlocks) {
 		if (!block.transactions.some((transaction) => transaction.hash === hash)) {
