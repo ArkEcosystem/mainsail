@@ -15,6 +15,8 @@ import { inspect } from "util";
 
 @injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
+	static LOG_LEVELS: string[] = ["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"];
+
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -39,30 +41,48 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
 		this.#stream = new PassThrough();
-		this.#logger = pino.default(
-			{
-				base: null,
-				customLevels: {
-					alert: 1,
-					critical: 2,
-					debug: 7,
-					emergency: 0,
-					error: 3,
-					info: 6,
-					notice: 5,
-					warning: 4,
-				},
-				formatters: {
-					level(label, number) {
-						return { level: label, pid: process.pid };
+
+		if (options.workerMode) {
+			this.#logger = Object.fromEntries(
+				PinoLogger.LOG_LEVELS.map((level) => [
+					level,
+					(message: string) => {
+						const thread = this.app.thread();
+						//const ignore = this.app.isWorker() ? `` : `pid`;
+						process.stdout.write(`[${level}] [${thread}](${process.pid}) ${message}\n`);
 					},
+				]),
+			) as unknown as pino.Logger<
+				"alert" | "critical" | "debug" | "emergency" | "error" | "info" | "notice" | "warning"
+			>;
+
+			return this;
+		} else {
+			this.#logger = pino.default(
+				{
+					base: null,
+					customLevels: {
+						alert: 1,
+						critical: 2,
+						debug: 7,
+						emergency: 0,
+						error: 3,
+						info: 6,
+						notice: 5,
+						warning: 4,
+					},
+					formatters: {
+						level(label, number) {
+							return { level: label, pid: process.pid };
+						},
+					},
+					level: "emergency",
+					safe: true,
+					useOnlyCustomLevels: true,
 				},
-				level: "emergency",
-				safe: true,
-				useOnlyCustomLevels: true,
-			},
-			this.#stream,
-		);
+				this.#stream,
+			);
+		}
 
 		if (this.#isValidLevel(options.levels.console)) {
 			pump(
@@ -164,14 +184,8 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 	}
 
 	#createPrettyTransport(level: string, prettyOptions?: PrettyOptions): Transform {
-		const thread = this.app.thread();
-		const ignore = this.app.isWorker() ? `` : `pid`;
-
 		const pinoPretty = prettyFactory({
-			customPrettifiers: {
-				pid: () => thread,
-			},
-			ignore,
+			ignore: "pid",
 			levelFirst: false,
 			translateTime: "yyyy-mm-dd HH:MM:ss.l",
 			...prettyOptions,
@@ -230,6 +244,6 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 	}
 
 	#isValidLevel(level: string): boolean {
-		return ["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"].includes(level);
+		return PinoLogger.LOG_LEVELS.includes(level);
 	}
 }
