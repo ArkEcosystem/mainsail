@@ -47,7 +47,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 				[...PinoLogger.LOG_LEVELS].map((level) => [
 					level,
 					(message: string) => {
-						process.stdout.write(`[${level}] [${this.app.thread()}](${process.pid}) ${message}\n`);
+						process.stdout.write(`[${level}] (${this.app.thread()}) ${message}\n`);
 					},
 				]),
 			) as unknown as pino.Logger<
