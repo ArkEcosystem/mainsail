@@ -1,7 +1,6 @@
 [
 	{
 		"confirmations": 0,
-		"amount": "12499999999999969",
 		"fee": "0",
 		"gasUsed": 0,
 		"reward": "0",
@@ -22,7 +21,6 @@
 	},
 	{
 		"confirmations": 0,
-		"amount": "0",
 		"fee": "0",
 		"gasUsed": 0,
 		"reward": "0",
@@ -43,7 +41,6 @@
 	},
 	{
 		"confirmations": 0,
-		"amount": "0",
 		"fee": "0",
 		"gasUsed": 0,
 		"reward": "0",
