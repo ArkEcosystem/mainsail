@@ -171,7 +171,6 @@ impl EvmInner {
 
                 Ok(match code {
                     Bytecode::LegacyAnalyzed(code) => code.original_bytes(),
-                    Bytecode::Eof(code) => code.raw.clone(),
                     Bytecode::Eip7702(code) => code.raw.clone(),
                 })
             }
@@ -1008,9 +1007,9 @@ impl EvmInner {
                     return;
                 };
 
-                block_env.number = block_ctx.commit_key.0;
+                block_env.number = U256::from(block_ctx.commit_key.0);
                 block_env.beneficiary = block_ctx.validator_address;
-                block_env.timestamp = block_ctx.timestamp;
+                block_env.timestamp = U256::from(block_ctx.timestamp);
                 block_env.gas_limit = block_ctx.gas_limit;
                 block_env.difficulty = U256::ZERO;
             })
@@ -1038,7 +1037,7 @@ impl EvmInner {
 
                 // Update state if transaction is part of a commit
                 if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key) {
-                    let state_db = evm.db();
+                    let state_db = evm.db_mut();
                     state_db.commit(state);
 
                     if let Some(pending_commit) = self.pending_commits.get_mut(commit_key) {

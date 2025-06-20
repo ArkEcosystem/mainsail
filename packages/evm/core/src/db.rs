@@ -1216,7 +1216,7 @@ fn test_commit_changes() {
     // 2) Update balance for account
     let mut state = HashMap::new();
 
-    let mut account = revm::state::Account::new_not_existing();
+    let mut account = revm::state::Account::new_not_existing(0);
     account.info.balance = U256::from(100);
     account.status = revm::state::AccountStatus::Touched;
 
@@ -1289,7 +1289,7 @@ fn test_storage() {
     let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
     let mut state = HashMap::new();
 
-    let mut account = revm::state::Account::new_not_existing();
+    let mut account = revm::state::Account::new_not_existing(0);
     account.status = revm::state::AccountStatus::Touched;
 
     let mut storage = HashMap::new();
@@ -1362,7 +1362,7 @@ fn test_storage_overwrite() {
     let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
     let mut state = HashMap::new();
 
-    let mut account = revm::state::Account::new_not_existing();
+    let mut account = revm::state::Account::new_not_existing(0);
     account.status = revm::state::AccountStatus::Touched;
 
     let mut storage = HashMap::new();
@@ -1465,7 +1465,7 @@ fn test_resize_on_commit() {
 
         let mut state = HashMap::new();
 
-        let mut account = revm::state::Account::new_not_existing();
+        let mut account = revm::state::Account::new_not_existing(0);
         account.status = revm::state::AccountStatus::Touched;
 
         let mut storage = HashMap::new();
