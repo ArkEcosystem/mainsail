@@ -272,9 +272,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
         // Refund the registration fee to the validator
         if (validator.fee > 0) {
-            uint256 refundFee = validator.fee;
-            validator.fee = 0;
-            (bool success,) = payable(msg.sender).call{value: refundFee}("");
+            (bool success,) = payable(msg.sender).call{value: validator.fee}("");
             if (!success) {
                 revert RefundFailed();
             }

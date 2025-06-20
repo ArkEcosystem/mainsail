@@ -1,4 +1,5 @@
-import { Contracts } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import split from "split2";
 import { Worker } from "worker_threads";
 
 export class Subprocess<T extends Record<string, any>> implements Contracts.Kernel.IPC.Subprocess<T> {
@@ -7,10 +8,34 @@ export class Subprocess<T extends Record<string, any>> implements Contracts.Kern
 	private readonly callbacks = new Map<number, Contracts.Kernel.IPC.RequestCallbacks<T>>();
 	private readonly eventHandlers = new Map<string, Contracts.Kernel.IPC.EventCallback<any>>();
 
-	public constructor(subprocess: Worker) {
+	public constructor(app: Contracts.Kernel.Application, subprocess: Worker) {
 		this.subprocess = subprocess;
 		this.subprocess.on("message", this.onSubprocessMessage.bind(this));
 		this.subprocess.on("message", this.onEmit.bind(this));
+
+		const logger = app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service);
+
+		this.subprocess.stdout.pipe(split()).on("data", (line) => {
+			// [LEVEL] MESSAGE
+			const match = line.match(/^\[(\w+)]\s+(.*)$/);
+			if (!match) {
+				// Fallback to normal console.log if output doesn't match expected format.
+				// For example, this is the case when worker uses `console.log` directly instead of logger service.
+				console.log(line);
+				return;
+			}
+
+			const [, level, message] = match;
+			if (logger.isValidLevel(level)) {
+				logger[level](message);
+			} else {
+				logger.warning(`[unknown:${level}] ${message}`);
+			}
+		});
+
+		this.subprocess.stderr.pipe(split()).on("data", (line) => {
+			logger.error(line);
+		});
 	}
 
 	public async kill(): Promise<number> {

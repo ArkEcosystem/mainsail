@@ -58,6 +58,10 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 		this.log("debug", message);
 	}
 
+	public isValidLevel(level: string): boolean {
+		return !!this.levelStyles[level];
+	}
+
 	public suppressConsoleOutput(suppress: boolean): void {
 		this.silentConsole = suppress;
 	}

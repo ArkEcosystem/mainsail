@@ -106,7 +106,7 @@ contract ConsensusTest is Base {
         assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
         assertEq(validator.data.voteBalance, 0);
         assertEq(validator.data.votersCount, 0);
-        assertEq(validator.data.fee, 0);
+        assertEq(validator.data.fee, customFee); // Fee does not get reset
         assertEq(validator.data.isResigned, true);
         assertEq(addr.balance, 100 ether);
     }
@@ -177,7 +177,7 @@ contract ConsensusTest is Base {
         consensus.resignValidator();
     }
 
-    function test_validator_resignation_revert_if_bellow_min_validators() public {
+    function test_validator_resignation_revert_if_below_min_validators() public {
         assertEq(consensus.validatorsCount(), 0);
         address addr = address(1);
 

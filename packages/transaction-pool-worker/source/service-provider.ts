@@ -15,8 +15,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind<() => Ipc.Subprocess<any>>(Identifiers.TransactionPool.WorkerSubprocess.Factory)
 			.toFactory(() => () => {
-				const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {});
-				return new Ipc.Subprocess(subprocess);
+				const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {
+					stderr: true,
+					stdout: true,
+				});
+				return new Ipc.Subprocess(this.app, subprocess);
 			});
 
 		this.app.bind(Identifiers.TransactionPool.Worker).toConstantValue(this.app.resolve(WorkerInstance));

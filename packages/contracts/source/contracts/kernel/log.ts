@@ -15,6 +15,8 @@ export interface Logger {
 
 	debug(message: string): void;
 
+	isValidLevel(level: string): boolean;
+
 	suppressConsoleOutput(suppress: boolean): void;
 
 	dispose(): Promise<void>;
