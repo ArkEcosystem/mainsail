@@ -13,8 +13,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async register(): Promise<void> {
 		this.app.bind<() => Ipc.Subprocess<any>>(Identifiers.Evm.WorkerSubprocess.Factory).toFactory(() => () => {
-			const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {});
-			return new Ipc.Subprocess(subprocess);
+			const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {
+				stdout: true,
+				stderr: true,
+			});
+			return new Ipc.Subprocess(this.app, subprocess);
 		});
 
 		this.app.bind(Identifiers.Evm.Worker).toConstantValue(this.app.resolve(WorkerInstance));
