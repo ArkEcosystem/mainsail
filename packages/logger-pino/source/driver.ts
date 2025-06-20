@@ -15,7 +15,7 @@ import { inspect } from "util";
 
 @injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
-	static LOG_LEVELS: string[] = ["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"];
+	static LOG_LEVELS = new Set(["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"]);
 
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
@@ -44,7 +44,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 		if (options.workerMode) {
 			this.#logger = Object.fromEntries(
-				PinoLogger.LOG_LEVELS.map((level) => [
+				[...PinoLogger.LOG_LEVELS].map((level) => [
 					level,
 					(message: string) => {
 						process.stdout.write(`[${level}] [${this.app.thread()}](${process.pid}) ${message}\n`);
@@ -55,34 +55,34 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			>;
 
 			return this;
-		} else {
-			this.#logger = pino.default(
-				{
-					base: null,
-					customLevels: {
-						alert: 1,
-						critical: 2,
-						debug: 7,
-						emergency: 0,
-						error: 3,
-						info: 6,
-						notice: 5,
-						warning: 4,
-					},
-					formatters: {
-						level(label, number) {
-							return { level: label, pid: process.pid };
-						},
-					},
-					level: "emergency",
-					safe: true,
-					useOnlyCustomLevels: true,
-				},
-				this.#stream,
-			);
 		}
 
-		if (this.#isValidLevel(options.levels.console)) {
+		this.#logger = pino.default(
+			{
+				base: null,
+				customLevels: {
+					alert: 1,
+					critical: 2,
+					debug: 7,
+					emergency: 0,
+					error: 3,
+					info: 6,
+					notice: 5,
+					warning: 4,
+				},
+				formatters: {
+					level(label, number) {
+						return { level: label, pid: process.pid };
+					},
+				},
+				level: "emergency",
+				safe: true,
+				useOnlyCustomLevels: true,
+			},
+			this.#stream,
+		);
+
+		if (this.isValidLevel(options.levels.console)) {
 			pump(
 				this.#stream,
 				split(),
