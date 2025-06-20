@@ -21,7 +21,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 
 	@postConstruct()
 	public initialize() {
-		const logPrefix = `${this.constructor.name}`;
+		const logPrefix = `evm`;
 
 		this.#evm = new Evm({
 			historySize: 256n,
