@@ -16,8 +16,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.bind<() => Ipc.Subprocess<any>>(Identifiers.TransactionPool.WorkerSubprocess.Factory)
 			.toFactory(() => () => {
 				const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {
-					stdout: true,
 					stderr: true,
+					stdout: true,
 				});
 				return new Ipc.Subprocess(this.app, subprocess);
 			});
