@@ -26,7 +26,7 @@ export class Subprocess<T extends Record<string, any>> implements Contracts.Kern
 			}
 
 			const [, level, message] = match;
-			if (typeof logger[level] === "function") {
+			if (logger.isValidLevel(level)) {
 				logger[level](message);
 			} else {
 				logger.warning(`[unknown:${level}] ${message}`);
