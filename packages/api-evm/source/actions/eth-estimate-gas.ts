@@ -2,6 +2,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 import dayjs from "dayjs";
+import crypto from "node:crypto";
 
 type TxData = {
 	from: string;
@@ -91,7 +92,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 			nonce: accountInfo.nonce,
 			specId: evmSpec,
 			to: data.to,
-			txHash: "0".repeat(64),
+			txHash: this.#generateTxHash(),
 			value: data.value ? BigInt(data.value) : BigInt(0),
 		};
 
@@ -175,4 +176,9 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 			return { executionError: error.message, success: false };
 		}
 	}
+
+	#generateTxHash = () => {
+		const randomBytes = crypto.randomBytes(32);
+		return crypto.createHash("sha256").update(randomBytes).digest("hex");
+	};
 }
