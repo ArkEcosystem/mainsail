@@ -731,45 +731,13 @@ impl EvmInner {
             Err(err) => {
                 match err {
                     EVMError::Transaction(err) => {
-                        match err {
-                            revm::context::result::InvalidTransaction::CallGasCostMoreThanGasLimit {.. }
-                            | revm::context::result::InvalidTransaction::NonceTooHigh { .. }
-                            | revm::context::result::InvalidTransaction::NonceTooLow { .. }
-                            | revm::context::result::InvalidTransaction::LackOfFundForMaxFee {
-                                ..
-                            } => {
-                                return Err(EVMError::Transaction(err));
-                            }
-                            // revm::context::result::InvalidTransaction::PriorityFeeGreaterThanMaxFee => todo!(),
-                            // revm::context::result::InvalidTransaction::GasPriceLessThanBasefee => todo!(),
-                            // revm::context::result::InvalidTransaction::CallerGasLimitMoreThanBlock => todo!(),
-                            // revm::context::result::InvalidTransaction::RejectCallerWithCode => todo!(),
-                            // revm::context::result::InvalidTransaction::OverflowPaymentInTransaction => todo!(),
-                            // revm::context::result::InvalidTransaction::NonceOverflowInTransaction => todo!(),
-                            // revm::context::result::InvalidTransaction::CreateInitCodeSizeLimit => todo!(),
-                            // revm::context::result::InvalidTransaction::InvalidChainId => todo!(),
-                            // revm::context::result::InvalidTransaction::AccessListNotSupported => todo!(),
-                            // revm::context::result::InvalidTransaction::MaxFeePerBlobGasNotSupported => todo!(),
-                            // revm::context::result::InvalidTransaction::BlobVersionedHashesNotSupported => todo!(),
-                            // revm::context::result::InvalidTransaction::BlobGasPriceGreaterThanMax => todo!(),
-                            // revm::context::result::InvalidTransaction::EmptyBlobs => todo!(),
-                            // revm::context::result::InvalidTransaction::BlobCreateTransaction => todo!(),
-                            // revm::context::result::InvalidTransaction::TooManyBlobs { max, have } => todo!(),
-                            // revm::context::result::InvalidTransaction::BlobVersionNotSupported => todo!(),
-                            // revm::context::result::InvalidTransaction::EofInitcodesNotSupported => todo!(),
-                            // revm::context::result::InvalidTransaction::EofInitcodesNumberLimit => todo!(),
-                            // revm::context::result::InvalidTransaction::EofInitcodesSizeLimit => todo!(),
-                            // revm::context::result::InvalidTransaction::EofCrateShouldHaveToAddress => todo!(),
-                            _ => {
-                                todo!("unhandled tx err {:?}", err);
-                            }
-                        }
+                        return Err(EVMError::Transaction(err));
                     }
                     // EVMError::Header(_) => todo!(),
                     // EVMError::Database(_) => todo!(),
                     // EVMError::Custom(_) => todo!(),
                     _ => {
-                        todo!("unhandled evm err {:?}", err);
+                        unimplemented!("fatal evm err {:?}", err);
                     }
                 }
             }
