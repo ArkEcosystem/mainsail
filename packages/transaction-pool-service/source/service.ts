@@ -16,6 +16,12 @@ export class Service implements Contracts.TransactionPool.Service {
 	@inject(Identifiers.State.Store)
 	private readonly stateStore!: Contracts.State.Store;
 
+	@inject(Identifiers.TransactionPool.Broadcaster)
+	private readonly broadcaster!: Contracts.TransactionPool.Broadcaster;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
+
 	@inject(Identifiers.TransactionPool.Storage)
 	private readonly storage!: Contracts.TransactionPool.Storage;
 
@@ -55,7 +61,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		return this.mempool.getSize();
 	}
 
-	public async commit(sendersAddresses: string[]): Promise<void> {
+	public async commit(sendersAddresses: string[], consumedGas: number): Promise<void> {
 		await this.#lock.runExclusive(async () => {
 			if (this.#disposed) {
 				return;
@@ -70,6 +76,8 @@ export class Service implements Contracts.TransactionPool.Service {
 			}
 
 			await this.#cleanUp();
+
+			await this.#rebroadcastStorageTransactions(consumedGas);
 		});
 	}
 
@@ -241,5 +249,36 @@ export class Service implements Contracts.TransactionPool.Service {
 		}
 
 		await this.mempool.addTransaction(transaction);
+	}
+
+	async #rebroadcastStorageTransactions(consumedGas: number): Promise<void> {
+		const blockNumber = this.stateStore.getBlockNumber();
+		const milestones = this.cryptoConfiguration.getMilestone(blockNumber);
+
+		const threshold = this.pluginConfiguration.getRequired<number>(
+			"maxBlockGasUtilizationTransactionRebroadcastThreshold",
+		);
+
+		// If block is not full rebroadcast local transactions.
+		if (consumedGas > milestones.block.maxGasLimit * (threshold / 100)) {
+			return;
+		}
+
+		const limit = this.pluginConfiguration.getRequired<number>("maxTransactionsPerRequest");
+		const broadcastTransactions: Contracts.Crypto.Transaction[] = [];
+
+		// Get old transactions up to current block number.
+		for (const { serialized } of this.storage.getOldTransactions(blockNumber, limit)) {
+			const transaction = await this.transactionFactory.fromBytes(serialized);
+			broadcastTransactions.push(transaction);
+		}
+
+		if (broadcastTransactions.length > 0) {
+			this.logger.info(`Rebroadcasting ${broadcastTransactions.length} transaction(s) from storage`);
+
+			this.broadcaster
+				.broadcastTransactions(broadcastTransactions)
+				.catch((error) => this.logger.error(error.stack));
+		}
 	}
 }
