@@ -32,21 +32,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		sender: Contracts.State.Wallet,
 		evm: Contracts.Evm.Instance,
 	): Promise<void> {
-		if (!sender.getNonce().isEqualTo(transaction.data.nonce)) {
-			throw new Exceptions.UnexpectedNonceError(transaction.data.nonce, sender);
-		}
-
-		if (
-			sender
-				.getBalance()
-				.minus(transaction.data.value)
-				.minus(this.feeCalculator.calculate(transaction))
-				.isNegative() &&
-			this.configuration.getHeight() > 0
-		) {
-			throw new Exceptions.InsufficientBalanceError();
-		}
-
 		// Legacy
 		if (sender.hasLegacySecondPublicKey()) {
 			await this.verifier.verifyLegacySecondSignature(transaction.data, sender.legacySecondPublicKey());
