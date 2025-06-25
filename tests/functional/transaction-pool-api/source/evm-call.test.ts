@@ -302,10 +302,12 @@ describe<{
 
 		let { accept, errors } = await addTransactionsToPool(context, txs);
 		assert.equal(accept, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+		assert.undefined(errors);
 
 		// Replace 6th transaction
 		({ accept, errors } = await addTransactionsToPool(context, [replacementTx]));
 		assert.equal(accept, [0]);
+		assert.undefined(errors);
 
 		await waitBlock(context);
 
@@ -393,10 +395,12 @@ describe<{
 
 		let { accept, errors } = await addTransactionsToPool(context, txs);
 		assert.equal(accept, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+		assert.undefined(errors);
 
 		// Replace 5th transaction
 		({ accept, errors } = await addTransactionsToPool(context, [replacementTx]));
 		assert.equal(accept, [0]);
+		assert.undefined(errors);
 
 		await waitBlock(context);
 
