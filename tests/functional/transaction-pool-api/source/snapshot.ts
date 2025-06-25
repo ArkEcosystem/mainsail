@@ -238,7 +238,7 @@ export class Snapshot {
 
 							// number of blocks + current round + number of deployed contracts
 							const expectedNonce = numberOfBlocks + round + numberOfContracts;
-							console.log("-- COMPARING DEPLOYER WALLET", expectedNonce, deployerDbWallet, dbWallet);
+							// console.log("-- COMPARING DEPLOYER WALLET", expectedNonce, deployerDbWallet, dbWallet);
 							if (BigNumber.make(expectedNonce).isEqualTo(deployerDbWallet.nonce)) {
 								nonceMismatch = false;
 							}
