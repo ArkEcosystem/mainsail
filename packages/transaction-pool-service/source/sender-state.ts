@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
+import { BigNumber } from "@mainsail/utils";
 import { Wallets } from "@mainsail/state";
 
 @injectable()
@@ -35,6 +36,10 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		return this;
 	}
 
+	public getNonce(): BigNumber {
+		return this.#wallet.getNonce();
+	}
+
 	public async reset(): Promise<void> {
 		this.#wallet = await this.app
 			.resolve(Wallets.Wallet)
@@ -42,6 +47,50 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	}
 
 	public async apply(transaction: Contracts.Crypto.Transaction): Promise<void> {
+		await this.#validateTransaction(transaction);
+
+		this.#wallet.increaseNonce();
+		this.#wallet.decreaseBalance(transaction.data.value.plus(this.feeCalculator.calculate(transaction)));
+	}
+
+	public async replace(
+		oldTransaction: Contracts.Crypto.Transaction,
+		newTransaction: Contracts.Crypto.Transaction,
+		currentNonce: BigNumber,
+	): Promise<boolean> {
+		if (!oldTransaction.data.nonce.isEqualTo(newTransaction.data.nonce)) {
+			throw new Error("cannot replace transaction with mismatching nonce");
+		}
+
+		const oldTransactionCost = oldTransaction.data.value.plus(this.feeCalculator.calculate(oldTransaction));
+		const newTransactionCost = newTransaction.data.value.plus(this.feeCalculator.calculate(newTransaction));
+
+		const availableBalance = this.#wallet.getBalance().plus(oldTransactionCost);
+		if (availableBalance.isLessThan(newTransactionCost)) {
+			return false;
+		}
+
+		const nonceOffset = currentNonce.minus(newTransaction.data.nonce).times(-1);
+		await this.#validateTransaction(newTransaction, nonceOffset, oldTransactionCost);
+
+		// Nonce stays the same
+
+		this.#wallet.increaseBalance(oldTransactionCost);
+		this.#wallet.decreaseBalance(newTransactionCost);
+
+		return true;
+	}
+
+	public revert(transaction: Contracts.Crypto.Transaction): void {
+		this.#wallet.decreaseNonce();
+		this.#wallet.increaseBalance(transaction.data.value.plus(this.feeCalculator.calculate(transaction)));
+	}
+
+	async #validateTransaction(
+		transaction: Contracts.Crypto.Transaction,
+		nonceOffset = BigNumber.ZERO,
+		refund = BigNumber.ZERO,
+	): Promise<void> {
 		const maxTransactionBytes: number = this.configuration.getRequired<number>("maxTransactionBytes");
 		if (transaction.serialized.length > maxTransactionBytes) {
 			throw new Exceptions.TransactionExceedsMaximumByteSizeError(transaction, maxTransactionBytes);
@@ -50,6 +99,21 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		const chainId: number = this.cryptoConfiguration.get("network.chainId");
 		if (transaction.data.network && transaction.data.network !== chainId) {
 			throw new Exceptions.TransactionFromWrongNetworkError(transaction, chainId);
+		}
+
+		if (!this.#wallet.getNonce().plus(nonceOffset).isEqualTo(transaction.data.nonce)) {
+			throw new Exceptions.UnexpectedNonceError(transaction.data.nonce, this.#wallet);
+		}
+
+		if (
+			this.#wallet
+				.getBalance()
+				.plus(refund)
+				.minus(transaction.data.value)
+				.minus(this.feeCalculator.calculate(transaction))
+				.isNegative()
+		) {
+			throw new Exceptions.InsufficientBalanceError();
 		}
 
 		const handler: Contracts.Transactions.TransactionHandler =
@@ -71,16 +135,8 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			} catch (error) {
 				throw new Exceptions.TransactionFailedToApplyError(transaction, error);
 			}
-
-			this.#wallet.increaseNonce();
-			this.#wallet.decreaseBalance(transaction.data.value.plus(this.feeCalculator.calculate(transaction)));
 		} else {
 			throw new Exceptions.TransactionFailedToVerifyError(transaction);
 		}
-	}
-
-	public revert(transaction: Contracts.Crypto.Transaction): void {
-		this.#wallet.decreaseNonce();
-		this.#wallet.increaseBalance(transaction.data.value.plus(this.feeCalculator.calculate(transaction)));
 	}
 }
