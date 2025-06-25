@@ -28,5 +28,10 @@ export const defaults = {
 		150,
 	),
 
+	maxBlockGasUtilizationTransactionRebroadcastThreshold: Environment.get(
+		Constants.EnvironmentVariables.MAINSAIL_MAX_BLOCK_GAS_UTILIZATION_TRANSACTION_REBROADCAST_THRESHOLD,
+		90,
+	),
+
 	storage: `${Environment.get(Constants.EnvironmentVariables.MAINSAIL_PATH_DATA)}/transaction-pool.sqlite`,
 };
