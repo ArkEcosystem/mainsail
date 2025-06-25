@@ -14,7 +14,7 @@ export class Storage implements Contracts.TransactionPool.Storage {
 	#addTransactionStmt!: BetterSqlite3.Statement<Contracts.TransactionPool.StoredTransaction>;
 	#hasTransactionStmt!: BetterSqlite3.Statement<{ hash: string }>;
 	#getAllTransactionsStmt!: BetterSqlite3.Statement;
-	#getOldTransactionsStmt!: BetterSqlite3.Statement<{ blockNumber: number }>;
+	#getOldTransactionsStmt!: BetterSqlite3.Statement<{ blockNumber: number; limit: number }>;
 	#removeTransactionStmt!: BetterSqlite3.Statement<{ hash: string }>;
 	#flushStmt!: BetterSqlite3.Statement;
 
@@ -59,7 +59,7 @@ export class Storage implements Contracts.TransactionPool.Storage {
 		);
 
 		this.#getOldTransactionsStmt = this.#database.prepare(
-			`SELECT blockNumber, hash, senderPublicKey, serialized FROM ${table} WHERE blockNumber <= :blockNumber ORDER BY n DESC`,
+			`SELECT blockNumber, hash, senderPublicKey, serialized FROM ${table} WHERE blockNumber <= :blockNumber ORDER BY n DESC LIMIT :limit`,
 		);
 
 		this.#removeTransactionStmt = this.#database.prepare(`DELETE FROM ${table} WHERE hash = :hash`);
@@ -83,9 +83,13 @@ export class Storage implements Contracts.TransactionPool.Storage {
 		return this.#getAllTransactionsStmt.all() as Iterable<Contracts.TransactionPool.StoredTransaction>;
 	}
 
-	public getOldTransactions(blockNumber: number): Iterable<Contracts.TransactionPool.StoredTransaction> {
+	public getOldTransactions(
+		blockNumber: number,
+		limit: number = -1,
+	): Iterable<Contracts.TransactionPool.StoredTransaction> {
 		return this.#getOldTransactionsStmt.all({
 			blockNumber,
+			limit: limit === -1 ? Number.MAX_SAFE_INTEGER : limit,
 		}) as Iterable<Contracts.TransactionPool.StoredTransaction>;
 	}
 

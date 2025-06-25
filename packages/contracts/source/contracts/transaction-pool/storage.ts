@@ -9,7 +9,7 @@ export interface Storage {
 	addTransaction(storedTransaction: StoredTransaction): void;
 	hasTransaction(hash: string): boolean;
 	getAllTransactions(): Iterable<StoredTransaction>;
-	getOldTransactions(blockNumber: number): Iterable<StoredTransaction>;
+	getOldTransactions(blockNumber: number, limit?: number): Iterable<StoredTransaction>;
 	removeTransaction(hash: string): void;
 	flush(): void;
 }
