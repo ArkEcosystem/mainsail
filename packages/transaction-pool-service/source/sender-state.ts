@@ -28,7 +28,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
-	#corrupt = false;
 	#wallet!: Contracts.State.Wallet;
 
 	public async configure(address: string, legacyAddress?: string): Promise<SenderState> {
@@ -62,10 +61,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 				transaction,
 			})
 		) {
-			if (this.#corrupt) {
-				throw new Exceptions.RetryTransactionError(transaction);
-			}
-
 			try {
 				await this.triggers.call("throwIfCannotBeApplied", {
 					evm: this.evm,

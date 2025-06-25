@@ -10,12 +10,6 @@ export class PoolError extends Exception {
 	}
 }
 
-export class RetryTransactionError extends PoolError {
-	public constructor(transaction: Transaction) {
-		super(`tx ${transaction.hash} cannot be added to pool, please retry`, "ERR_RETRY");
-	}
-}
-
 export class TransactionAlreadyInPoolError extends PoolError {
 	public constructor(transaction: Transaction) {
 		super(`tx ${transaction.hash} is already in pool`, "ERR_DUPLICATE");

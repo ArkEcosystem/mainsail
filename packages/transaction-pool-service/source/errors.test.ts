@@ -24,14 +24,6 @@ describe<{
 		};
 	});
 
-	it("RetryTransactionError", (context) => {
-		const error = new Exceptions.RetryTransactionError(context.transaction);
-
-		assert.instance(error, Exceptions.PoolError);
-		assert.equal(error.type, "ERR_RETRY");
-		assert.equal(error.message, `tx ${context.transaction.hash} cannot be added to pool, please retry`);
-	});
-
 	it("TransactionAlreadyInPoolError", (context) => {
 		const error = new Exceptions.TransactionAlreadyInPoolError(context.transaction);
 
