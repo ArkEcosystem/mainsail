@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class Mempool implements Contracts.TransactionPool.Mempool {
@@ -8,6 +8,12 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 
 	@inject(Identifiers.TransactionPool.SenderMempool.Factory)
 	private readonly createSenderMempool!: Contracts.TransactionPool.SenderMempoolFactory;
+
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly events!: Contracts.Kernel.EventDispatcher;
+
+	@inject(Identifiers.TransactionPool.Storage)
+	private readonly storage!: Contracts.TransactionPool.Storage;
 
 	readonly #senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();
 
@@ -42,7 +48,12 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		}
 
 		try {
-			await senderMempool.addTransaction(transaction);
+			// When receiving a nonce less than or equal to the current nonce try to replace it.
+			if (transaction.data.nonce.isLessThanEqual(senderMempool.getNonce())) {
+				await this.#tryReplaceTransaction(transaction, senderMempool);
+			} else {
+				await senderMempool.addTransaction(transaction);
+			}
 		} finally {
 			this.#removeDisposableMempool(from);
 		}
@@ -73,6 +84,25 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		}
 
 		return removedTransactions;
+	}
+
+	async #tryReplaceTransaction(
+		transaction: Contracts.Crypto.Transaction,
+		senderMempool: Contracts.TransactionPool.SenderMempool,
+	): Promise<void> {
+		const removedTransactions = await senderMempool.replaceTransaction(transaction);
+
+		// If no replacement happened, handle the transaction as usual to get a consistent behavior instead
+		// of failing silently.
+		if (removedTransactions.length === 0) {
+			return senderMempool.addTransaction(transaction);
+		}
+
+		for (const removed of removedTransactions) {
+			this.storage.removeTransaction(removed.hash);
+			this.logger.debug(`Removed overwritten tx ${removed.hash}`);
+			void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, removed.data);
+		}
 	}
 
 	public flush(): void {
