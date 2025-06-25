@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { BigNumber, Lock } from "@mainsail/utils";
+import { assert, BigNumber, Lock } from "@mainsail/utils";
 
 @injectable()
 export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
@@ -101,6 +101,8 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 
 		// Check if the transaction can be replaced
 		const sameNonceTransaction = affectedTransactions.at(-1);
+		assert.defined(sameNonceTransaction);
+
 		if (!sameNonceTransaction.data.nonce.isEqualTo(newTransaction.data.nonce)) {
 			throw new Error("transaction nonce mismatch");
 		}
