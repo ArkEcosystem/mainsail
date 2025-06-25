@@ -45,7 +45,7 @@ describe<{
 		assert.equal(accept, [0]);
 
 		await waitBlock(context);
-		await isTransactionCommitted(context, tx);
+		assert.true(await isTransactionCommitted(context, tx));
 	});
 
 	it("should deploy contract and interact with it", async (context) => {
@@ -55,7 +55,7 @@ describe<{
 		assert.equal(accept, [0]);
 
 		await waitBlock(context);
-		await isTransactionCommitted(context, deployTx);
+		assert.true(await isTransactionCommitted(context, deployTx));
 
 		const erc20Address = ethers.getCreateAddress({
 			from: ethers.computeAddress(`0x${deployTx.data.senderPublicKey}`),
@@ -110,7 +110,7 @@ describe<{
 		assert.equal(accept, [0]);
 
 		await waitBlock(context);
-		await isTransactionCommitted(context, tx);
+		assert.true(await isTransactionCommitted(context, tx));
 
 		const legacyAfter = await evm.getAccountInfo(legacyColdWallet.mainsailAddress);
 		assert.equal(legacyAfter.balance, legacyBefore.balance - 108160000000000n - 5n);
@@ -182,7 +182,7 @@ describe<{
 		assert.equal(accept, [0]);
 
 		await waitBlock(context);
-		await isTransactionCommitted(context, fundTx);
+		assert.true(await isTransactionCommitted(context, fundTx));
 
 		const legacyAfter = await evm.getAccountInfoExtended(
 			legacyColdWallet.mainsailAddress,
@@ -205,7 +205,7 @@ describe<{
 		assert.equal(accept, [0]);
 
 		await waitBlock(context);
-		await isTransactionCommitted(context, spentTx);
+		assert.true(await isTransactionCommitted(context, spentTx));
 
 		const receipt = await getTransactionReceipt(context, spentTx);
 		assert.defined(receipt);
@@ -248,9 +248,195 @@ describe<{
 		assert.equal(invalid, [0]);
 		assert.equal(errors, {
 			"0": {
-				message: `tx ${tx.hash} cannot be applied: Insufficient balance in the wallet.`,
-				type: "ERR_APPLY",
+				message: "Insufficient balance in the wallet.",
+				type: "ERR_OTHER",
 			},
 		});
+	});
+
+	it("should accept and replace same nonce with higher gas price", async (context) => {
+		const randomWallet = await Utils.getRandomColdWallet(context);
+
+		const tx1 = await EvmCalls.makeEvmCall(context, {
+			recipient: randomWallet.address,
+			gasPrice: 5 * 1e9,
+			nonceOffset: 0,
+		});
+		const tx2 = await EvmCalls.makeEvmCall(context, {
+			recipient: randomWallet.address,
+			gasPrice: 6 * 1e9,
+			nonceOffset: 0,
+		});
+
+		let { accept } = await addTransactionsToPool(context, [tx1]);
+		assert.equal(accept, [0]);
+
+		({ accept } = await addTransactionsToPool(context, [tx2]));
+		assert.equal(accept, [0]);
+
+		await waitBlock(context);
+
+		assert.false(await isTransactionCommitted(context, tx1));
+		assert.true(await isTransactionCommitted(context, tx2));
+	});
+
+	it("should accept and replace same nonce with higher gas price, but keep subsequent transactions", async (context) => {
+		const randomWallet = await Utils.getRandomColdWallet(context);
+
+		const txs: Contracts.Crypto.Transaction[] = [];
+		for (let i = 0; i < 10; i++) {
+			const tx = await EvmCalls.makeEvmCall(context, {
+				recipient: randomWallet.address,
+				gasPrice: 5 * 1e9,
+				nonceOffset: i,
+			});
+
+			txs.push(tx);
+		}
+
+		const replacementTx = await EvmCalls.makeEvmCall(context, {
+			recipient: randomWallet.address,
+			gasPrice: 6 * 1e9,
+			nonceOffset: 5,
+		});
+
+		let { accept, errors } = await addTransactionsToPool(context, txs);
+		assert.equal(accept, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+
+		// Replace 6th transaction
+		({ accept, errors } = await addTransactionsToPool(context, [replacementTx]));
+		assert.equal(accept, [0]);
+
+		await waitBlock(context);
+
+		for (let i = 0; i < 10; i++) {
+			if (txs[i].data.nonce.isEqualTo(replacementTx.data.nonce)) {
+				assert.false(await isTransactionCommitted(context, txs[i]));
+				assert.true(await isTransactionCommitted(context, replacementTx));
+			} else {
+				assert.true(await isTransactionCommitted(context, txs[i]));
+			}
+		}
+	});
+
+	it("should not accept and replace same nonce with same or lower gas price", async (context) => {
+		const randomWallet = await Utils.getRandomColdWallet(context);
+
+		const tx1 = await EvmCalls.makeEvmCall(context, {
+			recipient: randomWallet.address,
+			gasPrice: 5 * 1e9,
+			nonceOffset: 0,
+		});
+		const tx2 = await EvmCalls.makeEvmCall(context, {
+			recipient: randomWallet.address,
+			gasPrice: 5 * 1e9,
+			value: 1n,
+			nonceOffset: 0,
+		});
+		const tx3 = await EvmCalls.makeEvmCall(context, {
+			recipient: randomWallet.address,
+			gasPrice: 5 * 1e9,
+			value: 2n,
+			nonceOffset: 0,
+		});
+
+		let { accept, invalid } = await addTransactionsToPool(context, [tx1]);
+		assert.equal(accept, [0]);
+
+		({ accept, invalid } = await addTransactionsToPool(context, [tx2, tx3]));
+		assert.equal(accept, []);
+		assert.equal(invalid, [0, 1]);
+
+		await waitBlock(context);
+
+		assert.true(await isTransactionCommitted(context, tx1));
+		assert.false(await isTransactionCommitted(context, tx2));
+		assert.false(await isTransactionCommitted(context, tx3));
+	});
+
+	it("should accept and replace same nonce with higher gas price, but replay subsequent transactions", async (context) => {
+		const senderWallet = await Utils.getRandomColdWallet(context);
+		const recipientWallet = await Utils.getRandomColdWallet(context);
+
+		// Fund fresh wallet
+		const fundTx = await EvmCalls.makeEvmCall(context, {
+			recipient: senderWallet.address,
+			gasPrice: 5 * 1e9,
+			value: ethers.parseEther("1001"),
+		});
+		await addTransactionsToPool(context, [fundTx]);
+		await waitBlock(context);
+		assert.true(await isTransactionCommitted(context, fundTx));
+
+		// Send 10 txs each 100 ARK
+		const txs: Contracts.Crypto.Transaction[] = [];
+		for (let i = 0; i < 10; i++) {
+			const tx = await EvmCalls.makeEvmCall(context, {
+				sender: senderWallet.keyPair,
+				recipient: recipientWallet.address,
+				gasPrice: 5 * 1e9,
+				value: ethers.parseEther("100"),
+				nonceOffset: i,
+			});
+
+			txs.push(tx);
+		}
+
+		// Replace 6th transaction with 500 ARK, to invalidate all subsequent transactions.
+		const replacementTx = await EvmCalls.makeEvmCall(context, {
+			sender: senderWallet.keyPair,
+			recipient: recipientWallet.address,
+			gasPrice: 6 * 1e9,
+			value: ethers.parseEther("500"),
+			nonceOffset: 5,
+		});
+
+		let { accept, errors } = await addTransactionsToPool(context, txs);
+		assert.equal(accept, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+
+		// Replace 5th transaction
+		({ accept, errors } = await addTransactionsToPool(context, [replacementTx]));
+		assert.equal(accept, [0]);
+
+		await waitBlock(context);
+
+		for (let i = 0; i < 10; i++) {
+			if (txs[i].data.nonce.isLessThan(replacementTx.data.nonce)) {
+				assert.true(await isTransactionCommitted(context, txs[i]));
+			} else if (txs[i].data.nonce.isEqualTo(replacementTx.data.nonce)) {
+				assert.false(await isTransactionCommitted(context, txs[i]));
+				assert.true(await isTransactionCommitted(context, replacementTx));
+			} else {
+				assert.false(await isTransactionCommitted(context, txs[i]));
+			}
+		}
+	});
+
+	it("should not accept and replace same nonce with same or lower gas price", async (context) => {
+		const randomWallet = await Utils.getRandomColdWallet(context);
+
+		const tx1 = await EvmCalls.makeEvmCall(context, {
+			recipient: randomWallet.address,
+			gasPrice: 5 * 1e9,
+			nonceOffset: 0,
+		});
+		const tx2 = await EvmCalls.makeEvmCall(context, {
+			recipient: randomWallet.address,
+			gasPrice: 5 * 1e9,
+			value: 1n,
+			nonceOffset: 0,
+		});
+
+		let { accept, invalid } = await addTransactionsToPool(context, [tx1]);
+		assert.equal(accept, [0]);
+
+		({ accept, invalid } = await addTransactionsToPool(context, [tx2]));
+		assert.equal(accept, []);
+		assert.equal(invalid, [0]);
+
+		await waitBlock(context);
+
+		assert.true(await isTransactionCommitted(context, tx1));
+		assert.false(await isTransactionCommitted(context, tx2));
 	});
 });
