@@ -24,9 +24,9 @@ export class ValidatorFilter {
 					expressions: [
 						{ attribute: "validatorPublicKey", op: "jsonbAttributeExists", property: "attributes" },
 						{
-							property: "attributes",
 							jsonFieldAccessor: { fieldName: "validatorPublicKey", operator: "->>" },
 							op: "notEqual",
+							property: "attributes",
 							value: "",
 						},
 					],
