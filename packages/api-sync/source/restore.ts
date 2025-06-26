@@ -161,9 +161,9 @@ export class Restore {
 				contractRepository: this.contractRepositoryFactory(entityManager),
 				entityManager,
 				lastBlockNumber: this.configuration.getGenesisHeight(),
+				legacyAddresses: new Set(),
 				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
 				mostRecentCommit,
-				legacyAddresses: new Set(),
 				publicKeyToAddress: {},
 
 				receiptRepository: this.receiptRepositoryFactory(entityManager),
