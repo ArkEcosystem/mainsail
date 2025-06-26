@@ -27,6 +27,7 @@ interface RestoreContext {
 	// lookups
 	readonly addressToPublicKey: Record<string, string>;
 	readonly publicKeyToAddress: Record<string, string>;
+	readonly legacyAddresses: Set<string>;
 
 	// metrics
 	mostRecentCommit: Contracts.Crypto.Commit;
@@ -174,6 +175,7 @@ export class Restore {
 				validatorAttributes: {},
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
 				walletRepository: this.walletRepositoryFactory(entityManager),
+				legacyAddresses: new Set(),
 			};
 
 			// The restore keeps a long-lived postgres transaction while it ingests all data.
@@ -380,6 +382,7 @@ export class Restore {
 			for (const wallet of this.snapshotImporter.wallets) {
 				// add any imported address to the mapping
 				if (wallet.ethAddress && wallet.publicKey) {
+					context.legacyAddresses.add(wallet.ethAddress);
 					context.addressToPublicKey[wallet.ethAddress] = wallet.publicKey;
 				}
 			}
@@ -431,12 +434,20 @@ export class Restore {
 							? {
 									...(userAttributes.vote ? { vote: userAttributes.vote } : {}),
 									...(username ? { username } : {}),
-									...(userAttributes.legacyMerge ? { legacyMerge: userAttributes.legacyMerge } : {}),
+									...(userAttributes.legacyMerge
+										? // merged legacy cold wallets
+											{ isLegacy: true, legacyMerge: userAttributes.legacyMerge }
+										: {}),
+								}
+							: {}),
+						...(context.legacyAddresses.has(account.address)
+							? {
+									// all legacy non-cold wallets
+									isLegacy: true,
 								}
 							: {}),
 						...(legacyAttributes && Object.keys(legacyAttributes).length > 0
 							? {
-									isLegacy: true,
 									...(legacyAttributes.secondPublicKey
 										? { secondPublicKey: legacyAttributes.secondPublicKey }
 										: {}),

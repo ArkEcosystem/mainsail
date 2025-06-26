@@ -462,9 +462,10 @@ export class Sync implements Contracts.ApiSync.Service {
 		public_key = COALESCE(NULLIF(EXCLUDED.public_key, ''), "Wallet".public_key),
 		attributes = jsonb_strip_nulls(jsonb_build_object(
 			-- legacy attributes are kept indefinitely
-			'isLegacy', EXCLUDED.attributes->>'isLegacy',
-			'secondPublicKey', EXCLUDED.attributes->>'secondPublicKey',
-			'legacyMerge', EXCLUDED.attributes->>'legacyMerge',
+			'isLegacy', ("Wallet".attributes->>'isLegacy')::boolean,
+			'secondPublicKey', "Wallet".attributes->>'secondPublicKey',
+			'multiSignature', "Wallet".attributes->>'multiSignature',
+			'legacyMerge', "Wallet".attributes->>'legacyMerge',
 
 			-- if any unvote is present, it will overwrite the previous vote
 			'vote',
