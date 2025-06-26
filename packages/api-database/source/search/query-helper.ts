@@ -75,6 +75,13 @@ export class QueryHelper<TEntity> {
 				const parameters = { [parameter]: expression.value };
 				return { parameters, query };
 			}
+			case "notEqual": {
+				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
+				const parameter = `p${this.paramNo++}`;
+				const query = `${column} <> :${parameter}`;
+				const parameters = { [parameter]: expression.value };
+				return { parameters, query };
+			}
 			case "between": {
 				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
 				const parameterFrom = `p${this.paramNo++}`;
