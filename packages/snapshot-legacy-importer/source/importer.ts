@@ -46,6 +46,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
 	private readonly deployerAddress!: string;
 
+	#prepared = false;
+
 	#consensusProxyContractAddress!: string;
 	#usernamesProxyContractAddress!: string;
 
@@ -104,20 +106,14 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	#nonce = 0n;
 
 	public async run(genesisBlock: Contracts.Crypto.Commit): Promise<Contracts.Snapshot.LegacyImportResult> {
+		await this.prepareRestore();
+
 		const {
 			block: { header },
 		} = genesisBlock;
 
 		const milestone = this.configuration.getMilestone(this.configuration.getGenesisHeight());
 		assert.defined(milestone.snapshot);
-
-		const snapshotPath = path.join(
-			this.app.configPath("snapshot"),
-			`${milestone.snapshot.snapshotHash}.compressed`,
-		);
-		this.logger.info(`Importing genesis snapshot: ${snapshotPath}`);
-
-		await this.prepare(snapshotPath);
 
 		if (this.snapshotHash !== milestone.snapshot.snapshotHash) {
 			throw new Error("imported snapshot hash mismatch");
@@ -141,7 +137,25 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		return result;
 	}
 
+	public async prepareRestore(): Promise<void> {
+		const milestone = this.configuration.getMilestone(this.configuration.getGenesisHeight());
+		assert.defined(milestone.snapshot);
+
+		const snapshotPath = path.join(
+			this.app.configPath("snapshot"),
+			`${milestone.snapshot.snapshotHash}.compressed`,
+		);
+
+		this.logger.info(`Importing genesis snapshot: ${snapshotPath}`);
+
+		return this.prepare(snapshotPath);
+	}
+
 	public async prepare(snapshotPath: string): Promise<void> {
+		if (this.#prepared) {
+			return;
+		}
+
 		const snapshot = await this.#readSnapshot(snapshotPath);
 
 		const hash = createHash("sha256");
@@ -268,6 +282,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			voters,
 			wallets,
 		};
+
+		this.#prepared = true;
 	}
 
 	public async import(

@@ -133,6 +133,10 @@ export class Restore {
 	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
 
 	public async restore(): Promise<void> {
+		if (this.snapshotImporter) {
+			await this.snapshotImporter.prepareRestore();
+		}
+
 		const isEmpty = await this.databaseService.isEmpty();
 		const mostRecentCommit = await (isEmpty
 			? this.stateStore.getGenesisCommit()
