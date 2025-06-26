@@ -23,7 +23,7 @@ interface EstimateOutcome {
 @injectable()
 export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "validator")
+	@tagged("instance", "rpc")
 	private readonly evm!: Contracts.Evm.Instance;
 
 	@inject(Identifiers.Cryptography.Configuration)
