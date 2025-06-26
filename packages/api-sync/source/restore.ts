@@ -163,11 +163,12 @@ export class Restore {
 				lastBlockNumber: this.configuration.getGenesisHeight(),
 				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
 				mostRecentCommit,
+				legacyAddresses: new Set(),
 				publicKeyToAddress: {},
+
 				receiptRepository: this.receiptRepositoryFactory(entityManager),
 
 				stateRepository: this.stateRepositoryFactory(entityManager),
-
 				totalSupply: BigNumber.ZERO,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				transactionTypeRepository: this.transactionTypeRepositoryFactory(entityManager),
@@ -175,7 +176,6 @@ export class Restore {
 				validatorAttributes: {},
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
 				walletRepository: this.walletRepositoryFactory(entityManager),
-				legacyAddresses: new Set(),
 			};
 
 			// The restore keeps a long-lived postgres transaction while it ingests all data.
@@ -234,7 +234,7 @@ export class Restore {
 		const BATCH_SIZE = 1000;
 		const t0 = performance.now();
 
-		let genesisBlockNumber = this.configuration.getGenesisHeight();
+		const genesisBlockNumber = this.configuration.getGenesisHeight();
 		let currentBlockNumber = genesisBlockNumber;
 
 		do {
