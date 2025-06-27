@@ -86,6 +86,10 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return this.#evm.process(txContext);
 	}
 
+	public async simulate(txContext: Contracts.Evm.TransactionSimulateContext): Promise<Contracts.Evm.SimulateResult> {
+		return this.#evm.simulate(txContext);
+	}
+
 	public async initializeGenesis(info: Contracts.Evm.GenesisInfo): Promise<void> {
 		return this.#evm.initializeGenesis({
 			account: info.account,
