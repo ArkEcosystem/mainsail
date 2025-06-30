@@ -36,6 +36,8 @@ export interface TransactionData {
 	v?: number;
 	r?: string;
 	s?: string;
+	rlpPrefix?: number;
+
 	legacySecondSignature?: string;
 
 	transactionIndex?: number;
@@ -65,6 +67,7 @@ export interface TransactionJson {
 	v?: number;
 	r?: string;
 	s?: string;
+	rlpPrefix?: number;
 
 	transactionIndex?: number;
 	gasUsed?: number;

@@ -46,6 +46,8 @@ export const transactionBaseSchema: SchemaObject = {
 		// TODO: prefixed hex
 		s: { type: "string" },
 
+		rlpPrefix: { type: "number", minimum: 0, maximum: 2 },
+
 		senderLegacyAddress: { type: "string" },
 
 		senderPublicKey: { $ref: "publicKey" },
