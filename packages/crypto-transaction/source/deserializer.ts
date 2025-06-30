@@ -20,9 +20,10 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 				: serialized;
 
 		// Remove type prefix (e.g. 02) if it's a EIP1559 tx (`decodeRlp` expects input to be without)
-		const isPrefixed = rlpBuffer[0] < 0xc0;
-		if (isPrefixed) {
-			if (rlpBuffer[0] !== 0x02) {
+		let prefix: number | undefined = undefined;
+		if (rlpBuffer[0] < 0xc0) {
+			prefix = rlpBuffer[0];
+			if (prefix !== 0x02) {
 				throw new Error("expected EIP1559 transaction");
 			}
 
@@ -31,16 +32,16 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 		const decoded = decodeRlp(new Uint8Array(rlpBuffer));
 
-		if (isPrefixed) {
+		if (typeof prefix !== "undefined") {
 			this.#decodeEIP1559Transaction(decoded, data);
+			serialized = Buffer.concat([Buffer.from([prefix]), rlpBuffer]);
 		} else {
 			this.#decodeLegacyTransaction(decoded, data);
+			serialized = rlpBuffer;
 		}
 
 		const instance: Contracts.Crypto.Transaction = this.transactionTypeFactory.create(data);
-
-		const eip1559Prefix = 0x02; // marker for Type 2 (EIP1559) transaction which is the standard nowadays
-		instance.serialized = isPrefixed ? Buffer.concat([Buffer.from([eip1559Prefix]), rlpBuffer]) : rlpBuffer;
+		instance.serialized = serialized;
 
 		return instance;
 	}
@@ -65,6 +66,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		data.to = recipientAddressRaw ? getAddress(recipientAddressRaw) : undefined;
 		data.value = this.#parseBigNumber(decoded[6].toString());
 		data.data = this.#parseData(decoded[7].toString());
+		data.rlpPrefix = 0x02;
 
 		// Signature
 		if (decoded.length >= 12) {
@@ -106,7 +108,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 			data.network = chainId;
 
-			const normalizedV = v >= 35 ? ((v - 1) % 2) + 27 : v;
+			const normalizedV = v - (chainId * 2 + 35);
 			data.v = normalizedV;
 
 			data.r = decoded[7].toString().slice(2);
