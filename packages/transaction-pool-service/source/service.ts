@@ -77,7 +77,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			await this.#cleanUp();
 
-			await this.#rebroadcastStorageTransactions(consumedGas);
+			await this.#rebroadcastMempoolTransactions(consumedGas);
 		});
 	}
 
@@ -251,7 +251,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		await this.mempool.addTransaction(transaction);
 	}
 
-	async #rebroadcastStorageTransactions(consumedGas: number): Promise<void> {
+	async #rebroadcastMempoolTransactions(consumedGas: number): Promise<void> {
 		const blockNumber = this.stateStore.getBlockNumber();
 		const milestones = this.cryptoConfiguration.getMilestone(blockNumber);
 
@@ -265,10 +265,13 @@ export class Service implements Contracts.TransactionPool.Service {
 		const limit = this.pluginConfiguration.getRequired<number>("maxTransactionsPerRequest");
 		const broadcastTransactions: Contracts.Crypto.Transaction[] = [];
 
-		// Get old transactions up to current block number.
-		for (const { serialized } of this.storage.getOldTransactions(blockNumber, limit)) {
-			const transaction = await this.transactionFactory.fromBytes(serialized);
+		const all = await this.poolQuery.getFromHighestPriority().all();
+		for (const transaction of all) {
 			broadcastTransactions.push(transaction);
+
+			if (broadcastTransactions.length >= limit) {
+				break;
+			}
 		}
 
 		if (broadcastTransactions.length > 0) {
