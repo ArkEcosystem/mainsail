@@ -32,7 +32,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 		const decoded = decodeRlp(new Uint8Array(rlpBuffer));
 
-		if (typeof prefix !== "undefined") {
+		if (prefix !== undefined) {
 			this.#decodeEIP1559Transaction(decoded, data);
 			serialized = Buffer.concat([Buffer.from([prefix]), rlpBuffer]);
 		} else {

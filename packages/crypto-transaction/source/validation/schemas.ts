@@ -43,10 +43,10 @@ export const transactionBaseSchema: SchemaObject = {
 
 		r: { type: "string" },
 
+		rlpPrefix: { maximum: 2, minimum: 0, type: "number" },
+
 		// TODO: prefixed hex
 		s: { type: "string" },
-
-		rlpPrefix: { type: "number", minimum: 0, maximum: 2 },
 
 		senderLegacyAddress: { type: "string" },
 
