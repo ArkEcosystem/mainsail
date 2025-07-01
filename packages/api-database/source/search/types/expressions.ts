@@ -13,6 +13,13 @@ export type EqualExpression<TEntity> = {
 	value: any;
 };
 
+export type NotEqualExpression<TEntity> = {
+	property: keyof TEntity;
+	jsonFieldAccessor?: JsonFieldAccessor;
+	op: "notEqual";
+	value: any;
+};
+
 export type BetweenExpression<TEntity> = {
 	property: keyof TEntity;
 	jsonFieldAccessor?: JsonFieldAccessor;
@@ -75,6 +82,7 @@ export type Expression<TEntity> =
 	| TrueExpression
 	| FalseExpression
 	| EqualExpression<TEntity>
+	| NotEqualExpression<TEntity>
 	| BetweenExpression<TEntity>
 	| GreaterThanEqualExpression<TEntity>
 	| LessThanEqualExpression<TEntity>

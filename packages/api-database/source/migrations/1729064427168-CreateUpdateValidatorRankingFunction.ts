@@ -13,7 +13,7 @@ export class CreateUpdateValidatorRankingFunction1729064427168 implements Migrat
                         (attributes->>'validatorVoteBalance')::numeric AS vote_balance,
                         COALESCE((attributes->>'validatorResigned')::boolean, FALSE) AS is_resigned
                     FROM wallets
-                    WHERE attributes ? 'validatorPublicKey'
+                    WHERE attributes ? 'validatorPublicKey' AND attributes->>'validatorPublicKey' <> ''
                 ),
                 ranking AS (
                     SELECT

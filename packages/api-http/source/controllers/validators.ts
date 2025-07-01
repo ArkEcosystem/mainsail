@@ -109,6 +109,7 @@ export class ValidatorsController extends Controller {
 			.createQueryBuilder()
 			.select()
 			.where("attributes ? :validatorPublicKey", { validatorPublicKey: "validatorPublicKey" })
+			.andWhere("attributes->>:validatorPublicKey <> ''", { validatorPublicKey: "validatorPublicKey" })
 			.andWhere(
 				new ApiDatabaseContracts.Brackets((query) => {
 					query
