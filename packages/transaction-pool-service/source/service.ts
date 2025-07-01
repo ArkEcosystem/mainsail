@@ -255,9 +255,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		const blockNumber = this.stateStore.getBlockNumber();
 		const milestones = this.cryptoConfiguration.getMilestone(blockNumber);
 
-		const threshold = this.pluginConfiguration.getRequired<number>(
-			"maxBlockGasUtilizationTransactionRebroadcastThreshold",
-		);
+		const threshold = this.pluginConfiguration.getRequired<number>("rebroadcastThreshold");
 
 		// If block is not full rebroadcast local transactions.
 		if (consumedGas > milestones.block.maxGasLimit * (threshold / 100)) {

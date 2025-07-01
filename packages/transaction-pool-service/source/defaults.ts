@@ -6,9 +6,9 @@ export const defaults = {
 
 	enabled: !Environment.isTrue(Constants.EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_DISABLED),
 
-	maxBlockGasUtilizationTransactionRebroadcastThreshold: Environment.get(
-		Constants.EnvironmentVariables.MAINSAIL_MAX_BLOCK_GAS_UTILIZATION_TRANSACTION_REBROADCAST_THRESHOLD,
-		90,
+	rebroadcastThreshold: Environment.get(
+		Constants.EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_REBROADCAST_THRESHOLD,
+		60,
 	),
 
 	// Max transaction age in number of blocks produced since the transaction was created.
