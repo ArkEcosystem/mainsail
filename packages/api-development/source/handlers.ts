@@ -9,7 +9,6 @@ import * as Peers from "./routes/peers.js";
 import * as Round from "./routes/round.js";
 import * as Transactions from "./routes/transactions.js";
 import * as Validators from "./routes/validators.js";
-import * as Wallets from "./routes/wallets.js";
 
 const config = {
 	name: "Development API",
@@ -24,7 +23,6 @@ const config = {
 			Peers,
 			Round,
 			Transactions,
-			Wallets,
 		];
 
 		for (const handler of handlers) {
