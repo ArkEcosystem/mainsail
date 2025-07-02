@@ -8,7 +8,6 @@ import * as Node from "./routes/node.js";
 import * as Peers from "./routes/peers.js";
 import * as Round from "./routes/round.js";
 import * as Transactions from "./routes/transactions.js";
-import * as Validators from "./routes/validators.js";
 
 const config = {
 	name: "Development API",
@@ -18,7 +17,6 @@ const config = {
 			Blockchain,
 			Blocks,
 			Consensus,
-			Validators,
 			Node,
 			Peers,
 			Round,
