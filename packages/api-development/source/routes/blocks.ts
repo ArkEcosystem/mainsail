@@ -67,25 +67,4 @@ export const register = (server: Hapi.Server<any>): void => {
 		},
 		path: "/blocks/{id}",
 	});
-
-	server.route({
-		handler: (request: Hapi.Request) => controller.transactions(request),
-		method: "GET",
-		options: {
-			plugins: {
-				pagination: {
-					enabled: true,
-				},
-			},
-			validate: {
-				params: Joi.object({
-					id: Joi.string(),
-				}),
-				query: Joi.object({
-					transform: Joi.bool().default(true),
-				}).concat(pagination),
-			},
-		},
-		path: "/blocks/{id}/transactions",
-	});
 };

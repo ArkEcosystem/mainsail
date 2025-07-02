@@ -3,7 +3,7 @@ import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { BlockResource, TransactionResource } from "../resources/index.js";
+import { BlockResource } from "../resources/index.js";
 import { Controller } from "./controller.js";
 
 @injectable()
@@ -50,26 +50,6 @@ export class BlocksController extends Controller {
 		}
 
 		return this.respondWithResource(block, BlockResource);
-	}
-
-	public async transactions(request: Hapi.Request) {
-		const block = await this.getBlock(request.params.id);
-
-		if (!block) {
-			return notFound("Block not found");
-		}
-
-		const transactions = block.transactions.map((tx) => tx.data);
-
-		const pagination = this.getQueryPagination(request.query);
-
-		return this.toPagination(
-			{
-				results: transactions.slice(pagination.offset, pagination.offset + pagination.limit),
-				totalCount: block.transactions.length,
-			},
-			TransactionResource,
-		);
 	}
 
 	// TODO: Support block number only
