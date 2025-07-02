@@ -7,7 +7,6 @@ import * as Consensus from "./routes/consensus.js";
 import * as Node from "./routes/node.js";
 import * as Peers from "./routes/peers.js";
 import * as Round from "./routes/round.js";
-import * as Transactions from "./routes/transactions.js";
 
 const config = {
 	name: "Development API",
@@ -20,7 +19,6 @@ const config = {
 			Node,
 			Peers,
 			Round,
-			Transactions,
 		];
 
 		for (const handler of handlers) {
