@@ -4,8 +4,9 @@ use ctx::{
     BlockContext, CalculateRoundValidatorsContext, EvmOptions, ExecutionContext, GenesisContext,
     JsCalculateRoundValidatorsContext, JsCommitData, JsCommitKey, JsEvmOptions, JsGenesisContext,
     JsPrepareNextCommitContext, JsPreverifyTransactionContext, JsTransactionContext,
-    JsTransactionViewContext, JsUpdateRewardsAndVotesContext, PrepareNextCommitContext,
-    PreverifyTxContext, TxContext, TxViewContext, UpdateRewardsAndVotesContext,
+    JsTransactionSimulateContext, JsTransactionViewContext, JsUpdateRewardsAndVotesContext,
+    PrepareNextCommitContext, PreverifyTxContext, TxContext, TxSimulateContext, TxViewContext,
+    UpdateRewardsAndVotesContext,
 };
 use logger::JsLogger;
 use mainsail_evm_core::{
@@ -254,6 +255,7 @@ impl EvmInner {
             gas_price: 0,
             spec_id: ctx.spec_id,
             tx_hash: None,
+            stateful: true,
         }) {
             Ok(receipt) => {
                 self.logger.log(
@@ -339,6 +341,7 @@ impl EvmInner {
                     gas_price: 0,
                     spec_id: ctx.spec_id,
                     tx_hash: None,
+                    stateful: true,
                 }) {
                     Ok(receipt) => {
                         self.logger.log(
@@ -662,6 +665,13 @@ impl EvmInner {
         }
     }
 
+    pub fn simulate(
+        &mut self,
+        ctx: TxSimulateContext,
+    ) -> std::result::Result<TxReceipt, EVMError<String>> {
+        self.execute(ctx.into())
+    }
+
     pub fn process(
         &mut self,
         tx_ctx: TxContext,
@@ -721,27 +731,7 @@ impl EvmInner {
             }
         }
 
-        let result = self.transact_evm(tx_ctx.into());
-
-        match result {
-            Ok(result) => {
-                let receipt = map_execution_result(result);
-                Ok(receipt)
-            }
-            Err(err) => {
-                match err {
-                    EVMError::Transaction(err) => {
-                        return Err(EVMError::Transaction(err));
-                    }
-                    // EVMError::Header(_) => todo!(),
-                    // EVMError::Database(_) => todo!(),
-                    // EVMError::Custom(_) => todo!(),
-                    _ => {
-                        unimplemented!("fatal evm err {:?}", err);
-                    }
-                }
-            }
-        }
+        self.execute(tx_ctx.into())
     }
 
     pub fn commit(
@@ -947,13 +937,40 @@ impl EvmInner {
         Ok(())
     }
 
+    fn execute(
+        &mut self,
+        ctx: ExecutionContext,
+    ) -> std::result::Result<TxReceipt, EVMError<String>> {
+        match self.transact_evm(ctx.into()) {
+            Ok(result) => {
+                let receipt = map_execution_result(result);
+                Ok(receipt)
+            }
+            Err(err) => {
+                match err {
+                    EVMError::Transaction(err) => {
+                        return Err(EVMError::Transaction(err));
+                    }
+                    // EVMError::Header(_) => todo!(),
+                    // EVMError::Database(_) => todo!(),
+                    // EVMError::Custom(_) => todo!(),
+                    _ => {
+                        panic!("fatal evm err {:?}", err);
+                    }
+                }
+            }
+        }
+    }
+
     fn transact_evm(
         &mut self,
         ctx: ExecutionContext,
     ) -> std::result::Result<ExecutionResult, EVMError<mainsail_evm_core::db::Error>> {
         let mut state_builder = State::builder().with_bundle_update();
 
-        if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key) {
+        if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key)
+            && ctx.stateful
+        {
             if let Some(pending_commit) = self.pending_commits.get_mut(commit_key) {
                 state_builder =
                     state_builder.with_cached_prestate(std::mem::take(&mut pending_commit.cache));
@@ -1004,7 +1021,9 @@ impl EvmInner {
                 let ResultAndState { state, result } = result;
 
                 // Update state if transaction is part of a commit
-                if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key) {
+                if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key)
+                    && ctx.stateful
+                {
                     let state_db = evm.db_mut();
                     state_db.commit(state);
 
@@ -1137,6 +1156,19 @@ impl JsEvmWrapper {
         node_env.execute_tokio_future(
             Self::process_async(self.evm.clone(), tx_ctx),
             |&mut node_env, result| Ok(result::JsProcessResult::new(&node_env, result)?),
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<JsSimulateResult>")]
+    pub fn simulate(
+        &mut self,
+        node_env: Env,
+        tx_ctx: JsTransactionSimulateContext,
+    ) -> Result<JsObject> {
+        let tx_ctx = TxSimulateContext::try_from(tx_ctx)?;
+        node_env.execute_tokio_future(
+            Self::simulate_async(self.evm.clone(), tx_ctx),
+            |&mut node_env, result| Ok(result::JsSimulateResult::new(&node_env, result)?),
         )
     }
 
@@ -1594,6 +1626,19 @@ impl JsEvmWrapper {
     ) -> Result<TxReceipt> {
         let mut lock = evm.lock().await;
         let result = lock.process(tx_ctx);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn simulate_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        tx_ctx: TxSimulateContext,
+    ) -> Result<TxReceipt> {
+        let mut lock = evm.lock().await;
+        let result = lock.simulate(tx_ctx);
 
         match result {
             Ok(result) => Result::Ok(result),

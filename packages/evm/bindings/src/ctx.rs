@@ -35,6 +35,20 @@ pub struct JsTransactionContext {
 }
 
 #[napi(object)]
+pub struct JsTransactionSimulateContext {
+    pub from: JsString,
+    /// Omit recipient when deploying a contract
+    pub to: Option<JsString>,
+    pub gas_limit: JsBigInt,
+    pub gas_price: JsBigInt,
+    pub value: JsBigInt,
+    pub nonce: JsBigInt,
+    pub data: JsBuffer,
+    pub block_context: JsBlockContext,
+    pub spec_id: JsString,
+}
+
+#[napi(object)]
 pub struct JsPreverifyTransactionContext {
     pub from: JsString,
     pub legacy_address: Option<JsString>,
@@ -164,6 +178,19 @@ pub struct TxViewContext {
 }
 
 #[derive(Debug)]
+pub struct TxSimulateContext {
+    pub from: Address,
+    pub to: Option<Address>,
+    pub gas_limit: u64,
+    pub gas_price: u128,
+    pub value: U256,
+    pub nonce: u64,
+    pub data: Bytes,
+    pub block_context: BlockContext,
+    pub spec_id: SpecId,
+}
+
+#[derive(Debug)]
 pub struct BlockContext {
     pub commit_key: CommitKey,
     pub gas_limit: u64,
@@ -217,6 +244,7 @@ pub struct ExecutionContext {
     pub tx_hash: Option<B256>,
     pub block_context: Option<BlockContext>,
     pub spec_id: SpecId,
+    pub stateful: bool,
 }
 
 impl From<TxViewContext> for ExecutionContext {
@@ -232,6 +260,7 @@ impl From<TxViewContext> for ExecutionContext {
             tx_hash: None,
             block_context: None,
             spec_id: value.spec_id,
+            stateful: false,
         }
     }
 }
@@ -249,6 +278,25 @@ impl From<TxContext> for ExecutionContext {
             tx_hash: Some(value.tx_hash),
             block_context: Some(value.block_context),
             spec_id: value.spec_id,
+            stateful: true,
+        }
+    }
+}
+
+impl From<TxSimulateContext> for ExecutionContext {
+    fn from(value: TxSimulateContext) -> Self {
+        Self {
+            from: value.from,
+            to: value.to,
+            gas_limit: Some(value.gas_limit),
+            gas_price: value.gas_price,
+            value: value.value,
+            nonce: Some(value.nonce),
+            data: value.data,
+            tx_hash: None,
+            block_context: Some(value.block_context),
+            spec_id: value.spec_id,
+            stateful: false,
         }
     }
 }
@@ -364,6 +412,32 @@ impl TryFrom<JsTransactionContext> for TxContext {
         };
 
         Ok(tx_ctx)
+    }
+}
+
+impl TryFrom<JsTransactionSimulateContext> for TxSimulateContext {
+    type Error = anyhow::Error;
+
+    fn try_from(mut value: JsTransactionSimulateContext) -> std::result::Result<Self, Self::Error> {
+        let buf = value.data.into_value()?;
+
+        let to = if let Some(to) = value.to {
+            Some(utils::create_address_from_js_string(to)?)
+        } else {
+            None
+        };
+
+        Ok(TxSimulateContext {
+            to,
+            gas_limit: value.gas_limit.try_into()?,
+            gas_price: value.gas_price.get_u128()?.1,
+            from: utils::create_address_from_js_string(value.from)?,
+            value: utils::convert_bigint_to_u256(value.value)?,
+            nonce: value.nonce.get_u64()?.0,
+            data: Bytes::from(buf.as_ref().to_owned()),
+            block_context: value.block_context.try_into()?,
+            spec_id: parse_spec_id(value.spec_id)?,
+        })
     }
 }
 

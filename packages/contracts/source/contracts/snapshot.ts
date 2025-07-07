@@ -4,6 +4,7 @@ import { CommitKey } from "./evm/evm.js";
 export interface LegacyImporter {
 	run(genesisBlock: Commit): Promise<LegacyImportResult>;
 	prepare(snapshotPath: string): Promise<void>;
+	prepareRestore(): Promise<void>;
 	import(options: LegacyImportOptions): Promise<LegacyImportResult>;
 
 	wallets: ImportedLegacyWallet[];

@@ -9,7 +9,10 @@ export interface GenesisInfo {
 
 export interface ProcessResult {
 	readonly receipt: TransactionReceipt;
-	readonly mocked?: boolean;
+}
+
+export interface SimulateResult {
+	readonly receipt: TransactionReceipt;
 }
 
 export interface ViewResult {
@@ -114,6 +117,19 @@ export interface TransactionContext {
 	readonly blockContext: BlockContext;
 	readonly txHash: string;
 	readonly index?: number;
+	readonly specId: SpecId;
+}
+
+export interface TransactionSimulateContext {
+	readonly from: string;
+	/** Omit recipient when deploying a contract */
+	readonly to?: string;
+	readonly gasLimit: bigint;
+	readonly value: bigint;
+	readonly gasPrice: bigint;
+	readonly nonce: bigint;
+	readonly data: Buffer;
+	readonly blockContext: BlockContext;
 	readonly specId: SpecId;
 }
 

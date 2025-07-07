@@ -26,6 +26,18 @@ impl JsProcessResult {
 }
 
 #[napi(object)]
+pub struct JsSimulateResult {
+    pub receipt: JsTransactionReceipt,
+}
+impl JsSimulateResult {
+    pub fn new(node_env: &napi::Env, receipt: TxReceipt) -> anyhow::Result<Self> {
+        Ok(Self {
+            receipt: JsTransactionReceipt::new(node_env, receipt)?,
+        })
+    }
+}
+
+#[napi(object)]
 pub struct JsCommitResult {
     pub dirty_accounts: Vec<JsAccountUpdate>,
 }

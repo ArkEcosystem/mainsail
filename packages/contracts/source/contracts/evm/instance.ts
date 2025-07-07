@@ -15,7 +15,9 @@ import {
 	PreverifyTransactionContext,
 	PreverifyTransactionResult,
 	ProcessResult,
+	SimulateResult,
 	TransactionContext,
+	TransactionSimulateContext,
 	TransactionViewContext,
 	UpdateRewardsAndVotesContext,
 	ViewResult,
@@ -25,6 +27,7 @@ export interface Instance extends CommitHandler {
 	prepareNextCommit(context: PrepareNextCommitContext): Promise<void>;
 	preverifyTransaction(txContext: PreverifyTransactionContext): Promise<PreverifyTransactionResult>;
 	process(txContext: TransactionContext): Promise<ProcessResult>;
+	simulate(txContext: TransactionSimulateContext): Promise<SimulateResult>;
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
 	getAccountInfo(address: string, height?: bigint): Promise<AccountInfo>;

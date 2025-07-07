@@ -31,7 +31,6 @@ export interface TransactionData {
 	data: string;
 
 	hash: string;
-	timestamp: number;
 
 	v?: number;
 	r?: string;

@@ -19,6 +19,7 @@ export const defaults = {
 	// fee in the pool. In this case the transaction with the lowest fee is removed
 	// from the pool in order to accommodate the new one.
 	maxTransactionsInPool: Environment.get(Constants.EnvironmentVariables.MAINSAIL_MAX_TRANSACTIONS_IN_POOL, 15_000),
+
 	maxTransactionsPerRequest: Environment.get(
 		Constants.EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_MAX_PER_REQUEST,
 		40,
@@ -26,6 +27,11 @@ export const defaults = {
 	maxTransactionsPerSender: Environment.get(
 		Constants.EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_MAX_PER_SENDER,
 		150,
+	),
+
+	rebroadcastThreshold: Environment.get(
+		Constants.EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_REBROADCAST_THRESHOLD,
+		60,
 	),
 
 	storage: `${Environment.get(Constants.EnvironmentVariables.MAINSAIL_PATH_DATA)}/transaction-pool.sqlite`,

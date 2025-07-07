@@ -1,5 +1,3 @@
-import crypto from "node:crypto";
-
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
@@ -23,7 +21,7 @@ interface EstimateOutcome {
 @injectable()
 export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "validator")
+	@tagged("instance", "rpc")
 	private readonly evm!: Contracts.Evm.Instance;
 
 	@inject(Identifiers.Cryptography.Configuration)
@@ -93,7 +91,6 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 			nonce: accountInfo.nonce,
 			specId: evmSpec,
 			to: data.to,
-			txHash: this.#generateTxHash(),
 			value: data.value ? BigInt(data.value) : BigInt(0),
 		};
 
@@ -165,21 +162,12 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 		return `0x${maxGasLimit.toString(16)}`;
 	}
 
-	async #execute(context: Contracts.Evm.TransactionContext): Promise<EstimateOutcome> {
-		await this.evm.prepareNextCommit({
-			commitKey: context.blockContext.commitKey,
-		});
-
+	async #execute(context: Contracts.Evm.TransactionSimulateContext): Promise<EstimateOutcome> {
 		try {
-			const { receipt } = await this.evm.process(context);
+			const { receipt } = await this.evm.simulate(context);
 			return { receipt, success: receipt.status === 1 };
 		} catch (error) {
 			return { executionError: error.message, success: false };
 		}
 	}
-
-	#generateTxHash = () => {
-		const randomBytes = crypto.randomBytes(32);
-		return crypto.createHash("sha256").update(randomBytes).digest("hex");
-	};
 }

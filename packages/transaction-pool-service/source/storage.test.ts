@@ -190,6 +190,53 @@ describe<{
 		}
 	});
 
+	it("getOldTransactions - should return N old transactions", (context) => {
+		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
+		const storage = context.app.resolve(Storage);
+		storage.boot();
+
+		try {
+			const storedTransaction1 = {
+				blockNumber: 100,
+				hash: "first-tx-hash",
+				senderPublicKey: "some-public-key",
+				serialized: Buffer.from("test"),
+			};
+
+			const storedTransaction2 = {
+				blockNumber: 200,
+				hash: "second-tx-hash",
+				senderPublicKey: "second-public-key",
+				serialized: Buffer.from("second-serialized"),
+			};
+
+			const storedTransaction3 = {
+				blockNumber: 300,
+				hash: "third-tx-hash",
+				senderPublicKey: "third-public-key",
+				serialized: Buffer.from("third-serialized"),
+			};
+
+			storage.addTransaction(storedTransaction1);
+			storage.addTransaction(storedTransaction2);
+			storage.addTransaction(storedTransaction3);
+
+			let oldTransactions = [...storage.getOldTransactions(300, 2)];
+			assert.equal(oldTransactions, [storedTransaction3, storedTransaction2]);
+
+			oldTransactions = [...storage.getOldTransactions(300, 5)];
+			assert.equal(oldTransactions, [storedTransaction3, storedTransaction2, storedTransaction1]);
+
+			oldTransactions = [...storage.getOldTransactions(100, 2)];
+			assert.equal(oldTransactions, [storedTransaction1]);
+
+			oldTransactions = [...storage.getOldTransactions(200, 2)];
+			assert.equal(oldTransactions, [storedTransaction2, storedTransaction1]);
+		} finally {
+			storage.dispose();
+		}
+	});
+
 	it("addTransaction - should add new transaction", (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
 		const storage = context.app.resolve(Storage);

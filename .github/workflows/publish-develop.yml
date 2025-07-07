@@ -119,6 +119,13 @@ jobs:
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
                   restore-keys: ${{ runner.os }}-pnpm-
 
+            - uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  components: llvm-tools-preview
+                  profile: minimal
+                  override: true
+
             - name: Install dependencies
               run: pnpm install
 
