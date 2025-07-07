@@ -429,17 +429,16 @@ export class Restore {
 									// - validatorApproval
 								}
 							: {}),
-
 						...(userAttributes
 							? {
 									...(userAttributes.vote ? { vote: userAttributes.vote } : {}),
-									...(username ? { username } : {}),
 									...(userAttributes.legacyMerge
 										? // merged legacy cold wallets
 											{ isLegacy: true, legacyMerge: userAttributes.legacyMerge }
 										: {}),
 								}
 							: {}),
+						...(username ? { username } : {}),
 						...(context.legacyAddresses.has(account.address)
 							? {
 									// all legacy non-cold wallets
