@@ -232,6 +232,7 @@ export class Restore {
 		const { blockRepository, transactionRepository, mostRecentCommit } = context;
 
 		const BATCH_SIZE = 1000;
+		const CHUNK_SIZE = 256;
 		const t0 = performance.now();
 
 		const genesisBlockNumber = this.configuration.getGenesisHeight();
@@ -315,12 +316,12 @@ export class Restore {
 			}
 
 			// too large queries are not good for postgres
-			for (const batch of chunk(blocks, 256)) {
+			for (const batch of chunk(blocks, CHUNK_SIZE)) {
 				await blockRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
 			// batch insert 'transactions' separately from 'blocks', given that we will be consistent at the end of the db transaction anyway.
-			for (const batch of chunk(transactions, 256)) {
+			for (const batch of chunk(transactions, CHUNK_SIZE)) {
 				await transactionRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
@@ -374,9 +375,8 @@ export class Restore {
 		const t0 = performance.now();
 
 		const BATCH_SIZE = 1000n;
+		const CHUNK_SIZE = 250;
 		let offset: bigint | undefined = 0n;
-
-		const accounts: Models.Wallet[] = [];
 
 		if (this.snapshotImporter) {
 			for (const wallet of this.snapshotImporter.wallets) {
@@ -389,9 +389,11 @@ export class Restore {
 		}
 
 		let totalAccountBalance = 0n;
+		let totalAccounts = 0;
 
 		do {
 			const result = await this.evm.getAccounts(offset ?? 0n, BATCH_SIZE);
+			const accounts: Models.Wallet[] = [];
 
 			for (const account of result.accounts) {
 				const validatorAttributes = context.validatorAttributes[account.address];
@@ -429,17 +431,16 @@ export class Restore {
 									// - validatorApproval
 								}
 							: {}),
-
 						...(userAttributes
 							? {
 									...(userAttributes.vote ? { vote: userAttributes.vote } : {}),
-									...(username ? { username } : {}),
 									...(userAttributes.legacyMerge
 										? // merged legacy cold wallets
 											{ isLegacy: true, legacyMerge: userAttributes.legacyMerge }
 										: {}),
 								}
 							: {}),
+						...(username ? { username } : {}),
 						...(context.legacyAddresses.has(account.address)
 							? {
 									// all legacy non-cold wallets
@@ -463,34 +464,37 @@ export class Restore {
 					updated_at: "0",
 				});
 
+				totalAccounts++;
 				totalAccountBalance += account.balance;
+			}
+
+			for (const batch of chunk(accounts, CHUNK_SIZE)) {
+				await context.walletRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
 			offset = result.nextOffset;
 		} while (offset);
 
-		for (const batch of chunk(accounts, 256)) {
-			await context.walletRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
-		}
-
 		context.totalSupply = context.totalSupply.plus(totalAccountBalance);
 
 		const t1 = performance.now();
-		this.logger.info(`Restored ${accounts.length.toLocaleString()} wallets in ${t1 - t0}ms`);
+		this.logger.info(`Restored ${totalAccounts.toLocaleString()} wallets in ${t1 - t0}ms`);
 	}
 
 	async #ingestLegacyColdWallets(context: RestoreContext): Promise<void> {
 		const t0 = performance.now();
 
 		const BATCH_SIZE = 1000n;
+		const CHUNK_SIZE = 250;
 		let offset: bigint | undefined = 0n;
 
-		const legacyColdWallets: Models.LegacyColdWallet[] = [];
-
 		let totalLegacyAccountBalance = 0n;
+		let totalLegacyAccounts = 0;
 
 		do {
 			const result = await this.evm.getLegacyColdWallets(offset ?? 0n, BATCH_SIZE);
+
+			const legacyColdWallets: Models.LegacyColdWallet[] = [];
 
 			for (const wallet of result.wallets) {
 				legacyColdWallets.push({
@@ -500,6 +504,8 @@ export class Restore {
 					mergeInfoTransactionHash: wallet.mergeInfo?.txHash,
 					mergeInfoWalletAddress: wallet.mergeInfo?.address,
 				});
+
+				totalLegacyAccounts++;
 
 				if (wallet.mergeInfo) {
 					const userAttributes = context.userAttributes[wallet.mergeInfo.address] ?? {};
@@ -517,17 +523,22 @@ export class Restore {
 				}
 			}
 
+			for (const batch of chunk(legacyColdWallets, CHUNK_SIZE)) {
+				await context.legacyColdWalletRepository
+					.createQueryBuilder()
+					.insert()
+					.orIgnore()
+					.values(batch)
+					.execute();
+			}
+
 			offset = result.nextOffset;
 		} while (offset);
-
-		for (const batch of chunk(legacyColdWallets, 256)) {
-			await context.legacyColdWalletRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
-		}
 
 		context.totalSupply = context.totalSupply.plus(totalLegacyAccountBalance);
 
 		const t1 = performance.now();
-		this.logger.info(`Restored ${legacyColdWallets.length.toLocaleString()} legacy cold wallets in ${t1 - t0}ms`);
+		this.logger.info(`Restored ${totalLegacyAccounts.toLocaleString()} legacy cold wallets in ${t1 - t0}ms`);
 	}
 
 	async #ingestReceipts(context: RestoreContext): Promise<void> {

@@ -42,10 +42,6 @@ const applyModifiers = <T extends TransactionBuilder<T>>(
 		entity.nonce(options.nonce);
 	}
 
-	if (options.timestamp) {
-		entity.data.timestamp = options.timestamp;
-	}
-
 	if (options.senderAddress) {
 		entity.senderAddress(options.senderAddress);
 	}
