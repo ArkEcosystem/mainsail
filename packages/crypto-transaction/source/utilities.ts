@@ -25,7 +25,7 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 			toBeArray(transaction.nonce.toBigInt()),
 			toBeArray(0), // maxPriorityFeePerGas
 			toBeArray(transaction.gasPrice), // maxFeePerGas
-			toBeArray(transaction.gas),
+			toBeArray(transaction.gasLimit),
 			transaction.to || "0x",
 			toBeArray(transaction.value.toBigInt()),
 			transaction.data.startsWith("0x") ? transaction.data : `0x${transaction.data}`,

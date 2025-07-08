@@ -13,7 +13,7 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 			toBeArray(transaction.data.nonce.toBigInt()), // nonce - 1
 			toBeArray(0), // maxPriorityFeePerGas - 2
 			toBeArray(transaction.data.gasPrice), // maxFeePerGas - 3
-			toBeArray(transaction.data.gas), // gasLimit - 4
+			toBeArray(transaction.data.gasLimit), // gasLimit - 4
 			transaction.data.to || "0x", // to - 5
 			toBeArray(transaction.data.value.toBigInt()), // value - 6
 			transaction.data.data.startsWith("0x") ? transaction.data.data : `0x${transaction.data.data}`, // data - 7

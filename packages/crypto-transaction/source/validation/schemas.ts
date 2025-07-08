@@ -26,7 +26,7 @@ export const schemas = {
 export const transactionBaseSchema: SchemaObject = {
 	properties: {
 		from: { $ref: "address" },
-		gas: { transactionGasLimit: {} },
+		gasLimit: { transactionGasLimit: {} },
 		gasPrice: { transactionGasPrice: {} },
 
 		hash: { anyOf: [{ $ref: "transactionId" }, { type: "null" }] },
@@ -53,6 +53,6 @@ export const transactionBaseSchema: SchemaObject = {
 		v: { maximum: 1, minimum: 0, type: "number" },
 		value: { bignumber: { maximum: undefined, minimum: 0 } },
 	},
-	required: ["from", "senderPublicKey", "gasPrice", "gas", "value", "nonce"],
+	required: ["from", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
 	type: "object",
 };

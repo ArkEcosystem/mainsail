@@ -16,7 +16,7 @@ export class EvmCallTransaction extends Transaction {
 				to: { $ref: "address" },
 				value: { bignumber: { maximum: undefined, minimum: 0 } },
 			},
-			required: ["gasPrice", "gas"],
+			required: ["gasPrice", "gasLimit"],
 		});
 	}
 }

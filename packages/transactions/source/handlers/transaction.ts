@@ -47,7 +47,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 			blockGasLimit: BigInt(milestone.block.maxGasLimit),
 			data: Buffer.from(transaction.data.data, "hex"),
 			from: transaction.data.from,
-			gasLimit: BigInt(transaction.data.gas),
+			gasLimit: BigInt(transaction.data.gasLimit),
 			gasPrice: BigInt(transaction.data.gasPrice),
 			legacyAddress: transaction.data.senderLegacyAddress,
 			nonce: transaction.data.nonce.toBigInt(),

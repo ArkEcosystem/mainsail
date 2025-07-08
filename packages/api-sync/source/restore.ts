@@ -298,7 +298,7 @@ export class Restore {
 						blockNumber: block.header.number.toFixed(),
 						data: data.data,
 						from: data.from,
-						gas: data.gas,
+						gas: data.gasLimit,
 						gasPrice: data.gasPrice,
 						hash: data.hash,
 						legacySecondSignature: data.legacySecondSignature,

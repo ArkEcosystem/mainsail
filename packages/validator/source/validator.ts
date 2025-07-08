@@ -181,8 +181,8 @@ export class Validator implements Contracts.Validator.Validator {
 
 					let optimisticExecution = false;
 
-					const gas = transaction.data.gas;
-					if (gasLeft - gas < 0) {
+					const gasLimit = transaction.data.gasLimit;
+					if (gasLeft - gasLimit < 0) {
 						// Optimistically execute transaction even if the gas limit exceeds the remaining
 						// block space since there's possibly still space to fit the actual gas consumed.
 
@@ -190,7 +190,7 @@ export class Validator implements Contracts.Validator.Validator {
 						// calculate the root from the previous state (rollback).
 						optimisticExecution = true;
 						this.logger.info(
-							`attempting optimistic execution of tx ${transaction.hash} (tx.gas=${gas} gasLeft=${gasLeft})`,
+							`attempting optimistic execution of tx ${transaction.hash} (tx.gas=${gasLimit} gasLeft=${gasLeft})`,
 						);
 
 						await evm.snapshot(commitKey);

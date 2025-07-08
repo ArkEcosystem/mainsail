@@ -42,7 +42,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				blockContext,
 				data: Buffer.from(transaction.data.data, "hex"),
 				from,
-				gasLimit: BigInt(transaction.data.gas),
+				gasLimit: BigInt(transaction.data.gasLimit),
 				gasPrice: BigInt(transaction.data.gasPrice),
 				index: transaction.data.transactionIndex,
 				legacyAddress: senderLegacyAddress,
