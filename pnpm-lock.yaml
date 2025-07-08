@@ -278,9 +278,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils

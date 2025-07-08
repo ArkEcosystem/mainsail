@@ -28,7 +28,6 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/transactions": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"joi": "17.13.3",
 		"pretty-ms": "9.2.0",

@@ -10,8 +10,8 @@ export class BlockchainController extends Controller {
 		return {
 			data: {
 				block: {
+					hash: data.hash,
 					height: data.number,
-					id: data.hash,
 				},
 			},
 		};
