@@ -16,38 +16,40 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 		const decoded = decodeRlp(encodedRlp);
 
-		const recipientAddressRaw = this.#parseAddress(decoded[5].toString());
+		const recipientAddressRaw = this.#parseAddress(decoded[4].toString());
 
 		data.network = Number(decoded[0]);
 		data.nonce = BigNumber.make(this.#parseNumber(decoded[1].toString()));
 
-		// we do not support a priority fee and thus always expect a 0 value here.
-		if (this.#parseNumber(decoded[2].toString()) !== 0) {
-			throw new Error("priority fee must be 0");
-		}
+		// // we do not support a priority fee and thus always expect a 0 value here.
+		// if (this.#parseNumber(decoded[2].toString()) !== 0) {
+		// 	throw new Error("priority fee must be 0");
+		// }
 
-		data.gasPrice = this.#parseNumber(decoded[3].toString());
-		data.gasLimit = this.#parseNumber(decoded[4].toString());
+		data.gasPrice = this.#parseNumber(decoded[2].toString());
+		data.gasLimit = this.#parseNumber(decoded[3].toString());
 		data.to = recipientAddressRaw ? getAddress(recipientAddressRaw) : undefined;
-		data.value = this.#parseBigNumber(decoded[6].toString());
-		data.data = this.#parseData(decoded[7].toString());
+		data.value = this.#parseBigNumber(decoded[5].toString());
+		data.data = this.#parseData(decoded[6].toString());
+
+		// TODO: Check access list is empty
 
 		// Signature
-		if (decoded.length >= 12) {
-			data.v = this.#parseNumber(decoded[9].toString());
-			data.r = decoded[10].toString().slice(2);
-			data.s = decoded[11].toString().slice(2);
+		if (decoded.length >= 11) {
+			data.v = this.#parseNumber(decoded[8].toString());
+			data.r = decoded[9].toString().slice(2);
+			data.s = decoded[10].toString().slice(2);
 
 			// Legacy second signature
-			if (decoded.length === 13) {
+			if (decoded.length === 12) {
 				data.legacySecondSignature = decoded[12].toString().slice(2);
 			}
 		}
 
 		const instance: Contracts.Crypto.Transaction = this.transactionTypeFactory.create(data);
 
-		const eip1559Prefix = "02"; // marker for Type 2 (EIP1559) transaction which is the standard nowadays
-		instance.serialized = Buffer.from(`${eip1559Prefix}${encodedRlp.slice(2)}`, "hex");
+		const eip2930Prefix = "01"; // marker for Type 1 (EIP2930)
+		instance.serialized = Buffer.from(`${eip2930Prefix}${encodedRlp.slice(2)}`, "hex");
 
 		return instance;
 	}

@@ -19,12 +19,11 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 		transaction: Contracts.Crypto.TransactionData,
 		options?: Contracts.Crypto.SerializeOptions,
 	): Promise<Buffer> {
-		// based on EIP1559 encoding
+		// based on EIP2930 encoding
 		const fields = [
 			toBeArray(transaction.network),
 			toBeArray(transaction.nonce.toBigInt()),
-			toBeArray(0), // maxPriorityFeePerGas
-			toBeArray(transaction.gasPrice), // maxFeePerGas
+			toBeArray(transaction.gasPrice),
 			toBeArray(transaction.gasLimit),
 			transaction.to || "0x",
 			toBeArray(transaction.value.toBigInt()),
@@ -40,10 +39,10 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 			fields.push(toBeArray(transaction.v), `0x${transaction.r}`, `0x${transaction.s}`);
 		}
 
-		const eip1559Prefix = "02"; // marker for Type 2 (EIP1559) transaction which is the standard nowadays
+		const eip2930Prefix = "01"; // marker for Type 1 (EIP2930)
 		const encoded = encodeRlp(fields).slice(2); // remove 0x prefix
 
-		return Buffer.from(keccak256(Buffer.from(`${eip1559Prefix}${encoded}`, "hex")).slice(2), "hex");
+		return Buffer.from(keccak256(Buffer.from(`${eip2930Prefix}${encoded}`, "hex")).slice(2), "hex");
 	}
 
 	public async getHash(transaction: Contracts.Crypto.Transaction): Promise<string> {
