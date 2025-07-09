@@ -21,7 +21,11 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 
 		if (transaction.data.v !== undefined && transaction.data.r && transaction.data.s && !options.excludeSignature) {
 			// 6, 7, 8
-			fields.push(toBeArray(transaction.data.v + 10000 * 2 + 35), `0x${transaction.data.r}`, `0x${transaction.data.s}`);
+			fields.push(
+				toBeArray(transaction.data.v + 10000 * 2 + 35),
+				`0x${transaction.data.r}`,
+				`0x${transaction.data.s}`,
+			);
 
 			if (transaction.data.legacySecondSignature) {
 				// 10

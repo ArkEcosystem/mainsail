@@ -1,14 +1,14 @@
 {
-    "address": "0x97c362C562906C0a98aB11Cc6e78742cC8f9adbc",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "03988bd7ceb73b4e3dea99209e9b4700cf7928bdace62cf9f62e85f634d7fc64",
-        "publicKey": "a20ae98154ddc271293fdfc354e05ea4e40b0bff7d69d6d8e352b8a782daae6360db1e42846daca6d6a1d76b97e9bd6b"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "ec7ec0e322ea502b3833cc253e4ce6a2ded04bf6c9f09584d5f6859174b21558",
-        "publicKey": "03163a549df76eb1ceb1ba50065a8a8a4c6abc06171f46f463ca4f5b9fa126e3db"
-    },
-    "passphrase": "exile west slot quarter tell riot air supreme chair forward fire acid vivid cliff sing wild chunk media develop that latin blouse place trumpet"
+	"address": "0x97c362C562906C0a98aB11Cc6e78742cC8f9adbc",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "03988bd7ceb73b4e3dea99209e9b4700cf7928bdace62cf9f62e85f634d7fc64",
+		"publicKey": "a20ae98154ddc271293fdfc354e05ea4e40b0bff7d69d6d8e352b8a782daae6360db1e42846daca6d6a1d76b97e9bd6b"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "ec7ec0e322ea502b3833cc253e4ce6a2ded04bf6c9f09584d5f6859174b21558",
+		"publicKey": "03163a549df76eb1ceb1ba50065a8a8a4c6abc06171f46f463ca4f5b9fa126e3db"
+	},
+	"passphrase": "exile west slot quarter tell riot air supreme chair forward fire acid vivid cliff sing wild chunk media develop that latin blouse place trumpet"
 }

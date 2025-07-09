@@ -11,8 +11,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 	public async deserialize(serialized: Buffer | string): Promise<Contracts.Crypto.Transaction> {
 		const data = {} as Contracts.Crypto.TransactionData;
 
-		const encodedRlp =
-			"0x" + (typeof serialized === "string" ? serialized : serialized.toString("hex"));
+		const encodedRlp = "0x" + (typeof serialized === "string" ? serialized : serialized.toString("hex"));
 
 		const decoded = decodeRlp(encodedRlp);
 		const recipientAddressRaw = this.#parseAddress(decoded[3].toString());
