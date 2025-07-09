@@ -21,14 +21,14 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 	): Promise<Buffer> {
 		// based on EIP2930 encoding
 		const fields = [
-			toBeArray(transaction.network),
+			// toBeArray(transaction.network),
 			toBeArray(transaction.nonce.toBigInt()),
 			toBeArray(transaction.gasPrice),
 			toBeArray(transaction.gasLimit),
 			transaction.to || "0x",
 			toBeArray(transaction.value.toBigInt()),
 			transaction.data.startsWith("0x") ? transaction.data : `0x${transaction.data}`,
-			[], // accessList is unused
+			// [], // accessList is unused
 		];
 
 		if (options && !options.excludeSignature) {
@@ -36,13 +36,15 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 			assert.string(transaction.r);
 			assert.string(transaction.s);
 
-			fields.push(toBeArray(transaction.v), `0x${transaction.r}`, `0x${transaction.s}`);
+			fields.push(toBeArray(transaction.v + 10000 * 2 + 35), `0x${transaction.r}`, `0x${transaction.s}`);
+		} else {
+			fields.push(toBeArray(10000), toBeArray(0), toBeArray(0));
 		}
 
-		const eip2930Prefix = "01"; // marker for Type 1 (EIP2930)
+		// const eip2930Prefix = "01"; // marker for Type 1 (EIP2930)
 		const encoded = encodeRlp(fields).slice(2); // remove 0x prefix
 
-		return Buffer.from(keccak256(Buffer.from(`${eip2930Prefix}${encoded}`, "hex")).slice(2), "hex");
+		return Buffer.from(keccak256(Buffer.from(`${encoded}`, "hex")).slice(2), "hex");
 	}
 
 	public async getHash(transaction: Contracts.Crypto.Transaction): Promise<string> {
