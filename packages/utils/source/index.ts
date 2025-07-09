@@ -34,6 +34,7 @@ export * from "./first-map-entry.js";
 export * from "./first-map-key.js";
 export * from "./first-map-value.js";
 export * from "./flatten.js";
+export * from "./format-ecdsa-signature.js";
 export * from "./format-number.js";
 export * from "./format-string.js";
 export * from "./get.js";
