@@ -55,17 +55,21 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 			throw new Exceptions.MissingLegacySecondSignatureError();
 		}
 
+		const r = legacySecondSignature.slice(0, 64);
+		const s = legacySecondSignature.slice(64, 128);
+		const v = parseInt(legacySecondSignature.slice(128, 130), 16);
+
 		const hash: Buffer = await this.utils.toHash(data, {
 			excludeSignature: true,
 		});
 
-		if (
-			!(await this.signatureFactory.verify(
-				Buffer.from(legacySecondSignature, "hex"),
-				hash,
-				Buffer.from(legacySecondPublicKey, "hex"),
-			))
-		) {
+		const verified = await this.signatureFactory.verifyRecoverable(
+			{ r, s, v },
+			hash,
+			Buffer.from(legacySecondPublicKey, "hex"),
+		);
+
+		if (!verified) {
 			throw new Exceptions.InvalidLegacySecondSignatureError();
 		}
 

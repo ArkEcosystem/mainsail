@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { formatEcdsaSignature } from "@mainsail/utils";
 
 @injectable()
 export class Signer implements Contracts.Crypto.TransactionSigner {
@@ -39,10 +40,12 @@ export class Signer implements Contracts.Crypto.TransactionSigner {
 		}
 
 		const hash: Buffer = await this.utils.toHash(transaction, options);
-		const signature = await this.signatureFactory.sign(hash, Buffer.from(keys.privateKey, "hex"));
+		const { r, s, v } = await this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));
 
-		transaction.legacySecondSignature = signature;
+		const legacySecondSignature = formatEcdsaSignature(r, s, v);
 
-		return signature;
+		transaction.legacySecondSignature = legacySecondSignature;
+
+		return legacySecondSignature;
 	}
 }
