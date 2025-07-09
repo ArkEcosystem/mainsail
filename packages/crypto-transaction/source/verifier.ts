@@ -57,7 +57,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 
 		const r = legacySecondSignature.slice(0, 64);
 		const s = legacySecondSignature.slice(64, 128);
-		const v = parseInt(legacySecondSignature.slice(128, 130), 16);
+		const v = Number.parseInt(legacySecondSignature.slice(128, 130), 16);
 
 		const hash: Buffer = await this.utils.toHash(data, {
 			excludeSignature: true,
