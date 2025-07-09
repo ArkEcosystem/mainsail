@@ -6,7 +6,7 @@ import {
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Types } from "@mainsail/kernel";
-import { BigNumber, chunk, sleep, validatorSetPack } from "@mainsail/utils";
+import { BigNumber, chunk, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { Listeners } from "./contracts.js";
@@ -294,7 +294,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				legacySecondSignature: data.legacySecondSignature,
 				nonce: data.nonce.toFixed(),
 				senderPublicKey: data.senderPublicKey,
-				signature: `${data.r}${data.s}${data.v!.toString(16)}`,
+				signature: formatEcdsaSignature(data.r!, data.s!, data.v!),
 				timestamp: header.timestamp.toFixed(),
 				to: data.to,
 				transactionIndex: data.transactionIndex!,
