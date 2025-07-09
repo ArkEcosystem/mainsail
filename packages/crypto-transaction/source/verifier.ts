@@ -16,63 +16,6 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
 
-	public async verifySignatures(
-		transaction: Contracts.Crypto.TransactionData,
-		multiSignature: Contracts.Crypto.MultiSignatureAsset,
-	): Promise<boolean> {
-		return false;
-		// if (!multiSignature) {
-		// 	throw new Exceptions.InvalidMultiSignatureAssetError();
-		// }
-
-		// const { publicKeys, min }: Contracts.Crypto.MultiSignatureAsset = multiSignature;
-		// const { signatures }: Contracts.Crypto.TransactionData = transaction;
-
-		// const hash: Buffer = await this.utils.toHash(transaction, {
-		// 	excludeMultiSignature: true,
-		// 	excludeSignature: true,
-		// });
-
-		// const publicKeyIndexes: { [index: number]: boolean } = {};
-		// let verified = false;
-		// let verifiedSignatures = 0;
-
-		// if (signatures) {
-		// 	for (let index = 0; index < signatures.length; index++) {
-		// 		const signature: string = signatures[index];
-		// 		const publicKeyIndex: number = Number.parseInt(signature.slice(0, 2), 16);
-
-		// 		if (!publicKeyIndexes[publicKeyIndex]) {
-		// 			publicKeyIndexes[publicKeyIndex] = true;
-		// 		} else {
-		// 			throw new Exceptions.DuplicateParticipantInMultiSignatureError();
-		// 		}
-
-		// 		const partialSignature: string = signature.slice(2, this.signatureSize * 2 + 2);
-		// 		const publicKey: string = publicKeys[publicKeyIndex];
-
-		// 		if (
-		// 			await this.signatureFactory.verify(
-		// 				Buffer.from(partialSignature, "hex"),
-		// 				hash,
-		// 				Buffer.from(publicKey, "hex"),
-		// 			)
-		// 		) {
-		// 			verifiedSignatures++;
-		// 		}
-
-		// 		if (verifiedSignatures === min) {
-		// 			verified = true;
-		// 			break;
-		// 		} else if (signatures.length - (index + 1 - verifiedSignatures) < min) {
-		// 			break;
-		// 		}
-		// 	}
-		// }
-
-		// return verified;
-	}
-
 	public async verifyHash(data: Contracts.Crypto.TransactionData): Promise<boolean> {
 		const { v, r, s, senderPublicKey } = data;
 

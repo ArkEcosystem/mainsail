@@ -5,13 +5,6 @@ import { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class AcceptAnyTransactionVerifier implements Contracts.Crypto.TransactionVerifier {
-	public async verifySignatures(
-		transaction: Contracts.Crypto.TransactionData,
-		multiSignature: Contracts.Crypto.MultiSignatureAsset,
-	): Promise<boolean> {
-		return true;
-	}
-
 	public async verifyHash(data: Contracts.Crypto.TransactionData): Promise<boolean> {
 		return true;
 	}

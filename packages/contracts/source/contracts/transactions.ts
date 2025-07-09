@@ -1,4 +1,4 @@
-import { MultiSignatureAsset, Transaction, TransactionConstructor, TransactionData } from "./crypto/index.js";
+import { Transaction, TransactionConstructor, TransactionData } from "./crypto/index.js";
 import { BlockContext, CommitKey, Instance, TransactionReceipt } from "./evm/index.js";
 import { Wallet } from "./state/index.js";
 
@@ -19,12 +19,6 @@ export interface TransactionHandler {
 	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionReceipt>;
 
 	emitEvents(transaction: Transaction): void;
-
-	verifySignatures(
-		wallet: Wallet,
-		transaction: TransactionData,
-		multiSignature?: MultiSignatureAsset,
-	): Promise<boolean>;
 
 	// Abstract
 	getConstructor(): TransactionConstructor;
