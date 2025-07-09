@@ -14,12 +14,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		const encodedRlp =
 			"0x" + (typeof serialized === "string" ? serialized : serialized.toString("hex"));
 
-		console.debug("Deserializing transaction from RLP:", encodedRlp);
-
 		const decoded = decodeRlp(encodedRlp);
-
-		console.debug("Decoded RLP:", decoded);
-
 		const recipientAddressRaw = this.#parseAddress(decoded[3].toString());
 
 		// data.network = Number(decoded[0]);
