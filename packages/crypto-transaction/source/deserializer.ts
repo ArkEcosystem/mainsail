@@ -16,21 +16,13 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		const decoded = decodeRlp(encodedRlp);
 		const recipientAddressRaw = this.#parseAddress(decoded[3].toString());
 
-		// data.network = Number(decoded[0]);
 		data.nonce = BigNumber.make(this.#parseNumber(decoded[0].toString()));
-
-		// // we do not support a priority fee and thus always expect a 0 value here.
-		// if (this.#parseNumber(decoded[2].toString()) !== 0) {
-		// 	throw new Error("priority fee must be 0");
-		// }
 
 		data.gasPrice = this.#parseNumber(decoded[1].toString());
 		data.gasLimit = this.#parseNumber(decoded[2].toString());
 		data.to = recipientAddressRaw ? getAddress(recipientAddressRaw) : undefined;
 		data.value = this.#parseBigNumber(decoded[4].toString());
 		data.data = this.#parseData(decoded[5].toString());
-
-		// TODO: Check access list is empty
 
 		// Signature
 		if (decoded.length >= 9) {
@@ -46,7 +38,6 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 		const instance: Contracts.Crypto.Transaction = this.transactionTypeFactory.create(data);
 
-		// const eip2930Prefix = "01"; // marker for Type 1 (EIP2930)
 		instance.serialized = Buffer.from(`${encodedRlp.slice(2)}`, "hex");
 
 		return instance;

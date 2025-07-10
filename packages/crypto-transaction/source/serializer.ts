@@ -9,14 +9,12 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 		options: Contracts.Crypto.SerializeOptions = {},
 	): Promise<Buffer> {
 		const fields = [
-			// toBeArray(transaction.data.network), // chainId - 0
-			toBeArray(transaction.data.nonce.toBigInt()), // nonce - 1
-			toBeArray(transaction.data.gasPrice), // maxFeePerGas - 2
-			toBeArray(transaction.data.gasLimit), // gasLimit - 3
-			transaction.data.to || "0x", // to - 4
-			toBeArray(transaction.data.value.toBigInt()), // value - 5
-			transaction.data.data.startsWith("0x") ? transaction.data.data : `0x${transaction.data.data}`, // data - 6
-			// [], //accessList - 7
+			toBeArray(transaction.data.nonce.toBigInt()), // nonce - 0
+			toBeArray(transaction.data.gasPrice), // maxFeePerGas - 1
+			toBeArray(transaction.data.gasLimit), // gasLimit - 2
+			transaction.data.to || "0x", // to - 3
+			toBeArray(transaction.data.value.toBigInt()), // value - 4
+			transaction.data.data.startsWith("0x") ? transaction.data.data : `0x${transaction.data.data}`, // data - 5
 		];
 
 		if (transaction.data.v !== undefined && transaction.data.r && transaction.data.s && !options.excludeSignature) {
@@ -28,16 +26,12 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 			);
 
 			if (transaction.data.legacySecondSignature) {
-				// 10
+				// 9
 				fields.push(`0x${transaction.data.legacySecondSignature}`);
 			}
 		}
 
 		const rlpEncoded = encodeRlp(fields);
-
-		// const eip2930Prefix = "01"; // marker for Type 1 (EIP2930)
-
-		// transaction.serialized = Buffer.from(`${eip2930Prefix}${rlpEncoded.slice(2)}`, "hex");
 		transaction.serialized = Buffer.from(`${rlpEncoded.slice(2)}`, "hex");
 
 		return transaction.serialized;

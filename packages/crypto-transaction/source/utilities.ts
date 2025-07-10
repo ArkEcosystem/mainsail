@@ -19,16 +19,13 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 		transaction: Contracts.Crypto.TransactionData,
 		options?: Contracts.Crypto.SerializeOptions,
 	): Promise<Buffer> {
-		// based on EIP2930 encoding
 		const fields = [
-			// toBeArray(transaction.network),
 			toBeArray(transaction.nonce.toBigInt()),
 			toBeArray(transaction.gasPrice),
 			toBeArray(transaction.gasLimit),
 			transaction.to || "0x",
 			toBeArray(transaction.value.toBigInt()),
 			transaction.data.startsWith("0x") ? transaction.data : `0x${transaction.data}`,
-			// [], // accessList is unused
 		];
 
 		if (options && !options.excludeSignature) {
@@ -41,9 +38,7 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 			fields.push(toBeArray(10000), toBeArray(0), toBeArray(0));
 		}
 
-		// const eip2930Prefix = "01"; // marker for Type 1 (EIP2930)
 		const encoded = encodeRlp(fields).slice(2); // remove 0x prefix
-
 		return Buffer.from(keccak256(Buffer.from(`${encoded}`, "hex")).slice(2), "hex");
 	}
 
