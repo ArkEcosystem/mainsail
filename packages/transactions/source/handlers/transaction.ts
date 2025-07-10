@@ -64,14 +64,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction): void {}
 
-	public async verifySignatures(
-		wallet: Contracts.State.Wallet,
-		transaction: Contracts.Crypto.TransactionData,
-		multiSignature: Contracts.Crypto.MultiSignatureAsset,
-	): Promise<boolean> {
-		return this.verifier.verifySignatures(transaction, multiSignature);
-	}
-
 	public abstract apply(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,

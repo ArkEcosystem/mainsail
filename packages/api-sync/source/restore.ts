@@ -7,7 +7,7 @@ import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { UsernamesAbi } from "@mainsail/evm-contracts";
-import { assert, BigNumber, chunk, validatorSetPack } from "@mainsail/utils";
+import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
 import { ethers } from "ethers";
 import { performance } from "perf_hooks";
 
@@ -304,7 +304,7 @@ export class Restore {
 						legacySecondSignature: data.legacySecondSignature,
 						nonce: data.nonce.toFixed(),
 						senderPublicKey: data.senderPublicKey,
-						signature: `${data.r}${data.s}${data.v!.toString(16)}`,
+						signature: formatEcdsaSignature(data.r!, data.s!, data.v!),
 						timestamp: block.header.timestamp.toFixed(),
 						to: data.to,
 						transactionIndex: data.transactionIndex!,

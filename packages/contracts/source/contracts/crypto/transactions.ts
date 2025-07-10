@@ -1,7 +1,6 @@
 import { BigNumber } from "@mainsail/utils";
 
 import type { EcdsaSignature, KeyPair } from "./identities.js";
-import type { MultiSignatureAsset } from "./legacy.js";
 import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction {
@@ -73,7 +72,6 @@ export interface TransactionJson {
 
 export interface SerializeOptions {
 	excludeSignature?: boolean;
-	excludeMultiSignature?: boolean;
 	// TODO: consider passing pre-allocated buffer
 }
 
@@ -82,8 +80,6 @@ export interface TransactionServiceProvider {
 }
 
 export interface TransactionVerifier {
-	verifySignatures(transaction: TransactionData, multiSignature: MultiSignatureAsset): Promise<boolean>;
-
 	verifyHash(data: TransactionData): Promise<boolean>;
 
 	verifySchema(data: Omit<TransactionData, "hash">, strict?: boolean): Promise<SchemaValidationResult>;

@@ -33,7 +33,7 @@ export const transactionBaseSchema: SchemaObject = {
 
 		// Legacy
 		legacySecondSignature: {
-			allOf: [{ maxLength: 146, minLength: 140 }, { $ref: "alphanumeric" }],
+			allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }],
 			type: "string",
 		},
 
