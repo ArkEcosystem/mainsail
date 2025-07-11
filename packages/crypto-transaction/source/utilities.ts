@@ -33,9 +33,13 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 			assert.string(transaction.r);
 			assert.string(transaction.s);
 
-			fields.push(toBeArray(transaction.v + 10000 * 2 + 35), `0x${transaction.r}`, `0x${transaction.s}`);
+			fields.push(
+				toBeArray(transaction.v + transaction.network * 2 + 35),
+				`0x${transaction.r}`,
+				`0x${transaction.s}`,
+			);
 		} else {
-			fields.push(toBeArray(10000), toBeArray(0), toBeArray(0));
+			fields.push(toBeArray(transaction.network), toBeArray(0), toBeArray(0));
 		}
 
 		const encoded = encodeRlp(fields).slice(2); // remove 0x prefix

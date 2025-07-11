@@ -8,6 +8,9 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
 	public async deserialize(serialized: Buffer | string): Promise<Contracts.Crypto.Transaction> {
 		const data = {} as Contracts.Crypto.TransactionData;
 
@@ -26,7 +29,13 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 		// Signature
 		if (decoded.length >= 9) {
-			data.v = this.#parseNumber(decoded[6].toString()) - (10000 * 2 + 35);
+			const v = this.#parseNumber(decoded[6].toString());
+			const chainId = Math.floor((v - 35) / 2);
+			data.network = chainId;
+
+			const normalizedV = v - (chainId * 2 + 35);
+
+			data.v = normalizedV;
 			data.r = decoded[7].toString().slice(2);
 			data.s = decoded[8].toString().slice(2);
 
@@ -34,6 +43,8 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 			if (decoded.length === 10) {
 				data.legacySecondSignature = decoded[9].toString().slice(2);
 			}
+		} else {
+			data.network = this.configuration.get("network.chainId");
 		}
 
 		const instance: Contracts.Crypto.Transaction = this.transactionTypeFactory.create(data);

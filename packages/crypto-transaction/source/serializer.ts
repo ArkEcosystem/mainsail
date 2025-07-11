@@ -15,15 +15,20 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 			transaction.data.to || "0x", // to - 3
 			toBeArray(transaction.data.value.toBigInt()), // value - 4
 			transaction.data.data.startsWith("0x") ? transaction.data.data : `0x${transaction.data.data}`, // data - 5
+			toBeArray(transaction.data.network), // v - 6
+			toBeArray(0), // r - 7
+			toBeArray(0), // s - 8
 		];
 
 		if (transaction.data.v !== undefined && transaction.data.r && transaction.data.s && !options.excludeSignature) {
+			// Legacy with EIP-155
+			const normalizedV = transaction.data.v;
+			const v = transaction.data.network * 2 + 35 + normalizedV;
+
 			// 6, 7, 8
-			fields.push(
-				toBeArray(transaction.data.v + 10000 * 2 + 35),
-				`0x${transaction.data.r}`,
-				`0x${transaction.data.s}`,
-			);
+			fields[6] = toBeArray(v);
+			fields[7] = `0x${transaction.data.r}`;
+			fields[8] = `0x${transaction.data.s}`;
 
 			if (transaction.data.legacySecondSignature) {
 				// 9
