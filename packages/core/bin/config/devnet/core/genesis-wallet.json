@@ -1,14 +1,14 @@
 {
-    "address": "0xd4B6426d31d31cE3b6425c91E5DD998408c2E3b6",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "6f8ea524a76dc0f88069773a0ae7de207e6f5a3df5cb4994c54faea45204553b",
-        "publicKey": "ad809bddc9b82498105c6310dda33871006611713b826b8a720d55043868bf09c10703614ce9454b918791df60b063c8"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "e73af719ef9e4f4b56b3c3a9cc98bc51dab945926d3745fe2447d122934cf3dc",
-        "publicKey": "026eccc52b0cbe789781611bea2be9ab770c7080b8fecfa40e9f3c803a7ed9812b"
-    },
-    "passphrase": "science garment tornado meat cloth express behave myself exercise end obey feed intact jungle bridge good river unfold fix scissors submit orphan gun draw"
+	"address": "0xd4B6426d31d31cE3b6425c91E5DD998408c2E3b6",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "6f8ea524a76dc0f88069773a0ae7de207e6f5a3df5cb4994c54faea45204553b",
+		"publicKey": "ad809bddc9b82498105c6310dda33871006611713b826b8a720d55043868bf09c10703614ce9454b918791df60b063c8"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "e73af719ef9e4f4b56b3c3a9cc98bc51dab945926d3745fe2447d122934cf3dc",
+		"publicKey": "026eccc52b0cbe789781611bea2be9ab770c7080b8fecfa40e9f3c803a7ed9812b"
+	},
+	"passphrase": "science garment tornado meat cloth express behave myself exercise end obey feed intact jungle bridge good river unfold fix scissors submit orphan gun draw"
 }
