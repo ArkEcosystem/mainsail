@@ -1,14 +1,14 @@
 {
-	"address": "0x97c362C562906C0a98aB11Cc6e78742cC8f9adbc",
-	"consensusKeys": {
-		"compressed": true,
-		"privateKey": "03988bd7ceb73b4e3dea99209e9b4700cf7928bdace62cf9f62e85f634d7fc64",
-		"publicKey": "a20ae98154ddc271293fdfc354e05ea4e40b0bff7d69d6d8e352b8a782daae6360db1e42846daca6d6a1d76b97e9bd6b"
-	},
-	"keys": {
-		"compressed": true,
-		"privateKey": "ec7ec0e322ea502b3833cc253e4ce6a2ded04bf6c9f09584d5f6859174b21558",
-		"publicKey": "03163a549df76eb1ceb1ba50065a8a8a4c6abc06171f46f463ca4f5b9fa126e3db"
-	},
-	"passphrase": "exile west slot quarter tell riot air supreme chair forward fire acid vivid cliff sing wild chunk media develop that latin blouse place trumpet"
+    "address": "0xd4B6426d31d31cE3b6425c91E5DD998408c2E3b6",
+    "consensusKeys": {
+        "compressed": true,
+        "privateKey": "6f8ea524a76dc0f88069773a0ae7de207e6f5a3df5cb4994c54faea45204553b",
+        "publicKey": "ad809bddc9b82498105c6310dda33871006611713b826b8a720d55043868bf09c10703614ce9454b918791df60b063c8"
+    },
+    "keys": {
+        "compressed": true,
+        "privateKey": "e73af719ef9e4f4b56b3c3a9cc98bc51dab945926d3745fe2447d122934cf3dc",
+        "publicKey": "026eccc52b0cbe789781611bea2be9ab770c7080b8fecfa40e9f3c803a7ed9812b"
+    },
+    "passphrase": "science garment tornado meat cloth express behave myself exercise end obey feed intact jungle bridge good river unfold fix scissors submit orphan gun draw"
 }

@@ -1,14 +1,14 @@
 {
-    "address": "0x2D6dD0E5ee115EC9EA0d45b1190fb62356708335",
+    "address": "0x95b2AD35520F80d0Df33B896afF43d79DCA8E0de",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "0d0d3acc899f6c975e4a3a262098e534111f16066796ffcb9d22950423f3aaa0",
-        "publicKey": "b8ece8b85bef5839b045eaf8fd9410836d691dc82a6f2e55a4fd8478e53c622746fcf72d33ecf81d6b689f74c8bb3a40"
+        "privateKey": "1469643209eb4f92ed7bb11431e5635d11b672b6f21ea44e035bfbe86c0655b8",
+        "publicKey": "8932f541abe757ec18fcfd8298ba00e93080e1b1af82dca547e150aa48c2a56f0554c9df31c4c33a8b1627ccd859fa8c"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "cf1befc8316cf807e1687dd80553d7e2ef62c1d89d519128bbe6491b103ad13f",
-        "publicKey": "027389b5bed9023d6b86ba7291aebfc08ca2e3a67aba272972f03566cadedbb56c"
+        "privateKey": "b128c220bb50e6ada219e446952652bb7c0f569cbcaa936061b0c8a68f78f26c",
+        "publicKey": "02a1096571c32e0cc3508835a84320b306c031367e988eb21d6f2e6ff5d55406a9"
     },
-    "passphrase": "merit live awesome dash meat calm cool drink deliver midnight carbon crystal scissors globe love cover shoulder ahead chest castle produce truck ketchup wine"
+    "passphrase": "much diet add true humble summer museum execute diesel produce language bargain ahead honey portion jar solve good auction call length conduct suspect second"
 }
