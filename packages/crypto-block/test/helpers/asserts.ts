@@ -24,7 +24,7 @@ export const assertTransactionData = (assert, transactionData1, transactionData2
 		"senderPublicKey",
 		"from",
 		"gasPrice",
-		"gas",
+		"gasLimit",
 		"network",
 		"value",
 		"to",

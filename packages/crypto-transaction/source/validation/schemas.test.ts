@@ -87,7 +87,7 @@ describe<{
 	});
 
 	const transactionOriginal = {
-		gas: 21_000,
+		gasLimit: 21_000,
 		gasPrice: 5 * 1e9,
 		hash: "1".repeat(64),
 		network: 10_000,

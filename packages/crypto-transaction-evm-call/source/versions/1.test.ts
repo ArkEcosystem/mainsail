@@ -47,7 +47,7 @@ describe<{
 	const transactionOriginal = {
 		value: 0,
 		gasPrice: 5 * 1e9,
-		gas: 21000,
+		gasLimit: 21000,
 		nonce: 1,
 		to: ethers.ZeroAddress,
 		senderPublicKey: "a".repeat(66),
