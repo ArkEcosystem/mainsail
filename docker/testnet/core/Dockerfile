@@ -15,7 +15,7 @@ RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 py3-setuptools
     && echo "servers time.google.com" >> /etc/ntpd.conf \
     && npm install -g npm@latest \
     && su node -c "npm install --prefix=/home/node/.pnpm -g pnpm" \
-    && su node -c "pnpm add -g @mainsail/core@${mainsail_channel} --allow-build @chainsafe/blst --allow-build bcrypto --allow-build better-sqlite3 --allow-build bstring --allow-build lmdb --allow-build msgpackr-extract --allow-build nsfw --allow-build protobufjs" \
+    && su node -c "pnpm add -g @mainsail/core@${mainsail_channel} --allow-build=@chainsafe/blst --allow-build=bcrypto --allow-build=better-sqlite3 --allow-build=bstring --allow-build=lmdb --allow-build=msgpackr-extract --allow-build=nsfw --allow-build=protobufjs" \
     && su node -c "export PNPM_HOME=/home/node/.pnpm/bin" \
     && su node -c "pnpm store prune" \
     && su node -c "rm -rf ~/.cache/node-gyp" \
