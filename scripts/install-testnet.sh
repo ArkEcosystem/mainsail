@@ -168,7 +168,7 @@ allowBuild() {
     packages=("@chainsafe/blst" "bcrypto" "better-sqlite3" "bstring" "lmdb" "msgpackr-extract" "nsfw" "protobufjs")
     params=""
        for package in "${packages[@]}"; do
-          params+="--allow-build \"${package}\" "
+          params+="--allow-build=\"${package}\" "
        done
 }
 
@@ -176,7 +176,7 @@ addCore() {
     packages=(@chainsafe/blst bcrypto better-sqlite3 bstring lmdb msgpackr-extract nsfw protobufjs)
         params=""
        for package in "${packages[@]}"; do
-          params+="--allow-build ${package} "
+          params+="--allow-build=${package} "
        done
     while ! pnpm add -g @mainsail/core@${channel:-evm} ${params} ; do
         read -p "Installing Mainsail Core failed, do you want to retry? [y/N]: " choice
@@ -215,7 +215,7 @@ if [ -z "$NPM" ] ; then
 fi
 
 addApi() {
-    while ! pnpm add -g @mainsail/api@${channel:-evm} --allow-build nsfw ; do
+    while ! pnpm add -g @mainsail/api@${channel:-evm} --allow-build=nsfw ; do
         read -p "Installing Mainsail API failed, do you want to retry? [y/N]: " choice
             if [[ ! "$choice" =~ ^(yes|y|Y) ]] ; then
                  exit 1
