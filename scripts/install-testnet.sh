@@ -187,9 +187,11 @@ addCore() {
 }
 
 heading "Configuring for custom TestNet ..."
-
+# get snapshot URL    
+SNAP=$(curl -s -L -H "Accept: application/vnd.github+json" "https://api.github.com/repos/ArkEcosystem/mainsail-network-config/contents/testnet/mainsail/"  | grep  compressed | grep download_url | awk '{ print $2 }' | tr -d ",")
+#
     channel=evm addCore ${channel} && rm -rf ~/.config/mainsail/core/ &&  rm -rf ~/.local/state/mainsail/core/ &&  rm -rf ~/.local/share/mainsail/core/
-	mainsail config:publish:custom --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/peers.json --reset
+        mainsail config:publish:custom --app="https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/app.json" --peers="https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/peers.json" --crypto="https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/crypto.json" --snapshot=${SNAP} --overwrite
 	mainsail env:set --key=MAINSAIL_P2P_HOST --value=0.0.0.0
 	mainsail env:set --key=MAINSAIL_P2P_PORT --value=4000
 	mainsail env:set --key=MAINSAIL_API_TRANSACTION_POOL_HOST --value=0.0.0.0
@@ -197,6 +199,7 @@ heading "Configuring for custom TestNet ..."
 	mainsail env:set --key=MAINSAIL_API_EVM_HOST --value=0.0.0.0
 	mainsail env:set --key=MAINSAIL_API_EVM_PORT --value=4008
 	mainsail env:set --key=MAINSAIL_CRYPTO_WORKER_COUNT --value=2
+	mainsail env:set --key=MAINSAIL_API_SYNC_ENABLED --value=false
 
 warning "Cleaning up Pnpm cache .."
     pnpm store prune
@@ -342,7 +345,7 @@ if [[ "$choice" =~ ^(yes|y|Y) ]]; then
 heading "Configuring ..."
 
 	mainsail env:set --key=MAINSAIL_DB_USERNAME --value="${databaseUsername}"
-    mainsail env:set --key=MAINSAIL_DB_PASSWORD --value="${databasePassword}"
+	mainsail env:set --key=MAINSAIL_DB_PASSWORD --value="${databasePassword}"
 	mainsail env:set --key=MAINSAIL_DB_DATABASE --value="${databaseName}"
 	mainsail env:set --key=MAINSAIL_API_SYNC_ENABLED --value=true
 

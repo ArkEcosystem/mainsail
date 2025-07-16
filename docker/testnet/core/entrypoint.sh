@@ -8,12 +8,13 @@ sudo rm -rf /home/node/.config/mainsail/core/*
 sudo rm -rf /home/node/.local/state/mainsail/core/*
 sudo chown node:node -R /home/node/.config
 sudo chown node:node -R /home/node/.local
-#mainsail config:publish --token=$TOKEN --network=$NETWORK
+SNAP=$(curl -s -L -H "Accept: application/vnd.github+json" "https://api.github.com/repos/ArkEcosystem/mainsail-network-config/contents/testnet/mainsail/"  | grep  compressed | grep download_url | awk '{ print $2 }' | tr -d ",")
 if [ "$API" = "true" ]; then
-  mainsail config:publish:custom --token=$TOKEN --network=$NETWORK --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/peers.json --reset
+  mainsail config:publish:custom --app="https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/app.json" --peers="https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/peers.json" --crypto="https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/crypto.json" --snapshot=${SNAP} --overwrite 
   mainsail env:set --key=MAINSAIL_API_SYNC_ENABLED --value=true
 else
-  mainsail config:publish:custom --token=$TOKEN --network=$NETWORK --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/evm/testnet/mainsail/peers.json --reset
+  mainsail config:publish:custom --app="https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/app.json" --peers="https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/peers.json" --crypto="https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/crypto.json" --snapshot=${SNAP} --overwrite
+  mainsail env:set --key=MAINSAIL_API_SYNC_ENABLED --value=false
 fi
 
 if [ "$MODE" = "validator" ]; then
@@ -41,4 +42,3 @@ if [ "$MODE" = "validator" ] && [ -z "$SECRET" ] && [ -z "$MAINSAIL_FORGER_PASSW
 elif [ "$MODE" = "validator" ] && [ -n "$SECRET" ] && [ -n "$MAINSAIL_FORGER_PASSWORD" ]; then
     mainsail --token=$TOKEN --network=$NETWORK core:run
 fi
-
