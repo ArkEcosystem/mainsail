@@ -198,7 +198,6 @@ SNAP=$(curl -s -L -H "Accept: application/vnd.github+json" "https://api.github.c
 	mainsail env:set --key=MAINSAIL_API_TRANSACTION_POOL_PORT --value=4007
 	mainsail env:set --key=MAINSAIL_API_EVM_HOST --value=0.0.0.0
 	mainsail env:set --key=MAINSAIL_API_EVM_PORT --value=4008
-	mainsail env:set --key=MAINSAIL_CRYPTO_WORKER_COUNT --value=2
 	mainsail env:set --key=MAINSAIL_API_SYNC_ENABLED --value=false
 
 warning "Cleaning up Pnpm cache .."
