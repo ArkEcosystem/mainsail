@@ -187,7 +187,7 @@ addCore() {
 }
 
 heading "Configuring for custom TestNet ..."
-# get snapshot URL    
+# get snapshot URL
 SNAP=$(curl -s -L -H "Accept: application/vnd.github+json" "https://api.github.com/repos/ArkEcosystem/mainsail-network-config/contents/testnet/mainsail/"  | grep  compressed | grep download_url | awk '{ print $2 }' | tr -d ",")
 #
     channel=evm addCore ${channel} && rm -rf ~/.config/mainsail/core/ &&  rm -rf ~/.local/state/mainsail/core/ &&  rm -rf ~/.local/share/mainsail/core/
