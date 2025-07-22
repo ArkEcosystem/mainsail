@@ -34,6 +34,7 @@ export type NetworkOptions = {
 	pubKeyHash: number;
 	wif: number;
 	chainId: number;
+	nethashSalt?: number;
 };
 
 export type RewardOptions = {

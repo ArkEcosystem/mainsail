@@ -13,7 +13,12 @@ export class NetworkGenerator {
 				token: options.token,
 			},
 			name: options.network,
-			nethash: sha256(Buffer.from(options.chainId.toString(16) + options.token)).slice(2),
+			nethash: sha256(
+				Buffer.concat([
+					Buffer.from(options.chainId.toString(16) + options.token),
+					options.nethashSalt ? Buffer.from(options.nethashSalt.toString(16)) : Buffer.alloc(0),
+				]),
+			).slice(2),
 			pubKeyHash: options.pubKeyHash,
 			slip44: 1,
 			wif: options.wif,
