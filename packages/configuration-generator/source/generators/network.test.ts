@@ -35,4 +35,32 @@ describe<{
 			},
 		);
 	});
+
+	it("#generate - should generate network with nethashSalt", ({ generator }) => {
+		assert.equal(
+			generator.generate({
+				chainId: 1,
+				explorer: "http://myn.com",
+				network: "devnet",
+				pubKeyHash: 123,
+				symbol: "my",
+				token: "myn",
+				wif: 44,
+				nethashSalt: 1,
+			}),
+			{
+				chainId: 1,
+				client: {
+					explorer: "http://myn.com",
+					symbol: "my",
+					token: "myn",
+				},
+				name: "devnet",
+				nethash: "03e8eabf43d7fcee4ecd7c73d41be913ea0f8b582edfd8383570eb7e504df863",
+				pubKeyHash: 123,
+				slip44: 1,
+				wif: 44,
+			},
+		);
+	});
 });
