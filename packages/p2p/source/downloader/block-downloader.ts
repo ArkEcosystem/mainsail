@@ -235,16 +235,6 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		const isFirstJob = index === 0;
 		const blockNumberFrom = isFirstJob ? this.stateStore.getBlockNumber() + 1 : job.blockNumberFrom;
 
-		// Skip if next job is higher than current block number
-		if (
-			isFirstJob &&
-			this.#downloadJobs.length > 1 &&
-			this.#downloadJobs[1].blockNumberFrom > this.stateStore.getBlockNumber()
-		) {
-			this.#downloadJobs.shift();
-			return;
-		}
-
 		const peers = this.repository
 			.getPeers()
 			.filter((peer) => peer.header.blockNumber > Math.max(blockNumberFrom, job.blockNumberTo));
