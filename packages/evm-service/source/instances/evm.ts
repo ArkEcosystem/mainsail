@@ -258,9 +258,9 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		}
 
 		return {
-			commitRound: BigInt(commitRound),
 			block: blockBuffer,
 			blockHash: hash,
+			commitRound: BigInt(commitRound),
 			proof: proofBuffer,
 			transactionHashes,
 			transactions: transactionBuffers,
