@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/snapshot-legacy-importer",
-	"version": "0.0.1-evm.24",
+	"version": "0.0.1-evm.25",
 	"description": "Mainsail V3 legacy state importer",
 	"license": "GPL-3.0-only",
 	"contributors": [],

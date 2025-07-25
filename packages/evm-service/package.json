@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/evm-service",
-	"version": "0.0.1-evm.24",
+	"version": "0.0.1-evm.25",
 	"description": "EVM Service for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
