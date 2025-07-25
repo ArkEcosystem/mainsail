@@ -228,11 +228,13 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 			return undefined;
 		}
 
-		const { block, serialized } = await unit.getCommit();
+		const { block, serialized, proof } = await unit.getCommit();
 
 		const {
 			header: { number: height, hash },
 		} = block;
+
+		const { round: commitRound } = proof;
 
 		const proofSize = this.proofSize();
 		const headerSize = this.headerSize();
@@ -256,6 +258,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		}
 
 		return {
+			commitRound: BigInt(commitRound),
 			block: blockBuffer,
 			blockHash: hash,
 			proof: proofBuffer,
