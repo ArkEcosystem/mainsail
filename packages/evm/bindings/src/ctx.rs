@@ -118,6 +118,7 @@ pub struct JsCommitKey {
 
 #[napi(object)]
 pub struct JsCommitData {
+    pub commit_round: JsBigInt,
     pub block_hash: JsString,
     pub block: JsBuffer,
     pub proof: JsBuffer,
@@ -323,6 +324,7 @@ impl TryFrom<JsCommitData> for CommitData {
     type Error = anyhow::Error;
 
     fn try_from(value: JsCommitData) -> Result<Self, Self::Error> {
+        let commit_round = value.commit_round.get_u64()?.0;
         let proof = utils::convert_js_buffer_to_bytes(value.proof)?;
         let block = utils::convert_js_buffer_to_bytes(value.block)?;
         let block_hash = utils::convert_string_to_b256(value.block_hash)?;
@@ -340,6 +342,7 @@ impl TryFrom<JsCommitData> for CommitData {
         assert_eq!(transaction_hashes.len(), transactions.len());
 
         Ok(CommitData {
+            commit_round,
             block_hash,
             block,
             proof,

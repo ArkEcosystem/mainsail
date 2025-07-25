@@ -197,6 +197,7 @@ pub struct CommitKey(pub u64, pub u64, pub B256);
 
 #[derive(Default)]
 pub struct CommitData {
+    pub commit_round: u64,
     pub block_hash: B256,
     pub proof: Bytes,
     pub block: Bytes,
@@ -935,6 +936,7 @@ impl PersistentDB {
             //
             if let Some(commit_data) = commit_data {
                 let CommitData {
+                    commit_round,
                     block_hash,
                     block,
                     proof,
@@ -973,7 +975,7 @@ impl PersistentDB {
                 inner.state.put(
                     rwtxn,
                     &total_round_key,
-                    &Bytes::from_iter((current_total_round + key.1 + 1).to_le_bytes()),
+                    &Bytes::from_iter((current_total_round + commit_round + 1).to_le_bytes()),
                 )?;
             }
             // ========================================
