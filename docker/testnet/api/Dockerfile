@@ -4,7 +4,7 @@ WORKDIR /home/node
 
 ADD entrypoint.sh /entrypoint.sh
 
-ARG mainsail_channel=evm
+ARG mainsail_channel=rc
 
 ENV PNPM_HOME=/home/node/.pnpm/bin
 ENV PATH="${PATH}:${PNPM_HOME}"
