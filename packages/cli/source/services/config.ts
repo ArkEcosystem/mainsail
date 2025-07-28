@@ -83,7 +83,7 @@ export class Config {
 	}
 
 	#getRegistryChannel(version: string): string {
-		let channel = "evm";
+		let channel = "rc";
 		for (const item of Constants.Channels) {
 			if (version.includes(`-${item}`)) {
 				channel = item;
