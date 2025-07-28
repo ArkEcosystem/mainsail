@@ -178,7 +178,7 @@ addCore() {
        for package in "${packages[@]}"; do
           params+="--allow-build=${package} "
        done
-    while ! pnpm add -g @mainsail/core@${channel:-evm} ${params} ; do
+    while ! pnpm add -g @mainsail/core@${channel:-rc} ${params} ; do
         read -p "Installing Mainsail Core failed, do you want to retry? [y/N]: " choice
             if [[ ! "$choice" =~ ^(yes|y|Y) ]] ; then
                  exit 1
@@ -190,7 +190,7 @@ heading "Configuring for custom TestNet ..."
 # get snapshot URL
 SNAP=$(curl -s -L -H "Accept: application/vnd.github+json" "https://api.github.com/repos/ArkEcosystem/mainsail-network-config/contents/testnet/mainsail/"  | grep  compressed | grep download_url | awk '{ print $2 }' | tr -d ",")
 #
-    channel=evm addCore ${channel} && rm -rf ~/.config/mainsail/core/ &&  rm -rf ~/.local/state/mainsail/core/ &&  rm -rf ~/.local/share/mainsail/core/
+    channel=rc addCore ${channel} && rm -rf ~/.config/mainsail/core/ &&  rm -rf ~/.local/state/mainsail/core/ &&  rm -rf ~/.local/share/mainsail/core/
         mainsail config:publish:custom --app="https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/app.json" --peers="https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/peers.json" --crypto="https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/crypto.json" --snapshot=${SNAP} --overwrite
 	mainsail env:set --key=MAINSAIL_P2P_HOST --value=0.0.0.0
 	mainsail env:set --key=MAINSAIL_P2P_PORT --value=4000
@@ -217,7 +217,7 @@ if [ -z "$NPM" ] ; then
 fi
 
 addApi() {
-    while ! pnpm add -g @mainsail/api@${channel:-evm} --allow-build=nsfw ; do
+    while ! pnpm add -g @mainsail/api@${channel:-rc} --allow-build=nsfw ; do
         read -p "Installing Mainsail API failed, do you want to retry? [y/N]: " choice
             if [[ ! "$choice" =~ ^(yes|y|Y) ]] ; then
                  exit 1
@@ -322,7 +322,7 @@ if [ ! -z "$API" ] ; then
     pnpm rm -g @mainsail/api > /dev/null 2>&1 || true
 fi
 
-    channel=evm addApi ${channel} && rm -rf ~/.config/mainsail/api/ &&  rm -rf ~/.local/state/mainsail/api/ &&  rm -rf ~/.local/share/mainsail/api/
+    channel=rc addApi ${channel} && rm -rf ~/.config/mainsail/api/ &&  rm -rf ~/.local/state/mainsail/api/ &&  rm -rf ~/.local/share/mainsail/api/
 	mainsail-api config:publish --reset
 	mainsail-api env:set --key=MAINSAIL_DB_USERNAME --value="${databaseUsername}"
 	mainsail-api env:set --key=MAINSAIL_DB_PASSWORD --value="${databasePassword}"
