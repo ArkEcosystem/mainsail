@@ -148,7 +148,7 @@ jobs:
 
             - name: Publish to NPM
               run: |
-                  pnpm run release -- --publish-branch=main --tag=rc --no-git-checks
+                  pnpm run release -- --publish-branch=develop --tag=rc --no-git-checks
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
