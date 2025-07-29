@@ -27,7 +27,7 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 			return;
 		}
 
-		this.logger.info(`A total of ${this.#validators.size} validators(s) were found this node:`);
+		this.logger.info(`A total of ${this.#validators.size} validator(s) were found this node:`);
 
 		const active: string[] = [];
 		const standBy: string[] = [];
