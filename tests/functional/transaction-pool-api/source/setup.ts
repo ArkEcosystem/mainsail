@@ -23,15 +23,11 @@ const setup = async () => {
 		.inSingletonScope();
 
 	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
-		clear: async () => {},
 		getPrecommits: async () => [],
 		getPrevotes: async () => [],
 		getProposals: async () => [],
 		getState: async () => {},
-		savePrecommits: async () => {},
-		savePrevotes: async () => {},
-		saveProposals: async () => {},
-		saveState: async () => {},
+		persist: async () => {},
 	});
 
 	// TODO:
