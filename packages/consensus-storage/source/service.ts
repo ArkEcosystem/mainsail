@@ -1,20 +1,24 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { assert } from "@mainsail/utils";
 import * as lmdb from "lmdb";
 
 @injectable()
 export class Service implements Contracts.ConsensusStorage.Service {
+	@inject(Identifiers.ConsensusStorage.Root)
+	private readonly rootStorage!: lmdb.RootDatabase;
+
 	@inject(Identifiers.ConsensusStorage.Storage.Proposal)
-	private readonly proposalStorage!: lmdb.Database;
+	private readonly proposalStorage!: lmdb.Database<Contracts.Crypto.ProposalData>;
 
 	@inject(Identifiers.ConsensusStorage.Storage.PreVote)
-	private readonly prevoteStorage!: lmdb.Database;
+	private readonly prevoteStorage!: lmdb.Database<Contracts.Crypto.PrevoteData>;
 
 	@inject(Identifiers.ConsensusStorage.Storage.PreCommit)
-	private readonly precommitStorage!: lmdb.Database;
+	private readonly precommitStorage!: lmdb.Database<Contracts.Crypto.PrecommitData>;
 
 	@inject(Identifiers.ConsensusStorage.Storage.ConsensusState)
-	private readonly stateStorage!: lmdb.Database;
+	private readonly stateStorage!: lmdb.Database<Contracts.Consensus.StateData>;
 
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
@@ -27,7 +31,8 @@ export class Service implements Contracts.ConsensusStorage.Service {
 			return undefined;
 		}
 
-		const data = await this.stateStorage.get("consensus-state");
+		const data = this.stateStorage.get("consensus-state");
+		assert.defined(data);
 
 		return {
 			blockNumber: data.blockNumber,
@@ -38,51 +43,49 @@ export class Service implements Contracts.ConsensusStorage.Service {
 		};
 	}
 
-	public async saveState(state: Contracts.Consensus.State): Promise<void> {
+	public async persist({
+		state,
+		proposals,
+		prevotes,
+		precommits,
+	}: {
+		state: Contracts.Consensus.State;
+		proposals: Contracts.Crypto.Proposal[];
+		prevotes: Contracts.Crypto.Prevote[];
+		precommits: Contracts.Crypto.Precommit[];
+	}): Promise<void> {
 		// always overwrite existing state; we only care about state for uncommitted blocks
-		const data: Contracts.Consensus.StateData = {
-			blockNumber: state.blockNumber,
-			lockedRound: state.lockedRound,
-			round: state.round,
-			step: state.step,
-			validRound: state.validRound,
-		};
+		await this.rootStorage.transaction(async () => {
+			this.#clear();
 
-		await this.stateStorage.put("consensus-state", data);
-		await this.stateStorage.flushed;
-	}
+			// State
+			const data: Contracts.Consensus.StateData = {
+				blockNumber: state.blockNumber,
+				lockedRound: state.lockedRound,
+				round: state.round,
+				step: state.step,
+				validRound: state.validRound,
+			};
+			this.stateStorage.putSync("consensus-state", data);
 
-	public async saveProposals(proposals: Contracts.Crypto.Proposal[]): Promise<void> {
-		await this.proposalStorage.transaction(() => {
+			// Proposals
 			for (const proposal of proposals) {
 				const validator = this.validatorSet.getValidator(proposal.validatorIndex);
-				void this.proposalStorage.put(`${proposal.round}-${validator.blsPublicKey}`, proposal.toData());
+				this.proposalStorage.putSync(`${proposal.round}-${validator.blsPublicKey}`, proposal.toData());
 			}
-		});
 
-		await this.proposalStorage.flushed;
-	}
-
-	public async savePrevotes(prevotes: Contracts.Crypto.Prevote[]): Promise<void> {
-		await this.prevoteStorage.transaction(() => {
+			// Prevotes
 			for (const prevote of prevotes) {
 				const validator = this.validatorSet.getValidator(prevote.validatorIndex);
-				void this.prevoteStorage.put(`${prevote.round}-${validator.blsPublicKey}`, prevote.toData());
+				this.prevoteStorage.putSync(`${prevote.round}-${validator.blsPublicKey}`, prevote.toData());
 			}
-		});
 
-		await this.prevoteStorage.flushed;
-	}
-
-	public async savePrecommits(precommits: Contracts.Crypto.Precommit[]): Promise<void> {
-		await this.precommitStorage.transaction(() => {
+			// Precommits
 			for (const precommit of precommits) {
 				const validator = this.validatorSet.getValidator(precommit.validatorIndex);
-				void this.precommitStorage.put(`${precommit.round}-${validator.blsPublicKey}`, precommit.toData());
+				this.precommitStorage.putSync(`${precommit.round}-${validator.blsPublicKey}`, precommit.toData());
 			}
 		});
-
-		await this.precommitStorage.flushed;
 	}
 
 	public async getProposals(): Promise<Contracts.Crypto.Proposal[]> {
@@ -100,12 +103,10 @@ export class Service implements Contracts.ConsensusStorage.Service {
 		return Promise.all(precommits.map((precommit) => this.messageFactory.makePrecommitFromData(precommit)));
 	}
 
-	public async clear(): Promise<void> {
-		await Promise.all([
-			this.proposalStorage.clearAsync(),
-			this.prevoteStorage.clearAsync(),
-			this.precommitStorage.clearAsync(),
-			this.stateStorage.clearAsync(),
-		]);
+	#clear(): void {
+		this.proposalStorage.clearSync();
+		this.prevoteStorage.clearSync();
+		this.precommitStorage.clearSync();
+		this.stateStorage.clearSync();
 	}
 }

@@ -29,15 +29,11 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue(p2pRegistry.makeBroadcaster(id));
 
 	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
-		clear: async () => {},
 		getPrecommits: async () => [],
 		getPrevotes: async () => [],
 		getProposals: async () => [],
 		getState: async () => {},
-		savePrecommits: async () => {},
-		savePrevotes: async () => {},
-		saveProposals: async () => {},
-		saveState: async () => {},
+		persist: async () => {},
 	});
 
 	sandbox.app.bind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();

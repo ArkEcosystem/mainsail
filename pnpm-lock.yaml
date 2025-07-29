@@ -772,6 +772,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       lmdb:
         specifier: 3.2.6
         version: 3.2.6
