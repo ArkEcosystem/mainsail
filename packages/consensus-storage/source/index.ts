@@ -50,12 +50,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const storage = this.app.get<Service>(Identifiers.ConsensusStorage.Service);
 
 		await storage.persist({
-			state: this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service).getState(),
+			precommits: roundStates.flatMap((roundState) => roundState.getPrecommits()),
+			prevotes: roundStates.flatMap((roundState) => roundState.getPrevotes()),
 			proposals: roundStates
 				.map((roundState) => roundState.getProposal())
 				.filter((proposal): proposal is Contracts.Crypto.Proposal => !!proposal),
-			precommits: roundStates.flatMap((roundState) => roundState.getPrecommits()),
-			prevotes: roundStates.flatMap((roundState) => roundState.getPrevotes()),
+			state: this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service).getState(),
 		});
 	}
 }
