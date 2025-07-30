@@ -74,7 +74,7 @@ if [[ $(locale -a | grep ^en_US.UTF-8) ]] || [[ $(locale -a | grep ^en_US.utf8) 
     fi
 else
         # Install en_US.UTF-8 Locale
-		sudo $APT_ENV apt-get install locales -yq
+        sudo $APT_ENV apt-get install locales -yq
         sudo locale-gen en_US.UTF-8
         sudo update-locale LANG=en_US.UTF-8
     if ! $(grep -Eq "(en_US.UTF-8)" "$HOME/.bashrc"); then
