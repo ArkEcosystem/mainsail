@@ -11,7 +11,7 @@ export class LegacyAttributeVerifier implements Contracts.Processor.Handler {
 	private readonly transactionVerifier!: Contracts.Crypto.TransactionVerifier;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const senders = new Map<string, Contracts.Evm.LegacyAttributes | null>();
+		const senders = new Map<string, Contracts.Evm.LegacyAttributes | undefined | null>();
 
 		for (const transaction of unit.getBlock().transactions) {
 			const { from, legacySecondSignature, senderLegacyAddress } = transaction.data;
