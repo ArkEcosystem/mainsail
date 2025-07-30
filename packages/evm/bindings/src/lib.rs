@@ -19,7 +19,7 @@ use mainsail_evm_core::{
     state_changes::AccountUpdate,
     state_commit, state_root,
 };
-use napi::{JsBigInt, JsObject, JsString, bindgen_prelude::*};
+use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use result::{
     CommitResult, JsAccountInfoExtended, JsLegacyAttributes, JsLegacyColdWallet, PreverifyTxResult,
@@ -36,6 +36,8 @@ use revm::{
     primitives::{Address, B256, Bytes, TxKind, U256, hex::ToHexExt},
     state::{AccountInfo, Bytecode},
 };
+
+use crate::result::{JsCommitResult, JsGetState};
 
 mod ctx;
 mod logger;
@@ -1124,321 +1126,313 @@ impl JsEvmWrapper {
         })
     }
 
-    #[napi(ts_return_type = "Promise<JsPreverifyTransactionResult>")]
-    pub fn preverify_transaction(
+    #[napi]
+    pub fn preverify_transaction<'env>(
         &mut self,
-        node_env: Env,
+        env: &'env Env,
         tx_ctx: JsPreverifyTransactionContext,
-    ) -> Result<JsObject> {
+    ) -> Result<PromiseRaw<'env, result::JsPreverifyTransactionResult>> {
         let tx_ctx = PreverifyTxContext::try_from(tx_ctx)?;
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::preverify_transaction_async(self.evm.clone(), tx_ctx),
-            |&mut node_env, result| {
-                Ok(result::JsPreverifyTransactionResult::new(
-                    &node_env, result,
-                )?)
-            },
+            |_, result| Ok(result::JsPreverifyTransactionResult::new(result)),
         )
     }
 
-    #[napi(ts_return_type = "Promise<JsViewResult>")]
-    pub fn view(&mut self, node_env: Env, view_ctx: JsTransactionViewContext) -> Result<JsObject> {
+    #[napi]
+    pub fn view<'env>(
+        &mut self,
+        env: &'env Env,
+        view_ctx: JsTransactionViewContext,
+    ) -> Result<PromiseRaw<'env, result::JsViewResult>> {
         let view_ctx = TxViewContext::try_from(view_ctx)?;
-        node_env.execute_tokio_future(
-            Self::view_async(self.evm.clone(), view_ctx),
-            |&mut node_env, result| Ok(result::JsViewResult::new(&node_env, result)?),
-        )
+        env.spawn_future_with_callback(Self::view_async(self.evm.clone(), view_ctx), |_, result| {
+            Ok(result::JsViewResult::new(result)?)
+        })
     }
 
-    #[napi(ts_return_type = "Promise<JsProcessResult>")]
-    pub fn process(&mut self, node_env: Env, tx_ctx: JsTransactionContext) -> Result<JsObject> {
+    #[napi]
+    pub fn process<'env>(
+        &mut self,
+        env: &'env Env,
+        tx_ctx: JsTransactionContext,
+    ) -> Result<PromiseRaw<'env, result::JsProcessResult>> {
         let tx_ctx = TxContext::try_from(tx_ctx)?;
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::process_async(self.evm.clone(), tx_ctx),
-            |&mut node_env, result| Ok(result::JsProcessResult::new(&node_env, result)?),
+            |_, result| Ok(result::JsProcessResult::new(result)),
         )
     }
 
-    #[napi(ts_return_type = "Promise<JsSimulateResult>")]
-    pub fn simulate(
+    #[napi]
+    pub fn simulate<'env>(
         &mut self,
-        node_env: Env,
+        env: &'env Env,
         tx_ctx: JsTransactionSimulateContext,
-    ) -> Result<JsObject> {
+    ) -> Result<PromiseRaw<'env, result::JsSimulateResult>> {
         let tx_ctx = TxSimulateContext::try_from(tx_ctx)?;
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::simulate_async(self.evm.clone(), tx_ctx),
-            |&mut node_env, result| Ok(result::JsSimulateResult::new(&node_env, result)?),
+            |_, result| Ok(result::JsSimulateResult::new(result)),
         )
     }
 
-    #[napi(ts_return_type = "Promise<void>")]
-    pub fn initialize_genesis(
+    #[napi]
+    pub fn initialize_genesis<'env>(
         &mut self,
-        node_env: Env,
+        env: &'env Env,
         genesis_ctx: JsGenesisContext,
-    ) -> Result<JsObject> {
+    ) -> Result<PromiseRaw<'env, ()>> {
         let genesis_ctx = GenesisContext::try_from(genesis_ctx)?;
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::initialize_genesis_async(self.evm.clone(), genesis_ctx),
             |_, _| Ok(()),
         )
     }
 
-    #[napi(ts_return_type = "Promise<void>")]
-    pub fn prepare_next_commit(
+    #[napi]
+    pub fn prepare_next_commit<'env>(
         &mut self,
-        node_env: Env,
+        env: &'env Env,
         ctx: JsPrepareNextCommitContext,
-    ) -> Result<JsObject> {
+    ) -> Result<PromiseRaw<'env, ()>> {
         let ctx = PrepareNextCommitContext::try_from(ctx)?;
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::prepare_next_commit_async(self.evm.clone(), ctx),
             |_, _| Ok(()),
         )
     }
 
-    #[napi(ts_return_type = "Promise<void>")]
-    pub fn calculate_round_validators(
+    #[napi]
+    pub fn calculate_round_validators<'env>(
         &mut self,
-        node_env: Env,
+        env: &'env Env,
         ctx: JsCalculateRoundValidatorsContext,
-    ) -> Result<JsObject> {
+    ) -> Result<PromiseRaw<'env, ()>> {
         let ctx = CalculateRoundValidatorsContext::try_from(ctx)?;
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::calculate_round_validators_async(self.evm.clone(), ctx),
             |_, _| Ok(()),
         )
     }
 
-    #[napi(ts_return_type = "Promise<void>")]
-    pub fn update_rewards_and_votes(
+    #[napi]
+    pub fn update_rewards_and_votes<'env>(
         &mut self,
-        node_env: Env,
+        env: &'env Env,
         ctx: JsUpdateRewardsAndVotesContext,
-    ) -> Result<JsObject> {
+    ) -> Result<PromiseRaw<'env, ()>> {
         let ctx = UpdateRewardsAndVotesContext::try_from(ctx)?;
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::update_rewards_and_votes_async(self.evm.clone(), ctx),
             |_, _| Ok(()),
         )
     }
 
-    #[napi(ts_return_type = "Promise<JsAccountInfo>")]
-    pub fn get_account_info(
+    #[napi]
+    pub fn get_account_info<'env>(
         &mut self,
-        node_env: Env,
-        address: JsString,
-        block_number: Option<JsBigInt>,
-    ) -> Result<JsObject> {
-        let address = utils::create_address_from_js_string(address)?;
+        env: &'env Env,
+        address: String,
+        block_number: Option<BigInt>,
+    ) -> Result<PromiseRaw<'env, result::JsAccountInfo>> {
+        let address = utils::create_address_from_string(&address)?;
 
         let block_number = match block_number {
-            Some(block_number) => Some(block_number.get_u64()?.0),
+            Some(block_number) => Some(block_number.get_u64().1),
             None => None,
         };
 
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::get_account_info_async(self.evm.clone(), address, block_number),
-            |&mut node_env, result| Ok(result::JsAccountInfo::new(&node_env, result)?),
+            |_, result| Ok(result::JsAccountInfo::new(result)?),
         )
     }
 
-    #[napi(ts_return_type = "Promise<JsAccountInfoExtended>")]
-    pub fn get_account_info_extended(
+    #[napi]
+    pub fn get_account_info_extended<'env>(
         &mut self,
-        node_env: Env,
-        address: JsString,
-        legacy_address: Option<JsString>,
-    ) -> Result<JsObject> {
-        let address = utils::create_address_from_js_string(address)?;
+        env: &'env Env,
+        address: String,
+        legacy_address: Option<String>,
+    ) -> Result<PromiseRaw<'env, result::JsAccountInfoExtended>> {
+        let address = utils::create_address_from_string(&address)?;
         let legacy_address = if let Some(legacy_address) = legacy_address {
-            Some(utils::create_legacy_address_from_js_string(legacy_address)?)
+            Some(utils::create_legacy_address_from_string(&legacy_address)?)
         } else {
             None
         };
 
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::get_account_info_extended_async(self.evm.clone(), address, legacy_address),
-            |&mut node_env, result| Ok(result::JsAccountInfoExtended::new(&node_env, result)?),
+            |_, result| Ok(result::JsAccountInfoExtended::new(result)),
         )
     }
 
-    #[napi(ts_return_type = "Promise<void>")]
-    pub fn import_account_infos(
+    #[napi]
+    pub fn import_account_infos<'env>(
         &mut self,
-        node_env: Env,
+        env: &'env Env,
         infos: Vec<JsAccountInfoExtended>,
-    ) -> Result<JsObject> {
+    ) -> Result<PromiseRaw<'env, ()>> {
         let mut accounts: Vec<AccountInfoExtended> = Vec::with_capacity(infos.len());
         for info in infos {
             accounts.push(info.try_into()?);
         }
 
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::import_account_infos_async(self.evm.clone(), accounts),
             |_, _| Ok(()),
         )
     }
 
-    #[napi(ts_return_type = "Promise<void>")]
-    pub fn import_legacy_cold_wallets(
+    #[napi]
+    pub fn import_legacy_cold_wallets<'env>(
         &mut self,
-        node_env: Env,
+        env: &'env Env,
         infos: Vec<JsLegacyColdWallet>,
-    ) -> Result<JsObject> {
+    ) -> Result<PromiseRaw<'env, ()>> {
         let mut cold_wallets: Vec<LegacyColdWallet> = Vec::with_capacity(infos.len());
         for info in infos {
             cold_wallets.push(info.try_into()?);
         }
 
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::import_legacy_cold_wallets_async(self.evm.clone(), cold_wallets),
             |_, _| Ok(()),
         )
     }
 
-    #[napi(ts_return_type = "Promise<JsGetAccounts>")]
-    pub fn get_accounts(
+    #[napi]
+    pub fn get_accounts<'env>(
         &mut self,
-        node_env: Env,
-        offset: JsBigInt,
-        limit: JsBigInt,
-    ) -> Result<JsObject> {
-        let offset = offset.get_u64()?.0;
-        let limit = limit.get_u64()?.0;
+        env: &'env Env,
+        offset: BigInt,
+        limit: BigInt,
+    ) -> Result<PromiseRaw<'env, result::JsGetAccounts>> {
+        let offset = offset.get_u64().1;
+        let limit = limit.get_u64().1;
 
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::get_accounts_async(self.evm.clone(), offset, limit),
-            |&mut node_env, result| Ok(result::JsGetAccounts::new(&node_env, result.0, result.1)?),
+            |_, result| Ok(result::JsGetAccounts::new(result.0, result.1)),
         )
     }
 
-    #[napi(ts_return_type = "Promise<JsLegacyAttributes | null>")]
-    pub fn get_legacy_attributes(
+    #[napi]
+    pub fn get_legacy_attributes<'env>(
         &mut self,
-        node_env: Env,
-        address: JsString,
-        legacy_address: Option<JsString>,
-    ) -> Result<JsObject> {
-        let address = utils::create_address_from_js_string(address)?;
+        env: &'env Env,
+        address: String,
+        legacy_address: Option<String>,
+    ) -> Result<PromiseRaw<'env, Option<JsLegacyAttributes>>> {
+        let address = utils::create_address_from_string(&address)?;
         let legacy_address = if let Some(legacy_address) = legacy_address {
-            Some(utils::create_legacy_address_from_js_string(legacy_address)?)
+            Some(utils::create_legacy_address_from_string(&legacy_address)?)
         } else {
             None
         };
 
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::get_legacy_attributes_async(self.evm.clone(), address, legacy_address),
-            |&mut node_env, result| {
+            |_, result| {
                 Ok(match result {
-                    Some(result) => Some(JsLegacyAttributes::new(&node_env, result)?),
+                    Some(result) => Some(JsLegacyAttributes::new(result)),
                     None => None,
                 })
             },
         )
     }
 
-    #[napi(ts_return_type = "Promise<JsGetLegacyColdWallets>")]
-    pub fn get_legacy_cold_wallets(
+    #[napi]
+    pub fn get_legacy_cold_wallets<'env>(
         &mut self,
-        node_env: Env,
-        offset: JsBigInt,
-        limit: JsBigInt,
-    ) -> Result<JsObject> {
-        let offset = offset.get_u64()?.0;
-        let limit = limit.get_u64()?.0;
+        env: &'env Env,
+        offset: BigInt,
+        limit: BigInt,
+    ) -> Result<PromiseRaw<'env, result::JsGetLegacyColdWallets>> {
+        let offset = offset.get_u64().1;
+        let limit = limit.get_u64().1;
 
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::get_legacy_cold_wallets_async(self.evm.clone(), offset, limit),
-            |&mut node_env, result| {
-                Ok(result::JsGetLegacyColdWallets::new(
-                    &node_env, result.0, result.1,
-                )?)
-            },
+            |_, result| Ok(result::JsGetLegacyColdWallets::new(result.0, result.1)),
         )
     }
 
-    #[napi(ts_return_type = "Promise<JsGetReceipts>")]
-    pub fn get_receipts(
+    #[napi]
+    pub fn get_receipts<'env>(
         &mut self,
-        node_env: Env,
-        offset: JsBigInt,
-        limit: JsBigInt,
-    ) -> Result<JsObject> {
-        let offset = offset.get_u64()?.0;
-        let limit = limit.get_u64()?.0;
+        node_env: &'env Env,
+        offset: BigInt,
+        limit: BigInt,
+    ) -> Result<PromiseRaw<'env, result::JsGetReceipts>> {
+        let offset = offset.get_u64().1;
+        let limit = limit.get_u64().1;
 
-        node_env.execute_tokio_future(
+        node_env.spawn_future_with_callback(
             Self::get_receipts_async(self.evm.clone(), offset, limit),
-            |&mut node_env, result| Ok(result::JsGetReceipts::new(&node_env, result.0, result.1)?),
+            |_, result| Ok(result::JsGetReceipts::new(result.0, result.1)?),
         )
     }
 
-    #[napi(ts_return_type = "Promise<JsGetReceipt>")]
-    pub fn get_receipt(
+    #[napi]
+    pub fn get_receipt<'env>(
         &mut self,
-        node_env: Env,
-        block_number: JsBigInt,
-        tx_hash: JsString,
-    ) -> Result<JsObject> {
-        let block_number = block_number.get_u64()?.0;
+        env: &'env Env,
+        block_number: BigInt,
+        tx_hash: String,
+    ) -> Result<PromiseRaw<'env, result::JsGetReceipt>> {
+        let block_number = block_number.get_u64().1;
         let tx_hash = utils::convert_string_to_b256(tx_hash)?;
 
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::get_receipt_async(self.evm.clone(), block_number, tx_hash),
-            move |&mut node_env, result| {
-                Ok(result::JsGetReceipt::new(
-                    &node_env,
-                    result,
-                    block_number,
-                    tx_hash,
-                )?)
-            },
+            move |_, result| Ok(result::JsGetReceipt::new(result, block_number, tx_hash)),
         )
     }
 
-    #[napi(ts_return_type = "Promise<string>")]
-    pub fn code_at(
+    #[napi]
+    pub fn code_at<'env>(
         &mut self,
-        node_env: Env,
-        address: JsString,
-        block_number: Option<JsBigInt>,
-    ) -> Result<JsObject> {
-        let address = utils::create_address_from_js_string(address)?;
+        env: &'env Env,
+        address: String,
+        block_number: Option<BigInt>,
+    ) -> Result<PromiseRaw<'env, String>> {
+        let address = utils::create_address_from_string(&address)?;
         let block_number = match block_number {
-            Some(block_number) => Some(block_number.get_u64()?.0),
+            Some(block_number) => Some(block_number.get_u64().1),
             None => None,
         };
 
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::code_at_async(self.evm.clone(), address, block_number),
-            |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
+            |_, result| Ok(result),
         )
     }
 
-    #[napi(ts_return_type = "Promise<string>")]
-    pub fn storage_at(
+    #[napi]
+    pub fn storage_at<'env>(
         &mut self,
-        node_env: Env,
-        address: JsString,
-        slot: JsBigInt,
-    ) -> Result<JsObject> {
-        let address = utils::create_address_from_js_string(address)?;
+        env: &'env Env,
+        address: String,
+        slot: BigInt,
+    ) -> Result<PromiseRaw<'env, String>> {
+        let address = utils::create_address_from_string(&address)?;
         let slot = utils::convert_bigint_to_u256(slot)?;
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::storage_at_async(self.evm.clone(), address, slot),
-            |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
+            |_, result| Ok(result),
         )
     }
 
-    #[napi(ts_return_type = "Promise<JsCommitResult>")]
-    pub fn commit(
+    #[napi]
+    pub fn commit<'env>(
         &mut self,
-        node_env: Env,
+        env: &'env Env,
         commit_key: JsCommitKey,
         commit_data: Option<JsCommitData>,
-    ) -> Result<JsObject> {
+    ) -> Result<PromiseRaw<'env, JsCommitResult>> {
         let commit_key = CommitKey::try_from(commit_key)?;
         let commit_data = if let Some(commit_data) = commit_data {
             Some(CommitData::try_from(commit_data)?)
@@ -1446,157 +1440,169 @@ impl JsEvmWrapper {
             None
         };
 
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::commit_async(self.evm.clone(), commit_key, commit_data),
-            |&mut node_env, result| Ok(result::JsCommitResult::new(&node_env, result)?),
+            |_, result| Ok(result::JsCommitResult::new(result)?),
         )
     }
 
-    #[napi(ts_return_type = "Promise<string>")]
-    pub fn state_root(
+    #[napi]
+    pub fn state_root<'env>(
         &mut self,
-        node_env: Env,
+        env: &'env Env,
         commit_key: JsCommitKey,
-        current_hash: JsString,
-    ) -> Result<JsObject> {
+        current_hash: String,
+    ) -> Result<PromiseRaw<'env, String>> {
         let commit_key = CommitKey::try_from(commit_key)?;
         let current_hash = utils::convert_string_to_b256(current_hash)?;
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::state_root_async(self.evm.clone(), commit_key, current_hash),
-            |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
+            |_, result| Ok(result),
         )
     }
 
-    #[napi(ts_return_type = "Promise<string>")]
-    pub fn logs_bloom(&mut self, node_env: Env, commit_key: JsCommitKey) -> Result<JsObject> {
+    #[napi]
+    pub fn logs_bloom<'env>(
+        &mut self,
+        env: &'env Env,
+        commit_key: JsCommitKey,
+    ) -> Result<PromiseRaw<'env, String>> {
         let commit_key = CommitKey::try_from(commit_key)?;
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::logs_bloom_async(self.evm.clone(), commit_key),
-            |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
+            |_, result| Ok(result),
         )
     }
 
-    #[napi(ts_return_type = "Promise<boolean>")]
-    pub fn is_empty(&mut self, node_env: Env) -> Result<JsObject> {
-        node_env.execute_tokio_future(
-            Self::is_empty_async(self.evm.clone()),
-            |&mut node_env, result| Ok(node_env.get_boolean(result)?),
-        )
+    #[napi]
+    pub fn is_empty<'env>(&mut self, env: &'env Env) -> Result<PromiseRaw<'env, bool>> {
+        env.spawn_future_with_callback(Self::is_empty_async(self.evm.clone()), |_, result| {
+            Ok(result)
+        })
     }
 
-    #[napi(ts_return_type = "Promise<JsGetState>")]
-    pub fn get_state(&mut self, node_env: Env) -> Result<JsObject> {
-        node_env.execute_tokio_future(
-            Self::get_state_async(self.evm.clone()),
-            |&mut node_env, result| Ok(result::JsGetState::new(&node_env, result)?),
-        )
+    #[napi]
+    pub fn get_state<'env>(&mut self, env: &'env Env) -> Result<PromiseRaw<'env, JsGetState>> {
+        env.spawn_future_with_callback(Self::get_state_async(self.evm.clone()), |_, result| {
+            Ok(result::JsGetState::new(result))
+        })
     }
 
     #[napi(ts_return_type = "Promise<Buffer | undefined>")]
-    pub fn get_block_header_bytes(
+    pub fn get_block_header_bytes<'env>(
         &mut self,
-        node_env: Env,
-        block_number: JsBigInt,
-    ) -> Result<JsObject> {
-        let block_number = block_number.get_u64()?.0;
-        node_env.execute_tokio_future(
+        env: &'env Env,
+        block_number: BigInt,
+    ) -> Result<PromiseRaw<'env, Option<Buffer>>> {
+        let block_number = block_number.get_u64().1;
+        env.spawn_future_with_callback(
             Self::get_block_header_bytes_async(self.evm.clone(), block_number),
-            |&mut node_env, result| {
+            |_, result| {
                 Ok(match result {
-                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(&node_env, bytes)?),
+                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(bytes)),
                     None => None,
                 })
             },
         )
     }
 
-    #[napi(ts_return_type = "Promise<bigint | undefined>")]
-    pub fn get_block_number_by_hash(
+    #[napi]
+    pub fn get_block_number_by_hash<'env>(
         &mut self,
-        node_env: Env,
-        block_hash: JsString,
-    ) -> Result<JsObject> {
+        env: &'env Env,
+        block_hash: String,
+    ) -> Result<PromiseRaw<'env, Option<BigInt>>> {
         let block_hash = utils::convert_string_to_b256(block_hash)?;
 
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::get_block_number_by_hash_async(self.evm.clone(), block_hash),
-            |&mut node_env, result| {
+            |_, result| {
                 Ok(match result {
-                    Some(result) => Some(node_env.create_bigint_from_u64(result)?),
+                    Some(result) => Some(BigInt::from(result)),
                     None => None,
                 })
             },
         )
     }
 
-    #[napi(ts_return_type = "Promise<Buffer | undefined>")]
-    pub fn get_proof_bytes(&mut self, node_env: Env, block_number: JsBigInt) -> Result<JsObject> {
-        let block_number = block_number.get_u64()?.0;
-        node_env.execute_tokio_future(
-            Self::get_proof_bytes_async(self.evm.clone(), block_number),
-            |&mut node_env, result| {
-                Ok(match result {
-                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(&node_env, bytes)?),
-                    None => None,
-                })
-            },
-        )
-    }
-
-    #[napi(ts_return_type = "Promise<Buffer | undefined>")]
-    pub fn get_transaction_bytes(&mut self, node_env: Env, key: JsString) -> Result<JsObject> {
-        let key = key.into_utf8()?.into_owned()?;
-        node_env.execute_tokio_future(
-            Self::get_transaction_bytes_async(self.evm.clone(), key),
-            |&mut node_env, result| {
-                Ok(match result {
-                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(&node_env, bytes)?),
-                    None => None,
-                })
-            },
-        )
-    }
-
-    #[napi(ts_return_type = "Promise<string | undefined>")]
-    pub fn get_transaction_key_by_hash(
+    #[napi]
+    pub fn get_proof_bytes<'env>(
         &mut self,
-        node_env: Env,
-        tx_hash: JsString,
-    ) -> Result<JsObject> {
+        env: &'env Env,
+        block_number: BigInt,
+    ) -> Result<PromiseRaw<'env, Option<Buffer>>> {
+        let block_number = block_number.get_u64().1;
+        env.spawn_future_with_callback(
+            Self::get_proof_bytes_async(self.evm.clone(), block_number),
+            |_, result| {
+                Ok(match result {
+                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(bytes)),
+                    None => None,
+                })
+            },
+        )
+    }
+
+    #[napi]
+    pub fn get_transaction_bytes<'env>(
+        &mut self,
+        env: &'env Env,
+        key: String,
+    ) -> Result<PromiseRaw<'env, Option<Buffer>>> {
+        env.spawn_future_with_callback(
+            Self::get_transaction_bytes_async(self.evm.clone(), key),
+            |_, result| {
+                Ok(match result {
+                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(bytes)),
+                    None => None,
+                })
+            },
+        )
+    }
+
+    #[napi]
+    pub fn get_transaction_key_by_hash<'env>(
+        &mut self,
+        env: &'env Env,
+        tx_hash: String,
+    ) -> Result<PromiseRaw<'env, Option<String>>> {
         let tx_hash = utils::convert_string_to_b256(tx_hash)?;
 
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::get_transaction_key_by_hash_async(self.evm.clone(), tx_hash),
-            |&mut node_env, result| {
-                Ok(match result {
-                    Some(result) => Some(node_env.create_string(&result)?),
-                    None => None,
-                })
-            },
+            |_, result| Ok(result),
         )
     }
 
-    #[napi(ts_return_type = "Promise<void>")]
-    pub fn snapshot(&mut self, node_env: Env, commit_key: JsCommitKey) -> Result<JsObject> {
+    #[napi]
+    pub fn snapshot<'env>(
+        &mut self,
+        env: &'env Env,
+        commit_key: JsCommitKey,
+    ) -> Result<PromiseRaw<'env, ()>> {
         let commit_key = CommitKey::try_from(commit_key)?;
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::snapshot_async(self.evm.clone(), commit_key),
             |_, _| Ok(()),
         )
     }
 
-    #[napi(ts_return_type = "Promise<void>")]
-    pub fn rollback(&mut self, node_env: Env, commit_key: JsCommitKey) -> Result<JsObject> {
+    #[napi]
+    pub fn rollback<'env>(
+        &mut self,
+        env: &'env Env,
+        commit_key: JsCommitKey,
+    ) -> Result<PromiseRaw<'env, ()>> {
         let commit_key = CommitKey::try_from(commit_key)?;
-        node_env.execute_tokio_future(
+        env.spawn_future_with_callback(
             Self::rollback_async(self.evm.clone(), commit_key),
             |_, _| Ok(()),
         )
     }
 
-    #[napi(ts_return_type = "Promise<void>")]
-    pub fn dispose(&mut self, node_env: Env) -> Result<JsObject> {
-        node_env.execute_tokio_future(Self::dispose_async(self.evm.clone()), |_, _| Ok(()))
+    #[napi]
+    pub fn dispose<'env>(&mut self, env: &'env Env) -> Result<PromiseRaw<'env, ()>> {
+        env.spawn_future_with_callback(Self::dispose_async(self.evm.clone()), |_, _| Ok(()))
     }
 
     async fn preverify_transaction_async(
