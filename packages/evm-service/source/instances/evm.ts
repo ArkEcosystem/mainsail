@@ -25,10 +25,10 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 
 		this.#evm = new Evm({
 			historySize: 256n,
-			logger: (level: LogLevel, message: string) => {
-				message = `(${logPrefix}) ${message}`;
+			logger: (record) => {
+				const message = `(${logPrefix}) ${record.message}`;
 				try {
-					switch (level) {
+					switch (record.level) {
 						case LogLevel.Info: {
 							this.logger.info(message);
 							break;
@@ -127,7 +127,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 	public async getLegacyAttributes(
 		address: string,
 		legacyAddress?: string,
-	): Promise<Contracts.Evm.LegacyAttributes | null> {
+	): Promise<Contracts.Evm.LegacyAttributes | undefined | null> {
 		return this.#evm.getLegacyAttributes(address, legacyAddress);
 	}
 
@@ -186,11 +186,11 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return { blockNumber: Number(state.blockNumber), totalRound: Number(state.totalRound) };
 	}
 
-	public async getBlockHeaderBytes(height: number): Promise<Buffer | undefined> {
+	public async getBlockHeaderBytes(height: number): Promise<Buffer | undefined | null> {
 		return this.#evm.getBlockHeaderBytes(BigInt(height));
 	}
 
-	public async getBlockNumberByHash(blockHash: string): Promise<number | undefined> {
+	public async getBlockNumberByHash(blockHash: string): Promise<number | undefined | null> {
 		const result = await this.#evm.getBlockNumberByHash(blockHash);
 		if (!result) {
 			return undefined;
@@ -199,15 +199,15 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return Number(result);
 	}
 
-	public async getProofBytes(blockNumber: number): Promise<Buffer | undefined> {
+	public async getProofBytes(blockNumber: number): Promise<Buffer | undefined | null> {
 		return this.#evm.getProofBytes(BigInt(blockNumber));
 	}
 
-	public async getTransactionBytes(key: string): Promise<Buffer | undefined> {
+	public async getTransactionBytes(key: string): Promise<Buffer | undefined | null> {
 		return this.#evm.getTransactionBytes(key);
 	}
 
-	public async getTransactionKeyByHash(txHash: string): Promise<string | undefined> {
+	public async getTransactionKeyByHash(txHash: string): Promise<string | undefined | null> {
 		return this.#evm.getTransactionKeyByHash(txHash);
 	}
 
@@ -223,7 +223,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		await this.#evm.rollback(commitKey);
 	}
 
-	async #prepareCommitData(unit: Contracts.Processor.ProcessableUnit): Promise<JsCommitData | undefined> {
+	async #prepareCommitData(unit: Contracts.Processor.ProcessableUnit): Promise<JsCommitData | undefined | null> {
 		if (!("getCommit" in unit)) {
 			return undefined;
 		}

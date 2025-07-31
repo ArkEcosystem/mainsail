@@ -69,7 +69,7 @@ describe<{
 
 		const evm = new Evm({
 			path: sandbox.app.dataPath("loghook"),
-			logger: (level, message) => {
+			logger: ({ level, message }) => {
 				//console.log("CALLED HOOK", { level, message, hookCalled });
 				hookCalled++;
 			},
