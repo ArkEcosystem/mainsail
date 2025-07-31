@@ -2,11 +2,19 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { BigNumber } from "@mainsail/utils";
-import { ethers } from "ethers";
+import { encodeFunctionData, decodeFunctionResult, toHex } from "viem";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 
 const ROUNDS_PER_REQUEST = 1000;
+
+interface ConsensusContractValidatorRound {
+	readonly round: bigint;
+	readonly validators: {
+		readonly addr: string;
+		readonly voteBalance: bigint;
+	}[];
+}
 
 @injectable()
 export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm.ValidatorRound> {
@@ -51,8 +59,11 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
 		const { evmSpec } = this.configuration.getMilestone();
 
-		const iface = new ethers.Interface(ConsensusAbi.abi);
-		const data = iface.encodeFunctionData("getRounds", [this.#offset, ROUNDS_PER_REQUEST]).slice(2);
+		const data = encodeFunctionData({
+			abi: ConsensusAbi.abi,
+			functionName: "getRounds",
+			args: [this.#offset, ROUNDS_PER_REQUEST],
+		}).slice(2);
 
 		const result = await this.evm.view({
 			data: Buffer.from(data, "hex"),
@@ -65,11 +76,15 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 			await this.app.terminate("getRounds failed");
 		}
 
-		const [results] = iface.decodeFunctionResult("getRounds", result.output!);
+		const rounds = decodeFunctionResult({
+			abi: ConsensusAbi.abi,
+			functionName: "getRounds",
+			data: toHex(result.output!),
+		}) as ConsensusContractValidatorRound[];
 
 		const validatorRounds: Contracts.Evm.ValidatorRound[] = [];
-		for (const validatorRound of results) {
-			const [round, validators] = validatorRound;
+		for (const validatorRound of rounds) {
+			const { round, validators } = validatorRound;
 
 			const roundNumber = Number(round);
 
@@ -77,10 +92,10 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 				round: roundNumber,
 				roundHeight: this.roundCalculator.calculateRoundInfoByRound(roundNumber).roundHeight,
 				validators: validators.map((validator) => {
-					const [validatorAddress, voteBalance] = validator;
+					const { addr: address, voteBalance } = validator;
 
 					return {
-						address: validatorAddress,
+						address,
 						voteBalance: BigNumber.make(voteBalance),
 					};
 				}),
