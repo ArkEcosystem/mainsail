@@ -29,7 +29,7 @@
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"ethers": "6.13.5",
+		"viem": "2.33.1",
 		"joi": "17.13.3"
 	},
 	"devDependencies": {
