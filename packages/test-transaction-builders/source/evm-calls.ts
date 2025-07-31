@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
-import { BigNumberish, ethers } from "ethers";
+import { decodeFunctionResult, encodeFunctionData, parseEther, toBytes, toHex, zeroAddress } from "viem";
 
 import { default as DARK20 } from "./abis/DARK20.json" with { type: "json" };
 import { Context, EvmCallOptions } from "./types.js";
@@ -19,7 +19,7 @@ export const makeEvmCall = async (
 
 	if (!payload) {
 		const senderRecipient = await getAddressByPublicKey({ sandbox }, sender.publicKey);
-		payload = encodeErc20Transfer(senderRecipient, ethers.parseEther("1"));
+		payload = encodeErc20Transfer(senderRecipient, parseEther("1"));
 	}
 
 	if (recipient === undefined) {
@@ -52,7 +52,7 @@ export const makeEvmCallDeployErc20Contract = async (
 	gasPrice = gasPrice ?? 5 * 1e9;
 
 	if (!payload) {
-		payload = Buffer.from(ethers.getBytes(DARK20.bytecode)).toString("hex");
+		payload = Buffer.from(toBytes(DARK20.bytecode)).toString("hex");
 	}
 
 	const builder = app
@@ -64,27 +64,41 @@ export const makeEvmCallDeployErc20Contract = async (
 	return buildSignedTransaction(sandbox, builder, sender, options);
 };
 
-export const encodeErc20Transfer = (recipient: string, amount: BigNumberish): string => {
-	const iface = new ethers.Interface(DARK20.abi);
-	return iface.encodeFunctionData("transfer", [recipient, amount]).slice(2);
+export const encodeErc20Transfer = (recipient: string, amount: number | string | BigInt): string => {
+	return encodeFunctionData({
+		abi: DARK20.abi,
+		functionName: "transfer",
+		args: [recipient, amount],
+	}).slice(2);
 };
 
 export const getErc20BalanceOf = async (
 	context: Context,
 	erc20ContractAddress: string,
 	walletAddress: string,
-): Promise<BigNumberish> => {
-	const iface = new ethers.Interface(DARK20.abi);
+): Promise<BigInt> => {
+	const payload = encodeFunctionData({
+		abi: DARK20.abi,
+		functionName: "balanceOf",
+		args: [walletAddress],
+	});
 
-	const payload = iface.encodeFunctionData("balanceOf", [walletAddress]).slice(2);
-
-	const result = await callViewFunction(context, {
-		data: Buffer.from(ethers.getBytes(`0x${payload}`)),
-		from: ethers.ZeroAddress,
+	const { output } = await callViewFunction(context, {
+		data: Buffer.from(toBytes(payload)),
+		from: zeroAddress,
 		to: erc20ContractAddress,
 	});
 
-	const [balance] = iface.decodeFunctionResult("balanceOf", result.output!);
+	if (output?.byteLength === 0) {
+		return 0n;
+	}
+
+	const balance = decodeFunctionResult({
+		abi: DARK20.abi,
+		functionName: "balanceOf",
+		data: toHex(output!),
+	}) as BigInt;
+
 	return balance;
 };
 
