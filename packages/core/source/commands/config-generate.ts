@@ -225,8 +225,8 @@ export class Command extends Commands.Command {
 				.generate(this.#convertFlags(options));
 		}
 
-		const response = await prompts(
-			this.#flagSettings
+		const response = await prompts([
+			...this.#flagSettings
 				.filter((flag) => flag.promptType) // Show prompt only for flags with defined promptType
 				.map(
 					(flag) =>
@@ -236,13 +236,13 @@ export class Command extends Commands.Command {
 							name: flag.name,
 							type: flag.promptType,
 						}) as prompts.PromptObject<string>,
-				)
-				.concat({
-					message: "Can you confirm?",
-					name: "confirm",
-					type: "confirm",
-				} as prompts.PromptObject<string>),
-		);
+				),
+			{
+				message: "Can you confirm?",
+				name: "confirm",
+				type: "confirm",
+			} as prompts.PromptObject<string>,
+		]);
 
 		options = {
 			...defaults,
