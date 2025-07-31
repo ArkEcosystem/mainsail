@@ -23,7 +23,7 @@ export class ReceiptResource {
 			contractAddress: receipt.contractAddress,
 			logs: receipt.logs,
 			logsBloom: `0x${header.logsBloom}`,
-			type: "0x2",
+			type: "0x0",
 			status: receipt.status ? "0x1" : "0x0",
 		};
 		/* eslint-enable sort-keys-fix/sort-keys-fix */
