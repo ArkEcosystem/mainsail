@@ -1,6 +1,8 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { ethers } from "ethers";
+import { ProjectivePoint } from "@noble/secp256k1";
+import { Address, checksumAddress, getAddress, Hex, isAddress, keccak256, toBytes, toHex } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
 
 @injectable()
 export class AddressFactory implements Contracts.Crypto.AddressFactory {
@@ -17,7 +19,7 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 	}
 
 	public async fromPublicKey(publicKey: string): Promise<string> {
-		return ethers.computeAddress(`0x${publicKey}`);
+		return this.#computeAddress(publicKey);
 	}
 
 	public async fromWIF(wif: string): Promise<string> {
@@ -33,14 +35,29 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 	}
 
 	public async fromBuffer(buffer: Buffer): Promise<string> {
-		return ethers.getAddress(ethers.hexlify(buffer));
+		return getAddress(toHex(buffer));
 	}
 
 	public async toBuffer(address: string): Promise<Buffer> {
-		return Buffer.from(ethers.getBytes(address));
+		return Buffer.from(toBytes(address));
 	}
 
 	public async validate(address: string): Promise<boolean> {
-		return ethers.isAddress(address);
+		return isAddress(address);
+	}
+
+	// Convert compressed and uncompressed public keys to Ethereum address
+	// https://github.com/wevm/viem/discussions/2044
+	#computeAddress(publicKey: string): Address {
+		// Schnorr public keys are treated as private keys (replicated ethers.js behavior)
+		if (publicKey.length === 64) {
+			return privateKeyToAccount((publicKey.startsWith("0x") ? publicKey : `0x${publicKey}`) as Hex).address;
+		}
+
+		const point = ProjectivePoint.fromHex(publicKey.startsWith("0x") ? publicKey.slice(2) : publicKey);
+		const raw = point.toRawBytes(false).slice(1); // strip 0x04 prefix
+		const hash = keccak256(toHex(raw));
+
+		return checksumAddress(`0x${hash.slice(-40)}`);
 	}
 }

@@ -21,7 +21,7 @@ export const makeEvmCall = async (
 
     let builder = app
         .resolve(EvmCallBuilder)
-        .gasPrice("5000000000")
+        .gasPrice(5000000000)
         .gasLimit(21000)
         .payload("")
         .recipientAddress(to)
@@ -45,7 +45,7 @@ export const makeEvmDeploy = async (
 
     let builder = app
         .resolve(EvmCallBuilder)
-        .gasPrice("5000000000")
+        .gasPrice(5000000000)
         .gasLimit(4_000_000)
         .payload(abi.bytecode.object.slice(2))
         .nonce((walletNonce + nonceOffset).toString());

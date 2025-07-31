@@ -2,7 +2,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { ConsensusAbi, ERC1967ProxyAbi, MultiPaymentAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { assert, BigNumber } from "@mainsail/utils";
-import { ethers, sha256 } from "ethers";
+import { Address, encodeDeployData, encodeFunctionData, getCreateAddress, Hex, sha256, toBytes } from "viem";
 
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
 
@@ -32,7 +32,7 @@ export class Deployer {
 	private readonly evm!: Contracts.Evm.Instance;
 
 	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
-	private readonly deployerAddress!: string;
+	private readonly deployerAddress!: Address;
 
 	#genesisBlockInfo!: GenesisBlockInfo;
 
@@ -75,8 +75,8 @@ export class Deployer {
 			initialBlockNumber: BigNumber.make(this.#genesisBlockInfo.initialBlockNumber).toBigInt(),
 			initialSupply: BigNumber.make(this.#genesisBlockInfo.initialSupply).toBigInt(),
 
-			usernameContract: ethers.getCreateAddress({ from: this.deployerAddress, nonce: 3 }), // PROXY Uses nonce 3
-			validatorContract: ethers.getCreateAddress({ from: this.deployerAddress, nonce: 1 }), // PROXY Uses nonce 1
+			usernameContract: getCreateAddress({ from: this.deployerAddress, nonce: 3n }), // PROXY Uses nonce 3
+			validatorContract: getCreateAddress({ from: this.deployerAddress, nonce: 1n }), // PROXY Uses nonce 1
 		};
 
 		await this.evm.prepareNextCommit({ commitKey });
@@ -106,7 +106,7 @@ export class Deployer {
 		// CONSENSUS
 		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
-			data: Buffer.concat([Buffer.from(ethers.getBytes(ConsensusAbi.bytecode.object))]),
+			data: Buffer.from(toBytes(ConsensusAbi.bytecode.object)),
 			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
 			gasPrice: BigInt(0),
@@ -120,7 +120,7 @@ export class Deployer {
 			throw new Error("failed to deploy Consensus contract");
 		}
 
-		if (receipt.contractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 0 })) {
+		if (receipt.contractAddress !== getCreateAddress({ from: this.deployerAddress, nonce: 0n })) {
 			throw new Error("Contract address mismatch");
 		}
 
@@ -132,23 +132,23 @@ export class Deployer {
 	async #deployConsensusProxy(consensusContractAddress: string): Promise<void> {
 		const milestone = this.configuration.getMilestone();
 
-		// Logic contract initializer function ABI
-		const logicInterface = new ethers.Interface(ConsensusAbi.abi);
 		// Encode the initializer call
-		const initializerCalldata = logicInterface.encodeFunctionData("initialize", [
-			milestone.validatorRegistrationFee,
-		]);
+		const initializerCalldata = encodeFunctionData({
+			abi: ConsensusAbi.abi,
+			args: [milestone.validatorRegistrationFee],
+			functionName: "initialize",
+		});
+
 		// Prepare the constructor arguments for the proxy contract
-		const proxyConstructorArguments = new ethers.AbiCoder()
-			.encode(["address", "bytes"], [consensusContractAddress, initializerCalldata])
-			.slice(2);
+		const deployData = encodeDeployData({
+			abi: ERC1967ProxyAbi.abi,
+			args: [consensusContractAddress, initializerCalldata],
+			bytecode: ERC1967ProxyAbi.bytecode.object as Hex,
+		});
 
 		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
-			data: Buffer.concat([
-				Buffer.from(ethers.getBytes(ERC1967ProxyAbi.bytecode.object)),
-				Buffer.from(proxyConstructorArguments, "hex"),
-			]),
+			data: Buffer.from(toBytes(deployData)),
 			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
 			gasPrice: BigInt(0),
@@ -162,7 +162,7 @@ export class Deployer {
 			throw new Error("failed to deploy Consensus PROXY contract");
 		}
 
-		if (receipt.contractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 1 })) {
+		if (receipt.contractAddress !== getCreateAddress({ from: this.deployerAddress, nonce: 1n })) {
 			throw new Error("Contract address mismatch");
 		}
 
@@ -184,7 +184,7 @@ export class Deployer {
 	async #deployUsernamesContract(): Promise<string> {
 		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
-			data: Buffer.concat([Buffer.from(ethers.getBytes(UsernamesAbi.bytecode.object))]),
+			data: Buffer.from(toBytes(UsernamesAbi.bytecode.object)),
 			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
 			gasPrice: BigInt(0),
@@ -198,7 +198,7 @@ export class Deployer {
 			throw new Error("failed to deploy Usernames contract");
 		}
 
-		if (receipt.contractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 2 })) {
+		if (receipt.contractAddress !== getCreateAddress({ from: this.deployerAddress, nonce: 2n })) {
 			throw new Error("Contract address mismatch");
 		}
 
@@ -208,21 +208,23 @@ export class Deployer {
 	}
 
 	async #deployUsernamesProxy(usernamesContractAddress: string): Promise<void> {
-		// Logic contract initializer function ABI
-		const logicInterface = new ethers.Interface(UsernamesAbi.abi);
 		// Encode the initializer call
-		const initializerCalldata = logicInterface.encodeFunctionData("initialize");
+		const initializerCalldata = encodeFunctionData({
+			abi: UsernamesAbi.abi,
+			args: undefined,
+			functionName: "initialize",
+		});
+
 		// Prepare the constructor arguments for the proxy contract
-		const proxyConstructorArguments = new ethers.AbiCoder()
-			.encode(["address", "bytes"], [usernamesContractAddress, initializerCalldata])
-			.slice(2);
+		const deployData = encodeDeployData({
+			abi: ERC1967ProxyAbi.abi,
+			args: [usernamesContractAddress, initializerCalldata],
+			bytecode: ERC1967ProxyAbi.bytecode.object as Hex,
+		});
 
 		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
-			data: Buffer.concat([
-				Buffer.from(ethers.getBytes(ERC1967ProxyAbi.bytecode.object)),
-				Buffer.from(proxyConstructorArguments, "hex"),
-			]),
+			data: Buffer.from(toBytes(deployData)),
 			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
 			gasPrice: BigInt(0),
@@ -236,7 +238,7 @@ export class Deployer {
 			throw new Error("failed to deploy Usernames PROXY contract");
 		}
 
-		if (receipt.contractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 3 })) {
+		if (receipt.contractAddress !== getCreateAddress({ from: this.deployerAddress, nonce: 3n })) {
 			throw new Error("Contract address mismatch");
 		}
 
@@ -258,7 +260,7 @@ export class Deployer {
 	async #deployMultiPaymentContract(): Promise<string> {
 		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
-			data: Buffer.concat([Buffer.from(ethers.getBytes(MultiPaymentAbi.bytecode.object))]),
+			data: Buffer.concat([Buffer.from(toBytes(MultiPaymentAbi.bytecode.object))]),
 			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
 			gasPrice: BigInt(0),
@@ -272,7 +274,7 @@ export class Deployer {
 			throw new Error("failed to deploy MultiPayment contract");
 		}
 
-		if (receipt.contractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 4 })) {
+		if (receipt.contractAddress !== getCreateAddress({ from: this.deployerAddress, nonce: 4n })) {
 			throw new Error("Contract address mismatch");
 		}
 
@@ -282,21 +284,23 @@ export class Deployer {
 	}
 
 	async #deployMultiPaymentProxy(multiPaymentAddress: string): Promise<void> {
-		// Logic contract initializer function ABI
-		const logicInterface = new ethers.Interface(MultiPaymentAbi.abi);
 		// Encode the initializer call
-		const initializerCalldata = logicInterface.encodeFunctionData("initialize");
+		const initializerCalldata = encodeFunctionData({
+			abi: MultiPaymentAbi.abi,
+			args: undefined,
+			functionName: "initialize",
+		});
+
 		// Prepare the constructor arguments for the proxy contract
-		const proxyConstructorArguments = new ethers.AbiCoder()
-			.encode(["address", "bytes"], [multiPaymentAddress, initializerCalldata])
-			.slice(2);
+		const deployData = encodeDeployData({
+			abi: ERC1967ProxyAbi.abi,
+			args: [multiPaymentAddress, initializerCalldata],
+			bytecode: ERC1967ProxyAbi.bytecode.object as Hex,
+		});
 
 		const receipt = await this.#processTransaction({
 			blockContext: this.#getBlockContext(),
-			data: Buffer.concat([
-				Buffer.from(ethers.getBytes(ERC1967ProxyAbi.bytecode.object)),
-				Buffer.from(proxyConstructorArguments, "hex"),
-			]),
+			data: Buffer.from(toBytes(deployData)),
 			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
 			gasPrice: BigInt(0),
@@ -310,7 +314,7 @@ export class Deployer {
 			throw new Error("failed to deploy MultiPayment PROXY contract");
 		}
 
-		if (receipt.contractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 5 })) {
+		if (receipt.contractAddress !== getCreateAddress({ from: this.deployerAddress, nonce: 5n })) {
 			throw new Error("Contract address mismatch");
 		}
 

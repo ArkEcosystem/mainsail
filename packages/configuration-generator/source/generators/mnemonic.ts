@@ -1,6 +1,6 @@
 import { injectable } from "@mainsail/container";
 import { entropyToMnemonic, generateMnemonic } from "bip39";
-import { sha256 } from "ethers";
+import { sha256 } from "viem";
 
 @injectable()
 export class MnemonicGenerator {

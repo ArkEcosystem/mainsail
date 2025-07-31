@@ -1,7 +1,9 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
-import { encodeRlp, keccak256, toBeArray } from "ethers";
+import { keccak256, toBytes, toRlp } from "viem";
+
+import { toBytesCompat } from "./serializer.js";
 
 @injectable()
 export class Utils implements Contracts.Crypto.TransactionUtilities {
@@ -20,12 +22,12 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 		options?: Contracts.Crypto.SerializeOptions,
 	): Promise<Buffer> {
 		const fields = [
-			toBeArray(transaction.nonce.toBigInt()),
-			toBeArray(transaction.gasPrice),
-			toBeArray(transaction.gasLimit),
-			transaction.to || "0x",
-			toBeArray(transaction.value.toBigInt()),
-			transaction.data.startsWith("0x") ? transaction.data : `0x${transaction.data}`,
+			toBytesCompat(transaction.nonce.toBigInt()),
+			toBytesCompat(transaction.gasPrice),
+			toBytesCompat(transaction.gasLimit),
+			toBytes(transaction.to || "0x"),
+			toBytesCompat(transaction.value.toBigInt()),
+			toBytes(transaction.data.startsWith("0x") ? transaction.data : `0x${transaction.data}`),
 		];
 
 		if (options && !options.excludeSignature) {
@@ -34,16 +36,16 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 			assert.string(transaction.s);
 
 			fields.push(
-				toBeArray(transaction.v + transaction.network * 2 + 35),
-				`0x${transaction.r}`,
-				`0x${transaction.s}`,
+				toBytesCompat(transaction.v + transaction.network * 2 + 35),
+				toBytesCompat(`0x${transaction.r}`),
+				toBytesCompat(`0x${transaction.s}`),
 			);
 		} else {
-			fields.push(toBeArray(transaction.network), toBeArray(0), toBeArray(0));
+			fields.push(toBytesCompat(transaction.network), toBytesCompat(0), toBytesCompat(0));
 		}
 
-		const encoded = encodeRlp(fields).slice(2); // remove 0x prefix
-		return Buffer.from(keccak256(Buffer.from(`${encoded}`, "hex")).slice(2), "hex");
+		const encoded = toRlp(fields); // remove 0x prefix
+		return Buffer.from(keccak256(Buffer.from(`${encoded.slice(2)}`, "hex")).slice(2), "hex");
 	}
 
 	public async getHash(transaction: Contracts.Crypto.Transaction): Promise<string> {

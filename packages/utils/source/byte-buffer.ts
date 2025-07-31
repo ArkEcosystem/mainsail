@@ -1,6 +1,4 @@
-import { ethers } from "ethers";
-
-import { BigNumber } from "./big-number.js";
+import { bytesToBigInt, padBytes, toBytes, trim } from "viem";
 
 export class ByteBuffer {
 	#buffer: Buffer;
@@ -78,14 +76,13 @@ export class ByteBuffer {
 			value = BigInt(value);
 		}
 
-		const bytes = ethers.toBeArray(BigNumber.make(value).toBigInt());
+		const bytes = toBytes(value);
 		if (bytes.byteLength > 32) {
 			throw new Error("value must fit into uint256");
 		}
 
-		const padded = ethers.zeroPadValue(bytes, 32);
-
-		this.writeBytes(Buffer.from(ethers.getBytes(padded)));
+		const padded = padBytes(bytes, { size: 32 });
+		this.writeBytes(Buffer.from(padded));
 	}
 
 	public readUint64(): bigint {
@@ -96,8 +93,8 @@ export class ByteBuffer {
 
 	public readUint256(): bigint {
 		const bytes = this.readBytes(32);
-		const parsed = ethers.stripZerosLeft(bytes);
-		return parsed === "0x" ? 0n : ethers.toBigInt(parsed);
+		const parsed = trim(bytes, { dir: "left" });
+		return bytesToBigInt(parsed);
 	}
 
 	public writeBytes(value: Buffer): void {

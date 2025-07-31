@@ -31,8 +31,8 @@
 		"@mainsail/utils": "workspace:*",
 		"ajv": "8.17.1",
 		"dayjs": "1.11.13",
-		"ethers": "6.13.5",
-		"joi": "17.13.3"
+		"joi": "17.13.3",
+		"viem": "2.33.1"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-address-keccak256": "workspace:*",

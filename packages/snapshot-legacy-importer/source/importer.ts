@@ -10,8 +10,8 @@ import { Providers } from "@mainsail/kernel";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, BigNumber, chunk } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
-import { ethers, sha256 } from "ethers";
 import path from "path";
+import { encodeFunctionData, sha256 } from "viem";
 
 @injectable()
 export class Importer implements Contracts.Snapshot.LegacyImporter {
@@ -376,8 +376,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		importedValidatorsWithBlsKey: number;
 		importedValidatorsWithoutBlsKey: number;
 	}> {
-		const iface = new ethers.Interface(ConsensusAbi.abi);
-
 		this.logger.info(`seeding ${this.#data.validators.length} validators`);
 
 		const stats = {
@@ -415,13 +413,15 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				stats.importedValidatorsWithBlsKey++;
 			}
 
-			const data = iface
-				.encodeFunctionData("addValidator", [
+			const data = encodeFunctionData({
+				abi: ConsensusAbi.abi,
+				args: [
 					validator.ethAddress,
-					validator.blsPublicKey ? Buffer.from(validator.blsPublicKey, "hex") : Buffer.alloc(0),
+					validator.blsPublicKey ? `0x${validator.blsPublicKey}` : `0x`,
 					validator.isResigned,
-				])
-				.slice(2);
+				],
+				functionName: "addValidator",
+			}).slice(2);
 
 			const result = await this.evm.process(
 				this.#getTransactionContext({
@@ -440,8 +440,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	}
 
 	async #seedVoters(options: Contracts.Snapshot.LegacyImportOptions): Promise<number> {
-		const iface = new ethers.Interface(ConsensusAbi.abi);
-
 		let importedVoters = 0;
 
 		this.logger.info(`seeding ${this.#data.voters.length} voters`);
@@ -457,7 +455,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				validatorAddresses.push(voter.vote);
 			}
 
-			const data = iface.encodeFunctionData("addVotes", [voterAddresses, validatorAddresses]).slice(2);
+			const data = encodeFunctionData({
+				abi: ConsensusAbi.abi,
+				args: [voterAddresses, validatorAddresses],
+				functionName: "addVotes",
+			}).slice(2);
 
 			const result = await this.evm.process(
 				this.#getTransactionContext({
@@ -478,8 +480,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	}
 
 	async #seedUsernames(options: Contracts.Snapshot.LegacyImportOptions): Promise<number> {
-		const iface = new ethers.Interface(UsernamesAbi.abi);
-
 		this.logger.info(`seeding ${this.#data.validators.length} usernames`);
 
 		let importedUsernames = 0;
@@ -489,7 +489,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				continue;
 			}
 
-			const data = iface.encodeFunctionData("addUsername", [validator.ethAddress, validator.username]).slice(2);
+			const data = encodeFunctionData({
+				abi: UsernamesAbi.abi,
+				args: [validator.ethAddress, validator.username],
+				functionName: "addUsername",
+			}).slice(2);
 
 			const result = await this.evm.process(
 				this.#getTransactionContext({
