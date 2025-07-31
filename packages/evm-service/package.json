@@ -44,7 +44,7 @@
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/tmp": "0.2.6",
-		"ethers": "6.13.5",
+		"viem": "2.33.1",
 		"tmp": "0.2.3",
 		"uvu": "0.5.6"
 	},
