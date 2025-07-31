@@ -26,7 +26,8 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"ethers": "6.13.5"
+		"@noble/secp256k1": "2.3.0",
+		"viem": "2.33.1"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",
