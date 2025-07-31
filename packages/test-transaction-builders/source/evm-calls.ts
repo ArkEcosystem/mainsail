@@ -64,23 +64,22 @@ export const makeEvmCallDeployErc20Contract = async (
 	return buildSignedTransaction(sandbox, builder, sender, options);
 };
 
-export const encodeErc20Transfer = (recipient: string, amount: number | string | BigInt): string => {
-	return encodeFunctionData({
+export const encodeErc20Transfer = (recipient: string, amount: number | string | bigint): string =>
+	encodeFunctionData({
 		abi: DARK20.abi,
-		functionName: "transfer",
 		args: [recipient, amount],
+		functionName: "transfer",
 	}).slice(2);
-};
 
 export const getErc20BalanceOf = async (
 	context: Context,
 	erc20ContractAddress: string,
 	walletAddress: string,
-): Promise<BigInt> => {
+): Promise<bigint> => {
 	const payload = encodeFunctionData({
 		abi: DARK20.abi,
-		functionName: "balanceOf",
 		args: [walletAddress],
+		functionName: "balanceOf",
 	});
 
 	const { output } = await callViewFunction(context, {
@@ -95,9 +94,9 @@ export const getErc20BalanceOf = async (
 
 	const balance = decodeFunctionResult({
 		abi: DARK20.abi,
-		functionName: "balanceOf",
 		data: toHex(output!),
-	}) as BigInt;
+		functionName: "balanceOf",
+	}) as bigint;
 
 	return balance;
 };

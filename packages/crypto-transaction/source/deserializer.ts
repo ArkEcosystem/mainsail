@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
-import { getAddress, Hex, hexToBigInt, fromRlp } from "viem";
+import { fromRlp, getAddress, Hex, hexToBigInt } from "viem";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.TransactionDeserializer {

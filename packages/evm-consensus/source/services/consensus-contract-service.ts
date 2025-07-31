@@ -2,7 +2,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { BigNumber } from "@mainsail/utils";
-import { encodeFunctionData, decodeFunctionResult, toHex } from "viem";
+import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 import { AsyncValidatorRoundsIterator } from "./rounds-iterator.js";
@@ -38,8 +38,8 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 
 		const data = encodeFunctionData({
 			abi: ConsensusAbi.abi,
-			functionName: "getRoundValidators",
 			args: undefined,
+			functionName: "getRoundValidators",
 		}).slice(2);
 
 		const result = await this.evm.view({
@@ -55,8 +55,8 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 
 		const validators = decodeFunctionResult({
 			abi: ConsensusAbi.abi,
-			functionName: "getRoundValidators",
 			data: toHex(result.output!),
+			functionName: "getRoundValidators",
 		}) as ConsensusContractValidator[];
 
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
@@ -88,8 +88,8 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 
 		const data = encodeFunctionData({
 			abi: ConsensusAbi.abi,
-			functionName: "getAllValidators",
 			args: undefined,
+			functionName: "getAllValidators",
 		}).slice(2);
 
 		const result = await this.evm.view({
@@ -105,8 +105,8 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 
 		const validators = decodeFunctionResult({
 			abi: ConsensusAbi.abi,
-			functionName: "getAllValidators",
 			data: toHex(result.output!),
+			functionName: "getAllValidators",
 		}) as ConsensusContractValidator[];
 
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
@@ -142,8 +142,8 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 
 		const data = encodeFunctionData({
 			abi: ConsensusAbi.abi,
-			functionName: "getVotesCount",
 			args: undefined,
+			functionName: "getVotesCount",
 		}).slice(2);
 
 		const result = await this.evm.view({
@@ -159,8 +159,8 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 
 		const voters = decodeFunctionResult({
 			abi: ConsensusAbi.abi,
-			functionName: "getVotesCount",
 			data: toHex(result.output!),
+			functionName: "getVotesCount",
 		}) as bigint;
 
 		return Number(voters);

@@ -2,7 +2,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { ConsensusAbi, ERC1967ProxyAbi, MultiPaymentAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { assert, BigNumber } from "@mainsail/utils";
-import { encodeFunctionData, sha256, getCreateAddress, Address, toBytes, encodeDeployData, Hex } from "viem";
+import { Address, encodeDeployData, encodeFunctionData, getCreateAddress, Hex, sha256, toBytes } from "viem";
 
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
 
@@ -135,8 +135,8 @@ export class Deployer {
 		// Encode the initializer call
 		const initializerCalldata = encodeFunctionData({
 			abi: ConsensusAbi.abi,
-			functionName: "initialize",
 			args: [milestone.validatorRegistrationFee],
+			functionName: "initialize",
 		});
 
 		// Prepare the constructor arguments for the proxy contract
@@ -211,8 +211,8 @@ export class Deployer {
 		// Encode the initializer call
 		const initializerCalldata = encodeFunctionData({
 			abi: UsernamesAbi.abi,
-			functionName: "initialize",
 			args: undefined,
+			functionName: "initialize",
 		});
 
 		// Prepare the constructor arguments for the proxy contract
@@ -287,8 +287,8 @@ export class Deployer {
 		// Encode the initializer call
 		const initializerCalldata = encodeFunctionData({
 			abi: MultiPaymentAbi.abi,
-			functionName: "initialize",
 			args: undefined,
+			functionName: "initialize",
 		});
 
 		// Prepare the constructor arguments for the proxy contract

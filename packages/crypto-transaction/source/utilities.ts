@@ -2,6 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 import { keccak256, toBytes, toRlp } from "viem";
+
 import { toBytesCompat } from "./serializer.js";
 
 @injectable()

@@ -10,8 +10,8 @@ import { Providers } from "@mainsail/kernel";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, BigNumber, chunk } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
-import { encodeFunctionData, sha256 } from "viem";
 import path from "path";
+import { encodeFunctionData, sha256 } from "viem";
 
 @injectable()
 export class Importer implements Contracts.Snapshot.LegacyImporter {
@@ -415,12 +415,12 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 			const data = encodeFunctionData({
 				abi: ConsensusAbi.abi,
-				functionName: "addValidator",
 				args: [
 					validator.ethAddress,
 					validator.blsPublicKey ? `0x${validator.blsPublicKey}` : `0x`,
 					validator.isResigned,
 				],
+				functionName: "addValidator",
 			}).slice(2);
 
 			const result = await this.evm.process(
@@ -457,8 +457,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 			const data = encodeFunctionData({
 				abi: ConsensusAbi.abi,
-				functionName: "addVotes",
 				args: [voterAddresses, validatorAddresses],
+				functionName: "addVotes",
 			}).slice(2);
 
 			const result = await this.evm.process(
@@ -491,8 +491,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 			const data = encodeFunctionData({
 				abi: UsernamesAbi.abi,
-				functionName: "addUsername",
 				args: [validator.ethAddress, validator.username],
+				functionName: "addUsername",
 			}).slice(2);
 
 			const result = await this.evm.process(

@@ -45,6 +45,8 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 
 // Numbers are encoded as their minimal big‑endian byte form.
 export function toBytesCompat(value: Hex | bigint | number) {
-	if (value === 0n || value === 0 || value === "0x" || value === "0x0" || value === "0x00") return new Uint8Array([]);
+	if (value === 0n || value === 0 || value === "0x" || value === "0x0" || value === "0x00") {
+		return new Uint8Array([]);
+	}
 	return toBytes(value);
 }

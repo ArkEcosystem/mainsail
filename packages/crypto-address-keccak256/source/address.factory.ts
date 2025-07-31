@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { getAddress, toBytes, toHex, isAddress, keccak256, Address, checksumAddress, Hex } from "viem";
 import { ProjectivePoint } from "@noble/secp256k1";
+import { Address, checksumAddress, getAddress, Hex, isAddress, keccak256, toBytes, toHex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 @injectable()

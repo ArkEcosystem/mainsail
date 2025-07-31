@@ -2,7 +2,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { BigNumber } from "@mainsail/utils";
-import { encodeFunctionData, decodeFunctionResult, toHex } from "viem";
+import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 
@@ -61,8 +61,8 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 
 		const data = encodeFunctionData({
 			abi: ConsensusAbi.abi,
-			functionName: "getRounds",
 			args: [this.#offset, ROUNDS_PER_REQUEST],
+			functionName: "getRounds",
 		}).slice(2);
 
 		const result = await this.evm.view({
@@ -78,8 +78,8 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 
 		const rounds = decodeFunctionResult({
 			abi: ConsensusAbi.abi,
-			functionName: "getRounds",
 			data: toHex(result.output!),
+			functionName: "getRounds",
 		}) as ConsensusContractValidatorRound[];
 
 		const validatorRounds: Contracts.Evm.ValidatorRound[] = [];

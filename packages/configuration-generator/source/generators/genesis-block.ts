@@ -167,8 +167,8 @@ export class GenesisBlockGenerator extends Generator {
 		for (const [index, sender] of senders.entries()) {
 			const data = encodeFunctionData({
 				abi: ConsensusAbi.abi,
-				functionName: "registerValidator",
 				args: [`0x${sender.consensusKeys.publicKey}`],
+				functionName: "registerValidator",
 			}).slice(2);
 
 			result[index] = await (
@@ -194,8 +194,8 @@ export class GenesisBlockGenerator extends Generator {
 		for (const [index, sender] of senders.entries()) {
 			const data = encodeFunctionData({
 				abi: ConsensusAbi.abi,
-				functionName: "vote",
 				args: [sender.address],
+				functionName: "vote",
 			}).slice(2);
 
 			result[index] = await (

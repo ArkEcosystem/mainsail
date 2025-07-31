@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
-import { encodeFunctionData, decodeFunctionResult, toHex } from "viem";
+import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 
@@ -54,8 +54,8 @@ export class AsyncVotesIterator implements AsyncIterable<Contracts.Evm.Vote> {
 
 		const data = encodeFunctionData({
 			abi: ConsensusAbi.abi,
-			functionName: "getVotes",
 			args: [this.#address, VOTES_PER_REQUEST],
+			functionName: "getVotes",
 		}).slice(2);
 
 		const result = await this.evm.view({
@@ -71,8 +71,8 @@ export class AsyncVotesIterator implements AsyncIterable<Contracts.Evm.Vote> {
 
 		const votes = decodeFunctionResult({
 			abi: ConsensusAbi.abi,
-			functionName: "getVotes",
 			data: toHex(result.output!),
+			functionName: "getVotes",
 		}) as ConsensusContractVote[];
 
 		return votes.map((vote) => ({ validatorAddress: vote.validator, voterAddress: vote.voter }));

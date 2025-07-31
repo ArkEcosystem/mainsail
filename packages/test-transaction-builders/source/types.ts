@@ -55,5 +55,5 @@ export interface EvmCallOptions extends TransactionOptions {
 	gasLimit?: number;
 	payload?: string;
 	recipient?: string;
-	value?: string | number | BigInt;
+	value?: string | number | bigint;
 }

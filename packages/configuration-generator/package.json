@@ -50,9 +50,9 @@
 		"bip39": "3.1.0",
 		"dayjs": "1.11.13",
 		"envfile": "7.1.0",
-		"viem": "2.33.1",
 		"fs-extra": "11.3.0",
-		"tmp": "0.2.3"
+		"tmp": "0.2.3",
+		"viem": "2.33.1"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "11.0.4",
