@@ -21,7 +21,7 @@ export class TransactionResource {
 			to: transaction.to || null,
 			transactionIndex: `0x${transaction.transactionIndex?.toString(16)}`,
 			value: `0x${transaction.value.toString(16)}`,
-			type: `0x2`,
+			type: `0x0`,
 			v: `0x${transaction.v}`,
 			r: `0x${transaction.r}`,
 			s: `0x${transaction.s}`,
