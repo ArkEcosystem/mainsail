@@ -11,7 +11,7 @@ import {
 	isTransactionCommitted,
 	waitBlock,
 } from "./utilities.js";
-import { getAddress, getCreateAddress, Hex, parseEther, parseGwei, parseUnits } from "viem";
+import { getCreateAddress, Hex, parseEther, parseGwei } from "viem";
 
 describe<{
 	sandbox: Sandbox;
