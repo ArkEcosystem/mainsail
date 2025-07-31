@@ -14,8 +14,6 @@ export class TransactionResource {
 			gasPrice: `0x${transaction.gasPrice.toString(16)}`,
 			hash: `0x${transaction.hash}`,
 			input: `0x${transaction.data}`,
-			maxPriorityFeePerGas: `0x0`,
-			maxFeePerGas: `0x${transaction.gasPrice.toString(16)}`,
 			nonce: `0x${transaction.nonce.toString(16)}`,
 			// eslint-disable-next-line unicorn/no-null
 			to: transaction.to || null,
