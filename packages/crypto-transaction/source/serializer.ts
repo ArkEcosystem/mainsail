@@ -10,7 +10,7 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 	): Promise<Buffer> {
 		const fields = [
 			toBytesCompat(transaction.data.nonce.toBigInt()), // nonce - 0
-			toBytesCompat(transaction.data.gasPrice), // maxFeePerGas - 1
+			toBytesCompat(transaction.data.gasPrice), // gasPrice - 1
 			toBytesCompat(transaction.data.gasLimit), // gasLimit - 2
 			toBytes(transaction.data.to || "0x"), // to - 3
 			toBytesCompat(transaction.data.value.toBigInt()), // value - 4
