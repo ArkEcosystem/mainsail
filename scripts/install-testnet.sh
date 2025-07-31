@@ -74,6 +74,7 @@ if [[ $(locale -a | grep ^en_US.UTF-8) ]] || [[ $(locale -a | grep ^en_US.utf8) 
     fi
 else
         # Install en_US.UTF-8 Locale
+        sudo $APT_ENV apt-get install locales -yq
         sudo locale-gen en_US.UTF-8
         sudo update-locale LANG=en_US.UTF-8
     if ! $(grep -Eq "(en_US.UTF-8)" "$HOME/.bashrc"); then
@@ -134,7 +135,7 @@ success "Installed PM2!"
 
 heading "Installing program dependencies..."
 
-    sudo $APT_ENV apt-get install build-essential python-is-python3 pkg-config libtool autoconf automake libpq-dev jq libjemalloc-dev -yq
+    sudo $APT_ENV apt-get install build-essential python-is-python3 pkg-config libtool autoconf automake libpq-dev jq libjemalloc-dev python3-setuptools -yq
 
 success "Installed program dependencies!"
 
