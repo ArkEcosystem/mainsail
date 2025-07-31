@@ -5,7 +5,7 @@ import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-
 import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { assert, BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
-import { ethers } from "ethers";
+import { encodeFunctionData } from "viem";
 
 import { Wallet } from "../contracts.js";
 import { Generator } from "./generator.js";
@@ -164,12 +164,12 @@ export class GenesisBlockGenerator extends Generator {
 	): Promise<Contracts.Crypto.Transaction[]> {
 		const result: Contracts.Crypto.Transaction[] = [];
 
-		const iface = new ethers.Interface(ConsensusAbi.abi);
-
 		for (const [index, sender] of senders.entries()) {
-			const data = iface
-				.encodeFunctionData("registerValidator", [Buffer.from(sender.consensusKeys.publicKey, "hex")])
-				.slice(2);
+			const data = encodeFunctionData({
+				abi: ConsensusAbi.abi,
+				functionName: "registerValidator",
+				args: [`0x${sender.consensusKeys.publicKey}`],
+			}).slice(2);
 
 			result[index] = await (
 				await this.app
@@ -191,10 +191,12 @@ export class GenesisBlockGenerator extends Generator {
 	async #buildVoteTransactions(senders: Wallet[], chainId: number): Promise<Contracts.Crypto.Transaction[]> {
 		const result: Contracts.Crypto.Transaction[] = [];
 
-		const iface = new ethers.Interface(ConsensusAbi.abi);
-
 		for (const [index, sender] of senders.entries()) {
-			const data = iface.encodeFunctionData("vote", [sender.address]).slice(2);
+			const data = encodeFunctionData({
+				abi: ConsensusAbi.abi,
+				functionName: "vote",
+				args: [sender.address],
+			}).slice(2);
 
 			result[index] = await (
 				await this.app
