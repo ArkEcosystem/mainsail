@@ -4,8 +4,8 @@ import { readJSONSync, writeJSONSync } from "fs-extra/esm";
 import Joi from "joi";
 
 @injectable()
-	export class Command extends Commands.Command {
-		public signature = "config:forger:bls";
+export class Command extends Commands.Command {
+	public signature = "config:forger:bls";
 
 	public description = "Configure the forging validator using BLS12-381 private key.";
 
