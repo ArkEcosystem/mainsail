@@ -1,6 +1,6 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { sha256 } from "ethers";
+import { sha256 } from "viem";
 
 @injectable()
 export class NetworkGenerator {

@@ -199,7 +199,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	async #getBlockNumberByHash(blockHash: string): Promise<number | undefined> {
-		return this.storage.getBlockNumberByHash(blockHash);
+		return (await this.storage.getBlockNumberByHash(blockHash)) ?? undefined;
 	}
 
 	async #readCommitBytes(blockNumber: number): Promise<Buffer | undefined> {
@@ -237,7 +237,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return Buffer.concat([blockBuffer, ...transactions]);
 	}
 
-	async #readBlockHeaderBytes(blockNumber: number): Promise<Buffer | undefined> {
+	async #readBlockHeaderBytes(blockNumber: number): Promise<Buffer | undefined | null> {
 		return this.storage.getBlockHeaderBytes(blockNumber);
 	}
 

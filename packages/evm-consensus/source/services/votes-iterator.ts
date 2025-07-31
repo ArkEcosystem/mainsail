@@ -1,11 +1,16 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
-import { ethers } from "ethers";
+import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 
 const VOTES_PER_REQUEST = 10_000;
+
+interface ConsensusContractVote {
+	readonly validator: string;
+	readonly voter: string;
+}
 
 @injectable()
 export class AsyncVotesIterator implements AsyncIterable<Contracts.Evm.Vote> {
@@ -47,8 +52,11 @@ export class AsyncVotesIterator implements AsyncIterable<Contracts.Evm.Vote> {
 		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
 		const { evmSpec } = this.configuration.getMilestone();
 
-		const iface = new ethers.Interface(ConsensusAbi.abi);
-		const data = iface.encodeFunctionData("getVotes", [this.#address, VOTES_PER_REQUEST]).slice(2);
+		const data = encodeFunctionData({
+			abi: ConsensusAbi.abi,
+			args: [this.#address, VOTES_PER_REQUEST],
+			functionName: "getVotes",
+		}).slice(2);
 
 		const result = await this.evm.view({
 			data: Buffer.from(data, "hex"),
@@ -61,8 +69,12 @@ export class AsyncVotesIterator implements AsyncIterable<Contracts.Evm.Vote> {
 			await this.app.terminate("getVotes failed");
 		}
 
-		const [votes] = iface.decodeFunctionResult("getVotes", result.output!);
+		const votes = decodeFunctionResult({
+			abi: ConsensusAbi.abi,
+			data: toHex(result.output!),
+			functionName: "getVotes",
+		}) as ConsensusContractVote[];
 
-		return votes.map((vote: string[]) => ({ validatorAddress: vote[1], voterAddress: vote[0] }));
+		return votes.map((vote) => ({ validatorAddress: vote.validator, voterAddress: vote.voter }));
 	}
 }

@@ -1,6 +1,22 @@
+import { randomBytes } from "node:crypto";
 import { Contracts } from "@mainsail/contracts";
 import { Evm } from "@mainsail/evm";
-import { BigNumberish, ethers, randomBytes, ZeroAddress } from "ethers";
+import {
+	concat,
+	decodeEventLog,
+	decodeFunctionResult,
+	encodeFunctionData,
+	Hex,
+	hexToBigInt,
+	keccak256,
+	pad,
+	parseEther,
+	parseGwei,
+	toBytes,
+	toHex,
+	zeroAddress,
+	zeroHash,
+} from "viem";
 
 import { describe, Sandbox } from "../../../test-framework/distribution";
 import * as MainsailERC20 from "../../test/fixtures/MainsailERC20.json";
@@ -42,7 +58,7 @@ describe<{
 	const blockContext: Omit<Contracts.Evm.BlockContext, "commitKey"> = {
 		gasLimit: BigInt(10_000_000),
 		timestamp: BigInt(12345),
-		validatorAddress: ethers.ZeroAddress,
+		validatorAddress: zeroAddress,
 	};
 
 	it("should deploy contract successfully", async ({ instance }) => {
@@ -69,7 +85,7 @@ describe<{
 
 		const evm = new Evm({
 			path: sandbox.app.dataPath("loghook"),
-			logger: (level, message) => {
+			logger: ({ level, message }) => {
 				//console.log("CALLED HOOK", { level, message, hookCalled });
 				hookCalled++;
 			},
@@ -95,8 +111,6 @@ describe<{
 	it("should correctly set global variables", async ({ instance }) => {
 		const [validator, sender] = wallets;
 
-		const iface = new ethers.Interface(MainsailGlobals.abi);
-
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
 		await instance.prepareNextCommit({ commitKey });
 
@@ -121,12 +135,17 @@ describe<{
 			setAccountUpdates: () => {},
 		} as any);
 
-		const encodedCall = iface.encodeFunctionData("emitGlobals");
+		const encodedCall = encodeFunctionData({
+			abi: MainsailGlobals.abi,
+			functionName: "emitGlobals",
+			args: undefined,
+		});
+
 		({ receipt } = await instance.process({
 			from: sender.address,
 			value: 0n,
 			nonce: 1n,
-			data: Buffer.from(ethers.getBytes(encodedCall)),
+			data: Buffer.from(toBytes(encodedCall)),
 			to: "0x69230f08D82f095aCB9BE4B21043B502b712D3C1",
 			txHash: getRandomTxHash(),
 			blockContext: {
@@ -138,7 +157,14 @@ describe<{
 			...transferConfig,
 		}));
 
-		const data = iface.decodeEventLog("GlobalData", receipt.logs[0].data)[0];
+		const decoded = decodeEventLog({
+			abi: MainsailGlobals.abi,
+			eventName: "GlobalData",
+			data: receipt.logs[0].data as Hex,
+			topics: receipt.logs[0].topics,
+		});
+
+		const data = (decoded.args as any).data;
 
 		// struct Globals {
 		//     uint256 blockNumber;
@@ -150,13 +176,13 @@ describe<{
 		//     address txOrigin;
 		// }
 
-		assert.equal(data[0], 1245n);
-		assert.equal(data[1], 123_456_789n);
-		assert.equal(data[2], 12_000_000n);
-		assert.equal(data[3], validator.address);
-		assert.equal(data[4], 0n); // difficulty always 0
-		assert.equal(data[5], 0n); // gas price always 0
-		assert.equal(data[6], sender.address);
+		assert.equal(data.blockHeight, 1245n);
+		assert.equal(data.blockTimestamp, 123_456_789n);
+		assert.equal(data.blockGasLimit, 12_000_000n);
+		assert.equal(data.blockCoinbase, validator.address);
+		assert.equal(data.blockDifficulty, 0n); // difficulty always 0
+		assert.equal(data.txGasPrice, 0n); // gas price always 0
+		assert.equal(data.txOrigin, sender.address);
 	});
 
 	it("should deploy, transfer and and update balance correctly", async ({ instance }) => {
@@ -192,23 +218,26 @@ describe<{
 		const contractAddress = receipt.contractAddress;
 		assert.defined(contractAddress);
 
-		const iface = new ethers.Interface(MainsailERC20.abi);
-
 		const balanceBefore = await getBalance(instance, contractAddress!, sender.address);
-		assert.equal(ethers.parseEther("100000000"), balanceBefore);
+		assert.equal(parseEther("100000000"), balanceBefore);
 
-		const amount = ethers.parseEther("1999");
+		const amount = parseEther("1999");
 
 		commitKey = { blockNumber: BigInt(1), round: BigInt(0) };
 
 		await instance.prepareNextCommit({ commitKey });
 
-		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, amount]);
+		const transferEncodedCall = encodeFunctionData({
+			abi: MainsailERC20.abi,
+			functionName: "transfer",
+			args: [recipient.address, amount],
+		});
+
 		({ receipt } = await instance.process({
 			from: sender.address,
 			value: 0n,
 			nonce: 1n,
-			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
+			data: Buffer.from(toBytes(transferEncodedCall)),
 			to: contractAddress,
 			txHash: getRandomTxHash(),
 			blockContext: { ...blockContext, commitKey },
@@ -447,8 +476,6 @@ describe<{
 
 		//
 
-		const iface = new ethers.Interface(MainsailERC20.abi);
-
 		const commitKey1 = { blockNumber: BigInt(1), round: BigInt(0) };
 		const commitKey2 = { blockNumber: BigInt(1), round: BigInt(1) };
 
@@ -461,7 +488,13 @@ describe<{
 				nonce: 1n,
 				from: sender.address,
 				data: Buffer.from(
-					ethers.getBytes(iface.encodeFunctionData("transfer", [recipient.address, ethers.parseEther("1")])),
+					toBytes(
+						encodeFunctionData({
+							abi: MainsailERC20.abi,
+							functionName: "transfer",
+							args: [recipient.address, parseEther("1")],
+						}),
+					),
 				),
 				to: contractAddress,
 				txHash: getRandomTxHash(),
@@ -478,7 +511,13 @@ describe<{
 				nonce: 1n,
 				from: sender.address,
 				data: Buffer.from(
-					ethers.getBytes(iface.encodeFunctionData("transfer", [recipient.address, ethers.parseEther("2")])),
+					toBytes(
+						encodeFunctionData({
+							abi: MainsailERC20.abi,
+							functionName: "transfer",
+							args: [recipient.address, parseEther("2")],
+						}),
+					),
 				),
 				to: contractAddress,
 				txHash: getRandomTxHash(),
@@ -510,7 +549,7 @@ describe<{
 
 		// Balance updated correctly
 		const balance = await getBalance(instance, contractAddress!, recipient.address);
-		assert.equal(ethers.parseEther("1"), balance);
+		assert.equal(parseEther("1"), balance);
 	});
 
 	it("should not throw when commit is empty", async ({ instance }) => {
@@ -618,18 +657,22 @@ describe<{
 		const contractAddress = receipt.contractAddress;
 		assert.defined(contractAddress);
 
-		const iface = new ethers.Interface(MainsailERC20.abi);
-		const amount = ethers.parseEther("1999");
+		const amount = parseEther("1999");
 
 		commitKey = { blockNumber: BigInt(1), round: BigInt(0) };
 		await instance.prepareNextCommit({ commitKey });
 
-		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, amount]);
+		const transferEncodedCall = encodeFunctionData({
+			abi: MainsailERC20.abi,
+			functionName: "transfer",
+			args: [recipient.address, amount],
+		});
+
 		({ receipt } = await instance.process({
 			from: sender.address,
 			value: 0n,
 			nonce: 1n,
-			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
+			data: Buffer.from(toBytes(transferEncodedCall)),
 			to: contractAddress,
 			blockContext: { ...blockContext, commitKey },
 			txHash: getRandomTxHash(),
@@ -640,7 +683,7 @@ describe<{
 			from: sender.address,
 			value: 0n,
 			nonce: 2n,
-			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
+			data: Buffer.from(toBytes(transferEncodedCall)),
 			to: contractAddress,
 			blockContext: { ...blockContext, commitKey },
 			txHash: getRandomTxHash(),
@@ -651,7 +694,7 @@ describe<{
 			from: sender.address,
 			value: 0n,
 			nonce: 3n,
-			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
+			data: Buffer.from(toBytes(transferEncodedCall)),
 			to: contractAddress,
 			blockContext: { ...blockContext, commitKey },
 			txHash: getRandomTxHash(),
@@ -660,7 +703,7 @@ describe<{
 
 		// not updated yet
 		const balanceBefore = await getBalance(instance, contractAddress!, recipient.address);
-		assert.equal(ethers.parseEther("0"), balanceBefore);
+		assert.equal(parseEther("0"), balanceBefore);
 
 		await instance.onCommit({
 			blockNumber: BigInt(1),
@@ -673,7 +716,7 @@ describe<{
 
 		// Balance updated correctly
 		const balanceAfteer = await getBalance(instance, contractAddress!, recipient.address);
-		assert.equal(ethers.parseEther("5997"), balanceAfteer);
+		assert.equal(parseEther("5997"), balanceAfteer);
 	});
 
 	it("should revert transaction if it exceeds gas limit", async ({ instance }) => {
@@ -743,7 +786,7 @@ describe<{
 		assert.equal(code, "0x");
 
 		// empty
-		code = await instance.codeAt(ethers.ZeroAddress);
+		code = await instance.codeAt(zeroAddress);
 		assert.equal(code, "0x");
 
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
@@ -839,7 +882,7 @@ describe<{
 
 		// empty
 		let slot = await instance.storageAt(sender.address, BigInt(0));
-		assert.equal(slot, ethers.ZeroHash);
+		assert.equal(slot, zeroHash);
 
 		// deploy erc20
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
@@ -868,30 +911,30 @@ describe<{
 		//
 		// - slot of balance mapping is '0' (depends on code layout, but here it's a OpenZeppelin ERC20 contract)
 		// - calculate storage key by concatenating padded address and slot number
-		const storageKey = ethers.keccak256(
-			ethers.concat([ethers.zeroPadValue(sender.address, 32), ethers.zeroPadValue(ethers.toBeHex(0, 32), 32)]),
+		const storageKey = keccak256(
+			concat([pad(sender.address as `0x${string}`, { size: 32 }), pad(toHex(0), { size: 32 })]),
 		);
 
 		slot = await instance.storageAt(receipt.contractAddress!, BigInt(storageKey));
 
 		assert.equal(slot, "0x00000000000000000000000000000000000000000052b7d2dcc80cd2e4000000");
 
-		const balance = ethers.toBigInt(slot);
-		assert.equal(balance, ethers.parseEther("100000000"));
+		const balance = hexToBigInt(slot as Hex);
+		assert.equal(balance, parseEther("100000000"));
 	});
 
 	it("should preverify transaction", async ({ instance }) => {
 		const [sender, recipient] = wallets;
 
-		const initialSupply = ethers.parseEther("100");
+		const initialSupply = parseEther("100");
 
 		await instance.initializeGenesis({
 			account: sender.address,
 			initialSupply,
 			initialBlockNumber: 0n,
-			deployerAccount: ethers.ZeroAddress,
-			usernameContract: ethers.ZeroAddress,
-			validatorContract: ethers.ZeroAddress,
+			deployerAccount: zeroAddress,
+			usernameContract: zeroAddress,
+			validatorContract: zeroAddress,
 		});
 
 		const ctx = {
@@ -907,7 +950,7 @@ describe<{
 			...ctx,
 			from: sender.address,
 			to: recipient.address,
-			value: initialSupply - 21_000n * ethers.parseUnits("5", "gwei"),
+			value: initialSupply - 21_000n * parseGwei("5"),
 			data: Buffer.alloc(0),
 			gasLimit: 21_000n,
 			gasPrice: 5n,
@@ -986,14 +1029,14 @@ describe<{
 			account: sender.address,
 			initialSupply: 1000000n,
 			initialBlockNumber: 0n,
-			deployerAccount: ethers.ZeroAddress,
-			usernameContract: ethers.ZeroAddress,
-			validatorContract: ethers.ZeroAddress,
+			deployerAccount: zeroAddress,
+			usernameContract: zeroAddress,
+			validatorContract: zeroAddress,
 		});
 
 		const senderAccountBefore = await instance.getAccountInfo(sender.address);
 		const recipientAccountBefore = await instance.getAccountInfo(recipient.address);
-		const zeroAccountBefore = await instance.getAccountInfo(ZeroAddress);
+		const zeroAccountBefore = await instance.getAccountInfo(zeroAddress);
 
 		await instance.prepareNextCommit({ commitKey });
 
@@ -1016,7 +1059,7 @@ describe<{
 
 		await instance.process({
 			from: recipient.address,
-			to: ZeroAddress,
+			to: zeroAddress,
 			value: 50n,
 			nonce: 0n,
 			data: Buffer.alloc(0),
@@ -1039,7 +1082,7 @@ describe<{
 		//
 		const senderAccountAfter = await instance.getAccountInfo(sender.address);
 		const recipientAccountAfter = await instance.getAccountInfo(recipient.address);
-		const zeroAccountAfter = await instance.getAccountInfo(ZeroAddress);
+		const zeroAccountAfter = await instance.getAccountInfo(zeroAddress);
 
 		//console.log(senderAccountAfter, recipientAccountAfter, zeroAccountAfter);
 
@@ -1055,13 +1098,16 @@ const getBalance = async (
 	instance: Contracts.Evm.Instance,
 	contractAddress: string,
 	walletAddress: string,
-): Promise<BigNumberish> => {
-	const iface = new ethers.Interface(MainsailERC20.abi);
-	const balanceOf = iface.encodeFunctionData("balanceOf", [walletAddress]);
+): Promise<BigInt> => {
+	const balanceOf = encodeFunctionData({
+		abi: MainsailERC20.abi,
+		functionName: "balanceOf",
+		args: [walletAddress],
+	});
 
 	const { output } = await instance.view({
-		from: ethers.ZeroAddress,
-		data: Buffer.from(ethers.getBytes(balanceOf)),
+		from: zeroAddress,
+		data: Buffer.from(toBytes(balanceOf)),
 		to: contractAddress!,
 		specId: Contracts.Evm.SpecId.SHANGHAI,
 	});
@@ -1070,6 +1116,11 @@ const getBalance = async (
 		return 0n;
 	}
 
-	const [balance] = iface.decodeFunctionResult("balanceOf", output!);
+	const balance = decodeFunctionResult({
+		abi: MainsailERC20.abi,
+		functionName: "balanceOf",
+		data: toHex(output!),
+	}) as BigInt;
+
 	return balance;
 };

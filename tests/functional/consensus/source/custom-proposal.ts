@@ -4,7 +4,7 @@ import { Proposal } from "@mainsail/crypto-messages";
 import { Sandbox } from "@mainsail/test-framework";
 import { assert, BigNumber } from "@mainsail/utils";
 import { randomBytes } from "crypto";
-import { ethers } from "ethers";
+import { pad, toBytes } from "viem";
 
 import { Validator } from "./contracts.js";
 
@@ -259,12 +259,11 @@ export const makeTransactionBuilderContext = (node: Sandbox, nodes: Sandbox[], v
 };
 
 const toUint256Buffer = (amount: BigNumber): Buffer => {
-	const bytes = ethers.toBeArray(BigNumber.make(amount).toBigInt());
+	const bytes = toBytes(BigNumber.make(amount).toBigInt());
 	if (bytes.byteLength > 32) {
 		throw new Error("value must fit into uint256");
 	}
 
-	const padded = ethers.zeroPadValue(bytes, 32);
-
-	return Buffer.from(ethers.getBytes(padded));
+	const padded = pad(bytes, { size: 32, dir: "left" });
+	return Buffer.from(padded);
 };

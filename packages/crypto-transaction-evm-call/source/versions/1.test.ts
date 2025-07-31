@@ -7,7 +7,7 @@ import { makeKeywords, schemas as transactionSchemas } from "@mainsail/crypto-tr
 import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/crypto-validation";
 import { BigNumber } from "@mainsail/utils";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
-import { ethers } from "ethers";
+import { zeroAddress } from "viem";
 
 import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json";
 import { describe, Sandbox } from "../../../test-framework/source";
@@ -49,7 +49,7 @@ describe<{
 		gasPrice: 5 * 1e9,
 		gasLimit: 21000,
 		nonce: 1,
-		to: ethers.ZeroAddress,
+		to: zeroAddress,
 		senderPublicKey: "a".repeat(66),
 		from: "0x" + "a".repeat(40),
 		type: 0,

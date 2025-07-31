@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
-import { decodeRlp, ethers, getAddress } from "ethers";
+import { fromRlp, getAddress, Hex, hexToBigInt } from "viem";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
@@ -14,9 +14,8 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 	public async deserialize(serialized: Buffer | string): Promise<Contracts.Crypto.Transaction> {
 		const data = {} as Contracts.Crypto.TransactionData;
 
-		const encodedRlp = "0x" + (typeof serialized === "string" ? serialized : serialized.toString("hex"));
-
-		const decoded = decodeRlp(encodedRlp);
+		const encodedRlp = ("0x" + (typeof serialized === "string" ? serialized : serialized.toString("hex"))) as Hex;
+		const decoded = fromRlp(encodedRlp);
 		const recipientAddressRaw = this.#parseAddress(decoded[3].toString());
 
 		data.nonce = BigNumber.make(this.#parseNumber(decoded[0].toString()));
@@ -59,7 +58,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 	}
 
 	#parseBigNumber(value: string): BigNumber {
-		return value === "0x" ? BigNumber.ZERO : BigNumber.make(ethers.getBigInt(value));
+		return value === "0x" ? BigNumber.ZERO : BigNumber.make(hexToBigInt(value as Hex));
 	}
 
 	#parseAddress(value: string): string | undefined {

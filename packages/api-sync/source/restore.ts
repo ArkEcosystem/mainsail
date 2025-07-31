@@ -8,8 +8,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { UsernamesAbi } from "@mainsail/evm-contracts";
 import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
-import { ethers } from "ethers";
 import { performance } from "perf_hooks";
+import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
 
 interface RestoreContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;
@@ -707,8 +707,11 @@ export class Restore {
 	}
 
 	async #readUsername(account: string): Promise<string | null> {
-		const iface = new ethers.Interface(UsernamesAbi.abi);
-		const data = iface.encodeFunctionData("getUsername", [account]).slice(2);
+		const data = encodeFunctionData({
+			abi: UsernamesAbi.abi,
+			args: [account],
+			functionName: "getUsername",
+		}).slice(2);
 
 		const { evmSpec } = this.configuration.getMilestone(this.configuration.getGenesisHeight());
 
@@ -723,7 +726,12 @@ export class Restore {
 			await this.app.terminate("getUsername failed");
 		}
 
-		const [username] = iface.decodeFunctionResult("getUsername", result.output!);
+		const username = decodeFunctionResult({
+			abi: UsernamesAbi.abi,
+			data: toHex(result.output!),
+			functionName: "getUsername",
+		}) as string | undefined;
+
 		if (!username) {
 			return null;
 		}
