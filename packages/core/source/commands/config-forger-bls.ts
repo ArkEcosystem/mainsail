@@ -10,18 +10,18 @@ import Joi from "joi";
 	public description = "Configure the forging validator using BLS12-381 private key.";
 
 	public configure(): void {
-		this.definition.setFlag("bls", "A validator BLS12-381 private key.", Joi.string());
+		this.definition.setFlag("privateKey", "A validator BLS12-381 private key.", Joi.string());
 	}
 
 	public async execute(): Promise<void> {
-		if (this.hasFlag("bls")) {
+		if (this.hasFlag("privateKey")) {
 			return this.performConfiguration(this.getFlags());
 		}
 
 		const response = await this.components.prompt([
 			{
 				message: "Please enter your validator BLS12-381 private key.",
-				name: "bls",
+				name: "privateKey",
 				type: "password",
 				validate: (value) =>
 					!this.#verifyBlsPrivateKey(value) ? `Failed to verify the given key as BLS12-381 compliant.` : true,
@@ -42,18 +42,18 @@ import Joi from "joi";
 		await this.components.taskList([
 			{
 				task: () => {
-					if (!flags.bls || !this.#verifyBlsPrivateKey(flags.bls)) {
+					if (!flags.privateKey || !this.#verifyBlsPrivateKey(flags.privateKey)) {
 						throw new Error(`Failed to verify the given key as BLS12-381 compliant.`);
 					}
 				},
-				title: "Validating key is BLS12-381 compliant.",
+				title: "Validating privateKey is BLS12-381 compliant.",
 			},
 			{
 				task: () => {
 					const validatorsConfig = this.app.getCorePath("config", "validators.json");
 
 					const validators: Record<string, string | string[]> = readJSONSync(validatorsConfig);
-					validators.secrets = [flags.bls];
+					validators.secrets = [flags.privateKey];
 
 					writeJSONSync(validatorsConfig, validators);
 				},
