@@ -418,7 +418,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				functionName: "addValidator",
 				args: [
 					validator.ethAddress,
-					validator.blsPublicKey ? Buffer.from(validator.blsPublicKey, "hex") : Buffer.alloc(0),
+					validator.blsPublicKey ? `0x${validator.blsPublicKey}` : `0x`,
 					validator.isResigned,
 				],
 			}).slice(2);
