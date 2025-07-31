@@ -11,7 +11,7 @@ import {
 	isTransactionCommitted,
 	waitBlock,
 } from "./utilities.js";
-import { ethers } from "ethers";
+import { getAddress, getCreateAddress, Hex, parseEther, parseGwei, parseUnits } from "viem";
 
 describe<{
 	sandbox: Sandbox;
@@ -57,9 +57,9 @@ describe<{
 		await waitBlock(context);
 		assert.true(await isTransactionCommitted(context, deployTx));
 
-		const erc20Address = ethers.getCreateAddress({
-			from: ethers.computeAddress(`0x${deployTx.data.senderPublicKey}`),
-			nonce: 2,
+		const erc20Address = getCreateAddress({
+			from: deployTx.data.from as Hex,
+			nonce: 2n,
 		});
 
 		// Successfully transfer tokens on new contract
@@ -70,7 +70,7 @@ describe<{
 
 		const transferTx = await EvmCalls.makeEvmCall(context, {
 			recipient: erc20Address,
-			payload: EvmCalls.encodeErc20Transfer(randomWallet.address, ethers.parseEther("1234")),
+			payload: EvmCalls.encodeErc20Transfer(randomWallet.address, parseEther("1234")),
 		});
 
 		({ accept } = await addTransactionsToPool(context, [transferTx]));
@@ -81,7 +81,7 @@ describe<{
 
 		// Check final balance
 		const balanceAfter = await EvmCalls.getErc20BalanceOf(context, erc20Address, randomWallet.address);
-		assert.equal(balanceAfter, ethers.parseEther("1234"));
+		assert.equal(balanceAfter, parseEther("1234"));
 	});
 
 	it("should accept legacy cold wallet transaction", async (context) => {
@@ -192,7 +192,7 @@ describe<{
 
 		// Spent legacy balance and check remaining
 		const randomWallet = await Utils.getRandomColdWallet(context);
-		const spentValue = legacyAfter.balance - ethers.parseUnits("150000", "gwei");
+		const spentValue = legacyAfter.balance - parseGwei("150000");
 		const spentTx = await EvmCalls.makeEvmCall(context, {
 			sender: legacyColdWallet.keyPair,
 			recipient: randomWallet.address,
@@ -217,9 +217,7 @@ describe<{
 
 		assert.equal(
 			legacyAfterSpent.balance,
-			legacyAfter.balance -
-				spentValue -
-				ethers.parseUnits((receipt!.gasUsed * BigInt(spentTx.data.gasPrice)).toString(), "wei"),
+			legacyAfter.balance - spentValue - receipt!.gasUsed * BigInt(spentTx.data.gasPrice),
 		);
 
 		const recipientAfter = await evm.getAccountInfo(randomWallet.address);
@@ -364,7 +362,7 @@ describe<{
 		const fundTx = await EvmCalls.makeEvmCall(context, {
 			recipient: senderWallet.address,
 			gasPrice: 5 * 1e9,
-			value: ethers.parseEther("1001"),
+			value: parseEther("1001"),
 		});
 		await addTransactionsToPool(context, [fundTx]);
 		await waitBlock(context);
@@ -377,7 +375,7 @@ describe<{
 				sender: senderWallet.keyPair,
 				recipient: recipientWallet.address,
 				gasPrice: 5 * 1e9,
-				value: ethers.parseEther("100"),
+				value: parseEther("100"),
 				nonceOffset: i,
 			});
 
@@ -389,7 +387,7 @@ describe<{
 			sender: senderWallet.keyPair,
 			recipient: recipientWallet.address,
 			gasPrice: 6 * 1e9,
-			value: ethers.parseEther("500"),
+			value: parseEther("500"),
 			nonceOffset: 5,
 		});
 

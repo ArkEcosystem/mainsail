@@ -193,7 +193,7 @@ describe<{
 
 		for (let index = 0; index < blockDataWithTransactionsClone.transactions.length; index++) {
 			// Recalculated id
-			blockDataWithTransactionsClone.transactions[index].id = block.transactions[index].data.id;
+			blockDataWithTransactionsClone.transactions[index].hash = block.transactions[index].data.hash;
 
 			assertTransactionData(
 				assert,
