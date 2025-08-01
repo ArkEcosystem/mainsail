@@ -61,13 +61,13 @@ describe<{
 				id: "dummy-tx-id",
 				nonce: BigNumber.make(1),
 				senderPublicKey: "dummy-sender-key",
-				type: Contracts.Crypto.TransactionType.Transfer,
+				type: 0,
 				version: 2,
 			},
 			id: "dummy-tx-id",
 			key: "some-key",
 			serialized: Buffer.from("dummy"),
-			type: Contracts.Crypto.TransactionType.Transfer,
+			type: 0,
 		};
 
 		context.transaction2 = {
@@ -76,14 +76,14 @@ describe<{
 				id: "dummy-tx-id-2",
 				nonce: BigNumber.make(1),
 				senderPublicKey: "dummy-sender-key",
-				type: Contracts.Crypto.TransactionType.Transfer,
+				type: 0,
 				typeGroup: undefined,
 				version: 2,
 			},
 			id: "dummy-tx-id-2",
 			key: "some-key",
 			serialized: Buffer.from("dummy-2"),
-			type: Contracts.Crypto.TransactionType.Transfer,
+			type: 0,
 		};
 	});
 

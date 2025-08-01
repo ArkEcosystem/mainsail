@@ -32,13 +32,13 @@ describe<{
 	it("keyword transactionType should be ok", (context) => {
 		const schema = {
 			$id: "test",
-			transactionType: Contracts.Crypto.TransactionType.Transfer,
+			transactionType: 0,
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined(context.validator.validate("test", Contracts.Crypto.TransactionType.Transfer).error);
+		assert.undefined(context.validator.validate("test", 0).error);
 
-		assert.defined(context.validator.validate("test", Contracts.Crypto.TransactionType.Vote).error);
+		assert.defined(context.validator.validate("test", 3).error);
 		assert.defined(context.validator.validate("test", -1).error);
 		assert.defined(context.validator.validate("test", "").error);
 		assert.defined(context.validator.validate("test", "0").error);

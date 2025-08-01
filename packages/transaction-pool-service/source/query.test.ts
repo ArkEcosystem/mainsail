@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/contracts";
 
 import { describe } from "../../test-framework/source";
 import { BigNumber } from "@mainsail/utils";
@@ -31,13 +31,13 @@ describe<{
 				gasPrice: 100 * 1e9,
 				nonce: BigNumber.make(1),
 				from: "sender1",
-				type: 1,
+				type: 0,
 				version: 2,
 			},
 			hash: "dummy-tx-id",
 			key: "some-key",
 			serialized: Buffer.from("dummy"),
-			type: Contracts.Crypto.TransactionType.Transfer,
+			type: 0,
 		};
 
 		context.sender1Transaction200 = {
@@ -46,13 +46,13 @@ describe<{
 				gasPrice: 200 * 1e9,
 				nonce: BigNumber.make(2),
 				from: "sender1",
-				type: 1,
-				version: 2,
+				type: 0,
+				version: 0,
 			},
 			hash: "dummy-tx-id-2",
 			key: "some-key-2",
 			serialized: Buffer.from("dummy-2"),
-			type: Contracts.Crypto.TransactionType.ValidatorRegistration,
+			type: 0,
 		};
 
 		context.sender2Transaction100 = {
@@ -67,7 +67,7 @@ describe<{
 			hash: "dummy-tx-id-3",
 			key: "some-key-3",
 			serialized: Buffer.from("dummy-3"),
-			type: Contracts.Crypto.TransactionType.Transfer,
+			type: 0,
 		};
 
 		context.sender2Transaction200 = {
@@ -76,13 +76,13 @@ describe<{
 				gasPrice: 400 * 1e9,
 				nonce: BigNumber.make(4),
 				from: "sender2",
-				type: 1,
+				type: 0,
 				version: 2,
 			},
 			hash: "dummy-tx-id-4",
 			key: "some-key-3",
 			serialized: Buffer.from("dummy-4"),
-			type: Contracts.Crypto.TransactionType.ValidatorRegistration,
+			type: 0,
 		};
 	});
 
