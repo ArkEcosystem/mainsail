@@ -29,13 +29,13 @@ export const defaults = {
 		150,
 	),
 
-	rebroadcastThreshold: Environment.get(
-		Constants.EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_REBROADCAST_THRESHOLD,
-		60,
-	),
 	rebroadcastCooldownBlocks: Environment.get(
 		Constants.EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_REBROADCAST_COOLDOWN_BLOCKS,
 		3,
+	),
+	rebroadcastThreshold: Environment.get(
+		Constants.EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_REBROADCAST_THRESHOLD,
+		60,
 	),
 
 	storage: `${Environment.get(Constants.EnvironmentVariables.MAINSAIL_PATH_DATA)}/transaction-pool.sqlite`,
