@@ -31,8 +31,13 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 		await this.#app.resolve(StartHandler).handle(height);
 	}
 
-	public async commit(height: number, sendersAddresses: string[], consumedGas: number): Promise<void> {
-		await this.#app.resolve(CommitHandler).handle(height, sendersAddresses, consumedGas);
+	public async commit(
+		height: number,
+		sendersAddresses: string[],
+		consumedGas: number,
+		isSyncing: boolean,
+	): Promise<void> {
+		await this.#app.resolve(CommitHandler).handle(height, sendersAddresses, consumedGas, isSyncing);
 	}
 
 	public async getTransactions(): Promise<string[]> {

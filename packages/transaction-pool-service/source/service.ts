@@ -62,7 +62,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		return this.mempool.getSize();
 	}
 
-	public async commit(sendersAddresses: string[], consumedGas: number): Promise<void> {
+	public async commit(sendersAddresses: string[], consumedGas: number, isSyncing: boolean): Promise<void> {
 		await this.#lock.runExclusive(async () => {
 			if (this.#disposed) {
 				return;
@@ -79,7 +79,9 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			await this.#cleanUp();
 
-			await this.#rebroadcastMempoolTransactions(consumedGas);
+			if (!isSyncing) {
+				await this.#rebroadcastMempoolTransactions(consumedGas);
+			}
 		});
 	}
 
