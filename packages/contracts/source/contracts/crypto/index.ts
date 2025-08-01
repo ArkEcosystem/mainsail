@@ -3,7 +3,6 @@ export * from "./commit.js";
 export * from "./commit-handler.js";
 export * from "./config.js";
 export * from "./crypto.js";
-export * from "./enums.js";
 export * from "./hash.js";
 export * from "./identities.js";
 export * from "./legacy.js";
