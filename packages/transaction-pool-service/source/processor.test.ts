@@ -68,7 +68,6 @@ describe<{
 			key: "some-key",
 			serialized: Buffer.from("dummy"),
 			type: Contracts.Crypto.TransactionType.Transfer,
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		};
 
 		context.transaction2 = {
@@ -85,7 +84,6 @@ describe<{
 			key: "some-key",
 			serialized: Buffer.from("dummy-2"),
 			type: Contracts.Crypto.TransactionType.Transfer,
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		};
 	});
 

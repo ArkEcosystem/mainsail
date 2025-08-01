@@ -38,7 +38,6 @@ describe<{
 			key: "some-key",
 			serialized: Buffer.from("dummy"),
 			type: Contracts.Crypto.TransactionType.Transfer,
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		};
 
 		context.sender1Transaction200 = {
@@ -54,7 +53,6 @@ describe<{
 			key: "some-key-2",
 			serialized: Buffer.from("dummy-2"),
 			type: Contracts.Crypto.TransactionType.ValidatorRegistration,
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		};
 
 		context.sender2Transaction100 = {
@@ -70,7 +68,6 @@ describe<{
 			key: "some-key-3",
 			serialized: Buffer.from("dummy-3"),
 			type: Contracts.Crypto.TransactionType.Transfer,
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		};
 
 		context.sender2Transaction200 = {
@@ -86,7 +83,6 @@ describe<{
 			key: "some-key-3",
 			serialized: Buffer.from("dummy-4"),
 			type: Contracts.Crypto.TransactionType.ValidatorRegistration,
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		};
 	});
 

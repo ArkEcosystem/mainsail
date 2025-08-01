@@ -9,11 +9,3 @@ export enum TransactionType {
 	UsernameResignation = 9,
 	EvmCall = 10,
 }
-
-export enum TransactionTypeGroup {
-	Test = 0,
-	Core = 1,
-
-	// Everything above is available to anyone
-	Reserved = 1000,
-}
