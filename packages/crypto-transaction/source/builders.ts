@@ -94,7 +94,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.#legacySecondSignWithKeyPair(keys);
 	}
 
-	public async legacySecondsignWithWif(wif: string): Promise<TBuilder> {
+	public async legacySecondSignWithWif(wif: string): Promise<TBuilder> {
 		return this.#legacySecondSignWithKeyPair(await this.keyPairFactory.fromWIF(wif));
 	}
 
