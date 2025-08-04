@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { http, HttpResponse } from "@mainsail/utils";
 
-const helloWorld = { data: "Hello World from Mainsail API!" };
+const helloWorld = { data: "Hello World from Transaction Pool API!" };
 const helloWorldLength = JSON.stringify(helloWorld).length;
 
 @injectable()
