@@ -11,7 +11,6 @@ import {
 	Receipt,
 	State,
 	Transaction,
-	TransactionType,
 	ValidatorRound,
 	Wallet,
 } from "./models/index.js";
@@ -66,9 +65,6 @@ export type PeerRepositoryExtension = {
 };
 
 export type PeerRepository = ExtendedRepository<Peer> & PeerRepositoryExtension;
-
-export type TransactionTypeRepositoryExtension = Record<string, any>;
-export type TransactionTypeRepository = ExtendedRepository<TransactionType> & TransactionTypeRepositoryExtension;
 
 export type FeeStatistics = {
 	avg: string;
@@ -132,7 +128,6 @@ export type ContractRepositoryFactory = (customDataSource?: RepositoryDataSource
 export type PeerRepositoryFactory = (customDataSource?: RepositoryDataSource) => PeerRepository;
 export type ReceiptRepositoryFactory = (customDataSource?: RepositoryDataSource) => ReceiptRepository;
 export type TransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => TransactionRepository;
-export type TransactionTypeRepositoryFactory = (customDataSource?: RepositoryDataSource) => TransactionTypeRepository;
 export type ValidatorRoundRepositoryFactory = (customDataSource?: RepositoryDataSource) => ValidatorRoundRepository;
 export type PluginRepositoryFactory = (customDataSource?: RepositoryDataSource) => PluginRepository;
 export type StateRepositoryFactory = (customDataSource?: RepositoryDataSource) => StateRepository;
