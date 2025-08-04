@@ -18,9 +18,6 @@ export class NodeController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
-	@inject(ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory)
-	private readonly transactionTypeRepositoryFactory!: ApiDatabaseContracts.TransactionTypeRepositoryFactory;
-
 	@inject(ApiDatabaseIdentifiers.PeerRepositoryFactory)
 	private readonly peerRepositoryFactory!: ApiDatabaseContracts.PeerRepositoryFactory;
 
@@ -59,11 +56,18 @@ export class NodeController extends Controller {
 		const cryptoConfiguration = configuration.cryptoConfiguration as Contracts.Crypto.NetworkConfig;
 		const genesisTimestamp = cryptoConfiguration.genesisBlock.block.timestamp;
 
-		const transactionTypes = await this.transactionTypeRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.addOrderBy("key", "ASC")
-			.getMany();
+
+		// TODO: Remove this
+		// const transactionTypes = await this.transactionTypeRepositoryFactory()
+		// 	.createQueryBuilder()
+		// 	.select()
+		// 	.addOrderBy("key", "ASC")
+		// 	.getMany();
+
+		// TODO: Remove this
+		const transactionTypes = [
+			{ key: "evm" },
+		];
 
 		const result = await this.transactionRepositoryFactory().getFeeStatistics(genesisTimestamp, request.query.days);
 
