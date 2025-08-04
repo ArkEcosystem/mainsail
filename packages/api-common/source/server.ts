@@ -61,9 +61,11 @@ export abstract class AbstractServer {
 			return h.continue;
 		});
 
+		const helloWorld = `Hello World from ${this.baseName()}!`;
+
 		this.server.route({
 			handler() {
-				return { data: "Hello World from Mainsail API!" };
+				return { data: helloWorld };
 			},
 			method: "GET",
 			path: "/",
