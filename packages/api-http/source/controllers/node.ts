@@ -64,7 +64,7 @@ export class NodeController extends Controller {
 				max: result?.max ?? "0",
 				min: result?.min ?? "0",
 				sum: result?.sum ?? "0",
-			}
+			},
 		};
 
 		return { data: grouped, meta: { days: request.query.days } };
