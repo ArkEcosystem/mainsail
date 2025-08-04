@@ -1,10 +1,14 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import dayjs from "dayjs";
 
 @injectable()
 export class Worker implements Contracts.TransactionPool.Worker {
 	@inject(Identifiers.TransactionPool.WorkerSubprocess.Factory)
 	private readonly createWorkerSubprocess!: Contracts.Crypto.WorkerSubprocessFactory;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
@@ -55,11 +59,17 @@ export class Worker implements Contracts.TransactionPool.Worker {
 			sendersAddresses.add(transaction.data.from);
 		}
 
+		// TODO: get syncing status from p2p service
+		const nowMs = dayjs().valueOf();
+		const { blockTime } = this.configuration.getMilestone().timeouts;
+		const isSyncing = block.header.timestamp < nowMs - blockTime * 3;
+
 		await this.ipcSubprocess.sendRequest(
 			"commit",
 			unit.blockNumber,
 			[...sendersAddresses.keys()],
 			block.header.gasUsed,
+			isSyncing,
 		);
 	}
 

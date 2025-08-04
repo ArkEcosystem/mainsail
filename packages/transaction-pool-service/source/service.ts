@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { BigNumber, Lock } from "@mainsail/utils";
+import { BigNumber, Lock, randomNumber } from "@mainsail/utils";
 
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {
@@ -41,6 +41,7 @@ export class Service implements Contracts.TransactionPool.Service {
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
 	readonly #lock = new Lock();
+	readonly #txRebroadcastCooldowns = new Map<string, number>();
 
 	#disposed = false;
 
@@ -61,7 +62,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		return this.mempool.getSize();
 	}
 
-	public async commit(sendersAddresses: string[], consumedGas: number): Promise<void> {
+	public async commit(sendersAddresses: string[], consumedGas: number, isSyncing: boolean): Promise<void> {
 		await this.#lock.runExclusive(async () => {
 			if (this.#disposed) {
 				return;
@@ -71,13 +72,16 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			for (const transaction of removedTransactions) {
 				this.storage.removeTransaction(transaction.hash);
+				this.#txRebroadcastCooldowns.delete(transaction.hash);
 				this.logger.debug(`Removed tx ${transaction.hash}`);
 				void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.data);
 			}
 
 			await this.#cleanUp();
 
-			await this.#rebroadcastMempoolTransactions(consumedGas);
+			if (!isSyncing) {
+				await this.#rebroadcastMempoolTransactions(consumedGas);
+			}
 		});
 	}
 
@@ -101,6 +105,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			try {
 				await this.#addTransactionToMempool(transaction);
 				this.logger.debug(`tx ${transaction.hash} added to pool`);
+				this.#txRebroadcastCooldowns.set(transaction.hash, this.stateStore.getBlockNumber());
 
 				void this.events.dispatch(Events.TransactionEvent.AddedToPool, transaction.data);
 			} catch (error) {
@@ -201,6 +206,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			for (const removedTransactionHash of removedTransactionHashes) {
 				this.storage.removeTransaction(removedTransactionHash);
+				this.#txRebroadcastCooldowns.delete(removedTransactionHash);
 				this.logger.debug(`Removed old tx ${removedTransactionHash}`);
 
 				void this.events.dispatch(Events.TransactionEvent.Expired, removedTransactionHash);
@@ -219,6 +225,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 		for (const removedTransaction of removedTransactions) {
 			this.storage.removeTransaction(removedTransaction.hash);
+			this.#txRebroadcastCooldowns.delete(removedTransaction.hash);
 			this.logger.debug(`Removed lowest priority tx ${removedTransaction.hash}`);
 			void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, removedTransaction.data);
 		}
@@ -256,6 +263,8 @@ export class Service implements Contracts.TransactionPool.Service {
 		const milestones = this.cryptoConfiguration.getMilestone(blockNumber);
 
 		const threshold = this.pluginConfiguration.getRequired<number>("rebroadcastThreshold");
+		const cooldownBlocks = this.pluginConfiguration.getRequired<number>("rebroadcastCooldownBlocks");
+		const cooldownVariance = randomNumber(Math.min(1, cooldownBlocks), cooldownBlocks);
 
 		// If block is not full rebroadcast local transactions.
 		if (consumedGas > milestones.block.maxGasLimit * (threshold / 100)) {
@@ -267,6 +276,13 @@ export class Service implements Contracts.TransactionPool.Service {
 
 		const all = await this.poolQuery.getFromHighestPriority().all();
 		for (const transaction of all) {
+			const cooldown = this.#txRebroadcastCooldowns.get(transaction.hash);
+			if (cooldown && cooldown >= blockNumber) {
+				continue;
+			}
+
+			this.#txRebroadcastCooldowns.set(transaction.hash, blockNumber + cooldownVariance);
+
 			broadcastTransactions.push(transaction);
 
 			if (broadcastTransactions.length >= limit) {
