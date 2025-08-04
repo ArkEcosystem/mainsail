@@ -15,12 +15,12 @@ describe<{
 				network: 30,
 				nonce: BigNumber.make(1),
 				from: "dummy-sender-key",
-				type: Contracts.Crypto.TransactionType.Transfer,
+				type: 0,
 			},
 			hash: "dummy-tx-id",
 			key: "some-key",
 			serialized: Buffer.from("dummy"),
-			type: Contracts.Crypto.TransactionType.Transfer,
+			type: 0,
 		};
 	});
 

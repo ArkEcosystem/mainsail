@@ -3,6 +3,9 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.Service {
+	@inject(Identifiers.Application.Instance)
+	public readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -30,7 +33,10 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			await this.#buildRoundValidators();
 		}
 
-		await this.#calculateChangedValidators();
+		// Changed validators are only used by api-sync, hence skip if not loaded.
+		if (this.app.isBound(Identifiers.ApiSync.Service)) {
+			await this.#calculateChangedValidators();
+		}
 	}
 
 	public getAllValidators(): Contracts.State.ValidatorWallet[] {

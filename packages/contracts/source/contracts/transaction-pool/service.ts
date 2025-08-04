@@ -5,6 +5,6 @@ export interface Service {
 
 	addTransaction(transaction: Transaction): Promise<void>;
 	reAddTransactions(): Promise<void>;
-	commit(sendersAddresses: string[], consumedGas: number): Promise<void>;
+	commit(sendersAddresses: string[], consumedGas: number, isSyncing: boolean): Promise<void>;
 	flush(): Promise<void>;
 }

@@ -5,7 +5,7 @@ import { http, HttpResponse } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 // The default API server "/" response
-const helloWorld = { data: "Hello World from Mainsail API!" };
+const helloWorld = { data: "Hello World from Public API!" };
 const helloWorldLength = JSON.stringify(helloWorld).length;
 
 @injectable()
