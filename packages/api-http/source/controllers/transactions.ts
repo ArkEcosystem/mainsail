@@ -16,9 +16,6 @@ export class TransactionsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
-	@inject(ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory)
-	private readonly transactionTypeRepositoryFactory!: ApiDatabaseContracts.TransactionTypeRepositoryFactory;
-
 	public async index(request: Hapi.Request) {
 		const criteria: Search.Criteria.TransactionCriteria = request.query;
 		const pagination = this.getListingPage(request);
@@ -48,22 +45,6 @@ export class TransactionsController extends Controller {
 			.getOne();
 
 		return this.respondEnrichedTransaction(transaction, request);
-	}
-
-	public async schemas(request: Hapi.Request) {
-		const transactionTypes = await this.getTransactionTypes();
-
-		const schemasByKey: Record<string, any> = {};
-
-		for (const { key, schema } of transactionTypes) {
-			schemasByKey[key] = schema;
-		}
-
-		return { data: schemasByKey };
-	}
-
-	private async getTransactionTypes(): Promise<Models.TransactionType[]> {
-		return this.transactionTypeRepositoryFactory().createQueryBuilder().select().addOrderBy("key", "ASC").getMany();
 	}
 
 	private async respondEnrichedTransaction(transaction: Models.Transaction | null, request: Hapi.Request) {

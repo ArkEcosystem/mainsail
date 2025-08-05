@@ -47,10 +47,4 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		},
 		path: "/transactions/{hash}",
 	});
-
-	server.route({
-		handler: (request: Hapi.Request) => controller.schemas(request),
-		method: "GET",
-		path: "/transactions/schemas",
-	});
 };

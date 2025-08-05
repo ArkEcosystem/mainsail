@@ -105,14 +105,6 @@ describe<{
 		assert.equal(data.data, transactionsResponse.at(-1));
 	});
 
-	it("/transactions/schemas", async () => {
-		await apiContext.transactionTypeRepository.save(transactionTypes);
-
-		const { statusCode, data } = await request(`/transactions/schemas`, options);
-		assert.equal(statusCode, 200);
-		assert.equal(data.data, transactionSchemas);
-	});
-
 	it("/transactions with receipt enriched", async () => {
 		await apiContext.transactionRepository.save(receiptTransactions);
 		await apiContext.receiptsRepository.save(receipts);

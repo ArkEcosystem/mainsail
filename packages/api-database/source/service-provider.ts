@@ -17,7 +17,6 @@ import {
 	RepositoryDataSource,
 	StateRepository,
 	TransactionRepository,
-	TransactionTypeRepository,
 	ValidatorRoundRepository,
 	WalletRepository,
 } from "./contracts.js";
@@ -34,7 +33,6 @@ import {
 	Receipt,
 	State,
 	Transaction,
-	TransactionType,
 	ValidatorRound,
 	Wallet,
 } from "./models/index.js";
@@ -49,7 +47,6 @@ import {
 	makeReceiptRepository,
 	makeStateRepository,
 	makeTransactionRepository,
-	makeTransactionTypeRepository,
 	makeValidatorRoundRepository,
 	makeWalletRepository,
 } from "./repositories/index.js";
@@ -94,7 +91,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					Plugin,
 					Receipt,
 					State,
-					TransactionType,
 					Transaction,
 					ValidatorRound,
 					Wallet,
@@ -176,13 +172,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeTransactionRepository(customDataSource ?? dataSource),
-				);
-
-			this.app
-				.bind<() => TransactionTypeRepository>(Identifiers.TransactionTypeRepositoryFactory)
-				.toFactory(
-					() => (customDataSource?: RepositoryDataSource) =>
-						makeTransactionTypeRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
