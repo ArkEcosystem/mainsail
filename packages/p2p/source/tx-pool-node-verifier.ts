@@ -1,5 +1,6 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import { Providers } from "@mainsail/kernel";
 import { http, HttpResponse } from "@mainsail/utils";
 
 const helloWorld = { data: "Hello World from Transaction Pool API!" };
@@ -10,7 +11,15 @@ export class TxPoolNodeVerifier implements Contracts.P2P.TxPoolNodeVerifier {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
 
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "p2p")
+	private readonly configuration!: Providers.PluginConfiguration;
+
 	public async verify(node: Contracts.P2P.TxPoolNode): Promise<boolean> {
+		if (this.configuration.getRequired<boolean>("skipPeerStateVerification")) {
+			return true;
+		}
+
 		try {
 			const response = await http.get(node.url, {
 				headers: {},
