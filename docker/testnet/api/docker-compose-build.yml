@@ -17,7 +17,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        api_channel: evm 
+        api_channel: rc 
     image: mainsail-api 
     container_name: mainsail-api-testnet 
     restart: always

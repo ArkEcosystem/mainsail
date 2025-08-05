@@ -26,12 +26,12 @@ if [ "$MODE" = "validator" ]; then
     echo "set SECRET and/or MAINSAIL_FORGER_PASWORD if you want to run a forger"
     exit
   elif [ -n "$SECRET" ] && [ -n "$MAINSAIL_FORGER_PASSWORD" ]; then
-    mainsail --token=$TOKEN --network=$NETWORK config:forger:bip39 --bip39 "$SECRET"
+    mainsail --token=$TOKEN --network=$NETWORK config:forger:bls --privateKey "$SECRET"
   fi
 fi
 
 # relay
-if [[ "$MODE" = "relay" ]]; then
+if [ "$MODE" = "relay" ]; then
     mainsail --token=$TOKEN --network=$NETWORK core:run
 fi
 

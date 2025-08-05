@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        core_channel: evm 
+        core_channel: rc 
     image: mainsail-test
     container_name: mainsail-testnet
     restart: always

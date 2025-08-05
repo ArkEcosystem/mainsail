@@ -23,8 +23,12 @@ success ()
     echo "    ${green}==>${reset}${bold} $1${reset}"
 }
 
-read -sp "Please enter your delegate secret: " inputSecret
-echo
+    read -sp "Please enter your validator BLS12-381 private key: " inputSecret
+    echo
+    if [[ ! ${inputSecret} =~ ^[0-9a-fA-F]{64}$ ]]; then
+    echo "Sorry, it doesn't look to be a valid private key."
+    exit
+    fi
 
 while true; do
     read -sp "Please enter your password: " inputPass
