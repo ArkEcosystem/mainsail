@@ -127,6 +127,8 @@ export abstract class AbstractServer {
 			options.tls.cert = readFileSync(options.tls.cert).toString();
 		}
 
+		options.debug = false;
+
 		const defaultOptions = this.defaultOptions();
 		return merge(defaultOptions, options);
 	}
