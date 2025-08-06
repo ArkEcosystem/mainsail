@@ -12,7 +12,7 @@
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del distribution",
+		"clean": "del distribution && del tsconfig.tsbuildinfo",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 -r=text -r=lcov --all pnpm run test",

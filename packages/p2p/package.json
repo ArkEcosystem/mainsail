@@ -14,7 +14,7 @@
 		"build": "pnpm run clean && tsc",
 		"build:proto": "pnpm pbjs && pnpm pbts",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del distribution",
+		"clean": "del distribution && del tsconfig.tsbuildinfo",
 		"pbjs": "pbjs -t static-module -w commonjs source/socket-server/codecs/proto/*.proto -o source/socket-server/codecs/proto/protos.js",
 		"pbts": "pbts source/socket-server/codecs/proto/protos.js -o source/socket-server/codecs/proto/protos.d.ts",
 		"release": "pnpm publish --access public",
