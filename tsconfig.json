@@ -2,6 +2,7 @@
 	"compilerOptions": {
 		"assumeChangesOnlyAffectDirectDependencies": true,
 		"baseUrl": "./",
+		"composite": true,
 		"declaration": true,
 		"declarationMap": true,
 		"emitDecoratorMetadata": true,
