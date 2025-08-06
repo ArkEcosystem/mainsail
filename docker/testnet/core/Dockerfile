@@ -10,7 +10,7 @@ ENV PNPM_HOME=/home/node/.pnpm/bin
 ENV PATH="${PATH}:${PNPM_HOME}"
 
 RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 py3-setuptools git \
-    && apk add --no-cache bash sudo git openntpd openssl jemalloc \
+    && apk add --no-cache bash sudo git openntpd openssl jemalloc curl \
     && echo "servers pool.ntp.org" > /etc/ntpd.conf \
     && echo "servers time.google.com" >> /etc/ntpd.conf \
     && npm install -g npm@latest \
