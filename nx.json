@@ -24,6 +24,7 @@
 			"inputs": ["default"],
 			"outputs": [
 				"{projectRoot}/distribution",
+				"{projectRoot}/tsconfig.tsbuildinfo",
 				"{projectRoot}/index.d.ts",
 				"{projectRoot}/index.js",
 				"{projectRoot}/evm.*.node"
