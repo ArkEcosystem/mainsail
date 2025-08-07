@@ -16,7 +16,7 @@
 	],
 	"scripts": {
 		"api:devnet": "cross-env-shell MAINSAIL_PATH_CONFIG=./bin/config pnpm run mainsail-api api:run",
-		"build": "pnpm run clean && tsc -b",
+		"build": "tsc -b",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution && del tsconfig.tsbuildinfo",
 		"mainsail-api": "node ./bin/run.js",
