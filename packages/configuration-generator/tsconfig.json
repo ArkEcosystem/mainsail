@@ -5,5 +5,84 @@
 		"outDir": "distribution",
 		"allowJs": true
 	},
-	"include": ["source/**/**.ts"]
+	"include": [
+		"source/**/**.ts"
+	],
+	"references": [
+		{
+			"path": "../container"
+		},
+		{
+			"path": "../contracts"
+		},
+		{
+			"path": "../crypto-address-base58"
+		},
+		{
+			"path": "../crypto-address-keccak256"
+		},
+		{
+			"path": "../crypto-block"
+		},
+		{
+			"path": "../crypto-commit"
+		},
+		{
+			"path": "../crypto-config"
+		},
+		{
+			"path": "../crypto-consensus-bls12-381"
+		},
+		{
+			"path": "../crypto-hash-bcrypto"
+		},
+		{
+			"path": "../crypto-key-pair-ecdsa"
+		},
+		{
+			"path": "../crypto-messages"
+		},
+		{
+			"path": "../crypto-signature-ecdsa"
+		},
+		{
+			"path": "../crypto-transaction"
+		},
+		{
+			"path": "../crypto-transaction-evm-call"
+		},
+		{
+			"path": "../crypto-validation"
+		},
+		{
+			"path": "../crypto-wif"
+		},
+		{
+			"path": "../evm-consensus"
+		},
+		{
+			"path": "../evm-contracts"
+		},
+		{
+			"path": "../evm-service"
+		},
+		{
+			"path": "../kernel"
+		},
+		{
+			"path": "../serializer"
+		},
+		{
+			"path": "../snapshot-legacy-exporter"
+		},
+		{
+			"path": "../snapshot-legacy-importer"
+		},
+		{
+			"path": "../utils"
+		},
+		{
+			"path": "../validation"
+		}
+	]
 }

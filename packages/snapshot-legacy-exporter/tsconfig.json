@@ -4,5 +4,37 @@
 		"rootDir": "source",
 		"outDir": "distribution"
 	},
-	"include": ["source/**/**.ts", "source/**/**.json"]
+	"include": [
+		"source/**/**.ts",
+		"source/**/**.json"
+	],
+	"references": [
+		{
+			"path": "../container"
+		},
+		{
+			"path": "../contracts"
+		},
+		{
+			"path": "../crypto-address-keccak256"
+		},
+		{
+			"path": "../crypto-key-pair-ecdsa"
+		},
+		{
+			"path": "../crypto-validation"
+		},
+		{
+			"path": "../kernel"
+		},
+		{
+			"path": "../logger-pino"
+		},
+		{
+			"path": "../utils"
+		},
+		{
+			"path": "../validation"
+		}
+	]
 }

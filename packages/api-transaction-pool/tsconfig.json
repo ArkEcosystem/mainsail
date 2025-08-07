@@ -4,5 +4,22 @@
 		"rootDir": "source",
 		"outDir": "distribution"
 	},
-	"include": ["source/**/**.ts", "source/**/**.json"]
+	"include": [
+		"source/**/**.ts",
+		"source/**/**.json"
+	],
+	"references": [
+		{
+			"path": "../api-common"
+		},
+		{
+			"path": "../container"
+		},
+		{
+			"path": "../contracts"
+		},
+		{
+			"path": "../kernel"
+		}
+	]
 }

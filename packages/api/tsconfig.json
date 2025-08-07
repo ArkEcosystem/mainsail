@@ -4,5 +4,34 @@
 		"rootDir": "source",
 		"outDir": "distribution"
 	},
-	"include": ["source/**/**.ts", "source/**/**.json"]
+	"include": [
+		"source/**/**.ts",
+		"source/**/**.json"
+	],
+	"references": [
+		{
+			"path": "../api-database"
+		},
+		{
+			"path": "../api-http"
+		},
+		{
+			"path": "../cli"
+		},
+		{
+			"path": "../container"
+		},
+		{
+			"path": "../contracts"
+		},
+		{
+			"path": "../logger-pino"
+		},
+		{
+			"path": "../utils"
+		},
+		{
+			"path": "../validation"
+		}
+	]
 }

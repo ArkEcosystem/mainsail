@@ -4,5 +4,31 @@
 		"rootDir": "source",
 		"outDir": "distribution"
 	},
-	"include": ["source/**/**.ts", "source/**/**.json"]
+	"include": [
+		"source/**/**.ts",
+		"source/**/**.json"
+	],
+	"references": [
+		{
+			"path": "../container"
+		},
+		{
+			"path": "../contracts"
+		},
+		{
+			"path": "../crypto-transaction"
+		},
+		{
+			"path": "../crypto-transaction-evm-call"
+		},
+		{
+			"path": "../evm-contracts"
+		},
+		{
+			"path": "../test-framework"
+		},
+		{
+			"path": "../utils"
+		}
+	]
 }

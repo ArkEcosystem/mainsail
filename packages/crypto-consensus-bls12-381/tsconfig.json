@@ -4,5 +4,25 @@
 		"rootDir": "source",
 		"outDir": "distribution"
 	},
-	"include": ["source/**/**.ts", "source/**/**.json"]
+	"include": [
+		"source/**/**.ts",
+		"source/**/**.json"
+	],
+	"references": [
+		{
+			"path": "../container"
+		},
+		{
+			"path": "../contracts"
+		},
+		{
+			"path": "../crypto-key-pair-bls12-381"
+		},
+		{
+			"path": "../crypto-signature-bls12-381"
+		},
+		{
+			"path": "../kernel"
+		}
+	]
 }

@@ -4,5 +4,31 @@
 		"rootDir": "source",
 		"outDir": "distribution"
 	},
-	"include": ["source/**/**.ts", "source/**/**.json"]
+	"include": [
+		"source/**/**.ts",
+		"source/**/**.json"
+	],
+	"references": [
+		{
+			"path": "../api-common"
+		},
+		{
+			"path": "../api-database"
+		},
+		{
+			"path": "../container"
+		},
+		{
+			"path": "../contracts"
+		},
+		{
+			"path": "../evm-contracts"
+		},
+		{
+			"path": "../kernel"
+		},
+		{
+			"path": "../utils"
+		}
+	]
 }

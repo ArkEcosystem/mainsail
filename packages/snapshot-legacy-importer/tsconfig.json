@@ -4,5 +4,31 @@
 		"rootDir": "source",
 		"outDir": "distribution"
 	},
-	"include": ["source/**/**.ts", "source/**/**.json"]
+	"include": [
+		"source/**/**.ts",
+		"source/**/**.json"
+	],
+	"references": [
+		{
+			"path": "../container"
+		},
+		{
+			"path": "../contracts"
+		},
+		{
+			"path": "../evm-consensus"
+		},
+		{
+			"path": "../evm-contracts"
+		},
+		{
+			"path": "../kernel"
+		},
+		{
+			"path": "../snapshot-legacy-exporter"
+		},
+		{
+			"path": "../utils"
+		}
+	]
 }
