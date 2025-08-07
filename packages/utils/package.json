@@ -17,7 +17,7 @@
 	],
 	"scripts": {
 		"bench": "pnpm run build && node benchmark/index.js",
-		"build": "pnpm run clean && tsc",
+		"build": "pnpm run clean && tsc -b",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution && del tsconfig.tsbuildinfo",
 		"release": "pnpm publish --access public",

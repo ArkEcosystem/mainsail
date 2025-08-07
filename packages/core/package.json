@@ -15,7 +15,7 @@
 		"/distribution"
 	],
 	"scripts": {
-		"build": "pnpm run clean && tsc",
+		"build": "pnpm run clean && tsc -b",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution && del tsconfig.tsbuildinfo",
 		"full:devnet": "cross-env-shell MAINSAIL_PATH_CONFIG=./bin/config/devnet pnpm run mainsail core:run -- --env=test",
