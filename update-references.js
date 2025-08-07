@@ -3,6 +3,8 @@ import { lstatSync, readdirSync, readFileSync, writeFileSync} from "fs";
 
 const source = resolve(join(process.cwd(), "packages"));
 
+const filterProject = "evm";
+
 const clearReferences = (tsconfigPath, tsconfig) => {
 	if (tsconfig.references) {
 		delete tsconfig.references;
@@ -13,7 +15,7 @@ const clearReferences = (tsconfigPath, tsconfig) => {
 const main = async () => {
 		const pkgs = readdirSync(source)
 		.filter((name) => lstatSync(`${source}/${name}`).isDirectory())
-		.filter((name) => name !== "evm")
+		.filter((name) => name !== filterProject)
 		.sort();
 
 		for (const pkg of pkgs) {
@@ -41,6 +43,7 @@ const main = async () => {
 			// Find dependencies that are in the same workspace. They have "workspace:^" in their version
 			const workspaceDeps = Object.entries(packageJson.dependencies)
 				.filter(([_, version]) => typeof version === 'string' && version.startsWith('workspace:'))
+				.filter(([name, _]) => name.split('/').pop() !== filterProject)
 				.map(([name]) => name);
 
 			if (workspaceDeps.length === 0) {
