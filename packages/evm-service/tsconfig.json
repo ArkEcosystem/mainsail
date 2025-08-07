@@ -16,9 +16,6 @@
 			"path": "../contracts"
 		},
 		{
-			"path": "../evm"
-		},
-		{
 			"path": "../kernel"
 		},
 		{
