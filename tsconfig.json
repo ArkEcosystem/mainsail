@@ -3,7 +3,6 @@
 		"assumeChangesOnlyAffectDirectDependencies": true,
 		"baseUrl": "./",
 		"composite": true,
-		"incremental": true,
 		"declaration": true,
 		"declarationMap": true,
 		"emitDecoratorMetadata": true,
