@@ -4,10 +4,7 @@
 		"rootDir": "source",
 		"outDir": "distribution"
 	},
-	"include": [
-		"source/**/**.ts",
-		"source/**/**.json"
-	],
+	"include": ["source/**/**.ts", "source/**/**.json"],
 	"references": [
 		{
 			"path": "../cli"

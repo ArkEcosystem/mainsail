@@ -5,9 +5,7 @@
 		"outDir": "distribution",
 		"allowJs": true
 	},
-	"include": [
-		"source/**/**.ts"
-	],
+	"include": ["source/**/**.ts"],
 	"references": [
 		{
 			"path": "../container"
