@@ -10,7 +10,7 @@ const main = async () => {
 		.sort();
 
 		for (const pkg of pkgs) {
-			console.log(`{ "path": "packages/${pkg}" }`);
+			console.log(`{ "path": "packages/${pkg}" },`);
 		}
 }
 
