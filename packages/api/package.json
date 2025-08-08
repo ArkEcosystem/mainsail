@@ -16,9 +16,9 @@
 	],
 	"scripts": {
 		"api:devnet": "cross-env-shell MAINSAIL_PATH_CONFIG=./bin/config pnpm run mainsail-api api:run",
-		"build": "pnpm run clean && tsc",
+		"build": "tsc -b",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del distribution",
+		"clean": "del distribution && del tsconfig.tsbuildinfo",
 		"mainsail-api": "node ./bin/run.js",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",

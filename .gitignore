@@ -53,8 +53,8 @@ package-lock.json
 bundle.min.js
 
 # Build
-packages/**/dist/
 packages/**/distribution/
+packages/**/tsconfig.tsbuildinfo
 !packages/kernel/test/stubs/**
 
 # Microsoft Visual Studio settings

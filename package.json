@@ -27,6 +27,7 @@
 		"pg:up": "docker compose -f docker/local/docker-compose.yml up -d",
 		"prettier": "prettier --write \"./*.{ts,js,json,md}\" \"./packages/**/*.{ts,js,json,md}\" \"./.github/**/*.{json,yml,yaml}\"",
 		"prettier:dry": "prettier --check \"./*.{ts,js,json,md}\" \"./packages/**/*.{ts,js,json,md}\" \"./.github/**/*.{json,yml,yaml}\"",
+		"references": "node ./scripts/references/update-references.js",
 		"release": "lerna run release --concurrency=1",
 		"setup": "pnpm install && pnpm run build",
 		"sort": "sort-package-json \"package.json\" \"packages/*/package.json\"",

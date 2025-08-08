@@ -1,7 +1,13 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
+		"rootDir": "source",
 		"outDir": "distribution"
 	},
-	"include": ["source/**/**.ts"]
+	"include": ["source/**/**.ts"],
+	"references": [
+		{
+			"path": "../utils"
+		}
+	]
 }

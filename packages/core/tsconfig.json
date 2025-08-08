@@ -1,7 +1,166 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
+		"rootDir": "source",
 		"outDir": "distribution"
 	},
-	"include": ["source/**/**.ts"]
+	"include": ["source/**/**.ts", "source/**/**.json"],
+	"references": [
+		{
+			"path": "../api-common"
+		},
+		{
+			"path": "../api-database"
+		},
+		{
+			"path": "../api-development"
+		},
+		{
+			"path": "../api-evm"
+		},
+		{
+			"path": "../api-http"
+		},
+		{
+			"path": "../api-sync"
+		},
+		{
+			"path": "../api-transaction-pool"
+		},
+		{
+			"path": "../blockchain-utils"
+		},
+		{
+			"path": "../bootstrap"
+		},
+		{
+			"path": "../cli"
+		},
+		{
+			"path": "../configuration-generator"
+		},
+		{
+			"path": "../consensus"
+		},
+		{
+			"path": "../consensus-storage"
+		},
+		{
+			"path": "../container"
+		},
+		{
+			"path": "../contracts"
+		},
+		{
+			"path": "../crypto-address-base58"
+		},
+		{
+			"path": "../crypto-address-keccak256"
+		},
+		{
+			"path": "../crypto-block"
+		},
+		{
+			"path": "../crypto-commit"
+		},
+		{
+			"path": "../crypto-config"
+		},
+		{
+			"path": "../crypto-consensus-bls12-381"
+		},
+		{
+			"path": "../crypto-hash-bcrypto"
+		},
+		{
+			"path": "../crypto-key-pair-bls12-381"
+		},
+		{
+			"path": "../crypto-key-pair-schnorr"
+		},
+		{
+			"path": "../crypto-messages"
+		},
+		{
+			"path": "../crypto-signature-schnorr"
+		},
+		{
+			"path": "../crypto-transaction"
+		},
+		{
+			"path": "../crypto-transaction-evm-call"
+		},
+		{
+			"path": "../crypto-validation"
+		},
+		{
+			"path": "../crypto-wif"
+		},
+		{
+			"path": "../crypto-worker"
+		},
+		{
+			"path": "../database"
+		},
+		{
+			"path": "../evm-api-worker"
+		},
+		{
+			"path": "../evm-consensus"
+		},
+		{
+			"path": "../evm-contracts"
+		},
+		{
+			"path": "../evm-service"
+		},
+		{
+			"path": "../evm-state"
+		},
+		{
+			"path": "../logger-pino"
+		},
+		{
+			"path": "../networking-dns"
+		},
+		{
+			"path": "../networking-ntp"
+		},
+		{
+			"path": "../p2p"
+		},
+		{
+			"path": "../processor"
+		},
+		{
+			"path": "../serializer"
+		},
+		{
+			"path": "../state"
+		},
+		{
+			"path": "../transaction-pool-broadcaster"
+		},
+		{
+			"path": "../transaction-pool-service"
+		},
+		{
+			"path": "../transaction-pool-worker"
+		},
+		{
+			"path": "../transactions"
+		},
+		{
+			"path": "../utils"
+		},
+		{
+			"path": "../validation"
+		},
+		{
+			"path": "../validator"
+		},
+		{
+			"path": "../webhooks"
+		}
+	]
 }
