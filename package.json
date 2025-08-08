@@ -9,6 +9,8 @@
 	],
 	"scripts": {
 		"build": "lerna run build",
+		"build:ts": "pnpm run build:rs && lerna run build --ignore=@mainsail/evm",
+		"build:rs": "lerna run build --scope=@mainsail/evm",
 		"clean": "lerna run clean --parallel",
 		"clean:all": "pnpm run clean && pnpm run clean:node_modules && rm -r .cache",
 		"clean:node_modules": "del packages/*/node_modules && del node_modules",
