@@ -27,6 +27,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"ajv": "8.17.1",
+		"bcrypto": "5.5.2",
 		"viem": "2.33.1"
 	},
 	"devDependencies": {

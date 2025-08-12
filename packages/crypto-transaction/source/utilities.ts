@@ -1,7 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
-import { keccak256, toBytes, toRlp } from "viem";
+import { toBytes, toRlp } from "viem";
+import { Keccak256 } from "bcrypto";
 
 import { toBytesCompat } from "./serializer.js";
 
@@ -45,7 +46,7 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 		}
 
 		const encoded = toRlp(fields); // remove 0x prefix
-		return Buffer.from(keccak256(Buffer.from(`${encoded.slice(2)}`, "hex")).slice(2), "hex");
+		return Buffer.from(Keccak256.digest(Buffer.from(`${encoded.slice(2)}`, "hex")));
 	}
 
 	public async getHash(transaction: Contracts.Crypto.Transaction): Promise<string> {
