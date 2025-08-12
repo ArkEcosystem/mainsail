@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
-import { toBytes, toRlp } from "viem";
 import { Keccak256 } from "bcrypto";
+import { toBytes, toRlp } from "viem";
 
 import { toBytesCompat } from "./serializer.js";
 

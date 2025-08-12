@@ -1,8 +1,8 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Keccak256, secp256k1 } from "bcrypto";
 import { Address, checksumAddress, getAddress, Hex, isAddress, toBytes, toHex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { Keccak256, secp256k1 } from "bcrypto";
 
 @injectable()
 export class AddressFactory implements Contracts.Crypto.AddressFactory {
