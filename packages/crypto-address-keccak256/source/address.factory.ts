@@ -75,12 +75,12 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 
 		const address = hexAddress.split("");
 
-		for (let i = 0; i < 40; i += 2) {
-			if (hash[i >> 1] >> 4 >= 8 && address[i]) {
-				address[i] = address[i].toUpperCase();
+		for (let index = 0; index < 40; index += 2) {
+			if (hash[index >> 1] >> 4 >= 8 && address[index]) {
+				address[index] = address[index].toUpperCase();
 			}
-			if ((hash[i >> 1] & 0x0f) >= 8 && address[i + 1]) {
-				address[i + 1] = address[i + 1].toUpperCase();
+			if ((hash[index >> 1] & 0x0f) >= 8 && address[index + 1]) {
+				address[index + 1] = address[index + 1].toUpperCase();
 			}
 		}
 
