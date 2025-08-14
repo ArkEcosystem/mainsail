@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Keccak256, secp256k1 } from "bcrypto";
-import { Address, checksumAddress, getAddress, Hex, isAddress, toBytes, toHex } from "viem";
+import { Address, getAddress, Hex, isAddress, toBytes, toHex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 @injectable()
@@ -66,6 +66,24 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 		const unprefixed = publicKeyBytes.subarray(1); // drop 0x04
 		const hash = Keccak256.digest(unprefixed);
 
-		return checksumAddress(`0x${hash.slice(-20).toString("hex")}`);
+		return this.#toChecksumAddress(hash.slice(-20));
+	}
+
+	#toChecksumAddress(addressBytes: Buffer): Address {
+		const hexAddress = addressBytes.toString("hex");
+		const hash = Keccak256.digest(Buffer.from(hexAddress, "utf8"));
+
+		const address = hexAddress.split("");
+
+		for (let i = 0; i < 40; i += 2) {
+			if (hash[i >> 1] >> 4 >= 8 && address[i]) {
+				address[i] = address[i].toUpperCase();
+			}
+			if ((hash[i >> 1] & 0x0f) >= 8 && address[i + 1]) {
+				address[i + 1] = address[i + 1].toUpperCase();
+			}
+		}
+
+		return `0x${address.join("")}`;
 	}
 }
