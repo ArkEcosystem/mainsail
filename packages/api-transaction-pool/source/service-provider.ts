@@ -36,6 +36,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				},
 				plugin: Plugins.whitelist,
 			},
+			{ plugin: Plugins.commaArrayQuery },
 			{
 				options: {
 					...config.rateLimit,

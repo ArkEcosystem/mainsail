@@ -151,6 +151,21 @@ describe<{
 		]);
 	});
 
+	it("getFromHighestPriority - should return transactions order by nonce/fee for sender", async (context) => {
+		stub(context.mempool, "getSenderMempools").returnValueOnce([
+			{ getFromEarliest: () => [context.sender1Transaction100, context.sender1Transaction200] },
+			{ getFromEarliest: () => [context.sender2Transaction100, context.sender2Transaction200] },
+		]);
+
+		const query = context.container.get(Query, { autobind: true });
+		const result = await query
+			.getFromHighestPriority()
+			.wherePredicate(async (t) => t.data.from === "sender2")
+			.all();
+
+		assert.equal(result, [context.sender2Transaction100, context.sender2Transaction200]);
+	});
+
 	it("whereId - should filter transactions by id", async (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
 		const result = await queryIterable.whereId(context.sender1Transaction200.hash).all();

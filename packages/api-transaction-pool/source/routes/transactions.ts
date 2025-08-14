@@ -1,5 +1,6 @@
 import Hapi from "@hapi/hapi";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Schemas } from "@mainsail/api-common";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
@@ -60,7 +61,10 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				},
 			},
 			validate: {
-				query: Joi.object({}).concat(pagination),
+				query: Joi.object({
+					from: Schemas.orEqualCriteria(Schemas.addressSchema),
+					to: Schemas.orEqualCriteria(Schemas.addressSchema),
+				}).concat(pagination),
 			},
 		},
 		path: "/transactions/unconfirmed",
