@@ -6,6 +6,10 @@ import wallets from "../../test/fixtures/wallets.json";
 import transactions from "../../test/fixtures/transactions.json";
 import walletTransactions from "../../test/fixtures/wallet_transactions.json";
 import walletTransactionsResponse from "../../test/fixtures/wallet_transactions.response.json";
+import multiPayments from "../../test/fixtures/multi_payments.json";
+import multiPaymentTransactions from "../../test/fixtures/multi_payments.transactions.json";
+import multiPaymentWallets from "../../test/fixtures/multi_payments.wallets.json";
+import multiPaymentTransactionsResponse from "../../test/fixtures/multi_payments.transactions.response.json";
 
 describe<{
 	sandbox: Sandbox;
@@ -187,5 +191,61 @@ describe<{
 		const { statusCode, data } = await request(`/wallets/${recipient}/transactions/received`, options);
 		assert.equal(statusCode, 200);
 		assert.equal(data.data, walletTransactionsResponse);
+	});
+
+	it("/wallets/{id}/transactions (with multipayments)", async () => {
+		await apiContext.walletRepository.save(wallets);
+		await apiContext.transactionRepository.save(transactions);
+		await apiContext.walletRepository.save(multiPaymentWallets);
+
+		const senderWallet = multiPaymentWallets[0];
+		const recipientWallet1 = multiPaymentWallets[1];
+		const recipientWallet2 = multiPaymentWallets[2];
+
+		let { statusCode, data } = await request(`/wallets/${recipientWallet1.address}/transactions`, options);
+		assert.equal(statusCode, 200);
+		assert.empty(data.data);
+
+		await apiContext.transactionRepository.save(multiPaymentTransactions);
+		await apiContext.multiPaymentRepository.save(multiPayments);
+
+		for (const wallet of [senderWallet, recipientWallet1, recipientWallet2]) {
+			({ statusCode, data } = await request(`/wallets/${wallet.address}/transactions`, options));
+
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, multiPaymentTransactionsResponse);
+		}
+	});
+
+	it("/wallets/{id}/transactions/received (with multipayments)", async () => {
+		await apiContext.walletRepository.save(wallets);
+		await apiContext.transactionRepository.save(transactions);
+		await apiContext.walletRepository.save(multiPaymentWallets);
+
+		const senderWallet = multiPaymentWallets[0];
+		const recipientWallet1 = multiPaymentWallets[1];
+		const recipientWallet2 = multiPaymentWallets[2];
+
+		let { statusCode, data } = await request(`/wallets/${recipientWallet1.address}/transactions/received`, options);
+		assert.equal(statusCode, 200);
+		assert.empty(data.data);
+
+		await apiContext.transactionRepository.save(multiPaymentTransactions);
+		await apiContext.multiPaymentRepository.save(multiPayments);
+
+		({ statusCode, data } = await request(`/wallets/${recipientWallet1.address}/transactions/received`, options));
+
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, multiPaymentTransactionsResponse);
+
+		({ statusCode, data } = await request(`/wallets/${recipientWallet2.address}/transactions/received`, options));
+
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, multiPaymentTransactionsResponse);
+
+		({ statusCode, data } = await request(`/wallets/${senderWallet.address}/transactions/received`, options));
+
+		assert.equal(statusCode, 200);
+		assert.empty(data.data);
 	});
 });

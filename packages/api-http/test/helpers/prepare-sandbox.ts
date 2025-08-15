@@ -44,6 +44,12 @@ export class ApiContext {
 		)();
 	}
 
+	public get multiPaymentRepository(): ApiDatabaseContracts.MultiPaymentRepository {
+		return this.app.get<ApiDatabaseContracts.MultiPaymentRepositoryFactory>(
+			ApiDatabaseIdentifiers.MultiPaymentRepositoryFactory,
+		)();
+	}
+
 	public get walletRepository(): ApiDatabaseContracts.WalletRepository {
 		return this.app.get<ApiDatabaseContracts.WalletRepositoryFactory>(
 			ApiDatabaseIdentifiers.WalletRepositoryFactory,
