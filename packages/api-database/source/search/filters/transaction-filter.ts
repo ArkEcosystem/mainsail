@@ -149,10 +149,21 @@ export class TransactionFilter {
 	private static async handleRecipientAddressCriteria(
 		criteria: EqualCriteria<string>,
 	): Promise<Expression<Transaction>> {
-		return {
+		const recipientExpression: Expression<Transaction> = {
 			op: "equal",
 			property: "to" as keyof Transaction,
 			value: criteria,
+		};
+
+		const multipaymentRecipientExpression: MultiPaymentExpression = {
+			op: "multiPayment",
+			property: "to",
+			value: criteria,
+		};
+
+		return {
+			op: "or",
+			expressions: [recipientExpression, multipaymentRecipientExpression],
 		};
 	}
 
