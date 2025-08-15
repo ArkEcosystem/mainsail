@@ -7,6 +7,7 @@ import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert, Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
+import { parseAbi, parseEventLogs } from "viem";
 
 import { getAccountByAddressOrPublicKey, getLegacyColdWallets } from "./utilities.js";
 
@@ -378,6 +379,32 @@ export class Snapshot {
 					if (transaction.data.to && transaction.data.value.isGreaterThan(0)) {
 						await negativeBalanceChange(receipt.sender, transaction.data.value);
 						await positiveBalanceChange(transaction.data.to, transaction.data.value);
+					}
+
+					// multipayment forwards value to recipients
+					const multiPaymentContract = this.sandbox.app.get<string>(
+						EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
+					);
+					if (transaction.data.to === multiPaymentContract) {
+						const paymentAbi = parseAbi([
+							"event Payment(address indexed recipient, uint256 amount, bool success)",
+						] as const);
+
+						const payments = parseEventLogs({
+							abi: paymentAbi,
+							logs: receipt.receipt.logs ?? [],
+							eventName: "Payment",
+						});
+
+						for (const payment of payments) {
+							const { recipient, amount, success } = payment.args;
+							if (!success) {
+								continue;
+							}
+
+							await negativeBalanceChange(multiPaymentContract, BigNumber.make(amount));
+							await positiveBalanceChange(recipient, BigNumber.make(amount));
+						}
 					}
 				}
 			}

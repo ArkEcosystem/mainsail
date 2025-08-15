@@ -5,6 +5,7 @@ import { decodeFunctionResult, encodeFunctionData, parseEther, toBytes, toHex, z
 import { default as DARK20 } from "./abis/DARK20.json" with { type: "json" };
 import { Context, EvmCallOptions } from "./types.js";
 import { buildSignedTransaction, getAddressByPublicKey } from "./utilities.js";
+import { MultiPaymentAbi } from "@mainsail/evm-contracts";
 
 export const makeEvmCall = async (
 	{ sandbox, wallets }: Context,
@@ -69,6 +70,13 @@ export const encodeErc20Transfer = (recipient: string, amount: number | string |
 		abi: DARK20.abi,
 		args: [recipient, amount],
 		functionName: "transfer",
+	}).slice(2);
+
+export const encodeMultiPayment = (recipients: string[], amounts: (number | string | bigint)[]): string =>
+	encodeFunctionData({
+		abi: MultiPaymentAbi.abi,
+		args: [recipients, amounts],
+		functionName: "pay",
 	}).slice(2);
 
 export const getErc20BalanceOf = async (
