@@ -1,4 +1,4 @@
-import { RepositoryDataSource, MultiPaymentRepository, MultiPaymentRepositoryExtension } from "../contracts.js";
+import { MultiPaymentRepository, MultiPaymentRepositoryExtension, RepositoryDataSource } from "../contracts.js";
 import { MultiPayment } from "../models/multi-payments.js";
 import { makeExtendedRepository } from "./repository-extension.js";
 

@@ -10,6 +10,7 @@ import { UsernamesAbi } from "@mainsail/evm-contracts";
 import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
+
 import { parseMultiPayments } from "./parsers/multi-payment.js";
 
 interface RestoreContext {
@@ -164,14 +165,14 @@ export class Restore {
 				legacyAddresses: new Set(),
 				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
 				mostRecentCommit,
+				multiPaymentRepository: this.multiPaymentRepositoryFactory(entityManager),
+
 				publicKeyToAddress: {},
 
 				receiptRepository: this.receiptRepositoryFactory(entityManager),
-
 				stateRepository: this.stateRepositoryFactory(entityManager),
 				totalSupply: BigNumber.ZERO,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
-				multiPaymentRepository: this.multiPaymentRepositoryFactory(entityManager),
 				userAttributes: {},
 				validatorAttributes: {},
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),

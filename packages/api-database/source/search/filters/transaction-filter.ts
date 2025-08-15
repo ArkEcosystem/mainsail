@@ -162,8 +162,8 @@ export class TransactionFilter {
 		};
 
 		return {
-			op: "or",
 			expressions: [recipientExpression, multipaymentRecipientExpression],
+			op: "or",
 		};
 	}
 

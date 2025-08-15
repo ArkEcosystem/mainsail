@@ -52,8 +52,8 @@ import {
 	makeValidatorRoundRepository,
 	makeWalletRepository,
 } from "./repositories/index.js";
-import { SnakeNamingStrategy } from "./utils/snake-naming-strategy.js";
 import { makeMultiPaymentRepository } from "./repositories/multi-payment-repository.js";
+import { SnakeNamingStrategy } from "./utils/snake-naming-strategy.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {

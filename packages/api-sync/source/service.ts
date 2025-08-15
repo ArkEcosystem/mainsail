@@ -11,8 +11,8 @@ import { BigNumber, chunk, formatEcdsaSignature, sleep, validatorSetPack } from 
 import { performance } from "perf_hooks";
 
 import { Listeners } from "./contracts.js";
-import { Restore } from "./restore.js";
 import { parseMultiPayments } from "./parsers/index.js";
+import { Restore } from "./restore.js";
 
 interface DeferredSync {
 	block: Models.Block;

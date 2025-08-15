@@ -15,20 +15,20 @@ export function parseMultiPayments(
 
 	const payments = parseEventLogs({
 		abi: paymentAbi,
-		logs: receipt.logs ?? [],
 		eventName: "Payment",
+		logs: receipt.logs ?? [],
 	});
 
 	return payments.map((payment, logIndex) => {
 		const { recipient, amount, success } = payment.args;
 
 		return {
+			amount: amount.toString(),
+			from: transaction.data.from,
 			hash: transaction.data.hash,
 			logIndex,
-			from: transaction.data.from,
-			to: recipient,
-			amount: amount.toString(),
 			success,
+			to: recipient,
 		};
 	});
 }

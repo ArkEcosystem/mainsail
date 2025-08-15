@@ -6,12 +6,12 @@ export const Identifiers = {
 	DataSource: Symbol.for("API<DataSource>"),
 	LegacyColdWalletRepositoryFactory: Symbol.for("API<Factory.LegacyColdWalletRepositoryFactory>"),
 	Migrations: Symbol.for("API<Migrations>"),
+	MultiPaymentRepositoryFactory: Symbol.for("API<Factory.MultiPaymentRepositoryFactory>"),
 	PeerRepositoryFactory: Symbol.for("API<Factory.PeerRepositoryFactory>"),
 	PluginRepositoryFactory: Symbol.for("API<Factory.PluginRepositoryFactory>"),
 	ReceiptRepositoryFactory: Symbol.for("API<Factory.ReceiptRepositoryFactory>"),
 	StateRepositoryFactory: Symbol.for("API<Factory.StateRepositoryFactory>"),
 	TransactionRepositoryFactory: Symbol.for("API<Factory.TransactionRepositoryFactory>"),
-	MultiPaymentRepositoryFactory: Symbol.for("API<Factory.MultiPaymentRepositoryFactory>"),
 	ValidatorRoundRepositoryFactory: Symbol.for("API<Factory.ValidatorRoundRepositoryFactory>"),
 	WalletRepositoryFactory: Symbol.for("API<Factory.WalletRepositoryFactory>"),
 };

@@ -1,11 +1,11 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
+import { MultiPaymentAbi } from "@mainsail/evm-contracts";
 import { decodeFunctionResult, encodeFunctionData, parseEther, toBytes, toHex, zeroAddress } from "viem";
 
 import { default as DARK20 } from "./abis/DARK20.json" with { type: "json" };
 import { Context, EvmCallOptions } from "./types.js";
 import { buildSignedTransaction, getAddressByPublicKey } from "./utilities.js";
-import { MultiPaymentAbi } from "@mainsail/evm-contracts";
 
 export const makeEvmCall = async (
 	{ sandbox, wallets }: Context,
