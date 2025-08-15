@@ -10,6 +10,7 @@ import {
 	ConfigurationRepository,
 	ContractRepository,
 	LegacyColdWalletRepository,
+	MultiPaymentRepository,
 	PeerRepository,
 	PluginRepository,
 	PostgresConnectionOptions,
@@ -28,6 +29,7 @@ import {
 	Configuration,
 	Contract,
 	LegacyColdWallet,
+	MultiPayment,
 	Peer,
 	Plugin,
 	Receipt,
@@ -51,6 +53,7 @@ import {
 	makeWalletRepository,
 } from "./repositories/index.js";
 import { SnakeNamingStrategy } from "./utils/snake-naming-strategy.js";
+import { makeMultiPaymentRepository } from "./repositories/multi-payment-repository.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -92,6 +95,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					Receipt,
 					State,
 					Transaction,
+					MultiPayment,
 					ValidatorRound,
 					Wallet,
 					LegacyColdWallet,
@@ -172,6 +176,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeTransactionRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind<() => MultiPaymentRepository>(Identifiers.MultiPaymentRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeMultiPaymentRepository(customDataSource ?? dataSource),
 				);
 
 			this.app

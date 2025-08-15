@@ -41,6 +41,9 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX receipts_contracts ON receipts(contract_address)
             WHERE contract_address IS NOT NULL;
 
+            CREATE INDEX multi_payments_hash_to ON multi_payments(hash, "to") WHERE success IS TRUE;
+            CREATE INDEX multi_payments_hash_from ON multi_payments(hash, "from") WHERE success IS TRUE;
+
             CREATE INDEX wallets_balance ON wallets(balance);
             CREATE INDEX wallets_attributes ON wallets using GIN(attributes);
             CREATE INDEX wallets_validators ON wallets ((attributes->>'validatorPublicKey'))
