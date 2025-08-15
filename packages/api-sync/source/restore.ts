@@ -581,8 +581,9 @@ export class Restore {
 				});
 
 				const transaction = this.#txLookup.get(receipt.txHash);
-				assert.defined(transaction);
-				multiPayments.push(...parseMultiPayments(multiPaymentContractAddress, transaction, receipt));
+				if (transaction) {
+					multiPayments.push(...parseMultiPayments(multiPaymentContractAddress, transaction, receipt));
+				}
 			}
 
 			for (const batch of chunk(receipts, 256)) {
