@@ -10,6 +10,7 @@ import { UsernamesAbi } from "@mainsail/evm-contracts";
 import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
+import { parseMultiPayments } from "./parsers/multi-payment.js";
 
 interface RestoreContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;
@@ -18,6 +19,7 @@ interface RestoreContext {
 	readonly contractRepository: ApiDatabaseContracts.ContractRepository;
 	readonly stateRepository: ApiDatabaseContracts.StateRepository;
 	readonly transactionRepository: ApiDatabaseContracts.TransactionRepository;
+	readonly multiPaymentRepository: ApiDatabaseContracts.MultiPaymentRepository;
 	readonly receiptRepository: ApiDatabaseContracts.ReceiptRepository;
 	readonly validatorRoundRepository: ApiDatabaseContracts.ValidatorRoundRepository;
 	readonly walletRepository: ApiDatabaseContracts.WalletRepository;
@@ -104,6 +106,9 @@ export class Restore {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.MultiPaymentRepositoryFactory)
+	private readonly multiPaymentRepositoryFactory!: ApiDatabaseContracts.MultiPaymentRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
 	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.ValidatorRoundRepositoryFactory;
 
@@ -125,6 +130,8 @@ export class Restore {
 	@inject(Identifiers.Snapshot.Legacy.Importer)
 	@optional()
 	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
+
+	#txLookup = new Map<string, Contracts.Crypto.Transaction>();
 
 	public async restore(): Promise<void> {
 		if (this.snapshotImporter) {
@@ -164,6 +171,7 @@ export class Restore {
 				stateRepository: this.stateRepositoryFactory(entityManager),
 				totalSupply: BigNumber.ZERO,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
+				multiPaymentRepository: this.multiPaymentRepositoryFactory(entityManager),
 				userAttributes: {},
 				validatorAttributes: {},
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
@@ -274,7 +282,10 @@ export class Restore {
 				}
 
 				// Handle transactions
-				for (const { data } of block.transactions) {
+				for (const transaction of block.transactions) {
+					this.#txLookup.set(transaction.hash, transaction);
+
+					const { data } = transaction;
 					const { senderPublicKey } = data;
 					if (!context.publicKeyToAddress[senderPublicKey]) {
 						const address = await this.addressFactory.fromPublicKey(senderPublicKey);
@@ -538,8 +549,14 @@ export class Restore {
 
 		let totalReceipts = 0;
 
+		const multiPaymentContractAddress = this.app.get<string>(
+			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
+		);
+
 		do {
 			const receipts: Models.Receipt[] = [];
+			const multiPayments: Models.MultiPayment[] = [];
+
 			const result = await this.evm.getReceipts(offset ?? 0n, BATCH_SIZE);
 
 			for (const receipt of result.receipts) {
@@ -561,10 +578,18 @@ export class Restore {
 					status: receipt.status,
 					transactionHash: receipt.txHash.slice(2),
 				});
+
+				const transaction = this.#txLookup.get(receipt.txHash);
+				assert.defined(transaction);
+				multiPayments.push(...parseMultiPayments(multiPaymentContractAddress, transaction, receipt));
 			}
 
 			for (const batch of chunk(receipts, 256)) {
 				await context.receiptRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
+			}
+
+			for (const batch of chunk(multiPayments, 256)) {
+				await context.multiPaymentRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
 			offset = result.nextOffset;
