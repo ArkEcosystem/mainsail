@@ -31,7 +31,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"chalk": "5.4.1",
+		"chalk": "5.5.0",
 		"cron": "4.1.0",
 		"date-fns": "4.1.0",
 		"deepmerge": "4.3.1",

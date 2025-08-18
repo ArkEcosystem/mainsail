@@ -57,7 +57,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			return this;
 		}
 
-		this.#logger = pino.default(
+		this.#logger = pino(
 			{
 				base: null,
 				customLevels: {
