@@ -577,7 +577,7 @@ export class Restore {
 					logs: receipt.logs,
 					output: receipt.output,
 					status: receipt.status,
-					transactionHash: receipt.txHash.slice(2),
+					transactionHash: receipt.txHash,
 				});
 
 				const transaction = this.#txLookup.get(receipt.txHash);

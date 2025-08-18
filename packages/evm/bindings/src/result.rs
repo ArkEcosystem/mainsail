@@ -410,7 +410,7 @@ impl JsGetReceipts {
                 let mut receipt = JsTransactionReceipt::new(tx_receipt);
 
                 receipt.block_number = Some(block_number.into());
-                receipt.tx_hash = Some(hash.to_string());
+                receipt.tx_hash = Some(format!("{:x}", hash));
 
                 mapped.push(receipt);
             }
