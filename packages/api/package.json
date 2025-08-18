@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/api",
-	"version": "0.0.1-evm.28",
+	"version": "0.0.1-rc.3",
 	"description": "API for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -16,9 +16,9 @@
 	],
 	"scripts": {
 		"api:devnet": "cross-env-shell MAINSAIL_PATH_CONFIG=./bin/config pnpm run mainsail-api api:run",
-		"build": "pnpm run clean && tsc",
+		"build": "tsc -b",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del distribution",
+		"clean": "del distribution && del tsconfig.tsbuildinfo",
 		"mainsail-api": "node ./bin/run.js",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",

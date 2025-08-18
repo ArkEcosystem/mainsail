@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { ProjectivePoint } from "@noble/secp256k1";
-import { Address, checksumAddress, getAddress, Hex, isAddress, keccak256, toBytes, toHex } from "viem";
+import { Keccak256, secp256k1 } from "bcrypto";
+import { Address, getAddress, Hex, isAddress, toBytes, toHex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 @injectable()
@@ -54,10 +54,36 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 			return privateKeyToAccount((publicKey.startsWith("0x") ? publicKey : `0x${publicKey}`) as Hex).address;
 		}
 
-		const point = ProjectivePoint.fromHex(publicKey.startsWith("0x") ? publicKey.slice(2) : publicKey);
-		const raw = point.toRawBytes(false).slice(1); // strip 0x04 prefix
-		const hash = keccak256(toHex(raw));
+		let publicKeyBytes = Buffer.from(publicKey, "hex");
+		if (publicKeyBytes.length === 33) {
+			publicKeyBytes = secp256k1.publicKeyConvert(publicKeyBytes, false);
+		}
 
-		return checksumAddress(`0x${hash.slice(-40)}`);
+		if (publicKeyBytes.length !== 65 || publicKeyBytes[0] !== 0x04) {
+			throw new Error("Invalid uncompressed public key");
+		}
+
+		const unprefixed = publicKeyBytes.subarray(1); // drop 0x04
+		const hash = Keccak256.digest(unprefixed);
+
+		return this.#toChecksumAddress(hash.slice(-20));
+	}
+
+	#toChecksumAddress(addressBytes: Buffer): Address {
+		const hexAddress = addressBytes.toString("hex");
+		const hash = Keccak256.digest(Buffer.from(hexAddress, "utf8"));
+
+		const address = hexAddress.split("");
+
+		for (let index = 0; index < 40; index += 2) {
+			if (hash[index >> 1] >> 4 >= 8 && address[index]) {
+				address[index] = address[index].toUpperCase();
+			}
+			if ((hash[index >> 1] & 0x0f) >= 8 && address[index + 1]) {
+				address[index + 1] = address[index + 1].toUpperCase();
+			}
+		}
+
+		return `0x${address.join("")}`;
 	}
 }

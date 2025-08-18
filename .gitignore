@@ -53,8 +53,8 @@ package-lock.json
 bundle.min.js
 
 # Build
-packages/**/dist/
 packages/**/distribution/
+packages/**/tsconfig.tsbuildinfo
 !packages/kernel/test/stubs/**
 
 # Microsoft Visual Studio settings
@@ -77,6 +77,10 @@ undefined
 tmp
 oclif.manifest.json
 npm-shrinkwrap.json
+
+# Github Copilot
+.github/copilot-instructions.md
+.github/chatmodes/
 
 # Transaction Pool
 transaction-pool.sqlite

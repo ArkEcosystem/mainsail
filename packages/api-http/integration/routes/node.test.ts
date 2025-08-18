@@ -94,7 +94,6 @@ describe<{
 			version: "0.0.1",
 		});
 
-		await apiContext.transactionTypeRepository.save(transactionTypes);
 		await apiContext.transactionRepository.save(
 			transactions.map((tx) => ({ ...tx, gasPrice: "5000000000", timestamp: Math.floor(new Date().getTime()) })),
 		);

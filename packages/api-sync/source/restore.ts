@@ -18,7 +18,6 @@ interface RestoreContext {
 	readonly contractRepository: ApiDatabaseContracts.ContractRepository;
 	readonly stateRepository: ApiDatabaseContracts.StateRepository;
 	readonly transactionRepository: ApiDatabaseContracts.TransactionRepository;
-	readonly transactionTypeRepository: ApiDatabaseContracts.TransactionTypeRepository;
 	readonly receiptRepository: ApiDatabaseContracts.ReceiptRepository;
 	readonly validatorRoundRepository: ApiDatabaseContracts.ValidatorRoundRepository;
 	readonly walletRepository: ApiDatabaseContracts.WalletRepository;
@@ -105,12 +104,6 @@ export class Restore {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
-	@inject(ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory)
-	private readonly transactionTypeRepositoryFactory!: ApiDatabaseContracts.TransactionTypeRepositoryFactory;
-
-	@inject(Identifiers.Transaction.Handler.Registry)
-	private readonly transactionHandlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
-
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
 	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.ValidatorRoundRepositoryFactory;
 
@@ -171,7 +164,6 @@ export class Restore {
 				stateRepository: this.stateRepositoryFactory(entityManager),
 				totalSupply: BigNumber.ZERO,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
-				transactionTypeRepository: this.transactionTypeRepositoryFactory(entityManager),
 				userAttributes: {},
 				validatorAttributes: {},
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
@@ -203,9 +195,6 @@ export class Restore {
 			// 6) All `validator_rounds` are read from the EVM storage and written to:
 			// - `validator_rounds` table
 			await this.#ingestValidatorRounds(context);
-
-			// 7) Write `transction_types` table
-			await this.#ingestTransactionTypes(context);
 
 			// 8) Write `configuration` table
 			await this.#ingestConfiguration(context);
@@ -633,25 +622,6 @@ export class Restore {
 
 		const t1 = performance.now();
 		this.logger.info(`Restored ${totalRounds.toLocaleString()} validator rounds in ${t1 - t0}ms`);
-	}
-
-	async #ingestTransactionTypes(context: RestoreContext): Promise<void> {
-		const transactionHandlers = await this.transactionHandlerRegistry.getActivatedHandlers();
-
-		const types: Models.TransactionType[] = [];
-
-		for (const handler of transactionHandlers) {
-			const constructor = handler.getConstructor();
-
-			const key: string | undefined = constructor.key;
-			assert.string(key);
-
-			types.push({ key, schema: constructor.getSchema().properties });
-		}
-
-		types.sort((a, b) => a.key.localeCompare(b.key, undefined, { sensitivity: "base" }));
-
-		await context.transactionTypeRepository.upsert(types, ["key"]);
 	}
 
 	async #ingestConfiguration(context: RestoreContext): Promise<void> {

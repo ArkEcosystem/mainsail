@@ -44,12 +44,6 @@ export class ApiContext {
 		)();
 	}
 
-	public get transactionTypeRepository(): ApiDatabaseContracts.TransactionTypeRepository {
-		return this.app.get<ApiDatabaseContracts.TransactionTypeRepositoryFactory>(
-			ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory,
-		)();
-	}
-
 	public get walletRepository(): ApiDatabaseContracts.WalletRepository {
 		return this.app.get<ApiDatabaseContracts.WalletRepositoryFactory>(
 			ApiDatabaseIdentifiers.WalletRepositoryFactory,
@@ -134,7 +128,6 @@ const setupDatabase = async (app: Application): Promise<CoreApiDatabase> => {
 		.discover("@mainsail/api-database", "@mainsail/api-database");
 
 	pluginConfiguration.merge({
-		enabled: true,
 		database: {
 			...databaseOptions,
 			applicationName: "mainsail/api-database-test",
@@ -143,6 +136,7 @@ const setupDatabase = async (app: Application): Promise<CoreApiDatabase> => {
 			migrationsRun: true,
 			synchronize: true,
 		},
+		enabled: true,
 	});
 
 	const database = app.resolve(CoreApiDatabase);
@@ -158,11 +152,11 @@ const setupHttp = async (app: Application): Promise<CoreApiHttp> => {
 		.discover("@mainsail/api-http", "@mainsail/api-http");
 
 	pluginConfiguration.merge({
-		enabled: false,
 		database: {
 			...databaseOptions,
 			applicationName: "mainsail/api-http-test",
 		},
+		enabled: false,
 		plugins: {
 			pagination: {
 				limit: 100,

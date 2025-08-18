@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-worker",
-	"version": "0.0.1-evm.28",
+	"version": "0.0.1-rc.3",
 	"description": "Crypto worker based on node child processes for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -10,9 +10,9 @@
 		"/distribution"
 	],
 	"scripts": {
-		"build": "pnpm run clean && tsc",
+		"build": "tsc -b",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del distribution",
+		"clean": "del distribution && del tsconfig.tsbuildinfo",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 -r=text -r=lcov --all pnpm run test",

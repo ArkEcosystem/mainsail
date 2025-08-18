@@ -1,5 +1,6 @@
-import { inject, injectable } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import { inject, injectable, tagged } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -31,8 +32,12 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
 
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "p2p")
+	private readonly configuration!: Providers.PluginConfiguration;
+
 	public async verify(peer: Contracts.P2P.Peer): Promise<boolean> {
-		if (process.env[Constants.EnvironmentVariables.MAINSAIL_SKIP_PEER_STATE_VERIFICATION] === "true") {
+		if (this.configuration.getRequired<boolean>("skipPeerStateVerification")) {
 			return true;
 		}
 

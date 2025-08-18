@@ -25,6 +25,7 @@ export const defaults = {
 		logLevel: Environment.get(Constants.EnvironmentVariables.MAINSAIL_NETWORK_NAME) === "devnet" ? 1 : 0,
 		port: Environment.get(Constants.EnvironmentVariables.MAINSAIL_P2P_PORT, 4002),
 	},
+	skipPeerStateVerification: Environment.isTrue(Constants.EnvironmentVariables.MAINSAIL_SKIP_PEER_STATE_VERIFICATION),
 	txPoolPort: Environment.get(Constants.EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_PORT, 4007),
 	verifyTimeout: 60_000,
 	whitelist: ["*"],

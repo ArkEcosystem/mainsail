@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-transaction",
-	"version": "0.0.1-evm.28",
+	"version": "0.0.1-rc.3",
 	"description": "Crypto transaction utilities for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -11,9 +11,9 @@
 		"/distribution"
 	],
 	"scripts": {
-		"build": "pnpm run clean && tsc",
+		"build": "tsc -b",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del distribution",
+		"clean": "del distribution && del tsconfig.tsbuildinfo",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 -r=text -r=lcov --all pnpm run test",
@@ -27,6 +27,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"ajv": "8.17.1",
+		"bcrypto": "5.5.2",
 		"viem": "2.33.1"
 	},
 	"devDependencies": {
