@@ -19,7 +19,7 @@ export const register = (server: Hapi.Server<any>): void => {
 			},
 			validate: {
 				query: Joi.object({
-					ip: Joi.string().ip({ version: ["ipv4", "ipV6"] }),
+					ip: Joi.string().ip({ version: ["ipv4", "ipv6"] }),
 					orderBy: orderBy,
 					version: Joi.string(),
 				}).concat(pagination),
@@ -34,7 +34,7 @@ export const register = (server: Hapi.Server<any>): void => {
 		options: {
 			validate: {
 				params: Joi.object({
-					ip: Joi.string().ip({ version: ["ipv4", "ipV6"] }),
+					ip: Joi.string().ip({ version: ["ipv4", "ipv6"] }),
 				}),
 			},
 		},

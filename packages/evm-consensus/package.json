@@ -27,7 +27,7 @@
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"viem": "2.33.1"
+		"viem": "2.34.0"
 	},
 	"devDependencies": {
 		"@types/seedrandom": "3.0.8",
