@@ -711,9 +711,9 @@ export class Restore {
 	}
 
 	async #readUsernames(wallets: Models.Wallet[]): Promise<Models.Wallet[]> {
-		const addressToWallet: Record<string, Models.Wallet> = wallets.reduce((prev, curr) => {
-			prev[curr.address] = curr;
-			return prev;
+		const addressToWallet: Record<string, Models.Wallet> = wallets.reduce((previous, current) => {
+			previous[current.address] = current;
+			return previous;
 		}, {});
 
 		const addresses = Object.keys(addressToWallet);
