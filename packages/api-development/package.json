@@ -23,7 +23,7 @@
 	},
 	"dependencies": {
 		"@hapi/boom": "10.0.1",
-		"@hapi/hapi": "21.4.0",
+		"@hapi/hapi": "21.4.3",
 		"@mainsail/api-common": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
@@ -31,10 +31,10 @@
 		"@mainsail/utils": "workspace:*",
 		"joi": "18.0.0",
 		"pretty-ms": "9.2.0",
-		"semver": "7.7.1"
+		"semver": "7.7.2"
 	},
 	"devDependencies": {
-		"@types/semver": "7.5.8",
+		"@types/semver": "7.7.0",
 		"uvu": "0.5.6"
 	},
 	"engines": {

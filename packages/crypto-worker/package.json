@@ -28,7 +28,7 @@
 		"joi": "18.0.0"
 	},
 	"devDependencies": {
-		"@types/chance": "1.1.6",
+		"@types/chance": "1.1.7",
 		"@types/fs-extra": "11.0.4",
 		"@types/lodash.clonedeep": "4.5.9",
 		"@types/tmp": "0.2.6",
