@@ -24,7 +24,6 @@ export function parseMultiPayments(
 
 		return {
 			amount: amount.toString(),
-			from: transaction.data.from,
 			hash: transaction.data.hash,
 			logIndex,
 			success,

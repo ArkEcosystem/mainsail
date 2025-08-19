@@ -20,12 +20,6 @@ export class MultiPayment {
 		nullable: false,
 		type: "citext",
 	})
-	public readonly from!: string;
-
-	@Column({
-		nullable: false,
-		type: "citext",
-	})
 	public readonly to!: string;
 
 	@Column({
