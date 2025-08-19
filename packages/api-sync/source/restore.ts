@@ -408,8 +408,6 @@ export class Restore {
 				const userAttributes = context.userAttributes[account.address];
 				const { legacyAttributes } = account;
 
-				const username = await this.#readUsername(account.address);
-
 				accounts.push({
 					address: account.address,
 					attributes: {
@@ -448,7 +446,6 @@ export class Restore {
 										: {}),
 								}
 							: {}),
-						...(username ? { username } : {}),
 						...(context.legacyAddresses.has(account.address)
 							? {
 									// all legacy non-cold wallets
@@ -477,7 +474,9 @@ export class Restore {
 			}
 
 			for (const batch of chunk(accounts, CHUNK_SIZE)) {
-				await context.walletRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
+				await this.#readUsernames(batch).then((batch) =>
+					context.walletRepository.createQueryBuilder().insert().orIgnore().values(batch).execute(),
+				);
 			}
 
 			offset = result.nextOffset;
@@ -711,11 +710,17 @@ export class Restore {
 		await context.entityManager.query("SELECT update_validator_ranks();", []);
 	}
 
-	async #readUsername(account: string): Promise<string | null> {
+	async #readUsernames(wallets: Models.Wallet[]): Promise<Models.Wallet[]> {
+		const addressToWallet: Record<string, Models.Wallet> = wallets.reduce((prev, curr) => {
+			prev[curr.address] = curr;
+			return prev;
+		}, {});
+
+		const addresses = Object.keys(addressToWallet);
 		const data = encodeFunctionData({
 			abi: UsernamesAbi.abi,
-			args: [account],
-			functionName: "getUsername",
+			args: [addresses],
+			functionName: "getUsernames",
 		}).slice(2);
 
 		const { evmSpec } = this.configuration.getMilestone(this.configuration.getGenesisHeight());
@@ -728,19 +733,31 @@ export class Restore {
 		});
 
 		if (!result.success) {
-			await this.app.terminate("getUsername failed");
+			await this.app.terminate("getUsernames failed");
 		}
 
-		const username = decodeFunctionResult({
+		const users = decodeFunctionResult({
 			abi: UsernamesAbi.abi,
 			data: toHex(result.output!),
-			functionName: "getUsername",
-		}) as string | undefined;
+			functionName: "getUsernames",
+		}) as Username[];
 
-		if (!username) {
-			return null;
+		for (const { addr, username } of users) {
+			const wallet = addressToWallet[addr];
+			assert.defined(wallet);
+			assert.defined(username);
+
+			wallet.attributes = {
+				username,
+				...wallet.attributes,
+			};
 		}
 
-		return username;
+		return wallets;
 	}
+}
+
+interface Username {
+	readonly addr: string;
+	readonly username: string;
 }
