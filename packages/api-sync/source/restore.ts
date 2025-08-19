@@ -236,11 +236,14 @@ export class Restore {
 		const genesisBlockNumber = this.configuration.getGenesisHeight();
 		let currentBlockNumber = genesisBlockNumber;
 
+		let ingestedBlocks = 0;
+		let ingestedTransactions = 0;
+
 		do {
-			const commits = this.databaseService.readCommits(
-				Math.min(currentBlockNumber, mostRecentCommit.block.header.number),
-				Math.min(currentBlockNumber + BATCH_SIZE, mostRecentCommit.block.header.number),
-			);
+			const fromBlockNumber = Math.min(currentBlockNumber, mostRecentCommit.block.header.number);
+			const toBlockNumber = Math.min(currentBlockNumber + BATCH_SIZE - 1, mostRecentCommit.block.header.number);
+
+			const commits = this.databaseService.readCommits(fromBlockNumber, toBlockNumber);
 
 			const blocks: Models.Block[] = [];
 			const transactions: Models.Transaction[] = [];
@@ -282,6 +285,8 @@ export class Restore {
 					validatorAttributes.lastBlock = block.header;
 				}
 
+				ingestedBlocks++;
+
 				// Handle transactions
 				for (const transaction of block.transactions) {
 					this.#txLookup.set(transaction.hash, transaction);
@@ -311,6 +316,8 @@ export class Restore {
 						transactionIndex: data.transactionIndex!,
 						value: data.value.toFixed(),
 					});
+
+					ingestedTransactions++;
 				}
 
 				context.lastBlockNumber = block.header.number;
@@ -327,13 +334,13 @@ export class Restore {
 			}
 
 			if (
-				currentBlockNumber % 10_000 === 0 ||
+				ingestedBlocks % (BATCH_SIZE * 10) === 0 ||
 				currentBlockNumber + BATCH_SIZE > mostRecentCommit.block.header.number
 			) {
 				const t1 = performance.now();
 
 				this.logger.info(
-					`Restored blocks: ${(context.lastBlockNumber - genesisBlockNumber + 1).toLocaleString()} elapsed: ${t1 - t0}ms`,
+					`Restored blocks: ${ingestedBlocks.toLocaleString()} transactions: ${ingestedTransactions.toLocaleString()} elapsed: ${t1 - t0}ms`,
 				);
 				await new Promise<void>((resolve) => setImmediate(resolve)); // Log might stuck if this line is removed
 			}
@@ -546,6 +553,7 @@ export class Restore {
 		const t0 = performance.now();
 
 		const BATCH_SIZE = 1000n;
+		const CHUNK_SIZE = 256;
 		let offset: bigint | undefined = 0n;
 
 		let totalReceipts = 0;
@@ -586,11 +594,11 @@ export class Restore {
 				}
 			}
 
-			for (const batch of chunk(receipts, 256)) {
+			for (const batch of chunk(receipts, CHUNK_SIZE)) {
 				await context.receiptRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
-			for (const batch of chunk(multiPayments, 256)) {
+			for (const batch of chunk(multiPayments, CHUNK_SIZE)) {
 				await context.multiPaymentRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
