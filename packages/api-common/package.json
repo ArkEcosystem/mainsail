@@ -31,7 +31,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"ajv": "8.17.1",
-		"joi": "17.13.3",
+		"joi": "18.0.0",
 		"nanomatch": "1.2.13",
 		"rate-limiter-flexible": "6.0.0"
 	},

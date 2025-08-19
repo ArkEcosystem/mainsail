@@ -41,7 +41,7 @@
 		"fs-extra": "11.3.0",
 		"ip": "2.0.1",
 		"ipaddr.js": "2.2.0",
-		"joi": "17.13.3",
+		"joi": "18.0.0",
 		"long": "5.3.1",
 		"protobufjs": "7.4.0",
 		"rate-limiter-flexible": "6.0.0",
