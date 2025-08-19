@@ -69,8 +69,8 @@
 		"sort-package-json": "3.4.0",
 		"tsx": "4.20.4",
 		"typedoc": "0.28.10",
-		"typescript": "5.8.2",
-		"typescript-eslint": "^8.26.1",
+		"typescript": "5.9.2",
+		"typescript-eslint": "^8.40.0",
 		"typesync": "0.14.3",
 		"yaml": "2.8.1"
 	},
