@@ -2,6 +2,8 @@ import Joi from "joi";
 
 const isSchema = (value: Joi.Schema | SchemaObject): value is Joi.Schema => Joi.isSchema(value);
 
+export const addressSchema = Joi.string().hex({ prefix: true }).length(42);
+
 // Criteria
 
 export type SchemaObject = {

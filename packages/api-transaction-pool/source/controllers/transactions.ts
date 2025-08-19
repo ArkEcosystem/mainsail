@@ -32,7 +32,24 @@ export class TransactionsController extends AbstractController {
 
 	public async unconfirmed(request: Hapi.Request) {
 		const pagination: Contracts.Api.Pagination = super.getListingPage(request);
-		const all: Contracts.Crypto.Transaction[] = await this.poolQuery.getFromHighestPriority().all();
+
+		const poolQuery = this.poolQuery.getFromHighestPriority();
+
+		if (request.query.from) {
+			poolQuery.wherePredicate(async (t) =>
+				Array.isArray(request.query.from)
+					? request.query.from.includes(t.data.from)
+					: request.query.from === t.data.from,
+			);
+		}
+
+		if (request.query.to) {
+			poolQuery.wherePredicate(async (t) =>
+				Array.isArray(request.query.to) ? request.query.to.includes(t.data.to) : request.query.to === t.data.to,
+			);
+		}
+
+		const all: Contracts.Crypto.Transaction[] = await poolQuery.all();
 		const transactions: Contracts.Crypto.Transaction[] = all.slice(
 			pagination.offset,
 			pagination.offset + pagination.limit,

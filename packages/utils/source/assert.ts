@@ -4,7 +4,20 @@ const assertType = (condition: boolean, description: string): asserts condition 
 	}
 };
 
-export const assert = {
+export type Assert = {
+	array<T>(value: unknown): asserts value is Array<T>;
+	bigint(value: unknown): asserts value is bigint;
+	boolean(value: unknown): asserts value is boolean;
+	buffer(value: unknown): asserts value is Buffer;
+	defined<T>(value: undefined | null | T): asserts value is NonNullable<T>;
+	number(value: unknown): asserts value is number;
+	object(value: unknown): asserts value is Record<string, any>;
+	string(value: unknown): asserts value is string;
+	symbol(value: unknown): asserts value is symbol;
+	undefined(value: unknown): asserts value is undefined;
+};
+
+export const assert: Assert = {
 	array: <T>(value: unknown): asserts value is Array<T> => assertType(Array.isArray(value), "array"),
 	bigint: (value: unknown): asserts value is bigint => assertType(typeof value === "bigint", "bigint"),
 	boolean: (value: unknown): asserts value is boolean => assertType(typeof value === "boolean", "boolean"),
