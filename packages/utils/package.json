@@ -35,17 +35,17 @@
 		"fast-sort": "3.4.1",
 		"ipaddr.js": "2.2.0",
 		"nanomatch": "1.2.13",
-		"type-fest": "4.37.0",
-		"viem": "2.33.1"
+		"type-fest": "4.41.0",
+		"viem": "2.34.0"
 	},
 	"devDependencies": {
 		"@hapi/boom": "10.0.1",
-		"@hapi/hapi": "21.4.0",
+		"@hapi/hapi": "21.4.3",
 		"big-number": "2.0.0",
-		"bignumber.js": "9.1.2",
-		"jsbi": "4.3.0",
+		"bignumber.js": "9.3.1",
+		"jsbi": "4.3.2",
 		"lodash": "4.17.21",
-		"micro-bmark": "0.4.0",
+		"micro-bmark": "0.4.2",
 		"pluralize": "8.0.0",
 		"uvu": "0.5.6"
 	},

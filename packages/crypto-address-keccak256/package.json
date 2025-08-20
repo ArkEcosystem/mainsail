@@ -27,7 +27,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"bcrypto": "5.5.2",
-		"viem": "2.33.1"
+		"viem": "2.34.0"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",

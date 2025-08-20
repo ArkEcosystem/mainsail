@@ -37,7 +37,7 @@
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"uvu": "0.5.6",
-		"viem": "2.33.1"
+		"viem": "2.34.0"
 	},
 	"engines": {
 		"node": ">=20.x"

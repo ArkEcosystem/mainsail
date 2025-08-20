@@ -1,5 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
+import { MultiPaymentAbi } from "@mainsail/evm-contracts";
 import { decodeFunctionResult, encodeFunctionData, parseEther, toBytes, toHex, zeroAddress } from "viem";
 
 import { default as DARK20 } from "./abis/DARK20.json" with { type: "json" };
@@ -69,6 +70,13 @@ export const encodeErc20Transfer = (recipient: string, amount: number | string |
 		abi: DARK20.abi,
 		args: [recipient, amount],
 		functionName: "transfer",
+	}).slice(2);
+
+export const encodeMultiPayment = (recipients: string[], amounts: (number | string | bigint)[]): string =>
+	encodeFunctionData({
+		abi: MultiPaymentAbi.abi,
+		args: [recipients, amounts],
+		functionName: "pay",
 	}).slice(2);
 
 export const getErc20BalanceOf = async (

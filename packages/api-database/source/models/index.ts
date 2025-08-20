@@ -3,6 +3,7 @@ export * from "./block.js";
 export * from "./configuration.js";
 export * from "./contract.js";
 export * from "./legacy-cold-wallet.js";
+export * from "./multi-payments.js";
 export * from "./peer.js";
 export * from "./plugin.js";
 export * from "./receipt.js";

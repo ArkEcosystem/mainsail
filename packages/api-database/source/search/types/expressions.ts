@@ -78,6 +78,12 @@ export type FunctionSigExpression<TEntity> = {
 	value: string;
 };
 
+export type MultiPaymentExpression = {
+	property: "from" | "to";
+	op: "multiPayment";
+	value: string;
+};
+
 export type Expression<TEntity> =
 	| TrueExpression
 	| FalseExpression
@@ -91,7 +97,8 @@ export type Expression<TEntity> =
 	| AndExpression<TEntity>
 	| OrExpression<TEntity>
 	| JsonbAttributeExists<TEntity>
-	| FunctionSigExpression<TEntity>;
+	| FunctionSigExpression<TEntity>
+	| MultiPaymentExpression;
 
 export type JsonFieldOperator = "->>";
 export type JsonFieldCastType = "bigint" | "numeric";
