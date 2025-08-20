@@ -6,6 +6,7 @@ import {
 	Configuration,
 	Contract,
 	LegacyColdWallet,
+	MultiPayment,
 	Peer,
 	Plugin,
 	Receipt,
@@ -86,6 +87,8 @@ export type TransactionRepositoryExtension = {
 };
 export type TransactionRepository = ExtendedRepository<Transaction> & TransactionRepositoryExtension;
 
+export type MultiPaymentRepositoryExtension = Record<string, any>;
+export type MultiPaymentRepository = ExtendedRepository<MultiPayment> & MultiPaymentRepositoryExtension;
 export type LegacyColdWalletRepositoryExtension = Record<string, any>;
 export type LegacyColdWalletRepository = ExtendedRepository<LegacyColdWallet> & LegacyColdWalletRepositoryExtension;
 export type ValidatorRoundRepositoryExtension = Record<string, any>;
@@ -128,6 +131,7 @@ export type ContractRepositoryFactory = (customDataSource?: RepositoryDataSource
 export type PeerRepositoryFactory = (customDataSource?: RepositoryDataSource) => PeerRepository;
 export type ReceiptRepositoryFactory = (customDataSource?: RepositoryDataSource) => ReceiptRepository;
 export type TransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => TransactionRepository;
+export type MultiPaymentRepositoryFactory = (customDataSource?: RepositoryDataSource) => MultiPaymentRepository;
 export type ValidatorRoundRepositoryFactory = (customDataSource?: RepositoryDataSource) => ValidatorRoundRepository;
 export type PluginRepositoryFactory = (customDataSource?: RepositoryDataSource) => PluginRepository;
 export type StateRepositoryFactory = (customDataSource?: RepositoryDataSource) => StateRepository;

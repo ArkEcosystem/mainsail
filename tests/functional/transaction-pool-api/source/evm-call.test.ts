@@ -1,4 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { describe, Sandbox } from "@mainsail/test-framework";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
 import { setup, shutdown } from "./setup.js";
@@ -440,5 +441,31 @@ describe<{
 
 		assert.true(await isTransactionCommitted(context, tx1));
 		assert.false(await isTransactionCommitted(context, tx2));
+	});
+
+	it("should accept and commit multi payment call", async (context) => {
+		const randomWallet1 = await Utils.getRandomColdWallet(context);
+		const randomWallet2 = await Utils.getRandomColdWallet(context);
+
+		const multiPaymentContract = context.sandbox.app.get<string>(
+			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
+		);
+
+		const recipients = [randomWallet1.address, randomWallet2.address];
+
+		const amounts = [parseEther("1"), parseEther("2")];
+
+		const tx = await EvmCalls.makeEvmCall(context, {
+			gasLimit: 200_000,
+			recipient: multiPaymentContract,
+			payload: EvmCalls.encodeMultiPayment(recipients, amounts),
+			value: amounts.reduce((acc, val) => acc + val, 0n),
+		});
+
+		const { accept } = await addTransactionsToPool(context, [tx]);
+		assert.equal(accept, [0]);
+
+		await waitBlock(context);
+		assert.true(await isTransactionCommitted(context, tx));
 	});
 });

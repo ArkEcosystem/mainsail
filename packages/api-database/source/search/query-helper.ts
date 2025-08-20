@@ -144,6 +144,20 @@ export class QueryHelper<TEntity> {
 				const parameters = { [parameter]: expression.value };
 				return { parameters, query };
 			}
+			case "multiPayment": {
+				const column = `"${expression.property}"`;
+				const parameter = `p${this.paramNo++}`;
+				const query = `EXISTS(
+					SELECT 1 FROM multi_payments AS mp
+					WHERE
+						mp.hash = "Transaction"."hash"
+					AND	mp.${column} = :${parameter}
+					AND mp.success = true
+				)`;
+
+				const parameters = { [parameter]: expression.value };
+				return { parameters, query };
+			}
 			default: {
 				throw new Error(`Unexpected expression`);
 			}
