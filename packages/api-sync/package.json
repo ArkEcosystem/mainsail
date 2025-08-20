@@ -29,8 +29,8 @@
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"joi": "17.13.3",
-		"viem": "2.33.1"
+		"joi": "18.0.0",
+		"viem": "2.34.0"
 	},
 	"devDependencies": {
 		"uvu": "0.5.6"

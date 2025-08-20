@@ -9,7 +9,7 @@
 		"esModuleInterop": true,
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,
-		"lib": ["es2021"],
+		"lib": ["ES2023"],
 		"module": "nodenext",
 		"moduleResolution": "nodenext",
 		"newLine": "lf",
@@ -25,7 +25,7 @@
 		"sourceMap": true,
 		"strict": true,
 		"stripInternal": true,
-		"target": "es2021",
+		"target": "es2023",
 		"typeRoots": ["reflect-metadata", "node_modules/@types"],
 		"useUnknownInCatchVariables": false
 	},

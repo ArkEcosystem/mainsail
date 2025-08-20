@@ -29,7 +29,7 @@ import { readdirSync, lstatSync } from "fs";
 const EXCEPTIONS = {
 	"@mainsail/api": {
 		dependencies: ["@mainsail/logger-pino", "@mainsail/validation", "@mainsail/api-database", "@mainsail/api-http"],
-		devDependencies: [],
+		devDependencies: ["cross-env"],
 	},
 	"@mainsail/configuration-generator": {
 		dependencies: [
@@ -111,7 +111,7 @@ const EXCEPTIONS = {
 			"@mainsail/validator",
 			"@mainsail/webhooks",
 		],
-		devDependencies: [],
+		devDependencies: ["cross-env"],
 	},
 	"@mainsail/crypto-key-pair-bls12-381": {
 		dependencies: ["@chainsafe/blst"],

@@ -98,7 +98,9 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 					.items(
 						Joi.object().keys({
 							ip: Joi.string()
-								.ip({ version: ["ipv4", "ipV6"] })
+								.ip({
+									version: ["ipv4", "ipv6"],
+								})
 								.required(),
 							port: Joi.number().port().required(),
 						}),
