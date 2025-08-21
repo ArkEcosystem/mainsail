@@ -7,11 +7,6 @@ import { ProposerCalculator } from "./proposer-calculator.js";
 import { RoundCalculator } from "./round-calculator.js";
 import { TimestampCalculator } from "./timestamp-calculator.js";
 
-export { formatCurrency } from "./format-currency.js";
-export { getBlockNotChainedErrorMessage, isBlockChained } from "./is-block-chained.js";
-export { isMajority } from "./is-majority.js";
-export { isMinority } from "./is-minority.js";
-
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
