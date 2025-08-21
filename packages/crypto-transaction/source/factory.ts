@@ -34,11 +34,11 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
 
 	public async fromHex(hex: string): Promise<Contracts.Crypto.Transaction> {
-		return this.#fromSerialized(hex);
+		return this.#fromSerialized(Buffer.from(hex, "hex"));
 	}
 
 	public async fromBytes(buff: Buffer, strict = true): Promise<Contracts.Crypto.Transaction> {
-		return this.#fromSerialized(buff.toString("hex"), strict);
+		return this.#fromSerialized(buff, strict);
 	}
 
 	public async fromJson(json: Contracts.Crypto.TransactionJson): Promise<Contracts.Crypto.Transaction> {
@@ -62,7 +62,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		return this.fromBytes(transaction.serialized, strict);
 	}
 
-	async #fromSerialized(serialized: string, strict = true): Promise<Contracts.Crypto.Transaction> {
+	async #fromSerialized(serialized: Buffer, strict = true): Promise<Contracts.Crypto.Transaction> {
 		try {
 			const transaction = await this.deserializer.deserialize(serialized);
 

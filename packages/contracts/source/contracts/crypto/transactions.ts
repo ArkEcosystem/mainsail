@@ -97,7 +97,7 @@ export interface TransactionSerializer {
 }
 
 export interface TransactionDeserializer {
-	deserialize(serialized: string | Buffer): Promise<Transaction>;
+	deserialize(serialized: Buffer): Promise<Transaction>;
 }
 
 export interface TransactionFactory {
