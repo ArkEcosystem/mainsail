@@ -142,6 +142,9 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 					throw new Exceptions.TransactionSchemaError(computed.schemaError);
 				}
 
+				transaction.data.data = transaction.data.data.startsWith("0x")
+					? transaction.data.data.slice(2)
+					: transaction.data.data;
 				transaction.data.hash = computed.hash;
 				transaction.data.from = computed.address;
 				transaction.data.senderPublicKey = computed.publicKey;
