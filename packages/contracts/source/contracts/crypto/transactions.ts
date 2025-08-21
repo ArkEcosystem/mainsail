@@ -75,6 +75,14 @@ export interface SerializeOptions {
 	// TODO: consider passing pre-allocated buffer
 }
 
+export interface TransactionCryptoData {
+	readonly hash: string;
+	readonly publicKey: string;
+	readonly address: string;
+	readonly legacyAddress?: string;
+	readonly schemaError?: any;
+}
+
 export interface TransactionServiceProvider {
 	register(): Promise<void>;
 }
@@ -97,7 +105,7 @@ export interface TransactionSerializer {
 }
 
 export interface TransactionDeserializer {
-	deserialize(serialized: string | Buffer): Promise<Transaction>;
+	deserialize(serialized: Buffer): Promise<Transaction>;
 }
 
 export interface TransactionFactory {
@@ -108,6 +116,8 @@ export interface TransactionFactory {
 	fromJson(json: TransactionJson): Promise<Transaction>;
 
 	fromData(data: TransactionData, strict?: boolean): Promise<Transaction>;
+
+	computeCryptoData(data: TransactionData): Promise<TransactionCryptoData>;
 }
 
 export type TransactionConstructor = any;

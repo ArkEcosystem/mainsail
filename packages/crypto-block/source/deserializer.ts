@@ -1,6 +1,6 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
+import { inject, injectable, optional } from "@mainsail/container";
+import { Contracts, Exceptions, Identifiers, Utils } from "@mainsail/contracts";
 import { TransactionFactory } from "@mainsail/crypto-transaction";
 import { ByteBuffer, sleep } from "@mainsail/utils";
 
@@ -14,11 +14,18 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: TransactionFactory;
 
+	@inject(Identifiers.Cryptography.Transaction.Deserializer)
+	private readonly transactionDeserializer!: Contracts.Crypto.TransactionDeserializer;
+
 	@inject(Identifiers.Cryptography.Serializer)
 	private readonly serializer!: Contracts.Serializer.Serializer;
 
 	@inject(Identifiers.Cryptography.Block.HeaderSize)
 	private readonly headerSize!: () => number;
+
+	@inject(Identifiers.CryptoWorker.WorkerPool)
+	@optional()
+	private readonly workerPool: Contracts.Crypto.WorkerPool | undefined;
 
 	public async deserializeHeader(serialized: Buffer): Promise<Contracts.Crypto.BlockHeader> {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
@@ -120,20 +127,45 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 		 * We keep this behaviour out of the (de)serialiser because it
 		 * is very specific to this bit of code in this specific class.
 		 */
-		const transactions: Contracts.Crypto.Transaction[] = [];
+		const transactions: Contracts.Crypto.Transaction[] = new Array(block.transactionsCount);
 
-		for (let index = 0; index < block.transactions.length; index++) {
-			if (index % 20 === 0) {
-				await sleep(0);
-			}
+		await Promise.all(
+			block.transactions.map(async (serialized, index) => {
+				const transaction = await this.transactionDeserializer.deserialize(serialized as any);
 
-			const transaction = await this.transactionFactory.fromBytes(block.transactions[index] as any);
+				if (index % 20 === 0) {
+					await sleep(0);
+				}
 
-			transactions.push(transaction);
+				const computed = await this.#computeCryptoData(transaction.data);
+				if (computed.schemaError) {
+					throw new Exceptions.TransactionSchemaError(computed.schemaError);
+				}
 
-			block.transactions[index] = transaction.data;
-		}
+				transaction.data.data = transaction.data.data.startsWith("0x")
+					? transaction.data.data.slice(2)
+					: transaction.data.data;
+				transaction.data.hash = computed.hash;
+				transaction.data.from = computed.address;
+				transaction.data.senderPublicKey = computed.publicKey;
+				transaction.data.senderLegacyAddress = computed.legacyAddress;
+
+				transactions[index] = transaction;
+				block.transactions[index] = transaction.data;
+			}),
+		);
 
 		return transactions;
+	}
+
+	async #computeCryptoData(
+		transaction: Contracts.Crypto.TransactionData,
+	): Promise<Contracts.Crypto.TransactionCryptoData> {
+		if (this.workerPool) {
+			const worker = await this.workerPool.getWorker();
+			return worker.transactionFactory("computeCryptoData", transaction);
+		}
+
+		return this.transactionFactory.computeCryptoData(transaction);
 	}
 }

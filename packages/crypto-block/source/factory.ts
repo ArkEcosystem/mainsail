@@ -98,12 +98,11 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 			if (match === null) {
 				fatal = true;
 			} else {
-				const txIndex = match[1];
-
 				if (data.transactions) {
+					const txIndex = Number(match[1]);
 					const tx = data.transactions[txIndex];
 
-					if (tx.id === undefined) {
+					if (tx.hash === undefined) {
 						fatal = true;
 					}
 				}

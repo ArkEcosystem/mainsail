@@ -1,6 +1,6 @@
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { assert } from "@mainsail/utils";
+import { assert, BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
@@ -34,11 +34,11 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
 
 	public async fromHex(hex: string): Promise<Contracts.Crypto.Transaction> {
-		return this.#fromSerialized(hex);
+		return this.#fromSerialized(Buffer.from(hex, "hex"));
 	}
 
 	public async fromBytes(buff: Buffer, strict = true): Promise<Contracts.Crypto.Transaction> {
-		return this.#fromSerialized(buff.toString("hex"), strict);
+		return this.#fromSerialized(buff, strict);
 	}
 
 	public async fromJson(json: Contracts.Crypto.TransactionJson): Promise<Contracts.Crypto.Transaction> {
@@ -62,38 +62,66 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		return this.fromBytes(transaction.serialized, strict);
 	}
 
-	async #fromSerialized(serialized: string, strict = true): Promise<Contracts.Crypto.Transaction> {
+	public async computeCryptoData(
+		data: Contracts.Crypto.TransactionData,
+		strict = true,
+	): Promise<Contracts.Crypto.TransactionCryptoData> {
+		assert.number(data.v);
+		assert.string(data.r);
+		assert.string(data.s);
+
+		// Passing via IPC converts BigNumber to '{ value: bigint }'
+		if ("value" in data.value) {
+			data.value = BigNumber.make(data.value["value"]);
+		}
+
+		if ("value" in data.nonce) {
+			data.nonce = BigNumber.make(data.nonce["value"]);
+		}
+
+		const hash = await this.utils.toHash(data, {
+			excludeSignature: true,
+		});
+
+		const publicKey = this.signatureSerializer.recoverPublicKey(hash, {
+			r: data.r,
+			s: data.s,
+			v: data.v,
+		});
+
+		const address = await this.addressFactory.fromPublicKey(publicKey);
+
+		let legacyAddress: string | undefined;
+		if (this.legacyAddressFactory) {
+			legacyAddress = await this.legacyAddressFactory.fromPublicKey(publicKey);
+		}
+
+		const signedHash = await this.utils.toHash(data, {
+			excludeSignature: false,
+		});
+
+		// Assign to pass schema check
+		data.hash = signedHash.toString("hex");
+		data.from = address;
+		data.senderPublicKey = publicKey;
+		data.senderLegacyAddress = legacyAddress;
+
+		const { error } = await this.verifier.verifySchema(data, strict);
+
+		return {
+			address,
+			hash: data.hash,
+			legacyAddress,
+			publicKey,
+			schemaError: error,
+		};
+	}
+
+	async #fromSerialized(serialized: Buffer, strict = true): Promise<Contracts.Crypto.Transaction> {
 		try {
 			const transaction = await this.deserializer.deserialize(serialized);
 
-			assert.number(transaction.data.v);
-			assert.string(transaction.data.r);
-			assert.string(transaction.data.s);
-
-			const hash = await this.utils.toHash(transaction.data, {
-				excludeSignature: true,
-			});
-
-			transaction.data.senderPublicKey = this.signatureSerializer.recoverPublicKey(hash, {
-				r: transaction.data.r,
-				s: transaction.data.s,
-				v: transaction.data.v,
-			});
-			transaction.data.from = await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey);
-
-			if (this.legacyAddressFactory) {
-				transaction.data.senderLegacyAddress = await this.legacyAddressFactory.fromPublicKey(
-					transaction.data.senderPublicKey,
-				);
-			}
-
-			transaction.data.hash = await this.utils.getHash(transaction);
-
-			const { error } = await this.verifier.verifySchema(transaction.data, strict);
-
-			if (error) {
-				throw new Exceptions.TransactionSchemaError(error);
-			}
+			await this.computeCryptoData(transaction.data, strict);
 
 			return transaction;
 		} catch (error) {

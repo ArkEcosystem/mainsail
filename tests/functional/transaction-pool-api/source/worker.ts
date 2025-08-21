@@ -6,8 +6,8 @@ export class Worker implements Contracts.Crypto.WorkerScriptHandler {
 	// @inject(Identifiers.Cryptography.Block.Factory)
 	// private readonly blockFactoryImp!: Contracts.Crypto.BlockFactory;
 
-	// @inject(Identifiers.Cryptography.Transaction.Factory)
-	// private readonly transactionFactoryImp!: Contracts.Crypto.TransactionFactory;
+	@inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactoryImp!: Contracts.Crypto.TransactionFactory;
 
 	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "consensus")
@@ -50,7 +50,7 @@ export class Worker implements Contracts.Crypto.WorkerScriptHandler {
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.TransactionFactory[K]>
 	): Promise<ReturnType<Contracts.Crypto.TransactionFactory[K]>> {
-		throw new Error("Method transactionFactory not implemented.");
+		return this.#call(this.transactionFactoryImp, method, arguments_);
 	}
 
 	public async publicKeyFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.PublicKeyFactory>>(
