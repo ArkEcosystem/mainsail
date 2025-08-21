@@ -3,4 +3,3 @@ export { getBlockNotChainedErrorMessage, isBlockChained } from "./is-block-chain
 export { isMajority } from "./is-majority.js";
 export { isMinority } from "./is-minority.js";
 export { ServiceProvider } from "./service-provider.js";
-
