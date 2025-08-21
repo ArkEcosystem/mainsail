@@ -109,10 +109,10 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		const { error } = await this.verifier.verifySchema(data, strict);
 
 		return {
-			hash: data.hash,
-			publicKey,
 			address,
+			hash: data.hash,
 			legacyAddress,
+			publicKey,
 			schemaError: error,
 		};
 	}
