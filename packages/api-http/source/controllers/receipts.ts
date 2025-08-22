@@ -55,10 +55,10 @@ export class ReceiptsController extends Controller {
 
 			if (criteria.from) {
 				[queryReceipts, queryTotalCount].forEach((query) =>
-					query.innerJoin(Models.Wallet, "wallet", "transaction.from = wallet.address").andWhere(
+					query.andWhere(
 						new ApiDatabaseContracts.Brackets((qb) => {
-							qb.where("wallet.publicKey = :from", { from: criteria.from }).orWhere(
-								"wallet.address = :from",
+							qb.where("transaction.senderPublicKey = :from", { from: criteria.from }).orWhere(
+								"transaction.from = :from",
 								{
 									from: criteria.from,
 								},
@@ -120,11 +120,14 @@ export class ReceiptsController extends Controller {
 			.where("receipt.contractAddress IS NOT NULL");
 
 		if (criteria.from) {
-			query.innerJoin(Models.Wallet, "wallet", "transaction.from = wallet.address").andWhere(
+			query.andWhere(
 				new ApiDatabaseContracts.Brackets((qb) => {
-					qb.where("wallet.publicKey = :from", { from: criteria.from }).orWhere("wallet.address = :from", {
-						from: criteria.from,
-					});
+					qb.where("transaction.senderPublicKey = :from", { from: criteria.from }).orWhere(
+						"transaction.from = :from",
+						{
+							from: criteria.from,
+						},
+					);
 				}),
 			);
 		}
