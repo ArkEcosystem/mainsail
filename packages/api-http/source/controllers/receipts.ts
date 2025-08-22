@@ -1,4 +1,3 @@
-import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Models, Search } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
@@ -30,11 +29,11 @@ export class ReceiptsController extends Controller {
 				.select("COUNT(1) AS total_count");
 
 			if (criteria.transactionHash) {
-				[queryReceipts, queryTotalCount].forEach((query) =>
+				for (const query of [queryReceipts, queryTotalCount]) {
 					query.andWhere("receipt.transactionHash = :transactionHash", {
 						transactionHash: criteria.transactionHash,
-					}),
-				);
+					});
+				}
 			}
 
 			// Add join to count query conditionally
@@ -48,13 +47,13 @@ export class ReceiptsController extends Controller {
 
 			// in this context, recipient always refers to a contract
 			if (criteria.to) {
-				[queryReceipts, queryTotalCount].forEach((query) =>
-					query.andWhere("transaction.to = :to", { to: criteria.to }),
-				);
+				for (const query of [queryReceipts, queryTotalCount]) {
+					query.andWhere("transaction.to = :to", { to: criteria.to });
+				}
 			}
 
 			if (criteria.from) {
-				[queryReceipts, queryTotalCount].forEach((query) =>
+				for (const query of [queryReceipts, queryTotalCount]) {
 					query.andWhere(
 						new ApiDatabaseContracts.Brackets((qb) => {
 							qb.where("transaction.senderPublicKey = :from", { from: criteria.from }).orWhere(
@@ -64,8 +63,8 @@ export class ReceiptsController extends Controller {
 								},
 							);
 						}),
-					),
-				);
+					);
+				}
 			}
 
 			const [receipts, totalCount] = await Promise.all([
