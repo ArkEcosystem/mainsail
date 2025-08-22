@@ -99,7 +99,10 @@ describe<{
 
 		for (const { transactionHash, statusCode: expectedStatusCode = 200, result } of testCases) {
 			try {
-				const { statusCode, data } = await request(`/receipts/${transactionHash}`, options);
+				const {
+					statusCode,
+					data: { data },
+				} = await request(`/receipts/${transactionHash}`, options);
 				assert.equal(statusCode, expectedStatusCode);
 				assert.equal(data, result);
 			} catch (ex) {
