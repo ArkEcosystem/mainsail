@@ -102,11 +102,7 @@ export class ReceiptsController extends Controller {
 			.where("receipt.transactionHash = :transactionHash", { transactionHash: request.params.transactionHash })
 			.getOne();
 
-		if (!receipt) {
-			return Boom.notFound();
-		}
-
-		return this.toResource(receipt, ReceiptResource);
+		return this.respondWithResource(receipt, ReceiptResource);
 	}
 
 	public async contracts(request: Hapi.Request) {
