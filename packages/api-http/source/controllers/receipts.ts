@@ -13,46 +13,86 @@ export class ReceiptsController extends Controller {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.ReceiptCriteria = request.query;
 
-		const query = this.receiptRepositoryFactory()
-			.createQueryBuilder("receipt")
-			.select(this.getReceiptColumns(request.query.fullReceipt))
-			.innerJoin(Models.Transaction, "transaction", "receipt.transactionHash = transaction.hash");
+		const queryRunner = this.receiptRepositoryFactory().manager.connection.createQueryRunner("slave");
 
-		if (criteria.transactionHash) {
-			query.andWhere("receipt.transactionHash = :transactionHash", { transactionHash: criteria.transactionHash });
-		}
+		try {
+			await queryRunner.startTransaction("REPEATABLE READ");
 
-		// in this context, recipient always refers to a contract
-		if (criteria.to) {
-			query.andWhere("transaction.to = :to", { to: criteria.to });
-		}
+			const queryReceipts = this.receiptRepositoryFactory()
+				.createQueryBuilder("receipt")
+				.setQueryRunner(queryRunner)
+				.select(this.getReceiptColumns(request.query.fullReceipt))
+				.innerJoin(Models.Transaction, "transaction", "receipt.transactionHash = transaction.hash");
 
-		if (criteria.from) {
-			query.innerJoin(Models.Wallet, "wallet", "transaction.from = wallet.address").andWhere(
-				new ApiDatabaseContracts.Brackets((qb) => {
-					qb.where("wallet.publicKey = :from", { from: criteria.from }).orWhere("wallet.address = :from", {
-						from: criteria.from,
-					});
-				}),
+			const queryTotalCount = this.receiptRepositoryFactory()
+				.createQueryBuilder("receipt")
+				.setQueryRunner(queryRunner)
+				.select("COUNT(1) AS total_count");
+
+			if (criteria.transactionHash) {
+				[queryReceipts, queryTotalCount].forEach((query) =>
+					query.andWhere("receipt.transactionHash = :transactionHash", {
+						transactionHash: criteria.transactionHash,
+					}),
+				);
+			}
+
+			// Add join to count query conditionally
+			if (criteria.to || criteria.from) {
+				queryTotalCount.innerJoin(
+					Models.Transaction,
+					"transaction",
+					"receipt.transactionHash = transaction.hash",
+				);
+			}
+
+			// in this context, recipient always refers to a contract
+			if (criteria.to) {
+				[queryReceipts, queryTotalCount].forEach((query) =>
+					query.andWhere("transaction.to = :to", { to: criteria.to }),
+				);
+			}
+
+			if (criteria.from) {
+				[queryReceipts, queryTotalCount].forEach((query) =>
+					query.innerJoin(Models.Wallet, "wallet", "transaction.from = wallet.address").andWhere(
+						new ApiDatabaseContracts.Brackets((qb) => {
+							qb.where("wallet.publicKey = :from", { from: criteria.from }).orWhere(
+								"wallet.address = :from",
+								{
+									from: criteria.from,
+								},
+							);
+						}),
+					),
+				);
+			}
+
+			const [receipts, totalCount] = await Promise.all([
+				queryReceipts
+					.orderBy("transaction.blockNumber", "DESC")
+					.addOrderBy("transaction.transactionIndex", "DESC")
+					.offset(pagination.offset)
+					.limit(pagination.limit)
+					.select()
+					.getMany(),
+				queryTotalCount.getRawOne().then((row) => Number.parseFloat(row["total_count"])),
+			]);
+
+			return this.toPagination(
+				{
+					meta: { totalCountIsEstimate: false },
+					results: receipts,
+					totalCount,
+				},
+				ReceiptResource,
 			);
+		} catch (ex) {
+			await queryRunner.rollbackTransaction();
+			throw ex;
+		} finally {
+			await queryRunner.release();
 		}
-
-		const [receipts, totalCount] = await query
-			.orderBy("transaction.blockNumber", "DESC")
-			.addOrderBy("transaction.transactionIndex", "DESC")
-			.offset(pagination.offset)
-			.limit(pagination.limit)
-			.select()
-			.getManyAndCount();
-
-		return this.toPagination(
-			{
-				meta: { totalCountIsEstimate: false },
-				results: receipts,
-				totalCount,
-			},
-			ReceiptResource,
-		);
 	}
 
 	public async show(request: Hapi.Request) {
