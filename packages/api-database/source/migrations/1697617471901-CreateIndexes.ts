@@ -41,6 +41,15 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX receipts_contracts ON receipts(contract_address)
             WHERE contract_address IS NOT NULL;
 
+            -- optimization for receipt table joins
+            CREATE INDEX transactions_from_block_number_tx_index_hash
+            ON transactions ("from", block_number DESC, transaction_index DESC)
+            INCLUDE (hash);
+
+            CREATE INDEX transactions_sender_public_key_block_number_tx_index_hash
+            ON transactions (sender_public_key, block_number DESC, transaction_index DESC)
+            INCLUDE (hash);
+
             CREATE INDEX multi_payments_hash_to ON multi_payments(hash, "to") WHERE success IS TRUE;
 
             CREATE INDEX wallets_balance ON wallets(balance);
@@ -88,6 +97,8 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 
             DROP INDEX receipts_block_height;
             DROP INDEX receipts_contracts;
+            DROP INDEX transactions_from_block_number_tx_index_hash;
+            DROP INDEX transactions_sender_public_key_block_number_tx_index_hash;
 
             DROP INDEX wallets_balance;
             DROP INDEX wallets_attributes;
