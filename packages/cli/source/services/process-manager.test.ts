@@ -63,6 +63,23 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
+	it("#list - should return an empty array if stdout is not string", ({ processManager }) => {
+		// Arrange...
+		const spySync = stub(execa, "sync").returnValue({
+			failed: false,
+			stderr: undefined,
+			stdout: [],
+		});
+
+		// Act...
+		const processes: ProcessDescription[] | undefined = processManager.list();
+
+		// Assert...
+		assert.array(processes);
+		assert.empty(processes);
+		spySync.calledWith("pm2 jlist", { shell: true });
+	});
+
 	it("#list - should return an empty array if an exception is thrown", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").callsFake(() => {
