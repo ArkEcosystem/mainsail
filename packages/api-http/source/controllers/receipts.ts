@@ -53,17 +53,9 @@ export class ReceiptsController extends Controller {
 			}
 
 			if (criteria.from) {
+				const [where, params] = this.#inferSenderWhereClause(criteria.from.toString());
 				for (const query of [queryReceipts, queryTotalCount]) {
-					query.andWhere(
-						new TypeOrm.Brackets((qb) => {
-							qb.where("transaction.senderPublicKey = :from", { from: criteria.from }).orWhere(
-								"transaction.from = :from",
-								{
-									from: criteria.from,
-								},
-							);
-						}),
-					);
+					query.andWhere(where, params);
 				}
 			}
 
@@ -115,16 +107,8 @@ export class ReceiptsController extends Controller {
 			.where("receipt.contractAddress IS NOT NULL");
 
 		if (criteria.from) {
-			query.andWhere(
-				new TypeOrm.Brackets((qb) => {
-					qb.where("transaction.senderPublicKey = :from", { from: criteria.from }).orWhere(
-						"transaction.from = :from",
-						{
-							from: criteria.from,
-						},
-					);
-				}),
-			);
+			const [where, params] = this.#inferSenderWhereClause(criteria.from.toString());
+			query.andWhere(where, params);
 		}
 
 		const [receipts, totalCount] = await query
@@ -149,5 +133,12 @@ export class ReceiptsController extends Controller {
 		return {
 			estimateTotalCount: false,
 		};
+	}
+
+	#inferSenderWhereClause(from: string): [string, TypeOrm.ObjectLiteral] {
+		const likelyAddress = from.startsWith("0x") && from.length === 42;
+		return likelyAddress
+			? ["transaction.from = :from", { from }]
+			: ["transaction.senderPublicKey = :from", { from }];
 	}
 }

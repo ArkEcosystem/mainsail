@@ -60,6 +60,10 @@ describe<{
 				result: receiptsResult,
 			},
 			{
+				query: `?from=${receiptTransactions[0].from}`,
+				result: receiptsResult,
+			},
+			{
 				query: `?to=${receipts[1].contractAddress}`,
 				result: [receiptsResult[0]],
 			},
@@ -128,6 +132,10 @@ describe<{
 			},
 			{
 				query: `?from=${receiptTransactions[0].senderPublicKey}`,
+				result: [receiptsResult[1]],
+			},
+			{
+				query: `?from=${receiptTransactions[0].from}`,
 				result: [receiptsResult[1]],
 			},
 			{
