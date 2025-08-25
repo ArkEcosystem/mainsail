@@ -53,9 +53,9 @@ export class ReceiptsController extends Controller {
 			}
 
 			if (criteria.from) {
-				const [where, params] = this.#inferSenderWhereClause(criteria.from.toString());
+				const [where, parameters] = this.#inferSenderWhereClause(criteria.from.toString());
 				for (const query of [queryReceipts, queryTotalCount]) {
-					query.andWhere(where, params);
+					query.andWhere(where, parameters);
 				}
 			}
 
@@ -107,8 +107,8 @@ export class ReceiptsController extends Controller {
 			.where("receipt.contractAddress IS NOT NULL");
 
 		if (criteria.from) {
-			const [where, params] = this.#inferSenderWhereClause(criteria.from.toString());
-			query.andWhere(where, params);
+			const [where, parameters] = this.#inferSenderWhereClause(criteria.from.toString());
+			query.andWhere(where, parameters);
 		}
 
 		const [receipts, totalCount] = await query
