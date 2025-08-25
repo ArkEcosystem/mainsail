@@ -6,7 +6,7 @@ import { Installer } from "./installer";
 
 describe<{
 	installer: Installer;
-}>("Installer", ({ beforeEach, afterAll, it, spy, stub, assert }) => {
+}>("Installer", ({ beforeEach, afterAll, it, stub, assert }) => {
 	beforeEach((context) => {
 		const cli = new Console();
 
@@ -77,6 +77,35 @@ describe<{
 		spyInstallRangeLatest.calledWith("somepkg", "^1.0.0");
 	});
 
+	it("#installPeerDependencies - should update only peer dependency with different version", ({ installer }) => {
+		const spyInstallRangeLatest = stub(installer, "installRangeLatest");
+
+		const spySync = stub(execa, "sync")
+			.returnValueOnce({
+				exitCode: 0,
+				stdout: JSON.stringify({ pm2: "5.5.0", somepkg: "^1.0.0" }),
+			})
+			.returnValue({
+				exitCode: 0,
+				stdout: JSON.stringify([
+					{
+						dependencies: {
+							pm2: "4.5.0",
+							somepkg: "^1.0.0"
+						}
+					}
+				]),
+			});
+
+		installer.installPeerDependencies("@mainsail/core", "3.0.0");
+
+		spySync.calledWith("pnpm info @mainsail/core@3.0.0 peerDependencies --json", {
+			shell: true,
+		});
+
+		spyInstallRangeLatest.calledWith("pm2", "5.5.0");
+	});
+
 	it("#installPeerDependencies - should not install peer dependencies when there aren't any", ({ installer }) => {
 		const spyInstallRangeLatest = stub(installer, "installRangeLatest");
 
@@ -94,13 +123,31 @@ describe<{
 		spyInstallRangeLatest.neverCalled();
 	});
 
-	it("#installPeerDependencies - should throw error when yarn command fails", ({ installer }) => {
+	it("#installPeerDependencies - should throw error when pnpm info command fails", ({ installer }) => {
 		const spySync = stub(execa, "sync").returnValue({
 			exitCode: 1,
 			stderr: "stderr",
 		});
 
-		assert.throws(() => installer.installPeerDependencies("@mainsail/core"), "stderr");
+		assert.throws(() => installer.installPeerDependencies("@mainsail/core"), `"pnpm info @mainsail/core@latest peerDependencies --json" exited with code 1`);
+
+		spySync.calledWith("pnpm info @mainsail/core@latest peerDependencies --json", {
+			shell: true,
+		});
+	});
+
+	it("#installPeerDependencies - should throw error when pnpm list command fails", ({ installer }) => {
+		const spySync = stub(execa, "sync")
+		.returnValueNth(0, {
+			exitCode: 0,
+			stdout: "",
+		})
+		.returnValueNth(1,{
+			exitCode: 1,
+			stderr: "stderr",
+		});
+
+		assert.throws(() => installer.installPeerDependencies("@mainsail/core"), `"pnpm list -g --json" exited with code 1`);
 
 		spySync.calledWith("pnpm info @mainsail/core@latest peerDependencies --json", {
 			shell: true,
