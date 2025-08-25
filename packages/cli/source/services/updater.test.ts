@@ -23,6 +23,24 @@ describe<{
 
 	afterAll(() => nock.enableNetConnect());
 
+	it("#logStatus - should render update message if update is available", async ({ cli, updater }) => {
+		stub(updater, "check").resolvedValue(true);
+		const spyWarning = spy(cli.app.get(Identifiers.Warning), "render");
+
+		await updater.logStatus();
+
+		spyWarning.calledOnce();
+	});
+
+	it("#logStatus - should not render update message if update is not available", async ({ cli, updater }) => {
+		stub(updater, "check").resolvedValue(false);
+		const spyWarning = spy(cli.app.get(Identifiers.Warning), "render");
+
+		await updater.logStatus();
+
+		spyWarning.neverCalled();
+	});
+
 	it("#check - should return false if the latest version cannot be retrieved", async ({ cli, updater }) => {
 		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, {});
 
@@ -47,6 +65,22 @@ describe<{
 		config.set("lastUpdateCheck", Date.now());
 
 		assert.false(await updater.check());
+	});
+
+	it("#check - should check if the last check has been within the last 24 hours ago", async ({
+		config,
+		updater,
+	}) => {
+		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, versionNext);
+		const spyConfigSet = spy(config, "set");
+
+		config.set("latestVersion", versionNext);
+		config.set("lastUpdateCheck", Date.now() - 1000 * 60 * 60 * 24);
+
+		assert.false(await updater.check());
+
+		spyConfigSet.called();
+		spyConfigSet.calledWith("lastUpdateCheck");
 	});
 
 	it("#check - should return true if a new version is available", async ({ config, updater }) => {
