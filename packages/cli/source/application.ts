@@ -1,5 +1,4 @@
 import { Contracts } from "@mainsail/contracts";
-import { tmpdir } from "os";
 // eslint-disable-next-line unicorn/import-style
 import { resolve } from "path";
 
@@ -53,9 +52,5 @@ export class Application {
 		const path: string = this.get<Paths>(Identifiers.ConsolePaths)[type];
 
 		return resolve(file ? `${path}/${file}` : path);
-	}
-
-	public dataPath(): string {
-		return tmpdir();
 	}
 }
