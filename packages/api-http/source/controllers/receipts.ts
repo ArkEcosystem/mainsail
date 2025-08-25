@@ -1,5 +1,5 @@
 import Hapi from "@hapi/hapi";
-import { Contracts as ApiDatabaseContracts, Models, Search } from "@mainsail/api-database";
+import { Models, Search, TypeOrm } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
@@ -55,7 +55,7 @@ export class ReceiptsController extends Controller {
 			if (criteria.from) {
 				for (const query of [queryReceipts, queryTotalCount]) {
 					query.andWhere(
-						new ApiDatabaseContracts.Brackets((qb) => {
+						new TypeOrm.Brackets((qb) => {
 							qb.where("transaction.senderPublicKey = :from", { from: criteria.from }).orWhere(
 								"transaction.from = :from",
 								{
@@ -116,7 +116,7 @@ export class ReceiptsController extends Controller {
 
 		if (criteria.from) {
 			query.andWhere(
-				new ApiDatabaseContracts.Brackets((qb) => {
+				new TypeOrm.Brackets((qb) => {
 					qb.where("transaction.senderPublicKey = :from", { from: criteria.from }).orWhere(
 						"transaction.from = :from",
 						{

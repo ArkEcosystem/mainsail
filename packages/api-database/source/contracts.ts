@@ -138,7 +138,6 @@ export type StateRepositoryFactory = (customDataSource?: RepositoryDataSource) =
 export type WalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => WalletRepository;
 export type LegacyColdWalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => LegacyColdWalletRepository;
 
-export { Brackets, Entity, Repository } from "typeorm";
 export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
 
 export interface Migrations {

@@ -2,6 +2,7 @@ import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
+	TypeOrm,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events } from "@mainsail/contracts";
@@ -42,7 +43,7 @@ export class Peers extends AbstractListener<Contracts.P2P.Peer, Models.Peer> {
 
 	protected makeEntityRepository(
 		dataSource: ApiDatabaseContracts.RepositoryDataSource,
-	): ApiDatabaseContracts.Repository<Models.Peer> {
+	): TypeOrm.Repository<Models.Peer> {
 		return this.peerRepositoryFactory(dataSource);
 	}
 }
