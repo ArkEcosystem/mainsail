@@ -37,17 +37,12 @@ describe<{ DiscoverCommands; cmd: DiscoverCommands }>("DiscoverCommands", ({ bef
 		assert.equal(Object.keys(commands).length, 0);
 	});
 
-	// TODO: Fix this test, prepare hidden.js & visible.js as ESM packages
-	it.skip("#from - should discover commands within the given packages", async ({ cmd }) => {
+	it("#from - should discover commands within the given packages", async ({ cmd }) => {
 		const commandPath: string = resolve(import.meta.dirname, "../../test", "./pkg_distribution");
-
-		console.log(commandPath);
 
 		const commands = await cmd.from([commandPath]);
 
-		console.log(commands);
-
 		assert.object(commands);
-		assert.true(Object.keys(commands).includes("help"));
+		assert.true(Object.keys(commands).includes("version"));
 	});
 });
