@@ -57,7 +57,12 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 			await queryRunner.startTransaction("REPEATABLE READ");
 
 			try {
-				const resultsQueryBuilder = this.createQueryBuilder().setQueryRunner(queryRunner).select();
+				const resultsQueryBuilder = this.createQueryBuilder().setQueryRunner(queryRunner);
+
+				if (options?.selection) {
+					resultsQueryBuilder.select(options.selection);
+				}
+
 				this.addWhere(resultsQueryBuilder, expression);
 				this.addOrderBy(resultsQueryBuilder, sorting);
 				this.addSkipOffset(resultsQueryBuilder, pagination);

@@ -6,7 +6,6 @@ import {
 	Search,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
 
 import { PeerResource } from "../resources/peer.js";
 import { Controller } from "./controller.js";
@@ -43,7 +42,7 @@ export class PeersController extends Controller {
 		return this.respondWithResource(peer, PeerResource);
 	}
 
-	protected getListingOptions(): Contracts.Api.Options {
+	protected getListingOptions(): Search.Options {
 		return {
 			estimateTotalCount: false,
 		};

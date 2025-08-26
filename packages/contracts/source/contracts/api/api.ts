@@ -31,11 +31,6 @@ export type Pagination = {
 	limit: number;
 };
 
-export type Options = {
-	estimateTotalCount?: boolean;
-	selection?: string[];
-};
-
 export type ResultsPage<T> = {
 	results: T[];
 	totalCount: number;
