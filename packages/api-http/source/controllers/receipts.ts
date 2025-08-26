@@ -3,8 +3,8 @@ import Hapi from "@hapi/hapi";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
-	Models,
 	Search,
+	TypeOrm,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
@@ -35,13 +35,8 @@ export class ReceiptsController extends Controller {
 		}
 
 		if (criteria.from) {
-			query.innerJoin(Models.Wallet, "wallet", "transaction.from = wallet.address").andWhere(
-				new ApiDatabaseContracts.Brackets((qb) => {
-					qb.where("wallet.publicKey = :from", { from: criteria.from }).orWhere("wallet.address = :from", {
-						from: criteria.from,
-					});
-				}),
-			);
+			const [where, params] = this.#inferSenderWhereClause(criteria.from.toString());
+			query.andWhere(where, params);
 		}
 
 		const [receipts, totalCount] = await query
@@ -86,13 +81,8 @@ export class ReceiptsController extends Controller {
 			.where("transaction.deployedContractAddress IS NOT NULL");
 
 		if (criteria.from) {
-			query.innerJoin(Models.Wallet, "wallet", "transaction.from = wallet.address").andWhere(
-				new ApiDatabaseContracts.Brackets((qb) => {
-					qb.where("wallet.publicKey = :from", { from: criteria.from }).orWhere("wallet.address = :from", {
-						from: criteria.from,
-					});
-				}),
-			);
+			const [where, params] = this.#inferSenderWhereClause(criteria.from.toString());
+			query.andWhere(where, params);
 		}
 
 		const [receipts, totalCount] = await query
@@ -117,6 +107,13 @@ export class ReceiptsController extends Controller {
 		return {
 			estimateTotalCount: false,
 		};
+	}
+
+	#inferSenderWhereClause(from: string): [string, TypeOrm.ObjectLiteral] {
+		const likelyAddress = from.startsWith("0x") && from.length === 42;
+		return likelyAddress
+			? ["transaction.from = :from", { from }]
+			: ["transaction.senderPublicKey = :from", { from }];
 	}
 
 	#getReceiptColumns(fullReceipt?: boolean): string[] {
