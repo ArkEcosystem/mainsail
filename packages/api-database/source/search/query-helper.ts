@@ -14,7 +14,7 @@ export class QueryHelper<TEntity> {
 		metadata: EntityMetadata,
 		property: keyof TEntity,
 		jsonFieldAccessor?: JsonFieldAccessor,
-	): string {
+	): { name: string; isNullable: boolean } {
 		const column = metadata.columns.find((c) => c.propertyName === property);
 		if (!column) {
 			throw new Error(`Can't find ${String(property)} column`);
@@ -49,15 +49,15 @@ export class QueryHelper<TEntity> {
 				fullFieldPath = `(${fullFieldPath})::${jsonFieldAccessor.cast}`;
 			}
 
-			return fullFieldPath;
+			return { name: fullFieldPath, isNullable: true };
 		}
 
 		// Escape reserved keyword
 		if (["to", "from"].includes(column.databaseName)) {
-			return `"${column.databaseName}"`;
+			return { name: `"${column.databaseName}"`, isNullable: column.isNullable };
 		}
 
-		return column.databaseName;
+		return { name: column.databaseName, isNullable: column.isNullable };
 	}
 
 	public getWhereExpressionSql(metadata: EntityMetadata, expression: Expression<TEntity>): SqlExpression {
@@ -71,14 +71,14 @@ export class QueryHelper<TEntity> {
 			case "equal": {
 				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
 				const parameter = `p${this.paramNo++}`;
-				const query = `${column} = :${parameter}`;
+				const query = `${column.name} = :${parameter}`;
 				const parameters = { [parameter]: expression.value };
 				return { parameters, query };
 			}
 			case "notEqual": {
 				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
 				const parameter = `p${this.paramNo++}`;
-				const query = `${column} <> :${parameter}`;
+				const query = `${column.name} <> :${parameter}`;
 				const parameters = { [parameter]: expression.value };
 				return { parameters, query };
 			}
@@ -86,35 +86,35 @@ export class QueryHelper<TEntity> {
 				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
 				const parameterFrom = `p${this.paramNo++}`;
 				const parameterTo = `p${this.paramNo++}`;
-				const query = `${column} BETWEEN :${parameterFrom} AND :${parameterTo}`;
+				const query = `${column.name} BETWEEN :${parameterFrom} AND :${parameterTo}`;
 				const parameters = { [parameterFrom]: expression.from, [parameterTo]: expression.to };
 				return { parameters, query };
 			}
 			case "greaterThanEqual": {
 				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
 				const parameter = `p${this.paramNo++}`;
-				const query = `${column} >= :${parameter}`;
+				const query = `${column.name} >= :${parameter}`;
 				const parameters = { [parameter]: expression.value };
 				return { parameters, query };
 			}
 			case "lessThanEqual": {
 				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
 				const parameter = `p${this.paramNo++}`;
-				const query = `${column} <= :${parameter}`;
+				const query = `${column.name} <= :${parameter}`;
 				const parameters = { [parameter]: expression.value };
 				return { parameters, query };
 			}
 			case "like": {
 				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
 				const parameter = `p${this.paramNo++}`;
-				const query = `${column} LIKE :${parameter}`;
+				const query = `${column.name} LIKE :${parameter}`;
 				const parameters = { [parameter]: expression.pattern };
 				return { parameters, query };
 			}
 			case "contains": {
 				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
 				const parameter = `p${this.paramNo++}`;
-				const query = `${column} @> :${parameter}`;
+				const query = `${column.name} @> :${parameter}`;
 				const parameters = { [parameter]: expression.value };
 				return { parameters, query };
 			}
@@ -133,14 +133,14 @@ export class QueryHelper<TEntity> {
 			case "jsonbAttributeExists": {
 				const column = this.getColumnName(metadata, expression.property);
 				const parameter = `p${this.paramNo++}`;
-				const query = `${column} ? :${parameter}`;
+				const query = `${column.name} ? :${parameter}`;
 				const parameters = { [parameter]: expression.attribute };
 				return { parameters, query };
 			}
 			case "functionSig": {
 				const column = this.getColumnName(metadata, expression.property);
 				const parameter = `p${this.paramNo++}`;
-				const query = `SUBSTRING(${column} FROM 1 FOR 4) = :${parameter}`;
+				const query = `SUBSTRING(${column.name} FROM 1 FOR 4) = :${parameter}`;
 				const parameters = { [parameter]: expression.value };
 				return { parameters, query };
 			}

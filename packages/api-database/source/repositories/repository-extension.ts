@@ -19,11 +19,19 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 				sorting[0].property,
 				sorting[0].jsonFieldAccessor,
 			);
-			queryBuilder.orderBy(column, sorting[0].direction === "desc" ? "DESC" : "ASC", "NULLS LAST");
+			queryBuilder.orderBy(
+				column.name,
+				sorting[0].direction === "desc" ? "DESC" : "ASC",
+				column.isNullable ? "NULLS LAST" : undefined,
+			);
 
 			for (const item of sorting.slice(1)) {
 				const column = this.queryHelper.getColumnName(this.metadata, item.property, item.jsonFieldAccessor);
-				queryBuilder.addOrderBy(column, item.direction === "desc" ? "DESC" : "ASC", "NULLS LAST");
+				queryBuilder.addOrderBy(
+					column.name,
+					item.direction === "desc" ? "DESC" : "ASC",
+					column.isNullable ? "NULLS LAST" : undefined,
+				);
 			}
 		}
 	},
