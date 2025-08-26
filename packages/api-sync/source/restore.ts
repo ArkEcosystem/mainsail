@@ -302,24 +302,33 @@ export class Restore {
 						data: data.data,
 						from: data.from,
 						gas: data.gasLimit,
+						// Receipt data
+						deployedContractAddress: receipt.contractAddress,
+
 						gasPrice: data.gasPrice,
+
+						gasRefunded: Number(receipt.gasRefunded),
+
 						hash: data.hash,
+
+						gasUsed: Number(receipt.gasUsed),
+
 						legacySecondSignature: data.legacySecondSignature,
+
+						logs: receipt.logs,
+
 						nonce: data.nonce.toFixed(),
+
+						output: receipt.output,
+
 						senderPublicKey: data.senderPublicKey,
+
 						signature: formatEcdsaSignature(data.r!, data.s!, data.v!),
+						status: receipt.status,
 						timestamp: block.header.timestamp.toFixed(),
 						to: data.to,
 						transactionIndex: data.transactionIndex!,
 						value: data.value.toFixed(),
-
-						// Receipt data
-						deployedContractAddress: receipt.contractAddress,
-						gasRefunded: Number(receipt.gasRefunded),
-						gasUsed: Number(receipt.gasUsed),
-						logs: receipt.logs,
-						output: receipt.output,
-						status: receipt.status,
 					});
 
 					multiPayments.push(...parseMultiPayments(multiPaymentContractAddress, transaction, receipt));

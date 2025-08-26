@@ -49,15 +49,15 @@ export class QueryHelper<TEntity> {
 				fullFieldPath = `(${fullFieldPath})::${jsonFieldAccessor.cast}`;
 			}
 
-			return { name: fullFieldPath, isNullable: true };
+			return { isNullable: true, name: fullFieldPath };
 		}
 
 		// Escape reserved keyword
 		if (["to", "from"].includes(column.databaseName)) {
-			return { name: `"${column.databaseName}"`, isNullable: column.isNullable };
+			return { isNullable: column.isNullable, name: `"${column.databaseName}"` };
 		}
 
-		return { name: column.databaseName, isNullable: column.isNullable };
+		return { isNullable: column.isNullable, name: column.databaseName };
 	}
 
 	public getWhereExpressionSql(metadata: EntityMetadata, expression: Expression<TEntity>): SqlExpression {

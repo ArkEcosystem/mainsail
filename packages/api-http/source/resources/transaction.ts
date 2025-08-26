@@ -44,12 +44,10 @@ export class TransactionResource implements Contracts.Api.Resource {
 
 			...(resource.legacySecondSignature ? { legacySecondSignature: resource.legacySecondSignature } : {}),
 
-			timestamp: resource.timestamp ? resource.timestamp : undefined,
-
 			receipt: {
-				status: resource.status,
 				gasRefunded: resource.gasRefunded,
 				gasUsed: resource.gasUsed,
+				status: resource.status,
 				...(resource.deployedContractAddress
 					? { deployedContractAddress: resource.deployedContractAddress }
 					: {}),
@@ -60,6 +58,8 @@ export class TransactionResource implements Contracts.Api.Resource {
 						}
 					: {}),
 			},
+
+			timestamp: resource.timestamp ? resource.timestamp : undefined,
 		};
 	}
 }

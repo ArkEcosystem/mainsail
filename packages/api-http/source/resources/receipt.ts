@@ -10,14 +10,14 @@ export class ReceiptResource implements Contracts.Api.Resource {
 
 	public transform(resource: Models.Transaction): object {
 		return {
-			transactionHash: resource.hash,
-			status: resource.status,
 			blockNumber: resource.blockNumber,
-			gasUsed: resource.gasUsed,
-			gasRefunded: resource.gasRefunded,
 			contractAddress: resource.deployedContractAddress,
+			gasRefunded: resource.gasRefunded,
+			gasUsed: resource.gasUsed,
 			logs: resource.logs,
 			output: resource.output,
+			status: resource.status,
+			transactionHash: resource.hash,
 		};
 	}
 }
