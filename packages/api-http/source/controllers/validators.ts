@@ -5,6 +5,7 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 	Search,
+	TypeOrm,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
@@ -111,7 +112,7 @@ export class ValidatorsController extends Controller {
 			.where("attributes ? :validatorPublicKey", { validatorPublicKey: "validatorPublicKey" })
 			.andWhere("attributes->>:validatorPublicKey <> ''", { validatorPublicKey: "validatorPublicKey" })
 			.andWhere(
-				new ApiDatabaseContracts.Brackets((query) => {
+				new TypeOrm.Brackets((query) => {
 					query
 						.where("address = :address", { address: walletId })
 						.orWhere("public_key = :publicKey", { publicKey: walletId })

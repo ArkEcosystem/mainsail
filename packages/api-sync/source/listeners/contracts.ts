@@ -2,6 +2,7 @@ import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
+	TypeOrm,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events } from "@mainsail/contracts";
@@ -35,7 +36,7 @@ export class DeployerContracts extends AbstractListener<Contracts.Evm.DeployerCo
 
 	protected makeEntityRepository(
 		dataSource: ApiDatabaseContracts.RepositoryDataSource,
-	): ApiDatabaseContracts.Repository<Models.Contract> {
+	): TypeOrm.Repository<Models.Contract> {
 		return this.contractRepositoryFactory(dataSource);
 	}
 }
