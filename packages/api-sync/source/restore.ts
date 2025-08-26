@@ -21,7 +21,6 @@ interface RestoreContext {
 	readonly stateRepository: ApiDatabaseContracts.StateRepository;
 	readonly transactionRepository: ApiDatabaseContracts.TransactionRepository;
 	readonly multiPaymentRepository: ApiDatabaseContracts.MultiPaymentRepository;
-	readonly receiptRepository: ApiDatabaseContracts.ReceiptRepository;
 	readonly validatorRoundRepository: ApiDatabaseContracts.ValidatorRoundRepository;
 	readonly walletRepository: ApiDatabaseContracts.WalletRepository;
 	readonly legacyColdWalletRepository: ApiDatabaseContracts.LegacyColdWalletRepository;
@@ -98,9 +97,6 @@ export class Restore {
 	@inject(ApiDatabaseIdentifiers.ContractRepositoryFactory)
 	private readonly contractRepositoryFactory!: ApiDatabaseContracts.ContractRepositoryFactory;
 
-	@inject(ApiDatabaseIdentifiers.ReceiptRepositoryFactory)
-	private readonly receiptRepositoryFactory!: ApiDatabaseContracts.ReceiptRepositoryFactory;
-
 	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
 	private readonly stateRepositoryFactory!: ApiDatabaseContracts.StateRepositoryFactory;
 
@@ -131,8 +127,6 @@ export class Restore {
 	@inject(Identifiers.Snapshot.Legacy.Importer)
 	@optional()
 	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
-
-	#txLookup = new Map<string, Contracts.Crypto.Transaction>();
 
 	public async restore(): Promise<void> {
 		if (this.snapshotImporter) {
@@ -169,7 +163,6 @@ export class Restore {
 
 				publicKeyToAddress: {},
 
-				receiptRepository: this.receiptRepositoryFactory(entityManager),
 				stateRepository: this.stateRepositoryFactory(entityManager),
 				totalSupply: BigNumber.ZERO,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
@@ -197,24 +190,20 @@ export class Restore {
 			// - `wallets` table
 			await this.#ingestWallets(context);
 
-			// 5) All `receipts` are read from the EVM storage and written to:
-			// - `receipts` table
-			await this.#ingestReceipts(context);
-
-			// 6) All `validator_rounds` are read from the EVM storage and written to:
+			// 5) All `validator_rounds` are read from the EVM storage and written to:
 			// - `validator_rounds` table
 			await this.#ingestValidatorRounds(context);
 
-			// 8) Write `configuration` table
+			// 6) Write `configuration` table
 			await this.#ingestConfiguration(context);
 
-			// 9) Write `state` table
+			// 7) Write `state` table
 			await this.#ingestState(context);
 
-			// 10) Write `contracts` table
+			// 8) Write `contracts` table
 			await this.#ingestContracts(context);
 
-			// 11) Update validator ranks
+			// 9) Update validator ranks
 			await this.#updateValidatorRanks(context);
 
 			restoredHeight = context.lastBlockNumber;
@@ -239,6 +228,10 @@ export class Restore {
 		let ingestedBlocks = 0;
 		let ingestedTransactions = 0;
 
+		const multiPaymentContractAddress = this.app.get<string>(
+			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
+		);
+
 		do {
 			const fromBlockNumber = Math.min(currentBlockNumber, mostRecentCommit.block.header.number);
 			const toBlockNumber = Math.min(currentBlockNumber + BATCH_SIZE - 1, mostRecentCommit.block.header.number);
@@ -247,6 +240,7 @@ export class Restore {
 
 			const blocks: Models.Block[] = [];
 			const transactions: Models.Transaction[] = [];
+			const multiPayments: Models.MultiPayment[] = [];
 
 			for await (const { proof, block } of commits) {
 				blocks.push({
@@ -288,8 +282,11 @@ export class Restore {
 				ingestedBlocks++;
 
 				// Handle transactions
+				const receipts = await this.evm.getReceiptsByBlockNumber(BigInt(block.header.number));
+
 				for (const transaction of block.transactions) {
-					this.#txLookup.set(transaction.hash, transaction);
+					const receipt = receipts[transaction.hash];
+					assert.defined(receipt);
 
 					const { data } = transaction;
 					const { senderPublicKey } = data;
@@ -315,7 +312,17 @@ export class Restore {
 						to: data.to,
 						transactionIndex: data.transactionIndex!,
 						value: data.value.toFixed(),
+
+						// Receipt data
+						deployedContractAddress: receipt.contractAddress,
+						gasRefunded: Number(receipt.gasRefunded),
+						gasUsed: Number(receipt.gasUsed),
+						logs: receipt.logs,
+						output: receipt.output,
+						status: receipt.status,
 					});
+
+					multiPayments.push(...parseMultiPayments(multiPaymentContractAddress, transaction, receipt));
 
 					ingestedTransactions++;
 				}
@@ -331,6 +338,10 @@ export class Restore {
 			// batch insert 'transactions' separately from 'blocks', given that we will be consistent at the end of the db transaction anyway.
 			for (const batch of chunk(transactions, CHUNK_SIZE)) {
 				await transactionRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
+			}
+
+			for (const batch of chunk(multiPayments, CHUNK_SIZE)) {
+				await context.multiPaymentRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
 			if (
@@ -546,67 +557,6 @@ export class Restore {
 
 		const t1 = performance.now();
 		this.logger.info(`Restored ${totalLegacyAccounts.toLocaleString()} legacy cold wallets in ${t1 - t0}ms`);
-	}
-
-	async #ingestReceipts(context: RestoreContext): Promise<void> {
-		const t0 = performance.now();
-
-		const BATCH_SIZE = 1000n;
-		const CHUNK_SIZE = 256;
-		let offset: bigint | undefined = 0n;
-
-		let totalReceipts = 0;
-
-		const multiPaymentContractAddress = this.app.get<string>(
-			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
-		);
-
-		do {
-			const receipts: Models.Receipt[] = [];
-			const multiPayments: Models.MultiPayment[] = [];
-
-			const result = await this.evm.getReceipts(offset ?? 0n, BATCH_SIZE);
-
-			for (const receipt of result.receipts) {
-				assert.defined(receipt.txHash);
-				assert.defined(receipt.blockNumber);
-
-				// Initial deployment receipts
-				if (receipt.blockNumber >= BigInt(2 ** 32)) {
-					continue;
-				}
-
-				receipts.push({
-					blockNumber: BigNumber.make(receipt.blockNumber).toFixed(),
-					contractAddress: receipt.contractAddress,
-					gasRefunded: Number(receipt.gasRefunded),
-					gasUsed: Number(receipt.gasUsed),
-					logs: receipt.logs,
-					output: receipt.output,
-					status: receipt.status,
-					transactionHash: receipt.txHash,
-				});
-
-				const transaction = this.#txLookup.get(receipt.txHash);
-				if (transaction) {
-					multiPayments.push(...parseMultiPayments(multiPaymentContractAddress, transaction, receipt));
-				}
-			}
-
-			for (const batch of chunk(receipts, CHUNK_SIZE)) {
-				await context.receiptRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
-			}
-
-			for (const batch of chunk(multiPayments, CHUNK_SIZE)) {
-				await context.multiPaymentRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
-			}
-
-			offset = result.nextOffset;
-			totalReceipts += receipts.length;
-		} while (offset);
-
-		const t1 = performance.now();
-		this.logger.info(`Restored ${totalReceipts.toLocaleString()} receipts in ${t1 - t0}ms`);
 	}
 
 	async #ingestValidatorRounds(context: RestoreContext): Promise<void> {
