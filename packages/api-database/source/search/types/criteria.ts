@@ -50,6 +50,7 @@ export type TransactionCriteria = {
 	value?: OrNumericCriteria<string>;
 	gasPrice?: OrNumericCriteria<number>;
 	data?: OrEqualCriteria<string>;
+	deployedContractAddress?: OrEqualCriteria<boolean>;
 };
 
 export type OrTransactionCriteria = OrCriteria<TransactionCriteria>;

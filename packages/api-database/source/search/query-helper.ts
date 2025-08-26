@@ -130,6 +130,10 @@ export class QueryHelper<TEntity> {
 				const parameters = built.reduce((accumulator, b) => Object.assign({}, accumulator, b.parameters), {});
 				return { parameters, query };
 			}
+			case "notNull": {
+				const column = this.getColumnName(metadata, expression.property);
+				return { parameters: {}, query: `${column.name} IS NOT NULL` };
+			}
 			case "jsonbAttributeExists": {
 				const column = this.getColumnName(metadata, expression.property);
 				const parameter = `p${this.paramNo++}`;

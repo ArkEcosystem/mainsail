@@ -3,7 +3,6 @@ import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
 	Search,
-	TypeOrm,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
@@ -19,41 +18,34 @@ export class ReceiptsController extends Controller {
 	public async index(request: Hapi.Request) {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.ReceiptCriteria = request.query;
+		const sorting = this.getListingOrder(request);
+		const options = this.getListingOptions();
 
-		const query = this.transactionRepositoryFactory()
-			.createQueryBuilder("transaction")
-			.select(this.#getReceiptColumns(request.query.fullReceipt));
+		let transactionCriteria: Search.Criteria.TransactionCriteria = {};
 
 		if (criteria.transactionHash) {
-			query.andWhere("transaction.hash = :transactionHash", { transactionHash: criteria.transactionHash });
+			transactionCriteria.hash = criteria.transactionHash;
 		}
 
 		// in this context, recipient always refers to a contract
 		if (criteria.to) {
-			query.andWhere("transaction.to = :to", { to: criteria.to });
+			transactionCriteria.to = criteria.to;
 		}
 
 		if (criteria.from) {
-			const [where, params] = this.#inferSenderWhereClause(criteria.from.toString());
-			query.andWhere(where, params);
+			transactionCriteria = { ...transactionCriteria, ...this.#inferSenderCriteria(criteria.from.toString()) };
 		}
 
-		const [receipts, totalCount] = await query
-			.orderBy("transaction.blockNumber", "DESC")
-			.addOrderBy("transaction.transactionIndex", "DESC")
-			.offset(pagination.offset)
-			.limit(pagination.limit)
-			.select()
-			.getManyAndCount();
-
-		return this.toPagination(
-			{
-				meta: { totalCountIsEstimate: false },
-				results: receipts,
-				totalCount,
-			},
-			ReceiptResource,
+		const walletRepository = this.walletRepositoryFactory();
+		const receipts = await this.transactionRepositoryFactory().findManyByCriteria(
+			walletRepository,
+			transactionCriteria,
+			sorting,
+			pagination,
+			options,
 		);
+
+		return this.toPagination(receipts, ReceiptResource);
 	}
 
 	public async show(request: Hapi.Request) {
@@ -69,33 +61,27 @@ export class ReceiptsController extends Controller {
 	public async contracts(request: Hapi.Request) {
 		const criteria: Search.Criteria.ReceiptCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
+		const sorting = this.getListingOrder(request);
+		const options = this.getListingOptions();
 
-		const query = this.transactionRepositoryFactory()
-			.createQueryBuilder("transaction")
-			.select(this.#getReceiptColumns(request.query.fullReceipt))
-			.where("transaction.deployedContractAddress IS NOT NULL");
+		let transactionCriteria: Search.Criteria.TransactionCriteria = {
+			deployedContractAddress: true,
+		};
 
 		if (criteria.from) {
-			const [where, params] = this.#inferSenderWhereClause(criteria.from.toString());
-			query.andWhere(where, params);
+			transactionCriteria = { ...transactionCriteria, ...this.#inferSenderCriteria(criteria.from.toString()) };
 		}
 
-		const [receipts, totalCount] = await query
-			.orderBy("transaction.blockNumber", "DESC")
-			.addOrderBy("transaction.transactionIndex", "DESC")
-			.offset(pagination.offset)
-			.limit(pagination.limit)
-			.select()
-			.getManyAndCount();
-
-		return this.toPagination(
-			{
-				meta: { totalCountIsEstimate: false },
-				results: receipts,
-				totalCount,
-			},
-			ReceiptResource,
+		const walletRepository = this.walletRepositoryFactory();
+		const receipts = await this.transactionRepositoryFactory().findManyByCriteria(
+			walletRepository,
+			transactionCriteria,
+			sorting,
+			pagination,
+			options,
 		);
+
+		return this.toPagination(receipts, ReceiptResource);
 	}
 
 	protected getListingOptions(): Contracts.Api.Options {
@@ -104,11 +90,22 @@ export class ReceiptsController extends Controller {
 		};
 	}
 
-	#inferSenderWhereClause(from: string): [string, TypeOrm.ObjectLiteral] {
+	protected getListingOrder(_request: Hapi.Request): Contracts.Api.Sorting {
+		return [
+			{
+				direction: "desc",
+				property: "blockNumber",
+			},
+			{
+				direction: "desc",
+				property: "transactionIndex",
+			},
+		];
+	}
+
+	#inferSenderCriteria(from: string): Search.Criteria.TransactionCriteria {
 		const likelyAddress = from.startsWith("0x") && from.length === 42;
-		return likelyAddress
-			? ["transaction.from = :from", { from }]
-			: ["transaction.senderPublicKey = :from", { from }];
+		return likelyAddress ? { from } : { senderPublicKey: from };
 	}
 
 	#getReceiptColumns(fullReceipt?: boolean): string[] {
