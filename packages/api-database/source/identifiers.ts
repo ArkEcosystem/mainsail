@@ -9,7 +9,6 @@ export const Identifiers = {
 	MultiPaymentRepositoryFactory: Symbol.for("API<Factory.MultiPaymentRepositoryFactory>"),
 	PeerRepositoryFactory: Symbol.for("API<Factory.PeerRepositoryFactory>"),
 	PluginRepositoryFactory: Symbol.for("API<Factory.PluginRepositoryFactory>"),
-	ReceiptRepositoryFactory: Symbol.for("API<Factory.ReceiptRepositoryFactory>"),
 	StateRepositoryFactory: Symbol.for("API<Factory.StateRepositoryFactory>"),
 	TransactionRepositoryFactory: Symbol.for("API<Factory.TransactionRepositoryFactory>"),
 	ValidatorRoundRepositoryFactory: Symbol.for("API<Factory.ValidatorRoundRepositoryFactory>"),
