@@ -66,12 +66,6 @@ export class ApiContext {
 		)();
 	}
 
-	public get receiptsRepository(): ApiDatabaseContracts.ReceiptRepository {
-		return this.app.get<ApiDatabaseContracts.ReceiptRepositoryFactory>(
-			ApiDatabaseIdentifiers.ReceiptRepositoryFactory,
-		)();
-	}
-
 	public get configurationRepository(): ApiDatabaseContracts.ConfigurationRepository {
 		return this.app.get<ApiDatabaseContracts.ConfigurationRepositoryFactory>(
 			ApiDatabaseIdentifiers.ConfigurationRepositoryFactory,

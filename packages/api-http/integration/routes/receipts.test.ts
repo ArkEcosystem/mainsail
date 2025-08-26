@@ -39,7 +39,6 @@ describe<{
 		assert.empty(data.data);
 
 		await apiContext.transactionRepository.save(receiptTransactions);
-		await apiContext.receiptsRepository.save(receipts);
 		await apiContext.walletRepository.save(receiptWallets);
 
 		const testCases = [
@@ -78,7 +77,6 @@ describe<{
 
 	it("/receipts/{transactionHash}", async () => {
 		await apiContext.transactionRepository.save(receiptTransactions);
-		await apiContext.receiptsRepository.save(receipts);
 		await apiContext.walletRepository.save(receiptWallets);
 
 		const testCases = [
@@ -115,7 +113,6 @@ describe<{
 		assert.empty(data.data);
 
 		await apiContext.transactionRepository.save(receiptTransactions);
-		await apiContext.receiptsRepository.save(receipts);
 		await apiContext.walletRepository.save(receiptWallets);
 
 		const testCases = [
