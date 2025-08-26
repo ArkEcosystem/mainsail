@@ -1,4 +1,3 @@
-import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import {
 	Contracts as ApiDatabaseContracts,
@@ -64,11 +63,7 @@ export class ReceiptsController extends Controller {
 			.where("transaction.hash = :transactionHash", { transactionHash: request.params.transactionHash })
 			.getOne();
 
-		if (!receipt) {
-			return Boom.notFound();
-		}
-
-		return this.toResource(receipt, ReceiptResource);
+		return this.respondWithResource(receipt, ReceiptResource);
 	}
 
 	public async contracts(request: Hapi.Request) {
