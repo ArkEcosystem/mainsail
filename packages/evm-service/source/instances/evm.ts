@@ -142,6 +142,12 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return this.#evm.getReceipts(offset, limit);
 	}
 
+	public async getReceiptsByBlockNumber(
+		blockNumber: bigint,
+	): Promise<Record<string, Contracts.Evm.TransactionReceipt>> {
+		return this.#evm.getReceiptsByBlockNumber(blockNumber);
+	}
+
 	public async getReceipt(blockNumber: bigint, txHash: string): Promise<Contracts.Evm.GetReceiptResult> {
 		return this.#evm.getReceipt(blockNumber, txHash);
 	}

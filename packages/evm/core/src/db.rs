@@ -535,6 +535,19 @@ impl PersistentDB {
         )
     }
 
+    pub fn get_receipts_by_block_number(
+        &self,
+        block_number: u64,
+    ) -> Result<HashMap<B256, TxReceipt>, Error> {
+        let tx_env = self.env.read_txn()?;
+        let commit = self.inner.borrow().commits.get(&tx_env, &block_number)?;
+
+        match commit {
+            Some(commit) => Ok(commit.tx_receipts),
+            None => Ok(Default::default()),
+        }
+    }
+
     pub fn get_receipt(
         &self,
         block_number: u64,
