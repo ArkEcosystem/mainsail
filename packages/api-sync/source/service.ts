@@ -159,18 +159,20 @@ export class Sync implements Contracts.ApiSync.Service {
 				blockHash: header.hash,
 				blockNumber: header.number.toFixed(),
 				data: data.data,
-				from: data.from,
-				gas: data.gasLimit,
 				// Receipt data
 				deployedContractAddress: receipt.contractAddress,
+
+				from: data.from,
+
+				gas: data.gasLimit,
 
 				gasPrice: data.gasPrice,
 
 				gasRefunded: Number(receipt.gasRefunded),
 
-				hash: data.hash,
-
 				gasUsed: Number(receipt.gasUsed),
+
+				hash: data.hash,
 
 				legacySecondSignature: data.legacySecondSignature,
 
