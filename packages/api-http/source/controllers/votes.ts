@@ -54,7 +54,7 @@ export class VotesController extends Controller {
 		}
 
 		return this.respondWithResource(
-			await this.enrichTransaction(transaction, undefined, undefined, request.query.fullReceipt),
+			await this.enrichTransaction(transaction, undefined, request.query.fullReceipt),
 			TransactionResource,
 		);
 	}

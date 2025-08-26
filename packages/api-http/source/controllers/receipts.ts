@@ -1,7 +1,12 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
-import { Contracts as ApiDatabaseContracts, Models, Search } from "@mainsail/api-database";
-import { injectable } from "@mainsail/container";
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Models,
+	Search,
+} from "@mainsail/api-database";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
 import { ReceiptResource } from "../resources/index.js";
@@ -9,17 +14,19 @@ import { Controller } from "./controller.js";
 
 @injectable()
 export class ReceiptsController extends Controller {
+	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
+	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
+
 	public async index(request: Hapi.Request) {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.ReceiptCriteria = request.query;
 
-		const query = this.receiptRepositoryFactory()
-			.createQueryBuilder("receipt")
-			.select(this.getReceiptColumns(request.query.fullReceipt))
-			.innerJoin(Models.Transaction, "transaction", "receipt.transactionHash = transaction.hash");
+		const query = this.transactionRepositoryFactory()
+			.createQueryBuilder("transaction")
+			.select(this.#getReceiptColumns(request.query.fullReceipt));
 
 		if (criteria.transactionHash) {
-			query.andWhere("receipt.transactionHash = :transactionHash", { transactionHash: criteria.transactionHash });
+			query.andWhere("transaction.hash = :transactionHash", { transactionHash: criteria.transactionHash });
 		}
 
 		// in this context, recipient always refers to a contract
@@ -56,10 +63,10 @@ export class ReceiptsController extends Controller {
 	}
 
 	public async show(request: Hapi.Request) {
-		const receipt = await this.receiptRepositoryFactory()
-			.createQueryBuilder("receipt")
-			.select(this.getReceiptColumns(request.query.fullReceipt))
-			.where("receipt.transactionHash = :transactionHash", { transactionHash: request.params.transactionHash })
+		const receipt = await this.transactionRepositoryFactory()
+			.createQueryBuilder("transaction")
+			.select(this.#getReceiptColumns(request.query.fullReceipt))
+			.where("transaction.hash = :transactionHash", { transactionHash: request.params.transactionHash })
 			.getOne();
 
 		if (!receipt) {
@@ -73,11 +80,10 @@ export class ReceiptsController extends Controller {
 		const criteria: Search.Criteria.ReceiptCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
 
-		const query = this.receiptRepositoryFactory()
-			.createQueryBuilder("receipt")
-			.select(this.getReceiptColumns(request.query.fullReceipt))
-			.innerJoin(Models.Transaction, "transaction", "receipt.transactionHash = transaction.hash")
-			.where("receipt.contractAddress IS NOT NULL");
+		const query = this.transactionRepositoryFactory()
+			.createQueryBuilder("transaction")
+			.select(this.#getReceiptColumns(request.query.fullReceipt))
+			.where("transaction.deployedContractAddress IS NOT NULL");
 
 		if (criteria.from) {
 			query.innerJoin(Models.Wallet, "wallet", "transaction.from = wallet.address").andWhere(
@@ -111,5 +117,20 @@ export class ReceiptsController extends Controller {
 		return {
 			estimateTotalCount: false,
 		};
+	}
+
+	#getReceiptColumns(fullReceipt?: boolean): string[] {
+		let columns = [
+			"transaction.hash",
+			"transaction.status",
+			"transaction.gasUsed",
+			"transaction.gasRefunded",
+			"transaction.deployedContractAddress",
+		];
+		if (fullReceipt) {
+			columns = [...columns, "transaction.output", "transaction.logs"];
+		}
+
+		return columns;
 	}
 }
