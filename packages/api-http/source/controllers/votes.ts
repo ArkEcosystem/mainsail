@@ -24,7 +24,7 @@ export class VotesController extends Controller {
 
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		const walletRepository = this.walletRepositoryFactory();
 		const transactions = await this.transactionRepositoryFactory().findManyByCriteria(

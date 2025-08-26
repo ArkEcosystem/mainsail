@@ -19,7 +19,7 @@ export class PeersController extends Controller {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.PeerCriteria = request.query;
 		const sorting = this.getListingOrder(request);
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		const peers = await this.peerRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 
@@ -42,7 +42,7 @@ export class PeersController extends Controller {
 		return this.respondWithResource(peer, PeerResource);
 	}
 
-	protected getListingOptions(): Search.Options {
+	protected getListingOptions(_request: Hapi.Request): Search.Options {
 		return {
 			estimateTotalCount: false,
 		};

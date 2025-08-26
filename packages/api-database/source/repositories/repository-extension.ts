@@ -60,7 +60,11 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 				const resultsQueryBuilder = this.createQueryBuilder().setQueryRunner(queryRunner);
 
 				if (options?.selection) {
-					resultsQueryBuilder.select(options.selection);
+					resultsQueryBuilder.select([]);
+
+					for (const select of options.selection) {
+						resultsQueryBuilder.addSelect(select);
+					}
 				}
 
 				this.addWhere(resultsQueryBuilder, expression);

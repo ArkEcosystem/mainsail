@@ -18,6 +18,7 @@ export type Pagination = {
 export type Options = {
 	estimateTotalCount?: boolean;
 	selection?: string[];
+	fullReceipt?: boolean;
 };
 
 export type ResultsPage<T> = {

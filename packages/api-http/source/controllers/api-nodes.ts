@@ -18,7 +18,7 @@ export class ApiNodesController extends Controller {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.ApiNodeCriteria = request.query;
 		const sorting = this.getListingOrder(request);
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		const apiNodes = await this.apiNodeRepositoryFactory().findManyByCriteria(
 			criteria,
@@ -30,7 +30,7 @@ export class ApiNodesController extends Controller {
 		return this.toPagination(apiNodes, ApiNodeResource);
 	}
 
-	protected getListingOptions(): Search.Options {
+	protected getListingOptions(_request: Hapi.Request): Search.Options {
 		return {
 			estimateTotalCount: false,
 		};

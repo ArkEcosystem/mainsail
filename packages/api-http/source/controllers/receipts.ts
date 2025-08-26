@@ -19,7 +19,7 @@ export class ReceiptsController extends Controller {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.ReceiptCriteria = request.query;
 		const sorting = this.getListingOrder(request);
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		let transactionCriteria: Search.Criteria.TransactionCriteria = {};
 
@@ -50,9 +50,9 @@ export class ReceiptsController extends Controller {
 
 	public async show(request: Hapi.Request) {
 		const receipt = await this.transactionRepositoryFactory()
-			.createQueryBuilder("transaction")
+			.createQueryBuilder()
 			.select(this.#getReceiptColumns(request.query.fullReceipt))
-			.where("transaction.hash = :transactionHash", { transactionHash: request.params.transactionHash })
+			.where("Transaction.hash = :transactionHash", { transactionHash: request.params.transactionHash })
 			.getOne();
 
 		return this.respondWithResource(receipt, ReceiptResource);
@@ -62,7 +62,7 @@ export class ReceiptsController extends Controller {
 		const criteria: Search.Criteria.ReceiptCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		let transactionCriteria: Search.Criteria.TransactionCriteria = {
 			deployedContractAddress: true,
@@ -84,12 +84,6 @@ export class ReceiptsController extends Controller {
 		return this.toPagination(receipts, ReceiptResource);
 	}
 
-	protected getListingOptions(): Contracts.Api.Options {
-		return {
-			estimateTotalCount: false,
-		};
-	}
-
 	protected getListingOrder(_request: Hapi.Request): Contracts.Api.Sorting {
 		return [
 			{
@@ -103,6 +97,15 @@ export class ReceiptsController extends Controller {
 		];
 	}
 
+	protected getListingOptions(request: Hapi.Request): Search.Options {
+		const options = super.getListingOptions(request);
+
+		return {
+			...options,
+			selection: this.#getReceiptColumns(request.query.fullReceipt),
+		};
+	}
+
 	#inferSenderCriteria(from: string): Search.Criteria.TransactionCriteria {
 		const likelyAddress = from.startsWith("0x") && from.length === 42;
 		return likelyAddress ? { from } : { senderPublicKey: from };
@@ -110,14 +113,14 @@ export class ReceiptsController extends Controller {
 
 	#getReceiptColumns(fullReceipt?: boolean): string[] {
 		let columns = [
-			"transaction.hash",
-			"transaction.status",
-			"transaction.gasUsed",
-			"transaction.gasRefunded",
-			"transaction.deployedContractAddress",
+			"Transaction.hash",
+			"Transaction.status",
+			"Transaction.gasUsed",
+			"Transaction.gasRefunded",
+			"Transaction.deployedContractAddress",
 		];
 		if (fullReceipt) {
-			columns = [...columns, "transaction.output", "transaction.logs"];
+			columns = [...columns, "Transaction.output", "Transaction.logs"];
 		}
 
 		return columns;
