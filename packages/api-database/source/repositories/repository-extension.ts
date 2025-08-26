@@ -45,15 +45,6 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 		queryBuilder.where(sqlExpression.query, sqlExpression.parameters);
 	},
 
-	async findManyByExpression(expression: Expressions.Expression<TEntity>, sorting: Sorting = []): Promise<TEntity[]> {
-		const queryBuilder: SelectQueryBuilder<TEntity> = this.createQueryBuilder().select();
-
-		this.addWhere(queryBuilder, expression);
-		this.addOrderBy(queryBuilder, sorting);
-
-		return queryBuilder.getMany();
-	},
-
 	async listByExpression(
 		expression: Expression<TEntity>,
 		sorting: Sorting,

@@ -142,8 +142,6 @@ export interface RepositoryExtension<TEntity extends ObjectLiteral> {
 
 	addSkipOffset(queryBuilder: SelectQueryBuilder<TEntity>, pagination: Pagination): void;
 
-	findManyByExpression(expression: Expression<TEntity>, sorting?: Sorting): Promise<TEntity[]>;
-
 	listByExpression(
 		expression: Expression<TEntity>,
 		sorting: Sorting,

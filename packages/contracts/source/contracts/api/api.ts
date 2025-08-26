@@ -33,6 +33,7 @@ export type Pagination = {
 
 export type Options = {
 	estimateTotalCount?: boolean;
+	selection?: string[];
 };
 
 export type ResultsPage<T> = {
