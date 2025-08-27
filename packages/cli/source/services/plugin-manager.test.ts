@@ -1,6 +1,5 @@
 import { Contracts } from "@mainsail/test-runner";
 import esmock from "esmock";
-import fs from "fs";
 import { join } from "path";
 import { setGracefulCleanup } from "tmp";
 
@@ -9,10 +8,12 @@ import { Identifiers } from "../ioc/index.js";
 import { PluginManager } from "./plugin-manager";
 import { File, Git, NPM } from "./source-providers";
 
-let existSyncResponse: Contracts.Stub;
+let existSyncStub: Contracts.Stub;
+let removeSyncStub: Contracts.Stub;
 const { PluginManager: PluginManagerProxy } = await esmock("./plugin-manager", {
 	fs: {
-		existsSync: () => existSyncResponse.call(),
+		existsSync: () => existSyncStub.call(),
+		removeSync: () => removeSyncStub.call(),
 	},
 });
 
@@ -20,7 +21,8 @@ describe<{
 	cli: Console;
 	pluginManager: PluginManager;
 }>("DiscoverPlugins", ({ beforeEach, afterAll, assert, it, stub, stubFn }) => {
-	existSyncResponse = stubFn().returnValue(false);
+	existSyncStub = stubFn().returnValue(false);
+	removeSyncStub = stubFn();
 
 	const applicationName = "mainsail";
 	const packageName = "dummyPackageName";
@@ -170,7 +172,7 @@ describe<{
 
 	it("#update - if the plugin is a git directory, it should be updated", async ({ pluginManager }) => {
 		const spyGitUpdate = stub(Git.prototype, "update");
-		existSyncResponse = stubFn().returnValue(true);
+		existSyncStub = stubFn().returnValue(true);
 
 		await assert.resolves(() => pluginManager.update(packageName));
 
@@ -179,7 +181,7 @@ describe<{
 
 	it("#update - if the plugin is a NPM package, it should be updated on default path", async ({ pluginManager }) => {
 		const spyNpmUpdate = stub(NPM.prototype, "update");
-		existSyncResponse = stubFn().returnValueOnce(true).returnValue(false);
+		existSyncStub = stubFn().returnValueOnce(true).returnValue(false);
 
 		await assert.resolves(() => pluginManager.update(packageName));
 
@@ -190,12 +192,10 @@ describe<{
 		await assert.rejects(() => pluginManager.remove(packageName), `The package [${packageName}] does not exist.`);
 	});
 
-	// TODO: fix stub
-	it.skip("#remove - remove plugin if exist", async ({ pluginManager }) => {
-		stub(fs, "existsSync").returnValue(true);
-		const removeSync = stub(fs, "removeSync");
+	it("#remove - remove plugin if exist", async ({ pluginManager }) => {
+		existSyncStub = stubFn().returnValue(true);
 
 		await assert.resolves(() => pluginManager.remove(packageName));
-		removeSync.calledOnce();
+		existSyncStub.calledOnce();
 	});
 });
