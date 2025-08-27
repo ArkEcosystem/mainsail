@@ -21,19 +21,21 @@ export function parseTransactionError(
 
 		try {
 			const decoded = decodeErrorResult({ abi: errorAbis, data });
-			return formatErrorArgs(decoded.errorName, decoded.args);
+			return formatErrorArguments(decoded.errorName, decoded.args);
 		} catch {}
 	}
 
 	return "execution reverted";
 }
 
-function formatErrorArgs(errorName: string, args?: readonly unknown[]): string {
-	if (!args || args.length === 0) return errorName;
+function formatErrorArguments(errorName: string, arguments_?: readonly unknown[]): string {
+	if (!arguments_ || arguments_.length === 0) {
+		return errorName;
+	}
 
 	// Panic(uint256)
 	if (errorName === "Panic") {
-		const codeBig = args?.[0] as bigint | number | undefined;
+		const codeBig = arguments_?.[0] as bigint | number | undefined;
 		if (codeBig === undefined) {
 			return "Panic";
 		}
@@ -44,7 +46,7 @@ function formatErrorArgs(errorName: string, args?: readonly unknown[]): string {
 		return reason ? `Panic (${hex}): ${reason}` : `Panic (${hex})`;
 	}
 
-	const rendered = args
+	const rendered = arguments_
 		.map((a) => (typeof a === "bigint" ? a.toString() : typeof a === "string" ? a : JSON.stringify(a)))
 		.join(",");
 
@@ -53,8 +55,8 @@ function formatErrorArgs(errorName: string, args?: readonly unknown[]): string {
 
 function collectErrorItems(abis: Abi[]): AbiItem[] {
 	const builtinErrorAbi: Abi = [
-		{ type: "error", name: "Error", inputs: [{ name: "message", type: "string" }] },
-		{ type: "error", name: "Panic", inputs: [{ name: "code", type: "uint256" }] },
+		{ inputs: [{ name: "message", type: "string" }], name: "Error", type: "error" },
+		{ inputs: [{ name: "code", type: "uint256" }], name: "Panic", type: "error" },
 	];
 
 	const items: AbiItem[] = [];

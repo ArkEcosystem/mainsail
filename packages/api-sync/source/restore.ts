@@ -318,6 +318,8 @@ export class Restore {
 
 						legacySecondSignature: data.legacySecondSignature,
 
+						decodedError: parseTransactionError(transaction, receipt),
+
 						logs: receipt.logs,
 
 						nonce: data.nonce.toFixed(),
@@ -325,14 +327,12 @@ export class Restore {
 						output: receipt.output,
 
 						senderPublicKey: data.senderPublicKey,
-
 						signature: formatEcdsaSignature(data.r!, data.s!, data.v!),
 						status: receipt.status,
 						timestamp: block.header.timestamp.toFixed(),
 						to: data.to,
 						transactionIndex: data.transactionIndex!,
 						value: data.value.toFixed(),
-						decodedError: parseTransactionError(transaction, receipt),
 					});
 
 					multiPayments.push(...parseMultiPayments(multiPaymentContractAddress, transaction, receipt));
