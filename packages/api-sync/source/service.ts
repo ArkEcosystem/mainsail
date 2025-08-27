@@ -159,6 +159,9 @@ export class Sync implements Contracts.ApiSync.Service {
 				blockHash: header.hash,
 				blockNumber: header.number.toFixed(),
 				data: data.data,
+
+				decodedError: parseTransactionError(transaction, receipt),
+
 				// Receipt data
 				deployedContractAddress: receipt.contractAddress,
 
@@ -175,8 +178,6 @@ export class Sync implements Contracts.ApiSync.Service {
 				hash: data.hash,
 
 				legacySecondSignature: data.legacySecondSignature,
-
-				decodedError: parseTransactionError(transaction, receipt),
 
 				logs: receipt.logs,
 
