@@ -63,7 +63,7 @@ describe("TransactionError", ({ it, assert }) => {
 				} as Contracts.Evm.TransactionReceipt,
 			},
 			{
-				error: "Out of gas",
+				error: "out of gas",
 				transaction: { data: { gasLimit: 21000 } } as Contracts.Crypto.Transaction,
 				receipt: {
 					output: Buffer.alloc(0),

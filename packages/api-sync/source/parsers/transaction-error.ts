@@ -14,7 +14,7 @@ export function parseTransactionError(
 
 	if (!receipt.output || receipt.output.byteLength === 0) {
 		if (receipt.gasUsed >= transaction.data.gasLimit) {
-			return "Out of gas";
+			return "out of gas";
 		}
 	} else {
 		const data = toHex(receipt.output);
