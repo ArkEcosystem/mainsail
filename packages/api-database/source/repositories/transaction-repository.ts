@@ -44,6 +44,7 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): Tra
 					"Transaction.gasUsed",
 					"Transaction.gasRefunded",
 					"Transaction.deployedContractAddress",
+					"Transaction.decodedError",
 				];
 
 				if (options.fullReceipt) {

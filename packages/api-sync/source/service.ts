@@ -11,7 +11,7 @@ import { assert, BigNumber, chunk, formatEcdsaSignature, sleep, validatorSetPack
 import { performance } from "perf_hooks";
 
 import { Listeners } from "./contracts.js";
-import { parseMultiPayments } from "./parsers/index.js";
+import { parseMultiPayments, parseTransactionError } from "./parsers/index.js";
 import { Restore } from "./restore.js";
 
 interface DeferredSync {
@@ -159,6 +159,9 @@ export class Sync implements Contracts.ApiSync.Service {
 				blockHash: header.hash,
 				blockNumber: header.number.toFixed(),
 				data: data.data,
+
+				decodedError: parseTransactionError(transaction, receipt),
+
 				// Receipt data
 				deployedContractAddress: receipt.contractAddress,
 
@@ -183,7 +186,6 @@ export class Sync implements Contracts.ApiSync.Service {
 				output: receipt.output,
 
 				senderPublicKey: data.senderPublicKey,
-
 				signature: formatEcdsaSignature(data.r!, data.s!, data.v!),
 				status: receipt.status,
 				timestamp: header.timestamp.toFixed(),

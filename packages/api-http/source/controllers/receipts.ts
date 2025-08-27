@@ -118,6 +118,7 @@ export class ReceiptsController extends Controller {
 			"Transaction.gasUsed",
 			"Transaction.gasRefunded",
 			"Transaction.deployedContractAddress",
+			"Transaction.decodedError",
 		];
 		if (fullReceipt) {
 			columns = [...columns, "Transaction.output", "Transaction.logs"];

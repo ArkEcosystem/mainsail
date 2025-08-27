@@ -18,6 +18,7 @@ export class ReceiptResource implements Contracts.Api.Resource {
 			output: resource.output,
 			status: resource.status,
 			transactionHash: resource.hash,
+			...(resource.decodedError ? { decodedError: resource.decodedError } : {}),
 		};
 	}
 }

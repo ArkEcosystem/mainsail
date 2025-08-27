@@ -12,6 +12,7 @@ import { performance } from "perf_hooks";
 import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
 
 import { parseMultiPayments } from "./parsers/multi-payment.js";
+import { parseTransactionError } from "./parsers/transaction-error.js";
 
 interface RestoreContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;
@@ -300,6 +301,9 @@ export class Restore {
 						blockHash: block.header.hash,
 						blockNumber: block.header.number.toFixed(),
 						data: data.data,
+
+						decodedError: parseTransactionError(transaction, receipt),
+
 						// Receipt data
 						deployedContractAddress: receipt.contractAddress,
 
@@ -324,7 +328,6 @@ export class Restore {
 						output: receipt.output,
 
 						senderPublicKey: data.senderPublicKey,
-
 						signature: formatEcdsaSignature(data.r!, data.s!, data.v!),
 						status: receipt.status,
 						timestamp: block.header.timestamp.toFixed(),
