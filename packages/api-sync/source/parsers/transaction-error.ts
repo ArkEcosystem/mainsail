@@ -16,6 +16,8 @@ export function parseTransactionError(
 		if (receipt.gasUsed >= transaction.data.gasLimit) {
 			return "out of gas";
 		}
+
+		// TODO: proxy contracts might not use up all gas when they run out of gas (due to DELEGATECALL)
 	} else {
 		const data = toHex(receipt.output);
 
