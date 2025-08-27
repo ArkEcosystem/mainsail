@@ -51,6 +51,7 @@ export class TransactionResource implements Contracts.Api.Resource {
 				...(resource.deployedContractAddress
 					? { deployedContractAddress: resource.deployedContractAddress }
 					: {}),
+				...(resource.decodedError ? { decodedError: resource.decodedError } : {}),
 				...(resource.fullReceipt
 					? {
 							logs: resource.logs,

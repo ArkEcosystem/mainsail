@@ -143,4 +143,11 @@ export class Transaction {
 		type: "bytea",
 	})
 	public readonly output: Buffer | undefined;
+
+	@Column({
+		default: undefined,
+		nullable: true,
+		type: "varchar",
+	})
+	public readonly decodedError!: string | undefined;
 }
