@@ -1,6 +1,6 @@
 import { Exceptions } from "@mainsail/contracts";
 import { execaSync } from "execa";
-import { ensureDirSync, moveSync, readJSONSync,removeSync } from "fs-extra/esm";
+import { ensureDirSync, moveSync, readJSONSync, removeSync } from "fs-extra/esm";
 import { join } from "path";
 
 import { Source } from "./contracts.js";

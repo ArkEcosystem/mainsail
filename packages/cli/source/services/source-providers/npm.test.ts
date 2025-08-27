@@ -11,15 +11,20 @@ let removeSyncStub: Contracts.Stub;
 let moveSyncStub: Contracts.Stub;
 let execaSyncStub: Contracts.Stub;
 
-const { NPM: NPMProxy } = await esmock("./npm",import.meta.url, {}, {
-	"fs-extra/esm": {
-		removeSync: (...args) => removeSyncStub.call(...args),
-		moveSync: (...args) => moveSyncStub.call(...args),
+const { NPM: NPMProxy } = await esmock(
+	"./npm",
+	import.meta.url,
+	{},
+	{
+		"fs-extra/esm": {
+			removeSync: (...args) => removeSyncStub.call(...args),
+			moveSync: (...args) => moveSyncStub.call(...args),
+		},
+		execa: {
+			execaSync: (...args) => execaSyncStub.call(...args),
+		},
 	},
-	"execa": {
-		execaSync: (...args) => execaSyncStub.call(...args),
-	},
-});
+);
 
 describe<{
 	dataPath: string;
@@ -140,9 +145,7 @@ describe<{
 			.get("/@arkecosystem/utils/-/utils-0.9.1.tgz")
 			.reply(
 				200,
-				readFileSync(
-					resolve(new URL(".", import.meta.url).pathname, "../../../test/files", "utils-0.9.1.tgz"),
-				),
+				readFileSync(resolve(new URL(".", import.meta.url).pathname, "../../../test/files", "utils-0.9.1.tgz")),
 			);
 
 		// Act

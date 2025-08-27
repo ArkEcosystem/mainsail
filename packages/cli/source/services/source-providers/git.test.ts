@@ -10,14 +10,19 @@ import { Git } from "./git";
 let removeSyncStub: Contracts.Stub;
 let execaSyncStub: Contracts.Stub;
 
-const { Git: GitProxy } = await esmock("./git",import.meta.url, {}, {
-	"fs-extra/esm": {
-		removeSync: (...args) => removeSyncStub.call(...args),
+const { Git: GitProxy } = await esmock(
+	"./git",
+	import.meta.url,
+	{},
+	{
+		"fs-extra/esm": {
+			removeSync: (...args) => removeSyncStub.call(...args),
+		},
+		execa: {
+			execaSync: (...args) => execaSyncStub.call(...args),
+		},
 	},
-	"execa": {
-		execaSync: (...args) => execaSyncStub.call(...args),
-	},
-});
+);
 
 describe<{
 	dataPath: string;

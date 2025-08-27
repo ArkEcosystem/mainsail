@@ -67,10 +67,7 @@ describe<{
 		assert.false(await updater.check());
 	});
 
-	it("#check - should check if the last check has been within the last 24 hours ago", async ({
-		config,
-		updater,
-	}) => {
+	it("#check - should check if the last check has been within the last 24 hours ago", async ({ config, updater }) => {
 		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, versionNext);
 		const spyConfigSet = spy(config, "set");
 

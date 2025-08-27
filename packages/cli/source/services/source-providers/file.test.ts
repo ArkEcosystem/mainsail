@@ -10,15 +10,19 @@ import { File } from "./file";
 let removeSyncStub: Contracts.Stub;
 let execaSyncStub: Contracts.Stub;
 
-const { File: FileProxy } = await esmock("./file",import.meta.url, {}, {
-	"fs-extra/esm": {
-		removeSync: (...args) => removeSyncStub.call(...args),
+const { File: FileProxy } = await esmock(
+	"./file",
+	import.meta.url,
+	{},
+	{
+		"fs-extra/esm": {
+			removeSync: (...args) => removeSyncStub.call(...args),
+		},
+		execa: {
+			execaSync: (...args) => execaSyncStub.call(...args),
+		},
 	},
-	"execa": {
-		execaSync: (...args) => execaSyncStub.call(...args),
-	},
-});
-
+);
 
 describe<{
 	dataPath: string;
