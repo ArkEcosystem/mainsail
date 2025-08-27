@@ -12,6 +12,7 @@ import { performance } from "perf_hooks";
 import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
 
 import { parseMultiPayments } from "./parsers/multi-payment.js";
+import { parseTransactionError } from "./parsers/transaction-error.js";
 
 interface RestoreContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;
@@ -331,6 +332,7 @@ export class Restore {
 						to: data.to,
 						transactionIndex: data.transactionIndex!,
 						value: data.value.toFixed(),
+						decodedError: parseTransactionError(transaction, receipt),
 					});
 
 					multiPayments.push(...parseMultiPayments(multiPaymentContractAddress, transaction, receipt));
