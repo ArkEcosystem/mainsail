@@ -22,7 +22,7 @@ export class WalletsController extends Controller {
 		const criteria: Search.Criteria.WalletCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		const wallets = await this.walletRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 
@@ -33,7 +33,7 @@ export class WalletsController extends Controller {
 		const criteria: Search.Criteria.WalletCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		const wallets = await this.walletRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 
@@ -106,7 +106,7 @@ export class WalletsController extends Controller {
 	private async getTransactions(request: Hapi.Request, criteria: Search.Criteria.TransactionCriteria) {
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		const transactions = await this.transactionRepositoryFactory().findManyByCriteria(
 			this.walletRepositoryFactory(),

@@ -9,7 +9,6 @@ import {
 	MultiPayment,
 	Peer,
 	Plugin,
-	Receipt,
 	State,
 	Transaction,
 	ValidatorRound,
@@ -95,15 +94,6 @@ export type ValidatorRoundRepositoryExtension = Record<string, any>;
 export type ValidatorRoundRepository = ExtendedRepository<ValidatorRound> & ValidatorRoundRepositoryExtension;
 export type PluginRepositoryExtension = Record<string, any>;
 export type PluginRepository = ExtendedRepository<Plugin> & PluginRepositoryExtension;
-export type ReceiptRepositoryExtension = {
-	findManyByCriteria(
-		criteria: Criteria.OrReceiptCriteria,
-		sorting: Sorting,
-		pagination: Pagination,
-		options?: Options,
-	): Promise<ResultsPage<Receipt>>;
-};
-export type ReceiptRepository = ExtendedRepository<Receipt> & ReceiptRepositoryExtension;
 export type StateRepositoryExtension = Record<string, any>;
 export type StateRepository = ExtendedRepository<State> & StateRepositoryExtension;
 
@@ -129,7 +119,6 @@ export type BlockRepositoryFactory = (customDataSource?: RepositoryDataSource) =
 export type ConfigurationRepositoryFactory = (customDataSource?: RepositoryDataSource) => ConfigurationRepository;
 export type ContractRepositoryFactory = (customDataSource?: RepositoryDataSource) => ContractRepository;
 export type PeerRepositoryFactory = (customDataSource?: RepositoryDataSource) => PeerRepository;
-export type ReceiptRepositoryFactory = (customDataSource?: RepositoryDataSource) => ReceiptRepository;
 export type TransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => TransactionRepository;
 export type MultiPaymentRepositoryFactory = (customDataSource?: RepositoryDataSource) => MultiPaymentRepository;
 export type ValidatorRoundRepositoryFactory = (customDataSource?: RepositoryDataSource) => ValidatorRoundRepository;
@@ -138,7 +127,6 @@ export type StateRepositoryFactory = (customDataSource?: RepositoryDataSource) =
 export type WalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => WalletRepository;
 export type LegacyColdWalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => LegacyColdWalletRepository;
 
-export { Brackets, Entity, Repository } from "typeorm";
 export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
 
 export interface Migrations {
@@ -153,8 +141,6 @@ export interface RepositoryExtension<TEntity extends ObjectLiteral> {
 	addOrderBy(queryBuilder: SelectQueryBuilder<TEntity>, sorting: Sorting): void;
 
 	addSkipOffset(queryBuilder: SelectQueryBuilder<TEntity>, pagination: Pagination): void;
-
-	findManyByExpression(expression: Expression<TEntity>, sorting?: Sorting): Promise<TEntity[]>;
 
 	listByExpression(
 		expression: Expression<TEntity>,

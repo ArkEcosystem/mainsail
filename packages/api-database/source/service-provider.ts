@@ -14,7 +14,6 @@ import {
 	PeerRepository,
 	PluginRepository,
 	PostgresConnectionOptions,
-	ReceiptRepository,
 	RepositoryDataSource,
 	StateRepository,
 	TransactionRepository,
@@ -32,7 +31,6 @@ import {
 	MultiPayment,
 	Peer,
 	Plugin,
-	Receipt,
 	State,
 	Transaction,
 	ValidatorRound,
@@ -46,7 +44,6 @@ import {
 	makeLegacyColdWalletRepository,
 	makePeerRepository,
 	makePluginRepository,
-	makeReceiptRepository,
 	makeStateRepository,
 	makeTransactionRepository,
 	makeValidatorRoundRepository,
@@ -92,7 +89,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					Contract,
 					Peer,
 					Plugin,
-					Receipt,
 					State,
 					Transaction,
 					MultiPayment,
@@ -155,13 +151,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makePluginRepository(customDataSource ?? dataSource),
-				);
-
-			this.app
-				.bind<() => ReceiptRepository>(Identifiers.ReceiptRepositoryFactory)
-				.toFactory(
-					() => (customDataSource?: RepositoryDataSource) =>
-						makeReceiptRepository(customDataSource ?? dataSource),
 				);
 
 			this.app

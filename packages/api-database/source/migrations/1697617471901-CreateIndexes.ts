@@ -5,10 +5,9 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 		// language=postgresql
 		await queryRunner.query(`
             CREATE UNIQUE INDEX transactions_sender_nonce ON transactions(sender_public_key, nonce);
-		CREATE INDEX transactions_to ON transactions("to");
-            CREATE INDEX transactions_sender ON transactions(sender_public_key);
-		CREATE INDEX transactions_from ON transactions("from");
-
+            CREATE INDEX transactions_to_block_number_tx_index ON transactions("to", block_number DESC, transaction_index DESC);
+            CREATE INDEX transactions_from_block_number_tx_index ON transactions("from", block_number DESC, transaction_index DESC);
+            CREATE INDEX transactions_sender_block_number_tx_index ON transactions(sender_public_key, block_number DESC, transaction_index DESC);
 
             CREATE INDEX transactions_block_hash ON transactions(block_hash);
             CREATE INDEX transactions_block_number_transaction_index ON transactions(block_number, transaction_index);
@@ -32,14 +31,13 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
                   "to"
             );
 
+            CREATE INDEX transactions_deployed_contract_index ON transactions(deployed_contract_address, block_number DESC, transaction_index DESC)
+            WHERE deployed_contract_address IS NOT NULL;
+
             CREATE INDEX blocks_transactions_count ON blocks(transactions_count);
             CREATE INDEX blocks_reward ON blocks(reward);
             CREATE INDEX blocks_fee ON blocks(fee);
             CREATE INDEX blocks_validator_round ON blocks(validator_round);
-
-            CREATE INDEX receipts_block_height ON receipts(block_number);
-            CREATE INDEX receipts_contracts ON receipts(contract_address)
-            WHERE contract_address IS NOT NULL;
 
             CREATE INDEX multi_payments_hash_to ON multi_payments(hash, "to") WHERE success IS TRUE;
 
@@ -59,9 +57,9 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 		// language=postgresql
 		await queryRunner.query(`
             DROP INDEX transactions_sender_nonce;
-            DROP INDEX transactions_to;
-            DROP INDEX transactions_sender;
-            DROP INDEX transactions_from;
+            DROP INDEX transactions_to_block_number_tx_index;
+            DROP INDEX transactions_sender_block_number_tx_index;
+            DROP INDEX transactions_from_block_number_tx_index;
 
             DROP INDEX transactions_block_hash;
             DROP INDEX transactions_block_number_transaction_index;
@@ -80,6 +78,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX transactions_nonce_asc_transaction_index_desc;
             DROP INDEX transactions_timestamp_asc_transaction_index_desc;
             DROP INDEX transactions_function_sig_address;
+            DROP INDEX transactions_deployed_contract_index;
 
             DROP INDEX blocks_transactions_count;
             DROP INDEX blocks_reward;

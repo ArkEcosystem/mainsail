@@ -17,6 +17,7 @@ import {
 	ProcessResult,
 	SimulateResult,
 	TransactionContext,
+	TransactionReceipt,
 	TransactionSimulateContext,
 	TransactionViewContext,
 	UpdateRewardsAndVotesContext,
@@ -38,6 +39,7 @@ export interface Instance extends CommitHandler {
 	getLegacyAttributes(address: string, legacyAddress?: string): Promise<LegacyAttributes | undefined | null>;
 	getLegacyColdWallets(offset: bigint, limit: bigint): Promise<GetLegacyColdWalletsResult>;
 	getReceipts(offset: bigint, limit: bigint): Promise<GetReceiptsResult>;
+	getReceiptsByBlockNumber(blockNumber: bigint): Promise<Record<string, TransactionReceipt>>;
 	getReceipt(height: bigint, txHash: string): Promise<GetReceiptResult>;
 	calculateRoundValidators(context: CalculateRoundValidatorsContext): Promise<void>;
 	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;

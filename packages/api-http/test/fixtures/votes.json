@@ -14,6 +14,17 @@
 		"gas": "200000",
 		"data": "0x6dd7d8ea0000000000000000000000006df1492c168d0818f65faeaa4f7b4dc6d5a73607",
 		"signature": "ed00a08529b14053cabe409572189a398968afae3682be0ef2be8adb33f598f00e9f6cfd2ccbe892313cb70d9a204421b20e17ff3808de9981bb8d93e5cfb85501",
-		"legacySecondSignature": null
+		"legacySecondSignature": null,
+		"status": 1,
+		"gasUsed": 116802,
+		"gasRefunded": 0,
+		"logs": [
+			{
+				"data": "0x0000000000000000000000007b962da995bf5e0a7b10351b7a4381f7826504320000000000000000000000007b962da995bf5e0a7b10351b7a4381f782650432",
+				"topics": ["0xce0c7a2a940807f7dc2ce7a615c2532e915e6c0ac9a08bc4ed9d515a710a53e2"],
+				"address": "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459"
+			}
+		],
+		"output": "0x"
 	}
 ]

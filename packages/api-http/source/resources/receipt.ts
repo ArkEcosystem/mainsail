@@ -4,11 +4,20 @@ import { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class ReceiptResource implements Contracts.Api.Resource {
-	public raw(resource: Models.Receipt): object {
-		return resource;
+	public raw(resource: Models.Transaction): object {
+		return this.transform(resource);
 	}
 
-	public transform(resource: Models.Receipt): object {
-		return resource;
+	public transform(resource: Models.Transaction): object {
+		return {
+			blockNumber: resource.blockNumber,
+			contractAddress: resource.deployedContractAddress,
+			gasRefunded: resource.gasRefunded,
+			gasUsed: resource.gasUsed,
+			logs: resource.logs,
+			output: resource.output,
+			status: resource.status,
+			transactionHash: resource.hash,
+		};
 	}
 }

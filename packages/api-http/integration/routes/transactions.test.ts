@@ -1,11 +1,8 @@
 import { describe, Sandbox } from "../../../test-framework/source";
-import receipts from "../../test/fixtures/receipts.json";
 import receiptTransactions from "../../test/fixtures/receipt_transactions.json";
 import receiptTransactionsResponse from "../../test/fixtures/receipt_transactions.response.json";
 import transactions from "../../test/fixtures/transactions.json";
 import transactionsResponse from "../../test/fixtures/transactions.response.json";
-import transactionSchemas from "../../test/fixtures/transactions_schemas.json";
-import transactionTypes from "../../test/fixtures/transactions_types.json";
 import wallets from "../../test/fixtures/wallets.json";
 import { ApiContext, prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
@@ -107,7 +104,6 @@ describe<{
 
 	it("/transactions with receipt enriched", async () => {
 		await apiContext.transactionRepository.save(receiptTransactions);
-		await apiContext.receiptsRepository.save(receipts);
 
 		const { statusCode, data } = await request("/transactions", options);
 		assert.equal(statusCode, 200);

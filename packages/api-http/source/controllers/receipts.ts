@@ -1,7 +1,10 @@
-import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
-import { Contracts as ApiDatabaseContracts, Models, Search } from "@mainsail/api-database";
-import { injectable } from "@mainsail/container";
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Search,
+} from "@mainsail/api-database";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
 import { ReceiptResource } from "../resources/index.js";
@@ -9,107 +12,117 @@ import { Controller } from "./controller.js";
 
 @injectable()
 export class ReceiptsController extends Controller {
+	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
+	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
+
 	public async index(request: Hapi.Request) {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.ReceiptCriteria = request.query;
+		const sorting = this.getListingOrder(request);
+		const options = this.getListingOptions(request);
 
-		const query = this.receiptRepositoryFactory()
-			.createQueryBuilder("receipt")
-			.select(this.getReceiptColumns(request.query.fullReceipt))
-			.innerJoin(Models.Transaction, "transaction", "receipt.transactionHash = transaction.hash");
+		let transactionCriteria: Search.Criteria.TransactionCriteria = {};
 
 		if (criteria.transactionHash) {
-			query.andWhere("receipt.transactionHash = :transactionHash", { transactionHash: criteria.transactionHash });
+			transactionCriteria.hash = criteria.transactionHash;
 		}
 
 		// in this context, recipient always refers to a contract
 		if (criteria.to) {
-			query.andWhere("transaction.to = :to", { to: criteria.to });
+			transactionCriteria.to = criteria.to;
 		}
 
 		if (criteria.from) {
-			query.innerJoin(Models.Wallet, "wallet", "transaction.from = wallet.address").andWhere(
-				new ApiDatabaseContracts.Brackets((qb) => {
-					qb.where("wallet.publicKey = :from", { from: criteria.from }).orWhere("wallet.address = :from", {
-						from: criteria.from,
-					});
-				}),
-			);
+			transactionCriteria = { ...transactionCriteria, ...this.#inferSenderCriteria(criteria.from.toString()) };
 		}
 
-		const [receipts, totalCount] = await query
-			.orderBy("transaction.blockNumber", "DESC")
-			.addOrderBy("transaction.transactionIndex", "DESC")
-			.offset(pagination.offset)
-			.limit(pagination.limit)
-			.select()
-			.getManyAndCount();
-
-		return this.toPagination(
-			{
-				meta: { totalCountIsEstimate: false },
-				results: receipts,
-				totalCount,
-			},
-			ReceiptResource,
+		const walletRepository = this.walletRepositoryFactory();
+		const receipts = await this.transactionRepositoryFactory().findManyByCriteria(
+			walletRepository,
+			transactionCriteria,
+			sorting,
+			pagination,
+			options,
 		);
+
+		return this.toPagination(receipts, ReceiptResource);
 	}
 
 	public async show(request: Hapi.Request) {
-		const receipt = await this.receiptRepositoryFactory()
-			.createQueryBuilder("receipt")
-			.select(this.getReceiptColumns(request.query.fullReceipt))
-			.where("receipt.transactionHash = :transactionHash", { transactionHash: request.params.transactionHash })
+		const receipt = await this.transactionRepositoryFactory()
+			.createQueryBuilder()
+			.select(this.#getReceiptColumns(request.query.fullReceipt))
+			.where("Transaction.hash = :transactionHash", { transactionHash: request.params.transactionHash })
 			.getOne();
 
-		if (!receipt) {
-			return Boom.notFound();
-		}
-
-		return this.toResource(receipt, ReceiptResource);
+		return this.respondWithResource(receipt, ReceiptResource);
 	}
 
 	public async contracts(request: Hapi.Request) {
 		const criteria: Search.Criteria.ReceiptCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
+		const sorting = this.getListingOrder(request);
+		const options = this.getListingOptions(request);
 
-		const query = this.receiptRepositoryFactory()
-			.createQueryBuilder("receipt")
-			.select(this.getReceiptColumns(request.query.fullReceipt))
-			.innerJoin(Models.Transaction, "transaction", "receipt.transactionHash = transaction.hash")
-			.where("receipt.contractAddress IS NOT NULL");
+		let transactionCriteria: Search.Criteria.TransactionCriteria = {
+			deployedContractAddress: true,
+		};
 
 		if (criteria.from) {
-			query.innerJoin(Models.Wallet, "wallet", "transaction.from = wallet.address").andWhere(
-				new ApiDatabaseContracts.Brackets((qb) => {
-					qb.where("wallet.publicKey = :from", { from: criteria.from }).orWhere("wallet.address = :from", {
-						from: criteria.from,
-					});
-				}),
-			);
+			transactionCriteria = { ...transactionCriteria, ...this.#inferSenderCriteria(criteria.from.toString()) };
 		}
 
-		const [receipts, totalCount] = await query
-			.orderBy("transaction.blockNumber", "DESC")
-			.addOrderBy("transaction.transactionIndex", "DESC")
-			.offset(pagination.offset)
-			.limit(pagination.limit)
-			.select()
-			.getManyAndCount();
-
-		return this.toPagination(
-			{
-				meta: { totalCountIsEstimate: false },
-				results: receipts,
-				totalCount,
-			},
-			ReceiptResource,
+		const walletRepository = this.walletRepositoryFactory();
+		const receipts = await this.transactionRepositoryFactory().findManyByCriteria(
+			walletRepository,
+			transactionCriteria,
+			sorting,
+			pagination,
+			options,
 		);
+
+		return this.toPagination(receipts, ReceiptResource);
 	}
 
-	protected getListingOptions(): Contracts.Api.Options {
+	protected getListingOrder(_request: Hapi.Request): Contracts.Api.Sorting {
+		return [
+			{
+				direction: "desc",
+				property: "blockNumber",
+			},
+			{
+				direction: "desc",
+				property: "transactionIndex",
+			},
+		];
+	}
+
+	protected getListingOptions(request: Hapi.Request): Search.Options {
+		const options = super.getListingOptions(request);
+
 		return {
-			estimateTotalCount: false,
+			...options,
+			selection: this.#getReceiptColumns(request.query.fullReceipt),
 		};
+	}
+
+	#inferSenderCriteria(from: string): Search.Criteria.TransactionCriteria {
+		const likelyAddress = from.startsWith("0x") && from.length === 42;
+		return likelyAddress ? { from } : { senderPublicKey: from };
+	}
+
+	#getReceiptColumns(fullReceipt?: boolean): string[] {
+		let columns = [
+			"Transaction.hash",
+			"Transaction.status",
+			"Transaction.gasUsed",
+			"Transaction.gasRefunded",
+			"Transaction.deployedContractAddress",
+		];
+		if (fullReceipt) {
+			columns = [...columns, "Transaction.output", "Transaction.logs"];
+		}
+
+		return columns;
 	}
 }
