@@ -37,12 +37,11 @@ function formatErrorArguments(errorName: string, arguments_?: readonly unknown[]
 
 	// Panic(uint256)
 	if (errorName === "Panic") {
-		const codeBig = arguments_?.[0] as bigint | number | undefined;
-		if (codeBig === undefined) {
+		const code = Number(arguments_?.[0]) as number | undefined;
+		if (code === undefined) {
 			return "Panic";
 		}
 
-		const code = typeof codeBig === "bigint" ? Number(codeBig) : Number(codeBig);
 		const hex = `0x${code.toString(16)}`;
 		const reason = panicReasons[code as keyof typeof panicReasons];
 		return reason ? `Panic (${hex}): ${reason}` : `Panic (${hex})`;
