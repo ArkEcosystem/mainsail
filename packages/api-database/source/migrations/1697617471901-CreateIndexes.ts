@@ -5,9 +5,9 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 		// language=postgresql
 		await queryRunner.query(`
             CREATE UNIQUE INDEX transactions_sender_nonce ON transactions(sender_public_key, nonce);
-		CREATE INDEX transactions_to ON transactions("to", block_number DESC, transaction_index DESC);
-		CREATE INDEX transactions_from ON transactions("from", block_number DESC, transaction_index DESC);
-            CREATE INDEX transactions_sender ON transactions(sender_public_key, block_number DESC, transaction_index DESC);
+            CREATE INDEX transactions_to_block_number_tx_index ON transactions("to", block_number DESC, transaction_index DESC);
+            CREATE INDEX transactions_from_block_number_tx_index ON transactions("from", block_number DESC, transaction_index DESC);
+            CREATE INDEX transactions_sender_block_number_tx_index ON transactions(sender_public_key, block_number DESC, transaction_index DESC);
 
             CREATE INDEX transactions_block_hash ON transactions(block_hash);
             CREATE INDEX transactions_block_number_transaction_index ON transactions(block_number, transaction_index);
@@ -57,9 +57,9 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 		// language=postgresql
 		await queryRunner.query(`
             DROP INDEX transactions_sender_nonce;
-            DROP INDEX transactions_to;
-            DROP INDEX transactions_sender;
-            DROP INDEX transactions_from;
+            DROP INDEX transactions_to_block_number_tx_index;
+            DROP INDEX transactions_sender_block_number_tx_index;
+            DROP INDEX transactions_from_block_number_tx_index;
 
             DROP INDEX transactions_block_hash;
             DROP INDEX transactions_block_number_transaction_index;
