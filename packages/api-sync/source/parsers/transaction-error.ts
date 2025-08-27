@@ -4,32 +4,6 @@ import { Abi, AbiItem, decodeErrorResult, toHex } from "viem";
 
 const errorAbis = collectErrorItems([ConsensusAbi.abi, MultiPaymentAbi.abi, UsernamesAbi.abi] as Abi[]);
 
-export function parseTransactionError(
-	transaction: Contracts.Crypto.Transaction,
-	receipt: Contracts.Evm.TransactionReceipt,
-): string | undefined {
-	if (receipt.status === 1) {
-		return undefined;
-	}
-
-	if (!receipt.output || receipt.output.byteLength === 0) {
-		if (receipt.gasUsed >= transaction.data.gasLimit) {
-			return "out of gas";
-		}
-
-		// TODO: proxy contracts might not use up all gas when they run out of gas (due to DELEGATECALL)
-	} else {
-		const data = toHex(receipt.output);
-
-		try {
-			const decoded = decodeErrorResult({ abi: errorAbis, data });
-			return formatErrorArguments(decoded.errorName, decoded.args);
-		} catch {}
-	}
-
-	return "execution reverted";
-}
-
 function formatErrorArguments(errorName: string, arguments_?: readonly unknown[]): string {
 	if (!arguments_ || arguments_.length === 0) {
 		return errorName;
@@ -84,3 +58,29 @@ const panicReasons = {
 	65: "Allocated too much memory or created an array which is too large",
 	81: "Attempted to call a zero-initialized variable of internal function type",
 } as const;
+
+export function parseTransactionError(
+	transaction: Contracts.Crypto.Transaction,
+	receipt: Contracts.Evm.TransactionReceipt,
+): string | undefined {
+	if (receipt.status === 1) {
+		return undefined;
+	}
+
+	if (!receipt.output || receipt.output.byteLength === 0) {
+		if (receipt.gasUsed >= transaction.data.gasLimit) {
+			return "out of gas";
+		}
+
+		// TODO: proxy contracts might not use up all gas when they run out of gas (due to DELEGATECALL)
+	} else {
+		const data = toHex(receipt.output);
+
+		try {
+			const decoded = decodeErrorResult({ abi: errorAbis, data });
+			return formatErrorArguments(decoded.errorName, decoded.args);
+		} catch {}
+	}
+
+	return "execution reverted";
+}
