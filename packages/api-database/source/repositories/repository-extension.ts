@@ -19,11 +19,19 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 				sorting[0].property,
 				sorting[0].jsonFieldAccessor,
 			);
-			queryBuilder.orderBy(column, sorting[0].direction === "desc" ? "DESC" : "ASC", "NULLS LAST");
+			queryBuilder.orderBy(
+				column.name,
+				sorting[0].direction === "desc" ? "DESC" : "ASC",
+				column.isNullable ? "NULLS LAST" : undefined,
+			);
 
 			for (const item of sorting.slice(1)) {
 				const column = this.queryHelper.getColumnName(this.metadata, item.property, item.jsonFieldAccessor);
-				queryBuilder.addOrderBy(column, item.direction === "desc" ? "DESC" : "ASC", "NULLS LAST");
+				queryBuilder.addOrderBy(
+					column.name,
+					item.direction === "desc" ? "DESC" : "ASC",
+					column.isNullable ? "NULLS LAST" : undefined,
+				);
 			}
 		}
 	},
@@ -35,15 +43,6 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 	addWhere(queryBuilder: SelectQueryBuilder<TEntity>, expression: Expressions.Expression<TEntity>): void {
 		const sqlExpression = this.queryHelper.getWhereExpressionSql(this.metadata, expression);
 		queryBuilder.where(sqlExpression.query, sqlExpression.parameters);
-	},
-
-	async findManyByExpression(expression: Expressions.Expression<TEntity>, sorting: Sorting = []): Promise<TEntity[]> {
-		const queryBuilder: SelectQueryBuilder<TEntity> = this.createQueryBuilder().select();
-
-		this.addWhere(queryBuilder, expression);
-		this.addOrderBy(queryBuilder, sorting);
-
-		return queryBuilder.getMany();
 	},
 
 	async listByExpression(
@@ -58,7 +57,16 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 			await queryRunner.startTransaction("REPEATABLE READ");
 
 			try {
-				const resultsQueryBuilder = this.createQueryBuilder().setQueryRunner(queryRunner).select();
+				const resultsQueryBuilder = this.createQueryBuilder().setQueryRunner(queryRunner);
+
+				if (options?.selection) {
+					resultsQueryBuilder.select([]);
+
+					for (const select of options.selection) {
+						resultsQueryBuilder.addSelect(select);
+					}
+				}
+
 				this.addWhere(resultsQueryBuilder, expression);
 				this.addOrderBy(resultsQueryBuilder, sorting);
 				this.addSkipOffset(resultsQueryBuilder, pagination);

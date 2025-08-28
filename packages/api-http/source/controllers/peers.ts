@@ -6,7 +6,6 @@ import {
 	Search,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
 
 import { PeerResource } from "../resources/peer.js";
 import { Controller } from "./controller.js";
@@ -20,7 +19,7 @@ export class PeersController extends Controller {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.PeerCriteria = request.query;
 		const sorting = this.getListingOrder(request);
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		const peers = await this.peerRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 
@@ -43,7 +42,7 @@ export class PeersController extends Controller {
 		return this.respondWithResource(peer, PeerResource);
 	}
 
-	protected getListingOptions(): Contracts.Api.Options {
+	protected getListingOptions(_request: Hapi.Request): Search.Options {
 		return {
 			estimateTotalCount: false,
 		};

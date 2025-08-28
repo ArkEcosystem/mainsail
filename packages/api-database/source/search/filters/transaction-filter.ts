@@ -98,6 +98,12 @@ export class TransactionFilter {
 						this.handleDataCritera(c),
 					);
 				}
+				case "deployedContractAddress": {
+					return handleOrCriteria(criteria.gasPrice, async (c) =>
+						// @ts-ignore
+						this.handleDeployedContractCriteria(criteria.deployedContractAddress, c),
+					);
+				}
 				default: {
 					return { op: "true" };
 				}
@@ -165,6 +171,16 @@ export class TransactionFilter {
 			expressions: [recipientExpression, multipaymentRecipientExpression],
 			op: "or",
 		};
+	}
+
+	private static async handleDeployedContractCriteria(
+		criteria: EqualCriteria<boolean>,
+	): Promise<Expression<Transaction>> {
+		if (criteria) {
+			return { op: "notNull", property: "deployedContractAddress" };
+		}
+
+		return { op: "false" };
 	}
 
 	private static async handleDataCritera(criteria: EqualCriteria<string>): Promise<Expression<Transaction>> {

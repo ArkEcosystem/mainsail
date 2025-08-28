@@ -5,6 +5,7 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 	Search,
+	TypeOrm,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
@@ -24,7 +25,7 @@ export class ValidatorsController extends Controller {
 			request.query,
 			validatorCriteriaSchemaObject,
 		) as Search.Criteria.ValidatorCriteria;
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		const wallets = await this.walletRepositoryFactory().findManyValidatorsByCritera(
 			criteria,
@@ -61,7 +62,7 @@ export class ValidatorsController extends Controller {
 			request.query,
 			walletCriteriaSchemaObject,
 		) as Search.Criteria.WalletCriteria;
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		const wallets = await this.walletRepositoryFactory().findManyByCriteria(
 			{
@@ -93,7 +94,7 @@ export class ValidatorsController extends Controller {
 
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		const blocks = await this.blockRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 		const state = await this.getState();
@@ -111,7 +112,7 @@ export class ValidatorsController extends Controller {
 			.where("attributes ? :validatorPublicKey", { validatorPublicKey: "validatorPublicKey" })
 			.andWhere("attributes->>:validatorPublicKey <> ''", { validatorPublicKey: "validatorPublicKey" })
 			.andWhere(
-				new ApiDatabaseContracts.Brackets((query) => {
+				new TypeOrm.Brackets((query) => {
 					query
 						.where("address = :address", { address: walletId })
 						.orWhere("public_key = :publicKey", { publicKey: walletId })

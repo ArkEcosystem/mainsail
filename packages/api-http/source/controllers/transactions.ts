@@ -20,7 +20,7 @@ export class TransactionsController extends Controller {
 		const criteria: Search.Criteria.TransactionCriteria = request.query;
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		const walletRepository = this.walletRepositoryFactory();
 		const transactions = await this.transactionRepositoryFactory().findManyByCriteria(
@@ -53,7 +53,7 @@ export class TransactionsController extends Controller {
 		}
 
 		return this.respondWithResource(
-			await this.enrichTransaction(transaction, undefined, undefined, request.query.fullReceipt),
+			await this.enrichTransaction(transaction, undefined, request.query.fullReceipt),
 			TransactionResource,
 		);
 	}

@@ -66,12 +66,6 @@ export class ApiContext {
 		)();
 	}
 
-	public get receiptsRepository(): ApiDatabaseContracts.ReceiptRepository {
-		return this.app.get<ApiDatabaseContracts.ReceiptRepositoryFactory>(
-			ApiDatabaseIdentifiers.ReceiptRepositoryFactory,
-		)();
-	}
-
 	public get configurationRepository(): ApiDatabaseContracts.ConfigurationRepository {
 		return this.app.get<ApiDatabaseContracts.ConfigurationRepositoryFactory>(
 			ApiDatabaseIdentifiers.ConfigurationRepositoryFactory,
@@ -89,6 +83,8 @@ export class ApiContext {
 		await dataSource.dropDatabase();
 		await dataSource.synchronize(true);
 		await dataSource.runMigrations();
+
+		await this.stateRepository.save({ id: 0, blockNumber: "0", supply: "1500000" });
 	}
 
 	public async dispose() {

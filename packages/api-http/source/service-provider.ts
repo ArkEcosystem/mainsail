@@ -44,6 +44,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 			},
 			{ plugin: Plugins.commaArrayQuery },
 			{ plugin: Plugins.dotSeparatedQuery },
+			{ plugin: Plugins.databaseReady },
 			{
 				options: {
 					query: {

@@ -39,7 +39,6 @@ describe<{
 		assert.empty(data.data);
 
 		await apiContext.transactionRepository.save(receiptTransactions);
-		await apiContext.receiptsRepository.save(receipts);
 		await apiContext.walletRepository.save(receiptWallets);
 
 		const testCases = [
@@ -57,6 +56,10 @@ describe<{
 			},
 			{
 				query: `?from=${receiptTransactions[0].senderPublicKey}`,
+				result: receiptsResult,
+			},
+			{
+				query: `?from=${receiptTransactions[0].from}`,
 				result: receiptsResult,
 			},
 			{
@@ -78,7 +81,6 @@ describe<{
 
 	it("/receipts/{transactionHash}", async () => {
 		await apiContext.transactionRepository.save(receiptTransactions);
-		await apiContext.receiptsRepository.save(receipts);
 		await apiContext.walletRepository.save(receiptWallets);
 
 		const testCases = [
@@ -99,7 +101,10 @@ describe<{
 
 		for (const { transactionHash, statusCode: expectedStatusCode = 200, result } of testCases) {
 			try {
-				const { statusCode, data } = await request(`/receipts/${transactionHash}`, options);
+				const {
+					statusCode,
+					data: { data },
+				} = await request(`/receipts/${transactionHash}`, options);
 				assert.equal(statusCode, expectedStatusCode);
 				assert.equal(data, result);
 			} catch (ex) {
@@ -115,7 +120,6 @@ describe<{
 		assert.empty(data.data);
 
 		await apiContext.transactionRepository.save(receiptTransactions);
-		await apiContext.receiptsRepository.save(receipts);
 		await apiContext.walletRepository.save(receiptWallets);
 
 		const testCases = [
@@ -125,6 +129,10 @@ describe<{
 			},
 			{
 				query: `?from=${receiptTransactions[0].senderPublicKey}`,
+				result: [receiptsResult[1]],
+			},
+			{
+				query: `?from=${receiptTransactions[0].from}`,
 				result: [receiptsResult[1]],
 			},
 			{
