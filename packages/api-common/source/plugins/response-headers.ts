@@ -9,6 +9,12 @@ export const responseHeaders = {
 		);
 
 		return async (request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Hapi.Lifecycle.ReturnValue> => {
+			if ("statusCode" in request.response) {
+				if (request.response.statusCode === 503) {
+					return h.continue;
+				}
+			}
+
 			const blockNumber = await blockRepositoryFactory().getLatestHeight();
 
 			const responsePropertyToUpdate = "isBoom" in request.response ? request.response.output : request.response;

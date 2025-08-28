@@ -83,6 +83,8 @@ export class ApiContext {
 		await dataSource.dropDatabase();
 		await dataSource.synchronize(true);
 		await dataSource.runMigrations();
+
+		await this.stateRepository.save({ id: 0, blockNumber: "0", supply: "1500000" });
 	}
 
 	public async dispose() {
