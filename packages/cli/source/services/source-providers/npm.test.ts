@@ -1,21 +1,47 @@
-import fs from "fs-extra/esm";
+import { readFileSync } from "fs";
 import { join, resolve } from "path";
+import esmock from "esmock";
 import { dirSync, setGracefulCleanup } from "tmp";
+import { Contracts } from "@mainsail/test-runner";
 
 import { describe } from "../../../../test-framework/source";
-import { execa } from "../../execa";
 import { NPM } from "./npm";
+
+let removeSyncStub: Contracts.Stub;
+let moveSyncStub: Contracts.Stub;
+let execaSyncStub: Contracts.Stub;
+
+const { NPM: NPMProxy } = await esmock(
+	"./npm",
+	import.meta.url,
+	{},
+	{
+		"fs-extra/esm": {
+			removeSync: (...args) => removeSyncStub.call(...args),
+			moveSync: (...args) => moveSyncStub.call(...args),
+		},
+		execa: {
+			execaSync: (...args) => execaSyncStub.call(...args),
+		},
+	},
+);
 
 describe<{
 	dataPath: string;
 	tempPath: string;
 	source: NPM;
-}>("NPM", ({ beforeEach, afterEach, afterAll, it, assert, spy, stub, nock }) => {
+	sourceMocked: NPM;
+}>("NPM", ({ beforeEach, afterEach, afterAll, it, assert, spy, stub, nock, stubFn }) => {
 	beforeEach((context) => {
+		removeSyncStub = stubFn();
+		moveSyncStub = stubFn();
+		execaSyncStub = stubFn();
+
 		context.dataPath = dirSync().name;
 		context.tempPath = dirSync().name;
 
 		context.source = new NPM({ data: context.dataPath, temp: context.tempPath });
+		context.sourceMocked = new NPMProxy({ data: context.dataPath, temp: context.tempPath });
 
 		nock.cleanAll();
 	});
@@ -96,8 +122,7 @@ describe<{
 		assert.false(await source.exists("does not exist"));
 	});
 
-	// TODO: fix stub
-	it.skip("#update - should successfully install the plugin", async ({ source, tempPath, dataPath }) => {
+	it("#update - should successfully install the plugin", async ({ sourceMocked, tempPath, dataPath }) => {
 		nock.fake(/.*/)
 			.get("/@arkecosystem/utils")
 			.reply(200, {
@@ -120,30 +145,20 @@ describe<{
 			.get("/@arkecosystem/utils/-/utils-0.9.1.tgz")
 			.reply(
 				200,
-				fs.readFileSync(
-					resolve(new URL(".", import.meta.url).pathname, "../../../test/files", "utils-0.9.1.tgz"),
-				),
+				readFileSync(resolve(new URL(".", import.meta.url).pathname, "../../../test/files", "utils-0.9.1.tgz")),
 			);
-
-		// Arrange
-		const removeSync = spy(fs, "removeSync");
-		const ensureFileSync = spy(fs, "ensureFileSync");
-		const moveSync = spy(fs, "moveSync");
-		const spyOnExeca = stub(execa, "sync");
 
 		// Act
 		const packageName = "@arkecosystem/utils";
-		await source.update(packageName);
+		await sourceMocked.update(packageName);
 
 		// Assert
 		const pathPlugin = `${dataPath}/${packageName}`;
-		removeSync.calledWith(pathPlugin);
-		ensureFileSync.calledWith(`${tempPath}/${packageName}.tgz`);
-		removeSync.calledWith(pathPlugin);
-		moveSync.calledWith(`${tempPath}/package`, pathPlugin);
-		removeSync.calledWith(pathPlugin);
-		removeSync.calledWith(`${tempPath}/${packageName}.tgz`);
-		spyOnExeca.calledWith(`pnpm`, ["install", "--production"], {
+		removeSyncStub.calledWith(pathPlugin);
+		// ensureFileSync.calledWith(`${tempPath}/${packageName}.tgz`);
+		moveSyncStub.calledWith(`${tempPath}/package`, pathPlugin);
+		removeSyncStub.calledWith(`${tempPath}/${packageName}.tgz`);
+		execaSyncStub.calledWith(`pnpm`, ["install", "--production"], {
 			cwd: join(dataPath, packageName),
 		});
 	});

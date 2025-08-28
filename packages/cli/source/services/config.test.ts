@@ -3,6 +3,7 @@ import { setGracefulCleanup } from "tmp";
 
 import { Console, describe } from "../../../test-framework/source";
 import { Config } from "./config";
+import { Identifiers } from "../ioc/index.js";
 
 describe<{
 	cli: Console;
@@ -37,6 +38,22 @@ describe<{
 		config.load();
 
 		restoreDefaults.calledOnce();
+
+		assert.equal(config.get("channel"), "next");
+		assert.equal(config.get("plugins"), []);
+	});
+
+	it("#load - should restore the defaults if the config is not object", ({ config, configPath }) => {
+		writeFileSync(configPath, JSON.stringify([]));
+
+		const restoreDefaults = spy(config, "restoreDefaults");
+
+		config.load();
+
+		restoreDefaults.calledOnce();
+
+		assert.equal(config.get("channel"), "next");
+		assert.equal(config.get("plugins"), []);
 	});
 
 	it("#save - should restore the defaults if the config has been corrupted", ({ config }) => {
@@ -62,6 +79,21 @@ describe<{
 		config.restoreDefaults();
 
 		assert.equal(config.get("channel"), "next");
+		assert.equal(config.get("plugins"), []);
+	});
+
+	it("#restoreDefaults - should set channel to default if version is not set in package.json", ({ config, cli }) => {
+		config.forget("channel");
+		config.forget("plugins");
+
+		assert.undefined(config.get("channel"));
+		assert.undefined(config.get("plugins"));
+
+		cli.app.get<any>(Identifiers.Package).version = undefined;
+
+		config.restoreDefaults();
+
+		assert.equal(config.get("channel"), "rc");
 		assert.equal(config.get("plugins"), []);
 	});
 });

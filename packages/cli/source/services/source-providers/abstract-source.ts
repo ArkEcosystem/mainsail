@@ -1,8 +1,8 @@
 import { Exceptions } from "@mainsail/contracts";
+import { execaSync } from "execa";
 import { ensureDirSync, moveSync, readJSONSync, removeSync } from "fs-extra/esm";
 import { join } from "path";
 
-import { execa } from "../../execa.js";
 import { Source } from "./contracts.js";
 
 export abstract class AbstractSource implements Source {
@@ -34,7 +34,7 @@ export abstract class AbstractSource implements Source {
 	}
 
 	protected async installDependencies(packageName: string): Promise<void> {
-		execa.sync(`pnpm`, ["install", "--production"], { cwd: this.getDestPath(packageName) });
+		execaSync(`pnpm`, ["install", "--production"], { cwd: this.getDestPath(packageName) });
 	}
 
 	protected getOriginPath(): string {

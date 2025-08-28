@@ -50,6 +50,10 @@ export class Config {
 	public load(): any {
 		try {
 			this.#store = readJSONSync(this.#file);
+
+			if (this.#store.constructor !== Object) {
+				throw new Error("Config file is corrupted");
+			}
 		} catch {
 			this.restoreDefaults();
 

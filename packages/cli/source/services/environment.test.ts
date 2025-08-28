@@ -25,6 +25,14 @@ describe<{
 		delete process.env.MAINSAIL_PATH_CONFIG;
 	});
 
+	it("should respect the MAINSAIL_PATH_DATA environment variable", async ({ environment }) => {
+		process.env.MAINSAIL_PATH_DATA = "something";
+
+		assert.true(environment.getPaths().data.endsWith("/something/core"));
+
+		delete process.env.MAINSAIL_PATH_DATA;
+	});
+
 	it("should fail to update the variables if the file doesn't exist", async ({ environment }) => {
 		assert.throws(() => environment.updateVariables("some-file", {}), "No environment file found at some-file.");
 	});

@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
 import { ActionFactory } from "../action-factory.js";
@@ -44,12 +44,6 @@ export abstract class Command {
 	protected definition: InputDefinition = new InputDefinition();
 
 	protected input!: Input;
-
-	@postConstruct()
-	// @TODO for some reason this isn't recognized in tests for being called
-	public configure(): void {
-		// Do nothing...
-	}
 
 	public register(argv: string[]) {
 		try {
