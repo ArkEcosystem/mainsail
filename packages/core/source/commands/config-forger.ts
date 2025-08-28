@@ -60,7 +60,6 @@ export class Command extends Commands.Command {
 		const cmd = this.app.resolve(commandSignature);
 
 		const flags = this.getFlags();
-		cmd.configure();
 		cmd.register([]);
 
 		for (const flag in flags) {
