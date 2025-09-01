@@ -23,14 +23,14 @@ export class NodeController extends Controller {
 
 	public async status(request: Hapi.Request) {
 		const state = await this.getState();
-		const medianPeerBlockNumber = await this.peerRepositoryFactory().getMedianPeerBlockNumber();
+		const peerBlockNumber = await this.peerRepositoryFactory().getPeerBlockNumberP90();
 		const ownBlockNumber = Number(state?.blockNumber ?? 0);
 
 		return {
 			data: {
-				blocksCount: state ? medianPeerBlockNumber - ownBlockNumber : 0,
+				blocksCount: state ? peerBlockNumber - ownBlockNumber : 0,
 				now: ownBlockNumber,
-				synced: ownBlockNumber >= medianPeerBlockNumber,
+				synced: ownBlockNumber >= peerBlockNumber - 1,
 				timestamp: dayjs().unix(),
 			},
 		};
@@ -38,15 +38,15 @@ export class NodeController extends Controller {
 
 	public async syncing(request: Hapi.Request) {
 		const state = await this.getState();
-		const medianPeerBlockNumber = await this.peerRepositoryFactory().getMedianPeerBlockNumber();
+		const peerBlockNumber = await this.peerRepositoryFactory().getPeerBlockNumberP90();
 		const ownBlockNumber = Number(state?.blockNumber ?? 0);
 
 		return {
 			data: {
 				blockNumber: ownBlockNumber,
-				blocks: state ? medianPeerBlockNumber - ownBlockNumber : 0,
+				blocks: state ? peerBlockNumber - ownBlockNumber : 0,
 				id: state?.id ?? 0,
-				syncing: ownBlockNumber < medianPeerBlockNumber,
+				syncing: ownBlockNumber < peerBlockNumber - 1,
 			},
 		};
 	}

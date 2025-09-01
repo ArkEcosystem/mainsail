@@ -14,13 +14,13 @@ export class NodeController extends Controller {
 
 	public async status(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const lastBlock = this.stateStore.getLastBlock();
-		const networkBlockNumber = this.p2pService.getNetworkBlockNumber();
+		const networkBlockNumber = this.p2pService.getNetworkBlockNumberPercentile(90);
 
 		return {
 			data: {
 				blockNumber: lastBlock.data.number,
-				networkBlockNumber: networkBlockNumber - 1, // Use -1 to determine last block state. Consensus state is provided.
-				synced: lastBlock.data.number + 1 >= networkBlockNumber,
+				networkBlockNumber: networkBlockNumber,
+				synced: lastBlock.data.number >= networkBlockNumber - 1,
 			},
 		};
 	}

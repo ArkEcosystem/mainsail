@@ -54,7 +54,7 @@ export type ApiNodeRepositoryExtension = {
 export type ApiNodeRepository = ExtendedRepository<ApiNode> & ApiNodeRepositoryExtension;
 
 export type PeerRepositoryExtension = {
-	getMedianPeerBlockNumber(): Promise<number>;
+	getPeerBlockNumberP90(): Promise<number>;
 
 	findManyByCriteria(
 		peerCriteria: Criteria.OrPeerCriteria,
