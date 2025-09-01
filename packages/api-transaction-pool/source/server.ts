@@ -19,6 +19,16 @@ export class Server extends AbstractServer {
 	}
 
 	protected defaultOptions(): Record<string, any> {
+		const validateContext = {
+			configuration: {
+				plugins: {
+					pagination: {
+						limit: this.configuration.getRequired<number>("plugins.pagination.limit"),
+					},
+				},
+			},
+		};
+
 		return {
 			router: {
 				stripTrailingSlash: true,
@@ -34,6 +44,9 @@ export class Server extends AbstractServer {
 					/* istanbul ignore next */
 					async failAction(request, h, error) {
 						return badData(error.message);
+					},
+					options: {
+						context: validateContext,
 					},
 				},
 			},
