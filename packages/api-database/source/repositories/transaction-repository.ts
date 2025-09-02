@@ -21,6 +21,39 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): Tra
 			pagination: Pagination,
 			options?: Options,
 		): Promise<ResultsPage<Transaction>> {
+			if (options?.fullReceipt !== undefined && !options.selection) {
+				// Explicit selection of transaction table columns to make the query more efficient.
+				const selection = [
+					"Transaction.hash",
+					"Transaction.blockHash",
+					"Transaction.blockNumber",
+					"Transaction.transactionIndex",
+					"Transaction.timestamp",
+					"Transaction.nonce",
+					"Transaction.senderPublicKey",
+					"Transaction.from",
+					"Transaction.to",
+					"Transaction.value",
+					"Transaction.gasPrice",
+					"Transaction.gas",
+					"Transaction.data",
+					"Transaction.signature",
+					"Transaction.legacySecondSignature",
+
+					"Transaction.status",
+					"Transaction.gasUsed",
+					"Transaction.gasRefunded",
+					"Transaction.deployedContractAddress",
+					"Transaction.decodedError",
+				];
+
+				if (options.fullReceipt) {
+					selection.push("Transaction.logs", "Transaction.output");
+				}
+
+				options.selection = selection;
+			}
+
 			const transactionExpression = await TransactionFilter.getExpression(walletRepository, transactionCriteria);
 			return this.listByExpression(transactionExpression, sorting, pagination, options);
 		},

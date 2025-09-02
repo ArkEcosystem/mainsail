@@ -16,11 +16,11 @@ export const makePeerRepository = (dataSource: RepositoryDataSource): PeerReposi
 			return this.listByExpression(peerExpression, sorting, pagination, options);
 		},
 
-		async getMedianPeerBlockNumber(): Promise<number> {
+		async getPeerBlockNumberP90(): Promise<number> {
 			const result = await this.createQueryBuilder()
-				.select("percentile_cont(0.5) WITHIN GROUP (ORDER BY block_number)", "median_block_number")
-				.getRawOne<{ median_block_number: number }>();
+				.select("percentile_disc(0.9) WITHIN GROUP (ORDER BY block_number)", "p90")
+				.getRawOne<{ p90: number }>();
 
-			return result?.median_block_number ?? 0;
+			return result?.p90 ?? 0;
 		},
 	});

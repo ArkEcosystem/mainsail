@@ -1,3 +1,4 @@
+import Hapi from "@hapi/hapi";
 import { AbstractController } from "@mainsail/api-common";
 import {
 	Contracts as ApiDatabaseContracts,
@@ -6,7 +7,7 @@ import {
 	Search,
 } from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 
@@ -24,17 +25,15 @@ export class Controller extends AbstractController {
 	@inject(ApiDatabaseIdentifiers.ConfigurationRepositoryFactory)
 	private readonly configurationRepositoryFactory!: ApiDatabaseContracts.ConfigurationRepositoryFactory;
 
-	@inject(ApiDatabaseIdentifiers.ReceiptRepositoryFactory)
-	protected readonly receiptRepositoryFactory!: ApiDatabaseContracts.ReceiptRepositoryFactory;
-
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	protected readonly walletRepositoryFactory!: ApiDatabaseContracts.WalletRepositoryFactory;
 
-	protected getListingOptions(): Contracts.Api.Options {
+	protected getListingOptions(request: Hapi.Request): Search.Options {
 		const estimateTotalCount = this.apiConfiguration.getOptional<boolean>("options.estimateTotalCount", true);
 
 		return {
 			estimateTotalCount,
+			fullReceipt: request.query.fullReceipt,
 		};
 	}
 
@@ -49,21 +48,6 @@ export class Controller extends AbstractController {
 		const configuration = await configurationRepository.createQueryBuilder().getOne();
 
 		return configuration ?? ({} as Models.Configuration);
-	}
-
-	protected async getReceipts(hashes: string[], full = false): Promise<Record<string, Models.Receipt>> {
-		const receiptRepository = this.receiptRepositoryFactory();
-
-		const receipts = await receiptRepository
-			.createQueryBuilder("receipt")
-			.select(this.getReceiptColumns(full))
-			.whereInIds(hashes)
-			.getMany();
-
-		return receipts.reduce((accumulator, current) => {
-			accumulator[current.transactionHash] = current;
-			return accumulator;
-		}, {});
 	}
 
 	protected async enrichBlockResult(
@@ -133,20 +117,12 @@ export class Controller extends AbstractController {
 		resultPage: Search.ResultsPage<Models.Transaction>,
 		context?: { state?: Models.State; fullReceipt?: boolean },
 	): Promise<Search.ResultsPage<EnrichedTransaction>> {
-		const [state, receipts] = await Promise.all([
-			context?.state ?? this.getState(),
-			this.getReceipts(
-				resultPage.results.map((tx) => tx.hash),
-				context?.fullReceipt ?? false,
-			),
-		]);
+		const state = context?.state ?? (await this.getState());
 
 		return {
 			...resultPage,
 			results: await Promise.all(
-				resultPage.results.map((tx) =>
-					this.enrichTransaction(tx, state, receipts[tx.hash] ?? null, context?.fullReceipt),
-				),
+				resultPage.results.map((tx) => this.enrichTransaction(tx, state, context?.fullReceipt)),
 			),
 		};
 	}
@@ -154,35 +130,16 @@ export class Controller extends AbstractController {
 	protected async enrichTransaction(
 		transaction: Models.Transaction,
 		state?: Models.State,
-		receipt?: Models.Receipt | null,
 		fullReceipt?: boolean,
 	): Promise<EnrichedTransaction> {
-		const [_state, receipts] = await Promise.all([
-			state ? state : this.getState(),
-			receipt !== undefined ? receipt : this.getReceipts([transaction.hash], fullReceipt),
-		]);
+		const [_state] = await Promise.all([state ? state : this.getState()]);
 
-		return { ...transaction, receipt: receipt ?? receipts?.[transaction.hash] ?? undefined, state: _state };
+		return { ...transaction, fullReceipt: fullReceipt ?? false, state: _state };
 	}
 
 	protected getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {
 		const asHeight = Number(idOrHeight);
 		// NOTE: This assumes all block ids are sha256 and never a valid number below this threshold.
 		return !isNaN(asHeight) && asHeight <= Number.MAX_SAFE_INTEGER ? { number: asHeight } : { hash: idOrHeight };
-	}
-
-	protected getReceiptColumns(fullReceipt?: boolean): string[] {
-		let columns = [
-			"receipt.transactionHash",
-			"receipt.status",
-			"receipt.gasUsed",
-			"receipt.gasRefunded",
-			"receipt.contractAddress",
-		];
-		if (fullReceipt) {
-			columns = [...columns, "receipt.output", "receipt.logs"];
-		}
-
-		return columns;
 	}
 }

@@ -1,3 +1,4 @@
+import { percentile } from "@mainsail/blockchain-utils";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
@@ -153,13 +154,12 @@ export class Service implements Contracts.P2P.Service {
 		}
 	}
 
-	public getNetworkBlockNumber(): number {
-		const medians = this.repository
+	public getNetworkBlockNumberPercentile(p: number): number {
+		const blockNumbers = this.repository
 			.getPeers()
 			.filter((peer) => peer.header.blockNumber)
-			.map((peer) => peer.header.blockNumber)
-			.sort((a, b) => a - b);
+			.map((peer) => peer.header.blockNumber);
 
-		return medians[Math.floor(medians.length / 2)] || 0;
+		return percentile(blockNumbers, p);
 	}
 }

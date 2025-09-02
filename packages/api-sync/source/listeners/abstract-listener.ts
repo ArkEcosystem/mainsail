@@ -1,4 +1,8 @@
-import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	TypeOrm,
+} from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
@@ -73,7 +77,7 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 	protected abstract mapEventToEntity(event: TEventData): TEntity;
 	protected abstract makeEntityRepository(
 		dataSource: ApiDatabaseContracts.RepositoryDataSource,
-	): ApiDatabaseContracts.Repository<TEntity>;
+	): TypeOrm.Repository<TEntity>;
 
 	public async handle({ name, data }: { name: Contracts.Kernel.EventName; data: TEventData }): Promise<void> {
 		const eventMapping = this.getEventMapping();

@@ -37,7 +37,7 @@ use revm::{
     state::{AccountInfo, Bytecode},
 };
 
-use crate::result::{JsCommitResult, JsGetState};
+use crate::result::{JsCommitResult, JsGetState, JsTransactionReceipt};
 
 mod ctx;
 mod logger;
@@ -568,6 +568,21 @@ impl EvmInner {
             Ok((next_offset, receipts)) => Ok((next_offset, receipts)),
             Err(err) => Err(EVMError::Database(
                 format!("failed reading receipts: {}", err).into(),
+            )),
+        }
+    }
+
+    pub fn get_receipts_by_block_number(
+        &mut self,
+        block_number: u64,
+    ) -> std::result::Result<HashMap<B256, TxReceipt>, EVMError<String>> {
+        match self
+            .persistent_db
+            .get_receipts_by_block_number(block_number)
+        {
+            Ok(receipts) => Ok(receipts),
+            Err(err) => Err(EVMError::Database(
+                format!("failed reading receipts by block number: {}", err).into(),
             )),
         }
     }
@@ -1377,6 +1392,25 @@ impl JsEvmWrapper {
     }
 
     #[napi]
+    pub fn get_receipts_by_block_number<'env>(
+        &mut self,
+        node_env: &'env Env,
+        block_number: BigInt,
+    ) -> Result<PromiseRaw<'env, HashMap<String, result::JsTransactionReceipt>>> {
+        let block_number = block_number.get_u64().1;
+
+        node_env.spawn_future_with_callback(
+            Self::get_receipts_by_block_number_async(self.evm.clone(), block_number),
+            |_, result| {
+                Ok(result
+                    .into_iter()
+                    .map(|(k, v)| (format!("{:x}", k), JsTransactionReceipt::new(v)))
+                    .collect())
+            },
+        )
+    }
+
+    #[napi]
     pub fn get_receipt<'env>(
         &mut self,
         env: &'env Env,
@@ -1880,6 +1914,19 @@ impl JsEvmWrapper {
     ) -> Result<(Option<u64>, Vec<(u64, Vec<(B256, TxReceipt)>)>)> {
         let mut lock = evm.lock().await;
         let result = lock.get_receipts(offset, limit);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_receipts_by_block_number_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        block_number: u64,
+    ) -> Result<HashMap<B256, TxReceipt>> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_receipts_by_block_number(block_number);
 
         match result {
             Ok(result) => Result::Ok(result),

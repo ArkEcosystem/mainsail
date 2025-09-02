@@ -24,7 +24,7 @@ export class BlocksController extends Controller {
 		const criteria: Search.Criteria.BlockCriteria = request.query;
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		const blocks = await this.blockRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 		if (blocks.results.length === 0) {
@@ -90,7 +90,7 @@ export class BlocksController extends Controller {
 
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
-		const options = this.getListingOptions();
+		const options = this.getListingOptions(request);
 
 		const walletRepository = this.walletRepositoryFactory();
 		const criteria: Search.Criteria.TransactionCriteria = { ...request.query, blockHash: block.hash };

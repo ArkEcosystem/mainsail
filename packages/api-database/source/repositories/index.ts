@@ -5,7 +5,6 @@ export { makeContractRepository } from "./contract-repository.js";
 export { makeLegacyColdWalletRepository } from "./legacy-cold-wallet-repository.js";
 export { makePeerRepository } from "./peer-repository.js";
 export { makePluginRepository } from "./plugin-repository.js";
-export { makeReceiptRepository } from "./receipt-repository.js";
 export { makeStateRepository } from "./state-repository.js";
 export { makeTransactionRepository } from "./transaction-repository.js";
 export { makeValidatorRoundRepository } from "./validator-round-repository.js";

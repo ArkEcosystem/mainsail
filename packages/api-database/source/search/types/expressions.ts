@@ -84,6 +84,11 @@ export type MultiPaymentExpression = {
 	value: string;
 };
 
+export type NotNullExpression<TEntity> = {
+	property: keyof TEntity;
+	op: "notNull";
+};
+
 export type Expression<TEntity> =
 	| TrueExpression
 	| FalseExpression
@@ -98,7 +103,8 @@ export type Expression<TEntity> =
 	| OrExpression<TEntity>
 	| JsonbAttributeExists<TEntity>
 	| FunctionSigExpression<TEntity>
-	| MultiPaymentExpression;
+	| MultiPaymentExpression
+	| NotNullExpression<TEntity>;
 
 export type JsonFieldOperator = "->>";
 export type JsonFieldCastType = "bigint" | "numeric";

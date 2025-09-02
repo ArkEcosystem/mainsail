@@ -12,7 +12,12 @@
 		"signature": "6ec9b47085cf1c12decdb750397a88ffb849d3f5454c3aeb181bd702ac96ba656ac875d8b15c86c62d6fffea7c8bf70fa31fd1df72b62afa19db91d6de67db1600",
 		"to": "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459",
 		"value": "0",
-		"timestamp": "1728618018574"
+		"timestamp": "1728618018574",
+		"receipt": {
+			"status": 1,
+			"gasRefunded": 0,
+			"gasUsed": 116802
+		}
 	},
 	{
 		"blockHash": "c2e37569db79379446bed974c72551397fd6bad352699e653d67fbcabfdcb66b",
@@ -27,6 +32,11 @@
 		"signature": "7c21083caa26fd18dfeecfa75cd57a2e80836872db21608f6ebce1d772b98c9f31b6bb897118297f4c6138d19e7dedbaa1ed6c59816acb7410dc59fbaba54e1400",
 		"to": "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459",
 		"value": "0",
-		"timestamp": "1728618018574"
+		"timestamp": "1728618018574",
+		"receipt": {
+			"status": 1,
+			"gasRefunded": 0,
+			"gasUsed": 116802
+		}
 	}
 ]

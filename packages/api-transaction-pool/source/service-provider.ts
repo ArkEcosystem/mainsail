@@ -44,6 +44,16 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				},
 				plugin: Plugins.rateLimit,
 			},
+			{
+				options: {
+					query: {
+						limit: {
+							default: config.pagination.limit,
+						},
+					},
+				},
+				plugin: Plugins.pagination,
+			},
 		];
 	}
 }

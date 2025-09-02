@@ -35,7 +35,7 @@ pub(crate) struct AddressWrapper(Address);
 impl heed::BytesEncode<'_> for AddressWrapper {
     type EItem = AddressWrapper;
 
-    fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
+    fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
         Ok(Cow::Borrowed(item.0.as_slice()))
     }
 }
@@ -53,7 +53,7 @@ pub(crate) struct LegacyAddressWrapper(LegacyAddress);
 impl heed::BytesEncode<'_> for LegacyAddressWrapper {
     type EItem = LegacyAddressWrapper;
 
-    fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
+    fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
         Ok(Cow::Borrowed(item.0.as_slice()))
     }
 }
@@ -70,7 +70,7 @@ pub(crate) struct BytesWrapper(Bytes);
 impl heed::BytesEncode<'_> for BytesWrapper {
     type EItem = BytesWrapper;
 
-    fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
+    fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
         Ok(Cow::Borrowed(item.0.as_ref()))
     }
 }
@@ -88,7 +88,7 @@ pub(crate) struct HashWrapper(B256);
 impl heed::BytesEncode<'_> for HashWrapper {
     type EItem = HashWrapper;
 
-    fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
+    fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
         Ok(Cow::Borrowed(item.0.as_slice()))
     }
 }
@@ -98,7 +98,7 @@ pub(crate) struct StringWrapper(String);
 impl heed::BytesEncode<'_> for StringWrapper {
     type EItem = StringWrapper;
 
-    fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
+    fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
         Ok(Cow::Borrowed(item.0.as_bytes()))
     }
 }
@@ -108,7 +108,7 @@ pub(crate) struct StaticStringWrapper(&'static str);
 impl heed::BytesEncode<'_> for StaticStringWrapper {
     type EItem = StaticStringWrapper;
 
-    fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
+    fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
         Ok(Cow::Borrowed(item.0.as_bytes()))
     }
 }
@@ -120,7 +120,7 @@ pub(crate) struct StorageEntryWrapper(U256, U256);
 impl heed::BytesEncode<'_> for StorageEntryWrapper {
     type EItem = StorageEntryWrapper;
 
-    fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
+    fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
         let a = item.0.as_le_bytes();
         let b = item.1.as_le_bytes();
 
@@ -533,6 +533,19 @@ impl PersistentDB {
             offset,
             limit,
         )
+    }
+
+    pub fn get_receipts_by_block_number(
+        &self,
+        block_number: u64,
+    ) -> Result<HashMap<B256, TxReceipt>, Error> {
+        let tx_env = self.env.read_txn()?;
+        let commit = self.inner.borrow().commits.get(&tx_env, &block_number)?;
+
+        match commit {
+            Some(commit) => Ok(commit.tx_receipts),
+            None => Ok(Default::default()),
+        }
     }
 
     pub fn get_receipt(
