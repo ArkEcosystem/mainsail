@@ -94,42 +94,42 @@ function decodeListBounds(buffer: Uint8Array): { start: number; end: number } {
 
 	const prefix = buffer[0];
 	if (prefix >= 0xc0 && prefix <= 0xf7) {
-		const len = prefix - 0xc0;
+		const length = prefix - 0xc0;
 		const start = 1;
-		const end = start + len;
+		const end = start + length;
 		if (end > buffer.length) {
 			throw new Error("decode RLP truncated short list");
 		}
 
-		return { start, end };
+		return { end, start };
 	}
 
 	if (prefix >= 0xf8 && prefix <= 0xff) {
-		const lenOfLen = prefix - 0xf7;
-		if (1 + lenOfLen > buffer.length) {
+		const lengthOfLength = prefix - 0xf7;
+		if (1 + lengthOfLength > buffer.length) {
 			throw new Error("decode RLP truncated length-of-length");
 		}
 
-		let len = 0;
-		for (let i = 0; i < lenOfLen; i++) {
-			const v = buffer[1 + i];
-			if (i === 0 && lenOfLen > 1 && v === 0) {
+		let length = 0;
+		for (let index = 0; index < lengthOfLength; index++) {
+			const v = buffer[1 + index];
+			if (index === 0 && lengthOfLength > 1 && v === 0) {
 				throw new Error("decode RLP leading zero in length");
 			}
 
-			len = (len << 8) | v;
+			length = (length << 8) | v;
 		}
-		if (len < 56) {
+		if (length < 56) {
 			throw new Error("decode RLP non-minimal long list");
 		}
 
-		const start = 1 + lenOfLen;
-		const end = start + len;
+		const start = 1 + lengthOfLength;
+		const end = start + length;
 		if (end > buffer.length) {
 			throw new Error("decode RLP truncated long list");
 		}
 
-		return { start, end };
+		return { end, start };
 	}
 
 	throw new Error("decode RLP not a list");
@@ -149,14 +149,14 @@ function decodeItem(buffer: Uint8Array, offset: number): { hex: Hex; next: numbe
 
 	// short string
 	if (p <= 0xb7) {
-		const len = p - 0x80;
+		const length = p - 0x80;
 		const start = offset + 1,
-			end = start + len;
+			end = start + length;
 		if (end > buffer.length) {
 			throw new Error("decode RLP truncated short str");
 		}
 
-		if (len === 1 && buffer[start] < 0x80) {
+		if (length === 1 && buffer[start] < 0x80) {
 			throw new Error("decode RLP non-minimal short str");
 		}
 
@@ -165,8 +165,8 @@ function decodeItem(buffer: Uint8Array, offset: number): { hex: Hex; next: numbe
 
 	// long string
 	if (p <= 0xbf) {
-		const lenOfLen = p - 0xb7;
-		const { len, next } = readLength(buffer, offset + 1, lenOfLen);
+		const lengthOfLength = p - 0xb7;
+		const { len, next } = readLength(buffer, offset + 1, lengthOfLength);
 		if (len < 56) {
 			throw new Error("decode RLP non-minimal long str");
 		}
@@ -183,24 +183,24 @@ function decodeItem(buffer: Uint8Array, offset: number): { hex: Hex; next: numbe
 	throw new Error("decode RLP list prefix inside item (unexpected for legacy flat fields)");
 }
 
-function readLength(buffer: Uint8Array, offset: number, lenOfLen: number) {
-	if (lenOfLen < 1 || lenOfLen > 8) {
+function readLength(buffer: Uint8Array, offset: number, lengthOfLength: number) {
+	if (lengthOfLength < 1 || lengthOfLength > 8) {
 		throw new Error("decode RLP invalid length-of-length");
 	}
 
-	if (offset + lenOfLen > buffer.length) {
+	if (offset + lengthOfLength > buffer.length) {
 		throw new Error("decode RLP truncated length");
 	}
 
 	// compute big-endian length; enforce minimal form (no leading zero when lenOfLen > 1)
-	let len = 0;
-	for (let i = 0; i < lenOfLen; i++) {
-		const v = buffer[offset + i];
-		if (i === 0 && lenOfLen > 1 && v === 0) {
+	let length = 0;
+	for (let index = 0; index < lengthOfLength; index++) {
+		const v = buffer[offset + index];
+		if (index === 0 && lengthOfLength > 1 && v === 0) {
 			throw new Error("decode RLP leading zero in length");
 		}
-		len = (len << 8) | v;
+		length = (length << 8) | v;
 	}
 
-	return { len, next: offset + lenOfLen };
+	return { len: length, next: offset + lengthOfLength };
 }
