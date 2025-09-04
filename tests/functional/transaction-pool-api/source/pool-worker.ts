@@ -23,13 +23,13 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 		return 0;
 	}
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const sendersAddresses: Set<string> = new Set();
+		const dirtyAddresses: Set<string> = new Set();
 
-		for (const transaction of unit.getBlock().transactions) {
-			sendersAddresses.add(transaction.data.from);
+		for (const { address } of unit.getAccountUpdates()) {
+			dirtyAddresses.add(address);
 		}
 
-		await this.transactionPoolMempool.reAddTransactions([...sendersAddresses.keys()]);
+		await this.transactionPoolMempool.reAddTransactions([...dirtyAddresses.keys()]);
 	}
 
 	public async getTransactionBytes(): Promise<Buffer[]> {
