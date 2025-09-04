@@ -36,7 +36,7 @@ describe<{
 			stdout: "stdout",
 		});
 
-		installer.install("@mainsail/core", "3.0.0");
+		installer.install("@mainsail/core", [], "3.0.0");
 
 		spySync.calledWith("pnpm install -g @mainsail/core@3.0.0", { shell: true });
 	});
@@ -174,7 +174,7 @@ describe<{
 			shell: true,
 		});
 
-		spyInstall.calledWith("@mainsail/core", "3.1.0");
+		spyInstall.calledWith("@mainsail/core", [], "3.1.0");
 	});
 
 	it("#installRangeLatest - should throw error when command fails", ({ installer }) => {
