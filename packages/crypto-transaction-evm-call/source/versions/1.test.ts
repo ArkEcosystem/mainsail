@@ -1,47 +1,40 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
-import { schemas as base58AddressSchemas } from "@mainsail/crypto-address-base58";
 import { Configuration } from "@mainsail/crypto-config";
-import { schemas as kayParSchemas } from "@mainsail/crypto-key-pair-ecdsa";
-import { makeKeywords, schemas as transactionSchemas } from "@mainsail/crypto-transaction";
-import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/crypto-validation";
 import { BigNumber } from "@mainsail/utils";
-import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { zeroAddress } from "viem";
 
-import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json";
 import { describe, Sandbox } from "../../../test-framework/source";
-import { EvmCallTransaction } from "./1";
+import { prepareSandbox } from "../../test/helpers/prepare-sandbox";
+import {
+	serializedTransactionContractCall,
+	serializedTransactionContractCallWithSecondSignature,
+	serializedTransactionDeploy,
+	serializedTransactionTransfer,
+	serializedTransactionTransferEqualGreater11Fields,
+	serializedTransactionTransferLessThan9Fields,
+	transactionTransfer,
+} from "../../test/fixtures/transaction";
 
 describe<{
 	sandbox: Sandbox;
 	validator: Contracts.Crypto.Validator;
+	factory: Contracts.Crypto.TransactionFactory;
+	serializer: Contracts.Crypto.TransactionSerializer;
+	deserializer: Contracts.Crypto.TransactionDeserializer;
 }>("Schemas", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
-		context.sandbox = new Sandbox();
-
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
-
-		await context.sandbox.app.resolve(ValidationServiceProvider).register();
-		await context.sandbox.app.resolve(CryptoValidationServiceProvider).register();
+		await prepareSandbox(context);
 
 		context.validator = context.sandbox.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
-
-		for (const keyword of Object.values({
-			...makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
-		})) {
-			context.validator.addKeyword(keyword);
-		}
-
-		for (const schema of Object.values({
-			...transactionSchemas,
-			...kayParSchemas,
-			...addressSchemas,
-			...base58AddressSchemas,
-		})) {
-			context.validator.addSchema(schema);
-		}
+		context.factory = context.sandbox.app.get<Contracts.Crypto.TransactionFactory>(
+			Identifiers.Cryptography.Transaction.Factory,
+		);
+		context.serializer = context.sandbox.app.get<Contracts.Crypto.TransactionSerializer>(
+			Identifiers.Cryptography.Transaction.Serializer,
+		);
+		context.deserializer = context.sandbox.app.get<Contracts.Crypto.TransactionDeserializer>(
+			Identifiers.Cryptography.Transaction.Deserializer,
+		);
 	});
 
 	const transactionOriginal = {
@@ -56,14 +49,10 @@ describe<{
 	};
 
 	it("#getSchema - should be valid", ({ validator }) => {
-		validator.addSchema(EvmCallTransaction.getSchema());
-
 		assert.undefined(validator.validate("evmCall", transactionOriginal).error);
 	});
 
 	it("#getSchema - value should be bigNumber", ({ validator }) => {
-		validator.addSchema(EvmCallTransaction.getSchema());
-
 		const validValues = [0, "0", BigNumber.ZERO, 1, "1", BigNumber.ONE];
 		for (const value of validValues) {
 			const transaction = {
@@ -87,8 +76,6 @@ describe<{
 	});
 
 	it("#getSchema - gasPrice should be integer, min 5, max 1000 gwei", ({ sandbox, validator }) => {
-		validator.addSchema(EvmCallTransaction.getSchema());
-
 		const configuration = sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
 		configuration.setHeight(1);
 
@@ -114,13 +101,65 @@ describe<{
 	});
 
 	it("#getSchema - recipient should be optional", ({ validator }) => {
-		validator.addSchema(EvmCallTransaction.getSchema());
-
 		const transaction = {
 			...transactionOriginal,
 			recipientAddress: undefined,
 		};
 
 		assert.undefined(validator.validate("evmCall", transaction).error);
+	});
+
+	it("factory#fromJson - should deserialize well-formed transaction", async ({ factory }) => {
+		try {
+			const tx = await factory.fromJson(transactionTransfer);
+			//console.log(tx.serialized.toString("hex"));
+			assert.equal(tx.serialized, Buffer.from(serializedTransactionTransfer, "hex"));
+		} catch (ex) {
+			console.log(ex.message);
+			assert.false(true);
+		}
+	});
+
+	it("factory#fromHex - should deserialize well-formed transactions", async ({ factory }) => {
+		for (const serialized of [
+			serializedTransactionTransfer,
+			serializedTransactionContractCall,
+			serializedTransactionContractCallWithSecondSignature,
+			serializedTransactionDeploy,
+		]) {
+			await assert.resolves(async () => factory.fromHex(serialized));
+		}
+	});
+
+	it("factory#fromHex - should reject transaction with trailing bytes", async ({ factory }) => {
+		for (const hex of ["00", "01", "deadbeef", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
+			const serializedWithTrailingBytes = serializedTransactionTransfer + hex;
+			await assert.rejects(
+				async () => factory.fromHex(serializedWithTrailingBytes),
+				"Failed to deserialize transaction, encountered invalid bytes: decoded RLP contains trailing bytes",
+			);
+		}
+	});
+
+	it("factory#fromHex - should reject transaction with leading bytes", async ({ factory }) => {
+		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
+			const serializedWithTrailingBytes = hex + serializedTransactionTransfer;
+			await assert.rejects(
+				async () => factory.fromHex(serializedWithTrailingBytes),
+				"Failed to deserialize transaction, encountered invalid bytes: decode RLP not a list",
+			);
+		}
+	});
+
+	it("#deserialize - should not deserialize transaction with invalid number of fields", async ({ factory }) => {
+		for (const [serialized, error] of [
+			[serializedTransactionTransferLessThan9Fields, "decoded RLP contains too few fields"],
+			[serializedTransactionTransferEqualGreater11Fields, "decoded RLP contains too many fields"],
+		]) {
+			await assert.rejects(
+				async () => factory.fromHex(serialized),
+				`Failed to deserialize transaction, encountered invalid bytes: ${error}`,
+			);
+		}
 	});
 });
