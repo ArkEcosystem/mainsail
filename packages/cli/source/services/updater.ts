@@ -93,7 +93,11 @@ export class Updater implements Contracts_Updater {
 
 		spinner.start();
 
-		this.installer.install(this.#packageName, this.#packageChannel);
+		this.installer.install(
+			this.#packageName,
+			["brcypto", "better-sqlite3", "bstring", "lmdb", "msgpackr-extract", "nsfw", "protobufjs"],
+			this.#packageChannel,
+		);
 
 		if (updateProcessManager) {
 			this.processManager.update();
