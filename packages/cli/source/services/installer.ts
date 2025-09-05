@@ -18,13 +18,21 @@ export class Installer {
 	 * @param {string} pkg
 	 * @memberof Installer
 	 */
-	public install(package_: string, tag: string = "latest"): void {
+	public install(package_: string, buildPackages: readonly string[] = [], tag: string = "latest"): void {
 		this.installPeerDependencies(package_, tag);
 
-		const { stdout, stderr, exitCode } = execa.sync(`pnpm install -g ${package_}@${tag}`, { shell: true });
+		const space = buildPackages.length === 0 ? "" : " ";
+		const buildPackagesString =
+			space + buildPackages.map((buildPackage) => `--allow-build=${buildPackage}`).join(" ");
+
+		const { stdout, stderr, exitCode } = execa.sync(`pnpm install -g ${package_}@${tag}${buildPackagesString}`, {
+			shell: true,
+		});
 
 		if (exitCode !== 0) {
-			throw new Error(`"pnpm install -g ${package_}@${tag}" exited with code ${exitCode}\n${stderr}`);
+			throw new Error(
+				`"pnpm install -g ${package_}@${tag}${buildPackagesString}" exited with code ${exitCode}\n${stderr}`,
+			);
 		}
 
 		console.log(stdout);
@@ -66,7 +74,7 @@ export class Installer {
 			throw new Error(`No ${package_} version to satisfy ${range}`);
 		}
 
-		this.install(package_, versions[0]);
+		this.install(package_, [], versions[0]);
 	}
 
 	private getInstalled(): Package[] {
