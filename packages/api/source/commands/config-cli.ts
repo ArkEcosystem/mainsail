@@ -38,7 +38,7 @@ export class Command extends Commands.Command {
 			spinner.start();
 
 			assert.string(this.pkg.name);
-			this.installer.install(this.pkg.name, newChannel);
+			this.installer.install(this.pkg.name, Constants.BuildPackages, newChannel);
 
 			spinner.succeed();
 

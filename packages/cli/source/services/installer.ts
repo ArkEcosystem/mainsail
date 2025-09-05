@@ -18,7 +18,7 @@ export class Installer {
 	 * @param {string} pkg
 	 * @memberof Installer
 	 */
-	public install(package_: string, buildPackages: string[] = [], tag: string = "latest"): void {
+	public install(package_: string, buildPackages: readonly string[] = [], tag: string = "latest"): void {
 		this.installPeerDependencies(package_, tag);
 
 		const space = buildPackages.length === 0 ? "" : " ";
