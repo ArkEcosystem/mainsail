@@ -468,4 +468,53 @@ describe<{
 		await waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 	});
+
+	it("should accept and transfer from and back to sender", async (context) => {
+		const walletA = await Utils.getRandomColdWallet(context);
+		const walletB = await Utils.getRandomColdWallet(context);
+
+		// Fund wallet A
+		const fundTx = await EvmCalls.makeEvmCall(context, {
+			recipient: walletA.address,
+			value: parseEther("350"),
+		});
+		await addTransactionsToPool(context, [fundTx]);
+		await waitBlock(context);
+		assert.true(await isTransactionCommitted(context, fundTx));
+
+		const txFromAToB = await EvmCalls.makeEvmCall(context, {
+			sender: walletA.keyPair,
+			recipient: walletB.address,
+			value: parseEther("300"),
+		});
+		let { accept, invalid, errors } = await addTransactionsToPool(context, [txFromAToB]);
+		await waitBlock(context);
+		assert.equal(accept, [0]);
+		assert.equal(invalid, []);
+		assert.true(await isTransactionCommitted(context, txFromAToB));
+
+		const txFromBToA = await EvmCalls.makeEvmCall(context, {
+			sender: walletB.keyPair,
+			recipient: walletA.address,
+			value: parseEther("299"),
+		});
+		({ accept, invalid } = await addTransactionsToPool(context, [txFromBToA]));
+		assert.equal(accept, [0]);
+		assert.equal(invalid, []);
+		await waitBlock(context);
+		assert.true(await isTransactionCommitted(context, txFromBToA));
+
+		const txFromAToBAgain = await EvmCalls.makeEvmCall(context, {
+			sender: walletA.keyPair,
+			recipient: walletB.address,
+			value: parseEther("60"),
+		});
+		({ accept, invalid, errors } = await addTransactionsToPool(context, [txFromAToBAgain]));
+		console.log(accept, invalid, errors);
+		assert.equal(accept, [0]);
+		assert.equal(invalid, []);
+		await waitBlock(context);
+
+		assert.true(await isTransactionCommitted(context, txFromAToBAgain));
+	});
 });

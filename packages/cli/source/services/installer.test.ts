@@ -36,9 +36,24 @@ describe<{
 			stdout: "stdout",
 		});
 
-		installer.install("@mainsail/core", "3.0.0");
+		installer.install("@mainsail/core", [], "3.0.0");
 
 		spySync.calledWith("pnpm install -g @mainsail/core@3.0.0", { shell: true });
+	});
+
+	it("#install - should install latest package with --allow-build flags", ({ installer }) => {
+		stub(installer, "installPeerDependencies");
+
+		const spySync = stub(execa, "sync").returnValue({
+			exitCode: 0,
+			stdout: "stdout",
+		});
+
+		installer.install("@mainsail/core", ["pkg1", "pkg2"]);
+
+		spySync.calledWith("pnpm install -g @mainsail/core@latest --allow-build=pkg1 --allow-build=pkg2", {
+			shell: true,
+		});
 	});
 
 	it("#install - should throw when exit code isn't 0", ({ installer }) => {
@@ -174,7 +189,7 @@ describe<{
 			shell: true,
 		});
 
-		spyInstall.calledWith("@mainsail/core", "3.1.0");
+		spyInstall.calledWith("@mainsail/core", [], "3.1.0");
 	});
 
 	it("#installRangeLatest - should throw error when command fails", ({ installer }) => {

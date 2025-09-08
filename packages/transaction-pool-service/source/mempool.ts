@@ -81,6 +81,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 			}
 
 			removedTransactions.push(...(await senderMempool.reAddTransactions()));
+			this.#removeDisposableMempool(address);
 		}
 
 		return removedTransactions;
