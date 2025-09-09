@@ -185,6 +185,8 @@ export class Consensus implements Contracts.Consensus.Service {
 				return;
 			}
 
+			this.#didMajorityPrecommit = false;
+
 			await this.#processBlock(commitState);
 
 			await this.onMajorityPrecommit(commitState);
