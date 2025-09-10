@@ -155,6 +155,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			const receipt = receipts?.get(transaction.hash);
 			assert.defined(receipt);
 
+			const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
+
 			transactions.push({
 				blockHash: header.hash,
 				blockNumber: header.number.toFixed(),
@@ -192,9 +194,12 @@ export class Sync implements Contracts.ApiSync.Service {
 				to: data.to,
 				transactionIndex: data.transactionIndex!,
 				value: data.value.toFixed(),
+				multiPaymentRecipients: parsedMultiPayments.length
+					? [...new Set(parsedMultiPayments.map((mp) => mp.to))]
+					: undefined,
 			});
 
-			multiPayments.push(...parseMultiPayments(multiPaymentContractAddress, transaction, receipt));
+			multiPayments.push(...parsedMultiPayments);
 		}
 
 		const dirtyValidators: Record<string, Contracts.State.ValidatorWallet> = this.validatorSet

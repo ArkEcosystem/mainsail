@@ -149,5 +149,13 @@ export class Transaction {
 		nullable: true,
 		type: "varchar",
 	})
-	public readonly decodedError!: string | undefined;
+	public readonly decodedError: string | undefined;
+
+	@Column({
+		default: undefined,
+		nullable: true,
+		type: "citext",
+		array: true,
+	})
+	public readonly multiPaymentRecipients: string[] | undefined;
 }
