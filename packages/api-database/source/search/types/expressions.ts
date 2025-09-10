@@ -79,9 +79,8 @@ export type FunctionSigExpression<TEntity> = {
 };
 
 export type MultiPaymentExpression = {
-	property: "from" | "to";
 	op: "multiPayment";
-	value: string;
+	value: string[];
 };
 
 export type NotNullExpression<TEntity> = {
