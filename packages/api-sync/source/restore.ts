@@ -325,10 +325,14 @@ export class Restore {
 
 						logs: receipt.logs,
 
+						multiPaymentRecipients:
+							parsedMultiPayments.length > 0
+								? [...new Set(parsedMultiPayments.map((mp) => mp.to))]
+								: undefined,
+
 						nonce: data.nonce.toFixed(),
 
 						output: receipt.output,
-
 						senderPublicKey: data.senderPublicKey,
 						signature: formatEcdsaSignature(data.r!, data.s!, data.v!),
 						status: receipt.status,
@@ -336,9 +340,6 @@ export class Restore {
 						to: data.to,
 						transactionIndex: data.transactionIndex!,
 						value: data.value.toFixed(),
-						multiPaymentRecipients: parsedMultiPayments.length
-							? [...new Set(parsedMultiPayments.map((mp) => mp.to))]
-							: undefined,
 					});
 
 					multiPayments.push(...parsedMultiPayments);

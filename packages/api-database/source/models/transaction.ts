@@ -152,10 +152,10 @@ export class Transaction {
 	public readonly decodedError: string | undefined;
 
 	@Column({
+		array: true,
 		default: undefined,
 		nullable: true,
 		type: "citext",
-		array: true,
 	})
 	public readonly multiPaymentRecipients: string[] | undefined;
 }
