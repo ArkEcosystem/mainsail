@@ -88,7 +88,7 @@ export class ReceiptsController extends Controller {
 		return [
 			{
 				direction: "desc",
-				property: "blockNumber",
+				property: "timestamp",
 			},
 			{
 				direction: "desc",
