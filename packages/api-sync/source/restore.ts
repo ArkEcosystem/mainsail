@@ -297,6 +297,8 @@ export class Restore {
 						context.addressToPublicKey[address] = senderPublicKey;
 					}
 
+					const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
+
 					transactions.push({
 						blockHash: block.header.hash,
 						blockNumber: block.header.number.toFixed(),
@@ -323,10 +325,14 @@ export class Restore {
 
 						logs: receipt.logs,
 
+						multiPaymentRecipients:
+							parsedMultiPayments.length > 0
+								? [...new Set(parsedMultiPayments.map((mp) => mp.to))]
+								: undefined,
+
 						nonce: data.nonce.toFixed(),
 
 						output: receipt.output,
-
 						senderPublicKey: data.senderPublicKey,
 						signature: formatEcdsaSignature(data.r!, data.s!, data.v!),
 						status: receipt.status,
@@ -336,7 +342,7 @@ export class Restore {
 						value: data.value.toFixed(),
 					});
 
-					multiPayments.push(...parseMultiPayments(multiPaymentContractAddress, transaction, receipt));
+					multiPayments.push(...parsedMultiPayments);
 
 					ingestedTransactions++;
 				}

@@ -149,17 +149,10 @@ export class QueryHelper<TEntity> {
 				return { parameters, query };
 			}
 			case "multiPayment": {
-				const column = `"${expression.property}"`;
 				const parameter = `p${this.paramNo++}`;
-				const query = `EXISTS(
-					SELECT 1 FROM multi_payments AS mp
-					WHERE
-						mp.hash = "Transaction"."hash"
-					AND	mp.${column} = :${parameter}
-					AND mp.success = true
-				)`;
+				const query = `multi_payment_recipients @> ARRAY[:${parameter}]::citext[]`;
 
-				const parameters = { [parameter]: expression.value };
+				const parameters = { [parameter]: expression.value.join(",") };
 				return { parameters, query };
 			}
 			default: {

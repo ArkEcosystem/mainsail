@@ -163,8 +163,7 @@ export class TransactionFilter {
 
 		const multipaymentRecipientExpression: MultiPaymentExpression = {
 			op: "multiPayment",
-			property: "to",
-			value: criteria,
+			value: [criteria],
 		};
 
 		return {
