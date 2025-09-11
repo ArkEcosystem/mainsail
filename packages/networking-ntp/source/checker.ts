@@ -7,7 +7,7 @@ import { shuffle } from "@mainsail/utils";
 @injectable()
 export class Checker {
 	@inject(Identifiers.ServiceProvider.Configuration)
-	@tagged("plugin", "networking-dns")
+	@tagged("plugin", "networking-ntp")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.Services.Log.Service)
@@ -18,10 +18,12 @@ export class Checker {
 
 		for (const host of shuffle(this.configuration.getOptional<string[]>("hosts", []))) {
 			try {
-				await Sntp.time({
+				const result = await Sntp.time({
 					host,
 					timeout,
 				});
+
+				this.logger.info(`Successfully connected to NTP host: ${host}. Time offset: ${result.t} ms`);
 
 				return;
 			} catch (error) {
@@ -29,6 +31,6 @@ export class Checker {
 			}
 		}
 
-		throw new Error("Please check your NTP connectivity, couldn't connect to any host.");
+		this.logger.error("Please check your NTP connectivity, couldn't connect to any host.");
 	}
 }
