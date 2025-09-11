@@ -18,10 +18,12 @@ export class Checker {
 
 		for (const host of shuffle(this.configuration.getOptional<string[]>("hosts", []))) {
 			try {
-				await Sntp.time({
+				const result = await Sntp.time({
 					host,
 					timeout,
 				});
+
+				console.log("NTP: ", result);
 
 				return;
 			} catch (error) {
