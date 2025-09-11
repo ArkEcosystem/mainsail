@@ -23,7 +23,7 @@ export class Checker {
 					timeout,
 				});
 
-				console.log("NTP: ", result);
+				this.logger.info(`Successfully connected to NTP host: ${host}. Time offset: ${result.t} ms`);
 
 				return;
 			} catch (error) {
@@ -31,6 +31,6 @@ export class Checker {
 			}
 		}
 
-		throw new Error("Please check your NTP connectivity, couldn't connect to any host.");
+		this.logger.error("Please check your NTP connectivity, couldn't connect to any host.");
 	}
 }
