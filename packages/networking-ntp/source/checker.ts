@@ -7,7 +7,7 @@ import { shuffle } from "@mainsail/utils";
 @injectable()
 export class Checker {
 	@inject(Identifiers.ServiceProvider.Configuration)
-	@tagged("plugin", "networking-dns")
+	@tagged("plugin", "networking-ntp")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.Services.Log.Service)
