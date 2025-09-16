@@ -1,5 +1,5 @@
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import { Contracts, Events, Identifiers, Constants } from "@mainsail/contracts";
+import { Constants, Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { assert, BigNumber, sleep } from "@mainsail/utils";
 
 @injectable()
