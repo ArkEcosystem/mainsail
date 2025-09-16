@@ -4,7 +4,7 @@ import { BigNumber } from "@mainsail/utils";
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { Configuration } from "../../crypto-config/distribution/index";
 import { describe, Sandbox } from "../../test-framework/source";
-import { formatCurrency } from "./format-currency.js";
+import { formatCurrency } from "./format.js";
 
 describe<{
 	sandbox: Sandbox;
