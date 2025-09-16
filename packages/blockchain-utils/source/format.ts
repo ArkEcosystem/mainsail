@@ -11,3 +11,5 @@ export const formatCurrency = (configuration: Contracts.Crypto.Configuration, am
 
 	return `${localeString} ${configuration.get("network.client.symbol")}`;
 };
+
+export const formatNumber = (value: number): string => value.toLocaleString("en");
