@@ -242,7 +242,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#step = Contracts.Consensus.Step.Prevote;
 
 		const { block } = proposal.getData();
-		this.logger.info(`Received proposal ${this.#blockNumber}/${this.#round} block hash: ${block.data.hash}`);
+		this.logger.info(`Received proposal ${this.#blockNumber}/${this.#round}/${block.data.hash}`);
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
 		await this.prevote(roundState.getProcessorResult() ? block.data.hash : undefined);
@@ -265,7 +265,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#step = Contracts.Consensus.Step.Prevote;
 
 		this.logger.info(
-			`Received proposal ${this.#blockNumber}/${this.#round} with locked block hash: ${block.data.hash}`,
+			`Received locked proposal ${this.#blockNumber}/${this.#round}/${block.data.hash} from round ${proposal.validRound}`,
 		);
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
@@ -293,9 +293,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		const { block } = proposal.getData();
 
-		this.logger.info(
-			`Received +2/3 prevotes for ${this.#blockNumber}/${this.#round} block hash: ${block.data.hash}`,
-		);
+		this.logger.info(`Received +2/3 prevotes for ${this.#blockNumber}/${this.#round}/${block.data.hash}`);
 
 		this.#didMajorityPrevote = true;
 
@@ -328,7 +326,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		this.logger.info(`Received +2/3 prevotes for ${this.#blockNumber}/${this.#round} blockHash: null`);
+		this.logger.info(`Received +2/3 prevotes for ${this.#blockNumber}/${this.#round}/null`);
 
 		this.#step = Contracts.Consensus.Step.Precommit;
 
@@ -355,16 +353,13 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#didMajorityPrecommit = true;
 		const block = roundState.getBlock();
 
+		this.logger.info(`Received +2/3 precommits for ${this.#blockNumber}/${roundState.round}/${block.data.hash}`);
+
 		if (!roundState.getProcessorResult().success) {
-			this.logger.info(
-				`Block ${block.data.hash} on block number ${this.#blockNumber} received +2/3 precommits but is invalid`,
-			);
+			this.logger.info(`Block ${this.#blockNumber}/${roundState.round}/${block.data.hash} is invalid`);
 			return;
 		}
 
-		this.logger.info(
-			`Received +2/3 precommits for ${this.#blockNumber}/${roundState.round} block hash: ${block.data.hash}`,
-		);
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.PrecommitedProposal, this.getState());
 
 		await this.commitLock.runExclusive(async () => {
@@ -478,9 +473,9 @@ export class Consensus implements Contracts.Consensus.Service {
 			const lockProof = await this.#validValue.aggregatePrevotes();
 
 			this.logger.info(
-				`Proposing valid block ${this.#blockNumber}/${
+				`Proposing existing block ${this.#blockNumber}/${
 					this.#round
-				} from round ${this.getValidRound()} with block hash: ${block.data.hash}`,
+				}/${block.data.hash} from round ${this.getValidRound()}`,
 			);
 
 			return await registeredProposer.propose(
@@ -497,7 +492,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#round,
 			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
 		);
-		this.logger.info(`Proposing new block ${this.#blockNumber}/${this.#round} with block hash: ${block.data.hash}`);
+		this.logger.info(`Proposing new block ${this.#blockNumber}/${this.#round}/${block.data.hash}`);
 
 		void this.eventDispatcher.dispatch(Events.BlockEvent.Forged, block.data);
 
@@ -576,7 +571,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		this.logger.info(
-			`Completed consensus bootstrap for ${this.#blockNumber}/${this.#round}/${this.stateStore.getTotalRound()}`,
+			`Completed consensus bootstrap for ${this.#blockNumber}/${this.#round} with total round ${this.stateStore.getTotalRound()}`,
 		);
 
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.Bootstrapped, this.getState());
