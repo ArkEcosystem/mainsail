@@ -242,7 +242,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#step = Contracts.Consensus.Step.Prevote;
 
 		const { block } = proposal.getData();
-		this.logger.info(`Received proposal ${this.#blockNumber}/${this.#round}/${block.data.hash}`);
+		this.logger.info(`Received proposal ${this.#getBlockString(block)}`);
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
 		await this.prevote(roundState.getProcessorResult() ? block.data.hash : undefined);
@@ -264,9 +264,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		const { block } = proposal.getData();
 		this.#step = Contracts.Consensus.Step.Prevote;
 
-		this.logger.info(
-			`Received locked proposal ${this.#blockNumber}/${this.#round}/${block.data.hash} from round ${proposal.validRound}`,
-		);
+		this.logger.info(`Received locked proposal ${this.#getBlockString(block)}`);
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
 		const lockedRound = this.getLockedRound();
@@ -293,7 +291,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		const { block } = proposal.getData();
 
-		this.logger.info(`Received +2/3 prevotes for ${this.#blockNumber}/${this.#round}/${block.data.hash}`);
+		this.logger.info(`Received +2/3 prevotes for ${this.#getBlockString(block)}`);
 
 		this.#didMajorityPrevote = true;
 
@@ -472,11 +470,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			const block = this.#validValue.getBlock();
 			const lockProof = await this.#validValue.aggregatePrevotes();
 
-			this.logger.info(
-				`Proposing existing block ${this.#blockNumber}/${
-					this.#round
-				}/${block.data.hash} from round ${this.getValidRound()}`,
-			);
+			this.logger.info(`Proposing existing block ${this.#getBlockString(block)}`);
 
 			return await registeredProposer.propose(
 				this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.address),
@@ -492,7 +486,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#round,
 			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
 		);
-		this.logger.info(`Proposing new block ${this.#blockNumber}/${this.#round}/${block.data.hash}`);
+		this.logger.info(`Proposing new block ${this.#getBlockString(block)}`);
 
 		void this.eventDispatcher.dispatch(Events.BlockEvent.Forged, block.data);
 
@@ -603,5 +597,13 @@ export class Consensus implements Contracts.Consensus.Service {
 				commitState.setProcessorResult({ gasUsed: 0, receipts: new Map(), success: false });
 			}
 		}
+	}
+
+	#getBlockString(block: Contracts.Crypto.Block): string {
+		if (block.header.round !== this.#round) {
+			return `${this.#blockNumber}/${this.#round}(${block.header.round})/${block.data.hash}`;
+		}
+
+		return `${this.#blockNumber}/${this.#round}/${block.data.hash}`;
 	}
 }
