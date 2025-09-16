@@ -100,6 +100,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.block = {
 			data: {
 				number: 1,
+				round: 0,
 				hash: "blockHash",
 			},
 		};
@@ -346,8 +347,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPropose.calledOnce();
 		spyValidatorPropose.calledWith(1, 1, 0, block, lockProof); // validator set, round, validRound, block, lockProof
 		spyLoggerInfo.calledWith(`>> Starting new round: ${1}/${1} with proposer: ${proposer.address}`);
-		// spyLoggerInfo.calledWith(`Proposing valid block ${1}/${1} from round ${0} with block hash: ${block.data.hash}`); // TODO: Later
-		spyLoggerInfo.calledWith(`Proposing existing block ${1}/${1}/${block.data.hash}`);
+		spyLoggerInfo.calledWith(`Proposing existing block ${1}/${1}(${0})/${block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.RoundStarted, {
 			blockNumber: 1,
@@ -677,7 +677,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyPrevoteProcess.calledOnce();
 		spyPrevoteProcess.calledWith(prevote);
-		spyLoggerInfo.calledWith(`Received locked proposal ${1}/${1}/${proposal.getData().block.data.hash}`); // TODO: Later
+		spyLoggerInfo.calledWith(`Received locked proposal ${1}/${1}(${0})/${proposal.getData().block.data.hash}`);
 		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
 			blockNumber: 1,
 			lockedRound: undefined,

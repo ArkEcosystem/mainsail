@@ -600,9 +600,9 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	#getBlockString(block: Contracts.Crypto.Block): string {
-		// if (block.header.round !== this.#round) {
-		// 	return `${this.#blockNumber}/${this.#round}(${block.header.round})/${block.data.hash}`;
-		// }
+		if (block.data.round !== this.#round) {
+			return `${this.#blockNumber}/${this.#round}(${block.data.round})/${block.data.hash}`;
+		}
 
 		return `${this.#blockNumber}/${this.#round}/${block.data.hash}`;
 	}
