@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Constants, Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -600,10 +600,14 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	#getBlockString(block: Contracts.Crypto.Block): string {
+		const number = this.#blockNumber.toLocaleString(Constants.Locale);
+		const consensusRound = this.#round.toLocaleString(Constants.Locale);
+		const blockRound = block.data.round.toLocaleString(Constants.Locale);
+
 		if (block.data.round !== this.#round) {
-			return `${this.#blockNumber}/${this.#round}(${block.data.round})/${block.data.hash}`;
+			return `${number}/${consensusRound}(${blockRound})/${block.data.hash}`;
 		}
 
-		return `${this.#blockNumber}/${this.#round}/${block.data.hash}`;
+		return `${number}/${consensusRound}/${block.data.hash}`;
 	}
 }
