@@ -1,5 +1,5 @@
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers, Constants } from "@mainsail/contracts";
 import { assert, BigNumber, sleep } from "@mainsail/utils";
 
 @injectable()
@@ -133,9 +133,19 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {
 		if (!this.state.isBootstrap()) {
 			const block = unit.getBlock();
-			this.logger.info(
-				`Block ${unit.blockNumber.toLocaleString()}/${unit.round.toLocaleString()} with ${block.data.transactionsCount.toLocaleString()} tx(s) committed (gasUsed=${block.data.gasUsed.toLocaleString()})`,
-			);
+
+			const blockNumber = unit.blockNumber.toLocaleString(Constants.Locale);
+			const round = unit.round.toLocaleString(Constants.Locale);
+			const blockRound = block.data.round.toLocaleString(Constants.Locale);
+			const transactionsCount = block.data.transactionsCount.toLocaleString(Constants.Locale);
+			const gasUsed = block.data.gasUsed.toLocaleString(Constants.Locale);
+
+			let blockString = `${blockNumber}/${round}/${block.data.hash}`;
+			if (block.data.round !== unit.round) {
+				blockString = `${blockNumber}/${round}(${blockRound})/${block.data.hash}`;
+			}
+
+			this.logger.info(`Committed block ${blockString} with ${transactionsCount} tx(s) (gasUsed=${gasUsed})`);
 		}
 	}
 
