@@ -62,6 +62,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				query: Joi.object({
+					address: Schemas.orEqualCriteria(Schemas.addressSchema),
 					from: Schemas.orEqualCriteria(Schemas.addressSchema),
 					to: Schemas.orEqualCriteria(Schemas.addressSchema),
 				}).concat(pagination),

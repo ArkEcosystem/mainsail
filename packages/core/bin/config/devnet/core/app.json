@@ -55,6 +55,9 @@
 			"package": "@mainsail/logger-pino"
 		},
 		{
+			"package": "@mainsail/networking-ntp"
+		},
+		{
 			"package": "@mainsail/state"
 		},
 		{

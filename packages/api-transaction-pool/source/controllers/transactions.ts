@@ -35,18 +35,29 @@ export class TransactionsController extends AbstractController {
 
 		const poolQuery = this.poolQuery.getFromHighestPriority();
 
+		const makePredicate = async (
+			{ data }: Contracts.Crypto.Transaction,
+			key: Extract<keyof Contracts.Crypto.TransactionData, "to" | "from">,
+			parameter: string | string[],
+		): Promise<boolean> => (Array.isArray(parameter) ? parameter.includes(data[key]!) : parameter === data[key]);
+
 		if (request.query.from) {
-			poolQuery.wherePredicate(async (t) =>
-				Array.isArray(request.query.from)
-					? request.query.from.includes(t.data.from)
-					: request.query.from === t.data.from,
-			);
+			poolQuery.wherePredicate(async (t) => makePredicate(t, "from", request.query.from));
 		}
 
 		if (request.query.to) {
-			poolQuery.wherePredicate(async (t) =>
-				Array.isArray(request.query.to) ? request.query.to.includes(t.data.to) : request.query.to === t.data.to,
-			);
+			poolQuery.wherePredicate(async (t) => makePredicate(t, "to", request.query.to));
+		}
+
+		if (request.query.address) {
+			poolQuery.wherePredicate(async (t) => {
+				const [isFrom, isTo] = await Promise.all([
+					makePredicate(t, "from", request.query.address),
+					makePredicate(t, "to", request.query.address),
+				]);
+
+				return isFrom || isTo;
+			});
 		}
 
 		const all: Contracts.Crypto.Transaction[] = await poolQuery.all();
