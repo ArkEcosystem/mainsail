@@ -346,7 +346,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPropose.calledOnce();
 		spyValidatorPropose.calledWith(1, 1, 0, block, lockProof); // validator set, round, validRound, block, lockProof
 		spyLoggerInfo.calledWith(`>> Starting new round: ${1}/${1} with proposer: ${proposer.address}`);
-		spyLoggerInfo.calledWith(`Proposing valid block ${1}/${1} from round ${0} with block hash: ${block.data.hash}`);
+		// spyLoggerInfo.calledWith(`Proposing valid block ${1}/${1} from round ${0} with block hash: ${block.data.hash}`); // TODO: Later
+		spyLoggerInfo.calledWith(`Proposing existing block ${1}/${1}/${block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.RoundStarted, {
 			blockNumber: 1,
@@ -498,7 +499,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrevote.calledOnce();
 		spyValidatorPrevote.calledWith(1, 1, 0, block.data.hash); // validatorIndex, blockNumber, round, blockHash
 
-		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} block hash: ${proposal.getData().block.data.hash}`);
+		spyLoggerInfo.calledWith(`Received proposal ${1}/${0}/${proposal.getData().block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
 			blockNumber: 1,
@@ -554,7 +555,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyPrevoteProcess.calledOnce();
 		spyPrevoteProcess.calledWith(prevote);
-		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} block hash: ${proposal.getData().block.data.hash}`);
+		spyLoggerInfo.calledWith(`Received proposal ${1}/${0}/${proposal.getData().block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
 			blockNumber: 1,
@@ -609,7 +610,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrevote.neverCalled();
 		spyPrevoteProcess.neverCalled();
 
-		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} block hash: ${proposal.getData().block.data.hash}`);
+		spyLoggerInfo.calledWith(`Received proposal ${1}/${0}/${proposal.getData().block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
 			blockNumber: 1,
@@ -676,9 +677,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyPrevoteProcess.calledOnce();
 		spyPrevoteProcess.calledWith(prevote);
-		spyLoggerInfo.calledWith(
-			`Received proposal ${1}/${1} with locked block hash: ${proposal.getData().block.data.hash}`,
-		);
+		spyLoggerInfo.calledWith(`Received locked proposal ${1}/${1}/${proposal.getData().block.data.hash}`); // TODO: Later
 		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
 			blockNumber: 1,
 			lockedRound: undefined,
@@ -888,9 +887,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrecommit.calledWith(1, 1, 0, block.data.hash);
 		spyPrecommitProcess.calledOnce();
 		spyPrecommitProcess.calledWith(precommit);
-		spyLoggerInfo.calledWith(
-			`Received +2/3 prevotes for ${1}/${0} block hash: ${proposal.getData().block.data.hash}`,
-		);
+		spyLoggerInfo.calledWith(`Received +2/3 prevotes for ${1}/${0}/${proposal.getData().block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.PrevotedProposal, {
 			blockNumber: 1,
@@ -1367,9 +1364,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyConsensusStartRound.calledOnce();
 		spyConsensusStartRound.calledWith(0);
 		spyRoundStateRepositoryClear.calledOnce();
-		spyLoggerInfo.calledWith(
-			`Received +2/3 precommits for ${1}/${0} block hash: ${proposal.getData().block.data.hash}`,
-		);
+		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0}/${proposal.getData().block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.PrecommitedProposal, {
 			blockNumber: 1,
@@ -1435,9 +1430,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyBlockProcessorCommit.neverCalled();
 		spyConsensusStartRound.neverCalled();
 		spyRoundStateRepositoryClear.neverCalled();
-		spyLoggerInfo.calledWith(
-			`Block ${block.data.hash} on block number ${1} received +2/3 precommits but is invalid`,
-		);
+		spyLoggerInfo.calledWith(`Block ${1}/${0}/${block.data.hash} is invalid`);
 		assert.equal(consensus.getBlockNumber(), 1);
 	});
 
