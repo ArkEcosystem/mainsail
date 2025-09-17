@@ -3072,6 +3072,9 @@ importers:
 
   tests/functional/consensus:
     devDependencies:
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../../../packages/blockchain-utils
       '@mainsail/consensus':
         specifier: workspace:*
         version: link:../../../packages/consensus
