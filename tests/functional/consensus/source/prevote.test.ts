@@ -5,7 +5,7 @@ import { sleep } from "@mainsail/utils";
 
 import crypto from "../config/crypto.json";
 import validators from "../config/validators.json";
-import { assertBlockId, assertBockHeight, assertBockRound } from "./asserts.js";
+import { assertBlockHash, assertBlockNumber, assertBlockRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
@@ -56,9 +56,9 @@ describe<{
 		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes - 1); // Assert number of prevotes
@@ -67,9 +67,9 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
 	});
 
 	it("should not confirm block, if > minority does not prevote", async ({ nodes, p2p }) => {
@@ -105,9 +105,9 @@ describe<{
 		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -123,9 +123,9 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
 	});
 
 	it("should not confirm block, if > minority prevote null", async ({ nodes, validators, p2p }) => {
@@ -150,9 +150,9 @@ describe<{
 		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 1);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 1);
+		await assertBlockHash(nodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -169,9 +169,9 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
 	});
 
 	it("should confirm block, if < minority prevote random block", async ({ nodes, validators, p2p }) => {
@@ -189,9 +189,9 @@ describe<{
 		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -213,9 +213,9 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
 	});
 
 	it("should not confirm block, if > minority prevote random block", async ({ nodes, validators, p2p }) => {
@@ -240,9 +240,9 @@ describe<{
 		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 1);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 1);
+		await assertBlockHash(nodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -259,9 +259,9 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
 	});
 
 	it("should confirm block, if < minority prevote multiple random blocks", async ({ nodes, validators, p2p }) => {
@@ -291,9 +291,9 @@ describe<{
 		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes + 4); // Assert number of prevotes
@@ -319,8 +319,8 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
 	});
 });
