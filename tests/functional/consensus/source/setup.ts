@@ -91,8 +91,6 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/crypto-wif",
 		"@mainsail/serializer",
 		"@mainsail/crypto-block",
-		"@mainsail/fees",
-		"@mainsail/fees-static",
 		"@mainsail/evm-service",
 		"@mainsail/blockchain-utils",
 		"@mainsail/crypto-transaction",
@@ -102,7 +100,6 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/crypto-messages",
 		"@mainsail/crypto-commit",
 		"@mainsail/processor",
-		"@mainsail/validator-set-static",
 		"@mainsail/validator",
 		"@mainsail/consensus",
 	];
