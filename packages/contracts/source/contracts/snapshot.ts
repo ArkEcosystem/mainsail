@@ -6,10 +6,10 @@ export interface LegacyImporter {
 	prepare(snapshotPath: string): Promise<void>;
 	prepareRestore(): Promise<void>;
 	import(options: LegacyImportOptions): Promise<LegacyImportResult>;
+	drain(): Generator<ImportedLegacyWallet>;
+	dispose(): void;
 
-	wallets: ImportedLegacyWallet[];
 	validators: ImportedLegacyValidator[];
-	voters: ImportedLegacyVoter[];
 	snapshotHash: string;
 	genesisBlockNumber: bigint;
 	previousGenesisBlockHash: string;

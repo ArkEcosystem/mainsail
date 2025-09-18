@@ -108,6 +108,8 @@ export class Bootstrapper {
 	async #initApiSync(): Promise<void> {
 		if (this.apiSync) {
 			await this.apiSync.bootstrap();
+		} else if (this.snapshotImporter) {
+			this.snapshotImporter.dispose();
 		}
 	}
 
