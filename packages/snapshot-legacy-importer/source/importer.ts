@@ -71,16 +71,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		wallets: [],
 	};
 
-	public get voters(): Contracts.Snapshot.ImportedLegacyVoter[] {
-		return this.#data.voters;
-	}
-
 	public get validators(): Contracts.Snapshot.ImportedLegacyValidator[] {
 		return this.#data.validators;
-	}
-
-	public get wallets(): Contracts.Snapshot.ImportedLegacyWallet[] {
-		return this.#data.wallets;
 	}
 
 	public get snapshotHash(): string {
@@ -334,6 +326,20 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		};
 	}
 
+	public *drain(): Generator<Contracts.Snapshot.ImportedLegacyWallet> {
+		while (this.#data.wallets.length > 0) {
+			yield this.#data.wallets.pop()!;
+		}
+
+		this.dispose();
+	}
+
+	public dispose(): void {
+		this.#data.wallets = [];
+		this.#data.validators = [];
+		this.#data.voters = [];
+	}
+
 	async #seedWallets(options: Contracts.Snapshot.LegacyImportOptions): Promise<bigint> {
 		let totalSupply = 0n;
 
@@ -444,7 +450,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		this.logger.info(`seeding ${this.#data.voters.length} voters`);
 
-		for (const voters of chunk(this.#data.voters, 1000)) {
+		while (this.#data.voters.length > 0) {
+			const count = Math.min(1000, this.#data.voters.length);
+			const voters = this.#data.voters.splice(this.#data.voters.length - count, count);
+
 			const voterAddresses: string[] = [];
 			const validatorAddresses: string[] = [];
 
