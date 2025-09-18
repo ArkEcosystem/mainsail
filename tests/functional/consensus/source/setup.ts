@@ -220,8 +220,13 @@ const runMany = async (sandboxes: Sandbox[]) => {
 };
 
 const stop = async (sandbox: Sandbox) => {
-	const consensus = sandbox.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
-	await consensus.dispose();
+	const serviceProviderRepository = sandbox.app.get<Providers.ServiceProviderRepository>(
+		Identifiers.ServiceProvider.Repository,
+	);
+
+	for (const [name] of serviceProviderRepository.all()) {
+		await serviceProviderRepository.dispose(name);
+	}
 };
 
 const stopMany = async (sandboxes: Sandbox[]) => {

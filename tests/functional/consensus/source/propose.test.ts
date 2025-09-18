@@ -39,11 +39,11 @@ describe<{
 		await bootMany(context.nodes);
 		await bootstrapMany(context.nodes);
 
-		// context.validators = await getValidators(context.nodes[0], validators);
+		context.validators = await getValidators(context.nodes[0], validators);
 	});
 
 	afterEach(async ({ nodes }) => {
-		// await stopMany(nodes);
+		await stopMany(nodes);
 	});
 
 	it.only("#single propose - should forge 3 blocks with all validators signing", async ({ nodes, validators }) => {
