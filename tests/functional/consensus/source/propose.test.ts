@@ -37,7 +37,7 @@ describe<{
 		}
 
 		await bootMany(context.nodes);
-		// await bootstrapMany(context.nodes);
+		await bootstrapMany(context.nodes);
 
 		// context.validators = await getValidators(context.nodes[0], validators);
 	});
@@ -47,6 +47,7 @@ describe<{
 	});
 
 	it.only("#single propose - should forge 3 blocks with all validators signing", async ({ nodes, validators }) => {
+		// await new Promise((resolve) => setTimeout(resolve, 10000));
 		/*
 		await runMany(nodes);
 

@@ -178,15 +178,13 @@ const bootstrap = async (sandbox: Sandbox) => {
 	const genesisCommitJson = configuration.get("genesisBlock");
 
 	const genesisCommit = await commitFactory.fromJson(genesisCommitJson);
-
-	const stateService = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
-	const store = stateService.getStore();
+	const store = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
 
 	store.setGenesisCommit(genesisCommit);
 	store.setLastBlock(genesisCommit.block);
 
 	const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
-	validatorSet.restore(store);
+	await validatorSet.restore();
 
 	const commitState = sandbox.app.get<Contracts.Consensus.CommitStateFactory>(
 		Identifiers.Consensus.CommitState.Factory,
