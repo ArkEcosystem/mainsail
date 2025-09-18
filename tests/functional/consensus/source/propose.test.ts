@@ -36,7 +36,7 @@ describe<{
 			);
 		}
 
-		// await bootMany(context.nodes);
+		await bootMany(context.nodes);
 		// await bootstrapMany(context.nodes);
 
 		// context.validators = await getValidators(context.nodes[0], validators);
