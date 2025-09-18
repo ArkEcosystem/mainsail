@@ -289,10 +289,10 @@
 				"denomination": 1000000000000000000
 			},
 			"timeouts": {
-				"blockPrepareTime": 4000,
-				"blockTime": 8000,
-				"stageTimeout": 2000,
-				"stageTimeoutIncrease": 2000,
+				"blockPrepareTime": 100,
+				"blockTime": 100,
+				"stageTimeout": 100,
+				"stageTimeoutIncrease": 100,
 				"tolerance": 100
 			},
 			"validatorRegistrationFee": "250000000000000000000"
