@@ -1,7 +1,6 @@
-// eslint-disable-next-line unicorn/prevent-abbreviations
+import { Pg } from "@mainsail/api-database";
 import { Commands } from "@mainsail/cli";
 import { injectable, postConstruct } from "@mainsail/container";
-import { Pg } from "@mainsail/api-database";
 import { parse } from "envfile";
 import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
@@ -36,11 +35,11 @@ export class Command extends Commands.Command {
 		const user = this.#fromEnv(environment, "MAINSAIL_DB_USERNAME");
 
 		const config = {
-			user,
 			database: "postgres",
 			host: this.#fromEnv(environment, "MAINSAIL_DB_HOST"),
 			password: this.#fromEnv(environment, "MAINSAIL_DB_PASSWORD"),
-			port: parseInt(this.#fromEnv(environment, "MAINSAIL_DB_PORT")),
+			port: Number.parseInt(this.#fromEnv(environment, "MAINSAIL_DB_PORT")),
+			user,
 		};
 
 		if (!this.hasFlag("force")) {
@@ -86,11 +85,11 @@ export class Command extends Commands.Command {
 					title: `Drop database "${databaseName}"`,
 				},
 				{
+					skip: () => !this.hasFlag("init"),
 					task: async () => {
 						await client.query(`CREATE DATABASE "${databaseName}" WITH OWNER "${user}"`);
 					},
 					title: `Create empty database "${databaseName}" with owner "${user}"`,
-					skip: () => !this.hasFlag("init"),
 				},
 			]);
 		} catch (ex) {
