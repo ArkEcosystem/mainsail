@@ -327,7 +327,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	}
 
 	public *drain(): Generator<Contracts.Snapshot.ImportedLegacyWallet> {
-		while (this.#data.wallets.length) {
+		while (this.#data.wallets.length > 0) {
 			yield this.#data.wallets.pop()!;
 		}
 
@@ -450,7 +450,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		this.logger.info(`seeding ${this.#data.voters.length} voters`);
 
-		while (this.#data.voters.length) {
+		while (this.#data.voters.length > 0) {
 			const count = Math.min(1000, this.#data.voters.length);
 			const voters = this.#data.voters.splice(this.#data.voters.length - count, count);
 
