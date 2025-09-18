@@ -36,9 +36,10 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		persist: async () => {},
 	});
 
-	sandbox.app.bind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
+	// TODO: Rebind after registartion
+	// sandbox.app.bind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
 
-	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
+	// sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
 		getTransactionBytes: async () => [],
@@ -96,6 +97,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/crypto-transaction",
 		"@mainsail/crypto-transaction-evm-call",
 		"@mainsail/state",
+		"@mainsail/database",
 		"@mainsail/transactions",
 		"@mainsail/crypto-messages",
 		"@mainsail/crypto-commit",
@@ -179,12 +181,11 @@ const bootstrap = async (sandbox: Sandbox) => {
 
 	const genesisCommit = await commitFactory.fromJson(genesisCommitJson);
 	const store = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
-
 	store.setGenesisCommit(genesisCommit);
-	store.setLastBlock(genesisCommit.block);
+	// store.setLastBlock(genesisCommit.block);
 
-	const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
-	await validatorSet.restore();
+	// const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
+	// await validatorSet.restore();
 
 	const commitState = sandbox.app.get<Contracts.Consensus.CommitStateFactory>(
 		Identifiers.Consensus.CommitState.Factory,
@@ -193,7 +194,7 @@ const bootstrap = async (sandbox: Sandbox) => {
 	const blockProcessor = sandbox.app.get<Contracts.Processor.BlockProcessor>(Identifiers.Processor.BlockProcessor);
 
 	const result = await blockProcessor.process(commitState);
-	if (!result) {
+	if (!result.success) {
 		throw new Error("Failed to process genesis block");
 	}
 	await blockProcessor.commit(commitState);
