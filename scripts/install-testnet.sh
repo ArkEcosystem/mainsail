@@ -97,7 +97,6 @@ heading "Installing system dependencies..."
 success "Installed system dependencies!"
 
 heading "Make sure NTP exists systemwide and it's enabled by default..."
-    sudo apt-get update
     sudo $APT_ENV apt-get install systemd-timesyncd -yq
     sudo timedatectl set-ntp on > /dev/null 2>&1 || true
 
