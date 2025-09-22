@@ -206,7 +206,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		const roundState = this.roundStateRepository.getRoundState(this.#blockNumber, this.#round);
 		this.logger.info(
-			`>> Starting new round: ${this.#blockNumber}/${this.#round} with proposer: ${roundState.proposer.address}`,
+			`>> Starting new round: ${this.#getHeightRoundString()} with proposer: ${roundState.proposer.address}`,
 		);
 
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.RoundStarted, this.getState());
@@ -324,7 +324,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		this.logger.info(`Received +2/3 prevotes for ${this.#blockNumber}/${this.#round}/null`);
+		this.logger.info(`Received +2/3 prevotes for ${this.#getHeightRoundString()}/null`);
 
 		this.#step = Contracts.Consensus.Step.Precommit;
 
@@ -351,10 +351,10 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#didMajorityPrecommit = true;
 		const block = roundState.getBlock();
 
-		this.logger.info(`Received +2/3 precommits for ${this.#blockNumber}/${roundState.round}/${block.data.hash}`);
+		this.logger.info(`Received +2/3 precommits for ${this.#getBlockString(block)}`);
 
 		if (!roundState.getProcessorResult().success) {
-			this.logger.info(`Block ${this.#blockNumber}/${roundState.round}/${block.data.hash} is invalid`);
+			this.logger.info(`Block ${this.#getBlockString(block)} is invalid`);
 			return;
 		}
 
@@ -395,7 +395,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				return;
 			}
 
-			this.logger.info(`Timeout to propose ${this.#blockNumber}/${this.#round} expired`);
+			this.logger.info(`Timeout to propose ${this.#getHeightRoundString()} expired`);
 
 			this.#step = Contracts.Consensus.Step.Prevote;
 			await this.prevote();
@@ -412,7 +412,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				return;
 			}
 
-			this.logger.info(`Timeout to prevote ${this.#blockNumber}/${this.#round} expired`);
+			this.logger.info(`Timeout to prevote ${this.#getHeightRoundString()} expired`);
 			this.roundStateRepository.getRoundState(this.#blockNumber, this.#round).logPrevotes();
 
 			this.#step = Contracts.Consensus.Step.Precommit;
@@ -426,7 +426,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				return;
 			}
 
-			this.logger.info(`Timeout to precommit ${this.#blockNumber}/${this.#round} expired`);
+			this.logger.info(`Timeout to precommit ${this.#getHeightRoundString()} expired`);
 			this.roundStateRepository.getRoundState(this.#blockNumber, this.#round).logPrevotes();
 			this.roundStateRepository.getRoundState(this.#blockNumber, this.#round).logPrecommits();
 
@@ -548,8 +548,11 @@ export class Consensus implements Contracts.Consensus.Service {
 				this.#lockedValue = state.lockedValue;
 				this.#validValue = state.validValue;
 			} else {
+				const storedBlockNumber = state.blockNumber.toLocaleString(Constants.Locale);
+				const currentBlockNumber = this.#blockNumber.toLocaleString(Constants.Locale);
+
 				this.logger.warning(
-					`Skipping state restore, because stored block number is ${state.blockNumber}, but should be ${this.#blockNumber}`,
+					`Skipping state restore, because stored block number is ${storedBlockNumber}, but should be ${currentBlockNumber}`,
 				);
 
 				this.roundStateRepository.clear();
@@ -565,7 +568,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		this.logger.info(
-			`Completed consensus bootstrap for ${this.#blockNumber}/${this.#round} with total round ${this.stateStore.getTotalRound()}`,
+			`Completed consensus bootstrap for ${this.#getHeightRoundString()} with total round ${this.stateStore.getTotalRound()}`,
 		);
 
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.Bootstrapped, this.getState());
@@ -597,6 +600,13 @@ export class Consensus implements Contracts.Consensus.Service {
 				commitState.setProcessorResult({ gasUsed: 0, receipts: new Map(), success: false });
 			}
 		}
+	}
+
+	#getHeightRoundString(): string {
+		const number = this.#blockNumber.toLocaleString(Constants.Locale);
+		const consensusRound = this.#round.toLocaleString(Constants.Locale);
+
+		return `${number}/${consensusRound}`;
 	}
 
 	#getBlockString(block: Contracts.Crypto.Block): string {
