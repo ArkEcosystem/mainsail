@@ -548,8 +548,11 @@ export class Consensus implements Contracts.Consensus.Service {
 				this.#lockedValue = state.lockedValue;
 				this.#validValue = state.validValue;
 			} else {
+				const storedBlockNumber = state.blockNumber.toLocaleString(Constants.Locale);
+				const currentBlockNumber = this.#blockNumber.toLocaleString(Constants.Locale);
+
 				this.logger.warning(
-					`Skipping state restore, because stored block number is ${state.blockNumber}, but should be ${this.#blockNumber}`,
+					`Skipping state restore, because stored block number is ${storedBlockNumber}, but should be ${currentBlockNumber}`,
 				);
 
 				this.roundStateRepository.clear();
