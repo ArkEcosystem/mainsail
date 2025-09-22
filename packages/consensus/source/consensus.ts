@@ -351,10 +351,10 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#didMajorityPrecommit = true;
 		const block = roundState.getBlock();
 
-		this.logger.info(`Received +2/3 precommits for ${this.#blockNumber}/${roundState.round}/${block.data.hash}`);
+		this.logger.info(`Received +2/3 precommits for ${this.#getBlockString(block)}`);
 
 		if (!roundState.getProcessorResult().success) {
-			this.logger.info(`Block ${this.#blockNumber}/${roundState.round}/${block.data.hash} is invalid`);
+			this.logger.info(`Block ${this.#getBlockString(block)} is invalid`);
 			return;
 		}
 
