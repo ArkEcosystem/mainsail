@@ -418,7 +418,7 @@ export class Restore {
 		let offset: bigint | undefined = 0n;
 
 		if (this.snapshotImporter) {
-			for (const wallet of this.snapshotImporter.wallets) {
+			for (const wallet of this.snapshotImporter.drain()) {
 				// add any imported address to the mapping
 				if (wallet.ethAddress && wallet.publicKey) {
 					context.legacyAddresses.add(wallet.ethAddress);
