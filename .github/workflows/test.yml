@@ -547,7 +547,7 @@ jobs:
         strategy:
             matrix:
                 node-version: [22.x]
-                name: ["transaction-pool-api"]
+                name: ["transaction-pool-api", "consensus"]
 
         services:
             postgres:
