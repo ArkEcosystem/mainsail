@@ -115,7 +115,7 @@ describe<{
 		// Assert all nodes precommits
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockId),
+			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockHash),
 			[undefined, commit.block.data.hash, commit.block.data.hash, commit.block.data.hash, commit.block.data.hash],
 		);
 

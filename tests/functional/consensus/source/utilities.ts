@@ -116,7 +116,7 @@ export const makePrecommit = async (
 	return await proposer.precommit(
 		node.app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-			.getValidatorIndexByWalletPublicKey(validator.publicKey),
+			.getValidatorIndexByWalletAddress(validator.address),
 		blockNumber,
 		round,
 		blockHash,
