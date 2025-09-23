@@ -62,15 +62,21 @@ export const makeCustomProposal = async (
 	let payloadSize = transactions.length * 2;
 
 	for (const transaction of transactions) {
-		const result = await transactionValidator.validate(
-			{
-				commitKey,
-				gasLimit: milestone.block.maxGasLimit,
-				generatorAddress: validators[0].publicKey,
-				timestamp: dayjs().valueOf(),
-			},
-			transaction,
-		);
+		let result = { gasRefunded: 0n, gasUsed: 0n, logs: [] as any, status: 0 };
+
+		try {
+			result = await transactionValidator.validate(
+				{
+					commitKey,
+					gasLimit: milestone.block.maxGasLimit,
+					generatorAddress: validators[0].publicKey,
+					timestamp: dayjs().valueOf(),
+				},
+				transaction,
+			);
+		} catch {
+			result = { ...result, gasUsed: BigInt(transaction.data.gasLimit) };
+		}
 
 		const { data, serialized } = transaction;
 		assert.string(data.hash);
