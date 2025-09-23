@@ -116,8 +116,8 @@ describe<{
 		// Assert all nodes prevote
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
-			[undefined, commit.block.data.id, commit.block.data.id, commit.block.data.id, commit.block.data.id],
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
+			[undefined, commit.block.data.hash, commit.block.data.hash, commit.block.data.hash, commit.block.data.hash],
 		);
 
 		// Next block
@@ -159,11 +159,11 @@ describe<{
 		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
 
 		// Assert all nodes prevote
-		const blockId = p2p.prevotes.getMessages(1, 0)[3].blockId;
-		assert.defined(blockId);
+		const blockHash = p2p.prevotes.getMessages(1, 0)[3].blockHash;
+		assert.defined(blockHash);
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
-			[undefined, undefined, blockId, blockId, blockId],
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
+			[undefined, undefined, blockHash, blockHash, blockHash],
 		);
 
 		// Next block
@@ -179,7 +179,7 @@ describe<{
 		const stubPrevote = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
 		const proposal = await makeProposal(node0, validators[0], 1, 0, Date.now());
-		const prevote = await makePrevote(node0, validators[0], 1, 0, proposal.getData().block.data.id);
+		const prevote = await makePrevote(node0, validators[0], 1, 0, proposal.getData().block.data.hash);
 
 		stubPrevote.callsFake(async () => {
 			stubPrevote.restore();
@@ -200,13 +200,13 @@ describe<{
 		// Assert all nodes prevote
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
 			[
-				proposal.getData().block.data.id,
-				commit.block.data.id,
-				commit.block.data.id,
-				commit.block.data.id,
-				commit.block.data.id,
+				proposal.getData().block.data.hash,
+				commit.block.data.hash,
+				commit.block.data.hash,
+				commit.block.data.hash,
+				commit.block.data.hash,
 			],
 		);
 
@@ -223,14 +223,14 @@ describe<{
 		const node1 = nodes[1];
 
 		const proposal = await makeProposal(node0, validators[0], 1, 0, Date.now());
-		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal.getData().block.data.id);
+		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal.getData().block.data.hash);
 		const stubPrevote0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote0.callsFake(async () => {
 			stubPrevote0.restore();
 			await p2p.broadcastPrevote(prevote0);
 		});
 
-		const prevote1 = await makePrevote(node1, validators[1], 1, 0, proposal.getData().block.data.id);
+		const prevote1 = await makePrevote(node1, validators[1], 1, 0, proposal.getData().block.data.hash);
 		const stubPrevote1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote1.callsFake(async () => {
 			stubPrevote1.restore();
@@ -249,11 +249,11 @@ describe<{
 		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
 
 		// Assert all nodes prevote
-		const blockId = p2p.prevotes.getMessages(1, 0)[3].blockId;
-		assert.defined(blockId);
+		const blockHash = p2p.prevotes.getMessages(1, 0)[3].blockHash;
+		assert.defined(blockHash);
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
-			[proposal.getData().block.data.id, proposal.getData().block.data.id, blockId, blockId, blockId],
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
+			[proposal.getData().block.data.hash, proposal.getData().block.data.hash, blockHash, blockHash, blockHash],
 		);
 
 		// Next block
@@ -273,11 +273,11 @@ describe<{
 		const proposal2 = await makeProposal(node0, validators[0], 1, 0, Date.now());
 		const proposal3 = await makeProposal(node0, validators[0], 1, 0, Date.now());
 		const proposal4 = await makeProposal(node0, validators[0], 1, 0, Date.now());
-		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal0.getData().block.data.id);
-		const prevote1 = await makePrevote(node0, validators[0], 1, 0, proposal1.getData().block.data.id);
-		const prevote2 = await makePrevote(node0, validators[0], 1, 0, proposal2.getData().block.data.id);
-		const prevote3 = await makePrevote(node0, validators[0], 1, 0, proposal3.getData().block.data.id);
-		const prevote4 = await makePrevote(node0, validators[0], 1, 0, proposal4.getData().block.data.id);
+		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal0.getData().block.data.hash);
+		const prevote1 = await makePrevote(node0, validators[0], 1, 0, proposal1.getData().block.data.hash);
+		const prevote2 = await makePrevote(node0, validators[0], 1, 0, proposal2.getData().block.data.hash);
+		const prevote3 = await makePrevote(node0, validators[0], 1, 0, proposal3.getData().block.data.hash);
+		const prevote4 = await makePrevote(node0, validators[0], 1, 0, proposal4.getData().block.data.hash);
 
 		stubPrevote.callsFake(async () => {
 			stubPrevote.restore();
@@ -302,17 +302,17 @@ describe<{
 		// Assert all nodes prevote
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
 			[
-				proposal0.getData().block.data.id,
-				proposal1.getData().block.data.id,
-				proposal2.getData().block.data.id,
-				proposal3.getData().block.data.id,
-				proposal4.getData().block.data.id,
-				commit.block.data.id,
-				commit.block.data.id,
-				commit.block.data.id,
-				commit.block.data.id,
+				proposal0.getData().block.data.hash,
+				proposal1.getData().block.data.hash,
+				proposal2.getData().block.data.hash,
+				proposal3.getData().block.data.hash,
+				proposal4.getData().block.data.hash,
+				commit.block.data.hash,
+				commit.block.data.hash,
+				commit.block.data.hash,
+				commit.block.data.hash,
 			],
 		);
 

@@ -91,7 +91,7 @@ export const makePrevote = async (
 	return await proposer.prevote(
 		node.app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-			.getValidatorIndexByWalletPublicKey(validator.publicKey),
+			.getValidatorIndexByWalletAddress(validator.address),
 		blockNumber,
 		round,
 		blockHash,
