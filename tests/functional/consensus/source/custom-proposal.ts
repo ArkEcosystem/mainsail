@@ -62,21 +62,15 @@ export const makeCustomProposal = async (
 	let payloadSize = transactions.length * 2;
 
 	for (const transaction of transactions) {
-		let result = { gasUsed: 0 };
-
-		try {
-			result = await transactionValidator.validate(
-				{
-					commitKey,
-					gasLimit: milestone.block.maxGasLimit,
-					generatorAddress: validators[0].publicKey,
-					timestamp: dayjs().valueOf(),
-				},
-				transaction,
-			);
-		} catch {
-			result = { gasUsed: transaction.data.gasLimit };
-		}
+		const result = await transactionValidator.validate(
+			{
+				commitKey,
+				gasLimit: milestone.block.maxGasLimit,
+				generatorAddress: validators[0].publicKey,
+				timestamp: dayjs().valueOf(),
+			},
+			transaction,
+		);
 
 		const { data, serialized } = transaction;
 		assert.string(data.hash);
@@ -85,7 +79,7 @@ export const makeCustomProposal = async (
 
 		totals.amount = totals.amount.plus(data.value);
 		totals.fee = totals.fee.plus(BigNumber.make(data.gasPrice).times(result.gasUsed));
-		totals.gasUsed += result.gasUsed;
+		totals.gasUsed += Number(result.gasUsed);
 
 		payloadBuffers.push(Buffer.from(data.hash, "hex"));
 

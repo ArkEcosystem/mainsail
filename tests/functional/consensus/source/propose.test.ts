@@ -2,8 +2,8 @@ import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
-import crypto from "../config/crypto.json";
-import validators from "../config/validators.json";
+import crypto from "../config/crypto.json" with { type: "json" };
+import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";

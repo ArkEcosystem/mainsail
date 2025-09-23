@@ -3,8 +3,8 @@ import { Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 import { sleep } from "@mainsail/utils";
 
-import crypto from "../config/crypto.json";
-import validators from "../config/validators.json";
+import crypto from "../config/crypto.json" with { type: "json" };
+import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound, assertCommitRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
