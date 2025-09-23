@@ -5,7 +5,6 @@ import { join } from "path";
 import { dirSync } from "tmp";
 
 import { ValidatorsJson } from "./contracts.js";
-import { MemoryDatabase } from "./database.js";
 import { TestLogger } from "./logger.js";
 import { P2PRegistry } from "./p2p.js";
 import { ProposerCalculator } from "./proposer-calculator.js";
@@ -35,11 +34,6 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		getState: async () => {},
 		persist: async () => {},
 	});
-
-	// TODO: Rebind after registartion
-	// sandbox.app.bind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
-
-	// sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
 		getTransactionBytes: async () => [],
@@ -118,6 +112,9 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	for (const packageId of packages) {
 		await loadPlugin(sandbox, packageId, options);
 	}
+
+	// Rebinds
+	sandbox.app.rebind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
 
 	return sandbox;
 };
@@ -198,6 +195,8 @@ const bootstrap = async (sandbox: Sandbox) => {
 		throw new Error("Failed to process genesis block");
 	}
 	await blockProcessor.commit(commitState);
+
+	sandbox.app.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository).printLoadedValidators();
 
 	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 };

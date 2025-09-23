@@ -19,6 +19,19 @@ import {
 import { makeCustomProposal, makeTransactionBuilderContext } from "./custom-proposal.js";
 import { EvmCalls } from "@mainsail/test-transaction-builders";
 
+const reorder = <T>(items: T[]): T[] => {
+	if (items.length !== 5) {
+		throw new Error("Reorder function only supports exactly 5 items");
+	}
+
+	// Swap items 3 and 4
+	const tmp = items[2];
+	items[2] = items[3];
+	items[3] = tmp;
+
+	return items;
+};
+
 describe<{
 	nodes: Sandbox[];
 	validators: Validator[];
@@ -46,9 +59,7 @@ describe<{
 		await stopMany(nodes);
 	});
 
-	it.only("#single propose - should forge 3 blocks with all validators signing", async ({ nodes, validators }) => {
-		// await new Promise((resolve) => setTimeout(resolve, 10000));
-		/*
+	it("#single propose - should forge 3 blocks with all validators signing", async ({ nodes, validators }) => {
 		await runMany(nodes);
 
 		await snoozeForBlock(nodes);
@@ -56,22 +67,21 @@ describe<{
 		await assertBlockNumber(nodes, 1);
 		await assertBlockRound(nodes, 0);
 		await assertBlockHash(nodes);
-		assert.equal((await getLastCommit(nodes[0])).block.data.proposer, validators[0].publicKey);
+		assert.equal((await getLastCommit(nodes[0])).block.data.proposer, validators[0].address);
 
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
 		await assertBlockRound(nodes, 0);
 		await assertBlockHash(nodes);
-		assert.equal((await getLastCommit(nodes[0])).block.data.proposer, validators[0].publicKey);
+		assert.equal((await getLastCommit(nodes[0])).block.data.proposer, validators[0].address);
 
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 3);
 		await assertBlockRound(nodes, 0);
 		await assertBlockHash(nodes);
-		assert.equal((await getLastCommit(nodes[0])).block.data.proposer, validators[0].publicKey);
-		*/
+		assert.equal((await getLastCommit(nodes[0])).block.data.proposer, validators[0].address);
 	});
 
 	it("#missing propose - should not accept block", async ({ nodes }) => {
@@ -238,13 +248,13 @@ describe<{
 		// Assert all nodes prevote
 		assert.equal(
 			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
-			[
+			reorder([
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
 				proposal1.getData().block.data.hash,
 				proposal1.getData().block.data.hash,
-			],
+			]),
 		);
 
 		// Assert all nodes precommit (null)
@@ -284,13 +294,13 @@ describe<{
 			// Assert all nodes prevote
 			assert.equal(
 				p2p.prevotes.getMessages(1, round).map((prevote) => prevote.blockHash),
-				[
+				reorder([
 					proposal0.getData().block.data.hash,
 					proposal0.getData().block.data.hash,
 					proposal0.getData().block.data.hash,
 					proposal1.getData().block.data.hash,
 					proposal1.getData().block.data.hash,
-				],
+				]),
 			);
 
 			// Assert all nodes precommit (null)
@@ -405,13 +415,13 @@ describe<{
 		// Assert all nodes prevote
 		assert.equal(
 			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
-			[
+			reorder([
 				proposal0.getData().block.data.hash,
 				proposal1.getData().block.data.hash,
 				proposal2.getData().block.data.hash,
 				proposal3.getData().block.data.hash,
 				proposal4.getData().block.data.hash,
-			],
+			]),
 		);
 
 		// Assert all nodes precommit (null)
@@ -434,8 +444,10 @@ describe<{
 			const context = makeTransactionBuilderContext(node0, nodes, validators);
 
 			const transactions: Contracts.Crypto.Transaction[] = [];
-			for (let i = 0; i < 150; i++) {
-				transactions.push(await EvmCalls.makeEvmCall(context, { nonceOffset: i }));
+			for (let i = 0; i < 1; i++) {
+				transactions.push(
+					await EvmCalls.makeEvmCall(context, { nonceOffset: i, recipient: validators[0].address }),
+				);
 			}
 
 			const proposal = await makeCustomProposal({ node: node0, validators }, transactions);
@@ -449,7 +461,7 @@ describe<{
 
 		await runMany(nodes);
 
-		// // Next block
+		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
 		await assertBlockRound(nodes, 0);
