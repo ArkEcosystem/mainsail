@@ -97,6 +97,8 @@ export const makeCustomProposal = async (
 		payloadSize += serialized.length;
 	}
 
+	await transactionValidator.getEvm().dispose();
+
 	const hashFactory = node.app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
 	const blockFactory = node.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
 	const block = await blockFactory.make(
