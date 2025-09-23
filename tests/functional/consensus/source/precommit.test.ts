@@ -127,7 +127,7 @@ describe<{
 		await assertBlockHash(nodes);
 	});
 
-	it.skip("should re-propose block, if one missed, malicious sends null", async ({ nodes, validators, p2p }) => {
+	it("should re-propose block, if one missed, malicious sends null", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
 		const stubPrecommit0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
 		stubPrecommit0.callsFake(async () => {
@@ -157,7 +157,7 @@ describe<{
 		// Assert all nodes precommits
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockId),
+			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockHash),
 			[undefined, commit.block.data.hash, commit.block.data.hash, commit.block.data.hash],
 		);
 
@@ -169,7 +169,7 @@ describe<{
 		await assertBlockHash(nodes);
 	});
 
-	it.skip("should re-propose block, if one missed, malicious sends random block id", async ({
+	it("should re-propose block, if one missed, malicious sends random block id", async ({
 		nodes,
 		validators,
 		p2p,
@@ -205,7 +205,7 @@ describe<{
 		// Assert all nodes precommits
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockId),
+			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockHash),
 			[
 				proposal.getData().block.data.hash,
 				commit.block.data.hash,
@@ -222,7 +222,7 @@ describe<{
 		await assertBlockHash(nodes);
 	});
 
-	it.skip("should re-propose block, if one missed, malicious sends multiple random block ids", async ({
+	it("should re-propose block, if one missed, malicious sends multiple random block ids", async ({
 		nodes,
 		validators,
 		p2p,
@@ -270,7 +270,7 @@ describe<{
 		// Assert all nodes precommits
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockId),
+			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockHash),
 			[
 				proposal0.getData().block.data.hash,
 				proposal1.getData().block.data.hash,
