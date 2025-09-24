@@ -16,6 +16,8 @@
 	},
 	"devDependencies": {
 		"@mainsail/container": "workspace:*",
+		"@mainsail/blockchain-utils": "workspace:*",
+		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/test-transaction-builders": "workspace:*",
@@ -23,7 +25,7 @@
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-hash-bcrypto": "workspace:*",
-		"@mainsail/crypto-signature-schnorr": "workspace:*",
+		"@mainsail/crypto-signature-ecdsa": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/crypto-consensus-bls12-381": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
@@ -53,7 +55,8 @@
 		"uvu": "0.5.6",
 		"date-fns": "4.1.0",
 		"fs-extra": "11.2.0",
-		"viem": "2.33.1"
+		"viem": "2.33.1",
+		"dayjs": "1.11.18"
 	},
 	"engines": {
 		"node": ">=20.x"

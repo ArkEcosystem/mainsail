@@ -14,9 +14,8 @@ export { Identifiers } from "./identifiers.js";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.ValidatorSet.Service).to(ValidatorSet).inSingletonScope();
-
 		this.app.bind(Identifiers.Evm.ContractService.Consensus).to(ConsensusContractService);
-
+		this.app.bind(EvmConsensusIdentifiers.Internal.Deployer).to(Deployer).inSingletonScope();
 		this.app
 			.bind(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
 			.toConstantValue("0x0000000000000000000000000000000000000001");
@@ -27,8 +26,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		assert.defined(genesisBlock);
-
-		this.app.bind(EvmConsensusIdentifiers.Internal.Deployer).to(Deployer).inSingletonScope();
 
 		await this.app.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer).deploy({
 			generatorAddress: genesisBlock.block.proposer,

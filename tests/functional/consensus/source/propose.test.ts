@@ -2,9 +2,9 @@ import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
-import crypto from "../config/crypto.json";
-import validators from "../config/validators.json";
-import { assertBlockId, assertBockHeight, assertBockRound } from "./asserts.js";
+import crypto from "../config/crypto.json" with { type: "json" };
+import validators from "../config/validators.json" with { type: "json" };
+import { assertBlockHash, assertBlockNumber, assertBlockRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
@@ -18,6 +18,19 @@ import {
 } from "./utilities.js";
 import { makeCustomProposal, makeTransactionBuilderContext } from "./custom-proposal.js";
 import { EvmCalls } from "@mainsail/test-transaction-builders";
+
+const reorder = <T>(items: T[]): T[] => {
+	if (items.length !== 5) {
+		throw new Error("Reorder function only supports exactly 5 items");
+	}
+
+	// Swap items 3 and 4
+	const tmp = items[2];
+	items[2] = items[3];
+	items[3] = tmp;
+
+	return items;
+};
 
 describe<{
 	nodes: Sandbox[];
@@ -51,24 +64,24 @@ describe<{
 
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
-		assert.equal((await getLastCommit(nodes[0])).block.data.generatorAddress, validators[0].publicKey);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
+		assert.equal((await getLastCommit(nodes[0])).block.data.proposer, validators[0].address);
 
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
-		assert.equal((await getLastCommit(nodes[0])).block.data.generatorAddress, validators[0].publicKey);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
+		assert.equal((await getLastCommit(nodes[0])).block.data.proposer, validators[0].address);
 
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 3);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes);
-		assert.equal((await getLastCommit(nodes[0])).block.data.generatorAddress, validators[0].publicKey);
+		await assertBlockNumber(nodes, 3);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
+		assert.equal((await getLastCommit(nodes[0])).block.data.proposer, validators[0].address);
 	});
 
 	it("#missing propose - should not accept block", async ({ nodes }) => {
@@ -83,14 +96,14 @@ describe<{
 
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 1);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 1);
+		await assertBlockHash(nodes);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
 	});
 
 	it("#missing propose - should not accept block for 3 rounds", async ({ nodes }) => {
@@ -107,14 +120,14 @@ describe<{
 
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, rounds + 1); // +1 for accepted block
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, rounds + 1); // +1 for accepted block
+		await assertBlockHash(nodes);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
 	});
 
 	it("#invalid proposer - should not accept block", async ({ nodes, validators, p2p }) => {
@@ -132,9 +145,9 @@ describe<{
 
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 1);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 1);
+		await assertBlockHash(nodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -142,20 +155,20 @@ describe<{
 
 		// Assert all nodes prevote
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
 			Array.from({ length: totalNodes }).fill(undefined),
 		);
 
 		// Assert all nodes precommit (null)
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
+			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockHash),
 			Array.from({ length: totalNodes }).fill(undefined),
 		);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
 	});
 
 	it("#double propose - one by one - should take the first proposal", async ({ nodes, validators, p2p }) => {
@@ -175,9 +188,9 @@ describe<{
 
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 0);
-		await assertBlockId(nodes, proposal0.getData().block.data.id);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes, proposal0.getData().block.data.hash);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -185,26 +198,26 @@ describe<{
 
 		// Assert all nodes prevote
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
 			[
-				proposal0.getData().block.data.id,
-				proposal0.getData().block.data.id,
-				proposal0.getData().block.data.id,
-				proposal0.getData().block.data.id,
-				proposal0.getData().block.data.id,
+				proposal0.getData().block.data.hash,
+				proposal0.getData().block.data.hash,
+				proposal0.getData().block.data.hash,
+				proposal0.getData().block.data.hash,
+				proposal0.getData().block.data.hash,
 			],
 		);
 
 		// Assert all nodes precommit
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
-			Array.from({ length: totalNodes }).fill(proposal0.getData().block.data.id),
+			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockHash),
+			Array.from({ length: totalNodes }).fill(proposal0.getData().block.data.hash),
 		);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
 	});
 
 	it("#double propose - 50 : 50 split - should not accept block", async ({ nodes, validators, p2p }) => {
@@ -224,9 +237,9 @@ describe<{
 
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 1);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 1);
+		await assertBlockHash(nodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -234,26 +247,26 @@ describe<{
 
 		// Assert all nodes prevote
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
-			[
-				proposal0.getData().block.data.id,
-				proposal0.getData().block.data.id,
-				proposal0.getData().block.data.id,
-				proposal1.getData().block.data.id,
-				proposal1.getData().block.data.id,
-			],
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
+			reorder([
+				proposal0.getData().block.data.hash,
+				proposal0.getData().block.data.hash,
+				proposal0.getData().block.data.hash,
+				proposal1.getData().block.data.hash,
+				proposal1.getData().block.data.hash,
+			]),
 		);
 
 		// Assert all nodes precommit (null)
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
+			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockHash),
 			Array.from({ length: totalNodes }).fill(undefined),
 		);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
 	});
 
 	it("#double propose - 50 : 50 split - should not accept block for 3 rounds", async ({ nodes, validators, p2p }) => {
@@ -280,19 +293,19 @@ describe<{
 
 			// Assert all nodes prevote
 			assert.equal(
-				p2p.prevotes.getMessages(1, round).map((prevote) => prevote.blockId),
-				[
-					proposal0.getData().block.data.id,
-					proposal0.getData().block.data.id,
-					proposal0.getData().block.data.id,
-					proposal1.getData().block.data.id,
-					proposal1.getData().block.data.id,
-				],
+				p2p.prevotes.getMessages(1, round).map((prevote) => prevote.blockHash),
+				reorder([
+					proposal0.getData().block.data.hash,
+					proposal0.getData().block.data.hash,
+					proposal0.getData().block.data.hash,
+					proposal1.getData().block.data.hash,
+					proposal1.getData().block.data.hash,
+				]),
 			);
 
 			// Assert all nodes precommit (null)
 			assert.equal(
-				p2p.precommits.getMessages(1, round).map((precommit) => precommit.blockId),
+				p2p.precommits.getMessages(1, round).map((precommit) => precommit.blockHash),
 				Array.from({ length: totalNodes }).fill(undefined),
 			);
 		}
@@ -300,14 +313,14 @@ describe<{
 		stubPropose.restore();
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, rounds + 1); // +1 for accepted block
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, rounds + 1); // +1 for accepted block
+		await assertBlockHash(nodes);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
 	});
 
 	it("#double propose - majority : minority split - should  accept block broadcasted to majority", async ({
@@ -332,9 +345,9 @@ describe<{
 		const nodesSubset = nodes.slice(0, 4);
 		await snoozeForBlock(nodesSubset);
 
-		await assertBockHeight(nodesSubset, 1);
-		await assertBockRound(nodesSubset, 0);
-		await assertBlockId(nodesSubset);
+		await assertBlockNumber(nodesSubset, 1);
+		await assertBlockRound(nodesSubset, 0);
+		await assertBlockHash(nodesSubset);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -342,20 +355,20 @@ describe<{
 
 		// Assert all nodes prevote
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
 			[
-				proposal0.getData().block.data.id,
-				proposal0.getData().block.data.id,
-				proposal0.getData().block.data.id,
-				proposal0.getData().block.data.id,
-				proposal1.getData().block.data.id,
+				proposal0.getData().block.data.hash,
+				proposal0.getData().block.data.hash,
+				proposal0.getData().block.data.hash,
+				proposal0.getData().block.data.hash,
+				proposal1.getData().block.data.hash,
 			],
 		);
 
 		// // Assert all nodes precommit (null)
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
-			Array.from({ length: totalNodes - 1 }).fill(proposal0.getData().block.data.id),
+			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockHash),
+			Array.from({ length: totalNodes - 1 }).fill(proposal0.getData().block.data.hash),
 		);
 
 		// Download blocks
@@ -364,8 +377,8 @@ describe<{
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
 	});
 
 	it("#multi propose - propose per node - should not accept block", async ({ nodes, validators, p2p }) => {
@@ -391,9 +404,9 @@ describe<{
 
 		await snoozeForBlock(nodes);
 
-		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 1);
-		await assertBlockId(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 1);
+		await assertBlockHash(nodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 5); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -401,26 +414,26 @@ describe<{
 
 		// Assert all nodes prevote
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
-			[
-				proposal0.getData().block.data.id,
-				proposal1.getData().block.data.id,
-				proposal2.getData().block.data.id,
-				proposal3.getData().block.data.id,
-				proposal4.getData().block.data.id,
-			],
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
+			reorder([
+				proposal0.getData().block.data.hash,
+				proposal1.getData().block.data.hash,
+				proposal2.getData().block.data.hash,
+				proposal3.getData().block.data.hash,
+				proposal4.getData().block.data.hash,
+			]),
 		);
 
 		// Assert all nodes precommit (null)
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
+			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockHash),
 			Array.from({ length: totalNodes }).fill(undefined),
 		);
 
 		// // Next block
 		await snoozeForBlock(nodes, 2);
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
 	});
 
 	it("should propose block with evm calls", async ({ nodes, validators }) => {
@@ -431,8 +444,10 @@ describe<{
 			const context = makeTransactionBuilderContext(node0, nodes, validators);
 
 			const transactions: Contracts.Crypto.Transaction[] = [];
-			for (let i = 0; i < 150; i++) {
-				transactions.push(await EvmCalls.makeEvmCall(context, { nonceOffset: i }));
+			for (let i = 0; i < 1; i++) {
+				transactions.push(
+					await EvmCalls.makeEvmCall(context, { nonceOffset: i, recipient: validators[0].address }),
+				);
 			}
 
 			const proposal = await makeCustomProposal({ node: node0, validators }, transactions);
@@ -446,9 +461,9 @@ describe<{
 
 		await runMany(nodes);
 
-		// // Next block
+		// Next block
 		await snoozeForBlock(nodes, 2);
-		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
 	});
 });

@@ -19,7 +19,7 @@ export class Messages<T extends Message> {
 	}
 
 	set(message: T): void {
-		this.getMessagesMap(message.height, message.round).set(message.serialized.toString("hex"), message);
+		this.getMessagesMap(message.blockNumber, message.round).set(message.serialized.toString("hex"), message);
 	}
 
 	getMessages(height: number, round: number): T[] {
