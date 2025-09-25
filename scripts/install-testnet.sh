@@ -96,6 +96,12 @@ heading "Installing system dependencies..."
 
 success "Installed system dependencies!"
 
+heading "Make sure NTP exists systemwide and it's enabled by default..."
+    sudo $APT_ENV apt-get install systemd-timesyncd -yq
+    sudo timedatectl set-ntp on > /dev/null 2>&1 || true
+
+success "Done setting up NTP!"
+
 heading "Installing node.js & npm..."
 
     sudo rm -rf /usr/local/{lib/node{,/.npm,_modules},bin,share/man}/{npm*,node*,man1/node*}
