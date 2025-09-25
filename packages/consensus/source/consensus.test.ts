@@ -1437,6 +1437,47 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getBlockNumber(), 1);
 	});
 
+	it("#onMajorityPrecommit - should log and do nothing if proposal is missing", async ({
+		consensus,
+		blockProcessor,
+		roundState,
+		logger,
+		roundStateRepository,
+		proposal,
+	}) => {
+		const fakeTimers = clock();
+
+		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.getData().block);
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyRoundStateRepositoryClear = stub(roundStateRepository, "clear");
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyLoggerInfo = spy(logger, "info");
+
+		roundState.hasProcessorResult = () => false;
+
+		assert.equal(consensus.getBlockNumber(), 1);
+		void consensus.onMajorityPrecommit(roundState);
+		await fakeTimers.nextAsync();
+
+		spyRoundStateGetBlock.neverCalled();
+		spyBlockProcessorCommit.neverCalled();
+		spyConsensusStartRound.neverCalled();
+		spyRoundStateRepositoryClear.neverCalled();
+		spyLoggerInfo.calledOnce();
+		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0}, but proposal is missing`);
+		assert.equal(consensus.getBlockNumber(), 1);
+
+		// Should not try again
+		void consensus.onMajorityPrecommit(roundState);
+		await fakeTimers.nextAsync();
+
+		spyRoundStateGetBlock.neverCalled();
+		spyBlockProcessorCommit.neverCalled();
+		spyConsensusStartRound.neverCalled();
+		spyRoundStateRepositoryClear.neverCalled();
+		spyLoggerInfo.calledOnce(); // still only called once from previous attempt
+	});
+
 	it("#onMajorityPrecommit - should be called only once", async ({
 		consensus,
 		blockProcessor,
