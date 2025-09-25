@@ -33,7 +33,11 @@ use revm::{
     },
     database::{State, TransitionAccount, WrapDatabaseRef},
     handler::EvmTr,
-    primitives::{Address, B256, Bytes, TxKind, U256, hex::ToHexExt},
+    primitives::{
+        Address, B256, Bytes, TxKind, U256,
+        bytes::{Buf, BufMut, BytesMut},
+        hex::ToHexExt,
+    },
     state::{AccountInfo, Bytecode},
 };
 
@@ -878,6 +882,75 @@ impl EvmInner {
         }
     }
 
+    pub fn get_commit_bytes(
+        &mut self,
+        block_number: u64,
+    ) -> std::result::Result<Option<Bytes>, EVMError<String>> {
+        let Some(proof_bytes) = self
+            .persistent_db
+            .get_proof_bytes(block_number)
+            .map_err(|err| EVMError::Database(format!("get_proof_bytes failed: {}", err).into()))?
+        else {
+            return Ok(None);
+        };
+
+        let header_bytes = self
+            .persistent_db
+            .get_block_header_bytes(block_number)
+            .map_err(|err| {
+                EVMError::Database(format!("get_block_header_bytes failed: {}", err).into())
+            })?
+            .ok_or_else(|| EVMError::Custom("header not found".into()))?;
+
+        // Read all transaction bytes. To do so, read tx count from the header bytes
+        // at the given offset and loop over them.
+        const TX_COUNT_OFFSET: usize =
+            1   // version
+          + 6   // timestamp
+          + 4   // number
+          + 4   // round
+          + 32  // parentHash
+          + 32  // stateRoot
+          + 256 // logsBloom
+        ;
+
+        assert!(header_bytes.len() >= TX_COUNT_OFFSET + 2);
+        let tx_count = (&header_bytes[TX_COUNT_OFFSET..TX_COUNT_OFFSET + 2]).get_u16_le();
+
+        const TX_PAYLOAD_SIZE_OFFSET: usize = TX_COUNT_OFFSET +
+            2  // transactionsCount
+          + 4  // gasUsed
+          + 32 // fee
+          + 32 // reward
+        ;
+
+        assert!(header_bytes.len() >= TX_PAYLOAD_SIZE_OFFSET + 4);
+        let tx_payload_size =
+            (&header_bytes[TX_PAYLOAD_SIZE_OFFSET..TX_PAYLOAD_SIZE_OFFSET + 4]).get_u32_le();
+
+        let mut full_bytes = BytesMut::with_capacity(
+            proof_bytes.len() + header_bytes.len() + tx_payload_size as usize,
+        );
+
+        full_bytes.extend_from_slice(&proof_bytes);
+        full_bytes.extend_from_slice(&header_bytes);
+
+        for i in 0..tx_count {
+            let key = format!("{block_number}-{i}");
+            let tx_bytes = self
+                .get_transaction_bytes(key)?
+                .ok_or_else(|| EVMError::Custom("tx not found".into()))?;
+
+            // Inside a block, each tx is prefixed by it's length.
+            // Additionally, the EVM storage keeps txs prefixed by block number and index (4 bytes each)
+            // which must be ignored here. For more context also see `#prepareCommitData`
+            full_bytes.put_u32_le(tx_bytes.len() as u32 - 8);
+            full_bytes.extend_from_slice(&tx_bytes[8..]);
+        }
+
+        Ok(Some(Bytes(full_bytes.freeze())))
+    }
+
     pub fn get_transaction_bytes(
         &mut self,
         key: String,
@@ -1578,6 +1651,24 @@ impl JsEvmWrapper {
     }
 
     #[napi]
+    pub fn get_commit_bytes<'env>(
+        &mut self,
+        env: &'env Env,
+        block_number: BigInt,
+    ) -> Result<PromiseRaw<'env, Option<Buffer>>> {
+        let block_number = block_number.get_u64().1;
+        env.spawn_future_with_callback(
+            Self::get_commit_bytes_async(self.evm.clone(), block_number),
+            |_, result| {
+                Ok(match result {
+                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(bytes)),
+                    None => None,
+                })
+            },
+        )
+    }
+
+    #[napi]
     pub fn get_transaction_bytes<'env>(
         &mut self,
         env: &'env Env,
@@ -2000,6 +2091,19 @@ impl JsEvmWrapper {
     ) -> Result<Option<Bytes>> {
         let mut lock = evm.lock().await;
         let result = lock.get_proof_bytes(block_number);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_commit_bytes_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        block_number: u64,
+    ) -> Result<Option<Bytes>> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_commit_bytes(block_number);
 
         match result {
             Ok(result) => Result::Ok(result),

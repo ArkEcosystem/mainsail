@@ -203,15 +203,12 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	async #readCommitBytes(blockNumber: number): Promise<Buffer | undefined> {
-		const commitBuffer = await this.storage.getProofBytes(blockNumber);
+		const commitBuffer = await this.storage.getCommitBytes(blockNumber);
 		if (!commitBuffer) {
 			return;
 		}
 
-		const blockBuffer: Buffer | undefined = await this.#readBlockBytes(blockNumber);
-		assert.buffer(blockBuffer);
-
-		return Buffer.concat([commitBuffer, blockBuffer]);
+		return commitBuffer;
 	}
 
 	async #readBlockBytes(blockNumber: number): Promise<Buffer | undefined> {

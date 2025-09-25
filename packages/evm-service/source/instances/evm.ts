@@ -192,8 +192,8 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return { blockNumber: Number(state.blockNumber), totalRound: Number(state.totalRound) };
 	}
 
-	public async getBlockHeaderBytes(height: number): Promise<Buffer | undefined | null> {
-		return this.#evm.getBlockHeaderBytes(BigInt(height));
+	public async getBlockHeaderBytes(blockNumber: number): Promise<Buffer | undefined | null> {
+		return this.#evm.getBlockHeaderBytes(BigInt(blockNumber));
 	}
 
 	public async getBlockNumberByHash(blockHash: string): Promise<number | undefined | null> {
@@ -207,6 +207,10 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 
 	public async getProofBytes(blockNumber: number): Promise<Buffer | undefined | null> {
 		return this.#evm.getProofBytes(BigInt(blockNumber));
+	}
+
+	public async getCommitBytes(blockNumber: number): Promise<Buffer | undefined | null> {
+		return this.#evm.getCommitBytes(BigInt(blockNumber));
 	}
 
 	public async getTransactionBytes(key: string): Promise<Buffer | undefined | null> {
