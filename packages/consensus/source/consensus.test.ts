@@ -1352,6 +1352,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyLoggerInfo = spy(logger, "info");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
+		roundState.hasProcessorResult = () => true;
 		roundState.getProcessorResult = () => ({ success: true });
 
 		assert.equal(consensus.getBlockNumber(), 1);
@@ -1390,6 +1391,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.getData().block);
 		const spyBlockProcessorCommit = stub(blockProcessor, "commit").rejectedValue(error);
 
+		roundState.hasProcessorResult = () => true;
 		roundState.getProcessorResult = () => ({ success: true });
 
 		assert.equal(consensus.getBlockNumber(), 1);
@@ -1420,6 +1422,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 		const spyLoggerInfo = spy(logger, "info");
 
+		roundState.hasProcessorResult = () => true;
 		roundState.getProcessorResult = () => ({ success: false });
 
 		assert.equal(consensus.getBlockNumber(), 1);
@@ -1446,6 +1449,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 
+		roundState.hasProcessorResult = () => true;
 		roundState.getProcessorResult = () => ({ success: true });
 
 		assert.equal(consensus.getBlockNumber(), 1);
