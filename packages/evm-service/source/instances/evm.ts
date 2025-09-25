@@ -209,6 +209,10 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return this.#evm.getProofBytes(BigInt(blockNumber));
 	}
 
+	public async getCommitBytes(blockNumber: number): Promise<Buffer | undefined | null> {
+		return this.#evm.getCommitBytes(BigInt(blockNumber));
+	}
+
 	public async getTransactionBytes(key: string): Promise<Buffer | undefined | null> {
 		return this.#evm.getTransactionBytes(key);
 	}
