@@ -187,7 +187,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 			await this.#processBlock(commitState);
 
-			await this.onMajorityPrecommit(commitState);
+			await this.onMajorityPrecommit(commitState, false);
 		});
 	}
 
@@ -342,13 +342,19 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 	}
 
-	protected async onMajorityPrecommit(roundState: Contracts.Processor.ProcessableUnit): Promise<void> {
+	protected async onMajorityPrecommit(
+		roundState: Contracts.Processor.ProcessableUnit,
+		isRoundState: boolean = true,
+	): Promise<void> {
 		// TODO: Only block number must match. Round can be any. Add tests
-		if (this.#didMajorityPrecommit || roundState.blockNumber !== this.#blockNumber) {
+		if ((isRoundState && this.#didMajorityPrecommit) || roundState.blockNumber !== this.#blockNumber) {
 			return;
 		}
 
-		this.#didMajorityPrecommit = true;
+		if (isRoundState) {
+			this.#didMajorityPrecommit = true;
+		}
+
 		const block = roundState.getBlock();
 
 		this.logger.info(`Received +2/3 precommits for ${this.#getBlockString(block)}`);
