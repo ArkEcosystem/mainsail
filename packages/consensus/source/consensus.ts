@@ -58,6 +58,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	#didMajorityPrevote = false;
 	#didMajorityPrecommit = false;
+	#didMajorityPrecommitAndProposalIsMissing = false;
 	#isDisposed = false;
 	#pendingJobs = new Set<Contracts.Consensus.RoundState>();
 
@@ -343,11 +344,21 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	protected async onMajorityPrecommit(
-		roundState: Contracts.Processor.ProcessableUnit,
+		processState: Contracts.Processor.ProcessableUnit,
 		isRoundState: boolean = true,
 	): Promise<void> {
 		// TODO: Only block number must match. Round can be any. Add tests
-		if ((isRoundState && this.#didMajorityPrecommit) || roundState.blockNumber !== this.#blockNumber) {
+		if ((isRoundState && this.#didMajorityPrecommit) || processState.blockNumber !== this.#blockNumber) {
+			return;
+		}
+
+		if (processState.hasProcessorResult() === false) {
+			if (this.#didMajorityPrecommitAndProposalIsMissing) {
+				return;
+			}
+
+			this.logger.info(`Received +2/3 precommits for ${this.#getHeightRoundString()}, but proposal is missing`);
+			this.#didMajorityPrecommitAndProposalIsMissing = true;
 			return;
 		}
 
@@ -356,11 +367,11 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#didMajorityPrecommit = true;
 		}
 
-		const block = roundState.getBlock();
+		const block = processState.getBlock();
 
 		this.logger.info(`Received +2/3 precommits for ${this.#getBlockString(block)}`);
 
-		if (!roundState.getProcessorResult().success) {
+		if (!processState.getProcessorResult().success) {
 			this.logger.info(`Block ${this.#getBlockString(block)} is invalid`);
 			return;
 		}
@@ -369,7 +380,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		await this.commitLock.runExclusive(async () => {
 			try {
-				await this.processor.commit(roundState);
+				await this.processor.commit(processState);
 			} catch (error) {
 				await this.app.terminate("Failed to commit block", error);
 			}
