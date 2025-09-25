@@ -352,6 +352,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		if (isRoundState) {
+			// Sets it only once for round state
 			this.#didMajorityPrecommit = true;
 		}
 
