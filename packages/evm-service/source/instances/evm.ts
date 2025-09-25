@@ -192,8 +192,8 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return { blockNumber: Number(state.blockNumber), totalRound: Number(state.totalRound) };
 	}
 
-	public async getBlockHeaderBytes(height: number): Promise<Buffer | undefined | null> {
-		return this.#evm.getBlockHeaderBytes(BigInt(height));
+	public async getBlockHeaderBytes(blockNumber: number): Promise<Buffer | undefined | null> {
+		return this.#evm.getBlockHeaderBytes(BigInt(blockNumber));
 	}
 
 	public async getBlockNumberByHash(blockHash: string): Promise<number | undefined | null> {
