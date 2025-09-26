@@ -9,7 +9,7 @@ import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-
 import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
-import { parseUsernames, parseMultiPayments, parseTransactionError } from "./parsers/index.js";
+import { parseMultiPayments, parseTransactionError, parseUsernames } from "./parsers/index.js";
 
 interface RestoreContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;
