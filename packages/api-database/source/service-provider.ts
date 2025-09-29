@@ -16,6 +16,7 @@ import {
 	PostgresConnectionOptions,
 	RepositoryDataSource,
 	StateRepository,
+	SystemRepository,
 	TransactionRepository,
 	ValidatorRoundRepository,
 	WalletRepository,
@@ -32,6 +33,7 @@ import {
 	Peer,
 	Plugin,
 	State,
+	System,
 	Transaction,
 	ValidatorRound,
 	Wallet,
@@ -45,6 +47,7 @@ import {
 	makePeerRepository,
 	makePluginRepository,
 	makeStateRepository,
+	makeSystemRepository,
 	makeTransactionRepository,
 	makeValidatorRoundRepository,
 	makeWalletRepository,
@@ -90,6 +93,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					Peer,
 					Plugin,
 					State,
+					System,
 					Transaction,
 					MultiPayment,
 					ValidatorRound,
@@ -158,6 +162,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeStateRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind<() => SystemRepository>(Identifiers.SystemRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeSystemRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
