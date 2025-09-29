@@ -60,7 +60,7 @@ export interface ImportedLegacyVoter {
 
 export interface ImportedLegacyValidator {
 	readonly arkAddress: string;
-	readonly ethAddress?: string;
+	readonly ethAddress: string;
 	readonly publicKey: string;
 	readonly isResigned: boolean;
 

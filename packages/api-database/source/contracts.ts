@@ -130,7 +130,8 @@ export type LegacyColdWalletRepositoryFactory = (customDataSource?: RepositoryDa
 export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
 
 export interface Migrations {
-	run(): Promise<void>;
+	synchronizeEntities(): Promise<void>;
+	runMigrations(): Promise<void>;
 }
 
 export interface RepositoryExtension<TEntity extends ObjectLiteral> {

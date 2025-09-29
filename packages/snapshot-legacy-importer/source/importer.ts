@@ -230,6 +230,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 					throw new Error("delegate is missing public key");
 				}
 
+				if (!ethAddress) {
+					throw new Error("delegate is missing eth address");
+				}
+
 				validators.push({
 					arkAddress: wallet.arkAddress,
 					blsPublicKey: wallet.attributes?.["delegate"]["blsPublicKey"],
