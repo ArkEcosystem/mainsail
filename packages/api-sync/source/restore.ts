@@ -73,6 +73,9 @@ export class Restore {
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	private readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
 
+	@inject(ApiDatabaseIdentifiers.Migrations)
+	private readonly migrations!: ApiDatabaseContracts.Migrations;
+
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
@@ -209,6 +212,8 @@ export class Restore {
 
 			restoredHeight = context.lastBlockNumber;
 		});
+
+		await this.migrations.runMigrations();
 
 		const t1 = performance.now();
 		this.logger.info(
