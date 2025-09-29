@@ -64,6 +64,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
 	private readonly stateRepositoryFactory!: ApiDatabaseContracts.StateRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.SystemRepositoryFactory)
+	private readonly systemRepositoryFactory!: ApiDatabaseContracts.SystemRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
@@ -550,6 +553,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			? genesisHeight
 			: (await this.databaseService.getLastCommit()).block.header.number;
 
+		const inMaintenance = await this.systemRepositoryFactory().inMaintenance();
 		const [blocks] = await this.dataSource.query(
 			"select coalesce(max(number), $1)::bigint as max_height, count(1) as count from blocks",
 			[genesisHeight],
@@ -561,11 +565,11 @@ export class Sync implements Contracts.ApiSync.Service {
 			`checking for database reset (forced=${forcedTruncateDatabase}, db.blocks=${blocks.count}, db.height=${blocks.max_height}, storage.height=${lastHeight})`,
 		);
 
-		if (blocksOk && !forcedTruncateDatabase) {
+		if (blocksOk && !forcedTruncateDatabase && !inMaintenance) {
 			return;
 		}
 
-		if (lastHeight !== genesisHeight || blocks.count !== "0") {
+		if (lastHeight !== genesisHeight || blocks.count !== "0" || inMaintenance) {
 			this.logger.warning(`Clearing API database for full restore.`);
 		}
 

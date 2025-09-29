@@ -10,6 +10,7 @@ import {
 	Peer,
 	Plugin,
 	State,
+	System,
 	Transaction,
 	ValidatorRound,
 	Wallet,
@@ -96,6 +97,11 @@ export type PluginRepositoryExtension = Record<string, any>;
 export type PluginRepository = ExtendedRepository<Plugin> & PluginRepositoryExtension;
 export type StateRepositoryExtension = Record<string, any>;
 export type StateRepository = ExtendedRepository<State> & StateRepositoryExtension;
+export type SystemRepositoryExtension = {
+	inMaintenance(): Promise<boolean>;
+	setMaintenance(enabled: boolean): Promise<void>;
+};
+export type SystemRepository = ExtendedRepository<System> & SystemRepositoryExtension;
 
 export type WalletRepositoryExtension = {
 	findManyByCriteria(
@@ -124,6 +130,7 @@ export type MultiPaymentRepositoryFactory = (customDataSource?: RepositoryDataSo
 export type ValidatorRoundRepositoryFactory = (customDataSource?: RepositoryDataSource) => ValidatorRoundRepository;
 export type PluginRepositoryFactory = (customDataSource?: RepositoryDataSource) => PluginRepository;
 export type StateRepositoryFactory = (customDataSource?: RepositoryDataSource) => StateRepository;
+export type SystemRepositoryFactory = (customDataSource?: RepositoryDataSource) => SystemRepository;
 export type WalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => WalletRepository;
 export type LegacyColdWalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => LegacyColdWalletRepository;
 
