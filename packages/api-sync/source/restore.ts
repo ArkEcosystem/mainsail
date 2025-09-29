@@ -264,7 +264,7 @@ export class Restore {
 			const transactions: Models.Transaction[] = [];
 			const multiPayments: Models.MultiPayment[] = [];
 
-			const flushTransactions = async () => {
+			const insertTransactions = async () => {
 				if (transactions.length === 0) {
 					return;
 				}
@@ -274,7 +274,7 @@ export class Restore {
 				transactions.length = 0;
 			};
 
-			const flushMultiPayments = async () => {
+			const insertMultiPayments = async () => {
 				if (multiPayments.length === 0) {
 					return;
 				}
@@ -397,11 +397,11 @@ export class Restore {
 					multiPayments.push(...parsedMultiPayments);
 
 					if (transactions.length >= CHUNK_SIZE) {
-						await flushTransactions();
+						await insertTransactions();
 					}
 
 					if (multiPayments.length >= CHUNK_SIZE) {
-						await flushMultiPayments();
+						await insertMultiPayments();
 					}
 
 					ingestedTransactions++;
@@ -416,8 +416,8 @@ export class Restore {
 				await blockRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
-			await flushTransactions();
-			await flushMultiPayments();
+			await insertTransactions();
+			await insertMultiPayments();
 
 			if (
 				ingestedBlocks % (BATCH_SIZE * 10) === 0 ||
