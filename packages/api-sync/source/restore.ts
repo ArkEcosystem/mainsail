@@ -6,13 +6,10 @@ import {
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
-import { UsernamesAbi } from "@mainsail/evm-contracts";
 import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
-import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
 
-import { parseMultiPayments } from "./parsers/multi-payment.js";
-import { parseTransactionError } from "./parsers/transaction-error.js";
+import { parseMultiPayments, parseTransactionError, parseUsernames } from "./parsers/index.js";
 
 interface RestoreContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;
@@ -55,6 +52,8 @@ interface ValidatorAttributes {
 }
 
 interface UserAttributes {
+	username?: string;
+	usernameFromContract?: boolean;
 	vote?: string;
 	legacyMerge?: Contracts.Evm.AccountMergeInfo;
 }
@@ -118,12 +117,6 @@ export class Restore {
 
 	@inject(Identifiers.Evm.ContractService.Consensus)
 	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
-
-	@inject(EvmConsensusIdentifiers.Contracts.Addresses.Usernames)
-	private readonly usernamesContractAddress!: string;
-
-	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
-	private readonly deployerAddress!: string;
 
 	@inject(Identifiers.Snapshot.Legacy.Importer)
 	@optional()
@@ -233,6 +226,8 @@ export class Restore {
 			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
 		);
 
+		const usernameContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Usernames);
+
 		do {
 			const fromBlockNumber = Math.min(currentBlockNumber, mostRecentCommit.block.header.number);
 			const toBlockNumber = Math.min(currentBlockNumber + BATCH_SIZE - 1, mostRecentCommit.block.header.number);
@@ -291,13 +286,24 @@ export class Restore {
 
 					const { data } = transaction;
 					const { senderPublicKey } = data;
+					const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
+					const parsedUsernames = parseUsernames(usernameContractAddress, transaction, receipt);
+
 					if (!context.publicKeyToAddress[senderPublicKey]) {
 						const address = await this.addressFactory.fromPublicKey(senderPublicKey);
 						context.publicKeyToAddress[senderPublicKey] = address;
 						context.addressToPublicKey[address] = senderPublicKey;
 					}
 
-					const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
+					for (const parsedUsername of parsedUsernames ?? []) {
+						const userAttributes = context.userAttributes[parsedUsername.address] ?? {};
+
+						context.userAttributes[parsedUsername.address] = {
+							...userAttributes,
+							username: parsedUsername.username,
+							usernameFromContract: true,
+						};
+					}
 
 					transactions.push({
 						blockHash: block.header.hash,
@@ -400,7 +406,10 @@ export class Restore {
 
 		let totalVotes = 0;
 		for await (const votes of this.consensusContractService.getVotes()) {
+			const userAttributes = context.userAttributes[votes.voterAddress] ?? {};
+
 			context.userAttributes[votes.voterAddress] = {
+				...userAttributes,
 				vote: votes.validatorAddress,
 			};
 			totalVotes++;
@@ -418,6 +427,20 @@ export class Restore {
 		let offset: bigint | undefined = 0n;
 
 		if (this.snapshotImporter) {
+			for (const validator of this.snapshotImporter.validators) {
+				const userAttributes = context.userAttributes[validator.ethAddress] ?? {};
+
+				// Contract takes precedence over snapshot.
+				if (userAttributes.usernameFromContract) {
+					continue;
+				}
+
+				context.userAttributes[validator.ethAddress] = {
+					...userAttributes,
+					username: validator.username,
+				};
+			}
+
 			for (const wallet of this.snapshotImporter.drain()) {
 				// add any imported address to the mapping
 				if (wallet.ethAddress && wallet.publicKey) {
@@ -470,6 +493,7 @@ export class Restore {
 							: {}),
 						...(userAttributes
 							? {
+									...(userAttributes.username ? { username: userAttributes.username } : {}),
 									...(userAttributes.vote ? { vote: userAttributes.vote } : {}),
 									...(userAttributes.legacyMerge
 										? // merged legacy cold wallets
@@ -505,9 +529,7 @@ export class Restore {
 			}
 
 			for (const batch of chunk(accounts, CHUNK_SIZE)) {
-				await this.#readUsernames(batch).then((batch) =>
-					context.walletRepository.createQueryBuilder().insert().orIgnore().values(batch).execute(),
-				);
+				await context.walletRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
 			offset = result.nextOffset;
@@ -679,55 +701,4 @@ export class Restore {
 	async #updateValidatorRanks(context: RestoreContext): Promise<void> {
 		await context.entityManager.query("SELECT update_validator_ranks();", []);
 	}
-
-	async #readUsernames(wallets: Models.Wallet[]): Promise<Models.Wallet[]> {
-		const addressToWallet: Record<string, Models.Wallet> = wallets.reduce((previous, current) => {
-			previous[current.address] = current;
-			return previous;
-		}, {});
-
-		const addresses = Object.keys(addressToWallet);
-		const data = encodeFunctionData({
-			abi: UsernamesAbi.abi,
-			args: [addresses],
-			functionName: "getUsernames",
-		}).slice(2);
-
-		const { evmSpec } = this.configuration.getMilestone(this.configuration.getGenesisHeight());
-
-		const result = await this.evm.view({
-			data: Buffer.from(data, "hex"),
-			from: this.deployerAddress,
-			specId: evmSpec,
-			to: this.usernamesContractAddress,
-		});
-
-		if (!result.success) {
-			await this.app.terminate("getUsernames failed");
-		}
-
-		const users = decodeFunctionResult({
-			abi: UsernamesAbi.abi,
-			data: toHex(result.output!),
-			functionName: "getUsernames",
-		}) as Username[];
-
-		for (const { addr, username } of users) {
-			const wallet = addressToWallet[addr];
-			assert.defined(wallet);
-			assert.defined(username);
-
-			wallet.attributes = {
-				username,
-				...wallet.attributes,
-			};
-		}
-
-		return wallets;
-	}
-}
-
-interface Username {
-	readonly addr: string;
-	readonly username: string;
 }
