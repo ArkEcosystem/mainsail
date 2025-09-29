@@ -101,6 +101,9 @@ export class Restore {
 	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
 	private readonly stateRepositoryFactory!: ApiDatabaseContracts.StateRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.SystemRepositoryFactory)
+	private readonly systemRepositoryFactory!: ApiDatabaseContracts.SystemRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
@@ -148,6 +151,8 @@ export class Restore {
 
 		const t0 = performance.now();
 		let restoredHeight = 0;
+
+		await this.systemRepositoryFactory().setMaintenance(true);
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 			const context: RestoreContext = {
@@ -214,6 +219,8 @@ export class Restore {
 		this.logger.info(
 			`Finished restore of ${(restoredHeight - genesisBlockNumber + 1).toLocaleString()} blocks in ${t1 - t0}ms`,
 		);
+
+		await this.systemRepositoryFactory().setMaintenance(false);
 	}
 
 	async #ingestBlocksAndTransactions(context: RestoreContext): Promise<void> {
