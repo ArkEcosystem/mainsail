@@ -100,7 +100,7 @@ export class Sync implements Contracts.ApiSync.Service {
 	private readonly listeners!: Listeners;
 
 	public async bootstrap(): Promise<void> {
-		await this.migrations.run();
+		await this.migrations.synchronizeEntities();
 		await this.#resetDatabaseIfNecessary();
 		this.#queue = await this.createQueue();
 
@@ -108,6 +108,8 @@ export class Sync implements Contracts.ApiSync.Service {
 		const [blocks] = await this.dataSource.query("select count(1) from blocks");
 		if (blocks.count === "0") {
 			await this.#bootstrapRestore();
+		} else {
+			await this.migrations.runMigrations();
 		}
 
 		await this.listeners.bootstrap();

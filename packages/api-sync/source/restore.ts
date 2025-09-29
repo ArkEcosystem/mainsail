@@ -72,6 +72,9 @@ export class Restore {
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	private readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
 
+	@inject(ApiDatabaseIdentifiers.Migrations)
+	private readonly migrations!: ApiDatabaseContracts.Migrations;
+
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
@@ -197,15 +200,38 @@ export class Restore {
 			// 8) Write `contracts` table
 			await this.#ingestContracts(context);
 
-			// 9) Update validator ranks
-			await this.#updateValidatorRanks(context);
-
 			restoredHeight = context.lastBlockNumber;
 		});
 
+		await this.migrations.runMigrations();
+
 		const t1 = performance.now();
+
+		await this.dataSource.transaction(async (entityManager) => {
+			await entityManager.query("SET LOCAL statement_timeout = 0;");
+
+			const context: RestoreContext = {
+				blockRepository: this.blockRepositoryFactory(entityManager),
+				configurationRepository: this.configurationRepositoryFactory(entityManager),
+				contractRepository: this.contractRepositoryFactory(entityManager),
+				entityManager,
+				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
+				multiPaymentRepository: this.multiPaymentRepositoryFactory(entityManager),
+				stateRepository: this.stateRepositoryFactory(entityManager),
+				transactionRepository: this.transactionRepositoryFactory(entityManager),
+				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
+				walletRepository: this.walletRepositoryFactory(entityManager),
+			} as any;
+
+			await this.#analyzeTables(context);
+			await this.#updateValidatorRanks(context);
+		});
+
+		const t2 = performance.now();
+		this.logger.info(`Analyzed tables in ${t2 - t1}ms`);
+
 		this.logger.info(
-			`Finished restore of ${(restoredHeight - genesisBlockNumber + 1).toLocaleString()} blocks in ${t1 - t0}ms`,
+			`Finished restore of ${(restoredHeight - genesisBlockNumber + 1).toLocaleString()} blocks in ${t2 - t0}ms`,
 		);
 	}
 
@@ -700,5 +726,31 @@ export class Restore {
 
 	async #updateValidatorRanks(context: RestoreContext): Promise<void> {
 		await context.entityManager.query("SELECT update_validator_ranks();", []);
+	}
+
+	async #analyzeTables({
+		blockRepository,
+		contractRepository,
+		stateRepository,
+		transactionRepository,
+		walletRepository,
+		legacyColdWalletRepository,
+		multiPaymentRepository,
+		configurationRepository,
+		validatorRoundRepository,
+	}: RestoreContext): Promise<void> {
+		await Promise.all(
+			[
+				blockRepository,
+				contractRepository,
+				stateRepository,
+				transactionRepository,
+				validatorRoundRepository,
+				walletRepository,
+				legacyColdWalletRepository,
+				multiPaymentRepository,
+				configurationRepository,
+			].map((repo) => repo.query(`ANALYZE ${repo.metadata.tableName}`)),
+		);
 	}
 }
