@@ -12,7 +12,7 @@ export const databaseReady = {
 			try {
 				return systemRepository.inMaintenance();
 			} catch {
-				return false;
+				return true;
 			}
 		};
 
