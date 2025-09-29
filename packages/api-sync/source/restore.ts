@@ -218,10 +218,10 @@ export class Restore {
 			await entityManager.query("SET LOCAL statement_timeout = 0;");
 
 			const context: RestoreContext = {
-				entityManager,
 				blockRepository: this.blockRepositoryFactory(entityManager),
 				configurationRepository: this.configurationRepositoryFactory(entityManager),
 				contractRepository: this.contractRepositoryFactory(entityManager),
+				entityManager,
 				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
 				multiPaymentRepository: this.multiPaymentRepositoryFactory(entityManager),
 				stateRepository: this.stateRepositoryFactory(entityManager),
