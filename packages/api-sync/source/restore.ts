@@ -436,8 +436,9 @@ export class Restore {
 	async #ingestWallets(context: RestoreContext): Promise<void> {
 		const t0 = performance.now();
 
-		const BATCH_SIZE = 1000n;
-		const CHUNK_SIZE = 250;
+		const BATCH_SIZE = 10000n;
+		const CHUNK_SIZE = 2500;
+
 		let offset: bigint | undefined = 0n;
 
 		if (this.snapshotImporter) {
@@ -545,8 +546,8 @@ export class Restore {
 	async #ingestLegacyColdWallets(context: RestoreContext): Promise<void> {
 		const t0 = performance.now();
 
-		const BATCH_SIZE = 1000n;
-		const CHUNK_SIZE = 250;
+		const BATCH_SIZE = 10000n;
+		const CHUNK_SIZE = 2500;
 		let offset: bigint | undefined = 0n;
 
 		let totalLegacyAccountBalance = 0n;
@@ -608,6 +609,8 @@ export class Restore {
 		let totalRounds = 0;
 		let validatorRounds: Models.ValidatorRound[] = [];
 
+		const CHUNK_SIZE = 1000;
+
 		const insert = async () => {
 			if (validatorRounds.length === 0) {
 				return;
@@ -640,7 +643,7 @@ export class Restore {
 			});
 			totalRounds += 1;
 
-			if (validatorRounds.length === 256) {
+			if (validatorRounds.length === CHUNK_SIZE) {
 				await insert();
 			}
 		}
