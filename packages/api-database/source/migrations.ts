@@ -49,7 +49,7 @@ export class Migrations implements ApiDatabaseContracts_Migrations {
 				this.logger.info(`>>> ${migration.name}`);
 			}
 		} catch (error) {
-			this.app.terminate("failed to run migrations", error);
+			await this.app.terminate("failed to run migrations", error);
 		} finally {
 			await this.dataSource.manager.query(`SET statement_timeout = '${oldTimeout}'`);
 		}
