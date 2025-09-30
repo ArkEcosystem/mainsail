@@ -8,7 +8,7 @@ export interface Application {
 
 	boot(): Promise<void>;
 
-	reboot(): void;
+	reboot(): Promise<void>;
 
 	config<T = any>(key: string, value?: T, defaultValue?: T): T | undefined;
 
