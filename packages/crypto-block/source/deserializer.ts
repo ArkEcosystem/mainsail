@@ -1,7 +1,6 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { inject, injectable, optional } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers, Utils } from "@mainsail/contracts";
-import { TransactionFactory } from "@mainsail/crypto-transaction";
 import { ByteBuffer, sleep } from "@mainsail/utils";
 
 import { HashFactory } from "./hash.factory.js";
@@ -10,9 +9,6 @@ import { HashFactory } from "./hash.factory.js";
 export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 	@inject(Identifiers.Cryptography.Block.HashFactory)
 	private readonly hashFactory!: HashFactory;
-
-	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory!: TransactionFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Deserializer)
 	private readonly transactionDeserializer!: Contracts.Crypto.TransactionDeserializer;
@@ -24,8 +20,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 	private readonly headerSize!: () => number;
 
 	@inject(Identifiers.CryptoWorker.WorkerPool)
-	@optional()
-	private readonly workerPool: Contracts.Crypto.WorkerPool | undefined;
+	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
 	public async deserializeHeader(serialized: Buffer): Promise<Contracts.Crypto.BlockHeader> {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
@@ -124,7 +119,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 		/**
 		 * After unpacking we need to turn the transactions into DTOs!
 		 *
-		 * We keep this behaviour out of the (de)serialiser because it
+		 * We keep this behavior out of the (de)serializer because it
 		 * is very specific to this bit of code in this specific class.
 		 */
 		const transactions: Contracts.Crypto.Transaction[] = new Array(block.transactionsCount);
@@ -137,7 +132,8 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 					await sleep(0);
 				}
 
-				const computed = await this.#computeCryptoData(transaction.data);
+				const worker = await this.workerPool.getWorker();
+				const computed = await worker.transactionFactory("computeCryptoData", transaction.data);
 				if (computed.schemaError) {
 					throw new Exceptions.TransactionSchemaError(computed.schemaError);
 				}
@@ -156,16 +152,5 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 		);
 
 		return transactions;
-	}
-
-	async #computeCryptoData(
-		transaction: Contracts.Crypto.TransactionData,
-	): Promise<Contracts.Crypto.TransactionCryptoData> {
-		if (this.workerPool) {
-			const worker = await this.workerPool.getWorker();
-			return worker.transactionFactory("computeCryptoData", transaction);
-		}
-
-		return this.transactionFactory.computeCryptoData(transaction);
 	}
 }
