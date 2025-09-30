@@ -6,7 +6,7 @@ export interface Application {
 
 	bootstrap({ flags, plugins }: { flags: JsonObject; plugins?: JsonObject }): Promise<void>;
 
-	boot(): void;
+	boot(): Promise<void>;
 
 	reboot(): void;
 
