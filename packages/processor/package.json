@@ -13,7 +13,6 @@
 	"scripts": {
 		"build": "tsc -b",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del distribution && del tsconfig.tsbuildinfo",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 --check-coverage --lines 100 pnpm run test",
