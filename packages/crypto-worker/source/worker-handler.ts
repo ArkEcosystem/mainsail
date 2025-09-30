@@ -4,9 +4,6 @@ import { Application, Services } from "@mainsail/kernel";
 
 @injectable()
 class WorkerImpl {
-	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
-
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
@@ -41,13 +38,6 @@ class WorkerImpl {
 		arguments_: Parameters<Contracts.Crypto.TransactionFactory[K]>,
 	): Promise<ReturnType<Contracts.Crypto.TransactionFactory[K]>> {
 		return this.#call(this.transactionFactory, method, arguments_);
-	}
-
-	public async callBlockFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.BlockFactory>>(
-		method: K,
-		arguments_: Parameters<Contracts.Crypto.BlockFactory[K]>,
-	): Promise<ReturnType<Contracts.Crypto.BlockFactory[K]>> {
-		return this.#call(this.blockFactory, method, arguments_);
 	}
 
 	public async callPublicKeyFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.PublicKeyFactory>>(
@@ -111,14 +101,6 @@ export class WorkerScriptHandler implements Contracts.Crypto.WorkerScriptHandler
 	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
 		// @ts-ignore
 		return this.#impl.callWalletSignawture(method, arguments_[0]);
-	}
-
-	public async blockFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.BlockFactory>>(
-		method: K,
-		...arguments_: Parameters<Contracts.Crypto.BlockFactory[K]>
-	): Promise<ReturnType<Contracts.Crypto.BlockFactory[K]>> {
-		// @ts-ignore
-		return this.#impl.callBlockFactory(method, arguments_[0]);
 	}
 
 	public async transactionFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.TransactionFactory>>(

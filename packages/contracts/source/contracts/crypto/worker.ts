@@ -1,4 +1,3 @@
-import { BlockFactory } from "../crypto/block.js";
 import { PublicKeyFactory, Signature } from "../crypto/identities.js";
 import { TransactionFactory } from "../crypto/transactions.js";
 import { Requests, Subprocess } from "../kernel/ipc.js";
@@ -18,10 +17,6 @@ export interface WorkerScriptHandler {
 		method: K,
 		...arguments_: Parameters<Signature[K]>
 	): Promise<ReturnType<Signature[K]>>;
-	blockFactory<K extends Requests<BlockFactory>>(
-		method: K,
-		...arguments_: Parameters<BlockFactory[K]>
-	): Promise<ReturnType<BlockFactory[K]>>;
 	transactionFactory<K extends Requests<TransactionFactory>>(
 		method: K,
 		...arguments_: Parameters<TransactionFactory[K]>

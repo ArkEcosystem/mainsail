@@ -53,13 +53,6 @@ export class Worker implements Contracts.Crypto.Worker {
 		return this.ipcSubprocess.sendRequest("walletSignature", method, arguments_);
 	}
 
-	public async blockFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.BlockFactory>>(
-		method: K,
-		...arguments_: Parameters<Contracts.Crypto.BlockFactory[K]>
-	): Promise<ReturnType<Contracts.Crypto.BlockFactory[K]>> {
-		return this.ipcSubprocess.sendRequest("blockFactory", method, arguments_);
-	}
-
 	public async transactionFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.TransactionFactory>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.TransactionFactory[K]>
