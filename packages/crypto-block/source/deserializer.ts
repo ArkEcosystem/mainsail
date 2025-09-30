@@ -122,7 +122,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 		 * We keep this behavior out of the (de)serializer because it
 		 * is very specific to this bit of code in this specific class.
 		 */
-		const transactions: Contracts.Crypto.Transaction[] = new Array(block.transactionsCount);
+		const transactions: Contracts.Crypto.Transaction[] = Array.from({ length: block.transactionsCount });
 
 		await Promise.all(
 			block.transactions.map(async (serialized, index) => {
