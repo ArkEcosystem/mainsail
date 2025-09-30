@@ -11,7 +11,7 @@
 		"build": "lerna run build",
 		"build:rs": "lerna run build --scope=@mainsail/evm",
 		"build:ts": "pnpm run build:rs && lerna run build --ignore=@mainsail/evm",
-		"clean": "lerna run clean --parallel",
+		"clean": "rm -rf packages/*/distribution && rm -f packages/*/tsconfig.tsbuildinfo",
 		"clean:all": "pnpm run clean && pnpm run clean:node_modules && rm -r .cache",
 		"clean:node_modules": "del packages/*/node_modules && del node_modules",
 		"deps": "cross-env-shell ./scripts/deps/update.sh",
