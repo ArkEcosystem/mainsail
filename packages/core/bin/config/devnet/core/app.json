@@ -37,9 +37,6 @@
 			"package": "@mainsail/serializer"
 		},
 		{
-			"package": "@mainsail/crypto-block"
-		},
-		{
 			"package": "@mainsail/evm-service"
 		},
 		{
@@ -50,6 +47,9 @@
 		},
 		{
 			"package": "@mainsail/crypto-worker"
+		},
+		{
+			"package": "@mainsail/crypto-block"
 		},
 		{
 			"package": "@mainsail/logger-pino"
@@ -293,6 +293,9 @@
 		},
 		{
 			"package": "@mainsail/evm-service"
+		},
+		{
+			"package": "@mainsail/crypto-worker"
 		},
 		{
 			"package": "@mainsail/database"
