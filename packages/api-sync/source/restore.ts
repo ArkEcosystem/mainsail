@@ -243,10 +243,10 @@ export class Restore {
 	}
 
 	async #ingestBlocksAndTransactions(context: RestoreContext): Promise<void> {
-		const { blockRepository, transactionRepository, mostRecentCommit } = context;
+		const { blockRepository, transactionRepository, multiPaymentRepository, mostRecentCommit } = context;
 
 		const BATCH_SIZE = 1000;
-		const CHUNK_SIZE = 256;
+		const CHUNK_SIZE = 1000;
 		const t0 = performance.now();
 
 		const genesisBlockNumber = this.configuration.getGenesisHeight();
@@ -270,6 +270,26 @@ export class Restore {
 			const blocks: Models.Block[] = [];
 			const transactions: Models.Transaction[] = [];
 			const multiPayments: Models.MultiPayment[] = [];
+
+			const insertTransactions = async () => {
+				if (transactions.length === 0) {
+					return;
+				}
+
+				await transactionRepository.createQueryBuilder().insert().orIgnore().values(transactions).execute();
+
+				transactions.length = 0;
+			};
+
+			const insertMultiPayments = async () => {
+				if (multiPayments.length === 0) {
+					return;
+				}
+
+				await multiPaymentRepository.createQueryBuilder().insert().orIgnore().values(multiPayments).execute();
+
+				multiPayments.length = 0;
+			};
 
 			for await (const { proof, block } of commits) {
 				blocks.push({
@@ -383,25 +403,28 @@ export class Restore {
 
 					multiPayments.push(...parsedMultiPayments);
 
+					if (transactions.length >= CHUNK_SIZE) {
+						await insertTransactions();
+					}
+
+					if (multiPayments.length >= CHUNK_SIZE) {
+						await insertMultiPayments();
+					}
+
 					ingestedTransactions++;
 				}
+
+				block.transactions.length = 0;
 
 				context.lastBlockNumber = block.header.number;
 			}
 
-			// too large queries are not good for postgres
 			for (const batch of chunk(blocks, CHUNK_SIZE)) {
 				await blockRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
-			// batch insert 'transactions' separately from 'blocks', given that we will be consistent at the end of the db transaction anyway.
-			for (const batch of chunk(transactions, CHUNK_SIZE)) {
-				await transactionRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
-			}
-
-			for (const batch of chunk(multiPayments, CHUNK_SIZE)) {
-				await context.multiPaymentRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
-			}
+			await insertTransactions();
+			await insertMultiPayments();
 
 			if (
 				ingestedBlocks % (BATCH_SIZE * 10) === 0 ||
@@ -455,8 +478,9 @@ export class Restore {
 	async #ingestWallets(context: RestoreContext): Promise<void> {
 		const t0 = performance.now();
 
-		const BATCH_SIZE = 1000n;
-		const CHUNK_SIZE = 250;
+		const BATCH_SIZE = 10000n;
+		const CHUNK_SIZE = 2500;
+
 		let offset: bigint | undefined = 0n;
 
 		if (this.snapshotImporter) {
@@ -577,8 +601,8 @@ export class Restore {
 	async #ingestLegacyColdWallets(context: RestoreContext): Promise<void> {
 		const t0 = performance.now();
 
-		const BATCH_SIZE = 1000n;
-		const CHUNK_SIZE = 250;
+		const BATCH_SIZE = 10000n;
+		const CHUNK_SIZE = 2500;
 		let offset: bigint | undefined = 0n;
 
 		let totalLegacyAccountBalance = 0n;
@@ -640,6 +664,8 @@ export class Restore {
 		let totalRounds = 0;
 		let validatorRounds: Models.ValidatorRound[] = [];
 
+		const CHUNK_SIZE = 1000;
+
 		const insert = async () => {
 			if (validatorRounds.length === 0) {
 				return;
@@ -672,7 +698,7 @@ export class Restore {
 			});
 			totalRounds += 1;
 
-			if (validatorRounds.length === 256) {
+			if (validatorRounds.length === CHUNK_SIZE) {
 				await insert();
 			}
 		}
