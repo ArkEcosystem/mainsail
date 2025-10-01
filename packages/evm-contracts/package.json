@@ -13,7 +13,6 @@
 	"scripts": {
 		"build": "tsc -b",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del distribution && del tsconfig.tsbuildinfo",
 		"release": "pnpm publish --access public"
 	},
 	"engines": {
