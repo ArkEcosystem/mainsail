@@ -11,7 +11,7 @@
 		"build": "pnpm run clean && pnpm run build-napi",
 		"build-napi": "napi build --platform --output-dir ./ --manifest-path bindings/Cargo.toml --release",
 		"build-napi:debug": "napi build --platform --output-dir ./ --manifest-path bindings/Cargo.toml",
-		"clean": "del index.js index.d.ts evm.*.node target",
+		"clean": "rm -f index.js && rm -f index.d.ts && rm -f evm.*.node && rm -rf target",
 		"prepublishOnly": "napi prepublish -t pnpm",
 		"release": "pnpm publish --access public",
 		"test": "cargo test --release",
