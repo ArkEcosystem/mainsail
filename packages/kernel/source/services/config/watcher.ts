@@ -15,7 +15,7 @@ export class Watcher {
 		this.#watcher = await nsfw(this.app.configPath(), (events) => {
 			for (const event of events) {
 				if (event.action === nsfw.ActionType.MODIFIED && configFiles.has(event.file)) {
-					this.app.reboot();
+					await this.app.reboot();
 					break;
 				}
 			}
