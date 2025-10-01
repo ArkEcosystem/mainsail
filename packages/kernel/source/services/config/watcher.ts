@@ -12,7 +12,7 @@ export class Watcher {
 	public async boot(): Promise<void> {
 		const configFiles = new Set([".env", "validators.json", "peers.json", "plugins.js", "plugins.json"]);
 
-		this.#watcher = await nsfw(this.app.configPath(), (events) => {
+		this.#watcher = await nsfw(this.app.configPath(), async (events) => {
 			for (const event of events) {
 				if (event.action === nsfw.ActionType.MODIFIED && configFiles.has(event.file)) {
 					await this.app.reboot();
