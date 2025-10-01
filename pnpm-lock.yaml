@@ -1132,9 +1132,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1166,6 +1163,9 @@ importers:
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../crypto-transaction
       '@mainsail/crypto-transaction-evm-call':
         specifier: workspace:*
         version: link:../crypto-transaction-evm-call
