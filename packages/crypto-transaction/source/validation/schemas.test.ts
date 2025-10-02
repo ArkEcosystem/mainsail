@@ -128,7 +128,7 @@ describe<{
 			assert.true(validator.validate("transaction", transaction).error.includes(field));
 		}
 
-		const optionalFields = ["hash", "v", "r", "s", "typeGroup", "version"];
+		const optionalFields = ["hash", "v", "r", "s"];
 		for (const field of optionalFields) {
 			const transaction = {
 				...transactionOriginal,
