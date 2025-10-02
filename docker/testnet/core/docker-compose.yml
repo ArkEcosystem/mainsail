@@ -1,32 +1,30 @@
-version: '3.5'
 services:
-  core:
-    image: arkecosystem/mainsail-core:testnet
-    container_name: mainsail-testnet
-    restart: always
-    ports:
-     - "4000:4000"
-     - "127.0.0.1:4004:4004"
-     - "127.0.0.1:4006:4006"
-     - "4007:4007"
-     - "4008:4008" 
-    cap_add:
-      - SYS_NICE
-      - SYS_RESOURCE
-      - SYS_TIME
-    volumes:
-     - ~/.config/mainsail:/home/node/.config/mainsail
-     - ~/.local/share/mainsail:/home/node/.local/share/mainsail
-     - ~/.local/state/mainsail:/home/node/.local/state/mainsail
-     - /etc/localtime:/etc/localtime:ro
-     - ./enc:/run/secrets
-    networks:
-      - core
-    env_file: testnet.env
-    tty: true
+    core:
+        image: arkecosystem/mainsail-core:testnet
+        container_name: mainsail-testnet
+        restart: always
+        ports:
+            - "4000:4000"
+            - "127.0.0.1:4004:4004"
+            - "127.0.0.1:4006:4006"
+            - "4007:4007"
+            - "4008:4008"
+        cap_add:
+            - SYS_NICE
+            - SYS_RESOURCE
+            - SYS_TIME
+        volumes:
+            - ~/.config/mainsail:/home/node/.config/mainsail
+            - ~/.local/share/mainsail:/home/node/.local/share/mainsail
+            - ~/.local/state/mainsail:/home/node/.local/state/mainsail
+            - /etc/localtime:/etc/localtime:ro
+            - ./enc:/run/secrets
+        networks:
+            - core
+        env_file: testnet.env
+        tty: true
 volumes:
-  core:
+    core:
 networks:
-  core:
-    external: true
-
+    core:
+        external: true
