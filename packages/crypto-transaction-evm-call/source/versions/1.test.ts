@@ -42,6 +42,7 @@ describe<{
 		gasPrice: 5 * 1e9,
 		gasLimit: 21000,
 		nonce: 1,
+		network: 10000,
 		to: zeroAddress,
 		senderPublicKey: "a".repeat(66),
 		from: "0x" + "a".repeat(40),
