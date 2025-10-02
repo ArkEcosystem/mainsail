@@ -58,7 +58,6 @@ export interface TransactionJson {
 	data: string;
 
 	hash?: string;
-	timestamp?: number;
 
 	v?: number;
 	r?: string;
