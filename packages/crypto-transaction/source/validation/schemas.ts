@@ -51,6 +51,6 @@ export const transactionBaseSchema: SchemaObject = {
 		v: { maximum: 1, minimum: 0, type: "number" },
 		value: { bignumber: { maximum: undefined, minimum: 0 } },
 	},
-	required: ["from", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
+	required: ["network", "from", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
 	type: "object",
 };

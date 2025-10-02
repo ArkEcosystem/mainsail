@@ -117,7 +117,7 @@ describe<{
 	it("transactionBaseSchema - should have required fields", ({ validator }) => {
 		validator.addSchema(schema);
 
-		const requiredFields = ["value", "gasPrice", "nonce", "senderPublicKey"];
+		const requiredFields = ["network", "value", "gasPrice", "nonce", "senderPublicKey"];
 		for (const field of requiredFields) {
 			const transaction = {
 				...transactionOriginal,
@@ -128,7 +128,7 @@ describe<{
 			assert.true(validator.validate("transaction", transaction).error.includes(field));
 		}
 
-		const optionalFields = ["hash", "network", "v", "r", "s", "typeGroup", "version"];
+		const optionalFields = ["hash", "v", "r", "s", "typeGroup", "version"];
 		for (const field of optionalFields) {
 			const transaction = {
 				...transactionOriginal,
