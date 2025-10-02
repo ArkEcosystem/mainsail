@@ -41,10 +41,8 @@ export const transactionBaseSchema: SchemaObject = {
 
 		nonce: { bignumber: { minimum: 0 } },
 
-		r: { type: "string" },
-
-		// TODO: prefixed hex
-		s: { type: "string" },
+		r: { $ref: "hex" },
+		s: { $ref: "hex" },
 
 		senderLegacyAddress: { type: "string" },
 
