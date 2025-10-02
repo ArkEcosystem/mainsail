@@ -29,7 +29,7 @@ export const transactionBaseSchema: SchemaObject = {
 		gasLimit: { transactionGasLimit: {} },
 		gasPrice: { transactionGasPrice: {} },
 
-		hash: { anyOf: [{ $ref: "transactionHash" }, { type: "null" }] },
+		hash: { $ref: "transactionHash" },
 
 		// Legacy
 		legacySecondSignature: {
