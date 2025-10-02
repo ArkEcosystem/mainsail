@@ -77,7 +77,7 @@ export class TransactionsController extends AbstractController {
 	public async showUnconfirmed(request: Hapi.Request) {
 		const transactionQuery: Contracts.TransactionPool.QueryIterable = this.poolQuery
 			.getFromHighestPriority()
-			.whereHash(request.params.id);
+			.whereHash(request.params.hash);
 
 		if ((await transactionQuery.has()) === false) {
 			return notFound("Transaction not found");
