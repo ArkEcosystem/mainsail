@@ -62,11 +62,11 @@ const configurations = [
 		initialHeight: 0,
 		overwriteConfig: true,
 		timeouts: {
-			blockPrepareTime: 100,
-			blockTime: 100,
-			stageTimeout: 100,
-			stageTimeoutIncrease: 100,
-			tolerance: 100,
+			blockPrepareTime: 200,
+			blockTime: 200,
+			stageTimeout: 200,
+			stageTimeoutIncrease: 200,
+			tolerance: 200,
 		},
 		postGenerate: (location) => {
 			// Functional tests run on single node
