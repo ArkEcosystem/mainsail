@@ -19,7 +19,7 @@ export class CustomQueryIterable implements Partial<Contracts.TransactionPool.Qu
 		}
 	}
 
-	public whereId(id: any): any {
+	public whereHash(hash: any): any {
 		return this;
 	}
 

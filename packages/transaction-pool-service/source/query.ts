@@ -58,8 +58,8 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 		return this;
 	}
 
-	public whereId(id: string): QueryIterable {
-		return this.wherePredicate(async (t) => t.hash === id);
+	public whereHash(hash: string): QueryIterable {
+		return this.wherePredicate(async (t) => t.hash === hash);
 	}
 
 	async #satisfiesPredicates(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
