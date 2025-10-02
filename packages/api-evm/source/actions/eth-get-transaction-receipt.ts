@@ -24,7 +24,7 @@ export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action {
 		maxItems: 1,
 		minItems: 1,
 
-		prefixItems: [{ $ref: "prefixedTransactionId" }],
+		prefixItems: [{ $ref: "prefixedTransactionHash" }],
 		type: "array",
 	};
 
