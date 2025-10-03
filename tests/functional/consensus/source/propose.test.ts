@@ -25,9 +25,9 @@ const reorder = <T>(items: T[]): T[] => {
 	}
 
 	// Swap items 3 and 4
-	const tmp = items[2];
-	items[2] = items[3];
-	items[3] = tmp;
+	const tmp = items[3];
+	items[3] = items[4];
+	items[4] = tmp;
 
 	return items;
 };
@@ -248,13 +248,13 @@ describe<{
 		// Assert all nodes prevote
 		assert.equal(
 			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
-			reorder([
+			[
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
 				proposal1.getData().block.data.hash,
 				proposal1.getData().block.data.hash,
-			]),
+			],
 		);
 
 		// Assert all nodes precommit (null)
@@ -356,13 +356,13 @@ describe<{
 		// Assert all nodes prevote
 		assert.equal(
 			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
-			[
+			reorder([
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
 				proposal1.getData().block.data.hash,
-			],
+			]),
 		);
 
 		// // Assert all nodes precommit (null)
