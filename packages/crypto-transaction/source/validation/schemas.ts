@@ -1,13 +1,13 @@
 import { SchemaObject } from "ajv";
 
-const transactionId: SchemaObject = {
-	$id: "transactionId",
+const transactionHash: SchemaObject = {
+	$id: "transactionHash",
 	allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
 	type: "string",
 };
 
-const prefixedTransactionId: SchemaObject = {
-	$id: "prefixedTransactionId",
+const prefixedTransactionHash: SchemaObject = {
+	$id: "prefixedTransactionHash",
 	allOf: [{ maxLength: 66, minLength: 66 }, { $ref: "prefixedQuantityHex" }],
 	type: "string",
 };
@@ -19,8 +19,8 @@ const networkByte: SchemaObject = {
 
 export const schemas = {
 	networkByte,
-	prefixedTransactionId,
-	transactionId,
+	prefixedTransactionHash,
+	transactionHash,
 };
 
 export const transactionBaseSchema: SchemaObject = {
@@ -29,7 +29,7 @@ export const transactionBaseSchema: SchemaObject = {
 		gasLimit: { transactionGasLimit: {} },
 		gasPrice: { transactionGasPrice: {} },
 
-		hash: { anyOf: [{ $ref: "transactionId" }, { type: "null" }] },
+		hash: { $ref: "transactionHash" },
 
 		// Legacy
 		legacySecondSignature: {
@@ -41,10 +41,8 @@ export const transactionBaseSchema: SchemaObject = {
 
 		nonce: { bignumber: { minimum: 0 } },
 
-		r: { type: "string" },
-
-		// TODO: prefixed hex
-		s: { type: "string" },
+		r: { $ref: "hex" },
+		s: { $ref: "hex" },
 
 		senderLegacyAddress: { type: "string" },
 
@@ -53,6 +51,6 @@ export const transactionBaseSchema: SchemaObject = {
 		v: { maximum: 1, minimum: 0, type: "number" },
 		value: { bignumber: { maximum: undefined, minimum: 0 } },
 	},
-	required: ["from", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
+	required: ["network", "from", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
 	type: "object",
 };

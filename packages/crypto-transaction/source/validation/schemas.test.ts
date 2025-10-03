@@ -43,28 +43,28 @@ describe<{
 		}
 	});
 
-	it("transactionId - should be ok", ({ validator }) => {
-		assert.undefined(validator.validate("transactionId", "0".repeat(64)).error);
+	it("transactionHash - should be ok", ({ validator }) => {
+		assert.undefined(validator.validate("transactionHash", "0".repeat(64)).error);
 
 		const validChars = "0123456789abcdef";
 
 		for (const char of validChars) {
-			assert.undefined(validator.validate("transactionId", char.repeat(64)).error);
+			assert.undefined(validator.validate("transactionHash", char.repeat(64)).error);
 		}
 	});
 
-	it("transactionId - should not be ok", ({ validator }) => {
-		assert.defined(validator.validate("transactionId", "0".repeat(63)).error);
-		assert.defined(validator.validate("transactionId", "0".repeat(65)).error);
-		assert.defined(validator.validate("transactionId", 123).error);
-		assert.defined(validator.validate("transactionId", null).error);
-		assert.defined(validator.validate("transactionId").error);
-		assert.defined(validator.validate("transactionId", {}).error);
+	it("transactionHash - should not be ok", ({ validator }) => {
+		assert.defined(validator.validate("transactionHash", "0".repeat(63)).error);
+		assert.defined(validator.validate("transactionHash", "0".repeat(65)).error);
+		assert.defined(validator.validate("transactionHash", 123).error);
+		assert.defined(validator.validate("transactionHash", null).error);
+		assert.defined(validator.validate("transactionHash").error);
+		assert.defined(validator.validate("transactionHash", {}).error);
 
 		const invalidChars = "ABCDEFGHIJKLghijkl!#$%&'|+/";
 
 		for (const char of invalidChars) {
-			assert.defined(validator.validate("transactionId", char.repeat(64)).error);
+			assert.defined(validator.validate("transactionHash", char.repeat(64)).error);
 		}
 	});
 
@@ -117,7 +117,7 @@ describe<{
 	it("transactionBaseSchema - should have required fields", ({ validator }) => {
 		validator.addSchema(schema);
 
-		const requiredFields = ["value", "gasPrice", "nonce", "senderPublicKey"];
+		const requiredFields = ["network", "value", "gasPrice", "nonce", "senderPublicKey"];
 		for (const field of requiredFields) {
 			const transaction = {
 				...transactionOriginal,
@@ -128,7 +128,7 @@ describe<{
 			assert.true(validator.validate("transaction", transaction).error.includes(field));
 		}
 
-		const optionalFields = ["id", "network", "v", "r", "s", "typeGroup", "version"];
+		const optionalFields = ["hash", "v", "r", "s"];
 		for (const field of optionalFields) {
 			const transaction = {
 				...transactionOriginal,
@@ -217,7 +217,7 @@ describe<{
 		assert.undefined(validator.validate("transaction", transaction).error);
 	});
 
-	it("transactionBaseSchema - id should be transactionId", ({ validator }) => {
+	it("transactionBaseSchema - hash should be transactionHash", ({ validator }) => {
 		validator.addSchema(schema);
 
 		const validChars = "0123456789abcdef";
