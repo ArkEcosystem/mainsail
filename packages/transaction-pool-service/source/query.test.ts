@@ -166,9 +166,9 @@ describe<{
 		assert.equal(result, [context.sender2Transaction100, context.sender2Transaction200]);
 	});
 
-	it("whereId - should filter transactions by id", async (context) => {
+	it("whereHash - should filter transactions by hash", async (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = await queryIterable.whereId(context.sender1Transaction200.hash).all();
+		const result = await queryIterable.whereHash(context.sender1Transaction200.hash).all();
 
 		assert.length(result, 1);
 		assert.equal(result[0].hash, context.sender1Transaction200.hash);

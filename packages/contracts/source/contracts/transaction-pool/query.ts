@@ -11,7 +11,7 @@ export interface Query {
 
 export interface QueryIterable {
 	wherePredicate(predicate: QueryPredicate): QueryIterable;
-	whereId(id: string): QueryIterable;
+	whereHash(hash: string): QueryIterable;
 
 	has(): Promise<boolean>;
 	first(): Promise<Transaction>;
