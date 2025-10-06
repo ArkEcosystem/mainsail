@@ -3,7 +3,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
 @injectable()
-export abstract class TransactionHandler implements Contracts.Transactions.TransactionHandler {
+export class TransactionHandler implements Contracts.Transactions.TransactionHandler {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 

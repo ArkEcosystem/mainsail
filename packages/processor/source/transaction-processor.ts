@@ -20,8 +20,8 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
-	@inject(Identifiers.Transaction.Handler.Registry)
-	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
+	@inject(Identifiers.Transaction.Handler)
+	private readonly transactionHandler!: Contracts.Transactions.TransactionHandler;
 
 	async process(
 		unit: Contracts.Processor.ProcessableUnit,
@@ -30,7 +30,6 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		const block = unit.getBlock();
 
 		const milestone = this.configuration.getMilestone(block.header.number);
-		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
 		const commitKey: Contracts.Evm.CommitKey = {
 			blockHash: block.header.hash,
@@ -50,11 +49,11 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			},
 		};
 
-		if (!(await transactionHandler.verify(transaction))) {
+		if (!(await this.transactionHandler.verify(transaction))) {
 			throw new Exceptions.InvalidSignatureError();
 		}
 
-		const receipt = await transactionHandler.apply(transactionHandlerContext, transaction);
+		const receipt = await this.transactionHandler.apply(transactionHandlerContext, transaction);
 
 		const feeConsumed = this.feeCalculator.calculateConsumed(transaction.data.gasPrice, Number(receipt.gasUsed));
 		this.logger.debug(
