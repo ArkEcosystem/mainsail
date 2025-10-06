@@ -21,13 +21,13 @@ export class Transaction implements Contracts.Crypto.Transaction {
 		return {
 			$id: "transaction",
 			properties: {
-				from: { $ref: "address" },
-				gasLimit: { transactionGasLimit: {} },
-
-				gasPrice: { transactionGasPrice: {} },
-				hash: { $ref: "transactionHash" },
-
 				data: { bytecode: {} },
+				from: { $ref: "address" },
+
+				gasLimit: { transactionGasLimit: {} },
+				gasPrice: { transactionGasPrice: {} },
+
+				hash: { $ref: "transactionHash" },
 
 				// Legacy
 				legacySecondSignature: {
@@ -44,9 +44,9 @@ export class Transaction implements Contracts.Crypto.Transaction {
 
 				senderLegacyAddress: { type: "string" },
 
-				to: { $ref: "address" },
-
 				senderPublicKey: { $ref: "publicKey" },
+
+				to: { $ref: "address" },
 				v: { maximum: 1, minimum: 0, type: "number" },
 				value: { bignumber: { maximum: undefined, minimum: 0 } },
 			},
