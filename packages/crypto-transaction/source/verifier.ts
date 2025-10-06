@@ -1,6 +1,8 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
+import { Transaction } from "./types/transaction.js";
+
 @injectable()
 export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	@inject(Identifiers.Cryptography.Signature.Instance)
@@ -12,9 +14,6 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
 	private readonly utils!: Contracts.Crypto.TransactionUtilities;
-
-	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
-	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
 
 	public async verifyHash(data: Contracts.Crypto.TransactionData): Promise<boolean> {
 		const { v, r, s, senderPublicKey } = data;
@@ -34,13 +33,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 		data: Contracts.Crypto.TransactionData,
 		strict: boolean,
 	): Promise<Contracts.Crypto.SchemaValidationResult> {
-		const transactionType = this.transactionTypeFactory.get(0, 0, 0);
-
-		if (!transactionType) {
-			throw new Error("Unknown transaction type");
-		}
-
-		const { $id } = transactionType.getSchema();
+		const { $id } = Transaction.getSchema();
 
 		return this.validator.validate(strict ? `${$id}Strict` : `${$id}`, data);
 	}

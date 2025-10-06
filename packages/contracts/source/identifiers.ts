@@ -129,7 +129,6 @@ export const Identifiers = {
 			Registry: Symbol("Crypto<Transaction.Registry>"),
 			Serializer: Symbol("Crypto<Transaction.Serializer>"),
 			Signer: Symbol("Crypto<Transaction.Signer>"),
-			TypeFactory: Symbol("Crypto<Transaction.TypeFactory>"),
 			Utils: Symbol("Crypto<Transaction.Utils>"),
 			Verifier: Symbol("Crypto<Transaction.Verifier>"),
 		},

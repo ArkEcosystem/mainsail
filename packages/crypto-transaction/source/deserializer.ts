@@ -5,8 +5,8 @@ import { bytesToHex, getAddress, Hex, hexToBigInt } from "viem";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
-	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
-	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
+	@inject(Identifiers.Cryptography.Transaction.Utils)
+	private readonly utils!: Contracts.Crypto.TransactionUtilities;
 
 	public async deserialize(serialized: Buffer): Promise<Contracts.Crypto.Transaction> {
 		const data = {} as Contracts.Crypto.TransactionData;
@@ -63,7 +63,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 			data.legacySecondSignature = fields[9].slice(2);
 		}
 
-		const instance: Contracts.Crypto.Transaction = this.transactionTypeFactory.create(data);
+		const instance = this.utils.resolve(data);
 
 		instance.serialized = serialized;
 

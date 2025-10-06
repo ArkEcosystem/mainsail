@@ -46,14 +46,6 @@ export interface TransactionHandlerProvider {
 	registerHandlers(): void;
 }
 
-export interface TransactionTypeFactory {
-	initialize(transactionTypes: Map<number, TransactionConstructor>);
-
-	create(data: TransactionData): Transaction;
-
-	get(type: number, typeGroup?: number, version?: number): TransactionConstructor;
-}
-
 export interface TransactionValidatorContext {
 	commitKey: CommitKey;
 	gasLimit: number;

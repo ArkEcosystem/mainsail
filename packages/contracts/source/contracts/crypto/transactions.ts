@@ -128,6 +128,8 @@ export interface TransactionRegistry {
 }
 
 export interface TransactionUtilities {
+	resolve(data: TransactionData): Transaction;
+
 	toBytes(data: TransactionData): Promise<Buffer>;
 
 	toHash(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;
