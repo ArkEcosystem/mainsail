@@ -1,6 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
-import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
 import { BigNumber } from "@mainsail/utils";
 
 import secrets from "../../internal/passphrases.json" with { type: "json" };
@@ -11,20 +10,15 @@ import { generateApp } from "./generate-app.js";
 const AMOUNT = 1;
 export const GAS_PRICE = 5 * 1e9;
 
-interface EntityOptions<T extends TransactionBuilder<T>> {
-	entity: TransactionBuilder<T>;
+interface EntityOptions {
+	entity: TransactionBuilder;
 	options: TransactionOptions;
 }
 
-const sign = async <T extends TransactionBuilder<T>>({
-	entity,
-	options,
-}: EntityOptions<T>): Promise<TransactionBuilder<T>> => entity.sign(options.passphrase || secrets[0]);
+const sign = async ({ entity, options }: EntityOptions): Promise<TransactionBuilder> =>
+	entity.sign(options.passphrase || secrets[0]);
 
-const multiSign = async <T extends TransactionBuilder<T>>({
-	entity,
-	options,
-}: EntityOptions<T>): Promise<TransactionBuilder<T>> =>
+const multiSign = async ({ entity, options }: EntityOptions): Promise<TransactionBuilder> =>
 	//	const passphrases: string[] = options.passphrases || [secrets[0], secrets[1], secrets[2]];
 
 	// for (const [index, passphrase] of passphrases.entries()) {
@@ -32,10 +26,7 @@ const multiSign = async <T extends TransactionBuilder<T>>({
 	// }
 
 	entity;
-const applyModifiers = <T extends TransactionBuilder<T>>(
-	entity: TransactionBuilder<T>,
-	options: TransactionOptions,
-): TransactionBuilder<T> => {
+const applyModifiers = (entity: TransactionBuilder, options: TransactionOptions): TransactionBuilder => {
 	entity.gasPrice(options.gasPrice || GAS_PRICE);
 
 	if (options.nonce) {
@@ -55,7 +46,7 @@ const applyModifiers = <T extends TransactionBuilder<T>>(
 
 export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
 	factory.set("Transfer", async ({ options }: { options: TransferOptions }) => {
-		const transferBuilder = app.resolve(EvmCallBuilder);
+		const transferBuilder = app.resolve(TransactionBuilder);
 
 		return applyModifiers(
 			transferBuilder
@@ -222,7 +213,7 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 
 export const registerEvmCallFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
 	factory.set("EvmCall", async ({ options }: { options: EvmCallOptions }) => {
-		const builder = app.resolve(EvmCallBuilder);
+		const builder = app.resolve(TransactionBuilder);
 
 		builder.payload(options.evmCall?.payload ?? "");
 		builder.gasLimit(options.evmCall?.gasLimit ?? 21_000);

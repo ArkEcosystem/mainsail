@@ -1,5 +1,4 @@
 import { Contracts } from "@mainsail/contracts";
-import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
 import { registerTransactionFactory } from "../factories/factories/transaction.js";
@@ -38,7 +37,7 @@ export class Signer {
 			.get("Transfer")
 			.withOptions(options)
 			.withStates(...states)
-			.make<TransactionBuilder<any>>();
+			.make();
 
 		this.#incrementNonce();
 		return builder.build();
@@ -53,7 +52,7 @@ export class Signer {
 			.get("ValidatorRegistration")
 			.withOptions(options)
 			.withStates("sign")
-			.make<TransactionBuilder<any>>();
+			.make();
 
 		this.#incrementNonce();
 		return await builder.build();
@@ -64,11 +63,7 @@ export class Signer {
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
 
-		const builder = await this.#factoryBuilder
-			.get("Vote")
-			.withOptions(options)
-			.withStates("sign")
-			.make<TransactionBuilder<any>>();
+		const builder = await this.#factoryBuilder.get("Vote").withOptions(options).withStates("sign").make();
 
 		this.#incrementNonce();
 		return builder.build();
@@ -83,7 +78,7 @@ export class Signer {
 			.get("MultiSignature")
 			.withOptions(options)
 			.withStates("sign", "multiSign")
-			.make<TransactionBuilder<any>>();
+			.make();
 
 		this.#incrementNonce();
 		return builder.build();
@@ -94,11 +89,7 @@ export class Signer {
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
 
-		const builder = await this.#factoryBuilder
-			.get("MultiPayment")
-			.withOptions(options)
-			.withStates("sign")
-			.make<TransactionBuilder<any>>();
+		const builder = await this.#factoryBuilder.get("MultiPayment").withOptions(options).withStates("sign").make();
 
 		this.#incrementNonce();
 		return builder.build();
@@ -109,11 +100,7 @@ export class Signer {
 
 		options = { nonce: this.#nonce.toFixed(), ...options };
 
-		const builder = await this.#factoryBuilder
-			.get("EvmCall")
-			.withOptions(options)
-			.withStates("sign")
-			.make<TransactionBuilder<any>>();
+		const builder = await this.#factoryBuilder.get("EvmCall").withOptions(options).withStates("sign").make();
 
 		this.#incrementNonce();
 		return builder.build();

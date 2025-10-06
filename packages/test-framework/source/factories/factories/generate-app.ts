@@ -10,7 +10,6 @@ import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-
 import { ServiceProvider as CoreCryptoMessages } from "@mainsail/crypto-messages";
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
-import { ServiceProvider as CoreEvmCallTransaction } from "@mainsail/crypto-transaction-evm-call";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
@@ -38,7 +37,6 @@ export const generateApp = async (
 	await sandbox.app.resolve(CoreCryptoHashBcrypto).register();
 	await sandbox.app.resolve(CoreCryptoConsensus).register();
 	await sandbox.app.resolve(CoreCryptoTransaction).register();
-	await sandbox.app.resolve(CoreEvmCallTransaction).register();
 	await sandbox.app.resolve(CoreCryptoBlock).register();
 	await sandbox.app.resolve(CoreCryptoMessages).register();
 	await sandbox.app.resolve(CoreCryptoCommit).register();

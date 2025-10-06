@@ -1,6 +1,6 @@
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
+import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { assert, BigNumber } from "@mainsail/utils";
@@ -128,7 +128,7 @@ export class GenesisBlockGenerator extends Generator {
 	): Promise<Contracts.Crypto.Transaction> {
 		return await (
 			await this.app
-				.resolve(EvmCallBuilder)
+				.resolve(TransactionBuilder)
 				.network(chainId)
 				.recipientAddress(recipient.address)
 				.nonce(nonce.toFixed(0))
@@ -173,7 +173,7 @@ export class GenesisBlockGenerator extends Generator {
 
 			result[index] = await (
 				await this.app
-					.resolve(EvmCallBuilder)
+					.resolve(TransactionBuilder)
 					.network(chainId)
 					.recipientAddress(this.#consensusProxyContractAddress)
 					.nonce("0") // validator registration tx is always the first one from sender
@@ -200,7 +200,7 @@ export class GenesisBlockGenerator extends Generator {
 
 			result[index] = await (
 				await this.app
-					.resolve(EvmCallBuilder)
+					.resolve(TransactionBuilder)
 					.network(chainId)
 					.recipientAddress(this.#consensusProxyContractAddress)
 					.nonce("1") // vote transaction is always the 3rd tx from sender (1st one is validator registration)

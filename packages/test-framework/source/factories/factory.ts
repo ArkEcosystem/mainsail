@@ -2,6 +2,7 @@ import { assert } from "@mainsail/utils";
 import { strictEqual } from "assert";
 
 import { FactoryFunction, FactoryFunctionOptions, HookFunction } from "./types.js";
+import { TransactionBuilder } from "@mainsail/crypto-transaction";
 
 export class Factory {
 	readonly #states: Map<string, FactoryFunction> = new Map<string, FactoryFunction>();
@@ -56,7 +57,7 @@ export class Factory {
 		return this;
 	}
 
-	public async make<T>(resetModifiers = true): Promise<T> {
+	public async make(resetModifiers = true): Promise<TransactionBuilder> {
 		const states: string[] = [...this.#modifiers.states.values()];
 		const initialState: string | undefined = states.shift();
 
@@ -66,7 +67,7 @@ export class Factory {
 
 		assert.defined(function_);
 
-		let result: T = await function_({
+		let result: TransactionBuilder = await function_({
 			entity: undefined,
 			options: this.#modifiers.options,
 		});
@@ -99,11 +100,11 @@ export class Factory {
 		return result;
 	}
 
-	public async makeMany<T>(count: number): Promise<T[]> {
-		const entities: T[] = [];
+	public async makeMany(count: number): Promise<TransactionBuilder[]> {
+		const entities: TransactionBuilder[] = [];
 
 		for (let index = 0; index < count; index++) {
-			entities.push(await this.make<T>(false));
+			entities.push(await this.make(false));
 		}
 
 		this.#resetModifiers();

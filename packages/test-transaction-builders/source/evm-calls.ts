@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
+import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { MultiPaymentAbi } from "@mainsail/evm-contracts";
 import { decodeFunctionResult, encodeFunctionData, parseEther, toBytes, toHex, zeroAddress } from "viem";
 
@@ -27,7 +27,7 @@ export const makeEvmCall = async (
 		throw new Error("missing recipient");
 	}
 
-	let builder = app.resolve(EvmCallBuilder).gasPrice(gasPrice);
+	let builder = app.resolve(TransactionBuilder).gasPrice(gasPrice);
 
 	if (value) {
 		builder = builder.value(value.toString());
@@ -57,7 +57,7 @@ export const makeEvmCallDeployErc20Contract = async (
 	}
 
 	const builder = app
-		.resolve(EvmCallBuilder)
+		.resolve(TransactionBuilder)
 		.gasPrice(gasPrice)
 		.gasLimit(gasLimit ?? 2_000_000)
 		.payload(payload);
