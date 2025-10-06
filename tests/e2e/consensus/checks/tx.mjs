@@ -44,7 +44,7 @@ export const makeEvmDeploy = async (
     const walletNonce = await getWalletNonce(config.peer, senderAddress);
 
     let builder = app
-        .resolve(EvmCallBuilder)
+        .resolve(TransactionBuilder)
         .gasPrice(5000000000)
         .gasLimit(4_000_000)
         .payload(abi.bytecode.object.slice(2))
