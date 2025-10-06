@@ -22,35 +22,3 @@ export const schemas = {
 	prefixedTransactionHash,
 	transactionHash,
 };
-
-export const transactionBaseSchema: SchemaObject = {
-	properties: {
-		from: { $ref: "address" },
-		gasLimit: { transactionGasLimit: {} },
-		gasPrice: { transactionGasPrice: {} },
-
-		hash: { $ref: "transactionHash" },
-
-		// Legacy
-		legacySecondSignature: {
-			allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }],
-			type: "string",
-		},
-
-		network: { $ref: "networkByte" },
-
-		nonce: { bignumber: { minimum: 0 } },
-
-		r: { $ref: "hex" },
-		s: { $ref: "hex" },
-
-		senderLegacyAddress: { type: "string" },
-
-		senderPublicKey: { $ref: "publicKey" },
-
-		v: { maximum: 1, minimum: 0, type: "number" },
-		value: { bignumber: { maximum: undefined, minimum: 0 } },
-	},
-	required: ["network", "from", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
-	type: "object",
-};

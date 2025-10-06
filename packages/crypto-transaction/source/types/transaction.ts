@@ -1,16 +1,14 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
-export abstract class Transaction implements Contracts.Crypto.Transaction {
+export class Transaction implements Contracts.Crypto.Transaction {
 	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	protected readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly configuration!: Contracts.Crypto.Configuration;
-
-	public static key: string | undefined = undefined;
 
 	public data!: Contracts.Crypto.TransactionData;
 	public serialized!: Buffer;
@@ -19,12 +17,42 @@ export abstract class Transaction implements Contracts.Crypto.Transaction {
 		return this.data.hash;
 	}
 
-	public get key(): string {
-		return (this as any).__proto__.constructor.key;
-	}
-
 	public static getSchema(): Contracts.Crypto.TransactionSchema {
-		throw new Exceptions.NotImplemented(this.constructor.name, "getSchema");
+		return {
+			$id: "transaction",
+			properties: {
+				from: { $ref: "address" },
+				to: { $ref: "address" },
+
+				gasLimit: { transactionGasLimit: {} },
+				gasPrice: { transactionGasPrice: {} },
+
+				hash: { $ref: "transactionHash" },
+
+				// Legacy
+				legacySecondSignature: {
+					allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }],
+					type: "string",
+				},
+
+				network: { $ref: "networkByte" },
+
+				nonce: { bignumber: { minimum: 0 } },
+
+				r: { $ref: "hex" },
+				s: { $ref: "hex" },
+
+				senderLegacyAddress: { type: "string" },
+
+				senderPublicKey: { $ref: "publicKey" },
+
+				v: { maximum: 1, minimum: 0, type: "number" },
+				value: { bignumber: { maximum: undefined, minimum: 0 } },
+				data: { bytecode: {} },
+			},
+			required: ["network", "from", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
+			type: "object",
+		};
 	}
 
 	public static getData(json: Contracts.Crypto.TransactionJson): Contracts.Crypto.TransactionData {

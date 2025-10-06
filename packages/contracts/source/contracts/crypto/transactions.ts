@@ -5,7 +5,6 @@ import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction {
 	readonly hash: string;
-	readonly key: string;
 
 	data: TransactionData;
 	serialized: Buffer;

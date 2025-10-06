@@ -1,6 +1,9 @@
-import { inject, injectable, optional, tagged } from "@mainsail/container";
+import { inject, injectable, optional, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { assert, BigNumber } from "@mainsail/utils";
+
+import { Transaction } from "./types/transaction.js";
+import { signedSchema, strictSchema } from "./validation/utilities.js";
 
 @injectable()
 export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
@@ -30,6 +33,13 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
+	@inject(Identifiers.Cryptography.Validator)
+	private readonly validator!: Contracts.Crypto.Validator;
+
+	@postConstruct()
+	public initialize(): void {
+		this.#initializeSchemas(Transaction.getSchema());
+	}
 
 	public async fromHex(hex: string): Promise<Contracts.Crypto.Transaction> {
 		return this.#fromSerialized(Buffer.from(hex, "hex"));
@@ -133,5 +143,31 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 
 			throw new Exceptions.InvalidTransactionBytesError(error.message);
 		}
+	}
+
+	#initializeSchemas(schema: Contracts.Crypto.TransactionSchema, remove?: boolean): void {
+		this.validator.extend((ajv) => {
+			if (ajv.getSchema(schema.$id)) {
+				remove = true;
+			}
+
+			if (remove) {
+				ajv.removeSchema(schema.$id);
+				ajv.removeSchema(`${schema.$id}Signed`);
+				ajv.removeSchema(`${schema.$id}Strict`);
+			}
+
+			ajv.addSchema(schema);
+			ajv.addSchema(signedSchema(schema));
+			ajv.addSchema(strictSchema(schema));
+
+			// Update schemas
+			ajv.removeSchema("transactions");
+			ajv.addSchema({
+				$id: "transactions",
+				items: { $ref: `${schema.$id}Signed` },
+				type: "array",
+			});
+		});
 	}
 }
