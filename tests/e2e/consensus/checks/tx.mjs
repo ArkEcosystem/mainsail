@@ -95,10 +95,7 @@ const getApplication = async (config) => {
         },
         {
             package: "@mainsail/crypto-transaction",
-        },
-        {
-            package: "@mainsail/crypto-transaction-evm-call",
-        },
+        }
     ];
 
     for (const plugin of plugins) {

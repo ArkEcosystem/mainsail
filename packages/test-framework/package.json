@@ -36,7 +36,6 @@
 		"@mainsail/crypto-messages": "workspace:*",
 		"@mainsail/crypto-signature-ecdsa": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
-		"@mainsail/crypto-transaction-evm-call": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/kernel": "workspace:*",

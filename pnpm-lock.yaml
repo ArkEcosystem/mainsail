@@ -662,9 +662,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -907,9 +904,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -1166,9 +1160,6 @@ importers:
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -1547,9 +1538,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -1668,49 +1656,6 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-key-pair-ecdsa':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-ecdsa
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
-      uvu:
-        specifier: 0.5.6
-        version: 0.5.6
-
-  packages/crypto-transaction-evm-call:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      '@mainsail/crypto-address-base58':
-        specifier: workspace:*
-        version: link:../crypto-address-base58
-      '@mainsail/crypto-address-keccak256':
-        specifier: workspace:*
-        version: link:../crypto-address-keccak256
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
@@ -1735,9 +1680,6 @@ importers:
       uvu:
         specifier: 0.5.6
         version: 0.5.6
-      viem:
-        specifier: 2.34.0
-        version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
 
   packages/crypto-validation:
     dependencies:
@@ -2548,9 +2490,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -2661,9 +2600,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../crypto-transaction-evm-call
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
@@ -3111,9 +3047,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../../../packages/crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../../../packages/crypto-validation
@@ -3255,9 +3188,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../../../packages/crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../../../packages/crypto-validation

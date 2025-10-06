@@ -35,6 +35,10 @@
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/crypto-hash-bcrypto": "workspace:*",
+		"@mainsail/crypto-signature-ecdsa": "workspace:*",
+		"@mainsail/crypto-wif": "workspace:*",
+		"@mainsail/serializer": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"uvu": "0.5.6"
 	},
