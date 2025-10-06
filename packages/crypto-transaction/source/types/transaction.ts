@@ -22,12 +22,12 @@ export class Transaction implements Contracts.Crypto.Transaction {
 			$id: "transaction",
 			properties: {
 				from: { $ref: "address" },
-				to: { $ref: "address" },
-
 				gasLimit: { transactionGasLimit: {} },
-				gasPrice: { transactionGasPrice: {} },
 
+				gasPrice: { transactionGasPrice: {} },
 				hash: { $ref: "transactionHash" },
+
+				data: { bytecode: {} },
 
 				// Legacy
 				legacySecondSignature: {
@@ -44,11 +44,11 @@ export class Transaction implements Contracts.Crypto.Transaction {
 
 				senderLegacyAddress: { type: "string" },
 
-				senderPublicKey: { $ref: "publicKey" },
+				to: { $ref: "address" },
 
+				senderPublicKey: { $ref: "publicKey" },
 				v: { maximum: 1, minimum: 0, type: "number" },
 				value: { bignumber: { maximum: undefined, minimum: 0 } },
-				data: { bytecode: {} },
 			},
 			required: ["network", "from", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
 			type: "object",

@@ -138,8 +138,6 @@ export class TransactionBuilder {
 
 		const struct: Contracts.Crypto.TransactionData = {
 			from: this.data.from,
-			to: this.data.to,
-			value: this.data.value,
 			gasPrice: this.data.gasPrice,
 			hash: await this.utils.getHash(await this.build()),
 			legacySecondSignature: this.data.legacySecondSignature,
@@ -148,7 +146,9 @@ export class TransactionBuilder {
 			r: this.data.r,
 			s: this.data.s,
 			senderPublicKey: this.data.senderPublicKey,
+			to: this.data.to,
 			v: this.data.v,
+			value: this.data.value,
 		} as Contracts.Crypto.TransactionData;
 
 		return struct;

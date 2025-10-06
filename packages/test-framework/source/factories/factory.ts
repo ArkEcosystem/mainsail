@@ -1,8 +1,8 @@
+import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { assert } from "@mainsail/utils";
 import { strictEqual } from "assert";
 
 import { FactoryFunction, FactoryFunctionOptions, HookFunction } from "./types.js";
-import { TransactionBuilder } from "@mainsail/crypto-transaction";
 
 export class Factory {
 	readonly #states: Map<string, FactoryFunction> = new Map<string, FactoryFunction>();
