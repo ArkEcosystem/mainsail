@@ -10,8 +10,9 @@ import { Validator } from "@mainsail/validation/source/validator";
 import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json";
 import { describe, Sandbox } from "../../../test-framework/source";
 import { makeKeywords } from "./keywords";
-import { schemas, transactionBaseSchema } from "./schemas";
+import { schemas } from "./schemas";
 import { extendSchema, signedSchema, strictSchema } from "./utilities";
+import { Transaction } from "../types/index";
 
 describe<{
 	sandbox: Sandbox;
@@ -79,7 +80,7 @@ describe<{
 		assert.defined(validator.validate("networkByte", {}).error);
 	});
 
-	const schema = extendSchema(transactionBaseSchema, {
+	const schema = extendSchema(Transaction.getSchema(), {
 		$id: "transaction",
 		properties: {
 			type: { minimum: 0, type: "integer" },
