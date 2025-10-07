@@ -1,20 +1,19 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
+import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
-import { ServiceProvider as CoreCryptoTransaction, TransactionRegistry } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
+import { ServiceProvider as CoreCryptoTransaction } from "../../source/service-provider.js";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
 import { Sandbox } from "../../../test-framework/source/index.js";
-import { EvmCallTransactionHandler } from "../../source/handlers/evm-call.js";
-import { EvmCallTransaction } from "../../source/versions/1.js";
 
 export const prepareSandbox = async (context: { sandbox: Sandbox }) => {
 	context.sandbox = new Sandbox();
@@ -33,11 +32,6 @@ export const prepareSandbox = async (context: { sandbox: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreCryptoAddressBase58).register();
 	await context.sandbox.app.resolve(CoreCryptoAddressKeccak256).register();
 	await context.sandbox.app.resolve(CoreCryptoWif).register();
+	await context.sandbox.app.resolve(CoreTransactions).register();
 	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
-
-	context.sandbox.app
-		.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
-		.registerTransactionType(EvmCallTransaction);
-
-	context.sandbox.app.bind(Identifiers.Transaction.Handler.Instances).to(EvmCallTransactionHandler);
 };

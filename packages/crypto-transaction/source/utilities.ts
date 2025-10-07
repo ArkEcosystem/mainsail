@@ -5,17 +5,24 @@ import { Keccak256 } from "bcrypto";
 import { toBytes, toRlp } from "viem";
 
 import { toBytesCompat } from "./serializer.js";
+import { Transaction } from "./transaction.js";
 
 @injectable()
 export class Utils implements Contracts.Crypto.TransactionUtilities {
+	@inject(Identifiers.Application.Instance)
+	public readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Cryptography.Transaction.Serializer)
 	private readonly serializer!: Contracts.Crypto.TransactionSerializer;
 
-	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
-	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
+	public resolve(data: Contracts.Crypto.TransactionData): Contracts.Crypto.Transaction {
+		const transaction: Contracts.Crypto.Transaction = this.app.resolve(Transaction);
+		transaction.data = data;
+		return transaction;
+	}
 
 	public async toBytes(data: Contracts.Crypto.TransactionData): Promise<Buffer> {
-		return this.serializer.serialize(this.transactionTypeFactory.create(data));
+		return this.serializer.serialize(this.resolve(data));
 	}
 
 	public async toHash(

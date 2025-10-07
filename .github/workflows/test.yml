@@ -183,8 +183,6 @@ jobs:
               run: cd packages/crypto-signature-schnorr && pnpm run test:coverage
             - name: Test crypto-transaction
               run: cd packages/crypto-transaction && pnpm run test:coverage
-            - name: Test crypto-transaction-evm-call
-              run: cd packages/crypto-transaction-evm-call && pnpm run test:coverage
             - name: Test crypto-validation
               run: cd packages/crypto-validation && pnpm run test:coverage
             - name: Test crypto-wif

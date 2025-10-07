@@ -1,7 +1,7 @@
 import { Container } from "/mainsail/packages/container/distribution/index.js";
 import { Identifiers } from "/mainsail/packages/contracts/distribution/index.js";
 import { Application } from "/mainsail/packages/kernel/distribution/index.js";
-import { EvmCallBuilder } from "/mainsail/packages/crypto-transaction-evm-call/distribution/index.js";
+import { TransactionBuilder } from "/mainsail/packages/crypto-transaction/distribution/index.js";
 
 import { getWalletNonce } from "./client.mjs";
 import { config } from "./config.mjs"
@@ -20,7 +20,7 @@ export const makeEvmCall = async (
     const walletNonce = await getWalletNonce(config.peer, senderAddress);
 
     let builder = app
-        .resolve(EvmCallBuilder)
+        .resolve(TransactionBuilder)
         .gasPrice(5000000000)
         .gasLimit(21000)
         .payload("")
@@ -44,7 +44,7 @@ export const makeEvmDeploy = async (
     const walletNonce = await getWalletNonce(config.peer, senderAddress);
 
     let builder = app
-        .resolve(EvmCallBuilder)
+        .resolve(TransactionBuilder)
         .gasPrice(5000000000)
         .gasLimit(4_000_000)
         .payload(abi.bytecode.object.slice(2))
@@ -95,10 +95,7 @@ const getApplication = async (config) => {
         },
         {
             package: "@mainsail/crypto-transaction",
-        },
-        {
-            package: "@mainsail/crypto-transaction-evm-call",
-        },
+        }
     ];
 
     for (const plugin of plugins) {

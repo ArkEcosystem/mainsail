@@ -4,10 +4,8 @@ import { Providers } from "@mainsail/kernel";
 
 import { Deserializer } from "./deserializer.js";
 import { TransactionFactory } from "./factory.js";
-import { TransactionRegistry } from "./registry.js";
 import { Serializer } from "./serializer.js";
 import { Signer } from "./signer.js";
-import { TransactionTypeFactory } from "./types/index.js";
 import { Utils as Utilities } from "./utilities.js";
 import { makeKeywords, schemas } from "./validation/index.js";
 import { Verifier } from "./verifier.js";
@@ -15,13 +13,11 @@ import { Verifier } from "./verifier.js";
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.Cryptography.Transaction.TypeFactory).to(TransactionTypeFactory).inSingletonScope();
+		this.app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer).inSingletonScope();
+		this.app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utilities).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Deserializer).to(Deserializer).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Factory).to(TransactionFactory).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Transaction.Registry).to(TransactionRegistry).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Signer).to(Signer).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utilities).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier).inSingletonScope();
 
 		this.#registerValidation();

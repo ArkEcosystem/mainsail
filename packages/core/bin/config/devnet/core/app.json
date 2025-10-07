@@ -46,9 +46,6 @@
 			"package": "@mainsail/crypto-transaction"
 		},
 		{
-			"package": "@mainsail/crypto-transaction-evm-call"
-		},
-		{
 			"package": "@mainsail/crypto-worker"
 		},
 		{
@@ -154,9 +151,6 @@
 		},
 		{
 			"package": "@mainsail/crypto-transaction"
-		},
-		{
-			"package": "@mainsail/crypto-transaction-evm-call"
 		}
 	],
 	"transaction-pool": [
@@ -210,9 +204,6 @@
 		},
 		{
 			"package": "@mainsail/crypto-transaction"
-		},
-		{
-			"package": "@mainsail/crypto-transaction-evm-call"
 		},
 		{
 			"package": "@mainsail/transactions"
@@ -281,9 +272,6 @@
 		},
 		{
 			"package": "@mainsail/crypto-transaction"
-		},
-		{
-			"package": "@mainsail/crypto-transaction-evm-call"
 		},
 		{
 			"package": "@mainsail/transactions"

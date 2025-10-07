@@ -1,6 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransactionBuilder, TransactionFactory, Verifier } from "@mainsail/crypto-transaction";
-import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
 import { Sandbox } from "@mainsail/test-framework";
 import { BigNumber, sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
@@ -68,9 +67,9 @@ const applyCustomSignatures = async (
 	// transaction.serialized = Buffer.from(transactionHex, "hex");
 };
 
-export const buildSignedTransaction = async <TBuilder extends TransactionBuilder<TBuilder>>(
+export const buildSignedTransaction = async <TBuilder extends TransactionBuilder>(
 	sandbox: Sandbox,
-	builder: TransactionBuilder<TBuilder>,
+	builder: TransactionBuilder,
 	keyPair: Contracts.Crypto.KeyPair,
 	options: TransactionOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
@@ -198,7 +197,7 @@ export const getRandomFundedWallet = async (
 
 	const fundTx = await (
 		await app
-			.resolve(EvmCallBuilder)
+			.resolve(TransactionBuilder)
 			.gasPrice(5)
 			.recipientAddress(recipient)
 			.value(BigNumber.make(amount).toFixed())

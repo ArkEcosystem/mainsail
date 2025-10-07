@@ -16,9 +16,6 @@
 			"path": "../crypto-transaction"
 		},
 		{
-			"path": "../crypto-transaction-evm-call"
-		},
-		{
 			"path": "../evm-contracts"
 		},
 		{

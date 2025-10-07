@@ -3,8 +3,8 @@ import { Configuration } from "@mainsail/crypto-config";
 import { BigNumber } from "@mainsail/utils";
 import { zeroAddress } from "viem";
 
-import { describe, Sandbox } from "../../../test-framework/source";
-import { prepareSandbox } from "../../test/helpers/prepare-sandbox";
+import { describe, Sandbox } from "../../test-framework/source";
+import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import {
 	serializedTransactionContractCall,
 	serializedTransactionContractCallWithSecondSignature,
@@ -13,7 +13,7 @@ import {
 	serializedTransactionTransferEqualGreater11Fields,
 	serializedTransactionTransferLessThan9Fields,
 	transactionTransfer,
-} from "../../test/fixtures/transaction";
+} from "../test/fixtures/transaction";
 
 describe<{
 	sandbox: Sandbox;
@@ -50,7 +50,7 @@ describe<{
 	};
 
 	it("#getSchema - should be valid", ({ validator }) => {
-		assert.undefined(validator.validate("evmCall", transactionOriginal).error);
+		assert.undefined(validator.validate("transaction", transactionOriginal).error);
 	});
 
 	it("#getSchema - value should be bigNumber", ({ validator }) => {
@@ -61,7 +61,7 @@ describe<{
 				value,
 			};
 
-			assert.undefined(validator.validate("evmCall", transaction).error);
+			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, "test", null, {}];
@@ -72,7 +72,7 @@ describe<{
 				value,
 			};
 
-			assert.true(validator.validate("evmCall", transaction).error.includes("value"));
+			assert.true(validator.validate("transaction", transaction).error.includes("value"));
 		}
 	});
 
@@ -87,7 +87,7 @@ describe<{
 				gasPrice: value * 1e9,
 			};
 
-			assert.undefined(validator.validate("evmCall", transaction).error);
+			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
 		const invalidValues = [0, -1, 1.1, "test", null, undefined, {}];
@@ -97,7 +97,7 @@ describe<{
 				gasPrice: value,
 			};
 
-			assert.true(validator.validate("evmCall", transaction).error.includes("gasPrice"));
+			assert.true(validator.validate("transaction", transaction).error.includes("gasPrice"));
 		}
 	});
 
@@ -107,7 +107,7 @@ describe<{
 			recipientAddress: undefined,
 		};
 
-		assert.undefined(validator.validate("evmCall", transaction).error);
+		assert.undefined(validator.validate("transaction", transaction).error);
 	});
 
 	it("factory#fromJson - should deserialize well-formed transaction", async ({ factory }) => {
@@ -115,7 +115,7 @@ describe<{
 			const tx = await factory.fromJson(transactionTransfer);
 			//console.log(tx.serialized.toString("hex"));
 			assert.equal(tx.serialized, Buffer.from(serializedTransactionTransfer, "hex"));
-		} catch (ex) {
+		} catch (ex: any) {
 			console.log(ex.message);
 			assert.false(true);
 		}

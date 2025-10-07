@@ -1,11 +1,11 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 import { TransactionFactory } from "./factory.js";
 
 @injectable()
-export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBuilder>> {
+export class TransactionBuilder {
 	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
@@ -32,11 +32,22 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 
 	protected signWithSenderAsRecipient = false;
 
+	@postConstruct()
+	public postConstruct() {
+		this.initializeData();
+
+		this.data.value = BigNumber.ZERO;
+		this.data.from = "";
+		this.data.gasLimit = 1_000_000;
+		this.data.gasPrice = 5 * 1e9;
+		this.data.data = "";
+	}
+
 	public async build(data: Partial<Contracts.Crypto.TransactionData> = {}): Promise<Contracts.Crypto.Transaction> {
 		return this.factory.fromData({ ...this.data, ...data }, false);
 	}
 
-	public nonce(nonce: string): TBuilder {
+	public nonce(nonce: string): TransactionBuilder {
 		if (nonce) {
 			this.data.nonce = BigNumber.make(nonce);
 		}
@@ -44,57 +55,69 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.instance();
 	}
 
-	public network(network: number): TBuilder {
+	public network(network: number): TransactionBuilder {
 		this.data.network = network;
 
 		return this.instance();
 	}
 
-	public gasPrice(gasPrice: number): TBuilder {
+	public gasPrice(gasPrice: number): TransactionBuilder {
 		this.data.gasPrice = gasPrice;
 
 		return this.instance();
 	}
 
-	public value(value: string): TBuilder {
+	public value(value: string): TransactionBuilder {
 		this.data.value = BigNumber.make(value);
 
 		return this.instance();
 	}
 
-	public senderAddress(senderAddress: string): TBuilder {
+	public senderAddress(senderAddress: string): TransactionBuilder {
 		this.data.from = senderAddress;
 
 		return this.instance();
 	}
 
-	public recipientAddress(recipientAddress: string): TBuilder {
+	public recipientAddress(recipientAddress: string): TransactionBuilder {
 		this.data.to = recipientAddress;
 
 		return this.instance();
 	}
 
-	public async sign(passphrase: string): Promise<TBuilder> {
+	public payload(payload: string): TransactionBuilder {
+		this.data.data = payload.startsWith("0x") ? payload : `0x${payload}`;
+
+		return this;
+	}
+
+	public gasLimit(gasLimit: number): TransactionBuilder {
+		this.data.gasLimit = gasLimit;
+
+		return this;
+	}
+
+	public async sign(passphrase: string): Promise<TransactionBuilder> {
 		return this.#signWithKeyPair(await this.keyPairFactory.fromMnemonic(passphrase));
 	}
 
-	public async signWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TBuilder> {
+	public async signWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TransactionBuilder> {
 		return this.#signWithKeyPair(keys);
 	}
 
-	public async signWithWif(wif: string): Promise<TBuilder> {
+	public async signWithWif(wif: string): Promise<TransactionBuilder> {
 		return this.#signWithKeyPair(await this.keyPairFactory.fromWIF(wif));
 	}
 
-	public async legacySecondSign(passphrase: string): Promise<TBuilder> {
+	public async legacySecondSign(passphrase: string): Promise<TransactionBuilder> {
 		return this.#legacySecondSignWithKeyPair(await this.keyPairFactory.fromMnemonic(passphrase));
 	}
 
-	public async legacySecondSignWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TBuilder> {
+	public async legacySecondSignWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TransactionBuilder> {
 		return this.#legacySecondSignWithKeyPair(keys);
 	}
 
-	public async legacySecondSignWithWif(wif: string): Promise<TBuilder> {
+	public async legacySecondSignWithWif(wif: string): Promise<TransactionBuilder> {
 		return this.#legacySecondSignWithKeyPair(await this.keyPairFactory.fromWIF(wif));
 	}
 
@@ -123,13 +146,15 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 			r: this.data.r,
 			s: this.data.s,
 			senderPublicKey: this.data.senderPublicKey,
+			to: this.data.to,
 			v: this.data.v,
+			value: this.data.value,
 		} as Contracts.Crypto.TransactionData;
 
 		return struct;
 	}
 
-	async #signWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TBuilder> {
+	async #signWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TransactionBuilder> {
 		this.data.senderPublicKey = keys.publicKey;
 		this.data.from = await this.addressFactory.fromPublicKey(keys.publicKey);
 
@@ -152,7 +177,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.instance();
 	}
 
-	async #legacySecondSignWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TBuilder> {
+	async #legacySecondSignWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TransactionBuilder> {
 		const data = this.#getSigningObject();
 		const { error } = await this.verifier.verifySchema(data, false);
 		if (error) {
@@ -189,5 +214,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		} as unknown as Contracts.Crypto.TransactionData;
 	}
 
-	protected abstract instance(): TBuilder;
+	protected instance(): TransactionBuilder {
+		return this;
+	}
 }

@@ -101,7 +101,6 @@ const setup = async () => {
 		"@mainsail/api-sync",
 		"@mainsail/blockchain-utils",
 		"@mainsail/crypto-transaction",
-		"@mainsail/crypto-transaction-evm-call",
 		"@mainsail/state",
 		"@mainsail/transactions",
 		"@mainsail/transaction-pool-service",

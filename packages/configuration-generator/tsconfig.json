@@ -47,9 +47,6 @@
 			"path": "../crypto-transaction"
 		},
 		{
-			"path": "../crypto-transaction-evm-call"
-		},
-		{
 			"path": "../crypto-validation"
 		},
 		{

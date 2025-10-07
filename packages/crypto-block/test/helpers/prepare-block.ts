@@ -1,12 +1,12 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
+import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
 import { BlockFactory } from "../../source/factory.js";
 
 // Function to generate test data
 export const prepareBlock = async (context) => {
-	const builder = context.sandbox.app.resolve(EvmCallBuilder);
+	const builder = context.sandbox.app.resolve(TransactionBuilder);
 
 	const tx1 = await (
 		await builder
