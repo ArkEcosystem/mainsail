@@ -5,7 +5,7 @@ import { Keccak256 } from "bcrypto";
 import { toBytes, toRlp } from "viem";
 
 import { toBytesCompat } from "./serializer.js";
-import { Transaction } from "./types/transaction.js";
+import { Transaction } from "./transaction.js";
 
 @injectable()
 export class Utils implements Contracts.Crypto.TransactionUtilities {

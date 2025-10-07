@@ -12,7 +12,7 @@ import { describe, Sandbox } from "../../../test-framework/source";
 import { makeKeywords } from "./keywords";
 import { schemas } from "./schemas";
 import { extendSchema, signedSchema, strictSchema } from "./utilities";
-import { Transaction } from "../types/index";
+import { Transaction } from "../transaction";
 
 describe<{
 	sandbox: Sandbox;

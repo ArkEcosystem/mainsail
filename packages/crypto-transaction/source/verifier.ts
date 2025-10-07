@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { Transaction } from "./types/transaction.js";
+import { Transaction } from "./transaction.js";
 
 @injectable()
 export class Verifier implements Contracts.Crypto.TransactionVerifier {

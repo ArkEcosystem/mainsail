@@ -3,8 +3,8 @@ import { Configuration } from "@mainsail/crypto-config";
 import { BigNumber } from "@mainsail/utils";
 import { zeroAddress } from "viem";
 
-import { describe, Sandbox } from "../../../test-framework/source";
-import { prepareSandbox } from "../../test/helpers/prepare-sandbox";
+import { describe, Sandbox } from "../../test-framework/source";
+import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import {
 	serializedTransactionContractCall,
 	serializedTransactionContractCallWithSecondSignature,
@@ -13,7 +13,7 @@ import {
 	serializedTransactionTransferEqualGreater11Fields,
 	serializedTransactionTransferLessThan9Fields,
 	transactionTransfer,
-} from "../../test/fixtures/transaction";
+} from "../test/fixtures/transaction";
 
 describe<{
 	sandbox: Sandbox;

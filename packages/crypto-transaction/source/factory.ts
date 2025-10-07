@@ -2,7 +2,7 @@ import { inject, injectable, optional, postConstruct, tagged } from "@mainsail/c
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { assert, BigNumber } from "@mainsail/utils";
 
-import { Transaction } from "./types/transaction.js";
+import { Transaction } from "./transaction.js";
 import { signedSchema, strictSchema } from "./validation/utilities.js";
 
 @injectable()
