@@ -1,6 +1,6 @@
 services:
     postgres:
-        image: postgres:16
+        image: postgres:18-alpine
         tmpfs: /pgtmpfs
         logging:
             driver: "none"
