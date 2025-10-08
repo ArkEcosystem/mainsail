@@ -1,4 +1,5 @@
 import { SchemaObject } from "ajv";
+import { signedSchema, strictSchema } from "./utilities.js";
 
 const transactionHash: SchemaObject = {
 	$id: "transactionHash",
@@ -17,7 +18,7 @@ const networkByte: SchemaObject = {
 	network: true,
 };
 
-export const transactionSchema: SchemaObject = {
+const transaction: SchemaObject = {
 	$id: "transaction",
 	properties: {
 		data: { bytecode: {} },
@@ -53,8 +54,18 @@ export const transactionSchema: SchemaObject = {
 	type: "object",
 };
 
+const transactions = {
+	$id: "transactions",
+	items: { $ref: "transactionSigned" },
+	type: "array",
+};
+
 export const schemas = {
 	networkByte,
 	prefixedTransactionHash,
 	transactionHash,
+	transaction,
+	transactionSigned: signedSchema(transaction),
+	transactionStrict: strictSchema(transaction),
+	transactions,
 };

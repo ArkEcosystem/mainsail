@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { transactionSchema } from "./validation/schemas.js";
+import { schemas } from "./validation/schemas.js";
 
 @injectable()
 export class Verifier implements Contracts.Crypto.TransactionVerifier {
@@ -33,7 +33,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 		data: Contracts.Crypto.TransactionData,
 		strict: boolean,
 	): Promise<Contracts.Crypto.SchemaValidationResult> {
-		const { $id } = transactionSchema;
+		const { $id } = schemas.transaction;
 		return this.validator.validate(strict ? `${$id}Strict` : `${$id}`, data);
 	}
 
