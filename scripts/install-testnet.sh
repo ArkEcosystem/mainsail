@@ -233,6 +233,7 @@ addApi() {
 }
 
 heading "Installing PostgreSQL..."
+
     OS_CODENAME=$( (grep -w "VERSION_CODENAME" /etc/os-release)  2>/dev/null | cut -d'=' -f2 )
     PG_VERSION="18"
     (echo -e "Package: postgresql\nPin: origin apt.postgresql.org\nPin-Priority: 999" | sudo tee /etc/apt/preferences.d/postgresql)
