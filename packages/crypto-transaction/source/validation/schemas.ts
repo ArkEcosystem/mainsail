@@ -1,4 +1,5 @@
 import { SchemaObject } from "ajv";
+
 import { signedSchema, strictSchema } from "./utilities.js";
 
 const transactionHash: SchemaObject = {
@@ -63,8 +64,8 @@ const transactions = {
 export const schemas = {
 	networkByte,
 	prefixedTransactionHash,
-	transactionHash,
 	transaction,
+	transactionHash,
 	transactionSigned: signedSchema(transaction),
 	transactionStrict: strictSchema(transaction),
 	transactions,
