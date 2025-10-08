@@ -7,7 +7,7 @@ import { TransactionFactory } from "./factory.js";
 import { Serializer } from "./serializer.js";
 import { Signer } from "./signer.js";
 import { Utils as Utilities } from "./utilities.js";
-import { makeKeywords, schemas } from "./validation/index.js";
+import { makeKeywords, schemas, signedSchema, strictSchema, transactionSchema } from "./validation/index.js";
 import { Verifier } from "./verifier.js";
 
 @injectable()
@@ -33,5 +33,34 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		for (const schema of Object.values(schemas)) {
 			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
 		}
+
+		this.#registerTransactionSchemas(transactionSchema);
+	}
+
+	#registerTransactionSchemas(schema: Contracts.Crypto.TransactionSchema): void {
+		this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).extend((ajv) => {
+			let remove = false;
+			if (ajv.getSchema(schema.$id)) {
+				remove = true;
+			}
+
+			if (remove) {
+				ajv.removeSchema(schema.$id);
+				ajv.removeSchema(`${schema.$id}Signed`);
+				ajv.removeSchema(`${schema.$id}Strict`);
+			}
+
+			ajv.addSchema(schema);
+			ajv.addSchema(signedSchema(schema));
+			ajv.addSchema(strictSchema(schema));
+
+			// Update schemas
+			ajv.removeSchema("transactions");
+			ajv.addSchema({
+				$id: "transactions",
+				items: { $ref: `${schema.$id}Signed` },
+				type: "array",
+			});
+		});
 	}
 }
