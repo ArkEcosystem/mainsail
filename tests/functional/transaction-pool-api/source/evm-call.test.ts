@@ -114,7 +114,7 @@ describe<{
 		assert.true(await isTransactionCommitted(context, tx));
 
 		const legacyAfter = await evm.getAccountInfo(legacyColdWallet.mainsailAddress);
-		assert.equal(legacyAfter.balance, legacyBefore.balance - 108160000000000n - 5n);
+		assert.equal(legacyAfter.balance, legacyBefore.balance - 108100000000000n - 5n);
 
 		const recipientAfter = await evm.getAccountInfo(randomWallet.address);
 		assert.equal(recipientAfter.balance, 5n);
@@ -136,7 +136,7 @@ describe<{
 		const recipientBefore = await evm.getAccountInfo(randomWallet.address);
 		assert.equal(recipientBefore.balance, 0n);
 
-		const gasSpentPerTx = 108160000000000n;
+		const gasSpentPerTx = 108100000000000n;
 		const valuePerTx = 5n;
 		const N = 10n;
 

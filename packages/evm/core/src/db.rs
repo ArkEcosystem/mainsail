@@ -13,7 +13,7 @@ use rayon::slice::ParallelSliceMut;
 use revm::{
     Database, DatabaseRef,
     context::{DBErrorMarker, result::ExecutionResult},
-    database::{CacheState, TransitionState},
+    database::{CacheState, TransitionAccount, TransitionState},
     primitives::*,
     state::{AccountInfo, Bytecode},
 };
@@ -1176,18 +1176,18 @@ impl PendingCommit {
             .with_cached_prestate(std::mem::take(&mut self.cache))
             .build();
 
-        state
-            .increment_balances(
-                vec![(address, info.balance.try_into().expect("fit u128"))]
-                    .into_iter()
-                    .collect::<HashMap<Address, u128>>(),
-            )
-            .expect("import account balance");
+        let account = state
+            .load_cache_account(address)
+            .expect("load_cache_account");
 
-        if let Some(transition_state) = state.transition_state.take() {
-            self.transitions
-                .add_transitions(transition_state.transitions.into_iter().collect());
-        }
+        let balance = info.balance.try_into().expect("fit u128");
+        let transition_account = account
+            .increment_balance(balance)
+            .unwrap_or_else(|| TransitionAccount::new_empty_eip161(Default::default()));
+
+        let transitions = vec![(address, transition_account)];
+
+        self.transitions.add_transitions(transitions);
 
         self.cache = std::mem::take(&mut state.cache);
 
