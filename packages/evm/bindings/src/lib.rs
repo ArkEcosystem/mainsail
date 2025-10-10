@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc, u64};
+use std::{sync::Arc, u64};
 
 use ctx::{
     BlockContext, CalculateRoundValidatorsContext, EvmOptions, ExecutionContext, GenesisContext,
@@ -37,6 +37,7 @@ use revm::{
         Address, B256, Bytes, TxKind, U256,
         bytes::{Buf, BufMut, BytesMut},
         hex::ToHexExt,
+        map::HashMap,
     },
     state::{AccountInfo, Bytecode},
 };
@@ -306,7 +307,7 @@ impl EvmInner {
             .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
 
         let mut pending_commit = self.pending_commits.get_mut(&ctx.commit_key).expect("ok");
-        let mut rewards = HashMap::<Address, u128>::new();
+        let mut rewards = HashMap::<Address, u128>::default();
         rewards.insert(ctx.validator_address, ctx.block_reward);
 
         match state_commit::apply_rewards(&mut self.persistent_db, &mut pending_commit, rewards) {
@@ -606,7 +607,7 @@ impl EvmInner {
                     EVMError::Database(format!("failed reading legacy cold wallet: {}", err).into())
                 })? {
                 Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
-                    let mut legacy_balances = HashMap::<Address, u128>::new();
+                    let mut legacy_balances = HashMap::<Address, u128>::default();
                     legacy_balances.insert(
                         ctx.from,
                         legacy_cold_wallet.balance.try_into().expect("fit u128"),
@@ -657,8 +658,11 @@ impl EvmInner {
             .build_mainnet();
 
         let ctx = evm.ctx_ref();
-        let result =
-            revm::handler::validation::validate_initial_tx_gas(ctx.tx(), ctx.cfg().spec().into());
+        let result = revm::handler::validation::validate_initial_tx_gas(
+            ctx.tx(),
+            ctx.cfg().spec().into(),
+            false,
+        );
 
         Ok(match result {
             Ok(result) => PreverifyTxResult {
@@ -722,7 +726,7 @@ impl EvmInner {
                             )
                         })? {
                         Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
-                            let mut legacy_balances = HashMap::<Address, u128>::new();
+                            let mut legacy_balances = HashMap::<Address, u128>::default();
                             legacy_balances.insert(
                                 tx_ctx.from,
                                 legacy_cold_wallet.balance.try_into().expect("fit u128"),

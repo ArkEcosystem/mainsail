@@ -1,10 +1,10 @@
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 
 use alloy_sol_types::SolEvent;
 use revm::{
     context::result::ExecutionResult,
     database::WrapDatabaseRef,
-    primitives::{Address, B256},
+    primitives::{Address, B256, map::HashMap},
 };
 
 use crate::{
@@ -223,7 +223,7 @@ fn test_apply_rewards() {
     let account1 = revm::primitives::address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
     let account2 = revm::primitives::address!("ad6f65c58a46427af4b257cbe231d0ed69ed5508");
 
-    let mut rewards = HashMap::<Address, u128>::new();
+    let mut rewards = HashMap::<Address, u128>::default();
     rewards.insert(account1, 1234);
     rewards.insert(account2, 0);
 
