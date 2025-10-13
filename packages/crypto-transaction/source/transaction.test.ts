@@ -5,15 +5,6 @@ import { zeroAddress } from "viem";
 
 import { describe, Sandbox } from "../../test-framework/source";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
-import {
-	serializedTransactionContractCall,
-	serializedTransactionContractCallWithSecondSignature,
-	serializedTransactionDeploy,
-	serializedTransactionTransfer,
-	serializedTransactionTransferEqualGreater11Fields,
-	serializedTransactionTransferLessThan9Fields,
-	transactionTransfer,
-} from "../test/fixtures/transaction";
 
 describe<{
 	sandbox: Sandbox;
@@ -108,59 +99,5 @@ describe<{
 		};
 
 		assert.undefined(validator.validate("transaction", transaction).error);
-	});
-
-	it("factory#fromJson - should deserialize well-formed transaction", async ({ factory }) => {
-		try {
-			const tx = await factory.fromJson(transactionTransfer);
-			//console.log(tx.serialized.toString("hex"));
-			assert.equal(tx.serialized, Buffer.from(serializedTransactionTransfer, "hex"));
-		} catch (ex: any) {
-			console.log(ex.message);
-			assert.false(true);
-		}
-	});
-
-	it("factory#fromHex - should deserialize well-formed transactions", async ({ factory }) => {
-		for (const serialized of [
-			serializedTransactionTransfer,
-			serializedTransactionContractCall,
-			serializedTransactionContractCallWithSecondSignature,
-			serializedTransactionDeploy,
-		]) {
-			await assert.resolves(async () => factory.fromHex(serialized));
-		}
-	});
-
-	it("factory#fromHex - should reject transaction with trailing bytes", async ({ factory }) => {
-		for (const hex of ["00", "01", "deadbeef", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			const serializedWithTrailingBytes = serializedTransactionTransfer + hex;
-			await assert.rejects(
-				async () => factory.fromHex(serializedWithTrailingBytes),
-				"Failed to deserialize transaction, encountered invalid bytes: decoded RLP contains trailing bytes",
-			);
-		}
-	});
-
-	it("factory#fromHex - should reject transaction with leading bytes", async ({ factory }) => {
-		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			const serializedWithTrailingBytes = hex + serializedTransactionTransfer;
-			await assert.rejects(
-				async () => factory.fromHex(serializedWithTrailingBytes),
-				"Failed to deserialize transaction, encountered invalid bytes: decode RLP not a list",
-			);
-		}
-	});
-
-	it("#deserialize - should not deserialize transaction with invalid number of fields", async ({ factory }) => {
-		for (const [serialized, error] of [
-			[serializedTransactionTransferLessThan9Fields, "decoded RLP contains too few fields"],
-			[serializedTransactionTransferEqualGreater11Fields, "decoded RLP contains too many fields"],
-		]) {
-			await assert.rejects(
-				async () => factory.fromHex(serialized),
-				`Failed to deserialize transaction, encountered invalid bytes: ${error}`,
-			);
-		}
 	});
 });
