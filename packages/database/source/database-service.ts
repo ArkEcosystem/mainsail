@@ -60,7 +60,8 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	public async hasCommitByHash(blockHash: string): Promise<boolean> {
-		return this.#getBlockNumberByHash(blockHash) !== undefined;
+		const blockNumber = await this.#getBlockNumberByHash(blockHash);
+		return blockNumber !== undefined;
 	}
 
 	public async findCommitBuffers(start: number, end: number): Promise<Buffer[]> {
@@ -240,7 +241,9 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	async #readTransaction(key: string): Promise<Contracts.Crypto.Transaction | undefined> {
 		const transactionBytes = await this.storage.getTransactionBytes(key);
-		assert.buffer(transactionBytes);
+		if (!transactionBytes) {
+			return undefined;
+		}
 
 		const buffer = ByteBuffer.fromBuffer(transactionBytes);
 		const blockNumber = buffer.readUint32();
