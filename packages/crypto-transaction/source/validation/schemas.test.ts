@@ -36,9 +36,9 @@ describe<{
 		for (const schema of Object.values({
 			...baseSchemas,
 			...keyPairSchemas,
-			...schemas,
 			...addressSchemas,
 			...base58addressSchemas,
+			...schemas,
 		})) {
 			context.validator.addSchema(schema);
 		}
@@ -80,8 +80,8 @@ describe<{
 		assert.defined(validator.validate("networkByte", {}).error);
 	});
 
-	const schema = extendSchema(Transaction.getSchema(), {
-		$id: "transaction",
+	const schema = extendSchema(schemas.transaction, {
+		$id: "transactionTest",
 		properties: {
 			type: { minimum: 0, type: "integer" },
 		},
@@ -101,7 +101,7 @@ describe<{
 	it("transactionBaseSchema - should be valid", ({ validator }) => {
 		validator.addSchema(schema);
 
-		assert.undefined(validator.validate("transaction", transactionOriginal).error);
+		assert.undefined(validator.validate("transactionTest", transactionOriginal).error);
 	});
 
 	it("transactionBaseSchema - should allow addtional properties", ({ validator }) => {
@@ -112,7 +112,7 @@ describe<{
 			test: "test",
 		};
 
-		assert.undefined(validator.validate("transaction", transaction).error);
+		assert.undefined(validator.validate("transactionTest", transaction).error);
 	});
 
 	it("transactionBaseSchema - should have required fields", ({ validator }) => {
@@ -126,7 +126,7 @@ describe<{
 
 			delete transaction[field];
 
-			assert.true(validator.validate("transaction", transaction).error.includes(field));
+			assert.true(validator.validate("transactionTest", transaction).error.includes(field));
 		}
 
 		const optionalFields = ["hash", "v", "r", "s"];
@@ -137,7 +137,7 @@ describe<{
 
 			delete transaction[field];
 
-			assert.undefined(validator.validate("transaction", transaction).error);
+			assert.undefined(validator.validate("transactionTest", transaction).error);
 		}
 	});
 
@@ -151,7 +151,7 @@ describe<{
 				value,
 			};
 
-			assert.undefined(validator.validate("transaction", transaction).error);
+			assert.undefined(validator.validate("transactionTest", transaction).error);
 		}
 
 		const invalidValues = [-1, "-1", 1.1, BigNumber.make(-1), -1, null, undefined, {}, "test"];
@@ -162,7 +162,7 @@ describe<{
 				value,
 			};
 
-			assert.true(validator.validate("transaction", transaction).error.includes("value"));
+			assert.true(validator.validate("transactionTest", transaction).error.includes("value"));
 		}
 	});
 
@@ -177,7 +177,7 @@ describe<{
 				gasPrice: value * 1e9,
 			};
 
-			assert.undefined(validator.validate("transaction", transaction).error);
+			assert.undefined(validator.validate("transactionTest", transaction).error);
 		}
 
 		const invalidValues = [0, -1, "-1", 1.1, BigNumber.make(-1), -1, null, undefined, {}, "test", 1 + 10000 * 1e9];
@@ -188,7 +188,7 @@ describe<{
 				gasPrice: value,
 			};
 
-			assert.true(validator.validate("transaction", transaction).error.includes("gasPrice"));
+			assert.true(validator.validate("transactionTest", transaction).error.includes("gasPrice"));
 		}
 	});
 
@@ -207,15 +207,15 @@ describe<{
 
 		genesisBlock.transactions.push(transaction as unknown as Contracts.Crypto.TransactionData);
 
-		assert.undefined(validator.validate("transaction", transaction).error);
+		assert.undefined(validator.validate("transactionTest", transaction).error);
 
 		// Fails for non-genesis tx
 		transaction.hash = "2".repeat(64);
-		assert.true(validator.validate("transaction", transaction).error.includes("gasPrice"));
+		assert.true(validator.validate("transactionTest", transaction).error.includes("gasPrice"));
 
 		// But works on height 0
 		configuration.setHeight(0);
-		assert.undefined(validator.validate("transaction", transaction).error);
+		assert.undefined(validator.validate("transactionTest", transaction).error);
 	});
 
 	it("transactionBaseSchema - hash should be transactionHash", ({ validator }) => {
@@ -229,7 +229,7 @@ describe<{
 				hash: char.repeat(64),
 			};
 
-			assert.undefined(validator.validate("transaction", transaction).error);
+			assert.undefined(validator.validate("transactionTest", transaction).error);
 		}
 
 		const invalidValues = ["0".repeat(63), "0".repeat(65), "G".repeat(64), "g".repeat(64), {}, "test"];
@@ -240,7 +240,7 @@ describe<{
 				hash: value,
 			};
 
-			assert.true(validator.validate("transaction", transaction).error.includes("hash"));
+			assert.true(validator.validate("transactionTest", transaction).error.includes("hash"));
 		}
 	});
 
@@ -255,7 +255,7 @@ describe<{
 				network: value,
 			};
 
-			assert.true(validator.validate("transaction", transaction).error.includes("network"));
+			assert.true(validator.validate("transactionTest", transaction).error.includes("network"));
 		}
 	});
 
@@ -270,7 +270,7 @@ describe<{
 				nonce: value,
 			};
 
-			assert.undefined(validator.validate("transaction", transaction).error);
+			assert.undefined(validator.validate("transactionTest", transaction).error);
 		}
 
 		const invalidValues = [-1, "-1", 1.1, BigNumber.make(-1), -1, null, undefined, {}, "test"];
@@ -281,7 +281,7 @@ describe<{
 				nonce: value,
 			};
 
-			assert.true(validator.validate("transaction", transaction).error.includes("nonce"));
+			assert.true(validator.validate("transactionTest", transaction).error.includes("nonce"));
 		}
 	});
 
@@ -296,7 +296,7 @@ describe<{
 				signature: char.repeat(130),
 			};
 
-			assert.undefined(validator.validate("transaction", transaction).error);
+			assert.undefined(validator.validate("transactionTest", transaction).error);
 		}
 
 		const invalidValues = [..."ABCDEFGHJKLMNPQRSTUVWXYZ", "/", "!", "&", {}];
@@ -307,7 +307,7 @@ describe<{
 				signature: value,
 			};
 
-			assert.true(validator.validate("transaction", transaction).error.includes("signature"));
+			assert.true(validator.validate("transactionTest", transaction).error.includes("signature"));
 		}
 	});
 
@@ -324,7 +324,7 @@ describe<{
 				signatures: [char.repeat(130)],
 			};
 
-			assert.undefined(validator.validate("transaction", transaction).error);
+			assert.undefined(validator.validate("transactionTest", transaction).error);
 		}
 
 		const invalidValues = [
@@ -344,13 +344,13 @@ describe<{
 				signatures: [value],
 			};
 
-			assert.true(validator.validate("transaction", transaction).error.includes("signatures"));
+			assert.true(validator.validate("transactionTest", transaction).error.includes("signatures"));
 		}
 
 		// Len 0
 		assert.true(
 			validator
-				.validate("transaction", {
+				.validate("transactionTest", {
 					...transactionOriginal,
 					signatures: [],
 				})
@@ -360,7 +360,7 @@ describe<{
 		// Len > 16
 		assert.true(
 			validator
-				.validate("transaction", {
+				.validate("transactionTest", {
 					...transactionOriginal,
 					signatures: [
 						"a".repeat(130),
@@ -388,7 +388,7 @@ describe<{
 		// Unique
 		assert.true(
 			validator
-				.validate("transaction", {
+				.validate("transactionTest", {
 					...transactionOriginal,
 					signatures: ["a".repeat(130), "a".repeat(130)],
 				})

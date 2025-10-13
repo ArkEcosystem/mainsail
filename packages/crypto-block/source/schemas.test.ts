@@ -299,6 +299,7 @@ describe<{
 	});
 
 	it("block - transactions count should be equal transactionsCount", ({ validator }) => {
+		validator.removeSchema("transactions");
 		validator.addSchema({
 			$id: "transactions",
 			type: "array",
