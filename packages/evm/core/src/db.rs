@@ -66,23 +66,6 @@ impl heed::BytesDecode<'_> for LegacyAddressWrapper {
     }
 }
 
-pub(crate) struct BytesWrapper(Bytes);
-impl heed::BytesEncode<'_> for BytesWrapper {
-    type EItem = BytesWrapper;
-
-    fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
-        Ok(Cow::Borrowed(item.0.as_ref()))
-    }
-}
-
-impl heed::BytesDecode<'_> for BytesWrapper {
-    type DItem = BytesWrapper;
-
-    fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
-        Ok(BytesWrapper(Bytes::from_iter(bytes)))
-    }
-}
-
 #[derive(Debug)]
 pub(crate) struct HashWrapper(B256);
 impl heed::BytesEncode<'_> for HashWrapper {
@@ -994,7 +977,7 @@ impl PersistentDB {
             // ========================================
 
             // Finalize commit
-            let mut tx_receipts = HashMap::new();
+            let mut tx_receipts = HashMap::default();
             for (k, result) in results {
                 tx_receipts.insert(k.clone(), map_execution_result(result.clone()));
             }
@@ -1229,7 +1212,7 @@ fn test_commit_changes() {
     );
 
     // 2) Update balance for account
-    let mut state = HashMap::new();
+    let mut state = HashMap::default();
 
     let mut account = revm::state::Account::new_not_existing(0);
     account.info.balance = U256::from(100);
@@ -1239,7 +1222,7 @@ fn test_commit_changes() {
     account.info.code_hash = code.hash_slow();
     account.info.code = Some(code.clone());
 
-    let mut storage = HashMap::new();
+    let mut storage = HashMap::default();
     storage.insert(
         U256::from(1),
         revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1234)),
@@ -1302,12 +1285,12 @@ fn test_storage() {
         PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
 
     let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
-    let mut state = HashMap::new();
+    let mut state = HashMap::default();
 
     let mut account = revm::state::Account::new_not_existing(0);
     account.status = revm::state::AccountStatus::Touched;
 
-    let mut storage = HashMap::new();
+    let mut storage = HashMap::default();
 
     storage.insert(
         U256::from(99),
@@ -1375,12 +1358,12 @@ fn test_storage_overwrite() {
         PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
 
     let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
-    let mut state = HashMap::new();
+    let mut state = HashMap::default();
 
     let mut account = revm::state::Account::new_not_existing(0);
     account.status = revm::state::AccountStatus::Touched;
 
-    let mut storage = HashMap::new();
+    let mut storage = HashMap::default();
 
     storage.insert(
         U256::from(1),
@@ -1421,13 +1404,13 @@ fn test_storage_overwrite() {
     assert_eq!(account_storage, U256::from(2));
 
     // Now overwrite index 1
-    let mut storage = HashMap::new();
+    let mut storage = HashMap::default();
     storage.insert(
         U256::from(1),
         revm::database::states::StorageSlot::new_changed(U256::from(1), U256::from(99)),
     );
 
-    let mut state = HashMap::new();
+    let mut state = HashMap::default();
     state.insert(
         address,
         revm::database::TransitionAccount {
@@ -1478,12 +1461,12 @@ fn test_resize_on_commit() {
         buf[0..8].copy_from_slice(&block_number.to_le_bytes());
         let address = Address::from_word(ethers_core::utils::keccak256(buf).into());
 
-        let mut state = HashMap::new();
+        let mut state = HashMap::default();
 
         let mut account = revm::state::Account::new_not_existing(0);
         account.status = revm::state::AccountStatus::Touched;
 
-        let mut storage = HashMap::new();
+        let mut storage = HashMap::default();
 
         for i in 0..n {
             storage.insert(
@@ -1657,12 +1640,14 @@ fn test_read_receipts() {
         for i in 0..target_block {
             let block_number = (i + 1) as u64;
 
-            let receipts: HashMap<B256, TxReceipt> = HashMap::from([
+            let receipts: HashMap<B256, TxReceipt> = [
                 (random_b256(block_number, 0), TxReceipt::default()),
                 (random_b256(block_number, 1), TxReceipt::default()),
                 (random_b256(block_number, 2), TxReceipt::default()),
                 (random_b256(block_number, 3), TxReceipt::default()),
-            ]);
+            ]
+            .into_iter()
+            .collect();
 
             total_receipts += receipts.len();
 
