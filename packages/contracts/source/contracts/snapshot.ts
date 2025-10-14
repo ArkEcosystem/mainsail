@@ -42,6 +42,7 @@ export interface ImportedLegacyWallet {
 }
 
 export interface ImportedLegacyWalletAttributes {
+	readonly legacyNonce: bigint;
 	readonly secondPublicKey?: string;
 	readonly multiSignature?: ImportedLegacyMultiSignatureAttribute;
 }
