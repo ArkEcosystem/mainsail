@@ -243,6 +243,7 @@ impl JsLegacyColdWallet {
 
 #[napi(object)]
 pub struct JsLegacyAttributes {
+    pub legacy_nonce: Option<BigInt>,
     pub second_public_key: Option<String>,
     pub multi_signature: Option<JsLegacyMultiSignatureAttribute>,
 }
@@ -314,6 +315,7 @@ impl JsLegacyAttributes {
         };
 
         JsLegacyAttributes {
+            legacy_nonce: legacy_attributes.legacy_nonce.map(|nonce| nonce.into()),
             second_public_key: legacy_attributes.second_public_key,
             multi_signature,
         }
@@ -323,6 +325,7 @@ impl JsLegacyAttributes {
 impl Into<LegacyAccountAttributes> for JsLegacyAttributes {
     fn into(self) -> LegacyAccountAttributes {
         LegacyAccountAttributes {
+            legacy_nonce: self.legacy_nonce.map(|nonce| nonce.get_u64().1),
             second_public_key: self.second_public_key,
             multi_signature: self.multi_signature.map(Into::into),
         }
