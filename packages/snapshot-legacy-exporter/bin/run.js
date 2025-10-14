@@ -22,7 +22,7 @@ async function run() {
 	// 	{ hash: "a1b8d3f6e9c2a0b4d7e1f0c8a3b5d6e7f9a0b1c3d4e5f6a7b8c9d0e1f2a3b4c5", number: 0 },
 	// 	[
 	// 		{ arkAddress: "DFF4dzL2ZoFeGdcCbER4gfmuWBEVbEnU5f", publicKey: "034b7f14dd621010d9719a027971dac8e00e00467b3c6d5945e0a5ced797b13b2d", balance: "10000000000", legacyNonce: 256,
-	// 			attributes: { delegate: { username: "valdiator_1" }} 
+	// 			attributes: { delegate: { username: "valdiator_1" }}
 	// 		},
 	// 		{ arkAddress: "DFf62eynQTZDoTLADQdxW7EJEGV4xcGT1f", publicKey: "03b36b275ef33b7527d08fa5cf29c04ff142a427f228f1c4d02161c76a7404bef5", balance: "20000000000", legacyNonce: 3,
 	// 			attributes: { delegate: { username: "valdiator_2" }}
@@ -39,7 +39,7 @@ async function run() {
 	// 		{ arkAddress: "DFfFDrrppKzVTK5frHYh6JJP73UeD2MZnC", publicKey: "02a1a95d0445074b2ef84c66ffcb203ef838c398a8b802ef7441d6ffc88b326d1e", balance: "10", legacyNonce: 5 },
 	// 		{ arkAddress: "DFFgVGsEoVQtnVoaBoHHZJyqWEX8tsxzwP", publicKey: undefined, balance: "20", legacyNonce: 0 }
 	// 	]
-	// );	
+	// );
 }
 
 run();
