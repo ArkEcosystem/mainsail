@@ -201,7 +201,7 @@ const configurations = [
 		snapshot: {
 			// reuse existing snapshot to build new genesis block
 			// also see commit: 718b4cf2f1b49df9b80e6474be06fa97acc80d44
-			path: "../../tests/e2e/snapshot/nodes/node0/core/snapshot/f11b12e6d3a7524482deaacf745d5411d476ae39beeb7ce5141bfeee912cd08d.compressed",
+			path: "../../tests/e2e/snapshot/nodes/node0/core/snapshot/edccff0c18f4384efed02b5bf8475bde2477a1802dcbef0f6d263208d15defe9.compressed",
 		},
 		postGenerate: (location) => {
 			// E2E tests run multiple nodes (1 validator per node)

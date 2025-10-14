@@ -14,6 +14,7 @@ pub struct LegacyColdWallet {
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct LegacyAccountAttributes {
+    pub legacy_nonce: Option<u64>,
     pub second_public_key: Option<String>,
     pub multi_signature: Option<LegacyMultiSignatureAttribute>,
 }

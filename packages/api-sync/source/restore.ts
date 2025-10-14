@@ -55,6 +55,7 @@ interface UserAttributes {
 	username?: string;
 	usernameFromContract?: boolean;
 	vote?: string;
+	legacyNonce?: bigint;
 	legacyMerge?: Contracts.Evm.AccountMergeInfo;
 }
 
@@ -501,6 +502,12 @@ export class Restore {
 			for (const wallet of this.snapshotImporter.drain()) {
 				// add any imported address to the mapping
 				if (wallet.ethAddress && wallet.publicKey) {
+					const userAttributes = context.userAttributes[wallet.ethAddress] ?? {};
+					context.userAttributes[wallet.ethAddress] = {
+						...userAttributes,
+						legacyNonce: wallet.legacyAttributes.legacyNonce,
+					};
+
 					context.legacyAddresses.add(wallet.ethAddress);
 					context.addressToPublicKey[wallet.ethAddress] = wallet.publicKey;
 				}
@@ -552,6 +559,9 @@ export class Restore {
 							? {
 									...(userAttributes.username ? { username: userAttributes.username } : {}),
 									...(userAttributes.vote ? { vote: userAttributes.vote } : {}),
+									...(userAttributes.legacyNonce !== undefined
+										? { legacyNonce: userAttributes.legacyNonce.toString() }
+										: {}),
 									...(userAttributes.legacyMerge
 										? // merged legacy cold wallets
 											{ isLegacy: true, legacyMerge: userAttributes.legacyMerge }
@@ -566,6 +576,9 @@ export class Restore {
 							: {}),
 						...(legacyAttributes && Object.keys(legacyAttributes).length > 0
 							? {
+									...(legacyAttributes.legacyNonce !== undefined
+										? { legacyNonce: legacyAttributes.legacyNonce.toString() }
+										: {}),
 									...(legacyAttributes.secondPublicKey
 										? { secondPublicKey: legacyAttributes.secondPublicKey }
 										: {}),
@@ -617,7 +630,14 @@ export class Restore {
 				legacyColdWallets.push({
 					address: wallet.address,
 					balance: BigNumber.make(wallet.balance).toFixed(),
-					...(Object.keys(wallet.legacyAttributes).length > 0 ? { attributes: wallet.legacyAttributes } : {}),
+					...(Object.keys(wallet.legacyAttributes).length > 0
+						? {
+								attributes: {
+									...wallet.legacyAttributes,
+									...{ legacyNonce: wallet.legacyAttributes.legacyNonce?.toString() },
+								},
+							}
+						: {}),
 					mergeInfoTransactionHash: wallet.mergeInfo?.txHash,
 					mergeInfoWalletAddress: wallet.mergeInfo?.address,
 				});

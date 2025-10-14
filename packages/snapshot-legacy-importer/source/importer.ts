@@ -202,6 +202,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				balance,
 				ethAddress,
 				legacyAttributes: {
+					legacyNonce: BigNumber.make(wallet.legacyNonce).toBigInt(),
 					multiSignature: wallet.attributes?.["multiSignature"]?.["publicKeys"]
 						? wallet.attributes?.["multiSignature"]
 						: undefined,
