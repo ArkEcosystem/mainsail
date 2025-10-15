@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Events, Identifiers } from "@mainsail/contracts";
-import { Lock } from "@mainsail/utils";
+import { assert, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 @injectable()
@@ -62,6 +62,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	#isDisposed = false;
 	#pendingJobs = new Set<Contracts.Consensus.RoundState>();
 
+	#proposedBlock?: Contracts.Crypto.Block;
 	#proposalPromise?: Promise<Contracts.Crypto.Proposal>;
 	#roundStartTime = 0;
 
@@ -104,8 +105,9 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	// TODO: Only for tests
-	public setProposal(proposalPromise: Promise<Contracts.Crypto.Proposal>): void {
+	public setProposal(proposalPromise: Promise<Contracts.Crypto.Proposal>, block: Contracts.Crypto.Block): void {
 		this.#proposalPromise = proposalPromise;
+		this.#proposedBlock = block;
 	}
 
 	public getState(): Contracts.Consensus.State {
@@ -223,7 +225,12 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		if (this.#proposalPromise) {
 			const proposal = await this.#proposalPromise;
+			assert.defined(this.#proposedBlock);
+
+			this.logger.info(`Proposing block ${this.#getBlockString(this.#proposedBlock)}`);
+
 			this.#proposalPromise = undefined;
+			this.#proposedBlock = undefined;
 			await this.proposalProcessor.process(proposal);
 		}
 	}
@@ -485,34 +492,34 @@ export class Consensus implements Contracts.Consensus.Service {
 		registeredProposer: Contracts.Validator.Validator,
 	): Promise<Contracts.Crypto.Proposal> {
 		if (this.#validValue) {
-			const block = this.#validValue.getBlock();
+			this.#proposedBlock = this.#validValue.getBlock();
 			const lockProof = await this.#validValue.aggregatePrevotes();
 
-			this.logger.info(`Proposing existing block ${this.#getBlockString(block)}`);
+			this.logger.info(`Created proposal with existing block ${this.#getBlockString(this.#proposedBlock)}`);
 
 			return await registeredProposer.propose(
 				this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.address),
 				this.#round,
 				this.#validValue.round,
-				block,
+				this.#proposedBlock,
 				lockProof,
 			);
 		}
 
-		const block = await registeredProposer.prepareBlock(
+		this.#proposedBlock = this.#proposedBlock = await registeredProposer.prepareBlock(
 			roundState.proposer.address,
 			this.#round,
 			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
 		);
-		this.logger.info(`Proposing new block ${this.#getBlockString(block)}`);
+		this.logger.info(`Created proposal with new block ${this.#getBlockString(this.#proposedBlock)}`);
 
-		void this.eventDispatcher.dispatch(Events.BlockEvent.Forged, block.data);
+		void this.eventDispatcher.dispatch(Events.BlockEvent.Forged, this.#proposedBlock.data);
 
 		return registeredProposer.propose(
 			this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.address),
 			this.#round,
 			undefined,
-			block,
+			this.#proposedBlock,
 		);
 	}
 

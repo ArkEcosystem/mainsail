@@ -287,7 +287,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
-	it("#onTimeoutStartRound - local validator should propose validRound", async ({
+	it("#startRound - local validator should propose validRound", async ({
 		consensus,
 		validatorsRepository,
 		roundStateRepository,
@@ -347,7 +347,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPropose.calledOnce();
 		spyValidatorPropose.calledWith(1, 1, 0, block, lockProof); // validator set, round, validRound, block, lockProof
 		spyLoggerInfo.calledWith(`>> Starting new round: ${1}/${1} with proposer: ${proposer.address}`);
-		spyLoggerInfo.calledWith(`Proposing existing block ${1}/${1}(${0})/${block.data.hash}`);
+		spyLoggerInfo.calledWith(`Created proposal with existing block ${1}/${1}(${0})/${block.data.hash}`);
+		// spyLoggerInfo.calledWith(`Proposing block ${1}/${1}(${0})/${block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.RoundStarted, {
 			blockNumber: 1,
@@ -363,14 +364,17 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		consensus,
 		proposalProcessor,
 		proposal,
+		logger,
 	}) => {
 		const spyProposalProcess = spy(proposalProcessor, "process");
+		const spyLoggerInfo = spy(logger, "info");
 
-		consensus.setProposal(proposal);
+		consensus.setProposal(proposal, proposal.getData().block);
 		await consensus.onTimeoutStartRound();
 
 		spyProposalProcess.calledOnce();
 		spyProposalProcess.calledWith(proposal);
+		spyLoggerInfo.calledWith(`Proposing block ${1}/${0}/${proposal.getData().block.data.hash}`);
 
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
@@ -383,7 +387,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	}) => {
 		const spyProposalProcess = spy(proposalProcessor, "process");
 
-		consensus.setProposal(proposal);
+		consensus.setProposal(proposal, proposal.getData().block);
 		await consensus.onTimeoutStartRound();
 		await consensus.onTimeoutStartRound();
 
