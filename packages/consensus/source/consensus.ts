@@ -227,7 +227,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			const proposal = await this.#proposalPromise;
 			assert.defined(this.#proposedBlock);
 
-			// this.logger.info(`Proposing new block ${this.#getBlockString(this.#proposedBlock)}`);
+			this.logger.info(`Proposing block ${this.#getBlockString(this.#proposedBlock)}`);
 
 			this.#proposalPromise = undefined;
 			this.#proposedBlock = undefined;
