@@ -10,7 +10,6 @@ import { Routes, SocketErrors } from "./enums.js";
 import * as replySchemas from "./reply-schemas/index.js";
 import { Codecs } from "./socket-server/codecs/index.js";
 import { Throttle } from "./throttle.js";
-import { time } from "console";
 
 
 // @TODO review the implementation
