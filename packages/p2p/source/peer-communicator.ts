@@ -2,6 +2,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { assert, http } from "@mainsail/utils";
+import { performance } from "perf_hooks";
 
 import { constants } from "./constants.js";
 import { Routes, SocketErrors } from "./enums.js";
@@ -9,6 +10,7 @@ import { Routes, SocketErrors } from "./enums.js";
 import * as replySchemas from "./reply-schemas/index.js";
 import { Codecs } from "./socket-server/codecs/index.js";
 import { Throttle } from "./throttle.js";
+
 
 // @TODO review the implementation
 @injectable()
@@ -158,17 +160,21 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		event: Routes,
 		payload: any,
 		options: Contracts.P2P.EmitOptions,
-	): Promise<{ data: T }> {
+	): Promise<{ data: T, throttleTime: number, responseTime: number, deserializeTime: number }> {
 		options = {
 			...options,
 		};
 
+		const timeBeforeThrottle = performance.now();
+
 		const throttle = await this.#getThrottle();
 		await throttle.throttle(peer, event);
 
+		const throttleTime = performance.now() - timeBeforeThrottle;
+
 		const codec = Codecs[event];
 
-		const timeBeforeSocketCall: number = Date.now();
+		const timeBeforeSocketCall = performance.now();
 
 		await this.connector.connect(peer);
 
@@ -183,22 +189,29 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			}),
 			options.timeout,
 		);
-		const parsedResponsePayload = codec.response.deserialize(response.payload) as T;
 
-		peer.latency = Date.now() - timeBeforeSocketCall;
+		const responseTime = performance.now() - timeBeforeSocketCall;
 
-		if (!this.validateReply(peer, parsedResponsePayload, event)) {
+		const timeBeforeDeserialize = performance.now();
+
+		const data = codec.response.deserialize(response.payload) as T;
+
+		const deserializeTime = performance.now() - timeBeforeDeserialize;
+		peer.latency = responseTime + deserializeTime;
+
+
+		if (!this.validateReply(peer, data, event)) {
 			const validationError = new Error(
-				`Response validation failed for ${event} from peer ${peer.ip}: ${JSON.stringify(parsedResponsePayload)}`,
+				`Response validation failed for ${event} from peer ${peer.ip}: ${JSON.stringify(data)}`,
 			);
 			validationError.name = SocketErrors.Validation;
 			throw validationError;
 		}
 
-		assert.defined(parsedResponsePayload.headers);
-		void this.headerService.handle(peer, parsedResponsePayload.headers);
+		assert.defined(data.headers);
+		void this.headerService.handle(peer, data.headers);
 
-		return { data: parsedResponsePayload };
+		return { data, deserializeTime, responseTime, throttleTime };
 	}
 
 	private handleSocketError(peer: Contracts.P2P.Peer, error: Error): void {
