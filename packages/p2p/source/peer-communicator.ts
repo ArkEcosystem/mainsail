@@ -10,6 +10,7 @@ import { Routes, SocketErrors } from "./enums.js";
 import * as replySchemas from "./reply-schemas/index.js";
 import { Codecs } from "./socket-server/codecs/index.js";
 import { Throttle } from "./throttle.js";
+import { time } from "console";
 
 
 // @TODO review the implementation
@@ -165,12 +166,18 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			...options,
 		};
 
+		const time = {
+			deserializeTime: 0,
+			responseTime: 0,
+			throttleTime: 0,
+		}
+
 		const timeBeforeThrottle = performance.now();
 
 		const throttle = await this.#getThrottle();
 		await throttle.throttle(peer, event);
 
-		const throttleTime = performance.now() - timeBeforeThrottle;
+		time.throttleTime = performance.now() - timeBeforeThrottle;
 
 		const codec = Codecs[event];
 
@@ -190,14 +197,14 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			options.timeout,
 		);
 
-		const responseTime = performance.now() - timeBeforeSocketCall;
+		time.responseTime = performance.now() - timeBeforeSocketCall;
 
 		const timeBeforeDeserialize = performance.now();
 
 		const data = codec.response.deserialize(response.payload) as T;
 
-		const deserializeTime = performance.now() - timeBeforeDeserialize;
-		peer.latency = responseTime + deserializeTime;
+		time.deserializeTime = performance.now() - timeBeforeDeserialize;
+		peer.latency = time.responseTime + time.deserializeTime;
 
 
 		if (!this.validateReply(peer, data, event)) {
@@ -211,7 +218,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		assert.defined(data.headers);
 		void this.headerService.handle(peer, data.headers);
 
-		return { data, deserializeTime, responseTime, throttleTime };
+		return { data, ...time };
 	}
 
 	private handleSocketError(peer: Contracts.P2P.Peer, error: Error): void {
