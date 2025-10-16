@@ -162,10 +162,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		payload: any,
 		options: Contracts.P2P.EmitOptions,
 	): Promise<{ data: T, throttleTime: number, responseTime: number, deserializeTime: number }> {
-		options = {
-			...options,
-		};
-
 		const time = {
 			deserializeTime: 0,
 			responseTime: 0,
