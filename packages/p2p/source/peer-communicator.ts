@@ -42,7 +42,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	public async postProposal(peer: Contracts.P2P.Peer, proposal: Buffer): Promise<void> {
 		try {
-			await this.emit(peer, Routes.PostProposal, { proposal }, { timeout: 6000 });
+			await this.#emit(peer, Routes.PostProposal, { proposal }, { timeout: 6000 });
 		} catch (error) {
 			this.handleSocketError(peer, error);
 		}
@@ -50,7 +50,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	public async postPrevote(peer: Contracts.P2P.Peer, prevote: Buffer): Promise<void> {
 		try {
-			await this.emit(peer, Routes.PostPrevote, { prevote }, { timeout: 6000 });
+			await this.#emit(peer, Routes.PostPrevote, { prevote }, { timeout: 6000 });
 		} catch (error) {
 			this.handleSocketError(peer, error);
 		}
@@ -58,7 +58,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	public async postPrecommit(peer: Contracts.P2P.Peer, precommit: Buffer): Promise<void> {
 		try {
-			await this.emit(peer, Routes.PostPrecommit, { precommit }, { timeout: 6000 });
+			await this.#emit(peer, Routes.PostPrecommit, { precommit }, { timeout: 6000 });
 		} catch (error) {
 			this.handleSocketError(peer, error);
 		}
@@ -74,34 +74,34 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 					if (statusCode === 200) {
 						peer.ports[name] = plugin.port;
 					}
-				} catch {}
+				} catch { }
 			}),
 		);
 	}
 
 	public async getMessages(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetMessagesResponse> {
-		return this.emit(peer, Routes.GetMessages, {}, { timeout: 5000 });
+		return this.#emit(peer, Routes.GetMessages, {}, { timeout: 5000 });
 	}
 
 	public async getProposal(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetProposalResponse> {
-		return this.emit(peer, Routes.GetProposal, {}, { timeout: 5000 });
+		return this.#emit(peer, Routes.GetProposal, {}, { timeout: 5000 });
 	}
 
 	public async getPeers(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetPeersResponse> {
 		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`);
-		return this.emit(peer, Routes.GetPeers, {}, { timeout: 5000 });
+		return this.#emit(peer, Routes.GetPeers, {}, { timeout: 5000 });
 	}
 
 	public async getApiNodes(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetApiNodesResponse> {
 		this.logger.debug(`Fetching API nodes from ${peer.url}`);
-		return this.emit(peer, Routes.GetApiNodes, {}, { timeout: 5000 });
+		return this.#emit(peer, Routes.GetApiNodes, {}, { timeout: 5000 });
 	}
 
 	public async getStatus(
 		peer: Contracts.P2P.Peer,
 		options: Partial<Contracts.P2P.EmitOptions> = {},
 	): Promise<Contracts.P2P.GetStatusResponse> {
-		return this.emit<Contracts.P2P.GetStatusResponse>(peer, Routes.GetStatus, {}, { timeout: 5000, ...options });
+		return this.#emit<Contracts.P2P.GetStatusResponse>(peer, Routes.GetStatus, {}, { timeout: 5000, ...options });
 	}
 
 	public async getBlocks(
@@ -109,7 +109,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		{ fromBlockNumber, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromBlockNumber: number; limit?: number },
 		options: Partial<Contracts.P2P.EmitOptions> = {},
 	): Promise<Contracts.P2P.GetBlocksResponse> {
-		const result = await this.emit<Contracts.P2P.GetBlocksResponse>(
+		const result = await this.#emit<Contracts.P2P.GetBlocksResponse>(
 			peer,
 			Routes.GetBlocks,
 			{
@@ -148,7 +148,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return true;
 	}
 
-	private async emit<T extends Contracts.P2P.Response>(
+	async #emit<T extends Contracts.P2P.Response>(
 		peer: Contracts.P2P.Peer,
 		event: Routes,
 		payload: any,
