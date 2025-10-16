@@ -46,7 +46,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		try {
 			await this.#emit(peer, Routes.PostProposal, { proposal }, { timeout: 6000 });
 		} catch (error) {
-			this.handleSocketError(peer, error);
+			this.#handleSocketError(peer, error);
 		}
 	}
 
@@ -54,7 +54,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		try {
 			await this.#emit(peer, Routes.PostPrevote, { prevote }, { timeout: 6000 });
 		} catch (error) {
-			this.handleSocketError(peer, error);
+			this.#handleSocketError(peer, error);
 		}
 	}
 
@@ -62,7 +62,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		try {
 			await this.#emit(peer, Routes.PostPrecommit, { precommit }, { timeout: 6000 });
 		} catch (error) {
-			this.handleSocketError(peer, error);
+			this.#handleSocketError(peer, error);
 		}
 	}
 
@@ -138,7 +138,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return result.data;
 	}
 
-	private validateReply(peer: Contracts.P2P.Peer, reply: any, endpoint: string) {
+	#validateReply(peer: Contracts.P2P.Peer, reply: any, endpoint: string) {
 		const schema = replySchemas[endpoint];
 		if (schema === undefined) {
 			this.logger.error(`Can't validate reply from "${endpoint}": none of the predefined schemas matches.`);
@@ -202,7 +202,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		peer.latency = time.responseTime + time.deserializeTime;
 
 
-		if (!this.validateReply(peer, data, event)) {
+		if (!this.#validateReply(peer, data, event)) {
 			const validationError = new Error(
 				`Response validation failed for ${event} from peer ${peer.ip}: ${JSON.stringify(data)}`,
 			);
@@ -216,7 +216,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return { data, ...time };
 	}
 
-	private handleSocketError(peer: Contracts.P2P.Peer, error: Error): void {
+	#handleSocketError(peer: Contracts.P2P.Peer, error: Error): void {
 		this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).banPeer(peer.ip, error);
 	}
 
