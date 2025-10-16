@@ -80,28 +80,33 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	public async getMessages(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetMessagesResponse> {
-		return this.#emit(peer, Routes.GetMessages, {}, { timeout: 5000 });
+		const response = await this.#emit<Contracts.P2P.GetMessagesResponse>(peer, Routes.GetMessages, {}, { timeout: 5000 });
+		return response.data;
 	}
 
 	public async getProposal(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetProposalResponse> {
-		return this.#emit(peer, Routes.GetProposal, {}, { timeout: 5000 });
+		const response = await this.#emit<Contracts.P2P.GetProposalResponse>(peer, Routes.GetProposal, {}, { timeout: 5000 });
+		return response.data;
 	}
 
 	public async getPeers(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetPeersResponse> {
 		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`);
-		return this.#emit(peer, Routes.GetPeers, {}, { timeout: 5000 });
+		const response = await this.#emit<Contracts.P2P.GetPeersResponse>(peer, Routes.GetPeers, {}, { timeout: 5000 });
+		return response.data;
 	}
 
 	public async getApiNodes(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetApiNodesResponse> {
 		this.logger.debug(`Fetching API nodes from ${peer.url}`);
-		return this.#emit(peer, Routes.GetApiNodes, {}, { timeout: 5000 });
+		const response = await this.#emit<Contracts.P2P.GetApiNodesResponse>(peer, Routes.GetApiNodes, {}, { timeout: 5000 });
+		return response.data;
 	}
 
 	public async getStatus(
 		peer: Contracts.P2P.Peer,
 		options: Partial<Contracts.P2P.EmitOptions> = {},
 	): Promise<Contracts.P2P.GetStatusResponse> {
-		return this.#emit<Contracts.P2P.GetStatusResponse>(peer, Routes.GetStatus, {}, { timeout: 5000, ...options });
+		const response = await this.#emit<Contracts.P2P.GetStatusResponse>(peer, Routes.GetStatus, {}, { timeout: 5000, ...options });
+		return response.data;
 	}
 
 	public async getBlocks(
@@ -122,13 +127,13 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			},
 		);
 
-		if (result.blocks.length === 0) {
+		if (result.data.blocks.length === 0) {
 			this.logger.debug(
 				`Peer ${peer.ip} did not return any blocks via block number ${fromBlockNumber.toLocaleString()}.`,
 			);
 		}
 
-		return result;
+		return result.data;
 	}
 
 	private validateReply(peer: Contracts.P2P.Peer, reply: any, endpoint: string) {
@@ -153,7 +158,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		event: Routes,
 		payload: any,
 		options: Contracts.P2P.EmitOptions,
-	): Promise<T> {
+	): Promise<{ data: T }> {
 		options = {
 			...options,
 		};
@@ -193,7 +198,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		assert.defined(parsedResponsePayload.headers);
 		void this.headerService.handle(peer, parsedResponsePayload.headers);
 
-		return parsedResponsePayload;
+		return { data: parsedResponsePayload };
 	}
 
 	private handleSocketError(peer: Contracts.P2P.Peer, error: Error): void {
