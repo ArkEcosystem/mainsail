@@ -76,7 +76,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 					if (statusCode === 200) {
 						peer.ports[name] = plugin.port;
 					}
-				} catch { }
+				} catch {
+					// empty
+				}
 			}),
 		);
 	}
