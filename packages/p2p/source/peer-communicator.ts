@@ -44,7 +44,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	public async postProposal(peer: Contracts.P2P.Peer, proposal: Buffer): Promise<void> {
 		try {
-			await this.#emit(peer, Routes.PostProposal, { proposal }, { timeout: 6000 });
+			const response = await this.#emit(peer, Routes.PostProposal, { proposal }, { timeout: 6000 });
+
+			console.log(`P2P: P: ${peer.ip}, Rt: ${Math.floor(response.responseTime)}ms, Dt: ${response.deserializeTime.toFixed(3)}ms, Tt: ${Math.floor(response.throttleTime)}ms`);
 		} catch (error) {
 			this.#handleSocketError(peer, error);
 		}
@@ -201,7 +203,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		const data = codec.response.deserialize(response.payload) as T;
 
 		time.deserializeTime = performance.now() - timeBeforeDeserialize;
-		peer.latency = time.responseTime + time.deserializeTime;
+		peer.latency = Math.floor(time.responseTime + time.deserializeTime);
 
 
 		if (!this.#validateReply(peer, data, event)) {
