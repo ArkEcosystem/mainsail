@@ -12,7 +12,6 @@ import { Codecs } from "./socket-server/codecs/index.js";
 import { Throttle } from "./throttle.js";
 
 
-// @TODO review the implementation
 @injectable()
 export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.Application.Instance)
