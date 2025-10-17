@@ -5,7 +5,7 @@ import delay from "delay";
 
 import { Client } from "./hapi-nes/index.js";
 
-const TEN_SECONDS_IN_MILLISECONDS = 10_000;
+const TEN_SECONDS = 10 * 1000;
 
 @injectable()
 export class PeerConnector implements Contracts.P2P.PeerConnector {
@@ -48,7 +48,7 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	async #create(peer: Contracts.P2P.Peer): Promise<Client> {
 		// delay a bit if last connection create was less than 10 sec ago to prevent possible abuse of reconnection
 		const timeSinceLastConnectionCreate = Date.now() - (this.#lastConnectionCreate.get(peer.ip) ?? 0);
-		await delay(Math.max(0, TEN_SECONDS_IN_MILLISECONDS - timeSinceLastConnectionCreate));
+		await delay(Math.max(0, TEN_SECONDS - timeSinceLastConnectionCreate));
 
 		const connection = new Client(`ws://${IpAddress.normalizeAddress(peer.ip)}:${peer.port}`, {
 			timeout: 10_000,
