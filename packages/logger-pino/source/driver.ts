@@ -19,6 +19,10 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 	static MAX_LEVEL_LENGTH = Math.max(...[...PinoLogger.LOG_LEVELS].map((level) => level.length));
 
+	static LOG_CONTEXTS: Contracts.Kernel.LoggerContext[] = ["system", "evm", "consensus", "p2p"];
+
+	static MAX_CONTEXT_LENGTH = Math.max(...PinoLogger.LOG_CONTEXTS.map((context) => context.length));
+
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -180,13 +184,19 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			message = inspect(message, { depth: 1 });
 		}
 
-		this.#logger[level](this.#padMessage(level, `[${context}] ${message}`));
+		this.#logger[level](this.#padMessage(level, this.#createMessage(context, message)));
 	}
 
 	#padMessage(level: string, message: string): string {
 		const paddingLength = PinoLogger.MAX_LEVEL_LENGTH - level.length;
 
 		return `${" ".repeat(paddingLength)}${message}`;
+	}
+
+	#createMessage(context: string, message: string): string {
+		const paddingLength = PinoLogger.MAX_CONTEXT_LENGTH - context.length;
+
+		return `[${context}]${" ".repeat(paddingLength)} ${message}`;
 	}
 
 	#createPrettyTransport(level: string, prettyOptions?: PrettyOptions): Transform {
