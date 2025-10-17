@@ -5,7 +5,7 @@ import delay from "delay";
 
 import { Client } from "./hapi-nes/index.js";
 
-const TEN_SECONDS = 10 * 1000;
+const TEN_SECONDS = 10 * 1000; // in milliseconds
 
 @injectable()
 export class PeerConnector implements Contracts.P2P.PeerConnector {
