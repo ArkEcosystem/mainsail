@@ -17,7 +17,7 @@ import { inspect } from "util";
 export class PinoLogger implements Contracts.Kernel.Logger {
 	static LOG_LEVELS = new Set(["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"]);
 
-	static MAX_LEVEL_LENGTH = Math.max(...Array.from(PinoLogger.LOG_LEVELS).map((level) => level.length));
+	static MAX_LEVEL_LENGTH = Math.max(...[...PinoLogger.LOG_LEVELS].map((level) => level.length));
 
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
