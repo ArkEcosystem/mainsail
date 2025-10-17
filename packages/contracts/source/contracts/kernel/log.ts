@@ -1,19 +1,19 @@
 export interface Logger {
-	emergency(message: string): void;
+	emergency(message: string, context?: string): void;
 
-	alert(message: string): void;
+	alert(message: string, context?: string): void;
 
-	critical(message: string): void;
+	critical(message: string, context?: string): void;
 
-	error(message: string): void;
+	error(message: string, context?: string): void;
 
-	warning(message: string): void;
+	warning(message: string, context?: string): void;
 
-	notice(message: string): void;
+	notice(message: string, context?: string): void;
 
-	info(message: string): void;
+	info(message: string, context?: string): void;
 
-	debug(message: string): void;
+	debug(message: string, context?: string): void;
 
 	isValidLevel(level: string): boolean;
 

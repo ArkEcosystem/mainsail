@@ -114,36 +114,36 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		return this;
 	}
 
-	public emergency(message: string): void {
-		this.#log("emergency", message);
+	public emergency(message: string, context?: string): void {
+		this.#log("emergency", message, context);
 	}
 
-	public alert(message: string): void {
-		this.#log("alert", message);
+	public alert(message: string, context?: string): void {
+		this.#log("alert", message, context);
 	}
 
-	public critical(message: string): void {
-		this.#log("critical", message);
+	public critical(message: string, context?: string): void {
+		this.#log("critical", message, context);
 	}
 
-	public error(message: string): void {
-		this.#log("error", message);
+	public error(message: string, context?: string): void {
+		this.#log("error", message, context);
 	}
 
-	public warning(message: string): void {
-		this.#log("warning", message);
+	public warning(message: string, context?: string): void {
+		this.#log("warning", message, context);
 	}
 
-	public notice(message: string): void {
-		this.#log("notice", message);
+	public notice(message: string, context?: string): void {
+		this.#log("notice", message, context);
 	}
 
-	public info(message: string): void {
-		this.#log("info", message);
+	public info(message: string, context?: string): void {
+		this.#log("info", message, context);
 	}
 
-	public debug(message: string): void {
-		this.#log("debug", message);
+	public debug(message: string, context?: string): void {
+		this.#log("debug", message, context);
 	}
 
 	public suppressConsoleOutput(suppress: boolean): void {
@@ -167,7 +167,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		}
 	}
 
-	#log(level: string, message: string): void {
+	#log(level: string, message: string, context: string = "SYSTEM"): void {
 		if (this.#silentConsole) {
 			return;
 		}
@@ -180,7 +180,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			message = inspect(message, { depth: 1 });
 		}
 
-		this.#logger[level](this.#padMessage(level, message));
+		this.#logger[level](this.#padMessage(level, `[${context}] ${message}`));
 	}
 
 	#padMessage(level: string, message: string): string {
