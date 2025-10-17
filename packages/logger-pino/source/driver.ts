@@ -17,6 +17,8 @@ import { inspect } from "util";
 export class PinoLogger implements Contracts.Kernel.Logger {
 	static LOG_LEVELS = new Set(["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"]);
 
+	static MAX_LEVEL_LENGTH = Math.max(...Array.from(PinoLogger.LOG_LEVELS).map((level) => level.length));
+
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -178,7 +180,13 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			message = inspect(message, { depth: 1 });
 		}
 
-		this.#logger[level](message);
+		this.#logger[level](this.#padMessage(level, message));
+	}
+
+	#padMessage(level: string, message: string): string {
+		const paddingLength = PinoLogger.MAX_LEVEL_LENGTH - level.length;
+
+		return `${" ".repeat(paddingLength)}${message}`;
 	}
 
 	#createPrettyTransport(level: string, prettyOptions?: PrettyOptions): Transform {
