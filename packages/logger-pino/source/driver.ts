@@ -114,35 +114,35 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		return this;
 	}
 
-	public emergency(message: string, context?: string): void {
+	public emergency(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("emergency", message, context);
 	}
 
-	public alert(message: string, context?: string): void {
+	public alert(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("alert", message, context);
 	}
 
-	public critical(message: string, context?: string): void {
+	public critical(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("critical", message, context);
 	}
 
-	public error(message: string, context?: string): void {
+	public error(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("error", message, context);
 	}
 
-	public warning(message: string, context?: string): void {
+	public warning(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("warning", message, context);
 	}
 
-	public notice(message: string, context?: string): void {
+	public notice(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("notice", message, context);
 	}
 
-	public info(message: string, context?: string): void {
+	public info(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("info", message, context);
 	}
 
-	public debug(message: string, context?: string): void {
+	public debug(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("debug", message, context);
 	}
 
@@ -167,7 +167,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		}
 	}
 
-	#log(level: string, message: string, context: string = "SYSTEM"): void {
+	#log(level: string, message: string, context: Contracts.Kernel.LoggerContext = "system"): void {
 		if (this.#silentConsole) {
 			return;
 		}

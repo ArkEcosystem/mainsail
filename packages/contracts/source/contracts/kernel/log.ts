@@ -1,19 +1,21 @@
+export type LoggerContext = "system" | "evm" | "consensus" | "p2p";
+
 export interface Logger {
-	emergency(message: string, context?: string): void;
+	emergency(message: string, context?: LoggerContext): void;
 
-	alert(message: string, context?: string): void;
+	alert(message: string, context?: LoggerContext): void;
 
-	critical(message: string, context?: string): void;
+	critical(message: string, context?: LoggerContext): void;
 
-	error(message: string, context?: string): void;
+	error(message: string, context?: LoggerContext): void;
 
-	warning(message: string, context?: string): void;
+	warning(message: string, context?: LoggerContext): void;
 
-	notice(message: string, context?: string): void;
+	notice(message: string, context?: LoggerContext): void;
 
-	info(message: string, context?: string): void;
+	info(message: string, context?: LoggerContext): void;
 
-	debug(message: string, context?: string): void;
+	debug(message: string, context?: LoggerContext): void;
 
 	isValidLevel(level: string): boolean;
 
