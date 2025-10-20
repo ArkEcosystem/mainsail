@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { assert, isEmpty } from "@mainsail/utils";
 import chalk, { ChalkInstance } from "chalk";
-import * as Colorette from "colorette";
+import { Color, Colorette } from "colorette";
 import { error as console_error } from "console";
 import pino, { LogDescriptor } from "pino";
 import { prettyFactory, PrettyOptions } from "pino-pretty";
@@ -15,10 +15,10 @@ import { PassThrough, Writable } from "stream";
 import { inspect } from "util";
 
 type ColoretteColorNames = keyof Pick<
-	Colorette.Colorette,
+	Colorette,
 	{
-		[K in keyof Colorette.Colorette]: Colorette.Colorette[K] extends Colorette.Color ? K : never;
-	}[keyof Colorette.Colorette]
+		[K in keyof Colorette]: Colorette[K] extends Color ? K : never;
+	}[keyof Colorette]
 >;
 
 @injectable()
@@ -219,15 +219,16 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		log: LogDescriptor,
 		messageKey: string,
 		levelLabel: string,
-		{ colors }: { colors: Colorette.Colorette },
+		{ colors }: { colors: Colorette },
 	): string {
 		const levelPadding = PinoLogger.MAX_LEVEL_LENGTH - log.level.length;
-		const contextPadding = PinoLogger.MAX_CONTEXT_LENGTH - log.context.length;
+		// const contextPadding = PinoLogger.MAX_CONTEXT_LENGTH - log.context.length;
 
 		let message = "";
 		message += `${" ".repeat(levelPadding)}`;
-		message += `[${log.context.toUpperCase()}${".".repeat(contextPadding)}]`;
-		message += `\t${log[messageKey]}`;
+		// message += `[${log.context.toUpperCase()}${".".repeat(contextPadding)}]`;
+		message += `[${log.context.toUpperCase().slice(0, 3)}]`;
+		message += ` ${log[messageKey]}`;
 
 		if (this.#contextStyles[log.context]) {
 			const colorName = this.#contextStyles[log.context];
