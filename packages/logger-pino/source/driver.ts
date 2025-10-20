@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { assert, isEmpty } from "@mainsail/utils";
@@ -184,7 +185,22 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			message = inspect(message, { depth: 1 });
 		}
 
-		this.#logger[level](this.#padMessage(level, this.#createMessage(context, message)));
+		if (this.#logger === undefined) {
+			return;
+		}
+
+		if (this.#logger.child === undefined) {
+			// console.log(" NOT A CHILD", this.app.thread());
+			// console.log(this.#logger);
+			return;
+		} else {
+			// console.log(" IS A CHILD");
+			// console.log(this.#logger);
+		}
+
+		const logger = this.#logger.child({ context });
+
+		logger[level](this.#padMessage(level, message));
 	}
 
 	#padMessage(level: string, message: string): string {
@@ -193,16 +209,25 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		return `${" ".repeat(paddingLength)}${message}`;
 	}
 
-	#createMessage(context: string, message: string): string {
-		const paddingLength = PinoLogger.MAX_CONTEXT_LENGTH - context.length;
+	// #createMessage(context: string, message: string): string {
+	// 	const paddingLength = PinoLogger.MAX_CONTEXT_LENGTH - context.length;
 
-		return `[${context}]${" ".repeat(paddingLength)} ${message}`;
+	// 	return `[${context}]${" ".repeat(paddingLength)} ${message}`;
+	// }
+
+	#messageFormat(log: LogDescriptor, messageKey: string, levelLabel: string, { colors }: any): string {
+		// return `This is a ${colors.red("colorized")}, custom message: ${log[messageKey]}`;
+		// return `TEST [${log.level}] [${log.context}] ${log[messageKey]}`;
+		const message = `[${log.context}] ${log[messageKey]}`;
+
+		return `${colors.red(message)}`;
 	}
 
 	#createPrettyTransport(level: string, prettyOptions?: PrettyOptions): Transform {
 		const pinoPretty = prettyFactory({
-			ignore: "pid",
+			ignore: "pid,context",
 			levelFirst: false,
+			messageFormat: this.#messageFormat.bind(this),
 			translateTime: "yyyy-mm-dd HH:MM:ss.l",
 			...prettyOptions,
 		});
