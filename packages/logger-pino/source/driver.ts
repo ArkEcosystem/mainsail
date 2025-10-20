@@ -47,7 +47,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 	readonly #contextStyles: Record<string, ColoretteColorNames> = {
 		consensus: "white",
-		// system: "red",
+		p2p: "gray",
 	};
 
 	#stream!: PassThrough;
