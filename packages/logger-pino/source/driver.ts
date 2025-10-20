@@ -2,6 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { assert, isEmpty } from "@mainsail/utils";
 import chalk, { ChalkInstance } from "chalk";
+import * as Colorette from "colorette";
 import { error as console_error } from "console";
 import pino, { LogDescriptor } from "pino";
 import { prettyFactory, PrettyOptions } from "pino-pretty";
@@ -12,6 +13,13 @@ import { createStream } from "rotating-file-stream";
 import split from "split2";
 import { PassThrough, Writable } from "stream";
 import { inspect } from "util";
+
+type ColoretteColorNames = keyof Pick<
+	Colorette.Colorette,
+	{
+		[K in keyof Colorette.Colorette]: Colorette.Colorette[K] extends Colorette.Color ? K : never;
+	}[keyof Colorette.Colorette]
+>;
 
 @injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
@@ -35,6 +43,11 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		info: chalk.blue,
 		notice: chalk.green,
 		warning: chalk.yellow,
+	};
+
+	readonly #contextStyles: Record<string, ColoretteColorNames> = {
+		consensus: "white",
+		// system: "red",
 	};
 
 	#stream!: PassThrough;
@@ -202,13 +215,23 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		logger[level](message);
 	}
 
-	#messageFormat(log: LogDescriptor, messageKey: string, levelLabel: string, { colors }: any): string {
+	#messageFormat(
+		log: LogDescriptor,
+		messageKey: string,
+		levelLabel: string,
+		{ colors }: { colors: Colorette.Colorette },
+	): string {
 		const levelPadding = PinoLogger.MAX_LEVEL_LENGTH - log.level.length;
 		const contextPadding = PinoLogger.MAX_CONTEXT_LENGTH - log.context.length;
 
 		const message = `${" ".repeat(levelPadding)}[${log.context.toUpperCase()}${".".repeat(contextPadding)}]\t${log[messageKey]}`;
 
-		return `${colors.white(message)}`;
+		if (this.#contextStyles[log.context]) {
+			const colorName = this.#contextStyles[log.context];
+			return `${colors[colorName](message)}`;
+		}
+
+		return message;
 	}
 
 	#createPrettyTransport(level: string, prettyOptions?: PrettyOptions): Transform {
