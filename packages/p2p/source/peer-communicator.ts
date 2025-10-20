@@ -88,12 +88,12 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	public async getPeers(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetPeersResponse> {
-		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`);
+		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`, "p2p");
 		return this.emit(peer, Routes.GetPeers, {}, { timeout: 5000 });
 	}
 
 	public async getApiNodes(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetApiNodesResponse> {
-		this.logger.debug(`Fetching API nodes from ${peer.url}`);
+		this.logger.debug(`Fetching API nodes from ${peer.url}`, "p2p");
 		return this.emit(peer, Routes.GetApiNodes, {}, { timeout: 5000 });
 	}
 
@@ -125,6 +125,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		if (result.blocks.length === 0) {
 			this.logger.debug(
 				`Peer ${peer.ip} did not return any blocks via block number ${fromBlockNumber.toLocaleString()}.`,
+				"p2p",
 			);
 		}
 
@@ -134,13 +135,16 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	private validateReply(peer: Contracts.P2P.Peer, reply: any, endpoint: string) {
 		const schema = replySchemas[endpoint];
 		if (schema === undefined) {
-			this.logger.error(`Can't validate reply from "${endpoint}": none of the predefined schemas matches.`);
+			this.logger.error(
+				`Can't validate reply from "${endpoint}": none of the predefined schemas matches.`,
+				"p2p",
+			);
 			return false;
 		}
 
 		const { error } = this.validator.validate(schema, reply);
 		if (error) {
-			this.logger.debugExtra(`Got unexpected reply from ${peer.url}/${endpoint}: ${error}`);
+			this.logger.debugExtra(`Got unexpected reply from ${peer.url}/${endpoint}: ${error}`, "p2p");
 
 			return false;
 		}

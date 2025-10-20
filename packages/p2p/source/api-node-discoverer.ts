@@ -41,7 +41,7 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 				}>("validateAndAcceptApiNode", { apiNode, options: {} });
 			}
 		} catch (error) {
-			this.logger.debug(`Failed to get api nodes from ${peer.ip}: ${error.message}`);
+			this.logger.debug(`Failed to get api nodes from ${peer.ip}: ${error.message}`, "p2p");
 		}
 	}
 

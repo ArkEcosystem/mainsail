@@ -80,7 +80,7 @@ export class Server implements Contracts.P2P.Server {
 	public async boot(): Promise<void> {
 		try {
 			await this.server.start();
-			this.logger.info(`${this.name} started at ${this.server.info.uri}`);
+			this.logger.info(`${this.name} started at ${this.server.info.uri}`, "p2p");
 		} catch (error) {
 			await this.app.terminate(`Failed to start ${this.name} Server!`, error);
 		}
@@ -89,7 +89,7 @@ export class Server implements Contracts.P2P.Server {
 	public async dispose(): Promise<void> {
 		try {
 			await this.server.stop();
-			this.logger.info(`${this.name} stopped at ${this.server.info.uri}`);
+			this.logger.info(`${this.name} stopped at ${this.server.info.uri}`, "p2p");
 		} catch (error) {
 			await this.app.terminate(`Failed to stop ${this.name} Server!`, error);
 		}
