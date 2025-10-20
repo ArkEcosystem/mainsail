@@ -224,7 +224,10 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		const levelPadding = PinoLogger.MAX_LEVEL_LENGTH - log.level.length;
 		const contextPadding = PinoLogger.MAX_CONTEXT_LENGTH - log.context.length;
 
-		const message = `${" ".repeat(levelPadding)}[${log.context.toUpperCase()}${".".repeat(contextPadding)}]\t${log[messageKey]}`;
+		let message = "";
+		message += `${" ".repeat(levelPadding)}`;
+		message += `[${log.context.toUpperCase()}${".".repeat(contextPadding)}]`;
+		message += `\t${log[messageKey]}`;
 
 		if (this.#contextStyles[log.context]) {
 			const colorName = this.#contextStyles[log.context];
