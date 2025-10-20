@@ -1,10 +1,9 @@
-// @ts-nocheck
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { assert, isEmpty } from "@mainsail/utils";
 import chalk, { ChalkInstance } from "chalk";
 import { error as console_error } from "console";
-import pino from "pino";
+import pino, { LogDescriptor } from "pino";
 import { prettyFactory, PrettyOptions } from "pino-pretty";
 import pump from "pump";
 import pumpify from "pumpify";
@@ -200,27 +199,16 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 		const logger = this.#logger.child({ context });
 
-		logger[level](this.#padMessage(level, message));
+		logger[level](message);
 	}
-
-	#padMessage(level: string, message: string): string {
-		const paddingLength = PinoLogger.MAX_LEVEL_LENGTH - level.length;
-
-		return `${" ".repeat(paddingLength)}${message}`;
-	}
-
-	// #createMessage(context: string, message: string): string {
-	// 	const paddingLength = PinoLogger.MAX_CONTEXT_LENGTH - context.length;
-
-	// 	return `[${context}]${" ".repeat(paddingLength)} ${message}`;
-	// }
 
 	#messageFormat(log: LogDescriptor, messageKey: string, levelLabel: string, { colors }: any): string {
-		// return `This is a ${colors.red("colorized")}, custom message: ${log[messageKey]}`;
-		// return `TEST [${log.level}] [${log.context}] ${log[messageKey]}`;
-		const message = `[${log.context}] ${log[messageKey]}`;
+		const levelPadding = PinoLogger.MAX_LEVEL_LENGTH - log.level.length;
+		const contextPadding = PinoLogger.MAX_CONTEXT_LENGTH - log.context.length;
 
-		return `${colors.red(message)}`;
+		const message = `${" ".repeat(levelPadding)}[${log.context.toUpperCase()}${".".repeat(contextPadding)}]\t${log[messageKey]}`;
+
+		return `${colors.white(message)}`;
 	}
 
 	#createPrettyTransport(level: string, prettyOptions?: PrettyOptions): Transform {
