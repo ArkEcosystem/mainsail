@@ -12,16 +12,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			Identifiers.Services.Log.Manager,
 		);
 
-		await logManager.extend("pino", async () => {
-			const logger = this.app.resolve<PinoLogger>(PinoLogger);
-
-			if (this.app.thread() === "main") {
-				return logger.make(this.config().all());
-			}
-
-			// Log output from workers is piped to main logger via Ipc.Subprocess.
-			return logger.make({ workerMode: true });
-		});
+		await logManager.extend("pino", async () => this.app.resolve(PinoLogger).make(this.config().all()));
 
 		logManager.setDefaultDriver("pino");
 	}
