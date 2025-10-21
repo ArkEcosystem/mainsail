@@ -1,6 +1,7 @@
 import { Container, inject } from "./ioc.js";
 import { injectable } from "./decorators.js";
 
+import { ServiceIdentifier, BindToFluentSyntax, Newable } from "inversify";
 // import { Container, inject, injectable } from "inversify";
 
 import { describe } from "../../test-framework/source";
@@ -13,6 +14,22 @@ const Identifiers = {
 
 @injectable()
 class App {
+	public constructor(public readonly container: Container) {
+		this.container.bind(Identifiers.App).toConstantValue(this);
+	}
+
+	public bind<T>(serviceIdentifier: ServiceIdentifier<T>): BindToFluentSyntax<T> {
+		return this.container.bind(serviceIdentifier);
+	}
+
+	public get<T>(serviceIdentifier: ServiceIdentifier<T>): T {
+		return this.container.get(serviceIdentifier);
+	}
+
+	public resolve<T>(constructorFunction: Newable<T>): T {
+		return this.container.get(constructorFunction, { autobind: true });
+	}
+
 	public thread(): string {
 		return "main";
 	}
@@ -37,25 +54,23 @@ class ChildClass extends BaseClass {
 }
 
 describe<{
-	container: Container;
+	app: App;
 }>("anyAncestorOrTargetTaggedFirst", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.container = new Container();
-		const container = context.container;
-		container.bind(Identifiers.App).to(App).inSingletonScope();
-		container.bind(Identifiers.Base).to(BaseClass).inSingletonScope();
-		container.bind(Identifiers.Child).to(ChildClass).inSingletonScope();
+		const app = (context.app = new App(new Container()));
+
+		app.bind(Identifiers.Base).to(BaseClass).inSingletonScope();
+		app.bind(Identifiers.Child).to(ChildClass).inSingletonScope();
 	});
 
-	it("should work with bindings", ({ container }) => {
-		assert.equal(container.get<App>(Identifiers.App).thread(), "main");
-		assert.equal(container.get<BaseClass>(Identifiers.Base).getThreadFromBase(), "main");
-		assert.equal(container.get<ChildClass>(Identifiers.Child).getThreadFromChild(), "main");
+	it("should work with get", ({ app }) => {
+		assert.equal(app.get<App>(Identifiers.App).thread(), "main");
+		assert.equal(app.get<BaseClass>(Identifiers.Base).getThreadFromBase(), "main");
+		assert.equal(app.get<ChildClass>(Identifiers.Child).getThreadFromChild(), "main");
 	});
 
-	it("should work with get", ({ container }) => {
-		assert.equal(container.get(App, { autobind: true }).thread(), "main");
-		assert.equal(container.get(BaseClass, { autobind: true }).getThreadFromBase(), "main");
-		assert.equal(container.get(ChildClass, { autobind: true }).getThreadFromChild(), "main");
+	it("should work with resolve", ({ app }) => {
+		assert.equal(app.resolve(BaseClass).getThreadFromBase(), "main");
+		assert.equal(app.resolve(ChildClass).getThreadFromChild(), "main");
 	});
 });
