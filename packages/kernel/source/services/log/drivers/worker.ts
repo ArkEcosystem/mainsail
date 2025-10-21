@@ -68,6 +68,6 @@ export class WorkerLogger implements Contracts.Kernel.Logger {
 			message = inspect(message, { depth: 1 });
 		}
 
-		process.stdout.write(`[${level}] (threadId) ${message}\n`);
+		process.stdout.write(`[${level}] ${message}\n`);
 	}
 }
