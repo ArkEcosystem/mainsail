@@ -1,14 +1,18 @@
 import { describe, Sandbox } from "../../../test-framework/source";
 import { InstanceManager } from "./instance-manager";
+import { injectable } from "@mainsail/container";
 
 interface MyDriver {}
 
+@injectable()
 class MyMemoryDriver implements MyDriver {}
 
+@injectable()
 class MyRemoteDriver implements MyDriver {
 	name: "remote";
 }
 
+@injectable()
 class MyManager extends InstanceManager<MyDriver> {
 	protected getDefaultDriver(): string {
 		return "memory";
@@ -38,7 +42,6 @@ describe<{
 
 	it("should throw when default driver cannot be created", async ({ sandbox }) => {
 		const invalidManager = sandbox.app.resolve(MyInvalidManager);
-		invalidManager.init();
 		const promise = invalidManager.boot();
 
 		await assert.rejects(() => promise);
@@ -46,8 +49,6 @@ describe<{
 
 	it("should return default driver instance", async ({ sandbox }) => {
 		const manager = sandbox.app.resolve(MyManager);
-		manager.init();
-
 		await manager.boot();
 		const memoryDriver = manager.driver();
 
@@ -56,8 +57,6 @@ describe<{
 
 	it("should return set driver instance", async ({ sandbox }) => {
 		const manager = sandbox.app.resolve(MyManager);
-		manager.init();
-
 		await manager.boot();
 		await manager.extend("remote", async () => new MyRemoteDriver());
 		manager.setDefaultDriver("remote");
@@ -68,8 +67,6 @@ describe<{
 
 	it("should return driver instance", async ({ sandbox }) => {
 		const manager = sandbox.app.resolve(MyManager);
-		manager.init();
-
 		await manager.boot();
 		await manager.extend("remote", async () => new MyRemoteDriver());
 		const remoteDriver = manager.driver("remote");
@@ -79,7 +76,6 @@ describe<{
 
 	it("should throw when attempting to get unknown driver instance", async ({ sandbox }) => {
 		const manager = sandbox.app.resolve(MyManager);
-		manager.init();
 
 		const check = () => manager.driver("some");
 
@@ -88,8 +84,6 @@ describe<{
 
 	it("should return driver instances", async ({ sandbox }) => {
 		const manager = sandbox.app.resolve(MyManager);
-		manager.init();
-
 		await manager.boot();
 		await manager.extend("remote", async () => new MyRemoteDriver());
 		const drivers = manager.getDrivers();
