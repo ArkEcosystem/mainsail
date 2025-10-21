@@ -1,21 +1,11 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { isEmpty } from "@mainsail/utils";
-import chalk, { ChalkInstance } from "chalk";
 import { inspect } from "util";
 
 @injectable()
 export class WorkerLogger implements Contracts.Kernel.Logger {
-	protected readonly levelStyles: Record<string, ChalkInstance> = {
-		alert: chalk.red,
-		critical: chalk.red,
-		debug: chalk.magenta,
-		emergency: chalk.bgRed,
-		error: chalk.red,
-		info: chalk.blue,
-		notice: chalk.green,
-		warning: chalk.yellow,
-	};
+	#levels = new Set(["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"]);
 
 	protected silentConsole = false;
 
@@ -56,7 +46,7 @@ export class WorkerLogger implements Contracts.Kernel.Logger {
 	}
 
 	public isValidLevel(level: string): boolean {
-		return !!this.levelStyles[level];
+		return this.#levels.has(level);
 	}
 
 	public suppressConsoleOutput(suppress: boolean): void {
