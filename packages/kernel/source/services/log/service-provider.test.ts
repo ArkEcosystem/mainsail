@@ -23,7 +23,7 @@ describe<{
 		assert.true(context.app.isBound(Identifiers.Services.Log.Service));
 	});
 
-	it("should create an instance of the MemoryPipeline", async (context) => {
+	it("should create an instance of the MemoryDriver", async (context) => {
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
 		assert.instance(context.app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service), MemoryLogger);

@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { pascalCase } from "@mainsail/utils";
 
@@ -7,11 +7,12 @@ export abstract class InstanceManager<T> {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	#defaultDriver: string;
+	#defaultDriver!: string;
 
 	#drivers: Map<string, T> = new Map<string, T>();
 
-	public constructor() {
+	@postConstruct()
+	public init() {
 		this.#defaultDriver = this.getDefaultDriver();
 	}
 
