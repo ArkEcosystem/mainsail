@@ -55,7 +55,7 @@ class ChildClass extends BaseClass {
 
 describe<{
 	app: App;
-}>("anyAncestorOrTargetTaggedFirst", ({ assert, beforeEach, it }) => {
+}>("Decorators", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		const app = (context.app = new App(new Container()));
 
