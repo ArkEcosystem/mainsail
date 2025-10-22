@@ -8,10 +8,6 @@ export class Logger {
 	@inject(Identifiers.Output)
 	private readonly output!: Output;
 
-	public emergency(message: string | Error): void {
-		this.log(message, "error");
-	}
-
 	public alert(message: string | Error): void {
 		this.log(message, "error");
 	}

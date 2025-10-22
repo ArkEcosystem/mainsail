@@ -6,10 +6,6 @@ export class Logger implements Contracts.P2P.Logger {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	emergency(message: string, context?: Contracts.Kernel.LoggerContext): void {
-		this.logger.emergency(message, context);
-	}
-
 	alert(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.logger.alert(message, context);
 	}

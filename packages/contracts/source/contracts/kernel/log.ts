@@ -1,8 +1,6 @@
 export type LoggerContext = "system" | "evm" | "consensus" | "p2p" | "tx-pool" | "api";
 
 export interface Logger {
-	emergency(message: string, context?: LoggerContext): void;
-
 	alert(message: string, context?: LoggerContext): void;
 
 	fatal(message: string, context?: LoggerContext): void;

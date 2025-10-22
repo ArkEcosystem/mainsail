@@ -23,10 +23,6 @@ export class Logger implements Contracts.Kernel.Logger {
 		return this;
 	}
 
-	public emergency(message: any): void {
-		this.#log("error", message);
-	}
-
 	public alert(message: any): void {
 		this.#log("error", message);
 	}

@@ -10,7 +10,6 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 	protected readonly levelStyles: Record<string, ChalkInstance> = {
 		alert: chalk.red,
 		debug: chalk.magenta,
-		emergency: chalk.bgRed,
 		error: chalk.red,
 		fatal: chalk.red,
 		info: chalk.blue,
@@ -24,10 +23,6 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 
 	public async make(options: unknown): Promise<Contracts.Kernel.Logger> {
 		return this;
-	}
-
-	public emergency(message: string): void {
-		this.log("emergency", message);
 	}
 
 	public alert(message: string): void {

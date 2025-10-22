@@ -7,10 +7,6 @@ export class NullLogger implements Contracts.Kernel.Logger {
 		return this;
 	}
 
-	public emergency(message: any): void {
-		//
-	}
-
 	public alert(message: any): void {
 		//
 	}
