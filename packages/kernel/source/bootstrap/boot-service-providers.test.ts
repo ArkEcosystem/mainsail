@@ -60,7 +60,7 @@ describe<{
 		const spyBoot = spy(serviceProvider, "boot");
 		context.serviceProviderRepository.set("stub", serviceProvider);
 
-		await assert.resolves(() => bootServiceProviders.bootstrap());
+		await assert.rejects(() => bootServiceProviders.bootstrap());
 
 		spyBoot.calledOnce();
 	});
