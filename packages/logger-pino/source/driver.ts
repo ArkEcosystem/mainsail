@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { assert, isEmpty } from "@mainsail/utils";
 import chalk, { ChalkInstance } from "chalk";
 import type { Color, Colorette } from "colorette";
@@ -23,9 +23,9 @@ type ColoretteColorNames = keyof Pick<
 
 @injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
-	static LOG_LEVELS = new Set(["alert", "error", "warn", "notice", "info", "debug"]);
+	static LOG_LEVELS: Set<string> = new Set(Constants.LogLevels);
 
-	static MAX_LEVEL_LENGTH = Math.max(...[...PinoLogger.LOG_LEVELS].map((level) => level.length));
+	static MAX_LEVEL_LENGTH = Math.max(...Constants.LogLevels.map((level) => level.length));
 
 	static LOG_CONTEXTS: Contracts.Kernel.LoggerContext[] = ["system", "evm", "consensus", "p2p", "tx-pool", "api"];
 
@@ -274,7 +274,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		);
 	}
 
-	#isValidLevel(level: string): boolean {
+	#isValidLevel(level: Contracts.Kernel.LoggerContext): boolean {
 		return PinoLogger.LOG_LEVELS.has(level);
 	}
 }
