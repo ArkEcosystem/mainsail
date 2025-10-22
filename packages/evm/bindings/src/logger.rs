@@ -13,7 +13,7 @@ pub enum JsLogLevel {
     Emergency,
     Alert,
     Fatal,
-    Warning,
+    Warn,
 }
 
 impl From<LogLevel> for JsLogLevel {
@@ -25,7 +25,7 @@ impl From<LogLevel> for JsLogLevel {
             LogLevel::Emergency => Self::Emergency,
             LogLevel::Alert => Self::Alert,
             LogLevel::Fatal => Self::Fatal,
-            LogLevel::Warning => Self::Warning,
+            LogLevel::Warn => Self::Warn,
         }
     }
 }

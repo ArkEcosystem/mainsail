@@ -49,7 +49,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	app.bind(Identifiers.Services.Log.Service).toConstantValue({
 		debug: (message: string) => console.log(message),
 		info: (message: string) => console.log(message),
-		warning: (message: string) => console.log(message),
+		warn: (message: string) => console.log(message),
 	});
 	// Used for evm instance
 	app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({

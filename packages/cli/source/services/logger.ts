@@ -24,7 +24,7 @@ export class Logger {
 		this.log(message, "error");
 	}
 
-	public warning(message: string | Error): void {
+	public warn(message: string | Error): void {
 		this.log(message, "warn");
 	}
 

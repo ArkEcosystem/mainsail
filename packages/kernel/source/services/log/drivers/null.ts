@@ -23,7 +23,7 @@ export class NullLogger implements Contracts.Kernel.Logger {
 		//
 	}
 
-	public warning(message: any): void {
+	public warn(message: any): void {
 		//
 	}
 

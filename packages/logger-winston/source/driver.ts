@@ -39,7 +39,7 @@ export class Logger implements Contracts.Kernel.Logger {
 		this.#log("error", message);
 	}
 
-	public warning(message: any): void {
+	public warn(message: any): void {
 		this.#log("warn", message);
 	}
 

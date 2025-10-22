@@ -96,7 +96,7 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 				// The dependency is optional for this package to function. We'll only output a warning.
 				const error = new Exceptions.OptionalDependencyCannotBeFound(serviceProviderName, name);
 
-				this.logger.warning(error.message);
+				this.logger.warn(error.message);
 
 				serviceProviders.fail(serviceProviderName);
 
@@ -115,7 +115,7 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 						await this.app.terminate(error.message, error);
 					}
 
-					this.logger.warning(error.message);
+					this.logger.warn(error.message);
 
 					serviceProviders.fail(serviceProviderName);
 				}

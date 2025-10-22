@@ -3,7 +3,7 @@ export enum LogLevel {
 	Alert = 1,
 	Fatal = 2,
 	Error = 3,
-	Warning = 4,
+	Warn = 4,
 	Notice = 5,
 	Informational = 6,
 	Debug = 7,

@@ -9,7 +9,7 @@ export interface Logger {
 
 	error(message: string, context?: LoggerContext): void;
 
-	warning(message: string, context?: LoggerContext): void;
+	warn(message: string, context?: LoggerContext): void;
 
 	notice(message: string, context?: LoggerContext): void;
 

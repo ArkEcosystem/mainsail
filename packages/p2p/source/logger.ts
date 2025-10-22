@@ -22,13 +22,13 @@ export class Logger implements Contracts.P2P.Logger {
 		this.logger.error(message, context);
 	}
 
-	warning(message: string, context?: Contracts.Kernel.LoggerContext): void {
-		this.logger.warning(message, context);
+	warn(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.logger.warn(message, context);
 	}
 
 	warningExtra(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		if (this.#allowExtra()) {
-			this.logger.warning(message, context);
+			this.logger.warn(message, context);
 		}
 	}
 
