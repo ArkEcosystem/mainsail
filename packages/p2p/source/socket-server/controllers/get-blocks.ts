@@ -54,6 +54,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 				blocksToReturn.length,
 				true,
 			)} from block number ${requestBlockNumber.toLocaleString()}`,
+			"p2p",
 		);
 
 		return { blocks: blocksToReturn };

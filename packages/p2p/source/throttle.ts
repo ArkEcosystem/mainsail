@@ -57,6 +57,7 @@ export class Throttle {
 		if (await this.#outgoingRateLimiter.hasExceededRateLimitNoConsume(peer.ip, event)) {
 			this.logger.debug(
 				`Throttling outgoing requests to ${peer.ip}/${event} to avoid triggering their rate limit`,
+				"p2p",
 			);
 
 			await delay(100);

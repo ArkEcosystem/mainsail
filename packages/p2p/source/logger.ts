@@ -6,47 +6,47 @@ export class Logger implements Contracts.P2P.Logger {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	emergency(message: any): void {
-		this.logger.emergency(message);
+	emergency(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.logger.emergency(message, context);
 	}
 
-	alert(message: any): void {
-		this.logger.alert(message);
+	alert(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.logger.alert(message, context);
 	}
 
-	critical(message: any): void {
-		this.logger.critical(message);
+	critical(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.logger.critical(message, context);
 	}
 
-	error(message: any): void {
-		this.logger.error(message);
+	error(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.logger.error(message, context);
 	}
 
-	warning(message: any): void {
-		this.logger.warning(message);
+	warning(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.logger.warning(message, context);
 	}
 
-	warningExtra(message: any): void {
+	warningExtra(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		if (this.#allowExtra()) {
-			this.logger.warning(message);
+			this.logger.warning(message, context);
 		}
 	}
 
-	notice(message: any): void {
-		this.logger.notice(message);
+	notice(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.logger.notice(message, context);
 	}
 
-	info(message: any): void {
-		this.logger.info(message);
+	info(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.logger.info(message, context);
 	}
 
-	debug(message: any): void {
-		this.logger.debug(message);
+	debug(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.logger.debug(message, context);
 	}
 
-	debugExtra(message: any): void {
+	debugExtra(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		if (this.#allowExtra()) {
-			this.logger.debug(message);
+			this.logger.debug(message, context);
 		}
 	}
 

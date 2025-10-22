@@ -79,6 +79,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		if (proposal.validRound >= proposal.round) {
 			this.logger.debug(
 				`Received proposal ${proposal.blockNumber}/${proposal.round} has validRound ${proposal.validRound} >= round ${proposal.round}`,
+				"consensus",
 			);
 
 			return false;
@@ -86,7 +87,10 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 
 		const lockProof = proposal.getData().lockProof;
 		if (!lockProof) {
-			this.logger.debug(`Received proposal ${proposal.blockNumber}/${proposal.round} with missing lock proof`);
+			this.logger.debug(
+				`Received proposal ${proposal.blockNumber}/${proposal.round} with missing lock proof`,
+				"consensus",
+			);
 			return true;
 		}
 
@@ -101,7 +105,10 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		const verified = await this.aggregator.verify(lockProof, data, roundValidators);
 
 		if (!verified) {
-			this.logger.debug(`Received proposal ${proposal.blockNumber}/${proposal.round} with invalid lock proof`);
+			this.logger.debug(
+				`Received proposal ${proposal.blockNumber}/${proposal.round} with invalid lock proof`,
+				"consensus",
+			);
 		}
 
 		return verified;

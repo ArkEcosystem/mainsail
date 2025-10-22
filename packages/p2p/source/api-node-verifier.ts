@@ -39,7 +39,7 @@ export class ApiNodeVerifier implements Contracts.P2P.ApiNodeVerifier {
 			this.#verifyHeaders(response);
 			this.#verifyResponseBody(response);
 		} catch (error) {
-			this.logger.debugExtra(`API node ${apiNode.url} verification failed: ${error.message}`);
+			this.logger.debugExtra(`API node ${apiNode.url} verification failed: ${error.message}`, "p2p");
 			return false;
 		}
 
