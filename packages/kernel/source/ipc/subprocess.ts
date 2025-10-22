@@ -30,11 +30,12 @@ export class Subprocess<T extends Record<string, any>> implements Contracts.Kern
 			}
 
 			const [, level, message] = match;
-			if (logger.isValidLevel(level)) {
-				logger[level](message, loggerContext);
-			} else {
-				logger.warning(`[unknown:${level}] ${message}`);
-			}
+			// if (logger.isValidLevel(level)) {
+			// 	logger[level](message, loggerContext);
+			// } else {
+			// 	logger.warning(`[unknown:${level}] ${message}`);
+			// }
+			logger[level](message, loggerContext);
 		});
 
 		this.subprocess.stderr.pipe(split()).on("data", (line) => {

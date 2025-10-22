@@ -39,10 +39,6 @@ export class NullLogger implements Contracts.Kernel.Logger {
 		//
 	}
 
-	public isValidLevel(level: string): boolean {
-		return true;
-	}
-
 	public suppressConsoleOutput(suppress: boolean): void {
 		//
 	}

@@ -88,7 +88,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			this.#stream,
 		);
 
-		if (this.isValidLevel(options.levels.console)) {
+		if (this.#isValidLevel(options.levels.console)) {
 			pump(
 				this.#stream,
 				split(),
@@ -101,7 +101,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			);
 		}
 
-		if (this.isValidLevel(options.levels.file)) {
+		if (this.#isValidLevel(options.levels.file)) {
 			this.#combinedFileStream = new pumpify(
 				split(),
 				this.#createPrettyTransport(options.levels.file, { colorize: false }),
@@ -286,7 +286,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		);
 	}
 
-	public isValidLevel(level: string): boolean {
+	#isValidLevel(level: string): boolean {
 		return PinoLogger.LOG_LEVELS.has(level);
 	}
 }
