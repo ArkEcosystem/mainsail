@@ -11,7 +11,7 @@ describeSkip<{
 	peers: Peer[];
 	block: any;
 }>("Broadcaster", ({ it, assert, beforeEach, stub, spy, each }) => {
-	const logger = { debug: () => {}, info: () => {}, warning: () => {} };
+	const logger = { debug: () => {}, info: () => {}, warn: () => {} };
 	const configuration = { getRequired: () => {} };
 	const repository = { getPeers: () => {} };
 	const communicator = { postBlock: () => {}, postTransactions: () => {} };
@@ -61,13 +61,13 @@ describeSkip<{
 	});
 
 	it("#broadcastTransactions - should warn when attempting to broadcast empty array", async ({ broadcaster }) => {
-		const spyLoggerWarning = stub(logger, "warning");
+		const spyLoggerWarn = stub(logger, "warn");
 		const spyCommunicatorPostTransactions = stub(communicator, "postTransactions");
 
 		await broadcaster.broadcastTransactions([]);
 
-		spyLoggerWarning.calledOnce();
-		spyLoggerWarning.calledWith("Broadcasting 0 transactions");
+		spyLoggerWarn.calledOnce();
+		spyLoggerWarn.calledWith("Broadcasting 0 transactions");
 		spyCommunicatorPostTransactions.neverCalled();
 	});
 
@@ -75,7 +75,7 @@ describeSkip<{
 		const peers = [{}, {}, {}];
 		const transactions = [{}];
 
-		const spyLoggerWarning = stub(logger, "warning");
+		const spyLoggerWarn = stub(logger, "warn");
 		const spyLoggerDebug = stub(logger, "debug");
 		const spyCommunicatorPostTransactions = stub(communicator, "postTransactions");
 		const spyConfigurationGetRequired = stub(configuration, "getRequired").returnValue(3);
@@ -84,7 +84,7 @@ describeSkip<{
 
 		await broadcaster.broadcastTransactions(transactions as Contracts.Crypto.Transaction[]);
 
-		spyLoggerWarning.neverCalled();
+		spyLoggerWarn.neverCalled();
 		spyLoggerDebug.calledWith("Broadcasting 1 transaction to 3 peers");
 		spyRepositoryGetPeers.calledOnce();
 		spySerialzierSerialzie.calledOnce();

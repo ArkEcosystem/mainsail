@@ -23,7 +23,7 @@ describe<{
 		context.logger = {
 			error: () => {},
 			notice: () => {},
-			warning: () => {},
+			warn: () => {},
 		};
 
 		context.app = new Application(new Container());

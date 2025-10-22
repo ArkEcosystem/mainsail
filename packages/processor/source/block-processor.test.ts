@@ -59,7 +59,7 @@
 // 			debug: () => {},
 // 			error: () => {},
 // 			info: () => {},
-// 			warning: () => {},
+// 			warn: () => {},
 // 		};
 // 		context.blockchain = {
 // 			clearQueue: () => {},

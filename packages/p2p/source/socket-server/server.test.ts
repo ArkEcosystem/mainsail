@@ -31,7 +31,7 @@ describeSkip<{ sandbox: Sandbox; server: ServerProxy }>("Server", ({ it, assert,
 	const name = "P2P server";
 	const options = { hostname: "127.0.0.1", port: 4000 };
 
-	const logger = { debug: () => {}, info: () => {}, warning: () => {} };
+	const logger = { debug: () => {}, info: () => {}, warn: () => {} };
 	const config = {
 		getRoundValidators: () => 51,
 		getMilestone: () => ({

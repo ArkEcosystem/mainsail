@@ -12,7 +12,7 @@ describeSkip<{
 	networkMonitor: Service;
 	configuration: Providers.PluginConfiguration;
 }>("NetworkMonitor", ({ it, assert, beforeEach, stub, spy, match, each }) => {
-	const logger = { debug: () => {}, error: () => {}, info: () => {}, notice: () => {}, warning: () => {} };
+	const logger = { debug: () => {}, error: () => {}, info: () => {}, notice: () => {}, warn: () => {} };
 
 	const emitter = { dispatch: () => {} };
 	const communicator = {
@@ -241,11 +241,11 @@ describeSkip<{
 		configuration.set("disableDiscovery", true);
 
 		const spyDiscoverPeers = spy(networkMonitor, "discoverPeers");
-		const spyLoggerWarning = spy(logger, "warning");
+		const spyLoggerWarn = spy(logger, "warn");
 
 		await networkMonitor.updateNetworkStatus();
 
-		spyLoggerWarning.calledWith("Skipped peer discovery because the relay is in non-discovery mode.");
+		spyLoggerWarn.calledWith("Skipped peer discovery because the relay is in non-discovery mode.");
 		spyDiscoverPeers.neverCalled();
 	});
 
