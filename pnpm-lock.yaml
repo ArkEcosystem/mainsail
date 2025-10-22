@@ -2099,6 +2099,9 @@ importers:
       chalk:
         specifier: 5.6.0
         version: 5.6.0
+      colorette:
+        specifier: 2.0.20
+        version: 2.0.20
       joi:
         specifier: 18.0.0
         version: 18.0.0
