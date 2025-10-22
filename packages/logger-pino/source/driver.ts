@@ -48,7 +48,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 	readonly #contextStyles: Record<string, ColoretteColorNames> = {
 		// consensus: "reset",
 		// evm: "reset",
-		p2p: "dim",
+		// p2p: "dim",
 		// system: "reset",
 	};
 
