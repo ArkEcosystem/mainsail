@@ -23,7 +23,7 @@ type ColoretteColorNames = keyof Pick<
 
 @injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
-	static LOG_LEVELS = new Set(["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"]);
+	static LOG_LEVELS = new Set(["alert", "error", "warn", "notice", "info", "debug"]);
 
 	static MAX_LEVEL_LENGTH = Math.max(...[...PinoLogger.LOG_LEVELS].map((level) => level.length));
 
@@ -36,13 +36,11 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 	readonly #levelStyles: Record<string, ChalkInstance> = {
 		alert: chalk.red,
-		critical: chalk.red,
 		debug: chalk.magenta,
-		emergency: chalk.bgRed,
 		error: chalk.red,
 		info: chalk.blue,
 		notice: chalk.green,
-		warning: chalk.yellow,
+		warn: chalk.yellow,
 	};
 
 	readonly #contextStyles: Record<string, ColoretteColorNames> = {
@@ -56,7 +54,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 	#combinedFileStream?: Writable;
 
-	#logger!: pino.Logger<"alert" | "critical" | "debug" | "emergency" | "error" | "info" | "notice" | "warning">;
+	#logger!: pino.Logger<"alert" | "debug" | "error" | "info" | "notice" | "warn">;
 
 	#silentConsole = false;
 
@@ -67,21 +65,19 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			{
 				base: null,
 				customLevels: {
-					alert: 1,
-					critical: 2,
-					debug: 7,
-					emergency: 0,
-					error: 3,
-					info: 6,
-					notice: 5,
-					warning: 4,
+					alert: 0,
+					debug: 5,
+					error: 1,
+					info: 4,
+					notice: 3,
+					warn: 2,
 				},
 				formatters: {
 					level(label, number) {
 						return { level: label, pid: process.pid };
 					},
 				},
-				level: "emergency",
+				level: "alert",
 				safe: true,
 				useOnlyCustomLevels: true,
 			},
@@ -118,24 +114,16 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		return this;
 	}
 
-	public emergency(message: string, context?: Contracts.Kernel.LoggerContext): void {
-		this.#log("emergency", message, context);
-	}
-
 	public alert(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("alert", message, context);
-	}
-
-	public critical(message: string, context?: Contracts.Kernel.LoggerContext): void {
-		this.#log("critical", message, context);
 	}
 
 	public error(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("error", message, context);
 	}
 
-	public warning(message: string, context?: Contracts.Kernel.LoggerContext): void {
-		this.#log("warning", message, context);
+	public warn(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.#log("warn", message, context);
 	}
 
 	public notice(message: string, context?: Contracts.Kernel.LoggerContext): void {

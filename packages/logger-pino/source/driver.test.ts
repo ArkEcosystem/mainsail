@@ -58,25 +58,11 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 		assert.match(context.message.trim(), "[ 'Hello World' ]");
 	});
 
-	it("should log a message with the [emergency] level", (context) => {
-		context.logger.emergency("emergency_message");
-
-		assert.match(context.message, /emergency/);
-		assert.match(context.message, /emergency_message/);
-	});
-
 	it("should log a message with the [alert] level", (context) => {
 		context.logger.alert("alert_message");
 
 		assert.match(context.message, /alert/);
 		assert.match(context.message, /alert_message/);
-	});
-
-	it("should log a message with the [critical] level", (context) => {
-		context.logger.critical("critical_message");
-
-		assert.match(context.message, /critical/);
-		assert.match(context.message, /critical_message/);
 	});
 
 	it("should log a message with the [error] level", (context) => {
@@ -86,10 +72,10 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 		assert.match(context.message, /error_message/);
 	});
 
-	it("should log a message with the [warning] level", (context) => {
-		context.logger.warning("warning_message");
+	it("should log a message with the [warn] level", (context) => {
+		context.logger.warn("warning_message");
 
-		assert.match(context.message, /warning/);
+		assert.match(context.message, /warn/);
 		assert.match(context.message, /warning_message/);
 	});
 
@@ -175,8 +161,8 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 				interval: "1s",
 			},
 			levels: {
-				console: process.env.MAINSAIL_LOG_LEVEL || "emergency",
-				file: process.env.MAINSAIL_LOG_LEVEL_FILE || "emergency",
+				console: process.env.MAINSAIL_LOG_LEVEL || "debug",
+				file: process.env.MAINSAIL_LOG_LEVEL_FILE || "debug",
 			},
 		});
 

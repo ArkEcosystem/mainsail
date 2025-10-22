@@ -18,7 +18,7 @@ describe<{
 	sandbox: Sandbox;
 	validatePlugin: ValidateDataPlugin;
 }>("ValidatePlugin", ({ it, assert, beforeEach, spy, match, stub }) => {
-	const logger = { debug: () => {}, warning: () => {} };
+	const logger = { debug: () => {}, warn: () => {} };
 	const configuration = { getRequired: () => {} };
 
 	const responsePayload = { status: "ok" };

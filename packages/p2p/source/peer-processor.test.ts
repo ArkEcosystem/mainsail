@@ -11,7 +11,7 @@ describeSkip<{
 	peerProcessor: PeerProcessor;
 	configuration: Providers.PluginConfiguration;
 }>("PeerProcessor", ({ it, assert, beforeEach, stub }) => {
-	const logger = { debug: () => {}, warning: () => {} };
+	const logger = { debug: () => {}, warn: () => {} };
 	const peerCommunicator = { ping: () => {} };
 	const peerConnector = { disconnect: () => {} };
 	const peerRepository = {
@@ -113,12 +113,12 @@ describeSkip<{
 	}) => {
 		const peer = new Peer("178.165.55.55", 4000);
 
-		const spyLoggerWarning = stub(logger, "warning");
+		const spyLoggerWarn = stub(logger, "warn");
 		configuration.set("disableDiscovery", true);
 
 		assert.false(peerProcessor.validatePeerIp(peer));
-		spyLoggerWarning.calledOnce();
-		spyLoggerWarning.calledWith(`Rejected ${peer.ip} because the relay is in non-discovery mode.`);
+		spyLoggerWarn.calledOnce();
+		spyLoggerWarn.calledWith(`Rejected ${peer.ip} because the relay is in non-discovery mode.`);
 
 		configuration.set("disableDiscovery", false);
 	});

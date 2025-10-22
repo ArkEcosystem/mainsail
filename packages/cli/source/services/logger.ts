@@ -8,15 +8,7 @@ export class Logger {
 	@inject(Identifiers.Output)
 	private readonly output!: Output;
 
-	public emergency(message: string | Error): void {
-		this.log(message, "error");
-	}
-
 	public alert(message: string | Error): void {
-		this.log(message, "error");
-	}
-
-	public critical(message: string | Error): void {
 		this.log(message, "error");
 	}
 
@@ -24,7 +16,7 @@ export class Logger {
 		this.log(message, "error");
 	}
 
-	public warning(message: string | Error): void {
+	public warn(message: string | Error): void {
 		this.log(message, "warn");
 	}
 

@@ -9,13 +9,11 @@ import { inspect } from "util";
 export class MemoryLogger implements Contracts.Kernel.Logger {
 	protected readonly levelStyles: Record<string, ChalkInstance> = {
 		alert: chalk.red,
-		critical: chalk.red,
 		debug: chalk.magenta,
-		emergency: chalk.bgRed,
 		error: chalk.red,
 		info: chalk.blue,
 		notice: chalk.green,
-		warning: chalk.yellow,
+		warn: chalk.yellow,
 	};
 
 	protected silentConsole = false;
@@ -26,24 +24,16 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 		return this;
 	}
 
-	public emergency(message: string): void {
-		this.log("emergency", message);
-	}
-
 	public alert(message: string): void {
 		this.log("alert", message);
-	}
-
-	public critical(message: string): void {
-		this.log("critical", message);
 	}
 
 	public error(message: string): void {
 		this.log("error", message);
 	}
 
-	public warning(message: string): void {
-		this.log("warning", message);
+	public warn(message: string): void {
+		this.log("warn", message);
 	}
 
 	public notice(message: string): void {

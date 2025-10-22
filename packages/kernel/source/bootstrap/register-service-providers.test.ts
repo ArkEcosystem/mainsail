@@ -30,7 +30,7 @@ describe<{
 		context.logger = {
 			error: () => {},
 			notice: () => {},
-			warning: () => {},
+			warn: () => {},
 		};
 
 		context.app = new Application(new Container());
@@ -162,10 +162,10 @@ describe<{
 		serviceProvider.setConfig(context.app.resolve(PluginConfiguration));
 		context.serviceProviderRepository.set("stub", serviceProvider);
 
-		const spyWarning = spy(context.logger, "warning");
+		const spyWarn = spy(context.logger, "warn");
 		await context.app.resolve<RegisterServiceProviders>(RegisterServiceProviders).bootstrap();
 
-		spyWarning.calledWith(
+		spyWarn.calledWith(
 			'The "deps-optional" package is missing. Please, make sure to install this library to take advantage of stub.',
 		);
 		assert.true(context.serviceProviderRepository.failed("stub"));
@@ -211,10 +211,10 @@ describe<{
 		context.serviceProviderRepository.set("stub", serviceProvider);
 		context.serviceProviderRepository.set("dep", new StubServiceProvider());
 
-		const spyWarning = spy(context.logger, "warning");
+		const spyWarn = spy(context.logger, "warn");
 		await context.app.resolve<RegisterServiceProviders>(RegisterServiceProviders).bootstrap();
 
-		spyWarning.calledWith('Expected "dep" to satisfy ">=2.0.0" but received "1.0.0".');
+		spyWarn.calledWith('Expected "dep" to satisfy ">=2.0.0" but received "1.0.0".');
 		assert.true(context.serviceProviderRepository.failed("stub"));
 	});
 });

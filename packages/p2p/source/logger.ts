@@ -6,29 +6,21 @@ export class Logger implements Contracts.P2P.Logger {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	emergency(message: string, context?: Contracts.Kernel.LoggerContext): void {
-		this.logger.emergency(message, context);
-	}
-
 	alert(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.logger.alert(message, context);
-	}
-
-	critical(message: string, context?: Contracts.Kernel.LoggerContext): void {
-		this.logger.critical(message, context);
 	}
 
 	error(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.logger.error(message, context);
 	}
 
-	warning(message: string, context?: Contracts.Kernel.LoggerContext): void {
-		this.logger.warning(message, context);
+	warn(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.logger.warn(message, context);
 	}
 
 	warningExtra(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		if (this.#allowExtra()) {
-			this.logger.warning(message, context);
+			this.logger.warn(message, context);
 		}
 	}
 

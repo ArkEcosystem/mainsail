@@ -416,7 +416,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 						`importing legacy delegate ${validator.arkAddress} (${validator.username}) with valid blsPublicKey '${validator.blsPublicKey}'`,
 					);
 				} else {
-					this.logger.warning(
+					this.logger.warn(
 						`importing legacy delegate ${validator.arkAddress} (${validator.username}) with invalid blsPublicKey '${validator.blsPublicKey}'`,
 					);
 				}

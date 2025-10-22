@@ -170,7 +170,7 @@ export class Application implements Contracts.Kernel.Application {
 		this.#terminating = true;
 
 		if (reason) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service)[error ? "error" : "warning"](
+			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service)[error ? "error" : "warn"](
 				`Application shutdown: ${reason}`,
 			);
 		}
@@ -189,7 +189,7 @@ export class Application implements Contracts.Kernel.Application {
 		}
 
 		const timeout = setTimeout(() => {
-			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warning(
+			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warn(
 				"Force application termination. Service providers did not dispose in time.",
 			);
 			exit(1);
@@ -300,7 +300,7 @@ export class Application implements Contracts.Kernel.Application {
 			const fsRequests = resourcesInfo.filter((resource) => resource.includes("FSReqCallback"));
 
 			if (timeouts.length > 0 || fsRequests.length > 0) {
-				this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warning(
+				this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warn(
 					`There are ${timeouts.length} active timeouts and ${fsRequests.length} active file system requests.`,
 				);
 			}

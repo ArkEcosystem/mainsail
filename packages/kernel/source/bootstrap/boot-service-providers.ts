@@ -36,7 +36,7 @@ export class BootServiceProviders implements Contracts.Kernel.Bootstrapper {
 					if (isRequired) {
 						throw new Exceptions.ServiceProviderCannotBeBooted(serviceProviderName, error.message);
 					} else {
-						this.logger.warning(`${name}: ${error.stack}`);
+						this.logger.warn(`${name}: ${error.stack}`);
 					}
 
 					this.serviceProviders.fail(serviceProviderName);

@@ -47,25 +47,11 @@ describe<{
 		assert.string(context.message.trim());
 	});
 
-	it("should log a message with the [emergency] level", (context) => {
-		context.logger.emergency("emergency_message");
-
-		assert.match(context.message, /emergency/);
-		assert.match(context.message, /emergency_message/);
-	});
-
 	it("should log a message with the [alert] level", (context) => {
 		context.logger.alert("alert_message");
 
 		assert.match(context.message, /alert/);
 		assert.match(context.message, /alert_message/);
-	});
-
-	it("should log a message with the [critical] level", (context) => {
-		context.logger.critical("critical_message");
-
-		assert.match(context.message, /critical/);
-		assert.match(context.message, /critical_message/);
 	});
 
 	it("should log a message with the [error] level", (context) => {
@@ -75,11 +61,11 @@ describe<{
 		assert.match(context.message, /error_message/);
 	});
 
-	it("should log a message with the [warning] level", (context) => {
-		context.logger.warning("warning_message");
+	it("should log a message with the [warn] level", (context) => {
+		context.logger.warn("warn_message");
 
-		assert.match(context.message, /warning/);
-		assert.match(context.message, /warning_message/);
+		assert.match(context.message, /warn/);
+		assert.match(context.message, /warn_message/);
 	});
 
 	it("should log a message with the [notice] level", (context) => {
