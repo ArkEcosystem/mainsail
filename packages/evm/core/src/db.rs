@@ -257,15 +257,15 @@ impl PersistentDBOptions {
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
-    #[error("IO error")]
+    #[error("IO error: {0}")]
     IO(#[from] std::io::Error),
-    #[error("heed error")]
+    #[error("heed error: {0}")]
     Heed(#[from] heed::Error),
     #[error("db full error")]
     DbFull,
-    #[error("bincode error")]
+    #[error("bincode error: {0}")]
     Bincode(#[from] bincode::Error),
-    #[error("infallible error")]
+    #[error("infallible error: {0}")]
     Infallible(#[from] Infallible),
     #[error("Lock error")]
     Lock,

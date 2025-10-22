@@ -63,21 +63,6 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
 		this.#stream = new PassThrough();
 
-		if (options.workerMode) {
-			this.#logger = Object.fromEntries(
-				[...PinoLogger.LOG_LEVELS].map((level) => [
-					level,
-					(message: string) => {
-						process.stdout.write(`[${level}] (${this.app.thread()}) ${message}\n`);
-					},
-				]),
-			) as unknown as pino.Logger<
-				"alert" | "critical" | "debug" | "emergency" | "error" | "info" | "notice" | "warning"
-			>;
-
-			return this;
-		}
-
 		this.#logger = pino(
 			{
 				base: null,
