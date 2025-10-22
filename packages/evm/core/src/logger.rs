@@ -32,7 +32,7 @@ pub enum LogLevel {
     Notice,
     Emergency,
     Alert,
-    Critical,
+    Fatal,
     Warning,
 }
 
@@ -44,7 +44,7 @@ impl std::fmt::Display for LogLevel {
             LogLevel::Notice => "NOTICE",
             LogLevel::Emergency => "EMERGENCY",
             LogLevel::Alert => "ALERT",
-            LogLevel::Critical => "CRITICAL",
+            LogLevel::Fatal => "FATAL",
             LogLevel::Warning => "WARNING",
         };
         write!(f, "{}", uppercase)

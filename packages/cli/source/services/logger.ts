@@ -16,7 +16,7 @@ export class Logger {
 		this.log(message, "error");
 	}
 
-	public critical(message: string | Error): void {
+	public fatal(message: string | Error): void {
 		this.log(message, "error");
 	}
 

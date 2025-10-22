@@ -23,7 +23,7 @@ type ColoretteColorNames = keyof Pick<
 
 @injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
-	static LOG_LEVELS = new Set(["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"]);
+	static LOG_LEVELS = new Set(["emergency", "alert", "fatal", "error", "warning", "notice", "info", "debug"]);
 
 	static MAX_LEVEL_LENGTH = Math.max(...[...PinoLogger.LOG_LEVELS].map((level) => level.length));
 
@@ -36,10 +36,10 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 	readonly #levelStyles: Record<string, ChalkInstance> = {
 		alert: chalk.red,
-		critical: chalk.red,
 		debug: chalk.magenta,
 		emergency: chalk.bgRed,
 		error: chalk.red,
+		fatal: chalk.red,
 		info: chalk.blue,
 		notice: chalk.green,
 		warning: chalk.yellow,
@@ -56,7 +56,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 	#combinedFileStream?: Writable;
 
-	#logger!: pino.Logger<"alert" | "critical" | "debug" | "emergency" | "error" | "info" | "notice" | "warning">;
+	#logger!: pino.Logger<"alert" | "fatal" | "debug" | "emergency" | "error" | "info" | "notice" | "warning">;
 
 	#silentConsole = false;
 
@@ -68,10 +68,10 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 				base: null,
 				customLevels: {
 					alert: 1,
-					critical: 2,
 					debug: 7,
 					emergency: 0,
 					error: 3,
+					fatal: 2,
 					info: 6,
 					notice: 5,
 					warning: 4,
@@ -126,8 +126,8 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		this.#log("alert", message, context);
 	}
 
-	public critical(message: string, context?: Contracts.Kernel.LoggerContext): void {
-		this.#log("critical", message, context);
+	public fatal(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.#log("fatal", message, context);
 	}
 
 	public error(message: string, context?: Contracts.Kernel.LoggerContext): void {

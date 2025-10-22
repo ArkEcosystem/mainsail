@@ -5,7 +5,7 @@ export interface Logger {
 
 	alert(message: string, context?: LoggerContext): void;
 
-	critical(message: string, context?: LoggerContext): void;
+	fatal(message: string, context?: LoggerContext): void;
 
 	error(message: string, context?: LoggerContext): void;
 

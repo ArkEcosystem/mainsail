@@ -14,8 +14,8 @@ export class Logger implements Contracts.P2P.Logger {
 		this.logger.alert(message, context);
 	}
 
-	critical(message: string, context?: Contracts.Kernel.LoggerContext): void {
-		this.logger.critical(message, context);
+	fatal(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.logger.fatal(message, context);
 	}
 
 	error(message: string, context?: Contracts.Kernel.LoggerContext): void {
