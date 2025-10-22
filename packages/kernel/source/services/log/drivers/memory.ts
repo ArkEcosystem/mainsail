@@ -11,7 +11,6 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 		alert: chalk.red,
 		debug: chalk.magenta,
 		error: chalk.red,
-		fatal: chalk.red,
 		info: chalk.blue,
 		notice: chalk.green,
 		warn: chalk.yellow,
@@ -27,10 +26,6 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 
 	public alert(message: string): void {
 		this.log("alert", message);
-	}
-
-	public fatal(message: string): void {
-		this.log("fatal", message);
 	}
 
 	public error(message: string): void {

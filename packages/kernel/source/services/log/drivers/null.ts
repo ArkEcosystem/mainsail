@@ -11,10 +11,6 @@ export class NullLogger implements Contracts.Kernel.Logger {
 		//
 	}
 
-	public fatal(message: any): void {
-		//
-	}
-
 	public error(message: any): void {
 		//
 	}

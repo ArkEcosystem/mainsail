@@ -12,10 +12,6 @@ export class Logger {
 		this.log(message, "error");
 	}
 
-	public fatal(message: string | Error): void {
-		this.log(message, "error");
-	}
-
 	public error(message: string | Error): void {
 		this.log(message, "error");
 	}
