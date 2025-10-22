@@ -4,6 +4,9 @@ import { assert } from "@mainsail/utils";
 
 @injectable()
 export class Store implements Contracts.State.Store {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -43,7 +46,7 @@ export class Store implements Contracts.State.Store {
 		this.#blockNumber = blockNumber;
 		this.configuration.setHeight(blockNumber + 1);
 
-		if (this.configuration.isNewMilestone()) {
+		if (this.configuration.isNewMilestone() && !this.app.isWorker()) {
 			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
 			void this.events.dispatch(Events.CryptoEvent.MilestoneChanged);
 		}

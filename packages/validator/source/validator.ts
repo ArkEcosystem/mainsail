@@ -205,7 +205,7 @@ export class Validator implements Contracts.Validator.Validator {
 
 					// Ignore transaction if it uses more than what's left.
 					if (gasLeft < 0) {
-						this.logger.warning(
+						this.logger.warn(
 							`skipping tx ${transaction.hash} due to insufficient block space (tx.gasUsed=${Number(result.gasUsed)} gasLeft=${gasLeft} optimistic=${optimisticExecution})`,
 						);
 
@@ -219,7 +219,7 @@ export class Validator implements Contracts.Validator.Validator {
 					transaction.data.gasUsed = Number(result.gasUsed);
 					candidateTransactions.push(transaction);
 				} catch (error) {
-					this.logger.warning(
+					this.logger.warn(
 						`tx ${transaction.hash} from ${transaction.data.from} failed to collate: ${error.message}`,
 					);
 

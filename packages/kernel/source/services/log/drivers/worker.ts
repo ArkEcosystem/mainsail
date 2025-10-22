@@ -5,7 +5,7 @@ import { inspect } from "util";
 
 @injectable()
 export class WorkerLogger implements Contracts.Kernel.Logger {
-	#levels = new Set(["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"]);
+	#levels = new Set(["alert", "error", "warn", "notice", "info", "debug"]);
 
 	protected silentConsole = false;
 
@@ -13,24 +13,16 @@ export class WorkerLogger implements Contracts.Kernel.Logger {
 		return this;
 	}
 
-	public emergency(message: string): void {
-		this.log("emergency", message);
-	}
-
 	public alert(message: string): void {
 		this.log("alert", message);
-	}
-
-	public critical(message: string): void {
-		this.log("critical", message);
 	}
 
 	public error(message: string): void {
 		this.log("error", message);
 	}
 
-	public warning(message: string): void {
-		this.log("warning", message);
+	public warn(message: string): void {
+		this.log("warn", message);
 	}
 
 	public notice(message: string): void {

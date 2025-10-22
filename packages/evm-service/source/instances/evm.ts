@@ -38,20 +38,12 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 							this.logger.notice(record.message, "evm");
 							break;
 						}
-						case LogLevel.Emergency: {
-							this.logger.emergency(record.message, "evm");
-							break;
-						}
 						case LogLevel.Alert: {
 							this.logger.alert(record.message, "evm");
 							break;
 						}
-						case LogLevel.Critical: {
-							this.logger.critical(record.message, "evm");
-							break;
-						}
-						case LogLevel.Warning: {
-							this.logger.warning(record.message, "evm");
+						case LogLevel.Warn: {
+							this.logger.warn(record.message, "evm");
 							break;
 						}
 					}
