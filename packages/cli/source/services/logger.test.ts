@@ -13,26 +13,10 @@ describe<{
 		context.logger = context.cli.app.resolve(Logger);
 	});
 
-	it("should log an emergency message", ({ logger }) => {
-		const spyConsole = spy(console, "error");
-
-		logger.emergency("this should be written to stdout");
-
-		spyConsole.calledOnce();
-	});
-
 	it("should log an alert message", ({ logger }) => {
 		const spyConsole = spy(console, "error");
 
 		logger.alert("this should be written to stdout");
-
-		spyConsole.calledOnce();
-	});
-
-	it("should log a critical message", ({ logger }) => {
-		const spyConsole = spy(console, "error");
-
-		logger.critical("this should be written to stdout");
 
 		spyConsole.calledOnce();
 	});
@@ -45,10 +29,10 @@ describe<{
 		spyConsole.calledOnce();
 	});
 
-	it("should log a warning message", ({ logger }) => {
+	it("should log a warn message", ({ logger }) => {
 		const spyConsole = spy(console, "warn");
 
-		logger.warning("this should be written to stdout");
+		logger.warn("this should be written to stdout");
 
 		spyConsole.calledOnce();
 	});
