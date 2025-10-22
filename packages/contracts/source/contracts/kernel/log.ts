@@ -1,4 +1,4 @@
-export type LoggerContext = "system" | "evm" | "consensus" | "p2p";
+export type LoggerContext = "system" | "evm" | "consensus" | "p2p" | "tx-pool" | "api";
 
 export interface Logger {
 	emergency(message: string, context?: LoggerContext): void;

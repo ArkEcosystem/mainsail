@@ -19,7 +19,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					stderr: true,
 					stdout: true,
 				});
-				return new Ipc.Subprocess(this.app, subprocess);
+				return new Ipc.Subprocess(this.app, "tx-pool", subprocess);
 			});
 
 		this.app.bind(Identifiers.TransactionPool.Worker).toConstantValue(this.app.resolve(WorkerInstance));

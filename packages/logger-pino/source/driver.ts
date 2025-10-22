@@ -27,7 +27,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 	static MAX_LEVEL_LENGTH = Math.max(...[...PinoLogger.LOG_LEVELS].map((level) => level.length));
 
-	static LOG_CONTEXTS: Contracts.Kernel.LoggerContext[] = ["system", "evm", "consensus", "p2p"];
+	static LOG_CONTEXTS: Contracts.Kernel.LoggerContext[] = ["system", "evm", "consensus", "p2p", "tx-pool", "api"];
 
 	static MAX_CONTEXT_LENGTH = Math.max(...PinoLogger.LOG_CONTEXTS.map((context) => context.length));
 
@@ -214,7 +214,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		let message = "";
 		message += `${" ".repeat(levelPadding)}`;
 		// message += `[${log.context.toUpperCase()}${".".repeat(contextPadding)}]`;
-		message += `[${log.context.toUpperCase().slice(0, 3)}]`;
+		message += `[${log.context.toUpperCase().replace("-", "").slice(0, 3)}]`;
 		message += ` ${log[messageKey]}`;
 
 		if (this.#contextStyles[log.context]) {
