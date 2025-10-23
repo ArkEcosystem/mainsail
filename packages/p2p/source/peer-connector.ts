@@ -12,6 +12,9 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.P2P.Logger)
+	private readonly logger!: Contracts.P2P.Logger;
+
 	private readonly connections: Map<string, Client> = new Map<string, Client>();
 	readonly #lastConnectionCreate: Map<string, number> = new Map<string, number>();
 
@@ -55,6 +58,13 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		});
 		this.connections.set(peer.ip, connection);
 		this.#lastConnectionCreate.set(peer.ip, Date.now());
+
+		connection.onDisconnect = () => {
+			this.logger.debug(`Disconnected from peer ${peer.ip}`);
+
+			const peerDisposer = this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer);
+			peerDisposer.disposePeer(peer.ip);
+		}
 
 		connection.onError = (error) => {
 			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).banPeer(peer.ip, error);
