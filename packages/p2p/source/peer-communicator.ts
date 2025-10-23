@@ -10,6 +10,9 @@ import { replySchemas } from "./reply-schemas/index.js";
 import { Codecs } from "./socket-server/codecs/index.js";
 import { Throttle } from "./throttle.js";
 
+const LOG_RESPONSE_TIME = 100; //ms
+const LOG_DESERIALIZE_TIME = 5; //ms
+
 @injectable()
 export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.Application.Instance)
@@ -207,6 +210,20 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 		time.deserializeTime = performance.now() - timeBeforeDeserialize;
 		peer.latency = Math.floor(time.responseTime + time.deserializeTime);
+
+		if (time.responseTime >= LOG_RESPONSE_TIME) {
+			this.logger.warn(
+				`Response time for ${event} from peer ${peer.ip} exceeded ${LOG_RESPONSE_TIME}ms: ${time.responseTime}ms`,
+				"p2p",
+			);
+		}
+
+		if (time.deserializeTime >= LOG_DESERIALIZE_TIME) {
+			this.logger.warn(
+				`Deserialization time for ${event} from peer ${peer.ip} exceeded ${LOG_DESERIALIZE_TIME}ms: ${time.deserializeTime}ms`,
+				"p2p",
+			);
+		}
 
 
 		if (!this.#validateReply(peer, data, event)) {
