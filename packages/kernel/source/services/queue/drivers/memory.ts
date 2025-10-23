@@ -140,7 +140,7 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 					executionTime: performance.now() - start,
 				});
 
-				this.logger.warning(`Queue error occured while handling job: ${error.message}`);
+				this.logger.warn(`Queue error occured while handling job: ${error.message}`);
 
 				this.emit("jobError", job, error);
 			}

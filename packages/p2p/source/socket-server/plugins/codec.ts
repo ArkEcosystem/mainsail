@@ -80,7 +80,7 @@ export class CodecPlugin extends BasePlugin {
 						statusCode: 500,
 					};
 
-					this.logger.error(`Response serializing on ${request.path} failed: ${error}`);
+					this.logger.error(`Response serializing on ${request.path} failed: ${error}`, "p2p");
 				}
 				return h.continue;
 			},

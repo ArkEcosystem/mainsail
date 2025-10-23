@@ -10,6 +10,6 @@ export class Warning {
 	private readonly logger!: Logger;
 
 	public render(message: string): void {
-		this.logger.warning(white(bgYellow(`[WARNING] ${message}`)));
+		this.logger.warn(white(bgYellow(`[WARNING] ${message}`)));
 	}
 }

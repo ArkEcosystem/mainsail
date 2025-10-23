@@ -56,7 +56,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 			return true;
 		} catch (error) {
-			this.logger.debugExtra(`Peer ${peer.ip} verification failed: ${error.message}`);
+			this.logger.debugExtra(`Peer ${peer.ip} verification failed: ${error.message}`, "p2p");
 
 			this.peerDisposer.banPeer(peer.ip, error);
 

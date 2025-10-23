@@ -25,6 +25,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"chalk": "5.6.0",
+		"colorette": "2.0.20",
 		"joi": "18.0.0",
 		"pino": "9.9.0",
 		"pino-pretty": "13.1.1",

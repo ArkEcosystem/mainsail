@@ -40,7 +40,7 @@ export class Service implements Contracts.P2P.Service {
 
 	public async boot(): Promise<void> {
 		if (process.env[Constants.EnvironmentVariables.MAINSAIL_ENV] === "test") {
-			this.logger.info("Skipping P2P service boot, because test environment is used");
+			this.logger.info("Skipping P2P service boot, because test environment is used", "p2p");
 
 			return;
 		}
@@ -50,7 +50,7 @@ export class Service implements Contracts.P2P.Service {
 		await this.peerDiscoverer.populateSeedPeers();
 
 		for (const [version, peers] of Object.entries(groupBy(this.repository.getPeers(), (peer) => peer.version))) {
-			this.logger.info(`Discovered ${pluralize("peer", peers.length, true)} with v${version}.`);
+			this.logger.info(`Discovered ${pluralize("peer", peers.length, true)} with v${version}.`, "p2p");
 		}
 
 		void this.mainLoop();
@@ -79,7 +79,7 @@ export class Service implements Contracts.P2P.Service {
 		this.#lastMinPeerCheck = dayjs();
 
 		if (!this.repository.hasMinimumPeers()) {
-			this.logger.info(`Couldn't find enough peers. Falling back to seed peers.`);
+			this.logger.info(`Couldn't find enough peers. Falling back to seed peers.`, "p2p");
 
 			await this.peerDiscoverer.populateSeedPeers();
 
@@ -121,7 +121,7 @@ export class Service implements Contracts.P2P.Service {
 		let unresponsivePeers = 0;
 		const pingDelay = fast ? 1500 : this.configuration.getRequired<number>("verifyTimeout");
 
-		this.logger.info(`Checking ${pluralize("peer", max, true)}`);
+		this.logger.info(`Checking ${pluralize("peer", max, true)}`, "p2p");
 
 		// we use Promise.race to cut loose in case some communicator.ping() does not resolve within the delay
 		// in that case we want to keep on with our program execution while ping promises can finish in the background
@@ -150,7 +150,7 @@ export class Service implements Contracts.P2P.Service {
 		});
 
 		if (unresponsivePeers > 0) {
-			this.logger.debug(`Removed ${pluralize("peer", unresponsivePeers, true)}`);
+			this.logger.debug(`Removed ${pluralize("peer", unresponsivePeers, true)}`, "p2p");
 		}
 	}
 

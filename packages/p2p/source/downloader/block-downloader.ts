@@ -101,7 +101,10 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 	async #downloadBlocksFromPeer(job: DownloadJob): Promise<void> {
 		try {
-			this.logger.debug(`Downloading blocks ${job.blockNumberFrom}-${job.blockNumberTo} from ${job.peer.ip}`);
+			this.logger.debug(
+				`Downloading blocks ${job.blockNumberFrom}-${job.blockNumberTo} from ${job.peer.ip}`,
+				"p2p",
+			);
 
 			const result = await this.communicator.getBlocks(job.peer, {
 				fromBlockNumber: job.blockNumberFrom,
@@ -122,7 +125,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			return;
 		}
 
-		this.logger.debug(`Processing blocks ${job.blockNumberFrom}-${job.blockNumberTo} from ${job.peer.ip}`);
+		this.logger.debug(`Processing blocks ${job.blockNumberFrom}-${job.blockNumberTo} from ${job.peer.ip}`, "p2p");
 
 		let number = job.blockNumberFrom;
 		job.status = JobStatus.Processing;
@@ -203,6 +206,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			`Error ${job.status === JobStatus.Downloading ? "downloading" : "processing"} blocks ${job.blockNumberFrom}-${
 				job.blockNumberTo
 			} from ${job.peer.ip}. ${error.message}`,
+			"p2p",
 		);
 		this.peerDisposer.banPeer(job.peer.ip, error);
 

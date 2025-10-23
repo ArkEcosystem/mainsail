@@ -32,7 +32,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 				}>("validateAndAcceptPeer", { ip: peer.ip, options: {} });
 			}
 		} catch (error) {
-			this.logger.debug(`Failed to get peers from ${peer.ip}: ${error.message}`);
+			this.logger.debug(`Failed to get peers from ${peer.ip}: ${error.message}`, "p2p");
 			this.peerDisposer.banPeer(peer.ip, error);
 		}
 	}
@@ -83,7 +83,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 			}
 
 			// URL...
-			this.logger.debug(`GET ${url}`);
+			this.logger.debug(`GET ${url}`, "p2p");
 			const { data } = await http.get(url);
 			return typeof data === "object" ? data : JSON.parse(data);
 		}

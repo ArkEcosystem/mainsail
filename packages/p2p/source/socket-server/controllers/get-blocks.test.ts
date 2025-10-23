@@ -7,7 +7,7 @@ describe<{
 	sandbox: Sandbox;
 	controller: GetBlocksController;
 }>("GetBlocksController", ({ it, assert, beforeEach, stub }) => {
-	const logger = { debug: () => {}, info: () => {}, warning: () => {} };
+	const logger = { debug: () => {}, info: () => {}, warn: () => {} };
 	const database = { findCommitBuffers: () => {} };
 	const store = {
 		getLastDownloadedBlock: () => {},

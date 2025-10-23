@@ -7,15 +7,7 @@ export class NullLogger implements Contracts.Kernel.Logger {
 		return this;
 	}
 
-	public emergency(message: any): void {
-		//
-	}
-
 	public alert(message: any): void {
-		//
-	}
-
-	public critical(message: any): void {
 		//
 	}
 
@@ -23,7 +15,7 @@ export class NullLogger implements Contracts.Kernel.Logger {
 		//
 	}
 
-	public warning(message: any): void {
+	public warn(message: any): void {
 		//
 	}
 
@@ -37,10 +29,6 @@ export class NullLogger implements Contracts.Kernel.Logger {
 
 	public debug(message: any): void {
 		//
-	}
-
-	public isValidLevel(level: string): boolean {
-		return true;
 	}
 
 	public suppressConsoleOutput(suppress: boolean): void {

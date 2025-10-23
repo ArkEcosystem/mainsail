@@ -21,40 +21,29 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 
 	@postConstruct()
 	public initialize() {
-		const logPrefix = `evm`;
-
 		this.#evm = new Evm({
 			historySize: 256n,
 			logger: (record) => {
-				const message = `(${logPrefix}) ${record.message}`;
 				try {
 					switch (record.level) {
 						case LogLevel.Info: {
-							this.logger.info(message);
+							this.logger.info(record.message, "evm");
 							break;
 						}
 						case LogLevel.Debug: {
-							this.logger.debug(message);
+							this.logger.debug(record.message, "evm");
 							break;
 						}
 						case LogLevel.Notice: {
-							this.logger.notice(message);
-							break;
-						}
-						case LogLevel.Emergency: {
-							this.logger.emergency(message);
+							this.logger.notice(record.message, "evm");
 							break;
 						}
 						case LogLevel.Alert: {
-							this.logger.alert(message);
+							this.logger.alert(record.message, "evm");
 							break;
 						}
-						case LogLevel.Critical: {
-							this.logger.critical(message);
-							break;
-						}
-						case LogLevel.Warning: {
-							this.logger.warning(message);
+						case LogLevel.Warn: {
+							this.logger.warn(record.message, "evm");
 							break;
 						}
 					}

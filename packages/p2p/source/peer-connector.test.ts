@@ -31,7 +31,7 @@ describeSkip<{
 	sandbox: Sandbox;
 	peerConnector: PeerConnector;
 }>("PeerConnector", ({ it, assert, beforeEach, stub, spy, spyFn }) => {
-	const logger = { debug: () => {}, error: () => {}, info: () => {}, warning: () => {} };
+	const logger = { debug: () => {}, error: () => {}, info: () => {}, warn: () => {} };
 	beforeEach((context) => {
 		onDelay = () => {};
 		ClientMock.onConstructor = () => {};

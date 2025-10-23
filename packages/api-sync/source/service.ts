@@ -394,7 +394,7 @@ export class Sync implements Contracts.ApiSync.Service {
 					} catch (error) {
 						const nextAttemptDelay = Math.min(baseDelay + attempts * 500, maxDelay);
 						attempts++;
-						this.logger.warning(
+						this.logger.warn(
 							`sync encountered exception: ${error.message} (query: ${error.query}). retry #${attempts} in ... ${nextAttemptDelay}ms`,
 						);
 						await sleep(nextAttemptDelay);
@@ -570,7 +570,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		}
 
 		if (lastHeight !== genesisHeight || blocks.count !== "0" || inMaintenance) {
-			this.logger.warning(`Clearing API database for full restore.`);
+			this.logger.warn(`Clearing API database for full restore.`);
 		}
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {

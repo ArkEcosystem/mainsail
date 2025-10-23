@@ -122,7 +122,7 @@ impl EvmInner {
             Ok(r) => {
                 if !r.is_success() {
                     self.logger
-                        .log(LogLevel::Warning, format!("view call failed: {:?}", r));
+                        .log(LogLevel::Warn, format!("view call failed: {:?}", r));
                 }
 
                 TxViewResult {
@@ -132,7 +132,7 @@ impl EvmInner {
             }
             Err(err) => {
                 self.logger.log(
-                    LogLevel::Warning,
+                    LogLevel::Warn,
                     format!("view call returned error: {:?}", err),
                 );
 

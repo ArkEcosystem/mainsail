@@ -28,7 +28,7 @@ describe<{
 			dispatch: () => {},
 		};
 		context.logger = {
-			warning: () => {},
+			warn: () => {},
 		};
 		context.jobMethod = () => {};
 
@@ -244,7 +244,7 @@ describe<{
 	});
 
 	it("Pause should pause after current job is processed with error", async (context) => {
-		const warningLoggerSpy = spy(context.logger, "warning");
+		const warnLoggerSpy = spy(context.logger, "warn");
 		const jobMethod1 = stubFn().callsFake(async () => {
 			await sleep(50);
 			throw new Error();
@@ -269,7 +269,7 @@ describe<{
 		assert.false(context.driver.isRunning());
 		assert.false(context.driver.isStarted());
 
-		warningLoggerSpy.calledOnce();
+		warnLoggerSpy.calledOnce();
 	});
 
 	it("Pause should not process new jobs after pause", async (context) => {
@@ -540,7 +540,7 @@ describe<{
 			throw error;
 		});
 		const dispatchSpy = spy(context.eventDispatcher, "dispatch");
-		const warningLoggerSpy = spy(context.logger, "warning");
+		const warnLoggerSpy = spy(context.logger, "warn");
 
 		await context.driver.push(new DummyJob(() => jobMethodStub.call()));
 		await context.driver.push(new DummyJob(() => jobMethodStub.call()));
@@ -549,7 +549,7 @@ describe<{
 		await sleep(10);
 
 		jobMethodStub.calledTimes(2);
-		warningLoggerSpy.calledTimes(2);
+		warnLoggerSpy.calledTimes(2);
 		dispatchSpy.calledTimes(2);
 		dispatchSpy.calledWith(
 			Events.QueueEvent.Failed,

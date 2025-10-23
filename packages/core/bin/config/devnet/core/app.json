@@ -111,9 +111,6 @@
 	],
 	"crypto-worker": [
 		{
-			"package": "@mainsail/logger-pino"
-		},
-		{
 			"package": "@mainsail/validation"
 		},
 		{
@@ -154,9 +151,6 @@
 		}
 	],
 	"transaction-pool": [
-		{
-			"package": "@mainsail/logger-pino"
-		},
 		{
 			"package": "@mainsail/validation"
 		},
@@ -225,9 +219,6 @@
 		}
 	],
 	"evm-api": [
-		{
-			"package": "@mainsail/logger-pino"
-		},
 		{
 			"package": "@mainsail/validation"
 		},

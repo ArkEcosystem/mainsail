@@ -1,24 +1,11 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { isEmpty, prettyTime } from "@mainsail/utils";
-import chalk, { ChalkInstance } from "chalk";
-import { differenceInMilliseconds, format } from "date-fns";
+import { isEmpty } from "@mainsail/utils";
 import { inspect } from "util";
 
 @injectable()
-export class MemoryLogger implements Contracts.Kernel.Logger {
-	protected readonly levelStyles: Record<string, ChalkInstance> = {
-		alert: chalk.red,
-		debug: chalk.magenta,
-		error: chalk.red,
-		info: chalk.blue,
-		notice: chalk.green,
-		warn: chalk.yellow,
-	};
-
+export class WorkerLogger implements Contracts.Kernel.Logger {
 	protected silentConsole = false;
-
-	#lastTimestamp: Date = new Date();
 
 	public async make(options: unknown): Promise<Contracts.Kernel.Logger> {
 		return this;
@@ -67,21 +54,6 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 			message = inspect(message, { depth: 1 });
 		}
 
-		level = level ? this.levelStyles[level](`[${level.toUpperCase()}] `) : "";
-
-		const timestamp: string = format(new Date(), "yyyy-MM-dd HH:MM:ss.SSS");
-		const timestampDiff: string = this.getTimestampDiff();
-
-		process.stdout.write(`[${timestamp}] ${level}${message}${timestampDiff}\n`);
-	}
-
-	protected getTimestampDiff(): string {
-		const now = new Date();
-
-		const diff: number = differenceInMilliseconds(now, this.#lastTimestamp);
-
-		this.#lastTimestamp = new Date();
-
-		return chalk.yellow(` +${diff ? prettyTime(diff) : "0ms"}`);
+		process.stdout.write(`[${level}] ${message}\n`);
 	}
 }

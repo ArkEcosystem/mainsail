@@ -1,9 +1,10 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { assert, isEmpty } from "@mainsail/utils";
 import chalk, { ChalkInstance } from "chalk";
+import type { Color, Colorette } from "colorette";
 import { error as console_error } from "console";
-import pino from "pino";
+import pino, { LogDescriptor } from "pino";
 import { prettyFactory, PrettyOptions } from "pino-pretty";
 import pump from "pump";
 import pumpify from "pumpify";
@@ -13,76 +14,77 @@ import split from "split2";
 import { PassThrough, Writable } from "stream";
 import { inspect } from "util";
 
+type ColoretteColorNames = keyof Pick<
+	Colorette,
+	{
+		[K in keyof Colorette]: Colorette[K] extends Color ? K : never;
+	}[keyof Colorette]
+>;
+
 @injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
-	static LOG_LEVELS = new Set(["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"]);
+	static LOG_LEVELS: Set<string> = new Set(Constants.LogLevels);
+
+	static MAX_LEVEL_LENGTH = Math.max(...Constants.LogLevels.map((level) => level.length));
+
+	static LOG_CONTEXTS: Contracts.Kernel.LoggerContext[] = ["system", "evm", "consensus", "p2p", "tx-pool", "api"];
+
+	static MAX_CONTEXT_LENGTH = Math.max(...PinoLogger.LOG_CONTEXTS.map((context) => context.length));
 
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	readonly #levelStyles: Record<string, ChalkInstance> = {
 		alert: chalk.red,
-		critical: chalk.red,
 		debug: chalk.magenta,
-		emergency: chalk.bgRed,
 		error: chalk.red,
 		info: chalk.blue,
 		notice: chalk.green,
-		warning: chalk.yellow,
+		warn: chalk.yellow,
+	};
+
+	readonly #contextStyles: Record<string, ColoretteColorNames> = {
+		// consensus: "reset",
+		// evm: "reset",
+		// p2p: "dim",
+		// system: "reset",
 	};
 
 	#stream!: PassThrough;
 
 	#combinedFileStream?: Writable;
 
-	#logger!: pino.Logger<"alert" | "critical" | "debug" | "emergency" | "error" | "info" | "notice" | "warning">;
+	#logger!: pino.Logger<"alert" | "debug" | "error" | "info" | "notice" | "warn">;
 
 	#silentConsole = false;
 
 	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
 		this.#stream = new PassThrough();
 
-		if (options.workerMode) {
-			this.#logger = Object.fromEntries(
-				[...PinoLogger.LOG_LEVELS].map((level) => [
-					level,
-					(message: string) => {
-						process.stdout.write(`[${level}] (${this.app.thread()}) ${message}\n`);
-					},
-				]),
-			) as unknown as pino.Logger<
-				"alert" | "critical" | "debug" | "emergency" | "error" | "info" | "notice" | "warning"
-			>;
-
-			return this;
-		}
-
 		this.#logger = pino(
 			{
 				base: null,
 				customLevels: {
-					alert: 1,
-					critical: 2,
-					debug: 7,
-					emergency: 0,
-					error: 3,
-					info: 6,
-					notice: 5,
-					warning: 4,
+					alert: 0,
+					debug: 5,
+					error: 1,
+					info: 4,
+					notice: 3,
+					warn: 2,
 				},
 				formatters: {
 					level(label, number) {
 						return { level: label, pid: process.pid };
 					},
 				},
-				level: "emergency",
+				level: "alert",
 				safe: true,
 				useOnlyCustomLevels: true,
 			},
 			this.#stream,
 		);
 
-		if (this.isValidLevel(options.levels.console)) {
+		if (this.#isValidLevel(options.levels.console)) {
 			pump(
 				this.#stream,
 				split(),
@@ -95,7 +97,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			);
 		}
 
-		if (this.isValidLevel(options.levels.file)) {
+		if (this.#isValidLevel(options.levels.file)) {
 			this.#combinedFileStream = new pumpify(
 				split(),
 				this.#createPrettyTransport(options.levels.file, { colorize: false }),
@@ -112,36 +114,28 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		return this;
 	}
 
-	public emergency(message: string): void {
-		this.#log("emergency", message);
+	public alert(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.#log("alert", message, context);
 	}
 
-	public alert(message: string): void {
-		this.#log("alert", message);
+	public error(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.#log("error", message, context);
 	}
 
-	public critical(message: string): void {
-		this.#log("critical", message);
+	public warn(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.#log("warn", message, context);
 	}
 
-	public error(message: string): void {
-		this.#log("error", message);
+	public notice(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.#log("notice", message, context);
 	}
 
-	public warning(message: string): void {
-		this.#log("warning", message);
+	public info(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.#log("info", message, context);
 	}
 
-	public notice(message: string): void {
-		this.#log("notice", message);
-	}
-
-	public info(message: string): void {
-		this.#log("info", message);
-	}
-
-	public debug(message: string): void {
-		this.#log("debug", message);
+	public debug(message: string, context?: Contracts.Kernel.LoggerContext): void {
+		this.#log("debug", message, context);
 	}
 
 	public suppressConsoleOutput(suppress: boolean): void {
@@ -165,7 +159,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		}
 	}
 
-	#log(level: string, message: string): void {
+	#log(level: string, message: string, context: Contracts.Kernel.LoggerContext = "system"): void {
 		if (this.#silentConsole) {
 			return;
 		}
@@ -178,13 +172,52 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			message = inspect(message, { depth: 1 });
 		}
 
-		this.#logger[level](message);
+		if (this.#logger === undefined) {
+			return;
+		}
+
+		if (this.#logger.child === undefined) {
+			// console.log(" NOT A CHILD", this.app.thread());
+			// console.log(this.#logger);
+			return;
+		} else {
+			// console.log(" IS A CHILD");
+			// console.log(this.#logger);
+		}
+
+		const logger = this.#logger.child({ context });
+
+		logger[level](message);
+	}
+
+	#messageFormat(
+		log: LogDescriptor,
+		messageKey: string,
+		levelLabel: string,
+		{ colors }: { colors: Colorette },
+	): string {
+		const levelPadding = PinoLogger.MAX_LEVEL_LENGTH - log.level.length;
+		// const contextPadding = PinoLogger.MAX_CONTEXT_LENGTH - log.context.length;
+
+		let message = "";
+		message += `${" ".repeat(levelPadding)}`;
+		// message += `[${log.context.toUpperCase()}${".".repeat(contextPadding)}]`;
+		message += `[${log.context.toUpperCase().replace("-", "").slice(0, 3)}]`;
+		message += ` ${log[messageKey]}`;
+
+		if (this.#contextStyles[log.context]) {
+			const colorName = this.#contextStyles[log.context];
+			return `${colors[colorName](message)}`;
+		}
+
+		return message;
 	}
 
 	#createPrettyTransport(level: string, prettyOptions?: PrettyOptions): Transform {
 		const pinoPretty = prettyFactory({
-			ignore: "pid",
+			ignore: "pid,context",
 			levelFirst: false,
+			messageFormat: this.#messageFormat.bind(this),
 			translateTime: "yyyy-mm-dd HH:MM:ss.l",
 			...prettyOptions,
 		});
@@ -241,7 +274,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		);
 	}
 
-	public isValidLevel(level: string): boolean {
+	#isValidLevel(level: Contracts.Kernel.LoggerContext): boolean {
 		return PinoLogger.LOG_LEVELS.has(level);
 	}
 }

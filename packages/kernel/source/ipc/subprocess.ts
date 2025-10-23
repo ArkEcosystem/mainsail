@@ -1,14 +1,20 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import split from "split2";
 import { Worker } from "worker_threads";
 
 export class Subprocess<T extends Record<string, any>> implements Contracts.Kernel.IPC.Subprocess<T> {
+	#logLevels = new Set(Constants.LogLevels);
+
 	private lastId = 1;
 	private readonly subprocess: Worker;
 	private readonly callbacks = new Map<number, Contracts.Kernel.IPC.RequestCallbacks<T>>();
 	private readonly eventHandlers = new Map<string, Contracts.Kernel.IPC.EventCallback<any>>();
 
-	public constructor(app: Contracts.Kernel.Application, subprocess: Worker) {
+	public constructor(
+		app: Contracts.Kernel.Application,
+		loggerContext: Contracts.Kernel.LoggerContext,
+		subprocess: Worker,
+	) {
 		this.subprocess = subprocess;
 		this.subprocess.on("message", this.onSubprocessMessage.bind(this));
 		this.subprocess.on("message", this.onEmit.bind(this));
@@ -26,10 +32,10 @@ export class Subprocess<T extends Record<string, any>> implements Contracts.Kern
 			}
 
 			const [, level, message] = match;
-			if (logger.isValidLevel(level)) {
-				logger[level](message);
+			if (this.#logLevels.has(level)) {
+				logger[level](message, loggerContext);
 			} else {
-				logger.warning(`[unknown:${level}] ${message}`);
+				logger.warn(`[unknown:${level}] ${message}`);
 			}
 		});
 
