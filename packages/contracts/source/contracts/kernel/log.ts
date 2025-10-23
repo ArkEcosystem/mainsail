@@ -13,8 +13,6 @@ export interface Logger {
 
 	debug(message: string, context?: LoggerContext): void;
 
-	isValidLevel(level: string): boolean;
-
 	suppressConsoleOutput(suppress: boolean): void;
 
 	dispose(): Promise<void>;

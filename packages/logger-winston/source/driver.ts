@@ -47,10 +47,6 @@ export class Logger implements Contracts.Kernel.Logger {
 		this.#log("debug", message);
 	}
 
-	public isValidLevel(level: string): boolean {
-		return !!this.#logger.levels[level];
-	}
-
 	public suppressConsoleOutput(suppress: boolean): void {
 		//
 	}

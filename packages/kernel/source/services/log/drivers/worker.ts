@@ -5,8 +5,6 @@ import { inspect } from "util";
 
 @injectable()
 export class WorkerLogger implements Contracts.Kernel.Logger {
-	#levels = new Set(["alert", "error", "warn", "notice", "info", "debug"]);
-
 	protected silentConsole = false;
 
 	public async make(options: unknown): Promise<Contracts.Kernel.Logger> {
@@ -35,10 +33,6 @@ export class WorkerLogger implements Contracts.Kernel.Logger {
 
 	public debug(message: string): void {
 		this.log("debug", message);
-	}
-
-	public isValidLevel(level: string): boolean {
-		return this.#levels.has(level);
 	}
 
 	public suppressConsoleOutput(suppress: boolean): void {

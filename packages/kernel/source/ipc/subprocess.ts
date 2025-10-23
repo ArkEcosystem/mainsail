@@ -1,8 +1,10 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import split from "split2";
 import { Worker } from "worker_threads";
 
 export class Subprocess<T extends Record<string, any>> implements Contracts.Kernel.IPC.Subprocess<T> {
+	#logLevels = new Set(Constants.LogLevels);
+
 	private lastId = 1;
 	private readonly subprocess: Worker;
 	private readonly callbacks = new Map<number, Contracts.Kernel.IPC.RequestCallbacks<T>>();
@@ -30,7 +32,7 @@ export class Subprocess<T extends Record<string, any>> implements Contracts.Kern
 			}
 
 			const [, level, message] = match;
-			if (logger.isValidLevel(level)) {
+			if (this.#logLevels.has(level)) {
 				logger[level](message, loggerContext);
 			} else {
 				logger.warn(`[unknown:${level}] ${message}`);
