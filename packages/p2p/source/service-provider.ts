@@ -28,6 +28,7 @@ import { PeerDiscoverer } from "./peer-discoverer.js";
 import { PeerDisposer } from "./peer-disposer.js";
 import { PeerProcessor } from "./peer-processor.js";
 import { PeerRepository } from "./peer-repository.js";
+import { PeerStatistic } from "./peer-statistic.js";
 import { PeerVerifier } from "./peer-verifier.js";
 import { Service } from "./service.js";
 import { Server } from "./socket-server/server.js";
@@ -150,6 +151,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.Peer.Disposer).to(PeerDisposer).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.Peer.Verifier).to(PeerVerifier).inSingletonScope();
+
+		this.app.bind(Identifiers.P2P.Peer.Statistic).to(PeerStatistic).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.Header.Service).to(HeaderService).inSingletonScope();
 
