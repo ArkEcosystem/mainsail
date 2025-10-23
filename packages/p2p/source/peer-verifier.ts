@@ -50,7 +50,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 			await this.#verifyHighestCommonBlock(peer, status.state);
 
-			peer.setPinged();
 			peer.plugins = status.config.plugins;
 
 			return true;

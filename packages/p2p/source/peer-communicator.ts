@@ -209,7 +209,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		const data = codec.response.deserialize(response.payload) as T;
 
 		time.deserializeTime = performance.now() - timeBeforeDeserialize;
-		peer.latency = Math.floor(time.responseTime + time.deserializeTime);
+		peer.setPinged(Math.floor(time.responseTime + time.deserializeTime));
 
 		if (time.responseTime >= LOG_RESPONSE_TIME) {
 			this.logger.warn(

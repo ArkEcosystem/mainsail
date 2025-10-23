@@ -24,14 +24,14 @@ export interface Peer {
 	readonly lastPinged: Dayjs | undefined;
 
 	version: string | undefined;
-	latency: number | undefined;
+	readonly latency: number | undefined;
 
 	header: HeaderData;
 	plugins: PeerPlugins;
 	sequentialErrorCounter: number;
 	apiNodes: ApiNode[];
 
-	setPinged(): void;
+	setPinged(latency: number): void;
 
 	toBroadcast(): PeerBroadcast;
 

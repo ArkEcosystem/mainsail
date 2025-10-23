@@ -73,8 +73,9 @@ export class Peer implements Contracts.P2P.Peer {
 		}
 	}
 
-	public setPinged(): void {
+	public setPinged(latency: number): void {
 		this.lastPinged = dayjs();
+		this.latency = latency;
 	}
 
 	public toBroadcast(): Contracts.P2P.PeerBroadcast {
