@@ -210,7 +210,6 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-
 		await this.peerStatistic.logStatistic();
 
 		const roundState = this.roundStateRepository.getRoundState(this.#blockNumber, this.#round);

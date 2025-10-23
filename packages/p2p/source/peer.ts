@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Types } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 
 import { getPeerUrl } from "./utils/get-peer-url.js";
 
@@ -26,7 +26,7 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public latency: number | undefined;
 
-	public lastPinged: Dayjs | undefined;
+	public lastPinged: number | undefined;
 
 	public sequentialErrorCounter = 0;
 
@@ -74,7 +74,7 @@ export class Peer implements Contracts.P2P.Peer {
 	}
 
 	public setPinged(latency: number): void {
-		this.lastPinged = dayjs();
+		this.lastPinged = dayjs().valueOf();
 		this.latency = latency;
 	}
 

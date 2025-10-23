@@ -1,5 +1,3 @@
-import { Dayjs } from "dayjs";
-
 import { Queue } from "../kernel/queue.js";
 import { ApiNode } from "./api-node.js";
 import { PeerProtocol } from "./enums.js";
@@ -21,7 +19,7 @@ export interface Peer {
 	readonly ip: string;
 	readonly ports: PeerPorts;
 
-	readonly lastPinged: Dayjs | undefined;
+	readonly lastPinged: number | undefined;
 
 	version: string | undefined;
 	readonly latency: number | undefined;
