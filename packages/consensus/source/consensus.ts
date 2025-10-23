@@ -50,6 +50,9 @@ export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.P2P.Peer.Statistic)
+	private readonly peerStatistic!: Contracts.P2P.PeerStatistic;
+
 	#blockNumber = 1;
 	#round = 0;
 	#step: Contracts.Consensus.Step = Contracts.Consensus.Step.Propose;
@@ -135,7 +138,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	public async dispose(): Promise<void> {
 		this.scheduler.clear();
 		this.#isDisposed = true;
-		await this.#handlerLock.runExclusive(async () => {});
+		await this.#handlerLock.runExclusive(async () => { });
 	}
 
 	async handle(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -206,6 +209,9 @@ export class Consensus implements Contracts.Consensus.Service {
 		if (this.#isDisposed) {
 			return;
 		}
+
+
+		await this.peerStatistic.logStatistic();
 
 		const roundState = this.roundStateRepository.getRoundState(this.#blockNumber, this.#round);
 		this.logger.info(
@@ -594,8 +600,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		if (this.#blockNumber !== this.configuration.getHeight()) {
 			throw new Error(
-				`bootstrapped block number ${
-					this.#blockNumber
+				`bootstrapped block number ${this.#blockNumber
 				} does not match configuration block number ${this.configuration.getHeight()}`,
 			);
 		}

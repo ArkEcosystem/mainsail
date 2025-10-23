@@ -15,9 +15,7 @@ export class PeerStatistic implements Contracts.P2P.PeerStatistic {
 
 
 	public async logStatistic(): Promise<void> {
-		this.logger.info("Logging peer statistics...", "p2p");
-
-		let statistic = "";
+		let statistic = "Peer statistics...\n";
 
 		const peers = this.peerRepository.getPeers();
 		statistic += `Active Peers: ${peers.length}\n`;
