@@ -15,19 +15,20 @@ export class PeerStatistic implements Contracts.P2P.PeerStatistic {
 
 
 	public async logStatistic(): Promise<void> {
-		let statistic = "Peer statistics...\n";
+		let statistic = "";
 
 		const peers = this.peerRepository.getPeers();
-		statistic += `Active Peers: ${peers.length}\n`;
-		statistic += `Banned Peers: ${this.peerDisposer.bannedPeers().length}\n`;
+		statistic += `Peers: ${peers.length}, `;
+		statistic += `Banned Peers: ${this.peerDisposer.bannedPeers().length}, `;
 
-		statistic += `Average Latency: ${this.#getAverageLatency(peers).toFixed(2)} ms\n`;
-		statistic += `Median Latency: ${this.#getMedianLatency(peers).toFixed(2)} ms\n`;
-		statistic += `Best Latencies: ${this.#getBestLatencies(peers, 3).map((latency) => latency.toFixed(2)).join(", ")} ms\n`;
-		statistic += `Worst Latencies: ${this.#getWorstLatencies(peers, 3).map((latency) => latency.toFixed(2)).join(", ")} ms\n`;
+		statistic += `Latency: `;
+		statistic += `Average: ${this.#getAverageLatency(peers).toFixed(0)} ms, `;
+		statistic += `Median: ${this.#getMedianLatency(peers).toFixed(0)} ms, `;
+		statistic += `Best: ${this.#getBestLatencies(peers, 3).map((latency) => latency).join(", ")} ms, `;
+		statistic += `Worst: ${this.#getWorstLatencies(peers, 3).map((latency) => latency).join(", ")} ms`;
 
 
-		this.logger.info(statistic, "p2p");
+		this.logger.debug(statistic, "p2p");
 	}
 
 	#getLatencies(peers: Contracts.P2P.Peer[]): number[] {
