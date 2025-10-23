@@ -73,6 +73,10 @@ export class Peer implements Contracts.P2P.Peer {
 		}
 	}
 
+	public setPinged(): void {
+		this.lastPinged = dayjs();
+	}
+
 	public recentlyPinged(): boolean {
 		return !!this.lastPinged && dayjs().diff(this.lastPinged, "minute") < 2;
 	}

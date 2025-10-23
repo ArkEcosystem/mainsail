@@ -21,15 +21,17 @@ export interface Peer {
 	readonly ip: string;
 	readonly ports: PeerPorts;
 
+	readonly lastPinged: Dayjs | undefined;
+
 	version: string | undefined;
 	latency: number | undefined;
 
 	header: HeaderData;
 	plugins: PeerPlugins;
-	lastPinged: Dayjs | undefined;
 	sequentialErrorCounter: number;
 	apiNodes: ApiNode[];
 
+	setPinged(): void;
 	recentlyPinged(): boolean;
 
 	toBroadcast(): PeerBroadcast;
