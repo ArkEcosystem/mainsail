@@ -10,7 +10,6 @@ import { replySchemas } from "./reply-schemas/index.js";
 import { Codecs } from "./socket-server/codecs/index.js";
 import { Throttle } from "./throttle.js";
 
-
 @injectable()
 export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.Application.Instance)
@@ -168,7 +167,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		event: Routes,
 		payload: any,
 		options: Contracts.P2P.EmitOptions,
-	): Promise<{ data: T, throttleTime: number, responseTime: number, deserializeTime: number }> {
+	): Promise<Contracts.P2P.EmitResult<T>> {
 		const time = {
 			deserializeTime: 0,
 			responseTime: 0,
@@ -221,7 +220,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		assert.defined(data.headers);
 		void this.headerService.handle(peer, data.headers);
 
-		return { data, ...time };
+		return { data, success: true, ...time };
 	}
 
 	#handleSocketError(peer: Contracts.P2P.Peer, error: Error): void {
