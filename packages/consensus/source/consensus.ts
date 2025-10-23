@@ -138,7 +138,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	public async dispose(): Promise<void> {
 		this.scheduler.clear();
 		this.#isDisposed = true;
-		await this.#handlerLock.runExclusive(async () => { });
+		await this.#handlerLock.runExclusive(async () => {});
 	}
 
 	async handle(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -599,7 +599,8 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		if (this.#blockNumber !== this.configuration.getHeight()) {
 			throw new Error(
-				`bootstrapped block number ${this.#blockNumber
+				`bootstrapped block number ${
+					this.#blockNumber
 				} does not match configuration block number ${this.configuration.getHeight()}`,
 			);
 		}

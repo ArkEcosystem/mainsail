@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-
 @injectable()
 export class PeerStatistic implements Contracts.P2P.PeerStatistic {
 	@inject(Identifiers.P2P.Logger)
@@ -27,9 +26,12 @@ export class PeerStatistic implements Contracts.P2P.PeerStatistic {
 		statistic += `LATENCY: `;
 		statistic += `Average: ${this.#getAverageLatency(roundPeers).toFixed(0)} ms, `;
 		statistic += `Median: ${this.#getMedianLatency(roundPeers).toFixed(0)} ms, `;
-		statistic += `Best: ${this.#getBestLatencies(roundPeers, 3).map((latency) => latency).join(", ")} ms, `;
-		statistic += `Worst: ${this.#getWorstLatencies(roundPeers, 3).map((latency) => latency).join(", ")} ms`;
-
+		statistic += `Best: ${this.#getBestLatencies(roundPeers, 3)
+			.map((latency) => latency)
+			.join(", ")} ms, `;
+		statistic += `Worst: ${this.#getWorstLatencies(roundPeers, 3)
+			.map((latency) => latency)
+			.join(", ")} ms`;
 
 		this.logger.debug(statistic, "p2p");
 	}

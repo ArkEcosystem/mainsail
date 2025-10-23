@@ -84,12 +84,22 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	public async getMessages(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetMessagesResponse> {
-		const response = await this.#emit<Contracts.P2P.GetMessagesResponse>(peer, Routes.GetMessages, {}, { timeout: 5000 });
+		const response = await this.#emit<Contracts.P2P.GetMessagesResponse>(
+			peer,
+			Routes.GetMessages,
+			{},
+			{ timeout: 5000 },
+		);
 		return response.data;
 	}
 
 	public async getProposal(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetProposalResponse> {
-		const response = await this.#emit<Contracts.P2P.GetProposalResponse>(peer, Routes.GetProposal, {}, { timeout: 5000 });
+		const response = await this.#emit<Contracts.P2P.GetProposalResponse>(
+			peer,
+			Routes.GetProposal,
+			{},
+			{ timeout: 5000 },
+		);
 		return response.data;
 	}
 
@@ -102,16 +112,25 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	public async getApiNodes(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetApiNodesResponse> {
 		this.logger.debug(`Fetching API nodes from ${peer.url}`);
-		const response = await this.#emit<Contracts.P2P.GetApiNodesResponse>(peer, Routes.GetApiNodes, {}, { timeout: 5000 });
+		const response = await this.#emit<Contracts.P2P.GetApiNodesResponse>(
+			peer,
+			Routes.GetApiNodes,
+			{},
+			{ timeout: 5000 },
+		);
 		return response.data;
 	}
-
 
 	public async getStatus(
 		peer: Contracts.P2P.Peer,
 		options: Partial<Contracts.P2P.EmitOptions> = {},
 	): Promise<Contracts.P2P.GetStatusResponse> {
-		const response = await this.#emit<Contracts.P2P.GetStatusResponse>(peer, Routes.GetStatus, {}, { timeout: 5000, ...options });
+		const response = await this.#emit<Contracts.P2P.GetStatusResponse>(
+			peer,
+			Routes.GetStatus,
+			{},
+			{ timeout: 5000, ...options },
+		);
 		return response.data;
 	}
 
@@ -173,7 +192,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			deserializeTime: 0,
 			responseTime: 0,
 			throttleTime: 0,
-		}
+		};
 
 		const timeBeforeThrottle = performance.now();
 
@@ -222,7 +241,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				"p2p",
 			);
 		}
-
 
 		if (!this.#validateReply(peer, data, event)) {
 			const validationError = new Error(

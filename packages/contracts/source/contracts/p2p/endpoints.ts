@@ -13,11 +13,11 @@ export interface Request extends Hapi.Request {
 }
 
 export interface EmitResult<T extends Response> {
-	data: T,
-	success: boolean,
-	deserializeTime: number,
-	responseTime: number,
-	throttleTime: number,
+	data: T;
+	success: boolean;
+	deserializeTime: number;
+	responseTime: number;
+	throttleTime: number;
 }
 
 export interface Response {

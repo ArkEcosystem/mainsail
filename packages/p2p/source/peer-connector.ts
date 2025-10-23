@@ -64,7 +64,7 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 
 			const peerDisposer = this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer);
 			peerDisposer.disposePeer(peer.ip);
-		}
+		};
 
 		connection.onError = (error) => {
 			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).banPeer(peer.ip, error);
