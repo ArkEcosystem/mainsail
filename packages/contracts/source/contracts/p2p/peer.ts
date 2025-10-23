@@ -32,7 +32,6 @@ export interface Peer {
 	apiNodes: ApiNode[];
 
 	setPinged(): void;
-	recentlyPinged(): boolean;
 
 	toBroadcast(): PeerBroadcast;
 
