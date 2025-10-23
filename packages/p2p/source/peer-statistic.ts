@@ -13,19 +13,22 @@ export class PeerStatistic implements Contracts.P2P.PeerStatistic {
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
-
-	public async logStatistic(): Promise<void> {
+	public logStatistic(roundStartTime: number): void {
 		let statistic = "";
 
 		const peers = this.peerRepository.getPeers();
-		statistic += `Peers: ${peers.length}, `;
-		statistic += `Banned Peers: ${this.peerDisposer.bannedPeers().length}, `;
+		statistic += `PEERS: `;
+		statistic += `Total: ${peers.length}, `;
+		statistic += `Banned: ${this.peerDisposer.bannedPeers().length}, `;
 
-		statistic += `Latency: `;
-		statistic += `Average: ${this.#getAverageLatency(peers).toFixed(0)} ms, `;
-		statistic += `Median: ${this.#getMedianLatency(peers).toFixed(0)} ms, `;
-		statistic += `Best: ${this.#getBestLatencies(peers, 3).map((latency) => latency).join(", ")} ms, `;
-		statistic += `Worst: ${this.#getWorstLatencies(peers, 3).map((latency) => latency).join(", ")} ms`;
+		const roundPeers = peers.filter((peer) => peer.lastPinged !== undefined && peer.lastPinged >= roundStartTime);
+		statistic += `Round: ${roundPeers.length}, `;
+
+		statistic += `LATENCY: `;
+		statistic += `Average: ${this.#getAverageLatency(roundPeers).toFixed(0)} ms, `;
+		statistic += `Median: ${this.#getMedianLatency(roundPeers).toFixed(0)} ms, `;
+		statistic += `Best: ${this.#getBestLatencies(roundPeers, 3).map((latency) => latency).join(", ")} ms, `;
+		statistic += `Worst: ${this.#getWorstLatencies(roundPeers, 3).map((latency) => latency).join(", ")} ms`;
 
 
 		this.logger.debug(statistic, "p2p");

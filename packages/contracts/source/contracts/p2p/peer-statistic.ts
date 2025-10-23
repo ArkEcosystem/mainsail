@@ -1,4 +1,4 @@
 
 export interface PeerStatistic {
-	logStatistic(): Promise<void>;
+	logStatistic(roundStartTime: number): void;
 }
