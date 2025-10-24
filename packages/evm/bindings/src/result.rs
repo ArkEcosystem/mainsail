@@ -203,7 +203,7 @@ impl JsTransactionData {
             v: tx.v,
             r: utils::convert_u256_to_hex(tx.r),
             s: utils::convert_u256_to_hex(tx.s),
-            legacy_second_signature: None,
+            legacy_second_signature: tx.legacy_second_signature,
             index: tx.index,
         }
     }

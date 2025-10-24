@@ -252,7 +252,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 				r: transaction.data.r,
 				s: transaction.data.s,
 				v: transaction.data.v,
-				legacySecondSignature: undefined,
+				legacySecondSignature: transaction.data.legacySecondSignature,
 			});
 		}
 

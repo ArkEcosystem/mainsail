@@ -428,7 +428,7 @@ impl TryFrom<JsTransactionData> for TransactionData {
             tx_hash: utils::convert_string_to_b256(value.tx_hash)?,
             block_number: value.block_number,
             index: value.index,
-            legacy_second_signature: None,
+            legacy_second_signature: value.legacy_second_signature,
             v: value.v,
             r: utils::convert_hex_to_u256(&value.r),
             s: utils::convert_hex_to_u256(&value.s),
