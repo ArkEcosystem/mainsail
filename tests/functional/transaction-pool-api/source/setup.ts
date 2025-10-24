@@ -36,6 +36,8 @@ const setup = async () => {
 		broadcastPrevote: async () => {},
 		broadcastProposal: async () => {},
 	});
+	sandbox.app.bind(Identifiers.P2P.Peer.Statistic).toConstantValue({ logStatistic: () => {} });
+
 	sandbox.app.bind(Identifiers.TransactionPool.Broadcaster).toConstantValue({
 		broadcastTransactions: async () => {},
 	});
