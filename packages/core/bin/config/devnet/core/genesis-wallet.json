@@ -1,14 +1,14 @@
 {
-	"address": "0xd4B6426d31d31cE3b6425c91E5DD998408c2E3b6",
-	"consensusKeys": {
-		"compressed": true,
-		"privateKey": "6f8ea524a76dc0f88069773a0ae7de207e6f5a3df5cb4994c54faea45204553b",
-		"publicKey": "ad809bddc9b82498105c6310dda33871006611713b826b8a720d55043868bf09c10703614ce9454b918791df60b063c8"
-	},
-	"keys": {
-		"compressed": true,
-		"privateKey": "e73af719ef9e4f4b56b3c3a9cc98bc51dab945926d3745fe2447d122934cf3dc",
-		"publicKey": "026eccc52b0cbe789781611bea2be9ab770c7080b8fecfa40e9f3c803a7ed9812b"
-	},
-	"passphrase": "science garment tornado meat cloth express behave myself exercise end obey feed intact jungle bridge good river unfold fix scissors submit orphan gun draw"
+    "address": "0x18F8a91Aa88af45329fb1650BCdD53aAC1Ff4bfe",
+    "consensusKeys": {
+        "compressed": true,
+        "privateKey": "2061c5ae8a90cde5b53d1687c69da9226cd503de027c764f09a5044df188c577",
+        "publicKey": "b332de55ae9ed6fb195ace8f04a6c62de246b021f609f13abe3edfa5da03a8d9af8d46d00cc55a67a5b3bd9f51dd2dd5"
+    },
+    "keys": {
+        "compressed": true,
+        "privateKey": "cb84466332df8ed7de08ee1b8255d9df0f6a0c7c79c96527e6aa18e31e91a633",
+        "publicKey": "03335579fc9eab385e3076e31a2bae5f7560e4697abe6d476c93d07ffae628a359"
+    },
+    "passphrase": "letter pledge tiger miracle aim best isolate rookie prosper faint expire buffalo toss account lamp gather crunch winter frozen robust humble mention treat remain"
 }
