@@ -1,7 +1,7 @@
 use anyhow;
-use mainsail_evm_core::legacy::LegacyAddress;
+use mainsail_evm_core::{db::BlsSig, legacy::LegacyAddress};
 use napi::bindgen_prelude::{BigInt, Buffer};
-use revm::primitives::{Address, B256, Bytes, U256};
+use revm::primitives::{Address, B256, Bytes, U256, hex};
 use std::str::FromStr;
 
 pub(crate) fn create_address_from_string(str: &str) -> anyhow::Result<Address> {
@@ -20,6 +20,20 @@ pub(crate) fn convert_string_to_b256(str: String) -> anyhow::Result<B256> {
     Ok(B256::try_from(
         &Bytes::from_str(str.as_str())?.as_ref()[..],
     )?)
+}
+
+pub(crate) fn convert_string_to_bls_sig(str: String) -> anyhow::Result<BlsSig> {
+    Ok(BlsSig::try_from(
+        &Bytes::from_str(str.as_str())?.as_ref()[..],
+    )?)
+}
+
+pub(crate) fn convert_hex_to_u256(str: &str) -> U256 {
+    U256::from_le_slice(&hex::decode(&str).expect("valid hex")[..])
+}
+
+pub(crate) fn convert_u256_to_hex(value: U256) -> String {
+    hex::encode(value.to_le_bytes_vec())
 }
 
 pub(crate) fn convert_bigint_to_u256(bigint: BigInt) -> anyhow::Result<U256> {

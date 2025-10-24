@@ -1,5 +1,6 @@
 use mainsail_evm_core::{
     account::AccountInfoExtended,
+    db::{BlockHeaderData, ProofData, TransactionData},
     legacy::{LegacyAccountAttributes, LegacyColdWallet, LegacyMultiSignatureAttribute},
     receipt::TxReceipt,
     state_changes::AccountUpdate,
@@ -7,11 +8,14 @@ use mainsail_evm_core::{
 use napi::bindgen_prelude::{BigInt, Buffer};
 use napi_derive::napi;
 use revm::{
-    primitives::{B256, Bytes},
+    primitives::{B256, Bytes, hex::ToHexExt},
     state::AccountInfo,
 };
 
-use crate::utils;
+use crate::{
+    ctx::{JsBlockHeaderData, JsCommitData, JsProofData, JsTransactionData},
+    utils,
+};
 
 #[napi(object)]
 pub struct JsProcessResult {
@@ -129,6 +133,78 @@ impl JsTransactionReceipt {
             output: receipt.output.map(|o| utils::convert_bytes_to_js_buffer(o)),
             block_number: None,
             tx_hash: None,
+        }
+    }
+}
+
+impl JsCommitData {
+    pub fn new(
+        proof: ProofData,
+        header: BlockHeaderData,
+        transactions: Vec<TransactionData>,
+    ) -> Self {
+        JsCommitData {
+            proof: JsProofData::new(proof),
+            header: JsBlockHeaderData::new(header),
+            transactions: transactions
+                .into_iter()
+                .map(|tx| JsTransactionData::new(tx))
+                .collect(),
+        }
+    }
+}
+
+impl JsProofData {
+    pub fn new(proof: ProofData) -> Self {
+        JsProofData {
+            round: proof.round,
+            signature: proof.signature.encode_hex(),
+            validator_set: proof.validator_set.into(),
+        }
+    }
+}
+
+impl JsBlockHeaderData {
+    pub fn new(header: BlockHeaderData) -> Self {
+        JsBlockHeaderData {
+            version: header.version,
+            timestamp: header.timestamp.into(),
+            number: header.number,
+            round: header.round,
+            hash: format!("{:x}", header.hash),
+            parent_hash: format!("{:x}", header.parent_hash),
+            state_root: format!("{:x}", header.state_root),
+            logs_bloom: header.logs_bloom.encode_hex(),
+            transactions_root: format!("{:x}", header.transactions_root),
+            transactions_count: header.transactions_count,
+            gas_used: header.gas_used,
+            fee: utils::convert_u256_to_bigint(header.fee),
+            reward: utils::convert_u256_to_bigint(header.reward),
+            payload_size: header.payload_size,
+            proposer: header.proposer.to_string(),
+        }
+    }
+}
+
+impl JsTransactionData {
+    pub fn new(tx: TransactionData) -> Self {
+        JsTransactionData {
+            block_number: tx.block_number,
+            tx_hash: format!("{:x}", tx.tx_hash),
+            from: tx.from.to_string(),
+            sender_public_key: tx.sender_public_key,
+            legacy_address: tx.legacy_address.map(|address| address.to_string()),
+            to: tx.to.map(|address| address.to_string()),
+            gas_limit: tx.gas_limit.into(),
+            gas_price: tx.gas_price.into(),
+            value: utils::convert_u256_to_bigint(tx.value),
+            nonce: tx.nonce.into(),
+            data: utils::convert_bytes_to_js_buffer(tx.data),
+            v: tx.v,
+            r: utils::convert_u256_to_hex(tx.r),
+            s: utils::convert_u256_to_hex(tx.s),
+            legacy_second_signature: None,
+            index: tx.index,
         }
     }
 }
@@ -362,6 +438,31 @@ impl JsGetAccounts {
         JsGetAccounts {
             next_offset,
             accounts: mapped,
+        }
+    }
+}
+
+#[napi(object)]
+pub struct JsGetTransactionBytesRaw {
+    pub next_offset: Option<BigInt>,
+    pub txs: Vec<(String, Buffer)>,
+}
+
+impl JsGetTransactionBytesRaw {
+    pub fn new(next_offset: Option<u64>, txs: Vec<(String, Bytes)>) -> Self {
+        let next_offset = match next_offset {
+            Some(next_offset) => Some(next_offset.into()),
+            None => None,
+        };
+
+        let mut mapped = Vec::with_capacity(txs.len());
+        for (key, bytes) in txs {
+            mapped.push((key, utils::convert_bytes_to_js_buffer(bytes)));
+        }
+
+        JsGetTransactionBytesRaw {
+            next_offset,
+            txs: mapped,
         }
     }
 }

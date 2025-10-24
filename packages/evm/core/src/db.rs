@@ -178,14 +178,59 @@ pub(crate) struct InnerStorage {
 #[derive(Hash, PartialEq, Eq, Debug, Default, Clone, Copy)]
 pub struct CommitKey(pub u64, pub u64, pub B256);
 
+pub type BlsSig = revm::primitives::FixedBytes<96>;
+
+#[derive(Default, Debug, Deserialize, Serialize)]
+pub struct ProofData {
+    pub round: u32,
+    pub signature: BlsSig,
+    pub validator_set: u128,
+}
+
+#[derive(Default, Debug, Deserialize, Serialize)]
+pub struct BlockHeaderData {
+    pub version: u8,
+    pub timestamp: u64,
+    pub number: u32,
+    pub round: u32,
+    pub hash: B256,
+    pub parent_hash: B256,
+    pub state_root: B256,
+    pub logs_bloom: Bloom,
+    pub transactions_root: B256,
+    pub transactions_count: u16,
+    pub gas_used: u32,
+    pub fee: U256,
+    pub reward: U256,
+    pub payload_size: u32,
+    pub proposer: Address,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct TransactionData {
+    pub from: Address,
+    pub sender_public_key: String,
+    pub legacy_address: Option<LegacyAddress>,
+    pub to: Option<Address>,
+    pub gas_limit: u64,
+    pub gas_price: u128,
+    pub value: U256,
+    pub nonce: u64,
+    pub data: Bytes,
+    pub v: u32,
+    pub r: U256,
+    pub s: U256,
+    pub legacy_second_signature: Option<String>,
+    pub tx_hash: B256,
+    pub block_number: u32,
+    pub index: u32,
+}
+
 #[derive(Default)]
 pub struct CommitData {
-    pub commit_round: u64,
-    pub block_hash: B256,
-    pub proof: Bytes,
-    pub block: Bytes,
-    pub transaction_hashes: Vec<B256>,
-    pub transactions: Vec<Bytes>,
+    pub proof: ProofData,
+    pub header: BlockHeaderData,
+    pub transactions: Vec<TransactionData>,
 }
 
 #[derive(Clone, Debug, Default)]
