@@ -44,6 +44,30 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		return this.fromData(Transaction.getData(json));
 	}
 
+	public async fromStorage(data: Contracts.Evm.TransactionStorageData): Promise<Contracts.Crypto.Transaction> {
+		const transaction = this.utils.resolve({
+			blockNumber: data.blockNumber,
+			data: data.data.toString("hex"),
+			from: data.from,
+			gasLimit: Number(data.gasLimit),
+			gasPrice: Number(data.gasPrice),
+			hash: data.txHash,
+			legacySecondSignature: data.legacySecondSignature,
+			network: this.configuration.get<number>("network.chainId"),
+			nonce: BigNumber.make(data.nonce),
+			r: data.r,
+			s: data.s,
+			senderLegacyAddress: data.legacyAddress,
+			senderPublicKey: data.senderPublicKey,
+			to: data.to,
+			transactionIndex: data.index,
+			v: data.v,
+			value: BigNumber.make(data.value),
+		});
+
+		return transaction;
+	}
+
 	public async fromData(
 		data: Contracts.Crypto.TransactionData,
 		strict?: boolean,

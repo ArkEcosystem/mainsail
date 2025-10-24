@@ -223,7 +223,7 @@ export class GenesisBlockGenerator extends Generator {
 
 		const commit: Contracts.Crypto.CommitSerializable = {
 			block: genesisBlock.block,
-			proof: { round: 0, signature: "", validators: [] },
+			proof: { round: 0, signature: "0".repeat(192), validators: [] },
 		};
 
 		const serialized = await this.commitSerializer.serializeCommit(commit);

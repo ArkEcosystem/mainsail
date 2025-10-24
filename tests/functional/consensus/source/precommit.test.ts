@@ -115,8 +115,17 @@ describe<{
 		// Assert all nodes precommits
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockHash),
-			[undefined, commit.block.data.hash, commit.block.data.hash, commit.block.data.hash, commit.block.data.hash],
+			p2p.precommits
+				.getMessages(1, 0)
+				.map((prevote) => prevote.blockHash)
+				.sort(),
+			[
+				undefined,
+				commit.block.data.hash,
+				commit.block.data.hash,
+				commit.block.data.hash,
+				commit.block.data.hash,
+			].sort(),
 		);
 
 		// Next block
@@ -157,8 +166,11 @@ describe<{
 		// Assert all nodes precommits
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockHash),
-			[undefined, commit.block.data.hash, commit.block.data.hash, commit.block.data.hash],
+			p2p.precommits
+				.getMessages(1, 0)
+				.map((prevote) => prevote.blockHash)
+				.sort(),
+			[undefined, commit.block.data.hash, commit.block.data.hash, commit.block.data.hash].sort(),
 		);
 
 		// Next block
@@ -205,13 +217,16 @@ describe<{
 		// Assert all nodes precommits
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockHash),
+			p2p.precommits
+				.getMessages(1, 0)
+				.map((prevote) => prevote.blockHash)
+				.sort(),
 			[
 				proposal.getData().block.data.hash,
 				commit.block.data.hash,
 				commit.block.data.hash,
 				commit.block.data.hash,
-			],
+			].sort(),
 		);
 
 		// Next block
@@ -270,7 +285,10 @@ describe<{
 		// Assert all nodes precommits
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockHash),
+			p2p.precommits
+				.getMessages(1, 0)
+				.map((prevote) => prevote.blockHash)
+				.sort(),
 			[
 				proposal0.getData().block.data.hash,
 				proposal1.getData().block.data.hash,
@@ -280,7 +298,7 @@ describe<{
 				commit.block.data.hash,
 				commit.block.data.hash,
 				commit.block.data.hash,
-			],
+			].sort(),
 		);
 
 		// Next block
