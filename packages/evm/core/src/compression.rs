@@ -1,10 +1,10 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, ops::Deref};
 
 const VERSION: u8 = 1;
 const ZSTD_LEVEL: i32 = 3;
 
 #[derive(Debug)]
-pub(crate) struct CompressedBincode<T>(pub T);
+pub struct CompressedBincode<T>(pub T);
 impl<'a, T: serde::Serialize + 'a> heed::BytesEncode<'a> for CompressedBincode<T> {
     type EItem = CompressedBincode<&'a T>;
 
@@ -41,5 +41,13 @@ impl<'a, T: serde::de::DeserializeOwned + 'a> heed::BytesDecode<'a> for Compress
         let deserialized = bincode::deserialize(&decompressed)?;
 
         Ok(CompressedBincode(deserialized))
+    }
+}
+
+impl<T> Deref for CompressedBincode<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }

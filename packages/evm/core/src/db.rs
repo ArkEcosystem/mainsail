@@ -155,19 +155,19 @@ pub(crate) struct CommitReceipts {
 }
 
 pub(crate) struct InnerStorage {
-    pub accounts: heed::Database<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>,
+    pub accounts: heed::Database<AddressWrapper, CompressedBincode<AccountInfo>>,
     pub accounts_history: Option<
         heed::Database<
             HeedBlockNumber,
-            heed::types::SerdeBincode<BTreeMap<Address, HistoricalAccountData>>,
+            CompressedBincode<BTreeMap<Address, HistoricalAccountData>>,
         >,
     >,
-    pub commits: heed::Database<HeedBlockNumber, heed::types::SerdeBincode<CommitReceipts>>,
-    pub contracts: heed::Database<HashWrapper, heed::types::SerdeBincode<Bytecode>>,
+    pub commits: heed::Database<HeedBlockNumber, CompressedBincode<CommitReceipts>>,
+    pub contracts: heed::Database<HashWrapper, CompressedBincode<Bytecode>>,
     pub legacy_attributes:
-        heed::Database<AddressWrapper, heed::types::SerdeBincode<LegacyAccountAttributes>>,
+        heed::Database<AddressWrapper, CompressedBincode<LegacyAccountAttributes>>,
     pub legacy_cold_wallets:
-        heed::Database<LegacyAddressWrapper, heed::types::SerdeBincode<LegacyColdWallet>>,
+        heed::Database<LegacyAddressWrapper, CompressedBincode<LegacyColdWallet>>,
     pub storage: heed::Database<
         AddressWrapper,
         StorageEntryWrapper,
@@ -372,37 +372,35 @@ impl PersistentDB {
         let tx_env = env.clone();
         let mut wtxn = tx_env.write_txn()?;
 
-        let accounts = env
-            .create_database::<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>(
-                &mut wtxn,
-                Some("accounts"),
-            )?;
+        let accounts = env.create_database::<AddressWrapper, CompressedBincode<AccountInfo>>(
+            &mut wtxn,
+            Some("accounts"),
+        )?;
 
         let (accounts_history_db, accounts_history) = match opts.history_size {
             Some(history_size) if history_size > 0 => {
-                let db = env.create_database::<HeedBlockNumber, heed::types::SerdeBincode<
+                let db = env.create_database::<HeedBlockNumber,CompressedBincode<
             BTreeMap<Address, HistoricalAccountData>>>(&mut wtxn, Some("accounts_history")) ?;
                 (Some(db), Some(AccountHistory::new(history_size)))
             }
             _ => (None, None),
         };
 
-        let commits = env
-            .create_database::<HeedBlockNumber, heed::types::SerdeBincode<CommitReceipts>>(
-                &mut wtxn,
-                Some("commits"),
-            )?;
-        let contracts = env.create_database::<HashWrapper, heed::types::SerdeBincode<Bytecode>>(
+        let commits = env.create_database::<HeedBlockNumber, CompressedBincode<CommitReceipts>>(
+            &mut wtxn,
+            Some("commits"),
+        )?;
+        let contracts = env.create_database::<HashWrapper, CompressedBincode<Bytecode>>(
             &mut wtxn,
             Some("contracts"),
         )?;
         let legacy_attributes = env
-            .create_database::<AddressWrapper, heed::types::SerdeBincode<LegacyAccountAttributes>>(
+            .create_database::<AddressWrapper, CompressedBincode<LegacyAccountAttributes>>(
                 &mut wtxn,
                 Some("legacy_attributes"),
             )?;
         let legacy_cold_wallets = env
-            .create_database::<LegacyAddressWrapper, heed::types::SerdeBincode<LegacyColdWallet>>(
+            .create_database::<LegacyAddressWrapper, CompressedBincode<LegacyColdWallet>>(
                 &mut wtxn,
                 Some("legacy_cold_wallets"),
             )?;
@@ -512,7 +510,7 @@ impl PersistentDB {
                 .legacy_attributes
                 .get(&tx_env, &AddressWrapper(account.address))?
             {
-                account.legacy_attributes = legacy_attributes;
+                account.legacy_attributes = legacy_attributes.0;
             }
         }
 
@@ -537,7 +535,7 @@ impl PersistentDB {
             |item| match item {
                 Some(item) => {
                     let (_, legacy_cold_wallet) = item?;
-                    Ok(Some(legacy_cold_wallet))
+                    Ok(Some(legacy_cold_wallet.0))
                 }
                 None => Ok(None),
             },
@@ -563,8 +561,11 @@ impl PersistentDB {
             iter,
             |item| match item {
                 Some(item) => {
-                    let (block_number, CommitReceipts { tx_receipts, .. }) = item?;
-                    Ok(Some((block_number, tx_receipts.into_iter().collect())))
+                    let (block_number, commit) = item?;
+                    Ok(Some((
+                        block_number,
+                        commit.0.tx_receipts.into_iter().collect(),
+                    )))
                 }
                 None => Ok(None),
             },
@@ -581,7 +582,7 @@ impl PersistentDB {
         let commit = self.inner.borrow().commits.get(&tx_env, &block_number)?;
 
         match commit {
-            Some(commit) => Ok(commit.tx_receipts),
+            Some(inner) => Ok(inner.0.tx_receipts),
             None => Ok(Default::default()),
         }
     }
@@ -648,7 +649,8 @@ impl PersistentDB {
             .inner
             .borrow()
             .legacy_attributes
-            .get(&tx_env, &AddressWrapper(address))?)
+            .get(&tx_env, &AddressWrapper(address))?
+            .map(|inner| inner.0))
     }
 
     pub fn get_legacy_cold_wallet(
@@ -660,7 +662,8 @@ impl PersistentDB {
             .inner
             .borrow()
             .legacy_cold_wallets
-            .get(&tx_env, &LegacyAddressWrapper(address))?)
+            .get(&tx_env, &LegacyAddressWrapper(address))?
+            .map(|inner| inner.0))
     }
 
     pub fn resize(&self) -> Result<(), Error> {
@@ -750,7 +753,7 @@ impl DatabaseRef for PersistentDB {
         let inner = self.inner.borrow();
 
         let basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
-            Some(account) => account,
+            Some(account) => account.0,
             None => match &self.genesis_info {
                 Some(genesis) if genesis.account == address => revm::state::AccountInfo {
                     balance: genesis.initial_supply,
@@ -768,7 +771,7 @@ impl DatabaseRef for PersistentDB {
         let inner = self.inner.borrow();
 
         let contract = match inner.contracts.get(&txn, &HashWrapper(code_hash))? {
-            Some(contract) => contract,
+            Some(contract) => contract.0,
             None => Default::default(),
         };
 
@@ -851,7 +854,9 @@ impl PersistentDB {
                 let address = AddressWrapper(*address);
 
                 if let Some(account) = account {
-                    inner.accounts.put(rwtxn, &address, &account)?;
+                    inner
+                        .accounts
+                        .put(rwtxn, &address, &CompressedBincode(account))?;
                 } else {
                     inner.accounts.delete(rwtxn, &address)?;
                 }
@@ -876,22 +881,28 @@ impl PersistentDB {
             // Update legacy attributes
             for (address, legacy_attributes) in legacy_attributes.into_iter() {
                 let address = AddressWrapper(*address);
-                inner
-                    .legacy_attributes
-                    .put(rwtxn, &address, legacy_attributes)?;
+                inner.legacy_attributes.put(
+                    rwtxn,
+                    &address,
+                    &CompressedBincode(legacy_attributes),
+                )?;
             }
 
             // Update legacy cold wallets
             for (address, legacy_cold_wallets) in legacy_cold_wallets.into_iter() {
                 let address = LegacyAddressWrapper(*address);
-                inner
-                    .legacy_cold_wallets
-                    .put(rwtxn, &address, legacy_cold_wallets)?;
+                inner.legacy_cold_wallets.put(
+                    rwtxn,
+                    &address,
+                    &CompressedBincode(legacy_cold_wallets),
+                )?;
             }
 
             // Update contracts
             for (hash, bytecode) in contracts.into_iter() {
-                inner.contracts.put(rwtxn, &HashWrapper(*hash), &bytecode)?;
+                inner
+                    .contracts
+                    .put(rwtxn, &HashWrapper(*hash), &CompressedBincode(&bytecode))?;
             }
 
             // Update storage
@@ -965,21 +976,24 @@ impl PersistentDB {
                 let mut legacy_cold_wallet = inner
                     .legacy_cold_wallets
                     .get(&rwtxn, key)?
-                    .expect("legacy cold wallet to be found");
+                    .expect("legacy cold wallet to be found")
+                    .0;
 
                 assert!(legacy_cold_wallet.merge_info.is_none());
                 legacy_cold_wallet.merge_info.replace((legacy.0, *address));
 
-                inner
-                    .legacy_cold_wallets
-                    .put(rwtxn, key, &legacy_cold_wallet)?;
+                inner.legacy_cold_wallets.put(
+                    rwtxn,
+                    key,
+                    &CompressedBincode(&legacy_cold_wallet),
+                )?;
 
                 // The legacy balance has already been applied to the `PendingCommit`,
                 // thus only the legacy attributes need to be moved to a different storage.
                 inner.legacy_attributes.put(
                     rwtxn,
                     &AddressWrapper(*address),
-                    &legacy_cold_wallet.legacy_attributes,
+                    &CompressedBincode(&legacy_cold_wallet.legacy_attributes),
                 )?;
             }
 
@@ -1043,12 +1057,12 @@ impl PersistentDB {
             inner.commits.put(
                 rwtxn,
                 &key.0,
-                &CommitReceipts {
+                &CompressedBincode(&CommitReceipts {
                     accounts_hash: state_root::calculate_accounts_hash(&change_set)?,
                     contracts_hash: state_root::calculate_contracts_hash(&change_set)?,
                     storage_hash: state_root::calculate_storage_hash(&change_set)?,
                     tx_receipts,
-                },
+                }),
             )?;
 
             Ok(())
@@ -1636,11 +1650,11 @@ fn test_read_accounts() {
                 .put(
                     &mut wtxn,
                     &AddressWrapper(*address),
-                    &AccountInfo {
+                    &CompressedBincode(&AccountInfo {
                         balance: U256::from(index),
                         nonce: index as u64,
                         ..Default::default()
-                    },
+                    }),
                 )
                 .unwrap();
         }
@@ -1721,10 +1735,10 @@ fn test_read_receipts() {
                 .put(
                     &mut wtxn,
                     &block_number,
-                    &CommitReceipts {
+                    &CompressedBincode(&CommitReceipts {
                         tx_receipts: receipts,
                         ..Default::default()
-                    },
+                    }),
                 )
                 .unwrap();
         }
