@@ -213,5 +213,16 @@ export async function snoozeForInvalidBlock(
 	}
 }
 
-export const getLastCommit = async (sandbox: Sandbox): Promise<Contracts.Crypto.Commit> =>
-	sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service).getLastCommit();
+export const getLastCommit = async (sandbox: Sandbox): Promise<Contracts.Crypto.Commit> => {
+	const databaseService = sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
+
+	const lasCommit = await databaseService.getLastCommit();
+	const [serialized] = await databaseService.findCommitBuffers(
+		lasCommit.block.header.number,
+		lasCommit.block.header.number,
+	);
+
+	return sandbox.app
+		.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory)
+		.fromBytes(serialized);
+};
