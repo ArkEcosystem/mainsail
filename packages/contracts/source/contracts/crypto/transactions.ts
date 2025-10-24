@@ -1,8 +1,8 @@
 import { BigNumber } from "@mainsail/utils";
 
+import { TransactionStorageData } from "../evm/storage.js";
 import type { EcdsaSignature, KeyPair } from "./identities.js";
 import type { SchemaValidationResult } from "./validator.js";
-import { TransactionStorageData } from "../evm/storage.js";
 
 export interface Transaction {
 	readonly hash: string;

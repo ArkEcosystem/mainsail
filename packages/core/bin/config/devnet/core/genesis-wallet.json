@@ -1,14 +1,14 @@
 {
-    "address": "0x18F8a91Aa88af45329fb1650BCdD53aAC1Ff4bfe",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "2061c5ae8a90cde5b53d1687c69da9226cd503de027c764f09a5044df188c577",
-        "publicKey": "b332de55ae9ed6fb195ace8f04a6c62de246b021f609f13abe3edfa5da03a8d9af8d46d00cc55a67a5b3bd9f51dd2dd5"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "cb84466332df8ed7de08ee1b8255d9df0f6a0c7c79c96527e6aa18e31e91a633",
-        "publicKey": "03335579fc9eab385e3076e31a2bae5f7560e4697abe6d476c93d07ffae628a359"
-    },
-    "passphrase": "letter pledge tiger miracle aim best isolate rookie prosper faint expire buffalo toss account lamp gather crunch winter frozen robust humble mention treat remain"
+	"address": "0x18F8a91Aa88af45329fb1650BCdD53aAC1Ff4bfe",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "2061c5ae8a90cde5b53d1687c69da9226cd503de027c764f09a5044df188c577",
+		"publicKey": "b332de55ae9ed6fb195ace8f04a6c62de246b021f609f13abe3edfa5da03a8d9af8d46d00cc55a67a5b3bd9f51dd2dd5"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "cb84466332df8ed7de08ee1b8255d9df0f6a0c7c79c96527e6aa18e31e91a633",
+		"publicKey": "03335579fc9eab385e3076e31a2bae5f7560e4697abe6d476c93d07ffae628a359"
+	},
+	"passphrase": "letter pledge tiger miracle aim best isolate rookie prosper faint expire buffalo toss account lamp gather crunch winter frozen robust humble mention treat remain"
 }

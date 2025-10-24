@@ -1,8 +1,8 @@
 import { BigNumber } from "@mainsail/utils";
 
 import { Mutable } from "../../utilities.js";
-import { Transaction, TransactionData, TransactionJson } from "./transactions.js";
 import { BlockHeaderStorageData, TransactionStorageData } from "../evm/storage.js";
+import { Transaction, TransactionData, TransactionJson } from "./transactions.js";
 
 export type BlockTag = "latest" | "finalized" | "safe";
 export type BlockHeader = Exclude<BlockData, "transactions">;

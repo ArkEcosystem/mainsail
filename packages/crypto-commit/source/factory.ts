@@ -37,12 +37,12 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 		const { roundValidators } = this.configuration.getMilestone(block.header.number);
 
 		return {
+			block,
 			proof: {
 				round: data.proof.round,
 				signature: data.proof.signature,
 				validators: validatorSetUnpack(data.proof.validatorSet, roundValidators),
 			},
-			block,
 			serialized: "",
 		};
 	}

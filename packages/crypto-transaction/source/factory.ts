@@ -46,23 +46,23 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 
 	public async fromStorage(data: Contracts.Evm.TransactionStorageData): Promise<Contracts.Crypto.Transaction> {
 		const transaction = this.utils.resolve({
+			blockNumber: data.blockNumber,
+			data: data.data.toString("hex"),
 			from: data.from,
-			senderLegacyAddress: data.legacyAddress,
 			gasLimit: Number(data.gasLimit),
 			gasPrice: Number(data.gasPrice),
 			nonce: BigNumber.make(data.nonce),
-			to: data.to,
-			senderPublicKey: data.senderPublicKey,
-			data: data.data.toString("hex"),
-			value: BigNumber.make(data.value),
-			blockNumber: data.blockNumber,
-			transactionIndex: data.index,
-			r: data.r,
-			s: data.s,
-			v: data.v,
 			legacySecondSignature: data.legacySecondSignature,
+			r: data.r,
 			hash: data.txHash,
+			s: data.s,
 			network: this.configuration.get<number>("network.chainId"),
+			senderLegacyAddress: data.legacyAddress,
+			senderPublicKey: data.senderPublicKey,
+			to: data.to,
+			transactionIndex: data.index,
+			v: data.v,
+			value: BigNumber.make(data.value),
 		});
 
 		return transaction;

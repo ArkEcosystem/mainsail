@@ -80,25 +80,25 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 
 		return sealBlock({
 			data: {
+				gasUsed: header.gasUsed,
 				hash: header.hash,
-				parentHash: header.parentHash,
-				timestamp: Number(header.timestamp),
-				version: header.version,
+				fee: BigNumber.make(header.fee),
+				logsBloom: header.logsBloom,
 				number: header.number,
+				parentHash: header.parentHash,
+				payloadSize: header.payloadSize,
+				proposer: header.proposer,
+				reward: BigNumber.make(header.reward),
 				round: header.round,
 				stateRoot: header.stateRoot,
-				logsBloom: header.logsBloom,
-				transactionsCount: header.transactionsCount,
-				gasUsed: header.gasUsed,
-				fee: BigNumber.make(header.fee),
-				reward: BigNumber.make(header.reward),
-				payloadSize: header.payloadSize,
-				transactionsRoot: header.transactionsRoot,
-				proposer: header.proposer,
+				timestamp: Number(header.timestamp),
 				transactions: parsedTransactions.map((tx) => tx.data),
+				version: header.version,
+				transactionsCount: header.transactionsCount,
+				transactionsRoot: header.transactionsRoot,
 			},
-			transactions: parsedTransactions,
 			serialized: "",
+			transactions: parsedTransactions,
 		});
 	}
 
