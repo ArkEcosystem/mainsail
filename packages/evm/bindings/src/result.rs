@@ -443,31 +443,6 @@ impl JsGetAccounts {
 }
 
 #[napi(object)]
-pub struct JsGetTransactionBytesRaw {
-    pub next_offset: Option<BigInt>,
-    pub txs: Vec<(String, Buffer)>,
-}
-
-impl JsGetTransactionBytesRaw {
-    pub fn new(next_offset: Option<u64>, txs: Vec<(String, Bytes)>) -> Self {
-        let next_offset = match next_offset {
-            Some(next_offset) => Some(next_offset.into()),
-            None => None,
-        };
-
-        let mut mapped = Vec::with_capacity(txs.len());
-        for (key, bytes) in txs {
-            mapped.push((key, utils::convert_bytes_to_js_buffer(bytes)));
-        }
-
-        JsGetTransactionBytesRaw {
-            next_offset,
-            txs: mapped,
-        }
-    }
-}
-
-#[napi(object)]
 pub struct JsGetLegacyColdWallets {
     pub next_offset: Option<BigInt>,
     pub wallets: Vec<JsLegacyColdWallet>,
