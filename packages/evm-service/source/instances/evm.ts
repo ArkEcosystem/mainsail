@@ -1,7 +1,7 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Evm, JsCommitData, LogLevel } from "@mainsail/evm";
-import { assert, ByteBuffer } from "@mainsail/utils";
+import { Evm, JsCommitData, JsTransactionData, LogLevel } from "@mainsail/evm";
+import { assert, validatorSetPack } from "@mainsail/utils";
 
 @injectable()
 export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storage {
@@ -10,12 +10,6 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
-
-	@inject(Identifiers.Cryptography.Commit.ProofSize)
-	private readonly proofSize!: () => number;
-
-	@inject(Identifiers.Cryptography.Block.HeaderSize)
-	private readonly headerSize!: () => number;
 
 	#evm!: Evm;
 
@@ -181,8 +175,10 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return { blockNumber: Number(state.blockNumber), totalRound: Number(state.totalRound) };
 	}
 
-	public async getBlockHeaderBytes(blockNumber: number): Promise<Buffer | undefined | null> {
-		return this.#evm.getBlockHeaderBytes(BigInt(blockNumber));
+	public async getBlockHeaderData(
+		blockNumber: number,
+	): Promise<Contracts.Evm.BlockHeaderStorageData | undefined | null> {
+		return this.#evm.getBlockHeaderData(BigInt(blockNumber));
 	}
 
 	public async getBlockNumberByHash(blockHash: string): Promise<number | undefined | null> {
@@ -194,16 +190,17 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return Number(result);
 	}
 
-	public async getProofBytes(blockNumber: number): Promise<Buffer | undefined | null> {
-		return this.#evm.getProofBytes(BigInt(blockNumber));
+	public async getCommitData(blockNumber: number): Promise<Contracts.Evm.CommitStorageData | undefined | null> {
+		const result = await this.#evm.getCommitData(BigInt(blockNumber));
+		if (!result) {
+			return undefined;
+		}
+
+		return result;
 	}
 
-	public async getCommitBytes(blockNumber: number): Promise<Buffer | undefined | null> {
-		return this.#evm.getCommitBytes(BigInt(blockNumber));
-	}
-
-	public async getTransactionBytes(key: string): Promise<Buffer | undefined | null> {
-		return this.#evm.getTransactionBytes(key);
+	public async getTransactionData(key: string): Promise<Contracts.Evm.TransactionStorageData | undefined | null> {
+		return this.#evm.getTransactionData(key);
 	}
 
 	public async getTransactionKeyByHash(txHash: string): Promise<string | undefined | null> {
@@ -227,42 +224,62 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 			return undefined;
 		}
 
-		const { block, serialized, proof } = await unit.getCommit();
+		const { block, proof } = await unit.getCommit();
 
-		const {
-			header: { number: height, hash },
-		} = block;
+		const { header } = block;
 
-		const { round: commitRound } = proof;
+		const transactions: JsTransactionData[] = [];
 
-		const proofSize = this.proofSize();
-		const headerSize = this.headerSize();
-
-		const commitBuffer = Buffer.from(serialized.slice(0, (proofSize + headerSize) * 2), "hex");
-		const proofBuffer = commitBuffer.subarray(0, proofSize);
-		const blockBuffer = commitBuffer.subarray(proofSize, proofSize + headerSize);
-
-		const transactionBuffers: Buffer[] = [];
-		const transactionHashes: string[] = [];
 		for (const transaction of block.transactions) {
 			assert.number(transaction.data.transactionIndex);
+			assert.defined(transaction.data.r);
+			assert.defined(transaction.data.s);
+			assert.defined(transaction.data.v);
 
-			const buff = ByteBuffer.fromSize(transaction.serialized.length + 8);
-			buff.writeUint32(height);
-			buff.writeUint32(transaction.data.transactionIndex);
-			buff.writeBytes(transaction.serialized);
-
-			transactionBuffers.push(buff.toBuffer());
-			transactionHashes.push(transaction.hash);
+			transactions.push({
+				from: transaction.data.from,
+				data: Buffer.from(transaction.data.data, "hex"),
+				gasLimit: BigInt(transaction.data.gasLimit),
+				gasPrice: BigInt(transaction.data.gasPrice),
+				nonce: transaction.data.nonce.toBigInt(),
+				senderPublicKey: transaction.data.senderPublicKey,
+				legacyAddress: transaction.data.senderLegacyAddress,
+				txHash: transaction.hash,
+				value: transaction.data.value.toBigInt(),
+				index: transaction.data.transactionIndex,
+				blockNumber: header.number,
+				to: transaction.data.to,
+				r: transaction.data.r,
+				s: transaction.data.s,
+				v: transaction.data.v,
+				legacySecondSignature: undefined,
+			});
 		}
 
 		return {
-			block: blockBuffer,
-			blockHash: hash,
-			commitRound: BigInt(commitRound),
-			proof: proofBuffer,
-			transactionHashes,
-			transactions: transactionBuffers,
+			proof: {
+				round: proof.round,
+				signature: proof.signature,
+				validatorSet: validatorSetPack(proof.validators),
+			},
+			header: {
+				version: header.version,
+				timestamp: BigInt(header.timestamp),
+				number: header.number,
+				round: header.round,
+				hash: header.hash,
+				parentHash: header.parentHash,
+				stateRoot: header.stateRoot,
+				logsBloom: header.logsBloom,
+				transactionsRoot: header.transactionsRoot,
+				transactionsCount: header.transactionsCount,
+				gasUsed: header.gasUsed,
+				fee: header.fee.toBigInt(),
+				reward: header.reward.toBigInt(),
+				payloadSize: header.payloadSize,
+				proposer: header.proposer,
+			},
+			transactions,
 		};
 	}
 }

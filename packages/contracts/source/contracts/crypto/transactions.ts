@@ -2,6 +2,7 @@ import { BigNumber } from "@mainsail/utils";
 
 import type { EcdsaSignature, KeyPair } from "./identities.js";
 import type { SchemaValidationResult } from "./validator.js";
+import { TransactionStorageData } from "../evm/storage.js";
 
 export interface Transaction {
 	readonly hash: string;
@@ -114,6 +115,8 @@ export interface TransactionFactory {
 	fromJson(json: TransactionJson): Promise<Transaction>;
 
 	fromData(data: TransactionData, strict?: boolean): Promise<Transaction>;
+
+	fromStorage(data: TransactionStorageData): Promise<Transaction>;
 
 	computeCryptoData(data: TransactionData): Promise<TransactionCryptoData>;
 }

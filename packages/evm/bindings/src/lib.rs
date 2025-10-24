@@ -2,16 +2,19 @@ use std::{sync::Arc, u64};
 
 use ctx::{
     BlockContext, CalculateRoundValidatorsContext, EvmOptions, ExecutionContext, GenesisContext,
-    JsCalculateRoundValidatorsContext, JsCommitData, JsCommitKey, JsEvmOptions, JsGenesisContext,
-    JsPrepareNextCommitContext, JsPreverifyTransactionContext, JsTransactionContext,
-    JsTransactionSimulateContext, JsTransactionViewContext, JsUpdateRewardsAndVotesContext,
-    PrepareNextCommitContext, PreverifyTxContext, TxContext, TxSimulateContext, TxViewContext,
-    UpdateRewardsAndVotesContext,
+    JsBlockHeaderData, JsCalculateRoundValidatorsContext, JsCommitData, JsCommitKey, JsEvmOptions,
+    JsGenesisContext, JsPrepareNextCommitContext, JsPreverifyTransactionContext,
+    JsTransactionContext, JsTransactionData, JsTransactionSimulateContext,
+    JsTransactionViewContext, JsUpdateRewardsAndVotesContext, PrepareNextCommitContext,
+    PreverifyTxContext, TxContext, TxSimulateContext, TxViewContext, UpdateRewardsAndVotesContext,
 };
 use logger::JsLogger;
 use mainsail_evm_core::{
     account::AccountInfoExtended,
-    db::{CommitData, CommitKey, GenesisInfo, PendingCommit, PersistentDB, PersistentDBOptions},
+    db::{
+        BlockHeaderData, CommitData, CommitKey, GenesisInfo, PendingCommit, PersistentDB,
+        PersistentDBOptions, ProofData, TransactionData,
+    },
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
     logs_bloom,
@@ -22,8 +25,8 @@ use mainsail_evm_core::{
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use result::{
-    CommitResult, JsAccountInfoExtended, JsLegacyAttributes, JsLegacyColdWallet, PreverifyTxResult,
-    TxViewResult,
+    CommitResult, JsAccountInfoExtended, JsCommitResult, JsGetState, JsLegacyAttributes,
+    JsLegacyColdWallet, JsTransactionReceipt, PreverifyTxResult, TxViewResult,
 };
 use revm::{
     Database, DatabaseCommit, ExecuteEvm, MainBuilder, MainContext,
@@ -33,16 +36,9 @@ use revm::{
     },
     database::{State, TransitionAccount, WrapDatabaseRef},
     handler::EvmTr,
-    primitives::{
-        Address, B256, Bytes, TxKind, U256,
-        bytes::{Buf, BufMut, BytesMut},
-        hex::ToHexExt,
-        map::HashMap,
-    },
+    primitives::{Address, B256, Bytes, TxKind, U256, hex::ToHexExt, map::HashMap},
     state::{AccountInfo, Bytecode},
 };
-
-use crate::result::{JsCommitResult, JsGetState, JsTransactionReceipt};
 
 mod ctx;
 mod logger;
@@ -844,11 +840,11 @@ impl EvmInner {
         }
     }
 
-    pub fn get_block_header_bytes(
+    pub fn get_block_header_data(
         &mut self,
         block_number: u64,
-    ) -> std::result::Result<Option<Bytes>, EVMError<String>> {
-        let result = self.persistent_db.get_block_header_bytes(block_number);
+    ) -> std::result::Result<Option<BlockHeaderData>, EVMError<String>> {
+        let result = self.persistent_db.get_block_header_data(block_number);
 
         match result {
             Ok(result) => Ok(result),
@@ -872,99 +868,53 @@ impl EvmInner {
         }
     }
 
-    pub fn get_proof_bytes(
+    pub fn get_commit_data(
         &mut self,
         block_number: u64,
-    ) -> std::result::Result<Option<Bytes>, EVMError<String>> {
-        let result = self.persistent_db.get_proof_bytes(block_number);
-
-        match result {
-            Ok(result) => Ok(result),
-            Err(err) => Err(EVMError::Database(
-                format!("get_proof_bytes failed: {}", err).into(),
-            )),
-        }
-    }
-
-    pub fn get_commit_bytes(
-        &mut self,
-        block_number: u64,
-    ) -> std::result::Result<Option<Bytes>, EVMError<String>> {
-        let Some(proof_bytes) = self
+    ) -> std::result::Result<
+        Option<(ProofData, BlockHeaderData, Vec<TransactionData>)>,
+        EVMError<String>,
+    > {
+        let Some(proof) = self
             .persistent_db
-            .get_proof_bytes(block_number)
-            .map_err(|err| EVMError::Database(format!("get_proof_bytes failed: {}", err).into()))?
+            .get_proof_data(block_number)
+            .map_err(|err| EVMError::Database(format!("get_proof_data failed: {}", err).into()))?
         else {
             return Ok(None);
         };
 
-        let header_bytes = self
+        let header = self
             .persistent_db
-            .get_block_header_bytes(block_number)
+            .get_block_header_data(block_number)
             .map_err(|err| {
-                EVMError::Database(format!("get_block_header_bytes failed: {}", err).into())
+                EVMError::Database(format!("get_block_header_data failed: {}", err).into())
             })?
             .ok_or_else(|| EVMError::Custom("header not found".into()))?;
 
-        // Read all transaction bytes. To do so, read tx count from the header bytes
-        // at the given offset and loop over them.
-        const TX_COUNT_OFFSET: usize =
-            1   // version
-          + 6   // timestamp
-          + 4   // number
-          + 4   // round
-          + 32  // parentHash
-          + 32  // stateRoot
-          + 256 // logsBloom
-        ;
+        let mut txs = Vec::with_capacity(header.transactions_count as usize);
 
-        assert!(header_bytes.len() >= TX_COUNT_OFFSET + 2);
-        let tx_count = (&header_bytes[TX_COUNT_OFFSET..TX_COUNT_OFFSET + 2]).get_u16_le();
-
-        const TX_PAYLOAD_SIZE_OFFSET: usize = TX_COUNT_OFFSET +
-            2  // transactionsCount
-          + 4  // gasUsed
-          + 32 // fee
-          + 32 // reward
-        ;
-
-        assert!(header_bytes.len() >= TX_PAYLOAD_SIZE_OFFSET + 4);
-        let tx_payload_size =
-            (&header_bytes[TX_PAYLOAD_SIZE_OFFSET..TX_PAYLOAD_SIZE_OFFSET + 4]).get_u32_le();
-
-        let mut full_bytes = BytesMut::with_capacity(
-            proof_bytes.len() + header_bytes.len() + tx_payload_size as usize,
-        );
-
-        full_bytes.extend_from_slice(&proof_bytes);
-        full_bytes.extend_from_slice(&header_bytes);
-
-        for i in 0..tx_count {
+        for i in 0..header.transactions_count {
             let key = format!("{block_number}-{i}");
-            let tx_bytes = self
-                .get_transaction_bytes(key)?
-                .ok_or_else(|| EVMError::Custom("tx not found".into()))?;
+            let tx_data = self.get_transaction_data(key)?.ok_or_else(|| {
+                EVMError::Custom(format!("tx {block_number}-{i} not found").into())
+            })?;
 
-            // Inside a block, each tx is prefixed by it's length.
-            // Additionally, the EVM storage keeps txs prefixed by block number and index (4 bytes each)
-            // which must be ignored here. For more context also see `#prepareCommitData`
-            full_bytes.put_u32_le(tx_bytes.len() as u32 - 8);
-            full_bytes.extend_from_slice(&tx_bytes[8..]);
+            txs.push(tx_data);
         }
 
-        Ok(Some(Bytes(full_bytes.freeze())))
+        Ok(Some((proof, header, txs)))
     }
 
-    pub fn get_transaction_bytes(
+    pub fn get_transaction_data(
         &mut self,
         key: String,
-    ) -> std::result::Result<Option<Bytes>, EVMError<String>> {
-        let result = self.persistent_db.get_transaction_bytes(key);
+    ) -> std::result::Result<Option<TransactionData>, EVMError<String>> {
+        let result = self.persistent_db.get_transaction_data(key);
 
         match result {
             Ok(result) => Ok(result),
             Err(err) => Err(EVMError::Database(
-                format!("get_transaction_bytes failed: {}", err).into(),
+                format!("get_transaction_data failed: {}", err).into(),
             )),
         }
     }
@@ -1599,18 +1549,18 @@ impl JsEvmWrapper {
         })
     }
 
-    #[napi(ts_return_type = "Promise<Buffer | undefined>")]
-    pub fn get_block_header_bytes<'env>(
+    #[napi]
+    pub fn get_block_header_data<'env>(
         &mut self,
         env: &'env Env,
         block_number: BigInt,
-    ) -> Result<PromiseRaw<'env, Option<Buffer>>> {
+    ) -> Result<PromiseRaw<'env, Option<JsBlockHeaderData>>> {
         let block_number = block_number.get_u64().1;
         env.spawn_future_with_callback(
-            Self::get_block_header_bytes_async(self.evm.clone(), block_number),
+            Self::get_block_header_data_async(self.evm.clone(), block_number),
             |_, result| {
                 Ok(match result {
-                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(bytes)),
+                    Some(data) => Some(JsBlockHeaderData::new(data)),
                     None => None,
                 })
             },
@@ -1637,17 +1587,17 @@ impl JsEvmWrapper {
     }
 
     #[napi]
-    pub fn get_proof_bytes<'env>(
+    pub fn get_commit_data<'env>(
         &mut self,
         env: &'env Env,
         block_number: BigInt,
-    ) -> Result<PromiseRaw<'env, Option<Buffer>>> {
+    ) -> Result<PromiseRaw<'env, Option<JsCommitData>>> {
         let block_number = block_number.get_u64().1;
         env.spawn_future_with_callback(
-            Self::get_proof_bytes_async(self.evm.clone(), block_number),
+            Self::get_commit_data_async(self.evm.clone(), block_number),
             |_, result| {
                 Ok(match result {
-                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(bytes)),
+                    Some((proof, header, txs)) => Some(JsCommitData::new(proof, header, txs)),
                     None => None,
                 })
             },
@@ -1655,37 +1605,14 @@ impl JsEvmWrapper {
     }
 
     #[napi]
-    pub fn get_commit_bytes<'env>(
-        &mut self,
-        env: &'env Env,
-        block_number: BigInt,
-    ) -> Result<PromiseRaw<'env, Option<Buffer>>> {
-        let block_number = block_number.get_u64().1;
-        env.spawn_future_with_callback(
-            Self::get_commit_bytes_async(self.evm.clone(), block_number),
-            |_, result| {
-                Ok(match result {
-                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(bytes)),
-                    None => None,
-                })
-            },
-        )
-    }
-
-    #[napi]
-    pub fn get_transaction_bytes<'env>(
+    pub fn get_transaction_data<'env>(
         &mut self,
         env: &'env Env,
         key: String,
-    ) -> Result<PromiseRaw<'env, Option<Buffer>>> {
+    ) -> Result<PromiseRaw<'env, Option<JsTransactionData>>> {
         env.spawn_future_with_callback(
-            Self::get_transaction_bytes_async(self.evm.clone(), key),
-            |_, result| {
-                Ok(match result {
-                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(bytes)),
-                    None => None,
-                })
-            },
+            Self::get_transaction_data_async(self.evm.clone(), key),
+            |_, result| Ok(result.map(|data| JsTransactionData::new(data))),
         )
     }
 
@@ -2063,12 +1990,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn get_block_header_bytes_async(
+    async fn get_block_header_data_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         block_number: u64,
-    ) -> Result<Option<Bytes>> {
+    ) -> Result<Option<BlockHeaderData>> {
         let mut lock = evm.lock().await;
-        let result = lock.get_block_header_bytes(block_number);
+        let result = lock.get_block_header_data(block_number);
 
         match result {
             Ok(result) => Result::Ok(result),
@@ -2089,12 +2016,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn get_proof_bytes_async(
+    async fn get_commit_data_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         block_number: u64,
-    ) -> Result<Option<Bytes>> {
+    ) -> Result<Option<(ProofData, BlockHeaderData, Vec<TransactionData>)>> {
         let mut lock = evm.lock().await;
-        let result = lock.get_proof_bytes(block_number);
+        let result = lock.get_commit_data(block_number);
 
         match result {
             Ok(result) => Result::Ok(result),
@@ -2102,25 +2029,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn get_commit_bytes_async(
-        evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        block_number: u64,
-    ) -> Result<Option<Bytes>> {
-        let mut lock = evm.lock().await;
-        let result = lock.get_commit_bytes(block_number);
-
-        match result {
-            Ok(result) => Result::Ok(result),
-            Err(err) => Result::Err(serde::de::Error::custom(err)),
-        }
-    }
-
-    async fn get_transaction_bytes_async(
+    async fn get_transaction_data_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         key: String,
-    ) -> Result<Option<Bytes>> {
+    ) -> Result<Option<TransactionData>> {
         let mut lock = evm.lock().await;
-        let result = lock.get_transaction_bytes(key);
+        let result = lock.get_transaction_data(key);
 
         match result {
             Ok(result) => Result::Ok(result),

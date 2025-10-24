@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { assert, ByteBuffer } from "@mainsail/utils";
+import { assert } from "@mainsail/utils";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.DatabaseService {
@@ -11,11 +11,11 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
+	@inject(Identifiers.Cryptography.Commit.Serializer)
+	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
+
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
-
-	@inject(Identifiers.Cryptography.Block.Deserializer)
-	private readonly blockDeserializer!: Contracts.Crypto.BlockDeserializer;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
@@ -34,31 +34,6 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return this.storage.isEmpty();
 	}
 
-	public async getCommit(blockNumber: number): Promise<Contracts.Crypto.Commit | undefined> {
-		const bytes = await this.#readCommitBytes(blockNumber);
-
-		if (bytes) {
-			return await this.commitFactory.fromBytes(bytes);
-		}
-
-		return undefined;
-	}
-
-	public async getCommitByHash(blockHash: string): Promise<Contracts.Crypto.Commit | undefined> {
-		const blockNumber = await this.#getBlockNumberByHash(blockHash);
-
-		if (blockNumber === undefined) {
-			return undefined;
-		}
-
-		const bytes = await this.#readCommitBytes(blockNumber);
-		if (bytes) {
-			return this.commitFactory.fromBytes(bytes);
-		}
-
-		return undefined;
-	}
-
 	public async hasCommitByHash(blockHash: string): Promise<boolean> {
 		const blockNumber = await this.#getBlockNumberByHash(blockHash);
 		return blockNumber !== undefined;
@@ -71,24 +46,29 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			blockNumbers.push(blockNumber);
 		}
 
-		const blocks = await Promise.all(
+		const buffers = await Promise.all(
 			blockNumbers.map(async (blockNumber: number) => {
 				try {
-					return await this.#readCommitBytes(blockNumber);
+					const commitStorage = await this.#readCommitStorage(blockNumber);
+					if (!commitStorage) {
+						return;
+					}
+
+					return this.commitSerializer.serializeCommit(await this.commitFactory.fromStorage(commitStorage));
 				} catch {
 					return;
 				}
 			}),
 		);
 
-		return blocks.filter((block): block is Buffer => !!block);
+		return buffers.filter((commit) => !!commit);
 	}
 
 	public async getBlock(blockNumber: number): Promise<Contracts.Crypto.Block | undefined> {
-		const bytes = await this.#readBlockBytes(blockNumber);
-
-		if (bytes) {
-			return await this.blockFactory.fromBytes(bytes);
+		const commit = await this.#readCommitStorage(blockNumber);
+		if (commit) {
+			const { block } = await this.commitFactory.fromStorage(commit);
+			return block;
 		}
 
 		return undefined;
@@ -101,19 +81,15 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return undefined;
 		}
 
-		const bytes = await this.#readBlockBytes(blockNumber);
-		if (bytes) {
-			return await this.blockFactory.fromBytes(bytes);
-		}
-
-		return undefined;
+		return this.getBlock(blockNumber);
 	}
 
 	public async getBlockHeader(blockNumber: number): Promise<Contracts.Crypto.BlockHeader | undefined> {
-		const bytes = await this.#readBlockHeaderBytes(blockNumber);
+		const data = await this.#readBlockHeaderData(blockNumber);
 
-		if (bytes) {
-			return await this.blockDeserializer.deserializeHeader(bytes);
+		if (data) {
+			const { header } = await this.blockFactory.fromStorage(data, []);
+			return header;
 		}
 
 		return undefined;
@@ -126,9 +102,10 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return undefined;
 		}
 
-		const bytes = await this.#readBlockHeaderBytes(blockNumber);
-		if (bytes) {
-			return this.blockDeserializer.deserializeHeader(bytes);
+		const data = await this.#readBlockHeaderData(blockNumber);
+		if (data) {
+			const { header } = await this.blockFactory.fromStorage(data, []);
+			return header;
 		}
 
 		return undefined;
@@ -172,13 +149,13 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {
 		for (let blockNumber = start; blockNumber <= end; blockNumber++) {
-			const data = await this.#readCommitBytes(blockNumber);
+			const data = await this.#readCommitStorage(blockNumber);
 
 			if (!data) {
 				return;
 			}
 
-			const commit = await this.commitFactory.fromBytes(data);
+			const commit = await this.commitFactory.fromStorage(data);
 			yield commit;
 		}
 	}
@@ -188,9 +165,9 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			throw new Error("Database is empty");
 		}
 
-		const bytes = await this.#readCommitBytes(this.#state.blockNumber);
-		assert.buffer(bytes);
-		return this.commitFactory.fromBytes(bytes);
+		const data = await this.#readCommitStorage(this.#state.blockNumber);
+		assert.defined(data);
+		return this.commitFactory.fromStorage(data);
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
@@ -203,60 +180,33 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return (await this.storage.getBlockNumberByHash(blockHash)) ?? undefined;
 	}
 
-	async #readCommitBytes(blockNumber: number): Promise<Buffer | undefined> {
-		const commitBuffer = await this.storage.getCommitBytes(blockNumber);
-		if (!commitBuffer) {
-			return;
-		}
+	async #readCommitStorage(blockNumber: number): Promise<Contracts.Evm.CommitStorageData | undefined> {
+		const result = await this.storage.getCommitData(blockNumber);
 
-		return commitBuffer;
-	}
-
-	async #readBlockBytes(blockNumber: number): Promise<Buffer | undefined> {
-		const blockBuffer = await this.storage.getBlockHeaderBytes(blockNumber);
-		if (!blockBuffer) {
-			return;
-		}
-
-		const blockHeader = await this.blockDeserializer.deserializeHeader(blockBuffer);
-
-		const transactions: Buffer[] = [];
-		for (let index = 0; index < blockHeader.transactionsCount; index++) {
-			const key = `${blockNumber}-${index}`;
-
-			const transaction = await this.storage.getTransactionBytes(key);
-			assert.buffer(transaction);
-
-			const sizeBuff = ByteBuffer.fromSize(4);
-			sizeBuff.writeUint32(transaction.length - 8);
-			transactions.push(sizeBuff.toBuffer(), transaction.subarray(8));
-		}
-
-		return Buffer.concat([blockBuffer, ...transactions]);
-	}
-
-	async #readBlockHeaderBytes(blockNumber: number): Promise<Buffer | undefined | null> {
-		return this.storage.getBlockHeaderBytes(blockNumber);
-	}
-
-	async #readTransaction(key: string): Promise<Contracts.Crypto.Transaction | undefined> {
-		const transactionBytes = await this.storage.getTransactionBytes(key);
-		if (!transactionBytes) {
+		if (!result) {
 			return undefined;
 		}
 
-		const buffer = ByteBuffer.fromBuffer(transactionBytes);
-		const blockNumber = buffer.readUint32();
-		const transactionIndex = buffer.readUint32();
-		const transaction = await this.transactionFactory.fromBytes(buffer.getRemainder());
+		return result;
+	}
 
-		transaction.data.transactionIndex = transactionIndex;
-		transaction.data.blockNumber = blockNumber;
+	async #readBlockHeaderData(blockNumber: number): Promise<Contracts.Evm.BlockHeaderStorageData | undefined | null> {
+		return this.storage.getBlockHeaderData(blockNumber);
+	}
 
-		const blockBuffer = await this.#readBlockHeaderBytes(blockNumber);
-		assert.buffer(blockBuffer);
-		const block = await this.blockDeserializer.deserializeHeader(blockBuffer);
-		transaction.data.blockHash = block.hash;
+	async #readTransaction(key: string): Promise<Contracts.Crypto.Transaction | undefined> {
+		const transactionStorageData = await this.storage.getTransactionData(key);
+		if (!transactionStorageData) {
+			return undefined;
+		}
+
+		const transaction = await this.transactionFactory.fromStorage(transactionStorageData);
+
+		assert.defined<number>(transaction.data.blockNumber);
+		const blockHeaderData = await this.#readBlockHeaderData(transaction.data.blockNumber);
+		assert.defined(blockHeaderData);
+
+		transaction.data.blockHash = blockHeaderData.hash;
 
 		return transaction;
 	}

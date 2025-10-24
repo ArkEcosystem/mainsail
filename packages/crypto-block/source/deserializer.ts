@@ -1,7 +1,6 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import { inject, injectable, optional } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers, Utils } from "@mainsail/contracts";
-import { TransactionFactory } from "@mainsail/crypto-transaction";
 import { ByteBuffer, sleep } from "@mainsail/utils";
 
 import { HashFactory } from "./hash.factory.js";
@@ -12,7 +11,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 	private readonly hashFactory!: HashFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory!: TransactionFactory;
+	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Deserializer)
 	private readonly transactionDeserializer!: Contracts.Crypto.TransactionDeserializer;

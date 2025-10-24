@@ -8,6 +8,7 @@ use std::{
     sync::{LazyLock, RwLock},
 };
 
+use alloy_primitives::Bloom;
 use heed::{Comparator, EnvFlags, EnvOpenOptions};
 use rayon::slice::ParallelSliceMut;
 use revm::{
@@ -21,6 +22,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     account::AccountInfoExtended,
+    compression::CompressedBincode,
     historical::{AccountHistory, HistoricalAccountData},
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::{LogLevel, Logger},
@@ -83,6 +85,14 @@ impl heed::BytesEncode<'_> for StringWrapper {
 
     fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
         Ok(Cow::Borrowed(item.0.as_bytes()))
+    }
+}
+
+impl heed::BytesDecode<'_> for StringWrapper {
+    type DItem = StringWrapper;
+
+    fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
+        Ok(StringWrapper(String::from_utf8(bytes.into())?))
     }
 }
 
@@ -166,10 +176,10 @@ pub(crate) struct InnerStorage {
     >,
     // Carried over from previous database-service.ts lmdb backend
     pub state: heed::Database<StaticStringWrapper, heed::types::SerdeBincode<Bytes>>,
-    pub proofs: heed::Database<HeedBlockNumber, heed::types::SerdeBincode<Bytes>>,
-    pub blocks: heed::Database<HeedBlockNumber, heed::types::SerdeBincode<Bytes>>,
+    pub proofs: heed::Database<HeedBlockNumber, CompressedBincode<ProofData>>,
+    pub blocks: heed::Database<HeedBlockNumber, CompressedBincode<BlockHeaderData>>,
     pub blocks_hash_number: heed::Database<HashWrapper, HeedBlockNumber>,
-    pub transactions: heed::Database<StringWrapper, heed::types::SerdeBincode<Bytes>>,
+    pub transactions: heed::Database<StringWrapper, CompressedBincode<TransactionData>>,
     pub transactions_hash_key: heed::Database<HashWrapper, heed::types::SerdeBincode<String>>,
     //
 }
@@ -409,11 +419,11 @@ impl PersistentDB {
             &mut wtxn,
             Some("state"),
         )?;
-        let proofs = env.create_database::<HeedBlockNumber, heed::types::SerdeBincode<Bytes>>(
+        let proofs = env.create_database::<HeedBlockNumber, CompressedBincode<ProofData>>(
             &mut wtxn,
             Some("proofs"),
         )?;
-        let blocks = env.create_database::<HeedBlockNumber, heed::types::SerdeBincode<Bytes>>(
+        let blocks = env.create_database::<HeedBlockNumber, CompressedBincode<BlockHeaderData>>(
             &mut wtxn,
             Some("blocks"),
         )?;
@@ -421,16 +431,16 @@ impl PersistentDB {
             &mut wtxn,
             Some("blocks_hash_number"),
         )?;
-        let transactions = env.create_database::<StringWrapper, heed::types::SerdeBincode<Bytes>>(
-            &mut wtxn,
-            Some("transactions"),
-        )?;
+        let transactions = env
+            .create_database::<StringWrapper, CompressedBincode<TransactionData>>(
+                &mut wtxn,
+                Some("transactions"),
+            )?;
         let transactions_hash_key = env
             .create_database::<HashWrapper, heed::types::SerdeBincode<String>>(
                 &mut wtxn,
                 Some("transactions_hash_key"),
             )?;
-        //
 
         wtxn.commit()?;
 
@@ -445,11 +455,11 @@ impl PersistentDB {
                 legacy_cold_wallets,
                 storage,
                 state,
-                proofs,
-                blocks,
                 blocks_hash_number,
-                transactions,
+                blocks,
+                proofs,
                 transactions_hash_key,
+                transactions,
             }),
             accounts_history,
             logger: opts.logger.unwrap_or_default(),
@@ -977,35 +987,38 @@ impl PersistentDB {
             //
             if let Some(commit_data) = commit_data {
                 let CommitData {
-                    commit_round,
-                    block_hash,
-                    block,
                     proof,
-                    transaction_hashes,
+                    header,
                     transactions,
                 } = commit_data;
 
                 // Update blocks
-                inner.blocks.put(rwtxn, &key.0, &block)?;
+                inner
+                    .blocks
+                    .put(rwtxn, &key.0, &CompressedBincode(header))?;
                 inner
                     .blocks_hash_number
-                    .put(rwtxn, &HashWrapper(*block_hash), &key.0)?;
+                    .put(rwtxn, &HashWrapper(header.hash), &key.0)?;
 
                 // Update proofs
-                inner.proofs.put(rwtxn, &key.0, proof)?;
+                inner.proofs.put(rwtxn, &key.0, &CompressedBincode(proof))?;
 
                 // Update transactions
-                for (sequence, transaction) in transactions.iter().enumerate() {
+                for (sequence, _) in transactions.iter().enumerate() {
                     let key = format!("{}-{}", key.0, sequence);
-                    let transaction_hash = transaction_hashes[sequence];
+                    let transaction = &transactions[sequence];
 
-                    inner
-                        .transactions_hash_key
-                        .put(rwtxn, &HashWrapper(transaction_hash), &key)?;
+                    inner.transactions_hash_key.put(
+                        rwtxn,
+                        &HashWrapper(transaction.tx_hash),
+                        &key,
+                    )?;
 
-                    inner
-                        .transactions
-                        .put(rwtxn, &StringWrapper(key), transaction)?;
+                    inner.transactions.put(
+                        rwtxn,
+                        &StringWrapper(key),
+                        &CompressedBincode(transaction),
+                    )?;
                 }
 
                 // Update state
@@ -1016,7 +1029,7 @@ impl PersistentDB {
                 inner.state.put(
                     rwtxn,
                     &total_round_key,
-                    &Bytes::from_iter((current_total_round + commit_round + 1).to_le_bytes()),
+                    &Bytes::from_iter((current_total_round + proof.round as u64 + 1).to_le_bytes()),
                 )?;
             }
             // ========================================
@@ -1122,14 +1135,6 @@ impl PersistentDB {
         Ok((block_number, total_round))
     }
 
-    pub fn get_block_header_bytes(&self, block_number: u64) -> Result<Option<Bytes>, Error> {
-        let env = self.env.clone();
-        let rtxn = env.read_txn().expect("read");
-        let inner = self.inner.borrow();
-
-        Ok(inner.blocks.get(&rtxn, &block_number)?)
-    }
-
     pub fn get_block_number_by_hash(&self, block_hash: B256) -> Result<Option<u64>, Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
@@ -1140,20 +1145,34 @@ impl PersistentDB {
             .get(&rtxn, &HashWrapper(block_hash))?)
     }
 
-    pub fn get_proof_bytes(&self, block_number: u64) -> Result<Option<Bytes>, Error> {
+    pub fn get_proof_data(&self, block_number: u64) -> Result<Option<ProofData>, Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
 
-        Ok(inner.proofs.get(&rtxn, &block_number)?)
+        Ok(inner.proofs.get(&rtxn, &block_number)?.map(|data| data.0))
     }
 
-    pub fn get_transaction_bytes(&self, key: String) -> Result<Option<Bytes>, Error> {
+    pub fn get_block_header_data(
+        &self,
+        block_number: u64,
+    ) -> Result<Option<BlockHeaderData>, Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
 
-        Ok(inner.transactions.get(&rtxn, &StringWrapper(key))?)
+        Ok(inner.blocks.get(&rtxn, &block_number)?.map(|data| data.0))
+    }
+
+    pub fn get_transaction_data(&self, key: String) -> Result<Option<TransactionData>, Error> {
+        let env = self.env.clone();
+        let rtxn = env.read_txn().expect("read");
+        let inner = self.inner.borrow();
+
+        Ok(inner
+            .transactions
+            .get(&rtxn, &StringWrapper(key))?
+            .map(|data| data.0))
     }
 
     pub fn get_transaction_key_by_hash(&self, tx_hash: B256) -> Result<Option<String>, Error> {

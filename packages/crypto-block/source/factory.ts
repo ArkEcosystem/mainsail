@@ -16,6 +16,9 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	@inject(Identifiers.Cryptography.Block.HashFactory)
 	private readonly hashFactory!: HashFactory;
 
+	@inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
+
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.Validator;
 
@@ -66,6 +69,36 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		return sealBlock({
 			...(await this.deserializer.deserializeWithTransactions(serialized)),
 			serialized: serialized.toString("hex"),
+		});
+	}
+
+	public async fromStorage(
+		header: Contracts.Evm.BlockHeaderStorageData,
+		transactions: Contracts.Evm.TransactionStorageData[],
+	): Promise<Contracts.Crypto.Block> {
+		const parsedTransactions = await Promise.all(transactions.map((tx) => this.transactionFactory.fromStorage(tx)));
+
+		return sealBlock({
+			data: {
+				hash: header.hash,
+				parentHash: header.parentHash,
+				timestamp: Number(header.timestamp),
+				version: header.version,
+				number: header.number,
+				round: header.round,
+				stateRoot: header.stateRoot,
+				logsBloom: header.logsBloom,
+				transactionsCount: header.transactionsCount,
+				gasUsed: header.gasUsed,
+				fee: BigNumber.make(header.fee),
+				reward: BigNumber.make(header.reward),
+				payloadSize: header.payloadSize,
+				transactionsRoot: header.transactionsRoot,
+				proposer: header.proposer,
+				transactions: parsedTransactions.map((tx) => tx.data),
+			},
+			transactions: parsedTransactions,
+			serialized: "",
 		});
 	}
 
