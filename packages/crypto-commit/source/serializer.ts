@@ -6,6 +6,9 @@ export class Serializer implements Contracts.Crypto.CommitSerializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	private readonly serializer!: Contracts.Serializer.Serializer;
 
+	@inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
+
 	@inject(Identifiers.Cryptography.Commit.ProofSize)
 	private readonly proofSize!: () => number;
 
@@ -29,7 +32,12 @@ export class Serializer implements Contracts.Crypto.CommitSerializer {
 
 	public async serializeCommit(commit: Contracts.Crypto.CommitSerializable): Promise<Buffer> {
 		const serializedProof = await this.serializeCommitProof(commit.proof);
-		const serializedBlock = Buffer.from(commit.block.serialized, "hex");
+
+		let serializedBlock: Buffer = Buffer.from(commit.block.serialized, "hex");
+		if (serializedBlock.byteLength === 0) {
+			serializedBlock = await this.blockSerializer.serializeWithTransactions(commit.block.data);
+		}
+
 		return Buffer.concat([serializedProof, serializedBlock]);
 	}
 }

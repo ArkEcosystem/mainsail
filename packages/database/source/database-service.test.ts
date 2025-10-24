@@ -57,18 +57,6 @@ describe<{
 		await assert.rejects(async () => databaseService.getLastCommit(), "Database is empty");
 	});
 
-	it("getCommit - should be ok", async ({ databaseService }) => {
-		const commit = await databaseService.getCommit(0);
-		assert.undefined(commit);
-	});
-
-	it("getCommitByHash - should be ok", async ({ databaseService }) => {
-		const commit = await databaseService.getCommitByHash(
-			"0000000000000000000000000000000000000000000000000000000000000000",
-		);
-		assert.undefined(commit);
-	});
-
 	it("hasCommitByHash - should be ok", async ({ databaseService }) => {
 		const result = await databaseService.hasCommitByHash(
 			"0000000000000000000000000000000000000000000000000000000000000000",

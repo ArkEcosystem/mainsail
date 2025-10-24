@@ -19,19 +19,6 @@ import {
 import { makeCustomProposal, makeTransactionBuilderContext } from "./custom-proposal.js";
 import { EvmCalls } from "@mainsail/test-transaction-builders";
 
-const reorder = <T>(items: T[]): T[] => {
-	if (items.length !== 5) {
-		throw new Error("Reorder function only supports exactly 5 items");
-	}
-
-	// Swap items 3 and 4
-	const tmp = items[3];
-	items[3] = items[4];
-	items[4] = tmp;
-
-	return items;
-};
-
 describe<{
 	nodes: Sandbox[];
 	validators: Validator[];
@@ -198,14 +185,17 @@ describe<{
 
 		// Assert all nodes prevote
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
+			p2p.prevotes
+				.getMessages(1, 0)
+				.map((prevote) => prevote.blockHash)
+				.sort(),
 			[
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
-			],
+			].sort(),
 		);
 
 		// Assert all nodes precommit
@@ -247,14 +237,17 @@ describe<{
 
 		// Assert all nodes prevote
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
+			p2p.prevotes
+				.getMessages(1, 0)
+				.map((prevote) => prevote.blockHash)
+				.sort(),
 			[
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
+				proposal1.getData().block.data.hash,
+				proposal1.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
-				proposal1.getData().block.data.hash,
-				proposal1.getData().block.data.hash,
-			],
+			].sort(),
 		);
 
 		// Assert all nodes precommit (null)
@@ -293,14 +286,17 @@ describe<{
 
 			// Assert all nodes prevote
 			assert.equal(
-				p2p.prevotes.getMessages(1, round).map((prevote) => prevote.blockHash),
-				reorder([
+				p2p.prevotes
+					.getMessages(1, round)
+					.map((prevote) => prevote.blockHash)
+					.sort(),
+				[
 					proposal0.getData().block.data.hash,
 					proposal0.getData().block.data.hash,
 					proposal0.getData().block.data.hash,
 					proposal1.getData().block.data.hash,
 					proposal1.getData().block.data.hash,
-				]),
+				].sort(),
 			);
 
 			// Assert all nodes precommit (null)
@@ -323,7 +319,7 @@ describe<{
 		await assertBlockRound(nodes, 0);
 	});
 
-	it("#double propose - majority : minority split - should  accept block broadcasted to majority", async ({
+	it("#double propose - majority : minority split - should accept block broadcasted to majority", async ({
 		nodes,
 		validators,
 		p2p,
@@ -355,14 +351,17 @@ describe<{
 
 		// Assert all nodes prevote
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
-			reorder([
+			p2p.prevotes
+				.getMessages(1, 0)
+				.map((prevote) => prevote.blockHash)
+				.sort(),
+			[
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
 				proposal0.getData().block.data.hash,
 				proposal1.getData().block.data.hash,
-			]),
+			].sort(),
 		);
 
 		// // Assert all nodes precommit (null)
@@ -414,14 +413,17 @@ describe<{
 
 		// Assert all nodes prevote
 		assert.equal(
-			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
-			reorder([
+			p2p.prevotes
+				.getMessages(1, 0)
+				.map((prevote) => prevote.blockHash)
+				.sort(),
+			[
 				proposal0.getData().block.data.hash,
-				proposal1.getData().block.data.hash,
 				proposal2.getData().block.data.hash,
-				proposal3.getData().block.data.hash,
 				proposal4.getData().block.data.hash,
-			]),
+				proposal3.getData().block.data.hash,
+				proposal1.getData().block.data.hash,
+			].sort(),
 		);
 
 		// Assert all nodes precommit (null)

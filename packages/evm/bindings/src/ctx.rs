@@ -1,12 +1,12 @@
 use std::{path::PathBuf, str::FromStr};
 
 use mainsail_evm_core::{
-    db::{CommitData, CommitKey},
+    db::{BlockHeaderData, CommitData, CommitKey, ProofData, TransactionData},
     legacy::LegacyAddress,
 };
 use napi::bindgen_prelude::{BigInt, Buffer, Function};
 use napi_derive::napi;
-use revm::primitives::{Address, B256, Bytes, U256, hardfork::SpecId};
+use revm::primitives::{Address, B256, Bytes, U256, alloy_primitives::Bloom, hardfork::SpecId};
 
 use crate::{logger::JsLogMessage, utils};
 
@@ -110,6 +110,52 @@ pub struct JsUpdateRewardsAndVotesContext {
 }
 
 #[napi(object)]
+pub struct JsProofData {
+    pub round: u32,
+    pub signature: String,
+    pub validator_set: BigInt,
+}
+
+#[napi(object)]
+pub struct JsBlockHeaderData {
+    pub version: u8,
+    pub timestamp: BigInt,
+    pub number: u32,
+    pub round: u32,
+    pub hash: String,
+    pub parent_hash: String,
+    pub state_root: String,
+    pub logs_bloom: String,
+    pub transactions_root: String,
+    pub transactions_count: u16,
+    pub gas_used: u32,
+    pub fee: BigInt,
+    pub reward: BigInt,
+    pub payload_size: u32,
+    pub proposer: String,
+}
+
+#[napi(object)]
+pub struct JsTransactionData {
+    pub from: String,
+    pub sender_public_key: String,
+    pub legacy_address: Option<String>,
+    pub to: Option<String>,
+    pub gas_limit: BigInt,
+    pub gas_price: BigInt,
+    pub value: BigInt,
+    pub nonce: BigInt,
+    pub data: Buffer,
+    pub v: u32,
+    pub r: String,
+    pub s: String,
+    pub legacy_second_signature: Option<String>,
+    pub tx_hash: String,
+    pub block_number: u32,
+    pub index: u32,
+}
+
+#[napi(object)]
 pub struct JsCommitKey {
     pub block_number: BigInt,
     pub round: BigInt,
@@ -118,12 +164,9 @@ pub struct JsCommitKey {
 
 #[napi(object)]
 pub struct JsCommitData {
-    pub commit_round: BigInt,
-    pub block_hash: String,
-    pub block: Buffer,
-    pub proof: Buffer,
-    pub transaction_hashes: Vec<String>,
-    pub transactions: Vec<Buffer>,
+    pub proof: JsProofData,
+    pub header: JsBlockHeaderData,
+    pub transactions: Vec<JsTransactionData>,
 }
 
 #[napi(object)]
@@ -320,33 +363,96 @@ impl TryFrom<JsCommitKey> for CommitKey {
     }
 }
 
+impl TryFrom<JsProofData> for ProofData {
+    type Error = anyhow::Error;
+
+    fn try_from(value: JsProofData) -> Result<Self, Self::Error> {
+        Ok(ProofData {
+            round: value.round,
+            signature: utils::convert_string_to_bls_sig(value.signature)?,
+            validator_set: value.validator_set.get_u128().1,
+        })
+    }
+}
+
+impl TryFrom<JsBlockHeaderData> for BlockHeaderData {
+    type Error = anyhow::Error;
+
+    fn try_from(value: JsBlockHeaderData) -> Result<Self, Self::Error> {
+        Ok(BlockHeaderData {
+            proposer: utils::create_address_from_string(&value.proposer)?,
+            version: value.version,
+            timestamp: value.timestamp.get_u64().1,
+            number: value.number,
+            round: value.round,
+            hash: utils::convert_string_to_b256(value.hash)?,
+            parent_hash: utils::convert_string_to_b256(value.parent_hash)?,
+            state_root: utils::convert_string_to_b256(value.state_root)?,
+            logs_bloom: Bloom::from_str(&value.logs_bloom)?,
+            transactions_root: utils::convert_string_to_b256(value.transactions_root)?,
+            transactions_count: value.transactions_count,
+            gas_used: value.gas_used,
+            fee: utils::convert_bigint_to_u256(value.fee)?,
+            reward: utils::convert_bigint_to_u256(value.reward)?,
+            payload_size: value.payload_size,
+        })
+    }
+}
+
+impl TryFrom<JsTransactionData> for TransactionData {
+    type Error = anyhow::Error;
+
+    fn try_from(value: JsTransactionData) -> Result<Self, Self::Error> {
+        let to = if let Some(to) = value.to {
+            Some(utils::create_address_from_string(&to)?)
+        } else {
+            None
+        };
+
+        let legacy_address = if let Some(legacy_address) = value.legacy_address {
+            Some(utils::create_legacy_address_from_string(&legacy_address)?)
+        } else {
+            None
+        };
+
+        Ok(TransactionData {
+            from: utils::create_address_from_string(&value.from)?,
+            sender_public_key: value.sender_public_key,
+            legacy_address,
+            to,
+            gas_limit: value.gas_limit.get_u64().1,
+            gas_price: value.gas_price.get_u128().1,
+            value: utils::convert_bigint_to_u256(value.value)?,
+            nonce: value.nonce.get_u64().1,
+            data: utils::convert_js_buffer_to_bytes(value.data),
+            tx_hash: utils::convert_string_to_b256(value.tx_hash)?,
+            block_number: value.block_number,
+            index: value.index,
+            legacy_second_signature: value.legacy_second_signature,
+            v: value.v,
+            r: utils::convert_hex_to_u256(&value.r),
+            s: utils::convert_hex_to_u256(&value.s),
+        })
+    }
+}
+
 impl TryFrom<JsCommitData> for CommitData {
     type Error = anyhow::Error;
 
     fn try_from(value: JsCommitData) -> Result<Self, Self::Error> {
-        let commit_round = value.commit_round.get_u64().1;
-        let proof = utils::convert_js_buffer_to_bytes(value.proof);
-        let block = utils::convert_js_buffer_to_bytes(value.block);
-        let block_hash = utils::convert_string_to_b256(value.block_hash)?;
-
-        let mut transaction_hashes = Vec::with_capacity(value.transaction_hashes.len());
-        for transaction_hash in value.transaction_hashes {
-            transaction_hashes.push(utils::convert_string_to_b256(transaction_hash)?);
-        }
+        let proof: ProofData = value.proof.try_into()?;
+        let header: BlockHeaderData = value.header.try_into()?;
 
         let mut transactions = Vec::with_capacity(value.transactions.len());
-        for transaction in value.transactions {
-            transactions.push(utils::convert_js_buffer_to_bytes(transaction));
+        for data in value.transactions {
+            transactions.push(data.try_into()?);
         }
 
-        assert_eq!(transaction_hashes.len(), transactions.len());
+        assert_eq!(header.transactions_count, transactions.len() as u16);
 
         Ok(CommitData {
-            commit_round,
-            block_hash,
-            block,
             proof,
-            transaction_hashes,
+            header,
             transactions,
         })
     }
