@@ -237,8 +237,8 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 			assert.defined(transaction.data.v);
 
 			transactions.push({
-				data: Buffer.from(transaction.data.data, "hex"),
 				blockNumber: header.number,
+				data: Buffer.from(transaction.data.data, "hex"),
 				from: transaction.data.from,
 				gasLimit: BigInt(transaction.data.gasLimit),
 				gasPrice: BigInt(transaction.data.gasPrice),
@@ -258,21 +258,21 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 
 		return {
 			header: {
+				fee: header.fee.toBigInt(),
+				gasUsed: header.gasUsed,
 				hash: header.hash,
 				logsBloom: header.logsBloom,
-				fee: header.fee.toBigInt(),
 				number: header.number,
-				gasUsed: header.gasUsed,
 				parentHash: header.parentHash,
 				payloadSize: header.payloadSize,
-				timestamp: BigInt(header.timestamp),
 				proposer: header.proposer,
-				version: header.version,
 				reward: header.reward.toBigInt(),
 				round: header.round,
 				stateRoot: header.stateRoot,
+				timestamp: BigInt(header.timestamp),
 				transactionsCount: header.transactionsCount,
 				transactionsRoot: header.transactionsRoot,
+				version: header.version,
 			},
 			proof: {
 				round: proof.round,

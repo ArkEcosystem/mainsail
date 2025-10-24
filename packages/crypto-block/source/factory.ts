@@ -80,9 +80,9 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 
 		return sealBlock({
 			data: {
+				fee: BigNumber.make(header.fee),
 				gasUsed: header.gasUsed,
 				hash: header.hash,
-				fee: BigNumber.make(header.fee),
 				logsBloom: header.logsBloom,
 				number: header.number,
 				parentHash: header.parentHash,
@@ -93,9 +93,9 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 				stateRoot: header.stateRoot,
 				timestamp: Number(header.timestamp),
 				transactions: parsedTransactions.map((tx) => tx.data),
-				version: header.version,
 				transactionsCount: header.transactionsCount,
 				transactionsRoot: header.transactionsRoot,
+				version: header.version,
 			},
 			serialized: "",
 			transactions: parsedTransactions,
