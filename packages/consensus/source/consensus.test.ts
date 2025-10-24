@@ -25,6 +25,7 @@ type Context = {
 	eventDispatcher: any;
 	roundState: Contracts.Consensus.RoundState;
 	roundStateRepository: any;
+	peerStatistic: any;
 };
 
 describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each }) => {
@@ -135,6 +136,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			setProcessorResult: () => {},
 		} as unknown as Contracts.Consensus.RoundState;
 
+		context.peerStatistic = {
+			logStatistic: () => {},
+		};
+
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
@@ -156,6 +161,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			.bind(Identifiers.Consensus.RoundStateRepository)
 			.toConstantValue(context.roundStateRepository);
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.P2P.Peer.Statistic).toConstantValue(context.peerStatistic);
 
 		context.consensus = context.sandbox.app.resolve(Consensus);
 	});
@@ -198,10 +204,12 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		eventDispatcher,
 		proposer,
 		logger,
+		peerStatistic,
 	}) => {
 		const spyScheduleClear = spy(scheduler, "clear");
 		const spyScheduleTimeoutBlockPrepare = spy(scheduler, "scheduleTimeoutBlockPrepare");
 		const spyLoggerInfo = spy(logger, "info");
+		const spyLogStatistic = spy(peerStatistic, "logStatistic");
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue();
 		const spyGetRoundState = stub(roundStateRepository, "getRoundState").returnValue({
 			hasProposal: () => false,
@@ -211,6 +219,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		await consensus.startRound(0);
 
+		spyLogStatistic.calledOnce();
+		spyLogStatistic.calledWith(0);
 		spyScheduleClear.calledOnce();
 		spyScheduleTimeoutBlockPrepare.calledOnce();
 
