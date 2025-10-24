@@ -10,6 +10,9 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 	@inject(Identifiers.Cryptography.Commit.Deserializer)
 	private readonly commitDeserializer!: Contracts.Crypto.CommitDeserializer;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
 	@inject(Identifiers.Cryptography.Commit.ProofSize)
 	private readonly proofSize!: () => number;
 
@@ -31,11 +34,13 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 	public async fromStorage(data: Contracts.Evm.CommitStorageData): Promise<Contracts.Crypto.Commit> {
 		const block = await this.blockFactory.fromStorage(data.header, data.transactions);
 
+		const { roundValidators } = this.configuration.getMilestone(block.header.number);
+
 		return {
 			proof: {
 				round: data.proof.round,
 				signature: data.proof.signature,
-				validators: validatorSetUnpack(data.proof.validatorSet, 42),
+				validators: validatorSetUnpack(data.proof.validatorSet, roundValidators),
 			},
 			block,
 			serialized: "",
