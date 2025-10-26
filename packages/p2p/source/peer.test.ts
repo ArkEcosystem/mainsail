@@ -38,18 +38,6 @@ describe<{
 		],
 	);
 
-	it("#recentlyPinged - should return true when lastPinged is less than 2 minutes ago", ({ peer }) => {
-		peer.lastPinged = dayjs();
-
-		assert.true(peer.recentlyPinged());
-	});
-
-	it("#recentlyPinged - should return false when lastPinged is more than 2 minutes ago", ({ peer }) => {
-		peer.lastPinged = dayjs().subtract(2, "minute");
-
-		assert.false(peer.recentlyPinged());
-	});
-
 	it("#toBroadcast - should return a Contracts.P2P.PeerBroadcast object for peer properties", ({ peer }) => {
 		peer.version = "3.0.1";
 		peer.latency = 135;

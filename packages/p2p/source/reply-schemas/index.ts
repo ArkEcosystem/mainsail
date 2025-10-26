@@ -1,10 +1,23 @@
-export * from "./get-api-nodes.js";
-export * from "./get-blocks.js";
-export * from "./get-messages.js";
-export * from "./get-peers.js";
-export * from "./get-proposal.js";
-export * from "./get-status.js";
-export * from "./headers.js";
-export * from "./post-precommit.js";
-export * from "./post-prevote.js";
-export * from "./post-proposal.js";
+import { getApiNodes } from "./get-api-nodes.js";
+import { getBlocks } from "./get-blocks.js";
+import { getMessages } from "./get-messages.js";
+import { getPeers } from "./get-peers.js";
+import { getProposal } from "./get-proposal.js";
+import { getStatus } from "./get-status.js";
+import { headers } from "./headers.js";
+import { postPrecommit } from "./post-precommit.js";
+import { postPrevote } from "./post-prevote.js";
+import { postProposal } from "./post-proposal.js";
+
+export const replySchemas = {
+	getApiNodes,
+	getBlocks,
+	getMessages,
+	getPeers,
+	getProposal,
+	getStatus,
+	headers,
+	postPrecommit,
+	postPrevote,
+	postProposal,
+};

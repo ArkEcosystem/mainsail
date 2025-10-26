@@ -98,7 +98,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		const maxSameSubnetPeers = this.configuration.getRequired<number>("maxSameSubnetPeers");
 
 		if (this.repository.getSameSubnetPeers(ip).length >= maxSameSubnetPeers && !options.seed) {
-			this.logger.warningExtra(
+			this.logger.warnExtra(
 				`Rejected ${ip} because we are already at the ${maxSameSubnetPeers} limit for peers sharing the same /24 subnet.`,
 				"p2p",
 			);
@@ -118,7 +118,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 		if ((await this.peerVerifier.verify(peer)) && (await this.txPoolNodeVerifier.verify(txPoolNode))) {
 			this.repository.setPeer(peer);
-			this.logger.debugExtra(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
+			this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
 
 			void this.events.dispatch(Events.PeerEvent.Added, peer);
 

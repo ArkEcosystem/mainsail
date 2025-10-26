@@ -192,6 +192,7 @@ export const Identifiers = {
 			Factory: Symbol("P2P<Peer.Factory>"),
 			Processor: Symbol("P2P<Peer.Processor>"),
 			Repository: Symbol("P2P<Peer.Repository>"),
+			Statistic: Symbol("P2P<Peer.Statistic>"),
 			Verifier: Symbol("P2P<Peer.Verifier>"),
 		},
 		Server: Symbol("P2P<Server>"),

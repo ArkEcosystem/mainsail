@@ -50,6 +50,9 @@ export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.P2P.Peer.Statistic)
+	private readonly peerStatistic!: Contracts.P2P.PeerStatistic;
+
 	#blockNumber = 1;
 	#round = 0;
 	#step: Contracts.Consensus.Step = Contracts.Consensus.Step.Propose;
@@ -195,6 +198,8 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	public async startRound(round: number): Promise<void> {
+		this.peerStatistic.logStatistic(this.#roundStartTime);
+
 		this.#round = round;
 		this.#step = Contracts.Consensus.Step.Propose;
 		this.#didMajorityPrevote = false;

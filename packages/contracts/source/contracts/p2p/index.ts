@@ -18,6 +18,7 @@ export * from "./peer-discoverer.js";
 export * from "./peer-disposer.js";
 export * from "./peer-processor.js";
 export * from "./peer-repository.js";
+export * from "./peer-statistic.js";
 export * from "./peer-verifier.js";
 export * from "./server.js";
 export * from "./service.js";

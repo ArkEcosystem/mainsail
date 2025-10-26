@@ -2,7 +2,6 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
-import dayjs from "dayjs";
 
 import { isValidVersion } from "./utils/index.js";
 
@@ -51,7 +50,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 			await this.#verifyHighestCommonBlock(peer, status.state);
 
-			peer.lastPinged = dayjs();
 			peer.plugins = status.config.plugins;
 
 			return true;
