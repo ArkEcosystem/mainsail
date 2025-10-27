@@ -145,7 +145,12 @@ export default [
 			"unicorn/error-message": "warn",
 			"unicorn/explicit-length-check": "warn",
 			"unicorn/filename-case": "warn",
-			"unicorn/import-style": "warn",
+			"unicorn/import-style": [
+				"warn",
+				{
+					styles: { chalk: "named" },
+				},
+			],
 			"unicorn/no-abusive-eslint-disable": "warn",
 			"unicorn/no-array-callback-reference": "warn",
 			"unicorn/no-array-for-each": "warn",
