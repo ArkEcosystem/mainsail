@@ -1,38 +1,38 @@
 import { Contracts } from "@mainsail/contracts";
 
-import * as ApiNodes from "./routes/api-nodes.js";
-import * as Blockchain from "./routes/blockchain.js";
-import * as Blocks from "./routes/blocks.js";
-import * as Commits from "./routes/commits.js";
-import * as DeployedContracts from "./routes/contracts.js";
-import * as Legacy from "./routes/legacy.js";
-import * as Node from "./routes/node.js";
-import * as Peers from "./routes/peers.js";
-import * as Receipts from "./routes/receipts.js";
-import * as Transactions from "./routes/transactions.js";
-import * as ValidatorRounds from "./routes/validator-rounds.js";
-import * as Validators from "./routes/validators.js";
-import * as Votes from "./routes/votes.js";
-import * as Wallets from "./routes/wallets.js";
+import { register as apiNodesRegister } from "./routes/api-nodes.js";
+import { register as blockchainRegister } from "./routes/blockchain.js";
+import { register as blocksRegister } from "./routes/blocks.js";
+import { register as commitsRegister } from "./routes/commits.js";
+import { register as contractsRegister } from "./routes/contracts.js";
+import { register as legacyRegister } from "./routes/legacy.js";
+import { register as nodeRegister } from "./routes/node.js";
+import { register as peersRegister } from "./routes/peers.js";
+import { register as receiptsRegister } from "./routes/receipts.js";
+import { register as transactionsRegister } from "./routes/transactions.js";
+import { register as validatorRoundsRegister } from "./routes/validator-rounds.js";
+import { register as validatorsRegister } from "./routes/validators.js";
+import { register as votesRegister } from "./routes/votes.js";
+import { register as walletsRegister } from "./routes/wallets.js";
 
 const config = {
 	name: "Public API",
 	async register(server: Contracts.Api.ApiServer): Promise<void> {
 		const handlers = [
-			ApiNodes,
-			Blocks,
-			Blockchain,
-			Commits,
-			DeployedContracts,
-			Validators,
-			Peers,
-			Receipts,
-			Transactions,
-			Node,
-			ValidatorRounds,
-			Votes,
-			Wallets,
-			Legacy,
+			{ register: apiNodesRegister },
+			{ register: blockchainRegister },
+			{ register: blocksRegister },
+			{ register: commitsRegister },
+			{ register: contractsRegister },
+			{ register: validatorsRegister },
+			{ register: peersRegister },
+			{ register: receiptsRegister },
+			{ register: transactionsRegister },
+			{ register: nodeRegister },
+			{ register: validatorRoundsRegister },
+			{ register: votesRegister },
+			{ register: walletsRegister },
+			{ register: legacyRegister },
 		];
 
 		for (const handler of handlers) {

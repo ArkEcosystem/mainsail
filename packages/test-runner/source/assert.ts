@@ -1,28 +1,42 @@
 import { format } from "concordance";
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { join } from "path";
-import * as uvu from "uvu/assert";
+import {
+	Assertion,
+	equal,
+	fixture,
+	instance,
+	is,
+	match,
+	Message,
+	not,
+	ok,
+	throws,
+	type,
+	unreachable,
+} from "uvu/assert";
 import { z, ZodRawShape } from "zod";
 
 interface Constructable {
 	new (...arguments_: any): any;
 }
 
+// Overrides: snapshot, equal, throws, not.equal, not.throws
+
 export const assert = {
-	...uvu,
-	array: (value: unknown): void => uvu.ok(Array.isArray(value)),
-	boolean: (value: unknown): void => uvu.type(value, "boolean"),
-	buffer: (value: unknown): void => uvu.instance(value, Buffer),
-	bufferArray: (values: unknown[]): void => uvu.ok(values.every((value) => value instanceof Buffer)),
+	array: (value: unknown): void => ok(Array.isArray(value)),
+	boolean: (value: unknown): void => type(value, "boolean"),
+	buffer: (value: unknown): void => instance(value, Buffer),
+	bufferArray: (values: unknown[]): void => ok(values.every((value) => value instanceof Buffer)),
 	containKey: (value: object, key: string): void => assert.true(Object.keys(value).includes(key)),
 	containKeys: (value: object, keys: string[]): void => {
 		for (const key of keys) {
-			uvu.ok(value[key] !== undefined);
+			ok(value[key] !== undefined);
 		}
 	},
 	containValues: (value: object, key: string): void => assert.false(Object.values(value).includes(key)),
-	defined: (value: unknown): void => uvu.ok(value !== undefined, "Expected value to be defined."),
-	empty: (value: any): void => uvu.ok(!value || value.length === 0 || Object.keys(value).length === 0),
+	defined: (value: unknown): void => ok(value !== undefined, "Expected value to be defined."),
+	empty: (value: any): void => ok(!value || value.length === 0 || Object.keys(value).length === 0),
 	equal: (a: any, b: any): void => {
 		if (typeof a === "object" && typeof a.toBigInt === "function") {
 			a = a.toString();
@@ -32,23 +46,26 @@ export const assert = {
 			b = b.toString();
 		}
 
-		uvu.equal(a, b);
+		equal(a, b);
 	},
-	false: (value: unknown): void => uvu.is(value, false),
-	function: (value: unknown): void => uvu.type(value, "function"),
-	gt: (a: number, b: number): void => uvu.ok(a > b),
-	gte: (a: number, b: number): void => uvu.ok(a >= b),
-	includeAllMembers: (values: unknown[], items: unknown[]): void =>
-		uvu.ok(items.every((item) => values.includes(item))),
-	length: (value: string | unknown[], length: number): void => uvu.is(value.length, length),
-	lt: (a: number, b: number): void => uvu.ok(a < b),
-	lte: (a: number, b: number): void => uvu.ok(a <= b),
-	matchesObject: (value: unknown, schema: ZodRawShape): void => uvu.not.throws(() => z.object(schema).parse(value)),
+	false: (value: unknown): void => is(value, false),
+	fixture,
+	function: (value: unknown): void => type(value, "function"),
+	gt: (a: number, b: number): void => ok(a > b),
+	gte: (a: number, b: number): void => ok(a >= b),
+	includeAllMembers: (values: unknown[], items: unknown[]): void => ok(items.every((item) => values.includes(item))),
+	instance,
+	is,
+	length: (value: string | unknown[], length: number): void => is(value.length, length),
+	lt: (a: number, b: number): void => ok(a < b),
+	lte: (a: number, b: number): void => ok(a <= b),
+	match,
+	matchesObject: (value: unknown, schema: ZodRawShape): void => not.throws(() => z.object(schema).parse(value)),
 	not: {
-		...uvu.not,
+		...not,
 		containKey: (value: object, key: string): void => assert.false(Object.keys(value).includes(key)),
-		defined: (value: unknown): void => uvu.ok(value === undefined, "Expected value not to be defined."),
-		empty: (value: unknown[]): void => uvu.ok(Object.keys(value).length > 0),
+		defined: (value: unknown): void => ok(value === undefined, "Expected value not to be defined."),
+		empty: (value: unknown[]): void => ok(Object.keys(value).length > 0),
 		equal: (a: any, b: any): void => {
 			if (typeof a === "object" && typeof a.toBigInt === "function") {
 				a = a.toString();
@@ -58,55 +75,57 @@ export const assert = {
 				b = b.toString();
 			}
 
-			uvu.not.equal(a, b);
+			not.equal(a, b);
 		},
-		matchesObject: (value: unknown, schema: ZodRawShape): void => uvu.throws(() => z.object(schema).parse(value)),
-		undefined: (value: unknown): void => uvu.ok(value !== undefined, "Expected value not to be undefined."),
+		matchesObject: (value: unknown, schema: ZodRawShape): void => throws(() => z.object(schema).parse(value)),
+		undefined: (value: unknown): void => ok(value !== undefined, "Expected value not to be undefined."),
 	},
-	null: (value: unknown): void => uvu.ok(value === null),
-	number: (value: unknown): void => uvu.type(value, "number"),
-	object: (value: unknown): void => uvu.type(value, "object"),
-	positive: (value: number): void => uvu.ok(value > 0),
+	null: (value: unknown): void => ok(value === null),
+	number: (value: unknown): void => type(value, "number"),
+	object: (value: unknown): void => type(value, "object"),
+	ok,
+	positive: (value: number): void => ok(value > 0),
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-	rejects: async (callback: Function, ...expected: (uvu.Message | Constructable)[]): Promise<void> => {
+	rejects: async (callback: Function, ...expected: (Message | Constructable)[]): Promise<void> => {
 		try {
 			await callback();
 
-			uvu.ok(false, "Expected promise to be rejected but it resolved.");
+			ok(false, "Expected promise to be rejected but it resolved.");
 		} catch (error) {
-			if (error instanceof uvu.Assertion) {
+			if (error instanceof Assertion) {
 				throw error;
 			}
 
 			for (const item of expected) {
 				if (item instanceof Error) {
-					uvu.instance(error, item);
+					instance(error, item);
 				}
 
 				if (typeof item === "function") {
-					uvu.instance(error, item);
+					instance(error, item);
 				}
 
 				if (typeof item === "string") {
-					uvu.ok(error.message.includes(item) || error.name.includes(item));
+					ok(error.message.includes(item) || error.name.includes(item));
 				}
 			}
 
-			uvu.ok(true);
+			ok(true);
 		}
 	},
+
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	resolves: async (callback: Function): Promise<void> => {
 		try {
 			await callback();
 
-			uvu.ok(true);
+			ok(true);
 		} catch (error) {
-			if (error instanceof uvu.Assertion) {
+			if (error instanceof Assertion) {
 				throw error;
 			}
 
-			uvu.ok(false, "Expected promise to be resolved but it rejected.");
+			ok(false, "Expected promise to be resolved but it rejected.");
 		}
 	},
 	snapshot: (name: string, value: unknown): void => {
@@ -130,18 +149,20 @@ export const assert = {
 
 		assert.is(format(value), readFileSync(snapshot).toString());
 	},
-	startsWith: (value: string, prefix: string): void => uvu.ok(value.startsWith(prefix)),
-	string: (value: unknown): void => uvu.type(value, "string"),
-	stringArray: (values: unknown[]): void => uvu.ok(values.every((value) => typeof value === "string")),
+	startsWith: (value: string, prefix: string): void => ok(value.startsWith(prefix)),
+	string: (value: unknown): void => type(value, "string"),
+	stringArray: (values: unknown[]): void => ok(values.every((value) => typeof value === "string")),
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-	throws: (function_: Function, expects?: uvu.Message | RegExp | Function): void => {
+	throws: (function_: Function, expects?: Message | RegExp | Function): void => {
 		if (typeof expects === "string") {
 			expects = new RegExp(expects);
 		}
 
-		uvu.throws(function_, expects);
+		throws(function_, expects);
 	},
-	true: (value: unknown): void => uvu.is(value, true),
-	truthy: (value: unknown): void => uvu.ok(!!value),
-	undefined: (value: unknown): void => uvu.ok(value === undefined, "Expected value to be undefined."),
+	true: (value: unknown): void => is(value, true),
+	truthy: (value: unknown): void => ok(!!value),
+	type,
+	undefined: (value: unknown): void => ok(value === undefined, "Expected value to be undefined."),
+	unreachable,
 };

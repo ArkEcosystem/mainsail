@@ -88,7 +88,7 @@ export default [
 			"import/no-dynamic-require": "off",
 			"import/no-extraneous-dependencies": "warn",
 			"import/no-mutable-exports": "warn",
-			"import/no-namespace": "warn",
+			"import/no-namespace": "error",
 			"import/no-restricted-paths": "warn",
 			"import/no-self-import": "warn",
 			"import/no-unresolved": "off",

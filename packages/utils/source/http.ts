@@ -1,6 +1,11 @@
-import { ClientRequest, IncomingMessage, RequestOptions } from "http";
-import * as httpClient from "http";
-import * as httpsClient from "https";
+import {
+	ClientRequest,
+	globalAgent as httpGlobalAgent,
+	IncomingMessage,
+	request as httpRequest,
+	RequestOptions,
+} from "http";
+import { globalAgent as httpsGlobalAgent, request as httpsRequest } from "https";
 import { JsonArray, JsonObject, Primitive } from "type-fest";
 import { URL } from "url";
 
@@ -18,8 +23,10 @@ const sendRequest = (method: string, url: string, options?: HttpOptions): Promis
 			throw new Error("failed to parseURL");
 		}
 
-		const client = parsedUrl.protocol === "https:" ? httpsClient : httpClient;
-		const { globalAgent, request } = client;
+		const { globalAgent, request } =
+			parsedUrl.protocol === "https:"
+				? { globalAgent: httpsGlobalAgent, request: httpsRequest }
+				: { globalAgent: httpGlobalAgent, request: httpRequest };
 
 		options = { ...options };
 		options.host = parsedUrl.host;

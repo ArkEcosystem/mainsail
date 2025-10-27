@@ -1,24 +1,24 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
-import * as lmdb from "lmdb";
+import type { Database, Key, RootDatabase } from "lmdb";
 
 @injectable()
 export class Service implements Contracts.ConsensusStorage.Service {
 	@inject(Identifiers.ConsensusStorage.Root)
-	private readonly rootStorage!: lmdb.RootDatabase;
+	private readonly rootStorage!: RootDatabase;
 
 	@inject(Identifiers.ConsensusStorage.Storage.Proposal)
-	private readonly proposalStorage!: lmdb.Database<Contracts.Crypto.ProposalData>;
+	private readonly proposalStorage!: Database<Contracts.Crypto.ProposalData>;
 
 	@inject(Identifiers.ConsensusStorage.Storage.PreVote)
-	private readonly prevoteStorage!: lmdb.Database<Contracts.Crypto.PrevoteData>;
+	private readonly prevoteStorage!: Database<Contracts.Crypto.PrevoteData>;
 
 	@inject(Identifiers.ConsensusStorage.Storage.PreCommit)
-	private readonly precommitStorage!: lmdb.Database<Contracts.Crypto.PrecommitData>;
+	private readonly precommitStorage!: Database<Contracts.Crypto.PrecommitData>;
 
 	@inject(Identifiers.ConsensusStorage.Storage.ConsensusState)
-	private readonly stateStorage!: lmdb.Database<Contracts.Consensus.StateData>;
+	private readonly stateStorage!: Database<Contracts.Consensus.StateData>;
 
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
@@ -89,17 +89,17 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	}
 
 	public async getProposals(): Promise<Contracts.Crypto.Proposal[]> {
-		const proposals = [...this.proposalStorage.getValues(undefined as unknown as lmdb.Key)];
+		const proposals = [...this.proposalStorage.getValues(undefined as unknown as Key)];
 		return Promise.all(proposals.map((proposal) => this.messageFactory.makeProposalFromData(proposal)));
 	}
 
 	public async getPrevotes(): Promise<Contracts.Crypto.Prevote[]> {
-		const prevotes = [...this.prevoteStorage.getValues(undefined as unknown as lmdb.Key)];
+		const prevotes = [...this.prevoteStorage.getValues(undefined as unknown as Key)];
 		return Promise.all(prevotes.map((prevote) => this.messageFactory.makePrevoteFromData(prevote)));
 	}
 
 	public async getPrecommits(): Promise<Contracts.Crypto.Precommit[]> {
-		const precommits = [...this.precommitStorage.getValues(undefined as unknown as lmdb.Key)];
+		const precommits = [...this.precommitStorage.getValues(undefined as unknown as Key)];
 		return Promise.all(precommits.map((precommit) => this.messageFactory.makePrecommitFromData(precommit)));
 	}
 
