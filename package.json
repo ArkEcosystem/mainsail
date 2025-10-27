@@ -21,6 +21,7 @@
 		"docker": "node ./scripts/docker/generate-docker.js",
 		"format": "pnpm run lint && pnpm run prettier",
 		"lint": "eslint packages/*/source --fix",
+		"lint:error": "eslint packages/*/source --quiet",
 		"lint:dry": "eslint packages/*/source",
 		"lint:test": "eslint packages/ --ext .test.ts --fix",
 		"madge:circular": "node ./scripts/circular.js",
