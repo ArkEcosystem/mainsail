@@ -148,7 +148,7 @@ export default [
 			"unicorn/import-style": [
 				"warn",
 				{
-					styles: { chalk: "named" },
+					styles: { chalk: { named: true } },
 				},
 			],
 			"unicorn/no-abusive-eslint-disable": "warn",
