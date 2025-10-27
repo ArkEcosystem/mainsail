@@ -146,9 +146,9 @@ export default [
 			"unicorn/explicit-length-check": "warn",
 			"unicorn/filename-case": "warn",
 			"unicorn/import-style": [
-				"warn",
+				"error",
 				{
-					styles: { chalk: { named: true } },
+					styles: { chalk: { named: true }, path: { named: true } },
 				},
 			],
 			"unicorn/no-abusive-eslint-disable": "warn",

@@ -1,5 +1,4 @@
 import { Contracts } from "@mainsail/contracts";
-// eslint-disable-next-line unicorn/import-style
 import { resolve } from "path";
 
 import { Paths } from "./contracts.js";

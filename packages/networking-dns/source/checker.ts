@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { shuffle } from "@mainsail/utils";
 import dns from "dns";
-import util from "util";
+import { promisify } from "util";
 
 @injectable()
 export class Checker {
@@ -15,7 +15,7 @@ export class Checker {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(): Promise<void> {
-		const lookupService = util.promisify(dns.lookupService);
+		const lookupService = promisify(dns.lookupService);
 
 		for (const host of shuffle(this.configuration.getRequired<string[]>("hosts"))) {
 			try {
