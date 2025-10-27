@@ -101,7 +101,7 @@ export default [
 			"no-unneeded-ternary": "warn",
 			"no-unused-expressions": "off",
 			"no-unused-vars": "off",
-			"no-empty": "warn",
+			"no-empty": ["error", { allowEmptyCatch: true }],
 
 			"prefer-const": [
 				"warn",
