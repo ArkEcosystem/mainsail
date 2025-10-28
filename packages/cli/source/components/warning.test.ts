@@ -15,7 +15,7 @@ describe<{
 	});
 
 	it("should render the component", async ({ component, cli }) => {
-		const spyOnLog = spy(cli.app.get(Identifiers.Logger), "warning");
+		const spyOnLog = spy(cli.app.get(Identifiers.Logger), "warn");
 
 		component.render("Hello World");
 

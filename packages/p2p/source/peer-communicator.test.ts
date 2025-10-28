@@ -27,7 +27,7 @@ describeSkip<{
 	sandbox: Sandbox;
 	peerCommunicator: PeerCommunicator;
 }>("PeerCommunicator", ({ it, assert, beforeEach, stub, spy, match }) => {
-	const logger = { debug: () => {}, error: () => {}, info: () => {}, warning: () => {} };
+	const logger = { debug: () => {}, error: () => {}, info: () => {}, warn: () => {} };
 	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 	const connector = { connect: () => {}, emit: () => {}, forgetError: () => {}, setError: () => {} };
 	const cryptoConfig = {};

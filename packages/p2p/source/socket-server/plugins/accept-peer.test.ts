@@ -11,7 +11,7 @@ describe<{
 	sandbox: Sandbox;
 	acceptPeerPlugin: AcceptPeerPlugin;
 }>("AcceptPeerPlugin", ({ it, assert, beforeEach, spy, match }) => {
-	const logger = { debug: () => {}, warning: () => {} };
+	const logger = { debug: () => {}, warn: () => {} };
 	const peerProcessor = { validateAndAcceptPeer: () => {} };
 
 	beforeEach((context) => {

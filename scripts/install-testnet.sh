@@ -96,6 +96,12 @@ heading "Installing system dependencies..."
 
 success "Installed system dependencies!"
 
+heading "Make sure NTP exists systemwide and it's enabled by default..."
+    sudo $APT_ENV apt-get install systemd-timesyncd -yq
+    sudo timedatectl set-ntp on > /dev/null 2>&1 || true
+
+success "Done setting up NTP!"
+
 heading "Installing node.js & npm..."
 
     sudo rm -rf /usr/local/{lib/node{,/.npm,_modules},bin,share/man}/{npm*,node*,man1/node*}
@@ -228,8 +234,13 @@ addApi() {
 
 heading "Installing PostgreSQL..."
 
+    OS_CODENAME=$( (grep -w "VERSION_CODENAME" /etc/os-release)  2>/dev/null | cut -d'=' -f2 )
+    PG_VERSION="18"
+    (echo -e "Package: postgresql\nPin: origin apt.postgresql.org\nPin-Priority: 999" | sudo tee /etc/apt/preferences.d/postgresql)
+    curl -sL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/pgdg.gpg >/dev/null
+    (echo "deb [signed-by=/usr/share/keyrings/pgdg.gpg] https://apt.postgresql.org/pub/repos/apt ${OS_CODENAME}-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list)
     sudo apt-get update
-    sudo $APT_ENV apt-get install postgresql -yq
+    sudo $APT_ENV apt-get install postgresql-${PG_VERSION} postgresql -yq
 
 success "Installed PostgreSQL!"
 

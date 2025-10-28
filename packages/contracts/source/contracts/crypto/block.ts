@@ -1,6 +1,7 @@
 import { BigNumber } from "@mainsail/utils";
 
 import { Mutable } from "../../utilities.js";
+import { BlockHeaderStorageData, TransactionStorageData } from "../evm/storage.js";
 import { Transaction, TransactionData, TransactionJson } from "./transactions.js";
 
 export type BlockTag = "latest" | "finalized" | "safe";
@@ -31,8 +32,6 @@ export interface BlockData {
 	readonly transactionsRoot: string;
 	readonly proposer: string;
 
-	// TODO: transactions field is missing when retrieved from storage
-	// and transactionsCount = 0
 	readonly transactions: TransactionData[];
 }
 
@@ -67,6 +66,7 @@ export interface BlockFactory {
 	fromBytes(buff: Buffer): Promise<Block>;
 	fromJson(json: BlockJson): Promise<Block>;
 	fromData(data: BlockData): Promise<Block>;
+	fromStorage(header: BlockHeaderStorageData, transactions: TransactionStorageData[]): Promise<Block>;
 }
 
 export interface BlockSerializer {

@@ -13,7 +13,6 @@ import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-
 import { ServiceProvider as CryptoMessages } from "@mainsail/crypto-messages";
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
-import { ServiceProvider as CoreCryptoTransactionEvmCall } from "@mainsail/crypto-transaction-evm-call";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreEvmConsensus } from "@mainsail/evm-consensus";
@@ -50,7 +49,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	app.bind(Identifiers.Services.Log.Service).toConstantValue({
 		debug: (message: string) => console.log(message),
 		info: (message: string) => console.log(message),
-		warning: (message: string) => console.log(message),
+		warn: (message: string) => console.log(message),
 	});
 	// Used for evm instance
 	app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({
@@ -81,7 +80,6 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CoreCryptoBlock).register();
 	await app.resolve(CoreEvmConsensus).register();
 	await app.resolve(CoreCryptoTransaction).register();
-	await app.resolve(CoreCryptoTransactionEvmCall).register();
 	await app.resolve(CoreSnapshotLegacyImporter).register();
 	await app.resolve(EvmService).register();
 

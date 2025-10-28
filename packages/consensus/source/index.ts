@@ -31,7 +31,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			);
 
 		this.app.bind(Identifiers.Consensus.Bootstrapper).to(Bootstrapper).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.Service).toConstantValue(this.app.resolve(Consensus));
+		this.app.bind(Identifiers.Consensus.Service).to(Consensus).inSingletonScope();
 	}
 
 	public async dispose(): Promise<void> {

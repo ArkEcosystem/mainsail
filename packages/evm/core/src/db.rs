@@ -8,12 +8,13 @@ use std::{
     sync::{LazyLock, RwLock},
 };
 
+use alloy_primitives::Bloom;
 use heed::{Comparator, EnvFlags, EnvOpenOptions};
 use rayon::slice::ParallelSliceMut;
 use revm::{
     Database, DatabaseRef,
     context::{DBErrorMarker, result::ExecutionResult},
-    database::{CacheState, TransitionState},
+    database::{CacheState, TransitionAccount, TransitionState},
     primitives::*,
     state::{AccountInfo, Bytecode},
 };
@@ -21,6 +22,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     account::AccountInfoExtended,
+    compression::CompressedBincode,
     historical::{AccountHistory, HistoricalAccountData},
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::{LogLevel, Logger},
@@ -66,23 +68,6 @@ impl heed::BytesDecode<'_> for LegacyAddressWrapper {
     }
 }
 
-pub(crate) struct BytesWrapper(Bytes);
-impl heed::BytesEncode<'_> for BytesWrapper {
-    type EItem = BytesWrapper;
-
-    fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
-        Ok(Cow::Borrowed(item.0.as_ref()))
-    }
-}
-
-impl heed::BytesDecode<'_> for BytesWrapper {
-    type DItem = BytesWrapper;
-
-    fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
-        Ok(BytesWrapper(Bytes::from_iter(bytes)))
-    }
-}
-
 #[derive(Debug)]
 pub(crate) struct HashWrapper(B256);
 impl heed::BytesEncode<'_> for HashWrapper {
@@ -100,6 +85,14 @@ impl heed::BytesEncode<'_> for StringWrapper {
 
     fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
         Ok(Cow::Borrowed(item.0.as_bytes()))
+    }
+}
+
+impl heed::BytesDecode<'_> for StringWrapper {
+    type DItem = StringWrapper;
+
+    fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
+        Ok(StringWrapper(String::from_utf8(bytes.into())?))
     }
 }
 
@@ -162,19 +155,19 @@ pub(crate) struct CommitReceipts {
 }
 
 pub(crate) struct InnerStorage {
-    pub accounts: heed::Database<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>,
+    pub accounts: heed::Database<AddressWrapper, CompressedBincode<AccountInfo>>,
     pub accounts_history: Option<
         heed::Database<
             HeedBlockNumber,
-            heed::types::SerdeBincode<BTreeMap<Address, HistoricalAccountData>>,
+            CompressedBincode<BTreeMap<Address, HistoricalAccountData>>,
         >,
     >,
-    pub commits: heed::Database<HeedBlockNumber, heed::types::SerdeBincode<CommitReceipts>>,
-    pub contracts: heed::Database<HashWrapper, heed::types::SerdeBincode<Bytecode>>,
+    pub commits: heed::Database<HeedBlockNumber, CompressedBincode<CommitReceipts>>,
+    pub contracts: heed::Database<HashWrapper, CompressedBincode<Bytecode>>,
     pub legacy_attributes:
-        heed::Database<AddressWrapper, heed::types::SerdeBincode<LegacyAccountAttributes>>,
+        heed::Database<AddressWrapper, CompressedBincode<LegacyAccountAttributes>>,
     pub legacy_cold_wallets:
-        heed::Database<LegacyAddressWrapper, heed::types::SerdeBincode<LegacyColdWallet>>,
+        heed::Database<LegacyAddressWrapper, CompressedBincode<LegacyColdWallet>>,
     pub storage: heed::Database<
         AddressWrapper,
         StorageEntryWrapper,
@@ -183,10 +176,10 @@ pub(crate) struct InnerStorage {
     >,
     // Carried over from previous database-service.ts lmdb backend
     pub state: heed::Database<StaticStringWrapper, heed::types::SerdeBincode<Bytes>>,
-    pub proofs: heed::Database<HeedBlockNumber, heed::types::SerdeBincode<Bytes>>,
-    pub blocks: heed::Database<HeedBlockNumber, heed::types::SerdeBincode<Bytes>>,
+    pub proofs: heed::Database<HeedBlockNumber, CompressedBincode<ProofData>>,
+    pub blocks: heed::Database<HeedBlockNumber, CompressedBincode<BlockHeaderData>>,
     pub blocks_hash_number: heed::Database<HashWrapper, HeedBlockNumber>,
-    pub transactions: heed::Database<StringWrapper, heed::types::SerdeBincode<Bytes>>,
+    pub transactions: heed::Database<StringWrapper, CompressedBincode<TransactionData>>,
     pub transactions_hash_key: heed::Database<HashWrapper, heed::types::SerdeBincode<String>>,
     //
 }
@@ -195,14 +188,59 @@ pub(crate) struct InnerStorage {
 #[derive(Hash, PartialEq, Eq, Debug, Default, Clone, Copy)]
 pub struct CommitKey(pub u64, pub u64, pub B256);
 
+pub type BlsSig = revm::primitives::FixedBytes<96>;
+
+#[derive(Default, Debug, Deserialize, Serialize)]
+pub struct ProofData {
+    pub round: u32,
+    pub signature: BlsSig,
+    pub validator_set: u128,
+}
+
+#[derive(Default, Debug, Deserialize, Serialize)]
+pub struct BlockHeaderData {
+    pub version: u8,
+    pub timestamp: u64,
+    pub number: u32,
+    pub round: u32,
+    pub hash: B256,
+    pub parent_hash: B256,
+    pub state_root: B256,
+    pub logs_bloom: Bloom,
+    pub transactions_root: B256,
+    pub transactions_count: u16,
+    pub gas_used: u32,
+    pub fee: U256,
+    pub reward: U256,
+    pub payload_size: u32,
+    pub proposer: Address,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct TransactionData {
+    pub from: Address,
+    pub sender_public_key: String,
+    pub legacy_address: Option<LegacyAddress>,
+    pub to: Option<Address>,
+    pub gas_limit: u64,
+    pub gas_price: u128,
+    pub value: U256,
+    pub nonce: u64,
+    pub data: Bytes,
+    pub v: u32,
+    pub r: U256,
+    pub s: U256,
+    pub legacy_second_signature: Option<String>,
+    pub tx_hash: B256,
+    pub block_number: u32,
+    pub index: u32,
+}
+
 #[derive(Default)]
 pub struct CommitData {
-    pub commit_round: u64,
-    pub block_hash: B256,
-    pub proof: Bytes,
-    pub block: Bytes,
-    pub transaction_hashes: Vec<B256>,
-    pub transactions: Vec<Bytes>,
+    pub proof: ProofData,
+    pub header: BlockHeaderData,
+    pub transactions: Vec<TransactionData>,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -274,15 +312,15 @@ impl PersistentDBOptions {
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
-    #[error("IO error")]
+    #[error("IO error: {0}")]
     IO(#[from] std::io::Error),
-    #[error("heed error")]
+    #[error("heed error: {0}")]
     Heed(#[from] heed::Error),
     #[error("db full error")]
     DbFull,
-    #[error("bincode error")]
+    #[error("bincode error: {0}")]
     Bincode(#[from] bincode::Error),
-    #[error("infallible error")]
+    #[error("infallible error: {0}")]
     Infallible(#[from] Infallible),
     #[error("Lock error")]
     Lock,
@@ -334,37 +372,35 @@ impl PersistentDB {
         let tx_env = env.clone();
         let mut wtxn = tx_env.write_txn()?;
 
-        let accounts = env
-            .create_database::<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>(
-                &mut wtxn,
-                Some("accounts"),
-            )?;
+        let accounts = env.create_database::<AddressWrapper, CompressedBincode<AccountInfo>>(
+            &mut wtxn,
+            Some("accounts"),
+        )?;
 
         let (accounts_history_db, accounts_history) = match opts.history_size {
             Some(history_size) if history_size > 0 => {
-                let db = env.create_database::<HeedBlockNumber, heed::types::SerdeBincode<
+                let db = env.create_database::<HeedBlockNumber,CompressedBincode<
             BTreeMap<Address, HistoricalAccountData>>>(&mut wtxn, Some("accounts_history")) ?;
                 (Some(db), Some(AccountHistory::new(history_size)))
             }
             _ => (None, None),
         };
 
-        let commits = env
-            .create_database::<HeedBlockNumber, heed::types::SerdeBincode<CommitReceipts>>(
-                &mut wtxn,
-                Some("commits"),
-            )?;
-        let contracts = env.create_database::<HashWrapper, heed::types::SerdeBincode<Bytecode>>(
+        let commits = env.create_database::<HeedBlockNumber, CompressedBincode<CommitReceipts>>(
+            &mut wtxn,
+            Some("commits"),
+        )?;
+        let contracts = env.create_database::<HashWrapper, CompressedBincode<Bytecode>>(
             &mut wtxn,
             Some("contracts"),
         )?;
         let legacy_attributes = env
-            .create_database::<AddressWrapper, heed::types::SerdeBincode<LegacyAccountAttributes>>(
+            .create_database::<AddressWrapper, CompressedBincode<LegacyAccountAttributes>>(
                 &mut wtxn,
                 Some("legacy_attributes"),
             )?;
         let legacy_cold_wallets = env
-            .create_database::<LegacyAddressWrapper, heed::types::SerdeBincode<LegacyColdWallet>>(
+            .create_database::<LegacyAddressWrapper, CompressedBincode<LegacyColdWallet>>(
                 &mut wtxn,
                 Some("legacy_cold_wallets"),
             )?;
@@ -381,11 +417,11 @@ impl PersistentDB {
             &mut wtxn,
             Some("state"),
         )?;
-        let proofs = env.create_database::<HeedBlockNumber, heed::types::SerdeBincode<Bytes>>(
+        let proofs = env.create_database::<HeedBlockNumber, CompressedBincode<ProofData>>(
             &mut wtxn,
             Some("proofs"),
         )?;
-        let blocks = env.create_database::<HeedBlockNumber, heed::types::SerdeBincode<Bytes>>(
+        let blocks = env.create_database::<HeedBlockNumber, CompressedBincode<BlockHeaderData>>(
             &mut wtxn,
             Some("blocks"),
         )?;
@@ -393,16 +429,16 @@ impl PersistentDB {
             &mut wtxn,
             Some("blocks_hash_number"),
         )?;
-        let transactions = env.create_database::<StringWrapper, heed::types::SerdeBincode<Bytes>>(
-            &mut wtxn,
-            Some("transactions"),
-        )?;
+        let transactions = env
+            .create_database::<StringWrapper, CompressedBincode<TransactionData>>(
+                &mut wtxn,
+                Some("transactions"),
+            )?;
         let transactions_hash_key = env
             .create_database::<HashWrapper, heed::types::SerdeBincode<String>>(
                 &mut wtxn,
                 Some("transactions_hash_key"),
             )?;
-        //
 
         wtxn.commit()?;
 
@@ -417,11 +453,11 @@ impl PersistentDB {
                 legacy_cold_wallets,
                 storage,
                 state,
-                proofs,
-                blocks,
                 blocks_hash_number,
-                transactions,
+                blocks,
+                proofs,
                 transactions_hash_key,
+                transactions,
             }),
             accounts_history,
             logger: opts.logger.unwrap_or_default(),
@@ -474,7 +510,7 @@ impl PersistentDB {
                 .legacy_attributes
                 .get(&tx_env, &AddressWrapper(account.address))?
             {
-                account.legacy_attributes = legacy_attributes;
+                account.legacy_attributes = legacy_attributes.0;
             }
         }
 
@@ -499,7 +535,7 @@ impl PersistentDB {
             |item| match item {
                 Some(item) => {
                     let (_, legacy_cold_wallet) = item?;
-                    Ok(Some(legacy_cold_wallet))
+                    Ok(Some(legacy_cold_wallet.0))
                 }
                 None => Ok(None),
             },
@@ -525,8 +561,11 @@ impl PersistentDB {
             iter,
             |item| match item {
                 Some(item) => {
-                    let (block_number, CommitReceipts { tx_receipts, .. }) = item?;
-                    Ok(Some((block_number, tx_receipts.into_iter().collect())))
+                    let (block_number, commit) = item?;
+                    Ok(Some((
+                        block_number,
+                        commit.0.tx_receipts.into_iter().collect(),
+                    )))
                 }
                 None => Ok(None),
             },
@@ -543,7 +582,7 @@ impl PersistentDB {
         let commit = self.inner.borrow().commits.get(&tx_env, &block_number)?;
 
         match commit {
-            Some(commit) => Ok(commit.tx_receipts),
+            Some(inner) => Ok(inner.0.tx_receipts),
             None => Ok(Default::default()),
         }
     }
@@ -610,7 +649,8 @@ impl PersistentDB {
             .inner
             .borrow()
             .legacy_attributes
-            .get(&tx_env, &AddressWrapper(address))?)
+            .get(&tx_env, &AddressWrapper(address))?
+            .map(|inner| inner.0))
     }
 
     pub fn get_legacy_cold_wallet(
@@ -622,7 +662,8 @@ impl PersistentDB {
             .inner
             .borrow()
             .legacy_cold_wallets
-            .get(&tx_env, &LegacyAddressWrapper(address))?)
+            .get(&tx_env, &LegacyAddressWrapper(address))?
+            .map(|inner| inner.0))
     }
 
     pub fn resize(&self) -> Result<(), Error> {
@@ -712,7 +753,7 @@ impl DatabaseRef for PersistentDB {
         let inner = self.inner.borrow();
 
         let basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
-            Some(account) => account,
+            Some(account) => account.0,
             None => match &self.genesis_info {
                 Some(genesis) if genesis.account == address => revm::state::AccountInfo {
                     balance: genesis.initial_supply,
@@ -730,7 +771,7 @@ impl DatabaseRef for PersistentDB {
         let inner = self.inner.borrow();
 
         let contract = match inner.contracts.get(&txn, &HashWrapper(code_hash))? {
-            Some(contract) => contract,
+            Some(contract) => contract.0,
             None => Default::default(),
         };
 
@@ -813,7 +854,9 @@ impl PersistentDB {
                 let address = AddressWrapper(*address);
 
                 if let Some(account) = account {
-                    inner.accounts.put(rwtxn, &address, &account)?;
+                    inner
+                        .accounts
+                        .put(rwtxn, &address, &CompressedBincode(account))?;
                 } else {
                     inner.accounts.delete(rwtxn, &address)?;
                 }
@@ -838,22 +881,28 @@ impl PersistentDB {
             // Update legacy attributes
             for (address, legacy_attributes) in legacy_attributes.into_iter() {
                 let address = AddressWrapper(*address);
-                inner
-                    .legacy_attributes
-                    .put(rwtxn, &address, legacy_attributes)?;
+                inner.legacy_attributes.put(
+                    rwtxn,
+                    &address,
+                    &CompressedBincode(legacy_attributes),
+                )?;
             }
 
             // Update legacy cold wallets
             for (address, legacy_cold_wallets) in legacy_cold_wallets.into_iter() {
                 let address = LegacyAddressWrapper(*address);
-                inner
-                    .legacy_cold_wallets
-                    .put(rwtxn, &address, legacy_cold_wallets)?;
+                inner.legacy_cold_wallets.put(
+                    rwtxn,
+                    &address,
+                    &CompressedBincode(legacy_cold_wallets),
+                )?;
             }
 
             // Update contracts
             for (hash, bytecode) in contracts.into_iter() {
-                inner.contracts.put(rwtxn, &HashWrapper(*hash), &bytecode)?;
+                inner
+                    .contracts
+                    .put(rwtxn, &HashWrapper(*hash), &CompressedBincode(&bytecode))?;
             }
 
             // Update storage
@@ -927,21 +976,24 @@ impl PersistentDB {
                 let mut legacy_cold_wallet = inner
                     .legacy_cold_wallets
                     .get(&rwtxn, key)?
-                    .expect("legacy cold wallet to be found");
+                    .expect("legacy cold wallet to be found")
+                    .0;
 
                 assert!(legacy_cold_wallet.merge_info.is_none());
                 legacy_cold_wallet.merge_info.replace((legacy.0, *address));
 
-                inner
-                    .legacy_cold_wallets
-                    .put(rwtxn, key, &legacy_cold_wallet)?;
+                inner.legacy_cold_wallets.put(
+                    rwtxn,
+                    key,
+                    &CompressedBincode(&legacy_cold_wallet),
+                )?;
 
                 // The legacy balance has already been applied to the `PendingCommit`,
                 // thus only the legacy attributes need to be moved to a different storage.
                 inner.legacy_attributes.put(
                     rwtxn,
                     &AddressWrapper(*address),
-                    &legacy_cold_wallet.legacy_attributes,
+                    &CompressedBincode(&legacy_cold_wallet.legacy_attributes),
                 )?;
             }
 
@@ -949,35 +1001,38 @@ impl PersistentDB {
             //
             if let Some(commit_data) = commit_data {
                 let CommitData {
-                    commit_round,
-                    block_hash,
-                    block,
                     proof,
-                    transaction_hashes,
+                    header,
                     transactions,
                 } = commit_data;
 
                 // Update blocks
-                inner.blocks.put(rwtxn, &key.0, &block)?;
+                inner
+                    .blocks
+                    .put(rwtxn, &key.0, &CompressedBincode(header))?;
                 inner
                     .blocks_hash_number
-                    .put(rwtxn, &HashWrapper(*block_hash), &key.0)?;
+                    .put(rwtxn, &HashWrapper(header.hash), &key.0)?;
 
                 // Update proofs
-                inner.proofs.put(rwtxn, &key.0, proof)?;
+                inner.proofs.put(rwtxn, &key.0, &CompressedBincode(proof))?;
 
                 // Update transactions
-                for (sequence, transaction) in transactions.iter().enumerate() {
+                for (sequence, _) in transactions.iter().enumerate() {
                     let key = format!("{}-{}", key.0, sequence);
-                    let transaction_hash = transaction_hashes[sequence];
+                    let transaction = &transactions[sequence];
 
-                    inner
-                        .transactions_hash_key
-                        .put(rwtxn, &HashWrapper(transaction_hash), &key)?;
+                    inner.transactions_hash_key.put(
+                        rwtxn,
+                        &HashWrapper(transaction.tx_hash),
+                        &key,
+                    )?;
 
-                    inner
-                        .transactions
-                        .put(rwtxn, &StringWrapper(key), transaction)?;
+                    inner.transactions.put(
+                        rwtxn,
+                        &StringWrapper(key),
+                        &CompressedBincode(transaction),
+                    )?;
                 }
 
                 // Update state
@@ -988,13 +1043,13 @@ impl PersistentDB {
                 inner.state.put(
                     rwtxn,
                     &total_round_key,
-                    &Bytes::from_iter((current_total_round + commit_round + 1).to_le_bytes()),
+                    &Bytes::from_iter((current_total_round + proof.round as u64 + 1).to_le_bytes()),
                 )?;
             }
             // ========================================
 
             // Finalize commit
-            let mut tx_receipts = HashMap::new();
+            let mut tx_receipts = HashMap::default();
             for (k, result) in results {
                 tx_receipts.insert(k.clone(), map_execution_result(result.clone()));
             }
@@ -1002,12 +1057,12 @@ impl PersistentDB {
             inner.commits.put(
                 rwtxn,
                 &key.0,
-                &CommitReceipts {
+                &CompressedBincode(&CommitReceipts {
                     accounts_hash: state_root::calculate_accounts_hash(&change_set)?,
                     contracts_hash: state_root::calculate_contracts_hash(&change_set)?,
                     storage_hash: state_root::calculate_storage_hash(&change_set)?,
                     tx_receipts,
-                },
+                }),
             )?;
 
             Ok(())
@@ -1094,14 +1149,6 @@ impl PersistentDB {
         Ok((block_number, total_round))
     }
 
-    pub fn get_block_header_bytes(&self, block_number: u64) -> Result<Option<Bytes>, Error> {
-        let env = self.env.clone();
-        let rtxn = env.read_txn().expect("read");
-        let inner = self.inner.borrow();
-
-        Ok(inner.blocks.get(&rtxn, &block_number)?)
-    }
-
     pub fn get_block_number_by_hash(&self, block_hash: B256) -> Result<Option<u64>, Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
@@ -1112,20 +1159,34 @@ impl PersistentDB {
             .get(&rtxn, &HashWrapper(block_hash))?)
     }
 
-    pub fn get_proof_bytes(&self, block_number: u64) -> Result<Option<Bytes>, Error> {
+    pub fn get_proof_data(&self, block_number: u64) -> Result<Option<ProofData>, Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
 
-        Ok(inner.proofs.get(&rtxn, &block_number)?)
+        Ok(inner.proofs.get(&rtxn, &block_number)?.map(|data| data.0))
     }
 
-    pub fn get_transaction_bytes(&self, key: String) -> Result<Option<Bytes>, Error> {
+    pub fn get_block_header_data(
+        &self,
+        block_number: u64,
+    ) -> Result<Option<BlockHeaderData>, Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
 
-        Ok(inner.transactions.get(&rtxn, &StringWrapper(key))?)
+        Ok(inner.blocks.get(&rtxn, &block_number)?.map(|data| data.0))
+    }
+
+    pub fn get_transaction_data(&self, key: String) -> Result<Option<TransactionData>, Error> {
+        let env = self.env.clone();
+        let rtxn = env.read_txn().expect("read");
+        let inner = self.inner.borrow();
+
+        Ok(inner
+            .transactions
+            .get(&rtxn, &StringWrapper(key))?
+            .map(|data| data.0))
     }
 
     pub fn get_transaction_key_by_hash(&self, tx_hash: B256) -> Result<Option<String>, Error> {
@@ -1176,18 +1237,18 @@ impl PendingCommit {
             .with_cached_prestate(std::mem::take(&mut self.cache))
             .build();
 
-        state
-            .increment_balances(
-                vec![(address, info.balance.try_into().expect("fit u128"))]
-                    .into_iter()
-                    .collect::<HashMap<Address, u128>>(),
-            )
-            .expect("import account balance");
+        let account = state
+            .load_cache_account(address)
+            .expect("load_cache_account");
 
-        if let Some(transition_state) = state.transition_state.take() {
-            self.transitions
-                .add_transitions(transition_state.transitions.into_iter().collect());
-        }
+        let balance = info.balance.try_into().expect("fit u128");
+        let transition_account = account
+            .increment_balance(balance)
+            .unwrap_or_else(|| TransitionAccount::new_empty_eip161(Default::default()));
+
+        let transitions = vec![(address, transition_account)];
+
+        self.transitions.add_transitions(transitions);
 
         self.cache = std::mem::take(&mut state.cache);
 
@@ -1229,7 +1290,7 @@ fn test_commit_changes() {
     );
 
     // 2) Update balance for account
-    let mut state = HashMap::new();
+    let mut state = HashMap::default();
 
     let mut account = revm::state::Account::new_not_existing(0);
     account.info.balance = U256::from(100);
@@ -1239,7 +1300,7 @@ fn test_commit_changes() {
     account.info.code_hash = code.hash_slow();
     account.info.code = Some(code.clone());
 
-    let mut storage = HashMap::new();
+    let mut storage = HashMap::default();
     storage.insert(
         U256::from(1),
         revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1234)),
@@ -1302,12 +1363,12 @@ fn test_storage() {
         PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
 
     let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
-    let mut state = HashMap::new();
+    let mut state = HashMap::default();
 
     let mut account = revm::state::Account::new_not_existing(0);
     account.status = revm::state::AccountStatus::Touched;
 
-    let mut storage = HashMap::new();
+    let mut storage = HashMap::default();
 
     storage.insert(
         U256::from(99),
@@ -1375,12 +1436,12 @@ fn test_storage_overwrite() {
         PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
 
     let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
-    let mut state = HashMap::new();
+    let mut state = HashMap::default();
 
     let mut account = revm::state::Account::new_not_existing(0);
     account.status = revm::state::AccountStatus::Touched;
 
-    let mut storage = HashMap::new();
+    let mut storage = HashMap::default();
 
     storage.insert(
         U256::from(1),
@@ -1421,13 +1482,13 @@ fn test_storage_overwrite() {
     assert_eq!(account_storage, U256::from(2));
 
     // Now overwrite index 1
-    let mut storage = HashMap::new();
+    let mut storage = HashMap::default();
     storage.insert(
         U256::from(1),
         revm::database::states::StorageSlot::new_changed(U256::from(1), U256::from(99)),
     );
 
-    let mut state = HashMap::new();
+    let mut state = HashMap::default();
     state.insert(
         address,
         revm::database::TransitionAccount {
@@ -1478,12 +1539,12 @@ fn test_resize_on_commit() {
         buf[0..8].copy_from_slice(&block_number.to_le_bytes());
         let address = Address::from_word(ethers_core::utils::keccak256(buf).into());
 
-        let mut state = HashMap::new();
+        let mut state = HashMap::default();
 
         let mut account = revm::state::Account::new_not_existing(0);
         account.status = revm::state::AccountStatus::Touched;
 
-        let mut storage = HashMap::new();
+        let mut storage = HashMap::default();
 
         for i in 0..n {
             storage.insert(
@@ -1589,11 +1650,11 @@ fn test_read_accounts() {
                 .put(
                     &mut wtxn,
                     &AddressWrapper(*address),
-                    &AccountInfo {
+                    &CompressedBincode(&AccountInfo {
                         balance: U256::from(index),
                         nonce: index as u64,
                         ..Default::default()
-                    },
+                    }),
                 )
                 .unwrap();
         }
@@ -1657,12 +1718,14 @@ fn test_read_receipts() {
         for i in 0..target_block {
             let block_number = (i + 1) as u64;
 
-            let receipts: HashMap<B256, TxReceipt> = HashMap::from([
+            let receipts: HashMap<B256, TxReceipt> = [
                 (random_b256(block_number, 0), TxReceipt::default()),
                 (random_b256(block_number, 1), TxReceipt::default()),
                 (random_b256(block_number, 2), TxReceipt::default()),
                 (random_b256(block_number, 3), TxReceipt::default()),
-            ]);
+            ]
+            .into_iter()
+            .collect();
 
             total_receipts += receipts.len();
 
@@ -1672,10 +1735,10 @@ fn test_read_receipts() {
                 .put(
                     &mut wtxn,
                     &block_number,
-                    &CommitReceipts {
+                    &CompressedBincode(&CommitReceipts {
                         tx_receipts: receipts,
                         ..Default::default()
-                    },
+                    }),
                 )
                 .unwrap();
         }

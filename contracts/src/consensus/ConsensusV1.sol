@@ -220,11 +220,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         _verifyAndRegisterBlsPublicKey(blsPublicKey);
 
         ValidatorData memory validator = ValidatorData({
-            votersCount: 0,
-            voteBalance: 0,
-            fee: uint128(msg.value),
-            isResigned: false,
-            blsPublicKey: blsPublicKey
+            votersCount: 0, voteBalance: 0, fee: uint128(msg.value), isResigned: false, blsPublicKey: blsPublicKey
         });
 
         _hasValidator[msg.sender] = true;
@@ -371,9 +367,9 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
             ValidatorData storage headData = _validatorsData[_roundValidatorsHead];
 
-            if (
-                _isGreater(Validator({addr: addr, data: data}), Validator({addr: _roundValidatorsHead, data: headData}))
-            ) {
+            if (_isGreater(
+                    Validator({addr: addr, data: data}), Validator({addr: _roundValidatorsHead, data: headData})
+                )) {
                 _insertValidator(addr, top);
             }
         }
@@ -534,7 +530,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             /* Swap example
             i = 0; j = 2;
 
-    		Initial state
+            Initial state
             A B C
             A:0 B:1 C:2
 
@@ -590,12 +586,10 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     function _insertValidator(address addr, uint8 top) internal {
         ValidatorData memory data = _validatorsData[addr];
 
-        if (
-            _isGreater(
+        if (_isGreater(
                 Validator({addr: _roundValidatorsHead, data: _validatorsData[_roundValidatorsHead]}),
                 Validator({addr: addr, data: data})
-            )
-        ) {
+            )) {
             _insertHead(addr);
         } else {
             address current = _roundValidatorsMap[_roundValidatorsHead];
@@ -607,11 +601,9 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
                     break;
                 }
 
-                if (
-                    _isGreater(
+                if (_isGreater(
                         Validator({addr: current, data: _validatorsData[current]}), Validator({addr: addr, data: data})
-                    )
-                ) {
+                    )) {
                     _insertAfter(previous, addr);
                     break;
                 }

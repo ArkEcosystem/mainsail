@@ -1,7 +1,7 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Evm, JsCommitData, LogLevel } from "@mainsail/evm";
-import { assert, ByteBuffer } from "@mainsail/utils";
+import { Evm, JsCommitData, JsTransactionData, LogLevel } from "@mainsail/evm";
+import { assert, validatorSetPack } from "@mainsail/utils";
 
 @injectable()
 export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storage {
@@ -11,50 +11,33 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Cryptography.Commit.ProofSize)
-	private readonly proofSize!: () => number;
-
-	@inject(Identifiers.Cryptography.Block.HeaderSize)
-	private readonly headerSize!: () => number;
-
 	#evm!: Evm;
 
 	@postConstruct()
 	public initialize() {
-		const logPrefix = `evm`;
-
 		this.#evm = new Evm({
 			historySize: 256n,
 			logger: (record) => {
-				const message = `(${logPrefix}) ${record.message}`;
 				try {
 					switch (record.level) {
 						case LogLevel.Info: {
-							this.logger.info(message);
+							this.logger.info(record.message, "evm");
 							break;
 						}
 						case LogLevel.Debug: {
-							this.logger.debug(message);
+							this.logger.debug(record.message, "evm");
 							break;
 						}
 						case LogLevel.Notice: {
-							this.logger.notice(message);
-							break;
-						}
-						case LogLevel.Emergency: {
-							this.logger.emergency(message);
+							this.logger.notice(record.message, "evm");
 							break;
 						}
 						case LogLevel.Alert: {
-							this.logger.alert(message);
+							this.logger.alert(record.message, "evm");
 							break;
 						}
-						case LogLevel.Critical: {
-							this.logger.critical(message);
-							break;
-						}
-						case LogLevel.Warning: {
-							this.logger.warning(message);
+						case LogLevel.Warn: {
+							this.logger.warn(record.message, "evm");
 							break;
 						}
 					}
@@ -192,8 +175,10 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return { blockNumber: Number(state.blockNumber), totalRound: Number(state.totalRound) };
 	}
 
-	public async getBlockHeaderBytes(height: number): Promise<Buffer | undefined | null> {
-		return this.#evm.getBlockHeaderBytes(BigInt(height));
+	public async getBlockHeaderData(
+		blockNumber: number,
+	): Promise<Contracts.Evm.BlockHeaderStorageData | undefined | null> {
+		return this.#evm.getBlockHeaderData(BigInt(blockNumber));
 	}
 
 	public async getBlockNumberByHash(blockHash: string): Promise<number | undefined | null> {
@@ -205,12 +190,17 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return Number(result);
 	}
 
-	public async getProofBytes(blockNumber: number): Promise<Buffer | undefined | null> {
-		return this.#evm.getProofBytes(BigInt(blockNumber));
+	public async getCommitData(blockNumber: number): Promise<Contracts.Evm.CommitStorageData | undefined | null> {
+		const result = await this.#evm.getCommitData(BigInt(blockNumber));
+		if (!result) {
+			return undefined;
+		}
+
+		return result;
 	}
 
-	public async getTransactionBytes(key: string): Promise<Buffer | undefined | null> {
-		return this.#evm.getTransactionBytes(key);
+	public async getTransactionData(key: string): Promise<Contracts.Evm.TransactionStorageData | undefined | null> {
+		return this.#evm.getTransactionData(key);
 	}
 
 	public async getTransactionKeyByHash(txHash: string): Promise<string | undefined | null> {
@@ -234,42 +224,62 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 			return undefined;
 		}
 
-		const { block, serialized, proof } = await unit.getCommit();
+		const { block, proof } = await unit.getCommit();
 
-		const {
-			header: { number: height, hash },
-		} = block;
+		const { header } = block;
 
-		const { round: commitRound } = proof;
+		const transactions: JsTransactionData[] = [];
 
-		const proofSize = this.proofSize();
-		const headerSize = this.headerSize();
-
-		const commitBuffer = Buffer.from(serialized.slice(0, (proofSize + headerSize) * 2), "hex");
-		const proofBuffer = commitBuffer.subarray(0, proofSize);
-		const blockBuffer = commitBuffer.subarray(proofSize, proofSize + headerSize);
-
-		const transactionBuffers: Buffer[] = [];
-		const transactionHashes: string[] = [];
 		for (const transaction of block.transactions) {
 			assert.number(transaction.data.transactionIndex);
+			assert.defined(transaction.data.r);
+			assert.defined(transaction.data.s);
+			assert.defined(transaction.data.v);
 
-			const buff = ByteBuffer.fromSize(transaction.serialized.length + 8);
-			buff.writeUint32(height);
-			buff.writeUint32(transaction.data.transactionIndex);
-			buff.writeBytes(transaction.serialized);
-
-			transactionBuffers.push(buff.toBuffer());
-			transactionHashes.push(transaction.hash);
+			transactions.push({
+				blockNumber: header.number,
+				data: Buffer.from(transaction.data.data, "hex"),
+				from: transaction.data.from,
+				gasLimit: BigInt(transaction.data.gasLimit),
+				gasPrice: BigInt(transaction.data.gasPrice),
+				index: transaction.data.transactionIndex,
+				legacyAddress: transaction.data.senderLegacyAddress,
+				legacySecondSignature: transaction.data.legacySecondSignature,
+				nonce: transaction.data.nonce.toBigInt(),
+				r: transaction.data.r,
+				s: transaction.data.s,
+				senderPublicKey: transaction.data.senderPublicKey,
+				to: transaction.data.to,
+				txHash: transaction.hash,
+				v: transaction.data.v,
+				value: transaction.data.value.toBigInt(),
+			});
 		}
 
 		return {
-			block: blockBuffer,
-			blockHash: hash,
-			commitRound: BigInt(commitRound),
-			proof: proofBuffer,
-			transactionHashes,
-			transactions: transactionBuffers,
+			header: {
+				fee: header.fee.toBigInt(),
+				gasUsed: header.gasUsed,
+				hash: header.hash,
+				logsBloom: header.logsBloom,
+				number: header.number,
+				parentHash: header.parentHash,
+				payloadSize: header.payloadSize,
+				proposer: header.proposer,
+				reward: header.reward.toBigInt(),
+				round: header.round,
+				stateRoot: header.stateRoot,
+				timestamp: BigInt(header.timestamp),
+				transactionsCount: header.transactionsCount,
+				transactionsRoot: header.transactionsRoot,
+				version: header.version,
+			},
+			proof: {
+				round: proof.round,
+				signature: proof.signature,
+				validatorSet: validatorSetPack(proof.validators),
+			},
+			transactions,
 		};
 	}
 }

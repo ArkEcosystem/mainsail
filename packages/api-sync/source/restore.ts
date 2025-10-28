@@ -6,13 +6,10 @@ import {
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
-import { UsernamesAbi } from "@mainsail/evm-contracts";
 import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
-import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
 
-import { parseMultiPayments } from "./parsers/multi-payment.js";
-import { parseTransactionError } from "./parsers/transaction-error.js";
+import { parseMultiPayments, parseTransactionError, parseUsernames } from "./parsers/index.js";
 
 interface RestoreContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;
@@ -55,7 +52,10 @@ interface ValidatorAttributes {
 }
 
 interface UserAttributes {
+	username?: string;
+	usernameFromContract?: boolean;
 	vote?: string;
+	legacyNonce?: bigint;
 	legacyMerge?: Contracts.Evm.AccountMergeInfo;
 }
 
@@ -72,6 +72,9 @@ export class Restore {
 
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	private readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
+
+	@inject(ApiDatabaseIdentifiers.Migrations)
+	private readonly migrations!: ApiDatabaseContracts.Migrations;
 
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
@@ -101,6 +104,9 @@ export class Restore {
 	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
 	private readonly stateRepositoryFactory!: ApiDatabaseContracts.StateRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.SystemRepositoryFactory)
+	private readonly systemRepositoryFactory!: ApiDatabaseContracts.SystemRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
@@ -118,12 +124,6 @@ export class Restore {
 
 	@inject(Identifiers.Evm.ContractService.Consensus)
 	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
-
-	@inject(EvmConsensusIdentifiers.Contracts.Addresses.Usernames)
-	private readonly usernamesContractAddress!: string;
-
-	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
-	private readonly deployerAddress!: string;
 
 	@inject(Identifiers.Snapshot.Legacy.Importer)
 	@optional()
@@ -148,6 +148,8 @@ export class Restore {
 
 		const t0 = performance.now();
 		let restoredHeight = 0;
+
+		await this.systemRepositoryFactory().setMaintenance(true);
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 			const context: RestoreContext = {
@@ -204,23 +206,48 @@ export class Restore {
 			// 8) Write `contracts` table
 			await this.#ingestContracts(context);
 
-			// 9) Update validator ranks
-			await this.#updateValidatorRanks(context);
-
 			restoredHeight = context.lastBlockNumber;
 		});
 
+		await this.migrations.runMigrations();
+
 		const t1 = performance.now();
+
+		await this.dataSource.transaction(async (entityManager) => {
+			await entityManager.query("SET LOCAL statement_timeout = 0;");
+
+			const context: RestoreContext = {
+				blockRepository: this.blockRepositoryFactory(entityManager),
+				configurationRepository: this.configurationRepositoryFactory(entityManager),
+				contractRepository: this.contractRepositoryFactory(entityManager),
+				entityManager,
+				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
+				multiPaymentRepository: this.multiPaymentRepositoryFactory(entityManager),
+				stateRepository: this.stateRepositoryFactory(entityManager),
+				transactionRepository: this.transactionRepositoryFactory(entityManager),
+				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
+				walletRepository: this.walletRepositoryFactory(entityManager),
+			} as any;
+
+			await this.#analyzeTables(context);
+			await this.#updateValidatorRanks(context);
+		});
+
+		const t2 = performance.now();
+		this.logger.info(`Analyzed tables in ${t2 - t1}ms`);
+
 		this.logger.info(
-			`Finished restore of ${(restoredHeight - genesisBlockNumber + 1).toLocaleString()} blocks in ${t1 - t0}ms`,
+			`Finished restore of ${(restoredHeight - genesisBlockNumber + 1).toLocaleString()} blocks in ${t2 - t0}ms`,
 		);
+
+		await this.systemRepositoryFactory().setMaintenance(false);
 	}
 
 	async #ingestBlocksAndTransactions(context: RestoreContext): Promise<void> {
-		const { blockRepository, transactionRepository, mostRecentCommit } = context;
+		const { blockRepository, transactionRepository, multiPaymentRepository, mostRecentCommit } = context;
 
 		const BATCH_SIZE = 1000;
-		const CHUNK_SIZE = 256;
+		const CHUNK_SIZE = 1000;
 		const t0 = performance.now();
 
 		const genesisBlockNumber = this.configuration.getGenesisHeight();
@@ -233,6 +260,8 @@ export class Restore {
 			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
 		);
 
+		const usernameContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Usernames);
+
 		do {
 			const fromBlockNumber = Math.min(currentBlockNumber, mostRecentCommit.block.header.number);
 			const toBlockNumber = Math.min(currentBlockNumber + BATCH_SIZE - 1, mostRecentCommit.block.header.number);
@@ -242,6 +271,26 @@ export class Restore {
 			const blocks: Models.Block[] = [];
 			const transactions: Models.Transaction[] = [];
 			const multiPayments: Models.MultiPayment[] = [];
+
+			const insertTransactions = async () => {
+				if (transactions.length === 0) {
+					return;
+				}
+
+				await transactionRepository.createQueryBuilder().insert().orIgnore().values(transactions).execute();
+
+				transactions.length = 0;
+			};
+
+			const insertMultiPayments = async () => {
+				if (multiPayments.length === 0) {
+					return;
+				}
+
+				await multiPaymentRepository.createQueryBuilder().insert().orIgnore().values(multiPayments).execute();
+
+				multiPayments.length = 0;
+			};
 
 			for await (const { proof, block } of commits) {
 				blocks.push({
@@ -291,13 +340,24 @@ export class Restore {
 
 					const { data } = transaction;
 					const { senderPublicKey } = data;
+					const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
+					const parsedUsernames = parseUsernames(usernameContractAddress, transaction, receipt);
+
 					if (!context.publicKeyToAddress[senderPublicKey]) {
 						const address = await this.addressFactory.fromPublicKey(senderPublicKey);
 						context.publicKeyToAddress[senderPublicKey] = address;
 						context.addressToPublicKey[address] = senderPublicKey;
 					}
 
-					const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
+					for (const parsedUsername of parsedUsernames ?? []) {
+						const userAttributes = context.userAttributes[parsedUsername.address] ?? {};
+
+						context.userAttributes[parsedUsername.address] = {
+							...userAttributes,
+							username: parsedUsername.username,
+							usernameFromContract: true,
+						};
+					}
 
 					transactions.push({
 						blockHash: block.header.hash,
@@ -344,25 +404,28 @@ export class Restore {
 
 					multiPayments.push(...parsedMultiPayments);
 
+					if (transactions.length >= CHUNK_SIZE) {
+						await insertTransactions();
+					}
+
+					if (multiPayments.length >= CHUNK_SIZE) {
+						await insertMultiPayments();
+					}
+
 					ingestedTransactions++;
 				}
+
+				block.transactions.length = 0;
 
 				context.lastBlockNumber = block.header.number;
 			}
 
-			// too large queries are not good for postgres
 			for (const batch of chunk(blocks, CHUNK_SIZE)) {
 				await blockRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
-			// batch insert 'transactions' separately from 'blocks', given that we will be consistent at the end of the db transaction anyway.
-			for (const batch of chunk(transactions, CHUNK_SIZE)) {
-				await transactionRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
-			}
-
-			for (const batch of chunk(multiPayments, CHUNK_SIZE)) {
-				await context.multiPaymentRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
-			}
+			await insertTransactions();
+			await insertMultiPayments();
 
 			if (
 				ingestedBlocks % (BATCH_SIZE * 10) === 0 ||
@@ -400,7 +463,10 @@ export class Restore {
 
 		let totalVotes = 0;
 		for await (const votes of this.consensusContractService.getVotes()) {
+			const userAttributes = context.userAttributes[votes.voterAddress] ?? {};
+
 			context.userAttributes[votes.voterAddress] = {
+				...userAttributes,
 				vote: votes.validatorAddress,
 			};
 			totalVotes++;
@@ -413,14 +479,35 @@ export class Restore {
 	async #ingestWallets(context: RestoreContext): Promise<void> {
 		const t0 = performance.now();
 
-		const BATCH_SIZE = 1000n;
-		const CHUNK_SIZE = 250;
+		const BATCH_SIZE = 10000n;
+		const CHUNK_SIZE = 2500;
+
 		let offset: bigint | undefined = 0n;
 
 		if (this.snapshotImporter) {
+			for (const validator of this.snapshotImporter.validators) {
+				const userAttributes = context.userAttributes[validator.ethAddress] ?? {};
+
+				// Contract takes precedence over snapshot.
+				if (userAttributes.usernameFromContract) {
+					continue;
+				}
+
+				context.userAttributes[validator.ethAddress] = {
+					...userAttributes,
+					username: validator.username,
+				};
+			}
+
 			for (const wallet of this.snapshotImporter.drain()) {
 				// add any imported address to the mapping
 				if (wallet.ethAddress && wallet.publicKey) {
+					const userAttributes = context.userAttributes[wallet.ethAddress] ?? {};
+					context.userAttributes[wallet.ethAddress] = {
+						...userAttributes,
+						legacyNonce: wallet.legacyAttributes.legacyNonce,
+					};
+
 					context.legacyAddresses.add(wallet.ethAddress);
 					context.addressToPublicKey[wallet.ethAddress] = wallet.publicKey;
 				}
@@ -470,7 +557,11 @@ export class Restore {
 							: {}),
 						...(userAttributes
 							? {
+									...(userAttributes.username ? { username: userAttributes.username } : {}),
 									...(userAttributes.vote ? { vote: userAttributes.vote } : {}),
+									...(userAttributes.legacyNonce !== undefined
+										? { legacyNonce: userAttributes.legacyNonce.toString() }
+										: {}),
 									...(userAttributes.legacyMerge
 										? // merged legacy cold wallets
 											{ isLegacy: true, legacyMerge: userAttributes.legacyMerge }
@@ -485,6 +576,9 @@ export class Restore {
 							: {}),
 						...(legacyAttributes && Object.keys(legacyAttributes).length > 0
 							? {
+									...(legacyAttributes.legacyNonce !== undefined
+										? { legacyNonce: legacyAttributes.legacyNonce.toString() }
+										: {}),
 									...(legacyAttributes.secondPublicKey
 										? { secondPublicKey: legacyAttributes.secondPublicKey }
 										: {}),
@@ -505,9 +599,7 @@ export class Restore {
 			}
 
 			for (const batch of chunk(accounts, CHUNK_SIZE)) {
-				await this.#readUsernames(batch).then((batch) =>
-					context.walletRepository.createQueryBuilder().insert().orIgnore().values(batch).execute(),
-				);
+				await context.walletRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
 			offset = result.nextOffset;
@@ -522,8 +614,8 @@ export class Restore {
 	async #ingestLegacyColdWallets(context: RestoreContext): Promise<void> {
 		const t0 = performance.now();
 
-		const BATCH_SIZE = 1000n;
-		const CHUNK_SIZE = 250;
+		const BATCH_SIZE = 10000n;
+		const CHUNK_SIZE = 2500;
 		let offset: bigint | undefined = 0n;
 
 		let totalLegacyAccountBalance = 0n;
@@ -538,7 +630,14 @@ export class Restore {
 				legacyColdWallets.push({
 					address: wallet.address,
 					balance: BigNumber.make(wallet.balance).toFixed(),
-					...(Object.keys(wallet.legacyAttributes).length > 0 ? { attributes: wallet.legacyAttributes } : {}),
+					...(Object.keys(wallet.legacyAttributes).length > 0
+						? {
+								attributes: {
+									...wallet.legacyAttributes,
+									...{ legacyNonce: wallet.legacyAttributes.legacyNonce?.toString() },
+								},
+							}
+						: {}),
 					mergeInfoTransactionHash: wallet.mergeInfo?.txHash,
 					mergeInfoWalletAddress: wallet.mergeInfo?.address,
 				});
@@ -585,6 +684,8 @@ export class Restore {
 		let totalRounds = 0;
 		let validatorRounds: Models.ValidatorRound[] = [];
 
+		const CHUNK_SIZE = 1000;
+
 		const insert = async () => {
 			if (validatorRounds.length === 0) {
 				return;
@@ -617,7 +718,7 @@ export class Restore {
 			});
 			totalRounds += 1;
 
-			if (validatorRounds.length === 256) {
+			if (validatorRounds.length === CHUNK_SIZE) {
 				await insert();
 			}
 		}
@@ -680,54 +781,29 @@ export class Restore {
 		await context.entityManager.query("SELECT update_validator_ranks();", []);
 	}
 
-	async #readUsernames(wallets: Models.Wallet[]): Promise<Models.Wallet[]> {
-		const addressToWallet: Record<string, Models.Wallet> = wallets.reduce((previous, current) => {
-			previous[current.address] = current;
-			return previous;
-		}, {});
-
-		const addresses = Object.keys(addressToWallet);
-		const data = encodeFunctionData({
-			abi: UsernamesAbi.abi,
-			args: [addresses],
-			functionName: "getUsernames",
-		}).slice(2);
-
-		const { evmSpec } = this.configuration.getMilestone(this.configuration.getGenesisHeight());
-
-		const result = await this.evm.view({
-			data: Buffer.from(data, "hex"),
-			from: this.deployerAddress,
-			specId: evmSpec,
-			to: this.usernamesContractAddress,
-		});
-
-		if (!result.success) {
-			await this.app.terminate("getUsernames failed");
-		}
-
-		const users = decodeFunctionResult({
-			abi: UsernamesAbi.abi,
-			data: toHex(result.output!),
-			functionName: "getUsernames",
-		}) as Username[];
-
-		for (const { addr, username } of users) {
-			const wallet = addressToWallet[addr];
-			assert.defined(wallet);
-			assert.defined(username);
-
-			wallet.attributes = {
-				username,
-				...wallet.attributes,
-			};
-		}
-
-		return wallets;
+	async #analyzeTables({
+		blockRepository,
+		contractRepository,
+		stateRepository,
+		transactionRepository,
+		walletRepository,
+		legacyColdWalletRepository,
+		multiPaymentRepository,
+		configurationRepository,
+		validatorRoundRepository,
+	}: RestoreContext): Promise<void> {
+		await Promise.all(
+			[
+				blockRepository,
+				contractRepository,
+				stateRepository,
+				transactionRepository,
+				validatorRoundRepository,
+				walletRepository,
+				legacyColdWalletRepository,
+				multiPaymentRepository,
+				configurationRepository,
+			].map((repo) => repo.query(`ANALYZE ${repo.metadata.tableName}`)),
+		);
 	}
-}
-
-interface Username {
-	readonly addr: string;
-	readonly username: string;
 }

@@ -6,7 +6,7 @@ import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 
-const ROUNDS_PER_REQUEST = 1000;
+const ROUNDS_PER_REQUEST = 2500;
 
 interface ConsensusContractValidatorRound {
 	readonly round: bigint;

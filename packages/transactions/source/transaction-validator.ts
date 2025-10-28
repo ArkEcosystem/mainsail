@@ -9,8 +9,8 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 	@tagged("instance", "validator")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	@inject(Identifiers.Transaction.Handler.Registry)
-	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
+	@inject(Identifiers.Transaction.Handler)
+	private readonly transactionHandler!: Contracts.Transactions.TransactionHandler;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
@@ -30,8 +30,7 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 
 		const { commitKey, gasLimit, timestamp, generatorAddress } = context;
 
-		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-		const receipt = await handler.apply(
+		const receipt = await this.transactionHandler.apply(
 			{
 				evm: {
 					blockContext: {

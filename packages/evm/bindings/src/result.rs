@@ -1,5 +1,6 @@
 use mainsail_evm_core::{
     account::AccountInfoExtended,
+    db::{BlockHeaderData, ProofData, TransactionData},
     legacy::{LegacyAccountAttributes, LegacyColdWallet, LegacyMultiSignatureAttribute},
     receipt::TxReceipt,
     state_changes::AccountUpdate,
@@ -7,11 +8,14 @@ use mainsail_evm_core::{
 use napi::bindgen_prelude::{BigInt, Buffer};
 use napi_derive::napi;
 use revm::{
-    primitives::{B256, Bytes},
+    primitives::{B256, Bytes, hex::ToHexExt},
     state::AccountInfo,
 };
 
-use crate::utils;
+use crate::{
+    ctx::{JsBlockHeaderData, JsCommitData, JsProofData, JsTransactionData},
+    utils,
+};
 
 #[napi(object)]
 pub struct JsProcessResult {
@@ -133,6 +137,78 @@ impl JsTransactionReceipt {
     }
 }
 
+impl JsCommitData {
+    pub fn new(
+        proof: ProofData,
+        header: BlockHeaderData,
+        transactions: Vec<TransactionData>,
+    ) -> Self {
+        JsCommitData {
+            proof: JsProofData::new(proof),
+            header: JsBlockHeaderData::new(header),
+            transactions: transactions
+                .into_iter()
+                .map(|tx| JsTransactionData::new(tx))
+                .collect(),
+        }
+    }
+}
+
+impl JsProofData {
+    pub fn new(proof: ProofData) -> Self {
+        JsProofData {
+            round: proof.round,
+            signature: proof.signature.encode_hex(),
+            validator_set: proof.validator_set.into(),
+        }
+    }
+}
+
+impl JsBlockHeaderData {
+    pub fn new(header: BlockHeaderData) -> Self {
+        JsBlockHeaderData {
+            version: header.version,
+            timestamp: header.timestamp.into(),
+            number: header.number,
+            round: header.round,
+            hash: format!("{:x}", header.hash),
+            parent_hash: format!("{:x}", header.parent_hash),
+            state_root: format!("{:x}", header.state_root),
+            logs_bloom: header.logs_bloom.encode_hex(),
+            transactions_root: format!("{:x}", header.transactions_root),
+            transactions_count: header.transactions_count,
+            gas_used: header.gas_used,
+            fee: utils::convert_u256_to_bigint(header.fee),
+            reward: utils::convert_u256_to_bigint(header.reward),
+            payload_size: header.payload_size,
+            proposer: header.proposer.to_string(),
+        }
+    }
+}
+
+impl JsTransactionData {
+    pub fn new(tx: TransactionData) -> Self {
+        JsTransactionData {
+            block_number: tx.block_number,
+            tx_hash: format!("{:x}", tx.tx_hash),
+            from: tx.from.to_string(),
+            sender_public_key: tx.sender_public_key,
+            legacy_address: tx.legacy_address.map(|address| address.to_string()),
+            to: tx.to.map(|address| address.to_string()),
+            gas_limit: tx.gas_limit.into(),
+            gas_price: tx.gas_price.into(),
+            value: utils::convert_u256_to_bigint(tx.value),
+            nonce: tx.nonce.into(),
+            data: utils::convert_bytes_to_js_buffer(tx.data),
+            v: tx.v,
+            r: utils::convert_u256_to_hex(tx.r),
+            s: utils::convert_u256_to_hex(tx.s),
+            legacy_second_signature: tx.legacy_second_signature,
+            index: tx.index,
+        }
+    }
+}
+
 #[napi(object)]
 pub struct JsAccountInfo {
     pub balance: BigInt,
@@ -243,6 +319,7 @@ impl JsLegacyColdWallet {
 
 #[napi(object)]
 pub struct JsLegacyAttributes {
+    pub legacy_nonce: Option<BigInt>,
     pub second_public_key: Option<String>,
     pub multi_signature: Option<JsLegacyMultiSignatureAttribute>,
 }
@@ -314,6 +391,7 @@ impl JsLegacyAttributes {
         };
 
         JsLegacyAttributes {
+            legacy_nonce: legacy_attributes.legacy_nonce.map(|nonce| nonce.into()),
             second_public_key: legacy_attributes.second_public_key,
             multi_signature,
         }
@@ -323,6 +401,7 @@ impl JsLegacyAttributes {
 impl Into<LegacyAccountAttributes> for JsLegacyAttributes {
     fn into(self) -> LegacyAccountAttributes {
         LegacyAccountAttributes {
+            legacy_nonce: self.legacy_nonce.map(|nonce| nonce.get_u64().1),
             second_public_key: self.second_public_key,
             multi_signature: self.multi_signature.map(Into::into),
         }

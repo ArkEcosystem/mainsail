@@ -202,6 +202,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				balance,
 				ethAddress,
 				legacyAttributes: {
+					legacyNonce: BigNumber.make(wallet.legacyNonce).toBigInt(),
 					multiSignature: wallet.attributes?.["multiSignature"]?.["publicKeys"]
 						? wallet.attributes?.["multiSignature"]
 						: undefined,
@@ -228,6 +229,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			if (wallet.attributes?.["delegate"]) {
 				if (!wallet.publicKey) {
 					throw new Error("delegate is missing public key");
+				}
+
+				if (!ethAddress) {
+					throw new Error("delegate is missing eth address");
 				}
 
 				validators.push({
@@ -411,7 +416,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 						`importing legacy delegate ${validator.arkAddress} (${validator.username}) with valid blsPublicKey '${validator.blsPublicKey}'`,
 					);
 				} else {
-					this.logger.warning(
+					this.logger.warn(
 						`importing legacy delegate ${validator.arkAddress} (${validator.username}) with invalid blsPublicKey '${validator.blsPublicKey}'`,
 					);
 				}

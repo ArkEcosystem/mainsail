@@ -10,19 +10,7 @@ describe("NullLogger", ({ assert, it }) => {
 
 	it("should return undefined", () => {
 		const driver = new NullLogger();
-		const result = driver.emergency("message");
-		assert.undefined(result);
-	});
-
-	it("should return undefined", () => {
-		const driver = new NullLogger();
 		const result = driver.alert("message");
-		assert.undefined(result);
-	});
-
-	it("should return undefined", () => {
-		const driver = new NullLogger();
-		const result = driver.critical("message");
 		assert.undefined(result);
 	});
 
@@ -34,7 +22,7 @@ describe("NullLogger", ({ assert, it }) => {
 
 	it("should return undefined", () => {
 		const driver = new NullLogger();
-		const result = driver.warning("message");
+		const result = driver.warn("message");
 		assert.undefined(result);
 	});
 

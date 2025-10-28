@@ -66,15 +66,8 @@ export const makeProposal = async (
 
 	await sleep(1); // Sleep to avoid same timestamp
 
-	const block = await proposer.prepareBlock(validator.publicKey, round, timestamp);
-	const proposal = await proposer.propose(
-		node.app
-			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-			.getValidatorIndexByWalletPublicKey(validator.publicKey),
-		round,
-		undefined,
-		block,
-	);
+	const block = await proposer.prepareBlock(validator.address, round, timestamp);
+	const proposal = await proposer.propose(0, round, undefined, block);
 
 	await proposal.deserializeData();
 	return proposal;
@@ -98,7 +91,7 @@ export const makePrevote = async (
 	return await proposer.prevote(
 		node.app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-			.getValidatorIndexByWalletPublicKey(validator.publicKey),
+			.getValidatorIndexByWalletAddress(validator.address),
 		blockNumber,
 		round,
 		blockHash,
@@ -123,7 +116,7 @@ export const makePrecommit = async (
 	return await proposer.precommit(
 		node.app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-			.getValidatorIndexByWalletPublicKey(validator.publicKey),
+			.getValidatorIndexByWalletAddress(validator.address),
 		blockNumber,
 		round,
 		blockHash,
@@ -220,5 +213,16 @@ export async function snoozeForInvalidBlock(
 	}
 }
 
-export const getLastCommit = async (sandbox: Sandbox): Promise<Contracts.Crypto.Commit> =>
-	sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service).getLastCommit();
+export const getLastCommit = async (sandbox: Sandbox): Promise<Contracts.Crypto.Commit> => {
+	const databaseService = sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
+
+	const lasCommit = await databaseService.getLastCommit();
+	const [serialized] = await databaseService.findCommitBuffers(
+		lasCommit.block.header.number,
+		lasCommit.block.header.number,
+	);
+
+	return sandbox.app
+		.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory)
+		.fromBytes(serialized);
+};

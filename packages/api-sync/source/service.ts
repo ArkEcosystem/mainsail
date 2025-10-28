@@ -64,6 +64,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
 	private readonly stateRepositoryFactory!: ApiDatabaseContracts.StateRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.SystemRepositoryFactory)
+	private readonly systemRepositoryFactory!: ApiDatabaseContracts.SystemRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
@@ -100,7 +103,7 @@ export class Sync implements Contracts.ApiSync.Service {
 	private readonly listeners!: Listeners;
 
 	public async bootstrap(): Promise<void> {
-		await this.migrations.run();
+		await this.migrations.synchronizeEntities();
 		await this.#resetDatabaseIfNecessary();
 		this.#queue = await this.createQueue();
 
@@ -108,6 +111,8 @@ export class Sync implements Contracts.ApiSync.Service {
 		const [blocks] = await this.dataSource.query("select count(1) from blocks");
 		if (blocks.count === "0") {
 			await this.#bootstrapRestore();
+		} else {
+			await this.migrations.runMigrations();
 		}
 
 		await this.listeners.bootstrap();
@@ -389,7 +394,7 @@ export class Sync implements Contracts.ApiSync.Service {
 					} catch (error) {
 						const nextAttemptDelay = Math.min(baseDelay + attempts * 500, maxDelay);
 						attempts++;
-						this.logger.warning(
+						this.logger.warn(
 							`sync encountered exception: ${error.message} (query: ${error.query}). retry #${attempts} in ... ${nextAttemptDelay}ms`,
 						);
 						await sleep(nextAttemptDelay);
@@ -548,6 +553,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			? genesisHeight
 			: (await this.databaseService.getLastCommit()).block.header.number;
 
+		const inMaintenance = await this.systemRepositoryFactory().inMaintenance();
 		const [blocks] = await this.dataSource.query(
 			"select coalesce(max(number), $1)::bigint as max_height, count(1) as count from blocks",
 			[genesisHeight],
@@ -559,12 +565,12 @@ export class Sync implements Contracts.ApiSync.Service {
 			`checking for database reset (forced=${forcedTruncateDatabase}, db.blocks=${blocks.count}, db.height=${blocks.max_height}, storage.height=${lastHeight})`,
 		);
 
-		if (blocksOk && !forcedTruncateDatabase) {
+		if (blocksOk && !forcedTruncateDatabase && !inMaintenance) {
 			return;
 		}
 
-		if (lastHeight !== genesisHeight || blocks.count !== "0") {
-			this.logger.warning(`Clearing API database for full restore.`);
+		if (lastHeight !== genesisHeight || blocks.count !== "0" || inMaintenance) {
+			this.logger.warn(`Clearing API database for full restore.`);
 		}
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {

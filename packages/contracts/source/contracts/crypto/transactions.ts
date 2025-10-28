@@ -1,11 +1,11 @@
 import { BigNumber } from "@mainsail/utils";
 
+import { TransactionStorageData } from "../evm/storage.js";
 import type { EcdsaSignature, KeyPair } from "./identities.js";
 import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction {
 	readonly hash: string;
-	readonly key: string;
 
 	data: TransactionData;
 	serialized: Buffer;
@@ -58,7 +58,6 @@ export interface TransactionJson {
 	data: string;
 
 	hash?: string;
-	timestamp?: number;
 
 	v?: number;
 	r?: string;
@@ -117,6 +116,8 @@ export interface TransactionFactory {
 
 	fromData(data: TransactionData, strict?: boolean): Promise<Transaction>;
 
+	fromStorage(data: TransactionStorageData): Promise<Transaction>;
+
 	computeCryptoData(data: TransactionData): Promise<TransactionCryptoData>;
 }
 
@@ -129,6 +130,8 @@ export interface TransactionRegistry {
 }
 
 export interface TransactionUtilities {
+	resolve(data: TransactionData): Transaction;
+
 	toBytes(data: TransactionData): Promise<Buffer>;
 
 	toHash(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;

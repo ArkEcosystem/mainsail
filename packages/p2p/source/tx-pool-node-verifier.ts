@@ -31,7 +31,7 @@ export class TxPoolNodeVerifier implements Contracts.P2P.TxPoolNodeVerifier {
 			this.#verifyHeaders(response);
 			this.#verifyResponseBody(response);
 		} catch (error) {
-			this.logger.debugExtra(`TX Pool node ${node.url} verification failed: ${error.message}`);
+			this.logger.debugExtra(`TX Pool node ${node.url} verification failed: ${error.message}`, "p2p");
 			return false;
 		}
 

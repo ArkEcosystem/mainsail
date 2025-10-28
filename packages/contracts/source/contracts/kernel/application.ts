@@ -6,9 +6,9 @@ export interface Application {
 
 	bootstrap({ flags, plugins }: { flags: JsonObject; plugins?: JsonObject }): Promise<void>;
 
-	boot(): void;
+	boot(): Promise<void>;
 
-	reboot(): void;
+	reboot(): Promise<void>;
 
 	config<T = any>(key: string, value?: T, defaultValue?: T): T | undefined;
 

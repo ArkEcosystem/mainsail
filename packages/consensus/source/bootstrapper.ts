@@ -15,7 +15,7 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 	public async run(): Promise<Contracts.Consensus.State | undefined> {
 		const proposals = await this.storage.getProposals();
 
-		this.logger.info(`Consensus Bootstrap - Proposals: ${proposals.length}`);
+		this.logger.info(`Consensus Bootstrap - Proposals: ${proposals.length}`, "consensus");
 
 		for (const proposal of proposals) {
 			const roundState = this.roundStateRepo.getRoundState(proposal.blockNumber, proposal.round);
@@ -24,7 +24,7 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 
 		const prevotes = await this.storage.getPrevotes();
 
-		this.logger.info(`Consensus Bootstrap - Prevotes: ${prevotes.length}`);
+		this.logger.info(`Consensus Bootstrap - Prevotes: ${prevotes.length}`, "consensus");
 		for (const prevote of prevotes) {
 			const roundState = this.roundStateRepo.getRoundState(prevote.blockNumber, prevote.round);
 			roundState.addPrevote(prevote);
@@ -32,7 +32,7 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 
 		const precommits = await this.storage.getPrecommits();
 
-		this.logger.info(`Consensus Bootstrap - Precommits: ${precommits.length}`);
+		this.logger.info(`Consensus Bootstrap - Precommits: ${precommits.length}`, "consensus");
 		for (const precommit of precommits) {
 			const roundState = this.roundStateRepo.getRoundState(precommit.blockNumber, precommit.round);
 			roundState.addPrecommit(precommit);

@@ -110,7 +110,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				void this.events.dispatch(Events.TransactionEvent.AddedToPool, transaction.data);
 			} catch (error) {
 				this.storage.removeTransaction(transaction.hash);
-				this.logger.warning(`tx ${transaction.hash} failed to enter pool: ${error.message}`);
+				this.logger.warn(`tx ${transaction.hash} failed to enter pool: ${error.message}`);
 
 				void this.events.dispatch(Events.TransactionEvent.RejectedByPool, transaction.data);
 
@@ -169,7 +169,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.logger.info(`${previouslyStoredExpirations} previously stored transactions expired`);
 			}
 			if (previouslyStoredFailures >= 1) {
-				this.logger.warning(`${previouslyStoredFailures} previously stored transactions failed re-adding`);
+				this.logger.warn(`${previouslyStoredFailures} previously stored transactions failed re-adding`);
 			}
 		});
 	}

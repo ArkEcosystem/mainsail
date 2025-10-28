@@ -1,3 +1,4 @@
+import type { CommitStorageData } from "../evm/storage.js";
 import type { Block, BlockData, BlockJson } from "./block.js";
 
 export interface CommitJson {
@@ -21,7 +22,7 @@ export type CommitSerializable = Omit<Commit, "serialized">;
 
 export interface CommitFactory {
 	fromBytes(buff: Buffer): Promise<Commit>;
-
+	fromStorage(data: CommitStorageData): Promise<Commit>;
 	fromJson(json: CommitJson): Promise<Commit>;
 }
 

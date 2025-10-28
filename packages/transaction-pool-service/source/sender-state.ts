@@ -20,8 +20,8 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@tagged("instance", "transaction-pool")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	@inject(Identifiers.Transaction.Handler.Registry)
-	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
+	@inject(Identifiers.Transaction.Handler)
+	private readonly transactionHandler!: Contracts.Transactions.TransactionHandler;
 
 	@inject(Identifiers.Services.Trigger.Service)
 	private readonly triggers!: Services.Triggers.Triggers;
@@ -116,19 +116,16 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new Exceptions.InsufficientBalanceError();
 		}
 
-		const handler: Contracts.Transactions.TransactionHandler =
-			await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-
 		if (
 			await this.triggers.call("verifyTransaction", {
-				handler,
+				handler: this.transactionHandler,
 				transaction,
 			})
 		) {
 			try {
 				await this.triggers.call("throwIfCannotBeApplied", {
 					evm: this.evm,
-					handler,
+					handler: this.transactionHandler,
 					sender: this.#wallet,
 					transaction,
 				});

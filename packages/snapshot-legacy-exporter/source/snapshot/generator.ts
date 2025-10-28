@@ -76,10 +76,10 @@ export class Generator {
 					SELECT * FROM dblink(
 						'v3_db',
 						'
-							SELECT address, public_key, balance, attributes FROM wallets
+							SELECT address, public_key, balance, nonce, attributes FROM wallets
 							ORDER BY balance DESC, address ASC LIMIT ${limit} OFFSET ${offset}
 						'
-					) AS wallets("arkAddress" varchar, "publicKey" varchar, balance bigint, attributes jsonb);
+					) AS wallets("arkAddress" varchar, "publicKey" varchar, balance bigint, "legacyNonce" bigint, attributes jsonb);
 				`);
 
 				for (const wallet of chunk) {

@@ -29,7 +29,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					stderr: true,
 					stdout: true,
 				});
-				return new Ipc.Subprocess(this.app, subprocess);
+				return new Ipc.Subprocess(this.app, "system", subprocess);
 			});
 	}
 

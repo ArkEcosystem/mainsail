@@ -30,5 +30,5 @@ export const prepareValidatorContext = (context: Context) => {
 
 	context.validator.addSchema(cryptoValidationSchemas.hex);
 	context.validator.addSchema(cryptoBlockSchemas.blockHash);
-	context.validator.addSchema(cryptoTransactionSchemas.transactionId);
+	context.validator.addSchema(cryptoTransactionSchemas.transactionHash);
 };

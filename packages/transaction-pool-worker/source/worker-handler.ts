@@ -13,8 +13,7 @@ import {
 } from "./handlers/index.js";
 
 export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScriptHandler {
-	// @ts-ignore
-	#app: Contracts.Kernel.Application;
+	#app!: Contracts.Kernel.Application;
 
 	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
 		const app: Contracts.Kernel.Application = new Application(new Container());

@@ -64,7 +64,6 @@
 		{ "path": "packages/crypto-signature-ecdsa" },
 		{ "path": "packages/crypto-signature-schnorr" },
 		{ "path": "packages/crypto-transaction" },
-		{ "path": "packages/crypto-transaction-evm-call" },
 		{ "path": "packages/crypto-validation" },
 		{ "path": "packages/crypto-wif" },
 		{ "path": "packages/crypto-worker" },

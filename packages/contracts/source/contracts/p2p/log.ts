@@ -1,21 +1,6 @@
-export interface Logger {
-	emergency(message: any): void;
+import { Logger as MainLogger, LoggerContext } from "../kernel/index.js";
 
-	alert(message: any): void;
-
-	critical(message: any): void;
-
-	error(message: any): void;
-
-	warning(message: any): void;
-
-	warningExtra(message: any): void;
-
-	notice(message: any): void;
-
-	info(message: any): void;
-
-	debug(message: any): void;
-
-	debugExtra(message: any): void;
+export interface Logger extends Omit<MainLogger, "dispose" | "suppressConsoleOutput"> {
+	warnExtra(message: string, context?: LoggerContext): void;
+	debugExtra(message: string, context?: LoggerContext): void;
 }

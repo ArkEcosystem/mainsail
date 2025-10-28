@@ -29,9 +29,6 @@ importers:
       cross-env:
         specifier: 10.0.0
         version: 10.0.0
-      del-cli:
-        specifier: 6.0.0
-        version: 6.0.0
       depcheck:
         specifier: 1.4.7
         version: 1.4.7
@@ -665,9 +662,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -786,8 +780,8 @@ importers:
   packages/container:
     dependencies:
       inversify:
-        specifier: 7.8.1
-        version: 7.8.1(reflect-metadata@0.2.2)
+        specifier: 7.10.3
+        version: 7.10.3(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -811,8 +805,8 @@ importers:
         specifier: 1.11.13
         version: 1.11.13
       inversify:
-        specifier: 7.8.1
-        version: 7.8.1(reflect-metadata@0.2.2)
+        specifier: 7.10.3
+        version: 7.10.3(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -910,9 +904,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -1135,9 +1126,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1169,9 +1157,9 @@ importers:
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
-      '@mainsail/crypto-transaction-evm-call':
+      '@mainsail/crypto-transaction':
         specifier: workspace:*
-        version: link:../crypto-transaction-evm-call
+        version: link:../crypto-transaction
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -1550,9 +1538,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -1671,49 +1656,6 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-key-pair-ecdsa':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-ecdsa
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
-      uvu:
-        specifier: 0.5.6
-        version: 0.5.6
-
-  packages/crypto-transaction-evm-call:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      '@mainsail/crypto-address-base58':
-        specifier: workspace:*
-        version: link:../crypto-address-base58
-      '@mainsail/crypto-address-keccak256':
-        specifier: workspace:*
-        version: link:../crypto-address-keccak256
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
@@ -1732,15 +1674,15 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
       uvu:
         specifier: 0.5.6
         version: 0.5.6
-      viem:
-        specifier: 2.34.0
-        version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
 
   packages/crypto-validation:
     dependencies:
@@ -1844,6 +1786,60 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
+      '@mainsail/crypto-address-keccak256':
+        specifier: workspace:*
+        version: link:../crypto-address-keccak256
+      '@mainsail/crypto-block':
+        specifier: workspace:*
+        version: link:../crypto-block
+      '@mainsail/crypto-commit':
+        specifier: workspace:*
+        version: link:../crypto-commit
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
+      '@mainsail/crypto-consensus-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-consensus-bls12-381
+      '@mainsail/crypto-hash-bcrypto':
+        specifier: workspace:*
+        version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-ecdsa':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-signature-ecdsa':
+        specifier: workspace:*
+        version: link:../crypto-signature-ecdsa
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../crypto-transaction
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../crypto-validation
+      '@mainsail/crypto-wif':
+        specifier: workspace:*
+        version: link:../crypto-wif
+      '@mainsail/evm-service':
+        specifier: workspace:*
+        version: link:../evm-service
+      '@mainsail/serializer':
+        specifier: workspace:*
+        version: link:../serializer
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
+      '@types/tmp':
+        specifier: 0.2.6
+        version: 0.2.6
+      tmp:
+        specifier: 0.2.5
+        version: 0.2.5
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2103,6 +2099,9 @@ importers:
       chalk:
         specifier: 5.6.0
         version: 5.6.0
+      colorette:
+        specifier: 2.0.20
+        version: 2.0.20
       joi:
         specifier: 18.0.0
         version: 18.0.0
@@ -2551,9 +2550,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -2664,9 +2660,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../crypto-transaction-evm-call
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
@@ -3072,6 +3065,9 @@ importers:
 
   tests/functional/consensus:
     devDependencies:
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../../../packages/blockchain-utils
       '@mainsail/consensus':
         specifier: workspace:*
         version: link:../../../packages/consensus
@@ -3105,15 +3101,12 @@ importers:
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../../../packages/crypto-messages
-      '@mainsail/crypto-signature-schnorr':
+      '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
-        version: link:../../../packages/crypto-signature-schnorr
+        version: link:../../../packages/crypto-signature-ecdsa
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../../../packages/crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../../../packages/crypto-validation
@@ -3129,6 +3122,9 @@ importers:
       '@mainsail/evm-api-worker':
         specifier: workspace:*
         version: link:../../../packages/evm-api-worker
+      '@mainsail/evm-consensus':
+        specifier: workspace:*
+        version: link:../../../packages/evm-consensus
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../../../packages/evm-service
@@ -3177,6 +3173,9 @@ importers:
       date-fns:
         specifier: 4.1.0
         version: 4.1.0
+      dayjs:
+        specifier: 1.11.18
+        version: 1.11.18
       fs-extra:
         specifier: 11.2.0
         version: 11.2.0
@@ -3249,9 +3248,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../../../packages/crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../../../packages/crypto-validation
@@ -3943,13 +3939,13 @@ packages:
   '@inversifyjs/common@1.5.2':
     resolution: {integrity: sha512-WlzR9xGadABS9gtgZQ+luoZ8V6qm4Ii6RQfcfC9Ho2SOlE6ZuemFo7PKJvKI0ikm8cmKbU8hw5UK6E4qovH21w==}
 
-  '@inversifyjs/container@1.12.5':
-    resolution: {integrity: sha512-Lmadb4kBWiDcCMZXHtaIpNkr48qa3UbN7L25oM+EIRKMdY26j/34snApSLA62mzgqi+GK5wLAWJNLt8jrPQVsQ==}
+  '@inversifyjs/container@1.14.0':
+    resolution: {integrity: sha512-jOxjPgkDGc8N6tm2kuAg911/83Ybnf4u70EanXZPSdOskUSnxohCZmLrOJ1WRr/kzLJYCg3sqhZ5iK32z0uOPQ==}
     peerDependencies:
       reflect-metadata: ~0.2.2
 
-  '@inversifyjs/core@7.1.1':
-    resolution: {integrity: sha512-TZmbndhFcM5hZXa64n4NWphYsHYm4m7rLQ9xn0yxkSfznIPpPzLQQ1ocXokbNvltIXmtNAM+oM8npXO+z0esCA==}
+  '@inversifyjs/core@9.1.0':
+    resolution: {integrity: sha512-SEpW7Rqa/9f1OcaqtqSTGJQOiuSlauSDcyOcZZCyK1g15efshVw0LsYQS+wpUFkpgEYKhGRBIfvlfgWKKYiFuQ==}
 
   '@inversifyjs/plugin@0.2.0':
     resolution: {integrity: sha512-R/JAdkTSD819pV1zi0HP54mWHyX+H2m8SxldXRgPQarS3ySV4KPyRdosWcfB8Se0JJZWZLHYiUNiS6JvMWSPjw==}
@@ -3957,10 +3953,10 @@ packages:
   '@inversifyjs/prototype-utils@0.1.2':
     resolution: {integrity: sha512-WZAEycwVd8zVCPCQ7GRzuQmjYF7X5zbjI9cGigDbBoTHJ8y5US9om00IAp0RYislO+fYkMzgcB2SnlIVIzyESA==}
 
-  '@inversifyjs/reflect-metadata-utils@1.3.0':
-    resolution: {integrity: sha512-JJVnIRq75+nF8FP4WwFPdVQ4sgqf09acXbODi3B7vVtJo+0Mo0YQOOdSWw/cHmbP8+5MAKi4PBYOK3yqn4tGNg==}
+  '@inversifyjs/reflect-metadata-utils@1.4.1':
+    resolution: {integrity: sha512-Cp77C4d2wLaHXiUB7iH6Cxb7i1lD/YDuTIHLTDzKINqGSz0DCSoL/Dg2wVkW/6Qx03r/yQMLJ+32Agl32N2X8g==}
     peerDependencies:
-      reflect-metadata: 0.2.2
+      reflect-metadata: ~0.2.2
 
   '@isaacs/balanced-match@4.0.1':
     resolution: {integrity: sha512-yzMTt9lEb8Gv7zRioUilSglI0c0smZ9k5D65677DLWLtWJaXIS3CqcGyUFByYKlnUj6TkjLVs54fBl6+TiGQDQ==}
@@ -4890,10 +4886,6 @@ packages:
 
   '@sindresorhus/is@7.0.2':
     resolution: {integrity: sha512-d9xRovfKNz1SKieM0qJdO+PQonjnnIfSNWfHYnBSJ9hkjm0ZPw6HlxscDXYstp3z+7V2GOFHc+J0CYrYTjqCJw==}
-    engines: {node: '>=18'}
-
-  '@sindresorhus/merge-streams@2.3.0':
-    resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
 
   '@sindresorhus/merge-streams@4.0.0':
@@ -6110,6 +6102,9 @@ packages:
   dayjs@1.11.13:
     resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
 
+  dayjs@1.11.18:
+    resolution: {integrity: sha512-zFBQ7WFRvVRhKcWoUh+ZA1g2HVgUbsZm9sbddh8EC5iv93sui8DVVz1Npvz+r6meo9VKfa8NyLWBsQK1VvIKPA==}
+
   dayjs@1.8.36:
     resolution: {integrity: sha512-3VmRXEtw7RZKAf+4Tv1Ym9AGeo8r8+CjDi26x+7SYQil1UqtqdaokhzoEJohqlzt0m5kacJSDhJQkG/LWhpRBw==}
 
@@ -6220,18 +6215,9 @@ packages:
     resolution: {integrity: sha512-TllpMR/t0M5sqCXfj85i4XaAzxmS5tVA16dqvdkMwGmzI+dXLXnw3J+3Vdv7VKw+ThlTMboK6i9rnZ6Nntj5CQ==}
     engines: {node: '>= 14'}
 
-  del-cli@6.0.0:
-    resolution: {integrity: sha512-9nitGV2W6KLFyya4qYt4+9AKQFL+c0Ehj5K7V7IwlxTc6RMCfQUGY9E9pLG6e8TQjtwXpuiWIGGZb3mfVxyZkw==}
-    engines: {node: '>=18'}
-    hasBin: true
-
   del@6.1.1:
     resolution: {integrity: sha512-ua8BhapfP0JUJKC/zV9yHHDW/rDoDxP4Zhn3AkA6/xT6gY7jYXJiaeyBZznYVujhZZET+UgcbZiQ7sN3WqcImg==}
     engines: {node: '>=10'}
-
-  del@8.0.0:
-    resolution: {integrity: sha512-R6ep6JJ+eOBZsBr9esiNN1gxFbZE4Q2cULkUSFumGYecAiS6qodDvcPx/sFuWHMNul7DWmrtoEOpYSm7o6tbSA==}
-    engines: {node: '>=18'}
 
   delay@6.0.0:
     resolution: {integrity: sha512-2NJozoOHQ4NuZuVIr5CWd0iiLVIRSDepakaovIN+9eIDHEhdCAEvSy2cuf1DCrPPQLvHmbqTHODlhHg8UCy4zw==}
@@ -7176,10 +7162,6 @@ packages:
     resolution: {integrity: sha512-jhIXaOzy1sb8IyocaruWSn1TjmnBVs8Ayhcy83rmxNJ8q2uWKCAj3CnJY+KpGSXCueAPc0i05kVvVKtP1t9S3g==}
     engines: {node: '>=10'}
 
-  globby@14.1.0:
-    resolution: {integrity: sha512-0Ia46fDOaT7k4og1PDW4YbodWWr3scS2vAr2lTbsplOt2WkKp0vQbkI9wKis/T5LV/dqPjO3bpS/z6GTJB82LA==}
-    engines: {node: '>=18'}
-
   gonzales-pe@4.3.0:
     resolution: {integrity: sha512-otgSPpUmdWJ43VXyiNgEYE4luzHCL2pz4wQ0OnDluC6Eg4Ko3Vexy/SrSynglw/eR+OhkzmqFCZa/OFa/RgAOQ==}
     engines: {node: '>=0.6.0'}
@@ -7426,10 +7408,8 @@ packages:
     resolution: {integrity: sha512-4gd7VpWNQNB4UKKCFFVcp1AVv+FMOgs9NKzjHKusc8jTMhd5eL1NqQqOpE0KzMds804/yHlglp3uxgluOqAPLw==}
     engines: {node: '>= 0.4'}
 
-  inversify@7.8.1:
-    resolution: {integrity: sha512-UARBurbyW86JQL1XdBm9mTJG4tw/k/CYxZLvu0AY1vjh88lu0+IdQ9njCncr6e9YFsg4vnJviWyclg4icJhnXA==}
-    peerDependencies:
-      reflect-metadata: ~0.2.2
+  inversify@7.10.3:
+    resolution: {integrity: sha512-pqcnrXWOg28LykoR/ndoPQJIgkoxtUgxbkcsH+43nmf1BcM4GfCBKjzC0IncWdQRYOKUdkKhOGAtQfdlhwAEiQ==}
 
   ip-address@9.0.5:
     resolution: {integrity: sha512-zHtQzGojZXTwZTHQqra+ETKd4Sn3vgi7uBmlPoXVWZqYvuKmtI0l/VZTjqGmJY9x88GGOaZ9+G9ES8hC4T4X8g==}
@@ -7618,17 +7598,9 @@ packages:
     resolution: {integrity: sha512-w942bTcih8fdJPJmQHFzkS76NEP8Kzzvmw92cXsazb8intwLqPibPPdXf4ANdKV3rYMuuQYGIWtvz9JilB3NFQ==}
     engines: {node: '>=6'}
 
-  is-path-cwd@3.0.0:
-    resolution: {integrity: sha512-kyiNFFLU0Ampr6SDZitD/DwUo4Zs1nSdnygUBqsu3LooL00Qvb5j+UnvApUn/TTj1J3OuE6BTdQ5rudKmU2ZaA==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-
   is-path-inside@3.0.3:
     resolution: {integrity: sha512-Fd4gABb+ycGAmKou8eMftCupSir5lRxqf4aD/vd0cD2qc4HL07OjCeuHMr8Ro4CoMaeCKDB0/ECBOVWjTwUvPQ==}
     engines: {node: '>=8'}
-
-  is-path-inside@4.0.0:
-    resolution: {integrity: sha512-lJJV/5dYS+RcL8uQdBDW9c9uWFLLBNRyFhnAKXw5tVqLlKZ4RMGZKv+YQ/IA3OhD+RpbJa1LLFM1FQPGyIXvOA==}
-    engines: {node: '>=12'}
 
   is-plain-obj@1.1.0:
     resolution: {integrity: sha512-yvkRyxmFKEOQ4pNXCmJG5AEQNlXJS5LaONXo5/cLdTZdWvsZ1ioJEonLGAosKlMWE8lwUy/bJzMjcw8az73+Fg==}
@@ -8210,10 +8182,6 @@ packages:
   memoizee@0.4.17:
     resolution: {integrity: sha512-DGqD7Hjpi/1or4F/aYAspXKNm5Yili0QDAFAY4QYvpqpgiY6+1jOfqpmByzjxbWd/T9mChbCArXAbDAsTm5oXA==}
     engines: {node: '>=0.12'}
-
-  meow@13.2.0:
-    resolution: {integrity: sha512-pxQJQzB6djGPXh08dacEloMFopsOqGVRKFPYvPOt9XDZ1HasbgDZA74CJGreSU4G3Ak7EFJGoiH2auq+yXISgA==}
-    engines: {node: '>=18'}
 
   meow@8.1.2:
     resolution: {integrity: sha512-r85E3NdZ+mpYk1C6RjPFEMSE+s1iZMuHtsHAqY0DT3jZczl0diWUZ8g6oU7h0M9cD2EL+PzaYghhCLzR0ZNn5Q==}
@@ -9019,10 +8987,6 @@ packages:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
     engines: {node: '>=8'}
 
-  path-type@6.0.0:
-    resolution: {integrity: sha512-Vj7sf++t5pBD637NSfkxpHSMfWaeig5+DKWLhcqIYx6mWQz5hdJTGDVMQiJcw1ZYkhs7AazKDGpRVji1LJCZUQ==}
-    engines: {node: '>=18'}
-
   pg-cloudflare@1.2.7:
     resolution: {integrity: sha512-YgCtzMH0ptvZJslLM1ffsY4EuGaU0cx4XSdXLRFae8bPP4dS5xL1tNB3k2o/N64cHJpwU7dxKli/nZ2lUa5fLg==}
 
@@ -9793,10 +9757,6 @@ packages:
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
-
-  slash@5.1.0:
-    resolution: {integrity: sha512-ZA6oR3T/pEyuqwMgAKT0/hAv8oAXckzbkmR0UkUosQ+Mc4RxGoJkRmwHgHufaenlyAgE1Mxgpdcrf75y6XcnDg==}
-    engines: {node: '>=14.16'}
 
   slice-ansi@0.0.4:
     resolution: {integrity: sha512-up04hB2hR92PgjpyU3y/eg91yIBILyjVY26NvvciY3EVVPjybkMszMpXQ9QAkcS3I5rtJBDLoTxxg+qvW8c7rw==}
@@ -11461,19 +11421,19 @@ snapshots:
 
   '@inversifyjs/common@1.5.2': {}
 
-  '@inversifyjs/container@1.12.5(reflect-metadata@0.2.2)':
+  '@inversifyjs/container@1.14.0(reflect-metadata@0.2.2)':
     dependencies:
       '@inversifyjs/common': 1.5.2
-      '@inversifyjs/core': 7.1.1(reflect-metadata@0.2.2)
+      '@inversifyjs/core': 9.1.0(reflect-metadata@0.2.2)
       '@inversifyjs/plugin': 0.2.0
-      '@inversifyjs/reflect-metadata-utils': 1.3.0(reflect-metadata@0.2.2)
+      '@inversifyjs/reflect-metadata-utils': 1.4.1(reflect-metadata@0.2.2)
       reflect-metadata: 0.2.2
 
-  '@inversifyjs/core@7.1.1(reflect-metadata@0.2.2)':
+  '@inversifyjs/core@9.1.0(reflect-metadata@0.2.2)':
     dependencies:
       '@inversifyjs/common': 1.5.2
       '@inversifyjs/prototype-utils': 0.1.2
-      '@inversifyjs/reflect-metadata-utils': 1.3.0(reflect-metadata@0.2.2)
+      '@inversifyjs/reflect-metadata-utils': 1.4.1(reflect-metadata@0.2.2)
     transitivePeerDependencies:
       - reflect-metadata
 
@@ -11483,7 +11443,7 @@ snapshots:
     dependencies:
       '@inversifyjs/common': 1.5.2
 
-  '@inversifyjs/reflect-metadata-utils@1.3.0(reflect-metadata@0.2.2)':
+  '@inversifyjs/reflect-metadata-utils@1.4.1(reflect-metadata@0.2.2)':
     dependencies:
       reflect-metadata: 0.2.2
 
@@ -12516,8 +12476,6 @@ snapshots:
   '@sindresorhus/is@6.3.1': {}
 
   '@sindresorhus/is@7.0.2': {}
-
-  '@sindresorhus/merge-streams@2.3.0': {}
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
@@ -13870,6 +13828,8 @@ snapshots:
 
   dayjs@1.11.13: {}
 
+  dayjs@1.11.18: {}
+
   dayjs@1.8.36: {}
 
   debug@2.6.9:
@@ -13950,11 +13910,6 @@ snapshots:
       escodegen: 2.1.0
       esprima: 4.0.1
 
-  del-cli@6.0.0:
-    dependencies:
-      del: 8.0.0
-      meow: 13.2.0
-
   del@6.1.1:
     dependencies:
       globby: 11.1.0
@@ -13965,15 +13920,6 @@ snapshots:
       p-map: 4.0.0
       rimraf: 3.0.2
       slash: 3.0.0
-
-  del@8.0.0:
-    dependencies:
-      globby: 14.1.0
-      is-glob: 4.0.3
-      is-path-cwd: 3.0.0
-      is-path-inside: 4.0.0
-      p-map: 7.0.3
-      slash: 5.1.0
 
   delay@6.0.0: {}
 
@@ -15162,15 +15108,6 @@ snapshots:
       merge2: 1.4.1
       slash: 3.0.0
 
-  globby@14.1.0:
-    dependencies:
-      '@sindresorhus/merge-streams': 2.3.0
-      fast-glob: 3.3.3
-      ignore: 7.0.5
-      path-type: 6.0.0
-      slash: 5.1.0
-      unicorn-magic: 0.3.0
-
   gonzales-pe@4.3.0:
     dependencies:
       minimist: 1.2.8
@@ -15459,12 +15396,13 @@ snapshots:
       hasown: 2.0.2
       side-channel: 1.1.0
 
-  inversify@7.8.1(reflect-metadata@0.2.2):
+  inversify@7.10.3(reflect-metadata@0.2.2):
     dependencies:
       '@inversifyjs/common': 1.5.2
-      '@inversifyjs/container': 1.12.5(reflect-metadata@0.2.2)
-      '@inversifyjs/core': 7.1.1(reflect-metadata@0.2.2)
-      reflect-metadata: 0.2.2
+      '@inversifyjs/container': 1.14.0(reflect-metadata@0.2.2)
+      '@inversifyjs/core': 9.1.0(reflect-metadata@0.2.2)
+    transitivePeerDependencies:
+      - reflect-metadata
 
   ip-address@9.0.5:
     dependencies:
@@ -15627,11 +15565,7 @@ snapshots:
 
   is-path-cwd@2.2.0: {}
 
-  is-path-cwd@3.0.0: {}
-
   is-path-inside@3.0.3: {}
-
-  is-path-inside@4.0.0: {}
 
   is-plain-obj@1.1.0: {}
 
@@ -16379,8 +16313,6 @@ snapshots:
       lru-queue: 0.1.0
       next-tick: 1.1.0
       timers-ext: 0.1.8
-
-  meow@13.2.0: {}
 
   meow@8.1.2:
     dependencies:
@@ -17339,8 +17271,6 @@ snapshots:
 
   path-type@4.0.0: {}
 
-  path-type@6.0.0: {}
-
   pg-cloudflare@1.2.7:
     optional: true
 
@@ -18232,8 +18162,6 @@ snapshots:
   sisteransi@1.0.5: {}
 
   slash@3.0.0: {}
-
-  slash@5.1.0: {}
 
   slice-ansi@0.0.4: {}
 

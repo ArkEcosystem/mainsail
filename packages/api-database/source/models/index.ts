@@ -7,6 +7,7 @@ export * from "./multi-payments.js";
 export * from "./peer.js";
 export * from "./plugin.js";
 export * from "./state.js";
+export * from "./system.js";
 export * from "./transaction.js";
 export * from "./validator-round.js";
 export * from "./wallet.js";

@@ -2,6 +2,8 @@ import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { assert, BigNumber } from "@mainsail/utils";
 
+import { Transaction } from "./transaction.js";
+
 @injectable()
 export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	@inject(Identifiers.Cryptography.Configuration)
@@ -30,9 +32,6 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
-	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
-	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
-
 	public async fromHex(hex: string): Promise<Contracts.Crypto.Transaction> {
 		return this.#fromSerialized(Buffer.from(hex, "hex"));
 	}
@@ -42,7 +41,31 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	}
 
 	public async fromJson(json: Contracts.Crypto.TransactionJson): Promise<Contracts.Crypto.Transaction> {
-		return this.fromData(this.transactionTypeFactory.get(0, 0, 0).getData(json));
+		return this.fromData(Transaction.getData(json));
+	}
+
+	public async fromStorage(data: Contracts.Evm.TransactionStorageData): Promise<Contracts.Crypto.Transaction> {
+		const transaction = this.utils.resolve({
+			blockNumber: data.blockNumber,
+			data: data.data.toString("hex"),
+			from: data.from,
+			gasLimit: Number(data.gasLimit),
+			gasPrice: Number(data.gasPrice),
+			hash: data.txHash,
+			legacySecondSignature: data.legacySecondSignature,
+			network: this.configuration.get<number>("network.chainId"),
+			nonce: BigNumber.make(data.nonce),
+			r: data.r,
+			s: data.s,
+			senderLegacyAddress: data.legacyAddress,
+			senderPublicKey: data.senderPublicKey,
+			to: data.to,
+			transactionIndex: data.index,
+			v: data.v,
+			value: BigNumber.make(data.value),
+		});
+
+		return transaction;
 	}
 
 	public async fromData(
@@ -55,7 +78,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			throw new Exceptions.TransactionSchemaError(error);
 		}
 
-		const transaction: Contracts.Crypto.Transaction = this.transactionTypeFactory.create(value);
+		const transaction = this.utils.resolve(value);
 
 		await this.serializer.serialize(transaction);
 

@@ -26,9 +26,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.Processor.TransactionProcessor)
 	private readonly transactionProcessor!: Contracts.Processor.TransactionProcessor;
 
-	@inject(Identifiers.Transaction.Handler.Registry)
-	private handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
-
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -96,7 +93,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			processResult.success = true;
 		} catch (error) {
 			void this.#emit(Events.BlockEvent.Invalid, { block: unit.getBlock().data, error });
-			this.logger.error(`Cannot process block because: ${error.message}`);
+			this.logger.error(`Cannot process block because: ${error.message}`, "consensus");
 		}
 
 		return processResult;
@@ -145,7 +142,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 				blockString = `${blockNumber}/${round}(${blockRound})/${block.data.hash}`;
 			}
 
-			this.logger.info(`Committed block ${blockString} with ${transactionsCount} tx(s) (gasUsed=${gasUsed})`);
+			this.logger.info(
+				`Committed block ${blockString} with ${transactionsCount} tx(s) (gasUsed=${gasUsed})`,
+				"consensus",
+			);
 		}
 	}
 
@@ -249,8 +249,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 
 		void this.#emit(Events.TransactionEvent.Applied, transaction.data);
-		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-		handler.emitEvents(transaction);
 	}
 
 	async #updateRewardsAndVotes(unit: Contracts.Processor.ProcessableUnit) {

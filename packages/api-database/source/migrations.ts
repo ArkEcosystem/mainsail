@@ -16,17 +16,7 @@ export class Migrations implements ApiDatabaseContracts_Migrations {
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	private readonly dataSource!: DataSource;
 
-	public async run(): Promise<void> {
-		this.logger.info(`running migrations...`);
-
-		await this.#synchronizeEntities();
-		const migrations = await this.dataSource.runMigrations();
-		for (const migration of migrations) {
-			this.logger.info(`>>> ${migration.name}`);
-		}
-	}
-
-	async #synchronizeEntities(): Promise<void> {
+	public async synchronizeEntities(): Promise<void> {
 		try {
 			// Manually run 'synchronize' to create entity tables once. We cannot rely on TypeORM to run it unconditionally
 			// when creating the datasource since it will fail to establish a connection when it runs into the 'Table already exists' error.
@@ -42,7 +32,26 @@ export class Migrations implements ApiDatabaseContracts_Migrations {
 				throw error;
 			}
 
-			this.logger.info(`entities already synchronized`);
+			this.logger.debug(`entities already synchronized`);
+		}
+	}
+
+	public async runMigrations(): Promise<void> {
+		this.logger.info(`Running migrations...`);
+
+		const [result] = await this.dataSource.manager.query(`SHOW statement_timeout`);
+		const oldTimeout = result.statement_timeout;
+		try {
+			await this.dataSource.manager.query(`SET statement_timeout = 0`);
+
+			const migrations = await this.dataSource.runMigrations({ transaction: "all" });
+			for (const migration of migrations) {
+				this.logger.info(`>>> ${migration.name}`);
+			}
+		} catch (error) {
+			await this.app.terminate("failed to run migrations", error);
+		} finally {
+			await this.dataSource.manager.query(`SET statement_timeout = '${oldTimeout}'`);
 		}
 	}
 }

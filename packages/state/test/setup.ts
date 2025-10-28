@@ -184,25 +184,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	const applySpy: SinonSpy = spy();
 	const revertSpy: SinonSpy = spy();
 
-	const getRegisteredHandlersSpy = spy();
-
-	@injectable()
-	class MockHandler {
-		public getActivatedHandlerForData() {
-			return {
-				apply: applySpy,
-				revert: revertSpy,
-			};
-		}
-
-		public getRegisteredHandlers() {
-			getRegisteredHandlersSpy();
-			return setUpOptions.getRegisteredHandlers;
-		}
-	}
-
-	sandbox.app.bind(Identifiers.Transaction.Handler.Registry).to(MockHandler);
-
 	const getBlockRewardsSpy = spy();
 
 	// @injectable()

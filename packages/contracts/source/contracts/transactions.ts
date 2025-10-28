@@ -1,4 +1,4 @@
-import { Transaction, TransactionConstructor, TransactionData } from "./crypto/index.js";
+import { Transaction, TransactionData } from "./crypto/index.js";
 import { BlockContext, CommitKey, Instance, TransactionReceipt } from "./evm/index.js";
 import { Wallet } from "./state/index.js";
 
@@ -17,15 +17,6 @@ export interface TransactionHandler {
 	throwIfCannotBeApplied(transaction: Transaction, sender: Wallet, evm: Instance): Promise<void>;
 
 	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionReceipt>;
-
-	emitEvents(transaction: Transaction): void;
-
-	// Abstract
-	getConstructor(): TransactionConstructor;
-
-	dependencies(): ReadonlyArray<TransactionHandlerConstructor>;
-
-	isActivated(): Promise<boolean>;
 }
 
 export interface TransactionHandlerRegistry {
@@ -44,14 +35,6 @@ export interface TransactionHandlerProvider {
 	isRegistrationRequired(): boolean;
 
 	registerHandlers(): void;
-}
-
-export interface TransactionTypeFactory {
-	initialize(transactionTypes: Map<number, TransactionConstructor>);
-
-	create(data: TransactionData): Transaction;
-
-	get(type: number, typeGroup?: number, version?: number): TransactionConstructor;
 }
 
 export interface TransactionValidatorContext {

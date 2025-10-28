@@ -4,21 +4,20 @@ import { Contracts } from "@mainsail/contracts";
 
 export const databaseReady = {
 	getOnRequestHandler(app: Contracts.Kernel.Application) {
-		const stateRepositoryFactory = app.get<ApiDatabaseContracts.StateRepositoryFactory>(
-			ApiDatabaseIdentifiers.StateRepositoryFactory,
-		);
+		const systemRepository = app.get<ApiDatabaseContracts.SystemRepositoryFactory>(
+			ApiDatabaseIdentifiers.SystemRepositoryFactory,
+		)();
 
-		const isReady = async () => {
+		const inMaintenance = async () => {
 			try {
-				const state = await stateRepositoryFactory().createQueryBuilder().getOne();
-				return !!state;
+				return systemRepository.inMaintenance();
 			} catch {
-				return false;
+				return true;
 			}
 		};
 
 		return async (request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Hapi.Lifecycle.ReturnValue> => {
-			if (!(await isReady())) {
+			if (await inMaintenance()) {
 				return h
 					.response({ error: "Service Unavailable", reason: "Database not ready" })
 					.code(503)

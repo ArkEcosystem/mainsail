@@ -1,5 +1,4 @@
-import { Exceptions } from "@mainsail/contracts";
-import { interfaces } from "@mainsail/container";
+import { Exceptions, Contracts } from "@mainsail/contracts";
 import { Sandbox } from "@mainsail/test-framework";
 import { assert } from "@mainsail/test-runner";
 
@@ -51,7 +50,7 @@ export const assertBlockHash = async (sandbox: Sandbox | Sandbox[], id?: string)
 };
 
 export const assertInvalidBlock = async (
-	exception: interfaces.Newable<Exceptions.Exception>,
+	exception: Contracts.Kernel.Container.Newable<Exceptions.Exception>,
 	sandbox: Sandbox | Sandbox[],
 	blockNumber: number,
 	round: number = 0,

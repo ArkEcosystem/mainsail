@@ -57,6 +57,7 @@ export interface AccountMergeInfo {
 }
 
 export interface LegacyAttributes {
+	readonly legacyNonce?: bigint;
 	readonly secondPublicKey?: string;
 	readonly multiSignature?: LegacyMultiSignatureAttribute;
 }

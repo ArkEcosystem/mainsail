@@ -1,4 +1,5 @@
 pub mod account;
+mod compression;
 pub mod db;
 mod events;
 pub mod historical;

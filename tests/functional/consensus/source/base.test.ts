@@ -1,8 +1,8 @@
 import { describe, Sandbox } from "@mainsail/test-framework";
 
-import crypto from "../config/crypto.json";
-import validators from "../config/validators.json";
-import { assertBlockHash, assertBockNumber } from "./asserts.js";
+import crypto from "../config/crypto.json" with { type: "json" };
+import validators from "../config/validators.json" with { type: "json" };
+import { assertBlockHash, assertBlockNumber } from "./asserts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import { getLastCommit, prepareNodeValidators, snoozeForBlock } from "./utilities.js";
@@ -37,7 +37,7 @@ describe<{
 
 		const commit = await getLastCommit(nodes[0]);
 
-		await assertBockNumber(nodes, 1);
+		await assertBlockNumber(nodes, 1);
 		await assertBlockHash(nodes, commit.block.data.hash);
 	});
 
@@ -46,7 +46,7 @@ describe<{
 
 		const commit = await getLastCommit(nodes[0]);
 
-		await assertBockNumber(nodes, 3);
+		await assertBlockNumber(nodes, 3);
 		await assertBlockHash(nodes, commit.block.data.hash);
 	});
 });

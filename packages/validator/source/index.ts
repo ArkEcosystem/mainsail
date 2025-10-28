@@ -12,7 +12,7 @@ import { ValidatorRepository } from "./validator-repository.js";
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.Validator.Repository).toConstantValue(this.app.resolve(ValidatorRepository));
+		this.app.bind(Identifiers.Validator.Repository).to(ValidatorRepository).inSingletonScope();
 	}
 
 	public async boot(): Promise<void> {

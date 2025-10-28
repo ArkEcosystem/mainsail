@@ -25,6 +25,7 @@ type Context = {
 	eventDispatcher: any;
 	roundState: Contracts.Consensus.RoundState;
 	roundStateRepository: any;
+	peerStatistic: any;
 };
 
 describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each }) => {
@@ -135,6 +136,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			setProcessorResult: () => {},
 		} as unknown as Contracts.Consensus.RoundState;
 
+		context.peerStatistic = {
+			logStatistic: () => {},
+		};
+
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
@@ -156,6 +161,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			.bind(Identifiers.Consensus.RoundStateRepository)
 			.toConstantValue(context.roundStateRepository);
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.P2P.Peer.Statistic).toConstantValue(context.peerStatistic);
 
 		context.consensus = context.sandbox.app.resolve(Consensus);
 	});
@@ -198,10 +204,12 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		eventDispatcher,
 		proposer,
 		logger,
+		peerStatistic,
 	}) => {
 		const spyScheduleClear = spy(scheduler, "clear");
 		const spyScheduleTimeoutBlockPrepare = spy(scheduler, "scheduleTimeoutBlockPrepare");
 		const spyLoggerInfo = spy(logger, "info");
+		const spyLogStatistic = spy(peerStatistic, "logStatistic");
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue();
 		const spyGetRoundState = stub(roundStateRepository, "getRoundState").returnValue({
 			hasProposal: () => false,
@@ -211,6 +219,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		await consensus.startRound(0);
 
+		spyLogStatistic.calledOnce();
+		spyLogStatistic.calledWith(0);
 		spyScheduleClear.calledOnce();
 		spyScheduleTimeoutBlockPrepare.calledOnce();
 
@@ -287,7 +297,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
-	it("#onTimeoutStartRound - local validator should propose validRound", async ({
+	it("#startRound - local validator should propose validRound", async ({
 		consensus,
 		validatorsRepository,
 		roundStateRepository,
@@ -347,7 +357,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPropose.calledOnce();
 		spyValidatorPropose.calledWith(1, 1, 0, block, lockProof); // validator set, round, validRound, block, lockProof
 		spyLoggerInfo.calledWith(`>> Starting new round: ${1}/${1} with proposer: ${proposer.address}`);
-		spyLoggerInfo.calledWith(`Proposing existing block ${1}/${1}(${0})/${block.data.hash}`);
+		spyLoggerInfo.calledWith(`Created proposal with existing block ${1}/${1}(${0})/${block.data.hash}`);
+		// spyLoggerInfo.calledWith(`Proposing block ${1}/${1}(${0})/${block.data.hash}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.ConsensusEvent.RoundStarted, {
 			blockNumber: 1,
@@ -363,14 +374,17 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		consensus,
 		proposalProcessor,
 		proposal,
+		logger,
 	}) => {
 		const spyProposalProcess = spy(proposalProcessor, "process");
+		const spyLoggerInfo = spy(logger, "info");
 
-		consensus.setProposal(proposal);
+		consensus.setProposal(proposal, proposal.getData().block);
 		await consensus.onTimeoutStartRound();
 
 		spyProposalProcess.calledOnce();
 		spyProposalProcess.calledWith(proposal);
+		spyLoggerInfo.calledWith(`Proposing block ${1}/${0}/${proposal.getData().block.data.hash}`);
 
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
@@ -383,7 +397,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	}) => {
 		const spyProposalProcess = spy(proposalProcessor, "process");
 
-		consensus.setProposal(proposal);
+		consensus.setProposal(proposal, proposal.getData().block);
 		await consensus.onTimeoutStartRound();
 		await consensus.onTimeoutStartRound();
 
@@ -1352,6 +1366,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyLoggerInfo = spy(logger, "info");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
+		roundState.hasProcessorResult = () => true;
 		roundState.getProcessorResult = () => ({ success: true });
 
 		assert.equal(consensus.getBlockNumber(), 1);
@@ -1390,6 +1405,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.getData().block);
 		const spyBlockProcessorCommit = stub(blockProcessor, "commit").rejectedValue(error);
 
+		roundState.hasProcessorResult = () => true;
 		roundState.getProcessorResult = () => ({ success: true });
 
 		assert.equal(consensus.getBlockNumber(), 1);
@@ -1420,6 +1436,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 		const spyLoggerInfo = spy(logger, "info");
 
+		roundState.hasProcessorResult = () => true;
 		roundState.getProcessorResult = () => ({ success: false });
 
 		assert.equal(consensus.getBlockNumber(), 1);
@@ -1434,6 +1451,47 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getBlockNumber(), 1);
 	});
 
+	it("#onMajorityPrecommit - should log and do nothing if proposal is missing", async ({
+		consensus,
+		blockProcessor,
+		roundState,
+		logger,
+		roundStateRepository,
+		proposal,
+	}) => {
+		const fakeTimers = clock();
+
+		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.getData().block);
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyRoundStateRepositoryClear = stub(roundStateRepository, "clear");
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyLoggerInfo = spy(logger, "info");
+
+		roundState.hasProcessorResult = () => false;
+
+		assert.equal(consensus.getBlockNumber(), 1);
+		void consensus.onMajorityPrecommit(roundState);
+		await fakeTimers.nextAsync();
+
+		spyRoundStateGetBlock.neverCalled();
+		spyBlockProcessorCommit.neverCalled();
+		spyConsensusStartRound.neverCalled();
+		spyRoundStateRepositoryClear.neverCalled();
+		spyLoggerInfo.calledOnce();
+		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0}, but proposal is missing`);
+		assert.equal(consensus.getBlockNumber(), 1);
+
+		// Should not try again
+		void consensus.onMajorityPrecommit(roundState);
+		await fakeTimers.nextAsync();
+
+		spyRoundStateGetBlock.neverCalled();
+		spyBlockProcessorCommit.neverCalled();
+		spyConsensusStartRound.neverCalled();
+		spyRoundStateRepositoryClear.neverCalled();
+		spyLoggerInfo.calledOnce(); // still only called once from previous attempt
+	});
+
 	it("#onMajorityPrecommit - should be called only once", async ({
 		consensus,
 		blockProcessor,
@@ -1446,6 +1504,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 
+		roundState.hasProcessorResult = () => true;
 		roundState.getProcessorResult = () => ({ success: true });
 
 		assert.equal(consensus.getBlockNumber(), 1);

@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/core",
-	"version": "0.0.1-evm.35",
+	"version": "0.0.1-rc.6",
 	"description": "Core CLI commands for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -17,7 +17,6 @@
 	"scripts": {
 		"build": "tsc -b",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del distribution && del tsconfig.tsbuildinfo",
 		"full:devnet": "cross-env-shell MAINSAIL_PATH_CONFIG=./bin/config/devnet pnpm run mainsail core:run -- --env=test",
 		"full:devnet:debug": "cross-env-shell MAINSAIL_PATH_CONFIG=./bin/config/devnet pnpm run mainsail:debug core:run -- --env=test",
 		"mainsail": "node ./bin/run.js",
@@ -58,7 +57,6 @@
 		"@mainsail/crypto-messages": "workspace:*",
 		"@mainsail/crypto-signature-schnorr": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
-		"@mainsail/crypto-transaction-evm-call": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/crypto-worker": "workspace:*",

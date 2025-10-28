@@ -1,17 +1,20 @@
-use std::{collections::HashMap, sync::Arc, u64};
+use std::{sync::Arc, u64};
 
 use ctx::{
     BlockContext, CalculateRoundValidatorsContext, EvmOptions, ExecutionContext, GenesisContext,
-    JsCalculateRoundValidatorsContext, JsCommitData, JsCommitKey, JsEvmOptions, JsGenesisContext,
-    JsPrepareNextCommitContext, JsPreverifyTransactionContext, JsTransactionContext,
-    JsTransactionSimulateContext, JsTransactionViewContext, JsUpdateRewardsAndVotesContext,
-    PrepareNextCommitContext, PreverifyTxContext, TxContext, TxSimulateContext, TxViewContext,
-    UpdateRewardsAndVotesContext,
+    JsBlockHeaderData, JsCalculateRoundValidatorsContext, JsCommitData, JsCommitKey, JsEvmOptions,
+    JsGenesisContext, JsPrepareNextCommitContext, JsPreverifyTransactionContext,
+    JsTransactionContext, JsTransactionData, JsTransactionSimulateContext,
+    JsTransactionViewContext, JsUpdateRewardsAndVotesContext, PrepareNextCommitContext,
+    PreverifyTxContext, TxContext, TxSimulateContext, TxViewContext, UpdateRewardsAndVotesContext,
 };
 use logger::JsLogger;
 use mainsail_evm_core::{
     account::AccountInfoExtended,
-    db::{CommitData, CommitKey, GenesisInfo, PendingCommit, PersistentDB, PersistentDBOptions},
+    db::{
+        BlockHeaderData, CommitData, CommitKey, GenesisInfo, PendingCommit, PersistentDB,
+        PersistentDBOptions, ProofData, TransactionData,
+    },
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
     logs_bloom,
@@ -22,8 +25,8 @@ use mainsail_evm_core::{
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use result::{
-    CommitResult, JsAccountInfoExtended, JsLegacyAttributes, JsLegacyColdWallet, PreverifyTxResult,
-    TxViewResult,
+    CommitResult, JsAccountInfoExtended, JsCommitResult, JsGetState, JsLegacyAttributes,
+    JsLegacyColdWallet, JsTransactionReceipt, PreverifyTxResult, TxViewResult,
 };
 use revm::{
     Database, DatabaseCommit, ExecuteEvm, MainBuilder, MainContext,
@@ -33,11 +36,9 @@ use revm::{
     },
     database::{State, TransitionAccount, WrapDatabaseRef},
     handler::EvmTr,
-    primitives::{Address, B256, Bytes, TxKind, U256, hex::ToHexExt},
+    primitives::{Address, B256, Bytes, TxKind, U256, hex::ToHexExt, map::HashMap},
     state::{AccountInfo, Bytecode},
 };
-
-use crate::result::{JsCommitResult, JsGetState, JsTransactionReceipt};
 
 mod ctx;
 mod logger;
@@ -117,7 +118,7 @@ impl EvmInner {
             Ok(r) => {
                 if !r.is_success() {
                     self.logger
-                        .log(LogLevel::Warning, format!("view call failed: {:?}", r));
+                        .log(LogLevel::Warn, format!("view call failed: {:?}", r));
                 }
 
                 TxViewResult {
@@ -127,7 +128,7 @@ impl EvmInner {
             }
             Err(err) => {
                 self.logger.log(
-                    LogLevel::Warning,
+                    LogLevel::Warn,
                     format!("view call returned error: {:?}", err),
                 );
 
@@ -302,7 +303,7 @@ impl EvmInner {
             .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
 
         let mut pending_commit = self.pending_commits.get_mut(&ctx.commit_key).expect("ok");
-        let mut rewards = HashMap::<Address, u128>::new();
+        let mut rewards = HashMap::<Address, u128>::default();
         rewards.insert(ctx.validator_address, ctx.block_reward);
 
         match state_commit::apply_rewards(&mut self.persistent_db, &mut pending_commit, rewards) {
@@ -602,7 +603,7 @@ impl EvmInner {
                     EVMError::Database(format!("failed reading legacy cold wallet: {}", err).into())
                 })? {
                 Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
-                    let mut legacy_balances = HashMap::<Address, u128>::new();
+                    let mut legacy_balances = HashMap::<Address, u128>::default();
                     legacy_balances.insert(
                         ctx.from,
                         legacy_cold_wallet.balance.try_into().expect("fit u128"),
@@ -653,8 +654,11 @@ impl EvmInner {
             .build_mainnet();
 
         let ctx = evm.ctx_ref();
-        let result =
-            revm::handler::validation::validate_initial_tx_gas(ctx.tx(), ctx.cfg().spec().into());
+        let result = revm::handler::validation::validate_initial_tx_gas(
+            ctx.tx(),
+            ctx.cfg().spec().into(),
+            false,
+        );
 
         Ok(match result {
             Ok(result) => PreverifyTxResult {
@@ -718,7 +722,7 @@ impl EvmInner {
                             )
                         })? {
                         Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
-                            let mut legacy_balances = HashMap::<Address, u128>::new();
+                            let mut legacy_balances = HashMap::<Address, u128>::default();
                             legacy_balances.insert(
                                 tx_ctx.from,
                                 legacy_cold_wallet.balance.try_into().expect("fit u128"),
@@ -836,11 +840,11 @@ impl EvmInner {
         }
     }
 
-    pub fn get_block_header_bytes(
+    pub fn get_block_header_data(
         &mut self,
         block_number: u64,
-    ) -> std::result::Result<Option<Bytes>, EVMError<String>> {
-        let result = self.persistent_db.get_block_header_bytes(block_number);
+    ) -> std::result::Result<Option<BlockHeaderData>, EVMError<String>> {
+        let result = self.persistent_db.get_block_header_data(block_number);
 
         match result {
             Ok(result) => Ok(result),
@@ -864,30 +868,53 @@ impl EvmInner {
         }
     }
 
-    pub fn get_proof_bytes(
+    pub fn get_commit_data(
         &mut self,
         block_number: u64,
-    ) -> std::result::Result<Option<Bytes>, EVMError<String>> {
-        let result = self.persistent_db.get_proof_bytes(block_number);
+    ) -> std::result::Result<
+        Option<(ProofData, BlockHeaderData, Vec<TransactionData>)>,
+        EVMError<String>,
+    > {
+        let Some(proof) = self
+            .persistent_db
+            .get_proof_data(block_number)
+            .map_err(|err| EVMError::Database(format!("get_proof_data failed: {}", err).into()))?
+        else {
+            return Ok(None);
+        };
 
-        match result {
-            Ok(result) => Ok(result),
-            Err(err) => Err(EVMError::Database(
-                format!("get_proof_bytes failed: {}", err).into(),
-            )),
+        let header = self
+            .persistent_db
+            .get_block_header_data(block_number)
+            .map_err(|err| {
+                EVMError::Database(format!("get_block_header_data failed: {}", err).into())
+            })?
+            .ok_or_else(|| EVMError::Custom("header not found".into()))?;
+
+        let mut txs = Vec::with_capacity(header.transactions_count as usize);
+
+        for i in 0..header.transactions_count {
+            let key = format!("{block_number}-{i}");
+            let tx_data = self.get_transaction_data(key)?.ok_or_else(|| {
+                EVMError::Custom(format!("tx {block_number}-{i} not found").into())
+            })?;
+
+            txs.push(tx_data);
         }
+
+        Ok(Some((proof, header, txs)))
     }
 
-    pub fn get_transaction_bytes(
+    pub fn get_transaction_data(
         &mut self,
         key: String,
-    ) -> std::result::Result<Option<Bytes>, EVMError<String>> {
-        let result = self.persistent_db.get_transaction_bytes(key);
+    ) -> std::result::Result<Option<TransactionData>, EVMError<String>> {
+        let result = self.persistent_db.get_transaction_data(key);
 
         match result {
             Ok(result) => Ok(result),
             Err(err) => Err(EVMError::Database(
-                format!("get_transaction_bytes failed: {}", err).into(),
+                format!("get_transaction_data failed: {}", err).into(),
             )),
         }
     }
@@ -1522,18 +1549,18 @@ impl JsEvmWrapper {
         })
     }
 
-    #[napi(ts_return_type = "Promise<Buffer | undefined>")]
-    pub fn get_block_header_bytes<'env>(
+    #[napi]
+    pub fn get_block_header_data<'env>(
         &mut self,
         env: &'env Env,
         block_number: BigInt,
-    ) -> Result<PromiseRaw<'env, Option<Buffer>>> {
+    ) -> Result<PromiseRaw<'env, Option<JsBlockHeaderData>>> {
         let block_number = block_number.get_u64().1;
         env.spawn_future_with_callback(
-            Self::get_block_header_bytes_async(self.evm.clone(), block_number),
+            Self::get_block_header_data_async(self.evm.clone(), block_number),
             |_, result| {
                 Ok(match result {
-                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(bytes)),
+                    Some(data) => Some(JsBlockHeaderData::new(data)),
                     None => None,
                 })
             },
@@ -1560,17 +1587,17 @@ impl JsEvmWrapper {
     }
 
     #[napi]
-    pub fn get_proof_bytes<'env>(
+    pub fn get_commit_data<'env>(
         &mut self,
         env: &'env Env,
         block_number: BigInt,
-    ) -> Result<PromiseRaw<'env, Option<Buffer>>> {
+    ) -> Result<PromiseRaw<'env, Option<JsCommitData>>> {
         let block_number = block_number.get_u64().1;
         env.spawn_future_with_callback(
-            Self::get_proof_bytes_async(self.evm.clone(), block_number),
+            Self::get_commit_data_async(self.evm.clone(), block_number),
             |_, result| {
                 Ok(match result {
-                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(bytes)),
+                    Some((proof, header, txs)) => Some(JsCommitData::new(proof, header, txs)),
                     None => None,
                 })
             },
@@ -1578,19 +1605,14 @@ impl JsEvmWrapper {
     }
 
     #[napi]
-    pub fn get_transaction_bytes<'env>(
+    pub fn get_transaction_data<'env>(
         &mut self,
         env: &'env Env,
         key: String,
-    ) -> Result<PromiseRaw<'env, Option<Buffer>>> {
+    ) -> Result<PromiseRaw<'env, Option<JsTransactionData>>> {
         env.spawn_future_with_callback(
-            Self::get_transaction_bytes_async(self.evm.clone(), key),
-            |_, result| {
-                Ok(match result {
-                    Some(bytes) => Some(utils::convert_bytes_to_js_buffer(bytes)),
-                    None => None,
-                })
-            },
+            Self::get_transaction_data_async(self.evm.clone(), key),
+            |_, result| Ok(result.map(|data| JsTransactionData::new(data))),
         )
     }
 
@@ -1968,12 +1990,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn get_block_header_bytes_async(
+    async fn get_block_header_data_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         block_number: u64,
-    ) -> Result<Option<Bytes>> {
+    ) -> Result<Option<BlockHeaderData>> {
         let mut lock = evm.lock().await;
-        let result = lock.get_block_header_bytes(block_number);
+        let result = lock.get_block_header_data(block_number);
 
         match result {
             Ok(result) => Result::Ok(result),
@@ -1994,12 +2016,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn get_proof_bytes_async(
+    async fn get_commit_data_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         block_number: u64,
-    ) -> Result<Option<Bytes>> {
+    ) -> Result<Option<(ProofData, BlockHeaderData, Vec<TransactionData>)>> {
         let mut lock = evm.lock().await;
-        let result = lock.get_proof_bytes(block_number);
+        let result = lock.get_commit_data(block_number);
 
         match result {
             Ok(result) => Result::Ok(result),
@@ -2007,12 +2029,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn get_transaction_bytes_async(
+    async fn get_transaction_data_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         key: String,
-    ) -> Result<Option<Bytes>> {
+    ) -> Result<Option<TransactionData>> {
         let mut lock = evm.lock().await;
-        let result = lock.get_transaction_bytes(key);
+        let result = lock.get_transaction_data(key);
 
         match result {
             Ok(result) => Result::Ok(result),

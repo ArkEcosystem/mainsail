@@ -36,6 +36,8 @@ const setup = async () => {
 		broadcastPrevote: async () => {},
 		broadcastProposal: async () => {},
 	});
+	sandbox.app.bind(Identifiers.P2P.Peer.Statistic).toConstantValue({ logStatistic: () => {} });
+
 	sandbox.app.bind(Identifiers.TransactionPool.Broadcaster).toConstantValue({
 		broadcastTransactions: async () => {},
 	});
@@ -101,7 +103,6 @@ const setup = async () => {
 		"@mainsail/api-sync",
 		"@mainsail/blockchain-utils",
 		"@mainsail/crypto-transaction",
-		"@mainsail/crypto-transaction-evm-call",
 		"@mainsail/state",
 		"@mainsail/transactions",
 		"@mainsail/transaction-pool-service",

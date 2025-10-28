@@ -6,6 +6,7 @@ export { makeLegacyColdWalletRepository } from "./legacy-cold-wallet-repository.
 export { makePeerRepository } from "./peer-repository.js";
 export { makePluginRepository } from "./plugin-repository.js";
 export { makeStateRepository } from "./state-repository.js";
+export { makeSystemRepository } from "./system-repository.js";
 export { makeTransactionRepository } from "./transaction-repository.js";
 export { makeValidatorRoundRepository } from "./validator-round-repository.js";
 export { makeWalletRepository } from "./wallet-repository.js";

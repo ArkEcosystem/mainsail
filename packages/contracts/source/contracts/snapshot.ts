@@ -42,6 +42,7 @@ export interface ImportedLegacyWallet {
 }
 
 export interface ImportedLegacyWalletAttributes {
+	readonly legacyNonce: bigint;
 	readonly secondPublicKey?: string;
 	readonly multiSignature?: ImportedLegacyMultiSignatureAttribute;
 }
@@ -60,7 +61,7 @@ export interface ImportedLegacyVoter {
 
 export interface ImportedLegacyValidator {
 	readonly arkAddress: string;
-	readonly ethAddress?: string;
+	readonly ethAddress: string;
 	readonly publicKey: string;
 	readonly isResigned: boolean;
 

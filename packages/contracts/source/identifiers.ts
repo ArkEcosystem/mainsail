@@ -129,7 +129,6 @@ export const Identifiers = {
 			Registry: Symbol("Crypto<Transaction.Registry>"),
 			Serializer: Symbol("Crypto<Transaction.Serializer>"),
 			Signer: Symbol("Crypto<Transaction.Signer>"),
-			TypeFactory: Symbol("Crypto<Transaction.TypeFactory>"),
 			Utils: Symbol("Crypto<Transaction.Utils>"),
 			Verifier: Symbol("Crypto<Transaction.Verifier>"),
 		},
@@ -193,6 +192,7 @@ export const Identifiers = {
 			Factory: Symbol("P2P<Peer.Factory>"),
 			Processor: Symbol("P2P<Peer.Processor>"),
 			Repository: Symbol("P2P<Peer.Repository>"),
+			Statistic: Symbol("P2P<Peer.Statistic>"),
 			Verifier: Symbol("P2P<Peer.Verifier>"),
 		},
 		Server: Symbol("P2P<Server>"),
@@ -264,12 +264,7 @@ export const Identifiers = {
 		Store: Symbol("State<Store>"),
 	},
 	Transaction: {
-		Handler: {
-			Constructors: Symbol("Transaction<Handler.Constructors>"),
-			Instances: Symbol("Transaction<Handler.Instances>"),
-			Provider: Symbol("Transaction<Handler.Provider>"),
-			Registry: Symbol("Transaction<Handler.Registry>"),
-		},
+		Handler: Symbol("Transaction<Handler>"),
 		Validator: {
 			Factory: Symbol("Transaction<Validator.Factory>"),
 			Instance: Symbol("Transaction<Validator.Instance>"),

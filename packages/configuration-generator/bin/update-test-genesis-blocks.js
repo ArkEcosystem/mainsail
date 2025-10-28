@@ -50,6 +50,45 @@ const configurations = [
 			}
 		},
 	},
+	// tests/functional/consensus/config/
+	{
+		network: "devnet",
+		symbol: "TѦ",
+		token: "ARK",
+		distribute: true,
+		premine: "125000000000000000000000000",
+		chainId: 10000,
+		validators: 5,
+		initialHeight: 0,
+		overwriteConfig: true,
+		timeouts: {
+			blockPrepareTime: 200,
+			blockTime: 200,
+			stageTimeout: 200,
+			stageTimeoutIncrease: 200,
+			tolerance: 200,
+		},
+		postGenerate: (location) => {
+			// Functional tests run on single node
+			const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+			for (const file of ["crypto.json", "validators.json"]) {
+				const source = path.join(location, file);
+				const target = path.join(
+					__dirname,
+					"..",
+					"..",
+					"..",
+					"tests",
+					"functional",
+					"consensus",
+					"config",
+					file,
+				);
+				copyFileSync(source, target);
+			}
+		},
+	},
 
 	// E2E Consensus
 	// tests/e2e/consensus
@@ -162,7 +201,7 @@ const configurations = [
 		snapshot: {
 			// reuse existing snapshot to build new genesis block
 			// also see commit: 718b4cf2f1b49df9b80e6474be06fa97acc80d44
-			path: "../../tests/e2e/snapshot/nodes/node0/core/snapshot/f11b12e6d3a7524482deaacf745d5411d476ae39beeb7ce5141bfeee912cd08d.compressed",
+			path: "../../tests/e2e/snapshot/nodes/node0/core/snapshot/edccff0c18f4384efed02b5bf8475bde2477a1802dcbef0f6d263208d15defe9.compressed",
 		},
 		postGenerate: (location) => {
 			// E2E tests run multiple nodes (1 validator per node)

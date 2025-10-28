@@ -5,12 +5,15 @@ import delay from "delay";
 
 import { Client } from "./hapi-nes/index.js";
 
-const TEN_SECONDS_IN_MILLISECONDS = 10_000;
+const TEN_SECONDS = 10 * 1000; // in milliseconds
 
 @injectable()
 export class PeerConnector implements Contracts.P2P.PeerConnector {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
+
+	@inject(Identifiers.P2P.Logger)
+	private readonly logger!: Contracts.P2P.Logger;
 
 	private readonly connections: Map<string, Client> = new Map<string, Client>();
 	readonly #lastConnectionCreate: Map<string, number> = new Map<string, number>();
@@ -48,13 +51,20 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	async #create(peer: Contracts.P2P.Peer): Promise<Client> {
 		// delay a bit if last connection create was less than 10 sec ago to prevent possible abuse of reconnection
 		const timeSinceLastConnectionCreate = Date.now() - (this.#lastConnectionCreate.get(peer.ip) ?? 0);
-		await delay(Math.max(0, TEN_SECONDS_IN_MILLISECONDS - timeSinceLastConnectionCreate));
+		await delay(Math.max(0, TEN_SECONDS - timeSinceLastConnectionCreate));
 
 		const connection = new Client(`ws://${IpAddress.normalizeAddress(peer.ip)}:${peer.port}`, {
 			timeout: 10_000,
 		});
 		this.connections.set(peer.ip, connection);
 		this.#lastConnectionCreate.set(peer.ip, Date.now());
+
+		connection.onDisconnect = () => {
+			this.logger.debug(`Disconnected from peer ${peer.ip}`);
+
+			const peerDisposer = this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer);
+			peerDisposer.disposePeer(peer.ip);
+		};
 
 		connection.onError = (error) => {
 			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).banPeer(peer.ip, error);
