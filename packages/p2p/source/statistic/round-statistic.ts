@@ -12,8 +12,7 @@ type EndpointStatistic = {
 	endpoint: string;
 	count: {
 		success: number;
-		fail: number;
-		emit: number;
+		emits: number;
 		peers: number;
 	},
 	response: {
@@ -88,8 +87,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 
 		for (const [endpoint, emits] of this.#emitStatisticsByEndpoint.entries()) {
 			const count = {
-				emit: emits.length,
-				fail: emits.filter((emit) => !emit.success).length,
+				emits: emits.length,
 				peers: new Set(emits.map((emit) => emit.ip)).size,
 				success: emits.filter((emit) => emit.success).length,
 			};
@@ -116,10 +114,10 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		const generalStatistic = this.getGeneralStatistic();
 		this.logger.info(`Round statistics: ${JSON.stringify(generalStatistic)}`);
 
-		let emitStatisticsLog = "Emit statistics by endpoint: name - peers:emits:success-fail average min[] max[]";
+		let emitStatisticsLog = "Emit statistics by endpoint: \nname \tpeers success/emits\taverage\tmin[] max[]";
 		const endpointStatistics = this.getEndpointStatistics();
 		for (const endpointStatistic of endpointStatistics) {
-			emitStatisticsLog += `\n${endpointStatistic.endpoint} - ${endpointStatistic.count.peers}:${endpointStatistic.count.emit}:${endpointStatistic.count.success}-${endpointStatistic.count.fail} ${endpointStatistic.response.average} ${endpointStatistic.response.min} ${endpointStatistic.response.max}`;
+			emitStatisticsLog += `\n${endpointStatistic.endpoint}\t${endpointStatistic.count.peers}:${endpointStatistic.count.success}/${endpointStatistic.count.emits}\t${endpointStatistic.response.average}\t[${endpointStatistic.response.min}]\t[${endpointStatistic.response.max}]`;
 		}
 
 		this.logger.info(emitStatisticsLog);
