@@ -116,12 +116,10 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		const generalStatistic = this.getGeneralStatistic();
 		this.logger.info(`Round statistics: ${JSON.stringify(generalStatistic)}`);
 
-		let emitStatisticsLog = "Emit statistics by endpoint:";
+		let emitStatisticsLog = "Emit statistics by endpoint: name - peers:emits:success-fail average min[] max[]";
 		const endpointStatistics = this.getEndpointStatistics();
 		for (const endpointStatistic of endpointStatistics) {
-			emitStatisticsLog += `\nEndpoint: ${endpointStatistic.endpoint}`;
-			emitStatisticsLog += `\nCount: ${JSON.stringify(endpointStatistic.count)}`;
-			emitStatisticsLog += `\nResponse: ${JSON.stringify(endpointStatistic.response)}`;
+			emitStatisticsLog += `\n${endpointStatistic.endpoint} - ${endpointStatistic.count.peers}:${endpointStatistic.count.emit}:${endpointStatistic.count.success}-${endpointStatistic.count.fail} ${endpointStatistic.response.average} ${endpointStatistic.response.min} ${endpointStatistic.response.max}`;
 		}
 
 		this.logger.info(emitStatisticsLog);
