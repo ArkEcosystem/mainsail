@@ -40,6 +40,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.P2P.Throttle.Factory)
 	private readonly throttleFactory!: () => Promise<Throttle>;
 
+	@inject(Identifiers.P2P.Statistic.Service)
+	private readonly statisticService!: Contracts.P2P.StatisticService;
+
 	#throttle?: Throttle;
 
 	public async postProposal(peer: Contracts.P2P.Peer, proposal: Buffer): Promise<void> {
@@ -188,9 +191,10 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		payload: any,
 		options: Contracts.P2P.EmitOptions,
 	): Promise<Contracts.P2P.EmitResult<T>> {
-		const time = {
+		const statistic: Contracts.P2P.EmitStatistic = {
 			deserializeTime: 0,
 			responseTime: 0,
+			success: false,
 			throttleTime: 0,
 		};
 
@@ -199,7 +203,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		const throttle = await this.#getThrottle();
 		await throttle.throttle(peer, event);
 
-		time.throttleTime = performance.now() - timeBeforeThrottle;
+		statistic.throttleTime = performance.now() - timeBeforeThrottle;
 
 		const codec = Codecs[event];
 
@@ -219,25 +223,25 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			options.timeout,
 		);
 
-		time.responseTime = performance.now() - timeBeforeSocketCall;
+		statistic.responseTime = performance.now() - timeBeforeSocketCall;
 
 		const timeBeforeDeserialize = performance.now();
 
 		const data = codec.response.deserialize(response.payload) as T;
 
-		time.deserializeTime = performance.now() - timeBeforeDeserialize;
-		peer.setPinged(Math.floor(time.responseTime + time.deserializeTime));
+		statistic.deserializeTime = performance.now() - timeBeforeDeserialize;
+		peer.setPinged(Math.floor(statistic.responseTime + statistic.deserializeTime));
 
-		if (time.responseTime >= LOG_RESPONSE_TIME) {
+		if (statistic.responseTime >= LOG_RESPONSE_TIME) {
 			this.logger.warnExtra(
-				`Response time for ${event} from peer ${peer.ip} exceeded ${LOG_RESPONSE_TIME}ms: ${time.responseTime}ms`,
+				`Response time for ${event} from peer ${peer.ip} exceeded ${LOG_RESPONSE_TIME}ms: ${statistic.responseTime}ms`,
 				"p2p",
 			);
 		}
 
-		if (time.deserializeTime >= LOG_DESERIALIZE_TIME) {
+		if (statistic.deserializeTime >= LOG_DESERIALIZE_TIME) {
 			this.logger.warnExtra(
-				`Deserialization time for ${event} from peer ${peer.ip} exceeded ${LOG_DESERIALIZE_TIME}ms: ${time.deserializeTime}ms`,
+				`Deserialization time for ${event} from peer ${peer.ip} exceeded ${LOG_DESERIALIZE_TIME}ms: ${statistic.deserializeTime}ms`,
 				"p2p",
 			);
 		}
@@ -253,7 +257,11 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		assert.defined(data.headers);
 		void this.headerService.handle(peer, data.headers);
 
-		return { data, success: true, ...time };
+		statistic.success = true;
+
+		this.statisticService.getCurrentRoundStatistic().addPeerResponseTime(peer.ip, event, statistic);
+
+		return { data, ...statistic };
 	}
 
 	#handleSocketError(peer: Contracts.P2P.Peer, error: Error): void {

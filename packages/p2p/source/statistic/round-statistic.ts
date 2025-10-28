@@ -7,7 +7,7 @@ type GeneralRoundStatistic = {
 };
 
 @injectable()
-export class RoundStatistic {
+export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
 
@@ -18,6 +18,10 @@ export class RoundStatistic {
 	public init() {
 		this.#startTime = performance.now();
 		this.#endTime = 0;
+	}
+
+	public addPeerResponseTime(ip: string, endpoint: string, emitStatistic: Contracts.P2P.EmitStatistic): void {
+		// Here you can store or process the response time per peer and endpoint if needed
 	}
 
 	public calculate(): void {
