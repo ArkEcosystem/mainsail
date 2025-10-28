@@ -95,7 +95,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 			};
 
 			const response = {
-				average: emits.reduce((sum, emit) => sum + emit.responseTime, 0) / emits.length,
+				average: Math.round((emits.reduce((sum, emit) => sum + emit.responseTime, 0) / emits.length)),
 				max: emits
 					.sort((a, b) => b.responseTime - a.responseTime)
 					.slice(0, MIN_MAX_SLICE)

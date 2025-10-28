@@ -203,7 +203,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		const throttle = await this.#getThrottle();
 		await throttle.throttle(peer, event);
 
-		statistic.throttleTime = performance.now() - timeBeforeThrottle;
+		statistic.throttleTime = Math.round(performance.now() - timeBeforeThrottle);
 
 		const codec = Codecs[event];
 
@@ -223,13 +223,13 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			options.timeout,
 		);
 
-		statistic.responseTime = performance.now() - timeBeforeSocketCall;
+		statistic.responseTime = Math.round(performance.now() - timeBeforeSocketCall);
 
 		const timeBeforeDeserialize = performance.now();
 
 		const data = codec.response.deserialize(response.payload) as T;
 
-		statistic.deserializeTime = performance.now() - timeBeforeDeserialize;
+		statistic.deserializeTime = Math.round(performance.now() - timeBeforeDeserialize);
 		peer.setPinged(Math.floor(statistic.responseTime + statistic.deserializeTime));
 
 		if (statistic.responseTime >= LOG_RESPONSE_TIME) {
