@@ -6,6 +6,10 @@ type GeneralRoundStatistic = {
 	duration: number;
 };
 
+interface JoinedEmitStatistic extends Contracts.P2P.EmitStatistic {
+	endpoint: string;
+}
+
 @injectable()
 export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	@inject(Identifiers.P2P.Logger)
@@ -14,6 +18,8 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	#startTime!: number;
 	#endTime!: number;
 
+	#peers = new Map<string, JoinedEmitStatistic[]>();
+
 	@postConstruct()
 	public init() {
 		this.#startTime = performance.now();
@@ -21,7 +27,16 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	}
 
 	public addEmit(ip: string, endpoint: string, emitStatistic: Contracts.P2P.EmitStatistic): void {
-		// Here you can store or process the response time per peer and endpoint if needed
+		const peer = this.#getPeer(ip);
+		peer.push({ endpoint, ...emitStatistic });
+	}
+
+	#getPeer(ip: string): JoinedEmitStatistic[] {
+		if (!this.#peers.has(ip)) {
+			this.#peers.set(ip, []);
+		}
+
+		return this.#peers.get(ip)!;
 	}
 
 	public calculate(): void {
