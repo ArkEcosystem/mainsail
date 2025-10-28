@@ -1,3 +1,8 @@
 export interface StatisticService {
-	logStatistic(roundStartTime: number): void;
+	newRound(height: number, round: number): void;
+}
+
+export interface RoundStatistic {
+	calculate(): void;
+	log(): void;
 }

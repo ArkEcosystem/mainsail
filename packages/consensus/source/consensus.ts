@@ -198,8 +198,6 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	public async startRound(round: number): Promise<void> {
-		this.statisticService.logStatistic(this.#roundStartTime);
-
 		this.#round = round;
 		this.#step = Contracts.Consensus.Step.Propose;
 		this.#didMajorityPrevote = false;
@@ -207,6 +205,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#roundStartTime = dayjs().valueOf();
 
 		this.scheduler.clear();
+		this.statisticService.newRound(this.#blockNumber, round);
 
 		if (this.#isDisposed) {
 			return;
