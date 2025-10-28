@@ -32,7 +32,7 @@ import { PeerVerifier } from "./peer-verifier.js";
 import { Service } from "./service.js";
 import { Server } from "./socket-server/server.js";
 import { State } from "./state.js";
-import { PeerStatistic } from "./statistic/index.js";
+import { StatisticService } from "./statistic/index.js";
 import { Throttle } from "./throttle.js";
 import { TxPoolNode } from "./tx-pool-node.js";
 import { TxPoolNodeVerifier } from "./tx-pool-node-verifier.js";
@@ -152,7 +152,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.P2P.Peer.Verifier).to(PeerVerifier).inSingletonScope();
 
-		this.app.bind(Identifiers.P2P.Peer.Statistic).to(PeerStatistic).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Statistic.Service).to(StatisticService).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.Header.Service).to(HeaderService).inSingletonScope();
 

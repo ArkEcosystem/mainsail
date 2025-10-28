@@ -1,3 +1,3 @@
-export interface PeerStatistic {
+export interface StatisticService {
 	logStatistic(roundStartTime: number): void;
 }

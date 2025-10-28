@@ -1,1 +1,1 @@
-export * from "./peer-statistic.js";
+export * from "./statistic-service.js";
