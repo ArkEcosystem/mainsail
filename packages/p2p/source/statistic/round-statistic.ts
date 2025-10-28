@@ -45,6 +45,7 @@ interface JoinedEmitStatistic extends Contracts.P2P.EmitStatistic {
 }
 
 const MIN_MAX_SLICE = 3;
+const LOG_EXTRA_PEER_STATISTIC = true;
 
 @injectable()
 export class RoundStatistic implements Contracts.P2P.RoundStatistic {
@@ -158,6 +159,9 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 			}
 
 			const endpoints: { name: string; responseTimes: number[] }[] = [...endpointsMap.values()];
+			for (const endpoint of endpoints) {
+				endpoint.responseTimes.sort((a, b) => a - b);
+			}
 
 			statistics.push({ count, endpoints, ip, response });
 		}
@@ -186,10 +190,16 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		let peerStatisticsLog = "Emit statistics by peer: \nip \tsuccess/emits\taverage\tmin[] max[]";
 		for (const peerStatistic of peerStatistics) {
 			peerStatisticsLog += `\n${peerStatistic.ip}\t${peerStatistic.count.success}/${peerStatistic.count.emits}\t${peerStatistic.response.average}\t[${peerStatistic.response.min}]\t[${peerStatistic.response.max}]`;
-		}
 
-		if (peerStatisticsLog.length > 0) {
-			this.logger.info(peerStatisticsLog);
+			if (LOG_EXTRA_PEER_STATISTIC) {
+				for (const endpoint of peerStatistic.endpoints) {
+					peerStatisticsLog += `\n  ${endpoint.name}: [${endpoint.responseTimes}]`;
+				}
+			}
+
+			if (peerStatisticsLog.length > 0) {
+				this.logger.info(peerStatisticsLog);
+			}
 		}
 	}
 }
