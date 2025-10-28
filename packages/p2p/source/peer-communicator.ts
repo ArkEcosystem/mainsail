@@ -229,14 +229,14 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		peer.setPinged(Math.floor(time.responseTime + time.deserializeTime));
 
 		if (time.responseTime >= LOG_RESPONSE_TIME) {
-			this.logger.warn(
+			this.logger.warnExtra(
 				`Response time for ${event} from peer ${peer.ip} exceeded ${LOG_RESPONSE_TIME}ms: ${time.responseTime}ms`,
 				"p2p",
 			);
 		}
 
 		if (time.deserializeTime >= LOG_DESERIALIZE_TIME) {
-			this.logger.warn(
+			this.logger.warnExtra(
 				`Deserialization time for ${event} from peer ${peer.ip} exceeded ${LOG_DESERIALIZE_TIME}ms: ${time.deserializeTime}ms`,
 				"p2p",
 			);
