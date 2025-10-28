@@ -22,6 +22,23 @@ type EndpointStatistic = {
 	}
 }
 
+type PeerStatistic = {
+	ip: string;
+	count: {
+		success: number;
+		emits: number;
+	},
+	response: {
+		average: number;
+		max: number[];
+		min: number[];
+	}
+	endpoints: {
+		name: string;
+		responseTimes: number[];
+	}[];
+}
+
 interface JoinedEmitStatistic extends Contracts.P2P.EmitStatistic {
 	endpoint: string;
 	ip: string;
@@ -110,16 +127,69 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		return statistics;
 	}
 
+	public getPeerStatistics(): PeerStatistic[] {
+		const statistics: PeerStatistic[] = [];
+
+		for (const [ip, emits] of this.#emitStatisticsByPeer.entries()) {
+			const count = {
+				emits: emits.length,
+				success: emits.filter((emit) => emit.success).length,
+			};
+
+			const response = {
+
+				average: Math.round((emits.reduce((sum, emit) => sum + emit.responseTime, 0) / emits.length)),
+				max: emits
+					.sort((a, b) => b.responseTime - a.responseTime)
+					.slice(0, MIN_MAX_SLICE)
+					.map((emit) => emit.responseTime),
+				min: emits
+					.sort((a, b) => a.responseTime - b.responseTime)
+					.slice(0, MIN_MAX_SLICE)
+					.map((emit) => emit.responseTime),
+			};
+
+			const endpointsMap = new Map<string, { name: string; responseTimes: number[] }>();
+			for (const emit of emits) {
+				if (!endpointsMap.has(emit.endpoint)) {
+					endpointsMap.set(emit.endpoint, { name: emit.endpoint, responseTimes: [] });
+				}
+				endpointsMap.get(emit.endpoint)!.responseTimes.push(emit.responseTime);
+			}
+
+			const endpoints: { name: string; responseTimes: number[] }[] = [...endpointsMap.values()];
+
+			statistics.push({ count, endpoints, ip, response });
+		}
+
+		return statistics.sort((a, b) => b.response.average - a.response.average);
+	}
+
 	public log(): void {
+		// General
 		const generalStatistic = this.getGeneralStatistic();
 		this.logger.info(`Round statistics: ${JSON.stringify(generalStatistic)}`);
 
-		let emitStatisticsLog = "Emit statistics by endpoint: \nname \tpeers success/emits\taverage\tmin[] max[]";
+		// Endpoints
 		const endpointStatistics = this.getEndpointStatistics();
+		let emitStatisticsLog = "Emit statistics by endpoint: \nname \tpeers success/emits\taverage\tmin[] max[]";
 		for (const endpointStatistic of endpointStatistics) {
 			emitStatisticsLog += `\n${endpointStatistic.endpoint}\t${endpointStatistic.count.peers}:${endpointStatistic.count.success}/${endpointStatistic.count.emits}\t${endpointStatistic.response.average}\t[${endpointStatistic.response.min}]\t[${endpointStatistic.response.max}]`;
 		}
 
-		this.logger.info(emitStatisticsLog);
+		if (emitStatisticsLog.length > 0) {
+			this.logger.info(emitStatisticsLog);
+		}
+
+		// Peers
+		const peerStatistics = this.getPeerStatistics();
+		let peerStatisticsLog = "Emit statistics by peer: \nip \tsuccess/emits\taverage\tmin[] max[]";
+		for (const peerStatistic of peerStatistics) {
+			peerStatisticsLog += `\n${peerStatistic.ip}\t${peerStatistic.count.success}/${peerStatistic.count.emits}\t${peerStatistic.response.average}\t[${peerStatistic.response.min}]\t[${peerStatistic.response.max}]`;
+		}
+
+		if (peerStatisticsLog.length > 0) {
+			this.logger.info(peerStatisticsLog);
+		}
 	}
 }
