@@ -20,7 +20,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		this.#endTime = 0;
 	}
 
-	public addPeerResponseTime(ip: string, endpoint: string, emitStatistic: Contracts.P2P.EmitStatistic): void {
+	public addEmit(ip: string, endpoint: string, emitStatistic: Contracts.P2P.EmitStatistic): void {
 		// Here you can store or process the response time per peer and endpoint if needed
 	}
 

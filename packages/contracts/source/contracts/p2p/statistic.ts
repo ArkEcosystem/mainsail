@@ -13,5 +13,5 @@ export interface EmitStatistic {
 export interface RoundStatistic {
 	calculate(): void;
 	log(): void;
-	addPeerResponseTime(ip: string, endpoint: string, emitStatistic: EmitStatistic): void;
+	addEmit(ip: string, endpoint: string, emitStatistic: EmitStatistic): void;
 }
