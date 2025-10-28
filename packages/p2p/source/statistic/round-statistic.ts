@@ -4,11 +4,31 @@ import { performance } from "perf_hooks";
 
 type GeneralRoundStatistic = {
 	duration: number;
+	roundPeersCount: number;
+	roundEmitCount: number;
 };
+
+type EndpointStatistic = {
+	endpoint: string;
+	count: {
+		success: number;
+		fail: number;
+		emit: number;
+		peers: number;
+	},
+	response: {
+		average: number;
+		max: number[];
+		min: number[];
+	}
+}
 
 interface JoinedEmitStatistic extends Contracts.P2P.EmitStatistic {
 	endpoint: string;
+	ip: string;
 }
+
+const MIN_MAX_SLICE = 3;
 
 @injectable()
 export class RoundStatistic implements Contracts.P2P.RoundStatistic {
@@ -18,7 +38,8 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	#startTime!: number;
 	#endTime!: number;
 
-	#peers = new Map<string, JoinedEmitStatistic[]>();
+	#emitStatisticsByPeer = new Map<string, JoinedEmitStatistic[]>();
+	#emitStatisticsByEndpoint = new Map<string, JoinedEmitStatistic[]>();
 
 	@postConstruct()
 	public init() {
@@ -27,16 +48,26 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	}
 
 	public addEmit(ip: string, endpoint: string, emitStatistic: Contracts.P2P.EmitStatistic): void {
-		const peer = this.#getPeer(ip);
-		peer.push({ endpoint, ...emitStatistic });
+		const joined = { endpoint, ip, ...emitStatistic };
+
+		this.#getEmitStatisticsByPeer(ip).push(joined);
+		this.#getEmitStatisticsByEndpoint(endpoint).push(joined);
 	}
 
-	#getPeer(ip: string): JoinedEmitStatistic[] {
-		if (!this.#peers.has(ip)) {
-			this.#peers.set(ip, []);
+	#getEmitStatisticsByPeer(ip: string): JoinedEmitStatistic[] {
+		if (!this.#emitStatisticsByPeer.has(ip)) {
+			this.#emitStatisticsByPeer.set(ip, []);
 		}
 
-		return this.#peers.get(ip)!;
+		return this.#emitStatisticsByPeer.get(ip)!;
+	}
+
+	#getEmitStatisticsByEndpoint(endpoint: string): JoinedEmitStatistic[] {
+		if (!this.#emitStatisticsByEndpoint.has(endpoint)) {
+			this.#emitStatisticsByEndpoint.set(endpoint, []);
+		}
+
+		return this.#emitStatisticsByEndpoint.get(endpoint)!;
 	}
 
 	public calculate(): void {
@@ -45,11 +76,54 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 
 	public getGeneralStatistic(): GeneralRoundStatistic {
 		const duration = this.#endTime - this.#startTime;
-		return { duration };
+
+		const roundPeersCount = this.#emitStatisticsByPeer.size;
+		const roundEmitCount = [...this.#emitStatisticsByPeer.values()].flat().length;
+
+		return { duration, roundEmitCount, roundPeersCount };
+	}
+
+	public getEndpointStatistics(): EndpointStatistic[] {
+		const statistics: EndpointStatistic[] = [];
+
+		for (const [endpoint, emits] of this.#emitStatisticsByEndpoint.entries()) {
+			const count = {
+				emit: emits.length,
+				fail: emits.filter((emit) => !emit.success).length,
+				peers: new Set(emits.map((emit) => emit.ip)).size,
+				success: emits.filter((emit) => emit.success).length,
+			};
+
+			const response = {
+				average: emits.reduce((sum, emit) => sum + emit.responseTime, 0) / emits.length,
+				max: emits
+					.sort((a, b) => b.responseTime - a.responseTime)
+					.slice(0, MIN_MAX_SLICE)
+					.map((emit) => emit.responseTime),
+				min: emits
+					.sort((a, b) => a.responseTime - b.responseTime)
+					.slice(0, MIN_MAX_SLICE)
+					.map((emit) => emit.responseTime),
+			}
+
+			statistics.push({ count, endpoint, response });
+		}
+
+		return statistics;
 	}
 
 	public log(): void {
 		const generalStatistic = this.getGeneralStatistic();
 		this.logger.info(`Round statistics: ${JSON.stringify(generalStatistic)}`);
+
+		let emitStatisticsLog = "Emit statistics by endpoint:";
+		const endpointStatistics = this.getEndpointStatistics();
+		for (const endpointStatistic of endpointStatistics) {
+			emitStatisticsLog += `\nEndpoint: ${endpointStatistic.endpoint}`;
+			emitStatisticsLog += `\nCount: ${JSON.stringify(endpointStatistic.count)}`;
+			emitStatisticsLog += `\nResponse: ${JSON.stringify(endpointStatistic.response)}`;
+		}
+
+		this.logger.info(emitStatisticsLog);
 	}
 }
