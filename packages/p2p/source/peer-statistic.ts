@@ -71,11 +71,19 @@ export class PeerStatistic implements Contracts.P2P.PeerStatistic {
 
 	#getBestLatencies(peers: Contracts.P2P.Peer[], count: number): number[] {
 		const latencies = this.#getLatencies(peers);
+		if (latencies.length === 0) {
+			return [0];
+		}
+
 		return latencies.slice(0, count);
 	}
 
 	#getWorstLatencies(peers: Contracts.P2P.Peer[], count: number): number[] {
 		const latencies = this.#getLatencies(peers);
+		if (latencies.length === 0) {
+			return [0];
+		}
+
 		return latencies.slice(-count);
 	}
 }
