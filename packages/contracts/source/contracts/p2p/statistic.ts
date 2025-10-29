@@ -26,8 +26,14 @@ export interface EmitStatistic {
 
 export type GeneralStatistic = {
 	duration: number;
-	roundPeersCount: number;
-	roundEmitCount: number;
+	count: {
+		roundPeers: number;
+		totalPeers: number;
+		roundEmits: number;
+	}
+	response: {
+		average: number;
+	}
 };
 
 export type EndpointStatistic = {

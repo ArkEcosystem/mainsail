@@ -51,12 +51,21 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	}
 
 	public getGeneralStatistic(): Contracts.P2P.GeneralStatistic {
-		const duration = this.#endTime - this.#startTime;
+		const duration = Math.round(this.#endTime - this.#startTime);
 
-		const roundPeersCount = this.#emitStatisticsByPeer.size;
-		const roundEmitCount = [...this.#emitStatisticsByPeer.values()].flat().length;
+		const emits = [...this.#emitStatisticsByPeer.values()].flat();
 
-		return { duration, roundEmitCount, roundPeersCount };
+		const count = {
+			roundEmits: emits.length,
+			roundPeers: this.#emitStatisticsByPeer.size,
+			totalPeers: this.#emitStatisticsByPeer.size,
+		}
+
+		const response = {
+			average: Math.round((emits.reduce((sum, emit) => sum + emit.responseTime, 0) / emits.length)),
+		};
+
+		return { count, duration, response };
 	}
 
 	public getEndpointStatistics(): Contracts.P2P.EndpointStatistic[] {

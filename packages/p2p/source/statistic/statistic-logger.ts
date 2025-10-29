@@ -17,7 +17,14 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 	#logGeneralStatistic(roundStatistic: Contracts.P2P.RoundStatistic): void {
 		const generalStatistic = roundStatistic.getGeneralStatistic();
-		this.logger.info(`Round statistics: ${JSON.stringify(generalStatistic)}`);
+
+		let output = "Round statistic:";
+		output += ` duration=${generalStatistic.duration} ms`;
+		output += ` peers=${generalStatistic.count.roundPeers}/${generalStatistic.count.totalPeers}`;
+		output += ` emits=${generalStatistic.count.roundEmits}`;
+		output += ` average=${generalStatistic.response.average} ms`;
+
+		this.logger.info(output);
 	}
 
 	#logEndpointStatistics(roundStatistic: Contracts.P2P.RoundStatistic): void {
