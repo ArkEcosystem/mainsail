@@ -60,10 +60,13 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 
 		const emits = [...this.#emitStatisticsByPeer.values()].flat();
 
+		const emitsFailed = emits.reduce((count, emit) => count + (emit.success ? 0 : 1), 0);
+
 		const count = {
-			roundEmits: emits.length,
-			roundPeers: this.#emitStatisticsByPeer.size,
-			totalPeers: this.#totalPeers,
+			emitsFailed,
+			emitsSuccess: emits.length - emitsFailed,
+			peersRound: this.#emitStatisticsByPeer.size,
+			peersTotal: this.#totalPeers,
 		}
 
 		const response = {
