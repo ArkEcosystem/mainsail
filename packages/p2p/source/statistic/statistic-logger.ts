@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
@@ -13,6 +13,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 	#verbosityLevel = 0;
 
+	@postConstruct()
 	public init(): void {
 		this.#verbosityLevel = this.configuration.getRequired<number>("statistic.verbosity");
 	}
@@ -111,7 +112,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 			peerStatisticsLog += `\n${ip.padEnd(maxIpWidth)} ${successEmits.padEnd(maxSuccessEmitsWidth)} ${average.padEnd(maxAverageWidth)} ${min.padEnd(maxMinWidth)} ${max.padEnd(maxMaxWidth)}`;
 
-			if (this.#verbosityLevel >= 2) {
+			if (this.#verbosityLevel >= 3) {
 				for (const endpoint of peerStatistic.endpoints.sort((a, b) => b.responseTimes.length - a.responseTimes.length)) {
 					peerStatisticsLog += `\n${endpoint.name}: [${endpoint.responseTimes}]`;
 				}
