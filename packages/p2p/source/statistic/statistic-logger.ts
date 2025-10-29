@@ -2,9 +2,6 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-
-const LOG_EXTRA_PEER_STATISTIC = false;
-
 @injectable()
 export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 	@inject(Identifiers.P2P.Logger)
@@ -14,14 +11,25 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+	#verbosityLevel = 0;
+
+	public init(): void {
+		this.#verbosityLevel = this.configuration.getRequired<number>("statistic.verbosity");
+	}
+
 	public log(roundStatistic: Contracts.P2P.RoundStatistic): void {
 		this.#logGeneralStatistic(roundStatistic);
 
-		if (!this.configuration.get("statistic.enabled")) {
+		if (this.#verbosityLevel <= 0) {
 			return;
 		}
 
 		this.#logEndpointStatistics(roundStatistic);
+
+		if (this.#verbosityLevel <= 1) {
+			return;
+		}
+
 		this.#logPeerStatistics(roundStatistic);
 	}
 
@@ -103,7 +111,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 			peerStatisticsLog += `\n${ip.padEnd(maxIpWidth)} ${successEmits.padEnd(maxSuccessEmitsWidth)} ${average.padEnd(maxAverageWidth)} ${min.padEnd(maxMinWidth)} ${max.padEnd(maxMaxWidth)}`;
 
-			if (LOG_EXTRA_PEER_STATISTIC) {
+			if (this.#verbosityLevel >= 2) {
 				for (const endpoint of peerStatistic.endpoints.sort((a, b) => b.responseTimes.length - a.responseTimes.length)) {
 					peerStatisticsLog += `\n${endpoint.name}: [${endpoint.responseTimes}]`;
 				}

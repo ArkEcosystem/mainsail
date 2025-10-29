@@ -95,7 +95,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			skipDiscovery: Joi.bool(),
 			skipPeerStateVerification: Joi.bool(),
 			statistic: Joi.object({
-				enabled: Joi.bool().required(),
+				verbosity: Joi.number().integer().min(0).max(3).required(),
 			}).required(),
 			txPoolPort: Joi.number().integer().min(0).required(),
 			verifyTimeout: Joi.number().integer().min(0).required(),
