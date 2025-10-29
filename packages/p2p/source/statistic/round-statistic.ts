@@ -1,5 +1,5 @@
-import { injectable, postConstruct } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable, postConstruct } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { performance } from "perf_hooks";
 
 interface JoinedEmitStatistic extends Contracts.P2P.EmitStatistic {
@@ -11,8 +11,12 @@ const MIN_MAX_SLICE = 3;
 
 @injectable()
 export class RoundStatistic implements Contracts.P2P.RoundStatistic {
+	@inject(Identifiers.P2P.Peer.Repository)
+	private readonly peerRepository!: Contracts.P2P.PeerRepository;
+
 	#startTime!: number;
 	#endTime!: number;
+	#totalPeers!: number;
 
 	#emitStatisticsByPeer = new Map<string, JoinedEmitStatistic[]>();
 	#emitStatisticsByEndpoint = new Map<string, JoinedEmitStatistic[]>();
@@ -21,6 +25,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	public init() {
 		this.#startTime = performance.now();
 		this.#endTime = 0;
+		this.#totalPeers = this.peerRepository.getPeers().length;
 	}
 
 	public addEmit(ip: string, endpoint: string, emitStatistic: Contracts.P2P.EmitStatistic): void {
@@ -58,7 +63,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		const count = {
 			roundEmits: emits.length,
 			roundPeers: this.#emitStatisticsByPeer.size,
-			totalPeers: this.#emitStatisticsByPeer.size,
+			totalPeers: this.#totalPeers,
 		}
 
 		const response = {
