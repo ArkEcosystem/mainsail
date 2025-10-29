@@ -1,5 +1,6 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Providers } from "@mainsail/kernel";
 
 
 const LOG_EXTRA_PEER_STATISTIC = false;
@@ -9,8 +10,17 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
 
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "p2p")
+	private readonly configuration!: Providers.PluginConfiguration;
+
 	public log(roundStatistic: Contracts.P2P.RoundStatistic): void {
 		this.#logGeneralStatistic(roundStatistic);
+
+		if (!this.configuration.get("statistic.enabled")) {
+			return;
+		}
+
 		this.#logEndpointStatistics(roundStatistic);
 		this.#logPeerStatistics(roundStatistic);
 	}
