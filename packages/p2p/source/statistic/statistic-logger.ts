@@ -32,14 +32,14 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 			peerStatisticsLog += `\n${peerStatistic.ip}\t${peerStatistic.count.success}/${peerStatistic.count.emits}\t${peerStatistic.response.average}\t[${peerStatistic.response.min}]\t[${peerStatistic.response.max}]`;
 
 			if (LOG_EXTRA_PEER_STATISTIC) {
-				for (const endpoint of peerStatistic.endpoints) {
+				for (const endpoint of peerStatistic.endpoints.sort((a, b) => b.responseTimes.length - a.responseTimes.length)) {
 					peerStatisticsLog += `\n  ${endpoint.name}: [${endpoint.responseTimes}]`;
 				}
 			}
+		}
 
-			if (peerStatisticsLog.length > 0) {
-				this.logger.info(peerStatisticsLog);
-			}
+		if (peerStatisticsLog.length > 0) {
+			this.logger.info(peerStatisticsLog);
 		}
 	}
 }
