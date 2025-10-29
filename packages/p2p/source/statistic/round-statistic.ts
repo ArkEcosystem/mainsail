@@ -70,7 +70,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		}
 
 		const response = {
-			average: Math.round((emits.reduce((sum, emit) => sum + emit.responseTime, 0) / emits.length)),
+			average: this.#calculateAverageResponseTime(emits),
 		};
 
 		return { count, duration, response };
@@ -87,7 +87,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 			};
 
 			const response = {
-				average: Math.round((emits.reduce((sum, emit) => sum + emit.responseTime, 0) / emits.length)),
+				average: this.#calculateAverageResponseTime(emits),
 				max: emits
 					.sort((a, b) => b.responseTime - a.responseTime)
 					.slice(0, MIN_MAX_SLICE)
@@ -115,7 +115,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 
 			const response = {
 
-				average: Math.round((emits.reduce((sum, emit) => sum + emit.responseTime, 0) / emits.length)),
+				average: this.#calculateAverageResponseTime(emits),
 				max: emits
 					.sort((a, b) => b.responseTime - a.responseTime)
 					.slice(0, MIN_MAX_SLICE)
@@ -143,5 +143,14 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		}
 
 		return statistics.sort((a, b) => b.response.average - a.response.average);
+	}
+
+	#calculateAverageResponseTime(emits: JoinedEmitStatistic[]): number {
+		if (emits.length === 0) {
+			return 0;
+		}
+
+		const totalResponseTime = emits.reduce((sum, emit) => sum + emit.responseTime, 0);
+		return Math.round(totalResponseTime / emits.length);
 	}
 }
