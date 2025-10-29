@@ -44,7 +44,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		output += ` emits=${generalStatistic.count.emitsSuccess}/${emitsTotal}`;
 		output += ` average=${generalStatistic.response.average} ms`;
 
-		this.logger.info(output);
+		this.logger.info(output, "p2p");
 	}
 
 	#logEndpointStatistics(roundStatistic: Contracts.P2P.RoundStatistic): void {
@@ -81,7 +81,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 			emitStatisticsLog += `\n${endpointStatistic.endpoint.padEnd(maxNameWidth)} ${peers.padEnd(maxPeersWidth)} ${rate.padEnd(maxRateWidth)} ${average.padEnd(maxAverageWidth)} ${min.padEnd(maxMinWidth)} ${max.padEnd(maxMaxWidth)}`;
 		}
 
-		this.logger.info(emitStatisticsLog);
+		this.logger.info(emitStatisticsLog, "p2p");
 	}
 
 	#logPeerStatistics(roundStatistic: Contracts.P2P.RoundStatistic): void {
@@ -120,7 +120,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		}
 
 		if (peerStatisticsLog.length > 0) {
-			this.logger.info(peerStatisticsLog);
+			this.logger.info(peerStatisticsLog, "p2p");
 		}
 	}
 }
