@@ -19,18 +19,21 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 	}
 
 	public log(roundStatistic: Contracts.P2P.RoundStatistic): void {
+		// Level 0: General statistic
 		this.#logGeneralStatistic(roundStatistic);
 
 		if (this.#verbosityLevel < 1) {
 			return;
 		}
 
+		// Level 1: Endpoint statistics
 		this.#logEndpointStatistics(roundStatistic);
 
 		if (this.#verbosityLevel < 2) {
 			return;
 		}
 
+		// Level 2: Peer statistics
 		this.#logPeerStatistics(roundStatistic);
 	}
 
@@ -112,6 +115,8 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 			peerStatisticsLog += `\n${ip.padEnd(maxIpWidth)} ${successEmits.padEnd(maxSuccessEmitsWidth)} ${average.padEnd(maxAverageWidth)} ${min.padEnd(maxMinWidth)} ${max.padEnd(maxMaxWidth)}`;
 
+
+			// Level 3: Endpoint response times
 			if (this.#verbosityLevel >= 3) {
 				for (const endpoint of peerStatistic.endpoints.sort((a, b) => b.responseTimes.length - a.responseTimes.length)) {
 					peerStatisticsLog += `\n${endpoint.name}: [${endpoint.responseTimes}]`;
