@@ -34,14 +34,35 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 	#logPeerStatistics(roundStatistic: Contracts.P2P.RoundStatistic): void {
 		const peerStatistics = roundStatistic.getPeerStatistics();
-		let peerStatisticsLog = "Emit statistics by peer: \nip \tsuccess/emits\taverage\tmin[] max[]";
+
+		const IP = "ip";
+		const RATE = "rate";
+		const AVERAGE = "avr";
+		const MIN = "min";
+		const MAX = "max";
+
+
+		const maxIpWidth = Math.max(IP.length, ...peerStatistics.map(p => p.ip.length));
+		const maxSuccessEmitsWidth = Math.max(RATE.length, ...peerStatistics.map(p => `${p.count.success}/${p.count.emits}`.length));
+		const maxAverageWidth = Math.max(AVERAGE.length, ...peerStatistics.map(p => p.response.average.toString().length));
+		const maxMinWidth = Math.max(MIN.length, ...peerStatistics.map(p => `[${p.response.min}]`.length));
+		const maxMaxWidth = Math.max(MAX.length, ...peerStatistics.map(p => `[${p.response.max}]`.length));
+
+		let peerStatisticsLog = "Statistics by peer:\n";
+		peerStatisticsLog += `${IP.padEnd(maxIpWidth)} ${RATE.padEnd(maxSuccessEmitsWidth)} ${AVERAGE.padEnd(maxAverageWidth)} ${MIN.padEnd(maxMinWidth)} ${MAX.padEnd(maxMaxWidth)}`;
+
 		for (const peerStatistic of peerStatistics) {
-			peerStatisticsLog += `\n${peerStatistic.ip}\t${peerStatistic.count.success}/${peerStatistic.count.emits}\t${peerStatistic.response.average}\t[${peerStatistic.response.min}]\t[${peerStatistic.response.max}]`;
+			const successEmits = `${peerStatistic.count.success}/${peerStatistic.count.emits}`;
+			const min = `[${peerStatistic.response.min}]`;
+			const max = `[${peerStatistic.response.max}]`;
+
+			peerStatisticsLog += `\n${peerStatistic.ip.padEnd(maxIpWidth)} ${successEmits.padEnd(maxSuccessEmitsWidth)} ${peerStatistic.response.average.toString().padEnd(maxAverageWidth)} ${min.padEnd(maxMinWidth)} ${max.padEnd(maxMaxWidth)}`;
 
 			if (LOG_EXTRA_PEER_STATISTIC) {
 				for (const endpoint of peerStatistic.endpoints.sort((a, b) => b.responseTimes.length - a.responseTimes.length)) {
-					peerStatisticsLog += `\n  ${endpoint.name}: [${endpoint.responseTimes}]`;
+					peerStatisticsLog += `\n${endpoint.name}: [${endpoint.responseTimes}]`;
 				}
+				peerStatisticsLog += "\n";
 			}
 		}
 
