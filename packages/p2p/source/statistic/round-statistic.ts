@@ -67,7 +67,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 			emitsSuccess: emits.length - emitsFailed,
 			peersRound: this.#emitStatisticsByPeer.size,
 			peersTotal: this.#totalPeers,
-		}
+		};
 
 		const response = {
 			average: this.#calculateAverageResponseTime(emits),
@@ -96,7 +96,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 					.sort((a, b) => a.responseTime - b.responseTime)
 					.slice(0, MIN_MAX_SLICE)
 					.map((emit) => emit.responseTime),
-			}
+			};
 
 			statistics.push({ count, endpoint, response });
 		}
@@ -114,7 +114,6 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 			};
 
 			const response = {
-
 				average: this.#calculateAverageResponseTime(emits),
 				max: emits
 					.sort((a, b) => b.responseTime - a.responseTime)

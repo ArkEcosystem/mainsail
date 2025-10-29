@@ -31,5 +31,5 @@ export const defaults = {
 	},
 	txPoolPort: Environment.get(Constants.EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_PORT, 4007),
 	verifyTimeout: 60_000,
-	whitelist: ["*"]
+	whitelist: ["*"],
 };

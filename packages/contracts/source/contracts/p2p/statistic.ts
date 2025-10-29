@@ -7,7 +7,6 @@ export interface RoundStatistic {
 	calculate(): void;
 	addEmit(ip: string, endpoint: string, emitStatistic: EmitStatistic): void;
 
-
 	getGeneralStatistic(): GeneralStatistic;
 	getEndpointStatistics(): EndpointStatistic[];
 	getPeerStatistics(): PeerStatistic[];
@@ -31,10 +30,10 @@ export type GeneralStatistic = {
 		peersRound: number;
 		emitsSuccess: number;
 		emitsFailed: number;
-	}
+	};
 	response: {
 		average: number;
-	}
+	};
 };
 
 export type EndpointStatistic = {
@@ -43,27 +42,27 @@ export type EndpointStatistic = {
 		success: number;
 		emits: number;
 		peers: number;
-	},
+	};
 	response: {
 		average: number;
 		max: number[];
 		min: number[];
-	}
-}
+	};
+};
 
 export type PeerStatistic = {
 	ip: string;
 	count: {
 		success: number;
 		emits: number;
-	},
+	};
 	response: {
 		average: number;
 		max: number[];
 		min: number[];
-	}
+	};
 	endpoints: {
 		name: string;
 		responseTimes: number[];
 	}[];
-}
+};

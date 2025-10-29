@@ -65,12 +65,18 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		const MIN = "min[]";
 		const MAX = "max[]";
 
-		const maxNameWidth = Math.max(NAME.length, ...endpointStatistics.map(e => e.endpoint.length));
-		const maxPeersWidth = Math.max(PEERS.length, ...endpointStatistics.map(e => e.count.peers.toString().length));
-		const maxRateWidth = Math.max(RATE.length, ...endpointStatistics.map(e => `${e.count.success}/${e.count.emits}`.length));
-		const maxAverageWidth = Math.max(AVERAGE.length, ...endpointStatistics.map(e => e.response.average.toString().length));
-		const maxMinWidth = Math.max(MIN.length, ...endpointStatistics.map(e => `[${e.response.min}]`.length));
-		const maxMaxWidth = Math.max(MAX.length, ...endpointStatistics.map(e => `[${e.response.max}]`.length));
+		const maxNameWidth = Math.max(NAME.length, ...endpointStatistics.map((e) => e.endpoint.length));
+		const maxPeersWidth = Math.max(PEERS.length, ...endpointStatistics.map((e) => e.count.peers.toString().length));
+		const maxRateWidth = Math.max(
+			RATE.length,
+			...endpointStatistics.map((e) => `${e.count.success}/${e.count.emits}`.length),
+		);
+		const maxAverageWidth = Math.max(
+			AVERAGE.length,
+			...endpointStatistics.map((e) => e.response.average.toString().length),
+		);
+		const maxMinWidth = Math.max(MIN.length, ...endpointStatistics.map((e) => `[${e.response.min}]`.length));
+		const maxMaxWidth = Math.max(MAX.length, ...endpointStatistics.map((e) => `[${e.response.max}]`.length));
 
 		let emitStatisticsLog = "Emit statistics by endpoint:\n";
 		emitStatisticsLog += `${NAME.padEnd(maxNameWidth)} ${PEERS.padEnd(maxPeersWidth)} ${RATE.padEnd(maxRateWidth)} ${AVERAGE.padEnd(maxAverageWidth)} ${MIN.padEnd(maxMinWidth)} ${MAX.padEnd(maxMaxWidth)}`;
@@ -97,11 +103,17 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		const MIN = "min";
 		const MAX = "max";
 
-		const maxIpWidth = Math.max(IP.length, ...peerStatistics.map(p => p.ip.length));
-		const maxSuccessEmitsWidth = Math.max(RATE.length, ...peerStatistics.map(p => `${p.count.success}/${p.count.emits}`.length));
-		const maxAverageWidth = Math.max(AVERAGE.length, ...peerStatistics.map(p => p.response.average.toString().length));
-		const maxMinWidth = Math.max(MIN.length, ...peerStatistics.map(p => `[${p.response.min}]`.length));
-		const maxMaxWidth = Math.max(MAX.length, ...peerStatistics.map(p => `[${p.response.max}]`.length));
+		const maxIpWidth = Math.max(IP.length, ...peerStatistics.map((p) => p.ip.length));
+		const maxSuccessEmitsWidth = Math.max(
+			RATE.length,
+			...peerStatistics.map((p) => `${p.count.success}/${p.count.emits}`.length),
+		);
+		const maxAverageWidth = Math.max(
+			AVERAGE.length,
+			...peerStatistics.map((p) => p.response.average.toString().length),
+		);
+		const maxMinWidth = Math.max(MIN.length, ...peerStatistics.map((p) => `[${p.response.min}]`.length));
+		const maxMaxWidth = Math.max(MAX.length, ...peerStatistics.map((p) => `[${p.response.max}]`.length));
 
 		let peerStatisticsLog = "Statistics by peer:\n";
 		peerStatisticsLog += `${IP.padEnd(maxIpWidth)} ${RATE.padEnd(maxSuccessEmitsWidth)} ${AVERAGE.padEnd(maxAverageWidth)} ${MIN.padEnd(maxMinWidth)} ${MAX.padEnd(maxMaxWidth)}`;
@@ -115,10 +127,11 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 			peerStatisticsLog += `\n${ip.padEnd(maxIpWidth)} ${successEmits.padEnd(maxSuccessEmitsWidth)} ${average.padEnd(maxAverageWidth)} ${min.padEnd(maxMinWidth)} ${max.padEnd(maxMaxWidth)}`;
 
-
 			// Level 3: Endpoint response times
 			if (this.#verbosityLevel >= 3) {
-				for (const endpoint of peerStatistic.endpoints.sort((a, b) => b.responseTimes.length - a.responseTimes.length)) {
+				for (const endpoint of peerStatistic.endpoints.sort(
+					(a, b) => b.responseTimes.length - a.responseTimes.length,
+				)) {
 					peerStatisticsLog += `\n${endpoint.name}: [${endpoint.responseTimes}]`;
 				}
 				peerStatisticsLog += "\n";

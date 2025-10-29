@@ -249,7 +249,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			statistic.success = true;
 
 			return { data, ...statistic };
-
 		} finally {
 			this.statisticService.getCurrentRoundStatistic().addEmit(peer.ip, event, statistic);
 		}

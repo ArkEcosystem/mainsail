@@ -13,8 +13,6 @@ export interface Request extends Hapi.Request {
 	};
 }
 
-
-
 export interface EmitResult<T extends Response> extends EmitStatistic {
 	data: T;
 }
