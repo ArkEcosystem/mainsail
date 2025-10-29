@@ -73,7 +73,6 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		const MIN = "min";
 		const MAX = "max";
 
-
 		const maxIpWidth = Math.max(IP.length, ...peerStatistics.map(p => p.ip.length));
 		const maxSuccessEmitsWidth = Math.max(RATE.length, ...peerStatistics.map(p => `${p.count.success}/${p.count.emits}`.length));
 		const maxAverageWidth = Math.max(AVERAGE.length, ...peerStatistics.map(p => p.response.average.toString().length));
