@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 
-const LOG_EXTRA_PEER_STATISTIC = true;
+const LOG_EXTRA_PEER_STATISTIC = false;
 
 @injectable()
 export class StatisticLogger implements Contracts.P2P.StatisticLogger {
@@ -10,11 +10,17 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 	private readonly logger!: Contracts.P2P.Logger;
 
 	public log(roundStatistic: Contracts.P2P.RoundStatistic): void {
-		// General
+		this.#logGeneralStatistic(roundStatistic);
+		this.#logEndpointStatistics(roundStatistic);
+		this.#logPeerStatistics(roundStatistic);
+	}
+
+	#logGeneralStatistic(roundStatistic: Contracts.P2P.RoundStatistic): void {
 		const generalStatistic = roundStatistic.getGeneralStatistic();
 		this.logger.info(`Round statistics: ${JSON.stringify(generalStatistic)}`);
+	}
 
-		// Endpoints
+	#logEndpointStatistics(roundStatistic: Contracts.P2P.RoundStatistic): void {
 		const endpointStatistics = roundStatistic.getEndpointStatistics();
 		let emitStatisticsLog = "Emit statistics by endpoint: \nname \tpeers success/emits\taverage\tmin[] max[]";
 		for (const endpointStatistic of endpointStatistics) {
@@ -24,8 +30,9 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		if (emitStatisticsLog.length > 0) {
 			this.logger.info(emitStatisticsLog);
 		}
+	}
 
-		// Peers
+	#logPeerStatistics(roundStatistic: Contracts.P2P.RoundStatistic): void {
 		const peerStatistics = roundStatistic.getPeerStatistics();
 		let peerStatisticsLog = "Emit statistics by peer: \nip \tsuccess/emits\taverage\tmin[] max[]";
 		for (const peerStatistic of peerStatistics) {
