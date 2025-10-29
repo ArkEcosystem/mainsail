@@ -195,56 +195,64 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			throttleTime: 0,
 		};
 
-		const timeBeforeThrottle = performance.now();
+		try {
+			// Throttle
+			const timeBeforeThrottle = performance.now();
 
-		const throttle = await this.#getThrottle();
-		await throttle.throttle(peer, event);
+			const throttle = await this.#getThrottle();
+			await throttle.throttle(peer, event);
 
-		statistic.throttleTime = Math.round(performance.now() - timeBeforeThrottle);
+			statistic.throttleTime = Math.round(performance.now() - timeBeforeThrottle);
 
-		const codec = Codecs[event];
+			// Emit
+			const codec = Codecs[event];
 
-		const timeBeforeSocketCall = performance.now();
+			const timeBeforeSocketCall = performance.now();
 
-		await this.connector.connect(peer);
+			await this.connector.connect(peer);
 
-		const response = await this.connector.emit(
-			peer,
-			event,
-			codec.request.serialize({
-				...payload,
-				headers: {
-					...this.headerFactory().toData(),
-				},
-			}),
-			options.timeout,
-		);
-
-		statistic.responseTime = Math.round(performance.now() - timeBeforeSocketCall);
-
-		const timeBeforeDeserialize = performance.now();
-
-		const data = codec.response.deserialize(response.payload) as T;
-
-		statistic.deserializeTime = Math.round(performance.now() - timeBeforeDeserialize);
-		peer.setPinged(Math.floor(statistic.responseTime + statistic.deserializeTime));
-
-		if (!this.#validateReply(peer, data, event)) {
-			const validationError = new Error(
-				`Response validation failed for ${event} from peer ${peer.ip}: ${JSON.stringify(data)}`,
+			const response = await this.connector.emit(
+				peer,
+				event,
+				codec.request.serialize({
+					...payload,
+					headers: {
+						...this.headerFactory().toData(),
+					},
+				}),
+				options.timeout,
 			);
-			validationError.name = SocketErrors.Validation;
-			throw validationError;
+			statistic.responseTime = Math.round(performance.now() - timeBeforeSocketCall);
+
+			// Deserialize
+			const timeBeforeDeserialize = performance.now();
+
+			const data = codec.response.deserialize(response.payload) as T;
+
+			statistic.deserializeTime = Math.round(performance.now() - timeBeforeDeserialize);
+
+			// Validate
+			peer.setPinged(Math.floor(statistic.responseTime + statistic.deserializeTime));
+
+			if (!this.#validateReply(peer, data, event)) {
+				const validationError = new Error(
+					`Response validation failed for ${event} from peer ${peer.ip}: ${JSON.stringify(data)}`,
+				);
+
+				validationError.name = SocketErrors.Validation;
+				throw validationError;
+			}
+
+			assert.defined(data.headers);
+			void this.headerService.handle(peer, data.headers);
+
+			statistic.success = true;
+
+			return { data, ...statistic };
+
+		} finally {
+			this.statisticService.getCurrentRoundStatistic().addEmit(peer.ip, event, statistic);
 		}
-
-		assert.defined(data.headers);
-		void this.headerService.handle(peer, data.headers);
-
-		statistic.success = true;
-
-		this.statisticService.getCurrentRoundStatistic().addEmit(peer.ip, event, statistic);
-
-		return { data, ...statistic };
 	}
 
 	#handleSocketError(peer: Contracts.P2P.Peer, error: Error): void {
