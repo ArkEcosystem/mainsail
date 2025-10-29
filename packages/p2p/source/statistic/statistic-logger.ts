@@ -5,7 +5,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 const LOG_EXTRA_PEER_STATISTIC = true;
 
 @injectable()
-export class StatisticLogger {
+export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
 

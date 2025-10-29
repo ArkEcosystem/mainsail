@@ -3,12 +3,6 @@ export interface StatisticService {
 	getCurrentRoundStatistic(): RoundStatistic;
 }
 
-export interface EmitStatistic {
-	deserializeTime: number;
-	responseTime: number;
-	throttleTime: number;
-	success: boolean;
-}
 export interface RoundStatistic {
 	calculate(): void;
 	addEmit(ip: string, endpoint: string, emitStatistic: EmitStatistic): void;
@@ -19,6 +13,16 @@ export interface RoundStatistic {
 	getPeerStatistics(): PeerStatistic[];
 }
 
+export interface StatisticLogger {
+	log(roundStatistic: RoundStatistic): void;
+}
+
+export interface EmitStatistic {
+	deserializeTime: number;
+	responseTime: number;
+	throttleTime: number;
+	success: boolean;
+}
 
 export type GeneralStatistic = {
 	duration: number;
