@@ -1,43 +1,6 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { injectable, postConstruct } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { performance } from "perf_hooks";
-
-type GeneralRoundStatistic = {
-	duration: number;
-	roundPeersCount: number;
-	roundEmitCount: number;
-};
-
-type EndpointStatistic = {
-	endpoint: string;
-	count: {
-		success: number;
-		emits: number;
-		peers: number;
-	},
-	response: {
-		average: number;
-		max: number[];
-		min: number[];
-	}
-}
-
-type PeerStatistic = {
-	ip: string;
-	count: {
-		success: number;
-		emits: number;
-	},
-	response: {
-		average: number;
-		max: number[];
-		min: number[];
-	}
-	endpoints: {
-		name: string;
-		responseTimes: number[];
-	}[];
-}
 
 interface JoinedEmitStatistic extends Contracts.P2P.EmitStatistic {
 	endpoint: string;
@@ -45,13 +8,9 @@ interface JoinedEmitStatistic extends Contracts.P2P.EmitStatistic {
 }
 
 const MIN_MAX_SLICE = 3;
-const LOG_EXTRA_PEER_STATISTIC = true;
 
 @injectable()
 export class RoundStatistic implements Contracts.P2P.RoundStatistic {
-	@inject(Identifiers.P2P.Logger)
-	private readonly logger!: Contracts.P2P.Logger;
-
 	#startTime!: number;
 	#endTime!: number;
 
@@ -91,7 +50,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		this.#endTime = performance.now();
 	}
 
-	public getGeneralStatistic(): GeneralRoundStatistic {
+	public getGeneralStatistic(): Contracts.P2P.GeneralStatistic {
 		const duration = this.#endTime - this.#startTime;
 
 		const roundPeersCount = this.#emitStatisticsByPeer.size;
@@ -100,8 +59,8 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		return { duration, roundEmitCount, roundPeersCount };
 	}
 
-	public getEndpointStatistics(): EndpointStatistic[] {
-		const statistics: EndpointStatistic[] = [];
+	public getEndpointStatistics(): Contracts.P2P.EndpointStatistic[] {
+		const statistics: Contracts.P2P.EndpointStatistic[] = [];
 
 		for (const [endpoint, emits] of this.#emitStatisticsByEndpoint.entries()) {
 			const count = {
@@ -128,8 +87,8 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		return statistics;
 	}
 
-	public getPeerStatistics(): PeerStatistic[] {
-		const statistics: PeerStatistic[] = [];
+	public getPeerStatistics(): Contracts.P2P.PeerStatistic[] {
+		const statistics: Contracts.P2P.PeerStatistic[] = [];
 
 		for (const [ip, emits] of this.#emitStatisticsByPeer.entries()) {
 			const count = {
@@ -167,39 +126,5 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		}
 
 		return statistics.sort((a, b) => b.response.average - a.response.average);
-	}
-
-	public log(): void {
-		// General
-		const generalStatistic = this.getGeneralStatistic();
-		this.logger.info(`Round statistics: ${JSON.stringify(generalStatistic)}`);
-
-		// Endpoints
-		const endpointStatistics = this.getEndpointStatistics();
-		let emitStatisticsLog = "Emit statistics by endpoint: \nname \tpeers success/emits\taverage\tmin[] max[]";
-		for (const endpointStatistic of endpointStatistics) {
-			emitStatisticsLog += `\n${endpointStatistic.endpoint}\t${endpointStatistic.count.peers}:${endpointStatistic.count.success}/${endpointStatistic.count.emits}\t${endpointStatistic.response.average}\t[${endpointStatistic.response.min}]\t[${endpointStatistic.response.max}]`;
-		}
-
-		if (emitStatisticsLog.length > 0) {
-			this.logger.info(emitStatisticsLog);
-		}
-
-		// Peers
-		const peerStatistics = this.getPeerStatistics();
-		let peerStatisticsLog = "Emit statistics by peer: \nip \tsuccess/emits\taverage\tmin[] max[]";
-		for (const peerStatistic of peerStatistics) {
-			peerStatisticsLog += `\n${peerStatistic.ip}\t${peerStatistic.count.success}/${peerStatistic.count.emits}\t${peerStatistic.response.average}\t[${peerStatistic.response.min}]\t[${peerStatistic.response.max}]`;
-
-			if (LOG_EXTRA_PEER_STATISTIC) {
-				for (const endpoint of peerStatistic.endpoints) {
-					peerStatisticsLog += `\n  ${endpoint.name}: [${endpoint.responseTimes}]`;
-				}
-			}
-
-			if (peerStatisticsLog.length > 0) {
-				this.logger.info(peerStatisticsLog);
-			}
-		}
 	}
 }

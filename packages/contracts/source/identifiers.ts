@@ -198,6 +198,7 @@ export const Identifiers = {
 		Service: Symbol("P2P<Service>"),
 		State: Symbol("P2P<State>"),
 		Statistic: {
+			Logger: Symbol("P2P<Statistic.Logger>"),
 			Service: Symbol("P2P<Statistic.Service>"),
 		},
 		Throttle: {

@@ -9,9 +9,50 @@ export interface EmitStatistic {
 	throttleTime: number;
 	success: boolean;
 }
-
 export interface RoundStatistic {
 	calculate(): void;
-	log(): void;
 	addEmit(ip: string, endpoint: string, emitStatistic: EmitStatistic): void;
+
+
+	getGeneralStatistic(): GeneralStatistic;
+	getEndpointStatistics(): EndpointStatistic[];
+	getPeerStatistics(): PeerStatistic[];
+}
+
+
+export type GeneralStatistic = {
+	duration: number;
+	roundPeersCount: number;
+	roundEmitCount: number;
+};
+
+export type EndpointStatistic = {
+	endpoint: string;
+	count: {
+		success: number;
+		emits: number;
+		peers: number;
+	},
+	response: {
+		average: number;
+		max: number[];
+		min: number[];
+	}
+}
+
+export type PeerStatistic = {
+	ip: string;
+	count: {
+		success: number;
+		emits: number;
+	},
+	response: {
+		average: number;
+		max: number[];
+		min: number[];
+	}
+	endpoints: {
+		name: string;
+		responseTimes: number[];
+	}[];
 }
