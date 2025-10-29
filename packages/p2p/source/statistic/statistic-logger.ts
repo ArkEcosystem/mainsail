@@ -20,13 +20,13 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 	public log(roundStatistic: Contracts.P2P.RoundStatistic): void {
 		this.#logGeneralStatistic(roundStatistic);
 
-		if (this.#verbosityLevel <= 0) {
+		if (this.#verbosityLevel < 1) {
 			return;
 		}
 
 		this.#logEndpointStatistics(roundStatistic);
 
-		if (this.#verbosityLevel <= 1) {
+		if (this.#verbosityLevel < 2) {
 			return;
 		}
 
