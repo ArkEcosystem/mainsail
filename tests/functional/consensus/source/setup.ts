@@ -26,7 +26,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 
 	p2pRegistry.registerNode(id, sandbox.app);
 	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue(p2pRegistry.makeBroadcaster(id));
-	sandbox.app.bind(Identifiers.P2P.Peer.Statistic).toConstantValue({ logStatistic: () => {} });
+	sandbox.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => {} });
 
 	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
 		getPrecommits: async () => [],

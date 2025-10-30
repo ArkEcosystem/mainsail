@@ -28,32 +28,27 @@ export interface TransferOptions extends TransactionOptions {
 	amount?: number | string | BigNumber;
 }
 
-export interface VoteOptions extends TransactionOptions {
-	voteAsset?: string;
-	unvoteAsset?: string;
-}
-
-export interface ValidatorRegistrationOptions extends TransactionOptions {
-	validatorPublicKey?: string;
-}
-
-export type ValidatorResignationOptions = TransactionOptions;
-
-export interface UsernameRegistrationOptions extends TransactionOptions {
-	username?: string;
-}
-
-export type UsernameResignationOptions = TransactionOptions;
-
-export interface MultiSignatureOptions extends TransactionOptions {
-	participants: Contracts.Crypto.KeyPair[];
-	min?: number;
-	participantSignatureOverwrite?: { [index: number]: string };
-}
-
 export interface EvmCallOptions extends TransactionOptions {
 	gasLimit?: number;
 	payload?: string;
 	recipient?: string;
 	value?: string | number | bigint;
 }
+
+export interface ValidatorRegistrationOptions extends EvmCallOptions {
+	validatorPublicKey?: string;
+}
+
+export type ValidatorResignationOptions = EvmCallOptions;
+
+export interface VoteOptions extends EvmCallOptions {
+	vote: string;
+}
+
+export type UnvoteOptions = EvmCallOptions;
+
+export interface UsernameRegistrationOptions extends EvmCallOptions {
+	username: string;
+}
+
+export type UsernameResignationOptions = EvmCallOptions;

@@ -24,6 +24,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
+		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/utils": "workspace:*",
