@@ -12,7 +12,7 @@ import {
 	waitBlock,
 	getRandomConsensusKeyPair,
 } from "./utilities.js";
-import { decodeErrorResult, decodeEventLog, Hex, parseEther, toHex } from "viem";
+import { decodeEventLog, Hex, parseEther } from "viem";
 
 describe<{
 	sandbox: Sandbox;
