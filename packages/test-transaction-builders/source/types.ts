@@ -28,11 +28,6 @@ export interface TransferOptions extends TransactionOptions {
 	amount?: number | string | BigNumber;
 }
 
-export interface VoteOptions extends TransactionOptions {
-	voteAsset?: string;
-	unvoteAsset?: string;
-}
-
 export interface UsernameRegistrationOptions extends TransactionOptions {
 	username?: string;
 }
@@ -57,3 +52,9 @@ export interface ValidatorRegistrationOptions extends EvmCallOptions {
 }
 
 export type ValidatorResignationOptions = EvmCallOptions;
+
+export interface VoteOptions extends EvmCallOptions {
+	vote: string;
+}
+
+export type UnvoteOptions = EvmCallOptions;
