@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
-import { ConsensusAbi, MultiPaymentAbi } from "@mainsail/evm-contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
+import { ConsensusAbi, MultiPaymentAbi } from "@mainsail/evm-contracts";
 import { decodeFunctionResult, encodeFunctionData, parseEther, toBytes, toHex, zeroAddress } from "viem";
 
 import { default as DARK20 } from "./abis/DARK20.json" with { type: "json" };
