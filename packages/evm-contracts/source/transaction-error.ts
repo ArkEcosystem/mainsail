@@ -1,6 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
-import { ConsensusAbi, MultiPaymentAbi, UsernamesAbi } from "./index.js";
 import { Abi, AbiItem, decodeErrorResult, toHex } from "viem";
+
+import { ConsensusAbi, MultiPaymentAbi, UsernamesAbi } from "./index.js";
 
 const errorAbis = collectErrorItems([ConsensusAbi.abi, MultiPaymentAbi.abi, UsernamesAbi.abi] as Abi[]);
 
