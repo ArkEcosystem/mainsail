@@ -39,6 +39,7 @@
 		"@mainsail/api-database": "workspace:*",
 		"@mainsail/api-sync": "workspace:*",
 		"@mainsail/evm-consensus": "workspace:*",
+		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/evm-service": "workspace:*",
 		"@mainsail/evm-api-worker": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
