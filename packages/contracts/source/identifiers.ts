@@ -192,12 +192,15 @@ export const Identifiers = {
 			Factory: Symbol("P2P<Peer.Factory>"),
 			Processor: Symbol("P2P<Peer.Processor>"),
 			Repository: Symbol("P2P<Peer.Repository>"),
-			Statistic: Symbol("P2P<Peer.Statistic>"),
 			Verifier: Symbol("P2P<Peer.Verifier>"),
 		},
 		Server: Symbol("P2P<Server>"),
 		Service: Symbol("P2P<Service>"),
 		State: Symbol("P2P<State>"),
+		Statistic: {
+			Logger: Symbol("P2P<Statistic.Logger>"),
+			Service: Symbol("P2P<Statistic.Service>"),
+		},
 		Throttle: {
 			Factory: Symbol("P2P<Throttle.Factory>"),
 		},

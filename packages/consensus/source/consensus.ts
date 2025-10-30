@@ -50,8 +50,8 @@ export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.P2P.Peer.Statistic)
-	private readonly peerStatistic!: Contracts.P2P.PeerStatistic;
+	@inject(Identifiers.P2P.Statistic.Service)
+	private readonly statisticService!: Contracts.P2P.StatisticService;
 
 	#blockNumber = 1;
 	#round = 0;
@@ -198,8 +198,6 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	public async startRound(round: number): Promise<void> {
-		this.peerStatistic.logStatistic(this.#roundStartTime);
-
 		this.#round = round;
 		this.#step = Contracts.Consensus.Step.Propose;
 		this.#didMajorityPrevote = false;
@@ -207,6 +205,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#roundStartTime = dayjs().valueOf();
 
 		this.scheduler.clear();
+		this.statisticService.newRound(this.#blockNumber, round);
 
 		if (this.#isDisposed) {
 			return;

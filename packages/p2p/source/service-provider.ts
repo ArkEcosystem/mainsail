@@ -28,11 +28,11 @@ import { PeerDiscoverer } from "./peer-discoverer.js";
 import { PeerDisposer } from "./peer-disposer.js";
 import { PeerProcessor } from "./peer-processor.js";
 import { PeerRepository } from "./peer-repository.js";
-import { PeerStatistic } from "./peer-statistic.js";
 import { PeerVerifier } from "./peer-verifier.js";
 import { Service } from "./service.js";
 import { Server } from "./socket-server/server.js";
 import { State } from "./state.js";
+import { StatisticLogger, StatisticService } from "./statistic/index.js";
 import { Throttle } from "./throttle.js";
 import { TxPoolNode } from "./tx-pool-node.js";
 import { TxPoolNodeVerifier } from "./tx-pool-node-verifier.js";
@@ -94,6 +94,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			}).required(),
 			skipDiscovery: Joi.bool(),
 			skipPeerStateVerification: Joi.bool(),
+			statistic: Joi.object({
+				verbosity: Joi.number().integer().min(0).max(3).required(),
+			}).required(),
 			txPoolPort: Joi.number().integer().min(0).required(),
 			verifyTimeout: Joi.number().integer().min(0).required(),
 			whitelist: Joi.array().items(Joi.string()).required(),
@@ -152,8 +155,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.P2P.Peer.Verifier).to(PeerVerifier).inSingletonScope();
 
-		this.app.bind(Identifiers.P2P.Peer.Statistic).to(PeerStatistic).inSingletonScope();
-
 		this.app.bind(Identifiers.P2P.Header.Service).to(HeaderService).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.Peer.Discoverer).to(PeerDiscoverer).inSingletonScope();
@@ -163,6 +164,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.Downloader.Proposal).to(ProposalDownloader).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.Downloader.Message).to(MessageDownloader).inSingletonScope();
+
+		this.app.bind(Identifiers.P2P.Statistic.Service).to(StatisticService).inSingletonScope();
+
+		this.app.bind(Identifiers.P2P.Statistic.Logger).to(StatisticLogger).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.Service).to(Service).inSingletonScope();
 
