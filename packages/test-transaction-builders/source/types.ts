@@ -57,4 +57,4 @@ export interface VoteOptions extends EvmCallOptions {
 	vote: string;
 }
 
-export interface UnvoteOptions extends EvmCallOptions {}
+export type UnvoteOptions = EvmCallOptions;
