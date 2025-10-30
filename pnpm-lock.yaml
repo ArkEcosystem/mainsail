@@ -1897,7 +1897,18 @@ importers:
         specifier: 0.5.6
         version: 0.5.6
 
-  packages/evm-contracts: {}
+  packages/evm-contracts:
+    dependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      viem:
+        specifier: 2.34.0
+        version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
+    devDependencies:
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
 
   packages/evm-service:
     dependencies:
@@ -12409,7 +12420,7 @@ snapshots:
 
   '@scure/bip32@1.7.0':
     dependencies:
-      '@noble/curves': 1.9.2
+      '@noble/curves': 1.9.6
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
 

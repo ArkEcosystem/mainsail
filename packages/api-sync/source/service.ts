@@ -6,12 +6,13 @@ import {
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
+import { parseTransactionError } from "@mainsail/evm-contracts";
 import { Providers, Types } from "@mainsail/kernel";
 import { assert, BigNumber, chunk, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { Listeners } from "./contracts.js";
-import { parseMultiPayments, parseTransactionError } from "./parsers/index.js";
+import { parseMultiPayments } from "./parsers/index.js";
 import { Restore } from "./restore.js";
 
 interface DeferredSync {
