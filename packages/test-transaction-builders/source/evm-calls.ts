@@ -1,10 +1,11 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
-import { MultiPaymentAbi } from "@mainsail/evm-contracts";
+import { ConsensusAbi, MultiPaymentAbi } from "@mainsail/evm-contracts";
+import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { decodeFunctionResult, encodeFunctionData, parseEther, toBytes, toHex, zeroAddress } from "viem";
 
 import { default as DARK20 } from "./abis/DARK20.json" with { type: "json" };
-import { Context, EvmCallOptions } from "./types.js";
+import { Context, EvmCallOptions, ValidatorRegistrationOptions, ValidatorResignationOptions } from "./types.js";
 import { buildSignedTransaction, getAddressByPublicKey } from "./utilities.js";
 
 export const makeEvmCall = async (
@@ -65,6 +66,78 @@ export const makeEvmCallDeployErc20Contract = async (
 	return buildSignedTransaction(sandbox, builder, sender, options);
 };
 
+export const makeValidatorRegistration = async (
+	{ sandbox, wallets }: Context,
+	options: ValidatorRegistrationOptions = {},
+): Promise<Contracts.Crypto.Transaction> => {
+	const { app } = sandbox;
+
+	let { value, sender, recipient, gasPrice, gasLimit, payload } = options;
+	sender = sender ?? wallets[0];
+
+	gasPrice = gasPrice ?? 5 * 1e9;
+
+	if (!payload) {
+		payload = encodeValidatorRegistration(options.validatorPublicKey ?? "");
+	}
+
+	if (!recipient) {
+		recipient = app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
+	}
+
+	if (recipient === undefined) {
+		throw new Error("missing recipient");
+	}
+
+	let builder = app.resolve(TransactionBuilder).gasPrice(gasPrice);
+
+	if (value === undefined) {
+		value = parseEther("250");
+	}
+
+	builder = builder.value(value.toString());
+
+	builder = builder
+		.recipientAddress(recipient)
+		.gasLimit(gasLimit ?? 300_000)
+		.payload(payload);
+
+	return buildSignedTransaction(sandbox, builder, sender, options);
+};
+
+export const makeValidatorResignation = async (
+	{ sandbox, wallets }: Context,
+	options: ValidatorResignationOptions = {},
+): Promise<Contracts.Crypto.Transaction> => {
+	const { app } = sandbox;
+
+	let { sender, recipient, gasPrice, gasLimit, payload } = options;
+	sender = sender ?? wallets[0];
+
+	gasPrice = gasPrice ?? 5 * 1e9;
+
+	if (!payload) {
+		payload = encodeValidatorResignation();
+	}
+
+	if (!recipient) {
+		recipient = app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
+	}
+
+	if (recipient === undefined) {
+		throw new Error("missing recipient");
+	}
+
+	let builder = app.resolve(TransactionBuilder).gasPrice(gasPrice);
+
+	builder = builder
+		.recipientAddress(recipient)
+		.gasLimit(gasLimit ?? 300_000)
+		.payload(payload);
+
+	return buildSignedTransaction(sandbox, builder, sender, options);
+};
+
 export const encodeErc20Transfer = (recipient: string, amount: number | string | bigint): string =>
 	encodeFunctionData({
 		abi: DARK20.abi,
@@ -77,6 +150,20 @@ export const encodeMultiPayment = (recipients: string[], amounts: (number | stri
 		abi: MultiPaymentAbi.abi,
 		args: [recipients, amounts],
 		functionName: "pay",
+	}).slice(2);
+
+export const encodeValidatorRegistration = (validatorPublicKey: string): string =>
+	encodeFunctionData({
+		abi: ConsensusAbi.abi,
+		args: [validatorPublicKey?.startsWith("0x") ? validatorPublicKey : `0x${validatorPublicKey}`],
+		functionName: "registerValidator",
+	}).slice(2);
+
+export const encodeValidatorResignation = (): string =>
+	encodeFunctionData({
+		abi: ConsensusAbi.abi,
+		args: [],
+		functionName: "resignValidator",
 	}).slice(2);
 
 export const getErc20BalanceOf = async (

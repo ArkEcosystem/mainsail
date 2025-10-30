@@ -25,6 +25,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",
+		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"viem": "2.34.0"
