@@ -22,8 +22,6 @@
 	},
 	"dependencies": {
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
 		"viem": "2.34.0"
 	},
 	"devDependencies": {
