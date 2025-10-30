@@ -5,7 +5,14 @@ import { ConsensusAbi, MultiPaymentAbi } from "@mainsail/evm-contracts";
 import { decodeFunctionResult, encodeFunctionData, parseEther, toBytes, toHex, zeroAddress } from "viem";
 
 import { default as DARK20 } from "./abis/DARK20.json" with { type: "json" };
-import { Context, EvmCallOptions, ValidatorRegistrationOptions, ValidatorResignationOptions } from "./types.js";
+import {
+	Context,
+	EvmCallOptions,
+	UnvoteOptions,
+	ValidatorRegistrationOptions,
+	ValidatorResignationOptions,
+	VoteOptions,
+} from "./types.js";
 import { buildSignedTransaction, getAddressByPublicKey } from "./utilities.js";
 
 export const makeEvmCall = async (
@@ -138,6 +145,72 @@ export const makeValidatorResignation = async (
 	return buildSignedTransaction(sandbox, builder, sender, options);
 };
 
+export const makeValidatorVote = async (
+	{ sandbox, wallets }: Context,
+	options: VoteOptions,
+): Promise<Contracts.Crypto.Transaction> => {
+	const { app } = sandbox;
+
+	let { sender, recipient, gasPrice, gasLimit, payload } = options;
+	sender = sender ?? wallets[0];
+
+	gasPrice = gasPrice ?? 5 * 1e9;
+
+	if (!payload) {
+		payload = encodeVote(options.vote);
+	}
+
+	if (!recipient) {
+		recipient = app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
+	}
+
+	if (recipient === undefined) {
+		throw new Error("missing recipient");
+	}
+
+	let builder = app.resolve(TransactionBuilder).gasPrice(gasPrice);
+
+	builder = builder
+		.recipientAddress(recipient)
+		.gasLimit(gasLimit ?? 300_000)
+		.payload(payload);
+
+	return buildSignedTransaction(sandbox, builder, sender, options);
+};
+
+export const makeValidatorUnvote = async (
+	{ sandbox, wallets }: Context,
+	options: UnvoteOptions,
+): Promise<Contracts.Crypto.Transaction> => {
+	const { app } = sandbox;
+
+	let { sender, recipient, gasPrice, gasLimit, payload } = options;
+	sender = sender ?? wallets[0];
+
+	gasPrice = gasPrice ?? 5 * 1e9;
+
+	if (!payload) {
+		payload = encodeUnvote();
+	}
+
+	if (!recipient) {
+		recipient = app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
+	}
+
+	if (recipient === undefined) {
+		throw new Error("missing recipient");
+	}
+
+	let builder = app.resolve(TransactionBuilder).gasPrice(gasPrice);
+
+	builder = builder
+		.recipientAddress(recipient)
+		.gasLimit(gasLimit ?? 300_000)
+		.payload(payload);
+
+	return buildSignedTransaction(sandbox, builder, sender, options);
+};
+
 export const encodeErc20Transfer = (recipient: string, amount: number | string | bigint): string =>
 	encodeFunctionData({
 		abi: DARK20.abi,
@@ -164,6 +237,20 @@ export const encodeValidatorResignation = (): string =>
 		abi: ConsensusAbi.abi,
 		args: [],
 		functionName: "resignValidator",
+	}).slice(2);
+
+export const encodeVote = (vote: string): string =>
+	encodeFunctionData({
+		abi: ConsensusAbi.abi,
+		args: [vote],
+		functionName: "vote",
+	}).slice(2);
+
+export const encodeUnvote = (): string =>
+	encodeFunctionData({
+		abi: ConsensusAbi.abi,
+		args: [],
+		functionName: "unvote",
 	}).slice(2);
 
 export const getErc20BalanceOf = async (
