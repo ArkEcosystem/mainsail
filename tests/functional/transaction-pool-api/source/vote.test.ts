@@ -210,7 +210,7 @@ describe<{
 		assert.equal(error, "VoteSameValidator");
 	});
 
-	it.only("should accept and vote swap", async (context) => {
+	it("should accept and vote swap", async (context) => {
 		const [validator1] = context.wallets;
 		const validatorAddress = await Utils.getAddressByPublicKey(context, validator1.publicKey);
 
