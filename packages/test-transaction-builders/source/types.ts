@@ -28,18 +28,6 @@ export interface TransferOptions extends TransactionOptions {
 	amount?: number | string | BigNumber;
 }
 
-export interface UsernameRegistrationOptions extends TransactionOptions {
-	username?: string;
-}
-
-export type UsernameResignationOptions = TransactionOptions;
-
-export interface MultiSignatureOptions extends TransactionOptions {
-	participants: Contracts.Crypto.KeyPair[];
-	min?: number;
-	participantSignatureOverwrite?: { [index: number]: string };
-}
-
 export interface EvmCallOptions extends TransactionOptions {
 	gasLimit?: number;
 	payload?: string;
@@ -58,3 +46,9 @@ export interface VoteOptions extends EvmCallOptions {
 }
 
 export type UnvoteOptions = EvmCallOptions;
+
+export interface UsernameRegistrationOptions extends EvmCallOptions {
+	username: string;
+}
+
+export type UsernameResignationOptions = EvmCallOptions;
