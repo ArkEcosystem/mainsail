@@ -3,6 +3,9 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { RoundStatistic } from "./round-statistic.js";
 
+// TODO: Read from config
+const MAX_ROUND_STATISTICS = 100;
+
 @injectable()
 export class StatisticService implements Contracts.P2P.StatisticService {
 	@inject(Identifiers.Application.Instance)
@@ -25,6 +28,12 @@ export class StatisticService implements Contracts.P2P.StatisticService {
 
 		this.#currentRoundStatistic = this.app.resolve(RoundStatistic);
 		this.#roundStatistics.set(`${height}-${round}`, this.#currentRoundStatistic);
+
+		// Remove first if we have more than 100 rounds stored
+		if (this.#roundStatistics.size > MAX_ROUND_STATISTICS) {
+			const firstKey = this.#roundStatistics.keys().next().value!;
+			this.#roundStatistics.delete(firstKey);
+		}
 	}
 
 	getCurrentRoundStatistic(): RoundStatistic {
