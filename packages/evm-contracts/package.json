@@ -13,7 +13,19 @@
 	"scripts": {
 		"build": "tsc -b",
 		"build:watch": "pnpm run clean && tsc -w",
-		"release": "pnpm publish --access public"
+		"release": "pnpm publish --access public",
+		"test": "pnpm run uvu source .test.ts",
+		"test:coverage": "c8 -r=text -r=lcov --all pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
+	},
+	"dependencies": {
+		"@mainsail/contracts": "workspace:*",
+		"viem": "2.34.0"
+	},
+	"devDependencies": {
+		"uvu": "0.5.6"
 	},
 	"engines": {
 		"node": ">=20.x"

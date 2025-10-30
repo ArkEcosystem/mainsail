@@ -1897,7 +1897,18 @@ importers:
         specifier: 0.5.6
         version: 0.5.6
 
-  packages/evm-contracts: {}
+  packages/evm-contracts:
+    dependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      viem:
+        specifier: 2.34.0
+        version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
+    devDependencies:
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
 
   packages/evm-service:
     dependencies:
@@ -2660,6 +2671,9 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
+      '@mainsail/evm-consensus':
+        specifier: workspace:*
+        version: link:../evm-consensus
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
@@ -3266,6 +3280,9 @@ importers:
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../../../packages/evm-consensus
+      '@mainsail/evm-contracts':
+        specifier: workspace:*
+        version: link:../../../packages/evm-contracts
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../../../packages/evm-service
@@ -9287,7 +9304,6 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
-
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qs@6.11.0:
@@ -12409,7 +12425,7 @@ snapshots:
 
   '@scure/bip32@1.7.0':
     dependencies:
-      '@noble/curves': 1.9.2
+      '@noble/curves': 1.9.6
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
 
