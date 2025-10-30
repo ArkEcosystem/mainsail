@@ -33,12 +33,6 @@ export interface VoteOptions extends TransactionOptions {
 	unvoteAsset?: string;
 }
 
-export interface ValidatorRegistrationOptions extends TransactionOptions {
-	validatorPublicKey?: string;
-}
-
-export type ValidatorResignationOptions = TransactionOptions;
-
 export interface UsernameRegistrationOptions extends TransactionOptions {
 	username?: string;
 }
@@ -57,3 +51,9 @@ export interface EvmCallOptions extends TransactionOptions {
 	recipient?: string;
 	value?: string | number | bigint;
 }
+
+export interface ValidatorRegistrationOptions extends EvmCallOptions {
+	validatorPublicKey?: string;
+}
+
+export type ValidatorResignationOptions = EvmCallOptions;
