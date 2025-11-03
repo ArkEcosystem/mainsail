@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { assert } from "@mainsail/utils";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 
@@ -30,13 +31,18 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
-			if (!(await this.#hasValidSignature(prevote))) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
-			}
-
 			const roundState = this.roundStateRepo.getRoundState(prevote.blockNumber, prevote.round);
 			if (roundState.hasPrevote(prevote.validatorIndex)) {
-				return Contracts.Consensus.ProcessorResult.Skipped;
+				const existingPrevote = roundState.getPrevote(prevote.validatorIndex);
+				assert.defined(existingPrevote);
+
+				if (existingPrevote.serialized === prevote.serialized) {
+					return Contracts.Consensus.ProcessorResult.Skipped;
+				}
+			}
+
+			if (!(await this.#hasValidSignature(prevote))) {
+				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
 			roundState.addPrevote(prevote);
