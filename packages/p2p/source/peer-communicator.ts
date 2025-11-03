@@ -249,6 +249,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			statistic.success = true;
 
 			return { data, ...statistic };
+		} catch (error) {
+			this.logger.debugExtra(`Error communicating with peer ${peer.ip} on event ${event}. Error ${error}`);
+			throw error;
 		} finally {
 			this.statisticService.getCurrentRoundStatistic().addEmit(peer.ip, event, statistic);
 		}
