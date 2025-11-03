@@ -31,6 +31,7 @@ export type GeneralStatistic = {
 	duration: number;
 	count: {
 		peersTotal: number;
+		peersBanned: number;
 		peersRound: number;
 		emitsSuccess: number;
 		emitsFailed: number;
@@ -41,6 +42,7 @@ export type GeneralStatistic = {
 	peers: {
 		added: string[];
 		removed: string[];
+		banned: string[];
 	}
 };
 

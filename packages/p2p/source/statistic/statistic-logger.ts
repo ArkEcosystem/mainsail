@@ -46,6 +46,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		let output = "Round statistic:";
 		output += ` duration=${generalStatistic.duration} ms`;
 		output += ` peers=${generalStatistic.count.peersRound}/${generalStatistic.count.peersTotal} (+${generalStatistic.peers.added.length}/-${generalStatistic.peers.removed.length})`;
+		output += ` ban=${generalStatistic.peers.banned.length}/${generalStatistic.count.peersBanned}`;
 		output += ` emits=${generalStatistic.count.emitsSuccess}/${emitsTotal}`;
 		output += ` average=${generalStatistic.response.average} ms`;
 
@@ -115,11 +116,15 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		let peerStatisticsLog = "Statistics by peer:\n";
 
 		if (generalStatistic.peers.added.length > 0) {
-			peerStatisticsLog += `Peers added: ${generalStatistic.peers.added.join(", ")}\n`;
+			peerStatisticsLog += `Added: ${generalStatistic.peers.added.join(", ")}\n`;
 		}
 
 		if (generalStatistic.peers.removed.length > 0) {
-			peerStatisticsLog += `Peers removed: ${generalStatistic.peers.removed.join(", ")}\n`;
+			peerStatisticsLog += `Removed: ${generalStatistic.peers.removed.join(", ")}\n`;
+		}
+
+		if (generalStatistic.peers.banned.length > 0) {
+			peerStatisticsLog += `Banned: ${generalStatistic.peers.banned.join(", ")}\n`;
 		}
 
 		peerStatisticsLog += `${IP.padEnd(maxIpWidth)} ${RATE.padEnd(maxSuccessEmitsWidth)} ${AVERAGE.padEnd(maxAverageWidth)} ${MIN.padEnd(maxMinWidth)} ${MAX.padEnd(maxMaxWidth)}`;

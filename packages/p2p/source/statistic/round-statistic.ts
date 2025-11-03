@@ -14,9 +14,14 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
+
+	@inject(Identifiers.P2P.Peer.Disposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+
 	#startTime!: number;
 	#endTime!: number;
 	#totalPeers!: number;
+	#totalPeersBanned!: number;
 
 	#emitStatisticsByPeer = new Map<string, JoinedEmitStatistic[]>();
 	#emitStatisticsByEndpoint = new Map<string, JoinedEmitStatistic[]>();
@@ -75,6 +80,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 
 	public calculate(): void {
 		this.#endTime = performance.now();
+		this.#totalPeersBanned = this.peerDisposer.bannedPeers().length;
 	}
 
 	public getGeneralStatistic(): Contracts.P2P.GeneralStatistic {
@@ -87,6 +93,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		const count = {
 			emitsFailed,
 			emitsSuccess: emits.length - emitsFailed,
+			peersBanned: this.#totalPeersBanned,
 			peersRound: this.#emitStatisticsByPeer.size,
 			peersTotal: this.#totalPeers,
 		};
@@ -97,6 +104,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 
 		const peers = {
 			added: [...this.#peersAdded],
+			banned: [...this.#peersBanned],
 			removed: [...this.#peersRemoved],
 		}
 
