@@ -21,6 +21,9 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	#emitStatisticsByPeer = new Map<string, JoinedEmitStatistic[]>();
 	#emitStatisticsByEndpoint = new Map<string, JoinedEmitStatistic[]>();
 
+	#peersAdded = new Set<string>();
+	#peersRemoved = new Set<string>();
+
 	@postConstruct()
 	public init() {
 		this.#startTime = performance.now();
@@ -51,6 +54,14 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		return this.#emitStatisticsByEndpoint.get(endpoint)!;
 	}
 
+	peerAdded(ip: string): void {
+		this.#peersAdded.add(ip);
+	}
+
+	peerRemoved(ip: string): void {
+		this.#peersRemoved.add(ip);
+	}
+
 	public calculate(): void {
 		this.#endTime = performance.now();
 	}
@@ -73,7 +84,12 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 			average: this.#calculateAverageResponseTime(emits),
 		};
 
-		return { count, duration, response };
+		const peers = {
+			added: [...this.#peersAdded],
+			removed: [...this.#peersRemoved],
+		}
+
+		return { count, duration, peers, response };
 	}
 
 	public getEndpointStatistics(): Contracts.P2P.EndpointStatistic[] {
