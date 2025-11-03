@@ -11,12 +11,8 @@ const MIN_MAX_SLICE = 3;
 
 @injectable()
 export class RoundStatistic implements Contracts.P2P.RoundStatistic {
-	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly peerRepository!: Contracts.P2P.PeerRepository;
-
-
-	@inject(Identifiers.P2P.Peer.Disposer)
-	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
 
 	#startTime!: number;
 	#endTime!: number;
@@ -33,12 +29,17 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	public start(): void {
 		this.#startTime = performance.now();
 		this.#endTime = 0;
-		this.#totalPeers = this.peerRepository.getPeers().length;
+
+		const peerRepository = this.app.get<Contracts.P2P.PeerRepository>(Identifiers.P2P.Peer.Repository);
+		this.#totalPeers = peerRepository.getPeers().length;
 	}
 
 	public stop(): void {
 		this.#endTime = performance.now();
-		this.#totalPeersBanned = this.peerDisposer.bannedPeers().length;
+
+
+		const peerDisposer = this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer);
+		this.#totalPeersBanned = peerDisposer.bannedPeers().length;
 	}
 
 	public addEmit(ip: string, endpoint: string, emitStatistic: Contracts.P2P.EmitStatistic): void {

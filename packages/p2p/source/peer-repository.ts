@@ -4,15 +4,14 @@ import { Providers } from "@mainsail/kernel";
 import { assert, IpAddress } from "@mainsail/utils";
 import ip from "ip";
 
-// @TODO review the implementation
 @injectable()
 export class PeerRepository implements Contracts.P2P.PeerRepository {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
+
+	@inject(Identifiers.P2P.Statistic.Service)
+	private readonly statisticService!: Contracts.P2P.StatisticService;
 
 	readonly #peers: Map<string, Contracts.P2P.Peer> = new Map<string, Contracts.P2P.Peer>();
 	readonly #peersPending: Map<string, Contracts.P2P.Peer> = new Map<string, Contracts.P2P.Peer>();
@@ -35,18 +34,12 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 
 	public setPeer(peer: Contracts.P2P.Peer): void {
 		this.#peers.set(peer.ip, peer);
-
-		// Dynamic get because of circular dependency
-		const statisticService = this.app.get<Contracts.P2P.StatisticService>(Identifiers.P2P.Statistic.Service);
-		statisticService.getCurrentRoundStatistic().peerAdded(peer.ip);
+		this.statisticService.getCurrentRoundStatistic().peerAdded(peer.ip);
 	}
 
 	public forgetPeer(peer: Contracts.P2P.Peer): void {
 		this.#peers.delete(peer.ip);
-
-		// Dynamic get because of circular dependency
-		const statisticService = this.app.get<Contracts.P2P.StatisticService>(Identifiers.P2P.Statistic.Service);
-		statisticService.getCurrentRoundStatistic().peerRemoved(peer.ip);
+		this.statisticService.getCurrentRoundStatistic().peerRemoved(peer.ip);
 	}
 
 	public hasPeer(ip: string): boolean {

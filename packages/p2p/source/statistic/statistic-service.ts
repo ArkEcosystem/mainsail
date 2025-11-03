@@ -20,6 +20,10 @@ export class StatisticService implements Contracts.P2P.StatisticService {
 	@postConstruct()
 	init() {
 		this.#currentRoundStatistic = this.app.resolve(RoundStatistic);
+	}
+
+	public boot(): void {
+		// Start the first round statistic
 		this.#currentRoundStatistic.start();
 	}
 

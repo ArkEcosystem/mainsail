@@ -7,9 +7,6 @@ import { errorTypes } from "./hapi-nes/index.js";
 
 @injectable()
 export class PeerDisposer implements Contracts.P2P.PeerDisposer {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
@@ -28,6 +25,9 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly transactionPoolWorker!: Contracts.TransactionPool.Worker;
+
+	@inject(Identifiers.P2P.Statistic.Service)
+	private readonly statisticService!: Contracts.P2P.StatisticService;
 
 	#blacklist = new Map<string, dayjs.Dayjs>();
 
@@ -48,9 +48,7 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 
 		this.logger.debug(`Banning peer ${ip}, because: ${error.message}`, "p2p");
 
-		// Dynamic get because of circular dependency
-		const statisticService = this.app.get<Contracts.P2P.StatisticService>(Identifiers.P2P.Statistic.Service);
-		statisticService.getCurrentRoundStatistic().peerBanned(ip);
+		this.statisticService.getCurrentRoundStatistic().peerBanned(ip);
 
 		const timeout = this.configuration.getRequired<number>("peerBanTime");
 		if (timeout > 0) {
