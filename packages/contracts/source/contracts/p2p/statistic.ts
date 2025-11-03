@@ -9,6 +9,7 @@ export interface RoundStatistic {
 
 	peerAdded(ip: string): void;
 	peerRemoved(ip: string): void;
+	peerBanned(ip: string): void;
 
 	getGeneralStatistic(): GeneralStatistic;
 	getEndpointStatistics(): EndpointStatistic[];

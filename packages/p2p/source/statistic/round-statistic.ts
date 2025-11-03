@@ -23,6 +23,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 
 	#peersAdded = new Set<string>();
 	#peersRemoved = new Set<string>();
+	#peersBanned = new Set<string>();
 
 	@postConstruct()
 	public init() {
@@ -59,7 +60,17 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	}
 
 	peerRemoved(ip: string): void {
-		this.#peersRemoved.add(ip);
+		if (!this.#peersBanned.has(ip)) {
+			this.#peersRemoved.add(ip);
+		}
+	}
+
+	peerBanned(ip: string): void {
+		if (this.#peersRemoved.has(ip)) {
+			this.#peersRemoved.delete(ip);
+		}
+
+		this.#peersBanned.add(ip);
 	}
 
 	public calculate(): void {
