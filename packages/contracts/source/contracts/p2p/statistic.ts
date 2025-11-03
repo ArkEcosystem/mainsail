@@ -1,11 +1,17 @@
 export interface StatisticService {
+	boot(): void;
 	newRound(height: number, round: number): void;
 	getCurrentRoundStatistic(): RoundStatistic;
 }
 
 export interface RoundStatistic {
-	calculate(): void;
+	start(): void;
+	stop(): void;
 	addEmit(ip: string, endpoint: string, emitStatistic: EmitStatistic): void;
+
+	peerAdded(ip: string): void;
+	peerRemoved(ip: string): void;
+	peerBanned(ip: string): void;
 
 	getGeneralStatistic(): GeneralStatistic;
 	getEndpointStatistics(): EndpointStatistic[];
@@ -27,12 +33,18 @@ export type GeneralStatistic = {
 	duration: number;
 	count: {
 		peersTotal: number;
+		peersBanned: number;
 		peersRound: number;
 		emitsSuccess: number;
 		emitsFailed: number;
 	};
 	response: {
 		average: number;
+	};
+	peers: {
+		added: string[];
+		removed: string[];
+		banned: string[];
 	};
 };
 

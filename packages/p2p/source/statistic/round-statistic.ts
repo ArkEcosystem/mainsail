@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { performance } from "perf_hooks";
 
@@ -11,21 +11,34 @@ const MIN_MAX_SLICE = 3;
 
 @injectable()
 export class RoundStatistic implements Contracts.P2P.RoundStatistic {
-	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly peerRepository!: Contracts.P2P.PeerRepository;
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
 
 	#startTime!: number;
 	#endTime!: number;
 	#totalPeers!: number;
+	#totalPeersBanned!: number;
 
 	#emitStatisticsByPeer = new Map<string, JoinedEmitStatistic[]>();
 	#emitStatisticsByEndpoint = new Map<string, JoinedEmitStatistic[]>();
 
-	@postConstruct()
-	public init() {
+	#peersAdded = new Set<string>();
+	#peersRemoved = new Set<string>();
+	#peersBanned = new Set<string>();
+
+	public start(): void {
 		this.#startTime = performance.now();
 		this.#endTime = 0;
-		this.#totalPeers = this.peerRepository.getPeers().length;
+
+		const peerRepository = this.app.get<Contracts.P2P.PeerRepository>(Identifiers.P2P.Peer.Repository);
+		this.#totalPeers = peerRepository.getPeers().length;
+	}
+
+	public stop(): void {
+		this.#endTime = performance.now();
+
+		const peerDisposer = this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer);
+		this.#totalPeersBanned = peerDisposer.bannedPeers().length;
 	}
 
 	public addEmit(ip: string, endpoint: string, emitStatistic: Contracts.P2P.EmitStatistic): void {
@@ -51,8 +64,22 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		return this.#emitStatisticsByEndpoint.get(endpoint)!;
 	}
 
-	public calculate(): void {
-		this.#endTime = performance.now();
+	peerAdded(ip: string): void {
+		this.#peersAdded.add(ip);
+	}
+
+	peerRemoved(ip: string): void {
+		if (!this.#peersBanned.has(ip)) {
+			this.#peersRemoved.add(ip);
+		}
+	}
+
+	peerBanned(ip: string): void {
+		if (this.#peersRemoved.has(ip)) {
+			this.#peersRemoved.delete(ip);
+		}
+
+		this.#peersBanned.add(ip);
 	}
 
 	public getGeneralStatistic(): Contracts.P2P.GeneralStatistic {
@@ -65,6 +92,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		const count = {
 			emitsFailed,
 			emitsSuccess: emits.length - emitsFailed,
+			peersBanned: this.#totalPeersBanned,
 			peersRound: this.#emitStatisticsByPeer.size,
 			peersTotal: this.#totalPeers,
 		};
@@ -73,7 +101,13 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 			average: this.#calculateAverageResponseTime(emits),
 		};
 
-		return { count, duration, response };
+		const peers = {
+			added: [...this.#peersAdded],
+			banned: [...this.#peersBanned],
+			removed: [...this.#peersRemoved],
+		};
+
+		return { count, duration, peers, response };
 	}
 
 	public getEndpointStatistics(): Contracts.P2P.EndpointStatistic[] {

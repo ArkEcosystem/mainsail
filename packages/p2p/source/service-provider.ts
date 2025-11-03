@@ -52,6 +52,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
+		this.app.get<Contracts.P2P.StatisticService>(Identifiers.P2P.Statistic.Service).boot();
+
 		await this.#buildServer();
 	}
 

@@ -20,40 +20,40 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 	public log(roundStatistic: Contracts.P2P.RoundStatistic): void {
 		// Level 0: General statistic
-		this.#logGeneralStatistic(roundStatistic);
+		const generalStatistic = roundStatistic.getGeneralStatistic();
+		this.#logGeneralStatistic(generalStatistic);
 
 		if (this.#verbosityLevel < 1) {
 			return;
 		}
 
 		// Level 1: Endpoint statistics
-		this.#logEndpointStatistics(roundStatistic);
+		const endpointStatistics = roundStatistic.getEndpointStatistics();
+		this.#logEndpointStatistics(endpointStatistics);
 
 		if (this.#verbosityLevel < 2) {
 			return;
 		}
 
 		// Level 2: Peer statistics
-		this.#logPeerStatistics(roundStatistic);
+		const peerStatistics = roundStatistic.getPeerStatistics();
+		this.#logPeerStatistics(generalStatistic, peerStatistics);
 	}
 
-	#logGeneralStatistic(roundStatistic: Contracts.P2P.RoundStatistic): void {
-		const generalStatistic = roundStatistic.getGeneralStatistic();
-
+	#logGeneralStatistic(generalStatistic: Contracts.P2P.GeneralStatistic): void {
 		const emitsTotal = generalStatistic.count.emitsSuccess + generalStatistic.count.emitsFailed;
 
 		let output = "Round statistic:";
 		output += ` duration=${generalStatistic.duration} ms`;
-		output += ` peers=${generalStatistic.count.peersRound}/${generalStatistic.count.peersTotal}`;
+		output += ` peers=${generalStatistic.count.peersRound}/${generalStatistic.count.peersTotal} (+${generalStatistic.peers.added.length}/-${generalStatistic.peers.removed.length})`;
+		output += ` ban=${generalStatistic.peers.banned.length}/${generalStatistic.count.peersBanned}`;
 		output += ` emits=${generalStatistic.count.emitsSuccess}/${emitsTotal}`;
 		output += ` average=${generalStatistic.response.average} ms`;
 
 		this.logger.info(output, "p2p");
 	}
 
-	#logEndpointStatistics(roundStatistic: Contracts.P2P.RoundStatistic): void {
-		const endpointStatistics = roundStatistic.getEndpointStatistics();
-
+	#logEndpointStatistics(endpointStatistics: Contracts.P2P.EndpointStatistic[]): void {
 		if (endpointStatistics.length === 0) {
 			return;
 		}
@@ -94,9 +94,10 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		this.logger.info(emitStatisticsLog, "p2p");
 	}
 
-	#logPeerStatistics(roundStatistic: Contracts.P2P.RoundStatistic): void {
-		const peerStatistics = roundStatistic.getPeerStatistics();
-
+	#logPeerStatistics(
+		generalStatistic: Contracts.P2P.GeneralStatistic,
+		peerStatistics: Contracts.P2P.PeerStatistic[],
+	): void {
 		const IP = "ip";
 		const RATE = "rate";
 		const AVERAGE = "average";
@@ -116,6 +117,19 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		const maxMaxWidth = Math.max(MAX.length, ...peerStatistics.map((p) => `[${p.response.max}]`.length));
 
 		let peerStatisticsLog = "Statistics by peer:\n";
+
+		if (generalStatistic.peers.added.length > 0) {
+			peerStatisticsLog += `Added: ${generalStatistic.peers.added.join(", ")}\n`;
+		}
+
+		if (generalStatistic.peers.removed.length > 0) {
+			peerStatisticsLog += `Removed: ${generalStatistic.peers.removed.join(", ")}\n`;
+		}
+
+		if (generalStatistic.peers.banned.length > 0) {
+			peerStatisticsLog += `Banned: ${generalStatistic.peers.banned.join(", ")}\n`;
+		}
+
 		peerStatisticsLog += `${IP.padEnd(maxIpWidth)} ${RATE.padEnd(maxSuccessEmitsWidth)} ${AVERAGE.padEnd(maxAverageWidth)} ${MIN.padEnd(maxMinWidth)} ${MAX.padEnd(maxMaxWidth)}`;
 
 		for (const peerStatistic of peerStatistics) {

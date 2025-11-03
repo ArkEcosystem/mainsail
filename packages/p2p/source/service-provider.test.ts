@@ -15,6 +15,7 @@ describe<{
 	const triggerService = { bind: () => {} };
 	const validator = { addFormat: () => {}, addKeyword: () => {} };
 	const server = { boot: async () => {}, dispose: async () => {}, initialize: async () => {} };
+	const statisticService = { boot: async () => {} };
 	const service = { boot: async () => {}, dispose: async () => {} };
 	const peerDisposer = { disposePeers: async () => {} };
 	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
@@ -36,8 +37,10 @@ describe<{
 	it("#boot - should call the server initialize", async ({ sandbox, serviceProvider }) => {
 		const spyServerInitialize = stub(server, "initialize");
 		const spyServerBoot = stub(server, "boot");
+		const spyStatisticServiceBoot = stub(statisticService, "boot");
 
 		sandbox.app.bind(Identifiers.P2P.Server).toConstantValue(server);
+		sandbox.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue(statisticService);
 
 		const config = sandbox.app.resolve(Providers.PluginConfiguration).from("", defaults);
 		serviceProvider.setConfig(config);
@@ -46,6 +49,7 @@ describe<{
 
 		spyServerInitialize.calledOnce();
 		spyServerBoot.neverCalled();
+		spyStatisticServiceBoot.calledOnce();
 	});
 
 	it("#dispose - should call the server dispose", async ({ sandbox, serviceProvider }) => {

@@ -22,13 +22,19 @@ export class StatisticService implements Contracts.P2P.StatisticService {
 		this.#currentRoundStatistic = this.app.resolve(RoundStatistic);
 	}
 
+	public boot(): void {
+		// Start the first round statistic
+		this.#currentRoundStatistic.start();
+	}
+
 	public newRound(height: number, round: number): void {
-		this.#currentRoundStatistic.calculate();
+		this.#currentRoundStatistic.stop();
 		this.logger.log(this.#currentRoundStatistic);
 
 		this.#currentRoundStatistic = this.app.resolve(RoundStatistic);
-		this.#roundStatistics.set(`${height}-${round}`, this.#currentRoundStatistic);
+		this.#currentRoundStatistic.start();
 
+		this.#roundStatistics.set(`${height}-${round}`, this.#currentRoundStatistic);
 		// Remove first if we have more than 100 rounds stored
 		if (this.#roundStatistics.size > MAX_ROUND_STATISTICS) {
 			const firstKey = this.#roundStatistics.keys().next().value!;
