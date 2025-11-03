@@ -20,26 +20,27 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 	public log(roundStatistic: Contracts.P2P.RoundStatistic): void {
 		// Level 0: General statistic
-		this.#logGeneralStatistic(roundStatistic);
+		const generalStatistic = roundStatistic.getGeneralStatistic();
+		this.#logGeneralStatistic(generalStatistic);
 
 		if (this.#verbosityLevel < 1) {
 			return;
 		}
 
 		// Level 1: Endpoint statistics
-		this.#logEndpointStatistics(roundStatistic);
+		const endpointStatistics = roundStatistic.getEndpointStatistics();
+		this.#logEndpointStatistics(endpointStatistics);
 
 		if (this.#verbosityLevel < 2) {
 			return;
 		}
 
 		// Level 2: Peer statistics
-		this.#logPeerStatistics(roundStatistic);
+		const peerStatistics = roundStatistic.getPeerStatistics();
+		this.#logPeerStatistics(peerStatistics);
 	}
 
-	#logGeneralStatistic(roundStatistic: Contracts.P2P.RoundStatistic): void {
-		const generalStatistic = roundStatistic.getGeneralStatistic();
-
+	#logGeneralStatistic(generalStatistic: Contracts.P2P.GeneralStatistic): void {
 		const emitsTotal = generalStatistic.count.emitsSuccess + generalStatistic.count.emitsFailed;
 
 		let output = "Round statistic:";
@@ -51,9 +52,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		this.logger.info(output, "p2p");
 	}
 
-	#logEndpointStatistics(roundStatistic: Contracts.P2P.RoundStatistic): void {
-		const endpointStatistics = roundStatistic.getEndpointStatistics();
-
+	#logEndpointStatistics(endpointStatistics: Contracts.P2P.EndpointStatistic[]): void {
 		if (endpointStatistics.length === 0) {
 			return;
 		}
@@ -94,9 +93,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		this.logger.info(emitStatisticsLog, "p2p");
 	}
 
-	#logPeerStatistics(roundStatistic: Contracts.P2P.RoundStatistic): void {
-		const peerStatistics = roundStatistic.getPeerStatistics();
-
+	#logPeerStatistics(peerStatistics: Contracts.P2P.PeerStatistic[]): void {
 		const IP = "ip";
 		const RATE = "rate";
 		const AVERAGE = "average";
