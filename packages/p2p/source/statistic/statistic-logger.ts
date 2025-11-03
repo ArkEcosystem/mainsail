@@ -37,7 +37,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 		// Level 2: Peer statistics
 		const peerStatistics = roundStatistic.getPeerStatistics();
-		this.#logPeerStatistics(peerStatistics);
+		this.#logPeerStatistics(generalStatistic, peerStatistics);
 	}
 
 	#logGeneralStatistic(generalStatistic: Contracts.P2P.GeneralStatistic): void {
@@ -93,7 +93,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		this.logger.info(emitStatisticsLog, "p2p");
 	}
 
-	#logPeerStatistics(peerStatistics: Contracts.P2P.PeerStatistic[]): void {
+	#logPeerStatistics(generalStatistic: Contracts.P2P.GeneralStatistic, peerStatistics: Contracts.P2P.PeerStatistic[]): void {
 		const IP = "ip";
 		const RATE = "rate";
 		const AVERAGE = "average";
@@ -113,6 +113,15 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		const maxMaxWidth = Math.max(MAX.length, ...peerStatistics.map((p) => `[${p.response.max}]`.length));
 
 		let peerStatisticsLog = "Statistics by peer:\n";
+
+		if (generalStatistic.peers.added.length > 0) {
+			peerStatisticsLog += `Peers added: ${generalStatistic.peers.added.join(", ")}\n`;
+		}
+
+		if (generalStatistic.peers.removed.length > 0) {
+			peerStatisticsLog += `Peers removed: ${generalStatistic.peers.removed.join(", ")}\n`;
+		}
+
 		peerStatisticsLog += `${IP.padEnd(maxIpWidth)} ${RATE.padEnd(maxSuccessEmitsWidth)} ${AVERAGE.padEnd(maxAverageWidth)} ${MIN.padEnd(maxMinWidth)} ${MAX.padEnd(maxMaxWidth)}`;
 
 		for (const peerStatistic of peerStatistics) {
