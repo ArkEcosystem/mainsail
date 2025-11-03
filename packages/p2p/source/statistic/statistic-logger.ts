@@ -44,7 +44,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 		let output = "Round statistic:";
 		output += ` duration=${generalStatistic.duration} ms`;
-		output += ` peers=${generalStatistic.count.peersRound}/${generalStatistic.count.peersTotal}`;
+		output += ` peers=${generalStatistic.count.peersRound}/${generalStatistic.count.peersTotal} (+${generalStatistic.peers.added.length}/-${generalStatistic.peers.removed.length})`;
 		output += ` emits=${generalStatistic.count.emitsSuccess}/${emitsTotal}`;
 		output += ` average=${generalStatistic.response.average} ms`;
 
