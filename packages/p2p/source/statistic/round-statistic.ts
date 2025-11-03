@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { performance } from "perf_hooks";
 
@@ -30,11 +30,15 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	#peersRemoved = new Set<string>();
 	#peersBanned = new Set<string>();
 
-	@postConstruct()
-	public init() {
+	public start(): void {
 		this.#startTime = performance.now();
 		this.#endTime = 0;
 		this.#totalPeers = this.peerRepository.getPeers().length;
+	}
+
+	public stop(): void {
+		this.#endTime = performance.now();
+		this.#totalPeersBanned = this.peerDisposer.bannedPeers().length;
 	}
 
 	public addEmit(ip: string, endpoint: string, emitStatistic: Contracts.P2P.EmitStatistic): void {
@@ -76,11 +80,6 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		}
 
 		this.#peersBanned.add(ip);
-	}
-
-	public calculate(): void {
-		this.#endTime = performance.now();
-		this.#totalPeersBanned = this.peerDisposer.bannedPeers().length;
 	}
 
 	public getGeneralStatistic(): Contracts.P2P.GeneralStatistic {

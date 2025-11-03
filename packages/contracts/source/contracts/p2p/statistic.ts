@@ -4,7 +4,8 @@ export interface StatisticService {
 }
 
 export interface RoundStatistic {
-	calculate(): void;
+	start(): void;
+	stop(): void;
 	addEmit(ip: string, endpoint: string, emitStatistic: EmitStatistic): void;
 
 	peerAdded(ip: string): void;
