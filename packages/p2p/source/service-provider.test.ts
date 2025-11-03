@@ -12,12 +12,13 @@ describe<{
 	sandbox: Sandbox;
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ it, assert, beforeEach, stub }) => {
-	const triggerService = { bind: () => {} };
-	const validator = { addFormat: () => {}, addKeyword: () => {} };
-	const server = { boot: async () => {}, dispose: async () => {}, initialize: async () => {} };
-	const service = { boot: async () => {}, dispose: async () => {} };
-	const peerDisposer = { disposePeers: async () => {} };
-	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
+	const triggerService = { bind: () => { } };
+	const validator = { addFormat: () => { }, addKeyword: () => { } };
+	const server = { boot: async () => { }, dispose: async () => { }, initialize: async () => { } };
+	const statisticService = { boot: async () => { } };
+	const service = { boot: async () => { }, dispose: async () => { } };
+	const peerDisposer = { disposePeers: async () => { } };
+	const eventDispatcher = { dispatch: () => { }, listen: () => { } };
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
@@ -36,8 +37,10 @@ describe<{
 	it("#boot - should call the server initialize", async ({ sandbox, serviceProvider }) => {
 		const spyServerInitialize = stub(server, "initialize");
 		const spyServerBoot = stub(server, "boot");
+		const spyStatisticServiceBoot = stub(statisticService, "boot");
 
 		sandbox.app.bind(Identifiers.P2P.Server).toConstantValue(server);
+		sandbox.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue(statisticService);
 
 		const config = sandbox.app.resolve(Providers.PluginConfiguration).from("", defaults);
 		serviceProvider.setConfig(config);
@@ -46,6 +49,7 @@ describe<{
 
 		spyServerInitialize.calledOnce();
 		spyServerBoot.neverCalled();
+		spyStatisticServiceBoot.calledOnce();
 	});
 
 	it("#dispose - should call the server dispose", async ({ sandbox, serviceProvider }) => {
@@ -91,8 +95,8 @@ describe<{
 }>("ServiceProvider.configSchema", ({ it, assert, beforeEach }) => {
 	const importDefaults = async () => (await importFresh<any>("../distribution/defaults.js")).defaults;
 
-	const triggerService = { bind: () => {} };
-	const validator = { addFormat: () => {} };
+	const triggerService = { bind: () => { } };
+	const validator = { addFormat: () => { } };
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
