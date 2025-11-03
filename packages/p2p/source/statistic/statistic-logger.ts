@@ -94,7 +94,10 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		this.logger.info(emitStatisticsLog, "p2p");
 	}
 
-	#logPeerStatistics(generalStatistic: Contracts.P2P.GeneralStatistic, peerStatistics: Contracts.P2P.PeerStatistic[]): void {
+	#logPeerStatistics(
+		generalStatistic: Contracts.P2P.GeneralStatistic,
+		peerStatistics: Contracts.P2P.PeerStatistic[],
+	): void {
 		const IP = "ip";
 		const RATE = "rate";
 		const AVERAGE = "average";

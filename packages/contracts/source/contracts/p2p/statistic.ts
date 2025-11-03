@@ -45,7 +45,7 @@ export type GeneralStatistic = {
 		added: string[];
 		removed: string[];
 		banned: string[];
-	}
+	};
 };
 
 export type EndpointStatistic = {

@@ -8,8 +8,8 @@ describe<{
 	sandbox: Sandbox;
 	peerRepository: PeerRepository;
 }>("PeerRepository", ({ it, assert, beforeEach, spy }) => {
-	const eventDispatcher = { dispatch: () => { }, listen: () => { } };
-	const roundStatistic = { peerAdded: () => { }, peerRemoved: () => { } };
+	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
+	const roundStatistic = { peerAdded: () => {}, peerRemoved: () => {} };
 	const statisticService = { getCurrentRoundStatistic: () => roundStatistic };
 
 	beforeEach((context) => {

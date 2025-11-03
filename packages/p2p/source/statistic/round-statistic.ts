@@ -37,7 +37,6 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	public stop(): void {
 		this.#endTime = performance.now();
 
-
 		const peerDisposer = this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer);
 		this.#totalPeersBanned = peerDisposer.bannedPeers().length;
 	}
@@ -106,7 +105,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 			added: [...this.#peersAdded],
 			banned: [...this.#peersBanned],
 			removed: [...this.#peersRemoved],
-		}
+		};
 
 		return { count, duration, peers, response };
 	}
