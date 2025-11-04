@@ -47,12 +47,9 @@ jobs:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
 
-            - uses: actions-rs/toolchain@v1
+            - uses: dtolnay/rust-toolchain@stable
               with:
-                  toolchain: stable
                   components: llvm-tools-preview
-                  profile: minimal
-                  override: true
 
             - name: Install dependencies
               run: pnpm install
@@ -103,12 +100,9 @@ jobs:
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.cache
-            - uses: actions-rs/toolchain@v1
+            - uses: dtolnay/rust-toolchain@stable
               with:
-                  toolchain: stable
                   components: llvm-tools-preview
-                  profile: minimal
-                  override: true
             - name: Install cargo-llvm-cov
               run: cargo install cargo-llvm-cov
             - name: Check rustc version
