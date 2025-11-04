@@ -17,7 +17,6 @@ export type Codec = {
 
 export type RouteConfig = {
 	id: string;
-	handler: any;
 	validation?: Joi.Schema;
 	codec: Codec;
 	maxBytes?: number;

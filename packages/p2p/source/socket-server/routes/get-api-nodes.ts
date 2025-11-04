@@ -9,11 +9,9 @@ import { Route, RouteConfig } from "./route.js";
 @injectable()
 export class GetApiNodesRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {
-		const controller = this.getController();
 		return {
 			"/getApiNodes": {
 				codec: Codecs.getApiNodes,
-				handler: controller.handle,
 				id: Routes.GetApiNodes,
 				maxBytes: 1024,
 				validation: Schemas.getApiNodes(this.cryptoConfiguration),

@@ -9,11 +9,9 @@ import { Route, RouteConfig } from "./route.js";
 @injectable()
 export class GetPeersRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {
-		const controller = this.getController();
 		return {
 			"/getPeers": {
 				codec: Codecs.getPeers,
-				handler: controller.handle,
 				id: Routes.GetPeers,
 				maxBytes: 1024,
 				validation: Schemas.getPeers(this.cryptoConfiguration),

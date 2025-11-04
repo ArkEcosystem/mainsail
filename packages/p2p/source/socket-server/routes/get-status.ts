@@ -9,11 +9,9 @@ import { Route, RouteConfig } from "./route.js";
 @injectable()
 export class GetStatusRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {
-		const controller = this.getController();
 		return {
 			"/getStatus": {
 				codec: Codecs.getStatus,
-				handler: controller.handle,
 				id: Routes.GetStatus,
 				maxBytes: 1024,
 				validation: Schemas.getStatus(this.cryptoConfiguration),
