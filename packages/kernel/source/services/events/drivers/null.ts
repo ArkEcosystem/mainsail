@@ -4,15 +4,13 @@ import { Contracts } from "@mainsail/contracts";
 @injectable()
 export class NullEventDispatcher implements Contracts.Kernel.EventDispatcher {
 	public listen(event: string, listener: Contracts.Kernel.EventListener): () => void {
-		return () => { };
+		return () => {};
 	}
 
-	public listenMany(
-		events: Array<[string, Contracts.Kernel.EventListener]>,
-	): Map<string, () => void> {
+	public listenMany(events: Array<[string, Contracts.Kernel.EventListener]>): Map<string, () => void> {
 		const map: Map<string, () => void> = new Map<string, () => void>();
 		for (const [name] of events) {
-			map.set(name, () => { });
+			map.set(name, () => {});
 		}
 		return map;
 	}
@@ -21,11 +19,9 @@ export class NullEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		//
 	}
 
-	public forget(event: string, listener?: Contracts.Kernel.EventListener): void { }
+	public forget(event: string, listener?: Contracts.Kernel.EventListener): void {}
 
-	public forgetMany(
-		events: string[] | Array<[string, Contracts.Kernel.EventListener]>,
-	): void {
+	public forgetMany(events: string[] | Array<[string, Contracts.Kernel.EventListener]>): void {
 		//
 	}
 

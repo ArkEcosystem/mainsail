@@ -7,7 +7,7 @@ class OnceListener implements Contracts.Kernel.EventListener {
 	public constructor(
 		private readonly dispatcher: Contracts.Kernel.EventDispatcher,
 		private readonly listener: Contracts.Kernel.EventListener,
-	) { }
+	) {}
 
 	public async handle({ name }): Promise<void> {
 		this.dispatcher.forget(name, this.listener);
@@ -27,13 +27,8 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		return this.forget.bind(this, event, listener);
 	}
 
-	public listenMany(
-		events: Array<[string, Contracts.Kernel.EventListener]>,
-	): Map<string, () => void> {
-		const listeners: Map<string, () => void> = new Map<
-			string,
-			() => void
-		>();
+	public listenMany(events: Array<[string, Contracts.Kernel.EventListener]>): Map<string, () => void> {
+		const listeners: Map<string, () => void> = new Map<string, () => void>();
 
 		for (const [event, listener] of events) {
 			listeners.set(event, this.listen(event, listener));
@@ -56,9 +51,7 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		return this.#listeners.delete(event);
 	}
 
-	public forgetMany(
-		events: string[] | Array<[string, Contracts.Kernel.EventListener]>,
-	): void {
+	public forgetMany(events: string[] | Array<[string, Contracts.Kernel.EventListener]>): void {
 		for (const event of events) {
 			if (Array.isArray(event)) {
 				this.forget(event[0], event[1]);
@@ -120,9 +113,7 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 	}
 
 	public async dispatchMany<T = any>(events: Array<[string, T]>): Promise<void> {
-		await Promise.all(
-			Object.values(events).map((value: [string, T]) => this.dispatch(value[0], value[1])),
-		);
+		await Promise.all(Object.values(events).map((value: [string, T]) => this.dispatch(value[0], value[1])));
 	}
 
 	public async dispatchManySeq<T = any>(events: Array<[string, T]>): Promise<void> {
