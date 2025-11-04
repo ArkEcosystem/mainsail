@@ -48,7 +48,9 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 				assert.defined(existingPrevote);
 
 				if (!existingPrevote.serialized.equals(prevote.serialized)) {
-					this.logger.warn(`Conflicting prevotes for validator index ${prevote.validatorIndex} in block ${prevote.blockNumber.toLocaleString(Constants.Locale)}/${prevote.round}. Existing: ${existingPrevote.serialized.toString("hex")}, New: ${prevote.serialized.toString("hex")}`);
+					this.logger.warn(
+						`Conflicting prevotes for validator index ${prevote.validatorIndex} in block ${prevote.blockNumber.toLocaleString(Constants.Locale)}/${prevote.round}. Existing: ${existingPrevote.serialized.toString("hex")}, New: ${prevote.serialized.toString("hex")}`,
+					);
 				}
 
 				return Contracts.Consensus.ProcessorResult.Skipped;

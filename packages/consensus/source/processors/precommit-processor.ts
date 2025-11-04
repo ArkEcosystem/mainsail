@@ -48,7 +48,9 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 			if (roundState.hasPrecommit(precommit.validatorIndex)) {
 				const existingPrecommit = roundState.getPrecommit(precommit.validatorIndex);
 				if (existingPrecommit && !existingPrecommit.serialized.equals(precommit.serialized)) {
-					this.logger.warn(`Conflicting precommits for validator index ${precommit.validatorIndex} in block ${precommit.blockNumber}/${precommit.round}. Existing: ${existingPrecommit.serialized.toString("hex")}, New: ${precommit.serialized.toString("hex")}`);
+					this.logger.warn(
+						`Conflicting precommits for validator index ${precommit.validatorIndex} in block ${precommit.blockNumber}/${precommit.round}. Existing: ${existingPrecommit.serialized.toString("hex")}, New: ${precommit.serialized.toString("hex")}`,
+					);
 				}
 
 				return Contracts.Consensus.ProcessorResult.Skipped;
