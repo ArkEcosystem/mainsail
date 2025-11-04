@@ -3,6 +3,12 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 
+enum SignatureCheckResult {
+	Skip,
+	Invalid,
+	Accepted,
+}
+
 @injectable()
 export class PrecommitProcessor extends AbstractProcessor implements Contracts.Consensus.PrecommitProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
@@ -20,6 +26,11 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 	@inject(Identifiers.CryptoWorker.WorkerPool)
 	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
+	@inject(Identifiers.Services.Log.Service)
+	protected readonly logger!: Contracts.Kernel.Logger;
+
+	#pendingPrecommits: Map<string, ((value: SignatureCheckResult) => void)[]> = new Map();
+
 	async process(
 		precommit: Contracts.Crypto.Precommit,
 		broadcast = true,
@@ -33,13 +44,25 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
-			if (!(await this.#hasValidSignature(precommit))) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
-			}
-
 			const roundState = this.roundStateRepo.getRoundState(precommit.blockNumber, precommit.round);
 			if (roundState.hasPrecommit(precommit.validatorIndex)) {
+				const existingPrecommit = roundState.getPrecommit(precommit.validatorIndex);
+				if (existingPrecommit && !existingPrecommit.serialized.equals(precommit.serialized)) {
+					this.logger.warn(
+						`Conflicting precommits for validator index ${precommit.validatorIndex} in block ${precommit.blockNumber}/${precommit.round}. Existing: ${existingPrecommit.serialized.toString("hex")}, New: ${precommit.serialized.toString("hex")}`,
+					);
+				}
+
 				return Contracts.Consensus.ProcessorResult.Skipped;
+			}
+
+			switch (await this.#signatureCheck(precommit)) {
+				case SignatureCheckResult.Skip: {
+					return Contracts.Consensus.ProcessorResult.Skipped;
+				}
+				case SignatureCheckResult.Invalid: {
+					return Contracts.Consensus.ProcessorResult.Invalid;
+				}
 			}
 
 			roundState.addPrecommit(precommit);
@@ -52,6 +75,27 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 
 			return Contracts.Consensus.ProcessorResult.Accepted;
 		});
+	}
+
+	async #signatureCheck(precommit: Contracts.Crypto.Precommit): Promise<SignatureCheckResult> {
+		const serializedHex = precommit.serialized.toString("hex");
+		if (this.#pendingPrecommits.has(serializedHex)) {
+			return new Promise((resolve) => {
+				this.#pendingPrecommits.get(serializedHex)!.push(resolve);
+			});
+		} else {
+			this.#pendingPrecommits.set(serializedHex, []);
+		}
+
+		const hasValidSignature = await this.#hasValidSignature(precommit);
+
+		for (const resolve of this.#pendingPrecommits.get(serializedHex)!) {
+			resolve(hasValidSignature ? SignatureCheckResult.Skip : SignatureCheckResult.Invalid);
+		}
+
+		this.#pendingPrecommits.delete(serializedHex);
+
+		return hasValidSignature ? SignatureCheckResult.Accepted : SignatureCheckResult.Invalid;
 	}
 
 	async #hasValidSignature(precommit: Contracts.Crypto.Precommit): Promise<boolean> {
