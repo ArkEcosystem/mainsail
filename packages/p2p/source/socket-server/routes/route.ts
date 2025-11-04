@@ -42,7 +42,7 @@ export abstract class Route {
 			server.route({
 				method: "POST",
 				options: {
-					handler: config.handler,
+					handler: this.getController().handle,
 					id: config.id,
 					isInternal: !this.configuration.getRequired("developmentMode.enabled"), // Routes are exposed when developmentMode is enabled
 					payload: {
