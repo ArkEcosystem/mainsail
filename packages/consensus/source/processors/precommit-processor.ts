@@ -20,6 +20,11 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 	@inject(Identifiers.CryptoWorker.WorkerPool)
 	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
+	@inject(Identifiers.Services.Log.Service)
+	protected readonly logger!: Contracts.Kernel.Logger;
+
+	#pendingPrecommits: Set<string> = new Set();
+
 	async process(
 		precommit: Contracts.Crypto.Precommit,
 		broadcast = true,
@@ -33,13 +38,34 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
-			if (!(await this.#hasValidSignature(precommit))) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
-			}
 
+			// Check round state for existing prevotes
 			const roundState = this.roundStateRepo.getRoundState(precommit.blockNumber, precommit.round);
 			if (roundState.hasPrecommit(precommit.validatorIndex)) {
+				const existingPrecommit = roundState.getPrecommit(precommit.validatorIndex);
+				if (existingPrecommit && !existingPrecommit.serialized.equals(precommit.serialized)) {
+					this.logger.warn(`Conflicting precommits for validator index ${precommit.validatorIndex} in block ${precommit.blockNumber}/${precommit.round}. Existing: ${existingPrecommit.serialized.toString("hex")}, New: ${precommit.serialized.toString("hex")}`);
+				}
+
 				return Contracts.Consensus.ProcessorResult.Skipped;
+			}
+
+			// Check pending precommits to prevent processing the same precommit multiple times
+			const serializedHex = precommit.serialized.toString("hex");
+			if (this.#pendingPrecommits.has(serializedHex)) {
+				return Contracts.Consensus.ProcessorResult.Skipped;
+			}
+			this.#pendingPrecommits.add(serializedHex);
+
+
+			// Check if the precommit has a valid signature
+			const hasValidSignature = await this.#hasValidSignature(precommit);
+
+			// Remove from pending precommits after processing
+			this.#pendingPrecommits.delete(serializedHex);
+
+			if (!hasValidSignature) {
+				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
 			roundState.addPrecommit(precommit);
