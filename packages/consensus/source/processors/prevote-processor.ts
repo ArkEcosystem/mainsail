@@ -42,7 +42,6 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
-			// Check round state for existing prevotes
 			const roundState = this.roundStateRepo.getRoundState(prevote.blockNumber, prevote.round);
 			if (roundState.hasPrevote(prevote.validatorIndex)) {
 				const existingPrevote = roundState.getPrevote(prevote.validatorIndex);
