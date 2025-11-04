@@ -11,9 +11,7 @@ import { HeaderIncludePlugin } from "./plugins/header-include.js";
 import { RateLimitPlugin } from "./plugins/rate-limit.js";
 import { ValidateDataPlugin } from "./plugins/validate-data.js";
 import { ValidateIpPlugin } from "./plugins/validate-ip.js";
-import {
-	Route
-} from "./routes/route.js";
+import { Route } from "./routes/route.js";
 
 // todo: review the implementation
 @injectable()
@@ -45,7 +43,6 @@ export class Server implements Contracts.P2P.Server {
 			},
 			plugin: hapiNesPlugin,
 		});
-
 
 		for (const route of this.routes) {
 			route.register(this.server);

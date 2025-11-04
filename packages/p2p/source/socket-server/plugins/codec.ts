@@ -2,9 +2,7 @@ import { inject, injectable, multiInject, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import {
-	Route
-} from "../routes/route.js";
+import { Route } from "../routes/route.js";
 import { BasePlugin } from "./base-plugin.js";
 
 @injectable()
@@ -27,7 +25,10 @@ export class CodecPlugin extends BasePlugin {
 			return;
 		}
 
-		const allRoutesConfigByPath = this.routes.reduce((accumulator, route) => ({ ...accumulator, ...route.getRoutesConfigByPath() }), {});
+		const allRoutesConfigByPath = this.routes.reduce(
+			(accumulator, route) => ({ ...accumulator, ...route.getRoutesConfigByPath() }),
+			{},
+		);
 
 		server.ext({
 			async method(request, h) {

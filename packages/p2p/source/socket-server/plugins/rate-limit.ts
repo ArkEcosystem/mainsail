@@ -5,9 +5,7 @@ import { Providers } from "@mainsail/kernel";
 
 import { RateLimiter } from "../../rate-limiter.js";
 import { buildRateLimiter } from "../../utils/build-rate-limiter.js";
-import {
-	Route
-} from "../routes/route.js";
+import { Route } from "../routes/route.js";
 
 @injectable()
 export class RateLimitPlugin {
@@ -34,7 +32,10 @@ export class RateLimitPlugin {
 			whitelist: [],
 		});
 
-		const allRoutesConfigByPath = this.routes.reduce((accumulator, route) => ({ ...accumulator, ...route.getRoutesConfigByPath() }), {});
+		const allRoutesConfigByPath = this.routes.reduce(
+			(accumulator, route) => ({ ...accumulator, ...route.getRoutesConfigByPath() }),
+			{},
+		);
 
 		server.ext({
 			method: async (request, h) => {

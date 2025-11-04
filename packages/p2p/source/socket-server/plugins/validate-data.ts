@@ -4,9 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { isValidVersion } from "../../utils/index.js";
-import {
-	Route
-} from "../routes/route.js";
+import { Route } from "../routes/route.js";
 import { BasePlugin } from "./base-plugin.js";
 
 @injectable()
@@ -26,7 +24,10 @@ export class ValidateDataPlugin extends BasePlugin {
 			return;
 		}
 
-		const allRoutesConfigByPath = this.routes.reduce((accumulator, route) => ({ ...accumulator, ...route.getRoutesConfigByPath() }), {});
+		const allRoutesConfigByPath = this.routes.reduce(
+			(accumulator, route) => ({ ...accumulator, ...route.getRoutesConfigByPath() }),
+			{},
+		);
 
 		server.ext({
 			method: async (request: Contracts.P2P.Request, h: ResponseToolkit) => {
