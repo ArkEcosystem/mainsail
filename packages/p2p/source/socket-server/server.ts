@@ -1,5 +1,5 @@
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, multiInject } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { constants } from "../constants.js";
@@ -12,16 +12,8 @@ import { RateLimitPlugin } from "./plugins/rate-limit.js";
 import { ValidateDataPlugin } from "./plugins/validate-data.js";
 import { ValidateIpPlugin } from "./plugins/validate-ip.js";
 import {
-	GetApiNodesRoute,
-	GetBlocksRoute,
-	GetMessagesRoute,
-	GetPeersRoute,
-	GetProposalRoute,
-	GetStatusRoute,
-	PostPrecommitRoute,
-	PostPrevoteRoute,
-	PostProposalRoute,
-} from "./routes/index.js";
+	Route
+} from "./routes/route.js";
 
 // todo: review the implementation
 @injectable()
@@ -31,6 +23,9 @@ export class Server implements Contracts.P2P.Server {
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
+
+	@multiInject(Identifiers.P2P.Routes)
+	private readonly routes!: Route[];
 
 	private server!: HapiServer;
 
@@ -51,15 +46,10 @@ export class Server implements Contracts.P2P.Server {
 			plugin: hapiNesPlugin,
 		});
 
-		this.app.resolve(GetBlocksRoute).register(this.server);
-		this.app.resolve(GetMessagesRoute).register(this.server);
-		this.app.resolve(GetPeersRoute).register(this.server);
-		this.app.resolve(GetApiNodesRoute).register(this.server);
-		this.app.resolve(GetProposalRoute).register(this.server);
-		this.app.resolve(GetStatusRoute).register(this.server);
-		this.app.resolve(PostPrecommitRoute).register(this.server);
-		this.app.resolve(PostPrevoteRoute).register(this.server);
-		this.app.resolve(PostProposalRoute).register(this.server);
+
+		for (const route of this.routes) {
+			route.register(this.server);
+		}
 
 		// onPreAuth
 		this.app.resolve(ValidateIpPlugin).register(this.server);

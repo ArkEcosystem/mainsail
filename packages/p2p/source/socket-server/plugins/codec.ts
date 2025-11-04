@@ -1,18 +1,10 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, multiInject, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import {
-	GetApiNodesRoute,
-	GetBlocksRoute,
-	GetMessagesRoute,
-	GetPeersRoute,
-	GetProposalRoute,
-	GetStatusRoute,
-	PostPrecommitRoute,
-	PostPrevoteRoute,
-	PostProposalRoute,
-} from "../routes/index.js";
+	Route
+} from "../routes/route.js";
 import { BasePlugin } from "./base-plugin.js";
 
 @injectable()
@@ -27,22 +19,15 @@ export class CodecPlugin extends BasePlugin {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+	@multiInject(Identifiers.P2P.Routes)
+	private readonly routes!: Route[];
+
 	public register(server) {
 		if (this.configuration.getRequired("developmentMode.enabled")) {
 			return;
 		}
 
-		const allRoutesConfigByPath = {
-			...this.app.resolve(GetBlocksRoute).getRoutesConfigByPath(),
-			...this.app.resolve(GetMessagesRoute).getRoutesConfigByPath(),
-			...this.app.resolve(GetPeersRoute).getRoutesConfigByPath(),
-			...this.app.resolve(GetApiNodesRoute).getRoutesConfigByPath(),
-			...this.app.resolve(GetProposalRoute).getRoutesConfigByPath(),
-			...this.app.resolve(GetStatusRoute).getRoutesConfigByPath(),
-			...this.app.resolve(PostPrecommitRoute).getRoutesConfigByPath(),
-			...this.app.resolve(PostPrevoteRoute).getRoutesConfigByPath(),
-			...this.app.resolve(PostProposalRoute).getRoutesConfigByPath(),
-		};
+		const allRoutesConfigByPath = this.routes.reduce((accumulator, route) => ({ ...accumulator, ...route.getRoutesConfigByPath() }), {});
 
 		server.ext({
 			async method(request, h) {
