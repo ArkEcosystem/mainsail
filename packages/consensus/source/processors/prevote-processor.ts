@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
 import { AbstractProcessor } from "./abstract-processor.js";
@@ -21,6 +21,11 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 	@inject(Identifiers.CryptoWorker.WorkerPool)
 	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
+	@inject(Identifiers.Services.Log.Service)
+	protected readonly logger!: Contracts.Kernel.Logger;
+
+	#pendingPrevotes: Set<string> = new Set();
+
 	async process(prevote: Contracts.Crypto.Prevote, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.hasValidBlockNumberOrRound(prevote)) {
@@ -31,17 +36,34 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
+			// Check round state for existing prevotes
 			const roundState = this.roundStateRepo.getRoundState(prevote.blockNumber, prevote.round);
 			if (roundState.hasPrevote(prevote.validatorIndex)) {
 				const existingPrevote = roundState.getPrevote(prevote.validatorIndex);
 				assert.defined(existingPrevote);
 
-				if (existingPrevote.serialized === prevote.serialized) {
-					return Contracts.Consensus.ProcessorResult.Skipped;
+				if (!existingPrevote.serialized.equals(prevote.serialized)) {
+					this.logger.warn(`Conflicting prevotes for validator index ${prevote.validatorIndex} in block ${prevote.blockNumber.toLocaleString(Constants.Locale)}/${prevote.round}. Existing: ${existingPrevote.serialized.toString("hex")}, New: ${prevote.serialized.toString("hex")}`);
 				}
+
+				return Contracts.Consensus.ProcessorResult.Skipped;
 			}
 
-			if (!(await this.#hasValidSignature(prevote))) {
+			// Check pending prevotes to prevent processing the same prevote multiple times
+			const serializedHex = prevote.serialized.toString("hex");
+			if (this.#pendingPrevotes.has(serializedHex)) {
+				return Contracts.Consensus.ProcessorResult.Skipped;
+			}
+			this.#pendingPrevotes.add(serializedHex);
+
+
+			// Check if the prevote has a valid signature
+			const hasValidSignature = await this.#hasValidSignature(prevote);
+
+			// Remove from pending prevotes after processing
+			this.#pendingPrevotes.delete(serializedHex);
+
+			if (!hasValidSignature) {
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
