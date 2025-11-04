@@ -4,6 +4,12 @@ import { assert } from "@mainsail/utils";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 
+enum SignatureCheckResult {
+	Skip,
+	Invalid,
+	Accepted,
+}
+
 @injectable()
 export class PrevoteProcessor extends AbstractProcessor implements Contracts.Consensus.PrevoteProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
@@ -24,7 +30,7 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	#pendingPrevotes: Set<string> = new Set();
+	#pendingPrevotes: Map<string, ((value: SignatureCheckResult) => void)[]> = new Map();
 
 	async process(prevote: Contracts.Crypto.Prevote, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
@@ -49,22 +55,13 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 				return Contracts.Consensus.ProcessorResult.Skipped;
 			}
 
-			// Check pending prevotes to prevent processing the same prevote multiple times
-			const serializedHex = prevote.serialized.toString("hex");
-			if (this.#pendingPrevotes.has(serializedHex)) {
-				return Contracts.Consensus.ProcessorResult.Skipped;
-			}
-			this.#pendingPrevotes.add(serializedHex);
-
-
-			// Check if the prevote has a valid signature
-			const hasValidSignature = await this.#hasValidSignature(prevote);
-
-			// Remove from pending prevotes after processing
-			this.#pendingPrevotes.delete(serializedHex);
-
-			if (!hasValidSignature) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
+			switch (await this.#signatureCheck(prevote)) {
+				case SignatureCheckResult.Skip: {
+					return Contracts.Consensus.ProcessorResult.Skipped;
+				}
+				case SignatureCheckResult.Invalid: {
+					return Contracts.Consensus.ProcessorResult.Invalid;
+				}
 			}
 
 			roundState.addPrevote(prevote);
@@ -77,6 +74,27 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 
 			return Contracts.Consensus.ProcessorResult.Accepted;
 		});
+	}
+
+	async #signatureCheck(prevote: Contracts.Crypto.Prevote): Promise<SignatureCheckResult> {
+		const serializedHex = prevote.serialized.toString("hex");
+		if (this.#pendingPrevotes.has(serializedHex)) {
+			return new Promise((resolve) => {
+				this.#pendingPrevotes.get(serializedHex)!.push(resolve);
+			});
+		} else {
+			this.#pendingPrevotes.set(serializedHex, []);
+		}
+
+		const hasValidSignature = await this.#hasValidSignature(prevote);
+
+		for (const resolve of this.#pendingPrevotes.get(serializedHex)!) {
+			resolve(hasValidSignature ? SignatureCheckResult.Skip : SignatureCheckResult.Invalid);
+		}
+
+		this.#pendingPrevotes.delete(serializedHex);
+
+		return hasValidSignature ? SignatureCheckResult.Accepted : SignatureCheckResult.Invalid;
 	}
 
 	async #hasValidSignature(prevote: Contracts.Crypto.Prevote): Promise<boolean> {
