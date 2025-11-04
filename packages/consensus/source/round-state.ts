@@ -167,7 +167,6 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 	public addPrevote(prevote: Contracts.Crypto.Prevote): void {
 		if (this.#prevotes.has(prevote.validatorIndex)) {
-			// TODO: Handle conflicting prevotes from the same validator
 			throw new Error("Prevote already exists.");
 		}
 
