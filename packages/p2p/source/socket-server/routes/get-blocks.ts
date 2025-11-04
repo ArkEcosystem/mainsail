@@ -9,11 +9,9 @@ import { Route, RouteConfig } from "./route.js";
 @injectable()
 export class GetBlocksRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {
-		const controller = this.getController();
 		return {
 			"/getBlocks": {
 				codec: Codecs.getBlocks,
-				handler: controller.handle,
 				id: Routes.GetBlocks,
 				maxBytes: 1024,
 				validation: Schemas.getBlocks(this.cryptoConfiguration),

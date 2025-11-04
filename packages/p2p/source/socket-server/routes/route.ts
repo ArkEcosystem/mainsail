@@ -17,7 +17,6 @@ export type Codec = {
 
 export type RouteConfig = {
 	id: string;
-	handler: any;
 	validation?: Joi.Schema;
 	codec: Codec;
 	maxBytes?: number;
@@ -42,7 +41,7 @@ export abstract class Route {
 			server.route({
 				method: "POST",
 				options: {
-					handler: config.handler,
+					handler: controller.handle.bind(controller),
 					id: config.id,
 					isInternal: !this.configuration.getRequired("developmentMode.enabled"), // Routes are exposed when developmentMode is enabled
 					payload: {

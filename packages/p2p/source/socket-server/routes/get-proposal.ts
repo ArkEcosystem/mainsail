@@ -9,11 +9,9 @@ import { Route, RouteConfig } from "./route.js";
 @injectable()
 export class GetProposalRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {
-		const controller = this.getController();
 		return {
 			"/getProposal": {
 				codec: Codecs.getProposal,
-				handler: controller.handle,
 				id: Routes.GetProposal,
 				maxBytes: 1024,
 				validation: Schemas.getProposal(this.cryptoConfiguration),

@@ -10,11 +10,9 @@ import { Route, RouteConfig } from "./route.js";
 @injectable()
 export class PostPrevoteRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {
-		const controller = this.getController();
 		return {
 			"/postPrevote": {
 				codec: Codecs.postPrevote,
-				handler: controller.handle,
 				id: Routes.PostPrevote,
 				maxBytes: constants.MAX_PAYLOAD_SERVER,
 				validation: Schemas.postPrevote(this.cryptoConfiguration),

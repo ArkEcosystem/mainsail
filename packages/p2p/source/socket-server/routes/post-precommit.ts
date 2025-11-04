@@ -10,11 +10,9 @@ import { Route, RouteConfig } from "./route.js";
 @injectable()
 export class PostPrecommitRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {
-		const controller = this.getController();
 		return {
 			"/postPrecommit": {
 				codec: Codecs.postPrecommit,
-				handler: controller.handle,
 				id: Routes.PostPrecommit,
 				maxBytes: constants.MAX_PAYLOAD_SERVER,
 				validation: Schemas.postPrecommit(this.cryptoConfiguration),
