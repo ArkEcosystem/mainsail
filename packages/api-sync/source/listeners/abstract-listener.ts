@@ -14,7 +14,7 @@ export enum ListenerEvent {
 	OnRemoved,
 }
 
-export type ListenerEventMapping = { [key: Contracts.Kernel.EventName]: ListenerEvent };
+export type ListenerEventMapping = { [key: string]: ListenerEvent };
 
 @injectable()
 export abstract class AbstractListener<TEventData, TEntity extends { [key: string]: any }> implements EventListener {
@@ -79,7 +79,7 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 		dataSource: ApiDatabaseContracts.RepositoryDataSource,
 	): TypeOrm.Repository<TEntity>;
 
-	public async handle({ name, data }: { name: Contracts.Kernel.EventName; data: TEventData }): Promise<void> {
+	public async handle({ name, data }: { name: string; data: TEventData }): Promise<void> {
 		const eventMapping = this.getEventMapping();
 
 		switch (eventMapping[name]) {

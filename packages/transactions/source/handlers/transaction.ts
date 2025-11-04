@@ -104,7 +104,7 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		}
 	}
 
-	async #emit<T>(event: Contracts.Kernel.EventName, data?: T): Promise<void> {
+	async #emit<T>(event: string, data?: T): Promise<void> {
 		if (this.state.isBootstrap()) {
 			return;
 		}
