@@ -8,6 +8,7 @@ export interface RoundStatistic {
 	start(): void;
 	stop(): void;
 	addEmit(ip: string, endpoint: string, emitStatistic: EmitStatistic): void;
+	addPing(ip: string, endpoint: string, pingStatistic: PingStatistic): void;
 
 	peerAdded(ip: string): void;
 	peerRemoved(ip: string): void;
@@ -26,6 +27,12 @@ export interface EmitStatistic {
 	deserializeTime: number;
 	responseTime: number;
 	throttleTime: number;
+	success: boolean;
+}
+
+export interface PingStatistic {
+	deserializeTime: number;
+	responseTime: number;
 	success: boolean;
 }
 

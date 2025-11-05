@@ -7,6 +7,11 @@ interface JoinedEmitStatistic extends Contracts.P2P.EmitStatistic {
 	ip: string;
 }
 
+interface JoinedPingStatistic extends Contracts.P2P.PingStatistic {
+	endpoint: string;
+	ip: string;
+}
+
 const MIN_MAX_SLICE = 3;
 
 @injectable()
@@ -21,6 +26,9 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 
 	#emitStatisticsByPeer = new Map<string, JoinedEmitStatistic[]>();
 	#emitStatisticsByEndpoint = new Map<string, JoinedEmitStatistic[]>();
+
+	#pingStatisticsByPeer = new Map<string, JoinedPingStatistic[]>();
+	#pingStatisticsByEndpoint = new Map<string, JoinedPingStatistic[]>();
 
 	#peersAdded = new Set<string>();
 	#peersRemoved = new Set<string>();
@@ -62,6 +70,29 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		}
 
 		return this.#emitStatisticsByEndpoint.get(endpoint)!;
+	}
+
+	public addPing(ip: string, endpoint: string, pingStatistic: Contracts.P2P.PingStatistic): void {
+		const joined = { endpoint, ip, ...pingStatistic };
+
+		this.#getPingStatisticsByPeer(ip).push(joined);
+		this.#getPingStatisticsByEndpoint(endpoint).push(joined);
+	}
+
+	#getPingStatisticsByPeer(ip: string): JoinedPingStatistic[] {
+		if (!this.#pingStatisticsByPeer.has(ip)) {
+			this.#pingStatisticsByPeer.set(ip, []);
+		}
+
+		return this.#pingStatisticsByPeer.get(ip)!;
+	}
+
+	#getPingStatisticsByEndpoint(endpoint: string): JoinedPingStatistic[] {
+		if (!this.#pingStatisticsByEndpoint.has(endpoint)) {
+			this.#pingStatisticsByEndpoint.set(endpoint, []);
+		}
+
+		return this.#pingStatisticsByEndpoint.get(endpoint)!;
 	}
 
 	peerAdded(ip: string): void {
