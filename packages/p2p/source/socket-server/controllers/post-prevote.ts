@@ -1,9 +1,10 @@
 import Hapi from "@hapi/hapi";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
-import { performance } from "perf_hooks";
+import { monitorEventLoopDelay, performance } from "perf_hooks";
 
 import { getPeerIp } from "../../utils/index.js";
+
 
 @injectable()
 export class PostPrevoteController implements Contracts.P2P.Controller {
@@ -26,6 +27,13 @@ export class PostPrevoteController implements Contracts.P2P.Controller {
 
 	@postConstruct()
 	public init(): void {
+		const h = monitorEventLoopDelay();
+		h.enable();
+
+		setInterval(() => {
+			// console.log('Mean delay (ms):', (h.mean / 1e6).toFixed(2));
+		}, 1000);
+
 		console.log("PostPrevoteController initialized");
 
 		this.eventDispatcher.listen(Events.ConsensusEvent.RoundStarted, {
