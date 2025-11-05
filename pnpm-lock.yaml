@@ -3077,6 +3077,18 @@ importers:
         specifier: 4.19.2
         version: 4.19.2
 
+  tests/e2e/sync/checks:
+    dependencies:
+      express:
+        specifier: 4.19.2
+        version: 4.19.2
+      got:
+        specifier: 14.2.1
+        version: 14.2.1
+      viem:
+        specifier: 2.33.1
+        version: 2.33.1(typescript@5.9.2)(zod@3.24.4)
+
   tests/functional/consensus:
     devDependencies:
       '@mainsail/blockchain-utils':
@@ -17049,7 +17061,7 @@ snapshots:
   ox@0.6.7(typescript@5.9.2)(zod@3.24.4):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
-      '@noble/curves': 1.9.2
+      '@noble/curves': 1.9.6
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
@@ -17064,7 +17076,7 @@ snapshots:
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
       '@noble/ciphers': 1.3.0
-      '@noble/curves': 1.9.2
+      '@noble/curves': 1.9.6
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0

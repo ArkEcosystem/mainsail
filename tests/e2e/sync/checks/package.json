@@ -1,0 +1,12 @@
+{
+	"name": "checks",
+	"type": "module",
+	"dependencies": {
+		"express": "4.19.2",
+		"got": "14.2.1",
+		"viem": "2.33.1"
+	},
+	"engines": {
+		"node": ">=16"
+	}
+}
