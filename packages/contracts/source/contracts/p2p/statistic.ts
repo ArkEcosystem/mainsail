@@ -16,6 +16,7 @@ export interface RoundStatistic {
 
 	getGeneralStatistic(): GeneralStatistic;
 	getEmitStatistics(): EndpointStatistic[];
+	getPingStatistics(): EndpointStatistic[];
 	getPeerStatistics(): PeerStatistic[];
 }
 

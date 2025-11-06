@@ -2,15 +2,14 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { performance } from "perf_hooks";
 
-interface JoinedEmitStatistic extends Contracts.P2P.EmitStatistic {
+type BasicStatistic = {
 	endpoint: string;
+	responseTime: number;
+	success: boolean;
 	ip: string;
 }
-
-interface JoinedPingStatistic extends Contracts.P2P.PingStatistic {
-	endpoint: string;
-	ip: string;
-}
+type JoinedEmitStatistic = Contracts.P2P.EmitStatistic & BasicStatistic;
+type JoinedPingStatistic = Contracts.P2P.PingStatistic & BasicStatistic;
 
 const MIN_MAX_SLICE = 3;
 
@@ -147,9 +146,17 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	}
 
 	public getEmitStatistics(): Contracts.P2P.EndpointStatistic[] {
+		return this.#calculateEndpointStatistics(this.#emitStatisticsByEndpoint);
+	}
+
+	public getPingStatistics(): Contracts.P2P.EndpointStatistic[] {
+		return this.#calculateEndpointStatistics(this.#pingStatisticsByEndpoint);
+	}
+
+	#calculateEndpointStatistics(data: Map<string, BasicStatistic[]>): Contracts.P2P.EndpointStatistic[] {
 		const statistics: Contracts.P2P.EndpointStatistic[] = [];
 
-		for (const [endpoint, emits] of this.#emitStatisticsByEndpoint.entries()) {
+		for (const [endpoint, emits] of data.entries()) {
 			const count = {
 				emits: emits.length,
 				peers: new Set(emits.map((emit) => emit.ip)).size,
@@ -214,7 +221,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		return statistics.sort((a, b) => b.response.average - a.response.average);
 	}
 
-	#calculateAverageResponseTime(emits: JoinedEmitStatistic[]): number {
+	#calculateAverageResponseTime(emits: BasicStatistic[]): number {
 		if (emits.length === 0) {
 			return 0;
 		}
