@@ -4,17 +4,9 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { constants } from "../constants.js";
 import { plugin as hapiNesPlugin } from "../hapi-nes/index.js";
-import { AcceptPeerPlugin } from "./plugins/accept-peer.js";
-import { CodecPlugin } from "./plugins/codec.js";
-import { HeaderHandlePlugin } from "./plugins/header-handle.js";
-import { HeaderIncludePlugin } from "./plugins/header-include.js";
-import { RateLimitPlugin } from "./plugins/rate-limit.js";
-import { StatisticPlugin } from "./plugins/statistic.js";
-import { ValidateDataPlugin } from "./plugins/validate-data.js";
-import { ValidateIpPlugin } from "./plugins/validate-ip.js";
+import { AcceptPeerPlugin, CodecPlugin, HeaderHandlePlugin, HeaderIncludePlugin, RateLimitPlugin, StatisticPlugin, ValidateDataPlugin, ValidateIpPlugin } from "./plugins/index.js";
 import { Route } from "./routes/route.js";
 
-// todo: review the implementation
 @injectable()
 export class Server implements Contracts.P2P.Server {
 	@inject(Identifiers.Application.Instance)
