@@ -15,7 +15,7 @@ export interface RoundStatistic {
 	peerBanned(ip: string): void;
 
 	getGeneralStatistic(): GeneralStatistic;
-	getEndpointStatistics(): EndpointStatistic[];
+	getEmitStatistics(): EndpointStatistic[];
 	getPeerStatistics(): PeerStatistic[];
 }
 

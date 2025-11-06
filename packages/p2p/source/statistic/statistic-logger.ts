@@ -28,7 +28,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		}
 
 		// Level 1: Endpoint statistics
-		const endpointStatistics = roundStatistic.getEndpointStatistics();
+		const endpointStatistics = roundStatistic.getEmitStatistics();
 		this.#logEndpointStatistics(endpointStatistics);
 
 		if (this.#verbosityLevel < 2) {

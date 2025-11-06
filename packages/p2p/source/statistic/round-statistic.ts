@@ -146,7 +146,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		return { count, duration, peers, response };
 	}
 
-	public getEndpointStatistics(): Contracts.P2P.EndpointStatistic[] {
+	public getEmitStatistics(): Contracts.P2P.EndpointStatistic[] {
 		const statistics: Contracts.P2P.EndpointStatistic[] = [];
 
 		for (const [endpoint, emits] of this.#emitStatisticsByEndpoint.entries()) {
