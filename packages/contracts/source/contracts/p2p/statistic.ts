@@ -43,6 +43,8 @@ export type GeneralStatistic = {
 		peersRound: number;
 		emitsSuccess: number;
 		emitsFailed: number;
+		pingsSuccess: number;
+		pingsFailed: number;
 	};
 	response: {
 		average: number;
