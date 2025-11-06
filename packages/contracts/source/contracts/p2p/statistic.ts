@@ -31,7 +31,6 @@ export interface EmitStatistic {
 }
 
 export interface PingStatistic {
-	deserializeTime: number;
 	responseTime: number;
 	success: boolean;
 }
