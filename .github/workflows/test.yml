@@ -585,7 +585,7 @@ jobs:
 
             - name: Running checks for ${{ matrix.name }}
               env:
-                MINIMUM_BLOCKS_TO_SYNC: 10000
+                  MINIMUM_BLOCKS_TO_SYNC: 10000
               run: |
                   container_id=$(docker ps -a | grep 'sync-checks' | awk '{print $1}')
                   while docker ps | grep -q $container_id; do echo "checks running..."; sleep 5; done
