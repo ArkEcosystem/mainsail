@@ -103,10 +103,6 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		generalStatistic: Contracts.P2P.GeneralStatistic,
 		peerStatistics: Contracts.P2P.PeerStatistic[],
 	): void {
-		if (peerStatistics.length === 0) {
-			return;
-		}
-
 		const IP = "ip";
 		const RATE = "rate";
 		const AVERAGE = "average";
@@ -152,13 +148,18 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 			this.#addEndpointResponseTimes(log, peerStatistic);
 		}
+
+		this.logger.info(log, "p2p");
 	}
 
 	#addEndpointResponseTimes(log: string, peerStatistic: Contracts.P2P.PeerStatistic): void {
 		// Level 3: Emit endpoints response times
 		if (this.#verbosityLevel >= 3) {
 			for (const endpoint of peerStatistic.emits.endpoints) {
-				log += `\n${endpoint.name}: [${endpoint.responseTimes}]`;
+				log += `\nE: ${endpoint.name}: [${endpoint.responseTimes}]`;
+			}
+			for (const endpoint of peerStatistic.pings.endpoints) {
+				log += `\nP: ${endpoint.name}: [${endpoint.responseTimes}]`;
 			}
 			log += "\n";
 		}
