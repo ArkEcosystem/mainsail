@@ -73,26 +73,26 @@ export type EndpointStatistic = {
 
 export type PeerStatistic = {
 	ip: string;
-	count: {
-		success: number;
-		emits: number;
-	};
 	emits: {
+		count: number;
+		success: number;
 		average: number;
 		max: number[];
 		min: number[];
+		endpoints: {
+			name: string;
+			responseTimes: number[];
+		}[];
 	};
-	emitEndpoints: {
-		name: string;
-		responseTimes: number[];
-	}[];
 	pings: {
+		count: number;
+		success: number;
 		average: number;
 		max: number[];
 		min: number[];
+		endpoints: {
+			name: string;
+			responseTimes: number[];
+		}[];
 	};
-	pingEndpoints: {
-		name: string;
-		responseTimes: number[];
-	}[];
 };

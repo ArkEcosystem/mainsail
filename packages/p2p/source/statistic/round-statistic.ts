@@ -185,22 +185,22 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		const statistics: Contracts.P2P.PeerStatistic[] = [];
 
 		const peerStatistic: Contracts.P2P.PeerStatistic = {
-			count: {
-				emits: 0,
-				success: 0,
-			},
-			emitEndpoints: [],
 			emits: {
 				average: 0,
+				count: 0,
+				endpoints: [],
 				max: [],
 				min: [],
+				success: 0,
 			},
 			ip: "",
-			pingEndpoints: [],
 			pings: {
 				average: 0,
+				count: 0,
+				endpoints: [],
 				max: [],
 				min: [],
+				success: 0,
 			},
 		};
 
@@ -211,21 +211,6 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 
 			const emits = this.#emitStatisticsByPeer.get(ip) || [];
 
-			peerStatistic.count.emits = emits.length;
-			peerStatistic.count.success = emits.filter((emit) => emit.success).length;
-
-			peerStatistic.emits = {
-				average: this.#calculateAverageResponseTime(emits),
-				max: emits
-					.sort((a, b) => b.responseTime - a.responseTime)
-					.slice(0, MIN_MAX_SLICE)
-					.map((emit) => emit.responseTime),
-				min: emits
-					.sort((a, b) => a.responseTime - b.responseTime)
-					.slice(0, MIN_MAX_SLICE)
-					.map((emit) => emit.responseTime),
-			};
-
 			const endpointsMap = new Map<string, { name: string; responseTimes: number[] }>();
 			for (const emit of emits) {
 				if (!endpointsMap.has(emit.endpoint)) {
@@ -234,10 +219,25 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 				endpointsMap.get(emit.endpoint)!.responseTimes.push(emit.responseTime);
 			}
 
-			peerStatistic.emitEndpoints = [...endpointsMap.values()];
-			for (const endpoint of peerStatistic.emitEndpoints) {
+			const emitEndpoints = [...endpointsMap.values()];
+			for (const endpoint of emitEndpoints) {
 				endpoint.responseTimes.sort((a, b) => a - b);
 			}
+
+			peerStatistic.emits = {
+				average: this.#calculateAverageResponseTime(emits),
+				count: emits.length,
+				endpoints: emitEndpoints,
+				max: emits
+					.sort((a, b) => b.responseTime - a.responseTime)
+					.slice(0, MIN_MAX_SLICE)
+					.map((emit) => emit.responseTime),
+				min: emits
+					.sort((a, b) => a.responseTime - b.responseTime)
+					.slice(0, MIN_MAX_SLICE)
+					.map((emit) => emit.responseTime),
+				success: emits.filter((emit) => emit.success).length,
+			};
 
 			statistics.push(peerStatistic);
 		}
