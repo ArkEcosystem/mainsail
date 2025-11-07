@@ -2,7 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { performance } from "perf_hooks";
 
-
 @injectable()
 export class StatisticPlugin {
 	@inject(Identifiers.P2P.Statistic.Service)
@@ -20,10 +19,12 @@ export class StatisticPlugin {
 		server.ext({
 			method: async (request, h) => {
 				const duration = Math.round(performance.now() - request.start);
-				this.statisticService.getCurrentRoundStatistic().addPing(request.info.remoteAddress, request.path.slice(1), {
-					responseTime: duration,
-					success: !request.response.isBoom,
-				});
+				this.statisticService
+					.getCurrentRoundStatistic()
+					.addPing(request.info.remoteAddress, request.path.slice(1), {
+						responseTime: duration,
+						success: !request.response.isBoom,
+					});
 
 				return h.continue;
 			},

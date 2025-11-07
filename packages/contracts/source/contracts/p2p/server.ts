@@ -1,4 +1,11 @@
-import { Request, ResponseToolkit, Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
+import {
+	Request,
+	ResponseToolkit,
+	Server as HapiServer,
+	ServerInjectOptions,
+	ServerInjectResponse,
+	ServerRoute,
+} from "@hapi/hapi";
 import { Schema } from "joi";
 
 export interface Controller {
@@ -35,5 +42,4 @@ export type RouteConfig = {
 export interface Route {
 	register(server: HapiServer): void;
 	getRoutesConfigByPath(): { [path: string]: RouteConfig };
-
 }

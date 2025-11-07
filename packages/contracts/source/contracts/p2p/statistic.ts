@@ -81,7 +81,7 @@ export type PeerSectionStatistic = {
 		name: string;
 		responseTimes: number[];
 	}[];
-}
+};
 
 export type PeerStatistic = {
 	ip: string;

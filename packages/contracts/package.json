@@ -25,8 +25,8 @@
 		"@mainsail/utils": "workspace:*",
 		"ajv": "8.17.1",
 		"dayjs": "1.11.13",
-		"joi": "18.0.0",
 		"inversify": "7.10.3",
+		"joi": "18.0.0",
 		"reflect-metadata": "0.2.2",
 		"type-fest": "4.41.0"
 	},

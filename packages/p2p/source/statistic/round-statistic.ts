@@ -7,7 +7,7 @@ type BasicStatistic = {
 	responseTime: number;
 	success: boolean;
 	ip: string;
-}
+};
 type JoinedEmitStatistic = Contracts.P2P.EmitStatistic & BasicStatistic;
 type JoinedPingStatistic = Contracts.P2P.PingStatistic & BasicStatistic;
 
@@ -129,7 +129,6 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 			peersTotal: this.#totalPeers,
 			pingsFailed,
 			pingsSuccess: pings.length - pingsFailed,
-
 		};
 
 		const response = {

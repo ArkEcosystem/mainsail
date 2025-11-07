@@ -4,7 +4,16 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { constants } from "../constants.js";
 import { plugin as hapiNesPlugin } from "../hapi-nes/index.js";
-import { AcceptPeerPlugin, CodecPlugin, HeaderHandlePlugin, HeaderIncludePlugin, RateLimitPlugin, StatisticPlugin, ValidateDataPlugin, ValidateIpPlugin } from "./plugins/index.js";
+import {
+	AcceptPeerPlugin,
+	CodecPlugin,
+	HeaderHandlePlugin,
+	HeaderIncludePlugin,
+	RateLimitPlugin,
+	StatisticPlugin,
+	ValidateDataPlugin,
+	ValidateIpPlugin,
+} from "./plugins/index.js";
 
 @injectable()
 export class Server implements Contracts.P2P.Server {

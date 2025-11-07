@@ -114,32 +114,18 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		const ipPad = Math.max(IP.length, ...peerStatistics.map((p) => p.ip.length));
 
 		const emitsPad = {
-			average: Math.max(
-				AVERAGE.length,
-				...peerStatistics.map((p) => p.emits.average.toString().length),
-			),
-			emits: Math.max(
-				EMITS.length,
-				...peerStatistics.map((p) => `${p.emits.success}/${p.emits.count}`.length),
-			),
+			average: Math.max(AVERAGE.length, ...peerStatistics.map((p) => p.emits.average.toString().length)),
+			emits: Math.max(EMITS.length, ...peerStatistics.map((p) => `${p.emits.success}/${p.emits.count}`.length)),
 			max: Math.max(MAX.length, ...peerStatistics.map((p) => `[${p.emits.max}]`.length)),
 			min: Math.max(MIN.length, ...peerStatistics.map((p) => `[${p.emits.min}]`.length)),
 		};
 
 		const pingPad = {
-			average: Math.max(
-				AVERAGE.length,
-				...peerStatistics.map((p) => p.pings.average.toString().length),
-			),
+			average: Math.max(AVERAGE.length, ...peerStatistics.map((p) => p.pings.average.toString().length)),
 			max: Math.max(MAX.length, ...peerStatistics.map((p) => `[${p.pings.max}]`.length)),
 			min: Math.max(MIN.length, ...peerStatistics.map((p) => `[${p.pings.min}]`.length)),
-			pings: Math.max(
-				PINGS.length,
-				...peerStatistics.map((p) => `${p.pings.success}/${p.pings.count}`.length),
-			),
+			pings: Math.max(PINGS.length, ...peerStatistics.map((p) => `${p.pings.success}/${p.pings.count}`.length)),
 		};
-
-
 
 		// Build log
 		let log = "Statistics by peer:\n";
@@ -166,7 +152,6 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 			log += `\n${ip.padEnd(ipPad)}`;
 			log += ` ${successEmits.padEnd(emitsPad.emits)} ${averageEmits.padEnd(emitsPad.average)} ${minEmits.padEnd(emitsPad.min)} ${maxEmits.padEnd(emitsPad.max)}`;
 			log += ` ${successPings.padEnd(pingPad.pings)} ${averagePings.padEnd(pingPad.average)} ${minPings.padEnd(pingPad.min)} ${maxPings.padEnd(pingPad.max)}`;
-
 
 			log += this.#getEndpointResponseTimes(peerStatistic);
 		}
