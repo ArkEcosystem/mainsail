@@ -123,17 +123,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 		let log = "Statistics by peer:\n";
 
-		if (generalStatistic.peers.added.length > 0) {
-			log += `Added: ${generalStatistic.peers.added.join(", ")}\n`;
-		}
-
-		if (generalStatistic.peers.removed.length > 0) {
-			log += `Removed: ${generalStatistic.peers.removed.join(", ")}\n`;
-		}
-
-		if (generalStatistic.peers.banned.length > 0) {
-			log += `Banned: ${generalStatistic.peers.banned.join(", ")}\n`;
-		}
+		log += this.#getPeersReport(generalStatistic);
 
 		log += `${IP.padEnd(maxIpWidth)} ${RATE.padEnd(maxSuccessEmitsWidth)} ${AVERAGE.padEnd(maxAverageWidth)} ${MIN.padEnd(maxMinWidth)} ${MAX.padEnd(maxMaxWidth)}`;
 
@@ -150,6 +140,24 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		}
 
 		this.logger.info(log, "p2p");
+	}
+
+	#getPeersReport(generalStatistic: Contracts.P2P.GeneralStatistic): string {
+		let log = "";
+
+		if (generalStatistic.peers.added.length > 0) {
+			log += `Added: ${generalStatistic.peers.added.join(", ")}\n`;
+		}
+
+		if (generalStatistic.peers.removed.length > 0) {
+			log += `Removed: ${generalStatistic.peers.removed.join(", ")}\n`;
+		}
+
+		if (generalStatistic.peers.banned.length > 0) {
+			log += `Banned: ${generalStatistic.peers.banned.join(", ")}\n`;
+		}
+
+		return log;
 	}
 
 	#getEndpointResponseTimes(peerStatistic: Contracts.P2P.PeerStatistic): string {
