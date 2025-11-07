@@ -28,8 +28,11 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		}
 
 		// Level 1: Endpoint statistics
-		const endpointStatistics = roundStatistic.getEmitStatistics();
-		this.#logEndpointStatistics(endpointStatistics);
+		const emitStatistics = roundStatistic.getEmitStatistics();
+		this.#logEndpointStatistics(emitStatistics, "Emit statistics by endpoint");
+
+		const pingStatistics = roundStatistic.getPingStatistics();
+		this.#logEndpointStatistics(pingStatistics, "Ping statistics by endpoint");
 
 		if (this.#verbosityLevel < 2) {
 			return;
@@ -55,7 +58,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		this.logger.info(output, "p2p");
 	}
 
-	#logEndpointStatistics(endpointStatistics: Contracts.P2P.EndpointStatistic[]): void {
+	#logEndpointStatistics(endpointStatistics: Contracts.P2P.EndpointStatistic[], header: string): void {
 		if (endpointStatistics.length === 0) {
 			return;
 		}
@@ -80,7 +83,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		const maxMinWidth = Math.max(MIN.length, ...endpointStatistics.map((e) => `[${e.response.min}]`.length));
 		const maxMaxWidth = Math.max(MAX.length, ...endpointStatistics.map((e) => `[${e.response.max}]`.length));
 
-		let emitStatisticsLog = "Emit statistics by endpoint:\n";
+		let emitStatisticsLog = `${header}:\n`;
 		emitStatisticsLog += `${NAME.padEnd(maxNameWidth)} ${PEERS.padEnd(maxPeersWidth)} ${RATE.padEnd(maxRateWidth)} ${AVERAGE.padEnd(maxAverageWidth)} ${MIN.padEnd(maxMinWidth)} ${MAX.padEnd(maxMaxWidth)}`;
 
 		for (const endpointStatistic of endpointStatistics) {
