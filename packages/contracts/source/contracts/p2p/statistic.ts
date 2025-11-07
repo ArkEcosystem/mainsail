@@ -71,28 +71,20 @@ export type EndpointStatistic = {
 	};
 };
 
+export type PeerSectionStatistic = {
+	count: number;
+	success: number;
+	average: number;
+	max: number[];
+	min: number[];
+	endpoints: {
+		name: string;
+		responseTimes: number[];
+	}[];
+}
+
 export type PeerStatistic = {
 	ip: string;
-	emits: {
-		count: number;
-		success: number;
-		average: number;
-		max: number[];
-		min: number[];
-		endpoints: {
-			name: string;
-			responseTimes: number[];
-		}[];
-	};
-	pings: {
-		count: number;
-		success: number;
-		average: number;
-		max: number[];
-		min: number[];
-		endpoints: {
-			name: string;
-			responseTimes: number[];
-		}[];
-	};
+	emits: PeerSectionStatistic;
+	pings: PeerSectionStatistic;
 };

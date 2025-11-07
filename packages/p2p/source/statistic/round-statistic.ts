@@ -187,16 +187,11 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		const ips = new Set<string>([...this.#emitStatisticsByPeer.keys(), ...this.#pingStatisticsByPeer.keys()]);
 
 		for (const ip of ips) {
+			const emits = this.#emitStatisticsByPeer.get(ip) || [];
+
 			const peerStatistic: Contracts.P2P.PeerStatistic = {
-				emits: {
-					average: 0,
-					count: 0,
-					endpoints: [],
-					max: [],
-					min: [],
-					success: 0,
-				},
-				ip: "",
+				emits: this.#calculatePeerSectionStatistic(emits),
+				ip,
 				pings: {
 					average: 0,
 					count: 0,
@@ -207,42 +202,40 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 				},
 			};
 
-			peerStatistic.ip = ip;
-
-			const emits = this.#emitStatisticsByPeer.get(ip) || [];
-
-			const endpointsMap = new Map<string, { name: string; responseTimes: number[] }>();
-			for (const emit of emits) {
-				if (!endpointsMap.has(emit.endpoint)) {
-					endpointsMap.set(emit.endpoint, { name: emit.endpoint, responseTimes: [] });
-				}
-				endpointsMap.get(emit.endpoint)!.responseTimes.push(emit.responseTime);
-			}
-
-			const emitEndpoints = [...endpointsMap.values()];
-			for (const endpoint of emitEndpoints) {
-				endpoint.responseTimes.sort((a, b) => a - b);
-			}
-
-			peerStatistic.emits = {
-				average: this.#calculateAverageResponseTime(emits),
-				count: emits.length,
-				endpoints: emitEndpoints,
-				max: emits
-					.sort((a, b) => b.responseTime - a.responseTime)
-					.slice(0, MIN_MAX_SLICE)
-					.map((emit) => emit.responseTime),
-				min: emits
-					.sort((a, b) => a.responseTime - b.responseTime)
-					.slice(0, MIN_MAX_SLICE)
-					.map((emit) => emit.responseTime),
-				success: emits.filter((emit) => emit.success).length,
-			};
-
 			statistics.push(peerStatistic);
 		}
 
 		return statistics.sort((a, b) => b.emits.average - a.emits.average);
+	}
+
+	#calculatePeerSectionStatistic(emits: BasicStatistic[]): Contracts.P2P.PeerSectionStatistic {
+		const endpointsMap = new Map<string, { name: string; responseTimes: number[] }>();
+		for (const emit of emits) {
+			if (!endpointsMap.has(emit.endpoint)) {
+				endpointsMap.set(emit.endpoint, { name: emit.endpoint, responseTimes: [] });
+			}
+			endpointsMap.get(emit.endpoint)!.responseTimes.push(emit.responseTime);
+		}
+
+		const emitEndpoints = [...endpointsMap.values()];
+		for (const endpoint of emitEndpoints) {
+			endpoint.responseTimes.sort((a, b) => a - b);
+		}
+
+		return {
+			average: this.#calculateAverageResponseTime(emits),
+			count: emits.length,
+			endpoints: emitEndpoints,
+			max: emits
+				.sort((a, b) => b.responseTime - a.responseTime)
+				.slice(0, MIN_MAX_SLICE)
+				.map((emit) => emit.responseTime),
+			min: emits
+				.sort((a, b) => a.responseTime - b.responseTime)
+				.slice(0, MIN_MAX_SLICE)
+				.map((emit) => emit.responseTime),
+			success: emits.filter((emit) => emit.success).length,
+		};
 	}
 
 	#calculateAverageResponseTime(emits: BasicStatistic[]): number {
