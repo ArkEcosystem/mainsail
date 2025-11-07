@@ -86,4 +86,13 @@ export type PeerStatistic = {
 		name: string;
 		responseTimes: number[];
 	}[];
+	pings: {
+		average: number;
+		max: number[];
+		min: number[];
+	};
+	pingEndpoints: {
+		name: string;
+		responseTimes: number[];
+	}[];
 };

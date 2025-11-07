@@ -184,38 +184,62 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	public getPeerStatistics(): Contracts.P2P.PeerStatistic[] {
 		const statistics: Contracts.P2P.PeerStatistic[] = [];
 
-		for (const [ip, entry] of this.#emitStatisticsByPeer.entries()) {
-			const count = {
-				emits: entry.length,
-				success: entry.filter((emit) => emit.success).length,
-			};
+		const peerStatistic: Contracts.P2P.PeerStatistic = {
+			count: {
+				emits: 0,
+				success: 0,
+			},
+			emitEndpoints: [],
+			emits: {
+				average: 0,
+				max: [],
+				min: [],
+			},
+			ip: "",
+			pingEndpoints: [],
+			pings: {
+				average: 0,
+				max: [],
+				min: [],
+			},
+		};
 
-			const emits = {
-				average: this.#calculateAverageResponseTime(entry),
-				max: entry
+		const ips = new Set<string>([...this.#emitStatisticsByPeer.keys(), ...this.#pingStatisticsByPeer.keys()]);
+
+		for (const ip of ips) {
+			peerStatistic.ip = ip;
+
+			const emits = this.#emitStatisticsByPeer.get(ip) || [];
+
+			peerStatistic.count.emits = emits.length;
+			peerStatistic.count.success = emits.filter((emit) => emit.success).length;
+
+			peerStatistic.emits = {
+				average: this.#calculateAverageResponseTime(emits),
+				max: emits
 					.sort((a, b) => b.responseTime - a.responseTime)
 					.slice(0, MIN_MAX_SLICE)
 					.map((emit) => emit.responseTime),
-				min: entry
+				min: emits
 					.sort((a, b) => a.responseTime - b.responseTime)
 					.slice(0, MIN_MAX_SLICE)
 					.map((emit) => emit.responseTime),
 			};
 
 			const endpointsMap = new Map<string, { name: string; responseTimes: number[] }>();
-			for (const emit of entry) {
+			for (const emit of emits) {
 				if (!endpointsMap.has(emit.endpoint)) {
 					endpointsMap.set(emit.endpoint, { name: emit.endpoint, responseTimes: [] });
 				}
 				endpointsMap.get(emit.endpoint)!.responseTimes.push(emit.responseTime);
 			}
 
-			const emitEndpoints: { name: string; responseTimes: number[] }[] = [...endpointsMap.values()];
-			for (const endpoint of emitEndpoints) {
+			peerStatistic.emitEndpoints = [...endpointsMap.values()];
+			for (const endpoint of peerStatistic.emitEndpoints) {
 				endpoint.responseTimes.sort((a, b) => a - b);
 			}
 
-			statistics.push({ count, emitEndpoints, emits: emits, ip });
+			statistics.push(peerStatistic);
 		}
 
 		return statistics.sort((a, b) => b.emits.average - a.emits.average);
