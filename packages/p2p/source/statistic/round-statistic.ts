@@ -184,29 +184,29 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	public getPeerStatistics(): Contracts.P2P.PeerStatistic[] {
 		const statistics: Contracts.P2P.PeerStatistic[] = [];
 
-		const peerStatistic: Contracts.P2P.PeerStatistic = {
-			emits: {
-				average: 0,
-				count: 0,
-				endpoints: [],
-				max: [],
-				min: [],
-				success: 0,
-			},
-			ip: "",
-			pings: {
-				average: 0,
-				count: 0,
-				endpoints: [],
-				max: [],
-				min: [],
-				success: 0,
-			},
-		};
-
 		const ips = new Set<string>([...this.#emitStatisticsByPeer.keys(), ...this.#pingStatisticsByPeer.keys()]);
 
 		for (const ip of ips) {
+			const peerStatistic: Contracts.P2P.PeerStatistic = {
+				emits: {
+					average: 0,
+					count: 0,
+					endpoints: [],
+					max: [],
+					min: [],
+					success: 0,
+				},
+				ip: "",
+				pings: {
+					average: 0,
+					count: 0,
+					endpoints: [],
+					max: [],
+					min: [],
+					success: 0,
+				},
+			};
+
 			peerStatistic.ip = ip;
 
 			const emits = this.#emitStatisticsByPeer.get(ip) || [];
