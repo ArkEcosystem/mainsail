@@ -20,7 +20,7 @@ export class StatisticPlugin {
 		server.ext({
 			method: async (request, h) => {
 				const duration = Math.round(performance.now() - request.start);
-				this.statisticService.getCurrentRoundStatistic().addPing(request.info.remoteAddress, request.path, {
+				this.statisticService.getCurrentRoundStatistic().addPing(request.info.remoteAddress, request.path.slice(1), {
 					responseTime: duration,
 					success: !request.response.isBoom,
 				});

@@ -146,22 +146,33 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 			log += `\n${ip.padEnd(maxIpWidth)} ${successEmits.padEnd(maxSuccessEmitsWidth)} ${average.padEnd(maxAverageWidth)} ${min.padEnd(maxMinWidth)} ${max.padEnd(maxMaxWidth)}`;
 
-			this.#addEndpointResponseTimes(log, peerStatistic);
+			log += this.#getEndpointResponseTimes(peerStatistic);
 		}
 
 		this.logger.info(log, "p2p");
 	}
 
-	#addEndpointResponseTimes(log: string, peerStatistic: Contracts.P2P.PeerStatistic): void {
+	#getEndpointResponseTimes(peerStatistic: Contracts.P2P.PeerStatistic): string {
+		let log = "";
+
 		// Level 3: Emit endpoints response times
 		if (this.#verbosityLevel >= 3) {
 			for (const endpoint of peerStatistic.emits.endpoints) {
-				log += `\nE: ${endpoint.name}: [${endpoint.responseTimes}]`;
+				const endpointName = `${endpoint.name}:`.padEnd(14);
+				log += `\nE: ${endpointName} [${endpoint.responseTimes}]`;
 			}
+
+			if (peerStatistic.emits.endpoints.length > 0) {
+				log += "\n";
+			}
+
 			for (const endpoint of peerStatistic.pings.endpoints) {
-				log += `\nP: ${endpoint.name}: [${endpoint.responseTimes}]`;
+				const endpointName = `${endpoint.name}:`.padEnd(14);
+				log += `\nP: ${endpointName} [${endpoint.responseTimes}]`;
 			}
 			log += "\n";
 		}
+
+		return log;
 	}
 }
