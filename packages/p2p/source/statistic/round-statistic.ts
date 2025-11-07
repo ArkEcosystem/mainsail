@@ -188,29 +188,21 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 
 		for (const ip of ips) {
 			const emits = this.#emitStatisticsByPeer.get(ip) || [];
+			const pings = this.#pingStatisticsByPeer.get(ip) || [];
 
-			const peerStatistic: Contracts.P2P.PeerStatistic = {
+			statistics.push({
 				emits: this.#calculatePeerSectionStatistic(emits),
 				ip,
-				pings: {
-					average: 0,
-					count: 0,
-					endpoints: [],
-					max: [],
-					min: [],
-					success: 0,
-				},
-			};
-
-			statistics.push(peerStatistic);
+				pings: this.#calculatePeerSectionStatistic(pings),
+			});
 		}
 
 		return statistics.sort((a, b) => b.emits.average - a.emits.average);
 	}
 
-	#calculatePeerSectionStatistic(emits: BasicStatistic[]): Contracts.P2P.PeerSectionStatistic {
+	#calculatePeerSectionStatistic(items: BasicStatistic[]): Contracts.P2P.PeerSectionStatistic {
 		const endpointsMap = new Map<string, { name: string; responseTimes: number[] }>();
-		for (const emit of emits) {
+		for (const emit of items) {
 			if (!endpointsMap.has(emit.endpoint)) {
 				endpointsMap.set(emit.endpoint, { name: emit.endpoint, responseTimes: [] });
 			}
@@ -223,27 +215,27 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 		}
 
 		return {
-			average: this.#calculateAverageResponseTime(emits),
-			count: emits.length,
-			endpoints: emitEndpoints,
-			max: emits
+			average: this.#calculateAverageResponseTime(items),
+			count: items.length,
+			endpoints: emitEndpoints.sort((a, b) => b.responseTimes.length - a.responseTimes.length),
+			max: items
 				.sort((a, b) => b.responseTime - a.responseTime)
 				.slice(0, MIN_MAX_SLICE)
 				.map((emit) => emit.responseTime),
-			min: emits
+			min: items
 				.sort((a, b) => a.responseTime - b.responseTime)
 				.slice(0, MIN_MAX_SLICE)
 				.map((emit) => emit.responseTime),
-			success: emits.filter((emit) => emit.success).length,
+			success: items.filter((emit) => emit.success).length,
 		};
 	}
 
-	#calculateAverageResponseTime(emits: BasicStatistic[]): number {
-		if (emits.length === 0) {
+	#calculateAverageResponseTime(items: BasicStatistic[]): number {
+		if (items.length === 0) {
 			return 0;
 		}
 
-		const totalResponseTime = emits.reduce((sum, emit) => sum + emit.responseTime, 0);
-		return Math.round(totalResponseTime / emits.length);
+		const totalResponseTime = items.reduce((sum, emit) => sum + emit.responseTime, 0);
+		return Math.round(totalResponseTime / items.length);
 	}
 }

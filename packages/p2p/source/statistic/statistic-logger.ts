@@ -148,9 +148,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 			// Level 3: Emit endpoints response times
 			if (this.#verbosityLevel >= 3) {
-				for (const endpoint of peerStatistic.emits.endpoints.sort(
-					(a, b) => b.responseTimes.length - a.responseTimes.length,
-				)) {
+				for (const endpoint of peerStatistic.emits.endpoints) {
 					peerStatisticsLog += `\n${endpoint.name}: [${endpoint.responseTimes}]`;
 				}
 				peerStatisticsLog += "\n";
