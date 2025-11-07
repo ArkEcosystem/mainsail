@@ -542,7 +542,7 @@ jobs:
             group: ${{ github.head_ref }}-e2e-${{ matrix.name }}
         runs-on: ubuntu-latest
 
-        timeout-minutes: 30
+        timeout-minutes: 15
 
         strategy:
             matrix:
