@@ -103,38 +103,70 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		generalStatistic: Contracts.P2P.GeneralStatistic,
 		peerStatistics: Contracts.P2P.PeerStatistic[],
 	): void {
+		// Calculate padding lengths
 		const IP = "ip";
-		const RATE = "rate";
+		const EMITS = "emits";
+		const PINGS = "pings";
 		const AVERAGE = "average";
 		const MIN = "min";
 		const MAX = "max";
 
-		const maxIpWidth = Math.max(IP.length, ...peerStatistics.map((p) => p.ip.length));
-		const maxSuccessEmitsWidth = Math.max(
-			RATE.length,
-			...peerStatistics.map((p) => `${p.emits.success}/${p.emits.count}`.length),
-		);
-		const maxAverageWidth = Math.max(
-			AVERAGE.length,
-			...peerStatistics.map((p) => p.emits.average.toString().length),
-		);
-		const maxMinWidth = Math.max(MIN.length, ...peerStatistics.map((p) => `[${p.emits.min}]`.length));
-		const maxMaxWidth = Math.max(MAX.length, ...peerStatistics.map((p) => `[${p.emits.max}]`.length));
+		const ipPad = Math.max(IP.length, ...peerStatistics.map((p) => p.ip.length));
 
+		const emitsPad = {
+			average: Math.max(
+				AVERAGE.length,
+				...peerStatistics.map((p) => p.emits.average.toString().length),
+			),
+			emits: Math.max(
+				EMITS.length,
+				...peerStatistics.map((p) => `${p.emits.success}/${p.emits.count}`.length),
+			),
+			max: Math.max(MAX.length, ...peerStatistics.map((p) => `[${p.emits.max}]`.length)),
+			min: Math.max(MIN.length, ...peerStatistics.map((p) => `[${p.emits.min}]`.length)),
+		};
+
+		const pingPad = {
+			average: Math.max(
+				AVERAGE.length,
+				...peerStatistics.map((p) => p.pings.average.toString().length),
+			),
+			max: Math.max(MAX.length, ...peerStatistics.map((p) => `[${p.pings.max}]`.length)),
+			min: Math.max(MIN.length, ...peerStatistics.map((p) => `[${p.pings.min}]`.length)),
+			pings: Math.max(
+				PINGS.length,
+				...peerStatistics.map((p) => `${p.pings.success}/${p.pings.count}`.length),
+			),
+		};
+
+
+
+		// Build log
 		let log = "Statistics by peer:\n";
 
 		log += this.#getPeersReport(generalStatistic);
 
-		log += `${IP.padEnd(maxIpWidth)} ${RATE.padEnd(maxSuccessEmitsWidth)} ${AVERAGE.padEnd(maxAverageWidth)} ${MIN.padEnd(maxMinWidth)} ${MAX.padEnd(maxMaxWidth)}`;
+		log += `${IP.padEnd(ipPad)}`;
+		log += ` ${EMITS.padEnd(emitsPad.emits)} ${AVERAGE.padEnd(emitsPad.average)} ${MIN.padEnd(emitsPad.min)} ${MAX.padEnd(emitsPad.max)}`;
+		log += ` ${PINGS.padEnd(pingPad.pings)} ${AVERAGE.padEnd(pingPad.average)} ${MIN.padEnd(pingPad.min)} ${MAX.padEnd(pingPad.max)}`;
 
 		for (const peerStatistic of peerStatistics) {
 			const ip = peerStatistic.ip;
-			const successEmits = `${peerStatistic.emits.success}/${peerStatistic.emits.count}`;
-			const average = peerStatistic.emits.average.toString();
-			const min = `[${peerStatistic.emits.min}]`;
-			const max = `[${peerStatistic.emits.max}]`;
 
-			log += `\n${ip.padEnd(maxIpWidth)} ${successEmits.padEnd(maxSuccessEmitsWidth)} ${average.padEnd(maxAverageWidth)} ${min.padEnd(maxMinWidth)} ${max.padEnd(maxMaxWidth)}`;
+			const successEmits = `${peerStatistic.emits.success}/${peerStatistic.emits.count}`;
+			const averageEmits = peerStatistic.emits.average.toString();
+			const minEmits = `[${peerStatistic.emits.min}]`;
+			const maxEmits = `[${peerStatistic.emits.max}]`;
+
+			const successPings = `${peerStatistic.pings.success}/${peerStatistic.pings.count}`;
+			const averagePings = peerStatistic.pings.average.toString();
+			const minPings = `[${peerStatistic.pings.min}]`;
+			const maxPings = `[${peerStatistic.pings.max}]`;
+
+			log += `\n${ip.padEnd(ipPad)}`;
+			log += ` ${successEmits.padEnd(emitsPad.emits)} ${averageEmits.padEnd(emitsPad.average)} ${minEmits.padEnd(emitsPad.min)} ${maxEmits.padEnd(emitsPad.max)}`;
+			log += ` ${successPings.padEnd(pingPad.pings)} ${averagePings.padEnd(pingPad.average)} ${minPings.padEnd(pingPad.min)} ${maxPings.padEnd(pingPad.max)}`;
+
 
 			log += this.#getEndpointResponseTimes(peerStatistic);
 		}
