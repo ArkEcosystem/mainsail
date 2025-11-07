@@ -1,12 +1,13 @@
 import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { http } from "@mainsail/utils";
-import { createWriteStream, existsSync, writeFileSync } from "fs";
+import { createWriteStream, existsSync, writeFileSync, readFileSync } from "fs";
 import { ensureDirSync, removeSync } from "fs-extra/esm";
 import got from "got";
 import Joi from "joi";
 import { join } from "path";
 import stream from "stream";
+import { fileURLToPath } from "url";
 import { promisify } from "util";
 
 const ENV = `MAINSAIL_LOG_LEVEL=info
@@ -25,6 +26,10 @@ const VALIDATORS = {
 	secrets: [],
 };
 
+const URI_OPTIONS: Joi.UriOptions = {
+	scheme: ["http", "https", "file"],
+};
+
 @injectable()
 export class Command extends Commands.Command {
 	@inject(Identifiers.Environment)
@@ -37,9 +42,9 @@ export class Command extends Commands.Command {
 	@postConstruct()
 	public configure(): void {
 		this.definition
-			.setFlag("app", "The link to the app.json file.", Joi.string().uri())
-			.setFlag("peers", "The link to the peers.json file.", Joi.string().uri())
-			.setFlag("crypto", "The link to the app.json file.", Joi.string().uri())
+			.setFlag("app", "The link to the app.json file.", Joi.string().uri(URI_OPTIONS))
+			.setFlag("peers", "The link to the peers.json file.", Joi.string().uri(URI_OPTIONS))
+			.setFlag("crypto", "The link to the app.json file.", Joi.string().uri(URI_OPTIONS))
 			.setFlag("snapshot", "The link to the <snapshot>.compressed file.", Joi.string().uri())
 			.setFlag("reset", "Using the --reset flag will remove existing configuration.", Joi.boolean())
 			.setFlag("overwrite", "Using the --overwrite will overwrite existing configuration.", Joi.boolean());
@@ -178,6 +183,11 @@ export class Command extends Commands.Command {
 
 	async #getFile(url: string): Promise<string> {
 		try {
+			if (url.startsWith("file://")) {
+				const data = readFileSync(fileURLToPath(url), "utf8");
+				return data;
+			}
+
 			const { data } = await http.get(url);
 			return data;
 		} catch (error) {
