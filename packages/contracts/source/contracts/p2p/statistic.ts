@@ -77,12 +77,12 @@ export type PeerStatistic = {
 		success: number;
 		emits: number;
 	};
-	response: {
+	emits: {
 		average: number;
 		max: number[];
 		min: number[];
 	};
-	endpoints: {
+	emitEndpoints: {
 		name: string;
 		responseTimes: number[];
 	}[];

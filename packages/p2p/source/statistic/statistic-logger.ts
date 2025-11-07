@@ -116,10 +116,10 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		);
 		const maxAverageWidth = Math.max(
 			AVERAGE.length,
-			...peerStatistics.map((p) => p.response.average.toString().length),
+			...peerStatistics.map((p) => p.emits.average.toString().length),
 		);
-		const maxMinWidth = Math.max(MIN.length, ...peerStatistics.map((p) => `[${p.response.min}]`.length));
-		const maxMaxWidth = Math.max(MAX.length, ...peerStatistics.map((p) => `[${p.response.max}]`.length));
+		const maxMinWidth = Math.max(MIN.length, ...peerStatistics.map((p) => `[${p.emits.min}]`.length));
+		const maxMaxWidth = Math.max(MAX.length, ...peerStatistics.map((p) => `[${p.emits.max}]`.length));
 
 		let peerStatisticsLog = "Statistics by peer:\n";
 
@@ -140,15 +140,15 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		for (const peerStatistic of peerStatistics) {
 			const ip = peerStatistic.ip;
 			const successEmits = `${peerStatistic.count.success}/${peerStatistic.count.emits}`;
-			const average = peerStatistic.response.average.toString();
-			const min = `[${peerStatistic.response.min}]`;
-			const max = `[${peerStatistic.response.max}]`;
+			const average = peerStatistic.emits.average.toString();
+			const min = `[${peerStatistic.emits.min}]`;
+			const max = `[${peerStatistic.emits.max}]`;
 
 			peerStatisticsLog += `\n${ip.padEnd(maxIpWidth)} ${successEmits.padEnd(maxSuccessEmitsWidth)} ${average.padEnd(maxAverageWidth)} ${min.padEnd(maxMinWidth)} ${max.padEnd(maxMaxWidth)}`;
 
-			// Level 3: Endpoint response times
+			// Level 3: Emit endpoints response times
 			if (this.#verbosityLevel >= 3) {
-				for (const endpoint of peerStatistic.endpoints.sort(
+				for (const endpoint of peerStatistic.emitEndpoints.sort(
 					(a, b) => b.responseTimes.length - a.responseTimes.length,
 				)) {
 					peerStatisticsLog += `\n${endpoint.name}: [${endpoint.responseTimes}]`;

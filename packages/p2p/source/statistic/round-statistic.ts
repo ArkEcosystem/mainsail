@@ -184,41 +184,41 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	public getPeerStatistics(): Contracts.P2P.PeerStatistic[] {
 		const statistics: Contracts.P2P.PeerStatistic[] = [];
 
-		for (const [ip, emits] of this.#emitStatisticsByPeer.entries()) {
+		for (const [ip, entry] of this.#emitStatisticsByPeer.entries()) {
 			const count = {
-				emits: emits.length,
-				success: emits.filter((emit) => emit.success).length,
+				emits: entry.length,
+				success: entry.filter((emit) => emit.success).length,
 			};
 
-			const response = {
-				average: this.#calculateAverageResponseTime(emits),
-				max: emits
+			const emits = {
+				average: this.#calculateAverageResponseTime(entry),
+				max: entry
 					.sort((a, b) => b.responseTime - a.responseTime)
 					.slice(0, MIN_MAX_SLICE)
 					.map((emit) => emit.responseTime),
-				min: emits
+				min: entry
 					.sort((a, b) => a.responseTime - b.responseTime)
 					.slice(0, MIN_MAX_SLICE)
 					.map((emit) => emit.responseTime),
 			};
 
 			const endpointsMap = new Map<string, { name: string; responseTimes: number[] }>();
-			for (const emit of emits) {
+			for (const emit of entry) {
 				if (!endpointsMap.has(emit.endpoint)) {
 					endpointsMap.set(emit.endpoint, { name: emit.endpoint, responseTimes: [] });
 				}
 				endpointsMap.get(emit.endpoint)!.responseTimes.push(emit.responseTime);
 			}
 
-			const endpoints: { name: string; responseTimes: number[] }[] = [...endpointsMap.values()];
-			for (const endpoint of endpoints) {
+			const emitEndpoints: { name: string; responseTimes: number[] }[] = [...endpointsMap.values()];
+			for (const endpoint of emitEndpoints) {
 				endpoint.responseTimes.sort((a, b) => a - b);
 			}
 
-			statistics.push({ count, endpoints, ip, response });
+			statistics.push({ count, emitEndpoints, emits: emits, ip });
 		}
 
-		return statistics.sort((a, b) => b.response.average - a.response.average);
+		return statistics.sort((a, b) => b.emits.average - a.emits.average);
 	}
 
 	#calculateAverageResponseTime(emits: BasicStatistic[]): number {
