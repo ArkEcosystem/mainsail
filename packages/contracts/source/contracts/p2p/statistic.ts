@@ -2,6 +2,7 @@ export interface StatisticService {
 	boot(): void;
 	newRound(height: number, round: number): void;
 	getCurrentRoundStatistic(): RoundStatistic;
+	getRoundStatisticList(): string[];
 }
 
 export interface RoundStatistic {
