@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { ServiceProviderCannotBeBooted } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
 import { ServiceProviderRepository } from "../providers/index.js";
@@ -35,7 +35,7 @@ export class BootServiceProviders implements Contracts.Kernel.Bootstrapper {
 					const isRequired: boolean = await serviceProvider.required();
 
 					if (isRequired) {
-						throw new Exceptions.ServiceProviderCannotBeBooted(serviceProviderName, error.message);
+						throw new ServiceProviderCannotBeBooted(serviceProviderName, error.message);
 					} else {
 						this.logger.warn(`${name}: ${error.stack}`);
 					}

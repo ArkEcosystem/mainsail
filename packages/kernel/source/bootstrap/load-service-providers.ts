@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { ServiceNotFound } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 import path from "path";
 import { URL } from "url";
@@ -80,7 +80,7 @@ export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 			}
 
 			if (!ServiceProvider) {
-				throw new Exceptions.ServiceNotFound(packageId);
+				throw new ServiceNotFound(packageId);
 			}
 
 			const serviceProvider: ServiceProvider = this.app.resolve(ServiceProvider);

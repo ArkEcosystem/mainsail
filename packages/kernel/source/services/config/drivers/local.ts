@@ -1,6 +1,10 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import {
+	ApplicationConfigurationCannotBeLoaded,
+	EnvironmentConfigurationCannotBeLoaded,
+	FileException,
+} from "@mainsail/exceptions";
 import { assert, dotenv, get, set } from "@mainsail/utils";
 import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
@@ -33,7 +37,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 				}
 			}
 		} catch (error) {
-			throw new Exceptions.EnvironmentConfigurationCannotBeLoaded(error.message);
+			throw new EnvironmentConfigurationCannotBeLoaded(error.message);
 		}
 	}
 
@@ -47,7 +51,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 			this.#loadCryptography();
 		} catch (error) {
-			throw new Exceptions.ApplicationConfigurationCannotBeLoaded(error.message);
+			throw new ApplicationConfigurationCannotBeLoaded(error.message);
 		}
 	}
 
@@ -161,7 +165,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 			}
 		}
 
-		throw new Exceptions.FileException(`Failed to discovery any files matching [${files.join(", ")}].`);
+		throw new FileException(`Failed to discovery any files matching [${files.join(", ")}].`);
 	}
 
 	#skipFileIfNotExists(filename: string, alwaysOptional = false): boolean {

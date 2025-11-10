@@ -1,4 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
+
 import { Exception } from "./base.js";
 
 export class PoolError extends Exception {

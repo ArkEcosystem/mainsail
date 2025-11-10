@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { NotImplemented } from "@mainsail/exceptions";
 
 @injectable()
 export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T> {
@@ -70,11 +70,11 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	}
 
 	public async forever(key: K, value: T): Promise<boolean> {
-		throw new Exceptions.NotImplemented(this.constructor.name, "forever");
+		throw new NotImplemented(this.constructor.name, "forever");
 	}
 
 	public async foreverMany(values: Array<[K, T]>): Promise<boolean[]> {
-		throw new Exceptions.NotImplemented(this.constructor.name, "foreverMany");
+		throw new NotImplemented(this.constructor.name, "foreverMany");
 	}
 
 	public async forget(key: K): Promise<boolean> {
@@ -98,6 +98,6 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	}
 
 	public async getPrefix(): Promise<string> {
-		throw new Exceptions.NotImplemented(this.constructor.name, "getPrefix");
+		throw new NotImplemented(this.constructor.name, "getPrefix");
 	}
 }

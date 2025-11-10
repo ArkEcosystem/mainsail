@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { RpcError } from "@mainsail/exceptions";
 
 @injectable()
 export class EthGetUncleByBlockHashAndIndex implements Contracts.Api.RPC.Action {
@@ -20,7 +20,7 @@ export class EthGetUncleByBlockHashAndIndex implements Contracts.Api.RPC.Action 
 
 	public async handle(parameters: [string]): Promise<null> {
 		if (!(await this.databaseService.hasCommitByHash(parameters[0].slice(2)))) {
-			throw new Exceptions.RpcError("Block not found");
+			throw new RpcError("Block not found");
 		}
 
 		// eslint-disable-next-line unicorn/no-null

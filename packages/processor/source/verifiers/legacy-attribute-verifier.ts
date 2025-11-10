@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { UnexpectedLegacySecondSignatureError } from "@mainsail/exceptions";
 
 @injectable()
 export class LegacyAttributeVerifier implements Contracts.Processor.Handler {
@@ -24,7 +24,7 @@ export class LegacyAttributeVerifier implements Contracts.Processor.Handler {
 
 			if (!legacyAttributes?.secondPublicKey) {
 				if (legacySecondSignature) {
-					throw new Exceptions.UnexpectedLegacySecondSignatureError();
+					throw new UnexpectedLegacySecondSignatureError();
 				}
 
 				continue;

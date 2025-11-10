@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { InvalidMultiSignatureAssetError, NotImplemented, PublicKeyError } from "@mainsail/exceptions";
 import { numberToHex } from "@mainsail/utils";
 import { secp256k1 } from "bcrypto";
 
@@ -22,12 +22,12 @@ export class PublicKeyFactory implements Contracts.Crypto.PublicKeyFactory {
 
 		for (const publicKey of publicKeys) {
 			if (!this.verify(publicKey)) {
-				throw new Exceptions.PublicKeyError(publicKey);
+				throw new PublicKeyError(publicKey);
 			}
 		}
 
 		if (min < 1 || min > publicKeys.length) {
-			throw new Exceptions.InvalidMultiSignatureAssetError();
+			throw new InvalidMultiSignatureAssetError();
 		}
 
 		const minKey: string = await this.fromMnemonic(numberToHex(min));
@@ -43,6 +43,6 @@ export class PublicKeyFactory implements Contracts.Crypto.PublicKeyFactory {
 	}
 
 	public async aggregate(publicKeys: Buffer[]): Promise<string> {
-		throw new Exceptions.NotImplemented(this.constructor.name, "aggregate");
+		throw new NotImplemented(this.constructor.name, "aggregate");
 	}
 }

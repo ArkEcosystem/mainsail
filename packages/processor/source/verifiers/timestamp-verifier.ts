@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { FutureBlock, InvalidTimestamp } from "@mainsail/exceptions";
 import dayjs from "dayjs";
 
 @injectable()
@@ -23,14 +23,14 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 		}
 
 		if (unit.getBlock().data.timestamp > dayjs().valueOf() + this.configuration.getMilestone().timeouts.tolerance) {
-			throw new Exceptions.FutureBlock(unit.getBlock());
+			throw new FutureBlock(unit.getBlock());
 		}
 
 		if (
 			unit.getBlock().data.timestamp <
 			this.timestampCalculator.calculateMinimalTimestamp(this.store.getLastBlock(), unit.getBlock().data.round)
 		) {
-			throw new Exceptions.InvalidTimestamp(unit.getBlock());
+			throw new InvalidTimestamp(unit.getBlock());
 		}
 	}
 }

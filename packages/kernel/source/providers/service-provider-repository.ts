@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { InvalidArgumentException } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
 import { ServiceProvider } from "./service-provider.js";
@@ -46,11 +46,11 @@ export class ServiceProviderRepository {
 
 	public alias(name: string, alias: string): void {
 		if (this.#aliases.has(alias)) {
-			throw new Exceptions.InvalidArgumentException(`The alias [${alias}] is already in use.`);
+			throw new InvalidArgumentException(`The alias [${alias}] is already in use.`);
 		}
 
 		if (!this.#serviceProviders.has(name)) {
-			throw new Exceptions.InvalidArgumentException(`The service provider [${name}] is unknown.`);
+			throw new InvalidArgumentException(`The service provider [${name}] is unknown.`);
 		}
 
 		this.#aliases.set(alias, name);

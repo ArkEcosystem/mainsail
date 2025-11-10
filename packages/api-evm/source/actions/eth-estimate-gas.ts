@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { RpcError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -98,12 +98,12 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 		// Execute with max allowed gas limit
 		let { success, receipt, executionError } = await this.#execute(context);
 		if (executionError) {
-			throw new Exceptions.RpcError(`execution reverted: ${executionError}`);
+			throw new RpcError(`execution reverted: ${executionError}`);
 		}
 
 		// First execution failed, so no point in trying further
 		if (!success) {
-			throw new Exceptions.RpcError("execution reverted");
+			throw new RpcError("execution reverted");
 		}
 
 		assert.defined(receipt);
@@ -121,7 +121,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 			if (executionError) {
 				// This should not happen under normal conditions since if we make it this far the
 				// transaction had run without error at least once before.
-				throw new Exceptions.RpcError(`execution reverted: ${executionError}`);
+				throw new RpcError(`execution reverted: ${executionError}`);
 			}
 
 			if (success) {
@@ -150,7 +150,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 
 			({ success, executionError } = await this.#execute({ ...context, gasLimit: midGasLimit }));
 			if (executionError) {
-				throw new Exceptions.RpcError(`execution reverted: ${executionError}`);
+				throw new RpcError(`execution reverted: ${executionError}`);
 			}
 
 			if (success) {

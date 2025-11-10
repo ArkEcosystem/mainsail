@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { NotImplemented } from "@mainsail/exceptions";
 
 @injectable()
 export class PublicKeyFactory implements Contracts.Crypto.PublicKeyFactory {
@@ -16,14 +16,14 @@ export class PublicKeyFactory implements Contracts.Crypto.PublicKeyFactory {
 	}
 
 	public async fromMultiSignatureAsset(asset: Contracts.Crypto.MultiSignatureAsset): Promise<string> {
-		throw new Exceptions.NotImplemented(this.constructor.name, "fromMultiSignatureAsset");
+		throw new NotImplemented(this.constructor.name, "fromMultiSignatureAsset");
 	}
 
 	public async verify(publicKey: string): Promise<boolean> {
-		throw new Exceptions.NotImplemented(this.constructor.name, "verify");
+		throw new NotImplemented(this.constructor.name, "verify");
 	}
 
 	public async aggregate(publicKeys: Buffer[]): Promise<string> {
-		throw new Exceptions.NotImplemented(this.constructor.name, "aggregate");
+		throw new NotImplemented(this.constructor.name, "aggregate");
 	}
 }

@@ -196,7 +196,7 @@ jobs:
             - name: Test evm-state
               run: cd packages/evm-state && pnpm run test:coverage
             - name: Test exceptions
-              run: cd packages/exceptions && pnpm run test:coverage              
+              run: cd packages/exceptions && pnpm run test:coverage
             - name: Test kernel
               run: cd packages/kernel && pnpm run test:coverage
             - name: Test logger-pino

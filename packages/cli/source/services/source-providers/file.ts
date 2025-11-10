@@ -1,4 +1,4 @@
-import * as Exceptions from "@mainsail/exceptions";
+import { MissingPackageFolder } from "@mainsail/exceptions";
 import { existsSync } from "fs";
 import { extract } from "tar";
 
@@ -27,7 +27,7 @@ export class File extends AbstractSource {
 		);
 
 		if (!existsSync(this.getOriginPath())) {
-			throw new Exceptions.MissingPackageFolder();
+			throw new MissingPackageFolder();
 		}
 	}
 }

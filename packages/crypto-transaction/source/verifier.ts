@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { InvalidLegacySecondSignatureError, MissingLegacySecondSignatureError } from "@mainsail/exceptions";
 
 import { schemas } from "./validation/schemas.js";
 
@@ -45,7 +45,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 		const { legacySecondSignature } = data;
 
 		if (!legacySecondSignature) {
-			throw new Exceptions.MissingLegacySecondSignatureError();
+			throw new MissingLegacySecondSignatureError();
 		}
 
 		const r = legacySecondSignature.slice(0, 64);
@@ -63,7 +63,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 		);
 
 		if (!verified) {
-			throw new Exceptions.InvalidLegacySecondSignatureError();
+			throw new InvalidLegacySecondSignatureError();
 		}
 
 		return true;

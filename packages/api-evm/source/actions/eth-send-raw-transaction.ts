@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { RpcError } from "@mainsail/exceptions";
 import { Environment } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
 
@@ -30,12 +30,12 @@ export class EthSendRawTransactionAction implements Contracts.Api.RPC.Action {
 				const tx = await this.transactionFactory.fromHex(parameters[0].slice(2));
 				return `0x${tx.hash}`;
 			} else {
-				throw new Exceptions.RpcError(response.data.errors[0].message);
+				throw new RpcError(response.data.errors[0].message);
 			}
 		}
 
 		// TODO Improve error handling
-		throw new Exceptions.RpcError("Error sending transaction");
+		throw new RpcError("Error sending transaction");
 	}
 
 	#getUrl(): string {

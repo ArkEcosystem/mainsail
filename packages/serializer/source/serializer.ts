@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { NotImplemented } from "@mainsail/exceptions";
 import { assert, BigNumber, ByteBuffer, validatorSetPack, validatorSetUnpack } from "@mainsail/utils";
 
 @injectable()
@@ -140,7 +140,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 				continue;
 			}
 
-			throw new Exceptions.NotImplemented(this.constructor.name, schema.type);
+			throw new NotImplemented(this.constructor.name, schema.type);
 		}
 
 		return result.toBuffer();
@@ -247,7 +247,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 				continue;
 			}
 
-			throw new Exceptions.NotImplemented(this.constructor.name, schema.type);
+			throw new NotImplemented(this.constructor.name, schema.type);
 		}
 
 		return target;

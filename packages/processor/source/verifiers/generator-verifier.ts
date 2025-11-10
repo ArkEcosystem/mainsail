@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { InvalidGenerator } from "@mainsail/exceptions";
 
 @injectable()
 export class GeneratorVerifier implements Contracts.Processor.Handler {
@@ -25,7 +25,7 @@ export class GeneratorVerifier implements Contracts.Processor.Handler {
 		const validator = this.validatorSet.getValidator(validatorIndex);
 
 		if (unit.getBlock().data.proposer !== validator.address) {
-			throw new Exceptions.InvalidGenerator(unit.getBlock(), validator.address);
+			throw new InvalidGenerator(unit.getBlock(), validator.address);
 		}
 	}
 }

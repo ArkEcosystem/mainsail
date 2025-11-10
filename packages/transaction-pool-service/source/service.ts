@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Events, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { PoolError, TransactionAlreadyInPoolError, TransactionPoolFullError } from "@mainsail/exceptions";
 import { Providers } from "@mainsail/kernel";
 import { BigNumber, Lock, randomNumber } from "@mainsail/utils";
 
@@ -93,7 +93,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			}
 
 			if (this.storage.hasTransaction(transaction.hash)) {
-				throw new Exceptions.TransactionAlreadyInPoolError(transaction);
+				throw new TransactionAlreadyInPoolError(transaction);
 			}
 
 			this.storage.addTransaction({
@@ -115,9 +115,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 				void this.events.dispatch(Events.TransactionEvent.RejectedByPool, transaction.data);
 
-				throw error instanceof Exceptions.PoolError
-					? error
-					: new Exceptions.PoolError(error.message, "ERR_OTHER");
+				throw error instanceof PoolError ? error : new PoolError(error.message, "ERR_OTHER");
 			}
 		});
 	}
@@ -250,7 +248,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		if (this.getPoolSize() >= maxTransactionsInPool) {
 			const lowest = await this.poolQuery.getFromLowestPriority().first();
 			if (BigNumber.make(transaction.data.gasPrice).isLessThanEqual(lowest.data.gasPrice)) {
-				throw new Exceptions.TransactionPoolFullError(transaction, lowest.data.gasPrice);
+				throw new TransactionPoolFullError(transaction, lowest.data.gasPrice);
 			}
 
 			await this.#removeLowestPriorityTransaction();

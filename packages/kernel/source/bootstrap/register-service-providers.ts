@@ -1,6 +1,12 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import {
+	DependencyVersionOutOfRange,
+	InvalidPluginConfiguration,
+	OptionalDependencyCannotBeFound,
+	RequiredDependencyCannotBeFound,
+	ServiceProviderCannotBeRegistered,
+} from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 import semver from "semver";
 
@@ -42,7 +48,7 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 				const isRequired: boolean = await serviceProvider.required();
 
 				if (isRequired) {
-					throw new Exceptions.ServiceProviderCannotBeRegistered(serviceProviderName, error.message);
+					throw new ServiceProviderCannotBeRegistered(serviceProviderName, error.message);
 				}
 
 				serviceProviders.fail(serviceProviderName);
@@ -65,7 +71,7 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 
 				assert.string(serviceProviderName);
 
-				throw new Exceptions.InvalidPluginConfiguration(serviceProviderName, validator.errors());
+				throw new InvalidPluginConfiguration(serviceProviderName, validator.errors());
 			}
 
 			serviceProvider.setConfig(config.merge(validator.valid() || {}));
@@ -89,13 +95,13 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 			if (!serviceProviders.has(name)) {
 				// The dependency is necessary for this package to function. We'll output an error and terminate the process.
 				if (isRequired) {
-					const error = new Exceptions.RequiredDependencyCannotBeFound(serviceProviderName, name);
+					const error = new RequiredDependencyCannotBeFound(serviceProviderName, name);
 
 					await this.app.terminate(error.message, error);
 				}
 
 				// The dependency is optional for this package to function. We'll only output a warning.
-				const error = new Exceptions.OptionalDependencyCannotBeFound(serviceProviderName, name);
+				const error = new OptionalDependencyCannotBeFound(serviceProviderName, name);
 
 				this.logger.warn(error.message);
 
@@ -110,7 +116,7 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 				assert.string(version);
 
 				if (!semver.satisfies(version, constraint)) {
-					const error = new Exceptions.DependencyVersionOutOfRange(name, constraint, version);
+					const error = new DependencyVersionOutOfRange(name, constraint, version);
 
 					if (isRequired) {
 						await this.app.terminate(error.message, error);

@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import * as Exceptions from "@mainsail/exceptions";
+import { InvalidArgumentException } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
 import { ActionArguments } from "../../types/index.js";
@@ -11,11 +11,11 @@ export class Triggers {
 
 	public bind<T>(name: string, action: Action<T>): Action<T> {
 		if (this.#triggers.has(name)) {
-			throw new Exceptions.InvalidArgumentException(`The given trigger [${name}] is already registered.`);
+			throw new InvalidArgumentException(`The given trigger [${name}] is already registered.`);
 		}
 
 		if (this.#usesReservedBindingName(name)) {
-			throw new Exceptions.InvalidArgumentException(`The given trigger [${name}] is reserved.`);
+			throw new InvalidArgumentException(`The given trigger [${name}] is reserved.`);
 		}
 
 		this.#triggers.set(name, action);
@@ -27,7 +27,7 @@ export class Triggers {
 		const trigger = this.#triggers.get(name);
 
 		if (!trigger) {
-			throw new Exceptions.InvalidArgumentException(`The given trigger [${name}] is not available.`);
+			throw new InvalidArgumentException(`The given trigger [${name}] is not available.`);
 		}
 
 		this.#triggers.delete(name);
@@ -114,7 +114,7 @@ export class Triggers {
 
 	#throwIfActionIsMissing(name: string): void {
 		if (!this.#triggers.has(name)) {
-			throw new Exceptions.InvalidArgumentException(`The given trigger [${name}] is not available.`);
+			throw new InvalidArgumentException(`The given trigger [${name}] is not available.`);
 		}
 	}
 

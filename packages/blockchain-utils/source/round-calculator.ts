@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { InvalidMilestoneConfigurationError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
 export interface MilestoneSearchResult {
@@ -64,7 +64,7 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 
 			const spanHeight = nextMilestone.height - milestoneHeight - 1;
 			if (milestoneHeight > genesisHeight && spanHeight % roundValidators !== 0) {
-				throw new Exceptions.InvalidMilestoneConfigurationError(
+				throw new InvalidMilestoneConfigurationError(
 					`Bad milestone at height: ${height}. The number of validators can only be changed at the beginning of a new round.`,
 				);
 			}

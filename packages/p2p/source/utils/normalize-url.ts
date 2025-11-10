@@ -1,4 +1,4 @@
-import * as Exceptions from "@mainsail/exceptions";
+import { InvalidApiNodeUrlError } from "@mainsail/exceptions";
 
 export function normalizeUrl(urlString: string) {
 	try {
@@ -14,6 +14,6 @@ export function normalizeUrl(urlString: string) {
 
 		return url.toString();
 	} catch {
-		throw new Exceptions.InvalidApiNodeUrlError(urlString);
+		throw new InvalidApiNodeUrlError(urlString);
 	}
 }

@@ -1,6 +1,6 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
+import { NotImplemented } from "@mainsail/exceptions";
 import { ByteBuffer } from "@mainsail/utils";
 import { schnorr } from "bcrypto";
 
@@ -28,11 +28,11 @@ export class Signature implements Contracts.Crypto.Signature {
 	}
 
 	public async aggregate(signatures: Buffer[]): Promise<string> {
-		throw new Exceptions.NotImplemented(this.constructor.name, "aggregate");
+		throw new NotImplemented(this.constructor.name, "aggregate");
 	}
 
 	public async signRecoverable(message: Buffer, privateKey: Buffer): Promise<Contracts.Crypto.EcdsaSignature> {
-		throw new Exceptions.NotImplemented(this.constructor.name, "signRecoverable");
+		throw new NotImplemented(this.constructor.name, "signRecoverable");
 	}
 
 	public async verifyRecoverable(
@@ -40,10 +40,10 @@ export class Signature implements Contracts.Crypto.Signature {
 		message: Buffer,
 		publicKey: Buffer,
 	): Promise<boolean> {
-		throw new Exceptions.NotImplemented(this.constructor.name, "verifyRecoverable");
+		throw new NotImplemented(this.constructor.name, "verifyRecoverable");
 	}
 
 	public recoverPublicKey(message: Buffer, signature: Contracts.Crypto.EcdsaSignature): string {
-		throw new Exceptions.NotImplemented(this.constructor.name, "recoverPublicKey");
+		throw new NotImplemented(this.constructor.name, "recoverPublicKey");
 	}
 }
