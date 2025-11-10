@@ -1,5 +1,6 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { MissingTransactionSignatureError, ValidationFailed } from "@mainsail/exceptions";
 import { BigNumber } from "@mainsail/utils";
 
 import { TransactionFactory } from "./factory.js";
@@ -133,7 +134,7 @@ export class TransactionBuilder {
 			!this.data.s ||
 			this.data.v === undefined
 		) {
-			throw new Exceptions.MissingTransactionSignatureError();
+			throw new MissingTransactionSignatureError();
 		}
 
 		const struct: Contracts.Crypto.TransactionData = {
@@ -165,7 +166,7 @@ export class TransactionBuilder {
 		const data = this.#getSigningObject();
 		const { error } = await this.verifier.verifySchema(data, false);
 		if (error) {
-			throw new Exceptions.ValidationFailed(error);
+			throw new ValidationFailed(error);
 		}
 
 		const signature = await this.signer.sign(data, keys);
@@ -181,7 +182,7 @@ export class TransactionBuilder {
 		const data = this.#getSigningObject();
 		const { error } = await this.verifier.verifySchema(data, false);
 		if (error) {
-			throw new Exceptions.ValidationFailed(error);
+			throw new ValidationFailed(error);
 		}
 
 		const signature = await this.signer.legacySecondSign(data, keys);

@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { InvalidReward } from "@mainsail/exceptions";
 
 @injectable()
 export class RewardVerifier implements Contracts.Processor.Handler {
@@ -13,7 +14,7 @@ export class RewardVerifier implements Contracts.Processor.Handler {
 		const reward = this.configuration.getMilestone().reward;
 
 		if (!unit.getBlock().data.reward.isEqualTo(reward)) {
-			throw new Exceptions.InvalidReward(unit.getBlock(), reward);
+			throw new InvalidReward(unit.getBlock(), reward);
 		}
 	}
 }

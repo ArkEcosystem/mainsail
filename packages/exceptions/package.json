@@ -1,7 +1,7 @@
 {
-	"name": "@mainsail/crypto-config",
+	"name": "@mainsail/exceptions",
 	"version": "0.0.1-rc.6",
-	"description": "Crypto configuration for the Mainsail blockchain",
+	"description": "Exceptions for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
 	"type": "module",
@@ -21,20 +21,9 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
-		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
-		"@mainsail/exceptions": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"deepmerge": "4.3.1",
-		"lodash.clone": "4.5.0",
-		"lodash.get": "4.4.2",
-		"lodash.set": "4.3.2"
+		"@mainsail/contracts": "workspace:*"
 	},
 	"devDependencies": {
-		"@types/lodash.clone": "4.5.9",
-		"@types/lodash.get": "4.4.9",
-		"@types/lodash.set": "4.3.9",
 		"uvu": "0.5.6"
 	},
 	"engines": {

@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { InvalidTransactionsLength } from "@mainsail/exceptions";
 
 @injectable()
 export class TransactionLengthVerifier implements Contracts.Processor.Handler {
@@ -10,7 +11,7 @@ export class TransactionLengthVerifier implements Contracts.Processor.Handler {
 		const block = unit.getBlock();
 
 		if (block.transactions.length !== block.data.transactionsCount) {
-			throw new Exceptions.InvalidTransactionsLength(block);
+			throw new InvalidTransactionsLength(block);
 		}
 	}
 }

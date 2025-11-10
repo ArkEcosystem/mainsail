@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers, Utils } from "@mainsail/contracts";
+import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
+import { BlockSchemaError } from "@mainsail/exceptions";
 import { BigNumber } from "@mainsail/utils";
 
 import { sealBlock } from "./block.js";
@@ -142,7 +143,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 			}
 
 			if (fatal) {
-				throw new Exceptions.BlockSchemaError(
+				throw new BlockSchemaError(
 					data.number,
 					`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
 						`${error.message}: ${JSON.stringify(error.data)}`,

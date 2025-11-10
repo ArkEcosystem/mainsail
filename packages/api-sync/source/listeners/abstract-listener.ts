@@ -4,7 +4,8 @@ import {
 	TypeOrm,
 } from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { NotImplemented } from "@mainsail/exceptions";
 import { Providers } from "@mainsail/kernel";
 
 import { EventListener } from "../contracts.js";
@@ -92,7 +93,7 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 				break;
 			}
 			default: {
-				throw new Exceptions.NotImplemented("handle", name.toString());
+				throw new NotImplemented("handle", name.toString());
 			}
 		}
 	}

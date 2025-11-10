@@ -1,4 +1,4 @@
-import { Contracts, Exceptions } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { BigNumber } from "@mainsail/utils";
 
 import { describe } from "../../test-framework/source";

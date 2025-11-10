@@ -1,6 +1,7 @@
 import { Container } from "@mainsail/container";
-import { Exceptions, Identifiers } from "@mainsail/contracts";
-import { join, resolve } from "path";
+import { Identifiers } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
+import { join } from "path";
 
 import { describe } from "../../../../../test-framework/source";
 import { Application } from "../../../application";

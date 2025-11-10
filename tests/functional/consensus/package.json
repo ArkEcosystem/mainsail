@@ -37,6 +37,7 @@
 		"@mainsail/database": "workspace:*",
 		"@mainsail/evm-service": "workspace:*",
 		"@mainsail/evm-api-worker": "workspace:*",
+		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/transaction-pool-service": "workspace:*",
 		"@mainsail/crypto-messages": "workspace:*",
