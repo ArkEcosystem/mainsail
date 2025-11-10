@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Constants, Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Constants, Contracts, Events, Identifiers } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { Providers } from "@mainsail/kernel";
 import { BigNumber, Lock, randomNumber } from "@mainsail/utils";
 

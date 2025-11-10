@@ -4,7 +4,8 @@ import {
 	TypeOrm,
 } from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { Providers } from "@mainsail/kernel";
 
 import { EventListener } from "../contracts.js";

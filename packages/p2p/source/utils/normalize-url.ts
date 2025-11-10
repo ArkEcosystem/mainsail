@@ -1,4 +1,4 @@
-import { Exceptions } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 
 export function normalizeUrl(urlString: string) {
 	try {

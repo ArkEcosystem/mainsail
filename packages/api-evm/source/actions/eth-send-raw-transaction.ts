@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Constants, Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { Environment } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
 

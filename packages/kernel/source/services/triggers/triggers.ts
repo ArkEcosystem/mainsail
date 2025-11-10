@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import { Exceptions } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
 import { ActionArguments } from "../../types/index.js";

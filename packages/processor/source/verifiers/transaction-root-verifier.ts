@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 
 @injectable()
 export class TransactionsRootVerifier implements Contracts.Processor.Handler {

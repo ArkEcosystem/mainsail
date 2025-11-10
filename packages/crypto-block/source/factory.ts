@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers, Utils } from "@mainsail/contracts";
+import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { BigNumber } from "@mainsail/utils";
 
 import { sealBlock } from "./block.js";

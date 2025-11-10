@@ -1,4 +1,4 @@
-import { Exceptions } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { execaSync } from "execa";
 import { ensureDirSync, moveSync, readJSONSync, removeSync } from "fs-extra/esm";
 import { join } from "path";

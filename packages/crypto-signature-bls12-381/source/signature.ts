@@ -1,5 +1,6 @@
 import { injectable } from "@mainsail/container";
-import { Contracts, Exceptions } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { getBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ByteBuffer } from "@mainsail/utils";
 

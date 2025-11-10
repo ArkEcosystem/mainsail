@@ -1,5 +1,6 @@
 import { injectable } from "@mainsail/container";
-import { Contracts, Exceptions } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 import deepmerge from "deepmerge";
 import clone from "lodash.clone";

@@ -1,4 +1,4 @@
-import { Exceptions } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { join } from "path";
 import esmock from "esmock";
 import { dirSync, fileSync, setGracefulCleanup } from "tmp";

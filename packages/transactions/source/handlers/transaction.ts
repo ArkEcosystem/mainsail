@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
 @injectable()

@@ -1,5 +1,6 @@
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { assert, BigNumber } from "@mainsail/utils";
 
 import { Transaction } from "./transaction.js";

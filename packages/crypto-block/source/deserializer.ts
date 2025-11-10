@@ -1,6 +1,7 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import { inject, injectable, optional } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers, Utils } from "@mainsail/contracts";
+import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { ByteBuffer, sleep } from "@mainsail/utils";
 
 import { HashFactory } from "./hash.factory.js";

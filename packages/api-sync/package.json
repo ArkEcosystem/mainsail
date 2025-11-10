@@ -26,6 +26,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",
+		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"joi": "18.0.0",

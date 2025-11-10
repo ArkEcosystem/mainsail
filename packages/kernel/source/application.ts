@@ -1,6 +1,7 @@
 import { exit } from "node:process";
 
-import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { join } from "path";
 import { isMainThread } from "worker_threads";
 
