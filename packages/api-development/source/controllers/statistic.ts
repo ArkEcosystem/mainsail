@@ -11,6 +11,17 @@ export class StatisticController extends Controller {
 	private readonly staticService!: Contracts.P2P.StatisticService;
 
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		return this.staticService.getRoundStatisticList().map((id) => {
+			const statistic = this.staticService.getRoundStatistic(id)!;
+			return {
+				round: `${statistic.height}-${statistic.round}`,
+				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+				general: statistic.getGeneralStatistic(),
+			};
+		});
+	}
+
+	public async list(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		return this.staticService.getRoundStatisticList();
 	}
 

@@ -14,6 +14,12 @@ export const register = (server: Hapi.Server<any>): void => {
 	});
 
 	server.route({
+		handler: (request: Hapi.Request) => controller.list(request),
+		method: "GET",
+		path: "/statistic/list",
+	});
+
+	server.route({
 		handler: (request: Hapi.Request) => controller.show(request),
 		method: "GET",
 		options: {
