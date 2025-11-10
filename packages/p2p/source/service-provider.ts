@@ -30,6 +30,17 @@ import { PeerProcessor } from "./peer-processor.js";
 import { PeerRepository } from "./peer-repository.js";
 import { PeerVerifier } from "./peer-verifier.js";
 import { Service } from "./service.js";
+import {
+	GetApiNodesRoute,
+	GetBlocksRoute,
+	GetMessagesRoute,
+	GetPeersRoute,
+	GetProposalRoute,
+	GetStatusRoute,
+	PostPrecommitRoute,
+	PostPrevoteRoute,
+	PostProposalRoute,
+} from "./socket-server/routes/index.js";
 import { Server } from "./socket-server/server.js";
 import { State } from "./state.js";
 import { StatisticLogger, StatisticService } from "./statistic/index.js";
@@ -52,6 +63,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
+		this.app.get<Contracts.P2P.StatisticService>(Identifiers.P2P.Statistic.Service).boot();
+
 		await this.#buildServer();
 	}
 
@@ -176,6 +189,20 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.Server).to(Server).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.State).to(State).inSingletonScope();
+
+		for (const route of [
+			GetApiNodesRoute,
+			GetBlocksRoute,
+			GetMessagesRoute,
+			GetPeersRoute,
+			GetProposalRoute,
+			GetStatusRoute,
+			PostPrecommitRoute,
+			PostPrevoteRoute,
+			PostProposalRoute,
+		]) {
+			this.app.bind(Identifiers.P2P.Routes).to(route).inSingletonScope();
+		}
 	}
 
 	async #buildServer(): Promise<void> {

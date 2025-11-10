@@ -2,29 +2,9 @@ import Hapi from "@hapi/hapi";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import Joi from "joi";
-
-export type Codec = {
-	request: {
-		serialize: any;
-		deserialize: any;
-	};
-	response: {
-		serialize: any;
-		deserialize: any;
-	};
-};
-
-export type RouteConfig = {
-	id: string;
-	handler: any;
-	validation?: Joi.Schema;
-	codec: Codec;
-	maxBytes?: number;
-};
 
 @injectable()
-export abstract class Route {
+export abstract class Route implements Contracts.P2P.Route {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
@@ -42,7 +22,7 @@ export abstract class Route {
 			server.route({
 				method: "POST",
 				options: {
-					handler: config.handler,
+					handler: controller.handle.bind(controller),
 					id: config.id,
 					isInternal: !this.configuration.getRequired("developmentMode.enabled"), // Routes are exposed when developmentMode is enabled
 					payload: {
@@ -57,7 +37,7 @@ export abstract class Route {
 		}
 	}
 
-	public abstract getRoutesConfigByPath(): { [path: string]: RouteConfig };
+	public abstract getRoutesConfigByPath(): { [path: string]: Contracts.P2P.RouteConfig };
 
 	protected abstract getController(): Contracts.P2P.Controller;
 }

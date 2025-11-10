@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { TransactionFailedToPreverifyError, UnexpectedLegacySecondSignatureError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
 @injectable()
@@ -40,7 +41,7 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 			await this.verifier.verifyLegacySecondSignature(transaction.data, sender.legacySecondPublicKey());
 		} else {
 			if (transaction.data.legacySecondSignature) {
-				throw new Exceptions.UnexpectedLegacySecondSignatureError();
+				throw new UnexpectedLegacySecondSignatureError();
 			}
 		}
 
@@ -61,7 +62,7 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		});
 
 		if (!preverified.success) {
-			throw new Exceptions.TransactionFailedToPreverifyError(transaction, new Error(preverified.error));
+			throw new TransactionFailedToPreverifyError(transaction, new Error(preverified.error));
 		}
 	}
 
@@ -104,7 +105,7 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		}
 	}
 
-	async #emit<T>(event: Contracts.Kernel.EventName, data?: T): Promise<void> {
+	async #emit<T>(event: string, data?: T): Promise<void> {
 		if (this.state.isBootstrap()) {
 			return;
 		}

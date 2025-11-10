@@ -1,4 +1,5 @@
-import { Wallet } from "../contracts/state/wallets.js";
+import { Contracts } from "@mainsail/contracts";
+
 import { Exception } from "./base.js";
 
 export class Bip38CompressionError extends Exception {
@@ -210,7 +211,7 @@ export class AlreadyRegisteredError extends Exception {
 }
 
 export class UnexpectedNonceError extends Exception {
-	public constructor(txNonce: any, sender: Wallet) {
+	public constructor(txNonce: any, sender: Contracts.State.Wallet) {
 		super(
 			`Cannot apply a transaction with nonce ${txNonce.toFixed()}: the ` +
 				`sender ${sender.getAddress()} has nonce ${sender.getNonce().toFixed()}${sender.getNonce().isZero() ? " (this might be due to a wrong signature)" : ""}.`,

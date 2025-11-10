@@ -1,5 +1,6 @@
 import { injectable } from "@mainsail/container";
-import { Contracts, Exceptions } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { InvalidMilestoneConfigurationError, InvalidNumberOfRoundValidatorsError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 import deepmerge from "deepmerge";
 import clone from "lodash.clone";
@@ -226,7 +227,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 		for (let index = 0; index < validatorMilestones.length; index++) {
 			const current = validatorMilestones[index];
 			if (current.height > initialHeight && current.roundValidators === 0) {
-				throw new Exceptions.InvalidNumberOfRoundValidatorsError(
+				throw new InvalidNumberOfRoundValidatorsError(
 					`Bad milestone at height: ${current.height}. The number of validators must be greater than 0.`,
 				);
 			}
@@ -246,7 +247,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			}
 
 			if ((current.height - Math.max(previous.height, 1)) % previous.roundValidators !== 0) {
-				throw new Exceptions.InvalidMilestoneConfigurationError(
+				throw new InvalidMilestoneConfigurationError(
 					`Bad milestone at height: ${current.height}. The number of validators can only be changed at the beginning of a new round.`,
 				);
 			}

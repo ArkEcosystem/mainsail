@@ -19,15 +19,15 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }
 
-napi = { version = "3.1.3", default-features = false, features = [
+napi = { version = "3.4.0", default-features = false, features = [
     "anyhow",
     "napi9",
     "serde-json",
     "tokio_rt",
 ] }
-napi-derive = "3.1.1"
+napi-derive = "3.3.0"
 
 mainsail_evm_core = { path = "../core", version = "0.1.0" }
 
 [build-dependencies]
-napi-build = "2.1.2"
+napi-build = "2.2.4"

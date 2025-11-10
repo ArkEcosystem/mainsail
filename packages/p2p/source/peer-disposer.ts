@@ -26,6 +26,9 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly transactionPoolWorker!: Contracts.TransactionPool.Worker;
 
+	@inject(Identifiers.P2P.Statistic.Service)
+	private readonly statisticService!: Contracts.P2P.StatisticService;
+
 	#blacklist = new Map<string, dayjs.Dayjs>();
 
 	public banPeer(ip: string, error: Error | Contracts.P2P.NesError): void {
@@ -44,6 +47,8 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 		}
 
 		this.logger.debug(`Banning peer ${ip}, because: ${error.message}`, "p2p");
+
+		this.statisticService.getCurrentRoundStatistic().peerBanned(ip);
 
 		const timeout = this.configuration.getRequired<number>("peerBanTime");
 		if (timeout > 0) {

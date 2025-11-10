@@ -1,4 +1,5 @@
-import { Exceptions, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { Configuration } from "../../crypto-config/distribution/index";

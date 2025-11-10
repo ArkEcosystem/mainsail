@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { InvalidBlockVersion } from "@mainsail/exceptions";
 
 @injectable()
 export class VersionVerifier implements Contracts.Processor.Handler {
@@ -13,7 +14,7 @@ export class VersionVerifier implements Contracts.Processor.Handler {
 		const version = this.configuration.getMilestone().block.version;
 
 		if (unit.getBlock().data.version !== version) {
-			throw new Exceptions.InvalidBlockVersion(unit.getBlock());
+			throw new InvalidBlockVersion(unit.getBlock());
 		}
 	}
 }
