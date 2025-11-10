@@ -2007,6 +2007,16 @@ importers:
 
   packages/evm/npm/linux-x64-musl: {}
 
+  packages/exceptions:
+    dependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
+
   packages/kernel:
     dependencies:
       '@mainsail/container':
