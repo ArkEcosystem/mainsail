@@ -49,4 +49,8 @@ export class StatisticService implements Contracts.P2P.StatisticService {
 	getRoundStatisticList(): string[] {
 		return [...this.#roundStatistics.keys()].reverse();
 	}
+
+	getRoundStatistic(id: string): Contracts.P2P.RoundStatistic | undefined {
+		return this.#roundStatistics.get(id);
+	}
 }

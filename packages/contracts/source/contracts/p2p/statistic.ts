@@ -3,6 +3,7 @@ export interface StatisticService {
 	newRound(height: number, round: number): void;
 	getCurrentRoundStatistic(): RoundStatistic;
 	getRoundStatisticList(): string[];
+	getRoundStatistic(id: string): RoundStatistic | undefined;
 }
 
 export interface RoundStatistic {
