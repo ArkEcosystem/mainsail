@@ -18,6 +18,9 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
+	public height: number = 0;
+	public round: number = 0;
+
 	#startTime!: number;
 	#endTime!: number;
 	#totalPeers!: number;

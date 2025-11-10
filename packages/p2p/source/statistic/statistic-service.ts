@@ -32,6 +32,8 @@ export class StatisticService implements Contracts.P2P.StatisticService {
 		this.logger.log(this.#currentRoundStatistic);
 
 		this.#currentRoundStatistic = this.app.resolve(RoundStatistic);
+		this.#currentRoundStatistic.height = height;
+		this.#currentRoundStatistic.round = round;
 		this.#currentRoundStatistic.start();
 
 		this.#roundStatistics.set(`${height}-${round}`, this.#currentRoundStatistic);

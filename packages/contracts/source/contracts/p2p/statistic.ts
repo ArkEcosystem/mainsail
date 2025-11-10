@@ -7,6 +7,9 @@ export interface StatisticService {
 }
 
 export interface RoundStatistic {
+	height: number;
+	round: number;
+
 	start(): void;
 	stop(): void;
 	addEmit(ip: string, endpoint: string, emitStatistic: EmitStatistic): void;

@@ -23,6 +23,8 @@ export class StatisticController extends Controller {
 		}
 
 		return {
+			round: `${statistic.height}-${statistic.round}`,
+			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
 			general: statistic.getGeneralStatistic(),
 			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
 			emits: statistic.getEmitStatistics(),
@@ -45,6 +47,8 @@ export class StatisticController extends Controller {
 		}
 
 		return {
+			round: `${statistic.height}-${statistic.round}`,
+			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
 			general: statistic.getGeneralStatistic(),
 			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
 			emits: statistic.getEmitStatistics(),
