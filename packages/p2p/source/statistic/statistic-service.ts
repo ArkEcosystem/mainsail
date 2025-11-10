@@ -32,6 +32,8 @@ export class StatisticService implements Contracts.P2P.StatisticService {
 		this.logger.log(this.#currentRoundStatistic);
 
 		this.#currentRoundStatistic = this.app.resolve(RoundStatistic);
+		this.#currentRoundStatistic.height = height;
+		this.#currentRoundStatistic.round = round;
 		this.#currentRoundStatistic.start();
 
 		this.#roundStatistics.set(`${height}-${round}`, this.#currentRoundStatistic);
@@ -44,5 +46,13 @@ export class StatisticService implements Contracts.P2P.StatisticService {
 
 	getCurrentRoundStatistic(): RoundStatistic {
 		return this.#currentRoundStatistic;
+	}
+
+	getRoundStatisticList(): string[] {
+		return [...this.#roundStatistics.keys()].reverse();
+	}
+
+	getRoundStatistic(id: string): Contracts.P2P.RoundStatistic | undefined {
+		return this.#roundStatistics.get(id);
 	}
 }

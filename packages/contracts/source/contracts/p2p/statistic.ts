@@ -2,9 +2,14 @@ export interface StatisticService {
 	boot(): void;
 	newRound(height: number, round: number): void;
 	getCurrentRoundStatistic(): RoundStatistic;
+	getRoundStatisticList(): string[];
+	getRoundStatistic(id: string): RoundStatistic | undefined;
 }
 
 export interface RoundStatistic {
+	height: number;
+	round: number;
+
 	start(): void;
 	stop(): void;
 	addEmit(ip: string, endpoint: string, emitStatistic: EmitStatistic): void;
