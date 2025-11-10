@@ -822,6 +822,9 @@ importers:
       inversify:
         specifier: 7.10.3
         version: 7.10.3(reflect-metadata@0.2.2)
+      joi:
+        specifier: 18.0.0
+        version: 18.0.0
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2

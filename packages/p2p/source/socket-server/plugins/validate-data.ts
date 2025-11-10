@@ -4,7 +4,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { isValidVersion } from "../../utils/index.js";
-import { Route } from "../routes/route.js";
 import { BasePlugin } from "./base-plugin.js";
 
 @injectable()
@@ -17,7 +16,7 @@ export class ValidateDataPlugin extends BasePlugin {
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@multiInject(Identifiers.P2P.Routes)
-	private readonly routes!: Route[];
+	private readonly routes!: Contracts.P2P.Route[];
 
 	public register(server) {
 		if (this.configuration.getRequired("developmentMode.enabled")) {

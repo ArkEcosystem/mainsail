@@ -5,7 +5,6 @@ import { Providers } from "@mainsail/kernel";
 
 import { RateLimiter } from "../../rate-limiter.js";
 import { buildRateLimiter } from "../../utils/build-rate-limiter.js";
-import { Route } from "../routes/route.js";
 
 @injectable()
 export class RateLimitPlugin {
@@ -20,7 +19,7 @@ export class RateLimitPlugin {
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	@multiInject(Identifiers.P2P.Routes)
-	private readonly routes!: Route[];
+	private readonly routes!: Contracts.P2P.Route[];
 
 	private rateLimiter!: RateLimiter;
 
