@@ -25,4 +25,10 @@ export const register = (server: Hapi.Server<any>): void => {
 		},
 		path: "/statistic/{id}",
 	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.latest(request),
+		method: "GET",
+		path: "/statistic/latest",
+	});
 };

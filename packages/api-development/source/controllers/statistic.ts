@@ -31,4 +31,26 @@ export class StatisticController extends Controller {
 			peers: statistic.getPeerStatistics(),
 		};
 	}
+
+	public async latest(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const list = this.staticService.getRoundStatisticList();
+		if (list.length === 0) {
+			return Boom.notFound("No statistics available");
+		}
+
+		const statistic = this.staticService.getRoundStatistic(list[0]);
+
+		if (!statistic) {
+			return Boom.notFound("Statistic not found");
+		}
+
+		return {
+			general: statistic.getGeneralStatistic(),
+			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+			emits: statistic.getEmitStatistics(),
+			pings: statistic.getPingStatistics(),
+			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+			peers: statistic.getPeerStatistics(),
+		};
+	}
 }
