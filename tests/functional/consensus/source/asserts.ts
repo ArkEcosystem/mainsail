@@ -1,4 +1,5 @@
-import { Exceptions, Contracts } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { Sandbox } from "@mainsail/test-framework";
 import { assert } from "@mainsail/test-runner";
 

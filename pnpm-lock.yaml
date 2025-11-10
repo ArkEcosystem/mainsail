@@ -946,6 +946,9 @@ importers:
       '@mainsail/evm-state':
         specifier: workspace:*
         version: link:../evm-state
+      '@mainsail/exceptions':
+        specifier: workspace:*
+        version: link:../exceptions
       '@mainsail/logger-pino':
         specifier: workspace:*
         version: link:../logger-pino
@@ -3221,6 +3224,9 @@ importers:
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../../../packages/evm-service
+      '@mainsail/exceptions':
+        specifier: workspace:*
+        version: link:../../../packages/exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../../../packages/kernel
