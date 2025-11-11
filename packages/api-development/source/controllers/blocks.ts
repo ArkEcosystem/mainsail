@@ -1,7 +1,8 @@
 import { notFound } from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 
 import { BlockResource } from "../resources/index.js";
 import { Controller } from "./controller.js";

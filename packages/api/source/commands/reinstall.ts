@@ -1,6 +1,6 @@
 import { Commands, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Constants } from "@mainsail/contracts";
+import { BuildPackages } from "@mainsail/constants";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
 
@@ -40,7 +40,7 @@ export class Command extends Commands.Command {
 		spinner.start();
 
 		assert.string(this.pkg.name);
-		this.installer.install(this.pkg.name, Constants.BuildPackages, this.pkg.version);
+		this.installer.install(this.pkg.name, BuildPackages, this.pkg.version);
 
 		this.processManager.update();
 

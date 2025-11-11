@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { writeFileSync } from "fs";
 import { dirSync, setGracefulCleanup } from "tmp";
 

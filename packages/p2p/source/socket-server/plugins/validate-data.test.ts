@@ -1,5 +1,5 @@
 import { Server } from "@hapi/hapi";
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 import Joi from "joi";
 

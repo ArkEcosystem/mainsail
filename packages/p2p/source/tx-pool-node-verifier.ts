@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers, Units } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 import { http, HttpResponse } from "@mainsail/utils";
 
@@ -23,7 +24,7 @@ export class TxPoolNodeVerifier implements Contracts.P2P.TxPoolNodeVerifier {
 		try {
 			const response = await http.get(node.url, {
 				headers: {},
-				maxContentLength: 1 * Constants.Units.KILOBYTE,
+				maxContentLength: 1 * Units.KILOBYTE,
 				timeout: 5000,
 			});
 

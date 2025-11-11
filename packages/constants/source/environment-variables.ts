@@ -1,4 +1,4 @@
-type EnvironmentVariable = (typeof EnvironmentVariableNames)[number];
+export type EnvironmentVariable = (typeof EnvironmentVariableNames)[number];
 
 export const EnvironmentVariableNames = [
 	// Log

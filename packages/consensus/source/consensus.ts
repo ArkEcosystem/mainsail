@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Constants, Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers, Events, Locale } from "@mainsail/constants";
 import { assert, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -584,8 +585,8 @@ export class Consensus implements Contracts.Consensus.Service {
 				this.#lockedValue = state.lockedValue;
 				this.#validValue = state.validValue;
 			} else {
-				const storedBlockNumber = state.blockNumber.toLocaleString(Constants.Locale);
-				const currentBlockNumber = this.#blockNumber.toLocaleString(Constants.Locale);
+				const storedBlockNumber = state.blockNumber.toLocaleString(Locale);
+				const currentBlockNumber = this.#blockNumber.toLocaleString(Locale);
 
 				this.logger.warn(
 					`Skipping state restore, because stored block number is ${storedBlockNumber}, but should be ${currentBlockNumber}`,
@@ -641,16 +642,16 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	#getHeightRoundString(): string {
-		const number = this.#blockNumber.toLocaleString(Constants.Locale);
-		const consensusRound = this.#round.toLocaleString(Constants.Locale);
+		const number = this.#blockNumber.toLocaleString(Locale);
+		const consensusRound = this.#round.toLocaleString(Locale);
 
 		return `${number}/${consensusRound}`;
 	}
 
 	#getBlockString(block: Contracts.Crypto.Block): string {
-		const number = this.#blockNumber.toLocaleString(Constants.Locale);
-		const consensusRound = this.#round.toLocaleString(Constants.Locale);
-		const blockRound = block.data.round.toLocaleString(Constants.Locale);
+		const number = this.#blockNumber.toLocaleString(Locale);
+		const consensusRound = this.#round.toLocaleString(Locale);
+		const blockRound = block.data.round.toLocaleString(Locale);
 
 		if (block.data.round !== this.#round) {
 			return `${number}/${consensusRound}(${blockRound})/${block.data.hash}`;

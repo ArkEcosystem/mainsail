@@ -1,5 +1,5 @@
 import { notFound } from "@hapi/boom";
-import { Events } from "@mainsail/contracts";
+import { Events } from "@mainsail/constants";
 
 import { describe } from "../../../test-framework/source";
 import { Webhook } from "../interfaces";

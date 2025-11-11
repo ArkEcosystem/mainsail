@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers, Events } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 import dayjs from "dayjs";
 

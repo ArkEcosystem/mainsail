@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers, Events } from "@mainsail/constants";
 import { ConsensusAbi, ERC1967ProxyAbi, MultiPaymentAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { assert, BigNumber } from "@mainsail/utils";
 import { Address, encodeDeployData, encodeFunctionData, getCreateAddress, Hex, sha256, toBytes } from "viem";

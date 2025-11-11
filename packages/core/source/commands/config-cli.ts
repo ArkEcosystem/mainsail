@@ -1,6 +1,6 @@
 import { Commands, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Constants } from "@mainsail/contracts";
+import { Channels, BuildPackages } from "@mainsail/constants";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
 
@@ -18,7 +18,7 @@ export class Command extends Commands.Command {
 		this.definition.setFlag(
 			"channel",
 			"The NPM registry channel that should be used.",
-			Joi.string().valid(...Constants.Channels),
+			Joi.string().valid(...Channels),
 		);
 	}
 
@@ -38,7 +38,7 @@ export class Command extends Commands.Command {
 			spinner.start();
 
 			assert.string(this.pkg.name);
-			this.installer.install(this.pkg.name, Constants.BuildPackages, newChannel);
+			this.installer.install(this.pkg.name, BuildPackages, newChannel);
 
 			spinner.succeed();
 

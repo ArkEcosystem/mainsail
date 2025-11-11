@@ -1,6 +1,6 @@
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
 import { injectable } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 
 import Handlers from "./handlers.js";
 import { Server } from "./server.js";

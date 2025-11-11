@@ -23,6 +23,7 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"wif": "5.0.0"
 	},

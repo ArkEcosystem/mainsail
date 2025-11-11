@@ -3,7 +3,7 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	ServiceProvider as CoreApiDatabase,
 } from "@mainsail/api-database";
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { Application, Providers } from "@mainsail/kernel";
 
 import { Sandbox } from "../../../test-framework/source/index.js";

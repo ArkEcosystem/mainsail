@@ -1,4 +1,5 @@
-import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
+import { Contracts, Utils } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import clone from "lodash.clonedeep";
 
 import { describe, Sandbox } from "../../test-framework/source";

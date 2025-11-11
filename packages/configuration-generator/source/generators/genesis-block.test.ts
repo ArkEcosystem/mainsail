@@ -1,4 +1,5 @@
-import { Contracts, Identifiers as AppIdentifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers as AppIdentifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 
 import { describe } from "../../../test-framework/source";

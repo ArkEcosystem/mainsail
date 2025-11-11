@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { InvalidMultiSignatureAssetError, NotImplemented, PublicKeyError } from "@mainsail/exceptions";
 import { numberToHex } from "@mainsail/utils";
 import { schnorr } from "bcrypto";

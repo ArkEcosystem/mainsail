@@ -1,5 +1,6 @@
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import { Constants, Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers, Events, Locale } from "@mainsail/constants";
 import { assert, BigNumber, sleep } from "@mainsail/utils";
 
 @injectable()
@@ -131,11 +132,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		if (!this.state.isBootstrap()) {
 			const block = unit.getBlock();
 
-			const blockNumber = unit.blockNumber.toLocaleString(Constants.Locale);
-			const round = unit.round.toLocaleString(Constants.Locale);
-			const blockRound = block.data.round.toLocaleString(Constants.Locale);
-			const transactionsCount = block.data.transactionsCount.toLocaleString(Constants.Locale);
-			const gasUsed = block.data.gasUsed.toLocaleString(Constants.Locale);
+			const blockNumber = unit.blockNumber.toLocaleString(Locale);
+			const round = unit.round.toLocaleString(Locale);
+			const blockRound = block.data.round.toLocaleString(Locale);
+			const transactionsCount = block.data.transactionsCount.toLocaleString(Locale);
+			const gasUsed = block.data.gasUsed.toLocaleString(Locale);
 
 			let blockString = `${blockNumber}/${round}/${block.data.hash}`;
 			if (block.data.round !== unit.round) {

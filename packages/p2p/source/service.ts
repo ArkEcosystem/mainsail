@@ -1,6 +1,7 @@
 import { percentile } from "@mainsail/blockchain-utils";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers, EnvironmentVariables } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 import { groupBy, pluralize, randomNumber, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
@@ -39,7 +40,7 @@ export class Service implements Contracts.P2P.Service {
 	#apiNodeCheckLoopTimeout?: NodeJS.Timeout = undefined;
 
 	public async boot(): Promise<void> {
-		if (process.env[Constants.EnvironmentVariables.MAINSAIL_ENV] === "test") {
+		if (process.env[EnvironmentVariables.MAINSAIL_ENV] === "test") {
 			this.logger.info("Skipping P2P service boot, because test environment is used", "p2p");
 
 			return;

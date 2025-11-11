@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { assert, camelCase, expandTilde, set } from "@mainsail/utils";
 import envPaths from "env-paths";
 import { join, resolve } from "path";

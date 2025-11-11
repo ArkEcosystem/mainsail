@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { DataSource, QueryFailedError } from "typeorm";
 
 import { Migrations as ApiDatabaseContracts_Migrations } from "./contracts.js";

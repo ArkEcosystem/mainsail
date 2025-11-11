@@ -1,4 +1,5 @@
-import { Identifiers, Contracts } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 
 import { describe, Sandbox } from "../../test-framework/source";
 import { TimestampCalculator } from "./timestamp-calculator";

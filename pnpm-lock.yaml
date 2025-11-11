@@ -110,6 +110,9 @@ importers:
       '@mainsail/cli':
         specifier: workspace:*
         version: link:../cli
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -189,6 +192,9 @@ importers:
       '@mainsail/api-database':
         specifier: workspace:*
         version: link:../api-database
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -229,6 +235,9 @@ importers:
 
   packages/api-database:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -269,6 +278,9 @@ importers:
       '@mainsail/api-common':
         specifier: workspace:*
         version: link:../api-common
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -309,6 +321,9 @@ importers:
       '@mainsail/api-common':
         specifier: workspace:*
         version: link:../api-common
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -370,6 +385,9 @@ importers:
       '@mainsail/api-database':
         specifier: workspace:*
         version: link:../api-database
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -410,6 +428,9 @@ importers:
       '@mainsail/api-database':
         specifier: workspace:*
         version: link:../api-database
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -453,6 +474,9 @@ importers:
       '@mainsail/api-common':
         specifier: workspace:*
         version: link:../api-common
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -478,6 +502,9 @@ importers:
 
   packages/blockchain-utils:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -500,6 +527,9 @@ importers:
 
   packages/bootstrap:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -516,6 +546,9 @@ importers:
 
   packages/cli:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -638,6 +671,9 @@ importers:
 
   packages/configuration-generator:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -747,6 +783,9 @@ importers:
       '@mainsail/blockchain-utils':
         specifier: workspace:*
         version: link:../blockchain-utils
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -772,6 +811,9 @@ importers:
 
   packages/consensus-storage:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -787,6 +829,12 @@ importers:
       lmdb:
         specifier: 3.4.2
         version: 3.4.2
+    devDependencies:
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
+
+  packages/constants:
     devDependencies:
       uvu:
         specifier: 0.5.6
@@ -880,6 +928,9 @@ importers:
       '@mainsail/consensus-storage':
         specifier: workspace:*
         version: link:../consensus-storage
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1055,6 +1106,9 @@ importers:
 
   packages/crypto-address-base58:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1098,6 +1152,9 @@ importers:
 
   packages/crypto-address-keccak256:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1141,6 +1198,9 @@ importers:
 
   packages/crypto-block:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1214,6 +1274,9 @@ importers:
 
   packages/crypto-commit:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1275,6 +1338,9 @@ importers:
 
   packages/crypto-config:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1318,6 +1384,9 @@ importers:
 
   packages/crypto-consensus-bls12-381:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1340,6 +1409,9 @@ importers:
 
   packages/crypto-hash-bcrypto:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1365,6 +1437,9 @@ importers:
       '@chainsafe/blst':
         specifier: 2.2.0
         version: 2.2.0
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1408,6 +1483,9 @@ importers:
 
   packages/crypto-key-pair-ecdsa:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1448,6 +1526,9 @@ importers:
 
   packages/crypto-key-pair-ed25519:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1494,6 +1575,9 @@ importers:
 
   packages/crypto-key-pair-schnorr:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1534,6 +1618,9 @@ importers:
 
   packages/crypto-messages:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1601,6 +1688,9 @@ importers:
 
   packages/crypto-signature-bls12-381:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1626,6 +1716,9 @@ importers:
 
   packages/crypto-signature-ecdsa:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1651,6 +1744,9 @@ importers:
 
   packages/crypto-signature-schnorr:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1676,6 +1772,9 @@ importers:
 
   packages/crypto-transaction:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1740,6 +1839,9 @@ importers:
 
   packages/crypto-validation:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1768,6 +1870,9 @@ importers:
 
   packages/crypto-wif:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1793,6 +1898,9 @@ importers:
 
   packages/crypto-worker:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1827,6 +1935,9 @@ importers:
 
   packages/database:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1906,6 +2017,9 @@ importers:
 
   packages/evm-api-worker:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1925,6 +2039,9 @@ importers:
 
   packages/evm-consensus:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1969,6 +2086,9 @@ importers:
 
   packages/evm-service:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2042,6 +2162,9 @@ importers:
 
   packages/evm-state:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2076,6 +2199,9 @@ importers:
 
   packages/kernel:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2165,6 +2291,9 @@ importers:
 
   packages/logger-pino:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2241,6 +2370,9 @@ importers:
 
   packages/logger-winston:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2266,6 +2398,9 @@ importers:
 
   packages/networking-dns:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2291,6 +2426,9 @@ importers:
       '@hapi/sntp':
         specifier: 4.0.0
         version: 4.0.0
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2334,6 +2472,9 @@ importers:
       '@mainsail/blockchain-utils':
         specifier: workspace:*
         version: link:../blockchain-utils
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2422,6 +2563,9 @@ importers:
       '@mainsail/blockchain-utils':
         specifier: workspace:*
         version: link:../blockchain-utils
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2447,6 +2591,9 @@ importers:
 
   packages/serializer:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2469,6 +2616,9 @@ importers:
 
   packages/snapshot-legacy-exporter:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2527,6 +2677,9 @@ importers:
 
   packages/snapshot-legacy-importer:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2561,6 +2714,9 @@ importers:
 
   packages/state:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2601,6 +2757,9 @@ importers:
       '@mainsail/configuration-generator':
         specifier: workspace:*
         version: link:../configuration-generator
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2741,6 +2900,9 @@ importers:
 
   packages/test-transaction-builders:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2778,6 +2940,9 @@ importers:
 
   packages/transaction-pool-broadcaster:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2803,6 +2968,9 @@ importers:
 
   packages/transaction-pool-service:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2849,6 +3017,9 @@ importers:
 
   packages/transaction-pool-worker:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2871,6 +3042,9 @@ importers:
 
   packages/transactions:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2951,6 +3125,9 @@ importers:
 
   packages/validation:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -2979,6 +3156,9 @@ importers:
       '@chainsafe/bls-keystore':
         specifier: 3.1.0
         version: 3.1.0
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -3058,6 +3238,9 @@ importers:
       '@hapi/hapi':
         specifier: 21.4.3
         version: 21.4.3
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -3098,6 +3281,9 @@ importers:
 
   tests/e2e/clients:
     devDependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../../../packages/constants
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../../../packages/contracts
@@ -3170,6 +3356,9 @@ importers:
       '@mainsail/consensus':
         specifier: workspace:*
         version: link:../../../packages/consensus
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../../../packages/constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../../../packages/container
@@ -3308,6 +3497,9 @@ importers:
       '@mainsail/consensus-storage':
         specifier: workspace:*
         version: link:../../../packages/consensus-storage
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../../../packages/constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../../../packages/container

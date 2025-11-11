@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 
 import { Importer } from "./importer.js";

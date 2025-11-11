@@ -24,6 +24,7 @@
 		"@mainsail/api-database": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/exceptions": "workspace:*",

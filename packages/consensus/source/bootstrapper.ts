@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
+import { Contracts, Utils } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 
 @injectable()
 export class Bootstrapper implements Contracts.Consensus.Bootstrapper {

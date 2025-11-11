@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Constants } from "@mainsail/contracts";
+import { EnvironmentVariables } from "@mainsail/constants";
 import { parse, stringify } from "envfile";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
@@ -20,17 +20,17 @@ export class Environment {
 			paths[key] = path.join(value, this.appName);
 		}
 
-		if (process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_CONFIG]) {
+		if (process.env[EnvironmentVariables.MAINSAIL_PATH_CONFIG]) {
 			paths = {
 				...paths,
-				config: path.resolve(process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_CONFIG]!, this.appName),
+				config: path.resolve(process.env[EnvironmentVariables.MAINSAIL_PATH_CONFIG]!, this.appName),
 			};
 		}
 
-		if (process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_DATA]) {
+		if (process.env[EnvironmentVariables.MAINSAIL_PATH_DATA]) {
 			paths = {
 				...paths,
-				data: path.resolve(process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_DATA]!, this.appName),
+				data: path.resolve(process.env[EnvironmentVariables.MAINSAIL_PATH_DATA]!, this.appName),
 			};
 		}
 

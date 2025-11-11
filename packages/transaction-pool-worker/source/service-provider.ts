@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { Ipc, Providers } from "@mainsail/kernel";
 import Joi from "joi";
 import { Worker } from "worker_threads";

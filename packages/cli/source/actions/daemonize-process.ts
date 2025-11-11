@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Constants } from "@mainsail/contracts";
+import { Units } from "@mainsail/constants";
 import { totalmem } from "os";
 
 import { Application } from "../application.js";
@@ -41,7 +41,7 @@ export class DaemonizeProcess {
 
 			flagsProcess.name = processName;
 
-			const potato: boolean = totalmem() < 2 * Constants.Units.GIGABYTE;
+			const potato: boolean = totalmem() < 2 * Units.GIGABYTE;
 
 			this.processManager.start(
 				{

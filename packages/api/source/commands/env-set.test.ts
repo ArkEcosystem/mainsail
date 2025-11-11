@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/prevent-abbreviations */
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { parse } from "envfile";
 import { readFileSync } from "fs";
 import { ensureFileSync, removeSync } from "fs-extra/esm";

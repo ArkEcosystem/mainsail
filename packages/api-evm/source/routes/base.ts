@@ -1,5 +1,6 @@
 import Hapi from "@hapi/hapi";
-import { Constants, Contracts } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Units } from "@mainsail/constants";
 
 export const BaseRoute = {
 	register(server: Contracts.Api.ApiServer): void {
@@ -8,7 +9,7 @@ export const BaseRoute = {
 			method: "POST",
 			options: {
 				payload: {
-					maxBytes: 100 * Constants.Units.KILOBYTE,
+					maxBytes: 100 * Units.KILOBYTE,
 				},
 			},
 			path: "/",

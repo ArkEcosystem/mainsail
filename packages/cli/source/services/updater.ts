@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Constants, Contracts } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { BuildPackages } from "@mainsail/constants";
 import { dim, green, reset } from "kleur/colors";
 import latestVersion from "latest-version";
 import { lt, lte } from "semver";
@@ -93,7 +94,7 @@ export class Updater implements Contracts_Updater {
 
 		spinner.start();
 
-		this.installer.install(this.#packageName, Constants.BuildPackages, this.#packageChannel);
+		this.installer.install(this.#packageName, BuildPackages, this.#packageChannel);
 
 		if (updateProcessManager) {
 			this.processManager.update();
