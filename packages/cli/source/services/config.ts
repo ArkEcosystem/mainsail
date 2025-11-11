@@ -1,6 +1,6 @@
+import { Channels } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Channels } from "@mainsail/constants";
 import { ensureFileSync, readJSONSync, writeJsonSync } from "fs-extra/esm";
 
 import { Application } from "../contracts.js";

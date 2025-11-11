@@ -1,6 +1,6 @@
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers, Events } from "@mainsail/constants";
 
 @injectable()
 export class Worker implements Contracts.Evm.Worker {

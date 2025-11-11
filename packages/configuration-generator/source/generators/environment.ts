@@ -1,5 +1,5 @@
-import { injectable } from "@mainsail/container";
 import { EnvironmentVariable } from "@mainsail/constants";
+import { injectable } from "@mainsail/container";
 
 import { EnvironmentData } from "../contracts.js";
 

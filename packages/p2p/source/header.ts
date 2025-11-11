@@ -1,6 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers } from "@mainsail/constants";
 
 @injectable()
 export class Header implements Contracts.P2P.Header {

@@ -1,5 +1,5 @@
-import { injectable } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
+import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 
 import { Validator } from "./validator.js";

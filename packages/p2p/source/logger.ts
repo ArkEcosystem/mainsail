@@ -1,6 +1,6 @@
+import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers, EnvironmentVariables } from "@mainsail/constants";
 
 @injectable()
 export class Logger implements Contracts.P2P.Logger {

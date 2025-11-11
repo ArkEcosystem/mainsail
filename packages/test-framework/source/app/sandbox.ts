@@ -1,7 +1,7 @@
 import { ConfigurationGenerator, makeApplication } from "@mainsail/configuration-generator";
+import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { Container } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers, EnvironmentVariables } from "@mainsail/constants";
 import { Application, Providers } from "@mainsail/kernel";
 import { readJSONSync, removeSync } from "fs-extra/esm";
 import { join, resolve } from "path";

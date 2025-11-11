@@ -1,6 +1,6 @@
+import { Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers, Events, Locale } from "@mainsail/constants";
 import { assert, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 

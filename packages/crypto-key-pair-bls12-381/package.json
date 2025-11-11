@@ -23,9 +23,9 @@
 	"dependencies": {
 		"@chainsafe/bls": "8.2.0",
 		"@chainsafe/blst": "2.2.0",
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/constants": "workspace:*",
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",

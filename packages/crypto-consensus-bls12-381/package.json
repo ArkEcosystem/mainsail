@@ -21,9 +21,9 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/constants": "workspace:*",
 		"@mainsail/crypto-key-pair-bls12-381": "workspace:*",
 		"@mainsail/crypto-signature-bls12-381": "workspace:*",
 		"@mainsail/kernel": "workspace:*"

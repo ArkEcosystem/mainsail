@@ -27,9 +27,9 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/constants": "workspace:*",
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"chalk": "5.6.0",

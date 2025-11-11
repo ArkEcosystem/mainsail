@@ -1,5 +1,5 @@
-import { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
+import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 import cloneDeep from "lodash.clonedeep";
 

@@ -1,6 +1,6 @@
+import { Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers, Locale } from "@mainsail/constants";
 import { assert } from "@mainsail/utils";
 
 import { AbstractProcessor } from "./abstract-processor.js";

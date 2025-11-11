@@ -1,5 +1,5 @@
-import { inject, injectable } from "@mainsail/container";
 import { EnvironmentVariables } from "@mainsail/constants";
+import { inject, injectable } from "@mainsail/container";
 import { parse, stringify } from "envfile";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import path from "path";

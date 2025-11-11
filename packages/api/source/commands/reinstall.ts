@@ -1,6 +1,6 @@
 import { Commands, Identifiers, Services } from "@mainsail/cli";
-import { inject, injectable, postConstruct } from "@mainsail/container";
 import { BuildPackages } from "@mainsail/constants";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
 

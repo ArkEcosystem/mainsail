@@ -1,6 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers } from "@mainsail/constants";
 import { getPublicKey } from "@noble/ed25519";
 // Fixes "etc.sha512Sync not set" (fix from https://github.com/paulmillr/noble-ed25519#usage)
 import { etc } from "@noble/ed25519";

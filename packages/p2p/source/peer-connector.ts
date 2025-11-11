@@ -1,6 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers } from "@mainsail/constants";
 import { IpAddress } from "@mainsail/utils";
 import delay from "delay";
 

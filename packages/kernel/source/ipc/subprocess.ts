@@ -1,5 +1,5 @@
-import { Contracts } from "@mainsail/contracts";
 import { Identifiers, LogLevels } from "@mainsail/constants";
+import { Contracts } from "@mainsail/contracts";
 import split from "split2";
 import { Worker } from "worker_threads";
 

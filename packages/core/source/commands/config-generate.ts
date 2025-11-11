@@ -1,8 +1,8 @@
 import { Commands, Contracts, Identifiers as CliIdentifiers, Services } from "@mainsail/cli";
 import { ConfigurationGenerator, Identifiers, makeApplication } from "@mainsail/configuration-generator";
+import { Identifiers as AppIdentifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts as AppContracts } from "@mainsail/contracts";
-import { Identifiers as AppIdentifiers } from "@mainsail/constants";
 import envPaths from "env-paths";
 import Joi from "joi";
 import path from "path";

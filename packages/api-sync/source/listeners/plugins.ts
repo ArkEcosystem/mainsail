@@ -4,9 +4,9 @@ import {
 	Models,
 	TypeOrm,
 } from "@mainsail/api-database";
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers, Events } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";

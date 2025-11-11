@@ -1,5 +1,5 @@
-import { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
+import { Contracts } from "@mainsail/contracts";
 import { generateMnemonic } from "bip39";
 
 import { FactoryBuilder } from "../factory-builder.js";

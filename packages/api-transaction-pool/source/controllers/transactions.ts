@@ -1,9 +1,9 @@
 import { notFound } from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { AbstractController } from "@mainsail/api-common";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers } from "@mainsail/constants";
 
 import { TransactionResource } from "../resources/index.js";
 

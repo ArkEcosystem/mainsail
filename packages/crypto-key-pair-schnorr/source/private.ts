@@ -1,6 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers } from "@mainsail/constants";
 
 @injectable()
 export class PrivateKeyFactory implements Contracts.Crypto.PrivateKeyFactory {

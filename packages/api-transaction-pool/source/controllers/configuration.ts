@@ -1,8 +1,8 @@
 import Hapi from "@hapi/hapi";
 import { AbstractController } from "@mainsail/api-common";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 
 @injectable()

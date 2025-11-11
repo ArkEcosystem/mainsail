@@ -1,7 +1,7 @@
 import Hapi from "@hapi/hapi";
 import { Schemas } from "@mainsail/api-common";
-import { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
+import { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 

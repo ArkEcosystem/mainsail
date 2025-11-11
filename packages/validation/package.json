@@ -21,9 +21,9 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/constants": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"ajv": "8.17.1",
 		"ajv-formats": "3.0.1",

@@ -1,6 +1,6 @@
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers, Events } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 import { isBlacklisted, isWhitelisted } from "@mainsail/utils";
 

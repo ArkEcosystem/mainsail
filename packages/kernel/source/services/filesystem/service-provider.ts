@@ -1,6 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers } from "@mainsail/constants";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers/index.js";
 import { FilesystemManager } from "./manager.js";

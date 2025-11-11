@@ -1,5 +1,5 @@
-import { injectable } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
+import { injectable } from "@mainsail/container";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers/index.js";
 import { Triggers } from "./triggers.js";

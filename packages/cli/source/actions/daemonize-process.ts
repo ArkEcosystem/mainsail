@@ -1,5 +1,5 @@
-import { inject, injectable } from "@mainsail/container";
 import { Units } from "@mainsail/constants";
+import { inject, injectable } from "@mainsail/container";
 import { totalmem } from "os";
 
 import { Application } from "../application.js";

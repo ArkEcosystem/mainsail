@@ -1,6 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Identifiers } from "@mainsail/constants";
 
 import * as ApiSyncContracts from "./contracts.js";
 import { ApiNodes } from "./listeners/api-nodes.js";

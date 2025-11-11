@@ -24,9 +24,9 @@
 		"@hapi/boom": "10.0.1",
 		"@hapi/hapi": "21.4.3",
 		"@mainsail/api-common": "workspace:*",
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/constants": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"joi": "18.0.0"
 	},
