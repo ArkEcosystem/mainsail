@@ -24,7 +24,6 @@
 	"dependencies": {
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.11.13",
@@ -32,6 +31,7 @@
 		"typeorm": "0.3.26"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"@types/pg": "8.15.5",
 		"uvu": "0.5.6"
 	},

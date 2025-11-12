@@ -23,7 +23,6 @@
 	"dependencies": {
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/state": "workspace:*",
@@ -33,6 +32,7 @@
 		"joi": "18.0.0"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@types/better-sqlite3": "7.6.13",
 		"@types/fs-extra": "11.0.4",

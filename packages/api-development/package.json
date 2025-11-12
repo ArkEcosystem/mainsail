@@ -26,7 +26,6 @@
 		"@mainsail/api-common": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"joi": "18.0.0",
@@ -34,6 +33,7 @@
 		"semver": "7.7.2"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"@types/semver": "7.7.0",
 		"uvu": "0.5.6"
 	},

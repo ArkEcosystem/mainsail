@@ -21,10 +21,10 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
-		"@mainsail/contracts": "workspace:*",
 		"viem": "2.34.0"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"uvu": "0.5.6"
 	},
 	"engines": {

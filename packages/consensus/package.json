@@ -24,12 +24,12 @@
 		"@mainsail/blockchain-utils": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.11.13"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"esmock": "2.7.1",
 		"uvu": "0.5.6"
 	},

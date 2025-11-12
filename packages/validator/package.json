@@ -24,13 +24,13 @@
 		"@chainsafe/bls-keystore": "3.1.0",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"joi": "18.0.0"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/blockchain-utils": "workspace:*",
 		"@mainsail/crypto-address-base58": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",

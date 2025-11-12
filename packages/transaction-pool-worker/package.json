@@ -23,12 +23,12 @@
 	"dependencies": {
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"dayjs": "1.11.13",
 		"joi": "18.0.0"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"uvu": "0.5.6"
 	},
 	"engines": {
