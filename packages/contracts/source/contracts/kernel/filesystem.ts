@@ -21,7 +21,7 @@ export interface Filesystem {
 
 	directories(directory: string): Promise<string[]>;
 
-	makeDirectory(path): Promise<boolean>;
+	makeDirectory(path: string): Promise<boolean>;
 
 	deleteDirectory(directory: string): Promise<boolean>;
 

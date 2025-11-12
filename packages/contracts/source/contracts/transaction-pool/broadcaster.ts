@@ -1,6 +1,6 @@
-import { Dayjs } from "dayjs";
+import type { Dayjs } from "dayjs";
 
-import { Transaction } from "../crypto/index.js";
+import type { Transaction } from "../crypto/index.js";
 
 export enum PeerProtocol {
 	Http = 0,

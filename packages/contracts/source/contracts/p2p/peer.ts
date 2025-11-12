@@ -1,7 +1,7 @@
-import { Queue } from "../kernel/queue.js";
-import { ApiNode } from "./api-node.js";
-import { PeerProtocol } from "./enums.js";
-import { HeaderData } from "./header.js";
+import type { Queue } from "../kernel/queue.js";
+import type { ApiNode } from "./api-node.js";
+import type { PeerProtocol } from "./enums.js";
+import type { HeaderData } from "./header.js";
 
 export interface PeerPorts {
 	[name: string]: number;

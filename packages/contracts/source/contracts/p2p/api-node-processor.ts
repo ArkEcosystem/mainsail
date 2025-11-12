@@ -1,4 +1,4 @@
-import { ApiNode } from "./api-node.js";
+import type { ApiNode } from "./api-node.js";
 
 export interface AcceptNewApiNodeOptions {
 	seed?: boolean;

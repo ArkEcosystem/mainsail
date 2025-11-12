@@ -1,9 +1,9 @@
-import Hapi from "@hapi/hapi";
-import { SchemaObject } from "ajv";
+import type { Request as HapiRequest } from "@hapi/hapi";
+import type { SchemaObject } from "ajv";
 
 export type Processor = {
 	registerAction(action: Action): void;
-	process(request: Hapi.Request): Promise<Response | Error | (Response | Error)[]>;
+	process(request: HapiRequest): Promise<Response | Error | (Response | Error)[]>;
 };
 
 export type Id = string | number | null;

@@ -1,4 +1,4 @@
-import { Block, Commit, CommitHandler } from "../crypto/index.js";
+import type { Block, Commit, CommitHandler } from "../crypto/index.js";
 
 export interface Store extends CommitHandler {
 	getGenesisCommit(): Commit;

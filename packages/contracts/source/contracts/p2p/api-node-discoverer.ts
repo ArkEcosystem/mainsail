@@ -1,5 +1,5 @@
-import { ApiNode } from "./api-node.js";
-import { Peer } from "./peer.js";
+import type { ApiNode } from "./api-node.js";
+import type { Peer } from "./peer.js";
 
 export type ApiNodeFactory = (url: string) => ApiNode;
 
