@@ -873,9 +873,6 @@ importers:
       joi:
         specifier: 18.0.0
         version: 18.0.0
-      reflect-metadata:
-        specifier: 0.2.2
-        version: 0.2.2
       type-fest:
         specifier: 4.41.0
         version: 4.41.0
