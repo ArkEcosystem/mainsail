@@ -143,6 +143,8 @@ jobs:
               run: cd packages/container && pnpm run test:coverage
             - name: Test contracts
               run: cd packages/contracts && pnpm run test:coverage
+            - name: Test constants
+              run: cd packages/constants && pnpm run test:coverage
             - name: Test core
               run: cd packages/core && pnpm run test:coverage
             - name: Test crypto-address-base58

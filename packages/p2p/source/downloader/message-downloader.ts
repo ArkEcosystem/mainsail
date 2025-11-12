@@ -1,6 +1,7 @@
 import { isMajority, isMinority } from "@mainsail/blockchain-utils";
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 
 import { getRandomPeer } from "../utils/index.js";
 

@@ -3,8 +3,9 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	TypeOrm,
 } from "@mainsail/api-database";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import { NotImplemented } from "@mainsail/exceptions";
 import { Providers } from "@mainsail/kernel";
 

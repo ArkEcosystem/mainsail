@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 
 import { describeSkip, Sandbox } from "../../test-framework/source";

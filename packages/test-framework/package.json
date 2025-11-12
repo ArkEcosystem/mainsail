@@ -23,6 +23,7 @@
 	"dependencies": {
 		"@mainsail/cli": "workspace:*",
 		"@mainsail/configuration-generator": "workspace:*",
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-address-base58": "workspace:*",

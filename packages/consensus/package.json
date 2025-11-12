@@ -22,6 +22,7 @@
 	},
 	"dependencies": {
 		"@mainsail/blockchain-utils": "workspace:*",
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",

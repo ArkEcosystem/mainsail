@@ -30,6 +30,7 @@
 		"@hapi/hoek": "11.0.7",
 		"@hapi/teamwork": "6.0.0",
 		"@mainsail/blockchain-utils": "workspace:*",
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/exceptions": "workspace:*",

@@ -1,5 +1,6 @@
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Mempool implements Contracts.TransactionPool.Mempool {

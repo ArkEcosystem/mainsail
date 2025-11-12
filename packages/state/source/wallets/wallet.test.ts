@@ -1,5 +1,5 @@
 import { BigNumber } from "@mainsail/utils";
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 
 import { describe, Sandbox } from "../../../test-framework/source";
 import { Wallet } from ".";

@@ -1,5 +1,6 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
 import crypto from "../config/crypto.json" with { type: "json" };

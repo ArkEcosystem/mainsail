@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { injectable, Selectors } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import {
 	KeyPairFactory,
 	PrivateKeyFactory,

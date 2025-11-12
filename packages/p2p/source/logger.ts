@@ -1,5 +1,6 @@
+import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Logger implements Contracts.P2P.Logger {
@@ -43,6 +44,6 @@ export class Logger implements Contracts.P2P.Logger {
 	}
 
 	#allowExtra(): boolean {
-		return process.env[Constants.EnvironmentVariables.MAINSAIL_P2P_PEER_LOG_EXTRA] === "true";
+		return process.env[EnvironmentVariables.MAINSAIL_P2P_PEER_LOG_EXTRA] === "true";
 	}
 }

@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 import { strictEqual } from "assert";
 

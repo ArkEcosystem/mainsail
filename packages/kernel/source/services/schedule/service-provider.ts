@@ -1,5 +1,5 @@
+import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers/index.js";
 import { Schedule } from "./schedule.js";

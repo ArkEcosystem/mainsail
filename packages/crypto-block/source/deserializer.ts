@@ -1,6 +1,7 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional } from "@mainsail/container";
-import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
+import { Contracts, Utils } from "@mainsail/contracts";
 import { TransactionSchemaError } from "@mainsail/exceptions";
 import { ByteBuffer, sleep } from "@mainsail/utils";
 

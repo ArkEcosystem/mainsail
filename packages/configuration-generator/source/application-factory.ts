@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 
+import { Identifiers } from "@mainsail/constants";
 import { Container } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";

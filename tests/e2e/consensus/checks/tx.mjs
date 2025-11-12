@@ -1,5 +1,5 @@
 import { Container } from "/mainsail/packages/container/distribution/index.js";
-import { Identifiers } from "/mainsail/packages/contracts/distribution/index.js";
+import { Identifiers } from "/mainsail/packages/constants/distribution/index.js";
 import { Application } from "/mainsail/packages/kernel/distribution/index.js";
 import { TransactionBuilder } from "/mainsail/packages/crypto-transaction/distribution/index.js";
 

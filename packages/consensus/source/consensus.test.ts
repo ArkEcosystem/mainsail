@@ -1,4 +1,5 @@
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers, Events } from "@mainsail/constants";
 import { Lock } from "@mainsail/utils";
 
 import { describe, Sandbox } from "../../test-framework/source";

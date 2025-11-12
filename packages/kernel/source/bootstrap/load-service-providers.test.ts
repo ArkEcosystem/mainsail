@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 

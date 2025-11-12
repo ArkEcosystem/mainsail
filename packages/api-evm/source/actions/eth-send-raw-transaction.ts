@@ -1,5 +1,6 @@
+import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import { RpcError } from "@mainsail/exceptions";
 import { Environment } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
@@ -41,14 +42,14 @@ export class EthSendRawTransactionAction implements Contracts.Api.RPC.Action {
 	#getUrl(): string {
 		const config = {
 			http: {
-				enabled: !Environment.isTrue(Constants.EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_DISABLED),
-				host: Environment.get(Constants.EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_HOST, "0.0.0.0"),
-				port: Environment.get(Constants.EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_PORT, 4007),
+				enabled: !Environment.isTrue(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_DISABLED),
+				host: Environment.get(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_HOST, "0.0.0.0"),
+				port: Environment.get(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_PORT, 4007),
 			},
 			https: {
-				enabled: Environment.isTrue(Constants.EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_SSL),
-				host: Environment.get(Constants.EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_SSL_HOST, "0.0.0.0"),
-				port: Environment.get(Constants.EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_SSL_PORT, 8447),
+				enabled: Environment.isTrue(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_SSL),
+				host: Environment.get(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_SSL_HOST, "0.0.0.0"),
+				port: Environment.get(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_SSL_PORT, 8447),
 			},
 		};
 

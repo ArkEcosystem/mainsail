@@ -1,4 +1,5 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
+import { Contracts } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 

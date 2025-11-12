@@ -1,7 +1,7 @@
 import { badData } from "@hapi/boom";
 import { AbstractServer } from "@mainsail/api-common";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 @injectable()

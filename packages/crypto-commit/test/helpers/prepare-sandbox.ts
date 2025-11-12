@@ -1,4 +1,5 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";

@@ -1,5 +1,5 @@
+import { EnvironmentVariable } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
 
 import { EnvironmentData } from "../contracts.js";
 
@@ -20,7 +20,7 @@ export class EnvironmentGenerator {
 		return this;
 	}
 
-	addRecord(key: Contracts.Kernel.EnvironmentVariable, value: string | number): EnvironmentGenerator {
+	addRecord(key: EnvironmentVariable, value: string | number): EnvironmentGenerator {
 		this.#data[key] = value;
 
 		return this;
@@ -28,7 +28,7 @@ export class EnvironmentGenerator {
 
 	addRecords(data: EnvironmentData): EnvironmentGenerator {
 		for (const [key, value] of Object.entries(data)) {
-			this.addRecord(key as Contracts.Kernel.EnvironmentVariable, value);
+			this.addRecord(key as EnvironmentVariable, value);
 		}
 
 		return this;

@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Events, Identifiers } from "@mainsail/contracts";
+import { Identifiers, Events } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 
 import { describe } from "../../../test-framework/source";

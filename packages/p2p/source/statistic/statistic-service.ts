@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 
 import { RoundStatistic } from "./round-statistic.js";
 

@@ -1,5 +1,6 @@
+import { Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
 import { AbstractProcessor } from "./abstract-processor.js";
@@ -49,7 +50,7 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 
 				if (!existingPrevote.serialized.equals(prevote.serialized)) {
 					this.logger.warn(
-						`Conflicting prevotes for validator index ${prevote.validatorIndex} in block ${prevote.blockNumber.toLocaleString(Constants.Locale)}/${prevote.round}. Existing: ${existingPrevote.serialized.toString("hex")}, New: ${prevote.serialized.toString("hex")}`,
+						`Conflicting prevotes for validator index ${prevote.validatorIndex} in block ${prevote.blockNumber.toLocaleString(Locale)}/${prevote.round}. Existing: ${existingPrevote.serialized.toString("hex")}, New: ${prevote.serialized.toString("hex")}`,
 					);
 				}
 

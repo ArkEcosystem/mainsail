@@ -1,4 +1,4 @@
-import { Events, Identifiers } from "@mainsail/contracts";
+import { Events, Identifiers } from "@mainsail/constants";
 import moment from "moment-timezone";
 
 import { describe, Sandbox } from "../../../../test-framework/source";

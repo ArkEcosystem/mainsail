@@ -1,6 +1,7 @@
 import { ResponseToolkit } from "@hapi/hapi";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { isValidVersion } from "../../utils/index.js";

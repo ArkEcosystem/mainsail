@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 
 import { Wallet } from "../contracts.js";

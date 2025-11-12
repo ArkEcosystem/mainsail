@@ -1,6 +1,7 @@
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
+import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import {
