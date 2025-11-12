@@ -1,7 +1,7 @@
 import { ResponseToolkit } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { getPeerIp } from "../../utils/index.js";

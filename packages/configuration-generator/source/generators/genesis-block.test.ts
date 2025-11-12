@@ -1,5 +1,5 @@
-import { Contracts } from "@mainsail/contracts";
-import { Identifiers as AppIdentifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
+import { Enums, Identifiers as AppIdentifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 
 import { describe } from "../../../test-framework/source";
@@ -36,7 +36,7 @@ describe<{
 					address: { bech32m: "ark" },
 					block: { maxGasLimit: 30_000_000, maxPayload: 2_097_152, version: 1 },
 					blockTime: 8000,
-					evmSpec: Contracts.Evm.SpecId.SHANGHAI,
+					evmSpec: Enums.Evm.SpecId.SHANGHAI,
 					// @ts-ignore
 					gas: {
 						maximumGasLimit: 2_000_000,

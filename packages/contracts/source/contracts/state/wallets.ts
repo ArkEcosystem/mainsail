@@ -1,4 +1,4 @@
-import { BigNumber } from "@mainsail/utils";
+import type { BigNumber } from "@mainsail/utils";
 
 export interface Wallet {
 	getAddress(): string;

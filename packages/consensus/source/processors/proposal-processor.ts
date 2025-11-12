@@ -1,6 +1,6 @@
-import { Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 
@@ -37,24 +37,24 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	async process(proposal: Contracts.Crypto.Proposal, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.hasValidBlockNumberOrRound(proposal)) {
-				return Contracts.Consensus.ProcessorResult.Skipped;
+				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
 			if (!this.isRoundInBounds(proposal)) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
+				return Enums.Consensus.ProcessorResult.Invalid;
 			}
 
 			if (!this.#hasValidProposer(proposal)) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
+				return Enums.Consensus.ProcessorResult.Invalid;
 			}
 
 			if (!(await this.#hasValidSignature(proposal))) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
+				return Enums.Consensus.ProcessorResult.Invalid;
 			}
 
 			const roundState = this.roundStateRepo.getRoundState(proposal.blockNumber, proposal.round);
 			if (roundState.hasProposal()) {
-				return Contracts.Consensus.ProcessorResult.Skipped;
+				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
 			roundState.addProposal(proposal);
@@ -68,7 +68,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 				void this.getConsensus().handle(roundState);
 			}, 0);
 
-			return Contracts.Consensus.ProcessorResult.Accepted;
+			return Enums.Consensus.ProcessorResult.Accepted;
 		});
 	}
 
@@ -99,7 +99,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			blockHash: proposal.getData().block.header.hash,
 			blockNumber: proposal.blockNumber,
 			round: proposal.validRound,
-			type: Contracts.Crypto.MessageType.Prevote,
+			type: Enums.Crypto.MessageType.Prevote,
 		});
 
 		const { roundValidators } = this.configuration.getMilestone(proposal.blockNumber);

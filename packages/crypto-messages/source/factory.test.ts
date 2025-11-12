@@ -1,5 +1,5 @@
-import { Contracts } from "@mainsail/contracts";
-import { Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers, Enums } from "@mainsail/constants";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { describe, Factories, Sandbox } from "../../test-framework/source";
@@ -131,7 +131,7 @@ describe<{
 				blockHash: undefined,
 				blockNumber: 1,
 				round: 1,
-				type: Contracts.Crypto.MessageType.Precommit,
+				type: Enums.Crypto.MessageType.Precommit,
 				validatorIndex: 0,
 			},
 			identity.keys,
@@ -155,7 +155,7 @@ describe<{
 				blockHash: undefined,
 				blockNumber: 1,
 				round: 1,
-				type: Contracts.Crypto.MessageType.Prevote,
+				type: Enums.Crypto.MessageType.Prevote,
 				validatorIndex: 0,
 			},
 			identity.keys,

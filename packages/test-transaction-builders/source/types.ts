@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
 

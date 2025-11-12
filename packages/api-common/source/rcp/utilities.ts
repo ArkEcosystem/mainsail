@@ -1,5 +1,6 @@
 import { Request } from "@hapi/hapi";
-import { Contracts } from "@mainsail/contracts";
+import { Enums } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 
 export const getRcpId = (request: Request): Contracts.Api.RPC.Id => {
 	const payload = request.payload as Record<string, unknown>;
@@ -17,11 +18,11 @@ export const getRcpId = (request: Request): Contracts.Api.RPC.Id => {
 };
 
 export const errorMessageMap = {
-	[Contracts.Api.RPC.ErrorCode.ParseError]: "Parse error",
-	[Contracts.Api.RPC.ErrorCode.InvalidRequest]: "Invalid request",
-	[Contracts.Api.RPC.ErrorCode.MethodNotFound]: "Method not found",
-	[Contracts.Api.RPC.ErrorCode.InvalidParameters]: "Invalid params",
-	[Contracts.Api.RPC.ErrorCode.InternalError]: "Internal error",
+	[Enums.Api.RcpErrorCode.ParseError]: "Parse error",
+	[Enums.Api.RcpErrorCode.InvalidRequest]: "Invalid request",
+	[Enums.Api.RcpErrorCode.MethodNotFound]: "Method not found",
+	[Enums.Api.RcpErrorCode.InvalidParameters]: "Invalid params",
+	[Enums.Api.RcpErrorCode.InternalError]: "Internal error",
 };
 
 export const prepareRcpError = (

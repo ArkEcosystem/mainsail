@@ -32,7 +32,6 @@
 		"@mainsail/cli": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
@@ -44,6 +43,7 @@
 		"kleur": "4.1.5"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"@types/fs-extra": "11.0.4",
 		"@types/prompts": "2.4.9",
 		"@types/tmp": "0.2.6",

@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/test-runner";
+import type { Contracts } from "@mainsail/test-runner";
 import esmock from "esmock";
 import { join } from "path";
 import { setGracefulCleanup } from "tmp";

@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { injectable, Selectors } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { KeyPairFactory } from "./pair.js";

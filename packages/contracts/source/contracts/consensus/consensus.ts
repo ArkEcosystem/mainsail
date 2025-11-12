@@ -1,7 +1,7 @@
-import { AggregatedSignature, Commit, Precommit, Prevote, Proposal } from "../crypto/index.js";
-import { ProcessableUnit } from "../processor/index.js";
-import { ValidatorWallet } from "../state/index.js";
-import { Step } from "./enums.js";
+import type { AggregatedSignature, Commit, Precommit, Prevote, Proposal } from "../crypto/index.js";
+import type { ProcessableUnit } from "../processor/index.js";
+import type { ValidatorWallet } from "../state/index.js";
+import type { Step } from "./enums.js";
 
 export interface RoundState extends ProcessableUnit {
 	readonly validators: string[];

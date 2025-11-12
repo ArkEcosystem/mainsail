@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import memoizee from "memoizee";
 
 import { registerBlockFactory, registerIdentityFactory, registerTransactionFactory } from "./factories/index.js";

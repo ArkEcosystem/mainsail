@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/constants";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { assert, BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
 

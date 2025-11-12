@@ -1,4 +1,4 @@
-import { TransactionReceipt } from "../evm/evm.js";
+import type { TransactionReceipt } from "../evm/evm.js";
 
 export interface BlockProcessorResult {
 	success: boolean;

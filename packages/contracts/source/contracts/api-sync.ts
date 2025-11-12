@@ -1,4 +1,4 @@
-import { CommitHandler } from "./crypto/commit-handler.js";
+import type { CommitHandler } from "./crypto/commit-handler.js";
 
 export interface Service extends CommitHandler {
 	bootstrap(): Promise<void>;

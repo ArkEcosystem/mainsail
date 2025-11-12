@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { minBy } from "@mainsail/utils";
 import Levenshtein from "fast-levenshtein";
 import { blue, red } from "kleur/colors";

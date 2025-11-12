@@ -1,5 +1,5 @@
 import { Boom, notFound } from "@hapi/boom";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 export const transformResource = (model): Contracts.Webhooks.Webhook => ({
 	conditions: model.conditions,

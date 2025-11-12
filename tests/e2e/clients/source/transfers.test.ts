@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa";
 import { describe, Factories, Sandbox } from "@mainsail/test-framework";

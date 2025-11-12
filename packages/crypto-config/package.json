@@ -23,7 +23,6 @@
 	"dependencies": {
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
@@ -33,6 +32,7 @@
 		"lodash.set": "4.3.2"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"@types/lodash.clone": "4.5.9",
 		"@types/lodash.get": "4.4.9",
 		"@types/lodash.set": "4.3.9",

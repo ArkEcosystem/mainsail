@@ -23,7 +23,6 @@
 	"dependencies": {
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
@@ -33,6 +32,7 @@
 		"viem": "2.34.0"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"uvu": "0.5.6"
 	},
 	"engines": {

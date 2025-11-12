@@ -27,7 +27,6 @@
 		"@mainsail/api-database": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
@@ -37,6 +36,7 @@
 		"rate-limiter-flexible": "7.2.0"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"@types/ip": "1.1.3",
 		"@types/semver": "7.7.0",
 		"uvu": "0.5.6"

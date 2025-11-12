@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 
 import { AnyObject } from "../contracts.js";

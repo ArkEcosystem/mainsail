@@ -1,4 +1,4 @@
-import {
+import type {
 	Request,
 	ResponseToolkit,
 	Server as HapiServer,
@@ -6,7 +6,7 @@ import {
 	ServerInjectResponse,
 	ServerRoute,
 } from "@hapi/hapi";
-import { Schema } from "joi";
+import type { Schema } from "joi";
 
 export interface Controller {
 	handle(request: Request, h: ResponseToolkit): Promise<any>;

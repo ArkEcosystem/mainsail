@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { blue, bold } from "kleur/colors";
 
 import { AppHeader } from "../components/index.js";

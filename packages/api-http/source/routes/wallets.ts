@@ -1,6 +1,6 @@
 import Hapi from "@hapi/hapi";
 import { Schemas } from "@mainsail/api-common";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { WalletsController } from "../controllers/wallets.js";

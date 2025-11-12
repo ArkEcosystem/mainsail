@@ -7,7 +7,7 @@ import {
 	Plugins,
 } from "@mainsail/cli";
 import { Container, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { existsSync } from "fs";
 import { readJSONSync } from "fs-extra/esm";
 import { platform } from "os";

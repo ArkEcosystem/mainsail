@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { InvalidMultiSignatureAssetError, NotImplemented, PublicKeyError } from "@mainsail/exceptions";
 import { numberToHex } from "@mainsail/utils";
 import { secp256k1 } from "bcrypto";

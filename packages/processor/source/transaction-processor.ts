@@ -1,7 +1,7 @@
 import { formatCurrency } from "@mainsail/blockchain-utils";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { InvalidSignatureError } from "@mainsail/exceptions";
 
 @injectable()

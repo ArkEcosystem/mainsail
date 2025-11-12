@@ -3,7 +3,7 @@ import Hapi from "@hapi/hapi";
 import { AbstractController } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { TransactionResource } from "../resources/index.js";
 

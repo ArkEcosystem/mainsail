@@ -1,4 +1,4 @@
-import { EventEmitter } from "events";
+import type { EventEmitter } from "events";
 
 export interface QueueJob {
 	handle(): Promise<void>;

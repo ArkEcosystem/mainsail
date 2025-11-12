@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { AnySchema } from "joi";
 export type { Paths } from "env-paths";
 

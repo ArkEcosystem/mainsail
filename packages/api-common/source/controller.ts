@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { SchemaObject } from "./schemas.js";
 
@@ -69,7 +69,7 @@ export abstract class AbstractController {
 		};
 	}
 
-	protected async toResource<T, R extends Contracts.Api.Resource>(
+	protected async toResource<T extends object, R extends Contracts.Api.Resource>(
 		item: T,
 		transformer: new () => R,
 	): Promise<ReturnType<R["transform"]>> {
@@ -77,14 +77,14 @@ export abstract class AbstractController {
 		return resource.transform(item) as ReturnType<R["transform"]>;
 	}
 
-	protected async toCollection<T, R extends Contracts.Api.Resource>(
+	protected async toCollection<T extends object, R extends Contracts.Api.Resource>(
 		items: T[],
 		transformer: new () => R,
 	): Promise<ReturnType<R["transform"]>[]> {
 		return Promise.all(items.map(async (item) => await this.toResource(item, transformer)));
 	}
 
-	protected async toPagination<T, R extends Contracts.Api.Resource>(
+	protected async toPagination<T extends object, R extends Contracts.Api.Resource>(
 		resultsPage: Contracts.Api.ResultsPage<T>,
 		transformer: new () => R,
 	): Promise<Contracts.Api.ResultsPage<ReturnType<R["transform"]>>> {

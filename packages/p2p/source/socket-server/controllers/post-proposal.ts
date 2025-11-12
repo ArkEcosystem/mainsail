@@ -1,7 +1,7 @@
 import Hapi from "@hapi/hapi";
-import { Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { getPeerIp } from "../../utils/index.js";
 
@@ -27,7 +27,7 @@ export class PostProposalController implements Contracts.P2P.Controller {
 			const proposal = await this.factory.makeProposalFromBytes(request.payload.proposal);
 			const result = await this.proposalProcessor.process(proposal);
 
-			if (result === Contracts.Consensus.ProcessorResult.Invalid) {
+			if (result === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error("Invalid proposal");
 			}
 

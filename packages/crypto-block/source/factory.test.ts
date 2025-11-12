@@ -1,4 +1,4 @@
-import { Contracts, Utils } from "@mainsail/contracts";
+import type { Contracts, Utils } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import clone from "lodash.clonedeep";
 

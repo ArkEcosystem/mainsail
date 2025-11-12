@@ -1,7 +1,7 @@
-import { BigNumber } from "@mainsail/utils";
+import type { BigNumber } from "@mainsail/utils";
 
-import { Block, Transaction } from "./crypto/index.js";
-import { RoundInfo } from "./shared/rounds.js";
+import type { Block, Transaction } from "./crypto/index.js";
+import type { RoundInfo } from "./shared/rounds.js";
 
 export interface FeeCalculator {
 	calculate(transaction: Transaction): BigNumber;

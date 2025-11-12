@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { SenderExceededMaximumTransactionCountError } from "@mainsail/exceptions";
 import { Providers } from "@mainsail/kernel";
 import { assert, BigNumber, Lock } from "@mainsail/utils";

@@ -1,11 +1,4 @@
-export enum Step {
-	Propose = 0,
-	Prevote = 1,
-	Precommit = 2,
-}
+import type { Enums } from "@mainsail/constants";
 
-export enum ProcessorResult {
-	Invalid,
-	Accepted,
-	Skipped,
-}
+export type Step = Enums.Consensus.Step;
+export type ProcessorResult = Enums.Consensus.ProcessorResult;

@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import { join, resolve } from "path";
 import esmock from "esmock";
 import { dirSync, setGracefulCleanup } from "tmp";
-import { Contracts } from "@mainsail/test-runner";
+import type { Contracts } from "@mainsail/test-runner";
 
 import { describe } from "../../../../test-framework/source";
 import { NPM } from "./npm";

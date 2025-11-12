@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 import { parseTransactionError, UsernamesAbi } from "@mainsail/evm-contracts";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";

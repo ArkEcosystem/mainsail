@@ -1,4 +1,4 @@
-import { ByteBuffer } from "@mainsail/utils";
+import type { ByteBuffer } from "@mainsail/utils";
 
 export type MandatoryPropertyType =
 	| "hash"

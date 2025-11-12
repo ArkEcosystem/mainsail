@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import { Enums } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation/source/validator";
 
 import { describe, Sandbox } from "../../../test-framework/source";
@@ -18,7 +18,7 @@ describe<Context>("GetPeers Schema", ({ it, assert, beforeEach, each }) => {
 	beforeEach((context) => {
 		data = {
 			headers,
-			peers: [{ ip: "127.0.0.1", port: 4000, protocol: Contracts.P2P.PeerProtocol.Http }],
+			peers: [{ ip: "127.0.0.1", port: 4000, protocol: Enums.Api.Protocol.Http }],
 		};
 
 		context.sandbox = new Sandbox();
@@ -37,7 +37,7 @@ describe<Context>("GetPeers Schema", ({ it, assert, beforeEach, each }) => {
 	it("should not pass if peer.ip is missing", ({ validator }) => {
 		const result = validator.validate(getPeers, {
 			...data,
-			peers: [{ port: 4000, protocol: Contracts.P2P.PeerProtocol.Http }],
+			peers: [{ port: 4000, protocol: Enums.Api.Protocol.Http }],
 		});
 
 		assert.defined(result.error);
@@ -46,19 +46,19 @@ describe<Context>("GetPeers Schema", ({ it, assert, beforeEach, each }) => {
 	it("should pass if peer.ip is ipv4 or ipv6", ({ validator }) => {
 		let result = validator.validate(getPeers, {
 			...data,
-			peers: [{ ip: "127.0.0.1", port: 4000, protocol: Contracts.P2P.PeerProtocol.Http }],
+			peers: [{ ip: "127.0.0.1", port: 4000, protocol: Enums.Api.Protocol.Http }],
 		});
 		assert.undefined(result.error);
 
 		result = validator.validate(getPeers, {
 			...data,
-			peers: [{ ip: "::1", port: 4000, protocol: Contracts.P2P.PeerProtocol.Http }],
+			peers: [{ ip: "::1", port: 4000, protocol: Enums.Api.Protocol.Http }],
 		});
 		assert.undefined(result.error);
 
 		result = validator.validate(getPeers, {
 			...data,
-			peers: [{ ip: 1, port: 4000, protocol: Contracts.P2P.PeerProtocol.Http }],
+			peers: [{ ip: 1, port: 4000, protocol: Enums.Api.Protocol.Http }],
 		});
 		assert.defined(result.error);
 	});
@@ -66,7 +66,7 @@ describe<Context>("GetPeers Schema", ({ it, assert, beforeEach, each }) => {
 	it("should not pass if peer.port is missing", ({ validator }) => {
 		const result = validator.validate(getPeers, {
 			...data,
-			peers: [{ ip: "127.0.0.1", protocol: Contracts.P2P.PeerProtocol.Http }],
+			peers: [{ ip: "127.0.0.1", protocol: Enums.Api.Protocol.Http }],
 		});
 
 		assert.defined(result.error);
@@ -78,7 +78,7 @@ describe<Context>("GetPeers Schema", ({ it, assert, beforeEach, each }) => {
 			peers: new Array(constants.MAX_PEERS_GET_PEERS + 1).fill({
 				ip: "127.0.0.1",
 				port: 4000,
-				protocol: Contracts.P2P.PeerProtocol.Http,
+				protocol: Enums.Api.Protocol.Http,
 			}),
 		});
 

@@ -1,11 +1,10 @@
-import { Block } from "./block.js";
-import { KeyPair } from "./identities.js";
-import { AggregatedSignature } from "./signatures.js";
+import type { Enums } from "@mainsail/constants";
 
-export enum MessageType {
-	Prevote = 1,
-	Precommit = 2,
-}
+import type { Block } from "./block.js";
+import type { KeyPair } from "./identities.js";
+import type { AggregatedSignature } from "./signatures.js";
+
+export type MessageType = Enums.Crypto.MessageType;
 
 export interface SignatureMessageData {
 	readonly type: MessageType;

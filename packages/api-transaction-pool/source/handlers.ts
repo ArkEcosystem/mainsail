@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import * as Configuration from "./routes/configuration.js";
 import * as Transactions from "./routes/transactions.js";

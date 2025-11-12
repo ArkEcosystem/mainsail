@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import { Enums } from "@mainsail/constants";
 
 import { describe } from "../../../test-framework/source";
 import { MilestonesGenerator } from "./milestones";
@@ -40,7 +40,7 @@ describe<{
 						version: 1,
 					},
 					epoch: date.toISOString().slice(0, 11) + "00:00:00.000Z",
-					evmSpec: Contracts.Evm.SpecId.SHANGHAI,
+					evmSpec: Enums.Evm.SpecId.SHANGHAI,
 					gas: {
 						maximumGasLimit: 5_000_000,
 						maximumGasPrice: 10_000 * 1e9,
