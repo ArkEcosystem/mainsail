@@ -1,5 +1,5 @@
 import { isMajority } from "@mainsail/blockchain-utils";
-import { Identifiers } from "@mainsail/constants";
+import { Identifiers, Enums } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
@@ -24,7 +24,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 
 	async process(commit: Contracts.Crypto.Commit): Promise<Contracts.Consensus.ProcessorResult> {
 		if (!this.#hasValidBlockNumber(commit)) {
-			return Contracts.Consensus.ProcessorResult.Skipped;
+			return Enums.Consensus.ProcessorResult.Skipped;
 		}
 
 		const commitState = this.commitStateFactory(commit);
@@ -32,8 +32,8 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 		await this.getConsensus().handleCommitState(commitState);
 
 		return commitState.getProcessorResult().success
-			? Contracts.Consensus.ProcessorResult.Accepted
-			: Contracts.Consensus.ProcessorResult.Invalid;
+			? Enums.Consensus.ProcessorResult.Accepted
+			: Enums.Consensus.ProcessorResult.Invalid;
 	}
 
 	async hasValidSignature(commit: Contracts.Crypto.Commit): Promise<boolean> {
@@ -58,7 +58,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 			blockHash: block.data.hash,
 			blockNumber: block.data.number,
 			round: proof.round,
-			type: Contracts.Crypto.MessageType.Precommit,
+			type: Enums.Crypto.MessageType.Precommit,
 		});
 
 		return this.aggregator.verify(proof, precommit, roundValidators);

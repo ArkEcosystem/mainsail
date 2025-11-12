@@ -1,5 +1,5 @@
 import Hapi from "@hapi/hapi";
-import { Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
@@ -28,7 +28,7 @@ export class PostPrevoteController implements Contracts.P2P.Controller {
 
 			const result = await this.prevoteProcessor.process(prevote);
 
-			if (result === Contracts.Consensus.ProcessorResult.Invalid) {
+			if (result === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error("Invalid prevote");
 			}
 

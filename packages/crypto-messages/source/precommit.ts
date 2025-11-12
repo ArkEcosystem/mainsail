@@ -1,4 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
+import { Enums } from "@mainsail/constants";
 
 export class Precommit implements Contracts.Crypto.Precommit {
 	#blockNumber: number;
@@ -25,7 +26,7 @@ export class Precommit implements Contracts.Crypto.Precommit {
 	}
 
 	get type(): Contracts.Crypto.MessageType {
-		return Contracts.Crypto.MessageType.Precommit;
+		return Enums.Crypto.MessageType.Precommit;
 	}
 
 	get blockNumber(): number {

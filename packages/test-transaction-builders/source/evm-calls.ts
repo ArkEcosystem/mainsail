@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
@@ -371,7 +371,7 @@ export const callViewFunction = async (
 	viewContext: Omit<Contracts.Evm.TransactionViewContext, "specId">,
 ): Promise<Contracts.Evm.ViewResult> => {
 	const instance = sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
-	return instance.view({ ...viewContext, specId: Contracts.Evm.SpecId.LATEST });
+	return instance.view({ ...viewContext, specId: Enums.Evm.SpecId.LATEST });
 };
 
 export * as ContractAbis from "@mainsail/evm-contracts";

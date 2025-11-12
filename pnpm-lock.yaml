@@ -2186,6 +2186,9 @@ importers:
 
   packages/exceptions:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts

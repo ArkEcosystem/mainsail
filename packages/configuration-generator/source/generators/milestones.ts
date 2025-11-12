@@ -1,5 +1,6 @@
 import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+import { Enums } from "@mainsail/constants";
 
 @injectable()
 export class MilestonesGenerator {
@@ -14,7 +15,7 @@ export class MilestonesGenerator {
 					version: 1,
 				},
 				epoch: options.epoch.toISOString().slice(0, 11) + "00:00:00.000Z",
-				evmSpec: Contracts.Evm.SpecId.SHANGHAI,
+				evmSpec: Enums.Evm.SpecId.SHANGHAI,
 				gas: {
 					maximumGasLimit: 5_000_000,
 					maximumGasPrice: 10_000 * 1e9,

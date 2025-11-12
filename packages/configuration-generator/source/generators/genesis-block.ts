@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
@@ -288,7 +288,7 @@ export class GenesisBlockGenerator extends Generator {
 				gasPrice: BigInt(transaction.data.gasPrice),
 				index: transaction.data.transactionIndex,
 				nonce: transaction.data.nonce.toBigInt(),
-				specId: Contracts.Evm.SpecId.SHANGHAI,
+				specId: Enums.Evm.SpecId.SHANGHAI,
 				to: transaction.data.to,
 				txHash: transaction.hash,
 				value: transaction.data.value.toBigInt(),
@@ -305,7 +305,7 @@ export class GenesisBlockGenerator extends Generator {
 		await this.evm.updateRewardsAndVotes({
 			blockReward: 0n,
 			commitKey,
-			specId: Contracts.Evm.SpecId.SHANGHAI,
+			specId: Enums.Evm.SpecId.SHANGHAI,
 			timestamp,
 			validatorAddress: proposer,
 		});
@@ -313,7 +313,7 @@ export class GenesisBlockGenerator extends Generator {
 		await this.evm.calculateRoundValidators({
 			commitKey,
 			roundValidators: BigNumber.make(options.validators).toBigInt(),
-			specId: Contracts.Evm.SpecId.SHANGHAI,
+			specId: Enums.Evm.SpecId.SHANGHAI,
 			timestamp,
 			validatorAddress: proposer,
 		});

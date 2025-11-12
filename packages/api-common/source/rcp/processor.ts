@@ -1,5 +1,5 @@
 import Hapi from "@hapi/hapi";
-import { Identifiers } from "@mainsail/constants";
+import { Identifiers, Enums } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { RpcError } from "@mainsail/exceptions";
@@ -24,7 +24,7 @@ export class Processor implements Contracts.Api.RPC.Processor {
 		Contracts.Api.RPC.Response | Contracts.Api.RPC.Error | (Contracts.Api.RPC.Response | Contracts.Api.RPC.Error)[]
 	> {
 		if (!this.#validatePayload(request)) {
-			return prepareRcpError(getRcpId(request), Contracts.Api.RPC.ErrorCode.InvalidRequest);
+			return prepareRcpError(getRcpId(request), Enums.Rpc.ErrorCode.InvalidRequest);
 		}
 
 		const payload = request.payload as Contracts.Api.RPC.Request<any>;
@@ -40,11 +40,11 @@ export class Processor implements Contracts.Api.RPC.Processor {
 	): Promise<Contracts.Api.RPC.Response | Contracts.Api.RPC.Error> {
 		const action = this.#actions.get(rcpRequest.method);
 		if (!action) {
-			return prepareRcpError(rcpRequest.id, Contracts.Api.RPC.ErrorCode.MethodNotFound);
+			return prepareRcpError(rcpRequest.id, Enums.Rpc.ErrorCode.MethodNotFound);
 		}
 
 		if (!this.#validateParams(rcpRequest.params, action)) {
-			return prepareRcpError(rcpRequest.id, Contracts.Api.RPC.ErrorCode.InvalidParameters);
+			return prepareRcpError(rcpRequest.id, Enums.Rpc.ErrorCode.InvalidParameters);
 		}
 
 		try {
@@ -58,7 +58,7 @@ export class Processor implements Contracts.Api.RPC.Processor {
 				return prepareRcpError(rcpRequest.id, error.code, error.message);
 			}
 
-			return prepareRcpError(rcpRequest.id, Contracts.Api.RPC.ErrorCode.InternalError);
+			return prepareRcpError(rcpRequest.id, Enums.Rpc.ErrorCode.InternalError);
 		}
 	}
 

@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { RpcError } from "@mainsail/exceptions";
@@ -67,7 +67,7 @@ export class CallAction implements Contracts.Api.RPC.Action {
 			data: Buffer.from(toBytes(data.data)),
 			from: data.from ?? "0x" + "0".repeat(40),
 			gasLimit,
-			specId: Contracts.Evm.SpecId.LATEST,
+			specId: Enums.Evm.SpecId.LATEST,
 			to: data.to,
 		});
 

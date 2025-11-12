@@ -36,10 +36,12 @@ export interface Action {
 	schema: SchemaObject;
 }
 
-export enum ErrorCode {
-	ParseError = -32_700,
-	InvalidRequest = -32_600,
-	MethodNotFound = -32_601,
-	InvalidParameters = -32_602,
-	InternalError = -32_603,
-}
+declare const ErrorCodeValues: {
+	readonly RpcServerError: -32_000;
+	readonly ParseError: -32_700;
+	readonly InvalidRequest: -32_600;
+	readonly MethodNotFound: -32_601;
+	readonly InvalidParameters: -32_602;
+	readonly InternalError: -32_603;
+};
+export type ErrorCode = (typeof ErrorCodeValues)[keyof typeof ErrorCodeValues];

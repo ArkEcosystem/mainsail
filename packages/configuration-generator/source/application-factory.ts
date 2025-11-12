@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 
-import { Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
@@ -93,7 +93,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 		},
 		milestones: [
 			{
-				evmSpec: Contracts.Evm.SpecId.SHANGHAI,
+				evmSpec: Enums.Evm.SpecId.SHANGHAI,
 				height: 0,
 				timeouts: {
 					blockPrepareTime: 4000,

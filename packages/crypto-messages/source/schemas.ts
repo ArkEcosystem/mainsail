@@ -1,4 +1,4 @@
-import type { Contracts } from "@mainsail/contracts";
+import { Enums } from "@mainsail/constants";
 import { AnySchemaObject } from "ajv";
 
 export const schemas: Record<
@@ -12,7 +12,7 @@ export const schemas: Record<
 			blockNumber: { minimum: 1, type: "integer" },
 			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
-			type: { enum: [Contracts.Crypto.MessageType.Precommit] },
+			type: { enum: [Enums.Crypto.MessageType.Precommit] },
 			validatorIndex: { isValidatorIndex: {} },
 		},
 		required: ["type", "blockNumber", "round", "validatorIndex", "signature"],
@@ -25,7 +25,7 @@ export const schemas: Record<
 			blockNumber: { minimum: 1, type: "integer" },
 			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
-			type: { enum: [Contracts.Crypto.MessageType.Prevote] },
+			type: { enum: [Enums.Crypto.MessageType.Prevote] },
 			validatorIndex: { isValidatorIndex: {} },
 		},
 		required: ["type", "blockNumber", "round", "validatorIndex", "signature"],

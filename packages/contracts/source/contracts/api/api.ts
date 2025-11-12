@@ -10,10 +10,11 @@ export interface Server {
 	dispose(): Promise<void>;
 }
 
-export enum ServerType {
-	Http = "HTTP",
-	Https = "HTTPS",
-}
+declare const ServerTypeValues: {
+	readonly Http: "HTTP";
+	readonly Https: "HTTPS";
+};
+export type ServerType = (typeof ServerTypeValues)[keyof typeof ServerTypeValues];
 
 export interface ServerState {
 	app: Application;

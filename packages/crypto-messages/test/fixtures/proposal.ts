@@ -1,4 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
+import { Enums } from "@mainsail/constants";
 import { BigNumber } from "@mainsail/utils";
 
 export const validatorMnemonic =
@@ -107,7 +108,7 @@ export const precommitData: Contracts.Crypto.PrecommitData = {
 	round: 1,
 	signature:
 		"8031c22986f2a9e6e8d7d2a90210bb8483e0cad175a35a9a7e3a880f7a383e6af06be29c06199a7f18d4f123bb8a6fd60101f3eabe387f55256b879eb654928c12968f77fdefd0f776dde1806d2865f6a8059f865108aab7e7161f18cf162ee3",
-	type: Contracts.Crypto.MessageType.Precommit,
+	type: Enums.Crypto.MessageType.Precommit,
 	validatorIndex: 0,
 };
 
@@ -123,7 +124,7 @@ export const precommitDataNoBlock: Contracts.Crypto.PrecommitData = {
 	round: 1,
 	signature:
 		"904c8055242bd7736a1cf7ce20c8fedeee5f2f8fe3f6cab6a166c36c1be0f616c2b7a333912becfa3ecb799c8cd420a012bf41018f5c52f67a2858a6d5bd016e8ef6f56a84d8a734ba6ce5f9a5260201fd9d73ce8688ff0019df2c07a1c33c4d",
-	type: Contracts.Crypto.MessageType.Precommit,
+	type: Enums.Crypto.MessageType.Precommit,
 	validatorIndex: 0,
 };
 
@@ -136,7 +137,7 @@ export const prevoteData: Contracts.Crypto.PrevoteData = {
 	round: 1,
 	signature:
 		"a25c6d7a0491513cecaabe83f9c1dc59d5d9750a09535fd7d2eb4a81641a425a664c41822c1ba0d414357ad34a8f0a5a084d269f04e8c09da20b44ff75d1a0280919a31d2a519bf0327459471fda97f8a1096500ec84a5b2004eff1dc719de77",
-	type: Contracts.Crypto.MessageType.Prevote,
+	type: Enums.Crypto.MessageType.Prevote,
 	validatorIndex: 0,
 };
 
@@ -152,7 +153,7 @@ export const prevoteDataNoBlock: Contracts.Crypto.PrevoteData = {
 	round: 1,
 	signature:
 		"927628d67c385fe216aa800def9cce0c09f5f9fbf836583d7c07ab6a98e1b5681802c92f81ad54984236a07fa389dbab1519f3c91ad39a505a61c3624a88c65da71fe721d7af0ed452516771b94d027be713dba68e14fa2c9680e35b63f0e038",
-	type: Contracts.Crypto.MessageType.Prevote,
+	type: Enums.Crypto.MessageType.Prevote,
 	validatorIndex: 0,
 };
 

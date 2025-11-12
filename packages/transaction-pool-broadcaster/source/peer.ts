@@ -1,5 +1,6 @@
 import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+import { Enums } from "@mainsail/constants";
 import dayjs, { Dayjs } from "dayjs";
 
 @injectable()
@@ -15,13 +16,13 @@ export class Peer implements Contracts.TransactionPool.Peer {
 	public init(ip: string, port: number): Peer {
 		this.ip = ip;
 		this.port = port;
-		this.protocol = Contracts.TransactionPool.PeerProtocol.Http;
+		this.protocol = Enums.TransactionPool.PeerProtocol.Http;
 
 		return this;
 	}
 
 	public get url(): string {
-		return `${this.protocol === Contracts.TransactionPool.PeerProtocol.Https ? "https" : "http"}://${this.ip}:${this.port}`;
+		return `${this.protocol === Enums.TransactionPool.PeerProtocol.Https ? "https" : "http"}://${this.ip}:${this.port}`;
 	}
 
 	public recentlyPinged(): boolean {

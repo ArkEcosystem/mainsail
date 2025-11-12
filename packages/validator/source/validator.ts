@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/constants";
+import { Identifiers, Enums } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
@@ -112,7 +112,7 @@ export class Validator implements Contracts.Validator.Validator {
 				blockHash,
 				blockNumber,
 				round,
-				type: Contracts.Crypto.MessageType.Prevote,
+				type: Enums.Crypto.MessageType.Prevote,
 				validatorIndex,
 			},
 			await this.#keyPair.getKeyPair(),
@@ -130,7 +130,7 @@ export class Validator implements Contracts.Validator.Validator {
 				blockHash,
 				blockNumber,
 				round,
-				type: Contracts.Crypto.MessageType.Precommit,
+				type: Enums.Crypto.MessageType.Precommit,
 				validatorIndex,
 			},
 			await this.#keyPair.getKeyPair(),

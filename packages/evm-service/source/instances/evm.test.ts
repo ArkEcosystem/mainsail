@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import type { Contracts } from "@mainsail/contracts";
+import { Enums } from "@mainsail/constants";
 import { Evm } from "@mainsail/evm";
 import {
 	concat,
@@ -46,13 +47,13 @@ describe<{
 	const deployConfig = {
 		gasLimit: BigInt(1_000_000),
 		gasPrice: BigInt(0),
-		specId: Contracts.Evm.SpecId.SHANGHAI,
+		specId: Enums.Evm.SpecId.SHANGHAI,
 	};
 
 	const transferConfig = {
 		gasLimit: BigInt(60_000),
 		gasPrice: BigInt(0),
-		specId: Contracts.Evm.SpecId.SHANGHAI,
+		specId: Enums.Evm.SpecId.SHANGHAI,
 	};
 
 	const blockContext: Omit<Contracts.Evm.BlockContext, "commitKey"> = {
@@ -733,7 +734,7 @@ describe<{
 					txHash: getRandomTxHash(),
 					gasLimit: 30_000n,
 					gasPrice: 5n,
-					specId: Contracts.Evm.SpecId.SHANGHAI,
+					specId: Enums.Evm.SpecId.SHANGHAI,
 				}),
 			"transaction validation error: call gas cost (137330) exceeds the gas limit (30000)",
 		);
@@ -942,7 +943,7 @@ describe<{
 			data: Buffer.alloc(0),
 			txHash: getRandomTxHash(),
 			blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(0), round: BigInt(0) } },
-			specId: Contracts.Evm.SpecId.SHANGHAI,
+			specId: Enums.Evm.SpecId.SHANGHAI,
 		};
 
 		// Succeeds
@@ -1109,7 +1110,7 @@ const getBalance = async (
 		from: zeroAddress,
 		data: Buffer.from(toBytes(balanceOf)),
 		to: contractAddress!,
-		specId: Contracts.Evm.SpecId.SHANGHAI,
+		specId: Enums.Evm.SpecId.SHANGHAI,
 	});
 
 	if (output?.byteLength === 0) {

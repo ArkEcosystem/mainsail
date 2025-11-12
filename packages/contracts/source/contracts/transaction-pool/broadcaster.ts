@@ -2,10 +2,11 @@ import type { Dayjs } from "dayjs";
 
 import type { Transaction } from "../crypto/index.js";
 
-export enum PeerProtocol {
-	Http = 0,
-	Https = 1,
-}
+declare const PeerProtocolValues: {
+	readonly Http: 0;
+	readonly Https: 1;
+};
+export type PeerProtocol = (typeof PeerProtocolValues)[keyof typeof PeerProtocolValues];
 
 export interface PeerBroadcast {
 	ip: string;

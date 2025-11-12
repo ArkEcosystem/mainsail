@@ -1,4 +1,4 @@
-import type { Contracts } from "@mainsail/contracts";
+import { Enums } from "@mainsail/constants";
 
 import { type shared } from "../socket-server/codecs/proto/protos.js";
 
@@ -8,11 +8,11 @@ export const getPeerUrl = (peer: shared.IPeerLike): string => {
 	// Heuristically check based on port first to match existing behavior.
 	switch (peer.port) {
 		case 80: {
-			protocol = Contracts.P2P.PeerProtocol.Http;
+			protocol = Enums.P2P.PeerProtocol.Http;
 			break;
 		}
 		case 443: {
-			protocol = Contracts.P2P.PeerProtocol.Https;
+			protocol = Enums.P2P.PeerProtocol.Https;
 			break;
 		}
 		default: {
@@ -21,10 +21,10 @@ export const getPeerUrl = (peer: shared.IPeerLike): string => {
 	}
 
 	switch (protocol) {
-		case Contracts.P2P.PeerProtocol.Http: {
+		case Enums.P2P.PeerProtocol.Http: {
 			return `http://${peer.ip}:${peer.port}`;
 		}
-		case Contracts.P2P.PeerProtocol.Https: {
+		case Enums.P2P.PeerProtocol.Https: {
 			return `https://${peer.ip}:${peer.port}`;
 		}
 		default: {

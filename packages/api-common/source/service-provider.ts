@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/constants";
+import { Identifiers, Enums } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
@@ -22,11 +22,11 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 
 	public async register(): Promise<void> {
 		if (this.config().get("server.http.enabled")) {
-			await this.buildServer(Contracts.Api.ServerType.Http, this.httpIdentifier());
+			await this.buildServer(Enums.Api.ServerType.Http, this.httpIdentifier());
 		}
 
 		if (this.config().get("server.https.enabled")) {
-			await this.buildServer(Contracts.Api.ServerType.Https, this.httpsIdentifier());
+			await this.buildServer(Enums.Api.ServerType.Https, this.httpsIdentifier());
 		}
 
 		this.#registerValidation();

@@ -1,4 +1,4 @@
-import { Events, Identifiers } from "@mainsail/constants";
+import { Events, Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Types } from "@mainsail/kernel";
@@ -42,7 +42,7 @@ export class Peer implements Contracts.P2P.Peer {
 	public init(ip: string, port: number): Peer {
 		this.ip = ip;
 		this.port = port;
-		this.protocol = Contracts.P2P.PeerProtocol.Http;
+		this.protocol = Enums.P2P.PeerProtocol.Http;
 
 		return this;
 	}

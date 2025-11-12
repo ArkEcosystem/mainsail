@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
@@ -166,7 +166,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 				for (const commit of commits) {
 					const response = await this.commitProcessor.process(commit);
-					if (response === Contracts.Consensus.ProcessorResult.Invalid) {
+					if (response === Enums.Consensus.ProcessorResult.Invalid) {
 						throw new Error(`Received block is invalid`);
 					}
 

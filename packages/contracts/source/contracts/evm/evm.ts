@@ -204,7 +204,8 @@ export interface TransactionReceipt {
 
 // Supported EVM specs
 // https://github.com/ethereum/execution-specs
-export enum SpecId {
-	SHANGHAI = "Shanghai",
-	LATEST = "Latest",
-}
+declare const SpecIdValues: {
+	readonly SHANGHAI: "Shanghai";
+	readonly LATEST: "Latest";
+};
+export type SpecId = (typeof SpecIdValues)[keyof typeof SpecIdValues];
