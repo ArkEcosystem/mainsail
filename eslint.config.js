@@ -187,7 +187,7 @@ export default [
 	{
 		files: ["packages/constants/source/enums.ts"],
 		rules: {
-			'@typescript-eslint/no-namespace': 'off',
+			"@typescript-eslint/no-namespace": "off",
 		},
-	},	
+	},
 ];

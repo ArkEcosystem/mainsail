@@ -1,6 +1,7 @@
-import { Exception } from "./base.js";
-import type { Contracts } from "@mainsail/contracts";
 import { Enums } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
+
+import { Exception } from "./base.js";
 
 export class RpcError extends Exception {
 	public constructor(

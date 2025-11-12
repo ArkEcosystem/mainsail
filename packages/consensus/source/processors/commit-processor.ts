@@ -1,5 +1,5 @@
 import { isMajority } from "@mainsail/blockchain-utils";
-import { Identifiers, Enums } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 

@@ -1,6 +1,6 @@
 import { Request } from "@hapi/hapi";
-import type { Contracts } from "@mainsail/contracts";
 import { Enums } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 
 export const getRcpId = (request: Request): Contracts.Api.RPC.Id => {
 	const payload = request.payload as Record<string, unknown>;

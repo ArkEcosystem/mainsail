@@ -1,5 +1,5 @@
 import { isMajority, isMinority } from "@mainsail/blockchain-utils";
-import { Events, Enums, Identifiers } from "@mainsail/constants";
+import { Enums, Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 

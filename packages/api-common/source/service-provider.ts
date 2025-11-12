@@ -1,4 +1,4 @@
-import { Identifiers, Enums } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";

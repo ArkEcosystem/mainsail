@@ -1,4 +1,4 @@
-import { Events, Enums, Identifiers, Locale } from "@mainsail/constants";
+import { Enums, Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { assert, Lock } from "@mainsail/utils";

@@ -21,8 +21,8 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
-		"@mainsail/contracts": "workspace:*",
-		"@mainsail/constants": "workspace:*"
+		"@mainsail/constants": "workspace:*",
+		"@mainsail/contracts": "workspace:*"
 	},
 	"devDependencies": {
 		"uvu": "0.5.6"
