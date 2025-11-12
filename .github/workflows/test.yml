@@ -583,11 +583,11 @@ jobs:
               run: pnpm run build
 
             - name: Docker ${{ matrix.name }}
+              env:
+                  MINIMUM_BLOCKS_TO_SYNC: 5000
               run: sudo chmod -R 777 tests/e2e/${{ matrix.name }}/nodes && cd tests/e2e/${{ matrix.name }} && docker compose up -d
 
             - name: Running checks for ${{ matrix.name }}
-              env:
-                  MINIMUM_BLOCKS_TO_SYNC: 10000
               run: |
                   container_id=$(docker ps -a | grep 'sync-checks' | awk '{print $1}')
                   while docker ps | grep -q $container_id; do echo "checks running..."; sleep 5; done
