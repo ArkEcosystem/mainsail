@@ -77,7 +77,7 @@ export class Controller {
 		};
 	}
 
-	protected async toResource<T extends {}, R extends Contracts.Api.Resource>(
+	protected async toResource<T extends object, R extends Contracts.Api.Resource>(
 		item: T,
 		transformer: new () => R,
 	): Promise<ReturnType<R["transform"]>> {
@@ -86,14 +86,14 @@ export class Controller {
 		return resource.transform(item) as ReturnType<R["transform"]>;
 	}
 
-	protected async toCollection<T extends {}, R extends Contracts.Api.Resource>(
+	protected async toCollection<T extends object, R extends Contracts.Api.Resource>(
 		items: T[],
 		transformer: new () => R,
 	): Promise<ReturnType<R["transform"]>[]> {
 		return Promise.all(items.map(async (item) => await this.toResource(item, transformer)));
 	}
 
-	protected async toPagination<T extends {}, R extends Contracts.Api.Resource>(
+	protected async toPagination<T extends object, R extends Contracts.Api.Resource>(
 		resultsPage: Contracts.Api.ResultsPage<T>,
 		transformer: new () => R,
 	): Promise<Contracts.Api.ResultsPage<ReturnType<R["transform"]>>> {
