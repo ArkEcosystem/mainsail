@@ -8,7 +8,7 @@ export enum Protocol {
 	Https = 1,
 }
 
-export enum ErrorCode {
+export enum RcpErrorCode {
 	RpcServerError = -32_000,
 	ParseError = -32_700,
 	InvalidRequest = -32_600,
