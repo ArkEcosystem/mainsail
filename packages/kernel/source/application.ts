@@ -1,6 +1,7 @@
 import { exit } from "node:process";
 
-import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { DirectoryCannotBeFound } from "@mainsail/exceptions";
 import { join } from "path";
 import { isMainThread } from "worker_threads";
 
@@ -311,7 +312,7 @@ export class Application implements Contracts.Kernel.Application {
 		const path: string = this.get<string>(`path.${type}`);
 
 		if (!this.get<Contracts.Kernel.Filesystem>(Identifiers.Services.Filesystem.Service).existsSync(path)) {
-			throw new Exceptions.DirectoryCannotBeFound(path);
+			throw new DirectoryCannotBeFound(path);
 		}
 
 		return path;
@@ -319,7 +320,7 @@ export class Application implements Contracts.Kernel.Application {
 
 	#usePath(type: string, path: string): void {
 		if (!this.get<Contracts.Kernel.Filesystem>(Identifiers.Services.Filesystem.Service).existsSync(path)) {
-			throw new Exceptions.DirectoryCannotBeFound(path);
+			throw new DirectoryCannotBeFound(path);
 		}
 
 		this.rebind<string>(`path.${type}`).toConstantValue(path);

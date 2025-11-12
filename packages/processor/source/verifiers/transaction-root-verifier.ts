@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { InvalidTransactionsRoot } from "@mainsail/exceptions";
 
 @injectable()
 export class TransactionsRootVerifier implements Contracts.Processor.Handler {
@@ -20,7 +21,7 @@ export class TransactionsRootVerifier implements Contracts.Processor.Handler {
 
 		const transactionsRoot = await this.hashFactory.sha256(payloadBuffers);
 		if (transactionsRoot.toString("hex") !== block.data.transactionsRoot) {
-			throw new Exceptions.InvalidTransactionsRoot(block, transactionsRoot.toString("hex"));
+			throw new InvalidTransactionsRoot(block, transactionsRoot.toString("hex"));
 		}
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/processor",
-	"version": "0.0.1-rc.6",
+	"version": "0.0.1-rc.7",
 	"description": "Block processor for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -24,6 +24,7 @@
 		"@mainsail/blockchain-utils": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.11.13"

@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { RpcError } from "@mainsail/exceptions";
 import { toBytes } from "viem";
 
 type TxData = {
@@ -73,6 +74,6 @@ export class CallAction implements Contracts.Api.RPC.Action {
 			return `0x${output?.toString("hex")}`;
 		}
 
-		throw new Exceptions.RpcError("execution reverted");
+		throw new RpcError("execution reverted");
 	}
 }

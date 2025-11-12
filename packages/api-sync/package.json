@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/api-sync",
-	"version": "0.0.1-rc.6",
+	"version": "0.0.1-rc.7",
 	"description": "API database sync for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -26,6 +26,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",
+		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"joi": "18.0.0",

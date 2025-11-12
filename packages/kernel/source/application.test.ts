@@ -1,5 +1,6 @@
 import { Container, injectable } from "@mainsail/container";
-import { Exceptions, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { setMaxListeners } from "events";
 import { join } from "path";
 import { dirSync } from "tmp";
@@ -153,9 +154,9 @@ describe<{
 
 		stub(context.app.get(Identifiers.Services.Filesystem.Service), "existsSync").returnValue(false);
 
-		assert.throws(() => context.app.dataPath(), new Exceptions.DirectoryCannotBeFound());
+		assert.throws(() => context.app.dataPath(), new Exceptions.DirectoryCannotBeFound(""));
 
-		assert.throws(() => context.app.useDataPath(), new Exceptions.DirectoryCannotBeFound());
+		assert.throws(() => context.app.useDataPath(), new Exceptions.DirectoryCannotBeFound(""));
 	});
 
 	it("should set and get the given data path", (context) => {

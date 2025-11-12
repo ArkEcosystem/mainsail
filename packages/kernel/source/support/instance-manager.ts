@@ -1,5 +1,6 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { DriverCannotBeResolved } from "@mainsail/exceptions";
 import { pascalCase } from "@mainsail/utils";
 
 @injectable()
@@ -26,7 +27,7 @@ export abstract class InstanceManager<T> {
 		const driver: T | undefined = this.#drivers.get(name);
 
 		if (!driver) {
-			throw new Exceptions.DriverCannotBeResolved(name);
+			throw new DriverCannotBeResolved(name);
 		}
 
 		return driver;

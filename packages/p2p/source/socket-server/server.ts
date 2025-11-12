@@ -4,16 +4,17 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { constants } from "../constants.js";
 import { plugin as hapiNesPlugin } from "../hapi-nes/index.js";
-import { AcceptPeerPlugin } from "./plugins/accept-peer.js";
-import { CodecPlugin } from "./plugins/codec.js";
-import { HeaderHandlePlugin } from "./plugins/header-handle.js";
-import { HeaderIncludePlugin } from "./plugins/header-include.js";
-import { RateLimitPlugin } from "./plugins/rate-limit.js";
-import { ValidateDataPlugin } from "./plugins/validate-data.js";
-import { ValidateIpPlugin } from "./plugins/validate-ip.js";
-import { Route } from "./routes/route.js";
+import {
+	AcceptPeerPlugin,
+	CodecPlugin,
+	HeaderHandlePlugin,
+	HeaderIncludePlugin,
+	RateLimitPlugin,
+	StatisticPlugin,
+	ValidateDataPlugin,
+	ValidateIpPlugin,
+} from "./plugins/index.js";
 
-// todo: review the implementation
 @injectable()
 export class Server implements Contracts.P2P.Server {
 	@inject(Identifiers.Application.Instance)
@@ -23,7 +24,7 @@ export class Server implements Contracts.P2P.Server {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@multiInject(Identifiers.P2P.Routes)
-	private readonly routes!: Route[];
+	private readonly routes!: Contracts.P2P.Route[];
 
 	private server!: HapiServer;
 
@@ -47,6 +48,9 @@ export class Server implements Contracts.P2P.Server {
 		for (const route of this.routes) {
 			route.register(this.server);
 		}
+
+		// onRequest
+		this.app.resolve(StatisticPlugin).register(this.server);
 
 		// onPreAuth
 		this.app.resolve(ValidateIpPlugin).register(this.server);

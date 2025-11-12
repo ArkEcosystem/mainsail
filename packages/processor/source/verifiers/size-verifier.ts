@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { InvalidPayloadSize, MaxPayloadExceeded } from "@mainsail/exceptions";
 
 @injectable()
 export class SizeVerifier implements Contracts.Processor.Handler {
@@ -18,12 +19,12 @@ export class SizeVerifier implements Contracts.Processor.Handler {
 
 		const totalSize = this.headerSize() + block.header.payloadSize;
 		if (totalSize > maxPayload) {
-			throw new Exceptions.MaxPayloadExceeded(block, totalSize, maxPayload);
+			throw new MaxPayloadExceeded(block, totalSize, maxPayload);
 		}
 
 		const actualSize = Buffer.byteLength(block.serialized, "hex");
 		if (totalSize !== actualSize) {
-			throw new Exceptions.InvalidPayloadSize(block, totalSize, actualSize);
+			throw new InvalidPayloadSize(block, totalSize, actualSize);
 		}
 
 		let totalPayloadLength = block.transactions.length * 4;
@@ -32,7 +33,7 @@ export class SizeVerifier implements Contracts.Processor.Handler {
 		}
 
 		if (totalPayloadLength !== block.data.payloadSize) {
-			throw new Exceptions.InvalidPayloadSize(block, totalSize, totalPayloadLength);
+			throw new InvalidPayloadSize(block, totalSize, totalPayloadLength);
 		}
 	}
 }
