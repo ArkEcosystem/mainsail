@@ -65,7 +65,7 @@ jobs:
 
     unit:
         name: "Unit"
-        if: false
+        if: true
         needs:
             - build
         strategy:
@@ -257,7 +257,7 @@ jobs:
 
     integration:
         name: "Integration"
-        if: false
+        if: true
         needs:
             - build
         strategy:
@@ -314,7 +314,7 @@ jobs:
 
     e2e-consensus:
         name: "E2E Consensus"
-        if: false
+        if: true
         needs:
             - build
         concurrency:
@@ -399,7 +399,7 @@ jobs:
 
     e2e-clients:
         name: "E2E Clients"
-        if: false
+        if: true
         needs:
             - build
         concurrency:
@@ -457,7 +457,7 @@ jobs:
 
     e2e-snapshot:
         name: "E2E Snapshot"
-        if: false
+        if: true
         needs:
             - build
         concurrency:
@@ -610,7 +610,7 @@ jobs:
 
     functional:
         name: "Functional - ${{matrix.name}}"
-        if: false
+        if: true
         needs:
             - build
         concurrency:
