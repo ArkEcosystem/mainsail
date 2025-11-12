@@ -5,4 +5,4 @@ export const Units = {
 	MEGABYTE: 1024 ** 2,
 	GIGABYTE: 1024 ** 3,
 	TERABYTE: 1024 ** 4,
-};
+} as const;

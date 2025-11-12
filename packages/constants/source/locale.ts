@@ -1,1 +1,1 @@
-export const Locale = "en-US";
+export const Locale = "en-US" as const;

@@ -312,4 +312,4 @@ export const Identifiers = {
 		Listener: Symbol.for("Webhooks<Listener>"),
 		Server: Symbol.for("Webhooks<Server>"),
 	},
-};
+} as const;

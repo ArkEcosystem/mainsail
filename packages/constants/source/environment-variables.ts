@@ -134,8 +134,6 @@ export const EnvironmentVariableNames = [
 	"MAINSAIL_PATH_TEMP",
 ] as const;
 
-// TODO: DisconnectInvalidPeers
-
 export const EnvironmentVariables = EnvironmentVariableNames.reduce((item, flagName) => {
 	item[flagName] = flagName;
 	return item;
