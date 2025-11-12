@@ -1,8 +1,8 @@
+import type { Enums } from "@mainsail/constants";
+
 import type { Block } from "./block.js";
 import type { KeyPair } from "./identities.js";
 import type { AggregatedSignature } from "./signatures.js";
-
-import type { Enums } from "@mainsail/constants";
 
 export type MessageType = Enums.Crypto.MessageType;
 
