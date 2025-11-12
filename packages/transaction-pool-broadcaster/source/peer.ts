@@ -16,13 +16,13 @@ export class Peer implements Contracts.TransactionPool.Peer {
 	public init(ip: string, port: number): Peer {
 		this.ip = ip;
 		this.port = port;
-		this.protocol = Enums.TransactionPool.PeerProtocol.Http;
+		this.protocol = Enums.Api.Protocol.Http;
 
 		return this;
 	}
 
 	public get url(): string {
-		return `${this.protocol === Enums.TransactionPool.PeerProtocol.Https ? "https" : "http"}://${this.ip}:${this.port}`;
+		return `${this.protocol === Enums.Api.Protocol.Https ? "https" : "http"}://${this.ip}:${this.port}`;
 	}
 
 	public recentlyPinged(): boolean {

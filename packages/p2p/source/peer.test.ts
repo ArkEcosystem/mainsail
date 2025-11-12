@@ -46,7 +46,7 @@ describe<{
 		const expectedBroadcast: Contracts.P2P.PeerBroadcast = {
 			ip,
 			port: 4000,
-			protocol: Enums.P2P.PeerProtocol.Http,
+			protocol: Enums.Api.Protocol.Http,
 		};
 
 		assert.equal(peer.toBroadcast(), expectedBroadcast);

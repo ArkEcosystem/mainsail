@@ -8,11 +8,11 @@ export const getPeerUrl = (peer: shared.IPeerLike): string => {
 	// Heuristically check based on port first to match existing behavior.
 	switch (peer.port) {
 		case 80: {
-			protocol = Enums.P2P.PeerProtocol.Http;
+			protocol = Enums.Api.Protocol.Http;
 			break;
 		}
 		case 443: {
-			protocol = Enums.P2P.PeerProtocol.Https;
+			protocol = Enums.Api.Protocol.Https;
 			break;
 		}
 		default: {
@@ -21,10 +21,10 @@ export const getPeerUrl = (peer: shared.IPeerLike): string => {
 	}
 
 	switch (protocol) {
-		case Enums.P2P.PeerProtocol.Http: {
+		case Enums.Api.Protocol.Http: {
 			return `http://${peer.ip}:${peer.port}`;
 		}
-		case Enums.P2P.PeerProtocol.Https: {
+		case Enums.Api.Protocol.Https: {
 			return `https://${peer.ip}:${peer.port}`;
 		}
 		default: {

@@ -18,7 +18,7 @@ describe<Context>("GetApiNodes Schema", ({ it, assert, beforeEach, each }) => {
 	beforeEach((context) => {
 		data = {
 			headers,
-			apiNodes: [{ ip: "127.0.0.1", port: 4003, protocol: Enums.P2P.PeerProtocol.Http }],
+			apiNodes: [{ ip: "127.0.0.1", port: 4003, protocol: Enums.Api.Protocol.Http }],
 		};
 
 		context.sandbox = new Sandbox();
