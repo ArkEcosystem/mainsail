@@ -17,7 +17,7 @@ export const rpcResponseHandler = {
 					return h.response(
 						Utilities.prepareRcpError(
 							Utilities.getRcpId(request),
-							Enums.Rpc.ErrorCode.InternalError,
+							Enums.Api.ErrorCode.InternalError,
 							response.output.payload.message,
 						),
 					);

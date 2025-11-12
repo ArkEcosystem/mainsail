@@ -37,4 +37,4 @@ export interface Action {
 	schema: SchemaObject;
 }
 
-export type ErrorCode = Enums.Rpc.ErrorCode;
+export type ErrorCode = Enums.Api.ErrorCode;

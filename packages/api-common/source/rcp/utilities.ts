@@ -18,11 +18,11 @@ export const getRcpId = (request: Request): Contracts.Api.RPC.Id => {
 };
 
 export const errorMessageMap = {
-	[Enums.Rpc.ErrorCode.ParseError]: "Parse error",
-	[Enums.Rpc.ErrorCode.InvalidRequest]: "Invalid request",
-	[Enums.Rpc.ErrorCode.MethodNotFound]: "Method not found",
-	[Enums.Rpc.ErrorCode.InvalidParameters]: "Invalid params",
-	[Enums.Rpc.ErrorCode.InternalError]: "Internal error",
+	[Enums.Api.ErrorCode.ParseError]: "Parse error",
+	[Enums.Api.ErrorCode.InvalidRequest]: "Invalid request",
+	[Enums.Api.ErrorCode.MethodNotFound]: "Method not found",
+	[Enums.Api.ErrorCode.InvalidParameters]: "Invalid params",
+	[Enums.Api.ErrorCode.InternalError]: "Internal error",
 };
 
 export const prepareRcpError = (

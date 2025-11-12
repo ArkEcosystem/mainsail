@@ -24,7 +24,7 @@ export class Processor implements Contracts.Api.RPC.Processor {
 		Contracts.Api.RPC.Response | Contracts.Api.RPC.Error | (Contracts.Api.RPC.Response | Contracts.Api.RPC.Error)[]
 	> {
 		if (!this.#validatePayload(request)) {
-			return prepareRcpError(getRcpId(request), Enums.Rpc.ErrorCode.InvalidRequest);
+			return prepareRcpError(getRcpId(request), Enums.Api.ErrorCode.InvalidRequest);
 		}
 
 		const payload = request.payload as Contracts.Api.RPC.Request<any>;
@@ -40,11 +40,11 @@ export class Processor implements Contracts.Api.RPC.Processor {
 	): Promise<Contracts.Api.RPC.Response | Contracts.Api.RPC.Error> {
 		const action = this.#actions.get(rcpRequest.method);
 		if (!action) {
-			return prepareRcpError(rcpRequest.id, Enums.Rpc.ErrorCode.MethodNotFound);
+			return prepareRcpError(rcpRequest.id, Enums.Api.ErrorCode.MethodNotFound);
 		}
 
 		if (!this.#validateParams(rcpRequest.params, action)) {
-			return prepareRcpError(rcpRequest.id, Enums.Rpc.ErrorCode.InvalidParameters);
+			return prepareRcpError(rcpRequest.id, Enums.Api.ErrorCode.InvalidParameters);
 		}
 
 		try {
@@ -58,7 +58,7 @@ export class Processor implements Contracts.Api.RPC.Processor {
 				return prepareRcpError(rcpRequest.id, error.code, error.message);
 			}
 
-			return prepareRcpError(rcpRequest.id, Enums.Rpc.ErrorCode.InternalError);
+			return prepareRcpError(rcpRequest.id, Enums.Api.ErrorCode.InternalError);
 		}
 	}
 
