@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Evm } from "@mainsail/evm";
 import {
 	concat,

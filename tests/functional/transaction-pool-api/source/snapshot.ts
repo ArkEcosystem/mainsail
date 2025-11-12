@@ -3,7 +3,7 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 } from "@mainsail/api-database";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Identifiers, Events } from "@mainsail/constants";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert, Sandbox } from "@mainsail/test-framework";

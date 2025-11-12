@@ -1,5 +1,5 @@
 import { Request } from "@hapi/hapi";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 export const getRcpId = (request: Request): Contracts.Api.RPC.Id => {
 	const payload = request.payload as Record<string, unknown>;

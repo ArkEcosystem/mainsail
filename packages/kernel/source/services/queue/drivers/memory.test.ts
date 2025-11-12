@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Identifiers, Events } from "@mainsail/constants";
 import { sleep } from "@mainsail/utils";
 import { EventEmitter } from "events";

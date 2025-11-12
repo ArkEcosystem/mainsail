@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Abi, AbiItem, decodeErrorResult, toHex } from "viem";
 
 import { default as ConsensusAbi } from "./abis/ConsensusV1.json" with { type: "json" };

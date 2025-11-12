@@ -4,7 +4,7 @@ import { brotliDecompress } from "node:zlib";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { Providers } from "@mainsail/kernel";

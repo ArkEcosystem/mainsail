@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Validator } from "@mainsail/validation/source/validator";
 
 import { describe, Sandbox } from "../../../test-framework/source";

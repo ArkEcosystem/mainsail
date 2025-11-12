@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { get, orderBy } from "@mainsail/utils";
 import semver from "semver";
 

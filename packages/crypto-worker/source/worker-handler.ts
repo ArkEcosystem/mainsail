@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { Container, inject, injectable, tagged } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Application, Services } from "@mainsail/kernel";
 
 @injectable()

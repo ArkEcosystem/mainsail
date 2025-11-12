@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 export type KeyValuePair<T = any> = Record<string, T>;
 

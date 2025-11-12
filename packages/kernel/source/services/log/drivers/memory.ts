@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { isEmpty, prettyTime } from "@mainsail/utils";
 import chalk, { ChalkInstance } from "chalk";
 import { differenceInMilliseconds, format } from "date-fns";

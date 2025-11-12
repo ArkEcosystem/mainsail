@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 
 const isApp = (node: Contracts.Kernel.Application | undefined): node is Contracts.Kernel.Application =>

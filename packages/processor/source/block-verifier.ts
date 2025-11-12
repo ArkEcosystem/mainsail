@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { injectable, multiInject } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class BlockVerifier implements Contracts.Processor.Verifier {

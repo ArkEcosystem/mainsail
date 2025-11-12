@@ -1,7 +1,7 @@
 import { exit } from "node:process";
 
 import { Events, Identifiers } from "@mainsail/constants";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { DirectoryCannotBeFound } from "@mainsail/exceptions";
 import { join } from "path";
 import { isMainThread } from "worker_threads";

@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
 const parseBlockNumber = (parentSchema): number | undefined => {

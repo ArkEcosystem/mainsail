@@ -1,5 +1,5 @@
 import { Models } from "@mainsail/api-database";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { parseAbi, parseEventLogs } from "viem";
 
 const paymentAbi = parseAbi(["event Payment(address indexed recipient, uint256 amount, bool success)"] as const);

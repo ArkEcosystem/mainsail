@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { assert, IpAddress } from "@mainsail/utils";
 import ip from "ip";

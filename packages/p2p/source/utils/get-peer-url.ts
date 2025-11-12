@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { type shared } from "../socket-server/codecs/proto/protos.js";
 

@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Identifiers as AppIdentifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 

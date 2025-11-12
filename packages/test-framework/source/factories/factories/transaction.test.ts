@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import cryptoConfig from "../../../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "../../index";

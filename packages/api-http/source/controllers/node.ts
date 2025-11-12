@@ -5,7 +5,7 @@ import {
 	Models,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import dayjs from "dayjs";
 
 import { Controller } from "./controller.js";

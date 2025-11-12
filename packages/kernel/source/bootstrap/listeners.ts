@@ -1,6 +1,6 @@
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
 

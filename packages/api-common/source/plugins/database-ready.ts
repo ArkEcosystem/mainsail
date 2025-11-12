@@ -1,6 +1,6 @@
 import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 export const databaseReady = {
 	getOnRequestHandler(app: Contracts.Kernel.Application) {

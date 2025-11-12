@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class ProposerCalculator implements Contracts.BlockchainUtils.ProposerCalculator {

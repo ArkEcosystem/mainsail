@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 let mockBlock: Partial<Contracts.Crypto.Block> | undefined;
 let lastHeight = 0;

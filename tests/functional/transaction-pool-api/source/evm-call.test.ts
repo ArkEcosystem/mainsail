@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { describe, Sandbox } from "@mainsail/test-framework";

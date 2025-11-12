@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 export type EqualCriteria<T> = T;
 export type NumericCriteria<T> = T | { from: T } | { to: T } | { from: T; to: T };

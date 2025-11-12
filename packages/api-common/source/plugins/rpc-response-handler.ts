@@ -1,6 +1,6 @@
 import { Boom } from "@hapi/boom";
 import { ResponseObject, Server as HapiServer } from "@hapi/hapi";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { Utils as Utilities } from "../rcp/index.js";
 

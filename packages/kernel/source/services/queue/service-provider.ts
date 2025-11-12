@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers/index.js";
 import { QueueManager } from "./manager.js";

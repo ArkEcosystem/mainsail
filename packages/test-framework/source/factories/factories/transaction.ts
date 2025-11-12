@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/constants";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 

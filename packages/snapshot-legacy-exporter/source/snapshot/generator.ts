@@ -5,7 +5,7 @@ import { brotliCompress } from "node:zlib";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 import { DataSource, EntityManager } from "typeorm";

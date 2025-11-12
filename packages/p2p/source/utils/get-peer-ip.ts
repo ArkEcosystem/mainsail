@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 export const getPeerIp = (request: Contracts.P2P.Request): string => {
 	// WebSockets requests

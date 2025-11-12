@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { getApiNodes } from "./get-api-nodes.js";
