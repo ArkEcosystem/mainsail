@@ -184,4 +184,10 @@ export default [
 			"unicorn/prefer-event-target": "warn",
 		},
 	},
+	{
+		files: ["packages/constants/source/enums.ts"],
+		rules: {
+			'@typescript-eslint/no-namespace': 'off',
+		},
+	},	
 ];
