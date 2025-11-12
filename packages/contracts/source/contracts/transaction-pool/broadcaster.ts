@@ -1,12 +1,9 @@
+import type { Enums } from "@mainsail/constants";
 import type { Dayjs } from "dayjs";
 
 import type { Transaction } from "../crypto/index.js";
 
-declare const PeerProtocolValues: {
-	readonly Http: 0;
-	readonly Https: 1;
-};
-export type PeerProtocol = (typeof PeerProtocolValues)[keyof typeof PeerProtocolValues];
+export type PeerProtocol = Enums.Api.Protocol;
 
 export interface PeerBroadcast {
 	ip: string;

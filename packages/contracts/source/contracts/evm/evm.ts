@@ -1,3 +1,5 @@
+import type { Enums } from "@mainsail/constants";
+
 export interface GenesisInfo {
 	readonly account: string;
 	readonly deployerAccount: string;
@@ -202,10 +204,4 @@ export interface TransactionReceipt {
 	readonly txHash?: string;
 }
 
-// Supported EVM specs
-// https://github.com/ethereum/execution-specs
-declare const SpecIdValues: {
-	readonly SHANGHAI: "Shanghai";
-	readonly LATEST: "Latest";
-};
-export type SpecId = (typeof SpecIdValues)[keyof typeof SpecIdValues];
+export type SpecId = Enums.Evm.SpecId;

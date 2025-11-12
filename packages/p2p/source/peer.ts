@@ -19,7 +19,7 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public port!: number;
 
-	public protocol!: Contracts.Api.Protocol;
+	public protocol!: Contracts.P2P.PeerProtocol;
 
 	public readonly ports: Contracts.P2P.PeerPorts = {};
 

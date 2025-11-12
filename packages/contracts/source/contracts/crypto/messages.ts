@@ -2,11 +2,9 @@ import type { Block } from "./block.js";
 import type { KeyPair } from "./identities.js";
 import type { AggregatedSignature } from "./signatures.js";
 
-declare const MessageTypeValues: {
-	readonly Prevote: 1;
-	readonly Precommit: 2;
-};
-export type MessageType = (typeof MessageTypeValues)[keyof typeof MessageTypeValues];
+import type { Enums } from "@mainsail/constants";
+
+export type MessageType = Enums.Crypto.MessageType;
 
 export interface SignatureMessageData {
 	readonly type: MessageType;

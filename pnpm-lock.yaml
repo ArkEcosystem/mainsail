@@ -858,6 +858,9 @@ importers:
       '@hapi/hapi':
         specifier: 21.4.3
         version: 21.4.3
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils

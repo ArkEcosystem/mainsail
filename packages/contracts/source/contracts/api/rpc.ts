@@ -1,4 +1,5 @@
 import type { Request as HapiRequest } from "@hapi/hapi";
+import type { Enums } from "@mainsail/constants";
 import type { SchemaObject } from "ajv";
 
 export type Processor = {
@@ -36,12 +37,4 @@ export interface Action {
 	schema: SchemaObject;
 }
 
-declare const ErrorCodeValues: {
-	readonly RpcServerError: -32_000;
-	readonly ParseError: -32_700;
-	readonly InvalidRequest: -32_600;
-	readonly MethodNotFound: -32_601;
-	readonly InvalidParameters: -32_602;
-	readonly InternalError: -32_603;
-};
-export type ErrorCode = (typeof ErrorCodeValues)[keyof typeof ErrorCodeValues];
+export type ErrorCode = Enums.Rpc.ErrorCode;

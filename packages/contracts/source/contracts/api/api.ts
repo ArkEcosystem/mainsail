@@ -1,4 +1,5 @@
 import type { Server as HapiServer } from "@hapi/hapi";
+import type { Enums } from "@mainsail/constants";
 
 import type { Application } from "../kernel/application.js";
 import type { Processor } from "./rpc.js";
@@ -10,11 +11,7 @@ export interface Server {
 	dispose(): Promise<void>;
 }
 
-declare const ServerTypeValues: {
-	readonly Http: "HTTP";
-	readonly Https: "HTTPS";
-};
-export type ServerType = (typeof ServerTypeValues)[keyof typeof ServerTypeValues];
+export type ServerType = Enums.Api.ServerType;
 
 export interface ServerState {
 	app: Application;

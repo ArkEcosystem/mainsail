@@ -23,6 +23,7 @@
 	"dependencies": {
 		"@hapi/hapi": "21.4.3",
 		"@mainsail/utils": "workspace:*",
+		"@mainsail/constants": "workspace:*",
 		"ajv": "8.17.1",
 		"dayjs": "1.11.13",
 		"inversify": "7.10.3",
