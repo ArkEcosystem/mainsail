@@ -1,0 +1,57 @@
+x-node-env: &nodeEnvironment
+    MAINSAIL_CRYPTO_WORKER_COUNT: 2
+
+x-postgres-env: &postgresEnvironment
+    MAINSAIL_DB_HOST: postgres-api
+    MAINSAIL_DB_PORT: 5432
+    MAINSAIL_DB_DATABASE: test_db
+    MAINSAIL_DB_USERNAME: test_db
+    MAINSAIL_DB_PASSWORD: password
+
+services:
+    checks:
+        build: ./checks
+        image: checks
+        depends_on:
+            - node
+        volumes:
+            - ./../../../:/mainsail
+        environment:
+            MINIMUM_BLOCKS_TO_SYNC: ${MINIMUM_BLOCKS_TO_SYNC:-10000}
+
+    postgres:
+        image: "postgres:18-alpine"
+        container_name: postgres-api
+        tmpfs: /pgtmpfs
+        logging:
+            driver: "none"
+        ports:
+            - "5454:5432"
+        environment:
+            POSTGRES_DB: test_db
+            POSTGRES_USER: test_db
+            POSTGRES_PASSWORD: password
+            PGDATA: /pgtmpfs
+
+    node: &nodeDefinition
+        build: ./nodes
+        image: mainsail
+        volumes:
+            - ./../../../:/mainsail
+            - ./entrypoint.sh:/entrypoint.sh
+        working_dir: /mainsail
+        depends_on:
+            - postgres
+        entrypoint: ["/bin/sh", "/entrypoint.sh"]
+        environment:
+            <<: [*postgresEnvironment, *nodeEnvironment]
+
+    api-http:
+        <<: *nodeDefinition
+        volumes:
+            - ./../../../:/mainsail
+            - ./entrypoint-api.sh:/entrypoint-api.sh
+        depends_on:
+            - postgres
+            - node
+        entrypoint: ["/bin/sh", "/entrypoint-api.sh"]
