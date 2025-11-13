@@ -5,7 +5,7 @@ export interface PluginConfiguration {
 	discover(name: string, packageId: string): Promise<PluginConfiguration>;
 	merge(values: JsonObject | undefined): PluginConfiguration;
 	all(): JsonObject;
-	get<T>(key: string, defaultValue?: T): T | undefined;
+	// get<T>(key: string, defaultValue?: T): T | undefined;
 	getRequired<T>(key: string): T;
 	getOptional<T>(key: string, defaultValue: T): T;
 	has(key: string): boolean;

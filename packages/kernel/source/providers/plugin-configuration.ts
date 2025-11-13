@@ -49,14 +49,6 @@ export class PluginConfiguration implements Contracts.Kernel.PluginConfiguration
 		return this.#items;
 	}
 
-	public get<T>(key: string, defaultValue?: T): T | undefined {
-		if (defaultValue !== undefined) {
-			throw new TypeError(`DEPRECATED get(${key}, ${defaultValue}), use getOptional instead`);
-		}
-
-		return get(this.#items, key);
-	}
-
 	public getRequired<T>(key: string): T {
 		if (!this.has(key)) {
 			throw new Error(`Missing required ${key} configuration value`);

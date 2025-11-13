@@ -45,7 +45,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			validators.push(
 				this.app
 					.resolve<Contracts.Validator.Validator>(Validator)
-					.configure(await new BIP38().configure(parsed, configuration.get("validatorKeystorePassword")!)),
+					.configure(
+						await new BIP38().configure(
+							parsed,
+							configuration.getOptional<string | undefined>("validatorKeystorePassword", undefined)!,
+						),
+					),
 			);
 
 			// Wipe original password as it gets rotated in-memory

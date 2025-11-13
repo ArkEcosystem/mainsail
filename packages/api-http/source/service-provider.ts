@@ -25,7 +25,21 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 	}
 
 	protected getPlugins(): any[] {
-		const config = this.config().get<any>("plugins");
+		const config = this.config().getRequired<{
+			trustProxy: boolean;
+			whitelist: string[];
+			socketTimeout: number;
+			rateLimit: {
+				blacklist: string[];
+				duration: number;
+				enabled: boolean;
+				points: number;
+				whitelist: string[];
+			};
+			pagination: {
+				limit: number;
+			};
+		}>("plugins");
 
 		return [
 			{

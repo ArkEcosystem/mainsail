@@ -120,7 +120,7 @@ export class Generator {
 			.resolve(Providers.PluginConfiguration)
 			.discover("@mainsail/snapshot-legacy-exporter", process.cwd());
 
-		const options = pluginConfig.get<DatabaseOptions>("database");
+		const options = pluginConfig.getRequired<DatabaseOptions>("database");
 		assert.defined(options);
 
 		const dataSource = new DataSource({

@@ -15,7 +15,7 @@ export const getHeaders = (app: Contracts.Kernel.Application) => {
 					"plugin",
 					"p2p",
 				)
-				.get<number>("port"),
+				.getRequired<number>("server.port"),
 		),
 		version: app.version(),
 	};

@@ -21,11 +21,12 @@ export class ConfigurationController extends AbstractController {
 					version: this.app.version(),
 				},
 				transactionPool: {
-					maxTransactionAge: this.pluginConfiguration.get("maxTransactionAge"),
-					maxTransactionBytes: this.pluginConfiguration.get("maxTransactionBytes"),
-					maxTransactionsInPool: this.pluginConfiguration.get("maxTransactionsInPool"),
-					maxTransactionsPerRequest: this.pluginConfiguration.get("maxTransactionsPerRequest"),
-					maxTransactionsPerSender: this.pluginConfiguration.get("maxTransactionsPerSender"),
+					maxTransactionAge: this.pluginConfiguration.getRequired<number>("maxTransactionAge"),
+					maxTransactionBytes: this.pluginConfiguration.getRequired<number>("maxTransactionBytes"),
+					maxTransactionsInPool: this.pluginConfiguration.getRequired<number>("maxTransactionsInPool"),
+					maxTransactionsPerRequest:
+						this.pluginConfiguration.getRequired<number>("maxTransactionsPerRequest"),
+					maxTransactionsPerSender: this.pluginConfiguration.getRequired<number>("maxTransactionsPerSender"),
 				},
 			},
 		};
