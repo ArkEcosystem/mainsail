@@ -9,7 +9,7 @@ import { ConfigRepository } from "../services/config/index.js";
 // @TODO review the implementation
 
 @injectable()
-export class PluginConfiguration {
+export class PluginConfiguration implements Contracts.Kernel.PluginConfiguration {
 	@inject(Identifiers.Config.Repository)
 	private readonly configRepository!: ConfigRepository;
 

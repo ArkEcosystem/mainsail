@@ -8,6 +8,7 @@ export * as IPC from "./ipc.js";
 export * from "./lock.js";
 export * from "./log.js";
 export * from "./pipeline.js";
+export * from "./providers.js";
 export * from "./queue.js";
 export * from "./repository.js";
 export * from "./validation.js";
