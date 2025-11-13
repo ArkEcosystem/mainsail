@@ -1,7 +1,6 @@
 import { Enums, Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Types } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -10,7 +9,7 @@ import { getPeerUrl } from "./utils/get-peer-url.js";
 @injectable()
 export class Peer implements Contracts.P2P.Peer {
 	@inject(Identifiers.Services.Queue.Factory)
-	private readonly createQueue!: Types.QueueFactory;
+	private readonly createQueue!: Contracts.Kernel.QueueFactory;
 
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
