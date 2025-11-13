@@ -13,7 +13,7 @@ describe("getHeaders", ({ it, assert }) => {
 	};
 	const app = {
 		get: (key) => appGet[key],
-		getTagged: () => ({ get: () => port }),
+		getTagged: () => ({ getRequired: () => port }),
 		version: () => version,
 	};
 
@@ -29,7 +29,7 @@ describe("getHeaders", ({ it, assert }) => {
 		store.isStarted = () => false;
 		const headers = getHeaders(app as any);
 
-		const portNumberAsString = app.getTagged().get();
+		const portNumberAsString = app.getTagged().getRequired();
 		assert.string(portNumberAsString);
 		assert.equal(portNumberAsString, "4005");
 		assert.number(headers.port);
