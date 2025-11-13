@@ -1,4 +1,4 @@
-import { Request } from "@hapi/hapi";
+import type { Request } from "@hapi/hapi";
 import { Enums } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 

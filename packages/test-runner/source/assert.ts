@@ -2,7 +2,8 @@ import { format } from "concordance";
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { join } from "path";
 import * as uvu from "uvu/assert";
-import { z, ZodRawShape } from "zod";
+import type { ZodRawShape } from "zod";
+import { z } from "zod";
 
 interface Constructable {
 	new (...arguments_: any): any;

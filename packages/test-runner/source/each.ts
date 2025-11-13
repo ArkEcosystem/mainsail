@@ -1,6 +1,6 @@
 import { format as concordance } from "concordance";
 import kit from "string-kit";
-import * as uvu from "uvu";
+import type * as uvu from "uvu";
 
 export const formatName = (name: string, dataset: unknown): string => kit.format(name, concordance(dataset));
 

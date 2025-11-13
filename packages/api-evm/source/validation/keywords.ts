@@ -1,5 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
-import { FuncKeywordDefinition } from "ajv";
+import type { FuncKeywordDefinition } from "ajv";
 
 export const makeKeywords = (stateStore: Contracts.State.Store) => {
 	const currentHeight: FuncKeywordDefinition = {

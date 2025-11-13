@@ -1,4 +1,4 @@
-import { FunctionReturning } from "./internal/index.js";
+import type { FunctionReturning } from "./internal/index.js";
 import { isArray } from "./is-array.js";
 import { mapArray } from "./map-array.js";
 import { mapObject } from "./map-object.js";

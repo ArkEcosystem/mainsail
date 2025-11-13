@@ -1,8 +1,8 @@
-import Hapi from "@hapi/hapi";
+import type Hapi from "@hapi/hapi";
 import { Schemas } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { TransactionsController } from "../controllers/transactions.js";

@@ -1,4 +1,5 @@
-import { http, HttpOptions, HttpResponse } from "@mainsail/utils";
+import type { HttpOptions, HttpResponse } from "@mainsail/utils";
+import { http } from "@mainsail/utils";
 
 export class RestClient {
 	public static async get(path: string, options?: HttpOptions): Promise<HttpResponse> {

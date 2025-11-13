@@ -6,7 +6,7 @@ import { ConsensusAbi, MultiPaymentAbi, UsernamesAbi } from "@mainsail/evm-contr
 import { decodeFunctionResult, encodeFunctionData, parseEther, toBytes, toHex, zeroAddress } from "viem";
 
 import { default as DARK20 } from "./abis/DARK20.json" with { type: "json" };
-import {
+import type {
 	Context,
 	EvmCallOptions,
 	UnvoteOptions,

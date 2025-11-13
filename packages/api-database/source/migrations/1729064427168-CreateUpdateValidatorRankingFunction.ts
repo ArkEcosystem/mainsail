@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import type { MigrationInterface, QueryRunner } from "typeorm";
 
 export class CreateUpdateValidatorRankingFunction1729064427168 implements MigrationInterface {
 	public async up(queryRunner: QueryRunner): Promise<void> {

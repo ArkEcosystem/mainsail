@@ -1,5 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
-import { AnySchemaObject, FuncKeywordDefinition } from "ajv";
+import type { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
 const parseBlockNumber = (parentSchema): number | undefined => {
 	if (!parentSchema || !parentSchema.parentData) {

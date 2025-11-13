@@ -1,4 +1,4 @@
-import { FormatDefinition } from "ajv";
+import type { FormatDefinition } from "ajv";
 
 import { isValidPeerIp } from "./is-valid-peer.js";
 

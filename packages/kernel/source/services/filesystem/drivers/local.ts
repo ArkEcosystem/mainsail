@@ -5,6 +5,7 @@ import { resolve } from "path";
 @injectable()
 export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 	// https://github.com/jprichardson/node-fs-extra/issues/743#issuecomment-580346768
+	/* eslint-disable @typescript-eslint/consistent-type-imports */
 	private fsExtra!: typeof import("fs-extra/esm");
 	private fs!: typeof import("fs");
 

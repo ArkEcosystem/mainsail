@@ -1,4 +1,4 @@
-import { Providers } from "@mainsail/kernel";
+import type { Providers } from "@mainsail/kernel";
 
 let mockServiceProviders: Providers.ServiceProvider[] = [];
 

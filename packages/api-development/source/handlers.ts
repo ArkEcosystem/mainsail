@@ -1,4 +1,4 @@
-import Hapi from "@hapi/hapi";
+import type Hapi from "@hapi/hapi";
 
 import * as ApiNodes from "./routes/api-nodes.js";
 import * as Blockchain from "./routes/blockchain.js";

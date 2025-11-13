@@ -1,4 +1,4 @@
-import { ContractRepository, ContractRepositoryExtension, RepositoryDataSource } from "../contracts.js";
+import type { ContractRepository, ContractRepositoryExtension, RepositoryDataSource } from "../contracts.js";
 import { Contract } from "../models/index.js";
 import { makeExtendedRepository } from "./repository-extension.js";
 

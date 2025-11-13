@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 
-import {
+import type {
 	FeeStatistics,
 	RepositoryDataSource,
 	TransactionRepository,
@@ -9,7 +9,7 @@ import {
 } from "../contracts.js";
 import { Transaction } from "../models/index.js";
 import { TransactionFilter } from "../search/filters/transaction-filter.js";
-import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search/types/index.js";
+import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search/types/index.js";
 import { makeExtendedRepository } from "./repository-extension.js";
 
 export const makeTransactionRepository = (dataSource: RepositoryDataSource): TransactionRepository =>

@@ -1,5 +1,5 @@
 import kleur from "kleur";
-import { Context } from "uvu";
+import type { Context } from "uvu";
 
 export const runHook =
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type

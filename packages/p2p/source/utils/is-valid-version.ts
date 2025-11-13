@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Providers } from "@mainsail/kernel";
 import semver from "semver";
 
 // @TODO review the implementation

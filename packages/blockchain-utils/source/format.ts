@@ -1,5 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
-import { BigNumber } from "@mainsail/utils";
+import type { BigNumber } from "@mainsail/utils";
 
 export const formatCurrency = (configuration: Contracts.Crypto.Configuration, amount: BigNumber): string => {
 	const { decimals, denomination } = configuration.getMilestone().satoshi;

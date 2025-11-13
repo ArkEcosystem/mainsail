@@ -1,5 +1,5 @@
 import { Enums } from "@mainsail/constants";
-import { AnySchemaObject } from "ajv";
+import type { AnySchemaObject } from "ajv";
 
 export const schemas: Record<
 	"proposal" | "prevote" | "precommit" | "proposalLockProof" | "validatorBitmap",

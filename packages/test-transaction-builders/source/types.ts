@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
-import { Sandbox } from "@mainsail/test-framework";
-import { BigNumber } from "@mainsail/utils";
+import type { Sandbox } from "@mainsail/test-framework";
+import type { BigNumber } from "@mainsail/utils";
 
 export interface Context {
 	sandbox: Sandbox;

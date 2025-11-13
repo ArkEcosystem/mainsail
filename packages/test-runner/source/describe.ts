@@ -1,6 +1,7 @@
 import kleur from "kleur";
 import sinon from "sinon";
-import { Callback, Context, suite, Test } from "uvu";
+import type { Callback, Context, Test } from "uvu";
+import { suite } from "uvu";
 import { z as schema } from "zod";
 
 import { assert } from "./assert.js";

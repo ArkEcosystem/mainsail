@@ -7,7 +7,7 @@ import { readJSONSync, removeSync } from "fs-extra/esm";
 import { join, resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { SandboxCallback } from "./contracts.js";
+import type { SandboxCallback } from "./contracts.js";
 
 export class Sandbox {
 	public readonly app: Application;

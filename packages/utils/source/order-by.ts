@@ -1,6 +1,6 @@
 import { sort } from "fast-sort";
 
-import { FunctionReturning, Iteratee } from "./internal/index.js";
+import type { FunctionReturning, Iteratee } from "./internal/index.js";
 import { isFunction } from "./is-function.js";
 import { isString } from "./is-string.js";
 import { map } from "./map.js";

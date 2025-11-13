@@ -1,4 +1,4 @@
-import { Request } from "@hapi/hapi";
+import type { Request } from "@hapi/hapi";
 
 export const getIp = (request: Request, trustProxy: boolean): string => {
 	if (trustProxy) {
