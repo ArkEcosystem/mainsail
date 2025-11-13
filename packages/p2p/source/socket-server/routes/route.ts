@@ -2,7 +2,6 @@ import Hapi from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
 
 @injectable()
 export abstract class Route implements Contracts.P2P.Route {
@@ -11,7 +10,7 @@ export abstract class Route implements Contracts.P2P.Route {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly cryptoConfiguration!: Contracts.Crypto.Configuration;

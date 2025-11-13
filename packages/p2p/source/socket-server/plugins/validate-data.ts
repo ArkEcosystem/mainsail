@@ -2,7 +2,6 @@ import { ResponseToolkit } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
 
 import { isValidVersion } from "../../utils/index.js";
 import { BasePlugin } from "./base-plugin.js";
@@ -14,7 +13,7 @@ export class ValidateDataPlugin extends BasePlugin {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@multiInject(Identifiers.P2P.Routes)
 	private readonly routes!: Contracts.P2P.Route[];

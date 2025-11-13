@@ -70,7 +70,7 @@ describe<{
 
 		spyRegister.calledOnce();
 		assert.false(context.serviceProviderRepository.failed("stub"));
-		assert.equal(serviceProvider.config().get("username"), "johndoe");
+		assert.equal(serviceProvider.config().getRequired("username"), "johndoe");
 	});
 
 	it("should mark the service provider as failed if the configuration validation fails", async (context) => {

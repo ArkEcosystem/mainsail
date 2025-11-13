@@ -78,7 +78,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			return;
 		}
 
-		const options = this.config().get<PostgresConnectionOptions>("database");
+		const options = this.config().getRequired<PostgresConnectionOptions>("database");
 		assert.defined(options);
 
 		try {

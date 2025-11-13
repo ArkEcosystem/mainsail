@@ -1,7 +1,6 @@
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
 import { errorTypes } from "./hapi-nes/index.js";
@@ -10,7 +9,7 @@ import { errorTypes } from "./hapi-nes/index.js";
 export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.Peer.Connector)
 	private readonly connector!: Contracts.P2P.PeerConnector;

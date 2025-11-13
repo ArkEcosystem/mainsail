@@ -8,7 +8,7 @@ import {
 } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
 import { EnrichedBlock, EnrichedTransaction } from "../resources/index.js";
@@ -17,7 +17,7 @@ import { EnrichedBlock, EnrichedTransaction } from "../resources/index.js";
 export class Controller extends AbstractController {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-http")
-	protected readonly apiConfiguration!: Providers.PluginConfiguration;
+	protected readonly apiConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
 	protected readonly stateRepositoryFactory!: ApiDatabaseContracts.StateRepositoryFactory;

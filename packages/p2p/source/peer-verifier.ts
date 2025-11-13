@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 
 import { isValidVersion } from "./utils/index.js";
@@ -34,7 +33,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	public async verify(peer: Contracts.P2P.Peer): Promise<boolean> {
 		if (this.configuration.getRequired<boolean>("skipPeerStateVerification")) {

@@ -1,13 +1,13 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Providers, Types } from "@mainsail/kernel";
+import { Types } from "@mainsail/kernel";
 
 @injectable()
 export class WorkerPool implements Contracts.Crypto.WorkerPool {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "crypto-worker")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;

@@ -20,7 +20,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		await this.app
 			.get<Server>(Identifiers.Webhooks.Server)
-			.register(this.config().get<Contracts.Types.JsonObject>("server")!);
+			.register(this.config().getRequired<Contracts.Types.JsonObject>("server")!);
 
 		// Setup Listeners...
 		this.#startListeners();
