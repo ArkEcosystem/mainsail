@@ -2,7 +2,6 @@ import type Hapi from "@hapi/hapi";
 import { Schemas } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
-import type { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { TransactionsController } from "../controllers/transactions.js";
@@ -13,7 +12,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	server.bind(controller);
 
 	const maxTransactionsPerRequest = server.app.app
-		.getTagged<Providers.PluginConfiguration>(
+		.getTagged<Contracts.Kernel.PluginConfiguration>(
 			Identifiers.ServiceProvider.Configuration,
 			"plugin",
 			"transaction-pool-service",
@@ -21,7 +20,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		.getRequired<number>("maxTransactionsPerRequest");
 
 	const maxTransactionBytes = server.app.app
-		.getTagged<Providers.PluginConfiguration>(
+		.getTagged<Contracts.Kernel.PluginConfiguration>(
 			Identifiers.ServiceProvider.Configuration,
 			"plugin",
 			"transaction-pool-service",

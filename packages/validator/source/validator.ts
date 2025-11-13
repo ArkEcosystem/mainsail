@@ -2,7 +2,6 @@ import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
-import { Providers } from "@mainsail/kernel";
 import { assert, BigNumber } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
@@ -10,7 +9,7 @@ import { performance } from "perf_hooks";
 export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "validator")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(EvmConsensusIdentifiers.Internal.GenesisInfo)
 	private readonly genesisInfo!: Contracts.Evm.GenesisInfo;

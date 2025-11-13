@@ -9,7 +9,7 @@ import {
 	TransactionFromWrongNetworkError,
 	UnexpectedNonceError,
 } from "@mainsail/exceptions";
-import { Providers, Services } from "@mainsail/kernel";
+import { Services } from "@mainsail/kernel";
 import { Wallets } from "@mainsail/state";
 import { BigNumber } from "@mainsail/utils";
 
@@ -20,7 +20,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool-service")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;

@@ -7,7 +7,6 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { NotImplemented } from "@mainsail/exceptions";
-import { Providers } from "@mainsail/kernel";
 
 import { EventListener } from "../contracts.js";
 
@@ -22,7 +21,7 @@ export type ListenerEventMapping = { [key: string]: ListenerEvent };
 export abstract class AbstractListener<TEventData, TEntity extends { [key: string]: any }> implements EventListener {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-sync")
-	private readonly pluginConfiguration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly configuration!: Contracts.Crypto.Configuration;

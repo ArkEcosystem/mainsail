@@ -36,7 +36,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		if (keystore) {
 			const parsed = Keystore.parse(keystore);
 
-			const configuration = this.app.getTagged<Providers.PluginConfiguration>(
+			const configuration = this.app.getTagged<Contracts.Kernel.PluginConfiguration>(
 				Identifiers.ServiceProvider.Configuration,
 				"plugin",
 				"validator",

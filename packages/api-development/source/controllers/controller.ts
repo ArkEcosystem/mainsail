@@ -3,7 +3,6 @@ import Hapi from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
 
 import { SchemaObject } from "../schemas.js";
 
@@ -14,7 +13,7 @@ export class Controller {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-development")
-	protected readonly apiConfiguration!: Providers.PluginConfiguration;
+	protected readonly apiConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.State.Store)
 	protected readonly stateStore!: Contracts.State.Store;

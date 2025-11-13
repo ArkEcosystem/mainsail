@@ -3,13 +3,12 @@ import { AbstractController } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
 
 @injectable()
 export class ConfigurationController extends AbstractController {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool-service")
-	private readonly pluginConfiguration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.State.Store)
 	private readonly stateStore!: Contracts.State.Store;

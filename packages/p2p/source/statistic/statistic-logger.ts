@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
 
 @injectable()
 export class StatisticLogger implements Contracts.P2P.StatisticLogger {
@@ -10,7 +9,7 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	#verbosityLevel = 0;
 

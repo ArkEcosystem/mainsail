@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
 import BetterSqlite3 from "better-sqlite3";
 import { ensureFileSync } from "fs-extra/esm";
 
@@ -9,7 +8,7 @@ import { ensureFileSync } from "fs-extra/esm";
 export class Storage implements Contracts.TransactionPool.Storage {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool-service")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	#database!: BetterSqlite3.Database;
 	#addTransactionStmt!: BetterSqlite3.Statement<Contracts.TransactionPool.StoredTransaction>;

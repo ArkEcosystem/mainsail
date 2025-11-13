@@ -7,6 +7,7 @@ export interface PluginConfiguration {
 	all(): JsonObject;
 	get<T>(key: string, defaultValue?: T): T | undefined;
 	getRequired<T>(key: string): T;
+	getOptional<T>(key: string, defaultValue: T): T;
 	has(key: string): boolean;
 	set<T>(key: string, value: T): void;
 	unset(key: string): void;

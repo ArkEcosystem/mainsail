@@ -1,7 +1,6 @@
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
 import { isBlacklisted, isWhitelisted } from "@mainsail/utils";
 
 import { isValidVersion } from "./utils/index.js";
@@ -14,7 +13,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2P.PeerRepository;

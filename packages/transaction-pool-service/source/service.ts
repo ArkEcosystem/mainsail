@@ -2,14 +2,13 @@ import { EnvironmentVariables, Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { PoolError, TransactionAlreadyInPoolError, TransactionPoolFullError } from "@mainsail/exceptions";
-import { Providers } from "@mainsail/kernel";
 import { BigNumber, Lock, randomNumber } from "@mainsail/utils";
 
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool-service")
-	private readonly pluginConfiguration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	@tagged("type", "wallet")
