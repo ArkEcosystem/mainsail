@@ -8,7 +8,6 @@ export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 	/* eslint-disable @typescript-eslint/consistent-type-imports */
 	private fsExtra!: typeof import("fs-extra/esm");
 	private fs!: typeof import("fs");
-	/* eslint-disable @typescript-eslint/consistent-type-imports */
 
 	public async make(): Promise<Contracts.Kernel.Filesystem> {
 		this.fsExtra = await import("fs-extra/esm");

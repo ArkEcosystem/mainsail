@@ -1,5 +1,5 @@
 import type Hapi from "@hapi/hapi";
-import type { Contracts as ApiDatabaseContracts} from "@mainsail/api-database";
+import type { Contracts as ApiDatabaseContracts } from "@mainsail/api-database";
 import { Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import type { Contracts } from "@mainsail/contracts";
 

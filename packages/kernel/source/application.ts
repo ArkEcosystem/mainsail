@@ -7,7 +7,7 @@ import { join } from "path";
 import { isMainThread } from "worker_threads";
 
 import { Bootstrappers } from "./bootstrap/index.js";
-import type { ServiceProvider} from "./providers/index.js";
+import type { ServiceProvider } from "./providers/index.js";
 import { ServiceProviderRepository } from "./providers/index.js";
 import { ConfigRepository } from "./services/config/index.js";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider.js";
