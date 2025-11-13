@@ -1,4 +1,5 @@
-import { Application, ApplicationFactory, Commands, Identifiers, Services, Utils } from "@mainsail/cli";
+import type { Application, Commands, Services} from "@mainsail/cli";
+import { ApplicationFactory, Identifiers, Utils } from "@mainsail/cli";
 import { Container } from "@mainsail/container";
 
 export class Console {

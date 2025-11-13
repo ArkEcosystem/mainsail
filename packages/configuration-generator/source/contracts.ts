@@ -1,4 +1,4 @@
-import { EnvironmentVariable } from "@mainsail/constants";
+import type { EnvironmentVariable } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 
 type PartialRecord<K extends keyof any, T> = {

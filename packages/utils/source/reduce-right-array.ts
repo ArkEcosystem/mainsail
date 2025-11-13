@@ -1,4 +1,4 @@
-import { FunctionReturning } from "./internal/index.js";
+import type { FunctionReturning } from "./internal/index.js";
 
 export const reduceRightArray = <T, V>(iterable: T[], iteratee: FunctionReturning, initialValue: V): V => {
 	let result: V = initialValue;

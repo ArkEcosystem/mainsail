@@ -1,4 +1,4 @@
-import { Container } from "@mainsail/container";
+import type { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 

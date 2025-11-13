@@ -1,6 +1,6 @@
-import { SinonStub } from "sinon";
+import type { SinonStub } from "sinon";
 
-import { Stub as IStub } from "./contracts.js";
+import type { Stub as IStub } from "./contracts.js";
 import { Fake } from "./fake.js";
 
 export class Stub extends Fake<SinonStub> implements IStub {

@@ -1,4 +1,4 @@
-import { LegacyColdWalletRepository, LegacyColdWalletRepositoryExtension, RepositoryDataSource } from "../contracts.js";
+import type { LegacyColdWalletRepository, LegacyColdWalletRepositoryExtension, RepositoryDataSource } from "../contracts.js";
 import { LegacyColdWallet } from "../models/legacy-cold-wallet.js";
 import { makeExtendedRepository } from "./repository-extension.js";
 

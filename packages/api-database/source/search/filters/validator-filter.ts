@@ -1,6 +1,6 @@
-import { Wallet } from "../../models/index.js";
+import type { Wallet } from "../../models/index.js";
 import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
-import {
+import type {
 	OrNumericCriteria,
 	OrValidatorCriteria,
 	ValidatorBlocks,
@@ -9,7 +9,7 @@ import {
 	ValidatorProduction,
 	ValidatorResourceLastBlock,
 } from "../types/criteria.js";
-import { Expression, JsonFieldCastType } from "../types/expressions.js";
+import type { Expression, JsonFieldCastType } from "../types/expressions.js";
 import { WalletFilter } from "./wallet-filter.js";
 
 export class ValidatorFilter {

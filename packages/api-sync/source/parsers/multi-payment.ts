@@ -1,4 +1,4 @@
-import { Models } from "@mainsail/api-database";
+import type { Models } from "@mainsail/api-database";
 import type { Contracts } from "@mainsail/contracts";
 import { parseAbi, parseEventLogs } from "viem";
 

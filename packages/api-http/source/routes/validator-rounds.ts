@@ -1,4 +1,4 @@
-import Hapi from "@hapi/hapi";
+import type Hapi from "@hapi/hapi";
 import { Schemas } from "@mainsail/api-common";
 import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";

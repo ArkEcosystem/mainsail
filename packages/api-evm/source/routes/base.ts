@@ -1,4 +1,4 @@
-import Hapi from "@hapi/hapi";
+import type Hapi from "@hapi/hapi";
 import { Units } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 

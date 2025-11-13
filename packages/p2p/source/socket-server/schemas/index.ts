@@ -1,5 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
-import Joi from "joi";
+import type Joi from "joi";
 
 import { getApiNodes } from "./get-api-nodes.js";
 import { getBlocks } from "./get-blocks.js";

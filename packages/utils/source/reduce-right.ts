@@ -1,4 +1,4 @@
-import { FunctionReturning } from "./internal/index.js";
+import type { FunctionReturning } from "./internal/index.js";
 import { isArray } from "./is-array.js";
 import { reduceRightArray } from "./reduce-right-array.js";
 import { reduceRightObject } from "./reduce-right-object.js";

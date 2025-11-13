@@ -1,4 +1,4 @@
-import Hapi from "@hapi/hapi";
+import type Hapi from "@hapi/hapi";
 
 import type { ApiNodeBroadcast } from "./api-node.js";
 import type { HeaderData } from "./header.js";

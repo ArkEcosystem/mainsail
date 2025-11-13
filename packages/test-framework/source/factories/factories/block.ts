@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 
 import secrets from "../../internal/passphrases.json" with { type: "json" };
 import { Signer } from "../../internal/signer.js";
-import { FactoryBuilder } from "../factory-builder.js";
+import type { FactoryBuilder } from "../factory-builder.js";
 import { generateApp } from "./generate-app.js";
 import { GAS_PRICE } from "./transaction.js";
 

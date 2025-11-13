@@ -1,5 +1,5 @@
 import { getImplementation } from "@chainsafe/bls/getImplementation";
-import { IBls } from "@chainsafe/bls/types";
+import type { IBls } from "@chainsafe/bls/types";
 
 let _bls: IBls | undefined;
 export const getBls = async (): Promise<IBls> => {

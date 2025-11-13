@@ -7,11 +7,12 @@ import { join } from "path";
 import { isMainThread } from "worker_threads";
 
 import { Bootstrappers } from "./bootstrap/index.js";
-import { ServiceProvider, ServiceProviderRepository } from "./providers/index.js";
+import type { ServiceProvider} from "./providers/index.js";
+import { ServiceProviderRepository } from "./providers/index.js";
 import { ConfigRepository } from "./services/config/index.js";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider.js";
-import { Constructor } from "./types/container.js";
-import { KeyValuePair } from "./types/index.js";
+import type { Constructor } from "./types/container.js";
+import type { KeyValuePair } from "./types/index.js";
 
 export class Application implements Contracts.Kernel.Application {
 	#booted = false;
