@@ -1,4 +1,4 @@
-export type EnvironmentVariable = (typeof EnvironmentVariableNames)[number];
+type EnvironmentVariable = (typeof EnvironmentVariableNames)[number];
 
 export const EnvironmentVariableNames = [
 	// Log
@@ -133,8 +133,6 @@ export const EnvironmentVariableNames = [
 	"MAINSAIL_PATH_LOG",
 	"MAINSAIL_PATH_TEMP",
 ] as const;
-
-// TODO: DisconnectInvalidPeers
 
 export const EnvironmentVariables = EnvironmentVariableNames.reduce((item, flagName) => {
 	item[flagName] = flagName;
