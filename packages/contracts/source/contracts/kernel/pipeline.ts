@@ -9,3 +9,5 @@ export interface Pipeline<T> {
 
 	process(payload: T): Promise<T | undefined>;
 }
+
+export type PipelineFactory<T> = () => Pipeline<T>;
