@@ -29,3 +29,5 @@ export interface Queue extends EventEmitter {
 
 	isRunning(): boolean;
 }
+
+export type QueueFactory = () => Promise<Queue>;

@@ -11,4 +11,5 @@ export * from "./pipeline.js";
 export * from "./providers.js";
 export * from "./queue.js";
 export * from "./repository.js";
+export * from "./trigger.js";
 export * from "./validation.js";

@@ -6,6 +6,7 @@ import { Application } from "../../application";
 import { QueueFactory } from "../../types";
 import { MemoryQueue } from "./drivers/memory";
 import { ServiceProvider } from "./service-provider";
+import { Contracts } from "@mainsail/contracts";
 
 describe<{
 	app: Application;
@@ -27,6 +28,9 @@ describe<{
 	it("should create an instance of the MemoryQueue", async (context) => {
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.instance(await context.app.get<QueueFactory>(Identifiers.Services.Queue.Factory)(), MemoryQueue);
+		assert.instance(
+			await context.app.get<Contracts.Kernel.QueueFactory>(Identifiers.Services.Queue.Factory)(),
+			MemoryQueue,
+		);
 	});
 });

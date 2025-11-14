@@ -35,3 +35,5 @@ export interface CacheStore<K, T> {
 
 	getPrefix(): Promise<string>;
 }
+
+export type CacheFactory<K, T> = <K, T>() => Promise<CacheStore<K, T>>;

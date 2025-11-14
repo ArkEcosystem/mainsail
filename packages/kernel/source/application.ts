@@ -11,8 +11,6 @@ import type { ServiceProvider } from "./providers/index.js";
 import { ServiceProviderRepository } from "./providers/index.js";
 import { ConfigRepository } from "./services/config/index.js";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider.js";
-import type { Constructor } from "./types/container.js";
-import type { KeyValuePair } from "./types/index.js";
 
 export class Application implements Contracts.Kernel.Application {
 	#booted = false;
@@ -32,8 +30,8 @@ export class Application implements Contracts.Kernel.Application {
 		flags: Contracts.Types.JsonObject;
 		plugins?: Contracts.Types.JsonObject;
 	}): Promise<void> {
-		this.bind<KeyValuePair>(Identifiers.Config.Flags).toConstantValue(options.flags);
-		this.bind<KeyValuePair>(Identifiers.Config.Plugins).toConstantValue(options.plugins || {});
+		this.bind(Identifiers.Config.Flags).toConstantValue(options.flags);
+		this.bind(Identifiers.Config.Plugins).toConstantValue(options.plugins || {});
 
 		await this.#registerEventDispatcher();
 
@@ -262,7 +260,9 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	async #bootstrapWith(type: string): Promise<void> {
-		const bootstrappers: Constructor<Contracts.Kernel.Bootstrapper>[] = Object.values(Bootstrappers[type]);
+		const bootstrappers: Contracts.Types.Constructor<Contracts.Kernel.Bootstrapper>[] = Object.values(
+			Bootstrappers[type],
+		);
 		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.Services.EventDispatcher.Service);
 
 		for (const bootstrapper of bootstrappers) {
