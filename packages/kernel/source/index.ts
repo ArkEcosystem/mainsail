@@ -1,6 +1,5 @@
 export { Application } from "./application.js";
 export * as Bootstrap from "./bootstrap/index.js";
-export * as Enums from "./enums/index.js";
 export * as Environment from "./environment.js";
 export * as Ipc from "./ipc/index.js";
 export * as Providers from "./providers/index.js";
