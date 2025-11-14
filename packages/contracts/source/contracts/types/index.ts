@@ -2,4 +2,4 @@ export type { Class, JsonObject, JsonValue, PackageJson, Primitive } from "type-
 
 export type KeyValuePair<T = any> = Record<string, T>;
 
-export * from "./container.js";
+export type Constructor<T = Record<string, any>> = new (...arguments_: any[]) => T;
