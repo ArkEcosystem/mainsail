@@ -2,8 +2,6 @@ import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { assert, get, has, set, unset } from "@mainsail/utils";
 
-import { KeyValuePair } from "../../types/index.js";
-
 @injectable()
 export class ConfigRepository implements Contracts.Kernel.Repository {
 	#items: Contracts.Types.JsonObject = {};
@@ -46,7 +44,7 @@ export class ConfigRepository implements Contracts.Kernel.Repository {
 		return true;
 	}
 
-	public merge(items: KeyValuePair): void {
+	public merge(items: Contracts.Types.KeyValuePair): void {
 		this.#items = { ...this.#items, ...items };
 	}
 }

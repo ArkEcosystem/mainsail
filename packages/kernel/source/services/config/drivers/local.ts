@@ -11,7 +11,6 @@ import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
 import { extname } from "path";
 
-import { KeyValuePair } from "../../../types/index.js";
 import { ConfigRepository } from "../repository.js";
 
 @injectable()
@@ -26,7 +25,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	private readonly validationService!: Contracts.Kernel.Validator;
 
 	@inject(Identifiers.Config.Flags)
-	private readonly configFlags!: KeyValuePair;
+	private readonly configFlags!: Contracts.Types.KeyValuePair;
 
 	public async loadEnvironmentVariables(): Promise<void> {
 		try {
@@ -151,11 +150,11 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		this.configRepository.set("crypto", this.#loadFromLocation(["crypto.json"]));
 	}
 
-	#loadFromLocation(files: string[]): KeyValuePair {
+	#loadFromLocation(files: string[]): Contracts.Types.KeyValuePair {
 		for (const file of files) {
 			const fullPath: string = this.app.configPath(file);
 			if (existsSync(fullPath)) {
-				const config: KeyValuePair | undefined =
+				const config: Contracts.Types.KeyValuePair | undefined =
 					extname(fullPath) === ".json"
 						? JSON.parse(readFileSync(fullPath).toString())
 						: readFileSync(fullPath);

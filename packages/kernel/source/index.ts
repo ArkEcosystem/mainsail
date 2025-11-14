@@ -6,4 +6,3 @@ export * as Ipc from "./ipc/index.js";
 export * as Providers from "./providers/index.js";
 export * as Services from "./services/index.js";
 export * as Support from "./support/index.js";
-export * as Types from "./types/index.js";

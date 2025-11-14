@@ -3,7 +3,6 @@ import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
 import { ConfigManager, ConfigRepository } from "../services/config/index.js";
-import { KeyValuePair } from "../types/index.js";
 
 @injectable()
 export class RegisterBaseConfiguration implements Contracts.Kernel.Bootstrapper {
@@ -18,8 +17,11 @@ export class RegisterBaseConfiguration implements Contracts.Kernel.Bootstrapper 
 
 		await this.app.get<ConfigManager>(Identifiers.Services.Config.Manager).boot();
 
-		this.configRepository.set("app.flags", this.app.get<KeyValuePair>(Identifiers.Config.Flags));
+		this.configRepository.set("app.flags", this.app.get<Contracts.Types.KeyValuePair>(Identifiers.Config.Flags));
 		// @@TODO better name for storing pluginOptions
-		this.configRepository.set("app.pluginOptions", this.app.get<KeyValuePair>(Identifiers.Config.Plugins));
+		this.configRepository.set(
+			"app.pluginOptions",
+			this.app.get<Contracts.Types.KeyValuePair>(Identifiers.Config.Plugins),
+		);
 	}
 }
