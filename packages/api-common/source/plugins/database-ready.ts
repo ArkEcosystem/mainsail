@@ -11,7 +11,7 @@ export const databaseReady = {
 
 		const inMaintenance = async () => {
 			try {
-				return systemRepository.inMaintenance();
+				return await systemRepository.inMaintenance();
 			} catch {
 				return true;
 			}
