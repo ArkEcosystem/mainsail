@@ -14,11 +14,14 @@ import { performance } from "perf_hooks";
 import { Listeners } from "./contracts.js";
 import { parseMultiPayments } from "./parsers/index.js";
 import { Restore } from "./restore.js";
+import { parseTokens } from "./parsers/tokens.js";
 
 interface DeferredSync {
 	block: Models.Block;
 	transactions: Models.Transaction[];
 	multiPayments: Models.MultiPayment[];
+	tokens: Models.Token[];
+	tokenHolders: Models.TokenHolder[];
 	validatorRound?: Models.ValidatorRound;
 	wallets: Array<[string, string | null, string, string, object, string]>;
 	mergedLegacyColdWallets: ({ legacyAddress: string } & Contracts.Evm.AccountMergeInfo)[];
@@ -50,6 +53,10 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(ApiDatabaseIdentifiers.Migrations)
 	private readonly migrations!: ApiDatabaseContracts.Migrations;
 
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "evm")
+	private readonly evm!: Contracts.Evm.Instance;
+
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
 
@@ -70,6 +77,12 @@ export class Sync implements Contracts.ApiSync.Service {
 
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
+
+	@inject(ApiDatabaseIdentifiers.TokenRepositoryFactory)
+	private readonly tokenRepositoryFactory!: ApiDatabaseContracts.TokenRepositoryFactory;
+
+	@inject(ApiDatabaseIdentifiers.TokenHolderRepositoryFactory)
+	private readonly tokenHolderRepositoryFactory!: ApiDatabaseContracts.TokenHolderRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
 	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.ValidatorRoundRepositoryFactory;
@@ -141,6 +154,8 @@ export class Sync implements Contracts.ApiSync.Service {
 		const transactions: Models.Transaction[] = [];
 		const mergedLegacyColdWallets: ({ legacyAddress: string } & Contracts.Evm.AccountMergeInfo)[] = [];
 		const multiPayments: Models.MultiPayment[] = [];
+		const tokens: Map<string, Models.Token> = new Map();
+		const tokenHolders: Map<string, Models.TokenHolder> = new Map();
 
 		const receipts = unit.getProcessorResult().receipts;
 
@@ -163,6 +178,13 @@ export class Sync implements Contracts.ApiSync.Service {
 			assert.defined(receipt);
 
 			const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
+			const { tokens: parsedTokens, tokenHolders: parsedTokenHolders } = await parseTokens(
+				this.logger,
+				this.configuration,
+				this.evm,
+				transaction,
+				receipt,
+			);
 
 			transactions.push({
 				blockHash: header.hash,
@@ -207,6 +229,14 @@ export class Sync implements Contracts.ApiSync.Service {
 			});
 
 			multiPayments.push(...parsedMultiPayments);
+
+			for (const token of parsedTokens) {
+				tokens.set(token.address, token);
+			}
+
+			for (const holder of parsedTokenHolders) {
+				tokenHolders.set(`${holder.tokenAddress}-${holder.address}`, holder);
+			}
 		}
 
 		const dirtyValidators: Record<string, Contracts.State.ValidatorWallet> = this.validatorSet
@@ -334,6 +364,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			mergedLegacyColdWallets,
 			multiPayments,
 			transactions,
+			tokens: [...tokens.values()],
+			tokenHolders: [...tokenHolders.values()],
 			wallets,
 
 			...(this.roundCalculator.isNewRound(header.number + 1)
@@ -419,6 +451,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
 			const walletRepository = this.walletRepositoryFactory(entityManager);
 			const legacyColdwalletRepository = this.legacyColdWalletRepositoryFactory(entityManager);
+			const tokenRepository = this.tokenRepositoryFactory(entityManager);
+			const tokenHolderRepository = this.tokenHolderRepositoryFactory(entityManager);
 
 			await blockRepository.createQueryBuilder().insert().orIgnore().values(deferred.block).execute();
 
@@ -441,6 +475,24 @@ export class Sync implements Contracts.ApiSync.Service {
 
 			for (const batch of chunk(deferred.multiPayments, 256)) {
 				await multiPaymentRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
+			}
+
+			for (const batch of chunk(deferred.tokens, 256)) {
+				await tokenRepository
+					.createQueryBuilder()
+					.insert()
+					.orUpdate(["name", "symbol", "decimals", "total_supply"], ["address"])
+					.values(batch)
+					.execute();
+			}
+
+			for (const batch of chunk(deferred.tokenHolders, 256)) {
+				await tokenHolderRepository
+					.createQueryBuilder()
+					.insert()
+					.orUpdate(["balance"], ["token_address", "address"])
+					.values(batch)
+					.execute();
 			}
 
 			if (deferred.validatorRound) {
@@ -585,6 +637,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			const walletRepository = this.walletRepositoryFactory(entityManager);
 			const legacyColdwalletRepository = this.legacyColdWalletRepositoryFactory(entityManager);
 			const multiPaymentRepository = this.multiPaymentRepositoryFactory(entityManager);
+			const tokenRepository = this.tokenRepositoryFactory(entityManager);
+			const tokenHolderRepository = this.tokenHolderRepositoryFactory(entityManager);
 
 			// Ensure all tables are truncated (already supposed to be idempotent, but it's cleaner)
 			await Promise.all(
@@ -597,6 +651,8 @@ export class Sync implements Contracts.ApiSync.Service {
 					walletRepository,
 					legacyColdwalletRepository,
 					multiPaymentRepository,
+					tokenRepository,
+					tokenHolderRepository,
 				].map((repo) => repo.clear()),
 			);
 		});
