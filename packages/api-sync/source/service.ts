@@ -13,8 +13,8 @@ import { performance } from "perf_hooks";
 
 import { Listeners } from "./contracts.js";
 import { parseMultiPayments } from "./parsers/index.js";
-import { Restore } from "./restore.js";
 import { parseTokens } from "./parsers/tokens.js";
+import { Restore } from "./restore.js";
 
 interface DeferredSync {
 	block: Models.Block;
@@ -363,9 +363,9 @@ export class Sync implements Contracts.ApiSync.Service {
 
 			mergedLegacyColdWallets,
 			multiPayments,
-			transactions,
-			tokens: [...tokens.values()],
 			tokenHolders: [...tokenHolders.values()],
+			tokens: [...tokens.values()],
+			transactions,
 			wallets,
 
 			...(this.roundCalculator.isNewRound(header.number + 1)

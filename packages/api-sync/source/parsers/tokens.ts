@@ -1,15 +1,7 @@
 import type { Models } from "@mainsail/api-database";
 import type { Contracts } from "@mainsail/contracts";
-import {
-	ContractFunctionParameters,
-	decodeFunctionResult,
-	encodeFunctionData,
-	EncodeFunctionDataParameters,
-	parseAbi,
-	parseEventLogs,
-	toHex,
-	zeroAddress,
-} from "viem";
+import type { ContractFunctionParameters, EncodeFunctionDataParameters } from "viem";
+import { decodeFunctionResult, encodeFunctionData, parseAbi, parseEventLogs, toHex, zeroAddress } from "viem";
 
 const erc20AbiFunctions = parseAbi([
 	"function totalSupply() view returns (uint256)",
@@ -80,13 +72,13 @@ export async function parseTokens(
 		for (const [account, contract] of dirtyAccounts) {
 			tokenHolders.push({
 				address: account,
-				tokenAddress: contract,
 				balance: await getTokenBalance(configuration, evm, contract, account),
+				tokenAddress: contract,
 			});
 		}
 	}
 
-	return { tokens, tokenHolders };
+	return { tokenHolders, tokens };
 }
 
 type TokenMetadata = {
@@ -105,58 +97,58 @@ const parseErc20Contract = async (
 ): Promise<TokenMetadata | undefined> => {
 	const { evmSpec } = configuration.getMilestone();
 
-	let tokenMetadata: TokenMetadataOptional = {
+	const tokenMetadata: TokenMetadataOptional = {
+		decimals: undefined,
 		name: undefined,
 		symbol: undefined,
-		decimals: undefined,
 		totalSupply: undefined,
 	};
 
 	const calls: (Erc20Call | Erc20MetadataCall)[] = [
 		{
 			abi: erc20AbiFunctions,
+			args: undefined,
 			functionName: "totalSupply",
-			args: undefined,
 		},
 		{
 			abi: erc20MetadataFunctions,
+			args: undefined,
 			functionName: "name",
-			args: undefined,
 		},
 		{
 			abi: erc20MetadataFunctions,
+			args: undefined,
 			functionName: "symbol",
-			args: undefined,
 		},
 		{
 			abi: erc20MetadataFunctions,
-			functionName: "decimals",
 			args: undefined,
+			functionName: "decimals",
 		},
 		{
 			abi: erc20AbiFunctions,
-			functionName: "allowance",
 			args: [zeroAddress, zeroAddress],
+			functionName: "allowance",
 		},
 		{
 			abi: erc20AbiFunctions,
-			functionName: "balanceOf",
 			args: [zeroAddress],
+			functionName: "balanceOf",
 		},
 		{
 			abi: erc20AbiFunctions,
+			args: [zeroAddress, 1n],
 			functionName: "transfer",
-			args: [zeroAddress, 1n],
 		},
 		{
 			abi: erc20AbiFunctions,
-			functionName: "transferFrom",
 			args: [zeroAddress, zeroAddress, 1n],
+			functionName: "transferFrom",
 		},
 		{
 			abi: erc20AbiFunctions,
-			functionName: "approve",
 			args: [zeroAddress, 1n],
+			functionName: "approve",
 		},
 	];
 
@@ -175,8 +167,8 @@ const parseErc20Contract = async (
 				if (isTokenMetadataCall(call)) {
 					const decoded = decodeFunctionResult({
 						abi: erc20MetadataFunctions,
-						functionName: call.functionName,
 						data: toHex(result.output!),
+						functionName: call.functionName,
 					});
 
 					tokenMetadata[call.functionName] = decoded as unknown as undefined;
@@ -211,8 +203,8 @@ const getTokenBalance = async (
 
 	const data = encodeFunctionData({
 		abi: erc20AbiFunctions,
-		functionName: "balanceOf",
 		args: [account],
+		functionName: "balanceOf",
 	}).slice(2);
 
 	try {
@@ -225,8 +217,8 @@ const getTokenBalance = async (
 
 		const decoded = decodeFunctionResult({
 			abi: erc20AbiFunctions,
-			functionName: "balanceOf",
 			data: toHex(result.output!),
+			functionName: "balanceOf",
 		});
 
 		return decoded.toString();

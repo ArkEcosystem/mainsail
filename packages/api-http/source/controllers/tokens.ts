@@ -3,9 +3,9 @@ import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
-import { Controller } from "./controller.js";
 import { TokenResource } from "../resources/token.js";
 import { TokenHolderResource } from "../resources/token-holder.js";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class TokensController extends Controller {

@@ -36,9 +36,9 @@ import {
 	Plugin,
 	State,
 	System,
-	Transaction,
 	Token,
 	TokenHolder,
+	Transaction,
 	ValidatorRound,
 	Wallet,
 } from "./models/index.js";

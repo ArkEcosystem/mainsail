@@ -179,12 +179,12 @@ export class Restore {
 				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
 				mostRecentCommit,
 				multiPaymentRepository: this.multiPaymentRepositoryFactory(entityManager),
-				tokenRepository: this.tokenRepositoryFactory(entityManager),
+				publicKeyToAddress: {},
+				stateRepository: this.stateRepositoryFactory(entityManager),
+
 				tokenHolderRepository: this.tokenHolderRepositoryFactory(entityManager),
 
-				publicKeyToAddress: {},
-
-				stateRepository: this.stateRepositoryFactory(entityManager),
+				tokenRepository: this.tokenRepositoryFactory(entityManager),
 				totalSupply: BigNumber.ZERO,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				userAttributes: {},
@@ -241,9 +241,9 @@ export class Restore {
 				entityManager,
 				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
 				multiPaymentRepository: this.multiPaymentRepositoryFactory(entityManager),
-				tokenRepository: this.tokenRepositoryFactory(entityManager),
-				tokenHolderRepository: this.tokenHolderRepositoryFactory(entityManager),
 				stateRepository: this.stateRepositoryFactory(entityManager),
+				tokenHolderRepository: this.tokenHolderRepositoryFactory(entityManager),
+				tokenRepository: this.tokenRepositoryFactory(entityManager),
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
 				walletRepository: this.walletRepositoryFactory(entityManager),
