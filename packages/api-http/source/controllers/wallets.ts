@@ -10,13 +10,17 @@ import { inject, injectable } from "@mainsail/container";
 import { FunctionSigs } from "@mainsail/evm-contracts";
 
 import { TransactionResource } from "../resources/index.js";
-import { WalletResource } from "../resources/wallet.js";
+import { TokenHolderResource } from "../resources/token-holder.js";
+import { EnrichedWallet, WalletResource } from "../resources/wallet.js";
 import { Controller } from "./controller.js";
 
 @injectable()
 export class WalletsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
+
+	@inject(ApiDatabaseIdentifiers.TokenHolderRepositoryFactory)
+	private readonly tokenHolderRepositoryFactory!: ApiDatabaseContracts.TokenHolderRepositoryFactory;
 
 	public async index(request: Hapi.Request): Promise<object> {
 		const criteria: Search.Criteria.WalletCriteria = request.query;
@@ -44,6 +48,10 @@ export class WalletsController extends Controller {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
+
+		if (wallet) {
+			(wallet as EnrichedWallet).tokenCount = await this.getTokenCount(wallet.address);
+		}
 
 		return this.respondWithResource(wallet, WalletResource);
 	}
@@ -103,6 +111,17 @@ export class WalletsController extends Controller {
 		});
 	}
 
+	public async tokens(request: Hapi.Request): Promise<object> {
+		const walletId = request.params.id as string;
+
+		const wallet = await this.getWallet(walletId);
+		if (!wallet) {
+			return Boom.notFound("Wallet not found");
+		}
+
+		return this.getTokens(request, wallet);
+	}
+
 	private async getTransactions(request: Hapi.Request, criteria: Search.Criteria.TransactionCriteria) {
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
@@ -125,6 +144,27 @@ export class WalletsController extends Controller {
 		);
 	}
 
+	private async getTokens(request: Hapi.Request, wallet: Models.Wallet) {
+		const pagination = this.getListingPage(request);
+
+		const [tokens, totalCount] = await this.tokenHolderRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.where("address = :address", { address: wallet.address })
+			.offset(pagination.offset)
+			.limit(pagination.limit)
+			.getManyAndCount();
+
+		return this.toPagination(
+			{
+				meta: { totalCountIsEstimate: false },
+				results: tokens,
+				totalCount,
+			},
+			TokenHolderResource,
+		);
+	}
+
 	private async getWallet(walletId: string): Promise<Models.Wallet | null> {
 		return this.walletRepositoryFactory()
 			.createQueryBuilder()
@@ -133,5 +173,14 @@ export class WalletsController extends Controller {
 			.orWhere("public_key = :publicKey", { publicKey: walletId })
 			.orWhere("attributes @> :username", { username: { username: walletId } })
 			.getOne();
+	}
+
+	private async getTokenCount(address: string): Promise<number> {
+		const tokenCount = await this.tokenHolderRepositoryFactory()
+			.createQueryBuilder()
+			.where("address = :address", { address })
+			.getCount();
+
+		return tokenCount;
 	}
 }

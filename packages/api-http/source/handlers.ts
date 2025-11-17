@@ -10,6 +10,7 @@ import { register as nodeRegister } from "./routes/node.js";
 import { register as peersRegister } from "./routes/peers.js";
 import { register as receiptsRegister } from "./routes/receipts.js";
 import { register as transactionsRegister } from "./routes/transactions.js";
+import { register as tokensRegister } from "./routes/tokens.js";
 import { register as validatorRoundsRegister } from "./routes/validator-rounds.js";
 import { register as validatorsRegister } from "./routes/validators.js";
 import { register as votesRegister } from "./routes/votes.js";
@@ -28,6 +29,7 @@ const config = {
 			{ register: peersRegister },
 			{ register: receiptsRegister },
 			{ register: transactionsRegister },
+			{ register: tokensRegister },
 			{ register: nodeRegister },
 			{ register: validatorRoundsRegister },
 			{ register: votesRegister },
