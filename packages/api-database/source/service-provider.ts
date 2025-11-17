@@ -17,6 +17,8 @@ import {
 	RepositoryDataSource,
 	StateRepository,
 	SystemRepository,
+	TokenHolderRepository,
+	TokenRepository,
 	TransactionRepository,
 	ValidatorRoundRepository,
 	WalletRepository,
@@ -35,6 +37,8 @@ import {
 	State,
 	System,
 	Transaction,
+	Token,
+	TokenHolder,
 	ValidatorRound,
 	Wallet,
 } from "./models/index.js";
@@ -48,6 +52,8 @@ import {
 	makePluginRepository,
 	makeStateRepository,
 	makeSystemRepository,
+	makeTokenHolderRepository,
+	makeTokenRepository,
 	makeTransactionRepository,
 	makeValidatorRoundRepository,
 	makeWalletRepository,
@@ -84,7 +90,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		try {
 			const dataSource = new DataSource({
 				...options,
-				// TODO: allow entities to be extended by plugins
 				entities: [
 					ApiNode,
 					Block,
@@ -95,6 +100,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					State,
 					System,
 					Transaction,
+					Token,
+					TokenHolder,
 					MultiPayment,
 					ValidatorRound,
 					Wallet,
@@ -183,6 +190,20 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeMultiPaymentRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind<() => TokenRepository>(Identifiers.TokenRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeTokenRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind<() => TokenHolderRepository>(Identifiers.TokenHolderRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeTokenHolderRepository(customDataSource ?? dataSource),
 				);
 
 			this.app

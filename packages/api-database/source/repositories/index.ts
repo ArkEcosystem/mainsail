@@ -8,5 +8,7 @@ export { makePluginRepository } from "./plugin-repository.js";
 export { makeStateRepository } from "./state-repository.js";
 export { makeSystemRepository } from "./system-repository.js";
 export { makeTransactionRepository } from "./transaction-repository.js";
+export { makeTokenRepository } from "./token-repository.js";
+export { makeTokenHolderRepository } from "./token-holder-repository.js";
 export { makeValidatorRoundRepository } from "./validator-round-repository.js";
 export { makeWalletRepository } from "./wallet-repository.js";
