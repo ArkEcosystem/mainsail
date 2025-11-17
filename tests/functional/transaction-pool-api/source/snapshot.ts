@@ -3,7 +3,8 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 } from "@mainsail/api-database";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers, Events } from "@mainsail/constants";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert, Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
@@ -307,6 +308,9 @@ export class Snapshot {
 
 	private async collectAccountDeltas(): Promise<{ accountDeltas: Record<string, WalletState>; lastHeight: number }> {
 		const database = this.sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
+		const configuration = this.sandbox.app.get<Contracts.Crypto.Configuration>(
+			Identifiers.Cryptography.Configuration,
+		);
 
 		const accountDeltas: Record<string, WalletState> = {};
 		if (await database.isEmpty()) {
@@ -376,9 +380,39 @@ export class Snapshot {
 					}
 
 					// add transferred value to recipient (if any)
-					if (transaction.data.to && transaction.data.value.isGreaterThan(0)) {
+					if (
+						transaction.data.to &&
+						transaction.data.value.isGreaterThan(0) &&
+						receipt.receipt.status === 1
+					) {
 						await negativeBalanceChange(receipt.sender, transaction.data.value);
 						await positiveBalanceChange(transaction.data.to, transaction.data.value);
+					}
+
+					const consensusContract = this.sandbox.app.get<string>(
+						EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
+					);
+
+					// Refund Validator Fee
+					if (transaction.data.to === consensusContract) {
+						const consensusAbi = parseAbi(["event ValidatorResigned(address addr)"] as const);
+
+						const resignations = parseEventLogs({
+							abi: consensusAbi,
+							logs: receipt.receipt.logs ?? [],
+							eventName: "ValidatorResigned",
+						});
+
+						for (const resignation of resignations) {
+							await negativeBalanceChange(
+								transaction.data.to,
+								BigNumber.make(configuration.getMilestone().validatorRegistrationFee),
+							);
+							await positiveBalanceChange(
+								resignation.args.addr,
+								BigNumber.make(configuration.getMilestone().validatorRegistrationFee),
+							);
+						}
 					}
 
 					// multipayment forwards value to recipients

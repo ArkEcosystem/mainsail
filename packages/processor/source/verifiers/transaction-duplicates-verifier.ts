@@ -1,5 +1,7 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { DuplicatedTransaction } from "@mainsail/exceptions";
 
 @injectable()
 export class TransactionDuplicatesVerifier implements Contracts.Processor.Handler {
@@ -12,7 +14,7 @@ export class TransactionDuplicatesVerifier implements Contracts.Processor.Handle
 		const appliedTransactions: Set<string> = new Set();
 		for (const transaction of block.transactions) {
 			if (appliedTransactions.has(transaction.hash)) {
-				throw new Exceptions.DuplicatedTransaction(unit.getBlock(), transaction.hash);
+				throw new DuplicatedTransaction(unit.getBlock(), transaction.hash);
 			}
 
 			appliedTransactions.add(transaction.hash);

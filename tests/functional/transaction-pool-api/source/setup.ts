@@ -1,4 +1,5 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { resolve } from "path";
@@ -36,7 +37,7 @@ const setup = async () => {
 		broadcastPrevote: async () => {},
 		broadcastProposal: async () => {},
 	});
-	sandbox.app.bind(Identifiers.P2P.Peer.Statistic).toConstantValue({ logStatistic: () => {} });
+	sandbox.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => {} });
 
 	sandbox.app.bind(Identifiers.TransactionPool.Broadcaster).toConstantValue({
 		broadcastTransactions: async () => {},

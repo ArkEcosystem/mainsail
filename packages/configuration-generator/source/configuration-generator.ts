@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 import { ensureDirSync, pathExistsSync } from "fs-extra/esm";
 import { join } from "path";

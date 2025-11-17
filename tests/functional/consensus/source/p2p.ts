@@ -1,4 +1,5 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Enums, Identifiers } from "@mainsail/constants";
 
 const isApp = (node: Contracts.Kernel.Application | undefined): node is Contracts.Kernel.Application =>
 	node !== undefined;
@@ -79,7 +80,7 @@ export class P2PRegistry {
 				.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
 				.process(deserializedProposal);
 
-			if (result === Contracts.Consensus.ProcessorResult.Invalid) {
+			if (result === Enums.Consensus.ProcessorResult.Invalid) {
 				console.log("postProposal process failed");
 			}
 		}, 0);

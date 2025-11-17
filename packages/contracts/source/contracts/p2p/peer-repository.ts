@@ -1,4 +1,4 @@
-import { Peer } from "./peer.js";
+import type { Peer } from "./peer.js";
 
 export interface PeerRepository {
 	getPeers(): Peer[];

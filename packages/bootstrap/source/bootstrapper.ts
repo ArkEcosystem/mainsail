@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Bootstrapper {

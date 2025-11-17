@@ -1,6 +1,7 @@
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
+import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import {
@@ -71,7 +72,18 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 	public async boot(): Promise<void> {}
 
 	protected getPlugins(): any[] {
-		const config = this.config().get<any>("plugins");
+		const config = this.config().getRequired<{
+			trustProxy: boolean;
+			whitelist: string[];
+			socketTimeout: number;
+			rateLimit: {
+				blacklist: string[];
+				duration: number;
+				enabled: boolean;
+				points: number;
+				whitelist: string[];
+			};
+		}>("plugins");
 
 		return [
 			{

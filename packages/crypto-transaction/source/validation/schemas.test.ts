@@ -1,4 +1,5 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
 import { schemas as base58addressSchemas } from "@mainsail/crypto-address-base58";
 import { Configuration } from "@mainsail/crypto-config";

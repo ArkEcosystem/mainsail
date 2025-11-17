@@ -1,4 +1,4 @@
-import { FunctionReturning } from "./internal/index.js";
+import type { FunctionReturning } from "./internal/index.js";
 
 export const every = <T>(subject: T[], iterator: FunctionReturning): boolean => {
 	for (let index = 0; index < subject.length; index++) {

@@ -177,6 +177,7 @@ export default [
 			"@typescript-eslint/no-floating-promises": "error",
 			"@typescript-eslint/await-thenable": "warn",
 			"@typescript-eslint/unbound-method": "warn",
+			"@typescript-eslint/consistent-type-imports": "error",
 			"promise/always-return": "warn",
 			"unicorn/prefer-default-parameters": "warn",
 			"unicorn/no-typeof-undefined": "warn",

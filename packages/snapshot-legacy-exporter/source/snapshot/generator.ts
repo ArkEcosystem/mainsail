@@ -3,8 +3,9 @@ import { writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import { brotliCompress } from "node:zlib";
 
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 import { DataSource, EntityManager } from "typeorm";
@@ -119,7 +120,7 @@ export class Generator {
 			.resolve(Providers.PluginConfiguration)
 			.discover("@mainsail/snapshot-legacy-exporter", process.cwd());
 
-		const options = pluginConfig.get<DatabaseOptions>("database");
+		const options = pluginConfig.getRequired<DatabaseOptions>("database");
 		assert.defined(options);
 
 		const dataSource = new DataSource({

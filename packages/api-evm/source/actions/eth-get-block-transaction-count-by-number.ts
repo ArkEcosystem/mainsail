@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class EthGetBlockTransactionCountByNumber implements Contracts.Api.RPC.Action {

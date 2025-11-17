@@ -1,5 +1,6 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { Proposal } from "@mainsail/crypto-messages";
 import { Sandbox } from "@mainsail/test-framework";
 import { assert, BigNumber } from "@mainsail/utils";

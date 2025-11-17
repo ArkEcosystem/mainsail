@@ -1,8 +1,8 @@
 import Boom from "@hapi/boom";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 import { merge } from "@mainsail/utils";
 import { readFileSync } from "fs";
 
@@ -113,7 +113,7 @@ export abstract class AbstractServer {
 		return this.server.inject(options);
 	}
 
-	protected abstract pluginConfiguration(): Providers.PluginConfiguration;
+	protected abstract pluginConfiguration(): Contracts.Kernel.PluginConfiguration;
 	protected abstract defaultOptions(): Record<string, any>;
 	protected abstract schemas(): any;
 

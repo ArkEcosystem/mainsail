@@ -1,6 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 import { assert, http } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
@@ -10,9 +10,6 @@ import { replySchemas } from "./reply-schemas/index.js";
 import { Codecs } from "./socket-server/codecs/index.js";
 import { Throttle } from "./throttle.js";
 
-const LOG_RESPONSE_TIME = 100; //ms
-const LOG_DESERIALIZE_TIME = 5; //ms
-
 @injectable()
 export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.Application.Instance)
@@ -20,7 +17,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.Peer.Connector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
@@ -39,6 +36,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	@inject(Identifiers.P2P.Throttle.Factory)
 	private readonly throttleFactory!: () => Promise<Throttle>;
+
+	@inject(Identifiers.P2P.Statistic.Service)
+	private readonly statisticService!: Contracts.P2P.StatisticService;
 
 	#throttle?: Throttle;
 
@@ -188,72 +188,73 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		payload: any,
 		options: Contracts.P2P.EmitOptions,
 	): Promise<Contracts.P2P.EmitResult<T>> {
-		const time = {
+		const statistic: Contracts.P2P.EmitStatistic = {
 			deserializeTime: 0,
 			responseTime: 0,
+			success: false,
 			throttleTime: 0,
 		};
 
-		const timeBeforeThrottle = performance.now();
+		try {
+			// Throttle
+			const timeBeforeThrottle = performance.now();
 
-		const throttle = await this.#getThrottle();
-		await throttle.throttle(peer, event);
+			const throttle = await this.#getThrottle();
+			await throttle.throttle(peer, event);
 
-		time.throttleTime = performance.now() - timeBeforeThrottle;
+			statistic.throttleTime = Math.round(performance.now() - timeBeforeThrottle);
 
-		const codec = Codecs[event];
+			// Emit
+			const codec = Codecs[event];
 
-		const timeBeforeSocketCall = performance.now();
+			const timeBeforeSocketCall = performance.now();
 
-		await this.connector.connect(peer);
+			await this.connector.connect(peer);
 
-		const response = await this.connector.emit(
-			peer,
-			event,
-			codec.request.serialize({
-				...payload,
-				headers: {
-					...this.headerFactory().toData(),
-				},
-			}),
-			options.timeout,
-		);
-
-		time.responseTime = performance.now() - timeBeforeSocketCall;
-
-		const timeBeforeDeserialize = performance.now();
-
-		const data = codec.response.deserialize(response.payload) as T;
-
-		time.deserializeTime = performance.now() - timeBeforeDeserialize;
-		peer.setPinged(Math.floor(time.responseTime + time.deserializeTime));
-
-		if (time.responseTime >= LOG_RESPONSE_TIME) {
-			this.logger.warn(
-				`Response time for ${event} from peer ${peer.ip} exceeded ${LOG_RESPONSE_TIME}ms: ${time.responseTime}ms`,
-				"p2p",
+			const response = await this.connector.emit(
+				peer,
+				event,
+				codec.request.serialize({
+					...payload,
+					headers: {
+						...this.headerFactory().toData(),
+					},
+				}),
+				options.timeout,
 			);
+			statistic.responseTime = Math.round(performance.now() - timeBeforeSocketCall);
+
+			// Deserialize
+			const timeBeforeDeserialize = performance.now();
+
+			const data = codec.response.deserialize(response.payload) as T;
+
+			statistic.deserializeTime = Math.round(performance.now() - timeBeforeDeserialize);
+
+			// Validate
+			peer.setPinged(Math.floor(statistic.responseTime + statistic.deserializeTime));
+
+			if (!this.#validateReply(peer, data, event)) {
+				const validationError = new Error(
+					`Response validation failed for ${event} from peer ${peer.ip}: ${JSON.stringify(data)}`,
+				);
+
+				validationError.name = SocketErrors.Validation;
+				throw validationError;
+			}
+
+			assert.defined(data.headers);
+			void this.headerService.handle(peer, data.headers);
+
+			statistic.success = true;
+
+			return { data, ...statistic };
+		} catch (error) {
+			this.logger.debugExtra(`Error communicating with peer ${peer.ip} on event ${event}. Error ${error}`);
+			throw error;
+		} finally {
+			this.statisticService.getCurrentRoundStatistic().addEmit(peer.ip, event, statistic);
 		}
-
-		if (time.deserializeTime >= LOG_DESERIALIZE_TIME) {
-			this.logger.warn(
-				`Deserialization time for ${event} from peer ${peer.ip} exceeded ${LOG_DESERIALIZE_TIME}ms: ${time.deserializeTime}ms`,
-				"p2p",
-			);
-		}
-
-		if (!this.#validateReply(peer, data, event)) {
-			const validationError = new Error(
-				`Response validation failed for ${event} from peer ${peer.ip}: ${JSON.stringify(data)}`,
-			);
-			validationError.name = SocketErrors.Validation;
-			throw validationError;
-		}
-
-		assert.defined(data.headers);
-		void this.headerService.handle(peer, data.headers);
-
-		return { data, success: true, ...time };
 	}
 
 	#handleSocketError(peer: Contracts.P2P.Peer, error: Error): void {

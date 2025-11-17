@@ -1,7 +1,8 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 import { generateMnemonic } from "bip39";
 
-import { FactoryBuilder } from "../factory-builder.js";
+import type { FactoryBuilder } from "../factory-builder.js";
 import { generateApp } from "./generate-app.js";
 
 export const registerIdentityFactory = async (

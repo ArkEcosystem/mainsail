@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
@@ -19,7 +20,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		await this.app
 			.get<Server>(Identifiers.Webhooks.Server)
-			.register(this.config().get<Contracts.Types.JsonObject>("server")!);
+			.register(this.config().getRequired<Contracts.Types.JsonObject>("server")!);
 
 		// Setup Listeners...
 		this.#startListeners();

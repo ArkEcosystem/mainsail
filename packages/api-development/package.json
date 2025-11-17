@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/api-development",
-	"version": "0.0.1-rc.6",
+	"version": "0.0.1-rc.7",
 	"description": "Development API for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -24,8 +24,8 @@
 		"@hapi/boom": "10.0.1",
 		"@hapi/hapi": "21.4.3",
 		"@mainsail/api-common": "workspace:*",
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"joi": "18.0.0",
@@ -33,6 +33,7 @@
 		"semver": "7.7.2"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"@types/semver": "7.7.0",
 		"uvu": "0.5.6"
 	},

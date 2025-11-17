@@ -1,13 +1,79 @@
-import {
-	Contracts as ApiDatabaseContracts,
-	Identifiers as ApiDatabaseIdentifiers,
-	ServiceProvider as CoreApiDatabase,
-} from "@mainsail/api-database";
-import { Identifiers } from "@mainsail/contracts";
-import { Application, Providers } from "@mainsail/kernel";
+import type { Contracts as ApiDatabaseContracts } from "@mainsail/api-database";
+import { Identifiers as ApiDatabaseIdentifiers, ServiceProvider as CoreApiDatabase } from "@mainsail/api-database";
+import { Identifiers } from "@mainsail/constants";
+import type { Application } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
 
 import { Sandbox } from "../../../test-framework/source/index.js";
 import { ServiceProvider as CoreApiHttp } from "../../source/service-provider.js";
+
+const setupDatabase = async (app: Application): Promise<CoreApiDatabase> => {
+	const pluginConfiguration = await app
+		.get<Providers.PluginConfiguration>(Identifiers.ServiceProvider.Configuration)
+		.discover("@mainsail/api-database", "@mainsail/api-database");
+
+	pluginConfiguration.merge({
+		database: {
+			...databaseOptions,
+			applicationName: "mainsail/api-database-test",
+			dropSchema: true,
+			logging: false,
+			migrationsRun: true,
+			synchronize: true,
+		},
+		enabled: true,
+	});
+
+	const database = app.resolve(CoreApiDatabase);
+	database.setConfig(pluginConfiguration);
+	await database.register();
+
+	return database;
+};
+
+const setupHttp = async (app: Application): Promise<CoreApiHttp> => {
+	const pluginConfiguration = await app
+		.get<Providers.PluginConfiguration>(Identifiers.ServiceProvider.Configuration)
+		.discover("@mainsail/api-http", "@mainsail/api-http");
+
+	pluginConfiguration.merge({
+		database: {
+			...databaseOptions,
+			applicationName: "mainsail/api-http-test",
+		},
+		enabled: false,
+		plugins: {
+			pagination: {
+				limit: 100,
+			},
+			socketTimeout: 5000,
+		},
+		server: { http: { enabled: true, host: "127.0.0.1", port: 4003 }, https: { enabled: false } },
+	});
+
+	const server = app.resolve(CoreApiHttp);
+	server.setConfig(pluginConfiguration);
+	await server.register();
+	await server.boot();
+
+	return server;
+};
+
+// TODO: either use env or hardcode same values for postgres in CI
+const databaseOptions = {
+	database: "test_db",
+	dropSchema: false,
+	entityPrefix: "public.",
+	host: "localhost",
+	logger: "simple-console",
+	logging: false,
+	migrationsRun: false,
+	password: "password",
+	port: 5432,
+	synchronize: false,
+	type: "postgres",
+	username: "test_db",
+};
 
 export class ApiContext {
 	public constructor(
@@ -84,7 +150,7 @@ export class ApiContext {
 		await dataSource.synchronize(true);
 		await dataSource.runMigrations();
 
-		await this.stateRepository.save({ id: 0, blockNumber: "0", supply: "1500000" });
+		await this.stateRepository.save({ blockNumber: "0", id: 0, supply: "1500000" });
 	}
 
 	public async dispose() {
@@ -122,72 +188,4 @@ export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<Api
 	const apiHttp = await setupHttp(context.sandbox.app);
 
 	return new ApiContext(context.sandbox.app, apiHttp, apiDatabase);
-};
-
-const setupDatabase = async (app: Application): Promise<CoreApiDatabase> => {
-	const pluginConfiguration = await app
-		.get<Providers.PluginConfiguration>(Identifiers.ServiceProvider.Configuration)
-		.discover("@mainsail/api-database", "@mainsail/api-database");
-
-	pluginConfiguration.merge({
-		database: {
-			...databaseOptions,
-			applicationName: "mainsail/api-database-test",
-			dropSchema: true,
-			logging: false,
-			migrationsRun: true,
-			synchronize: true,
-		},
-		enabled: true,
-	});
-
-	const database = app.resolve(CoreApiDatabase);
-	database.setConfig(pluginConfiguration);
-	await database.register();
-
-	return database;
-};
-
-const setupHttp = async (app: Application): Promise<CoreApiHttp> => {
-	const pluginConfiguration = await app
-		.get<Providers.PluginConfiguration>(Identifiers.ServiceProvider.Configuration)
-		.discover("@mainsail/api-http", "@mainsail/api-http");
-
-	pluginConfiguration.merge({
-		database: {
-			...databaseOptions,
-			applicationName: "mainsail/api-http-test",
-		},
-		enabled: false,
-		plugins: {
-			pagination: {
-				limit: 100,
-			},
-			socketTimeout: 5000,
-		},
-		server: { http: { enabled: true, host: "127.0.0.1", port: 4003 } },
-	});
-
-	const server = app.resolve(CoreApiHttp);
-	server.setConfig(pluginConfiguration);
-	await server.register();
-	await server.boot();
-
-	return server;
-};
-
-// TODO: either use env or hardcode same values for postgres in CI
-const databaseOptions = {
-	database: "test_db",
-	dropSchema: false,
-	entityPrefix: "public.",
-	host: "localhost",
-	logger: "simple-console",
-	logging: false,
-	migrationsRun: false,
-	password: "password",
-	port: 5432,
-	synchronize: false,
-	type: "postgres",
-	username: "test_db",
 };

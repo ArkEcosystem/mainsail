@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Ipc, Providers } from "@mainsail/kernel";
 import Joi from "joi";
 import { cpus } from "os";

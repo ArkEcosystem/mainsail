@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { EventListener, Listeners as IListeners } from "./contracts.js";
 import { ApiNodes } from "./listeners/api-nodes.js";

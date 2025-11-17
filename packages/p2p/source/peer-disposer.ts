@@ -1,6 +1,6 @@
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 import dayjs from "dayjs";
 
 import { errorTypes } from "./hapi-nes/index.js";
@@ -9,7 +9,7 @@ import { errorTypes } from "./hapi-nes/index.js";
 export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.Peer.Connector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
@@ -25,6 +25,9 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly transactionPoolWorker!: Contracts.TransactionPool.Worker;
+
+	@inject(Identifiers.P2P.Statistic.Service)
+	private readonly statisticService!: Contracts.P2P.StatisticService;
 
 	#blacklist = new Map<string, dayjs.Dayjs>();
 
@@ -44,6 +47,8 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 		}
 
 		this.logger.debug(`Banning peer ${ip}, because: ${error.message}`, "p2p");
+
+		this.statisticService.getCurrentRoundStatistic().peerBanned(ip);
 
 		const timeout = this.configuration.getRequired<number>("peerBanTime");
 		if (timeout > 0) {

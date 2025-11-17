@@ -1,6 +1,7 @@
 import Hapi from "@hapi/hapi";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { getPeerIp } from "../../utils/index.js";
 
@@ -26,7 +27,7 @@ export class PostPrecommitController implements Contracts.P2P.Controller {
 			const precommit = await this.factory.makePrecommitFromBytes(request.payload.precommit);
 			const result = await this.precommitProcessor.process(precommit);
 
-			if (result === Contracts.Consensus.ProcessorResult.Invalid) {
+			if (result === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error("Invalid precommit");
 			}
 

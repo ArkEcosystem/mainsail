@@ -1,4 +1,5 @@
-import { parse, UrlWithStringQuery } from "url";
+import type { UrlWithStringQuery } from "url";
+import { parse } from "url";
 
 import { last } from "./last.js";
 

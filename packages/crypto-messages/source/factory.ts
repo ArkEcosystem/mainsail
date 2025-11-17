@@ -1,5 +1,7 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { MessageSchemaError } from "@mainsail/exceptions";
 import { ByteBuffer } from "@mainsail/utils";
 
 import { Precommit } from "./precommit.js";
@@ -172,6 +174,6 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 			return result.value;
 		}
 
-		throw new Exceptions.MessageSchemaError(schema, result.error);
+		throw new MessageSchemaError(schema, result.error);
 	}
 }

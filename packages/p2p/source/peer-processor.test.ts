@@ -1,4 +1,4 @@
-import { Events, Identifiers } from "@mainsail/contracts";
+import { Identifiers, Events } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 
 import { describeSkip, Sandbox } from "../../test-framework/source";

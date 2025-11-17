@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 export class BIP39 implements Contracts.Validator.ValidatorKeyPair {
 	#keyPair!: Contracts.Crypto.KeyPair;

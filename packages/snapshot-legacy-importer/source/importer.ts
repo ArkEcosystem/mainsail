@@ -2,11 +2,11 @@ import { createHash } from "node:crypto";
 import { promisify } from "node:util";
 import { brotliDecompress } from "node:zlib";
 
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
-import { Providers } from "@mainsail/kernel";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, BigNumber, chunk } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
@@ -37,7 +37,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "snapshot-legacy-importer")
-	private readonly pluginConfiguration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")

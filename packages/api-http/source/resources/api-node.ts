@@ -1,6 +1,6 @@
 import { Models } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class ApiNodeResource implements Contracts.Api.Resource {

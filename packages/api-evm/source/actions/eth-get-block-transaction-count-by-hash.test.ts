@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { schemas as cryptoBlockSchemas } from "@mainsail/crypto-block";
 import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation";

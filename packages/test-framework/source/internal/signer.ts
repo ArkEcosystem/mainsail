@@ -1,9 +1,9 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 import { registerTransactionFactory } from "../factories/factories/transaction.js";
 import { FactoryBuilder } from "../factories/factory-builder.js";
-import {
+import type {
 	EvmCallOptions,
 	MultiPaymentOptions,
 	MultiSignatureOptions,

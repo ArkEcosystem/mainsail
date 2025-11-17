@@ -1,5 +1,7 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { NotEnoughRoundValidatorsError } from "@mainsail/exceptions";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.Service {
@@ -51,7 +53,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const { roundValidators } = this.configuration.getMilestone();
 
 		if (this.#topValidators.length !== roundValidators) {
-			throw new Exceptions.NotEnoughRoundValidatorsError(this.#topValidators.length, roundValidators);
+			throw new NotEnoughRoundValidatorsError(this.#topValidators.length, roundValidators);
 		}
 
 		return this.#topValidators.slice(0, roundValidators);
@@ -75,7 +77,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const { roundValidators } = this.configuration.getMilestone();
 		const validators = await this.consensusContractService.getRoundValidators();
 		if (validators.length < roundValidators) {
-			throw new Exceptions.NotEnoughRoundValidatorsError(this.#topValidators.length, roundValidators);
+			throw new NotEnoughRoundValidatorsError(this.#topValidators.length, roundValidators);
 		}
 
 		this.#topValidators = validators.slice(0, roundValidators);

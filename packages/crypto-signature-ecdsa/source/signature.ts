@@ -1,5 +1,7 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { NotImplemented } from "@mainsail/exceptions";
 import { ByteBuffer } from "@mainsail/utils";
 import { secp256k1 } from "bcrypto";
 
@@ -59,7 +61,7 @@ export class Signature implements Contracts.Crypto.Signature {
 	}
 
 	public async aggregate(signatures: Buffer[]): Promise<string> {
-		throw new Exceptions.NotImplemented(this.constructor.name, "aggregate");
+		throw new NotImplemented(this.constructor.name, "aggregate");
 	}
 
 	public async signRecoverable(message: Buffer, privateKey: Buffer): Promise<Contracts.Crypto.EcdsaSignature> {

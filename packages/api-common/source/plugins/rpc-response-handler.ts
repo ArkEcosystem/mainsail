@@ -1,6 +1,6 @@
-import { Boom } from "@hapi/boom";
-import { ResponseObject, Server as HapiServer } from "@hapi/hapi";
-import { Contracts } from "@mainsail/contracts";
+import type { Boom } from "@hapi/boom";
+import type { ResponseObject, Server as HapiServer } from "@hapi/hapi";
+import { Enums } from "@mainsail/constants";
 
 import { Utils as Utilities } from "../rcp/index.js";
 
@@ -17,7 +17,7 @@ export const rpcResponseHandler = {
 					return h.response(
 						Utilities.prepareRcpError(
 							Utilities.getRcpId(request),
-							Contracts.Api.RPC.ErrorCode.InternalError,
+							Enums.Api.RcpErrorCode.InternalError,
 							response.output.payload.message,
 						),
 					);

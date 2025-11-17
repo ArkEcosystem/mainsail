@@ -1,5 +1,5 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { describe, Sandbox } from "@mainsail/test-framework";
 import { sleep } from "@mainsail/utils";
 

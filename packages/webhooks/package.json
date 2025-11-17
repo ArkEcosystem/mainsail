@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/webhooks",
-	"version": "0.0.1-rc.6",
+	"version": "0.0.1-rc.7",
 	"description": "Webhooks service for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -22,8 +22,8 @@
 	"dependencies": {
 		"@hapi/boom": "10.0.1",
 		"@hapi/hapi": "21.4.3",
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"fs-extra": "11.3.1",
@@ -32,6 +32,7 @@
 		"uuid": "11.1.0"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"@types/fs-extra": "11.0.4",
 		"@types/tmp": "0.2.6",
 		"tmp": "0.2.5",

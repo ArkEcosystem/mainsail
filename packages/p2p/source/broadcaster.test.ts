@@ -1,4 +1,5 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { BigNumber, cloneDeep } from "@mainsail/utils";
 
 import { describeSkip, Sandbox } from "../../test-framework/source";

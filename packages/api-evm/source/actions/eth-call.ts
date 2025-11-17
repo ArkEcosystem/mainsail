@@ -1,5 +1,7 @@
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { RpcError } from "@mainsail/exceptions";
 import { toBytes } from "viem";
 
 type TxData = {
@@ -65,7 +67,7 @@ export class CallAction implements Contracts.Api.RPC.Action {
 			data: Buffer.from(toBytes(data.data)),
 			from: data.from ?? "0x" + "0".repeat(40),
 			gasLimit,
-			specId: Contracts.Evm.SpecId.LATEST,
+			specId: Enums.Evm.SpecId.LATEST,
 			to: data.to,
 		});
 
@@ -73,6 +75,6 @@ export class CallAction implements Contracts.Api.RPC.Action {
 			return `0x${output?.toString("hex")}`;
 		}
 
-		throw new Exceptions.RpcError("execution reverted");
+		throw new RpcError("execution reverted");
 	}
 }

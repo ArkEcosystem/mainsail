@@ -1,5 +1,6 @@
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { getRandomPeer } from "../utils/index.js";
 
@@ -132,7 +133,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 			}
 
 			const response = await this.proposalProcessor.process(proposal, false);
-			if (response === Contracts.Consensus.ProcessorResult.Invalid) {
+			if (response === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error(`Received proposal is invalid`);
 			}
 

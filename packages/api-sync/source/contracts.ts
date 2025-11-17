@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 export interface EventListener extends Contracts.Kernel.EventListener {
 	register(): Promise<void>;

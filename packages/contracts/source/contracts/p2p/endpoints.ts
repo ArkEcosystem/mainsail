@@ -1,9 +1,10 @@
-import Hapi from "@hapi/hapi";
+import type Hapi from "@hapi/hapi";
 
-import { ApiNodeBroadcast } from "./api-node.js";
-import { HeaderData } from "./header.js";
-import { Socket } from "./nes.js";
-import { PeerBroadcast, PeerConfig, PeerState } from "./peer.js";
+import type { ApiNodeBroadcast } from "./api-node.js";
+import type { HeaderData } from "./header.js";
+import type { Socket } from "./nes.js";
+import type { PeerBroadcast, PeerConfig, PeerState } from "./peer.js";
+import type { EmitStatistic } from "./statistic.js";
 
 export interface Request extends Hapi.Request {
 	socket?: Socket;
@@ -12,12 +13,8 @@ export interface Request extends Hapi.Request {
 	};
 }
 
-export interface EmitResult<T extends Response> {
+export interface EmitResult<T extends Response> extends EmitStatistic {
 	data: T;
-	success: boolean;
-	deserializeTime: number;
-	responseTime: number;
-	throttleTime: number;
 }
 
 export interface Response {

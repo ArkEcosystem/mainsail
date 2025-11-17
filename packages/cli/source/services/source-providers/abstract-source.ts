@@ -1,9 +1,9 @@
-import { Exceptions } from "@mainsail/contracts";
+import { InvalidPackageJson } from "@mainsail/exceptions";
 import { execaSync } from "execa";
 import { ensureDirSync, moveSync, readJSONSync, removeSync } from "fs-extra/esm";
 import { join } from "path";
 
-import { Source } from "./contracts.js";
+import type { Source } from "./contracts.js";
 
 export abstract class AbstractSource implements Source {
 	protected readonly dataPath: string;
@@ -49,7 +49,7 @@ export abstract class AbstractSource implements Source {
 		try {
 			return readJSONSync(join(path, "package.json")).name;
 		} catch {
-			throw new Exceptions.InvalidPackageJson();
+			throw new InvalidPackageJson();
 		}
 	}
 

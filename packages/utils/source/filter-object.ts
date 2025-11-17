@@ -1,4 +1,4 @@
-import { FunctionReturning } from "./internal/index.js";
+import type { FunctionReturning } from "./internal/index.js";
 
 export const filterObject = <T extends Record<string, any>>(iterable: T, iteratee: FunctionReturning): T => {
 	const keys = Object.keys(iterable);

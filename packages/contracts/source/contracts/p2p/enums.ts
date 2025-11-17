@@ -1,4 +1,3 @@
-export enum PeerProtocol {
-	Http = 0,
-	Https = 1,
-}
+import type { Enums } from "@mainsail/constants";
+
+export type PeerProtocol = Enums.Api.Protocol;

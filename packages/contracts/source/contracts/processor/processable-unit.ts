@@ -1,7 +1,7 @@
-import { Block } from "../crypto/block.js";
-import { Commit } from "../crypto/commit.js";
-import { AccountUpdate } from "../evm/evm.js";
-import { BlockProcessorResult } from "./block-processor-result.js";
+import type { Block } from "../crypto/block.js";
+import type { Commit } from "../crypto/commit.js";
+import type { AccountUpdate } from "../evm/evm.js";
+import type { BlockProcessorResult } from "./block-processor-result.js";
 
 export interface ProcessableUnit {
 	readonly blockNumber: number;

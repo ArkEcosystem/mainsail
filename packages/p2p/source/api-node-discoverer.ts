@@ -1,6 +1,7 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
+import { Services } from "@mainsail/kernel";
 import { shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -13,7 +14,7 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.ApiNode.Factory)
 	private readonly ApiNodeFactory!: Contracts.P2P.ApiNodeFactory;

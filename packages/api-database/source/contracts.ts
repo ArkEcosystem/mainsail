@@ -1,6 +1,6 @@
-import { type DataSource, EntityManager, ObjectLiteral, Repository, SelectQueryBuilder } from "typeorm";
+import type { DataSource, EntityManager, ObjectLiteral, Repository, SelectQueryBuilder } from "typeorm";
 
-import {
+import type {
 	ApiNode,
 	Block,
 	Configuration,
@@ -15,8 +15,8 @@ import {
 	ValidatorRound,
 	Wallet,
 } from "./models/index.js";
-import { QueryHelper } from "./search/query-helper.js";
-import { Expression } from "./search/types/expressions.js";
+import type { QueryHelper } from "./search/query-helper.js";
+import type { Expression } from "./search/types/expressions.js";
 import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search/types/index.js";
 
 export type RepositoryDataSource = DataSource | EntityManager;

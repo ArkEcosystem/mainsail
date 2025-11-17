@@ -1,35 +1,33 @@
-export type EventName = string | symbol;
-
 export interface EventListener {
-	handle(payload: { name: EventName; data: any }): void;
+	handle(payload: { name: string; data: any }): void;
 }
 
 export interface EventDispatcher {
-	listen(event: EventName, listener: EventListener): () => void;
+	listen(event: string, listener: EventListener): () => void;
 
-	listenMany(events: Array<[EventName, EventListener]>): Map<EventName, () => void>;
+	listenMany(events: Array<[string, EventListener]>): Map<string, () => void>;
 
-	listenOnce(name: EventName, listener: EventListener): void;
+	listenOnce(name: string, listener: EventListener): void;
 
-	forget(event: EventName, listener?: EventListener): void;
+	forget(event: string, listener?: EventListener): void;
 
-	forgetMany(events: Array<[EventName, EventListener]>): void;
+	forgetMany(events: Array<[string, EventListener]>): void;
 
 	flush(): void;
 
-	getListeners(event: EventName): EventListener[];
+	getListeners(event: string): EventListener[];
 
-	hasListeners(event: EventName): boolean;
+	hasListeners(event: string): boolean;
 
-	dispatch<T = any>(event: EventName, data?: T): Promise<void>;
+	dispatch<T = any>(event: string, data?: T): Promise<void>;
 
-	dispatchSeq<T = any>(event: EventName, data?: T): Promise<void>;
+	dispatchSeq<T = any>(event: string, data?: T): Promise<void>;
 
-	dispatchSync<T = any>(event: EventName, data?: T): void;
+	dispatchSync<T = any>(event: string, data?: T): void;
 
-	dispatchMany<T = any>(events: Array<[EventName, T]>): Promise<void>;
+	dispatchMany<T = any>(events: Array<[string, T]>): Promise<void>;
 
-	dispatchManySeq<T = any>(events: Array<[EventName, T]>): Promise<void>;
+	dispatchManySeq<T = any>(events: Array<[string, T]>): Promise<void>;
 
-	dispatchManySync<T = any>(events: Array<[EventName, T]>): void;
+	dispatchManySync<T = any>(events: Array<[string, T]>): void;
 }

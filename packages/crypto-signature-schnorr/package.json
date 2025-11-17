@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-signature-schnorr",
-	"version": "0.0.1-rc.6",
+	"version": "0.0.1-rc.7",
 	"description": "Schnorr (BIP340) signatures from libtorsion for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -21,13 +21,15 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
+		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"bcrypto": "5.5.2"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"uvu": "0.5.6"
 	},
 	"engines": {

@@ -1,5 +1,12 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import {
+	DuplicateParticipantInMultiSignatureError,
+	InvalidTransactionBytesError,
+	TransactionSchemaError,
+	TransactionVersionError,
+} from "@mainsail/exceptions";
 import { assert, BigNumber } from "@mainsail/utils";
 
 import { Transaction } from "./transaction.js";
@@ -75,7 +82,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		const { value, error } = await this.verifier.verifySchema(data, strict);
 
 		if (error) {
-			throw new Exceptions.TransactionSchemaError(error);
+			throw new TransactionSchemaError(error);
 		}
 
 		const transaction = this.utils.resolve(value);
@@ -149,14 +156,14 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			return transaction;
 		} catch (error) {
 			if (
-				error instanceof Exceptions.TransactionVersionError ||
-				error instanceof Exceptions.TransactionSchemaError ||
-				error instanceof Exceptions.DuplicateParticipantInMultiSignatureError
+				error instanceof TransactionVersionError ||
+				error instanceof TransactionSchemaError ||
+				error instanceof DuplicateParticipantInMultiSignatureError
 			) {
 				throw error;
 			}
 
-			throw new Exceptions.InvalidTransactionBytesError(error.message);
+			throw new InvalidTransactionBytesError(error.message);
 		}
 	}
 }

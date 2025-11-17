@@ -1,5 +1,7 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { RpcError } from "@mainsail/exceptions";
 
 @injectable()
 export class EthGetUncleByBlockNumberAndIndex implements Contracts.Api.RPC.Action {
@@ -19,7 +21,7 @@ export class EthGetUncleByBlockNumberAndIndex implements Contracts.Api.RPC.Actio
 
 	public async handle(parameters: [string]): Promise<null> {
 		if (this.stateStore.getBlockNumber() < Number(parameters[0])) {
-			throw new Exceptions.RpcError("Block not found");
+			throw new RpcError("Block not found");
 		}
 
 		// eslint-disable-next-line unicorn/no-null

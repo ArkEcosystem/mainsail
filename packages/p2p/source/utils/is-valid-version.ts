@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import { Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 import semver from "semver";
 
 // @TODO review the implementation
@@ -22,7 +22,7 @@ export const isValidVersion = (app: Contracts.Kernel.Application, version: strin
 	if (p2p && Array.isArray(p2p.minimumVersions) && p2p.minimumVersions.length > 0) {
 		minimumVersions = p2p.minimumVersions;
 	} else {
-		const configuration = app.getTagged<Providers.PluginConfiguration>(
+		const configuration = app.getTagged<Contracts.Kernel.PluginConfiguration>(
 			Identifiers.ServiceProvider.Configuration,
 			"plugin",
 			"p2p",

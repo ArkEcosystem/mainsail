@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { register as apiNodesRegister } from "./routes/api-nodes.js";
 import { register as blockchainRegister } from "./routes/blockchain.js";

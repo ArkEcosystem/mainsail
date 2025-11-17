@@ -3,9 +3,10 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	TypeOrm,
 } from "@mainsail/api-database";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
+import { NotImplemented } from "@mainsail/exceptions";
 
 import { EventListener } from "../contracts.js";
 
@@ -14,13 +15,13 @@ export enum ListenerEvent {
 	OnRemoved,
 }
 
-export type ListenerEventMapping = { [key: Contracts.Kernel.EventName]: ListenerEvent };
+export type ListenerEventMapping = { [key: string]: ListenerEvent };
 
 @injectable()
 export abstract class AbstractListener<TEventData, TEntity extends { [key: string]: any }> implements EventListener {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-sync")
-	private readonly pluginConfiguration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly configuration!: Contracts.Crypto.Configuration;
@@ -79,7 +80,7 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 		dataSource: ApiDatabaseContracts.RepositoryDataSource,
 	): TypeOrm.Repository<TEntity>;
 
-	public async handle({ name, data }: { name: Contracts.Kernel.EventName; data: TEventData }): Promise<void> {
+	public async handle({ name, data }: { name: string; data: TEventData }): Promise<void> {
 		const eventMapping = this.getEventMapping();
 
 		switch (eventMapping[name]) {
@@ -92,7 +93,7 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 				break;
 			}
 			default: {
-				throw new Exceptions.NotImplemented("handle", name.toString());
+				throw new NotImplemented("handle", name.toString());
 			}
 		}
 	}

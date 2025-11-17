@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as Schnorr } from "@mainsail/crypto-key-pair-schnorr";

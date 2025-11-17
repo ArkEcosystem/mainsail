@@ -1,5 +1,6 @@
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { performance } from "perf_hooks";
 
 import { Job } from "./interfaces.js";

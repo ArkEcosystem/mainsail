@@ -1,4 +1,5 @@
-import { Exceptions, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
+import * as Exceptions from "@mainsail/exceptions";
 import { Providers } from "@mainsail/kernel";
 import esmock from "esmock";
 

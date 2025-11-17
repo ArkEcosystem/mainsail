@@ -1,6 +1,8 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers, Utils } from "@mainsail/contracts";
+import type { Contracts, Utils } from "@mainsail/contracts";
+import { TransactionSchemaError } from "@mainsail/exceptions";
 import { ByteBuffer, sleep } from "@mainsail/utils";
 
 import { HashFactory } from "./hash.factory.js";
@@ -138,7 +140,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 
 				const computed = await this.#computeCryptoData(transaction.data);
 				if (computed.schemaError) {
-					throw new Exceptions.TransactionSchemaError(computed.schemaError);
+					throw new TransactionSchemaError(computed.schemaError);
 				}
 
 				transaction.data.data = transaction.data.data.startsWith("0x")

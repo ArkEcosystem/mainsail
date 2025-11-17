@@ -1,8 +1,8 @@
 import { badData } from "@hapi/boom";
 import { AbstractServer } from "@mainsail/api-common";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 
 import * as Schemas from "./schemas/index.js";
 
@@ -10,13 +10,13 @@ import * as Schemas from "./schemas/index.js";
 export class Server extends AbstractServer {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-http")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	protected baseName(): string {
 		return "Public API";
 	}
 
-	protected pluginConfiguration(): Providers.PluginConfiguration {
+	protected pluginConfiguration(): Contracts.Kernel.PluginConfiguration {
 		return this.configuration;
 	}
 

@@ -1,4 +1,5 @@
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers, Events } from "@mainsail/constants";
 import { Sandbox } from "@mainsail/test-framework";
 import { sleep } from "@mainsail/utils";
 

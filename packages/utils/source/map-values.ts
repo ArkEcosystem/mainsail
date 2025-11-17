@@ -1,4 +1,4 @@
-import { FunctionReturning } from "./internal/index.js";
+import type { FunctionReturning } from "./internal/index.js";
 
 export const mapValues = <T extends Record<string, any>>(iterable: T, iteratee: FunctionReturning): object => {
 	const keys: string[] = Object.keys(iterable);

@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";

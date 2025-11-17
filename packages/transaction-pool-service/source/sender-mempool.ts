@@ -1,13 +1,14 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
+import { SenderExceededMaximumTransactionCountError } from "@mainsail/exceptions";
 import { assert, BigNumber, Lock } from "@mainsail/utils";
 
 @injectable()
 export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool-service")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.TransactionPool.SenderState)
 	private readonly senderState!: Contracts.TransactionPool.SenderState;
@@ -53,10 +54,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 				if (this.#transactions.length >= maxTransactionsPerSender) {
 					const allowedSenders: string[] = this.configuration.getOptional<string[]>("allowedSenders", []);
 					if (!allowedSenders.includes(transaction.data.from)) {
-						throw new Exceptions.SenderExceededMaximumTransactionCountError(
-							transaction,
-							maxTransactionsPerSender,
-						);
+						throw new SenderExceededMaximumTransactionCountError(transaction, maxTransactionsPerSender);
 					}
 				}
 

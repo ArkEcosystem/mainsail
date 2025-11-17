@@ -3,15 +3,16 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 } from "@mainsail/api-database";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
-import { Providers, Types } from "@mainsail/kernel";
+import { parseTransactionError } from "@mainsail/evm-contracts";
 import { assert, BigNumber, chunk, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { Listeners } from "./contracts.js";
-import { parseMultiPayments, parseTransactionError } from "./parsers/index.js";
+import { parseMultiPayments } from "./parsers/index.js";
 import { Restore } from "./restore.js";
 
 interface DeferredSync {
@@ -93,10 +94,11 @@ export class Sync implements Contracts.ApiSync.Service {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-sync")
-	private readonly pluginConfiguration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Services.Queue.Factory)
-	private readonly createQueue!: Types.QueueFactory;
+	private readonly createQueue!: Contracts.Kernel.QueueFactory;
+
 	#queue!: Contracts.Kernel.Queue;
 
 	@inject(Identifiers.ApiSync.Listener)

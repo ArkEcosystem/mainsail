@@ -15,6 +15,7 @@
 	"devDependencies": {
 		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/utils": "workspace:*",

@@ -1,6 +1,7 @@
 import { isMajority, isMinority } from "@mainsail/blockchain-utils";
+import { Enums, Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { getRandomPeer } from "../utils/index.js";
 
@@ -319,7 +320,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 				const response = await this.prevoteProcessor.process(prevote, false);
 
-				if (response === Contracts.Consensus.ProcessorResult.Invalid) {
+				if (response === Enums.Consensus.ProcessorResult.Invalid) {
 					throw new Error(`Received prevote is invalid`);
 				}
 			}
@@ -337,7 +338,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 				const response = await this.precommitProcessor.process(precommit, false);
 
-				if (response === Contracts.Consensus.ProcessorResult.Invalid) {
+				if (response === Enums.Consensus.ProcessorResult.Invalid) {
 					throw new Error(`Received precommit is invalid`);
 				}
 			}

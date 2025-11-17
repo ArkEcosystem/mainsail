@@ -1,5 +1,5 @@
-import { NumericCriteria, OrCriteria } from "./types/criteria.js";
-import {
+import type { NumericCriteria, OrCriteria } from "./types/criteria.js";
+import type {
 	AndExpression,
 	BetweenExpression,
 	EqualExpression,

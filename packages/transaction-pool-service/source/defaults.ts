@@ -1,10 +1,10 @@
-import { Constants } from "@mainsail/contracts";
+import { EnvironmentVariables } from "@mainsail/constants";
 import { Environment } from "@mainsail/kernel";
 
 export const defaults = {
 	allowedSenders: [],
 
-	enabled: !Environment.isTrue(Constants.EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_DISABLED),
+	enabled: !Environment.isTrue(EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_DISABLED),
 
 	// Max transaction age in number of blocks produced since the transaction was created.
 	// If a transaction stays that long in the pool without being included in any block,
@@ -18,25 +18,16 @@ export const defaults = {
 	// only accepted if its fee is higher than the transaction with the lowest
 	// fee in the pool. In this case the transaction with the lowest fee is removed
 	// from the pool in order to accommodate the new one.
-	maxTransactionsInPool: Environment.get(Constants.EnvironmentVariables.MAINSAIL_MAX_TRANSACTIONS_IN_POOL, 15_000),
+	maxTransactionsInPool: Environment.get(EnvironmentVariables.MAINSAIL_MAX_TRANSACTIONS_IN_POOL, 15_000),
 
-	maxTransactionsPerRequest: Environment.get(
-		Constants.EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_MAX_PER_REQUEST,
-		40,
-	),
-	maxTransactionsPerSender: Environment.get(
-		Constants.EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_MAX_PER_SENDER,
-		150,
-	),
+	maxTransactionsPerRequest: Environment.get(EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_MAX_PER_REQUEST, 40),
+	maxTransactionsPerSender: Environment.get(EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_MAX_PER_SENDER, 150),
 
 	rebroadcastCooldownBlocks: Environment.get(
-		Constants.EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_REBROADCAST_COOLDOWN_BLOCKS,
+		EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_REBROADCAST_COOLDOWN_BLOCKS,
 		3,
 	),
-	rebroadcastThreshold: Environment.get(
-		Constants.EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_REBROADCAST_THRESHOLD,
-		60,
-	),
+	rebroadcastThreshold: Environment.get(EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_REBROADCAST_THRESHOLD, 60),
 
-	storage: `${Environment.get(Constants.EnvironmentVariables.MAINSAIL_PATH_DATA)}/transaction-pool.sqlite`,
+	storage: `${Environment.get(EnvironmentVariables.MAINSAIL_PATH_DATA)}/transaction-pool.sqlite`,
 };

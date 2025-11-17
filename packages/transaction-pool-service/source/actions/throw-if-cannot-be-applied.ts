@@ -1,10 +1,10 @@
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
-import { Services, Types } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
+import { Services } from "@mainsail/kernel";
 
 @injectable()
 export class ThrowIfCannotBeAppliedAction extends Services.Triggers.Action {
-	public async execute(arguments_: Types.ActionArguments): Promise<void> {
+	public async execute(arguments_: Contracts.Kernel.ActionArguments): Promise<void> {
 		const handler: Contracts.Transactions.TransactionHandler = arguments_.handler;
 		const transaction: Contracts.Crypto.Transaction = arguments_.transaction;
 		const sender: Contracts.State.Wallet = arguments_.sender;

@@ -3,13 +3,15 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 } from "@mainsail/api-database";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
+import { parseTransactionError } from "@mainsail/evm-contracts";
 import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
-import { parseMultiPayments, parseTransactionError, parseUsernames } from "./parsers/index.js";
+import { parseMultiPayments, parseUsernames } from "./parsers/index.js";
 
 interface RestoreContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;

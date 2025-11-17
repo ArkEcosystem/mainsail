@@ -1,5 +1,5 @@
 import { filter } from "./filter.js";
-import { FunctionReturning } from "./internal/index.js";
+import type { FunctionReturning } from "./internal/index.js";
 
 export const pullAllBy = <T>(iterable: T[], values: T[], iteratee: FunctionReturning): T[] => {
 	const iterateeValues = {};

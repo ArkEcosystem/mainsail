@@ -1,15 +1,16 @@
 import { exit } from "node:process";
 
-import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Events, Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
+import { DirectoryCannotBeFound } from "@mainsail/exceptions";
 import { join } from "path";
 import { isMainThread } from "worker_threads";
 
 import { Bootstrappers } from "./bootstrap/index.js";
-import { ServiceProvider, ServiceProviderRepository } from "./providers/index.js";
+import type { ServiceProvider } from "./providers/index.js";
+import { ServiceProviderRepository } from "./providers/index.js";
 import { ConfigRepository } from "./services/config/index.js";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider.js";
-import { Constructor } from "./types/container.js";
-import { KeyValuePair } from "./types/index.js";
 
 export class Application implements Contracts.Kernel.Application {
 	#booted = false;
@@ -29,8 +30,8 @@ export class Application implements Contracts.Kernel.Application {
 		flags: Contracts.Types.JsonObject;
 		plugins?: Contracts.Types.JsonObject;
 	}): Promise<void> {
-		this.bind<KeyValuePair>(Identifiers.Config.Flags).toConstantValue(options.flags);
-		this.bind<KeyValuePair>(Identifiers.Config.Plugins).toConstantValue(options.plugins || {});
+		this.bind(Identifiers.Config.Flags).toConstantValue(options.flags);
+		this.bind(Identifiers.Config.Plugins).toConstantValue(options.plugins || {});
 
 		await this.#registerEventDispatcher();
 
@@ -259,7 +260,9 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	async #bootstrapWith(type: string): Promise<void> {
-		const bootstrappers: Constructor<Contracts.Kernel.Bootstrapper>[] = Object.values(Bootstrappers[type]);
+		const bootstrappers: Contracts.Types.Constructor<Contracts.Kernel.Bootstrapper>[] = Object.values(
+			Bootstrappers[type],
+		);
 		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.Services.EventDispatcher.Service);
 
 		for (const bootstrapper of bootstrappers) {
@@ -311,7 +314,7 @@ export class Application implements Contracts.Kernel.Application {
 		const path: string = this.get<string>(`path.${type}`);
 
 		if (!this.get<Contracts.Kernel.Filesystem>(Identifiers.Services.Filesystem.Service).existsSync(path)) {
-			throw new Exceptions.DirectoryCannotBeFound(path);
+			throw new DirectoryCannotBeFound(path);
 		}
 
 		return path;
@@ -319,7 +322,7 @@ export class Application implements Contracts.Kernel.Application {
 
 	#usePath(type: string, path: string): void {
 		if (!this.get<Contracts.Kernel.Filesystem>(Identifiers.Services.Filesystem.Service).existsSync(path)) {
-			throw new Exceptions.DirectoryCannotBeFound(path);
+			throw new DirectoryCannotBeFound(path);
 		}
 
 		this.rebind<string>(`path.${type}`).toConstantValue(path);

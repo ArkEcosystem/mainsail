@@ -1,6 +1,6 @@
-import { BigNumber } from "@mainsail/utils";
+import type { BigNumber } from "@mainsail/utils";
 
-import { Transaction } from "../crypto/transactions.js";
+import type { Transaction } from "../crypto/transactions.js";
 
 export interface SenderState {
 	configure(address: string, legacyAddress?: string): Promise<SenderState>;

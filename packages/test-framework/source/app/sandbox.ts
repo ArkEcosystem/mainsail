@@ -1,12 +1,13 @@
 import { ConfigurationGenerator, makeApplication } from "@mainsail/configuration-generator";
+import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { Container } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
 import { readJSONSync, removeSync } from "fs-extra/esm";
 import { join, resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { SandboxCallback } from "./contracts.js";
+import type { SandboxCallback } from "./contracts.js";
 
 export class Sandbox {
 	public readonly app: Application;
@@ -66,7 +67,7 @@ export class Sandbox {
 		}
 
 		// Configure Application
-		process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_CONFIG] = this.getConfigurationPath();
+		process.env[EnvironmentVariables.MAINSAIL_PATH_CONFIG] = this.getConfigurationPath();
 
 		if (callback) {
 			callback({

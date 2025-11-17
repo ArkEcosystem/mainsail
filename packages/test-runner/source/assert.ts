@@ -1,21 +1,10 @@
 import { format } from "concordance";
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { join } from "path";
-import {
-	Assertion,
-	equal,
-	fixture,
-	instance,
-	is,
-	match,
-	Message,
-	not,
-	ok,
-	throws,
-	type,
-	unreachable,
-} from "uvu/assert";
-import { z, ZodRawShape } from "zod";
+import type { Message } from "uvu/assert";
+import { Assertion, equal, fixture, instance, is, match, not, ok, throws, type, unreachable } from "uvu/assert";
+import type { ZodRawShape } from "zod";
+import { z } from "zod";
 
 interface Constructable {
 	new (...arguments_: any): any;

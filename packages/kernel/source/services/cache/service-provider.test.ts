@@ -1,9 +1,8 @@
 import { Container } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 
 import { describe } from "../../../../test-framework/source";
 import { Application } from "../../application";
-import { CacheFactory } from "../../types";
 import { MemoryEventDispatcher } from "../events";
 import { MemoryCacheStore } from "./drivers";
 import { ServiceProvider } from "./service-provider";
@@ -28,7 +27,7 @@ describe<{
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
 		assert.instance(
-			await context.app.get<CacheFactory<string, string>>(Identifiers.Services.Cache.Factory)(),
+			await context.app.get<Contracts.Kernel.CacheFactory<string, string>>(Identifiers.Services.Cache.Factory)(),
 			MemoryCacheStore,
 		);
 	});

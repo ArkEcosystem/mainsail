@@ -1,6 +1,7 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Ipc, Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
+import { Ipc } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -11,7 +12,7 @@ export class PeerCommunicator implements Contracts.TransactionPool.PeerCommunica
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool-broadcaster")
-	protected readonly configuration!: Providers.PluginConfiguration;
+	protected readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;

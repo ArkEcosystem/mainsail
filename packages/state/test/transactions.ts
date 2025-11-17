@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 export const addTransactionsToBlock = (txs: Contracts.Crypto.Transaction[], block: Contracts.Crypto.Block) => {
 	const { data } = block;

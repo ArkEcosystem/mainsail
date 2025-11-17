@@ -1,0 +1,33 @@
+{
+	"name": "@mainsail/exceptions",
+	"version": "0.0.1-rc.7",
+	"description": "Exceptions for the Mainsail blockchain",
+	"license": "GPL-3.0-only",
+	"contributors": [],
+	"type": "module",
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "tsc -b",
+		"build:watch": "pnpm run clean && tsc -w",
+		"release": "pnpm publish --access public",
+		"test": "pnpm run uvu source .test.ts",
+		"test:coverage": "c8 -r=text -r=lcov --all pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
+	},
+	"dependencies": {
+		"@mainsail/constants": "workspace:*"
+	},
+	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
+		"uvu": "0.5.6"
+	},
+	"engines": {
+		"node": ">=20.x"
+	}
+}

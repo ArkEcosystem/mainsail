@@ -1,6 +1,6 @@
-import { BigNumber } from "@mainsail/utils";
+import type { BigNumber } from "@mainsail/utils";
 
-import { ValidatorWallet } from "../state/wallets.js";
+import type { ValidatorWallet } from "../state/wallets.js";
 
 export interface DeployerContract {
 	readonly name: string;

@@ -1,6 +1,6 @@
 import envPaths from "env-paths";
 import path from "path";
-import { Identifiers as AppIdentifiers } from "@mainsail/contracts";
+import { Identifiers as AppIdentifiers } from "@mainsail/constants";
 import { makeApplication } from "../distribution/application-factory.js";
 import { Identifiers } from "../distribution/identifiers.js";
 import { fileURLToPath } from "url";

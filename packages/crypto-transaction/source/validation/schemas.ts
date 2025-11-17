@@ -1,4 +1,4 @@
-import { SchemaObject } from "ajv";
+import type { SchemaObject } from "ajv";
 
 import { signedSchema, strictSchema } from "./utilities.js";
 

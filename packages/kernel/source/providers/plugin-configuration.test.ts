@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { join } from "path";
 
 import { describe } from "../../../test-framework/source";
@@ -39,7 +39,7 @@ describe<{
 		context.pluginConfiguration.set("key", "value");
 
 		assert.equal(context.pluginConfiguration.all(), { key: "value" });
-		assert.equal(context.pluginConfiguration.get("key"), "value");
+		assert.equal(context.pluginConfiguration.getRequired("key"), "value");
 		assert.true(context.pluginConfiguration.has("key"));
 		assert.equal(context.pluginConfiguration.getOptional("key", "default value"), "value");
 		assert.equal(context.pluginConfiguration.getRequired("key"), "value");
@@ -47,14 +47,10 @@ describe<{
 		context.pluginConfiguration.unset("key");
 
 		assert.equal(context.pluginConfiguration.all(), {});
-		assert.undefined(context.pluginConfiguration.get("key"));
+		assert.undefined(context.pluginConfiguration.getOptional("key", undefined));
 		assert.false(context.pluginConfiguration.has("key"));
 		assert.equal(context.pluginConfiguration.getOptional("key", "default value"), "default value");
 		assert.rejects(() => context.pluginConfiguration.getRequired("key"));
-	});
-
-	it("should throw when using deprecated get default value argument", (context) => {
-		assert.rejects(() => context.pluginConfiguration.get("key", "default value"));
 	});
 
 	it("should merge the given value", (context) => {

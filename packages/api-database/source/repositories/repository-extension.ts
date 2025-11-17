@@ -1,14 +1,14 @@
-import { EntityTarget, ObjectLiteral, SelectQueryBuilder } from "typeorm";
+import type { EntityTarget, ObjectLiteral, SelectQueryBuilder } from "typeorm";
 
-import {
+import type {
 	ExtendedRepository,
 	RepositoryDataSource,
 	RepositoryExtension,
 	ThisRepositoryExtension,
 } from "../contracts.js";
 import { QueryHelper } from "../search/index.js";
-import { Expression } from "../search/types/expressions.js";
-import { Expressions, Options, Pagination, ResultsPage, Sorting } from "../search/types/index.js";
+import type { Expression } from "../search/types/expressions.js";
+import type { Expressions, Options, Pagination, ResultsPage, Sorting } from "../search/types/index.js";
 
 const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExtension<TEntity> &
 	ThisRepositoryExtension<TEntity> => ({

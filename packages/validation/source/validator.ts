@@ -1,5 +1,5 @@
 import { injectable, postConstruct } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { AnySchema, FormatDefinition, KeywordDefinition, Schema } from "ajv";
 import AjvCore from "ajv/dist/2020.js";
 import formats from "ajv-formats";

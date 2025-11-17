@@ -1,7 +1,7 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { resolve } from "path";
 
-import { Paths } from "./contracts.js";
+import type { Paths } from "./contracts.js";
 import { Identifiers } from "./ioc/index.js";
 
 export class Application {

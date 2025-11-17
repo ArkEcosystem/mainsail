@@ -1,10 +1,10 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 type PartialRecord<K extends keyof any, T> = {
 	[P in K]?: T;
 };
 
-export type EnvironmentData = PartialRecord<Contracts.Kernel.EnvironmentVariable, string | number>;
+export type EnvironmentData = PartialRecord<string, string | number>;
 
 export type Wallet = {
 	address: string;

@@ -1,5 +1,5 @@
-import { JsonObject } from "../types/index.js";
-import { BindToFluentSyntax, Container, Newable, ServiceIdentifier } from "./container.js";
+import type { JsonObject } from "../types/index.js";
+import type { BindToFluentSyntax, Container, Newable, ServiceIdentifier } from "./container.js";
 
 export interface Application {
 	readonly container: Container;

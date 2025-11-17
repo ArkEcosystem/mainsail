@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 export const blockData: Contracts.Crypto.BlockData = {

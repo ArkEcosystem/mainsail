@@ -1,4 +1,4 @@
-import { FunctionReturning } from "./internal/index.js";
+import type { FunctionReturning } from "./internal/index.js";
 
 export const reduceObject = <T extends Record<string, any>, V>(
 	iterable: T,

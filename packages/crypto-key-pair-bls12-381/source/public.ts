@@ -1,5 +1,7 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { NotImplemented } from "@mainsail/exceptions";
 
 import { getBls } from "./get-bls.js";
 
@@ -17,7 +19,7 @@ export class PublicKeyFactory implements Contracts.Crypto.PublicKeyFactory {
 	}
 
 	public async fromMultiSignatureAsset(asset: Contracts.Crypto.MultiSignatureAsset): Promise<string> {
-		throw new Exceptions.NotImplemented(this.constructor.name, "fromMultiSignatureAsset");
+		throw new NotImplemented(this.constructor.name, "fromMultiSignatureAsset");
 	}
 
 	public async verify(publicKey: string): Promise<boolean> {

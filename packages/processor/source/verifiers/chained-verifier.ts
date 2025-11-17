@@ -1,6 +1,8 @@
 import { isBlockChained } from "@mainsail/blockchain-utils";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { BlockNotChained } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
 @injectable()
@@ -30,10 +32,10 @@ export class ChainedVerifier implements Contracts.Processor.Handler {
 			}
 
 			if (!validPreviousBlock) {
-				throw new Exceptions.BlockNotChained(unit.getBlock());
+				throw new BlockNotChained(unit.getBlock());
 			}
 		} else if (!isBlockChained(this.store.getLastBlock().data, blockData)) {
-			throw new Exceptions.BlockNotChained(unit.getBlock());
+			throw new BlockNotChained(unit.getBlock());
 		}
 	}
 }

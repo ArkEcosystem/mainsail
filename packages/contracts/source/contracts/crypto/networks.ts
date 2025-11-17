@@ -1,5 +1,5 @@
-import { SpecId } from "../evm/evm.js";
-import { CommitJson } from "./commit.js";
+import type { SpecId } from "../evm/evm.js";
+import type { CommitJson } from "./commit.js";
 
 export type NetworkConfig = {
 	genesisBlock: CommitJson;

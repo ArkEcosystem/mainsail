@@ -1,5 +1,7 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { ExceededGasLimit } from "@mainsail/exceptions";
 
 @injectable()
 export class GasLimitVerifier implements Contracts.Processor.Handler {
@@ -17,7 +19,7 @@ export class GasLimitVerifier implements Contracts.Processor.Handler {
 		const maxGasLimit = this.configuration.getMilestone().block.maxGasLimit;
 
 		if (unit.getBlock().data.gasUsed > maxGasLimit) {
-			throw new Exceptions.ExceededGasLimit(unit.getBlock(), maxGasLimit);
+			throw new ExceededGasLimit(unit.getBlock(), maxGasLimit);
 		}
 	}
 }

@@ -110,12 +110,12 @@ importers:
       '@mainsail/cli':
         specifier: workspace:*
         version: link:../cli
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/logger-pino':
         specifier: workspace:*
         version: link:../logger-pino
@@ -147,6 +147,9 @@ importers:
         specifier: ^6.0.8
         version: 6.0.8
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -189,12 +192,15 @@ importers:
       '@mainsail/api-database':
         specifier: workspace:*
         version: link:../api-database
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -214,6 +220,9 @@ importers:
         specifier: 7.2.0
         version: 7.2.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/ip':
         specifier: 1.1.3
         version: 1.1.3
@@ -226,12 +235,12 @@ importers:
 
   packages/api-database:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -248,6 +257,9 @@ importers:
         specifier: 0.3.26
         version: 0.3.26(better-sqlite3@12.2.0)(pg@8.16.3)(reflect-metadata@0.2.2)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/pg':
         specifier: 8.15.5
         version: 8.15.5
@@ -266,12 +278,12 @@ importers:
       '@mainsail/api-common':
         specifier: workspace:*
         version: link:../api-common
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -288,6 +300,9 @@ importers:
         specifier: 7.7.2
         version: 7.7.2
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/semver':
         specifier: 7.7.0
         version: 7.7.0
@@ -306,12 +321,15 @@ importers:
       '@mainsail/api-common':
         specifier: workspace:*
         version: link:../api-common
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -331,6 +349,9 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -364,12 +385,12 @@ importers:
       '@mainsail/api-database':
         specifier: workspace:*
         version: link:../api-database
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
@@ -386,6 +407,9 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/ip':
         specifier: 1.1.3
         version: 1.1.3
@@ -404,18 +428,21 @@ importers:
       '@mainsail/api-database':
         specifier: workspace:*
         version: link:../api-database
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../evm-consensus
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
+      '@mainsail/exceptions':
+        specifier: workspace:*
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -429,6 +456,9 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -444,12 +474,12 @@ importers:
       '@mainsail/api-common':
         specifier: workspace:*
         version: link:../api-common
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -457,6 +487,9 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/ip':
         specifier: 1.1.3
         version: 1.1.3
@@ -469,12 +502,15 @@ importers:
 
   packages/blockchain-utils:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -482,34 +518,43 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/bootstrap:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/cli:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -580,6 +625,9 @@ importers:
         specifier: 22.0.0
         version: 22.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -623,12 +671,12 @@ importers:
 
   packages/configuration-generator:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -714,6 +762,9 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -732,12 +783,12 @@ importers:
       '@mainsail/blockchain-utils':
         specifier: workspace:*
         version: link:../blockchain-utils
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -748,6 +799,9 @@ importers:
         specifier: 1.11.13
         version: 1.11.13
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       esmock:
         specifier: 2.7.1
         version: 2.7.1
@@ -757,12 +811,12 @@ importers:
 
   packages/consensus-storage:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -772,6 +826,15 @@ importers:
       lmdb:
         specifier: 3.4.2
         version: 3.4.2
+    devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
+
+  packages/constants:
     devDependencies:
       uvu:
         specifier: 0.5.6
@@ -795,6 +858,9 @@ importers:
       '@hapi/hapi':
         specifier: 21.4.3
         version: 21.4.3
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -807,9 +873,9 @@ importers:
       inversify:
         specifier: 7.10.3
         version: 7.10.3(reflect-metadata@0.2.2)
-      reflect-metadata:
-        specifier: 0.2.2
-        version: 0.2.2
+      joi:
+        specifier: 18.0.0
+        version: 18.0.0
       type-fest:
         specifier: 4.41.0
         version: 4.41.0
@@ -862,12 +928,12 @@ importers:
       '@mainsail/consensus-storage':
         specifier: workspace:*
         version: link:../consensus-storage
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -931,6 +997,9 @@ importers:
       '@mainsail/evm-state':
         specifier: workspace:*
         version: link:../evm-state
+      '@mainsail/exceptions':
+        specifier: workspace:*
+        version: link:../exceptions
       '@mainsail/logger-pino':
         specifier: workspace:*
         version: link:../logger-pino
@@ -1010,6 +1079,9 @@ importers:
         specifier: 2.4.2
         version: 2.4.2
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -1034,12 +1106,12 @@ importers:
 
   packages/crypto-address-base58:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1053,6 +1125,9 @@ importers:
         specifier: 0.3.9
         version: 0.3.9
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1077,12 +1152,12 @@ importers:
 
   packages/crypto-address-keccak256:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1096,6 +1171,9 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1120,12 +1198,15 @@ importers:
 
   packages/crypto-block:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1136,6 +1217,9 @@ importers:
         specifier: 8.17.1
         version: 8.17.1
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -1190,12 +1274,12 @@ importers:
 
   packages/crypto-commit:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1203,6 +1287,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -1251,12 +1338,15 @@ importers:
 
   packages/crypto-config:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1276,6 +1366,9 @@ importers:
         specifier: 4.3.2
         version: 4.3.2
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/lodash.clone':
         specifier: 4.5.9
         version: 4.5.9
@@ -1291,12 +1384,12 @@ importers:
 
   packages/crypto-consensus-bls12-381:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/crypto-key-pair-bls12-381':
         specifier: workspace:*
         version: link:../crypto-key-pair-bls12-381
@@ -1307,18 +1400,21 @@ importers:
         specifier: workspace:*
         version: link:../kernel
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/crypto-hash-bcrypto:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1326,6 +1422,9 @@ importers:
         specifier: 5.5.2
         version: 5.5.2
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1338,12 +1437,15 @@ importers:
       '@chainsafe/blst':
         specifier: 2.2.0
         version: 2.2.0
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1360,6 +1462,9 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1378,12 +1483,15 @@ importers:
 
   packages/crypto-key-pair-ecdsa:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1397,6 +1505,9 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1415,12 +1526,15 @@ importers:
 
   packages/crypto-key-pair-ed25519:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1440,6 +1554,9 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1458,12 +1575,15 @@ importers:
 
   packages/crypto-key-pair-schnorr:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1477,6 +1597,9 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1495,12 +1618,15 @@ importers:
 
   packages/crypto-messages:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1511,6 +1637,9 @@ importers:
         specifier: 8.17.1
         version: 8.17.1
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -1559,15 +1688,18 @@ importers:
 
   packages/crypto-signature-bls12-381:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/crypto-key-pair-bls12-381':
         specifier: workspace:*
         version: link:../crypto-key-pair-bls12-381
+      '@mainsail/exceptions':
+        specifier: workspace:*
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1575,18 +1707,24 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/crypto-signature-ecdsa:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1597,18 +1735,24 @@ importers:
         specifier: 5.5.2
         version: 5.5.2
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/crypto-signature-schnorr:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1619,18 +1763,24 @@ importers:
         specifier: 5.5.2
         version: 5.5.2
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/crypto-transaction:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1647,6 +1797,9 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -1686,12 +1839,12 @@ importers:
 
   packages/crypto-validation:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1702,6 +1855,9 @@ importers:
         specifier: 8.17.1
         version: 8.17.1
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1714,12 +1870,12 @@ importers:
 
   packages/crypto-wif:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1727,6 +1883,9 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1739,12 +1898,12 @@ importers:
 
   packages/crypto-worker:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1755,6 +1914,9 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/chance':
         specifier: 1.1.7
         version: 1.1.7
@@ -1773,12 +1935,12 @@ importers:
 
   packages/database:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1786,6 +1948,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -1852,12 +2017,12 @@ importers:
 
   packages/evm-api-worker:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1865,21 +2030,27 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/evm-consensus:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
+      '@mainsail/exceptions':
+        specifier: workspace:*
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1890,6 +2061,9 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/seedrandom':
         specifier: 3.0.8
         version: 3.0.8
@@ -1897,16 +2071,27 @@ importers:
         specifier: 0.5.6
         version: 0.5.6
 
-  packages/evm-contracts: {}
-
-  packages/evm-service:
+  packages/evm-contracts:
     dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
+      viem:
+        specifier: 2.34.0
+        version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
+    devDependencies:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
+
+  packages/evm-service:
+    dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
       '@mainsail/evm':
         specifier: workspace:*
         version: link:../evm
@@ -1917,6 +2102,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -1974,16 +2162,19 @@ importers:
 
   packages/evm-state:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1996,14 +2187,30 @@ importers:
 
   packages/evm/npm/linux-x64-musl: {}
 
-  packages/kernel:
+  packages/exceptions:
     dependencies:
-      '@mainsail/container':
+      '@mainsail/constants':
         specifier: workspace:*
-        version: link:../container
+        version: link:../constants
+    devDependencies:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
+
+  packages/kernel:
+    dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/exceptions':
+        specifier: workspace:*
+        version: link:../exceptions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2047,6 +2254,9 @@ importers:
         specifier: 4.2.0
         version: 4.2.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/capture-console':
         specifier: 1.0.5
         version: 1.0.5
@@ -2084,12 +2294,12 @@ importers:
 
   packages/logger-pino:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2127,6 +2337,9 @@ importers:
         specifier: 4.2.0
         version: 4.2.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/capture-console':
         specifier: 1.0.5
         version: 1.0.5
@@ -2160,12 +2373,12 @@ importers:
 
   packages/logger-winston:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2179,18 +2392,21 @@ importers:
         specifier: 3.17.0
         version: 3.17.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/networking-dns:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2201,6 +2417,9 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2210,12 +2429,12 @@ importers:
       '@hapi/sntp':
         specifier: 4.0.0
         version: 4.0.0
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2226,6 +2445,9 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/hapi__sntp':
         specifier: 3.1.4
         version: 3.1.4
@@ -2253,12 +2475,15 @@ importers:
       '@mainsail/blockchain-utils':
         specifier: workspace:*
         version: link:../blockchain-utils
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2302,6 +2527,9 @@ importers:
         specifier: 8.18.3
         version: 8.18.3
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -2338,12 +2566,15 @@ importers:
       '@mainsail/blockchain-utils':
         specifier: workspace:*
         version: link:../blockchain-utils
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2354,18 +2585,24 @@ importers:
         specifier: 1.11.13
         version: 1.11.13
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/serializer:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2373,18 +2610,21 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/snapshot-legacy-exporter:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -2416,6 +2656,9 @@ importers:
         specifier: 0.3.26
         version: 0.3.26(better-sqlite3@12.2.0)(pg@8.16.3)(reflect-metadata@0.2.2)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -2437,12 +2680,12 @@ importers:
 
   packages/snapshot-legacy-importer:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../evm-consensus
@@ -2465,18 +2708,21 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/state:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2484,6 +2730,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -2511,12 +2760,12 @@ importers:
       '@mainsail/configuration-generator':
         specifier: workspace:*
         version: link:../configuration-generator
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -2593,6 +2842,9 @@ importers:
         specifier: 0.2.5
         version: 0.2.5
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/chance':
         specifier: 1.1.7
         version: 1.1.7
@@ -2651,15 +2903,18 @@ importers:
 
   packages/test-transaction-builders:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
+      '@mainsail/evm-consensus':
+        specifier: workspace:*
+        version: link:../evm-consensus
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
@@ -2673,6 +2928,9 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/chance':
         specifier: 1.1.7
         version: 1.1.7
@@ -2685,12 +2943,12 @@ importers:
 
   packages/transaction-pool-broadcaster:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2704,18 +2962,24 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/transaction-pool-service:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2735,6 +2999,9 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -2753,12 +3020,12 @@ importers:
 
   packages/transaction-pool-worker:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2769,18 +3036,24 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/transactions:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
+      '@mainsail/exceptions':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2788,6 +3061,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2852,12 +3128,12 @@ importers:
 
   packages/validation:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2871,6 +3147,9 @@ importers:
         specifier: 5.1.0
         version: 5.1.0(ajv@8.17.1)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2880,12 +3159,12 @@ importers:
       '@chainsafe/bls-keystore':
         specifier: 3.1.0
         version: 3.1.0
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../evm-consensus
@@ -2902,6 +3181,9 @@ importers:
       '@mainsail/blockchain-utils':
         specifier: workspace:*
         version: link:../blockchain-utils
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -2959,12 +3241,12 @@ importers:
       '@hapi/hapi':
         specifier: 21.4.3
         version: 21.4.3
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2984,6 +3266,9 @@ importers:
         specifier: 11.1.0
         version: 11.1.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -2999,6 +3284,9 @@ importers:
 
   tests/e2e/clients:
     devDependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../../../packages/constants
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../../../packages/contracts
@@ -3063,6 +3351,18 @@ importers:
         specifier: 4.19.2
         version: 4.19.2
 
+  tests/e2e/sync/checks:
+    dependencies:
+      express:
+        specifier: 4.19.2
+        version: 4.19.2
+      got:
+        specifier: 14.2.1
+        version: 14.2.1
+      viem:
+        specifier: 2.33.1
+        version: 2.33.1(typescript@5.9.2)(zod@3.24.4)
+
   tests/functional/consensus:
     devDependencies:
       '@mainsail/blockchain-utils':
@@ -3071,6 +3371,9 @@ importers:
       '@mainsail/consensus':
         specifier: workspace:*
         version: link:../../../packages/consensus
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../../../packages/constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../../../packages/container
@@ -3128,6 +3431,9 @@ importers:
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../../../packages/evm-service
+      '@mainsail/exceptions':
+        specifier: workspace:*
+        version: link:../../../packages/exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../../../packages/kernel
@@ -3206,6 +3512,9 @@ importers:
       '@mainsail/consensus-storage':
         specifier: workspace:*
         version: link:../../../packages/consensus-storage
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../../../packages/constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../../../packages/container
@@ -3266,6 +3575,9 @@ importers:
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../../../packages/evm-consensus
+      '@mainsail/evm-contracts':
+        specifier: workspace:*
+        version: link:../../../packages/evm-contracts
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../../../packages/evm-service
@@ -9318,7 +9630,6 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
-
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qs@6.11.0:
@@ -12456,7 +12767,7 @@ snapshots:
 
   '@scure/bip32@1.7.0':
     dependencies:
-      '@noble/curves': 1.9.2
+      '@noble/curves': 1.9.6
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
 
@@ -17104,7 +17415,7 @@ snapshots:
   ox@0.6.7(typescript@5.9.2)(zod@3.24.4):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
-      '@noble/curves': 1.9.2
+      '@noble/curves': 1.9.6
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
@@ -17119,7 +17430,7 @@ snapshots:
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
       '@noble/ciphers': 1.3.0
-      '@noble/curves': 1.9.2
+      '@noble/curves': 1.9.6
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0

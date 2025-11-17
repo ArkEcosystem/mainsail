@@ -1,4 +1,5 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 import { ServiceProvider as Schnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { schemas as baseSchemas } from "@mainsail/crypto-validation";

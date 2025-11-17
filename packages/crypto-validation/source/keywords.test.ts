@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 import { BigNumber } from "@mainsail/utils";
 import { Validator } from "@mainsail/validation/source/validator";

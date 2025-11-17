@@ -1,5 +1,6 @@
+import { Enums, Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
@@ -20,33 +21,33 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 	}
 
 	public async register(): Promise<void> {
-		if (this.config().get("server.http.enabled")) {
-			await this.buildServer(Contracts.Api.ServerType.Http, this.httpIdentifier());
+		if (this.config().getRequired<boolean>("server.http.enabled")) {
+			await this.buildServer(Enums.Api.ServerType.Http, this.httpIdentifier());
 		}
 
-		if (this.config().get("server.https.enabled")) {
-			await this.buildServer(Contracts.Api.ServerType.Https, this.httpsIdentifier());
+		if (this.config().getRequired<boolean>("server.https.enabled")) {
+			await this.buildServer(Enums.Api.ServerType.Https, this.httpsIdentifier());
 		}
 
 		this.#registerValidation();
 	}
 
 	public async boot(): Promise<void> {
-		if (this.config().get("server.http.enabled")) {
+		if (this.config().getRequired<boolean>("server.http.enabled")) {
 			await this.app.get<T>(this.httpIdentifier()).boot();
 		}
 
-		if (this.config().get("server.https.enabled")) {
+		if (this.config().getRequired<boolean>("server.https.enabled")) {
 			await this.app.get<T>(this.httpsIdentifier()).boot();
 		}
 	}
 
 	public async dispose(): Promise<void> {
-		if (this.config().get("server.http.enabled")) {
+		if (this.config().getRequired<boolean>("server.http.enabled")) {
 			await this.app.get<T>(this.httpIdentifier()).dispose();
 		}
 
-		if (this.config().get("server.https.enabled")) {
+		if (this.config().getRequired<boolean>("server.https.enabled")) {
 			await this.app.get<T>(this.httpsIdentifier()).dispose();
 		}
 	}
@@ -87,7 +88,7 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 		const server = this.app.get<T>(id);
 
 		await server.initialize(type, {
-			...this.config().get(`server.${type.toLowerCase()}`),
+			...this.config().getRequired<Contracts.Types.JsonObject>(`server.${type.toLowerCase()}`),
 
 			routes: {
 				cors: true,

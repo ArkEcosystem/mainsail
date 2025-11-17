@@ -1,4 +1,4 @@
-import { ByteBuffer } from "@mainsail/utils";
+import type { ByteBuffer } from "@mainsail/utils";
 
 import type { MultiSignatureAsset } from "./legacy.js";
 

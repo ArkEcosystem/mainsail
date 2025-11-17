@@ -1,5 +1,7 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject, optional } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { InvalidTransactionDataError, PoolError } from "@mainsail/exceptions";
 
 @injectable()
 export class Processor implements Contracts.TransactionPool.Processor {
@@ -44,7 +46,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 				} catch (error) {
 					invalid.push(index);
 
-					if (error instanceof Exceptions.PoolError) {
+					if (error instanceof PoolError) {
 						if (error.type === "ERR_EXCEEDS_MAX_COUNT") {
 							excess.push(index);
 						}
@@ -82,7 +84,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		try {
 			return await this.transactionFactory.fromBytes(transactionData);
 		} catch (error) {
-			throw new Exceptions.InvalidTransactionDataError(error.message);
+			throw new InvalidTransactionDataError(error.message);
 		}
 	}
 }

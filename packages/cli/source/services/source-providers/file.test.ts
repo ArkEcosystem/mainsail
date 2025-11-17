@@ -1,8 +1,8 @@
-import { Exceptions } from "@mainsail/contracts";
+import * as Exceptions from "@mainsail/exceptions";
 import { join } from "path";
 import esmock from "esmock";
 import { dirSync, fileSync, setGracefulCleanup } from "tmp";
-import { Contracts } from "@mainsail/test-runner";
+import type { Contracts } from "@mainsail/test-runner";
 
 import { describe } from "../../../../test-framework/source";
 import { File } from "./file";

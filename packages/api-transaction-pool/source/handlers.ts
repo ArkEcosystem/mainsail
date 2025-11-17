@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { register as configurationRegister } from "./routes/configuration.js";
 import { register as transactionsRegister } from "./routes/transactions.js";

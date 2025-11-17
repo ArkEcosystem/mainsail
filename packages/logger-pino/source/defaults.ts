@@ -1,4 +1,4 @@
-import { Constants } from "@mainsail/contracts";
+import { EnvironmentVariables } from "@mainsail/constants";
 import { Environment } from "@mainsail/kernel";
 
 export const defaults = {
@@ -6,7 +6,7 @@ export const defaults = {
 		interval: "1d",
 	},
 	levels: {
-		console: Environment.get(Constants.EnvironmentVariables.MAINSAIL_LOG_LEVEL, "info"),
-		file: Environment.get(Constants.EnvironmentVariables.MAINSAIL_LOG_LEVEL_FILE, "debug"),
+		console: Environment.get(EnvironmentVariables.MAINSAIL_LOG_LEVEL, "info"),
+		file: Environment.get(EnvironmentVariables.MAINSAIL_LOG_LEVEL_FILE, "debug"),
 	},
 };

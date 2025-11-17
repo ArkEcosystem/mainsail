@@ -1,4 +1,4 @@
-import { JsonFieldAccessor } from "./expressions.js";
+import type { JsonFieldAccessor } from "./expressions.js";
 
 export * as Criteria from "./criteria.js";
 export * as Expressions from "./expressions.js";

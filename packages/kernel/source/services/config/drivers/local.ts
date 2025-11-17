@@ -1,11 +1,16 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import {
+	ApplicationConfigurationCannotBeLoaded,
+	EnvironmentConfigurationCannotBeLoaded,
+	FileException,
+} from "@mainsail/exceptions";
 import { assert, dotenv, get, set } from "@mainsail/utils";
 import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
 import { extname } from "path";
 
-import { KeyValuePair } from "../../../types/index.js";
 import { ConfigRepository } from "../repository.js";
 
 @injectable()
@@ -20,7 +25,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	private readonly validationService!: Contracts.Kernel.Validator;
 
 	@inject(Identifiers.Config.Flags)
-	private readonly configFlags!: KeyValuePair;
+	private readonly configFlags!: Contracts.Types.KeyValuePair;
 
 	public async loadEnvironmentVariables(): Promise<void> {
 		try {
@@ -32,7 +37,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 				}
 			}
 		} catch (error) {
-			throw new Exceptions.EnvironmentConfigurationCannotBeLoaded(error.message);
+			throw new EnvironmentConfigurationCannotBeLoaded(error.message);
 		}
 	}
 
@@ -46,7 +51,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 			this.#loadCryptography();
 		} catch (error) {
-			throw new Exceptions.ApplicationConfigurationCannotBeLoaded(error.message);
+			throw new ApplicationConfigurationCannotBeLoaded(error.message);
 		}
 	}
 
@@ -145,11 +150,11 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		this.configRepository.set("crypto", this.#loadFromLocation(["crypto.json"]));
 	}
 
-	#loadFromLocation(files: string[]): KeyValuePair {
+	#loadFromLocation(files: string[]): Contracts.Types.KeyValuePair {
 		for (const file of files) {
 			const fullPath: string = this.app.configPath(file);
 			if (existsSync(fullPath)) {
-				const config: KeyValuePair | undefined =
+				const config: Contracts.Types.KeyValuePair | undefined =
 					extname(fullPath) === ".json"
 						? JSON.parse(readFileSync(fullPath).toString())
 						: readFileSync(fullPath);
@@ -160,7 +165,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 			}
 		}
 
-		throw new Exceptions.FileException(`Failed to discovery any files matching [${files.join(", ")}].`);
+		throw new FileException(`Failed to discovery any files matching [${files.join(", ")}].`);
 	}
 
 	#skipFileIfNotExists(filename: string, alwaysOptional = false): boolean {

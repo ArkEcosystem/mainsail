@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 interface BlockArguments {
 	data: Contracts.Crypto.BlockData;

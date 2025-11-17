@@ -1,12 +1,7 @@
-import {
-	ClientRequest,
-	globalAgent as httpGlobalAgent,
-	IncomingMessage,
-	request as httpRequest,
-	RequestOptions,
-} from "http";
+import type { ClientRequest, IncomingMessage, RequestOptions } from "http";
+import { globalAgent as httpGlobalAgent, request as httpRequest } from "http";
 import { globalAgent as httpsGlobalAgent, request as httpsRequest } from "https";
-import { JsonArray, JsonObject, Primitive } from "type-fest";
+import type { JsonArray, JsonObject, Primitive } from "type-fest";
 import { URL } from "url";
 
 import { isObject } from "./is-object.js";

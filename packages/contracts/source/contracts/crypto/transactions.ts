@@ -1,6 +1,6 @@
-import { BigNumber } from "@mainsail/utils";
+import type { BigNumber } from "@mainsail/utils";
 
-import { TransactionStorageData } from "../evm/storage.js";
+import type { TransactionStorageData } from "../evm/storage.js";
 import type { EcdsaSignature, KeyPair } from "./identities.js";
 import type { SchemaValidationResult } from "./validator.js";
 

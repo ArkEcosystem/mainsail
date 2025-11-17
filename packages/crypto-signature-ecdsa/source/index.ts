@@ -1,5 +1,5 @@
+import { Identifiers } from "@mainsail/constants";
 import { injectable, Selectors } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { Signature } from "./signature.js";

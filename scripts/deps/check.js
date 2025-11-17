@@ -81,6 +81,7 @@ const EXCEPTIONS = {
 			"@mainsail/evm-contracts",
 			"@mainsail/evm-service",
 			"@mainsail/evm-state",
+			"@mainsail/exceptions",
 			"@mainsail/fees-static",
 			"@mainsail/fees",
 			"@mainsail/logger-pino",
@@ -143,12 +144,12 @@ class Package {
 
 	findExceptions() {
 		const exception = EXCEPTIONS[this.name];
-		return exception ? exception.dependencies : [];
+		return (exception ? exception.dependencies : []) ?? [];
 	}
 
 	findDevExceptions() {
 		const exception = EXCEPTIONS[this.name];
-		return exception ? exception.devDependencies : [];
+		return (exception ? exception.devDependencies : []) ?? [];
 	}
 
 	getResult() {
@@ -156,7 +157,7 @@ class Package {
 		const unused = [];
 		const missing = [];
 
-		const importNames = this.imports.filter((dep) => !dep.testOnly).map((dep) => dep.name);
+		const importNames = this.imports.filter((dep) => !dep.testOnly && !dep.compileTimeOnly).map((dep) => dep.name);
 		const combined = new Set([...importNames, ...this.dependencies]);
 
 		for (const dep of combined.values()) {
@@ -184,7 +185,7 @@ class Package {
 		const unused = [];
 		const missing = [];
 
-		const importNames = this.imports.filter((dep) => dep.testOnly).map((dep) => dep.name);
+		const importNames = this.imports.filter((dep) => dep.testOnly || dep.compileTimeOnly).map((dep) => dep.name);
 		const combined = new Set([...importNames, ...this.devDependencies]);
 
 		for (const dep of combined.values()) {
@@ -213,10 +214,15 @@ class Import {
 		this.name = name;
 		this.paths = paths;
 		this.testOnly = this.isTestOnly();
+		this.compileTimeOnly = this.isCompileTimeOnly();
 	}
 
 	isTestOnly() {
 		return this.paths.every((path) => path.endsWith(".test.ts") || !path.includes("/source/"));
+	}
+
+	isCompileTimeOnly() {
+		return this.name === "@mainsail/contracts";
 	}
 }
 

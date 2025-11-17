@@ -1,5 +1,7 @@
 import { Container } from "@mainsail/container";
-import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers, Events } from "@mainsail/constants";
+import * as Exceptions from "@mainsail/exceptions";
 import { Configuration } from "@mainsail/crypto-config";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";

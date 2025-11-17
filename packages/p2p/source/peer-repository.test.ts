@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 
 import { describe, Sandbox } from "../../test-framework/source";
 import { Peer } from "./peer";
@@ -7,8 +7,10 @@ import { PeerRepository } from "./peer-repository";
 describe<{
 	sandbox: Sandbox;
 	peerRepository: PeerRepository;
-}>("PeerRepository", ({ it, assert, beforeEach }) => {
+}>("PeerRepository", ({ it, assert, beforeEach, spy }) => {
 	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
+	const roundStatistic = { peerAdded: () => {}, peerRemoved: () => {} };
+	const statisticService = { getCurrentRoundStatistic: () => roundStatistic };
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
@@ -16,6 +18,7 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
+		context.sandbox.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue(statisticService);
 
 		context.peerRepository = context.sandbox.app.resolve(PeerRepository);
 	});
@@ -85,6 +88,8 @@ describe<{
 	});
 
 	it("#setPeer - should set the peer by its ip", ({ peerRepository, sandbox }) => {
+		const spyStatisticPeerAdded = spy(roundStatistic, "peerAdded");
+
 		const peersByIp = {
 			"176.165.44.33": sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
 			"176.165.66.55": sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
@@ -98,9 +103,16 @@ describe<{
 		for (const [ip, peer] of Object.entries(peersByIp)) {
 			assert.equal(peerRepository.getPeer(ip), peer);
 		}
+
+		spyStatisticPeerAdded.calledTimes(3);
+		spyStatisticPeerAdded.calledWith("176.165.44.33");
+		spyStatisticPeerAdded.calledWith("176.165.66.55");
+		spyStatisticPeerAdded.calledWith("2001:3984:3989::104");
 	});
 
 	it("#forgetPeer - should forget the peer", ({ peerRepository, sandbox }) => {
+		const spyStatisticPeerRemoved = spy(roundStatistic, "peerRemoved");
+
 		const peer = sandbox.app.resolve(Peer).init("176.165.66.55", 4000);
 
 		peerRepository.setPeer(peer);
@@ -112,6 +124,9 @@ describe<{
 
 		assert.false(peerRepository.hasPeer(peer.ip));
 		assert.throws(() => peerRepository.getPeer(peer.ip));
+
+		spyStatisticPeerRemoved.calledOnce();
+		spyStatisticPeerRemoved.calledWith("176.165.66.55");
 	});
 
 	it("#hasPeer - should return true if the peer exists", ({ peerRepository, sandbox }) => {

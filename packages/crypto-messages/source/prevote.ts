@@ -1,4 +1,5 @@
-import { Contracts } from "@mainsail/contracts";
+import { Enums } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 
 export class Prevote implements Contracts.Crypto.Prevote {
 	#blockNumber: number;
@@ -25,7 +26,7 @@ export class Prevote implements Contracts.Crypto.Prevote {
 	}
 
 	get type(): Contracts.Crypto.MessageType {
-		return Contracts.Crypto.MessageType.Prevote;
+		return Enums.Crypto.MessageType.Prevote;
 	}
 
 	get blockNumber(): number {

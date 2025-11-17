@@ -1,4 +1,4 @@
-import { SchemaObject } from "ajv";
+import type { SchemaObject } from "ajv";
 
 export const schemas: Record<"alphanumeric" | "hex" | "prefixedQuantityHex" | "prefixedDataHex", SchemaObject> = {
 	alphanumeric: {
