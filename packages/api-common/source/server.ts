@@ -40,7 +40,6 @@ export abstract class AbstractServer {
 		this.server.listener.headersTimeout = timeout;
 
 		this.server.app.app = this.app;
-		this.server.app.schemas = this.schemas();
 		this.server.app.rpc = this.app.resolve(Processor);
 
 		this.server.ext("onPreHandler", (request, h) => {
@@ -115,7 +114,6 @@ export abstract class AbstractServer {
 
 	protected abstract pluginConfiguration(): Contracts.Kernel.PluginConfiguration;
 	protected abstract defaultOptions(): Record<string, any>;
-	protected abstract schemas(): any;
 
 	private getServerOptions(options: Record<string, any>): object {
 		options = { ...options };
