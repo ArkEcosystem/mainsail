@@ -102,7 +102,7 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		await Promise.resolve();
 
 		for (const listener of this.#getListenersByPattern(event)) {
-			await listener.handle({ data, name: event });
+			listener.handle({ data, name: event });
 		}
 	}
 

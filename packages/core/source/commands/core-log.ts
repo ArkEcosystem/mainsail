@@ -16,7 +16,7 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		await this.app
+		this.app
 			.get<Contracts.ProcessFactory>(Identifiers.ProcessFactory)("mainsail")
 			.log(this.getFlag("error"), this.getFlag("lines"));
 	}
