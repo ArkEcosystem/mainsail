@@ -48,7 +48,6 @@ export default [
 
 		rules: {
 			"@typescript-eslint/ban-ts-comment": "off",
-			"@typescript-eslint/ban-types": "off",
 			"@typescript-eslint/explicit-module-boundary-types": "off",
 			"@typescript-eslint/naming-convention": "off",
 			"@typescript-eslint/no-empty-function": "off",
@@ -75,7 +74,7 @@ export default [
 			curly: "warn",
 			"import/default": "warn",
 			"import/export": "warn",
-			"import/exports-last": "warn",
+			"import/exports-last": "error",
 			"import/extensions": "off",
 			"import/first": "warn",
 			"import/group-exports": "off",

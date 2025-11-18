@@ -9,7 +9,6 @@ import type { EvmCallOptions, TransactionOptions, TransferOptions } from "../typ
 import { generateApp } from "./generate-app.js";
 
 const AMOUNT = 1;
-export const GAS_PRICE = 5 * 1e9;
 
 interface EntityOptions {
 	entity: TransactionBuilder;
@@ -44,6 +43,8 @@ const applyModifiers = (entity: TransactionBuilder, options: TransactionOptions)
 
 	return entity;
 };
+
+export const GAS_PRICE = 5 * 1e9;
 
 export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
 	factory.set("Transfer", async ({ options }: { options: TransferOptions }) => {

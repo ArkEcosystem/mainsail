@@ -3,10 +3,6 @@ import type { PeerRepository } from "@mainsail/p2p";
 
 let mockPeers: Contracts.P2P.Peer[] = [];
 
-export const setPeers = (peers: Contracts.P2P.Peer[]) => {
-	mockPeers = peers;
-};
-
 class PeerRepositoryMock implements Partial<PeerRepository> {
 	public getPeers(): Contracts.P2P.Peer[] {
 		return mockPeers;
@@ -20,5 +16,9 @@ class PeerRepositoryMock implements Partial<PeerRepository> {
 		return mockPeers[0];
 	}
 }
+
+export const setPeers = (peers: Contracts.P2P.Peer[]) => {
+	mockPeers = peers;
+};
 
 export const instance = new PeerRepositoryMock();
