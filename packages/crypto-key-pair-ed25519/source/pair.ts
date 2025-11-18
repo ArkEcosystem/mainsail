@@ -38,7 +38,7 @@ export class KeyPairFactory implements Contracts.Crypto.KeyPairFactory {
 		return {
 			compressed: true,
 			privateKey: Buffer.from(privateKey).toString("hex"),
-			publicKey: Buffer.from(await getPublicKey(privateKey)).toString("hex"),
+			publicKey: Buffer.from(getPublicKey(privateKey)).toString("hex"),
 		};
 	}
 }

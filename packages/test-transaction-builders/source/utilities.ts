@@ -8,19 +8,6 @@ import { randomBytes } from "crypto";
 import type { Context, TransactionOptions } from "./types.js";
 import { AcceptAnyTransactionVerifier } from "./verifier.js";
 
-export const getNonceByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<BigNumber> => {
-	const { app } = sandbox;
-
-	const address = await app
-		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-		.fromPublicKey(publicKey);
-
-	const instance = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
-	const accountInfo = await instance.getAccountInfo(address);
-
-	return BigNumber.make(accountInfo.nonce);
-};
-
 const applyCustomSignature = async (
 	sandbox: Sandbox,
 	transaction: Contracts.Crypto.Transaction,
@@ -66,6 +53,19 @@ const applyCustomSignatures = async (
 	// }
 
 	// transaction.serialized = Buffer.from(transactionHex, "hex");
+};
+
+export const getNonceByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<BigNumber> => {
+	const { app } = sandbox;
+
+	const address = await app
+		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
+		.fromPublicKey(publicKey);
+
+	const instance = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+	const accountInfo = await instance.getAccountInfo(address);
+
+	return BigNumber.make(accountInfo.nonce);
 };
 
 export const buildSignedTransaction = async <TBuilder extends TransactionBuilder>(

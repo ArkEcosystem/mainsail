@@ -1,20 +1,17 @@
-import type * as types from "./proto/protos.d.ts";
-import * as _protos from "./proto/protos.js";
-
-const proto = (_protos as any).default.getPeers as typeof types.getPeers;
+import { getPeers as proto } from "./proto/protos.js";
 
 export const getPeers = {
 	request: {
 		deserialize: (payload: Buffer): Record<string, any> => proto.GetPeersRequest.decode(payload),
-		serialize: (object: types.getPeers.GetPeersRequest): Buffer =>
+		serialize: (object: proto.IGetPeersRequest): Buffer =>
 			Buffer.from(proto.GetPeersRequest.encode(object).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): types.getPeers.IGetPeersResponse =>
+		deserialize: (payload: Buffer): proto.IGetPeersResponse =>
 			proto.GetPeersResponse.toObject(proto.GetPeersResponse.decode(payload), {
 				defaults: true,
 			}),
-		serialize: (object: types.getPeers.IGetPeersResponse): Buffer =>
+		serialize: (object: proto.IGetPeersResponse): Buffer =>
 			Buffer.from(proto.GetPeersResponse.encode(object).finish()),
 	},
 };
