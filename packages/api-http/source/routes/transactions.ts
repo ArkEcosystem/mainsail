@@ -4,7 +4,7 @@ import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { TransactionsController } from "../controllers/transactions.js";
-import { transactionSortingSchema } from "../schemas/index.js";
+import { transactionCriteriaSchemas, transactionsOrderBy, transactionSortingSchema } from "../schemas/index.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(TransactionsController);
@@ -21,9 +21,9 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				query: Joi.object({
-					...server.app.schemas.transactionCriteriaSchemas,
+					...transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
-					orderBy: server.app.schemas.transactionsOrderBy,
+					orderBy: transactionsOrderBy,
 				})
 					.concat(transactionSortingSchema)
 					.concat(Schemas.pagination),

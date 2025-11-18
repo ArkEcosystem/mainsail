@@ -52,8 +52,4 @@ export class Server extends AbstractServer {
 			},
 		};
 	}
-
-	protected schemas(): any {
-		return {};
-	}
 }

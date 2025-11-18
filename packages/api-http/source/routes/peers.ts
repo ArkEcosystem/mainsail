@@ -4,6 +4,7 @@ import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { PeersController } from "../controllers/peers.js";
+import { orderBy } from "../schemas/index.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(PeersController);
@@ -21,7 +22,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			validate: {
 				query: Joi.object({
 					ip: Joi.string().ip({ version: ["ipv4", "ipv6"] }),
-					orderBy: server.app.schemas.orderBy,
+					orderBy: orderBy,
 					version: Joi.string(),
 				}).concat(Schemas.pagination),
 			},
