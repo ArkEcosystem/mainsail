@@ -12,7 +12,7 @@ import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from
 import { performance } from "perf_hooks";
 
 import { parseMultiPayments, parseUsernames } from "./parsers/index.js";
-import { parseTokens } from "./parsers/tokens.js";
+import { TokenParser } from "./parsers/tokens.js";
 
 interface RepositoryContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;
@@ -289,6 +289,8 @@ export class Restore {
 
 		const usernameContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Usernames);
 
+		const tokenParser = this.app.resolve(TokenParser);
+
 		do {
 			const fromBlockNumber = Math.min(currentBlockNumber, mostRecentCommit.block.header.number);
 			const toBlockNumber = Math.min(currentBlockNumber + BATCH_SIZE - 1, mostRecentCommit.block.header.number);
@@ -395,12 +397,10 @@ export class Restore {
 					const { senderPublicKey } = data;
 					const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
 					const parsedUsernames = parseUsernames(usernameContractAddress, transaction, receipt);
-					const { tokens: parsedTokens, tokenHolders: parsedTokenHolders } = await parseTokens(
-						this.logger,
-						this.configuration,
-						this.evm,
+					const { tokens: parsedTokens, tokenHolders: parsedTokenHolders } = await tokenParser.parseReceipt(
 						transaction,
 						receipt,
+						tokenRepository,
 					);
 
 					if (!context.publicKeyToAddress[senderPublicKey]) {

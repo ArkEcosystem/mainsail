@@ -13,7 +13,7 @@ import { performance } from "perf_hooks";
 
 import { Listeners } from "./contracts.js";
 import { parseMultiPayments } from "./parsers/index.js";
-import { parseTokens } from "./parsers/tokens.js";
+import { TokenParser } from "./parsers/tokens.js";
 import { Restore } from "./restore.js";
 
 interface DeferredSync {
@@ -52,10 +52,6 @@ export class Sync implements Contracts.ApiSync.Service {
 
 	@inject(ApiDatabaseIdentifiers.Migrations)
 	private readonly migrations!: ApiDatabaseContracts.Migrations;
-
-	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "evm")
-	private readonly evm!: Contracts.Evm.Instance;
 
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
@@ -163,6 +159,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
 		);
 
+		const tokenParser = this.app.resolve(TokenParser);
+
 		for (const transaction of blockTransactions) {
 			const {
 				data,
@@ -178,10 +176,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			assert.defined(receipt);
 
 			const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
-			const { tokens: parsedTokens, tokenHolders: parsedTokenHolders } = await parseTokens(
-				this.logger,
-				this.configuration,
-				this.evm,
+			const { tokens: parsedTokens, tokenHolders: parsedTokenHolders } = await tokenParser.parseReceipt(
 				transaction,
 				receipt,
 			);

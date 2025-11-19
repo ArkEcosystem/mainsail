@@ -35,8 +35,9 @@ export class Token {
 	public readonly totalSupply!: string;
 
 	@Column({
-		nullable: false,
+		default: undefined,
+		nullable: true,
 		type: "citext",
 	})
-	public readonly deploymentHash!: string;
+	public readonly deploymentHash!: string | undefined;
 }

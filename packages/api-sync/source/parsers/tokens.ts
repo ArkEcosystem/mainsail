@@ -1,7 +1,12 @@
-import type { Models } from "@mainsail/api-database";
+import type { Models, Contracts as ApiDatabaseContracts } from "@mainsail/api-database";
+import { Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
+import { inject, injectable, tagged } from "@mainsail/container";
+import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import type { ContractFunctionParameters, EncodeFunctionDataParameters } from "viem";
 import { decodeFunctionResult, encodeFunctionData, parseAbi, parseEventLogs, toHex, zeroAddress } from "viem";
+import { LRUCache } from "lru-cache";
+import { assert } from "@mainsail/utils";
 
 const erc20AbiFunctions = parseAbi([
 	"function totalSupply() view returns (uint256)",
@@ -24,63 +29,6 @@ type Erc20MetadataCall = Omit<ContractFunctionParameters<typeof erc20MetadataFun
 
 const erc20AbiEvents = parseAbi(["event Transfer(address indexed from, address indexed to, uint256 value)"] as const);
 
-export async function parseTokens(
-	logger: Contracts.Kernel.Logger,
-	configuration: Contracts.Crypto.Configuration,
-	evm: Contracts.Evm.Instance,
-	transaction: Contracts.Crypto.Transaction,
-	receipt: Contracts.Evm.TransactionReceipt,
-): Promise<{ tokens: Models.Token[]; tokenHolders: Models.TokenHolder[] }> {
-	const tokens: Models.Token[] = [];
-	const tokenHolders: Models.TokenHolder[] = [];
-
-	if (transaction.data.to === undefined) {
-		if (receipt.contractAddress) {
-			const parsed = await parseErc20Contract(configuration, evm, receipt.contractAddress);
-			if (parsed) {
-				logger.debug(`Detected new ERC20 token contract: ${receipt.contractAddress}`);
-
-				tokens.push({
-					address: receipt.contractAddress,
-					deploymentHash: transaction.hash,
-					...parsed,
-				});
-			}
-		}
-
-		// Continue to look for potential events since a constructor could mint tokens on deployment.
-	}
-
-	const eventLogs = parseEventLogs({
-		abi: erc20AbiEvents,
-		eventName: "Transfer",
-		logs: receipt.logs ?? [],
-	});
-
-	const dirtyAccounts = new Map<`0x${string}`, string>();
-
-	for (const event of eventLogs) {
-		const { from, to } = event.args;
-
-		dirtyAccounts.set(from, event.address);
-		dirtyAccounts.set(to, event.address);
-	}
-
-	if (dirtyAccounts.size > 0) {
-		logger.debug(`Detected new ERC20 transfers affecting ${dirtyAccounts.size} account(s)`);
-
-		for (const [account, contract] of dirtyAccounts) {
-			tokenHolders.push({
-				address: account,
-				balance: await getTokenBalance(configuration, evm, contract, account),
-				tokenAddress: contract,
-			});
-		}
-	}
-
-	return { tokenHolders, tokens };
-}
-
 type TokenMetadata = {
 	totalSupply: string;
 	name: string;
@@ -90,144 +38,275 @@ type TokenMetadata = {
 
 type TokenMetadataOptional = Partial<TokenMetadata>;
 
-const parseErc20Contract = async (
-	configuration: Contracts.Crypto.Configuration,
-	evm: Contracts.Evm.Instance,
-	contract: string,
-): Promise<TokenMetadata | undefined> => {
-	const { evmSpec } = configuration.getMilestone();
+const tokenCache: LRUCache<string, Models.Token> = new LRUCache({
+	max: 256,
+});
 
-	const tokenMetadata: TokenMetadataOptional = {
-		decimals: undefined,
-		name: undefined,
-		symbol: undefined,
-		totalSupply: undefined,
-	};
+@injectable()
+export class TokenParser {
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "evm")
+	private readonly evm!: Contracts.Evm.Instance;
 
-	const calls: (Erc20Call | Erc20MetadataCall)[] = [
-		{
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
+	@inject(ApiDatabaseIdentifiers.TokenRepositoryFactory)
+	private readonly tokenRepositoryFactory!: ApiDatabaseContracts.TokenRepositoryFactory;
+
+	public async parseReceipt(
+		transaction: Contracts.Crypto.Transaction,
+		receipt: Contracts.Evm.TransactionReceipt,
+		tokenRepository?: ApiDatabaseContracts.TokenRepository,
+	): Promise<{ tokens: Models.Token[]; tokenHolders: Models.TokenHolder[] }> {
+		const tokens: Models.Token[] = [];
+		const tokenHolders: Models.TokenHolder[] = [];
+
+		const eventLogs = parseEventLogs({
+			abi: erc20AbiEvents,
+			eventName: "Transfer",
+			logs: receipt.logs ?? [],
+		});
+
+		const dirtyAccounts = new Map<`0x${string}`, string>();
+		const dirtyContractAddresses = new Set<string>();
+
+		for (const event of eventLogs) {
+			const { from, to } = event.args;
+
+			dirtyAccounts.set(from, event.address);
+			dirtyAccounts.set(to, event.address);
+			dirtyContractAddresses.add(event.address);
+		}
+
+		if (dirtyAccounts.size > 0) {
+			// Get tokens for corresponding contracts. Not all contracts are guaranteed to be a ERC20 contract.
+			const foundTokens = await this.#getTokens(
+				transaction,
+				[...dirtyContractAddresses.values()],
+				tokenRepository,
+			);
+
+			for (const [account, contract] of dirtyAccounts) {
+				// Skip anything if not deemed a token.
+				if (!foundTokens.has(contract)) {
+					this.logger.debug(
+						`Ignoring transfer in contract '${receipt.contractAddress}' because it does not implemented expected ERC20 ABI.`,
+					);
+					continue;
+				} else {
+					this.logger.debug(
+						`Detected ERC20 transfer affecting '${account}' in contract '${contract}' (cached: ${tokenCache.has(contract)})`,
+					);
+				}
+
+				if (!tokenCache.has(contract)) {
+					const foundToken = foundTokens.get(contract);
+					assert.defined(foundToken);
+					const { token, isNew } = foundToken;
+					tokenCache.set(contract, token);
+
+					if (isNew) {
+						tokens.push(token);
+					}
+				}
+
+				tokenHolders.push({
+					address: account,
+					balance: await this.#getTokenBalance(contract, account),
+					tokenAddress: contract,
+				});
+			}
+		}
+
+		return { tokens, tokenHolders };
+	}
+
+	async #getTokens(
+		transaction: Contracts.Crypto.Transaction,
+		addresses: string[],
+		tokenRepository?: ApiDatabaseContracts.TokenRepository,
+	): Promise<Map<string, { readonly token: Models.Token; readonly isNew: boolean }>> {
+		if (!tokenRepository) {
+			tokenRepository = this.tokenRepositoryFactory();
+		}
+
+		const result = new Map<string, { readonly token: Models.Token; readonly isNew: boolean }>();
+
+		for (const address of addresses) {
+			const fromCache = tokenCache.get(address);
+			if (fromCache) {
+				result.set(address, { token: fromCache, isNew: false });
+				continue;
+			}
+
+			// Postgres might already have the contract, load it and bail early.
+			const dbToken = await tokenRepository
+				.createQueryBuilder()
+				.where("address = :address", { address })
+				.getOne();
+
+			if (dbToken) {
+				this.logger.debug(`Found ERC20 token contract in postgres: ${address}`);
+				result.set(address, { token: dbToken, isNew: false });
+				continue;
+			}
+
+			// Perform calls on the contract to check if it conform to the ERC20 ABI.
+			// This should work regardless of what kind of ERC20 contract it is (Vanilla, Proxy, etc.)
+			const parsed = await this.#parseErc20Contract(address);
+			if (parsed) {
+				this.logger.debug(`Detected ERC20 token contract: ${address}`);
+
+				result.set(address, {
+					token: {
+						address,
+						deploymentHash: transaction.data.to === undefined ? transaction.hash : undefined,
+						...parsed,
+					},
+					isNew: true,
+				});
+
+				continue;
+			}
+		}
+
+		return result;
+	}
+
+	async #parseErc20Contract(contract: string): Promise<TokenMetadata | undefined> {
+		const { evmSpec } = this.configuration.getMilestone();
+
+		const tokenMetadata: TokenMetadataOptional = {
+			decimals: undefined,
+			name: undefined,
+			symbol: undefined,
+			totalSupply: undefined,
+		};
+
+		const calls: (Erc20Call | Erc20MetadataCall)[] = [
+			{
+				abi: erc20AbiFunctions,
+				args: undefined,
+				functionName: "totalSupply",
+			},
+			{
+				abi: erc20MetadataFunctions,
+				args: undefined,
+				functionName: "name",
+			},
+			{
+				abi: erc20MetadataFunctions,
+				args: undefined,
+				functionName: "symbol",
+			},
+			{
+				abi: erc20MetadataFunctions,
+				args: undefined,
+				functionName: "decimals",
+			},
+			{
+				abi: erc20AbiFunctions,
+				args: [zeroAddress, zeroAddress],
+				functionName: "allowance",
+			},
+			{
+				abi: erc20AbiFunctions,
+				args: [zeroAddress],
+				functionName: "balanceOf",
+			},
+			{
+				abi: erc20AbiFunctions,
+				args: [zeroAddress, 1n],
+				functionName: "transfer",
+			},
+			{
+				abi: erc20AbiFunctions,
+				args: [zeroAddress, zeroAddress, 1n],
+				functionName: "transferFrom",
+			},
+			{
+				abi: erc20AbiFunctions,
+				args: [zeroAddress, 1n],
+				functionName: "approve",
+			},
+		];
+
+		for (const call of calls) {
+			const data = encodeFunctionData(call as EncodeFunctionDataParameters).slice(2);
+
+			try {
+				const result = await this.evm.view({
+					data: Buffer.from(data, "hex"),
+					from: zeroAddress,
+					specId: evmSpec,
+					to: contract,
+				});
+
+				if (result.success && result.output) {
+					if (isTokenMetadataCall(call)) {
+						const decoded = decodeFunctionResult({
+							abi: erc20MetadataFunctions,
+							data: toHex(result.output!),
+							functionName: call.functionName,
+						});
+
+						tokenMetadata[call.functionName] = decoded as unknown as undefined;
+					}
+
+					continue;
+				}
+
+				// The function does not exist if the output is 0x.
+				if (!result.output || result.output.byteLength === 0) {
+					return undefined;
+				}
+
+				// Anything else is malformed but not empty
+			} catch {}
+		}
+
+		if (!hasRequiredTokenMetadata(tokenMetadata)) {
+			return undefined;
+		}
+
+		return tokenMetadata;
+	}
+
+	async #getTokenBalance(contract: string, account: `0x${string}`): Promise<string> {
+		const { evmSpec } = this.configuration.getMilestone();
+
+		const data = encodeFunctionData({
 			abi: erc20AbiFunctions,
-			args: undefined,
-			functionName: "totalSupply",
-		},
-		{
-			abi: erc20MetadataFunctions,
-			args: undefined,
-			functionName: "name",
-		},
-		{
-			abi: erc20MetadataFunctions,
-			args: undefined,
-			functionName: "symbol",
-		},
-		{
-			abi: erc20MetadataFunctions,
-			args: undefined,
-			functionName: "decimals",
-		},
-		{
-			abi: erc20AbiFunctions,
-			args: [zeroAddress, zeroAddress],
-			functionName: "allowance",
-		},
-		{
-			abi: erc20AbiFunctions,
-			args: [zeroAddress],
+			args: [account],
 			functionName: "balanceOf",
-		},
-		{
-			abi: erc20AbiFunctions,
-			args: [zeroAddress, 1n],
-			functionName: "transfer",
-		},
-		{
-			abi: erc20AbiFunctions,
-			args: [zeroAddress, zeroAddress, 1n],
-			functionName: "transferFrom",
-		},
-		{
-			abi: erc20AbiFunctions,
-			args: [zeroAddress, 1n],
-			functionName: "approve",
-		},
-	];
-
-	for (const call of calls) {
-		const data = encodeFunctionData(call as EncodeFunctionDataParameters).slice(2);
+		}).slice(2);
 
 		try {
-			const result = await evm.view({
+			const result = await this.evm.view({
 				data: Buffer.from(data, "hex"),
 				from: zeroAddress,
 				specId: evmSpec,
 				to: contract,
 			});
 
-			if (result.success && result.output) {
-				if (isTokenMetadataCall(call)) {
-					const decoded = decodeFunctionResult({
-						abi: erc20MetadataFunctions,
-						data: toHex(result.output!),
-						functionName: call.functionName,
-					});
+			const decoded = decodeFunctionResult({
+				abi: erc20AbiFunctions,
+				data: toHex(result.output!),
+				functionName: "balanceOf",
+			});
 
-					tokenMetadata[call.functionName] = decoded as unknown as undefined;
-				}
+			return decoded.toString();
+		} catch (ex) {
+			console.log(ex.message);
+		}
 
-				continue;
-			}
-
-			// The function does not exist if the output is 0x.
-			if (!result.output || result.output.byteLength === 0) {
-				return undefined;
-			}
-
-			// Anything else is malformed but not empty
-		} catch {}
+		return "0";
 	}
-
-	if (!hasRequiredTokenMetadata(tokenMetadata)) {
-		return undefined;
-	}
-
-	return tokenMetadata;
-};
-
-const getTokenBalance = async (
-	configuration: Contracts.Crypto.Configuration,
-	evm: Contracts.Evm.Instance,
-	contract: string,
-	account: `0x${string}`,
-): Promise<string> => {
-	const { evmSpec } = configuration.getMilestone();
-
-	const data = encodeFunctionData({
-		abi: erc20AbiFunctions,
-		args: [account],
-		functionName: "balanceOf",
-	}).slice(2);
-
-	try {
-		const result = await evm.view({
-			data: Buffer.from(data, "hex"),
-			from: zeroAddress,
-			specId: evmSpec,
-			to: contract,
-		});
-
-		const decoded = decodeFunctionResult({
-			abi: erc20AbiFunctions,
-			data: toHex(result.output!),
-			functionName: "balanceOf",
-		});
-
-		return decoded.toString();
-	} catch (ex) {
-		console.log(ex.message);
-	}
-
-	return "0";
-};
+}
 
 function isTokenMetadataCall(call: Erc20Call | Erc20MetadataCall): call is Erc20MetadataCall {
 	return erc20MetadataFunctions.some((m) => m.name === call.functionName);
