@@ -482,12 +482,29 @@ export class Sync implements Contracts.ApiSync.Service {
 			}
 
 			for (const batch of chunk(deferred.tokenHolders, 256)) {
-				await tokenHolderRepository
-					.createQueryBuilder()
-					.insert()
-					.orUpdate(["balance"], ["token_address", "address"])
-					.values(batch)
-					.execute();
+				const toUpsert: Models.TokenHolder[] = [];
+				const toDelete: Models.TokenHolder[] = [];
+
+				for (const holder of batch) {
+					if (holder.balance === "0") {
+						toDelete.push(holder);
+					} else {
+						toUpsert.push(holder);
+					}
+				}
+
+				if (toDelete.length > 0) {
+					await tokenHolderRepository.remove(toDelete);
+				}
+
+				if (toUpsert.length > 0) {
+					await tokenHolderRepository
+						.createQueryBuilder()
+						.insert()
+						.orUpdate(["balance"], ["token_address", "address"])
+						.values(toUpsert)
+						.execute();
+				}
 			}
 
 			if (deferred.validatorRound) {

@@ -468,7 +468,7 @@ export class Restore {
 						tokens.set(token.address, token);
 					}
 
-					for (const holder of parsedTokenHolders) {
+					for (const holder of parsedTokenHolders.filter((holder) => holder.balance !== "0")) {
 						tokenHolders.set(`${holder.tokenAddress}-${holder.address}`, holder);
 					}
 
