@@ -45,7 +45,7 @@ export abstract class Command {
 
 	protected input!: Input;
 
-	public register(argv: string[]) {
+	public register(argv: string[]): void {
 		try {
 			this.input = this.app.resolve(Input);
 			this.input.parse(argv, this.definition);
@@ -92,7 +92,7 @@ export abstract class Command {
 		return this.input.getArguments();
 	}
 
-	public getArgument(name: string) {
+	public getArgument(name: string): string {
 		return this.input.getArgument(name);
 	}
 
@@ -108,7 +108,7 @@ export abstract class Command {
 		return this.input.getFlags();
 	}
 
-	public getFlag(name: string) {
+	public getFlag<T = InputValue>(name: string): T {
 		return this.input.getFlag(name);
 	}
 

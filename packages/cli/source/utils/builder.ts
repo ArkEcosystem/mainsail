@@ -19,7 +19,11 @@ export const Builder = {
 
 		return app;
 	},
-	buildPeerFlags(flags: AnyObject) {
+	buildPeerFlags(flags: AnyObject): {
+		disableDiscovery: boolean;
+		ignoreMinimumNetworkReach: boolean;
+		skipDiscovery: boolean;
+	} {
 		const config = {
 			disableDiscovery: flags.disableDiscovery,
 			ignoreMinimumNetworkReach: flags.ignoreMinimumNetworkReach,

@@ -4,7 +4,7 @@ import { totalmem } from "os";
 
 import { Application } from "../application.js";
 import { Spinner } from "../components/index.js";
-import { ProcessOptions } from "../contracts.js";
+import { Flags, ProcessOptions } from "../contracts.js";
 import { Identifiers } from "../ioc/index.js";
 import { ProcessManager } from "../services/index.js";
 import { AbortRunningProcess } from "./abort-running-process.js";
@@ -18,7 +18,7 @@ export class DaemonizeProcess {
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
-	public execute(options: ProcessOptions, flags): void {
+	public execute(options: ProcessOptions, flags: Flags): void {
 		const processName: string = options.name;
 
 		if (this.processManager.has(processName)) {

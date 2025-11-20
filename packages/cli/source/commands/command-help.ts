@@ -5,6 +5,7 @@ import { blue, bold } from "kleur/colors";
 import { AppHeader } from "../components/index.js";
 import { Application } from "../contracts.js";
 import { Identifiers } from "../ioc/index.js";
+import type { Command } from "./command.js";
 
 @injectable()
 export class CommandHelp {
@@ -14,7 +15,7 @@ export class CommandHelp {
 	@inject(Identifiers.Package)
 	protected readonly pkg!: Contracts.Types.PackageJson;
 
-	public render(command): string {
+	public render(command: Command): string {
 		let helpMessage = `${this.app.get<AppHeader>(Identifiers.AppHeader).render()}
 
 ${blue(bold("Description"))}
