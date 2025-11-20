@@ -1,4 +1,4 @@
-import { Server as HapiServer, Plugin, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
+import { Plugin, Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";

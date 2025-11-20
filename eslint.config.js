@@ -186,10 +186,7 @@ export default [
 	},
 	// TODO: enable lint for API
 	{
-		files: [
-			"packages/api-common/**/*",
-			"packages/api-http/**/*",
-		],
+		files: ["packages/api-common/**/*", "packages/api-http/**/*"],
 		rules: {
 			"@typescript-eslint/explicit-module-boundary-types": "off",
 		},
