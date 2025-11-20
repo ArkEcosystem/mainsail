@@ -5,7 +5,10 @@ const strictTransaction = {
 	unevaluatedProperties: false,
 };
 
-export const extendSchema = (parent, properties): Contracts.Crypto.TransactionSchema =>
+export const extendSchema = (
+	parent: Contracts.Crypto.TransactionSchema,
+	properties: { unevaluatedProperties?: boolean; required?: string[] },
+): Contracts.Crypto.TransactionSchema =>
 	merge(parent, properties, {
 		arrayMerge(target, source, options) {
 			const result = source;
