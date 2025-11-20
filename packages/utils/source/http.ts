@@ -110,9 +110,11 @@ const sendRequest = (method: string, url: string, options?: HttpOptions): Promis
 		request_.end();
 	});
 
+export type HttpBody = Record<string, Primitive | JsonObject | JsonArray>;
+
 export type HttpOptions = RequestOptions & {
 	maxContentLength?: number;
-	body?: Record<string, Primitive | JsonObject | JsonArray>;
+	body?: HttpBody;
 };
 
 export type HttpResponse = {

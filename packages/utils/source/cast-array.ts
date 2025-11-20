@@ -4,7 +4,7 @@ import { isNull } from "./is-null.js";
 import { isString } from "./is-string.js";
 import { isUndefined } from "./is-undefined.js";
 
-export const castArray = <T>(value: any): T[] => {
+export const castArray = <T>(value: T): T[] => {
 	if (isNull(value) || isUndefined(value)) {
 		return [];
 	}
@@ -18,7 +18,7 @@ export const castArray = <T>(value: any): T[] => {
 	}
 
 	if (isFunction(value[Symbol.iterator])) {
-		return [...value];
+		return [...(value as Iterable<T>)];
 	}
 
 	return [value];

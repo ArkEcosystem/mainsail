@@ -9,11 +9,11 @@ export class ByteBuffer {
 		this.#buffer = buffer;
 	}
 
-	public static fromSize(size: number) {
+	public static fromSize(size: number): ByteBuffer {
 		return new ByteBuffer(Buffer.alloc(size));
 	}
 
-	public static fromBuffer(buffer: Buffer) {
+	public static fromBuffer(buffer: Buffer): ByteBuffer {
 		return new ByteBuffer(buffer);
 	}
 
