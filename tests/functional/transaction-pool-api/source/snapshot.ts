@@ -49,9 +49,13 @@ export class Snapshot {
 
 	private listenForEvmEvents() {
 		const event = Events.EvmEvent.TransactionReceipt;
-		const eventDispatcher = this.sandbox.app.get<Contracts.Kernel.EventDispatcher>(
-			Identifiers.Services.EventDispatcher.Service,
-		);
+		const eventDispatcher = this.sandbox.app.get<
+			Contracts.Kernel.EventDispatcher<{
+				receipt: Contracts.Evm.TransactionReceipt;
+				sender: string;
+				transactionId: string;
+			}>
+		>(Identifiers.Services.EventDispatcher.Service);
 
 		const listener = {
 			handle: ({
