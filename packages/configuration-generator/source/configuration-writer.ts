@@ -23,7 +23,7 @@ export class ConfigurationWriter {
 		writeFileSync(path.join(this.configurationPath, ".env"), stringify(environment));
 	}
 
-	writePeers(peers: { port: number; ip: string }[]) {
+	writePeers(peers: { port: number; ip: string }[]): void {
 		writeJSONSync(
 			path.join(this.configurationPath, "peers.json"),
 			{ list: peers },
