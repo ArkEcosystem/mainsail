@@ -184,4 +184,14 @@ export default [
 			"unused-imports/no-unused-imports": "warn",
 		},
 	},
+	// TODO: enable lint for API
+	{
+		files: [
+			"packages/api-common/**/*",
+			"packages/api-http/**/*",
+		],
+		rules: {
+			"@typescript-eslint/explicit-module-boundary-types": "off",
+		},
+	},
 ];
