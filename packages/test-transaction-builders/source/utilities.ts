@@ -160,7 +160,7 @@ export const addTransactionsToPool = async (
 	return processor.process(transactions.map((t) => t.serialized));
 };
 
-export const waitBlock = async (sandbox: Sandbox, count: number = 1) => {
+export const waitBlock = async (sandbox: Sandbox, count: number = 1): Promise<void> => {
 	const state = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
 
 	let currentBlockNumber = state.getBlockNumber();
