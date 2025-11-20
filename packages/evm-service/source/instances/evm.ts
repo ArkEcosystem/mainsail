@@ -15,7 +15,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 	#evm!: Evm;
 
 	@postConstruct()
-	public initialize() {
+	public initialize(): void {
 		this.#evm = new Evm({
 			historySize: 256n,
 			logger: (record) => {
