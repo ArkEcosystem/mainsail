@@ -9,7 +9,10 @@ jobs:
     source:
         runs-on: ubuntu-latest
         if: github.event.pull_request.head.repo.full_name == github.repository
-
+        
+        permissions:
+          contents: write
+        
         strategy:
             matrix:
                 node-version: [22.x]
@@ -17,7 +20,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with:
-                  token: ${{ secrets.GH_TOKEN }}
+                ref: ${{ github.head_ref }}
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v4
