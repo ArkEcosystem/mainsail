@@ -238,7 +238,7 @@ export class Application implements Contracts.Kernel.Application {
 	public getTagged<T>(
 		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
 		key: string | number | symbol,
-		value: any,
+		value: string,
 	): T {
 		return this.container.get(serviceIdentifier, { tag: { key, value } });
 	}
@@ -250,7 +250,7 @@ export class Application implements Contracts.Kernel.Application {
 	public isBoundTagged<T>(
 		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
 		key: string | number | symbol,
-		value: any,
+		value: string,
 	): boolean {
 		return this.container.isBound(serviceIdentifier, { tag: { key, value } });
 	}

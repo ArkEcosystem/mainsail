@@ -1,5 +1,7 @@
 import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+import type { WriteFileOptions } from "fs";
+import type { EnsureDirOptions } from "fs-extra";
 
 @injectable()
 export class NullFilesystem implements Contracts.Kernel.Filesystem {
@@ -47,7 +49,7 @@ export class NullFilesystem implements Contracts.Kernel.Filesystem {
 		return [];
 	}
 
-	public async makeDirectory(path): Promise<boolean> {
+	public async makeDirectory(path: string): Promise<boolean> {
 		return false;
 	}
 
@@ -55,7 +57,7 @@ export class NullFilesystem implements Contracts.Kernel.Filesystem {
 		return false;
 	}
 
-	public writeFileSync(file: string, data: string | NodeJS.ArrayBufferView, options: any): void {
+	public writeFileSync(file: string, data: string | NodeJS.ArrayBufferView, options: WriteFileOptions): void {
 		return;
 	}
 
@@ -71,7 +73,7 @@ export class NullFilesystem implements Contracts.Kernel.Filesystem {
 		return undefined as T;
 	}
 
-	public ensureDirSync(path: string, options?: any): void {
+	public ensureDirSync(path: string, options?: EnsureDirOptions | null): void {
 		return;
 	}
 }

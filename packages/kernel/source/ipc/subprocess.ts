@@ -54,7 +54,7 @@ export class Subprocess<T extends Record<string, any>> implements Contracts.Kern
 	}
 
 	// TODO: use type magic to infer args (didn't work when T is also using same signatures)
-	public sendRequest(method: string, ...arguments_: any): Promise<any> {
+	public sendRequest(method: string, ...arguments_: unknown[]): Promise<void> {
 		return new Promise((resolve, reject) => {
 			const id = this.lastId++;
 			this.callbacks.set(id, { reject, resolve });
