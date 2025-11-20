@@ -4,6 +4,8 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { getPeerIp } from "../../utils/index.js";
 
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 @injectable()
 export class AcceptPeerPlugin {
 	@inject(Identifiers.Application.Instance)

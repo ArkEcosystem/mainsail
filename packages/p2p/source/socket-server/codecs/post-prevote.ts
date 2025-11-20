@@ -2,7 +2,7 @@ import { postPrevote as proto } from "./proto/protos.js";
 
 export const postPrevote = {
 	request: {
-		deserialize: (payload: Buffer) => {
+		deserialize: (payload: Buffer): proto.IPostPrevoteRequest => {
 			const decoded = proto.PostPrevoteRequest.decode(payload);
 			return {
 				...decoded,

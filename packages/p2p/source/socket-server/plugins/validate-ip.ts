@@ -1,4 +1,4 @@
-import { ResponseToolkit } from "@hapi/hapi";
+import type { Server } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -18,21 +18,22 @@ export class ValidateIpPlugin extends BasePlugin {
 	@inject(Identifiers.P2P.Peer.Processor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 
-	public register(server) {
+	public register(server: Server): void {
 		if (this.configuration.getRequired("developmentMode.enabled")) {
 			return;
 		}
 
 		server.ext({
-			method: async (request: Contracts.P2P.Request, h: ResponseToolkit) => {
-				const ip = getPeerIp(request);
+			method: async (request, h) => {
+				const peerRequest = request as Contracts.P2P.Request;
+				const ip = getPeerIp(peerRequest);
 
 				if (this.peerDisposer.isBanned(ip)) {
-					return this.banAndReturnBadRequest(request, h, "Validation failed (peer is bannned)");
+					return this.banAndReturnBadRequest(peerRequest, h, "Validation failed (peer is bannned)");
 				}
 
 				if (!this.peerProcessor.validatePeerIp(ip)) {
-					return this.disposeAndReturnBadRequest(request, h, "Validation failed (bad ip)");
+					return this.disposeAndReturnBadRequest(peerRequest, h, "Validation failed (bad ip)");
 				}
 
 				return h.continue;

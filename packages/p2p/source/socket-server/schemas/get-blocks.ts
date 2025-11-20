@@ -4,7 +4,7 @@ import Joi from "joi";
 import { constants } from "../../constants.js";
 import { makeHeaders } from "./shared.js";
 
-export const getBlocks = (configuration: Contracts.Crypto.Configuration) =>
+export const getBlocks = (configuration: Contracts.Crypto.Configuration): Joi.ObjectSchema =>
 	Joi.object({
 		fromBlockNumber: Joi.number().integer().min(0).required(),
 		headers: makeHeaders(configuration),

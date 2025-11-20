@@ -1,4 +1,4 @@
-import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
+import { Server as HapiServer, Plugin, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -87,8 +87,7 @@ export class Server implements Contracts.P2P.Server {
 		}
 	}
 
-	// @todo: add proper types
-	public async register(plugins: any): Promise<void> {
+	public async register(plugins: Plugin<unknown, unknown>): Promise<void> {
 		await this.server.register(plugins);
 	}
 
