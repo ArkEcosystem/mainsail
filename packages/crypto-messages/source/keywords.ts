@@ -37,7 +37,9 @@ const parseBlockNumber = (parentSchema): number | undefined => {
 	return Buffer.from(serialized.slice(offset, offset + 8), "hex").readUInt32LE();
 };
 
-export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
+export const makeKeywords = (
+	configuration: Contracts.Crypto.Configuration,
+): { limitToRoundValidators: FuncKeywordDefinition; isValidatorIndex: FuncKeywordDefinition } => {
 	const limitToRoundValidators: FuncKeywordDefinition = {
 		// TODO: Check type (same as bignum)
 		// @ts-ignore
