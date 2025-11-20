@@ -6,7 +6,7 @@ export const bufferTransformer = {
 
 		return null;
 	},
-	to: (value: any): any => {
+	to: (value: string | Buffer): Buffer => {
 		if (typeof value === "string") {
 			value = value.startsWith("0x") ? value.slice(2) : value;
 
