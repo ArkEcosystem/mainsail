@@ -13,7 +13,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			Identifiers.Services.Log.Manager,
 		);
 
-		await logManager.extend("winston", async () => this.app.resolve<Logger>(Logger).make(this.config().all()));
+		await logManager.extend(
+			"winston",
+			async () =>
+				this.app.resolve<Logger>(Logger).make(
+					this.config().all() as {
+						levels: { console: Contracts.Kernel.LoggerContext; file: Contracts.Kernel.LoggerContext };
+					},
+				), // TODO: config interface
+		);
 
 		logManager.setDefaultDriver("winston");
 	}

@@ -3,6 +3,8 @@ import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { performance } from "perf_hooks";
 
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 @injectable()
 export class StatisticPlugin {
 	@inject(Identifiers.P2P.Statistic.Service)

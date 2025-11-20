@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+import type Table3 from "cli-table3";
 import { Options, Ora } from "ora";
 import { PromptObject } from "prompts";
 
@@ -123,7 +124,7 @@ export class ComponentFactory {
 		return this.app.get<Success>(Identifiers.Success).render(message);
 	}
 
-	public table(head: string[], callback: any, options: Record<string, any> = {}): void {
+	public table(head: string[], callback: (table: Table3.Table) => void, options: Record<string, any> = {}): void {
 		return this.app.get<Table>(Identifiers.Table).render(head, callback, options);
 	}
 

@@ -11,7 +11,10 @@ import { dirSync, setGracefulCleanup } from "tmp";
 import { Identifiers as InternalIdentifiers } from "./identifiers.js";
 import { Generator } from "./snapshot/generator.js";
 
-export const makeApplication = async (configurationPath: string, options: Record<string, any> = {}) => {
+export const makeApplication = async (
+	configurationPath: string,
+	options: Record<string, any> = {},
+): Promise<Application> => {
 	options = { name: "mainsail", ...options };
 
 	const app = new Application(new Container());

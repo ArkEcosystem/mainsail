@@ -65,7 +65,7 @@ export class Input {
 		this.flags = this.validator.validate(this.flags, definitionToSchema(this.#definition.getFlags()));
 	}
 
-	public getArguments(values?: object) {
+	public getArguments(values?: object): InputValues {
 		return values ? { ...values, ...this.args } : this.args;
 	}
 
@@ -81,11 +81,11 @@ export class Input {
 		return this.args[name] !== undefined;
 	}
 
-	public getFlags(values?: object) {
+	public getFlags(values?: object): InputValues {
 		return values ? { ...values, ...this.flags } : this.flags;
 	}
 
-	public getFlag<T = string>(name: string): InputValue {
+	public getFlag<T = InputValue>(name: string): T {
 		return this.flags[name];
 	}
 

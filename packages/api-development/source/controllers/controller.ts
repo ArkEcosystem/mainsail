@@ -62,7 +62,10 @@ export class Controller {
 		}));
 	}
 
-	protected async respondWithResource(data, transformer): Promise<any> {
+	protected async respondWithResource<T extends object, R extends Contracts.Api.Resource>(
+		data: T,
+		transformer: new () => R,
+	): Promise<{ data: ReturnType<R["transform"]> } | Boom.Boom> {
 		if (!data) {
 			return Boom.notFound();
 		}
@@ -70,7 +73,10 @@ export class Controller {
 		return { data: await this.toResource(data, transformer) };
 	}
 
-	protected async respondWithCollection(data, transformer): Promise<object> {
+	protected async respondWithCollection<T extends object, R extends Contracts.Api.Resource>(
+		data: T[],
+		transformer: new () => R,
+	): Promise<{ data: ReturnType<R["transform"]>[] } | Boom.Boom> {
 		return {
 			data: await this.toCollection(data, transformer),
 		};

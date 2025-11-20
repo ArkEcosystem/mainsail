@@ -2,7 +2,7 @@ import { postPrecommit as proto } from "./proto/protos.js";
 
 export const postPrecommit = {
 	request: {
-		deserialize: (payload: Buffer) => {
+		deserialize: (payload: Buffer): proto.IPostPrecommitRequest => {
 			const decoded = proto.PostPrecommitRequest.decode(payload);
 			return {
 				...decoded,

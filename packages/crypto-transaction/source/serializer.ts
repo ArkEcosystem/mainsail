@@ -1,6 +1,6 @@
 import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Hex, toBytes, toRlp } from "viem";
+import { ByteArray, Hex, toBytes, toRlp } from "viem";
 
 @injectable()
 export class Serializer implements Contracts.Crypto.TransactionSerializer {
@@ -44,7 +44,7 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 }
 
 // Numbers are encoded as their minimal big‑endian byte form.
-export function toBytesCompat(value: Hex | bigint | number) {
+export function toBytesCompat(value: Hex | bigint | number): ByteArray {
 	if (value === 0n || value === 0 || value === "0x" || value === "0x0" || value === "0x00") {
 		return new Uint8Array([]);
 	}

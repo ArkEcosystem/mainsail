@@ -8,7 +8,7 @@ const responseIsBoom = (response: ResponseObject | Boom): response is Boom => !!
 
 export const rpcResponseHandler = {
 	name: "rcpResponseHandler",
-	register: (server: HapiServer) => {
+	register: (server: HapiServer): void => {
 		server.ext({
 			method(request, h) {
 				const response = request.response;

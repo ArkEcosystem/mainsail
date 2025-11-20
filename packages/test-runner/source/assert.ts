@@ -10,6 +10,24 @@ interface Constructable {
 	new (...arguments_: any): any;
 }
 
+type BigIntLike = {
+	toBigInt?: () => bigint;
+	toString(): string;
+};
+
+const normalize = (value: unknown): unknown => {
+	if (
+		value &&
+		typeof value === "object" &&
+		"toBigInt" in value &&
+		typeof (value as BigIntLike).toBigInt === "function"
+	) {
+		return value.toString();
+	}
+
+	return value;
+};
+
 // Overrides: snapshot, equal, throws, not.equal, not.throws
 
 export const assert = {
@@ -26,16 +44,8 @@ export const assert = {
 	containValues: (value: object, key: string): void => assert.false(Object.values(value).includes(key)),
 	defined: (value: unknown): void => ok(value !== undefined, "Expected value to be defined."),
 	empty: (value: any): void => ok(!value || value.length === 0 || Object.keys(value).length === 0),
-	equal: (a: any, b: any): void => {
-		if (typeof a === "object" && typeof a.toBigInt === "function") {
-			a = a.toString();
-		}
-
-		if (typeof b === "object" && typeof b.toBigInt === "function") {
-			b = b.toString();
-		}
-
-		equal(a, b);
+	equal: (a: unknown, b: unknown): void => {
+		equal(normalize(a), normalize(b));
 	},
 	false: (value: unknown): void => is(value, false),
 	fixture,
@@ -55,16 +65,8 @@ export const assert = {
 		containKey: (value: object, key: string): void => assert.false(Object.keys(value).includes(key)),
 		defined: (value: unknown): void => ok(value === undefined, "Expected value not to be defined."),
 		empty: (value: unknown[]): void => ok(Object.keys(value).length > 0),
-		equal: (a: any, b: any): void => {
-			if (typeof a === "object" && typeof a.toBigInt === "function") {
-				a = a.toString();
-			}
-
-			if (typeof b === "object" && typeof b.toBigInt === "function") {
-				b = b.toString();
-			}
-
-			not.equal(a, b);
+		equal: (a: unknown, b: unknown): void => {
+			not.equal(normalize(a), normalize(b));
 		},
 		matchesObject: (value: unknown, schema: ZodRawShape): void => throws(() => z.object(schema).parse(value)),
 		undefined: (value: unknown): void => ok(value !== undefined, "Expected value not to be undefined."),

@@ -1,6 +1,6 @@
 import type { FuncKeywordDefinition } from "ajv";
 
-export const makeKeywords = () => {
+export const makeKeywords = (): { buffer: FuncKeywordDefinition } => {
 	const buffer: FuncKeywordDefinition = {
 		compile() {
 			return (data) => Buffer.isBuffer(data);

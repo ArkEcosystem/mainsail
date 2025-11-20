@@ -11,7 +11,10 @@ export class StatisticController extends Controller {
 	@inject(Identifiers.P2P.Statistic.Service)
 	private readonly staticService!: Contracts.P2P.StatisticService;
 
-	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async index(
+		request: Hapi.Request,
+		h: Hapi.ResponseToolkit,
+	): Promise<{ round: string; general: Contracts.P2P.GeneralStatistic }[]> {
 		return this.staticService.getRoundStatisticList().map((id) => {
 			const statistic = this.staticService.getRoundStatistic(id)!;
 			return {
@@ -22,11 +25,11 @@ export class StatisticController extends Controller {
 		});
 	}
 
-	public async list(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async list(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<string[]> {
 		return this.staticService.getRoundStatisticList();
 	}
 
-	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<object> {
 		const { id } = request.params as { id: string };
 		const statistic = this.staticService.getRoundStatistic(id);
 
@@ -46,7 +49,7 @@ export class StatisticController extends Controller {
 		};
 	}
 
-	public async latest(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async latest(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<object> {
 		const list = this.staticService.getRoundStatisticList();
 		if (list.length === 0) {
 			return Boom.notFound("No statistics available");

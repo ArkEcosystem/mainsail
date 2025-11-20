@@ -14,7 +14,7 @@ export abstract class InstanceManager<T> {
 	#drivers: Map<string, T> = new Map<string, T>();
 
 	@postConstruct()
-	public init() {
+	public init(): void {
 		this.#defaultDriver = this.getDefaultDriver();
 	}
 

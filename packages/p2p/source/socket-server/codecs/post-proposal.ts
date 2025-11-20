@@ -2,7 +2,7 @@ import { postProposal as proto } from "./proto/protos.js";
 
 export const postProposal = {
 	request: {
-		deserialize: (payload: Buffer) => {
+		deserialize: (payload: Buffer): proto.IPostProposalRequest => {
 			const decoded = proto.PostProposalRequest.decode(payload);
 			return {
 				...decoded,

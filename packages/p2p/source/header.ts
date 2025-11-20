@@ -21,7 +21,7 @@ export class Header implements Contracts.P2P.Header {
 	public proposal?: Contracts.Crypto.Proposal;
 
 	@postConstruct()
-	public init() {
+	public init(): void {
 		this.blockNumber = this.consensus.getBlockNumber();
 		this.round = this.consensus.getRound();
 		this.step = this.consensus.getStep();

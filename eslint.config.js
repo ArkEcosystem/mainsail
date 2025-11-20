@@ -50,7 +50,7 @@ export default [
 			"@typescript-eslint/await-thenable": "error",
 			"@typescript-eslint/ban-ts-comment": "off",
 			"@typescript-eslint/consistent-type-imports": "error",
-			"@typescript-eslint/explicit-module-boundary-types": "off",
+			"@typescript-eslint/explicit-module-boundary-types": "error",
 			"@typescript-eslint/naming-convention": "off",
 			"@typescript-eslint/no-base-to-string": "warn",
 			"@typescript-eslint/no-empty-function": "off",
@@ -182,6 +182,13 @@ export default [
 			"unicorn/require-number-to-fixed-digits-argument": "off",
 			"unicorn/switch-case-braces": "warn",
 			"unused-imports/no-unused-imports": "warn",
+		},
+	},
+	// TODO: enable lint for API
+	{
+		files: ["packages/api-common/**/*", "packages/api-http/**/*"],
+		rules: {
+			"@typescript-eslint/explicit-module-boundary-types": "off",
 		},
 	},
 ];

@@ -2192,6 +2192,9 @@ importers:
       '@mainsail/constants':
         specifier: workspace:*
         version: link:../constants
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
     devDependencies:
       '@mainsail/contracts':
         specifier: workspace:*

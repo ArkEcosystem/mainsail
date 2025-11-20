@@ -17,7 +17,7 @@ class PeerRepositoryMock implements Partial<PeerRepository> {
 	}
 }
 
-export const setPeers = (peers: Contracts.P2P.Peer[]) => {
+export const setPeers = (peers: Contracts.P2P.Peer[]): void => {
 	mockPeers = peers;
 };
 

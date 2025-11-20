@@ -24,7 +24,13 @@ class TransactionPoolProcessorMock implements Partial<Contracts.TransactionPool.
 	}
 }
 
-export const setProcessorState = (state: any): void => {
+export const setProcessorState = (state: {
+	accept: number[];
+	broadcast: number[];
+	invalid: number[];
+	excess: number[];
+	errors?: { [id: string]: Contracts.TransactionPool.ProcessorError };
+}): void => {
 	accept = state.accept ? state.accept : [];
 	broadcast = state.broadcast ? state.broadcast : [];
 	broadcast = state.broadcast ? state.broadcast : [];

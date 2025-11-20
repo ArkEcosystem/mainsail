@@ -14,6 +14,8 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		this.app.get<Contracts.ProcessFactory>(Identifiers.ProcessFactory)("mainsail-api").stop(this.getFlag("daemon"));
+		this.app
+			.get<Contracts.ProcessFactory>(Identifiers.ProcessFactory)("mainsail-api")
+			.stop(this.getFlag<boolean>("daemon"));
 	}
 }

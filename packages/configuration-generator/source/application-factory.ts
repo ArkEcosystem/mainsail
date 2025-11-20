@@ -39,7 +39,10 @@ import {
 } from "./generators/index.js";
 import { Identifiers as InternalIdentifiers } from "./identifiers.js";
 
-export const makeApplication = async (configurationPath: string, options: Record<string, any> = {}) => {
+export const makeApplication = async (
+	configurationPath: string,
+	options: Record<string, any> = {},
+): Promise<Application> => {
 	options = { address: "keccak256", name: "mainsail", ...options };
 
 	const app = new Application(new Container());

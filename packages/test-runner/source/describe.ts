@@ -133,5 +133,5 @@ export const describeEach = <T = Context>(title: string, callback: CallbackFunct
 	}
 };
 
-export const describeSkip = <T = Context>(title: string, callback: CallbackFunction<T>) =>
+export const describeSkip = <T = Context>(title: string, callback: CallbackFunction<T>): void =>
 	console.log(`${kleur.bold(kleur.bgYellow(kleur.black("Ignored test suite")))}: ${kleur.yellow(title)}`);

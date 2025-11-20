@@ -13,7 +13,7 @@ export class ConfigurationController extends AbstractController {
 	@inject(Identifiers.State.Store)
 	private readonly stateStore!: Contracts.State.Store;
 
-	public async configuration(request: Hapi.Request) {
+	public async configuration(request: Hapi.Request): Promise<object> {
 		return {
 			data: {
 				blockNumber: this.stateStore.getBlockNumber(),

@@ -2,7 +2,7 @@
 
 import Joi from "joi";
 
-export const getConfig = (options) => {
+export const getConfig = (options: Joi.ValidationOptions): { config?: unknown; error?: Joi.ValidationError } => {
 	const { error, value } = Joi.object({
 		query: Joi.object({
 			limit: Joi.object({

@@ -1,8 +1,17 @@
+import type { BigNumberType } from "@mainsail/utils";
 import { BigNumber } from "@mainsail/utils";
+
+type Primitive = string | number | boolean;
+type BigNumberish = Exclude<BigNumberType, bigint>;
+type Range = { min: BigNumberish; max: BigNumberish };
 
 const toBoolean = (value): boolean => value.toString().toLowerCase().trim() === "true";
 
-const compareBigNumber = (value, expected, comparison): boolean => {
+const compareBigNumber = (
+	value: BigNumberish,
+	expected: BigNumberish,
+	comparison: Extract<keyof BigNumber, "isGreaterThan" | "isGreaterThanEqual" | "isLessThan" | "isLessThanEqual">,
+): boolean => {
 	try {
 		return BigNumber.make(value)[comparison](expected);
 	} catch {
@@ -10,29 +19,33 @@ const compareBigNumber = (value, expected, comparison): boolean => {
 	}
 };
 
-const contains = (actual, expected): boolean => actual.includes(expected);
+const contains = (actual: string, expected: string): boolean => actual.includes(expected);
 
-const eq = (actual, expected): boolean => JSON.stringify(actual) === JSON.stringify(expected);
+const eq = (actual: Primitive, expected: Primitive): boolean => JSON.stringify(actual) === JSON.stringify(expected);
 
-const falsy = (actual): boolean => actual === false || !toBoolean(actual);
+const falsy = (actual: Primitive): boolean => actual === false || !toBoolean(actual);
 
-const gt = (actual, expected): boolean => compareBigNumber(actual, expected, "isGreaterThan");
+const gt = (actual: BigNumberish, expected: BigNumberish): boolean =>
+	compareBigNumber(actual, expected, "isGreaterThan");
 
-const gte = (actual, expected): boolean => compareBigNumber(actual, expected, "isGreaterThanEqual");
+const gte = (actual: BigNumberish, expected: BigNumberish): boolean =>
+	compareBigNumber(actual, expected, "isGreaterThanEqual");
 
-const lt = (actual, expected): boolean => compareBigNumber(actual, expected, "isLessThan");
+const lt = (actual: BigNumberish, expected: BigNumberish): boolean => compareBigNumber(actual, expected, "isLessThan");
 
-const lte = (actual, expected): boolean => compareBigNumber(actual, expected, "isLessThanEqual");
+const lte = (actual: BigNumberish, expected: BigNumberish): boolean =>
+	compareBigNumber(actual, expected, "isLessThanEqual");
 
-const between = (actual, expected): boolean => gt(actual, expected.min) && lt(actual, expected.max);
+const between = (actual: BigNumberish, expected: Range): boolean =>
+	gt(actual, expected.min) && lt(actual, expected.max);
 
-const ne = (actual, expected): boolean => !eq(actual, expected);
+const ne = (actual: Primitive, expected: Primitive): boolean => !eq(actual, expected);
 
-const notBetween = (actual, expected): boolean => !between(actual, expected);
+const notBetween = (actual: BigNumberish, expected: Range): boolean => !between(actual, expected);
 
-const regexp = (actual, expected): boolean => new RegExp(expected).test(actual);
+const regexp = (actual: string, expected: string | RegExp): boolean => new RegExp(expected).test(actual);
 
-const truthy = (actual): boolean => actual === true || toBoolean(actual);
+const truthy = (actual: Primitive): boolean => actual === true || toBoolean(actual);
 
 export const conditions = {
 	between,

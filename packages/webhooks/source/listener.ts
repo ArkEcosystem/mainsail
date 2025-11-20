@@ -7,7 +7,7 @@ import { performance } from "perf_hooks";
 import { conditions } from "./conditions.js";
 
 @injectable()
-export class Listener {
+export class Listener implements Contracts.Kernel.EventListener<{ name: string; data: object }> {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -17,7 +17,7 @@ export class Listener {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async handle({ name, data }): Promise<void> {
+	public async handle({ name, data }: { name: string; data: object }): Promise<void> {
 		// Skip own events to prevent cycling
 		if (name.includes("webhooks")) {
 			return;

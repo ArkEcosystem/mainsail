@@ -1,4 +1,4 @@
-import { notFound } from "@hapi/boom";
+import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
@@ -12,7 +12,9 @@ export class BlocksController extends Controller {
 	@inject(Identifiers.Database.Service)
 	private readonly database!: Contracts.Database.DatabaseService;
 
-	public async index(request: Hapi.Request) {
+	public async index(
+		request: Hapi.Request,
+	): Promise<Contracts.Api.ResultsPage<ReturnType<BlockResource["transform"]>> | Boom.Boom> {
 		const lastBlock = this.stateStore.getLastBlock();
 
 		const pagination = this.getQueryPagination(request.query);
@@ -32,22 +34,22 @@ export class BlocksController extends Controller {
 		);
 	}
 
-	public async first(request: Hapi.Request) {
+	public async first(request: Hapi.Request): Promise<{ data: ReturnType<BlockResource["transform"]> } | Boom.Boom> {
 		const commit = this.stateStore.getGenesisCommit();
 
 		return this.respondWithResource(commit.block, BlockResource);
 	}
 
-	public async last(request: Hapi.Request) {
+	public async last(request: Hapi.Request): Promise<{ data: ReturnType<BlockResource["transform"]> } | Boom.Boom> {
 		const block = this.stateStore.getLastBlock();
 		return this.respondWithResource(block, BlockResource);
 	}
 
-	public async show(request: Hapi.Request) {
+	public async show(request: Hapi.Request): Promise<{ data: ReturnType<BlockResource["transform"]> } | Boom.Boom> {
 		const block = await this.getBlock(request.params.id);
 
 		if (!block) {
-			return notFound("Block not found");
+			return Boom.notFound("Block not found");
 		}
 
 		return this.respondWithResource(block, BlockResource);

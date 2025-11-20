@@ -35,7 +35,7 @@ export class TransactionBuilder {
 	protected signWithSenderAsRecipient = false;
 
 	@postConstruct()
-	public postConstruct() {
+	public postConstruct(): void {
 		this.initializeData();
 
 		this.data.value = BigNumber.ZERO;
@@ -207,7 +207,7 @@ export class TransactionBuilder {
 		return data;
 	}
 
-	protected initializeData() {
+	protected initializeData(): void {
 		this.data = {
 			gasPrice: 0,
 			id: undefined,

@@ -59,7 +59,10 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 	#silentConsole = false;
 
-	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
+	public async make(options: {
+		levels: { console: Contracts.Kernel.LoggerContext; file: Contracts.Kernel.LoggerContext };
+		fileRotator: { interval: string };
+	}): Promise<Contracts.Kernel.Logger> {
 		this.#stream = new PassThrough();
 
 		this.#logger = pino(
@@ -89,7 +92,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			pump(
 				this.#stream,
 				split(),
-				this.#createPrettyTransport(options.levels.console, { colorize: true }),
+				this.#createPrettyTransport(options?.levels.console, { colorize: true }),
 				process.stdout,
 
 				(error) => {

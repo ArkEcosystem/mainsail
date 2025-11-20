@@ -9,7 +9,7 @@ import { ExecuteCallbackWhenReady } from "./listeners.js";
 @injectable()
 export class BlockJob implements Job {
 	@inject(Identifiers.Services.EventDispatcher.Service)
-	private readonly events!: Contracts.Kernel.EventDispatcher;
+	private readonly events!: Contracts.Kernel.EventDispatcher<Contracts.Crypto.BlockData>;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;

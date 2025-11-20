@@ -1,6 +1,6 @@
 import { InvalidApiNodeUrlError } from "@mainsail/exceptions";
 
-export function normalizeUrl(urlString: string) {
+export function normalizeUrl(urlString: string): string {
 	try {
 		const url = new URL(urlString);
 

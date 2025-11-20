@@ -13,7 +13,7 @@ export class NodeController extends Controller {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	public async status(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async status(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<object> {
 		const lastBlock = this.stateStore.getLastBlock();
 		const networkBlockNumber = this.p2pService.getNetworkBlockNumberPercentile(90);
 
@@ -26,7 +26,7 @@ export class NodeController extends Controller {
 		};
 	}
 
-	public async configurationNode(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async configurationNode(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<object> {
 		const network = this.configuration.all()!.network;
 
 		return {
@@ -46,7 +46,7 @@ export class NodeController extends Controller {
 		};
 	}
 
-	public async configurationCrypto() {
+	public async configurationCrypto(): Promise<object> {
 		return {
 			data: this.configuration.all(),
 		};

@@ -1,1 +1,2 @@
-export const isConstructor = (value: any): boolean => !!value.prototype && !!value.prototype.constructor.name;
+export const isConstructor = (value: unknown): boolean =>
+	typeof value === "function" && !!value.prototype && typeof value.prototype.constructor?.name === "string";

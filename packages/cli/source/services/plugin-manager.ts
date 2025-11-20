@@ -68,7 +68,7 @@ export class PluginManager implements IPluginManager {
 		return new NPM(paths).update(package_);
 	}
 
-	public async remove(package_): Promise<void> {
+	public async remove(package_: string): Promise<void> {
 		const directory: string = join(this.#getPluginsPath(), package_);
 
 		if (!existsSync(directory)) {

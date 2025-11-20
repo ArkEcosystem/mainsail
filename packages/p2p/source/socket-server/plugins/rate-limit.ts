@@ -6,6 +6,8 @@ import type { Contracts } from "@mainsail/contracts";
 import { RateLimiter } from "../../rate-limiter.js";
 import { buildRateLimiter } from "../../utils/build-rate-limiter.js";
 
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 @injectable()
 export class RateLimitPlugin {
 	@inject(Identifiers.Application.Instance)

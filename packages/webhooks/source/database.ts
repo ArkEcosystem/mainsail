@@ -17,7 +17,7 @@ export class Database implements Contracts.Webhooks.Database {
 
 	#database!: LowSync<{ webhooks: Contracts.Webhooks.Webhook[] }>;
 
-	public boot() {
+	public boot(): void {
 		const adapterFile: string = this.app.cachePath("webhooks.json");
 
 		if (!existsSync(adapterFile)) {

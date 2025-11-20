@@ -6,6 +6,8 @@ import type { Contracts } from "@mainsail/contracts";
 import { isValidVersion } from "../../utils/index.js";
 import { BasePlugin } from "./base-plugin.js";
 
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 @injectable()
 export class ValidateDataPlugin extends BasePlugin {
 	@inject(Identifiers.Application.Instance)
