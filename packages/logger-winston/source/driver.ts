@@ -8,7 +8,9 @@ import winston from "winston";
 export class Logger implements Contracts.Kernel.Logger {
 	#logger!: winston.Logger;
 
-	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
+	public async make(options: {
+		levels: { console: Contracts.Kernel.LoggerContext; file: Contracts.Kernel.LoggerContext };
+	}): Promise<Contracts.Kernel.Logger> {
 		this.#logger = winston.createLogger({
 			format: winston.format.json(),
 			level: options.levels.console,
@@ -23,27 +25,27 @@ export class Logger implements Contracts.Kernel.Logger {
 		return this;
 	}
 
-	public alert(message: any): void {
+	public alert(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("error", message);
 	}
 
-	public error(message: any): void {
+	public error(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("error", message);
 	}
 
-	public warn(message: any): void {
+	public warn(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("warn", message);
 	}
 
-	public notice(message: any): void {
+	public notice(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("info", message);
 	}
 
-	public info(message: any): void {
+	public info(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("info", message);
 	}
 
-	public debug(message: any): void {
+	public debug(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.#log("debug", message);
 	}
 
