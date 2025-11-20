@@ -50,7 +50,7 @@ export default [
 			"@typescript-eslint/await-thenable": "error",
 			"@typescript-eslint/ban-ts-comment": "off",
 			"@typescript-eslint/consistent-type-imports": "error",
-			"@typescript-eslint/explicit-module-boundary-types": "off",
+			"@typescript-eslint/explicit-module-boundary-types": "error",
 			"@typescript-eslint/naming-convention": "off",
 			"@typescript-eslint/no-base-to-string": "warn",
 			"@typescript-eslint/no-empty-function": "off",
