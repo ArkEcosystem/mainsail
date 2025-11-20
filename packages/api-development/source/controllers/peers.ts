@@ -17,7 +17,9 @@ export class PeersController extends Controller {
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
-	public async index(request: Hapi.Request) {
+	public async index(
+		request: Hapi.Request,
+	): Promise<Contracts.Api.ResultsPage<ReturnType<PeerResource["transform"]>> | Boom.Boom> {
 		const allPeers: Contracts.P2P.Peer[] = [...this.peerRepository.getPeers()];
 
 		let results = allPeers;
@@ -89,7 +91,7 @@ export class PeersController extends Controller {
 		return super.toPagination(resultsPage, PeerResource);
 	}
 
-	public async show(request: Hapi.Request) {
+	public async show(request: Hapi.Request): Promise<{ data: ReturnType<PeerResource["transform"]> } | Boom.Boom> {
 		if (!this.peerRepository.hasPeer(request.params.ip)) {
 			return Boom.notFound("Peer not found");
 		}
@@ -97,7 +99,9 @@ export class PeersController extends Controller {
 		return super.respondWithResource(this.peerRepository.getPeer(request.params.ip), PeerResource);
 	}
 
-	public async banned(request: Hapi.Request) {
+	public async banned(
+		request: Hapi.Request,
+	): Promise<Contracts.Api.ResultsPage<ReturnType<PeerResource["transform"]>> | Boom.Boom> {
 		const result = this.peerDisposer.bannedPeers();
 
 		const totalCount: number = result.length;

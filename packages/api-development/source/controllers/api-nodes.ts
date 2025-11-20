@@ -12,7 +12,7 @@ export class ApiNodesController extends Controller {
 	@inject(Identifiers.P2P.ApiNode.Repository)
 	private readonly peerRepository!: Contracts.P2P.ApiNodeRepository;
 
-	public async index(request: Hapi.Request) {
+	public async index(request: Hapi.Request): Promise<Contracts.Api.ResultsPage<object>> {
 		const allPeers: Contracts.P2P.ApiNode[] = [...this.peerRepository.getApiNodes()];
 
 		let results = allPeers;

@@ -16,7 +16,7 @@ export class RoundController extends Controller {
 	@inject(Identifiers.BlockchainUtils.RoundCalculator)
 	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
 
-	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<object> {
 		const roundValidators = this.validatorSet.getRoundValidators();
 
 		const orderedValidators = Array.from(

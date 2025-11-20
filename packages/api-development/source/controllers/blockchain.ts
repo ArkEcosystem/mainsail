@@ -4,7 +4,7 @@ import { Controller } from "./controller.js";
 
 @injectable()
 export class BlockchainController extends Controller {
-	public async index() {
+	public async index(): Promise<object> {
 		const { data } = this.stateStore.getLastBlock();
 
 		return {
