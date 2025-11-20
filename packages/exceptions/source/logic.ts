@@ -27,7 +27,7 @@ export class MethodArgumentNotImplemented extends BadMethodCallException {
 }
 
 export class MethodArgumentValueNotImplemented extends BadMethodCallException {
-	public constructor(methodName: string, argumentName: string, argumentValue) {
+	public constructor(methodName: string, argumentName: string, argumentValue: unknown) {
 		super(
 			`The ${methodName}() method's argument $${argumentName} value ${argumentValue} behavior is not implemented.`,
 		);
@@ -35,7 +35,7 @@ export class MethodArgumentValueNotImplemented extends BadMethodCallException {
 }
 
 export class UnexpectedType extends InvalidArgumentException {
-	public constructor(parameterName: string, expectedType: string, givenType: any) {
+	public constructor(parameterName: string, expectedType: string, givenType: string) {
 		super(`Expected argument [${parameterName}] of type ${expectedType}, ${givenType} given`);
 	}
 }
