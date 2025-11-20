@@ -5,7 +5,12 @@ import { blue, bold } from "kleur/colors";
 import { AppHeader } from "../components/index.js";
 import { Application } from "../contracts.js";
 import { Identifiers } from "../ioc/index.js";
-import type { Command } from "./command.js";
+
+interface CommandInterface {
+	readonly signature: string;
+	readonly description: string | undefined;
+	readonly isHidden: boolean;
+}
 
 @injectable()
 export class CommandHelp {
@@ -15,7 +20,7 @@ export class CommandHelp {
 	@inject(Identifiers.Package)
 	protected readonly pkg!: Contracts.Types.PackageJson;
 
-	public render(command: Command): string {
+	public render(command: CommandInterface): string {
 		let helpMessage = `${this.app.get<AppHeader>(Identifiers.AppHeader).render()}
 
 ${blue(bold("Description"))}
