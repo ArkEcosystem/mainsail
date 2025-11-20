@@ -18,6 +18,6 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		this.app
 			.get<Contracts.ProcessFactory>(Identifiers.ProcessFactory)("mainsail-api")
-			.log(this.getFlag("error"), this.getFlag("lines"));
+			.log(this.getFlag<boolean>("error"), this.getFlag<number>("lines"));
 	}
 }
