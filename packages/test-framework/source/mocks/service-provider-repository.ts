@@ -8,7 +8,7 @@ class ServiceProviderRepositoryMocks implements Partial<Providers.ServiceProvide
 	}
 }
 
-export const setServiceProviders = (serviceProviders: Providers.ServiceProvider[]) => {
+export const setServiceProviders = (serviceProviders: Providers.ServiceProvider[]): void => {
 	mockServiceProviders = serviceProviders;
 };
 

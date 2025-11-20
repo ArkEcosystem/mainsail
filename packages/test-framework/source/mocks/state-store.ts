@@ -17,11 +17,11 @@ class StoreMocks implements Partial<Contracts.State.Store> {
 	}
 }
 
-export const setBlock = (block: Partial<Contracts.Crypto.Block> | undefined) => {
+export const setBlock = (block: Partial<Contracts.Crypto.Block> | undefined): void => {
 	mockBlock = block;
 };
 
-export const setLastHeight = (height: number) => {
+export const setLastHeight = (height: number): void => {
 	lastHeight = height;
 };
 

@@ -44,11 +44,11 @@ export class Sandbox {
 		this.app = new Application(this.#container);
 	}
 
-	public getConfigurationPath() {
+	public getConfigurationPath(): string {
 		return join(this.#path, this.#configurationOptions.network);
 	}
 
-	public withConfigurationOptions(options: Contracts.NetworkGenerator.Options) {
+	public withConfigurationOptions(options: Contracts.NetworkGenerator.Options): Sandbox {
 		this.#configurationOptions = { ...this.#configurationOptions, ...options };
 
 		return this;

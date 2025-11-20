@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
-let mockTransactions: Partial<Contracts.Crypto.Transaction>[] = [];
+let mockTransactions: Contracts.Crypto.Transaction[] = [];
 
 class TransactionPoolQueryMock implements Partial<Contracts.TransactionPool.Query> {
 	public getFromHighestPriority(): Contracts.TransactionPool.QueryIterable {
@@ -8,14 +8,14 @@ class TransactionPoolQueryMock implements Partial<Contracts.TransactionPool.Quer
 	}
 }
 
-export const setTransactions = (transactions: Partial<Contracts.Crypto.Transaction>[]) => {
+export const setTransactions = (transactions: Contracts.Crypto.Transaction[]): void => {
 	mockTransactions = transactions;
 };
 
 export class CustomQueryIterable implements Partial<Contracts.TransactionPool.QueryIterable> {
 	public transactions: Contracts.Crypto.Transaction[];
 
-	public constructor(items) {
+	public constructor(items: Contracts.Crypto.Transaction[]) {
 		this.transactions = items;
 	}
 
@@ -25,7 +25,7 @@ export class CustomQueryIterable implements Partial<Contracts.TransactionPool.Qu
 		}
 	}
 
-	public whereHash(hash: any): any {
+	public whereHash(hash: string): any {
 		return this;
 	}
 
