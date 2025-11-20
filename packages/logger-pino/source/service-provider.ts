@@ -13,7 +13,16 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			Identifiers.Services.Log.Manager,
 		);
 
-		await logManager.extend("pino", async () => this.app.resolve(PinoLogger).make(this.config().all()));
+		await logManager.extend(
+			"pino",
+			async () =>
+				this.app.resolve(PinoLogger).make(
+					this.config().all() as {
+						levels: { console: Contracts.Kernel.LoggerContext; file: Contracts.Kernel.LoggerContext };
+						fileRotator: { interval: string };
+					},
+				), // TODO: config interface
+		);
 
 		logManager.setDefaultDriver("pino");
 	}
