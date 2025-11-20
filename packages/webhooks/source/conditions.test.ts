@@ -178,7 +178,7 @@ describe("Conditions.regexp", ({ it, assert }) => {
 	});
 
 	it("should be false", () => {
-		assert.false(regexp(123, "w+"));
+		assert.false(regexp("123", "w+"));
 	});
 });
 

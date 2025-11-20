@@ -103,7 +103,7 @@ export class Server {
 	async #registerPlugins(config: Contracts.Types.JsonObject): Promise<void> {
 		await this.#server.register({
 			options: {
-				whitelist: config.whitelist,
+				whitelist: config.whitelist as string[],
 			},
 			plugin: whitelist,
 		});
