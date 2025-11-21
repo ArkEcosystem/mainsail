@@ -1,6 +1,6 @@
 import { http } from "@mainsail/utils";
 
-import { Client } from "../types.js";
+import type { Client } from "../types.js";
 
 export class LocalClient implements Client {
 	#id = 0;
