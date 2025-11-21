@@ -1,4 +1,8 @@
-export const compareBlocks = (assert, a: Record<string, any>, b: Record<string, any>) => {
+import { assert } from "@mainsail/test-framework";
+
+type Assert = typeof assert;
+
+export const compareBlocks = (assert: Assert, a: Record<string, any>, b: Record<string, any>) => {
 	// Numeric fields
 	for (const field of [
 		"number",
@@ -29,7 +33,7 @@ export const compareBlocks = (assert, a: Record<string, any>, b: Record<string, 
 	}
 };
 
-export const compareTransactions = (assert, a: Record<string, any>, b: Record<string, any>) => {
+export const compareTransactions = (assert: Assert, a: Record<string, any>, b: Record<string, any>) => {
 	// Numeric fields
 	for (const field of [
 		"blockNumber",
@@ -61,7 +65,7 @@ export const compareTransactions = (assert, a: Record<string, any>, b: Record<st
 	}
 };
 
-export const compareReceipts = (assert, a: Record<string, any>, b: Record<string, any>) => {
+export const compareReceipts = (assert: Assert, a: Record<string, any>, b: Record<string, any>) => {
 	// Numeric fields
 	for (const field of [
 		// "transactionIndex",
