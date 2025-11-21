@@ -66,24 +66,11 @@ export class CallAction implements Contracts.Api.RPC.Action {
 			gasLimit = userGasLimit < gasLimit ? userGasLimit : gasLimit;
 		}
 
-		/*
-		const { success, output } = await this.evm.view({
-			// default to zero address
-			data: Buffer.from(toBytes(data.data)),
-			from: data.from ?? "0x" + "0".repeat(40),
-			gasLimit,
-			specId: Enums.Evm.SpecId.LATEST,
-			to: data.to,
-		});
-		*/
-
-		const commitKey = { blockNumber: BigInt(this.configuration.getHeight()), round: BigInt(0) };
-
 		const nonce = data.from ? (await this.evm.getAccountInfo(data.from)).nonce : 0;
 
 		const { receipt } = await this.evm.simulate({
 			blockContext: {
-				commitKey,
+				commitKey: { blockNumber: BigInt(this.configuration.getHeight()), round: BigInt(0) },
 				gasLimit: BigInt(maxGasLimit),
 				timestamp: BigInt(dayjs().valueOf()),
 				validatorAddress: "0x0000000000000000000000000000000000000001",
@@ -91,7 +78,6 @@ export class CallAction implements Contracts.Api.RPC.Action {
 			data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
 			from: data.from ?? "0x" + "0".repeat(40),
 			gasLimit,
-			// gasPrice: data.gasPrice ? BigInt(data.gasPrice) : BigInt(gas.minimumGasPrice),
 			gasPrice: BigInt(minimumGasPrice),
 			nonce: BigInt(nonce),
 			specId: evmSpec,
