@@ -9,6 +9,8 @@ type TxData = {
 	to: string;
 	data: string;
 	gas?: string;
+	gasPrice?: string;
+	value?: string;
 };
 
 @injectable()
