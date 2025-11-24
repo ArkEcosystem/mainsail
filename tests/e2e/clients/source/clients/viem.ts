@@ -1,6 +1,7 @@
-import { createPublicClient, http, PublicClient } from "viem";
+import type { PublicClient } from "viem";
+import { createPublicClient, http } from "viem";
 
-import { Client } from "../types.js";
+import type { Client } from "../types.js";
 
 export class ViemClient implements Client {
 	#client: PublicClient;
@@ -88,9 +89,9 @@ export class ViemClient implements Client {
 	public async call(address: string, data: string): Promise<string> {
 		return (
 			await this.#client.call({
-				to: address,
 				blockTag: "latest",
 				data,
+				to: address,
 			})
 		).data;
 	}
