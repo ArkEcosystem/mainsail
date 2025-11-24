@@ -55,38 +55,57 @@ export class CallAction implements Contracts.Api.RPC.Action {
 
 		const {
 			block: { maxGasLimit },
-			gas: { minimumGasPrice },
+			gas: { minimumGasLimit, minimumGasPrice, maximumGasPrice },
 			evmSpec,
 		} = this.configuration.getMilestone();
 
-		// Cap gas limit to block gas limit
+		// Cap gas limit to milestone gas limit
 		let gasLimit = BigInt(maxGasLimit);
 		if (data.gas) {
 			const userGasLimit = BigInt(data.gas);
 			gasLimit = userGasLimit < gasLimit ? userGasLimit : gasLimit;
+
+			if (gasLimit < minimumGasLimit) {
+				gasLimit = BigInt(minimumGasLimit);
+			}
+		}
+
+		// Accept 0 gas price for view calls.
+		let gasPrice = BigInt(0);
+		if (data.gasPrice) {
+			const userGasPrice = BigInt(data.gasPrice);
+			gasPrice = userGasPrice < minimumGasPrice && userGasPrice !== 0n ? BigInt(minimumGasPrice) : userGasPrice;
+
+			if (gasLimit > maximumGasPrice) {
+				gasLimit = BigInt(maximumGasPrice);
+			}
 		}
 
 		const nonce = data.from ? (await this.evm.getAccountInfo(data.from)).nonce : 0;
 
-		const { receipt } = await this.evm.simulate({
-			blockContext: {
-				commitKey: { blockNumber: BigInt(this.configuration.getHeight()), round: BigInt(0) },
-				gasLimit: BigInt(maxGasLimit),
-				timestamp: BigInt(dayjs().valueOf()),
-				validatorAddress: "0x0000000000000000000000000000000000000001",
-			},
-			data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
-			from: data.from ?? "0x" + "0".repeat(40),
-			gasLimit,
-			gasPrice: BigInt(minimumGasPrice),
-			nonce: BigInt(nonce),
-			specId: evmSpec,
-			to: data.to,
-			value: data.value ? BigInt(data.value) : BigInt(0),
-		});
+		try {
+			const { receipt } = await this.evm.simulate({
+				blockContext: {
+					commitKey: { blockNumber: BigInt(this.configuration.getHeight()), round: BigInt(0) },
+					gasLimit: BigInt(maxGasLimit),
+					timestamp: BigInt(dayjs().valueOf()),
+					validatorAddress: "0x0000000000000000000000000000000000000001",
+				},
+				data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
+				from: data.from ?? "0x" + "0".repeat(40),
+				gasLimit,
+				gasPrice,
+				nonce: BigInt(nonce),
+				specId: evmSpec,
+				to: data.to,
+				value: data.value ? BigInt(data.value) : BigInt(0),
+			});
 
-		if (receipt.status === 1) {
-			return `0x${receipt.output?.toString("hex")}`;
+			if (receipt.status === 1) {
+				return `0x${receipt.output?.toString("hex")}`;
+			}
+		} catch (ex) {
+			throw new RpcError(`execution reverted: ${ex.message}`);
 		}
 
 		throw new RpcError("execution reverted");
