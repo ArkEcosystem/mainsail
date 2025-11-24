@@ -51,6 +51,33 @@ export class CallAction implements Contracts.Api.RPC.Action {
 		type: "array",
 	};
 
+	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<any> {
+		const [data] = parameters;
+		const milestone = this.configuration.getMilestone();
+
+		try {
+			const { receipt } = await this.evm.simulate({
+				blockContext: this.#getBlockContext(milestone),
+				data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
+				from: data.from ?? zeroAddress,
+				gasLimit: this.#getGasLimit(data, milestone),
+				gasPrice: this.#getGasPrice(data, milestone),
+				nonce: await this.#getNonce(data),
+				specId: milestone.evmSpec,
+				to: data.to,
+				value: data.value ? BigInt(data.value) : BigInt(0),
+			});
+
+			if (receipt.status === 1) {
+				return `0x${receipt.output?.toString("hex")}`;
+			}
+		} catch (ex) {
+			throw new RpcError(`execution reverted: ${ex.message}`);
+		}
+
+		throw new RpcError("execution reverted");
+	}
+
 	#getGasLimit(data: TxData, milestone: Contracts.Crypto.Milestone): bigint {
 		const {
 			gas: { maximumGasLimit, minimumGasLimit },
@@ -114,32 +141,5 @@ export class CallAction implements Contracts.Api.RPC.Action {
 			timestamp: BigInt(dayjs().valueOf()),
 			validatorAddress: "0x0000000000000000000000000000000000000001",
 		};
-	}
-
-	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<any> {
-		const [data] = parameters;
-		const milestone = this.configuration.getMilestone();
-
-		try {
-			const { receipt } = await this.evm.simulate({
-				blockContext: this.#getBlockContext(milestone),
-				data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
-				from: data.from ?? zeroAddress,
-				gasLimit: this.#getGasLimit(data, milestone),
-				gasPrice: this.#getGasPrice(data, milestone),
-				nonce: await this.#getNonce(data),
-				specId: milestone.evmSpec,
-				to: data.to,
-				value: data.value ? BigInt(data.value) : BigInt(0),
-			});
-
-			if (receipt.status === 1) {
-				return `0x${receipt.output?.toString("hex")}`;
-			}
-		} catch (ex) {
-			throw new RpcError(`execution reverted: ${ex.message}`);
-		}
-
-		throw new RpcError("execution reverted");
 	}
 }
