@@ -51,44 +51,62 @@ export class CallAction implements Contracts.Api.RPC.Action {
 		type: "array",
 	};
 
-	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<any> {
-		const [data] = parameters;
-
+	#getGasLimit(data: TxData, milestone: Contracts.Crypto.Milestone): bigint {
 		const {
-			block: { maxGasLimit },
-			gas: { minimumGasLimit, minimumGasPrice, maximumGasPrice, maximumGasLimit },
-			evmSpec,
-		} = this.configuration.getMilestone();
+			gas: { maximumGasLimit, minimumGasLimit },
+		} = milestone;
 
-		// Cap gas limit to milestone gas limit
-		let gasLimit = BigInt(maximumGasLimit);
+		// Cap gas limit to milestone gas limits
 		if (data.gas) {
 			const userGasLimit = BigInt(data.gas);
 
-			if (gasLimit > maximumGasLimit) {
-				gasLimit = userGasLimit;
+			if (userGasLimit > maximumGasLimit) {
+				return BigInt(maximumGasLimit);
 			}
 
-			if (gasLimit < minimumGasLimit) {
-				gasLimit = BigInt(minimumGasLimit);
+			if (userGasLimit < minimumGasLimit) {
+				return BigInt(minimumGasLimit);
 			}
 		}
+
+		return BigInt(maximumGasLimit);
+	}
+
+	#getGasPrice(data: TxData, milestone: Contracts.Crypto.Milestone): bigint {
+		const {
+			gas: { minimumGasPrice, maximumGasPrice },
+		} = milestone;
 
 		// Accept 0 gas price for view calls
 		// Cap gas price to milestone limits if !== 0
-		let gasPrice = BigInt(0);
 		if (data.gasPrice) {
 			const userGasPrice = BigInt(data.gasPrice);
 
-			if (userGasPrice !== 0n) {
-				if (userGasPrice < minimumGasPrice) {
-					gasPrice = BigInt(minimumGasPrice);
-				}
-				if (userGasPrice > maximumGasPrice) {
-					gasPrice = BigInt(maximumGasPrice);
-				}
+			if (userGasPrice === 0n) {
+				return 0n;
+			}
+
+			if (userGasPrice < minimumGasPrice) {
+				return BigInt(minimumGasPrice);
+			}
+
+			if (userGasPrice > maximumGasPrice) {
+				return BigInt(maximumGasPrice);
 			}
 		}
+
+		return 0n;
+	}
+
+	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<any> {
+		const [data] = parameters;
+
+		const milestone = this.configuration.getMilestone();
+
+		const {
+			block: { maxGasLimit },
+			evmSpec,
+		} = milestone;
 
 		const nonce = data.from ? (await this.evm.getAccountInfo(data.from)).nonce : 0;
 
@@ -102,8 +120,8 @@ export class CallAction implements Contracts.Api.RPC.Action {
 				},
 				data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
 				from: data.from ?? zeroAddress,
-				gasLimit,
-				gasPrice,
+				gasLimit: this.#getGasLimit(data, milestone),
+				gasPrice: this.#getGasPrice(data, milestone),
 				nonce: BigInt(nonce),
 				specId: evmSpec,
 				to: data.to,
