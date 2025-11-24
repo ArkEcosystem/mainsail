@@ -75,10 +75,14 @@ export class CallAction implements Contracts.Api.RPC.Action {
 		let gasPrice = BigInt(0);
 		if (data.gasPrice) {
 			const userGasPrice = BigInt(data.gasPrice);
-			gasPrice = userGasPrice < minimumGasPrice && userGasPrice !== 0n ? BigInt(minimumGasPrice) : userGasPrice;
 
-			if (gasPrice > maximumGasPrice) {
-				gasPrice = BigInt(maximumGasPrice);
+			if (userGasPrice !== 0n) {
+				if (userGasPrice < minimumGasPrice) {
+					gasPrice = BigInt(minimumGasPrice);
+				}
+				if (userGasPrice > maximumGasPrice) {
+					gasPrice = BigInt(maximumGasPrice);
+				}
 			}
 		}
 
