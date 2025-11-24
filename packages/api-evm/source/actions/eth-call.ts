@@ -56,22 +56,26 @@ export class CallAction implements Contracts.Api.RPC.Action {
 
 		const {
 			block: { maxGasLimit },
-			gas: { minimumGasLimit, minimumGasPrice, maximumGasPrice },
+			gas: { minimumGasLimit, minimumGasPrice, maximumGasPrice, maximumGasLimit },
 			evmSpec,
 		} = this.configuration.getMilestone();
 
 		// Cap gas limit to milestone gas limit
-		let gasLimit = BigInt(maxGasLimit);
+		let gasLimit = BigInt(maximumGasLimit);
 		if (data.gas) {
 			const userGasLimit = BigInt(data.gas);
-			gasLimit = userGasLimit < gasLimit ? userGasLimit : gasLimit;
+
+			if (gasLimit > maximumGasLimit) {
+				gasLimit = userGasLimit;
+			}
 
 			if (gasLimit < minimumGasLimit) {
 				gasLimit = BigInt(minimumGasLimit);
 			}
 		}
 
-		// Accept 0 gas price for view calls.
+		// Accept 0 gas price for view calls
+		// Cap gas price to milestone limits if !== 0
 		let gasPrice = BigInt(0);
 		if (data.gasPrice) {
 			const userGasPrice = BigInt(data.gasPrice);
