@@ -98,6 +98,15 @@ export class CallAction implements Contracts.Api.RPC.Action {
 		return 0n;
 	}
 
+	async #getNonce(data: TxData): Promise<bigint> {
+		if (data.from) {
+			const accountInfo = await this.evm.getAccountInfo(data.from);
+			return BigInt(accountInfo.nonce);
+		}
+
+		return 0n;
+	}
+
 	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<any> {
 		const [data] = parameters;
 
@@ -107,8 +116,6 @@ export class CallAction implements Contracts.Api.RPC.Action {
 			block: { maxGasLimit },
 			evmSpec,
 		} = milestone;
-
-		const nonce = data.from ? (await this.evm.getAccountInfo(data.from)).nonce : 0;
 
 		try {
 			const { receipt } = await this.evm.simulate({
@@ -122,7 +129,7 @@ export class CallAction implements Contracts.Api.RPC.Action {
 				from: data.from ?? zeroAddress,
 				gasLimit: this.#getGasLimit(data, milestone),
 				gasPrice: this.#getGasPrice(data, milestone),
-				nonce: BigInt(nonce),
+				nonce: await this.#getNonce(data),
 				specId: evmSpec,
 				to: data.to,
 				value: data.value ? BigInt(data.value) : BigInt(0),
