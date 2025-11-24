@@ -107,30 +107,28 @@ export class CallAction implements Contracts.Api.RPC.Action {
 		return 0n;
 	}
 
+	#getBlockContext(milestone: Contracts.Crypto.Milestone): Contracts.Evm.BlockContext {
+		return {
+			commitKey: { blockNumber: BigInt(this.configuration.getHeight()), round: BigInt(0) },
+			gasLimit: BigInt(milestone.block.maxGasLimit),
+			timestamp: BigInt(dayjs().valueOf()),
+			validatorAddress: "0x0000000000000000000000000000000000000001",
+		};
+	}
+
 	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<any> {
 		const [data] = parameters;
-
 		const milestone = this.configuration.getMilestone();
-
-		const {
-			block: { maxGasLimit },
-			evmSpec,
-		} = milestone;
 
 		try {
 			const { receipt } = await this.evm.simulate({
-				blockContext: {
-					commitKey: { blockNumber: BigInt(this.configuration.getHeight()), round: BigInt(0) },
-					gasLimit: BigInt(maxGasLimit),
-					timestamp: BigInt(dayjs().valueOf()),
-					validatorAddress: "0x0000000000000000000000000000000000000001",
-				},
+				blockContext: this.#getBlockContext(milestone),
 				data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
 				from: data.from ?? zeroAddress,
 				gasLimit: this.#getGasLimit(data, milestone),
 				gasPrice: this.#getGasPrice(data, milestone),
 				nonce: await this.#getNonce(data),
-				specId: evmSpec,
+				specId: milestone.evmSpec,
 				to: data.to,
 				value: data.value ? BigInt(data.value) : BigInt(0),
 			});
