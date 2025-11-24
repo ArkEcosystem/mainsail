@@ -3,6 +3,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { RpcError } from "@mainsail/exceptions";
 import dayjs from "dayjs";
+import { zeroAddress } from "viem";
 
 type TxData = {
 	from?: string;
@@ -92,7 +93,7 @@ export class CallAction implements Contracts.Api.RPC.Action {
 					validatorAddress: "0x0000000000000000000000000000000000000001",
 				},
 				data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
-				from: data.from ?? "0x" + "0".repeat(40),
+				from: data.from ?? zeroAddress,
 				gasLimit,
 				gasPrice,
 				nonce: BigInt(nonce),
