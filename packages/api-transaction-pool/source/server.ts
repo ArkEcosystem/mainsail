@@ -18,7 +18,7 @@ export class Server extends AbstractServer {
 		return this.configuration;
 	}
 
-	protected defaultOptions(): Record<string, any> {
+	protected defaultOptions(): Record<string, unknown> {
 		const validateContext = {
 			configuration: {
 				plugins: {
