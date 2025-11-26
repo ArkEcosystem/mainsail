@@ -204,9 +204,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				legacyAttributes: {
 					legacyNonce: BigNumber.make(wallet.legacyNonce).toBigInt(),
 					multiSignature: wallet.attributes?.["multiSignature"]?.["publicKeys"]
-						? wallet.attributes?.["multiSignature"]
+						? (wallet.attributes?.[
+								"multiSignature"
+							] as Contracts.Snapshot.ImportedLegacyMultiSignatureAttribute)
 						: undefined,
-					secondPublicKey: wallet.attributes?.["secondPublicKey"] ?? undefined,
+					secondPublicKey: (wallet.attributes?.["secondPublicKey"] as string) ?? undefined,
 				},
 				publicKey: wallet.publicKey,
 			});
@@ -214,7 +216,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			if (wallet.attributes?.["vote"]) {
 				assert.string(wallet.publicKey);
 
-				const votedWallet = publicKeyLookup[wallet.attributes?.["vote"]];
+				const votedWallet = publicKeyLookup[wallet.attributes?.["vote"] as string];
 				assert.defined(votedWallet);
 				assert.defined(votedWallet.ethAddress);
 
