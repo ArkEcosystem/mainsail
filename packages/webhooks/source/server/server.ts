@@ -1,17 +1,25 @@
 import Boom, { badData } from "@hapi/boom";
-import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse } from "@hapi/hapi";
+import { Request as HapiRequest, Server as HapiServer, ServerInjectOptions, ServerInjectResponse } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { cloneDeep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
+import { defaults } from "../defaults.js";
 import { whitelist } from "./plugins/whitelist.js";
 import { destroy, show, store, update } from "./schema.js";
 import { respondWithResource } from "./utilities.js";
 
+type WebhookRequest = Omit<HapiRequest, "payload"> & {
+	payload: Contracts.Webhooks.Webhook;
+	server: WebhookServer;
+};
+
 export type WebhookAppState = { database: Contracts.Webhooks.Database };
 export type WebhookServer = HapiServer<WebhookAppState>;
+
+export type ServerOptions = typeof defaults.server;
 
 @injectable()
 export class Server {
@@ -26,7 +34,7 @@ export class Server {
 
 	#server!: WebhookServer;
 
-	public async register(optionsServer: Contracts.Types.JsonObject): Promise<void> {
+	public async register(optionsServer: ServerOptions): Promise<void> {
 		this.#server = new HapiServer(this.#getServerOptions(optionsServer));
 		this.#server.app.database = this.database;
 
@@ -68,7 +76,7 @@ export class Server {
 		return this.#server.inject(options);
 	}
 
-	#getServerOptions(options: Record<string, any>): object {
+	#getServerOptions(options: Record<string, object>): object {
 		options = {
 			...options.http,
 			whitelist: options.whitelist,
@@ -132,7 +140,7 @@ export class Server {
 		});
 
 		this.#server.route({
-			handler(request: any, h) {
+			handler(request: WebhookRequest, h) {
 				const token: string = randomBytes(32).toString("hex");
 
 				return h

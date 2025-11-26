@@ -7,7 +7,7 @@ import { performance } from "perf_hooks";
 import { conditions } from "./conditions.js";
 
 @injectable()
-export class Listener implements Contracts.Kernel.EventListener<{ name: string; data: object }> {
+export class Listener implements Contracts.Kernel.EventListener<{ name: string; data: Contracts.Types.JsonObject }> {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -17,7 +17,7 @@ export class Listener implements Contracts.Kernel.EventListener<{ name: string; 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async handle({ name, data }: { name: string; data: object }): Promise<void> {
+	public async handle({ name, data }: { name: string; data: Contracts.Types.JsonObject }): Promise<void> {
 		// Skip own events to prevent cycling
 		if (name.includes("webhooks")) {
 			return;
@@ -34,13 +34,17 @@ export class Listener implements Contracts.Kernel.EventListener<{ name: string; 
 		await Promise.all(promises);
 	}
 
-	public async broadcast(webhook: Contracts.Webhooks.Webhook, payload: object, timeout = 1500): Promise<void> {
+	public async broadcast(
+		webhook: Contracts.Webhooks.Webhook,
+		payload: Contracts.Types.JsonObject,
+		timeout = 1500,
+	): Promise<void> {
 		const start = performance.now();
 
 		try {
 			const { statusCode } = await http.post(webhook.target, {
 				body: {
-					data: payload as any,
+					data: payload,
 					// @TODO utils currently expects a primitive as data
 					event: webhook.event,
 					timestamp: Date.now(),
