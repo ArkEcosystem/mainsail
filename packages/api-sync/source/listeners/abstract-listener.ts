@@ -18,7 +18,7 @@ export enum ListenerEvent {
 export type ListenerEventMapping = { [key: string]: ListenerEvent };
 
 @injectable()
-export abstract class AbstractListener<TEventData, TEntity extends { [key: string]: any }> implements EventListener {
+export abstract class AbstractListener<TEventData, TEntity extends object> implements EventListener {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-sync")
 	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
@@ -141,7 +141,7 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 
 			if (addedEvents.length > 0) {
 				await entityRepository.upsert(
-					[...this.#addedEvents.values()].map((event) => this.mapEventToEntity(event)),
+					[...this.#addedEvents.values()].map((event) => this.mapEventToEntity(event) as unknown as object),
 					entityRepository.metadata.primaryColumns.map((c) => c.propertyName),
 				);
 

@@ -35,9 +35,9 @@ export class Peers extends AbstractListener<Contracts.P2P.Peer, Models.Peer> {
 			blockNumber: event.header.blockNumber,
 			ip: event.ip,
 			latency: event.latency,
-			plugins: event.plugins as Record<string, any>,
+			plugins: event.plugins as Record<string, unknown>,
 			port: event.port,
-			ports: event.ports as Record<string, any>,
+			ports: event.ports as Record<string, unknown>,
 			version: event.version,
 		};
 	}

@@ -47,7 +47,7 @@ export class Plugins extends AbstractListener<Event, Models.Plugin> {
 		return this.pluginRepositoryFactory(dataSource);
 	}
 
-	private sanitizeConfiguration(config: Contracts.Types.JsonObject): any {
+	private sanitizeConfiguration(config: Contracts.Types.JsonObject): Contracts.Types.JsonObject {
 		for (const key in config) {
 			if (config.hasOwnProperty(key)) {
 				if (key.toLowerCase() === "password") {
@@ -57,8 +57,7 @@ export class Plugins extends AbstractListener<Event, Models.Plugin> {
 
 				const value = config[key];
 				if (typeof value === "object") {
-					// @ts-ignore
-					config[key] = this.sanitizeConfiguration(value);
+					config[key] = this.sanitizeConfiguration(value as Contracts.Types.JsonObject);
 				}
 			}
 		}

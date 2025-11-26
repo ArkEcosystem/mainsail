@@ -20,9 +20,9 @@ interface DeferredSync {
 	transactions: Models.Transaction[];
 	multiPayments: Models.MultiPayment[];
 	validatorRound?: Models.ValidatorRound;
-	wallets: Array<Array<any>>;
+	wallets: Array<[string, string | null, string, string, object, string]>;
 	mergedLegacyColdWallets: ({ legacyAddress: string } & Contracts.Evm.AccountMergeInfo)[];
-	newMilestones?: Record<string, any>;
+	newMilestones?: Contracts.Crypto.Milestone;
 }
 
 const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve) => queue.once("drain", resolve));
@@ -188,7 +188,8 @@ export class Sync implements Contracts.ApiSync.Service {
 
 				legacySecondSignature: data.legacySecondSignature,
 
-				logs: receipt.logs,
+				// is converted into JSONB column
+				logs: receipt.logs as unknown as string,
 
 				multiPaymentRecipients:
 					parsedMultiPayments.length > 0 ? [...new Set(parsedMultiPayments.map((mp) => mp.to))] : undefined,
@@ -284,7 +285,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				attributes,
 				header.number.toFixed(),
 			];
-		});
+		}) as DeferredSync["wallets"];
 
 		// The block validator/dirty validators might not be part of the account updates if no rewards have been distributed,
 		// thus ensure they are manually inserted.
