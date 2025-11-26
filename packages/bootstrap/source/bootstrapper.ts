@@ -88,7 +88,7 @@ export class Bootstrapper {
 	}
 
 	async #setGenesisCommit(): Promise<void> {
-		const genesisBlockJson = this.configuration.get("genesisBlock");
+		const genesisBlockJson = this.configuration.get<Contracts.Crypto.CommitJson>("genesisBlock");
 		const genesisBlock = await this.commitFactory.fromJson(genesisBlockJson);
 
 		this.stateStore.setGenesisCommit(genesisBlock);
