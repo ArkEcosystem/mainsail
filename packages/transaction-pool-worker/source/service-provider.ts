@@ -14,7 +14,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async register(): Promise<void> {
 		this.app
-			.bind<() => Ipc.Subprocess<any>>(Identifiers.TransactionPool.WorkerSubprocess.Factory)
+			.bind<() => Ipc.Subprocess>(Identifiers.TransactionPool.WorkerSubprocess.Factory)
 			.toFactory(() => () => {
 				const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {
 					stderr: true,
