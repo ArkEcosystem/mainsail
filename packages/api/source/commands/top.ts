@@ -23,11 +23,9 @@ export class Command extends Commands.Command {
 
 		this.components.table(["ID", "Name", "Version", "Status", "Uptime", "CPU", "RAM"], (table) => {
 			for (const process of processes) {
-				// @ts-ignore
 				table.push([
 					process.pid,
 					process.name,
-					// @ts-ignore
 					process.pm2_env.version,
 					process.pm2_env.status,
 					prettyTime(dayjs().diff(process.pm2_env.pm_uptime)),
