@@ -77,7 +77,7 @@ describe<{
 			abi: ConsensusAbi.abi,
 			eventName: "Voted",
 			data: receipt?.logs[0].data as Hex,
-			topics: receipt?.logs[0].topics,
+			topics: receipt?.logs[0].topics ?? [],
 		});
 
 		assert.equal(decoded.args, {
@@ -143,7 +143,7 @@ describe<{
 			abi: ConsensusAbi.abi,
 			eventName: "Unvoted",
 			data: receipt?.logs[0].data as Hex,
-			topics: receipt?.logs[0].topics,
+			topics: receipt?.logs[0].topics ?? [],
 		});
 
 		assert.equal(decoded.args, {
@@ -271,7 +271,7 @@ describe<{
 			abi: ConsensusAbi.abi,
 			eventName: "Voted",
 			data: receipt?.logs[0].data as Hex,
-			topics: receipt?.logs[0].topics,
+			topics: receipt?.logs[0].topics ?? [],
 		});
 
 		assert.equal(decoded.args, {

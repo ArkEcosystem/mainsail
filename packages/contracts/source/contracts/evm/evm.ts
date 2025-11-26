@@ -1,4 +1,5 @@
 import type { Enums } from "@mainsail/constants";
+import type { Log } from "viem";
 
 export interface GenesisInfo {
 	readonly account: string;
@@ -194,7 +195,7 @@ export interface TransactionReceipt {
 	readonly gasRefunded: bigint;
 	readonly status: number;
 	readonly contractAddress?: string;
-	readonly logs: Record<string, unknown>[];
+	readonly logs: Log[];
 	readonly output?: Buffer;
 
 	// Only present when reading receipts explicitly via `get_receipts`

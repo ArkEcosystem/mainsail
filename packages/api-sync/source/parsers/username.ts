@@ -1,5 +1,4 @@
 import type { Contracts } from "@mainsail/contracts";
-import type { Log } from "viem";
 import { parseAbi, parseEventLogs } from "viem";
 
 const paymentAbi = parseAbi([
@@ -19,7 +18,7 @@ export function parseUsernames(
 	const logs = parseEventLogs({
 		abi: paymentAbi,
 		//eventName: "UsernameRegistered",
-		logs: (receipt.logs ?? []) as Log[],
+		logs: receipt.logs ?? [],
 	});
 
 	return logs.map((l) => {

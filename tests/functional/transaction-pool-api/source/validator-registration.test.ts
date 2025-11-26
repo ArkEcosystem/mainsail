@@ -65,7 +65,7 @@ describe<{
 			abi: ConsensusAbi.abi,
 			eventName: "ValidatorRegistered",
 			data: receipt?.logs[0].data as Hex,
-			topics: receipt?.logs[0].topics,
+			topics: receipt?.logs[0].topics ?? [],
 		});
 
 		assert.equal(decoded.args, {
