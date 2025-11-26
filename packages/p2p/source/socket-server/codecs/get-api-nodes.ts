@@ -2,8 +2,8 @@ import { getApiNodes as proto } from "./proto/protos.js";
 
 export const getApiNodes = {
 	request: {
-		deserialize: (payload: Buffer): Record<string, any> => proto.GetApiNodesRequest.decode(payload),
-		serialize: (object: proto.GetApiNodesRequest): Buffer =>
+		deserialize: (payload: Buffer): proto.IGetApiNodesRequest => proto.GetApiNodesRequest.decode(payload),
+		serialize: (object: proto.IGetApiNodesRequest): Buffer =>
 			Buffer.from(proto.GetApiNodesRequest.encode(object).finish()),
 	},
 	response: {

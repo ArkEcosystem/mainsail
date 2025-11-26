@@ -2,7 +2,7 @@ import { getStatus as proto } from "./proto/protos.js";
 
 export const getStatus = {
 	request: {
-		deserialize: (payload: Buffer): Record<string, any> => proto.GetStatusRequest.decode(payload),
+		deserialize: (payload: Buffer): proto.IGetStatusRequest => proto.GetStatusRequest.decode(payload),
 		serialize: (object: proto.IGetStatusRequest): Buffer =>
 			Buffer.from(proto.GetStatusRequest.encode(object).finish()),
 	},

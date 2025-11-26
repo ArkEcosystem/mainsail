@@ -49,7 +49,9 @@ export class Service implements Contracts.P2P.Service {
 
 		await this.peerDiscoverer.populateSeedPeers();
 
-		for (const [version, peers] of Object.entries(groupBy(this.repository.getPeers(), (peer) => peer.version))) {
+		for (const [version, peers] of Object.entries(
+			groupBy(this.repository.getPeers(), (peer) => peer.version ?? "unknown"),
+		)) {
 			this.logger.info(`Discovered ${pluralize("peer", peers.length, true)} with v${version}.`, "p2p");
 		}
 

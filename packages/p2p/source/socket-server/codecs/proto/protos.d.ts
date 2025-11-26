@@ -2533,10 +2533,10 @@ export namespace shared {
         proposedBlockHash?: (string|null);
 
         /** Headers validatorsSignedPrevote */
-        validatorsSignedPrevote?: (boolean[]|null);
+        readonly validatorsSignedPrevote?: (readonly boolean[]|null);
 
         /** Headers validatorsSignedPrecommit */
-        validatorsSignedPrecommit?: (boolean[]|null);
+        readonly validatorsSignedPrecommit?: (readonly boolean[]|null);
     }
 
     /** Represents a Headers. */

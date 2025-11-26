@@ -24,7 +24,7 @@ export class ApiNodeVerifier implements Contracts.P2P.ApiNodeVerifier {
 			const t0 = dayjs();
 			apiNode.lastPinged = t0;
 
-			const response = await http.get(apiNode.url, {
+			const response = await http.get<{ data: string }>(apiNode.url, {
 				headers: {},
 				maxContentLength: apiNodesMaxContentLength,
 				timeout: 5000,
@@ -59,7 +59,7 @@ export class ApiNodeVerifier implements Contracts.P2P.ApiNodeVerifier {
 		}
 	}
 
-	#verifyResponseBody(response: HttpResponse): void {
+	#verifyResponseBody(response: HttpResponse<{ data: string }>): void {
 		if (response.data.data !== helloWorld.data) {
 			throw new Error("Invalid response body");
 		}

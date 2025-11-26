@@ -13,7 +13,7 @@ export const postProposal = {
 			Buffer.from(proto.PostProposalRequest.encode(object).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): Record<string, any> =>
+		deserialize: (payload: Buffer): proto.IPostProposalResponse =>
 			proto.PostProposalResponse.toObject(proto.PostProposalResponse.decode(payload), { defaults: true }),
 		serialize: (object: proto.IPostProposalResponse): Buffer =>
 			Buffer.from(proto.PostProposalResponse.encode(object).finish()),

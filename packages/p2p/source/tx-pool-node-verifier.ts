@@ -21,7 +21,7 @@ export class TxPoolNodeVerifier implements Contracts.P2P.TxPoolNodeVerifier {
 		}
 
 		try {
-			const response = await http.get(node.url, {
+			const response = await http.get<{ data: string }>(node.url, {
 				headers: {},
 				maxContentLength: 1 * Units.KILOBYTE,
 				timeout: 5000,
@@ -51,7 +51,7 @@ export class TxPoolNodeVerifier implements Contracts.P2P.TxPoolNodeVerifier {
 		}
 	}
 
-	#verifyResponseBody(response: HttpResponse): void {
+	#verifyResponseBody(response: HttpResponse<{ data: string }>): void {
 		if (response.data.data !== helloWorld.data) {
 			throw new Error("Invalid response body");
 		}

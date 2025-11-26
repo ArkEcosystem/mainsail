@@ -2,7 +2,7 @@ import { getPeers as proto } from "./proto/protos.js";
 
 export const getPeers = {
 	request: {
-		deserialize: (payload: Buffer): Record<string, any> => proto.GetPeersRequest.decode(payload),
+		deserialize: (payload: Buffer): proto.IGetPeersRequest => proto.GetPeersRequest.decode(payload),
 		serialize: (object: proto.IGetPeersRequest): Buffer =>
 			Buffer.from(proto.GetPeersRequest.encode(object).finish()),
 	},
