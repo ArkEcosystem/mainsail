@@ -48,7 +48,7 @@ export class Config {
 		return Object.keys(this.#store).includes(key);
 	}
 
-	public load(): any {
+	public load(): void {
 		try {
 			this.#store = readJSONSync(this.#file);
 

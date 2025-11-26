@@ -2,14 +2,14 @@ import { inject, injectable } from "@mainsail/container";
 
 import { Application } from "../contracts.js";
 import { Identifiers } from "../ioc/index.js";
-import { Prompt } from "./prompt.js";
+import { Choice, Prompt } from "./prompt.js";
 
 @injectable()
 export class AutoComplete {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
-	public async render(message: string, choices: any[], options: object = {}): Promise<string> {
+	public async render(message: string, choices: Choice[], options: object = {}): Promise<string> {
 		const { value } = await this.app.get<Prompt>(Identifiers.Prompt).render({
 			choices,
 			message,

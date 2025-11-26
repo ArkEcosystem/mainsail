@@ -5,7 +5,10 @@ import { Application } from "@mainsail/kernel";
 import type { AnyObject } from "../contracts.js";
 
 export const Builder = {
-	async buildApplication(context?: AnyObject): Promise<Contracts.Kernel.Application> {
+	async buildApplication(context?: {
+		flags: Contracts.Types.JsonObject;
+		plugins: Contracts.Types.JsonObject;
+	}): Promise<Contracts.Kernel.Application> {
 		const app: Contracts.Kernel.Application = new Application(new Container());
 
 		if (context) {
@@ -25,9 +28,9 @@ export const Builder = {
 		skipDiscovery: boolean;
 	} {
 		const config = {
-			disableDiscovery: flags.disableDiscovery,
-			ignoreMinimumNetworkReach: flags.ignoreMinimumNetworkReach,
-			skipDiscovery: flags.skipDiscovery,
+			disableDiscovery: flags.disableDiscovery as boolean,
+			ignoreMinimumNetworkReach: flags.ignoreMinimumNetworkReach as boolean,
+			skipDiscovery: flags.skipDiscovery as boolean,
 		};
 
 		if (flags.launchMode === "seed") {

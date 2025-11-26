@@ -4,13 +4,15 @@ import type { Contracts } from "@mainsail/contracts";
 import { ActionFactory } from "../action-factory.js";
 import { ComponentFactory } from "../component-factory.js";
 import { Box } from "../components/index.js";
-import { Application, InputValue } from "../contracts.js";
+import { Application, InputValue, InputValues } from "../contracts.js";
 import { InputDefinition } from "../input/definition.js";
 import { Input } from "../input/index.js";
 import { Identifiers } from "../ioc/index.js";
 import { Output } from "../output/index.js";
 import { Config, Environment } from "../services/index.js";
 import { CommandHelp } from "./command-help.js";
+
+export type CommandList = Record<string, Command>;
 
 @injectable()
 export abstract class Command {
@@ -41,7 +43,7 @@ export abstract class Command {
 
 	public isHidden = false;
 
-	protected definition: InputDefinition = new InputDefinition();
+	public definition: InputDefinition = new InputDefinition();
 
 	protected input!: Input;
 
@@ -88,12 +90,12 @@ export abstract class Command {
 		this.app.get<Box>(Identifiers.Box).render(this.app.resolve(CommandHelp).render(this));
 	}
 
-	public getArguments(): Record<string, any> {
+	public getArguments(): InputValues {
 		return this.input.getArguments();
 	}
 
 	public getArgument(name: string): string {
-		return this.input.getArgument(name);
+		return this.input.getArgument(name) as string;
 	}
 
 	public setArgument(name: string, value: InputValue): void {
@@ -104,8 +106,8 @@ export abstract class Command {
 		return this.input.hasArgument(name);
 	}
 
-	public getFlags(): Record<string, any> {
-		return this.input.getFlags();
+	public getFlags<T = InputValues>(): T {
+		return this.input.getFlags() as T;
 	}
 
 	public getFlag<T = InputValue>(name: string): T {
