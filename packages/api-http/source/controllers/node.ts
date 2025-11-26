@@ -108,7 +108,10 @@ export class NodeController extends Controller {
 
 		for (const key of keys) {
 			if (plugins[key] && plugins[key].configuration.enabled) {
-				const { configuration } = plugins[key];
+				const { configuration } = plugins[key] as unknown as {
+					configuration: { port: string; server: { enabled: boolean; port: string } };
+				};
+
 				if (configuration.server && configuration.server.enabled) {
 					result[key] = +configuration.server.port;
 					continue;

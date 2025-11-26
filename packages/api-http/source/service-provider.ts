@@ -5,6 +5,7 @@ import Joi from "joi";
 import Handlers from "./handlers.js";
 import { Identifiers as ApiIdentifiers } from "./identifiers.js";
 import { Server } from "./server.js";
+import { NamedPlugin, Plugin } from "@hapi/hapi";
 
 @injectable()
 export class ServiceProvider extends AbstractServiceProvider<Server> {
@@ -20,11 +21,11 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 		return Server;
 	}
 
-	protected getHandlers(): any {
-		return Handlers;
+	protected getHandlers(): NamedPlugin<unknown> {
+		return Handlers as unknown as NamedPlugin<unknown>;
 	}
 
-	protected getPlugins(): any[] {
+	protected getPlugins(): Plugin<unknown>[] {
 		const config = this.config().getRequired<{
 			trustProxy: boolean;
 			whitelist: string[];
@@ -70,7 +71,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				plugin: Plugins.pagination,
 			},
 			{ plugin: Plugins.responseHeaders },
-		];
+		] as unknown as Plugin<unknown>[];
 	}
 
 	public configSchema(): Joi.ObjectSchema {
