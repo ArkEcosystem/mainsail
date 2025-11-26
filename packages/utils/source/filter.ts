@@ -18,7 +18,7 @@ export const filter = <T>(
 	// iterable is Record<string, T>
 	const object = iterable as Record<string, T>;
 
-	return filterObject(object, ((value, key, obj) => iteratee(value, key, obj)) as FunctionReturning<
+	return filterObject(object, ((value, key, object_) => iteratee(value, key, object_)) as FunctionReturning<
 		[T, string, Record<string, T>],
 		unknown
 	>);

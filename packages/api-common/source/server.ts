@@ -1,7 +1,7 @@
 import Boom from "@hapi/boom";
 import {
-	Server as HapiServer,
 	Plugin,
+	Server as HapiServer,
 	ServerInjectOptions,
 	ServerInjectResponse,
 	ServerRegisterPluginObject,

@@ -1,5 +1,4 @@
-import type { AnySchemaObject, ErrorObject, FormatDefinition, KeywordDefinition, Schema } from "ajv";
-import type { Ajv } from "ajv";
+import type { Ajv, AnySchemaObject, ErrorObject, FormatDefinition, KeywordDefinition, Schema } from "ajv";
 
 export interface SchemaValidationResult<T = unknown> {
 	value: T;
