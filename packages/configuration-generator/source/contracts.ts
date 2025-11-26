@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
-type PartialRecord<K extends keyof any, T> = {
+type PartialRecord<K extends PropertyKey, T> = {
 	[P in K]?: T;
 };
 

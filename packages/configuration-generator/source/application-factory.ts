@@ -41,7 +41,7 @@ import { Identifiers as InternalIdentifiers } from "./identifiers.js";
 
 export const makeApplication = async (
 	configurationPath: string,
-	options: Record<string, any> = {},
+	options: Record<string, unknown> = {},
 ): Promise<Application> => {
 	options = { address: "keccak256", name: "mainsail", ...options };
 
@@ -59,7 +59,7 @@ export const makeApplication = async (
 	app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({
 		existsSync: () => true,
 		get: (path: string) => readFileSync(path),
-		readJSONSync: (file: string, options?: Record<string, any>) => readJSONSync(file, options),
+		readJSONSync: (file: string, options?: Record<string, unknown>) => readJSONSync(file, options),
 	});
 	setGracefulCleanup();
 	app.rebind("path.data").toConstantValue(dirSync().name);
