@@ -36,7 +36,8 @@ describe<{
 		assert.equal(result.value, 123);
 		assert.equal(result.error, "data must be string");
 		assert.array(result.errors);
-		assert.length(result.errors, 1);
+		assert.defined(result.errors);
+		assert.length(result.errors!, 1);
 	});
 
 	it("#validate - should pass, when additionalProperties are enabled", ({ validator }) => {
