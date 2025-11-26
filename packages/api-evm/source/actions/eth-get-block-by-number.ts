@@ -6,7 +6,9 @@ import { BlockResource } from "../resources/index.js";
 import { resolveBlockTag } from "../utils/resolve-block-tag.js";
 
 @injectable()
-export class EthGetBlockByNumberAction implements Contracts.Api.RPC.Action {
+export class EthGetBlockByNumberAction
+	implements Contracts.Api.RPC.Action<[string | Contracts.Crypto.BlockTag, boolean]>
+{
 	public readonly name: string = "eth_getBlockByNumber";
 
 	@inject(Identifiers.Application.Instance)

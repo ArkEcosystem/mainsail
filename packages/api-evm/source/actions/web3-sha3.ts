@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Hex, keccak256 } from "viem";
 
 @injectable()
-export class Web3Sha3 implements Contracts.Api.RPC.Action {
+export class Web3Sha3 implements Contracts.Api.RPC.Action<[string]> {
 	public readonly name: string = "web3_sha3";
 
 	public readonly schema = {

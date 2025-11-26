@@ -36,6 +36,7 @@ import {
 import Handlers from "./handlers.js";
 import { Server } from "./server.js";
 import { makeKeywords, schemas } from "./validation/index.js";
+import { NamedPlugin, Plugin } from "@hapi/hapi";
 
 @injectable()
 export class ServiceProvider extends AbstractServiceProvider<Server> {
@@ -65,13 +66,13 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 		return Server;
 	}
 
-	protected getHandlers(): any {
-		return Handlers;
+	protected getHandlers(): NamedPlugin<unknown> {
+		return Handlers as unknown as NamedPlugin<unknown>;
 	}
 
 	public async boot(): Promise<void> {}
 
-	protected getPlugins(): any[] {
+	protected getPlugins(): Plugin<unknown>[] {
 		const config = this.config().getRequired<{
 			trustProxy: boolean;
 			whitelist: string[];
@@ -103,7 +104,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 			{
 				plugin: Plugins.rpcResponseHandler,
 			},
-		];
+		] as unknown as Plugin<unknown>[];
 	}
 
 	protected getActions(): Contracts.Api.RPC.Action[] {
@@ -135,7 +136,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 			this.app.resolve(NetVersion),
 			this.app.resolve(Web3ClientVersionAction),
 			this.app.resolve(Web3Sha3),
-		];
+		] as Contracts.Api.RPC.Action[];
 	}
 
 	public configSchema(): Joi.ObjectSchema {

@@ -4,7 +4,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { RpcError } from "@mainsail/exceptions";
 
 @injectable()
-export class EthGetUncleCountByBlockHash implements Contracts.Api.RPC.Action {
+export class EthGetUncleCountByBlockHash implements Contracts.Api.RPC.Action<[string]> {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
