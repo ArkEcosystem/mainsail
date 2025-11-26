@@ -1,4 +1,4 @@
-import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
+import { Commands, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { http } from "@mainsail/utils";
 import { createWriteStream, existsSync, readFileSync, writeFileSync } from "fs";
@@ -30,6 +30,15 @@ const URI_OPTIONS: Joi.UriOptions = {
 	scheme: ["http", "https", "file"],
 };
 
+interface Flags {
+	readonly overwrite?: boolean;
+	readonly app: string;
+	readonly peers: string;
+	readonly crypto: string;
+	readonly snapshot: string;
+	readonly reset?: boolean;
+}
+
 @injectable()
 export class Command extends Commands.Command {
 	@inject(Identifiers.Environment)
@@ -54,7 +63,7 @@ export class Command extends Commands.Command {
 		await this.#publish({ ...this.getFlags() });
 	}
 
-	async #publish(flags: Contracts.AnyObject): Promise<void> {
+	async #publish(flags: Flags): Promise<void> {
 		if (!flags.overwrite && (!flags.app || !flags.crypto)) {
 			throw new Error("You must provide the --app and --crypto flags to publish the configuration.");
 		}
@@ -188,7 +197,7 @@ export class Command extends Commands.Command {
 				return data;
 			}
 
-			const { data } = await http.get(url);
+			const { data } = await http.get<string>(url);
 			return data;
 		} catch (error) {
 			console.error(`Error fetching file from ${url}:`, error);

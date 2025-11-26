@@ -1,11 +1,16 @@
 import { Keystore } from "@chainsafe/bls-keystore";
-import { Commands, Contracts } from "@mainsail/cli";
+import { Commands } from "@mainsail/cli";
 import { injectable, postConstruct } from "@mainsail/container";
 import { ServiceProvider as CryptoServiceProvider } from "@mainsail/crypto-config";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-bls12-381";
 import { validateMnemonic } from "bip39";
 import { writeJSONSync } from "fs-extra/esm";
 import Joi from "joi";
+
+interface Flags {
+	readonly bip39: string;
+	readonly password: string;
+}
 
 @injectable()
 export class Command extends Commands.Command {
@@ -64,7 +69,7 @@ export class Command extends Commands.Command {
 		return this.performConfiguration({ ...this.getFlags(), ...response });
 	}
 
-	private async performConfiguration(flags: Contracts.AnyObject): Promise<void> {
+	private async performConfiguration(flags: Flags): Promise<void> {
 		let keystore: Keystore | undefined;
 
 		await this.components.taskList([
