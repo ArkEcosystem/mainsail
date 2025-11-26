@@ -1,17 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
-import cloneDeep from "lodash.clonedeep";
-
-export const injectMilestone = (
-	index: number,
-	milestone: Record<string, any>,
-	configuration: Contracts.Crypto.Configuration,
-): void =>
-	(configuration as any).milestones.splice(index, 0, {
-		...cloneDeep(configuration.getMilestone()),
-		...milestone,
-	});
 
 export const getLastHeight = (app: Contracts.Kernel.Application): number =>
 	app.get<Contracts.State.Store>(Identifiers.State.Store).getBlockNumber();

@@ -9,13 +9,25 @@ import type { FactoryBuilder } from "../factory-builder.js";
 import { generateApp } from "./generate-app.js";
 import { GAS_PRICE } from "./transaction.js";
 
+type Options = {
+	getPreviousBlock?: () => Contracts.Crypto.BlockData;
+	transactions?: Contracts.Crypto.Transaction[];
+	transactionsCount?: number;
+	nonce?: string;
+	passphrase?: string;
+	amount?: number;
+	fee?: number;
+	timestamp?: number;
+	reward?: string;
+};
+
 export const registerBlockFactory = async (
 	factory: FactoryBuilder,
 	config: Contracts.Crypto.NetworkConfigPartial,
 ): Promise<void> => {
 	const app = await generateApp(config);
 
-	factory.set("Block", async ({ options }): Promise<Contracts.Crypto.Commit> => {
+	factory.set("Block", async ({ options }: { options: Options }): Promise<Contracts.Crypto.Commit> => {
 		const previousBlock: Contracts.Crypto.BlockData = options.getPreviousBlock
 			? options.getPreviousBlock()
 			: await app
@@ -30,7 +42,7 @@ export const registerBlockFactory = async (
 		if (options.transactionsCount) {
 			const signer = new Signer(
 				app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).all()!,
-				options.nonce,
+				options.nonce ?? "0",
 			);
 
 			const genesisAddresses = (previousBlock.transactions ?? [])

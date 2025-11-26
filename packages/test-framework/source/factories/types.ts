@@ -1,10 +1,17 @@
 import type { Contracts } from "@mainsail/contracts";
 
-export type FactoryFunctionOptions = Record<string, any>;
+export type FactoryFunctionOptions = Record<string, unknown>;
 
-export type FactoryFunction = ({ entity, options }: { entity?: any; options: FactoryFunctionOptions }) => Promise<any>;
+export type FactoryFunction<
+	TEntity = unknown,
+	TResult = unknown,
+	TOptions extends FactoryFunctionOptions = FactoryFunctionOptions,
+> = (parameters: { entity?: TEntity; options: TOptions }) => Promise<TResult>;
 
-export type HookFunction = ({ entity, options }: { entity?: any; options: FactoryFunctionOptions }) => void;
+export type HookFunction<
+	TEntity = unknown,
+	TOptions extends FactoryFunctionOptions = FactoryFunctionOptions,
+> = (parameters: { entity?: TEntity; options: TOptions }) => void;
 
 export type TransactionOptions = {
 	nonce?: string;

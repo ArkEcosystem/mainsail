@@ -5,13 +5,19 @@ import { generateMnemonic } from "bip39";
 import type { FactoryBuilder } from "../factory-builder.js";
 import { generateApp } from "./generate-app.js";
 
+type Options = {
+	passphrase?: string;
+	keyType?: string;
+	app?: Contracts.Kernel.Application;
+};
+
 export const registerIdentityFactory = async (
 	factory: FactoryBuilder,
 	config: Contracts.Crypto.NetworkConfigPartial,
 ): Promise<void> => {
 	const app = await generateApp(config);
 
-	factory.set("Identity", async ({ options }) => {
+	factory.set("Identity", async ({ options }: { options: Options }) => {
 		const passphrase: string = options.passphrase || generateMnemonic();
 		const keyType = options.keyType || "wallet";
 		const application: Contracts.Kernel.Application = options.app || app;

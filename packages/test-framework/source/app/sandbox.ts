@@ -130,9 +130,9 @@ export class Sandbox {
 	}: {
 		name: string;
 		path: string;
-		klass: Contracts.Types.Class<any>;
+		klass: Contracts.Types.Class<Providers.ServiceProvider>;
 	}): Promise<this> {
-		const serviceProvider: Providers.ServiceProvider = this.app.resolve<any>(klass);
+		const serviceProvider: Providers.ServiceProvider = this.app.resolve<Providers.ServiceProvider>(klass);
 		// serviceProvider.setManifest(this.app.resolve(Providers.PluginManifest).discover(path)); // TODO: Check resolve path
 		serviceProvider.setConfig(await this.app.resolve(Providers.PluginConfiguration).discover(name, path));
 
