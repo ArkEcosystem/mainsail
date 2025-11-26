@@ -4,7 +4,7 @@ import type { Contracts } from "@mainsail/contracts";
 type ActionFunction<T> = (arguments_: T) => T;
 
 @injectable()
-export abstract class Action<T = any> {
+export abstract class Action<T = unknown> {
 	readonly #hooks = {
 		after: new Set<ActionFunction<T>>(),
 		before: new Set<ActionFunction<T>>(),

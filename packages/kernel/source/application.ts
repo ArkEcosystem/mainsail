@@ -53,7 +53,7 @@ export class Application implements Contracts.Kernel.Application {
 		await this.boot();
 	}
 
-	public config<T = any>(key: string, value?: T, defaultValue?: T): T | undefined {
+	public config<T = unknown>(key: string, value?: T, defaultValue?: T): T | undefined {
 		const config: ConfigRepository = this.get<ConfigRepository>(Identifiers.Config.Repository);
 
 		if (value) {
@@ -181,7 +181,7 @@ export class Application implements Contracts.Kernel.Application {
 
 			// Check for AggregateError
 			if ("errors" in error) {
-				errors = [...errors, ...(error as unknown as Record<string, any>).errors];
+				errors = [...errors, ...(error as unknown as { errors: Error[] }).errors];
 			}
 
 			for (const error of errors) {

@@ -124,7 +124,7 @@ export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 		return this.fsExtra.removeSync(path);
 	}
 
-	public readJSONSync<T>(file: string, options?: Record<string, any>): T {
+	public readJSONSync<T>(file: string, options?: Record<string, unknown>): T {
 		return this.fsExtra.readJSONSync(file, options);
 	}
 
