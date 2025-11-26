@@ -7,7 +7,7 @@ import { URL } from "url";
 import { isObject } from "./is-object.js";
 import { isUndefined } from "./is-undefined.js";
 
-const sendRequest = (method: string, url: string, options?: HttpOptions): Promise<HttpResponse> =>
+const sendRequest = <T>(method: string, url: string, options?: HttpOptions): Promise<HttpResponse<T>> =>
 	new Promise((resolve, reject) => {
 		if (!isObject(options)) {
 			options = {};
@@ -91,7 +91,7 @@ const sendRequest = (method: string, url: string, options?: HttpOptions): Promis
 					return reject(new HttpError(response));
 				}
 
-				return resolve(response);
+				return resolve(response as HttpResponse<T>);
 			});
 		});
 
@@ -117,11 +117,11 @@ export type HttpOptions = RequestOptions & {
 	body?: HttpBody;
 };
 
-export type HttpResponse = {
+export type HttpResponse<T = unknown> = {
 	method: string | undefined;
 	statusCode: number | undefined;
 	statusMessage: string | undefined;
-	data: any;
+	data: T;
 	headers: string[];
 };
 
@@ -157,9 +157,9 @@ export class HttpError extends Error {
 
 export const http = {
 	delete: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("DELETE", url, options),
-	get: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("GET", url, options),
+	get: <T>(url: string, options?: HttpOptions): Promise<HttpResponse<T>> => sendRequest("GET", url, options),
 	head: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("HEAD", url, options),
 	patch: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("PATCH", url, options),
-	post: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("POST", url, options),
+	post: <T>(url: string, options?: HttpOptions): Promise<HttpResponse<T>> => sendRequest("POST", url, options),
 	put: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("PUT", url, options),
 };

@@ -1,7 +1,7 @@
 import type { FunctionReturning } from "./internal/index.js";
 import { mapArray } from "./map-array.js";
 
-export const maxBy = <T>(iterable: T[], iteratee: FunctionReturning): T => {
+export const maxBy = <T>(iterable: T[], iteratee: FunctionReturning<[T], number>): T => {
 	const values: number[] = mapArray<T, number>(iterable, iteratee);
 
 	let index = 0;

@@ -1,11 +1,9 @@
-export const assign = <T>(target: T, ...sources: any[]): T => {
+export const assign = <T, S extends object[]>(target: T, ...sources: S): T & S[number] => {
 	for (const source of sources) {
-		const keys = Object.keys(source);
-
-		for (const key of keys) {
+		for (const key of Object.keys(source) as (keyof typeof source)[]) {
 			target[key] = source[key];
 		}
 	}
 
-	return target;
+	return target as T & S[number];
 };

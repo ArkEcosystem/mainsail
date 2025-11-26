@@ -1,22 +1,27 @@
+import type { ISortByObjectSorter } from "fast-sort";
 import { sort } from "fast-sort";
 
-import type { FunctionReturning, Iteratee } from "./internal/index.js";
-import { isFunction } from "./is-function.js";
-import { isString } from "./is-string.js";
+import type { Iteratee } from "./internal/index.js";
 import { map } from "./map.js";
 
-export const orderBy = <T>(values: T[], iteratees: Iteratee | Iteratee[], orders: string | string[]): T[] => {
-	if (isString(iteratees)) {
-		iteratees = [iteratees] as string[];
-	} else if (isFunction(iteratees)) {
-		iteratees = [iteratees] as FunctionReturning[];
-	}
+type SortDirection = "asc" | "desc";
 
-	if (isString(orders)) {
-		orders = [orders];
-	}
+const toSortDirection = (order: string | undefined): SortDirection => (order === "desc" ? "desc" : "asc");
 
-	return sort(values).by(
-		map(iteratees as any, (_: string, index: number) => ({ [orders[index]]: iteratees[index] })),
-	);
+export const orderBy = <T>(values: T[], iteratees: Iteratee<T> | Iteratee<T>[], orders: string | string[]): T[] => {
+	const iterArray: Iteratee<T>[] = Array.isArray(iteratees) ? iteratees : [iteratees];
+
+	const orderArray: string[] = Array.isArray(orders) ? orders : [orders];
+
+	const criteria = map<Iteratee<T>, ISortByObjectSorter<T>>(iterArray, (iter, index) => {
+		const direction = toSortDirection(orderArray[index]);
+
+		if (direction === "desc") {
+			return { desc: iter };
+		}
+
+		return { asc: iter };
+	});
+
+	return sort(values).by(criteria);
 };

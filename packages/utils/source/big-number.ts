@@ -99,6 +99,6 @@ export class BigNumber {
 			value = value.value;
 		}
 
-		return BigInt(value as any);
+		return BigInt(value);
 	}
 }

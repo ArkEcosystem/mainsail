@@ -11,7 +11,7 @@ export type Assert = {
 	buffer(value: unknown): asserts value is Buffer;
 	defined<T>(value: undefined | null | T): asserts value is NonNullable<T>;
 	number(value: unknown): asserts value is number;
-	object(value: unknown): asserts value is Record<string, any>;
+	object(value: unknown): asserts value is Record<string, unknown>;
 	string(value: unknown): asserts value is string;
 	symbol(value: unknown): asserts value is symbol;
 	undefined(value: unknown): asserts value is undefined;
@@ -25,7 +25,8 @@ export const assert: Assert = {
 	defined: <T>(value: undefined | null | T): asserts value is NonNullable<T> =>
 		assertType(value !== undefined && value !== null, "non-null and non-undefined"),
 	number: (value: unknown): asserts value is number => assertType(typeof value === "number", "number"),
-	object: (value: unknown): asserts value is Record<string, any> => assertType(typeof value === "object", "object"),
+	object: (value: unknown): asserts value is Record<string, unknown> =>
+		assertType(typeof value === "object", "object"),
 	string: (value: unknown): asserts value is string => assertType(typeof value === "string", "string"),
 	symbol: (value: unknown): asserts value is symbol => assertType(typeof value === "symbol", "symbol"),
 	undefined: (value: unknown): asserts value is undefined => assertType(value === undefined, "undefined"),
