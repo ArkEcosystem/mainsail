@@ -76,7 +76,7 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 ): Promise<Contracts.Crypto.Transaction> => {
 	// !! Overwrite verifier to accept invalid schema data
 	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
-	(builder as any).factory = sandbox.app.resolve(TransactionFactory);
+	(builder as unknown as { factory: TransactionFactory }).factory = sandbox.app.resolve(TransactionFactory);
 
 	if (options.multiSigKeys) {
 		throw new Error("unsupported");
