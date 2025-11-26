@@ -1,3 +1,4 @@
+import { NamedPlugin, Plugin } from "@hapi/hapi";
 import { Enums, Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -7,15 +8,15 @@ import Joi from "joi";
 import { AbstractServer } from "./server.js";
 import { Schemas } from "./validation/index.js";
 
-export type ServerConstructor<T extends AbstractServer> = new (...arguments_: any[]) => T;
+export type ServerConstructor<T extends AbstractServer> = new (...arguments_: unknown[]) => T;
 
 @injectable()
 export abstract class AbstractServiceProvider<T extends AbstractServer> extends Providers.ServiceProvider {
 	protected abstract httpIdentifier(): symbol;
 	protected abstract httpsIdentifier(): symbol;
 	protected abstract getServerConstructor(): ServerConstructor<T>;
-	protected abstract getHandlers(): any;
-	protected abstract getPlugins(): any[];
+	protected abstract getHandlers(): NamedPlugin<unknown>;
+	protected abstract getPlugins(): Plugin<unknown>[];
 	protected getActions(): Contracts.Api.RPC.Action[] {
 		return [];
 	}
@@ -95,9 +96,9 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 			},
 		});
 
-		await server.register(this.getPlugins());
+		await server.registerPlugins(this.getPlugins());
 
-		await server.register({
+		await server.registerHandlers({
 			plugin: this.getHandlers(),
 			routes: { prefix: "/api" },
 		});

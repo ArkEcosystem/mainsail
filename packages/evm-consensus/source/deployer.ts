@@ -63,7 +63,7 @@ export class Deployer {
 				commitKey,
 				getBlock: () => ({ header: { ...commitKey, number: commitKey.blockNumber } }),
 				setAccountUpdates: () => ({}),
-			} as any);
+			} as unknown as Contracts.Processor.ProcessableUnit);
 		}
 	}
 

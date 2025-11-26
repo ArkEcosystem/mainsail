@@ -6,8 +6,8 @@ import { Assertion, equal, fixture, instance, is, match, not, ok, throws, type, 
 import type { ZodRawShape } from "zod";
 import { z } from "zod";
 
-interface Constructable {
-	new (...arguments_: any): any;
+interface Constructable<T = unknown> {
+	new (...arguments_: unknown[]): T;
 }
 
 type BigIntLike = {
@@ -43,7 +43,13 @@ export const assert = {
 	},
 	containValues: (value: object, key: string): void => assert.false(Object.values(value).includes(key)),
 	defined: (value: unknown): void => ok(value !== undefined, "Expected value to be defined."),
-	empty: (value: any): void => ok(!value || value.length === 0 || Object.keys(value).length === 0),
+	empty: (value: string | unknown[] | Record<string, unknown> | null | undefined): void =>
+		ok(
+			!value ||
+				(typeof value === "string" && value.length === 0) ||
+				(Array.isArray(value) && value.length === 0) ||
+				(typeof value === "object" && !Array.isArray(value) && Object.keys(value).length === 0),
+		),
 	equal: (a: unknown, b: unknown): void => {
 		equal(normalize(a), normalize(b));
 	},

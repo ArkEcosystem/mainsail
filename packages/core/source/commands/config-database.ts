@@ -2,6 +2,14 @@ import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import Joi from "joi";
 
+interface Flags {
+	readonly host: string;
+	readonly port: number;
+	readonly database: string;
+	readonly username: string;
+	readonly password: string;
+}
+
 @injectable()
 export class Command extends Commands.Command {
 	@inject(Identifiers.Environment)
@@ -77,10 +85,10 @@ export class Command extends Commands.Command {
 			this.components.fatal("You'll need to confirm the input to continue.");
 		}
 
-		this.environment.updateVariables(environmentFile, this.#confirm(response));
+		this.environment.updateVariables(environmentFile, this.#confirm(response as unknown as Flags));
 	}
 
-	#confirm(flags: Contracts.AnyObject): Contracts.AnyObject {
+	#confirm(flags: Flags): Contracts.AnyObject {
 		const variables: Contracts.AnyObject = {};
 
 		for (const option of this.#validFlags) {

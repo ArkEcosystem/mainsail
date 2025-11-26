@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 
 import { Application } from "../application.js";
-import { InputValue, InputValues } from "../contracts.js";
+import { InputArguments, InputValue, InputValues } from "../contracts.js";
 import { Identifiers } from "../ioc/index.js";
 import { InputDefinition } from "./definition.js";
 import { InputParser } from "./parser.js";
@@ -44,11 +44,11 @@ export class Input {
 			this.args[key] = values[index];
 		}
 
-		this.flags = this.#rawFlags;
+		this.flags = this.#rawFlags as InputValues;
 	}
 
 	public validate(): void {
-		const definitionToSchema = (definition: InputValues): object => {
+		const definitionToSchema = (definition: InputArguments): object => {
 			const schema: object = {};
 
 			for (const [key, value] of Object.entries(definition)) {
@@ -59,10 +59,16 @@ export class Input {
 		};
 
 		if (Object.keys(this.args).length > 0) {
-			this.args = this.validator.validate(this.args, definitionToSchema(this.#definition.getArguments()));
+			this.args = this.validator.validate(
+				this.args,
+				definitionToSchema(this.#definition.getArguments()),
+			) as InputValues;
 		}
 
-		this.flags = this.validator.validate(this.flags, definitionToSchema(this.#definition.getFlags()));
+		this.flags = this.validator.validate(
+			this.flags,
+			definitionToSchema(this.#definition.getFlags()),
+		) as InputValues;
 	}
 
 	public getArguments(values?: object): InputValues {
@@ -86,7 +92,7 @@ export class Input {
 	}
 
 	public getFlag<T = InputValue>(name: string): T {
-		return this.flags[name];
+		return this.flags[name] as T;
 	}
 
 	public setFlag(name: string, value: InputValue): void {

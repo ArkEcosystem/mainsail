@@ -1,13 +1,13 @@
-import type { AnySchemaObject, ErrorObject, FormatDefinition, KeywordDefinition, Schema } from "ajv";
+import type { Ajv, AnySchemaObject, ErrorObject, FormatDefinition, KeywordDefinition, Schema } from "ajv";
 
-export interface SchemaValidationResult<T = any> {
+export interface SchemaValidationResult<T = unknown> {
 	value: T;
-	error: any;
+	error?: string;
 	errors?: ErrorObject[] | undefined;
 }
 
 export interface Validator {
-	validate<T = any>(schemaKeyReference: string | Schema, data: T): SchemaValidationResult<T>;
+	validate<T = unknown>(schemaKeyReference: string | Schema, data: T): SchemaValidationResult<T>;
 
 	addFormat(name: string, format: FormatDefinition<string> | FormatDefinition<number>): void;
 	addKeyword(definition: KeywordDefinition): void;
@@ -18,5 +18,5 @@ export interface Validator {
 	removeKeyword(keyword: string): void;
 	removeSchema(keyReference: string): void;
 
-	extend(callback: (ajv: any /* TODO Ajv */) => void): void;
+	extend(callback: (ajv: Ajv) => void): void;
 }

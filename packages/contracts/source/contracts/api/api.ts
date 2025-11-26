@@ -15,7 +15,6 @@ export type ServerType = Enums.Api.ServerType;
 
 export interface ServerState {
 	app: Application;
-	schemas: any;
 	rpc: Processor;
 }
 

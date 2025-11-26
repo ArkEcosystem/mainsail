@@ -1,6 +1,7 @@
 import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 
-import { ProcessDescription, ProcessIdentifier, ProcessState } from "../contracts.js";
+import { AnyObject, ProcessDescription, ProcessIdentifier, ProcessState } from "../contracts.js";
 import { execa, Result, SyncResult } from "../execa.js";
 import { Flags } from "../utils/flags.js";
 
@@ -37,14 +38,14 @@ export class ProcessManager {
 			return undefined;
 		}
 
-		return processes.find((process: ProcessDescription) => [process.id, process.name].includes(id));
+		return processes.find((process: ProcessDescription) => [process.pid, process.name].includes(id));
 	}
 
-	public start(options: Record<string, any>, flags: Record<string, any>): SyncResult {
+	public start(options: Contracts.Types.JsonObject, flags: AnyObject): SyncResult {
 		let command = `pm2 start ${options.script}`;
 
 		if (options.node_args) {
-			command += ` --node-args="${Flags.castFlagsToString(options.node_args)}"`;
+			command += ` --node-args="${Flags.castFlagsToString(options.node_args as unknown as AnyObject)}"`;
 		}
 
 		if (flags !== undefined && Object.keys(flags).length > 0) {
@@ -58,7 +59,7 @@ export class ProcessManager {
 		return this.#shellSync(command);
 	}
 
-	public stop(id: ProcessIdentifier, flags: Record<string, any> = {}): SyncResult {
+	public stop(id: ProcessIdentifier, flags: AnyObject = {}): SyncResult {
 		let command = `pm2 stop ${id}`;
 
 		if (Object.keys(flags).length > 0) {
@@ -68,7 +69,7 @@ export class ProcessManager {
 		return this.#shellSync(command);
 	}
 
-	public restart(id: ProcessIdentifier, flags: Record<string, any> = { "update-env": true }): SyncResult {
+	public restart(id: ProcessIdentifier, flags: AnyObject = { "update-env": true }): SyncResult {
 		let command = `pm2 restart ${id}`;
 
 		if (Object.keys(flags).length > 0) {

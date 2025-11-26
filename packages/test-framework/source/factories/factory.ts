@@ -63,11 +63,11 @@ export class Factory {
 
 		assert.string(initialState);
 
-		const function_: FactoryFunction | undefined = this.#states.get(initialState);
+		const function_ = this.#states.get(initialState) as FactoryFunction<TransactionBuilder, TransactionBuilder>;
 
 		assert.defined(function_);
 
-		let result: TransactionBuilder = await function_({
+		let result = await function_({
 			entity: undefined,
 			options: this.#modifiers.options,
 		});
@@ -76,7 +76,7 @@ export class Factory {
 
 		// We apply all states in order of insertion to guarantee consistency.
 		for (const state of states) {
-			const function_: FactoryFunction | undefined = this.#states.get(state);
+			const function_ = this.#states.get(state) as FactoryFunction<TransactionBuilder, TransactionBuilder>;
 
 			assert.defined(function_);
 

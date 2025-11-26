@@ -1,5 +1,5 @@
 import { Keystore } from "@chainsafe/bls-keystore";
-import { Commands, Contracts, Utils } from "@mainsail/cli";
+import { Commands, Utils } from "@mainsail/cli";
 import { injectable, postConstruct } from "@mainsail/container";
 import { assert } from "@mainsail/utils";
 import { existsSync } from "fs";
@@ -7,6 +7,17 @@ import { readJSONSync } from "fs-extra/esm";
 import Joi from "joi";
 import path from "path";
 import { URL } from "url";
+
+interface Flags {
+	readonly name: string;
+	readonly env: string;
+	readonly disableDiscovery: boolean;
+	readonly skipDiscovery: boolean;
+	readonly ignoreMinimumNetworkReach: boolean;
+	readonly launchMode: string;
+	readonly password: string;
+	readonly skipPrompts: boolean;
+}
 
 @injectable()
 export class Command extends Commands.Command {
@@ -30,7 +41,7 @@ export class Command extends Commands.Command {
 		const { name } = readJSONSync(path.resolve(new URL(".", import.meta.url).pathname, "../../package.json"));
 		assert.string(name);
 
-		const flags: Contracts.AnyObject = {
+		const flags = {
 			...this.getFlags(),
 			name: name.split("/")[1],
 		};
@@ -39,7 +50,7 @@ export class Command extends Commands.Command {
 			flags,
 			plugins: {
 				"@mainsail/p2p": Utils.Builder.buildPeerFlags(flags),
-				...(await this.buildValidatorConfiguration(flags)),
+				...(await this.buildValidatorConfiguration(flags as Flags)),
 			},
 		});
 
@@ -47,14 +58,14 @@ export class Command extends Commands.Command {
 		return new Promise(() => {});
 	}
 
-	async buildValidatorConfiguration(flags: Contracts.AnyObject): Promise<Record<string, any> | undefined> {
+	async buildValidatorConfiguration(flags: Flags): Promise<Record<string, unknown> | undefined> {
 		const validatorsConfig = this.app.getCorePath("config", "validators.json");
 
 		if (!existsSync(validatorsConfig)) {
 			return {};
 		}
 
-		const validators: Record<string, any> = readJSONSync(validatorsConfig);
+		const validators: { keystore?: string } = readJSONSync(validatorsConfig);
 		if (!validators.keystore) {
 			return {};
 		}
@@ -85,7 +96,7 @@ export class Command extends Commands.Command {
 				throw new Error("The password has to be a string.");
 			}
 
-			password = response.password;
+			password = response.password as string;
 		}
 
 		if (!(await Keystore.parse(validators.keystore).verifyPassword(password as string))) {

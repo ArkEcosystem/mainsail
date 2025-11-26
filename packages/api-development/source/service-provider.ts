@@ -1,3 +1,4 @@
+import { NamedPlugin, Plugin } from "@hapi/hapi";
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
 import { injectable } from "@mainsail/container";
 import Joi from "joi";
@@ -20,11 +21,11 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 		return Server;
 	}
 
-	protected getHandlers(): any {
-		return Handlers;
+	protected getHandlers(): NamedPlugin<unknown> {
+		return Handlers as unknown as NamedPlugin<unknown>;
 	}
 
-	protected getPlugins(): any[] {
+	protected getPlugins(): Plugin<unknown>[] {
 		const config = this.config().getRequired<{
 			trustProxy: boolean;
 			whitelist: string[];
@@ -68,7 +69,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				},
 				plugin: Plugins.pagination,
 			},
-		];
+		] as unknown as Plugin<unknown>[];
 	}
 
 	public configSchema(): Joi.ObjectSchema {

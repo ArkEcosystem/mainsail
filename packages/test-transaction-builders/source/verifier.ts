@@ -12,7 +12,7 @@ export class AcceptAnyTransactionVerifier implements Contracts.Crypto.Transactio
 	public async verifySchema(
 		data: Contracts.Crypto.TransactionData,
 		_: boolean,
-	): Promise<Contracts.Crypto.SchemaValidationResult> {
+	): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionData>> {
 		return {
 			error: undefined,
 			errors: undefined,

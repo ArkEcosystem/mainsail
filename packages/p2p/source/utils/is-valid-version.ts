@@ -15,7 +15,7 @@ export const isValidVersion = (app: Contracts.Kernel.Application, version: strin
 	const cryptoConfiguration: Contracts.Crypto.Configuration = app.get(Identifiers.Cryptography.Configuration);
 
 	let minimumVersions: string[];
-	const milestones: Record<string, any> = cryptoConfiguration.getMilestone();
+	const milestones = cryptoConfiguration.getMilestone();
 
 	const { p2p } = milestones;
 

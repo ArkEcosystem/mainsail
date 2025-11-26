@@ -59,7 +59,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 
 		const feeConsumed = this.feeCalculator.calculateConsumed(transaction.data.gasPrice, Number(receipt.gasUsed));
 		this.logger.debug(
-			`executed EVM call (status=${receipt.status}, from=${transaction.data.from} to=${transaction.data.to} gasUsed=${receipt.gasUsed} paidNativeFee=${formatCurrency(this.configuration, feeConsumed)} deployed=${receipt.contractAddress})`,
+			`executed EVM call (status=${receipt.status}, from=${transaction.data.from} to=${transaction.data.to} gasUsed=${receipt.gasUsed} paidNativeFee=${formatCurrency(this.configuration, feeConsumed)} deployed=${receipt.contractAddress ?? ""})`,
 			"consensus",
 		);
 

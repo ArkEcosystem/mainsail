@@ -25,7 +25,7 @@ export class Validator implements Contracts.Crypto.Validator {
 		formats.default(this.ajv_);
 	}
 
-	public validate<T = any>(schemaKeyReference: string | Schema, data: T): Contracts.Crypto.SchemaValidationResult<T> {
+	public validate<T>(schemaKeyReference: string | Schema, data: T): Contracts.Crypto.SchemaValidationResult<T> {
 		try {
 			this.ajv_.validate(schemaKeyReference, data);
 

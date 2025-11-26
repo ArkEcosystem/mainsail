@@ -55,7 +55,7 @@ export default [
 			"@typescript-eslint/no-base-to-string": "warn",
 			"@typescript-eslint/no-empty-function": "off",
 			"@typescript-eslint/no-empty-object": "off",
-			"@typescript-eslint/no-explicit-any": "off",
+			"@typescript-eslint/no-explicit-any": "error",
 			"@typescript-eslint/no-floating-promises": "error",
 			"@typescript-eslint/no-misused-promises": "warn",
 			"@typescript-eslint/no-non-null-asserted-optional-chain": "off",

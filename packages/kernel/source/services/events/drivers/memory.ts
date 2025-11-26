@@ -86,7 +86,7 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		return totalCount;
 	}
 
-	public async dispatch<T = any>(event: string, data?: T): Promise<void> {
+	public async dispatch<T = unknown>(event: string, data?: T): Promise<void> {
 		await Promise.resolve();
 
 		const resolvers: Array<Promise<void>> = [];
@@ -98,7 +98,7 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		await Promise.all(resolvers);
 	}
 
-	public async dispatchSeq<T = any>(event: string, data?: T): Promise<void> {
+	public async dispatchSeq<T = unknown>(event: string, data?: T): Promise<void> {
 		await Promise.resolve();
 
 		for (const listener of this.#getListenersByPattern(event)) {
@@ -106,23 +106,23 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		}
 	}
 
-	public dispatchSync<T = any>(event: string, data?: T): void {
+	public dispatchSync<T = unknown>(event: string, data?: T): void {
 		for (const listener of this.#getListenersByPattern(event)) {
 			listener.handle({ data, name: event });
 		}
 	}
 
-	public async dispatchMany<T = any>(events: Array<[string, T]>): Promise<void> {
+	public async dispatchMany<T = unknown>(events: Array<[string, T]>): Promise<void> {
 		await Promise.all(Object.values(events).map((value: [string, T]) => this.dispatch(value[0], value[1])));
 	}
 
-	public async dispatchManySeq<T = any>(events: Array<[string, T]>): Promise<void> {
+	public async dispatchManySeq<T = unknown>(events: Array<[string, T]>): Promise<void> {
 		for (const value of Object.values(events)) {
 			await this.dispatchSeq(value[0], value[1]);
 		}
 	}
 
-	public dispatchManySync<T = any>(events: Array<[string, T]>): void {
+	public dispatchManySync<T = unknown>(events: Array<[string, T]>): void {
 		for (const value of Object.values(events)) {
 			this.dispatchSync(value[0], value[1]);
 		}

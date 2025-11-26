@@ -55,7 +55,7 @@ export abstract class AbstractController {
 		}));
 	}
 
-	protected async respondWithResource(data, transformer): Promise<any> {
+	protected async respondWithResource(data, transformer): Promise<object> {
 		if (!data) {
 			return Boom.notFound();
 		}
@@ -93,7 +93,7 @@ export abstract class AbstractController {
 		return { ...resultsPage, results: items };
 	}
 
-	protected getEmptyPage(): Contracts.Api.ResultsPage<any> {
+	protected getEmptyPage(): Contracts.Api.ResultsPage<unknown> {
 		return { meta: { totalCountIsEstimate: false }, results: [], totalCount: 0 };
 	}
 }

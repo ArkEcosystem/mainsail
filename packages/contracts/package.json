@@ -28,7 +28,8 @@
 		"dayjs": "1.11.13",
 		"inversify": "7.10.3",
 		"joi": "18.0.0",
-		"type-fest": "4.41.0"
+		"type-fest": "4.41.0",
+		"viem": "2.33.1"
 	},
 	"devDependencies": {
 		"uvu": "0.5.6"

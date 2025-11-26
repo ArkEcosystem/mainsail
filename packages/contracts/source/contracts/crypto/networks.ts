@@ -59,7 +59,6 @@ export type MilestoneSnapshot = {
 export type Milestone = {
 	height: number;
 	roundValidators: number;
-	address: Record<string, any>;
 	block: MilestoneBlock;
 	epoch: string;
 	evmSpec: SpecId;
@@ -68,6 +67,7 @@ export type Milestone = {
 	satoshi: MilestoneSatoshi;
 	timeouts: MilestoneTimeouts;
 	snapshot?: MilestoneSnapshot;
+	p2p?: { minimumVersions?: string[] };
 	validatorRegistrationFee: string;
 };
 

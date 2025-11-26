@@ -25,11 +25,11 @@ export class Worker implements Contracts.Evm.Worker {
 		this.eventDispatcher.listen(Events.PeerEvent.Removed, this);
 	}
 
-	public registerEventHandler(event: string, callback: Contracts.Kernel.IPC.EventCallback<any>): void {
+	public registerEventHandler(event: string, callback: Contracts.Kernel.IPC.EventCallback): void {
 		this.ipcSubprocess.registerEventHandler(event, callback);
 	}
 
-	public handle(payload: { name: string; data: any }): void {
+	public handle(payload: { name: string; data: unknown }): void {
 		void this.setPeerCount(this.p2pRepository.getPeers().length);
 	}
 

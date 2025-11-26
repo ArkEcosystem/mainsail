@@ -1,3 +1,9 @@
+import type { BigNumberType } from "@mainsail/utils";
+
+export type ConditionPrimitive = string | number | boolean;
+export type ConditionBigNumberish = Exclude<BigNumberType, bigint>;
+export type ConditionRange = { min: ConditionBigNumberish; max: ConditionBigNumberish };
+
 export interface Webhook {
 	id?: string;
 	token?: string;
@@ -7,7 +13,7 @@ export interface Webhook {
 	enabled: boolean;
 	conditions: Array<{
 		key: string;
-		value: any;
+		value: ConditionPrimitive | ConditionBigNumberish | ConditionRange;
 		condition: string;
 	}>;
 }

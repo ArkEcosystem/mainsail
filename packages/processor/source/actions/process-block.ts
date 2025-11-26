@@ -5,10 +5,13 @@ import { Services } from "@mainsail/kernel";
 @injectable()
 export class ProcessBlockAction extends Services.Triggers.Action {
 	public async execute(
-		arguments_: Contracts.Kernel.ActionArguments,
+		arguments_: Contracts.Kernel.ActionArguments<{
+			blockProcessor: Contracts.Processor.BlockProcessor;
+			roundState: Contracts.Consensus.RoundState;
+		}>,
 	): Promise<Contracts.Processor.BlockProcessorResult> {
-		const blockProcessor: Contracts.Processor.BlockProcessor = arguments_.blockProcessor;
-		const roundState: Contracts.Consensus.RoundState = arguments_.roundState;
+		const blockProcessor = arguments_.blockProcessor;
+		const roundState = arguments_.roundState;
 
 		return blockProcessor.process(roundState);
 	}

@@ -6,7 +6,7 @@ import { assert } from "@mainsail/utils";
 import { ReceiptResource } from "../resources/index.js";
 
 @injectable()
-export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action {
+export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action<[string, boolean]> {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 

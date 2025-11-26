@@ -4,7 +4,7 @@ import { parse, stringify } from "envfile";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
-import { Paths } from "../contracts.js";
+import { InputValues, Paths } from "../contracts.js";
 import { envPaths as environmentPaths } from "../env-paths.js";
 import { Identifiers } from "../ioc/index.js";
 
@@ -37,7 +37,7 @@ export class Environment {
 		return paths;
 	}
 
-	public updateVariables(environmentFile: string, variables: Record<string, string | number>): void {
+	public updateVariables(environmentFile: string, variables: InputValues): void {
 		if (!existsSync(environmentFile)) {
 			throw new Error(`No environment file found at ${environmentFile}.`);
 		}

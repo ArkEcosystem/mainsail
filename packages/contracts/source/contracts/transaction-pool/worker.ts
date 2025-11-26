@@ -26,5 +26,5 @@ export interface Worker extends Omit<WorkerScriptHandler, "commit" | "getTransac
 	getQueueSize(): number;
 	kill(): Promise<number>;
 	getTransactionBytes(): Promise<Buffer[]>;
-	registerEventHandler(event: string, callback: EventCallback<any>): void;
+	registerEventHandler<T>(event: string, callback: EventCallback<T>): void;
 }

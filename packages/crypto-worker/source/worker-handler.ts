@@ -25,59 +25,84 @@ class WorkerImpl {
 
 	public async callConsensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
 		method: K,
-		arguments_: Parameters<Contracts.Crypto.Signature[K]>,
+		arguments_: Contracts.Kernel.IPC.MethodArguments<Contracts.Crypto.Signature, K>,
 	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
 		return this.#call(this.consensusSignature, method, arguments_);
 	}
 
 	public async callWalletSignawture<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
 		method: K,
-		arguments_: Parameters<Contracts.Crypto.Signature[K]>,
+		arguments_: Contracts.Kernel.IPC.MethodArguments<Contracts.Crypto.Signature, K>,
 	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
 		return this.#call(this.walletSignature, method, arguments_);
 	}
 
 	public async callTransactionFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.TransactionFactory>>(
 		method: K,
-		arguments_: Parameters<Contracts.Crypto.TransactionFactory[K]>,
+		arguments_: Contracts.Kernel.IPC.MethodArguments<Contracts.Crypto.TransactionFactory, K>,
 	): Promise<ReturnType<Contracts.Crypto.TransactionFactory[K]>> {
 		return this.#call(this.transactionFactory, method, arguments_);
 	}
 
 	public async callBlockFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.BlockFactory>>(
 		method: K,
-		arguments_: Parameters<Contracts.Crypto.BlockFactory[K]>,
+		arguments_: Contracts.Kernel.IPC.MethodArguments<Contracts.Crypto.BlockFactory, K>,
 	): Promise<ReturnType<Contracts.Crypto.BlockFactory[K]>> {
 		return this.#call(this.blockFactory, method, arguments_);
 	}
 
 	public async callPublicKeyFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.PublicKeyFactory>>(
 		method: K,
-		arguments_: Parameters<Contracts.Crypto.PublicKeyFactory[K]>,
+		arguments_: Contracts.Kernel.IPC.MethodArguments<Contracts.Crypto.PublicKeyFactory, K>,
 	): Promise<ReturnType<Contracts.Crypto.PublicKeyFactory[K]>> {
 		return this.#call(this.publicKeyFactory, method, arguments_);
 	}
 
-	async #call<T extends { [K in keyof T]: (...arguments_: any) => any }, K extends Contracts.Kernel.IPC.Requests<T>>(
+	async #call<T, K extends Contracts.Kernel.IPC.Requests<T> & keyof T>(
 		object: T,
 		method: K,
-		arguments_: Parameters<T[K]>,
-	): Promise<ReturnType<T[K]>> {
-		arguments_ = arguments_.map((argument) => {
-			if (argument?.type === "Buffer") {
+		arguments_: Contracts.Kernel.IPC.MethodArguments<T, K>,
+	): Promise<Contracts.Kernel.IPC.MethodReturn<T, K>> {
+		const normalizedArguments = (arguments_ as unknown[]).map((argument) => {
+			if (isBufferJson(argument)) {
 				return Buffer.from(argument.data);
 			}
 
-			if (Array.isArray(argument) && argument.length > 0 && argument[0]?.type === "Buffer") {
+			if (Array.isArray(argument) && argument.length > 0 && isBufferJson(argument[0])) {
 				return argument.map((item) => Buffer.from(item.data));
 			}
 
 			return argument;
-		}) as Parameters<T[K]>;
+		}) as Contracts.Kernel.IPC.MethodArguments<T, K>;
 
-		// @ts-ignore
-		return object[method](...arguments_);
+		if (typeof object[method] !== "function") {
+			throw new TypeError(`property "${method}" is not a function`);
+		}
+
+		return (
+			object[method] as (
+				...arguments__: Contracts.Kernel.IPC.MethodArguments<T, K>
+			) => Contracts.Kernel.IPC.MethodReturn<T, K>
+		)(...normalizedArguments);
 	}
+}
+
+type BufferJson = {
+	type: "Buffer";
+	data: Uint8Array | number[];
+};
+
+function isBufferJson(value: unknown): value is BufferJson {
+	if (typeof value !== "object" || value === null) {
+		return false;
+	}
+
+	const v = value as { type?: unknown; data?: unknown };
+	if (v.type !== "Buffer") {
+		return false;
+	}
+
+	return Array.isArray(v.data) || v.data instanceof Uint8Array;
 }
 
 export class WorkerScriptHandler implements Contracts.Crypto.WorkerScriptHandler {

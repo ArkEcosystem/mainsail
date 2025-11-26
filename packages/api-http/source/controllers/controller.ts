@@ -75,7 +75,7 @@ export class Controller extends AbstractController {
 			return null;
 		}
 
-		const promises: Promise<any>[] = [];
+		const promises: Promise<unknown>[] = [];
 		if (!state) {
 			promises.push(
 				(async () => {
@@ -87,18 +87,20 @@ export class Controller extends AbstractController {
 		if (!generator) {
 			promises.push(
 				(async () => {
-					generator = (await this.walletRepositoryFactory()
-						.createQueryBuilder()
-						.select()
-						.where("address = :address", { address: block.proposer })
-						.getOne()) ?? {
-						address: block.proposer,
-						attributes: {},
-						balance: "0",
-						nonce: "0",
-						publicKey: "",
-						updated_at: "0",
-					};
+					generator =
+						(await this.walletRepositoryFactory()
+							.createQueryBuilder()
+							.select()
+							.where("address = :address", { address: block.proposer })
+							.getOne()) ??
+						({
+							address: block.proposer,
+							attributes: {},
+							balance: "0",
+							nonce: "0",
+							publicKey: "",
+							updated_at: "0",
+						} as Models.Wallet);
 				})(),
 			);
 		}

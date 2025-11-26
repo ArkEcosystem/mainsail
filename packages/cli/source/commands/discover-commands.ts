@@ -1,9 +1,9 @@
 import { inject, injectable } from "@mainsail/container";
 import { lstatSync, readdirSync } from "fs";
 
-import { Application, CommandList } from "../contracts.js";
+import { Application } from "../contracts.js";
 import { Identifiers } from "../ioc/index.js";
-import { Command } from "./command.js";
+import { Command, CommandList } from "./command.js";
 
 @injectable()
 export class DiscoverCommands {

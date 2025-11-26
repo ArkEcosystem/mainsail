@@ -6,7 +6,7 @@ import { Environment } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
 
 @injectable()
-export class EthSendRawTransactionAction implements Contracts.Api.RPC.Action {
+export class EthSendRawTransactionAction implements Contracts.Api.RPC.Action<[string]> {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
@@ -22,7 +22,7 @@ export class EthSendRawTransactionAction implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: [string]): Promise<string> {
-		const response = await http.post(this.#getUrl(), {
+		const response = await http.post<{ data: Contracts.TransactionPool.ProcessorResult }>(this.#getUrl(), {
 			body: { transactions: [parameters[0].slice(2)] },
 		});
 
@@ -30,8 +30,11 @@ export class EthSendRawTransactionAction implements Contracts.Api.RPC.Action {
 			if (response.data.data.accept.length > 0) {
 				const tx = await this.transactionFactory.fromHex(parameters[0].slice(2));
 				return `0x${tx.hash}`;
-			} else {
-				throw new RpcError(response.data.errors[0].message);
+			}
+
+			const error = response.data.data.errors?.[0];
+			if (error) {
+				throw new RpcError(error.message);
 			}
 		}
 

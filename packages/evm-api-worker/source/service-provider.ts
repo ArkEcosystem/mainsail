@@ -13,7 +13,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	private readonly flags!: Contracts.Types.KeyValuePair;
 
 	public async register(): Promise<void> {
-		this.app.bind<() => Ipc.Subprocess<any>>(Identifiers.Evm.WorkerSubprocess.Factory).toFactory(() => () => {
+		this.app.bind<() => Ipc.Subprocess>(Identifiers.Evm.WorkerSubprocess.Factory).toFactory(() => () => {
 			const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {
 				stderr: true,
 				stdout: true,

@@ -7,7 +7,7 @@ import { Action } from "./action.js";
 
 @injectable()
 export class Triggers {
-	readonly #triggers: Map<string, Action<any>> = new Map<string, Action<any>>();
+	readonly #triggers: Map<string, Action<unknown>> = new Map<string, Action<unknown>>();
 
 	public bind<T>(name: string, action: Action<T>): Action<T> {
 		if (this.#triggers.has(name)) {
@@ -18,7 +18,7 @@ export class Triggers {
 			throw new InvalidArgumentException(`The given trigger [${name}] is reserved.`);
 		}
 
-		this.#triggers.set(name, action);
+		this.#triggers.set(name, action as Action<unknown>);
 
 		return action;
 	}
@@ -32,7 +32,7 @@ export class Triggers {
 
 		this.#triggers.delete(name);
 
-		return trigger;
+		return trigger as Action<T>;
 	}
 
 	public rebind<T>(name: string, action: Action<T>): Action<T> {
@@ -48,7 +48,7 @@ export class Triggers {
 
 		assert.defined(trigger);
 
-		return trigger;
+		return trigger as Action<T>;
 	}
 
 	// TODO: Check implementation

@@ -44,7 +44,7 @@ export class ConfigRepository implements Contracts.Kernel.Repository {
 		return true;
 	}
 
-	public merge(items: Contracts.Types.KeyValuePair): void {
+	public merge(items: Contracts.Types.JsonObject): void {
 		this.#items = { ...this.#items, ...items };
 	}
 }

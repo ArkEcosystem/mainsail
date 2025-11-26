@@ -132,7 +132,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 
 		await Promise.all(
 			block.transactions.map(async (serialized, index) => {
-				const transaction = await this.transactionDeserializer.deserialize(serialized as any);
+				const transaction = await this.transactionDeserializer.deserialize(serialized as unknown as Buffer);
 
 				if (index % 20 === 0) {
 					await sleep(0);

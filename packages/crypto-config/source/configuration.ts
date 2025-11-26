@@ -34,7 +34,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 		return this.#config;
 	}
 
-	public set<T = any>(key: string, value: T): void {
+	public set<T = unknown>(key: string, value: T): void {
 		if (!this.#config) {
 			this.#config = {
 				// @ts-ignore
@@ -54,13 +54,14 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 			this.#buildConstants();
 
-			this.#originalMilestones = (value as any).milestones;
+			// TODO: this doesn't make any sense?
+			this.#originalMilestones = (value as unknown as Contracts.Crypto.NetworkConfig).milestones;
 		} catch {
 			//
 		}
 	}
 
-	public get<T = any>(key: string): T {
+	public get<T = unknown>(key: string): T {
 		return get(this.#config, key);
 	}
 
@@ -169,7 +170,11 @@ export class Configuration implements Contracts.Crypto.Configuration {
 		};
 	}
 
-	public getMilestones(): any {
+	public getMilestones(): Contracts.Crypto.Milestone[] {
+		if (!this.#milestones) {
+			throw new Error(`Milestones are not initialized`);
+		}
+
 		return this.#milestones;
 	}
 

@@ -150,11 +150,11 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		this.configRepository.set("crypto", this.#loadFromLocation(["crypto.json"]));
 	}
 
-	#loadFromLocation(files: string[]): Contracts.Types.KeyValuePair {
+	#loadFromLocation(files: string[]): Contracts.Types.JsonObject {
 		for (const file of files) {
 			const fullPath: string = this.app.configPath(file);
 			if (existsSync(fullPath)) {
-				const config: Contracts.Types.KeyValuePair | undefined =
+				const config: Contracts.Types.JsonObject | undefined =
 					extname(fullPath) === ".json"
 						? JSON.parse(readFileSync(fullPath).toString())
 						: readFileSync(fullPath);

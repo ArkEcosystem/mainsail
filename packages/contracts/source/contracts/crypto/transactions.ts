@@ -11,7 +11,7 @@ export interface Transaction {
 	serialized: Buffer;
 }
 
-export type TransactionSchema = Record<string, any>;
+export type TransactionSchema = Record<string, unknown>;
 
 export interface TransactionData {
 	network: number;
@@ -79,7 +79,7 @@ export interface TransactionCryptoData {
 	readonly publicKey: string;
 	readonly address: string;
 	readonly legacyAddress?: string;
-	readonly schemaError?: any;
+	readonly schemaError?: string;
 }
 
 export interface TransactionServiceProvider {
@@ -89,7 +89,10 @@ export interface TransactionServiceProvider {
 export interface TransactionVerifier {
 	verifyHash(data: TransactionData): Promise<boolean>;
 
-	verifySchema(data: Omit<TransactionData, "hash">, strict?: boolean): Promise<SchemaValidationResult>;
+	verifySchema(
+		data: Omit<TransactionData, "hash">,
+		strict?: boolean,
+	): Promise<SchemaValidationResult<TransactionData>>;
 
 	verifyLegacySecondSignature(data: TransactionData, legacySecondPublicKey: string): Promise<boolean>;
 }
@@ -119,14 +122,6 @@ export interface TransactionFactory {
 	fromStorage(data: TransactionStorageData): Promise<Transaction>;
 
 	computeCryptoData(data: TransactionData): Promise<TransactionCryptoData>;
-}
-
-export type TransactionConstructor = any;
-
-export interface TransactionRegistry {
-	registerTransactionType(constructor: TransactionConstructor): void;
-
-	deregisterTransactionType(constructor: TransactionConstructor): void;
 }
 
 export interface TransactionUtilities {

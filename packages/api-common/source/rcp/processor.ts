@@ -27,7 +27,7 @@ export class Processor implements Contracts.Api.RPC.Processor {
 			return prepareRcpError(getRcpId(request), Enums.Api.RcpErrorCode.InvalidRequest);
 		}
 
-		const payload = request.payload as Contracts.Api.RPC.Request<any>;
+		const payload = request.payload as Contracts.Api.RPC.Request<[]>;
 		if (Array.isArray(payload)) {
 			return Promise.all(payload.map(async (rcpRequest) => await this.#processSingle(rcpRequest)));
 		} else {
@@ -36,7 +36,7 @@ export class Processor implements Contracts.Api.RPC.Processor {
 	}
 
 	async #processSingle(
-		rcpRequest: Contracts.Api.RPC.Request<any>,
+		rcpRequest: Contracts.Api.RPC.Request<[]>,
 	): Promise<Contracts.Api.RPC.Response | Contracts.Api.RPC.Error> {
 		const action = this.#actions.get(rcpRequest.method);
 		if (!action) {
@@ -70,7 +70,7 @@ export class Processor implements Contracts.Api.RPC.Processor {
 		return !error;
 	}
 
-	#validateParams(parameters: any, action: Contracts.Api.RPC.Action): boolean {
+	#validateParams(parameters: [], action: Contracts.Api.RPC.Action): boolean {
 		if (!action.schema.$id) {
 			return true;
 		}

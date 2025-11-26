@@ -1,16 +1,19 @@
 import type { FunctionReturning } from "./internal/index.js";
 
-export const groupBy = <T>(iterable: T[], iteratee: FunctionReturning): object => {
-	const groupedValues: object = {};
+export const groupBy = <T, K extends PropertyKey>(
+	iterable: T[],
+	iteratee: FunctionReturning<[T], K>,
+): Record<K, T[]> => {
+	const groupedValues = {} as Record<K, T[]>;
 
 	for (const value of iterable) {
-		const keyValue = iteratee(value);
+		const key = iteratee(value);
 
-		if (!groupedValues[keyValue]) {
-			groupedValues[keyValue] = [];
+		if (!groupedValues[key]) {
+			groupedValues[key] = [];
 		}
 
-		groupedValues[keyValue].push(value);
+		groupedValues[key].push(value);
 	}
 
 	return groupedValues;

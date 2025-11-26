@@ -29,7 +29,7 @@ export class Migrations implements ApiDatabaseContracts_Migrations {
 
 			// https://www.postgresql.org/docs/current/errcodes-appendix.html
 			// 42P07 	duplicate_table
-			if ((error as any).code !== "42P07") {
+			if (error["code"] !== "42P07") {
 				throw error;
 			}
 

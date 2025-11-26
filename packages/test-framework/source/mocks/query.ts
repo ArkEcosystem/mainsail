@@ -25,8 +25,8 @@ export class CustomQueryIterable implements Partial<Contracts.TransactionPool.Qu
 		}
 	}
 
-	public whereHash(hash: string): any {
-		return this;
+	public whereHash(hash: string): Contracts.TransactionPool.QueryIterable {
+		return this as unknown as Contracts.TransactionPool.QueryIterable;
 	}
 
 	public async has(): Promise<boolean> {

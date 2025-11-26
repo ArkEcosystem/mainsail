@@ -46,13 +46,13 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 		}
 	}
 
-	async populateApiNodesFromConfiguration(): Promise<any> {
+	async populateApiNodesFromConfiguration(): Promise<void> {
 		const apiNodes = this.configuration.getOptional<string[]>("apiNodes", []).map((url) => {
 			const normalizedUrl = normalizeUrl(url);
 			return this.ApiNodeFactory(normalizedUrl);
 		});
 
-		return Promise.all(
+		await Promise.all(
 			Object.values(apiNodes).map((apiNode: Contracts.P2P.ApiNode) =>
 				this.app.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service).call<{
 					apiNode: Contracts.P2P.ApiNode;
@@ -62,13 +62,13 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 		);
 	}
 
-	async discoverNewApiNodes(): Promise<any> {
+	async discoverNewApiNodes(): Promise<void> {
 		const peers = shuffle(this.peerRepository.getPeers()).slice(0, 5);
-		return Promise.all(peers.map((peer) => this.discoverApiNodes(peer)));
+		await Promise.all(peers.map((peer) => this.discoverApiNodes(peer)));
 	}
 
-	async refreshApiNodes(): Promise<any> {
-		return Promise.all(
+	async refreshApiNodes(): Promise<void> {
+		await Promise.all(
 			this.apiNodeRepository
 				.getApiNodes()
 				.filter((apiNode) =>

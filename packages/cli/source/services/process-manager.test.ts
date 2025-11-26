@@ -116,7 +116,7 @@ describe<{
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
-			stdout: '[{ "id": "stub", "pm2_env": { "status": "unknown" } }]',
+			stdout: '[{ "pid": "stub", "pm2_env": { "status": "unknown" } }]',
 		});
 
 		// Act...
@@ -132,7 +132,7 @@ describe<{
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
-			stdout: '[{ "id": "stub-other", "pm2_env": { "status": "unknown" } }]',
+			stdout: '[{ "pid": "stub-other", "pm2_env": { "status": "unknown" } }]',
 		});
 
 		// Act...
@@ -471,7 +471,7 @@ describe<{
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
-			stdout: '[{ "id": "stub", "pm2_env": { "status": "online" } }]',
+			stdout: '[{ "pid": "stub", "pm2_env": { "status": "online" } }]',
 		});
 
 		// Act...
@@ -501,7 +501,7 @@ describe<{
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
-			stdout: '[{ "id": "stub-other", "pm2_env": { "status": "online" } }]',
+			stdout: '[{ "pid": "stub-other", "pm2_env": { "status": "online" } }]',
 		});
 
 		// Act...
@@ -517,7 +517,7 @@ describe<{
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
-			stdout: '[{ "id": "stub", "pm2_env": { "status": "online" } }]',
+			stdout: '[{ "pid": "stub", "pm2_env": { "status": "online" } }]',
 		});
 
 		// Act...
@@ -533,7 +533,7 @@ describe<{
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
-			stdout: '[{ "id": "stub", "pm2_env": { "status": "stopped" } }]',
+			stdout: '[{ "pid": "stub", "pm2_env": { "status": "stopped" } }]',
 		});
 
 		// Act...
@@ -549,7 +549,7 @@ describe<{
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
-			stdout: '[{ "id": "stub", "pm2_env": { "status": "stopping" } }]',
+			stdout: '[{ "pid": "stub", "pm2_env": { "status": "stopping" } }]',
 		});
 
 		// Act...
@@ -565,7 +565,7 @@ describe<{
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
-			stdout: '[{ "id": "stub", "pm2_env": { "status": "waiting restart" } }]',
+			stdout: '[{ "pid": "stub", "pm2_env": { "status": "waiting restart" } }]',
 		});
 
 		// Act...
@@ -581,7 +581,7 @@ describe<{
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
-			stdout: '[{ "id": "stub", "pm2_env": { "status": "launching" } }]',
+			stdout: '[{ "pid": "stub", "pm2_env": { "status": "launching" } }]',
 		});
 
 		// Act...
@@ -597,7 +597,7 @@ describe<{
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
-			stdout: '[{ "id": "stub", "pm2_env": { "status": "errored" } }]',
+			stdout: '[{ "pid": "stub", "pm2_env": { "status": "errored" } }]',
 		});
 
 		// Act...
@@ -613,7 +613,7 @@ describe<{
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
-			stdout: '[{ "id": "stub", "pm2_env": { "status": "one-launch-status" } }]',
+			stdout: '[{ "pid": "stub", "pm2_env": { "status": "one-launch-status" } }]',
 		});
 
 		// Act...
@@ -629,7 +629,7 @@ describe<{
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
-			stdout: '[{ "id": "stub", "pm2_env": { "status": "unknown" } }]',
+			stdout: '[{ "pid": "stub", "pm2_env": { "status": "unknown" } }]',
 		});
 
 		// Act...
@@ -645,7 +645,7 @@ describe<{
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
-			stdout: '[{ "id": "stub", "pm2_env": { "status": "online" } }]',
+			stdout: '[{ "pid": "stub", "pm2_env": { "status": "online" } }]',
 		});
 
 		// Act...

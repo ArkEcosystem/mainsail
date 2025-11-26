@@ -3,7 +3,7 @@ import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
-export class EthGetBlockTransactionCountByNumber implements Contracts.Api.RPC.Action {
+export class EthGetBlockTransactionCountByNumber implements Contracts.Api.RPC.Action<[string]> {
 	public readonly name: string = "eth_getBlockTransactionCountByNumber";
 
 	@inject(Identifiers.Database.Service)

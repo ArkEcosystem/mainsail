@@ -1,1 +1,1 @@
-export type ActionArguments = Record<string, any>;
+export type ActionArguments<T = unknown> = T;

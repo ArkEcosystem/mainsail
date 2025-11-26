@@ -4,7 +4,7 @@ import type { Expression, JsonFieldAccessor } from "./types/expressions.js";
 
 export type SqlExpression = {
 	query: string;
-	parameters: Record<string, any>;
+	parameters: Record<string, unknown>;
 };
 
 export class QueryHelper<TEntity> {

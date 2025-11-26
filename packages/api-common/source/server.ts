@@ -1,5 +1,12 @@
 import Boom from "@hapi/boom";
-import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
+import {
+	Plugin,
+	Server as HapiServer,
+	ServerInjectOptions,
+	ServerInjectResponse,
+	ServerRegisterPluginObject,
+	ServerRoute,
+} from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -91,8 +98,11 @@ export abstract class AbstractServer {
 		}
 	}
 
-	// @todo: add proper types
-	public async register(plugins: any): Promise<void> {
+	public async registerPlugins<T = unknown>(plugins: Plugin<T>[]): Promise<void> {
+		await this.server.register(plugins);
+	}
+
+	public async registerHandlers<T = unknown>(plugins: ServerRegisterPluginObject<T>): Promise<void> {
 		return this.server.register(plugins);
 	}
 
@@ -113,16 +123,16 @@ export abstract class AbstractServer {
 	}
 
 	protected abstract pluginConfiguration(): Contracts.Kernel.PluginConfiguration;
-	protected abstract defaultOptions(): Record<string, any>;
+	protected abstract defaultOptions(): Record<string, unknown>;
 
-	private getServerOptions(options: Record<string, any>): object {
+	private getServerOptions(options: Record<string, unknown>): object {
 		options = { ...options };
 
 		delete options.enabled;
 
-		if (options.tls) {
-			options.tls.key = readFileSync(options.tls.key).toString();
-			options.tls.cert = readFileSync(options.tls.cert).toString();
+		if (options.tls && options.tls["key"]) {
+			options.tls["key"] = readFileSync(options.tls["key"]).toString();
+			options.tls["cert"] = readFileSync(options.tls["cert"]).toString();
 		}
 
 		options.debug = false;

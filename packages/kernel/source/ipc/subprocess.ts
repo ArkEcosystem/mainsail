@@ -3,13 +3,15 @@ import type { Contracts } from "@mainsail/contracts";
 import split from "split2";
 import type { Worker } from "worker_threads";
 
-export class Subprocess<T extends Record<string, any>> implements Contracts.Kernel.IPC.Subprocess<T> {
+export class Subprocess<T extends Record<string, unknown> = Record<string, unknown>>
+	implements Contracts.Kernel.IPC.Subprocess<T>
+{
 	#logLevels = new Set(LogLevels);
 
 	private lastId = 1;
 	private readonly subprocess: Worker;
 	private readonly callbacks = new Map<number, Contracts.Kernel.IPC.RequestCallbacks<T>>();
-	private readonly eventHandlers = new Map<string, Contracts.Kernel.IPC.EventCallback<any>>();
+	private readonly eventHandlers = new Map<string, Contracts.Kernel.IPC.EventCallback<string>>();
 
 	public constructor(
 		app: Contracts.Kernel.Application,
@@ -54,17 +56,17 @@ export class Subprocess<T extends Record<string, any>> implements Contracts.Kern
 	}
 
 	// TODO: use type magic to infer args (didn't work when T is also using same signatures)
-	public sendRequest(method: string, ...arguments_: unknown[]): Promise<void> {
+	public sendRequest<T>(method: string, ...arguments_: unknown[]): Promise<T> {
 		return new Promise((resolve, reject) => {
 			const id = this.lastId++;
-			this.callbacks.set(id, { reject, resolve });
+			this.callbacks.set(id, { reject, resolve } as unknown as Contracts.Kernel.IPC.RequestCallback);
 			// TODO: we have to make sure args are always serializable and ideally don't copy
 			this.subprocess.postMessage({ args: arguments_, id, method });
 		});
 	}
 
-	public registerEventHandler(event: string, callback: Contracts.Kernel.IPC.EventCallback<any>): void {
-		this.eventHandlers.set(event, callback);
+	public registerEventHandler<T>(event: string, callback: Contracts.Kernel.IPC.EventCallback<T>): void {
+		this.eventHandlers.set(event, callback as Contracts.Kernel.IPC.EventCallback<unknown>);
 	}
 
 	private onEmit(message: Contracts.Kernel.IPC.Event): void {
@@ -79,7 +81,7 @@ export class Subprocess<T extends Record<string, any>> implements Contracts.Kern
 		}
 	}
 
-	private onSubprocessMessage(message: Contracts.Kernel.IPC.Reply): void {
+	private onSubprocessMessage(message: Contracts.Kernel.IPC.Reply<void>): void {
 		if (!("id" in message)) {
 			return;
 		}
@@ -88,7 +90,7 @@ export class Subprocess<T extends Record<string, any>> implements Contracts.Kern
 			if ("error" in message) {
 				this.callbacks.get(message.id)?.reject(new Error(message.error));
 			} else {
-				this.callbacks.get(message.id)?.resolve(message.result);
+				this.callbacks.get(message.id)?.resolve(message.result as unknown as T);
 			}
 		} finally {
 			this.callbacks.delete(message.id);

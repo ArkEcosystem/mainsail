@@ -1,4 +1,4 @@
-import { Commands, Contracts, Identifiers } from "@mainsail/cli";
+import { Commands, Identifiers } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
 import boxen from "boxen";
 import { blue, bold, cyan } from "kleur/colors";
@@ -10,7 +10,7 @@ export class Command extends Commands.Command {
 	public description = "Displays detailed information on all commands available via CLI.";
 
 	public async execute(): Promise<void> {
-		const commands: Contracts.CommandList = this.app.get(Identifiers.Commands);
+		const commands: Commands.CommandList = this.app.get(Identifiers.Commands);
 
 		// figure out the longest signature
 		const signatures: string[] = Object.keys(commands);

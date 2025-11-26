@@ -15,7 +15,7 @@ type TxData = {
 };
 
 @injectable()
-export class CallAction implements Contracts.Api.RPC.Action {
+export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.Crypto.BlockTag]> {
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "rpc")
 	private readonly evm!: Contracts.Evm.Instance;
@@ -51,7 +51,7 @@ export class CallAction implements Contracts.Api.RPC.Action {
 		type: "array",
 	};
 
-	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<any> {
+	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<string> {
 		const [data] = parameters;
 		const milestone = this.configuration.getMilestone();
 

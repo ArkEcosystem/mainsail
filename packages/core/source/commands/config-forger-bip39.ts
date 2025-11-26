@@ -1,8 +1,12 @@
-import { Commands, Contracts } from "@mainsail/cli";
+import { Commands } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
 import { validateMnemonic } from "bip39";
 import { readJSONSync, writeJSONSync } from "fs-extra/esm";
 import Joi from "joi";
+
+interface Flags {
+	readonly bip39: string;
+}
 
 @injectable()
 export class Command extends Commands.Command {
@@ -39,7 +43,7 @@ export class Command extends Commands.Command {
 		}
 	}
 
-	private async performConfiguration(flags: Contracts.AnyObject): Promise<void> {
+	private async performConfiguration(flags: Flags): Promise<void> {
 		await this.components.taskList([
 			{
 				task: () => {

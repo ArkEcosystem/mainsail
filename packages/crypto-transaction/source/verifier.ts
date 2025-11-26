@@ -34,7 +34,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	public async verifySchema(
 		data: Contracts.Crypto.TransactionData,
 		strict: boolean,
-	): Promise<Contracts.Crypto.SchemaValidationResult> {
+	): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionData>> {
 		const { $id } = schemas.transaction;
 		return this.validator.validate(strict ? `${$id}Strict` : `${$id}`, data);
 	}

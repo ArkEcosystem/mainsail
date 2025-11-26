@@ -32,7 +32,12 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		}
 	}
 
-	public async emit(peer: Contracts.P2P.Peer, event: string, payload: Buffer, timeout?: number): Promise<any> {
+	public async emit(
+		peer: Contracts.P2P.Peer,
+		event: string,
+		payload: Buffer,
+		timeout?: number,
+	): Promise<{ payload: Buffer }> {
 		const connection: Client = await this.connect(peer);
 
 		if (timeout) {

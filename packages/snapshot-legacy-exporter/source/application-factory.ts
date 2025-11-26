@@ -1,5 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { Container } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CryptoValidation } from "@mainsail/crypto-validation";
@@ -13,7 +14,7 @@ import { Generator } from "./snapshot/generator.js";
 
 export const makeApplication = async (
 	configurationPath: string,
-	options: Record<string, any> = {},
+	options: Record<string, unknown> = {},
 ): Promise<Application> => {
 	options = { name: "mainsail", ...options };
 
@@ -38,7 +39,9 @@ export const makeApplication = async (
 	await app.resolve(Services.Log.ServiceProvider).register();
 
 	const logger = app.resolve(Logger);
-	logger.setConfig({ all: () => ({ levels: { console: "info" } }) } as unknown as any);
+	logger.setConfig({
+		all: () => ({ levels: { console: "info" } }),
+	} as unknown as Contracts.Kernel.PluginConfiguration);
 	await logger.register();
 
 	//

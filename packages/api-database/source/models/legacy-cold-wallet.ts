@@ -21,7 +21,7 @@ export class LegacyColdWallet {
 		nullable: true,
 		type: "jsonb",
 	})
-	public readonly attributes?: Record<string, any> | undefined;
+	public attributes: string | undefined;
 
 	@Column({
 		default: undefined,
