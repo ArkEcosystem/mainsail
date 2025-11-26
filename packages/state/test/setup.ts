@@ -5,8 +5,6 @@ import {
 	Deserializer as TransactionDeserializer,
 	Serializer,
 	TransactionFactory,
-	TransactionRegistry,
-	TransactionTypeFactory,
 	Utils,
 	Verifier,
 } from "@mainsail/crypto-transaction";
