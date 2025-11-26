@@ -1,8 +1,9 @@
 import type Hapi from "@hapi/hapi";
+import type { Contracts } from "@mainsail/contracts";
 
 import { BlockchainController } from "../controllers/blockchain.js";
 
-export const register = (server: Hapi.Server<any>): void => {
+export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(BlockchainController);
 	server.bind(controller);
 

@@ -1,4 +1,4 @@
-import type Hapi from "@hapi/hapi";
+import type { Contracts } from "@mainsail/contracts";
 
 import { register as apiNodeRegister } from "./routes/api-nodes.js";
 import { register as blockchainRegister } from "./routes/blockchain.js";
@@ -11,7 +11,7 @@ import { register as statisticRegister } from "./routes/statistic.js";
 
 const config = {
 	name: "Development API",
-	async register(server: Hapi.Server): Promise<void> {
+	async register(server: Contracts.Api.ApiServer): Promise<void> {
 		const handlers = [
 			{ register: apiNodeRegister },
 			{ register: blockchainRegister },

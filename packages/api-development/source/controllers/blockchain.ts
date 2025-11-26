@@ -1,10 +1,11 @@
+import type Hapi from "@hapi/hapi";
 import { injectable } from "@mainsail/container";
 
 import { Controller } from "./controller.js";
 
 @injectable()
 export class BlockchainController extends Controller {
-	public async index(): Promise<object> {
+	public async index(request: Hapi.Request): Promise<object> {
 		const { data } = this.stateStore.getLastBlock();
 
 		return {
