@@ -57,7 +57,7 @@ export class Logger implements Contracts.Kernel.Logger {
 		//
 	}
 
-	#log(level: string, message: any): void {
+	#log(level: string, message: string | Record<string, unknown>): void {
 		if (isEmpty(message)) {
 			return;
 		}
