@@ -19,11 +19,11 @@ export class Configuration {
 		nullable: false,
 		type: "jsonb",
 	})
-	public cryptoConfiguration!: Record<string, any>;
+	public cryptoConfiguration!: Record<string, unknown>;
 
 	@Column({
 		nullable: false,
 		type: "jsonb",
 	})
-	public activeMilestones!: Record<string, any>;
+	public activeMilestones!: Record<string, unknown>;
 }

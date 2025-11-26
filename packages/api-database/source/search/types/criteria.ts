@@ -60,7 +60,7 @@ export type WalletCriteria = {
 	publicKey?: OrEqualCriteria<string>;
 	balance?: OrNumericCriteria<string>;
 	nonce?: OrNumericCriteria<string>;
-	attributes?: OrContainsCriteria<Record<string, any>>;
+	attributes?: OrContainsCriteria<Record<string, unknown>>;
 };
 
 export type OrWalletCriteria = OrCriteria<WalletCriteria>;
@@ -98,7 +98,7 @@ export type ValidatorCriteria = {
 	production?: ValidatorProduction;
 	blocks?: ValidatorBlocks;
 
-	attributes?: OrContainsCriteria<Record<string, any>>;
+	attributes?: OrContainsCriteria<Record<string, unknown>>;
 };
 
 export type OrValidatorCriteria = OrCriteria<ValidatorCriteria>;

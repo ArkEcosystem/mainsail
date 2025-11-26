@@ -14,5 +14,5 @@ export class Plugin {
 		nullable: false,
 		type: "jsonb",
 	})
-	public configuration!: Record<string, any>;
+	public configuration!: Record<string, unknown>;
 }

@@ -34,7 +34,7 @@ export class Wallet {
 		nullable: true,
 		type: "jsonb",
 	})
-	public attributes!: Record<string, any> | undefined;
+	public attributes: string | undefined;
 
 	@Column({
 		nullable: false,

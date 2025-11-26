@@ -6,54 +6,54 @@ export type FalseExpression = {
 	op: "false";
 };
 
-export type EqualExpression<TEntity> = {
+export type EqualExpression<TEntity, TValue = unknown> = {
 	property: keyof TEntity;
 	jsonFieldAccessor?: JsonFieldAccessor;
 	op: "equal";
-	value: any;
+	value: TValue;
 };
 
-export type NotEqualExpression<TEntity> = {
+export type NotEqualExpression<TEntity, TValue = unknown> = {
 	property: keyof TEntity;
 	jsonFieldAccessor?: JsonFieldAccessor;
 	op: "notEqual";
-	value: any;
+	value: TValue;
 };
 
-export type BetweenExpression<TEntity> = {
+export type BetweenExpression<TEntity, TValue = unknown> = {
 	property: keyof TEntity;
 	jsonFieldAccessor?: JsonFieldAccessor;
 	op: "between";
-	from: any;
-	to: any;
+	from: TValue;
+	to: TValue;
 };
 
-export type GreaterThanEqualExpression<TEntity> = {
+export type GreaterThanEqualExpression<TEntity, TValue = unknown> = {
 	property: keyof TEntity;
 	jsonFieldAccessor?: JsonFieldAccessor;
 	op: "greaterThanEqual";
-	value: any;
+	value: TValue;
 };
 
-export type LessThanEqualExpression<TEntity> = {
+export type LessThanEqualExpression<TEntity, TValue = unknown> = {
 	property: keyof TEntity;
 	jsonFieldAccessor?: JsonFieldAccessor;
 	op: "lessThanEqual";
-	value: any;
+	value: TValue;
 };
 
-export type LikeExpression<TEntity> = {
+export type LikeExpression<TEntity, TValue = unknown> = {
 	property: keyof TEntity;
 	jsonFieldAccessor?: JsonFieldAccessor;
 	op: "like";
-	pattern: any;
+	pattern: TValue;
 };
 
-export type ContainsExpression<TEntity> = {
+export type ContainsExpression<TEntity, TValue = unknown> = {
 	property: keyof TEntity;
 	jsonFieldAccessor?: JsonFieldAccessor;
 	op: "contains";
-	value: any;
+	value: TValue;
 };
 
 export type AndExpression<TEntity> = {
