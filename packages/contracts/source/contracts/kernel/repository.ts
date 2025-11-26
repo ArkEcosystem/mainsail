@@ -1,4 +1,4 @@
-import type { JsonObject, KeyValuePair } from "../types/index.js";
+import type { JsonObject } from "../types/index.js";
 
 export interface Repository {
 	all(): JsonObject;
@@ -13,5 +13,5 @@ export interface Repository {
 
 	hasAll<T>(keys: string[]): boolean;
 
-	merge(items: KeyValuePair): void;
+	merge(items: JsonObject): void;
 }

@@ -1,3 +1,5 @@
+import type { WriteFileOptions } from "fs";
+
 export interface Filesystem {
 	make(): Promise<Filesystem>;
 
@@ -25,13 +27,20 @@ export interface Filesystem {
 
 	deleteDirectory(directory: string): Promise<boolean>;
 
-	writeFileSync(file: string, data: string | NodeJS.ArrayBufferView, options: any): void;
+	writeFileSync(file: string, data: string | NodeJS.ArrayBufferView, options: WriteFileOptions): void;
 
 	existsSync(path: string): boolean;
 
 	removeSync(path: string): void;
 
-	readJSONSync<T>(file: string, options?: Record<string, any>): T;
+	readJSONSync<T>(file: string, options?: Record<string, unknown>): T;
 
-	ensureDirSync(path: string, options?: any): void;
+	ensureDirSync(
+		path: string,
+		options?:
+			| {
+					mode?: number | undefined;
+			  }
+			| number,
+	): void;
 }

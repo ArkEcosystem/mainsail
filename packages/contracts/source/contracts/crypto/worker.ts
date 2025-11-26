@@ -2,9 +2,9 @@ import type { BlockFactory } from "../crypto/block.js";
 import type { PublicKeyFactory, Signature } from "../crypto/identities.js";
 import type { TransactionFactory } from "../crypto/transactions.js";
 import type { Requests, Subprocess } from "../kernel/ipc.js";
-import type { KeyValuePair } from "../types/index.js";
+import type { JsonObject } from "../types/index.js";
 
-export interface WorkerFlags extends KeyValuePair {
+export interface WorkerFlags extends JsonObject {
 	workerLoggingEnabled: boolean;
 }
 

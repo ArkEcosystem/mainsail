@@ -19,7 +19,7 @@ export type Request<T> = {
 export type Response = {
 	id: Id;
 	jsonrpc: "2.0";
-	result: any;
+	result: unknown;
 };
 
 export type Error = {
@@ -31,9 +31,9 @@ export type Error = {
 	};
 };
 
-export interface Action {
+export interface Action<TParameters extends unknown[] = []> {
 	name: string;
-	handle: (parameters: any) => Promise<any>;
+	handle: (parameters: TParameters) => Promise<unknown>;
 	schema: SchemaObject;
 }
 

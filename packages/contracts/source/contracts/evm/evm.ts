@@ -28,8 +28,6 @@ export interface PreverifyTransactionResult {
 	readonly error?: string;
 }
 
-export type CommitResult = Record<string, any>;
-
 export interface AccountInfo {
 	readonly nonce: bigint;
 	readonly balance: bigint;
@@ -196,7 +194,7 @@ export interface TransactionReceipt {
 	readonly gasRefunded: bigint;
 	readonly status: number;
 	readonly contractAddress?: string;
-	readonly logs: any;
+	readonly logs: Record<string, unknown>[];
 	readonly output?: Buffer;
 
 	// Only present when reading receipts explicitly via `get_receipts`

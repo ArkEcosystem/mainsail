@@ -19,15 +19,15 @@ export interface EventDispatcher<T = unknown> {
 
 	hasListeners(event: string): boolean;
 
-	dispatch<T = any>(event: string, data?: T): Promise<void>;
+	dispatch<T = unknown>(event: string, data?: T): Promise<void>;
 
-	dispatchSeq<T = any>(event: string, data?: T): Promise<void>;
+	dispatchSeq<T = unknown>(event: string, data?: T): Promise<void>;
 
-	dispatchSync<T = any>(event: string, data?: T): void;
+	dispatchSync<T = unknown>(event: string, data?: T): void;
 
-	dispatchMany<T = any>(events: Array<[string, T]>): Promise<void>;
+	dispatchMany<T = unknown>(events: Array<[string, T]>): Promise<void>;
 
-	dispatchManySeq<T = any>(events: Array<[string, T]>): Promise<void>;
+	dispatchManySeq<T = unknown>(events: Array<[string, T]>): Promise<void>;
 
-	dispatchManySync<T = any>(events: Array<[string, T]>): void;
+	dispatchManySync<T = unknown>(events: Array<[string, T]>): void;
 }

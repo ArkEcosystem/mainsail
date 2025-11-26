@@ -10,7 +10,7 @@ export interface Application {
 
 	reboot(): Promise<void>;
 
-	config<T = any>(key: string, value?: T, defaultValue?: T): T | undefined;
+	config<T = unknown>(key: string, value?: T, defaultValue?: T): T | undefined;
 
 	version(): string;
 
@@ -64,11 +64,19 @@ export interface Application {
 
 	get<T>(serviceIdentifier: ServiceIdentifier<T>): T;
 
-	getTagged<T>(serviceIdentifier: ServiceIdentifier<T>, key: string | number | symbol, value: any): T;
+	getTagged<T>(
+		serviceIdentifier: ServiceIdentifier<T>,
+		key: string | number | symbol,
+		value: string | number | symbol,
+	): T;
 
 	isBound<T>(serviceIdentifier: ServiceIdentifier<T>): boolean;
 
-	isBoundTagged<T>(serviceIdentifier: ServiceIdentifier<T>, key: string | number | symbol, value: any): boolean;
+	isBoundTagged<T>(
+		serviceIdentifier: ServiceIdentifier<T>,
+		key: string | number | symbol,
+		value: string | number | symbol,
+	): boolean;
 
 	resolve<T>(constructorFunction: Newable<T>): T;
 }
