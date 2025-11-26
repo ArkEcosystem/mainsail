@@ -242,7 +242,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 			if (schema.type === "transactions") {
 				target[property] = [];
 
-				for (let index = 0; index < (target as any).transactionsCount; index++) {
+				for (let index = 0; index < (target as Contracts.Crypto.BlockData).transactionsCount; index++) {
 					target[property].push(source.readBytes(source.readUint32()));
 				}
 				continue;
@@ -254,7 +254,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 		return target;
 	}
 
-	#writeOptional = (schema: { optional?: true }, result: ByteBuffer, value: any, write: () => void) => {
+	#writeOptional = (schema: { optional?: true }, result: ByteBuffer, value: unknown, write: () => void) => {
 		if (schema.optional) {
 			if (value === undefined) {
 				result.writeUint8(0);
