@@ -139,7 +139,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	public async dispose(): Promise<void> {
 		this.scheduler.clear();
 		this.#isDisposed = true;
-		await this.#handlerLock.runExclusive(async () => {});
+		await this.#handlerLock.runExclusive(async () => { });
 	}
 
 	async handle(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -599,8 +599,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		if (this.#blockNumber !== this.configuration.getHeight()) {
 			throw new Error(
-				`bootstrapped block number ${
-					this.#blockNumber
+				`bootstrapped block number ${this.#blockNumber
 				} does not match configuration block number ${this.configuration.getHeight()}`,
 			);
 		}
@@ -625,7 +624,12 @@ export class Consensus implements Contracts.Consensus.Service {
 				}
 
 				roundState.setProcessorResult(await this.processor.process(roundState));
-			} catch {
+			} catch (error) {
+				this.logger.error(
+					`Failed to process proposal ${this.#getHeightRoundString()}: ${error.message}`,
+					"consensus",
+				);
+
 				roundState.setProcessorResult({ gasUsed: 0, receipts: new Map(), success: false });
 			}
 		}
