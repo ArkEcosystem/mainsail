@@ -77,6 +77,8 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 	// !! Overwrite verifier to accept invalid schema data
 	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
 	(builder as unknown as { factory: TransactionFactory }).factory = sandbox.app.resolve(TransactionFactory);
+	(builder as unknown as { verifier: Contracts.Crypto.TransactionVerifier }).verifier =
+		sandbox.app.resolve(AcceptAnyTransactionVerifier);
 
 	if (options.multiSigKeys) {
 		throw new Error("unsupported");
@@ -147,6 +149,12 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 
 	// !! Reset
 	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
+	(builder as unknown as { factory: TransactionFactory }).factory = sandbox.app.get(
+		Identifiers.Cryptography.Transaction.Factory,
+	);
+	(builder as unknown as { verifier: Contracts.Crypto.TransactionVerifier }).verifier = sandbox.app.get(
+		Identifiers.Cryptography.Transaction.Verifier,
+	);
 
 	return transaction;
 };
