@@ -1,18 +1,20 @@
 // Based on https://github.com/fknop/hapi-pagination
 
-import { applyToDefaults, assert } from "@hapi/hoek";
-import { get } from "@mainsail/utils";
+import type Hapi from "@hapi/hapi";
+import { applyToDefaults } from "@hapi/hoek";
+import type { Utils } from "@mainsail/contracts";
+import { assert, get } from "@mainsail/utils";
 import Qs from "querystring";
 
 export class Extension {
 	private readonly routePathPrefix = "/api";
-	public constructor(private readonly config) {}
+	public constructor(private readonly config: object) {}
 
-	public isValidRoute(request) {
+	public isValidRoute(request: Hapi.Request): boolean {
 		return this.hasPagination(request);
 	}
 
-	public onPreHandler(request, h) {
+	public onPreHandler(request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue {
 		if (this.isValidRoute(request)) {
 			const setParameter = (name, defaultValue) => {
 				let value;
@@ -26,8 +28,6 @@ export class Extension {
 				}
 
 				request.query[name] = value || defaultValue;
-
-				return;
 			};
 
 			// ! should be set through validation schema
@@ -38,7 +38,11 @@ export class Extension {
 		return h.continue;
 	}
 
-	public onPostHandler(request, h) {
+	public onPostHandler(request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue {
+		if ("isBoom" in request.response) {
+			return h.continue;
+		}
+
 		const { statusCode } = request.response;
 		const processResponse: boolean =
 			this.isValidRoute(request) && statusCode >= 200 && statusCode <= 299 && this.hasPagination(request);
@@ -48,17 +52,23 @@ export class Extension {
 		}
 
 		const { source } = request.response;
-		const results = Array.isArray(source) ? source : source.results;
+		assert.defined(source);
 
-		assert(Array.isArray(results), "The results must be an array");
+		const results = Array.isArray(source) ? source : source["results"];
+		assert.array(results);
 
 		// strip prefix in baseUri, we want a "clean" relative path
 		const baseUri = request.url.pathname.slice(this.routePathPrefix.length) + "?";
-		const { query } = request;
+		const { query, response } = request;
 		const currentPage = query.page;
 		const currentLimit = query.limit;
 
-		const { totalCount } = source.totalCount ? source : request;
+		let totalCount = 0;
+		if (source["totalCount"]) {
+			totalCount = source["totalCount"];
+		} else if (request["totalCount"]) {
+			totalCount = request["totalCount"];
+		}
 
 		let pageCount = 1;
 		if (totalCount) {
@@ -73,7 +83,7 @@ export class Extension {
 
 		const newSource = {
 			meta: {
-				...source.meta,
+				...(source?.["meta"] ?? {}),
 
 				count: results.length,
 
@@ -96,23 +106,23 @@ export class Extension {
 			data: results,
 		};
 
-		if (source.response) {
-			const keys = Object.keys(source.response);
+		if (source["response"]) {
+			const keys = Object.keys(source["response"]);
 
 			for (const key of keys) {
 				/* istanbul ignore next */
 				if (key !== "meta" && key !== "data") {
-					newSource[key] = source.response[key];
+					newSource[key] = source["response"][key];
 				}
 			}
 		}
 
-		request.response.source = newSource;
+		(response as Utils.Mutable<Hapi.ResponseObject>).source = newSource;
 
 		return h.continue;
 	}
 
-	public hasPagination(request) {
+	public hasPagination(request: Hapi.Request): boolean {
 		const pagination = this.getRoutePaginationOptions(request);
 
 		if (!pagination) {
