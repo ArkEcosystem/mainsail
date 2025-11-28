@@ -1,11 +1,11 @@
-import type { Contracts } from "@mainsail/contracts";
 import { Enums } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 export const validatorMnemonic =
 	"sudden head royal retire duck discover danger then basic rice wish left whip chronic enrich sun behind idea remind retire coyote select goddess exile";
 
-export const blockData: Contracts.Crypto.BlockData = {
+export const blockHeader: Contracts.Crypto.BlockHeader = {
 	fee: BigNumber.make("10000000000"),
 	gasUsed: 2000,
 	hash: "82139a7708157c8e2b78f0db38216924c8a17f82e77d5997fb280b1435a6cc97",
@@ -19,6 +19,13 @@ export const blockData: Contracts.Crypto.BlockData = {
 	round: 1,
 	stateRoot: "0000000000000000000000000000000000000000000000000000000000000000",
 	timestamp: 1703128709748,
+	transactionsCount: 2,
+	transactionsRoot: "f01a3a2a2990990a64211feb47e2fa25c048decb3420ee52562fdc4931225c0f",
+	version: 1,
+}
+
+export const blockData: Contracts.Crypto.BlockData = {
+	...blockHeader,
 	transactions: [
 		{
 			data: "",
@@ -47,17 +54,14 @@ export const blockData: Contracts.Crypto.BlockData = {
 			nonce: BigNumber.ONE,
 			r: "6c9842bc78c2f68468cbf8a8f3fec0ae2679707ffb606a4b373dd01a02af55fc",
 			s: "1a4c4d984d750678fb204ce8b7e97d860c974ac1a423f098dc4921acd2be0c7d",
-			senderPublicKey: "03043bfdf530d59e919323a33d0c8f5ca43f6b50dfe753c9b3e987a4a5233a2a15",
 			senderLegacyAddress: "DQJTK7of6bPUfJEuL9gUV4qnUyq72eskKe",
+			senderPublicKey: "03043bfdf530d59e919323a33d0c8f5ca43f6b50dfe753c9b3e987a4a5233a2a15",
 			to: "0xBe89811e15f611C1db12e59679b6F3DC1F430155",
 			transactionIndex: 1,
 			v: 0,
 			value: BigNumber.ZERO,
 		},
-	],
-	transactionsCount: 2,
-	transactionsRoot: "f01a3a2a2990990a64211feb47e2fa25c048decb3420ee52562fdc4931225c0f",
-	version: 1,
+	]
 };
 
 export const serializedBlock =
@@ -73,10 +77,11 @@ export const serializedBlockWithLockProof =
 	"000174ba618a8c01020000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200d007000000000000000000000000000000000000000000000000000000000002540be4000000000000000000000000000000000000000000000000000000000000000000e2000000f01a3a2a2990990a64211feb47e2fa25c048decb3420ee52562fdc4931225c0fb559f4fbb75c378cdd3dd7ccbfeff9c5c2094e5569000000f8678085012a05f200830f424094be89811e15f611c1db12e59679b6f3dc1f4301558080824e43a0921101a4583fb153ec00e501f3c2e2636114e1c8c58d2df8a19426cc066a6768a022db4bce1e0ace485ce0838d178b4d5bcfa9f69b315a14c580d9b01e5c980bdd69000000f8670185012a05f200830f424094be89811e15f611c1db12e59679b6f3dc1f4301558080824e43a06c9842bc78c2f68468cbf8a8f3fec0ae2679707ffb606a4b373dd01a02af55fca01a4c4d984d750678fb204ce8b7e97d860c974ac1a423f098dc4921acd2be0c7d0000000000000000";
 
 export const proposalData: Contracts.Crypto.ProposalData = {
-	blockNumber: 2,
+	blockHeader,
 	data: {
 		serialized: serializedBlock,
 	},
+	lockProof: undefined,
 	round: 1,
 	signature:
 		"b7010f03f72afb5437da8f7ee039a7fee75d6e9c7b02e1b9cbd4ce844cdc0e81233fd312cdd493e4ef2c2a6ac3c9fc8a1967f06a1a205c3daf369ac77f0a895717c520af5e341a3925d23b126d847a6fd1e194a010b89082039e1e5b44352616",
@@ -85,10 +90,11 @@ export const proposalData: Contracts.Crypto.ProposalData = {
 };
 
 export const proposalDataWithValidRound: Contracts.Crypto.ProposalData = {
-	blockNumber: 2,
+	blockHeader,
 	data: {
 		serialized: serializedBlockWithLockProof,
 	},
+	lockProof: undefined,
 	round: 1,
 	signature:
 		"00b25fd16693a2246d3e9dff3d7ae3da1473c1b24f6ef8b33c69e38e21e32c9ca307ae5f7d4573e2679ec48ecc2f1ff89d16115d8e7f6ffcba72cc9a746bcc40cdd0f9120d87c20addb55baceea2cb8cdb75faaf036e6a4221d28dc8f6558d8c",

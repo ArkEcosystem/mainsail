@@ -6,6 +6,7 @@ import { describe, Factories, Sandbox } from "../../test-framework/source";
 import { Types } from "../../test-framework/source/factories";
 import {
 	blockData,
+	blockHeader,
 	precommitData,
 	precommitDataNoBlock,
 	prevoteData,
@@ -45,12 +46,12 @@ describe<{
 					consensusSignature: (method, message, privateKey) =>
 						context.sandbox.app
 							.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
-							[method](message, privateKey),
+						[method](message, privateKey),
 					// @ts-ignore
 					transactionFactory: (method, message, privateKey) =>
 						context.sandbox.app
 							.get(Identifiers.Cryptography.Transaction.Factory)!
-							[method](message, privateKey),
+						[method](message, privateKey),
 				};
 			},
 		};
@@ -169,6 +170,8 @@ describe<{
 
 	it("#makeProposalFromBytes - should be ok", async ({ factory }) => {
 		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposal, "hex"));
+
+		const data = proposal.toData();
 
 		assert.equal(proposal.toData(), proposalData);
 	});
