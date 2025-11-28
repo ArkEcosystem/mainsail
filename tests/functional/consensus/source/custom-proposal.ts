@@ -149,7 +149,7 @@ export const makeCustomProposal = async (
 	const signedProposal = Buffer.concat([serializedProposal, Buffer.from(proposalSignature, "hex")]);
 
 	const proposal = node.app.resolve(Proposal).initialize({
-		blockNumber: block.header.number,
+		blockHeader: block.header,
 		dataSerialized: proposedBytes.toString("hex"),
 		round,
 		serialized: signedProposal,
