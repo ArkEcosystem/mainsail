@@ -24,11 +24,11 @@ export interface BlockHeaderRaw {
 
 export type BlockHeader = BlockHeaderRaw & {
 	readonly hash: string;
-}
+};
 
 export type BlockData = BlockHeader & {
 	readonly transactions: TransactionData[];
-}
+};
 
 export interface Block {
 	readonly data: BlockData;

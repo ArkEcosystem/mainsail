@@ -18,6 +18,4 @@ export const sealBlock = ({ data, serialized, transactions }: BlockArguments): C
 			return transaction;
 		}),
 	});
-}
-
-
+};

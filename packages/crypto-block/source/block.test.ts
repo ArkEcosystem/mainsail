@@ -11,10 +11,7 @@ describe<{}>("Block", ({ it, assert }) => {
 		const transactionFactory = await Factories.factory("Transfer", crypto);
 
 		const transactionBuilder1 = await transactionFactory.withStates("sign").make();
-		const transactionBuilder2 = await transactionFactory
-			.withOptions({ nonce: 1 })
-			.withStates("sign")
-			.make();
+		const transactionBuilder2 = await transactionFactory.withOptions({ nonce: 1 }).withStates("sign").make();
 
 		const transaction1 = await transactionBuilder1.build();
 		const transaction2 = await transactionBuilder2.build();

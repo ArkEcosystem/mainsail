@@ -6,10 +6,12 @@ import { assert, BigNumber, ByteBuffer, validatorSetPack, validatorSetUnpack } f
 
 type TransactionCount = Pick<Contracts.Crypto.BlockData, "transactionsCount">;
 
-const assertTransactionCount: (data: unknown) => asserts data is TransactionCount = (data: unknown): asserts data is TransactionCount => {
+const assertTransactionCount: (data: unknown) => asserts data is TransactionCount = (
+	data: unknown,
+): asserts data is TransactionCount => {
 	assert.object(data);
 	assert.number(data["transactionsCount"]);
-}
+};
 
 @injectable()
 export class Serializer implements Contracts.Serializer.Serializer {
