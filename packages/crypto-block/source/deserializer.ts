@@ -1,7 +1,7 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional } from "@mainsail/container";
-import type { Contracts, Utils } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { TransactionSchemaError } from "@mainsail/exceptions";
 import { ByteBuffer, sleep } from "@mainsail/utils";
 
@@ -31,33 +31,40 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 	public async deserializeHeader(serialized: Buffer): Promise<Contracts.Crypto.BlockHeader> {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		const header: Utils.Mutable<Contracts.Crypto.BlockData> = await this.#deserializeBufferHeader(buffer);
+		const header = await this.#deserializeBufferHeader(buffer);
 
-		header.hash = await this.hashFactory.make(header);
-
-		return header;
+		return {
+			...header,
+			hash: await this.hashFactory.make(header),
+		};
 	}
 
 	public async deserializeWithTransactions(serialized: Buffer): Promise<Contracts.Crypto.BlockWithTransactions> {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		const block: Utils.Mutable<Contracts.Crypto.BlockData> = await this.#deserializeBufferHeader(buffer);
+		const header = await this.#deserializeBufferHeader(buffer);
 
 		let transactions: Contracts.Crypto.Transaction[] = [];
 
 		if (buffer.getRemainderLength() > 0) {
-			transactions = await this.#deserializeTransactions(block, buffer);
+			transactions = await this.#deserializeTransactions(header, buffer);
 		}
 
-		block.hash = await this.hashFactory.make(block);
+		return {
+			data: {
+				...header,
+				hash: await this.hashFactory.make(header),
+				transactions: transactions.map((tx) => tx.data),
+			},
+			transactions
 
-		return { data: block, transactions };
+		};
 	}
 
 	async #deserializeBufferHeader(buffer: ByteBuffer): Promise<Contracts.Crypto.BlockHeader> {
 		const block = {} as Contracts.Crypto.BlockHeader;
 
-		await this.serializer.deserialize<Contracts.Crypto.BlockData>(buffer, block, {
+		await this.serializer.deserialize<Contracts.Crypto.BlockHeader>(buffer, block, {
 			length: this.headerSize(),
 			schema: {
 				version: {
@@ -110,11 +117,11 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 	}
 
 	async #deserializeTransactions(
-		block: Contracts.Crypto.BlockData,
+		header: Contracts.Crypto.BlockHeader,
 		buf: ByteBuffer,
 	): Promise<Contracts.Crypto.Transaction[]> {
-		await this.serializer.deserialize<Contracts.Crypto.BlockData>(buf, block, {
-			length: block.payloadSize,
+		const block = await this.serializer.deserialize<Contracts.Crypto.BlockData>(buf, { ...header }, {
+			length: header.payloadSize,
 			schema: {
 				transactions: {
 					type: "transactions",
@@ -125,10 +132,10 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 		/**
 		 * After unpacking we need to turn the transactions into DTOs!
 		 *
-		 * We keep this behaviour out of the (de)serialiser because it
+		 * We keep this behavior out of the (de)serializer because it
 		 * is very specific to this bit of code in this specific class.
 		 */
-		const transactions: Contracts.Crypto.Transaction[] = new Array(block.transactionsCount);
+		const transactions: Contracts.Crypto.Transaction[] = Array.from({ length: block.transactionsCount });
 
 		await Promise.all(
 			block.transactions.map(async (serialized, index) => {

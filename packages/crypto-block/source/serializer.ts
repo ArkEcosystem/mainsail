@@ -15,8 +15,8 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 		return this.headerSize() + block.payloadSize;
 	}
 
-	public async serializeHeader(block: Contracts.Crypto.BlockDataSerializable): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.BlockDataSerializable>(block, {
+	public async serializeHeader(block: Contracts.Crypto.BlockHeaderSerializable): Promise<Buffer> {
+		return this.serializer.serialize(block, {
 			length: this.headerSize(),
 			skip: 0,
 			schema: {

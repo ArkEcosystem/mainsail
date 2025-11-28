@@ -5,7 +5,6 @@ import type { BlockHeaderStorageData, TransactionStorageData } from "../evm/stor
 import type { Transaction, TransactionData, TransactionJson } from "./transactions.js";
 
 export type BlockTag = "latest" | "finalized" | "safe";
-export type BlockHeader = Exclude<BlockData, "transactions">;
 
 export interface Block {
 	readonly data: BlockData;
@@ -14,7 +13,7 @@ export interface Block {
 	readonly transactions: Transaction[];
 }
 
-export interface BlockData {
+export interface BlockHeader {
 	readonly hash: string;
 
 	readonly timestamp: number;
@@ -31,7 +30,9 @@ export interface BlockData {
 	readonly payloadSize: number;
 	readonly transactionsRoot: string;
 	readonly proposer: string;
+}
 
+export type BlockData = BlockHeader & {
 	readonly transactions: TransactionData[];
 }
 
@@ -57,6 +58,7 @@ export interface BlockJson {
 	readonly transactions: TransactionJson[];
 }
 
+export type BlockHeaderSerializable = Omit<BlockHeader, "hash">;
 export type BlockDataSerializable = Omit<BlockData, "hash">;
 
 export interface BlockFactory {
@@ -72,7 +74,7 @@ export interface BlockFactory {
 export interface BlockSerializer {
 	totalSize(block: BlockDataSerializable): number;
 
-	serializeHeader(block: BlockDataSerializable): Promise<Buffer>;
+	serializeHeader(block: BlockHeaderSerializable): Promise<Buffer>;
 
 	serializeWithTransactions(block: BlockDataSerializable): Promise<Buffer>;
 }
