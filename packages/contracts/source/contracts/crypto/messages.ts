@@ -21,6 +21,7 @@ export type SignaturePrecommitData = WithOptionalBlockHash<SignatureMessageData>
 
 export interface ProposalData {
 	readonly blockHeader: BlockHeader;
+	readonly lockProof?: AggregatedSignature;
 	readonly round: number;
 	readonly data: { serialized: string };
 	readonly validatorIndex: number;

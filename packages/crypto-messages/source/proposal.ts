@@ -8,6 +8,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 	private readonly messageFactory!: Contracts.Crypto.MessageFactory;
 
 	#blockHeader!: Contracts.Crypto.BlockHeader;
+	#lockProof?: Contracts.Crypto.AggregatedSignature;
 	#round!: number;
 	#validRound?: number;
 	#dataSerialized!: string;
@@ -20,6 +21,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		round,
 		validatorIndex,
 		blockHeader,
+		lockProof,
 		dataSerialized,
 		validRound,
 		signature,
@@ -29,6 +31,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		serialized: Buffer;
 	}): Proposal {
 		this.#blockHeader = blockHeader;
+		this.#lockProof = lockProof;
 		this.#round = round;
 		this.#validRound = validRound;
 		this.#dataSerialized = dataSerialized;
@@ -106,6 +109,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		return {
 			blockHeader: this.#blockHeader,
 			data: { serialized: this.#dataSerialized },
+			lockProof: this.#lockProof,
 			round: this.#round,
 			signature: this.#signature,
 			validRound: this.#validRound,
