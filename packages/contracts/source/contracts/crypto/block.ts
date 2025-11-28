@@ -6,16 +6,7 @@ import type { Transaction, TransactionData, TransactionJson } from "./transactio
 
 export type BlockTag = "latest" | "finalized" | "safe";
 
-export interface Block {
-	readonly data: BlockData;
-	readonly header: BlockHeader;
-	readonly serialized: string;
-	readonly transactions: Transaction[];
-}
-
-export interface BlockHeader {
-	readonly hash: string;
-
+export interface BlockHeaderRaw {
 	readonly timestamp: number;
 	readonly version: number;
 	readonly number: number;
@@ -32,8 +23,19 @@ export interface BlockHeader {
 	readonly proposer: string;
 }
 
+export type BlockHeader = BlockHeaderRaw & {
+	readonly hash: string;
+}
+
 export type BlockData = BlockHeader & {
 	readonly transactions: TransactionData[];
+}
+
+export interface Block {
+	readonly data: BlockData;
+	readonly header: BlockHeader;
+	readonly serialized: string;
+	readonly transactions: Transaction[];
 }
 
 export interface BlockJson {
@@ -58,7 +60,6 @@ export interface BlockJson {
 	readonly transactions: TransactionJson[];
 }
 
-export type BlockHeaderSerializable = Omit<BlockHeader, "hash">;
 export type BlockDataSerializable = Omit<BlockData, "hash">;
 
 export interface BlockFactory {
@@ -74,7 +75,7 @@ export interface BlockFactory {
 export interface BlockSerializer {
 	totalSize(block: BlockDataSerializable): number;
 
-	serializeHeader(block: BlockHeaderSerializable): Promise<Buffer>;
+	serializeHeader(block: BlockHeaderRaw): Promise<Buffer>;
 
 	serializeWithTransactions(block: BlockDataSerializable): Promise<Buffer>;
 }
