@@ -63,7 +63,6 @@ export interface Prevote extends PrevoteData {
 	readonly serialized: Buffer;
 
 	toSignatureData(): SignaturePrevoteData;
-	toData(): PrevoteData;
 	toString(): string;
 }
 
@@ -80,7 +79,6 @@ export interface Precommit extends PrecommitData {
 	readonly serialized: Buffer;
 
 	toSignatureData(): SignaturePrecommitData;
-	toData(): PrecommitData;
 	toString(): string;
 }
 
