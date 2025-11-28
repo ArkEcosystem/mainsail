@@ -32,7 +32,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }): Promise<vo
 	await context.sandbox.app.resolve(CoreValidation).register();
 	await context.sandbox.app.resolve(CoreCryptoConfig).register();
 
-	context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => { } });
+	context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => {} });
 	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
 	await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();

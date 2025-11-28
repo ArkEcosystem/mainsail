@@ -37,7 +37,7 @@ describe<{
 				consensusSignature: (method, message, privateKey) =>
 					context.sandbox.app
 						.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
-					[method](message, privateKey),
+						[method](message, privateKey),
 				// @ts-ignore
 				transactionFactory: (method, message, privateKey) =>
 					context.sandbox.app.get(Identifiers.Cryptography.Transaction.Factory)![method](message, privateKey),
@@ -48,10 +48,11 @@ describe<{
 		context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
 		data.block.transactions = await Promise.all(
-			data.block.data.transactions.map(async (txData) =>
-				await context.sandbox.app
-					.get<Contracts.Crypto.TransactionFactory>(Identifiers.Cryptography.Transaction.Factory)
-					.fromData(txData),
+			data.block.data.transactions.map(
+				async (txData) =>
+					await context.sandbox.app
+						.get<Contracts.Crypto.TransactionFactory>(Identifiers.Cryptography.Transaction.Factory)
+						.fromData(txData),
 			),
 		);
 
@@ -83,7 +84,7 @@ describe<{
 			serialized: Buffer.from("dead", "hex"),
 		});
 
-		await proposalWithValidRound.deserializeData()
+		await proposalWithValidRound.deserializeData();
 		console.log("HERE", proposalWithValidRound.toData().lockProof);
 
 		// assert.defined(proposalWithValidRound.lockProof);
