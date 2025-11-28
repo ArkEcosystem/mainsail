@@ -7,4 +7,4 @@ export const toData = (message: Contracts.Crypto.Precommit): Contracts.Crypto.Pr
 	signature: message.signature,
 	type: message.type,
 	validatorIndex: message.validatorIndex,
-})
+});

@@ -37,7 +37,7 @@ describe<{
 				consensusSignature: (method, message, privateKey) =>
 					context.sandbox.app
 						.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
-					[method](message, privateKey),
+						[method](message, privateKey),
 				// @ts-ignore
 				transactionFactory: (method, message, privateKey) =>
 					context.sandbox.app.get(Identifiers.Cryptography.Transaction.Factory)![method](message, privateKey),
