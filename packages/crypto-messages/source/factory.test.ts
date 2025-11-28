@@ -6,6 +6,7 @@ import { describe, Factories, Sandbox } from "../../test-framework/source";
 import { Types } from "../../test-framework/source/factories";
 import {
 	blockData,
+	blockHeader,
 	precommitData,
 	precommitDataNoBlock,
 	prevoteData,
@@ -20,7 +21,7 @@ import {
 	serializedProposal,
 	serializedProposalDataWithValidRound,
 	validatorMnemonic,
-} from "../test/fixtures/proposal";
+} from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { MessageFactory } from "./factory";
 
@@ -70,12 +71,12 @@ describe<{
 				keyType: "consensus",
 				passphrase: validatorMnemonic,
 			})
-			.make<Types.Identity>();
+			.make();
 
 		context.identity = identity;
 	});
 
-	it("#makeProposal - should correctly make signed proposal", async ({ blockFactory, factory, identity }) => {
+	it("#makeProposal - should correctly make signed proposal", async ({ factory, identity }) => {
 		const proposal = await factory.makeProposal(
 			{
 				data: {
@@ -169,6 +170,8 @@ describe<{
 
 	it("#makeProposalFromBytes - should be ok", async ({ factory }) => {
 		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposal, "hex"));
+
+		const data = proposal.toData();
 
 		assert.equal(proposal.toData(), proposalData);
 	});

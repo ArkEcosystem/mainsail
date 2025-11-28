@@ -99,19 +99,22 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			dispatch: () => {},
 		};
 
+		const blockData = {
+			number: 1,
+			round: 0,
+			hash: "blockHash",
+		};
+
 		context.block = {
-			data: {
-				number: 1,
-				round: 0,
-				hash: "blockHash",
-			},
+			data: blockData,
+			header: blockData,
 		};
 
 		context.proposal = {
 			getData: () => ({
 				block: context.block,
 			}),
-			blockNumber: 1,
+			blockHeader: context.block.header,
 			round: 0,
 			serialized: Buffer.from(""),
 			validRound: undefined,
@@ -674,7 +677,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyLoggerInfo = spy(logger, "info");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
-		stub(proposal, "getData").returnValue({ block, lockProof: { signature: "1234", validators: [] } });
+		proposal.lockProof = { signature: "1234", validators: [] };
+		stub(proposal, "getData").returnValue({ block, lockProof: proposal.lockProof });
 
 		proposal.validRound = 0;
 		roundState = { ...roundState, round: 1 };
@@ -736,7 +740,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyPrevoteProcess = spy(prevoteProcessor, "process");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
-		stub(proposal, "getData").returnValue({ block, lockProof: { signature: "1234", validators: [] } });
+		proposal.lockProof = { signature: "1234", validators: [] };
+		stub(proposal, "getData").returnValue({ block, lockProof: proposal.lockProof });
 
 		proposal.validRound = 0;
 		roundState = { ...roundState, round: 1 };

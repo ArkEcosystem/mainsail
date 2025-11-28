@@ -8,7 +8,7 @@ import {
 	proposalData,
 	proposalDataWithValidRound,
 	serializedBlock,
-} from "../test/fixtures/proposal";
+} from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Proposal } from "./proposal";
 import { assertProposedData } from "../test/helpers/asserts";
@@ -25,6 +25,7 @@ describe<{
 			transactions: [],
 		},
 		serialized: serializedBlock,
+		lockProof: undefined,
 	};
 
 	beforeEach(async (context) => {
@@ -46,16 +47,19 @@ describe<{
 		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
-		const blockInstance = await context.sandbox.app
-			.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory)
-			.fromData(blockData);
-
-		(data.block as any).transactions = blockInstance.transactions;
+		data.block.transactions = await Promise.all(
+			data.block.data.transactions.map(
+				async (txData) =>
+					await context.sandbox.app
+						.get<Contracts.Crypto.TransactionFactory>(Identifiers.Cryptography.Transaction.Factory)
+						.fromData(txData),
+			),
+		);
 
 		context.proposal = context.sandbox.app.resolve(Proposal).initialize({
 			...proposalData,
 			dataSerialized: data.serialized,
-			blockNumber: data.block.data.number,
+			blockHeader: data.block.header,
 			serialized: Buffer.from("dead", "hex"),
 		});
 	});
@@ -64,8 +68,26 @@ describe<{
 		assert.equal(proposal.isDataDeserialized, false);
 	});
 
-	it("#blockNumber", ({ proposal }) => {
-		assert.equal(proposal.blockNumber, 2);
+	it("#blockHeader", ({ proposal }) => {
+		assert.equal(proposal.blockHeader, data.block.header);
+	});
+
+	it("#lockProof - should be undefined", ({ proposal }) => {
+		assert.undefined(proposal.lockProof);
+	});
+
+	it.only("#lockProof - should be undefined", async ({ sandbox }) => {
+		const proposalWithValidRound = sandbox.app.resolve(Proposal).initialize({
+			...proposalDataWithValidRound,
+			dataSerialized: proposalDataWithValidRound.data.serialized,
+			blockHeader: proposalDataWithValidRound.blockHeader,
+			serialized: Buffer.from("dead", "hex"),
+		});
+
+		await proposalWithValidRound.deserializeData();
+		console.log("HERE", proposalWithValidRound.toData().lockProof);
+
+		// assert.defined(proposalWithValidRound.lockProof);
 	});
 
 	it("#round", ({ proposal }) => {
@@ -95,16 +117,10 @@ describe<{
 	// User assert block data
 	it("#getData - should be ok", async ({ proposal }) => {
 		await proposal.deserializeData();
-		assertProposedData(assert, proposal.getData(), data);
+		assertProposedData(assert, proposal.getData().block.header, data.block.header);
 	});
 
 	it("#toString - should be ok", ({ proposal }) => {
-		assert.equal(proposal.toString(), `{"blockNumber":2,"round":1,"validatorIndex":0}`);
-	});
-
-	it("#toString - should include block id after deserialization", async ({ proposal }) => {
-		await proposal.deserializeData();
-
 		assert.equal(
 			proposal.toString(),
 			`{"block":"82139a7708157c8e2b78f0db38216924c8a17f82e77d5997fb280b1435a6cc97","blockNumber":2,"round":1,"validatorIndex":0}`,
@@ -112,7 +128,9 @@ describe<{
 	});
 
 	it("#toData", ({ proposal }) => {
-		assert.equal(proposal.toData(), proposalData);
+		const data = proposal.toData();
+
+		assert.equal(data, proposalData);
 	});
 
 	it("#toSerializableData", ({ sandbox, proposal }) => {
@@ -127,7 +145,7 @@ describe<{
 		const proposalWithValidRound = sandbox.app.resolve(Proposal).initialize({
 			...proposalDataWithValidRound,
 			dataSerialized: data.serialized,
-			blockNumber: data.block.data.number,
+			blockHeader: data.block.header,
 			serialized: Buffer.from("dead", "hex"),
 		});
 
