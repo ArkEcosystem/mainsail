@@ -47,6 +47,14 @@ describe<{
 		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
+		data.block.transactions = await Promise.all(
+			data.block.data.transactions.map(async (txData) =>
+				await context.sandbox.app
+					.get<Contracts.Crypto.TransactionFactory>(Identifiers.Cryptography.Transaction.Factory)
+					.fromData(txData),
+			),
+		);
+
 		context.proposal = context.sandbox.app.resolve(Proposal).initialize({
 			...proposalData,
 			dataSerialized: data.serialized,
@@ -61,6 +69,24 @@ describe<{
 
 	it("#blockHeader", ({ proposal }) => {
 		assert.equal(proposal.blockHeader, data.block.header);
+	});
+
+	it("#lockProof - should be undefined", ({ proposal }) => {
+		assert.undefined(proposal.lockProof);
+	});
+
+	it.only("#lockProof - should be undefined", async ({ sandbox }) => {
+		const proposalWithValidRound = sandbox.app.resolve(Proposal).initialize({
+			...proposalDataWithValidRound,
+			dataSerialized: proposalDataWithValidRound.data.serialized,
+			blockHeader: proposalDataWithValidRound.blockHeader,
+			serialized: Buffer.from("dead", "hex"),
+		});
+
+		await proposalWithValidRound.deserializeData()
+		console.log("HERE", proposalWithValidRound.toData().lockProof);
+
+		// assert.defined(proposalWithValidRound.lockProof);
 	});
 
 	it("#round", ({ proposal }) => {
@@ -90,14 +116,7 @@ describe<{
 	// User assert block data
 	it("#getData - should be ok", async ({ proposal }) => {
 		await proposal.deserializeData();
-
-		// console.log(data.block.header);
-		console.log(proposal.getData().block.header);
-
-		// assert.equal(proposal.getData(), data);
-
-		assert.equal(proposal.getData().block.header, data.block.header);
-		// assertProposedData(assert, proposal.getData().block.header, data.block.header);
+		assertProposedData(assert, proposal.getData().block.header, data.block.header);
 	});
 
 	it("#toString - should be ok", ({ proposal }) => {
