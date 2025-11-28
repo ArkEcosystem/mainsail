@@ -61,10 +61,8 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 		};
 	}
 
-	async #deserializeBufferHeader(buffer: ByteBuffer): Promise<Contracts.Crypto.BlockHeader> {
-		const block = {} as Contracts.Crypto.BlockHeader;
-
-		await this.serializer.deserialize<Contracts.Crypto.BlockHeader>(buffer, block, {
+	async #deserializeBufferHeader(buffer: ByteBuffer): Promise<Contracts.Crypto.BlockHeaderRaw> {
+		return await this.serializer.deserialize<Contracts.Crypto.BlockHeaderRaw>(buffer, {}, {
 			length: this.headerSize(),
 			schema: {
 				version: {
@@ -112,12 +110,10 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 				},
 			},
 		});
-
-		return block;
 	}
 
 	async #deserializeTransactions(
-		header: Contracts.Crypto.BlockHeader,
+		header: Contracts.Crypto.BlockHeaderRaw,
 		buf: ByteBuffer,
 	): Promise<Contracts.Crypto.Transaction[]> {
 		const block = await this.serializer.deserialize<Contracts.Crypto.BlockData>(buf, { ...header }, {
