@@ -157,7 +157,6 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		return new Precommit({ ...data, serialized });
 	}
 
-	// Performance can be improved by returning only a block height
 	async #getBlockHeaderFromProposedData(bytes: Buffer): Promise<Contracts.Crypto.BlockHeader> {
 		const buffer = ByteBuffer.fromBuffer(bytes);
 
