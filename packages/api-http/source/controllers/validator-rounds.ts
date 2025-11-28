@@ -12,7 +12,7 @@ export class ValidatorRoundsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
 	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.ValidatorRoundRepositoryFactory;
 
-	public async index(request: Hapi.Request) {
+	public async index(request: Hapi.Request): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 
 		const [validatorRounds, totalCount] = await this.validatorRoundRepositoryFactory()
@@ -33,7 +33,7 @@ export class ValidatorRoundsController extends Controller {
 		);
 	}
 
-	public async show(request: Hapi.Request) {
+	public async show(request: Hapi.Request): Promise<object> {
 		const validatorRounds = await this.validatorRoundRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -47,7 +47,7 @@ export class ValidatorRoundsController extends Controller {
 		return this.respondWithResource(validatorRounds, ValidatorRoundResource);
 	}
 
-	public async validators(request: Hapi.Request) {
+	public async validators(request: Hapi.Request): Promise<object> {
 		const round = await this.validatorRoundRepositoryFactory()
 			.createQueryBuilder()
 			.select()

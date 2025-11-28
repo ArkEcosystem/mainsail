@@ -10,7 +10,7 @@ export class ContractsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.ContractRepositoryFactory)
 	private readonly contractRepositoryFactory!: ApiDatabaseContracts.ContractRepositoryFactory;
 
-	public async index(request: Hapi.Request) {
+	public async index(request: Hapi.Request): Promise<object> {
 		const contractRepository = this.contractRepositoryFactory();
 
 		const contracts = await contractRepository.createQueryBuilder().orderBy("name").addOrderBy("address").getMany();
@@ -28,7 +28,7 @@ export class ContractsController extends Controller {
 		};
 	}
 
-	public async abi(request: Hapi.Request) {
+	public async abi(request: Hapi.Request): Promise<object> {
 		const contractRepository = this.contractRepositoryFactory();
 
 		const contract = await contractRepository

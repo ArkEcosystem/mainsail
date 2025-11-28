@@ -18,7 +18,7 @@ export class WalletsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
-	public async index(request: Hapi.Request) {
+	public async index(request: Hapi.Request): Promise<object> {
 		const criteria: Search.Criteria.WalletCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
@@ -29,7 +29,7 @@ export class WalletsController extends Controller {
 		return this.toPagination(wallets, WalletResource);
 	}
 
-	public async top(request: Hapi.Request) {
+	public async top(request: Hapi.Request): Promise<object> {
 		const criteria: Search.Criteria.WalletCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
@@ -40,7 +40,7 @@ export class WalletsController extends Controller {
 		return this.toPagination(wallets, WalletResource);
 	}
 
-	public async show(request: Hapi.Request) {
+	public async show(request: Hapi.Request): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -48,7 +48,7 @@ export class WalletsController extends Controller {
 		return this.respondWithResource(wallet, WalletResource);
 	}
 
-	public async transactions(request: Hapi.Request) {
+	public async transactions(request: Hapi.Request): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -59,7 +59,7 @@ export class WalletsController extends Controller {
 		return this.getTransactions(request, { address: wallet.address });
 	}
 
-	public async transactionsSent(request: Hapi.Request) {
+	public async transactionsSent(request: Hapi.Request): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -74,7 +74,7 @@ export class WalletsController extends Controller {
 		return this.getTransactions(request, { senderPublicKey: wallet.publicKey });
 	}
 
-	public async transactionsReceived(request: Hapi.Request) {
+	public async transactionsReceived(request: Hapi.Request): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -85,7 +85,7 @@ export class WalletsController extends Controller {
 		return this.getTransactions(request, { to: wallet.address });
 	}
 
-	public async votes(request: Hapi.Request) {
+	public async votes(request: Hapi.Request): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
