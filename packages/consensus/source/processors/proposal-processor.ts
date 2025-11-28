@@ -86,8 +86,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			return false;
 		}
 
-		const lockProof = proposal.getData().lockProof;
-		if (!lockProof) {
+		if (!proposal.lockProof) {
 			this.logger.debug(
 				`Received proposal ${proposal.blockHeader.number}/${proposal.round} with missing lock proof`,
 				"consensus",
@@ -96,14 +95,14 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		}
 
 		const data = await this.messageSerializer.serializePrevoteForSignature({
-			blockHash: proposal.getData().block.header.hash,
+			blockHash: proposal.blockHeader.hash,
 			blockNumber: proposal.blockHeader.number,
 			round: proposal.validRound,
 			type: Enums.Crypto.MessageType.Prevote,
 		});
 
 		const { roundValidators } = this.configuration.getMilestone(proposal.blockHeader.number);
-		const verified = await this.aggregator.verify(lockProof, data, roundValidators);
+		const verified = await this.aggregator.verify(proposal.lockProof, data, roundValidators);
 
 		if (!verified) {
 			this.logger.debug(
