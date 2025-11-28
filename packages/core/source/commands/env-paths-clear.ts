@@ -17,6 +17,8 @@ export class Command extends Commands.Command {
 		this.definition.setFlag("state-export", "Clear state exports.", Joi.boolean());
 		this.definition.setFlag("plugins", "Clear installed plugins.", Joi.boolean());
 		this.definition.setFlag("data", "Clear data.", Joi.boolean());
+		this.definition.setFlag("consensusData", "Clear consensus data.", Joi.boolean());
+		this.definition.setFlag("txPoolData", "Clear transaction pool data.", Joi.boolean());
 		this.definition.setFlag("config", "Clear config.", Joi.boolean());
 		this.definition.setFlag("cache", "Clear cache.", Joi.boolean());
 		this.definition.setFlag("log", "Clear log.", Joi.boolean());
