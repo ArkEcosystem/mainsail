@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
-import type { Database, Key, RootDatabase } from "lmdb";
+import type { Database, RootDatabase } from "lmdb";
 
 @injectable()
 export class Service implements Contracts.ConsensusStorage.Service {
@@ -90,17 +90,17 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	}
 
 	public async getProposals(): Promise<Contracts.Crypto.Proposal[]> {
-		const proposals = [...this.proposalStorage.getValues(undefined as unknown as Key)];
+		const proposals = [...this.proposalStorage.getRange().map((item) => item.value)];
 		return Promise.all(proposals.map((proposal) => this.messageFactory.makeProposalFromBytes(Buffer.from(proposal, "hex"))));
 	}
 
 	public async getPrevotes(): Promise<Contracts.Crypto.Prevote[]> {
-		const prevotes = [...this.prevoteStorage.getValues(undefined as unknown as Key)];
+		const prevotes = [...this.prevoteStorage.getRange().map((item) => item.value)];
 		return Promise.all(prevotes.map((prevote) => this.messageFactory.makePrevoteFromBytes(Buffer.from(prevote, "hex"))));
 	}
 
 	public async getPrecommits(): Promise<Contracts.Crypto.Precommit[]> {
-		const precommits = [...this.precommitStorage.getValues(undefined as unknown as Key)];
+		const precommits = [...this.precommitStorage.getRange().map((item) => item.value)];
 		return Promise.all(precommits.map((precommit) => this.messageFactory.makePrecommitFromBytes(Buffer.from(precommit, "hex"))));
 	}
 
