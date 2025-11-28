@@ -76,7 +76,8 @@ describe<{
 		assert.undefined(proposal.lockProof);
 	});
 
-	it.only("#lockProof - should be undefined", async ({ sandbox }) => {
+	// TODO: Fix test
+	it("#lockProof - should be defined", async ({ sandbox }) => {
 		const proposalWithValidRound = sandbox.app.resolve(Proposal).initialize({
 			...proposalDataWithValidRound,
 			dataSerialized: proposalDataWithValidRound.data.serialized,
@@ -85,8 +86,6 @@ describe<{
 		});
 
 		await proposalWithValidRound.deserializeData();
-		console.log("HERE", proposalWithValidRound.toData().lockProof);
-
 		// assert.defined(proposalWithValidRound.lockProof);
 	});
 

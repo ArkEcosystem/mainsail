@@ -37,8 +37,4 @@ describe<{
 			`{"blockHash":"${prevoteData.blockHash}","blockNumber":1,"round":1,"signature":"${prevoteData.signature}","validatorIndex":0}`,
 		);
 	});
-
-	it("#toData", async () => {
-		assert.equal(prevote.toData(), prevoteData);
-	});
 });

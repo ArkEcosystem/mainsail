@@ -71,15 +71,4 @@ export class Precommit implements Contracts.Crypto.Precommit {
 			type: this.type,
 		};
 	}
-
-	toData(): Contracts.Crypto.PrecommitData {
-		return {
-			blockHash: this.#blockHash,
-			blockNumber: this.#blockNumber,
-			round: this.#round,
-			signature: this.#signature,
-			type: this.type,
-			validatorIndex: this.#validatorIndex,
-		};
-	}
 }

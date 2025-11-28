@@ -71,15 +71,4 @@ export class Prevote implements Contracts.Crypto.Prevote {
 			type: this.type,
 		};
 	}
-
-	toData(): Contracts.Crypto.PrevoteData {
-		return {
-			blockHash: this.#blockHash,
-			blockNumber: this.#blockNumber,
-			round: this.#round,
-			signature: this.#signature,
-			type: this.type,
-			validatorIndex: this.#validatorIndex,
-		};
-	}
 }

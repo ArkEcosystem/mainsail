@@ -6,7 +6,6 @@ import { describe, Factories, Sandbox } from "../../test-framework/source";
 import { Types } from "../../test-framework/source/factories";
 import {
 	blockData,
-	blockHeader,
 	precommitData,
 	precommitDataNoBlock,
 	prevoteData,
@@ -23,6 +22,7 @@ import {
 	validatorMnemonic,
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
+import { toData } from "../test/helpers/utilities.js";
 import { MessageFactory } from "./factory";
 
 describe<{
@@ -185,24 +185,23 @@ describe<{
 	it("#makePrevoteFromBytes - should be ok", async ({ factory }) => {
 		const prevote = await factory.makePrevoteFromBytes(Buffer.from(serializedPrevote, "hex"));
 
-		assert.equal(prevote.toData(), prevoteData);
+		assert.equal(toData(prevote), prevoteData);
 	});
 
 	it("#makePrevoteFromBytes - should be ok with no block", async ({ factory }) => {
 		const prevote = await factory.makePrevoteFromBytes(Buffer.from(serializedPrevoteNoBlock, "hex"));
 
-		assert.equal(prevote.toData(), prevoteDataNoBlock);
+		assert.equal(toData(prevote), prevoteDataNoBlock);
 	});
 
 	it("#makePrecommitFromBytes - should be ok", async ({ factory }) => {
 		const precommit = await factory.makePrecommitFromBytes(Buffer.from(serializedPrecommit, "hex"));
 
-		assert.equal(precommit.toData(), precommitData);
+		assert.equal(toData(precommit), precommitData);
 	});
 
 	it("#makePrecommitFromBytes - should be ok with no block", async ({ factory }) => {
 		const precommit = await factory.makePrecommitFromBytes(Buffer.from(serializedPrecommitNoBlock, "hex"));
-
-		assert.equal(precommit.toData(), precommitDataNoBlock);
+		assert.equal(toData(precommit), precommitDataNoBlock);
 	});
 });
