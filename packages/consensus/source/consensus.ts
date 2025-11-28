@@ -263,11 +263,12 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	protected async onProposalLocked(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		const proposal = roundState.getProposal();
+
 		if (
 			this.#step !== Enums.Consensus.Step.Propose ||
 			this.#isInvalidRoundState(roundState) ||
 			!proposal ||
-			!proposal.getData().lockProof ||
+			!proposal.lockProof ||
 			proposal.validRound === undefined ||
 			proposal.validRound >= this.#round
 		) {

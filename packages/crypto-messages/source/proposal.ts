@@ -50,6 +50,10 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		return this.#blockHeader;
 	}
 
+	public get lockProof(): Contracts.Crypto.AggregatedSignature | undefined {
+		return this.#lockProof;
+	}
+
 	public get round(): number {
 		return this.#round;
 	}
