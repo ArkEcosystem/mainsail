@@ -22,7 +22,7 @@ export const blockHeader: Contracts.Crypto.BlockHeader = {
 	transactionsCount: 2,
 	transactionsRoot: "f01a3a2a2990990a64211feb47e2fa25c048decb3420ee52562fdc4931225c0f",
 	version: 1,
-}
+};
 
 export const blockData: Contracts.Crypto.BlockData = {
 	...blockHeader,
@@ -61,7 +61,7 @@ export const blockData: Contracts.Crypto.BlockData = {
 			v: 0,
 			value: BigNumber.ZERO,
 		},
-	]
+	],
 };
 
 export const serializedBlock =
