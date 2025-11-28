@@ -79,7 +79,7 @@ export class Command extends Commands.Command {
 
 	async #clearDb(nameLike: string, path: string) {
 		if (existsSync(path)) {
-			const files = readdirSync(path).filter(file => file.includes(nameLike));
+			const files = readdirSync(path).filter((file) => file.includes(nameLike));
 
 			if (files.length === 0) {
 				return;
