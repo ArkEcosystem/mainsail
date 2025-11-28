@@ -37,7 +37,7 @@ describe<{
 				consensusSignature: (method, message, privateKey) =>
 					context.sandbox.app
 						.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
-						[method](message, privateKey),
+					[method](message, privateKey),
 				// @ts-ignore
 				transactionFactory: (method, message, privateKey) =>
 					context.sandbox.app.get(Identifiers.Cryptography.Transaction.Factory)![method](message, privateKey),
@@ -76,7 +76,8 @@ describe<{
 		assert.undefined(proposal.lockProof);
 	});
 
-	it.only("#lockProof - should be undefined", async ({ sandbox }) => {
+	// TODO: Fix test
+	it("#lockProof - should be defined", async ({ sandbox }) => {
 		const proposalWithValidRound = sandbox.app.resolve(Proposal).initialize({
 			...proposalDataWithValidRound,
 			dataSerialized: proposalDataWithValidRound.data.serialized,
@@ -85,8 +86,6 @@ describe<{
 		});
 
 		await proposalWithValidRound.deserializeData();
-		console.log("HERE", proposalWithValidRound.toData().lockProof);
-
 		// assert.defined(proposalWithValidRound.lockProof);
 	});
 
