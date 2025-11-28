@@ -1,8 +1,11 @@
-import type { Contracts } from "@mainsail/contracts";
 import { Enums, Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 
 const isApp = (node: Contracts.Kernel.Application | undefined): node is Contracts.Kernel.Application =>
 	node !== undefined;
+
+const isProposal = (message: Message): message is Contracts.Crypto.Proposal =>
+	(message as Contracts.Crypto.Proposal).blockHeader !== undefined;
 
 export type Message = Contracts.Crypto.Proposal | Contracts.Crypto.Prevote | Contracts.Crypto.Precommit;
 
@@ -19,8 +22,13 @@ export class Messages<T extends Message> {
 		return this.#messages.get(key)!;
 	}
 
+
 	set(message: T): void {
-		this.getMessagesMap(message.blockNumber, message.round).set(message.serialized.toString("hex"), message);
+		if (isProposal(message)) {
+			this.getMessagesMap(message.blockHeader.number, message.round).set(message.serialized.toString("hex"), message);
+		} else {
+			this.getMessagesMap(message.blockNumber, message.round).set(message.serialized.toString("hex"), message);
+		}
 	}
 
 	getMessages(height: number, round: number): T[] {
