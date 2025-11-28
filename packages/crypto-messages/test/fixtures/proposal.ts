@@ -1,11 +1,11 @@
-import type { Contracts } from "@mainsail/contracts";
 import { Enums } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 export const validatorMnemonic =
 	"sudden head royal retire duck discover danger then basic rice wish left whip chronic enrich sun behind idea remind retire coyote select goddess exile";
 
-export const blockData: Contracts.Crypto.BlockData = {
+export const blockHeader: Contracts.Crypto.BlockHeader = {
 	fee: BigNumber.make("10000000000"),
 	gasUsed: 2000,
 	hash: "82139a7708157c8e2b78f0db38216924c8a17f82e77d5997fb280b1435a6cc97",
@@ -19,6 +19,13 @@ export const blockData: Contracts.Crypto.BlockData = {
 	round: 1,
 	stateRoot: "0000000000000000000000000000000000000000000000000000000000000000",
 	timestamp: 1703128709748,
+	transactionsCount: 2,
+	transactionsRoot: "f01a3a2a2990990a64211feb47e2fa25c048decb3420ee52562fdc4931225c0f",
+	version: 1,
+}
+
+export const blockData: Contracts.Crypto.BlockData = {
+	...blockHeader,
 	transactions: [
 		{
 			data: "",
@@ -47,17 +54,14 @@ export const blockData: Contracts.Crypto.BlockData = {
 			nonce: BigNumber.ONE,
 			r: "6c9842bc78c2f68468cbf8a8f3fec0ae2679707ffb606a4b373dd01a02af55fc",
 			s: "1a4c4d984d750678fb204ce8b7e97d860c974ac1a423f098dc4921acd2be0c7d",
-			senderPublicKey: "03043bfdf530d59e919323a33d0c8f5ca43f6b50dfe753c9b3e987a4a5233a2a15",
 			senderLegacyAddress: "DQJTK7of6bPUfJEuL9gUV4qnUyq72eskKe",
+			senderPublicKey: "03043bfdf530d59e919323a33d0c8f5ca43f6b50dfe753c9b3e987a4a5233a2a15",
 			to: "0xBe89811e15f611C1db12e59679b6F3DC1F430155",
 			transactionIndex: 1,
 			v: 0,
 			value: BigNumber.ZERO,
 		},
-	],
-	transactionsCount: 2,
-	transactionsRoot: "f01a3a2a2990990a64211feb47e2fa25c048decb3420ee52562fdc4931225c0f",
-	version: 1,
+	]
 };
 
 export const serializedBlock =
