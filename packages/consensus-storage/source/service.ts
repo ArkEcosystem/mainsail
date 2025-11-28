@@ -72,36 +72,51 @@ export class Service implements Contracts.ConsensusStorage.Service {
 			// Proposals
 			for (const proposal of proposals) {
 				const validator = this.validatorSet.getValidator(proposal.validatorIndex);
-				this.proposalStorage.putSync(`${proposal.round}-${validator.blsPublicKey}`, proposal.serialized.toString("hex"));
+				this.proposalStorage.putSync(
+					`${proposal.round}-${validator.blsPublicKey}`,
+					proposal.serialized.toString("hex"),
+				);
 			}
 
 			// Prevotes
 			for (const prevote of prevotes) {
 				const validator = this.validatorSet.getValidator(prevote.validatorIndex);
-				this.prevoteStorage.putSync(`${prevote.round}-${validator.blsPublicKey}`, prevote.serialized.toString("hex"));
+				this.prevoteStorage.putSync(
+					`${prevote.round}-${validator.blsPublicKey}`,
+					prevote.serialized.toString("hex"),
+				);
 			}
 
 			// Precommits
 			for (const precommit of precommits) {
 				const validator = this.validatorSet.getValidator(precommit.validatorIndex);
-				this.precommitStorage.putSync(`${precommit.round}-${validator.blsPublicKey}`, precommit.serialized.toString("hex"));
+				this.precommitStorage.putSync(
+					`${precommit.round}-${validator.blsPublicKey}`,
+					precommit.serialized.toString("hex"),
+				);
 			}
 		});
 	}
 
 	public async getProposals(): Promise<Contracts.Crypto.Proposal[]> {
 		const proposals = [...this.proposalStorage.getRange().map((item) => item.value)];
-		return Promise.all(proposals.map((proposal) => this.messageFactory.makeProposalFromBytes(Buffer.from(proposal, "hex"))));
+		return Promise.all(
+			proposals.map((proposal) => this.messageFactory.makeProposalFromBytes(Buffer.from(proposal, "hex"))),
+		);
 	}
 
 	public async getPrevotes(): Promise<Contracts.Crypto.Prevote[]> {
 		const prevotes = [...this.prevoteStorage.getRange().map((item) => item.value)];
-		return Promise.all(prevotes.map((prevote) => this.messageFactory.makePrevoteFromBytes(Buffer.from(prevote, "hex"))));
+		return Promise.all(
+			prevotes.map((prevote) => this.messageFactory.makePrevoteFromBytes(Buffer.from(prevote, "hex"))),
+		);
 	}
 
 	public async getPrecommits(): Promise<Contracts.Crypto.Precommit[]> {
 		const precommits = [...this.precommitStorage.getRange().map((item) => item.value)];
-		return Promise.all(precommits.map((precommit) => this.messageFactory.makePrecommitFromBytes(Buffer.from(precommit, "hex"))));
+		return Promise.all(
+			precommits.map((precommit) => this.messageFactory.makePrecommitFromBytes(Buffer.from(precommit, "hex"))),
+		);
 	}
 
 	#clear(): void {
