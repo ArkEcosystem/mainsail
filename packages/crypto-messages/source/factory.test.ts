@@ -71,12 +71,12 @@ describe<{
 				keyType: "consensus",
 				passphrase: validatorMnemonic,
 			})
-			.make<Types.Identity>();
+			.make();
 
-		context.identity = identity;
+		context.identity = identity.keys;
 	});
 
-	it("#makeProposal - should correctly make signed proposal", async ({ blockFactory, factory, identity }) => {
+	it("#makeProposal - should correctly make signed proposal", async ({ factory, identity }) => {
 		const proposal = await factory.makeProposal(
 			{
 				data: {
