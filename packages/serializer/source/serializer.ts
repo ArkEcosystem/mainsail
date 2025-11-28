@@ -4,6 +4,15 @@ import type { Contracts } from "@mainsail/contracts";
 import { NotImplemented } from "@mainsail/exceptions";
 import { assert, BigNumber, ByteBuffer, validatorSetPack, validatorSetUnpack } from "@mainsail/utils";
 
+type TransactionCount = Pick<Contracts.Crypto.BlockData, "transactionsCount">;
+
+const assertTransactionCount: (data: unknown) => asserts data is TransactionCount = (
+	data: unknown,
+): asserts data is TransactionCount => {
+	assert.object(data);
+	assert.number(data["transactionsCount"]);
+};
+
 @injectable()
 export class Serializer implements Contracts.Serializer.Serializer {
 	@inject(Identifiers.Cryptography.Identity.Address.Factory)
@@ -149,7 +158,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 
 	public async deserialize<T>(
 		source: ByteBuffer,
-		target: T,
+		target: Partial<T>,
 		configuration: Contracts.Serializer.DeserializationConfiguration,
 	): Promise<T> {
 		for (const [property, schema] of Object.entries(configuration.schema)) {
@@ -240,9 +249,10 @@ export class Serializer implements Contracts.Serializer.Serializer {
 			}
 
 			if (schema.type === "transactions") {
+				assertTransactionCount(target);
 				target[property] = [];
 
-				for (let index = 0; index < (target as Contracts.Crypto.BlockData).transactionsCount; index++) {
+				for (let index = 0; index < target.transactionsCount; index++) {
 					target[property].push(source.readBytes(source.readUint32()));
 				}
 				continue;
@@ -251,7 +261,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 			throw new NotImplemented(this.constructor.name, schema.type);
 		}
 
-		return target;
+		return target as T;
 	}
 
 	#writeOptional = (schema: { optional?: true }, result: ByteBuffer, value: unknown, write: () => void) => {

@@ -2,7 +2,13 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 
 import { describe, Sandbox } from "../../test-framework/source";
-import { blockData, blockHeader, proposalData, proposalDataWithValidRound, serializedBlock } from "../test/fixtures/proposal";
+import {
+	blockData,
+	blockHeader,
+	proposalData,
+	proposalDataWithValidRound,
+	serializedBlock,
+} from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Proposal } from "./proposal";
 import { assertProposedData } from "../test/helpers/asserts";
@@ -14,7 +20,7 @@ describe<{
 	const data: Contracts.Crypto.ProposedData = {
 		block: {
 			data: blockData,
-			header: { ...blockHeader },
+			header: blockHeader,
 			serialized: serializedBlock.slice(2),
 			transactions: [],
 		},
