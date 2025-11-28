@@ -14,7 +14,7 @@ export class ApiNodesController extends Controller {
 	@inject(ApiDatabaseIdentifiers.ApiNodeRepositoryFactory)
 	private readonly apiNodeRepositoryFactory!: ApiDatabaseContracts.ApiNodeRepositoryFactory;
 
-	public async index(request: Hapi.Request) {
+	public async index(request: Hapi.Request): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.ApiNodeCriteria = request.query;
 		const sorting = this.getListingOrder(request);

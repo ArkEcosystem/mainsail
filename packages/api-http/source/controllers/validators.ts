@@ -18,7 +18,7 @@ export class ValidatorsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
 
-	public async index(request: Hapi.Request) {
+	public async index(request: Hapi.Request): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
 		const criteria = this.getQueryCriteria(
@@ -37,7 +37,7 @@ export class ValidatorsController extends Controller {
 		return this.toPagination(wallets, ValidatorResource);
 	}
 
-	public async show(request: Hapi.Request) {
+	public async show(request: Hapi.Request): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const validator = await this.getWallet(walletId);
@@ -48,7 +48,7 @@ export class ValidatorsController extends Controller {
 		return this.respondWithResource(validator, ValidatorResource);
 	}
 
-	public async voters(request: Hapi.Request) {
+	public async voters(request: Hapi.Request): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const validator = await this.getWallet(walletId);
@@ -79,7 +79,7 @@ export class ValidatorsController extends Controller {
 		return this.toPagination(wallets, WalletResource);
 	}
 
-	public async blocks(request: Hapi.Request) {
+	public async blocks(request: Hapi.Request): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const validator = await this.getWallet(walletId);

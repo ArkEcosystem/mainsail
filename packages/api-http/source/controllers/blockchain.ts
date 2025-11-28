@@ -9,7 +9,7 @@ export class BlockchainController extends Controller {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
 
-	public async index(request: Hapi.Request) {
+	public async index(request: Hapi.Request): Promise<object> {
 		const block = await this.blockRepositoryFactory().getLatest();
 		const state = await this.getState();
 

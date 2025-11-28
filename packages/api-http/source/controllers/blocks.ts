@@ -20,7 +20,7 @@ export class BlocksController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
-	public async index(request: Hapi.Request) {
+	public async index(request: Hapi.Request): Promise<object> {
 		const criteria: Search.Criteria.BlockCriteria = request.query;
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
@@ -50,7 +50,7 @@ export class BlocksController extends Controller {
 		);
 	}
 
-	public async first(request: Hapi.Request) {
+	public async first(request: Hapi.Request): Promise<object> {
 		const block = await this.blockRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -60,7 +60,7 @@ export class BlocksController extends Controller {
 		return this.respondEnrichedBlock(block, request);
 	}
 
-	public async last(request: Hapi.Request) {
+	public async last(request: Hapi.Request): Promise<object> {
 		const block = await this.blockRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -71,7 +71,7 @@ export class BlocksController extends Controller {
 		return this.respondEnrichedBlock(block, request);
 	}
 
-	public async show(request: Hapi.Request) {
+	public async show(request: Hapi.Request): Promise<object> {
 		const blockRepository = this.blockRepositoryFactory();
 		const blockCriteria = this.getBlockCriteriaByIdOrHeight(request.params.id);
 
@@ -80,7 +80,7 @@ export class BlocksController extends Controller {
 		return this.respondEnrichedBlock(block, request);
 	}
 
-	public async transactions(request: Hapi.Request) {
+	public async transactions(request: Hapi.Request): Promise<object> {
 		const blockCriteria = this.getBlockCriteriaByIdOrHeight(request.params.id);
 		const block = await this.blockRepositoryFactory().findOneByCriteria(blockCriteria);
 
@@ -109,7 +109,7 @@ export class BlocksController extends Controller {
 		);
 	}
 
-	private async respondEnrichedBlock(block: Models.Block | null, request: Hapi.Request) {
+	private async respondEnrichedBlock(block: Models.Block | null, request: Hapi.Request): Promise<object> {
 		return this.respondWithResource(await this.enrichBlock(block), BlockResource);
 	}
 }
