@@ -14,10 +14,10 @@ export class Factory {
 		attributes: object;
 		options: FactoryFunctionOptions;
 	} = {
-		attributes: {},
-		options: {},
-		states: new Set<string>(["default"]),
-	};
+			attributes: {},
+			options: {},
+			states: new Set<string>(["default"]),
+		};
 
 	public state(state: string, function_: FactoryFunction): boolean {
 		this.#states.set(state, function_);
