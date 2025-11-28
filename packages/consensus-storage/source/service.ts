@@ -10,13 +10,13 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	private readonly rootStorage!: RootDatabase;
 
 	@inject(Identifiers.ConsensusStorage.Storage.Proposal)
-	private readonly proposalStorage!: Database<Contracts.Crypto.ProposalData>;
+	private readonly proposalStorage!: Database<string>;
 
 	@inject(Identifiers.ConsensusStorage.Storage.PreVote)
-	private readonly prevoteStorage!: Database<Contracts.Crypto.PrevoteData>;
+	private readonly prevoteStorage!: Database<string>;
 
 	@inject(Identifiers.ConsensusStorage.Storage.PreCommit)
-	private readonly precommitStorage!: Database<Contracts.Crypto.PrecommitData>;
+	private readonly precommitStorage!: Database<string>;
 
 	@inject(Identifiers.ConsensusStorage.Storage.ConsensusState)
 	private readonly stateStorage!: Database<Contracts.Consensus.StateData>;
@@ -72,36 +72,36 @@ export class Service implements Contracts.ConsensusStorage.Service {
 			// Proposals
 			for (const proposal of proposals) {
 				const validator = this.validatorSet.getValidator(proposal.validatorIndex);
-				this.proposalStorage.putSync(`${proposal.round}-${validator.blsPublicKey}`, proposal.toData());
+				this.proposalStorage.putSync(`${proposal.round}-${validator.blsPublicKey}`, proposal.serialized.toString("hex"));
 			}
 
 			// Prevotes
 			for (const prevote of prevotes) {
 				const validator = this.validatorSet.getValidator(prevote.validatorIndex);
-				this.prevoteStorage.putSync(`${prevote.round}-${validator.blsPublicKey}`, prevote.toData());
+				this.prevoteStorage.putSync(`${prevote.round}-${validator.blsPublicKey}`, prevote.serialized.toString("hex"));
 			}
 
 			// Precommits
 			for (const precommit of precommits) {
 				const validator = this.validatorSet.getValidator(precommit.validatorIndex);
-				this.precommitStorage.putSync(`${precommit.round}-${validator.blsPublicKey}`, precommit.toData());
+				this.precommitStorage.putSync(`${precommit.round}-${validator.blsPublicKey}`, precommit.serialized.toString("hex"));
 			}
 		});
 	}
 
 	public async getProposals(): Promise<Contracts.Crypto.Proposal[]> {
 		const proposals = [...this.proposalStorage.getValues(undefined as unknown as Key)];
-		return Promise.all(proposals.map((proposal) => this.messageFactory.makeProposalFromData(proposal)));
+		return Promise.all(proposals.map((proposal) => this.messageFactory.makeProposalFromBytes(Buffer.from(proposal, "hex"))));
 	}
 
 	public async getPrevotes(): Promise<Contracts.Crypto.Prevote[]> {
 		const prevotes = [...this.prevoteStorage.getValues(undefined as unknown as Key)];
-		return Promise.all(prevotes.map((prevote) => this.messageFactory.makePrevoteFromData(prevote)));
+		return Promise.all(prevotes.map((prevote) => this.messageFactory.makePrevoteFromBytes(Buffer.from(prevote, "hex"))));
 	}
 
 	public async getPrecommits(): Promise<Contracts.Crypto.Precommit[]> {
 		const precommits = [...this.precommitStorage.getValues(undefined as unknown as Key)];
-		return Promise.all(precommits.map((precommit) => this.messageFactory.makePrecommitFromData(precommit)));
+		return Promise.all(precommits.map((precommit) => this.messageFactory.makePrecommitFromBytes(Buffer.from(precommit, "hex"))));
 	}
 
 	#clear(): void {
