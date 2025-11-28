@@ -1,6 +1,6 @@
 import type { Enums } from "@mainsail/constants";
 
-import type { Block } from "./block.js";
+import type { Block, BlockHeader } from "./block.js";
 import type { KeyPair } from "./identities.js";
 import type { AggregatedSignature } from "./signatures.js";
 
@@ -20,7 +20,7 @@ export type SignaturePrevoteData = WithOptionalBlockHash<SignatureMessageData>;
 export type SignaturePrecommitData = WithOptionalBlockHash<SignatureMessageData>;
 
 export interface ProposalData {
-	readonly blockNumber: number;
+	readonly blockHeader: BlockHeader;
 	readonly round: number;
 	readonly data: { serialized: string };
 	readonly validatorIndex: number;

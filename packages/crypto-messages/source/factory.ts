@@ -53,7 +53,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		serialized?: Buffer,
 	): Promise<Contracts.Crypto.Proposal> {
 		this.#applySchema("proposal", proposalData);
-		const header = await this.#getBlockHeaderFromProposedData(Buffer.from(proposalData.data.serialized, "hex"));
+		const blockHeader = await this.#getBlockHeaderFromProposedData(Buffer.from(proposalData.data.serialized, "hex"));
 
 		if (!serialized) {
 			serialized = await this.serializer.serializeProposal(proposalData, { includeSignature: true });
@@ -61,7 +61,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 
 		return this.app.resolve<Proposal>(Proposal).initialize({
 			...proposalData,
-			blockNumber: header.number,
+			blockHeader: blockHeader,
 			dataSerialized: proposalData.data.serialized,
 			serialized,
 		});
