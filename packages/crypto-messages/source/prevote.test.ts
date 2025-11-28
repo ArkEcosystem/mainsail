@@ -1,5 +1,5 @@
 import { describe, Sandbox } from "../../test-framework/source";
-import { prevoteData } from "../test/fixtures/proposal";
+import { prevoteData } from "../test/fixtures/index.js";
 import { Prevote } from "./prevote";
 
 describe<{

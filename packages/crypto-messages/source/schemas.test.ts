@@ -13,7 +13,7 @@ import {
 	prevoteData,
 	prevoteDataNoBlock,
 	proposalData,
-} from "../test/fixtures/proposal";
+} from "../test/fixtures/index.js";
 import { makeKeywords as makeMessageKeywords } from "./keywords";
 import { schemas } from "./schemas";
 

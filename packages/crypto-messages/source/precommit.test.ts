@@ -1,5 +1,5 @@
 import { describe, Sandbox } from "../../test-framework/source";
-import { precommitData } from "../test/fixtures/proposal";
+import { precommitData } from "../test/fixtures/index.js";
 import { Precommit } from "./precommit";
 
 describe<{

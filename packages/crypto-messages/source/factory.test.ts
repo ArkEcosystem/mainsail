@@ -21,7 +21,7 @@ import {
 	serializedProposal,
 	serializedProposalDataWithValidRound,
 	validatorMnemonic,
-} from "../test/fixtures/proposal";
+} from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { MessageFactory } from "./factory";
 
@@ -73,7 +73,7 @@ describe<{
 			})
 			.make();
 
-		context.identity = identity.keys;
+		context.identity = identity;
 	});
 
 	it("#makeProposal - should correctly make signed proposal", async ({ factory, identity }) => {

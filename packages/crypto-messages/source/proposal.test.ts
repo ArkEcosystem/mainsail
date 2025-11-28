@@ -8,7 +8,7 @@ import {
 	proposalData,
 	proposalDataWithValidRound,
 	serializedBlock,
-} from "../test/fixtures/proposal";
+} from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Proposal } from "./proposal";
 import { assertProposedData } from "../test/helpers/asserts";
