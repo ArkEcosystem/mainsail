@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { describe, Sandbox } from "../../test-framework/source";
 import {
@@ -19,7 +19,7 @@ import {
 	serializedProposalDataWithValidRound,
 	serializedProposalDataWithValidRoundForSignature,
 	serializedProposalForSignature,
-} from "../test/fixtures/proposal";
+} from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Deserializer } from "./deserializer";
 import { Serializer } from "./serializer";

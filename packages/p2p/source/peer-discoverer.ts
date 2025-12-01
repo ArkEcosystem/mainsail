@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Services } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
 import { readJSONSync } from "fs-extra/esm";
@@ -37,8 +38,8 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 		}
 	}
 
-	async populateSeedPeers(): Promise<any> {
-		const peerList: Contracts.P2P.PeerData[] = this.app.config("peers").list;
+	async populateSeedPeers(): Promise<void> {
+		const peerList = this.app.config<{ list: Contracts.P2P.PeerData[] }>("peers")?.list ?? [];
 
 		try {
 			const peersFromUrl = await this.#loadPeersFromUrlList();
@@ -62,7 +63,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 			return peerInstance;
 		});
 
-		return Promise.all(
+		await Promise.all(
 			Object.values(peers).map((peer: Contracts.P2P.Peer) =>
 				this.app.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service).call<{
 					ip: string;
@@ -74,7 +75,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 
 	// TODO: Get from all sources
 	async #loadPeersFromUrlList(): Promise<Array<{ ip: string; port: number }>> {
-		const urls: string[] = this.app.config("peers").sources || [];
+		const urls: string[] = this.app.config<{ sources: string[] }>("peers")?.sources || [];
 
 		for (const url of urls) {
 			// Local File...
@@ -84,7 +85,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 
 			// URL...
 			this.logger.debug(`GET ${url}`, "p2p");
-			const { data } = await http.get(url);
+			const { data } = await http.get<string | Array<{ ip: string; port: number }>>(url);
 			return typeof data === "object" ? data : JSON.parse(data);
 		}
 

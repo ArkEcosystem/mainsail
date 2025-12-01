@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { RpcError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 import dayjs from "dayjs";
@@ -20,7 +21,7 @@ interface EstimateOutcome {
 }
 
 @injectable()
-export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
+export class EthEstimateGasAction implements Contracts.Api.RPC.Action<[TxData]> {
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "rpc")
 	private readonly evm!: Contracts.Evm.Instance;
@@ -56,7 +57,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 	};
 
 	// Loosely based on https://github.com/ethereum/go-ethereum/blob/5606cbc710ffcf327740e4db54776eb8a3c1a2fc/eth/gasestimator/gasestimator.go#L54
-	public async handle(parameters: [TxData]): Promise<any> {
+	public async handle(parameters: [TxData]): Promise<string> {
 		const defaultGas = 21_000;
 
 		const [data] = parameters;

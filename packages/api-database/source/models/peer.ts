@@ -40,12 +40,12 @@ export class Peer {
 		nullable: true,
 		type: "jsonb",
 	})
-	public ports!: Record<string, any> | undefined;
+	public ports!: Record<string, unknown> | undefined;
 
 	@Column({
 		default: undefined,
 		nullable: true,
 		type: "jsonb",
 	})
-	public plugins!: Record<string, any> | undefined;
+	public plugins!: Record<string, unknown> | undefined;
 }

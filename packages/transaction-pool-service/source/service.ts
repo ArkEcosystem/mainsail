@@ -1,14 +1,14 @@
+import { EnvironmentVariables, Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Constants, Contracts, Events, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { PoolError, TransactionAlreadyInPoolError, TransactionPoolFullError } from "@mainsail/exceptions";
-import { Providers } from "@mainsail/kernel";
 import { BigNumber, Lock, randomNumber } from "@mainsail/utils";
 
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool-service")
-	private readonly pluginConfiguration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	@tagged("type", "wallet")
@@ -48,8 +48,8 @@ export class Service implements Contracts.TransactionPool.Service {
 
 	public async boot(): Promise<void> {
 		if (
-			process.env[Constants.EnvironmentVariables.MAINSAIL_RESET_DATABASE] ||
-			process.env[Constants.EnvironmentVariables.MAINSAIL_RESET_POOL]
+			process.env[EnvironmentVariables.MAINSAIL_RESET_DATABASE] ||
+			process.env[EnvironmentVariables.MAINSAIL_RESET_POOL]
 		) {
 			await this.flush();
 		}

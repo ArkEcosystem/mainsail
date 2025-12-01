@@ -1,20 +1,17 @@
-import type * as types from "./proto/protos.d.ts";
-import * as _protos from "./proto/protos.js";
-
-const proto = (_protos as any).default.getStatus as typeof types.getStatus;
+import { getStatus as proto } from "./proto/protos.js";
 
 export const getStatus = {
 	request: {
-		deserialize: (payload: Buffer): Record<string, any> => proto.GetStatusRequest.decode(payload),
-		serialize: (object: types.getStatus.GetStatusRequest): Buffer =>
+		deserialize: (payload: Buffer): proto.IGetStatusRequest => proto.GetStatusRequest.decode(payload),
+		serialize: (object: proto.IGetStatusRequest): Buffer =>
 			Buffer.from(proto.GetStatusRequest.encode(object).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): types.getStatus.IGetStatusResponse =>
+		deserialize: (payload: Buffer): proto.IGetStatusResponse =>
 			proto.GetStatusResponse.toObject(proto.GetStatusResponse.decode(payload), {
 				defaults: true,
 			}),
-		serialize: (object: types.getStatus.IGetStatusResponse): Buffer =>
+		serialize: (object: proto.IGetStatusResponse): Buffer =>
 			Buffer.from(proto.GetStatusResponse.encode(object).finish()),
 	},
 };

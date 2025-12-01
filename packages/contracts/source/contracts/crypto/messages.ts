@@ -1,11 +1,10 @@
-import { Block } from "./block.js";
-import { KeyPair } from "./identities.js";
-import { AggregatedSignature } from "./signatures.js";
+import type { Enums } from "@mainsail/constants";
 
-export enum MessageType {
-	Prevote = 1,
-	Precommit = 2,
-}
+import type { Block, BlockHeader } from "./block.js";
+import type { KeyPair } from "./identities.js";
+import type { AggregatedSignature } from "./signatures.js";
+
+export type MessageType = Enums.Crypto.MessageType;
 
 export interface SignatureMessageData {
 	readonly type: MessageType;
@@ -21,7 +20,8 @@ export type SignaturePrevoteData = WithOptionalBlockHash<SignatureMessageData>;
 export type SignaturePrecommitData = WithOptionalBlockHash<SignatureMessageData>;
 
 export interface ProposalData {
-	readonly blockNumber: number;
+	readonly blockHeader: BlockHeader;
+	readonly lockProof?: AggregatedSignature;
 	readonly round: number;
 	readonly data: { serialized: string };
 	readonly validatorIndex: number;
@@ -63,7 +63,6 @@ export interface Prevote extends PrevoteData {
 	readonly serialized: Buffer;
 
 	toSignatureData(): SignaturePrevoteData;
-	toData(): PrevoteData;
 	toString(): string;
 }
 
@@ -80,7 +79,6 @@ export interface Precommit extends PrecommitData {
 	readonly serialized: Buffer;
 
 	toSignatureData(): SignaturePrecommitData;
-	toData(): PrecommitData;
 	toString(): string;
 }
 

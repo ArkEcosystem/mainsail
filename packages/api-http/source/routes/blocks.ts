@@ -1,10 +1,18 @@
-import Hapi from "@hapi/hapi";
+import type Hapi from "@hapi/hapi";
 import { Schemas } from "@mainsail/api-common";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { BlocksController } from "../controllers/blocks.js";
-import { blockSortingSchema, transactionSortingSchema } from "../schemas/index.js";
+import {
+	blockCriteriaSchemas,
+	blockHash,
+	blocksOrderBy,
+	blockSortingSchema,
+	transactionCriteriaSchemas,
+	transactionsOrderBy,
+	transactionSortingSchema,
+} from "../schemas/index.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(BlocksController);
@@ -21,8 +29,8 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				query: Joi.object({
-					...server.app.schemas.blockCriteriaSchemas,
-					orderBy: server.app.schemas.blocksOrderBy,
+					...blockCriteriaSchemas,
+					orderBy: blocksOrderBy,
 				})
 					.concat(blockSortingSchema)
 					.concat(Schemas.pagination),
@@ -59,7 +67,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		options: {
 			validate: {
 				params: Joi.object({
-					id: server.app.schemas.blockHash,
+					id: blockHash,
 				}),
 				query: Joi.object({}),
 			},
@@ -81,9 +89,9 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					id: Joi.string(),
 				}),
 				query: Joi.object({
-					...server.app.schemas.transactionCriteriaSchemas,
+					...transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
-					orderBy: server.app.schemas.transactionsOrderBy,
+					orderBy: transactionsOrderBy,
 				})
 					.concat(transactionSortingSchema)
 					.concat(Schemas.pagination),

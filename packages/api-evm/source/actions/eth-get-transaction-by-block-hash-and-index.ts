@@ -1,10 +1,11 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { TransactionResource } from "../resources/index.js";
 
 @injectable()
-export class EthGetTransactionByBlockHashAndIndex implements Contracts.Api.RPC.Action {
+export class EthGetTransactionByBlockHashAndIndex implements Contracts.Api.RPC.Action<[string, string]> {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -23,7 +24,7 @@ export class EthGetTransactionByBlockHashAndIndex implements Contracts.Api.RPC.A
 		type: "array",
 	};
 
-	public async handle(parameters: [string, string]): Promise<any> {
+	public async handle(parameters: [string, string]): Promise<object | null> {
 		const transaction = await this.databaseService.getTransactionByBlockHashAndIndex(
 			parameters[0].slice(2),
 			Number.parseInt(parameters[1]),

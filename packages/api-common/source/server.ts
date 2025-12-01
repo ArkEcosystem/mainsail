@@ -1,8 +1,15 @@
 import Boom from "@hapi/boom";
-import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
+import {
+	Plugin,
+	Server as HapiServer,
+	ServerInjectOptions,
+	ServerInjectResponse,
+	ServerRegisterPluginObject,
+	ServerRoute,
+} from "@hapi/hapi";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 import { merge } from "@mainsail/utils";
 import { readFileSync } from "fs";
 
@@ -40,7 +47,6 @@ export abstract class AbstractServer {
 		this.server.listener.headersTimeout = timeout;
 
 		this.server.app.app = this.app;
-		this.server.app.schemas = this.schemas();
 		this.server.app.rpc = this.app.resolve(Processor);
 
 		this.server.ext("onPreHandler", (request, h) => {
@@ -92,8 +98,11 @@ export abstract class AbstractServer {
 		}
 	}
 
-	// @todo: add proper types
-	public async register(plugins: any): Promise<void> {
+	public async registerPlugins<T = unknown>(plugins: Plugin<T>[]): Promise<void> {
+		await this.server.register(plugins);
+	}
+
+	public async registerHandlers<T = unknown>(plugins: ServerRegisterPluginObject<T>): Promise<void> {
 		return this.server.register(plugins);
 	}
 
@@ -113,18 +122,17 @@ export abstract class AbstractServer {
 		return this.server.inject(options);
 	}
 
-	protected abstract pluginConfiguration(): Providers.PluginConfiguration;
-	protected abstract defaultOptions(): Record<string, any>;
-	protected abstract schemas(): any;
+	protected abstract pluginConfiguration(): Contracts.Kernel.PluginConfiguration;
+	protected abstract defaultOptions(): Record<string, unknown>;
 
-	private getServerOptions(options: Record<string, any>): object {
+	private getServerOptions(options: Record<string, unknown>): object {
 		options = { ...options };
 
 		delete options.enabled;
 
-		if (options.tls) {
-			options.tls.key = readFileSync(options.tls.key).toString();
-			options.tls.cert = readFileSync(options.tls.cert).toString();
+		if (options.tls && options.tls["key"]) {
+			options.tls["key"] = readFileSync(options.tls["key"]).toString();
+			options.tls["cert"] = readFileSync(options.tls["cert"]).toString();
 		}
 
 		options.debug = false;

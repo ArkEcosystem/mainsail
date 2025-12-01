@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { getPublicKey } from "@noble/ed25519";
 // Fixes "etc.sha512Sync not set" (fix from https://github.com/paulmillr/noble-ed25519#usage)
 import { etc } from "@noble/ed25519";
@@ -37,7 +38,7 @@ export class KeyPairFactory implements Contracts.Crypto.KeyPairFactory {
 		return {
 			compressed: true,
 			privateKey: Buffer.from(privateKey).toString("hex"),
-			publicKey: Buffer.from(await getPublicKey(privateKey)).toString("hex"),
+			publicKey: Buffer.from(getPublicKey(privateKey)).toString("hex"),
 		};
 	}
 }

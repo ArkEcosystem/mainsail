@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Bootstrapper {
@@ -87,7 +88,7 @@ export class Bootstrapper {
 	}
 
 	async #setGenesisCommit(): Promise<void> {
-		const genesisBlockJson = this.configuration.get("genesisBlock");
+		const genesisBlockJson = this.configuration.get<Contracts.Crypto.CommitJson>("genesisBlock");
 		const genesisBlock = await this.commitFactory.fromJson(genesisBlockJson);
 
 		this.stateStore.setGenesisCommit(genesisBlock);

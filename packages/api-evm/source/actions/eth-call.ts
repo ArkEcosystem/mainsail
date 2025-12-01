@@ -1,17 +1,21 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { RpcError } from "@mainsail/exceptions";
-import { toBytes } from "viem";
+import dayjs from "dayjs";
+import { zeroAddress } from "viem";
 
 type TxData = {
 	from?: string;
 	to: string;
 	data: string;
 	gas?: string;
+	gasPrice?: string;
+	value?: string;
 };
 
 @injectable()
-export class CallAction implements Contracts.Api.RPC.Action {
+export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.Crypto.BlockTag]> {
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "rpc")
 	private readonly evm!: Contracts.Evm.Instance;
@@ -47,33 +51,95 @@ export class CallAction implements Contracts.Api.RPC.Action {
 		type: "array",
 	};
 
-	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<any> {
+	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<string> {
 		const [data] = parameters;
+		const milestone = this.configuration.getMilestone();
 
-		const {
-			block: { maxGasLimit },
-		} = this.configuration.getMilestone();
+		try {
+			const { receipt } = await this.evm.simulate({
+				blockContext: this.#getBlockContext(milestone),
+				data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
+				from: data.from ?? zeroAddress,
+				gasLimit: this.#getGasLimit(data, milestone),
+				gasPrice: this.#getGasPrice(data, milestone),
+				nonce: await this.#getNonce(data),
+				specId: milestone.evmSpec,
+				to: data.to,
+				value: data.value ? BigInt(data.value) : BigInt(0),
+			});
 
-		// Cap gas limit to block gas limit
-		let gasLimit = BigInt(maxGasLimit);
-		if (data.gas) {
-			const userGasLimit = BigInt(data.gas);
-			gasLimit = userGasLimit < gasLimit ? userGasLimit : gasLimit;
-		}
-
-		const { success, output } = await this.evm.view({
-			// default to zero address
-			data: Buffer.from(toBytes(data.data)),
-			from: data.from ?? "0x" + "0".repeat(40),
-			gasLimit,
-			specId: Contracts.Evm.SpecId.LATEST,
-			to: data.to,
-		});
-
-		if (success) {
-			return `0x${output?.toString("hex")}`;
+			if (receipt.status === 1) {
+				return `0x${receipt.output?.toString("hex")}`;
+			}
+		} catch (ex) {
+			throw new RpcError(`execution reverted: ${ex.message}`);
 		}
 
 		throw new RpcError("execution reverted");
+	}
+
+	#getGasLimit(data: TxData, milestone: Contracts.Crypto.Milestone): bigint {
+		const {
+			gas: { maximumGasLimit, minimumGasLimit },
+		} = milestone;
+
+		// Cap gas limit to milestone gas limits
+		if (data.gas) {
+			const userGasLimit = BigInt(data.gas);
+
+			if (userGasLimit > maximumGasLimit) {
+				return BigInt(maximumGasLimit);
+			}
+
+			if (userGasLimit < minimumGasLimit) {
+				return BigInt(minimumGasLimit);
+			}
+		}
+
+		return BigInt(maximumGasLimit);
+	}
+
+	#getGasPrice(data: TxData, milestone: Contracts.Crypto.Milestone): bigint {
+		const {
+			gas: { minimumGasPrice, maximumGasPrice },
+		} = milestone;
+
+		// Accept 0 gas price for view calls
+		// Cap gas price to milestone limits if !== 0
+		if (data.gasPrice) {
+			const userGasPrice = BigInt(data.gasPrice);
+
+			if (userGasPrice === 0n) {
+				return 0n;
+			}
+
+			if (userGasPrice < minimumGasPrice) {
+				return BigInt(minimumGasPrice);
+			}
+
+			if (userGasPrice > maximumGasPrice) {
+				return BigInt(maximumGasPrice);
+			}
+		}
+
+		return 0n;
+	}
+
+	async #getNonce(data: TxData): Promise<bigint> {
+		if (data.from) {
+			const accountInfo = await this.evm.getAccountInfo(data.from);
+			return BigInt(accountInfo.nonce);
+		}
+
+		return 0n;
+	}
+
+	#getBlockContext(milestone: Contracts.Crypto.Milestone): Contracts.Evm.BlockContext {
+		return {
+			commitKey: { blockNumber: BigInt(this.configuration.getHeight()), round: BigInt(0) },
+			gasLimit: BigInt(milestone.block.maxGasLimit),
+			timestamp: BigInt(dayjs().valueOf()),
+			validatorAddress: "0x0000000000000000000000000000000000000001",
+		};
 	}
 }

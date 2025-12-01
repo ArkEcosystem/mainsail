@@ -1,6 +1,7 @@
+import { NamedPlugin, Plugin } from "@hapi/hapi";
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
+import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
 
 import Handlers from "./handlers.js";
 import { Server } from "./server.js";
@@ -19,14 +20,28 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 		return Server;
 	}
 
-	protected getHandlers(): any {
-		return Handlers;
+	protected getHandlers(): NamedPlugin<unknown> {
+		return Handlers as unknown as NamedPlugin<unknown>;
 	}
 
 	public async boot(): Promise<void> {}
 
-	protected getPlugins(): any[] {
-		const config = this.config().get<any>("plugins");
+	protected getPlugins(): Plugin<unknown>[] {
+		const config = this.config().getRequired<{
+			trustProxy: boolean;
+			whitelist: string[];
+			socketTimeout: number;
+			rateLimit: {
+				blacklist: string[];
+				duration: number;
+				enabled: boolean;
+				points: number;
+				whitelist: string[];
+			};
+			pagination: {
+				limit: number;
+			};
+		}>("plugins");
 
 		return [
 			{
@@ -54,6 +69,6 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				},
 				plugin: Plugins.pagination,
 			},
-		];
+		] as unknown as Plugin<unknown>[];
 	}
 }

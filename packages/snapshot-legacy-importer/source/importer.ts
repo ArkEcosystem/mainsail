@@ -2,11 +2,11 @@ import { createHash } from "node:crypto";
 import { promisify } from "node:util";
 import { brotliDecompress } from "node:zlib";
 
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
-import { Providers } from "@mainsail/kernel";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, BigNumber, chunk } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
@@ -37,7 +37,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "snapshot-legacy-importer")
-	private readonly pluginConfiguration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
@@ -204,9 +204,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				legacyAttributes: {
 					legacyNonce: BigNumber.make(wallet.legacyNonce).toBigInt(),
 					multiSignature: wallet.attributes?.["multiSignature"]?.["publicKeys"]
-						? wallet.attributes?.["multiSignature"]
+						? (wallet.attributes?.[
+								"multiSignature"
+							] as Contracts.Snapshot.ImportedLegacyMultiSignatureAttribute)
 						: undefined,
-					secondPublicKey: wallet.attributes?.["secondPublicKey"] ?? undefined,
+					secondPublicKey: (wallet.attributes?.["secondPublicKey"] as string) ?? undefined,
 				},
 				publicKey: wallet.publicKey,
 			});
@@ -214,7 +216,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			if (wallet.attributes?.["vote"]) {
 				assert.string(wallet.publicKey);
 
-				const votedWallet = publicKeyLookup[wallet.attributes?.["vote"]];
+				const votedWallet = publicKeyLookup[wallet.attributes?.["vote"] as string];
 				assert.defined(votedWallet);
 				assert.defined(votedWallet.ethAddress);
 

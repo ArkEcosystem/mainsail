@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Header implements Contracts.P2P.Header {
@@ -20,7 +21,7 @@ export class Header implements Contracts.P2P.Header {
 	public proposal?: Contracts.Crypto.Proposal;
 
 	@postConstruct()
-	public init() {
+	public init(): void {
 		this.blockNumber = this.consensus.getBlockNumber();
 		this.round = this.consensus.getRound();
 		this.step = this.consensus.getStep();
@@ -34,8 +35,7 @@ export class Header implements Contracts.P2P.Header {
 	public toData(): Contracts.P2P.HeaderData {
 		return {
 			blockNumber: this.blockNumber,
-			proposedBlockHash:
-				this.proposal && this.proposal.isDataDeserialized ? this.proposal.getData().block.data.hash : undefined,
+			proposedBlockHash: this.proposal ? this.proposal.blockHeader.hash : undefined,
 			round: this.round,
 			step: this.step,
 			validatorsSignedPrecommit: this.validatorsSignedPrecommit,

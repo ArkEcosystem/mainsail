@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { MessageSchemaError } from "@mainsail/exceptions";
 import { ByteBuffer } from "@mainsail/utils";
 
@@ -52,7 +53,9 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		serialized?: Buffer,
 	): Promise<Contracts.Crypto.Proposal> {
 		this.#applySchema("proposal", proposalData);
-		const header = await this.#getBlockHeaderFromProposedData(Buffer.from(proposalData.data.serialized, "hex"));
+		const { blockHeader, lockProof } = await this.#getLockProofAndBlockHeaderFromProposedData(
+			Buffer.from(proposalData.data.serialized, "hex"),
+		);
 
 		if (!serialized) {
 			serialized = await this.serializer.serializeProposal(proposalData, { includeSignature: true });
@@ -60,8 +63,9 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 
 		return this.app.resolve<Proposal>(Proposal).initialize({
 			...proposalData,
-			blockNumber: header.number,
+			blockHeader,
 			dataSerialized: proposalData.data.serialized,
+			lockProof,
 			serialized,
 		});
 	}
@@ -156,14 +160,22 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		return new Precommit({ ...data, serialized });
 	}
 
-	// Performance can be improved by returning only a block height
-	async #getBlockHeaderFromProposedData(bytes: Buffer): Promise<Contracts.Crypto.BlockHeader> {
+	async #getLockProofAndBlockHeaderFromProposedData(
+		bytes: Buffer,
+	): Promise<{ blockHeader: Contracts.Crypto.BlockHeader; lockProof?: Contracts.Crypto.AggregatedSignature }> {
 		const buffer = ByteBuffer.fromBuffer(bytes);
 
 		const lockProofLength = buffer.readUint8();
-		buffer.skip(lockProofLength);
 
-		return this.blockDeserializer.deserializeHeader(buffer.getRemainder());
+		let lockProof: Contracts.Crypto.AggregatedSignature | undefined;
+		if (lockProofLength > 0) {
+			const lockProofBuffer = buffer.readBytes(lockProofLength);
+			lockProof = await this.deserializer.deserializeLockProof(lockProofBuffer);
+		}
+
+		const blockHeader = await this.blockDeserializer.deserializeHeader(buffer.getRemainder());
+
+		return { blockHeader, lockProof };
 	}
 
 	#applySchema<T>(schema: string, data: T): T {

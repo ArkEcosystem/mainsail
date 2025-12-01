@@ -1,8 +1,15 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 import { generateMnemonic } from "bip39";
 
-import { FactoryBuilder } from "../factory-builder.js";
+import type { FactoryBuilder } from "../factory-builder.js";
 import { generateApp } from "./generate-app.js";
+
+type Options = {
+	passphrase?: string;
+	keyType?: string;
+	app?: Contracts.Kernel.Application;
+};
 
 export const registerIdentityFactory = async (
 	factory: FactoryBuilder,
@@ -10,7 +17,7 @@ export const registerIdentityFactory = async (
 ): Promise<void> => {
 	const app = await generateApp(config);
 
-	factory.set("Identity", async ({ options }) => {
+	factory.set("Identity", async ({ options }: { options: Options }) => {
 		const passphrase: string = options.passphrase || generateMnemonic();
 		const keyType = options.keyType || "wallet";
 		const application: Contracts.Kernel.Application = options.app || app;

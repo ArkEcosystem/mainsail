@@ -1,9 +1,9 @@
 import { isObject } from "@mainsail/utils";
 
-import { Wallet } from "../../models/index.js";
+import type { Wallet } from "../../models/index.js";
 import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
-import { EqualCriteria, OrWalletCriteria, WalletCriteria } from "../types/criteria.js";
-import { Expression, JsonFieldCastType, OrExpression } from "../types/expressions.js";
+import type { EqualCriteria, NumericCriteria, OrWalletCriteria, WalletCriteria } from "../types/criteria.js";
+import type { Expression, JsonFieldCastType, OrExpression } from "../types/expressions.js";
 
 export class WalletFilter {
 	public static async getExpression(...criteria: OrWalletCriteria[]): Promise<Expression<Wallet>> {
@@ -70,7 +70,9 @@ export class WalletFilter {
 		};
 	}
 
-	public static async handleAttributesCriteria(criteria: Record<string, any>): Promise<OrExpression<Wallet>> {
+	public static async handleAttributesCriteria(
+		criteria: Record<string, NumericCriteria<string>>,
+	): Promise<OrExpression<Wallet>> {
 		return {
 			expressions: await Promise.all(
 				Object.entries(criteria).map(async ([k, v]) => {

@@ -1,9 +1,10 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { RpcError } from "@mainsail/exceptions";
 
 @injectable()
-export class EthGetUncleByBlockHashAndIndex implements Contracts.Api.RPC.Action {
+export class EthGetUncleByBlockHashAndIndex implements Contracts.Api.RPC.Action<[string]> {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 

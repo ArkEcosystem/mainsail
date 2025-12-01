@@ -1,10 +1,15 @@
-import Hapi from "@hapi/hapi";
+import type Hapi from "@hapi/hapi";
 import { Schemas } from "@mainsail/api-common";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { VotesController } from "../controllers/votes.js";
-import { transactionHashSchema, transactionSortingSchema } from "../schemas/index.js";
+import {
+	transactionCriteriaSchemas,
+	transactionHashSchema,
+	transactionsOrderBy,
+	transactionSortingSchema,
+} from "../schemas/index.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(VotesController);
@@ -21,9 +26,9 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				query: Joi.object({
-					...server.app.schemas.transactionCriteriaSchemas,
+					...transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
-					orderBy: server.app.schemas.transactionsOrderBy,
+					orderBy: transactionsOrderBy,
 				})
 					.concat(transactionSortingSchema)
 					.concat(Schemas.pagination),

@@ -9,7 +9,7 @@ export class Table {
 	@inject(Identifiers.Logger)
 	private readonly logger!: Logger;
 
-	public render(head: string[], callback: any, options: object = {}): void {
+	public render(head: string[], callback: (table: Table3.Table) => void, options: object = {}): void {
 		const table = new Table3({
 			chars: { "left-mid": "", mid: "", "mid-mid": "", "right-mid": "" },
 			head,

@@ -1,4 +1,5 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { resolve } from "path";
@@ -175,7 +176,7 @@ const bootstrap = async (sandbox: Sandbox) => {
 	const configuration = sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const commitFactory = sandbox.app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
 
-	const genesisCommitJson = configuration.get("genesisBlock");
+	const genesisCommitJson = configuration.get<Contracts.Crypto.CommitJson>("genesisBlock");
 	const genesisCommit = await commitFactory.fromJson(genesisCommitJson);
 
 	const store = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);

@@ -1,4 +1,5 @@
-import { Contracts } from "@mainsail/contracts";
+import { Enums } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 
 export class Prevote implements Contracts.Crypto.Prevote {
 	#blockNumber: number;
@@ -25,7 +26,7 @@ export class Prevote implements Contracts.Crypto.Prevote {
 	}
 
 	get type(): Contracts.Crypto.MessageType {
-		return Contracts.Crypto.MessageType.Prevote;
+		return Enums.Crypto.MessageType.Prevote;
 	}
 
 	get blockNumber(): number {
@@ -68,17 +69,6 @@ export class Prevote implements Contracts.Crypto.Prevote {
 			blockNumber: this.#blockNumber,
 			round: this.#round,
 			type: this.type,
-		};
-	}
-
-	toData(): Contracts.Crypto.PrevoteData {
-		return {
-			blockHash: this.#blockHash,
-			blockNumber: this.#blockNumber,
-			round: this.#round,
-			signature: this.#signature,
-			type: this.type,
-			validatorIndex: this.#validatorIndex,
 		};
 	}
 }

@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class NullEventDispatcher implements Contracts.Kernel.EventDispatcher {
@@ -41,27 +41,27 @@ export class NullEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		return 0;
 	}
 
-	public async dispatch<T = any>(event: string, data?: T): Promise<void> {
+	public async dispatch<T = unknown>(event: string, data?: T): Promise<void> {
 		//
 	}
 
-	public async dispatchSeq<T = any>(event: string, data?: T): Promise<void> {
+	public async dispatchSeq<T = unknown>(event: string, data?: T): Promise<void> {
 		//
 	}
 
-	public dispatchSync<T = any>(event: string, data?: T): void {
+	public dispatchSync<T = unknown>(event: string, data?: T): void {
 		//
 	}
 
-	public async dispatchMany<T = any>(events: Array<[string, T]>): Promise<void> {
+	public async dispatchMany<T = unknown>(events: Array<[string, T]>): Promise<void> {
 		//
 	}
 
-	public async dispatchManySeq<T = any>(events: Array<[string, T]>): Promise<void> {
+	public async dispatchManySeq<T = unknown>(events: Array<[string, T]>): Promise<void> {
 		//
 	}
 
-	public dispatchManySync<T = any>(events: Array<[string, T]>): void {
+	public dispatchManySync<T = unknown>(events: Array<[string, T]>): void {
 		//
 	}
 }

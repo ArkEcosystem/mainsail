@@ -1,11 +1,10 @@
 import { injectable } from "@mainsail/container";
-
-import { ActionArguments } from "../../types/index.js";
+import type { Contracts } from "@mainsail/contracts";
 
 type ActionFunction<T> = (arguments_: T) => T;
 
 @injectable()
-export abstract class Action<T = any> {
+export abstract class Action<T = unknown> {
 	readonly #hooks = {
 		after: new Set<ActionFunction<T>>(),
 		before: new Set<ActionFunction<T>>(),
@@ -36,6 +35,6 @@ export abstract class Action<T = any> {
 
 	// As suggested in: https://stackoverflow.com/questions/54378992/overriding-a-generic-method-in-typescript
 
-	public abstract execute<U>(arguments_: ActionArguments): Promise<U>;
-	public abstract execute<T>(arguments_: ActionArguments): Promise<T>;
+	public abstract execute<U>(arguments_: Contracts.Kernel.ActionArguments): Promise<U>;
+	public abstract execute<T>(arguments_: Contracts.Kernel.ActionArguments): Promise<T>;
 }

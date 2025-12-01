@@ -1,9 +1,15 @@
-import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
+import { Commands, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { existsSync } from "fs";
 import { copySync, ensureDirSync, removeSync } from "fs-extra/esm";
 import Joi from "joi";
 import { resolve } from "path";
+
+interface Flags {
+	readonly token: string;
+	readonly network: string;
+	readonly reset: boolean;
+}
 
 @injectable()
 export class Command extends Commands.Command {
@@ -52,7 +58,7 @@ export class Command extends Commands.Command {
 		await this.#performPublishment({ ...response, ...this.getFlags() });
 	}
 
-	async #performPublishment(flags: Contracts.AnyObject): Promise<void> {
+	async #performPublishment(flags: Flags): Promise<void> {
 		this.app.rebind(Identifiers.ApplicationPaths).toConstantValue(this.environment.getPaths());
 
 		const configDestination = this.app.getCorePath("config");

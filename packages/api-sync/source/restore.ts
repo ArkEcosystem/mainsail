@@ -3,8 +3,9 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 } from "@mainsail/api-database";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { parseTransactionError } from "@mainsail/evm-contracts";
 import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
@@ -12,7 +13,7 @@ import { performance } from "perf_hooks";
 
 import { parseMultiPayments, parseUsernames } from "./parsers/index.js";
 
-interface RestoreContext {
+interface RepositoryContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;
 	readonly blockRepository: ApiDatabaseContracts.BlockRepository;
 	readonly configurationRepository: ApiDatabaseContracts.ConfigurationRepository;
@@ -23,7 +24,9 @@ interface RestoreContext {
 	readonly validatorRoundRepository: ApiDatabaseContracts.ValidatorRoundRepository;
 	readonly walletRepository: ApiDatabaseContracts.WalletRepository;
 	readonly legacyColdWalletRepository: ApiDatabaseContracts.LegacyColdWalletRepository;
+}
 
+interface RestoreContext extends RepositoryContext {
 	// lookups
 	readonly addressToPublicKey: Record<string, string>;
 	readonly publicKeyToAddress: Record<string, string>;
@@ -217,7 +220,7 @@ export class Restore {
 		await this.dataSource.transaction(async (entityManager) => {
 			await entityManager.query("SET LOCAL statement_timeout = 0;");
 
-			const context: RestoreContext = {
+			const context: RepositoryContext = {
 				blockRepository: this.blockRepositoryFactory(entityManager),
 				configurationRepository: this.configurationRepositoryFactory(entityManager),
 				contractRepository: this.contractRepositoryFactory(entityManager),
@@ -228,7 +231,7 @@ export class Restore {
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
 				walletRepository: this.walletRepositoryFactory(entityManager),
-			} as any;
+			};
 
 			await this.#analyzeTables(context);
 			await this.#updateValidatorRanks(context);
@@ -384,7 +387,7 @@ export class Restore {
 
 						legacySecondSignature: data.legacySecondSignature,
 
-						logs: receipt.logs,
+						logs: receipt.logs as unknown as string, // is converted into JSONB column
 
 						multiPaymentRecipients:
 							parsedMultiPayments.length > 0
@@ -588,7 +591,7 @@ export class Restore {
 										: {}),
 								}
 							: {}),
-					},
+					} as string, // is converted into JSONB column
 					balance: BigNumber.make(account.balance).toFixed(),
 					nonce: BigNumber.make(account.nonce).toFixed(),
 					publicKey: context.addressToPublicKey[account.address] ?? null,
@@ -641,7 +644,7 @@ export class Restore {
 						: {}),
 					mergeInfoTransactionHash: wallet.mergeInfo?.txHash,
 					mergeInfoWalletAddress: wallet.mergeInfo?.address,
-				});
+				} as Models.LegacyColdWallet);
 
 				totalLegacyAccounts++;
 
@@ -735,8 +738,8 @@ export class Restore {
 			.createQueryBuilder()
 			.insert()
 			.values({
-				activeMilestones: this.configuration.getMilestone(context.lastBlockNumber) as Record<string, any>,
-				cryptoConfiguration: (this.configuration.all() ?? {}) as Record<string, any>,
+				activeMilestones: this.configuration.getMilestone(context.lastBlockNumber),
+				cryptoConfiguration: this.configuration.all() ?? {},
 				id: 1,
 				version: this.app.version(),
 			})
@@ -773,12 +776,12 @@ export class Restore {
 					implementations: event.implementations,
 					name: event.name,
 					proxy: event.proxy,
-				})),
+				})) as unknown as { address: string; abi: Record<string, unknown> }[],
 			)
 			.execute();
 	}
 
-	async #updateValidatorRanks(context: RestoreContext): Promise<void> {
+	async #updateValidatorRanks(context: RepositoryContext): Promise<void> {
 		await context.entityManager.query("SELECT update_validator_ranks();", []);
 	}
 
@@ -792,7 +795,7 @@ export class Restore {
 		multiPaymentRepository,
 		configurationRepository,
 		validatorRoundRepository,
-	}: RestoreContext): Promise<void> {
+	}: RepositoryContext): Promise<void> {
 		await Promise.all(
 			[
 				blockRepository,

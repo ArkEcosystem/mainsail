@@ -9,14 +9,14 @@ importers:
   .:
     devDependencies:
       '@eslint/compat':
-        specifier: ^1.3.2
-        version: 1.3.2(eslint@9.33.0)
+        specifier: ^1.4.0
+        version: 1.4.0(eslint@9.38.0)
       '@eslint/eslintrc':
         specifier: ^3.3.1
         version: 3.3.1
       '@eslint/js':
-        specifier: ^9.33.0
-        version: 9.33.0
+        specifier: ^9.38.0
+        version: 9.38.0
       '@types/node':
         specifier: 24.3.0
         version: 24.3.0
@@ -33,32 +33,32 @@ importers:
         specifier: 1.4.7
         version: 1.4.7
       eslint:
-        specifier: 9.33.0
-        version: 9.33.0
+        specifier: 9.38.0
+        version: 9.38.0
       eslint-plugin-import:
         specifier: 2.32.0
-        version: 2.32.0(@typescript-eslint/parser@8.40.0(eslint@9.33.0)(typescript@5.9.2))(eslint@9.33.0)
+        version: 2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.38.0)(typescript@5.9.2))(eslint@9.38.0)
       eslint-plugin-prettier:
         specifier: 5.5.4
-        version: 5.5.4(eslint@9.33.0)(prettier@3.6.2)
+        version: 5.5.4(eslint@9.38.0)(prettier@3.6.2)
       eslint-plugin-promise:
         specifier: 7.2.1
-        version: 7.2.1(eslint@9.33.0)
+        version: 7.2.1(eslint@9.38.0)
       eslint-plugin-simple-import-sort:
         specifier: 12.1.1
-        version: 12.1.1(eslint@9.33.0)
+        version: 12.1.1(eslint@9.38.0)
       eslint-plugin-sonarjs:
-        specifier: 3.0.4
-        version: 3.0.4(eslint@9.33.0)
+        specifier: 3.0.5
+        version: 3.0.5(eslint@9.38.0)
       eslint-plugin-sort-keys-fix:
         specifier: 1.1.2
         version: 1.1.2
       eslint-plugin-unicorn:
-        specifier: 60.0.0
-        version: 60.0.0(eslint@9.33.0)
+        specifier: 62.0.0
+        version: 62.0.0(eslint@9.38.0)
       eslint-plugin-unused-imports:
-        specifier: 4.2.0
-        version: 4.2.0(@typescript-eslint/eslint-plugin@8.40.0(@typescript-eslint/parser@8.40.0(eslint@9.33.0)(typescript@5.9.2))(eslint@9.33.0)(typescript@5.9.2))(eslint@9.33.0)
+        specifier: 4.3.0
+        version: 4.3.0(@typescript-eslint/eslint-plugin@8.46.2(@typescript-eslint/parser@8.46.2(eslint@9.38.0)(typescript@5.9.2))(eslint@9.38.0)(typescript@5.9.2))(eslint@9.38.0)
       husky:
         specifier: 9.1.7
         version: 9.1.7
@@ -66,8 +66,8 @@ importers:
         specifier: 6.6.2
         version: 6.6.2(encoding@0.1.13)
       lint-staged:
-        specifier: 16.1.5
-        version: 16.1.5
+        specifier: 16.2.6
+        version: 16.2.6
       madge:
         specifier: 8.0.0
         version: 8.0.0(typescript@5.9.2)
@@ -90,8 +90,8 @@ importers:
         specifier: 5.9.2
         version: 5.9.2
       typescript-eslint:
-        specifier: ^8.40.0
-        version: 8.40.0(eslint@9.33.0)(typescript@5.9.2)
+        specifier: ^8.46.2
+        version: 8.46.2(eslint@9.38.0)(typescript@5.9.2)
       typesync:
         specifier: 0.14.3
         version: 0.14.3
@@ -110,12 +110,12 @@ importers:
       '@mainsail/cli':
         specifier: workspace:*
         version: link:../cli
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/logger-pino':
         specifier: workspace:*
         version: link:../logger-pino
@@ -147,6 +147,9 @@ importers:
         specifier: ^6.0.8
         version: 6.0.8
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -189,12 +192,12 @@ importers:
       '@mainsail/api-database':
         specifier: workspace:*
         version: link:../api-database
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -217,6 +220,9 @@ importers:
         specifier: 7.2.0
         version: 7.2.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/ip':
         specifier: 1.1.3
         version: 1.1.3
@@ -229,12 +235,12 @@ importers:
 
   packages/api-database:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -251,6 +257,9 @@ importers:
         specifier: 0.3.26
         version: 0.3.26(better-sqlite3@12.2.0)(pg@8.16.3)(reflect-metadata@0.2.2)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/pg':
         specifier: 8.15.5
         version: 8.15.5
@@ -269,12 +278,12 @@ importers:
       '@mainsail/api-common':
         specifier: workspace:*
         version: link:../api-common
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -291,6 +300,9 @@ importers:
         specifier: 7.7.2
         version: 7.7.2
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/semver':
         specifier: 7.7.0
         version: 7.7.0
@@ -309,12 +321,12 @@ importers:
       '@mainsail/api-common':
         specifier: workspace:*
         version: link:../api-common
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -337,6 +349,9 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -370,12 +385,12 @@ importers:
       '@mainsail/api-database':
         specifier: workspace:*
         version: link:../api-database
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
@@ -392,6 +407,9 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/ip':
         specifier: 1.1.3
         version: 1.1.3
@@ -410,12 +428,12 @@ importers:
       '@mainsail/api-database':
         specifier: workspace:*
         version: link:../api-database
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../evm-consensus
@@ -438,6 +456,9 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -453,12 +474,12 @@ importers:
       '@mainsail/api-common':
         specifier: workspace:*
         version: link:../api-common
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -466,6 +487,9 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/ip':
         specifier: 1.1.3
         version: 1.1.3
@@ -478,12 +502,12 @@ importers:
 
   packages/blockchain-utils:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -494,34 +518,40 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/bootstrap:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/cli:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -595,6 +625,9 @@ importers:
         specifier: 22.0.0
         version: 22.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -638,12 +671,12 @@ importers:
 
   packages/configuration-generator:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -729,6 +762,9 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -747,12 +783,12 @@ importers:
       '@mainsail/blockchain-utils':
         specifier: workspace:*
         version: link:../blockchain-utils
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -763,6 +799,9 @@ importers:
         specifier: 1.11.13
         version: 1.11.13
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       esmock:
         specifier: 2.7.1
         version: 2.7.1
@@ -772,12 +811,12 @@ importers:
 
   packages/consensus-storage:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -787,6 +826,15 @@ importers:
       lmdb:
         specifier: 3.4.2
         version: 3.4.2
+    devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
+
+  packages/constants:
     devDependencies:
       uvu:
         specifier: 0.5.6
@@ -810,6 +858,9 @@ importers:
       '@hapi/hapi':
         specifier: 21.4.3
         version: 21.4.3
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -825,12 +876,12 @@ importers:
       joi:
         specifier: 18.0.0
         version: 18.0.0
-      reflect-metadata:
-        specifier: 0.2.2
-        version: 0.2.2
       type-fest:
         specifier: 4.41.0
         version: 4.41.0
+      viem:
+        specifier: 2.33.1
+        version: 2.33.1(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
       uvu:
         specifier: 0.5.6
@@ -880,12 +931,12 @@ importers:
       '@mainsail/consensus-storage':
         specifier: workspace:*
         version: link:../consensus-storage
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -1031,6 +1082,9 @@ importers:
         specifier: 2.4.2
         version: 2.4.2
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -1055,12 +1109,12 @@ importers:
 
   packages/crypto-address-base58:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1074,6 +1128,9 @@ importers:
         specifier: 0.3.9
         version: 0.3.9
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1098,12 +1155,12 @@ importers:
 
   packages/crypto-address-keccak256:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1117,6 +1174,9 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1141,12 +1201,12 @@ importers:
 
   packages/crypto-block:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -1160,6 +1220,9 @@ importers:
         specifier: 8.17.1
         version: 8.17.1
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -1214,12 +1277,12 @@ importers:
 
   packages/crypto-commit:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1227,6 +1290,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -1275,12 +1341,12 @@ importers:
 
   packages/crypto-config:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -1303,6 +1369,9 @@ importers:
         specifier: 4.3.2
         version: 4.3.2
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/lodash.clone':
         specifier: 4.5.9
         version: 4.5.9
@@ -1318,12 +1387,12 @@ importers:
 
   packages/crypto-consensus-bls12-381:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/crypto-key-pair-bls12-381':
         specifier: workspace:*
         version: link:../crypto-key-pair-bls12-381
@@ -1334,18 +1403,21 @@ importers:
         specifier: workspace:*
         version: link:../kernel
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/crypto-hash-bcrypto:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1353,6 +1425,9 @@ importers:
         specifier: 5.5.2
         version: 5.5.2
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1365,12 +1440,12 @@ importers:
       '@chainsafe/blst':
         specifier: 2.2.0
         version: 2.2.0
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -1390,6 +1465,9 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1408,12 +1486,12 @@ importers:
 
   packages/crypto-key-pair-ecdsa:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -1430,6 +1508,9 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1448,12 +1529,12 @@ importers:
 
   packages/crypto-key-pair-ed25519:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -1476,6 +1557,9 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1494,12 +1578,12 @@ importers:
 
   packages/crypto-key-pair-schnorr:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -1516,6 +1600,9 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1534,12 +1621,12 @@ importers:
 
   packages/crypto-messages:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -1553,6 +1640,9 @@ importers:
         specifier: 8.17.1
         version: 8.17.1
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -1601,12 +1691,12 @@ importers:
 
   packages/crypto-signature-bls12-381:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/crypto-key-pair-bls12-381':
         specifier: workspace:*
         version: link:../crypto-key-pair-bls12-381
@@ -1620,18 +1710,21 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/crypto-signature-ecdsa:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -1645,18 +1738,21 @@ importers:
         specifier: 5.5.2
         version: 5.5.2
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/crypto-signature-schnorr:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -1670,18 +1766,21 @@ importers:
         specifier: 5.5.2
         version: 5.5.2
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/crypto-transaction:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -1701,6 +1800,9 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -1740,12 +1842,12 @@ importers:
 
   packages/crypto-validation:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1756,6 +1858,9 @@ importers:
         specifier: 8.17.1
         version: 8.17.1
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1768,12 +1873,12 @@ importers:
 
   packages/crypto-wif:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1781,6 +1886,9 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1793,12 +1901,12 @@ importers:
 
   packages/crypto-worker:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1809,6 +1917,9 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/chance':
         specifier: 1.1.7
         version: 1.1.7
@@ -1827,12 +1938,12 @@ importers:
 
   packages/database:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1840,6 +1951,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -1906,12 +2020,12 @@ importers:
 
   packages/evm-api-worker:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1919,18 +2033,21 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/evm-consensus:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
@@ -1947,6 +2064,9 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/seedrandom':
         specifier: 3.0.8
         version: 3.0.8
@@ -1956,25 +2076,25 @@ importers:
 
   packages/evm-contracts:
     dependencies:
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       viem:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/evm-service:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/evm':
         specifier: workspace:*
         version: link:../evm
@@ -1985,6 +2105,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -2042,16 +2165,19 @@ importers:
 
   packages/evm-state:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2066,22 +2192,28 @@ importers:
 
   packages/exceptions:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-    devDependencies:
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/kernel:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -2128,6 +2260,9 @@ importers:
         specifier: 4.2.0
         version: 4.2.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/capture-console':
         specifier: 1.0.5
         version: 1.0.5
@@ -2165,12 +2300,12 @@ importers:
 
   packages/logger-pino:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2208,6 +2343,9 @@ importers:
         specifier: 4.2.0
         version: 4.2.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/capture-console':
         specifier: 1.0.5
         version: 1.0.5
@@ -2241,12 +2379,12 @@ importers:
 
   packages/logger-winston:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2260,18 +2398,21 @@ importers:
         specifier: 3.17.0
         version: 3.17.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/networking-dns:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2282,6 +2423,9 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2291,12 +2435,12 @@ importers:
       '@hapi/sntp':
         specifier: 4.0.0
         version: 4.0.0
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2307,6 +2451,9 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/hapi__sntp':
         specifier: 3.1.4
         version: 3.1.4
@@ -2334,12 +2481,12 @@ importers:
       '@mainsail/blockchain-utils':
         specifier: workspace:*
         version: link:../blockchain-utils
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -2386,6 +2533,9 @@ importers:
         specifier: 8.18.3
         version: 8.18.3
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -2422,12 +2572,12 @@ importers:
       '@mainsail/blockchain-utils':
         specifier: workspace:*
         version: link:../blockchain-utils
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -2441,18 +2591,21 @@ importers:
         specifier: 1.11.13
         version: 1.11.13
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/serializer:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -2463,18 +2616,21 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/snapshot-legacy-exporter:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -2506,6 +2662,9 @@ importers:
         specifier: 0.3.26
         version: 0.3.26(better-sqlite3@12.2.0)(pg@8.16.3)(reflect-metadata@0.2.2)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -2527,12 +2686,12 @@ importers:
 
   packages/snapshot-legacy-importer:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../evm-consensus
@@ -2555,18 +2714,21 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/state:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2574,6 +2736,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -2601,12 +2766,12 @@ importers:
       '@mainsail/configuration-generator':
         specifier: workspace:*
         version: link:../configuration-generator
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -2673,9 +2838,6 @@ importers:
       fs-extra:
         specifier: 11.3.1
         version: 11.3.1
-      lodash.clonedeep:
-        specifier: 4.5.0
-        version: 4.5.0
       memoizee:
         specifier: 0.4.17
         version: 0.4.17
@@ -2683,15 +2845,15 @@ importers:
         specifier: 0.2.5
         version: 0.2.5
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/chance':
         specifier: 1.1.7
         version: 1.1.7
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
-      '@types/lodash.clonedeep':
-        specifier: 4.5.9
-        version: 4.5.9
       '@types/memoizee':
         specifier: 0.4.12
         version: 0.4.12
@@ -2741,12 +2903,12 @@ importers:
 
   packages/test-transaction-builders:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -2766,6 +2928,9 @@ importers:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/chance':
         specifier: 1.1.7
         version: 1.1.7
@@ -2778,12 +2943,12 @@ importers:
 
   packages/transaction-pool-broadcaster:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2797,18 +2962,21 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/transaction-pool-service:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -2831,6 +2999,9 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -2849,12 +3020,12 @@ importers:
 
   packages/transaction-pool-worker:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2865,18 +3036,21 @@ importers:
         specifier: 18.0.0
         version: 18.0.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/transactions:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -2887,6 +3061,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2951,12 +3128,12 @@ importers:
 
   packages/validation:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2970,6 +3147,9 @@ importers:
         specifier: 5.1.0
         version: 5.1.0(ajv@8.17.1)
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2979,12 +3159,12 @@ importers:
       '@chainsafe/bls-keystore':
         specifier: 3.1.0
         version: 3.1.0
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../evm-consensus
@@ -3001,6 +3181,9 @@ importers:
       '@mainsail/blockchain-utils':
         specifier: workspace:*
         version: link:../blockchain-utils
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -3058,12 +3241,12 @@ importers:
       '@hapi/hapi':
         specifier: 21.4.3
         version: 21.4.3
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -3083,6 +3266,9 @@ importers:
         specifier: 11.1.0
         version: 11.1.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -3098,6 +3284,9 @@ importers:
 
   tests/e2e/clients:
     devDependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../../../packages/constants
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../../../packages/contracts
@@ -3162,6 +3351,18 @@ importers:
         specifier: 4.19.2
         version: 4.19.2
 
+  tests/e2e/sync/checks:
+    dependencies:
+      express:
+        specifier: 4.19.2
+        version: 4.19.2
+      got:
+        specifier: 14.2.1
+        version: 14.2.1
+      viem:
+        specifier: 2.33.1
+        version: 2.33.1(typescript@5.9.2)(zod@3.24.4)
+
   tests/functional/consensus:
     devDependencies:
       '@mainsail/blockchain-utils':
@@ -3170,6 +3371,9 @@ importers:
       '@mainsail/consensus':
         specifier: workspace:*
         version: link:../../../packages/consensus
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../../../packages/constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../../../packages/container
@@ -3308,6 +3512,9 @@ importers:
       '@mainsail/consensus-storage':
         specifier: workspace:*
         version: link:../../../packages/consensus-storage
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../../../packages/constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../../../packages/container
@@ -3452,6 +3659,10 @@ packages:
 
   '@babel/helper-validator-identifier@7.27.1':
     resolution: {integrity: sha512-D2hP9eA+Sqx1kBZgzxZh0y1trbuU+JoDkiEwqhQ36nodYqJwyEIhPSdMNd7lOm/4io72luTPWH20Yda0xOuUow==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/helper-validator-identifier@7.28.5':
+    resolution: {integrity: sha512-qSs4ifwzKJSV39ucNjsvc6WVHs6b7S03sOh2OcHF9UHfVPqWWALUsNUVzhSBiItjRZoLHx7nIarVjqKVusUZ1Q==}
     engines: {node: '>=6.9.0'}
 
   '@babel/parser@7.28.0':
@@ -3728,12 +3939,18 @@ packages:
     peerDependencies:
       eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
 
+  '@eslint-community/eslint-utils@4.9.0':
+    resolution: {integrity: sha512-ayVFHdtZ+hsq1t2Dy24wCmGXGe4q9Gu3smhLYALJrr473ZH27MsnSL+LKUlimp4BWJqMDMLmPpx/Q9R3OAlL4g==}
+    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    peerDependencies:
+      eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
+
   '@eslint-community/regexpp@4.12.1':
     resolution: {integrity: sha512-CCZCDJuduB9OUkFkY2IgppNZMi2lBQgD2qzwXkEia16cge2pijY/aXi96CJMquDMn3nJdlPV1A5KrJEXwfLNzQ==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
 
-  '@eslint/compat@1.3.2':
-    resolution: {integrity: sha512-jRNwzTbd6p2Rw4sZ1CgWRS8YMtqG15YyZf7zvb6gY2rB2u6n+2Z+ELW0GtL0fQgyl0pr4Y/BzBfng/BdsereRA==}
+  '@eslint/compat@1.4.0':
+    resolution: {integrity: sha512-DEzm5dKeDBPm3r08Ixli/0cmxr8LkRdwxMRUIJBlSCpAwSrvFEJpVBzV+66JhDxiaqKxnRzCXhtiMiczF7Hglg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.40 || 9
@@ -3741,32 +3958,32 @@ packages:
       eslint:
         optional: true
 
-  '@eslint/config-array@0.21.0':
-    resolution: {integrity: sha512-ENIdc4iLu0d93HeYirvKmrzshzofPw6VkZRKQGe9Nv46ZnWUzcF1xV01dcvEg/1wXUR61OmmlSfyeyO7EvjLxQ==}
+  '@eslint/config-array@0.21.1':
+    resolution: {integrity: sha512-aw1gNayWpdI/jSYVgzN5pL0cfzU02GT3NBpeT/DXbx1/1x7ZKxFPd9bwrzygx/qiwIQiJ1sw/zD8qY/kRvlGHA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@eslint/config-helpers@0.3.1':
-    resolution: {integrity: sha512-xR93k9WhrDYpXHORXpxVL5oHj3Era7wo6k/Wd8/IsQNnZUTzkGS29lyn3nAT05v6ltUuTFVCCYDEGfy2Or/sPA==}
+  '@eslint/config-helpers@0.4.1':
+    resolution: {integrity: sha512-csZAzkNhsgwb0I/UAV6/RGFTbiakPCf0ZrGmrIxQpYvGZ00PhTkSnyKNolphgIvmnJeGw6rcGVEXfTzUnFuEvw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@eslint/core@0.15.2':
-    resolution: {integrity: sha512-78Md3/Rrxh83gCxoUc0EiciuOHsIITzLy53m3d9UyiW8y9Dj2D29FeETqyKA+BRK76tnTp6RXWb3pCay8Oyomg==}
+  '@eslint/core@0.16.0':
+    resolution: {integrity: sha512-nmC8/totwobIiFcGkDza3GIKfAw1+hLiYVrh3I1nIomQ8PEr5cxg34jnkmGawul/ep52wGRAcyeDCNtWKSOj4Q==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@eslint/eslintrc@3.3.1':
     resolution: {integrity: sha512-gtF186CXhIl1p4pJNGZw8Yc6RlshoePRvE0X91oPGb3vZ8pM3qOS9W9NGPat9LziaBV7XrJWGylNQXkGcnM3IQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@eslint/js@9.33.0':
-    resolution: {integrity: sha512-5K1/mKhWaMfreBGJTwval43JJmkip0RmM+3+IuqupeSKNC/Th2Kc7ucaq5ovTSra/OOKB9c58CGSz3QMVbWt0A==}
+  '@eslint/js@9.38.0':
+    resolution: {integrity: sha512-UZ1VpFvXf9J06YG9xQBdnzU+kthors6KjhMAl6f4gH4usHyh31rUf2DLGInT8RFYIReYXNSydgPY0V2LuWgl7A==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@eslint/object-schema@2.1.6':
-    resolution: {integrity: sha512-RBMg5FRL0I0gs51M/guSAj5/e14VQ4tpZnQNWwuDT66P14I43ItmPfIZRhO9fUVIPOAQXU47atlywZ/czoqFPA==}
+  '@eslint/object-schema@2.1.7':
+    resolution: {integrity: sha512-VtAOaymWVfZcmZbp6E2mympDIHvyjXs/12LqWYjVw6qjrfF+VK+fyG33kChz3nnK+SU5/NeHOqrTEHS8sXO3OA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@eslint/plugin-kit@0.3.5':
-    resolution: {integrity: sha512-Z5kJ+wU3oA7MMIqVR9tyZRtjYPr4OC004Q4Rw7pgOKUOKkJfZ3O24nz3WYfGRpMDNmcOi3TwQOmgm7B7Tpii0w==}
+  '@eslint/plugin-kit@0.4.0':
+    resolution: {integrity: sha512-sB5uyeq+dwCWyPi31B2gQlVlo+j5brPlWx4yZBrEaRo/nhdDE8Xke1gsGgtiBdaBTxuTkceLVuVt/pclrasb0A==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@gar/promisify@1.1.3':
@@ -5198,16 +5415,16 @@ packages:
   '@types/yargs-parser@21.0.3':
     resolution: {integrity: sha512-I4q9QU9MQv4oEOz4tAHJtNz1cwuLxn2F3xcc2iV5WdqLPpUnj30aUuxt1mAxYTG+oe8CZMV/+6rU4S4gRDzqtQ==}
 
-  '@typescript-eslint/eslint-plugin@8.40.0':
-    resolution: {integrity: sha512-w/EboPlBwnmOBtRbiOvzjD+wdiZdgFeo17lkltrtn7X37vagKKWJABvyfsJXTlHe6XBzugmYgd4A4nW+k8Mixw==}
+  '@typescript-eslint/eslint-plugin@8.46.2':
+    resolution: {integrity: sha512-ZGBMToy857/NIPaaCucIUQgqueOiq7HeAKkhlvqVV4lm089zUFW6ikRySx2v+cAhKeUCPuWVHeimyk6Dw1iY3w==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
-      '@typescript-eslint/parser': ^8.40.0
+      '@typescript-eslint/parser': ^8.46.2
       eslint: ^8.57.0 || ^9.0.0
       typescript: '>=4.8.4 <6.0.0'
 
-  '@typescript-eslint/parser@8.40.0':
-    resolution: {integrity: sha512-jCNyAuXx8dr5KJMkecGmZ8KI61KBUhkCob+SD+C+I5+Y1FWI2Y3QmY4/cxMCC5WAsZqoEtEETVhUiUMIGCf6Bw==}
+  '@typescript-eslint/parser@8.46.2':
+    resolution: {integrity: sha512-BnOroVl1SgrPLywqxyqdJ4l3S2MsKVLDVxZvjI1Eoe8ev2r3kGDo+PcMihNmDE+6/KjkTubSJnmqGZZjQSBq/g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
@@ -5219,8 +5436,14 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4 <6.0.0'
 
-  '@typescript-eslint/scope-manager@8.40.0':
-    resolution: {integrity: sha512-y9ObStCcdCiZKzwqsE8CcpyuVMwRouJbbSrNuThDpv16dFAj429IkM6LNb1dZ2m7hK5fHyzNcErZf7CEeKXR4w==}
+  '@typescript-eslint/project-service@8.46.2':
+    resolution: {integrity: sha512-PULOLZ9iqwI7hXcmL4fVfIsBi6AN9YxRc0frbvmg8f+4hQAjQ5GYNKK0DIArNo+rOKmR/iBYwkpBmnIwin4wBg==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      typescript: '>=4.8.4 <6.0.0'
+
+  '@typescript-eslint/scope-manager@8.46.2':
+    resolution: {integrity: sha512-LF4b/NmGvdWEHD2H4MsHD8ny6JpiVNDzrSZr3CsckEgCbAGZbYM4Cqxvi9L+WqDMT+51Ozy7lt2M+d0JLEuBqA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@typescript-eslint/tsconfig-utils@8.40.0':
@@ -5229,8 +5452,14 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4 <6.0.0'
 
-  '@typescript-eslint/type-utils@8.40.0':
-    resolution: {integrity: sha512-eE60cK4KzAc6ZrzlJnflXdrMqOBaugeukWICO2rB0KNvwdIMaEaYiywwHMzA1qFpTxrLhN9Lp4E/00EgWcD3Ow==}
+  '@typescript-eslint/tsconfig-utils@8.46.2':
+    resolution: {integrity: sha512-a7QH6fw4S57+F5y2FIxxSDyi5M4UfGF+Jl1bCGd7+L4KsaUY80GsiF/t0UoRFDHAguKlBaACWJRmdrc6Xfkkag==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      typescript: '>=4.8.4 <6.0.0'
+
+  '@typescript-eslint/type-utils@8.46.2':
+    resolution: {integrity: sha512-HbPM4LbaAAt/DjxXaG9yiS9brOOz6fabal4uvUmaUYe6l3K1phQDMQKBRUrr06BQkxkvIZVVHttqiybM9nJsLA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
@@ -5240,14 +5469,24 @@ packages:
     resolution: {integrity: sha512-ETdbFlgbAmXHyFPwqUIYrfc12ArvpBhEVgGAxVYSwli26dn8Ko+lIo4Su9vI9ykTZdJn+vJprs/0eZU0YMAEQg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
+  '@typescript-eslint/types@8.46.2':
+    resolution: {integrity: sha512-lNCWCbq7rpg7qDsQrd3D6NyWYu+gkTENkG5IKYhUIcxSb59SQC/hEQ+MrG4sTgBVghTonNWq42bA/d4yYumldQ==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
   '@typescript-eslint/typescript-estree@8.40.0':
     resolution: {integrity: sha512-k1z9+GJReVVOkc1WfVKs1vBrR5MIKKbdAjDTPvIK3L8De6KbFfPFt6BKpdkdk7rZS2GtC/m6yI5MYX+UsuvVYQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       typescript: '>=4.8.4 <6.0.0'
 
-  '@typescript-eslint/utils@8.40.0':
-    resolution: {integrity: sha512-Cgzi2MXSZyAUOY+BFwGs17s7ad/7L+gKt6Y8rAVVWS+7o6wrjeFN4nVfTpbE25MNcxyJ+iYUXflbs2xR9h4UBg==}
+  '@typescript-eslint/typescript-estree@8.46.2':
+    resolution: {integrity: sha512-f7rW7LJ2b7Uh2EiQ+7sza6RDZnajbNbemn54Ob6fRwQbgcIn+GWfyuHDHRYgRoZu1P4AayVScrRW+YfbTvPQoQ==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      typescript: '>=4.8.4 <6.0.0'
+
+  '@typescript-eslint/utils@8.46.2':
+    resolution: {integrity: sha512-sExxzucx0Tud5tE0XqR0lT0psBQvEpnpiul9XbGUB1QwpWJJAps1O/Z7hJxLGiZLBKMCutjTzDgmd1muEhBnVg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
@@ -5255,6 +5494,10 @@ packages:
 
   '@typescript-eslint/visitor-keys@8.40.0':
     resolution: {integrity: sha512-8CZ47QwalyRjsypfwnbI3hKy5gJDPmrkLjkgMxhi0+DZZ2QNx2naS6/hWoVYUHU7LU2zleF68V9miaVZvhFfTA==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@typescript-eslint/visitor-keys@8.46.2':
+    resolution: {integrity: sha512-tUFMXI4gxzzMXt4xpGJEsBsTox0XbNQ1y94EwlD/CuZwFcQP79xfQqMhau9HsRc/J0cAPA/HZt1dZPtGn9V/7w==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@vue/compiler-core@3.5.18':
@@ -5606,6 +5849,10 @@ packages:
     resolution: {integrity: sha512-5T6P4xPgpp0YDFvSWwEZ4NoE3aM4QBQXDzmVbraCkFj8zHM+mba8SyqB5DbZWyR7mYHo6Y7BdQo3MoA4m0TeQg==}
     engines: {node: '>=0.10.0'}
 
+  baseline-browser-mapping@2.8.20:
+    resolution: {integrity: sha512-JMWsdF+O8Orq3EMukbUN1QfbLK9mX2CkUmQBcW2T0s8OmdAUL5LLM/6wFwSrqXzlXB13yhyK9gTKS1rIizOduQ==}
+    hasBin: true
+
   basic-ftp@5.0.5:
     resolution: {integrity: sha512-4Bcg1P8xhUuqcii/S0Z9wiHIrQVPMermM1any+MX5GeGD7faD3/msQUDGLol9wOcz4/jbg/WJnGqoJF6LiBdtg==}
     engines: {node: '>=10.0.0'}
@@ -5686,8 +5933,8 @@ packages:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
 
-  browserslist@4.25.1:
-    resolution: {integrity: sha512-KGj0KoOMXLpSNkkEI6Z6mShmQy0bc1I+T7K9N81k4WWMrfz+6fQ6es80B/YLAeRoKvjYE1YSHHOW1qe9xIVzHw==}
+  browserslist@4.27.0:
+    resolution: {integrity: sha512-AXVQwdhot1eqLihwasPElhX2tAZiBjWdJ9i/Zcj2S6QYIjkx62OKSfnobkriB81C3l4w0rVy3Nt4jaTBltYEpw==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
@@ -5816,8 +6063,8 @@ packages:
     resolution: {integrity: sha512-8WB3Jcas3swSvjIeA2yvCJ+Miyz5l1ZmB6HFb9R1317dt9LCQoswg/BGrmAmkWVEszSrrg4RwmO46qIm2OEnSA==}
     engines: {node: '>=16'}
 
-  caniuse-lite@1.0.30001731:
-    resolution: {integrity: sha512-lDdp2/wrOmTRWuoB5DpfNkC0rJDU8DqRa6nYL6HK6sytw70QMopt/NIc/9SM7ylItlBWfACXk0tEn37UWM/+mg==}
+  caniuse-lite@1.0.30001751:
+    resolution: {integrity: sha512-A0QJhug0Ly64Ii3eIqHu5X51ebln3k4yTUkY1j8drqpWHVreg/VLijN48cZ1bYPiqOQuqpkIKnzr/Ul8V+p6Cw==}
 
   capture-console@1.0.2:
     resolution: {integrity: sha512-vQNTSFr0cmHAYXXG3KG7ZJQn0XxC3K2di/wUZVb6yII6gqSN/10Egd3vV4XqJ00yCRNHy2wkN4uWHE+rJstDrw==}
@@ -5885,8 +6132,8 @@ packages:
     resolution: {integrity: sha512-NIxF55hv4nSqQswkAeiOi1r83xy8JldOFDTWiug55KBu9Jnblncd2U6ViHmYgHf01TPZS77NJBhBMKdWj9HQMQ==}
     engines: {node: '>=8'}
 
-  ci-info@4.3.0:
-    resolution: {integrity: sha512-l+2bNRMiQgcfILUi33labAZYIWlH1kWDp+ecNo5iisRKrbm0xcRyCww71/YU0Fkw0mAFpz9bJayXPjey6vkmaQ==}
+  ci-info@4.3.1:
+    resolution: {integrity: sha512-Wdy2Igu8OcBpI2pZePZ5oWjPC38tmDVx5WKUXKwlLYkA0ozo85sLsLvkBbBn/sZaSCMFOGZJ14fvW9t5/d7kdA==}
     engines: {node: '>=8'}
 
   class-utils@0.3.6:
@@ -5937,9 +6184,9 @@ packages:
     resolution: {integrity: sha512-f4r4yJnbT++qUPI9NR4XLDLq41gQ+uqnPItWG0F5ZkehuNiTTa3EY0S4AqTSUOeJ7/zU41oWPQSNkW5BqPL9bg==}
     engines: {node: '>=0.10.0'}
 
-  cli-truncate@4.0.0:
-    resolution: {integrity: sha512-nPdaFdQ0h/GEigbPClz11D0v/ZJEwxmeVZGeMo3Z5StPtUTkA9o1lD6QwoirYiSDzbcwn2XcjwmCp68W1IS4TA==}
-    engines: {node: '>=18'}
+  cli-truncate@5.1.1:
+    resolution: {integrity: sha512-SroPvNHxUnk+vIW/dOSfNqdy1sPEFkrTk6TUtqLCnBlo3N7TNYYkzzN7uSD6+jVjrdO4+p8nH7JzH6cIvUem6A==}
+    engines: {node: '>=20'}
 
   cli-width@3.0.0:
     resolution: {integrity: sha512-FxqpkPPwu1HjuN93Omfm4h8uIanXofW0RxVEW3k5RKx+mJJYSthzNhp32Kzxxy3YAEZ/Dc/EWN1vZRY0+kOhbw==}
@@ -6026,8 +6273,8 @@ packages:
     resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
     engines: {node: '>=18'}
 
-  commander@14.0.0:
-    resolution: {integrity: sha512-2uM9rYjPvyq39NwLRqaiLtWHyDC1FvryJDa2ATTVims5YAS4PupsEQsDvP14FqhFr0P49CYDugi59xaxJlTXRA==}
+  commander@14.0.2:
+    resolution: {integrity: sha512-TywoWNNRbhoD0BXs1P3ZEScW8W5iKrnbithIl0YH+uCmBd0QpPOA8yc82DS3BIE5Ma6FnBVUsJ7wVUDz4dvOWQ==}
     engines: {node: '>=20'}
 
   commander@2.15.1:
@@ -6122,8 +6369,8 @@ packages:
     resolution: {integrity: sha512-XgZ0pFcakEUlbwQEVNg3+QAis1FyTL3Qel9FYy8pSkQqoG3PNoT0bOCQtOXcOkur21r2Eq2kI+IE+gsmAEVlYw==}
     engines: {node: '>=0.10.0'}
 
-  core-js-compat@3.44.0:
-    resolution: {integrity: sha512-JepmAj2zfl6ogy34qfWtcE7nHKAJnKsQFRn++scjVS2bZFllwptzw61BZcZFYBPpUznLfAvh0LGhxKppk04ClA==}
+  core-js-compat@3.46.0:
+    resolution: {integrity: sha512-p9hObIIEENxSV8xIu+V68JjSeARg6UVMG5mR+JEUguG3sI6MsiS1njz2jHmyJDvA+8jX/sytkBHup6kxhM9law==}
 
   core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
@@ -6479,8 +6726,8 @@ packages:
     engines: {node: '>=0.10.0'}
     hasBin: true
 
-  electron-to-chromium@1.5.193:
-    resolution: {integrity: sha512-eePuBZXM9OVCwfYUhd2OzESeNGnWmLyeu0XAEjf7xjijNjHFdeJSzuRUGN4ueT2tEYo5YqjHramKEFxz67p3XA==}
+  electron-to-chromium@1.5.240:
+    resolution: {integrity: sha512-OBwbZjWgrCOH+g6uJsA2/7Twpas2OlepS9uvByJjR2datRDuKGYeD+nP8lBBks2qnB7bGJNHDUx7c/YLaT3QMQ==}
 
   elegant-spinner@1.0.1:
     resolution: {integrity: sha512-B+ZM+RXvRqQaAmkMlO/oSe5nMUOaUnyfGYCEHoR8wrXsZR2mA0XVibsxV1bvTwxdRWah1PkQqso2EzhILGHtEQ==}
@@ -6686,8 +6933,8 @@ packages:
     peerDependencies:
       eslint: '>=5.0.0'
 
-  eslint-plugin-sonarjs@3.0.4:
-    resolution: {integrity: sha512-ftQcP811kRJNXapqpQXHErEoVOdTPfYPPYd7n3AExIPwv4qWKKHf4slFvXmodiOnfgy1Tl3waPZZLD7lcvJOtw==}
+  eslint-plugin-sonarjs@3.0.5:
+    resolution: {integrity: sha512-dI62Ff3zMezUToi161hs2i1HX1ie8Ia2hO0jtNBfdgRBicAG4ydy2WPt0rMTrAe3ZrlqhpAO3w1jcQEdneYoFA==}
     peerDependencies:
       eslint: ^8.0.0 || ^9.0.0
 
@@ -6695,14 +6942,14 @@ packages:
     resolution: {integrity: sha512-DNPHFGCA0/hZIsfODbeLZqaGY/+q3vgtshF85r+YWDNCQ2apd9PNs/zL6ttKm0nD1IFwvxyg3YOTI7FHl4unrw==}
     engines: {node: '>=0.10.0'}
 
-  eslint-plugin-unicorn@60.0.0:
-    resolution: {integrity: sha512-QUzTefvP8stfSXsqKQ+vBQSEsXIlAiCduS/V1Em+FKgL9c21U/IIm20/e3MFy1jyCf14tHAhqC1sX8OTy6VUCg==}
+  eslint-plugin-unicorn@62.0.0:
+    resolution: {integrity: sha512-HIlIkGLkvf29YEiS/ImuDZQbP12gWyx5i3C6XrRxMvVdqMroCI9qoVYCoIl17ChN+U89pn9sVwLxhIWj5nEc7g==}
     engines: {node: ^20.10.0 || >=21.0.0}
     peerDependencies:
-      eslint: '>=9.29.0'
+      eslint: '>=9.38.0'
 
-  eslint-plugin-unused-imports@4.2.0:
-    resolution: {integrity: sha512-hLbJ2/wnjKq4kGA9AUaExVFIbNzyxYdVo49QZmKCnhk5pc9wcYRbfgLHvWJ8tnsdcseGhoUAddm9gn/lt+d74w==}
+  eslint-plugin-unused-imports@4.3.0:
+    resolution: {integrity: sha512-ZFBmXMGBYfHttdRtOG9nFFpmUvMtbHSjsKrS20vdWdbfiVYsO3yA2SGYy9i9XmZJDfMGBflZGBCm70SEnFQtOA==}
     peerDependencies:
       '@typescript-eslint/eslint-plugin': ^8.0.0-0 || ^7.0.0 || ^6.0.0 || ^5.0.0
       eslint: ^9.0.0 || ^8.0.0
@@ -6726,8 +6973,8 @@ packages:
     resolution: {integrity: sha512-Uhdk5sfqcee/9H/rCOJikYz67o0a2Tw2hGRPOG2Y1R2dg7brRe1uG0yaNQDHu+TO/uQPF/5eCapvYSmHUjt7JQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  eslint@9.33.0:
-    resolution: {integrity: sha512-TS9bTNIryDzStCpJN93aC5VRSW3uTx9sClUn4B87pwiCaJh220otoI0X8mJKr+VcPtniMdN8GKjlwgWGUv5ZKA==}
+  eslint@9.38.0:
+    resolution: {integrity: sha512-t5aPOpmtJcZcz5UJyY2GbvpDlsK5E8JqRqoKtfiKE3cNh437KIqfJr3A3AKf5k64NPx6d0G3dno6XDY05PqPtw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     hasBin: true
     peerDependencies:
@@ -7255,8 +7502,8 @@ packages:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}
     engines: {node: '>=18'}
 
-  globals@16.3.0:
-    resolution: {integrity: sha512-bqWEnJ1Nt3neqx2q5SFfGS8r/ahumIakg3HcwtNlrVlwXIeNumWn/c7Pn/wKzGhf6SaW6H6uWXLqC30STCMchQ==}
+  globals@16.4.0:
+    resolution: {integrity: sha512-ob/2LcVVaVGCYN+r14cnwnoDPUufjiYgSqRhiFD0Q1iI4Odora5RE8Iv1D24hAz5oMophRGkGz+yuvQmmUMnMw==}
     engines: {node: '>=18'}
 
   globalthis@1.0.4:
@@ -7637,10 +7884,6 @@ packages:
     resolution: {integrity: sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==}
     engines: {node: '>=8'}
 
-  is-fullwidth-code-point@4.0.0:
-    resolution: {integrity: sha512-O4L094N2/dZ7xqVdrXhh9r1KODPJpFms8B5sGdJLPy664AgvXsreZUyCQQNItZRDlYug4xStLjNp/sz3HvBowQ==}
-    engines: {node: '>=12'}
-
   is-fullwidth-code-point@5.0.0:
     resolution: {integrity: sha512-OVa3u9kkBbw7b8Xw5F9P+D/T9X+Z4+JruYVNapTjPYZYUznQ5YfWeFkOj606XYYW8yugTfC8Pj0hYqvi4ryAhA==}
     engines: {node: '>=18'}
@@ -7907,11 +8150,6 @@ packages:
     engines: {node: '>=12.0.0'}
     hasBin: true
 
-  jsesc@3.0.2:
-    resolution: {integrity: sha512-xKqzzWXDttJuOcawBt4KnKHHIf5oQ/Cxax+0PWFG+DFDgHNAdi+TXECADI+RYiFUMmx8792xsMbbgXj4CwnP4g==}
-    engines: {node: '>=6'}
-    hasBin: true
-
   jsesc@3.1.0:
     resolution: {integrity: sha512-/sM3dO2FOzXjKQhJuo0Q173wf2KOo8t4I8vHy6lF9poUp7bKT0/NHE8fPX23PwfhnykfqnC2xRxOnVw5XuGIaA==}
     engines: {node: '>=6'}
@@ -7964,9 +8202,9 @@ packages:
     resolution: {integrity: sha512-POQXvpdL69+CluYsillJ7SUhKvytYjW9vG/GKpnf+xP8UWgYEM/RaMzHHofbALDiKbbP1W8UEYmgGl39WkPZsg==}
     engines: {'0': node >= 0.2.0}
 
-  jsx-ast-utils@3.3.5:
-    resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
-    engines: {node: '>=4.0'}
+  jsx-ast-utils-x@0.1.0:
+    resolution: {integrity: sha512-eQQBjBnsVtGacsG9uJNB8qOr3yA8rga4wAaGG1qRcBzSIvfhERLrWxMAM1hp5fcS6Abo8M4+bUBTekYR0qTPQw==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   just-diff-apply@5.5.0:
     resolution: {integrity: sha512-OYTthRfSh55WOItVqwpefPtNt2VdKsq5AnAK6apdtR6yCH8pr0CmSr710J0Mf+WdQy7K/OzMy7K2MgAfdQURDw==}
@@ -8046,8 +8284,8 @@ packages:
   linkify-it@5.0.0:
     resolution: {integrity: sha512-5aHCbzQRADcdP+ATqnDuhhJ/MRIqDkZX5pyjFHRRysS8vZ5AbqGEoFIb6pYHPZ+L/OC2Lc+xT8uHVVR5CAK/wQ==}
 
-  lint-staged@16.1.5:
-    resolution: {integrity: sha512-uAeQQwByI6dfV7wpt/gVqg+jAPaSp8WwOA8kKC/dv1qw14oGpnpAisY65ibGHUGDUv0rYaZ8CAJZ/1U8hUvC2A==}
+  lint-staged@16.2.6:
+    resolution: {integrity: sha512-s1gphtDbV4bmW1eylXpVMk2u7is7YsrLl8hzrtvC70h4ByhcMLZFY01Fx05ZUDNuv1H8HO4E+e2zgejV1jVwNw==}
     engines: {node: '>=20.17'}
     hasBin: true
 
@@ -8065,8 +8303,8 @@ packages:
     resolution: {integrity: sha512-04PDPqSlsqIOaaaGZ+41vq5FejI9auqTInicFRndCBgE3bXG8D6W1I+mWhk+1nqbHmyhla/6BUrd5OSiHwKRXw==}
     engines: {node: '>=4'}
 
-  listr2@9.0.1:
-    resolution: {integrity: sha512-SL0JY3DaxylDuo/MecFeiC+7pedM0zia33zl0vcjgwcq1q1FWWF1To9EIauPbl8GbMCU0R2e0uJ8bZunhYKD2g==}
+  listr2@9.0.5:
+    resolution: {integrity: sha512-ME4Fb83LgEgwNw96RKNvKV4VTLuXfoKudAmm2lP8Kk87KaMK0/Xrx/aAkMWmT8mDb+3MlFDspfbCs7adjRxA2g==}
     engines: {node: '>=20.0.0'}
 
   listr@0.14.3:
@@ -8528,8 +8766,8 @@ packages:
   nan@2.23.0:
     resolution: {integrity: sha512-1UxuyYGdoQHcGg87Lkqm3FzefucTa0NAiOcuRsDmysep3c1LVCRK2krrUDafMWtjSG04htvAmvg96+SDknOmgQ==}
 
-  nano-spawn@1.0.2:
-    resolution: {integrity: sha512-21t+ozMQDAL/UGgQVBbZ/xXvNO10++ZPuTmKRO8k9V3AClVRht49ahtDjfY8l1q6nSHOrE5ASfthzH3ol6R/hg==}
+  nano-spawn@2.0.0:
+    resolution: {integrity: sha512-tacvGzUY5o2D8CBh2rrwxyNojUsZNU2zjNTzKQrkgGJQTbGAfArVWXSKMBokBeeg6C7OLRGUEyoFlYbfeWQIqw==}
     engines: {node: '>=20.17'}
 
   nanoid@3.3.11:
@@ -8617,8 +8855,8 @@ packages:
     engines: {node: ^12.13 || ^14.13 || >=16}
     hasBin: true
 
-  node-releases@2.0.19:
-    resolution: {integrity: sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==}
+  node-releases@2.0.26:
+    resolution: {integrity: sha512-S2M9YimhSjBSvYnlr5/+umAnPHE++ODwt5e2Ij6FoX45HA/s4vHdkDx1eax2pAPeAOqu4s9b7ppahsyEFdVqQA==}
 
   node-source-walk@7.0.1:
     resolution: {integrity: sha512-3VW/8JpPqPvnJvseXowjZcirPisssnBuDikk6JIZ8jQzF7KJQX52iPFX4RYYxLycYH7IbMRSPUOga/esVjy5Yg==}
@@ -9551,8 +9789,8 @@ packages:
     resolution: {integrity: sha512-+crtS5QjFRqFCoQmvGduwYWEBng99ZvmFvF+cUJkGYF1L1BfU8C6Zp9T7f5vPAwyLkUExpvK+ANVZmGU49qi4Q==}
     engines: {node: '>=12'}
 
-  regjsparser@0.12.0:
-    resolution: {integrity: sha512-cnE+y8bz4NhMjISKbgeVJtqNbtf5QpjZP+Bslo+UqkIt9QPnX9q095eiRRASJG1/tz6dlNr6Z5NsBiWYokp6EQ==}
+  regjsparser@0.13.0:
+    resolution: {integrity: sha512-NZQZdC5wOE/H3UT28fVGL+ikOZcEzfMGk/c3iN9UGxzWHMa1op7274oyiUVrAG4B2EuFhus8SvkaYnhvW92p9Q==}
     hasBin: true
 
   require-directory@2.1.1:
@@ -9761,6 +9999,11 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
+  semver@7.7.3:
+    resolution: {integrity: sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==}
+    engines: {node: '>=10'}
+    hasBin: true
+
   send@0.18.0:
     resolution: {integrity: sha512-qqWzuOjSFOuqPjFe4NOsMLafToQQwBSOEpS+FwEt3A2V3vKubTquT3vmLTQpFgMXp8AlFWFuP1qKaJZOtPpVXg==}
     engines: {node: '>= 0.8.0'}
@@ -9865,10 +10108,6 @@ packages:
   slice-ansi@0.0.4:
     resolution: {integrity: sha512-up04hB2hR92PgjpyU3y/eg91yIBILyjVY26NvvciY3EVVPjybkMszMpXQ9QAkcS3I5rtJBDLoTxxg+qvW8c7rw==}
     engines: {node: '>=0.10.0'}
-
-  slice-ansi@5.0.0:
-    resolution: {integrity: sha512-FC+lgizVPfie0kkhqUScwRu1O/lF6NOgJmlCgK+/LYxDCTk8sGelYaHDhFcDN+Sn3Cv+3VSa4Byeo+IMCzpMgQ==}
-    engines: {node: '>=12'}
 
   slice-ansi@7.1.0:
     resolution: {integrity: sha512-bSiSngZ/jWeX93BqeIAbImyTbEihizcwNjFoRUIY/T1wWQsfsm2Vw1agPKylXvQTU7iASGdHhyqRlqQzfz+Htg==}
@@ -10043,6 +10282,10 @@ packages:
     resolution: {integrity: sha512-tsaTIkKW9b4N+AEj+SVA+WhJzV7/zMhcSu78mLKWSk7cXMOSHsBKFWUs0fWwq8QyK3MgJBQRX6Gbi4kYbdvGkQ==}
     engines: {node: '>=18'}
 
+  string-width@8.1.0:
+    resolution: {integrity: sha512-Kxl3KJGb/gxkaUMOjRsQ8IrXiGW75O4E3RPjFIINOVH8AMl2SQ/yWdTzWwF3FevIX9LcMAjJW+GRwAlAbTSXdg==}
+    engines: {node: '>=20'}
+
   string.prototype.trim@1.2.10:
     resolution: {integrity: sha512-Rs66F0P/1kedk5lyYyH9uBzuiI/kNRmwJAR9quK6VOtIpZ2G+hMZd+HQbbv25MgCA6gEffoMZYxlTod4WcdrKA==}
     engines: {node: '>= 0.4'}
@@ -10101,8 +10344,8 @@ packages:
     resolution: {integrity: sha512-laJTa3Jb+VQpaC6DseHhF7dXVqHTfJPCRDaEbid/drOhgitgYku/letMUqOXFoWV0zIIUbjpdH2t+tYj4bQMRQ==}
     engines: {node: '>=8'}
 
-  strip-indent@4.0.0:
-    resolution: {integrity: sha512-mnVSV2l+Zv6BLpSD/8V87CW/y9EmmbYzGCIavsnsI6/nwn26DwffM/yztm30Z/I2DY9wdS3vXVCMnHDgZaVNoA==}
+  strip-indent@4.1.1:
+    resolution: {integrity: sha512-SlyRoSkdh1dYP0PzclLE7r0M9sgbFKKMFXpFRUMNuKhQSbC6VQIGzq3E0qsfvGJaUFJPGv6Ws1NZ/haTAjfbMA==}
     engines: {node: '>=12'}
 
   strip-json-comments@2.0.1:
@@ -10465,8 +10708,8 @@ packages:
       typeorm-aurora-data-api-driver:
         optional: true
 
-  typescript-eslint@8.40.0:
-    resolution: {integrity: sha512-Xvd2l+ZmFDPEt4oj1QEXzA4A2uUK6opvKu3eGN9aGjB8au02lIVcLyi375w94hHyejTOmzIU77L8ol2sRg9n7Q==}
+  typescript-eslint@8.46.2:
+    resolution: {integrity: sha512-vbw8bOmiuYNdzzV3lsiWv6sRwjyuKJMQqWulBOU7M0RrxedXledX8G8kBbQeiOYDnTfiXz0Y4081E1QMNB6iQg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
@@ -10570,8 +10813,8 @@ packages:
     resolution: {integrity: sha512-1uEe95xksV1O0CYKXo8vQvN1JEbtJp7lb7C5U9HMsIp6IVwntkH/oNUzyVNQSd4S1sYk2FpSSW44FqMc8qee5w==}
     engines: {node: '>=4'}
 
-  update-browserslist-db@1.1.3:
-    resolution: {integrity: sha512-UxhIZQ+QInVdunkDAaiazvvT/+fXL5Osr0JZlJulepYu6Jd7qJtDZjlur0emRlT71EN3ScPoE7gvsuIKKNavKw==}
+  update-browserslist-db@1.1.4:
+    resolution: {integrity: sha512-q0SPT4xyU84saUX+tomz1WLkxUbuaJnR1xWt17M7fJtEJigJeWUNGUqrauFXsHnqev9y9JTRGwk13tFBuKby4A==}
     hasBin: true
     peerDependencies:
       browserslist: '>= 4.21.0'
@@ -10947,6 +11190,8 @@ snapshots:
 
   '@babel/helper-validator-identifier@7.27.1': {}
 
+  '@babel/helper-validator-identifier@7.28.5': {}
+
   '@babel/parser@7.28.0':
     dependencies:
       '@babel/types': 7.28.2
@@ -11141,28 +11386,37 @@ snapshots:
   '@esbuild/win32-x64@0.25.8':
     optional: true
 
-  '@eslint-community/eslint-utils@4.7.0(eslint@9.33.0)':
+  '@eslint-community/eslint-utils@4.7.0(eslint@9.38.0)':
     dependencies:
-      eslint: 9.33.0
+      eslint: 9.38.0
+      eslint-visitor-keys: 3.4.3
+
+  '@eslint-community/eslint-utils@4.9.0(eslint@9.38.0)':
+    dependencies:
+      eslint: 9.38.0
       eslint-visitor-keys: 3.4.3
 
   '@eslint-community/regexpp@4.12.1': {}
 
-  '@eslint/compat@1.3.2(eslint@9.33.0)':
-    optionalDependencies:
-      eslint: 9.33.0
-
-  '@eslint/config-array@0.21.0':
+  '@eslint/compat@1.4.0(eslint@9.38.0)':
     dependencies:
-      '@eslint/object-schema': 2.1.6
+      '@eslint/core': 0.16.0
+    optionalDependencies:
+      eslint: 9.38.0
+
+  '@eslint/config-array@0.21.1':
+    dependencies:
+      '@eslint/object-schema': 2.1.7
       debug: 4.4.1
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
 
-  '@eslint/config-helpers@0.3.1': {}
+  '@eslint/config-helpers@0.4.1':
+    dependencies:
+      '@eslint/core': 0.16.0
 
-  '@eslint/core@0.15.2':
+  '@eslint/core@0.16.0':
     dependencies:
       '@types/json-schema': 7.0.15
 
@@ -11180,13 +11434,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@eslint/js@9.33.0': {}
+  '@eslint/js@9.38.0': {}
 
-  '@eslint/object-schema@2.1.6': {}
+  '@eslint/object-schema@2.1.7': {}
 
-  '@eslint/plugin-kit@0.3.5':
+  '@eslint/plugin-kit@0.4.0':
     dependencies:
-      '@eslint/core': 0.15.2
+      '@eslint/core': 0.16.0
       levn: 0.4.1
 
   '@gar/promisify@1.1.3': {}
@@ -12790,15 +13044,15 @@ snapshots:
 
   '@types/yargs-parser@21.0.3': {}
 
-  '@typescript-eslint/eslint-plugin@8.40.0(@typescript-eslint/parser@8.40.0(eslint@9.33.0)(typescript@5.9.2))(eslint@9.33.0)(typescript@5.9.2)':
+  '@typescript-eslint/eslint-plugin@8.46.2(@typescript-eslint/parser@8.46.2(eslint@9.38.0)(typescript@5.9.2))(eslint@9.38.0)(typescript@5.9.2)':
     dependencies:
       '@eslint-community/regexpp': 4.12.1
-      '@typescript-eslint/parser': 8.40.0(eslint@9.33.0)(typescript@5.9.2)
-      '@typescript-eslint/scope-manager': 8.40.0
-      '@typescript-eslint/type-utils': 8.40.0(eslint@9.33.0)(typescript@5.9.2)
-      '@typescript-eslint/utils': 8.40.0(eslint@9.33.0)(typescript@5.9.2)
-      '@typescript-eslint/visitor-keys': 8.40.0
-      eslint: 9.33.0
+      '@typescript-eslint/parser': 8.46.2(eslint@9.38.0)(typescript@5.9.2)
+      '@typescript-eslint/scope-manager': 8.46.2
+      '@typescript-eslint/type-utils': 8.46.2(eslint@9.38.0)(typescript@5.9.2)
+      '@typescript-eslint/utils': 8.46.2(eslint@9.38.0)(typescript@5.9.2)
+      '@typescript-eslint/visitor-keys': 8.46.2
+      eslint: 9.38.0
       graphemer: 1.4.0
       ignore: 7.0.5
       natural-compare: 1.4.0
@@ -12807,14 +13061,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.40.0(eslint@9.33.0)(typescript@5.9.2)':
+  '@typescript-eslint/parser@8.46.2(eslint@9.38.0)(typescript@5.9.2)':
     dependencies:
-      '@typescript-eslint/scope-manager': 8.40.0
-      '@typescript-eslint/types': 8.40.0
-      '@typescript-eslint/typescript-estree': 8.40.0(typescript@5.9.2)
-      '@typescript-eslint/visitor-keys': 8.40.0
+      '@typescript-eslint/scope-manager': 8.46.2
+      '@typescript-eslint/types': 8.46.2
+      '@typescript-eslint/typescript-estree': 8.46.2(typescript@5.9.2)
+      '@typescript-eslint/visitor-keys': 8.46.2
       debug: 4.4.1
-      eslint: 9.33.0
+      eslint: 9.38.0
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
@@ -12828,28 +13082,43 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/scope-manager@8.40.0':
+  '@typescript-eslint/project-service@8.46.2(typescript@5.9.2)':
     dependencies:
-      '@typescript-eslint/types': 8.40.0
-      '@typescript-eslint/visitor-keys': 8.40.0
+      '@typescript-eslint/tsconfig-utils': 8.46.2(typescript@5.9.2)
+      '@typescript-eslint/types': 8.46.2
+      debug: 4.4.1
+      typescript: 5.9.2
+    transitivePeerDependencies:
+      - supports-color
+
+  '@typescript-eslint/scope-manager@8.46.2':
+    dependencies:
+      '@typescript-eslint/types': 8.46.2
+      '@typescript-eslint/visitor-keys': 8.46.2
 
   '@typescript-eslint/tsconfig-utils@8.40.0(typescript@5.9.2)':
     dependencies:
       typescript: 5.9.2
 
-  '@typescript-eslint/type-utils@8.40.0(eslint@9.33.0)(typescript@5.9.2)':
+  '@typescript-eslint/tsconfig-utils@8.46.2(typescript@5.9.2)':
     dependencies:
-      '@typescript-eslint/types': 8.40.0
-      '@typescript-eslint/typescript-estree': 8.40.0(typescript@5.9.2)
-      '@typescript-eslint/utils': 8.40.0(eslint@9.33.0)(typescript@5.9.2)
+      typescript: 5.9.2
+
+  '@typescript-eslint/type-utils@8.46.2(eslint@9.38.0)(typescript@5.9.2)':
+    dependencies:
+      '@typescript-eslint/types': 8.46.2
+      '@typescript-eslint/typescript-estree': 8.46.2(typescript@5.9.2)
+      '@typescript-eslint/utils': 8.46.2(eslint@9.38.0)(typescript@5.9.2)
       debug: 4.4.1
-      eslint: 9.33.0
+      eslint: 9.38.0
       ts-api-utils: 2.1.0(typescript@5.9.2)
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
 
   '@typescript-eslint/types@8.40.0': {}
+
+  '@typescript-eslint/types@8.46.2': {}
 
   '@typescript-eslint/typescript-estree@8.40.0(typescript@5.9.2)':
     dependencies:
@@ -12867,13 +13136,29 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.40.0(eslint@9.33.0)(typescript@5.9.2)':
+  '@typescript-eslint/typescript-estree@8.46.2(typescript@5.9.2)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.7.0(eslint@9.33.0)
-      '@typescript-eslint/scope-manager': 8.40.0
-      '@typescript-eslint/types': 8.40.0
-      '@typescript-eslint/typescript-estree': 8.40.0(typescript@5.9.2)
-      eslint: 9.33.0
+      '@typescript-eslint/project-service': 8.46.2(typescript@5.9.2)
+      '@typescript-eslint/tsconfig-utils': 8.46.2(typescript@5.9.2)
+      '@typescript-eslint/types': 8.46.2
+      '@typescript-eslint/visitor-keys': 8.46.2
+      debug: 4.4.1
+      fast-glob: 3.3.3
+      is-glob: 4.0.3
+      minimatch: 9.0.5
+      semver: 7.7.2
+      ts-api-utils: 2.1.0(typescript@5.9.2)
+      typescript: 5.9.2
+    transitivePeerDependencies:
+      - supports-color
+
+  '@typescript-eslint/utils@8.46.2(eslint@9.38.0)(typescript@5.9.2)':
+    dependencies:
+      '@eslint-community/eslint-utils': 4.7.0(eslint@9.38.0)
+      '@typescript-eslint/scope-manager': 8.46.2
+      '@typescript-eslint/types': 8.46.2
+      '@typescript-eslint/typescript-estree': 8.46.2(typescript@5.9.2)
+      eslint: 9.38.0
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
@@ -12881,6 +13166,11 @@ snapshots:
   '@typescript-eslint/visitor-keys@8.40.0':
     dependencies:
       '@typescript-eslint/types': 8.40.0
+      eslint-visitor-keys: 4.2.1
+
+  '@typescript-eslint/visitor-keys@8.46.2':
+    dependencies:
+      '@typescript-eslint/types': 8.46.2
       eslint-visitor-keys: 4.2.1
 
   '@vue/compiler-core@3.5.18':
@@ -13213,6 +13503,8 @@ snapshots:
       mixin-deep: 1.3.2
       pascalcase: 0.1.1
 
+  baseline-browser-mapping@2.8.20: {}
+
   basic-ftp@5.0.5: {}
 
   bcrypto@5.5.2:
@@ -13311,12 +13603,13 @@ snapshots:
     dependencies:
       fill-range: 7.1.1
 
-  browserslist@4.25.1:
+  browserslist@4.27.0:
     dependencies:
-      caniuse-lite: 1.0.30001731
-      electron-to-chromium: 1.5.193
-      node-releases: 2.0.19
-      update-browserslist-db: 1.1.3(browserslist@4.25.1)
+      baseline-browser-mapping: 2.8.20
+      caniuse-lite: 1.0.30001751
+      electron-to-chromium: 1.5.240
+      node-releases: 2.0.26
+      update-browserslist-db: 1.1.4(browserslist@4.27.0)
 
   bs58@6.0.0:
     dependencies:
@@ -13502,7 +13795,7 @@ snapshots:
 
   camelcase@8.0.0: {}
 
-  caniuse-lite@1.0.30001731: {}
+  caniuse-lite@1.0.30001751: {}
 
   capture-console@1.0.2:
     dependencies:
@@ -13585,7 +13878,7 @@ snapshots:
 
   ci-info@3.9.0: {}
 
-  ci-info@4.3.0: {}
+  ci-info@4.3.1: {}
 
   class-utils@0.3.6:
     dependencies:
@@ -13633,10 +13926,10 @@ snapshots:
       slice-ansi: 0.0.4
       string-width: 1.0.2
 
-  cli-truncate@4.0.0:
+  cli-truncate@5.1.1:
     dependencies:
-      slice-ansi: 5.0.0
-      string-width: 7.2.0
+      slice-ansi: 7.1.0
+      string-width: 8.1.0
 
   cli-width@3.0.0: {}
 
@@ -13721,7 +14014,7 @@ snapshots:
 
   commander@12.1.0: {}
 
-  commander@14.0.0: {}
+  commander@14.0.2: {}
 
   commander@2.15.1: {}
 
@@ -13845,9 +14138,9 @@ snapshots:
 
   copy-descriptor@0.1.1: {}
 
-  core-js-compat@3.44.0:
+  core-js-compat@3.46.0:
     dependencies:
-      browserslist: 4.25.1
+      browserslist: 4.27.0
 
   core-util-is@1.0.3: {}
 
@@ -14191,7 +14484,7 @@ snapshots:
     dependencies:
       jake: 10.9.2
 
-  electron-to-chromium@1.5.193: {}
+  electron-to-chromium@1.5.240: {}
 
   elegant-spinner@1.0.1: {}
 
@@ -14414,17 +14707,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.40.0(eslint@9.33.0)(typescript@5.9.2))(eslint-import-resolver-node@0.3.9)(eslint@9.33.0):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.46.2(eslint@9.38.0)(typescript@5.9.2))(eslint-import-resolver-node@0.3.9)(eslint@9.38.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
-      '@typescript-eslint/parser': 8.40.0(eslint@9.33.0)(typescript@5.9.2)
-      eslint: 9.33.0
+      '@typescript-eslint/parser': 8.46.2(eslint@9.38.0)(typescript@5.9.2)
+      eslint: 9.38.0
       eslint-import-resolver-node: 0.3.9
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.40.0(eslint@9.33.0)(typescript@5.9.2))(eslint@9.33.0):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.38.0)(typescript@5.9.2))(eslint@9.38.0):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -14433,9 +14726,9 @@ snapshots:
       array.prototype.flatmap: 1.3.3
       debug: 3.2.7
       doctrine: 2.1.0
-      eslint: 9.33.0
+      eslint: 9.38.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.40.0(eslint@9.33.0)(typescript@5.9.2))(eslint-import-resolver-node@0.3.9)(eslint@9.33.0)
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.46.2(eslint@9.38.0)(typescript@5.9.2))(eslint-import-resolver-node@0.3.9)(eslint@9.38.0)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -14447,36 +14740,36 @@ snapshots:
       string.prototype.trimend: 1.0.9
       tsconfig-paths: 3.15.0
     optionalDependencies:
-      '@typescript-eslint/parser': 8.40.0(eslint@9.33.0)(typescript@5.9.2)
+      '@typescript-eslint/parser': 8.46.2(eslint@9.38.0)(typescript@5.9.2)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-prettier@5.5.4(eslint@9.33.0)(prettier@3.6.2):
+  eslint-plugin-prettier@5.5.4(eslint@9.38.0)(prettier@3.6.2):
     dependencies:
-      eslint: 9.33.0
+      eslint: 9.38.0
       prettier: 3.6.2
       prettier-linter-helpers: 1.0.0
       synckit: 0.11.11
 
-  eslint-plugin-promise@7.2.1(eslint@9.33.0):
+  eslint-plugin-promise@7.2.1(eslint@9.38.0):
     dependencies:
-      '@eslint-community/eslint-utils': 4.7.0(eslint@9.33.0)
-      eslint: 9.33.0
+      '@eslint-community/eslint-utils': 4.7.0(eslint@9.38.0)
+      eslint: 9.38.0
 
-  eslint-plugin-simple-import-sort@12.1.1(eslint@9.33.0):
+  eslint-plugin-simple-import-sort@12.1.1(eslint@9.38.0):
     dependencies:
-      eslint: 9.33.0
+      eslint: 9.38.0
 
-  eslint-plugin-sonarjs@3.0.4(eslint@9.33.0):
+  eslint-plugin-sonarjs@3.0.5(eslint@9.38.0):
     dependencies:
       '@eslint-community/regexpp': 4.12.1
       builtin-modules: 3.3.0
       bytes: 3.1.2
-      eslint: 9.33.0
+      eslint: 9.38.0
       functional-red-black-tree: 1.0.1
-      jsx-ast-utils: 3.3.5
+      jsx-ast-utils-x: 0.1.0
       lodash.merge: 4.6.2
       minimatch: 9.0.5
       scslre: 0.3.0
@@ -14490,33 +14783,33 @@ snapshots:
       natural-compare: 1.4.0
       requireindex: 1.2.0
 
-  eslint-plugin-unicorn@60.0.0(eslint@9.33.0):
+  eslint-plugin-unicorn@62.0.0(eslint@9.38.0):
     dependencies:
-      '@babel/helper-validator-identifier': 7.27.1
-      '@eslint-community/eslint-utils': 4.7.0(eslint@9.33.0)
-      '@eslint/plugin-kit': 0.3.5
+      '@babel/helper-validator-identifier': 7.28.5
+      '@eslint-community/eslint-utils': 4.9.0(eslint@9.38.0)
+      '@eslint/plugin-kit': 0.4.0
       change-case: 5.4.4
-      ci-info: 4.3.0
+      ci-info: 4.3.1
       clean-regexp: 1.0.0
-      core-js-compat: 3.44.0
-      eslint: 9.33.0
+      core-js-compat: 3.46.0
+      eslint: 9.38.0
       esquery: 1.6.0
       find-up-simple: 1.0.1
-      globals: 16.3.0
+      globals: 16.4.0
       indent-string: 5.0.0
       is-builtin-module: 5.0.0
       jsesc: 3.1.0
       pluralize: 8.0.0
       regexp-tree: 0.1.27
-      regjsparser: 0.12.0
-      semver: 7.7.2
-      strip-indent: 4.0.0
+      regjsparser: 0.13.0
+      semver: 7.7.3
+      strip-indent: 4.1.1
 
-  eslint-plugin-unused-imports@4.2.0(@typescript-eslint/eslint-plugin@8.40.0(@typescript-eslint/parser@8.40.0(eslint@9.33.0)(typescript@5.9.2))(eslint@9.33.0)(typescript@5.9.2))(eslint@9.33.0):
+  eslint-plugin-unused-imports@4.3.0(@typescript-eslint/eslint-plugin@8.46.2(@typescript-eslint/parser@8.46.2(eslint@9.38.0)(typescript@5.9.2))(eslint@9.38.0)(typescript@5.9.2))(eslint@9.38.0):
     dependencies:
-      eslint: 9.33.0
+      eslint: 9.38.0
     optionalDependencies:
-      '@typescript-eslint/eslint-plugin': 8.40.0(@typescript-eslint/parser@8.40.0(eslint@9.33.0)(typescript@5.9.2))(eslint@9.33.0)(typescript@5.9.2)
+      '@typescript-eslint/eslint-plugin': 8.46.2(@typescript-eslint/parser@8.46.2(eslint@9.38.0)(typescript@5.9.2))(eslint@9.38.0)(typescript@5.9.2)
 
   eslint-scope@8.4.0:
     dependencies:
@@ -14529,21 +14822,20 @@ snapshots:
 
   eslint-visitor-keys@4.2.1: {}
 
-  eslint@9.33.0:
+  eslint@9.38.0:
     dependencies:
-      '@eslint-community/eslint-utils': 4.7.0(eslint@9.33.0)
+      '@eslint-community/eslint-utils': 4.9.0(eslint@9.38.0)
       '@eslint-community/regexpp': 4.12.1
-      '@eslint/config-array': 0.21.0
-      '@eslint/config-helpers': 0.3.1
-      '@eslint/core': 0.15.2
+      '@eslint/config-array': 0.21.1
+      '@eslint/config-helpers': 0.4.1
+      '@eslint/core': 0.16.0
       '@eslint/eslintrc': 3.3.1
-      '@eslint/js': 9.33.0
-      '@eslint/plugin-kit': 0.3.5
+      '@eslint/js': 9.38.0
+      '@eslint/plugin-kit': 0.4.0
       '@humanfs/node': 0.16.6
       '@humanwhocodes/module-importer': 1.0.1
       '@humanwhocodes/retry': 0.4.3
       '@types/estree': 1.0.8
-      '@types/json-schema': 7.0.15
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.6
@@ -15196,7 +15488,7 @@ snapshots:
 
   globals@14.0.0: {}
 
-  globals@16.3.0: {}
+  globals@16.4.0: {}
 
   globalthis@1.0.4:
     dependencies:
@@ -15619,8 +15911,6 @@ snapshots:
 
   is-fullwidth-code-point@3.0.0: {}
 
-  is-fullwidth-code-point@4.0.0: {}
-
   is-fullwidth-code-point@5.0.0:
     dependencies:
       get-east-asian-width: 1.3.0
@@ -15868,8 +16158,6 @@ snapshots:
       strip-json-comments: 3.1.1
       underscore: 1.13.7
 
-  jsesc@3.0.2: {}
-
   jsesc@3.1.0: {}
 
   json-buffer@3.0.1: {}
@@ -15906,12 +16194,7 @@ snapshots:
 
   jsonparse@1.3.1: {}
 
-  jsx-ast-utils@3.3.5:
-    dependencies:
-      array-includes: 3.1.9
-      array.prototype.flat: 1.3.3
-      object.assign: 4.1.7
-      object.values: 1.2.1
+  jsx-ast-utils-x@0.1.0: {}
 
   just-diff-apply@5.5.0: {}
 
@@ -16076,20 +16359,15 @@ snapshots:
     dependencies:
       uc.micro: 2.1.0
 
-  lint-staged@16.1.5:
+  lint-staged@16.2.6:
     dependencies:
-      chalk: 5.6.0
-      commander: 14.0.0
-      debug: 4.4.1
-      lilconfig: 3.1.3
-      listr2: 9.0.1
+      commander: 14.0.2
+      listr2: 9.0.5
       micromatch: 4.0.8
-      nano-spawn: 1.0.2
+      nano-spawn: 2.0.0
       pidtree: 0.6.0
       string-argv: 0.3.2
       yaml: 2.8.1
-    transitivePeerDependencies:
-      - supports-color
 
   listr-silent-renderer@1.1.1: {}
 
@@ -16112,9 +16390,9 @@ snapshots:
       date-fns: 1.30.1
       figures: 2.0.0
 
-  listr2@9.0.1:
+  listr2@9.0.5:
     dependencies:
-      cli-truncate: 4.0.0
+      cli-truncate: 5.1.1
       colorette: 2.0.20
       eventemitter3: 5.0.1
       log-update: 6.1.0
@@ -16658,7 +16936,7 @@ snapshots:
 
   nan@2.23.0: {}
 
-  nano-spawn@1.0.2: {}
+  nano-spawn@2.0.0: {}
 
   nanoid@3.3.11: {}
 
@@ -16752,7 +17030,7 @@ snapshots:
       - bluebird
       - supports-color
 
-  node-releases@2.0.19: {}
+  node-releases@2.0.26: {}
 
   node-source-walk@7.0.1:
     dependencies:
@@ -17137,7 +17415,7 @@ snapshots:
   ox@0.6.7(typescript@5.9.2)(zod@3.24.4):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
-      '@noble/curves': 1.9.2
+      '@noble/curves': 1.9.6
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
@@ -17152,7 +17430,7 @@ snapshots:
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
       '@noble/ciphers': 1.3.0
-      '@noble/curves': 1.9.2
+      '@noble/curves': 1.9.6
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
@@ -17940,9 +18218,9 @@ snapshots:
     dependencies:
       rc: 1.2.8
 
-  regjsparser@0.12.0:
+  regjsparser@0.13.0:
     dependencies:
-      jsesc: 3.0.2
+      jsesc: 3.1.0
 
   require-directory@2.1.1: {}
 
@@ -18119,6 +18397,8 @@ snapshots:
 
   semver@7.7.2: {}
 
+  semver@7.7.3: {}
+
   send@0.18.0:
     dependencies:
       debug: 2.6.9
@@ -18268,11 +18548,6 @@ snapshots:
   slash@3.0.0: {}
 
   slice-ansi@0.0.4: {}
-
-  slice-ansi@5.0.0:
-    dependencies:
-      ansi-styles: 6.2.1
-      is-fullwidth-code-point: 4.0.0
 
   slice-ansi@7.1.0:
     dependencies:
@@ -18463,6 +18738,11 @@ snapshots:
       get-east-asian-width: 1.3.0
       strip-ansi: 7.1.0
 
+  string-width@8.1.0:
+    dependencies:
+      get-east-asian-width: 1.3.0
+      strip-ansi: 7.1.0
+
   string.prototype.trim@1.2.10:
     dependencies:
       call-bind: 1.0.8
@@ -18528,9 +18808,7 @@ snapshots:
     dependencies:
       min-indent: 1.0.1
 
-  strip-indent@4.0.0:
-    dependencies:
-      min-indent: 1.0.1
+  strip-indent@4.1.1: {}
 
   strip-json-comments@2.0.1: {}
 
@@ -18863,13 +19141,13 @@ snapshots:
       - babel-plugin-macros
       - supports-color
 
-  typescript-eslint@8.40.0(eslint@9.33.0)(typescript@5.9.2):
+  typescript-eslint@8.46.2(eslint@9.38.0)(typescript@5.9.2):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 8.40.0(@typescript-eslint/parser@8.40.0(eslint@9.33.0)(typescript@5.9.2))(eslint@9.33.0)(typescript@5.9.2)
-      '@typescript-eslint/parser': 8.40.0(eslint@9.33.0)(typescript@5.9.2)
-      '@typescript-eslint/typescript-estree': 8.40.0(typescript@5.9.2)
-      '@typescript-eslint/utils': 8.40.0(eslint@9.33.0)(typescript@5.9.2)
-      eslint: 9.33.0
+      '@typescript-eslint/eslint-plugin': 8.46.2(@typescript-eslint/parser@8.46.2(eslint@9.38.0)(typescript@5.9.2))(eslint@9.38.0)(typescript@5.9.2)
+      '@typescript-eslint/parser': 8.46.2(eslint@9.38.0)(typescript@5.9.2)
+      '@typescript-eslint/typescript-estree': 8.46.2(typescript@5.9.2)
+      '@typescript-eslint/utils': 8.46.2(eslint@9.38.0)(typescript@5.9.2)
+      eslint: 9.38.0
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
@@ -18963,9 +19241,9 @@ snapshots:
 
   upath@2.0.1: {}
 
-  update-browserslist-db@1.1.3(browserslist@4.25.1):
+  update-browserslist-db@1.1.4(browserslist@4.27.0):
     dependencies:
-      browserslist: 4.25.1
+      browserslist: 4.27.0
       escalade: 3.2.0
       picocolors: 1.1.1
 

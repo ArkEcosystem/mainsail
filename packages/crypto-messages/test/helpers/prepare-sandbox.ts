@@ -1,6 +1,7 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
+import { Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
+import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreConsensusBls12381 } from "@mainsail/crypto-consensus-bls12-381";
@@ -14,7 +15,7 @@ import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
-import crypto from "../../../core/bin/config/devnet/core/crypto.json";
+import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
 import { Sandbox } from "../../../test-framework/source/index.js";
 import { Deserializer } from "../../source/deserializer.js";
 import { MessageFactory } from "../../source/factory.js";
@@ -22,7 +23,7 @@ import { makeKeywords } from "../../source/keywords.js";
 import { schemas } from "../../source/schemas.js";
 import { Serializer } from "../../source/serializer.js";
 
-export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
+export const prepareSandbox = async (context: { sandbox?: Sandbox }): Promise<void> => {
 	context.sandbox = new Sandbox();
 
 	context.sandbox.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);

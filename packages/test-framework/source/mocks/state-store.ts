@@ -1,17 +1,9 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 let mockBlock: Partial<Contracts.Crypto.Block> | undefined;
 let lastHeight = 0;
 
-export const setBlock = (block: Partial<Contracts.Crypto.Block> | undefined) => {
-	mockBlock = block;
-};
-
-export const setLastHeight = (height: number) => {
-	lastHeight = height;
-};
-
-class storeMocks implements Partial<Contracts.State.Store> {
+class StoreMocks implements Partial<Contracts.State.Store> {
 	public getLastBlock(): Contracts.Crypto.Block {
 		return mockBlock as Contracts.Crypto.Block;
 	}
@@ -25,4 +17,12 @@ class storeMocks implements Partial<Contracts.State.Store> {
 	}
 }
 
-export const instance = new storeMocks();
+export const setBlock = (block: Partial<Contracts.Crypto.Block> | undefined): void => {
+	mockBlock = block;
+};
+
+export const setLastHeight = (height: number): void => {
+	lastHeight = height;
+};
+
+export const instance = new StoreMocks();

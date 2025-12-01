@@ -1,4 +1,4 @@
-import { ProcessableUnit } from "./processable-unit.js";
+import type { ProcessableUnit } from "./processable-unit.js";
 
 export interface Handler {
 	execute(unit: ProcessableUnit): Promise<void>;

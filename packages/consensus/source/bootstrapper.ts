@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
+import type { Contracts, Utils } from "@mainsail/contracts";
 
 @injectable()
 export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
@@ -18,7 +19,7 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 		this.logger.info(`Consensus Bootstrap - Proposals: ${proposals.length}`, "consensus");
 
 		for (const proposal of proposals) {
-			const roundState = this.roundStateRepo.getRoundState(proposal.blockNumber, proposal.round);
+			const roundState = this.roundStateRepo.getRoundState(proposal.blockHeader.number, proposal.round);
 			roundState.addProposal(proposal);
 		}
 

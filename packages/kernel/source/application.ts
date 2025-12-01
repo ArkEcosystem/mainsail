@@ -1,16 +1,16 @@
 import { exit } from "node:process";
 
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Events, Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 import { DirectoryCannotBeFound } from "@mainsail/exceptions";
 import { join } from "path";
 import { isMainThread } from "worker_threads";
 
 import { Bootstrappers } from "./bootstrap/index.js";
-import { ServiceProvider, ServiceProviderRepository } from "./providers/index.js";
+import type { ServiceProvider } from "./providers/index.js";
+import { ServiceProviderRepository } from "./providers/index.js";
 import { ConfigRepository } from "./services/config/index.js";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider.js";
-import { Constructor } from "./types/container.js";
-import { KeyValuePair } from "./types/index.js";
 
 export class Application implements Contracts.Kernel.Application {
 	#booted = false;
@@ -30,8 +30,8 @@ export class Application implements Contracts.Kernel.Application {
 		flags: Contracts.Types.JsonObject;
 		plugins?: Contracts.Types.JsonObject;
 	}): Promise<void> {
-		this.bind<KeyValuePair>(Identifiers.Config.Flags).toConstantValue(options.flags);
-		this.bind<KeyValuePair>(Identifiers.Config.Plugins).toConstantValue(options.plugins || {});
+		this.bind(Identifiers.Config.Flags).toConstantValue(options.flags);
+		this.bind(Identifiers.Config.Plugins).toConstantValue(options.plugins || {});
 
 		await this.#registerEventDispatcher();
 
@@ -53,7 +53,7 @@ export class Application implements Contracts.Kernel.Application {
 		await this.boot();
 	}
 
-	public config<T = any>(key: string, value?: T, defaultValue?: T): T | undefined {
+	public config<T = unknown>(key: string, value?: T, defaultValue?: T): T | undefined {
 		const config: ConfigRepository = this.get<ConfigRepository>(Identifiers.Config.Repository);
 
 		if (value) {
@@ -181,7 +181,7 @@ export class Application implements Contracts.Kernel.Application {
 
 			// Check for AggregateError
 			if ("errors" in error) {
-				errors = [...errors, ...(error as unknown as Record<string, any>).errors];
+				errors = [...errors, ...(error as unknown as { errors: Error[] }).errors];
 			}
 
 			for (const error of errors) {
@@ -238,7 +238,7 @@ export class Application implements Contracts.Kernel.Application {
 	public getTagged<T>(
 		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
 		key: string | number | symbol,
-		value: any,
+		value: string,
 	): T {
 		return this.container.get(serviceIdentifier, { tag: { key, value } });
 	}
@@ -250,7 +250,7 @@ export class Application implements Contracts.Kernel.Application {
 	public isBoundTagged<T>(
 		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
 		key: string | number | symbol,
-		value: any,
+		value: string,
 	): boolean {
 		return this.container.isBound(serviceIdentifier, { tag: { key, value } });
 	}
@@ -260,7 +260,9 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	async #bootstrapWith(type: string): Promise<void> {
-		const bootstrappers: Constructor<Contracts.Kernel.Bootstrapper>[] = Object.values(Bootstrappers[type]);
+		const bootstrappers: Contracts.Types.Constructor<Contracts.Kernel.Bootstrapper>[] = Object.values(
+			Bootstrappers[type],
+		);
 		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.Services.EventDispatcher.Service);
 
 		for (const bootstrapper of bootstrappers) {

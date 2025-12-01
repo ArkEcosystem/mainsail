@@ -1,10 +1,11 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { TransactionResource } from "../resources/index.js";
 
 @injectable()
-export class EthGetTransactionByHash implements Contracts.Api.RPC.Action {
+export class EthGetTransactionByHash implements Contracts.Api.RPC.Action<[string]> {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -23,7 +24,7 @@ export class EthGetTransactionByHash implements Contracts.Api.RPC.Action {
 		type: "array",
 	};
 
-	public async handle(parameters: [string]): Promise<any> {
+	public async handle(parameters: [string]): Promise<object | null> {
 		const transaction = await this.databaseService.getTransactionByHash(parameters[0].slice(2));
 
 		if (!transaction) {

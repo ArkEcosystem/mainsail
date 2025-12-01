@@ -1,11 +1,10 @@
 import { injectable, Selectors } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import {
 	Deserializer as TransactionDeserializer,
 	Serializer,
 	TransactionFactory,
-	TransactionRegistry,
-	TransactionTypeFactory,
 	Utils,
 	Verifier,
 } from "@mainsail/crypto-transaction";

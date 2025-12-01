@@ -1,7 +1,7 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
-import { PluginConfiguration } from "./plugin-configuration.js";
 import { PluginManifest } from "./plugin-manifest.js";
 
 @injectable()
@@ -9,7 +9,7 @@ export abstract class ServiceProvider {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	#packageConfiguration!: PluginConfiguration;
+	#packageConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	#packageManifest!: PluginManifest;
 
@@ -53,11 +53,11 @@ export abstract class ServiceProvider {
 		return undefined;
 	}
 
-	public config(): PluginConfiguration {
+	public config(): Contracts.Kernel.PluginConfiguration {
 		return this.#packageConfiguration;
 	}
 
-	public setConfig(config: PluginConfiguration): void {
+	public setConfig(config: Contracts.Kernel.PluginConfiguration): void {
 		this.#packageConfiguration = config;
 	}
 

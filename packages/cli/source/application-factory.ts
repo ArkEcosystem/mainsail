@@ -1,5 +1,5 @@
-import { Container } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Container } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
 import { ActionFactory } from "./action-factory.js";

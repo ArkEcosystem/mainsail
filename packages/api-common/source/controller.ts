@@ -1,7 +1,8 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { SchemaObject } from "./schemas.js";
 
@@ -54,7 +55,10 @@ export abstract class AbstractController {
 		}));
 	}
 
-	protected async respondWithResource(data, transformer): Promise<any> {
+	protected async respondWithResource<T extends object, R extends Contracts.Api.Resource>(
+		data: T | null,
+		transformer: new () => R,
+	): Promise<{ data: ReturnType<R["transform"]> } | Boom.Boom> {
 		if (!data) {
 			return Boom.notFound();
 		}
@@ -62,13 +66,16 @@ export abstract class AbstractController {
 		return { data: await this.toResource(data, transformer) };
 	}
 
-	protected async respondWithCollection(data, transformer): Promise<object> {
+	protected async respondWithCollection<T extends object, R extends Contracts.Api.Resource>(
+		data: T[],
+		transformer: new () => R,
+	): Promise<{ data: ReturnType<R["transform"]>[] } | Boom.Boom> {
 		return {
 			data: await this.toCollection(data, transformer),
 		};
 	}
 
-	protected async toResource<T, R extends Contracts.Api.Resource>(
+	protected async toResource<T extends object, R extends Contracts.Api.Resource>(
 		item: T,
 		transformer: new () => R,
 	): Promise<ReturnType<R["transform"]>> {
@@ -76,14 +83,14 @@ export abstract class AbstractController {
 		return resource.transform(item) as ReturnType<R["transform"]>;
 	}
 
-	protected async toCollection<T, R extends Contracts.Api.Resource>(
+	protected async toCollection<T extends object, R extends Contracts.Api.Resource>(
 		items: T[],
 		transformer: new () => R,
 	): Promise<ReturnType<R["transform"]>[]> {
 		return Promise.all(items.map(async (item) => await this.toResource(item, transformer)));
 	}
 
-	protected async toPagination<T, R extends Contracts.Api.Resource>(
+	protected async toPagination<T extends object, R extends Contracts.Api.Resource>(
 		resultsPage: Contracts.Api.ResultsPage<T>,
 		transformer: new () => R,
 	): Promise<Contracts.Api.ResultsPage<ReturnType<R["transform"]>>> {
@@ -92,7 +99,7 @@ export abstract class AbstractController {
 		return { ...resultsPage, results: items };
 	}
 
-	protected getEmptyPage(): Contracts.Api.ResultsPage<any> {
+	protected getEmptyPage(): Contracts.Api.ResultsPage<unknown> {
 		return { meta: { totalCountIsEstimate: false }, results: [], totalCount: 0 };
 	}
 }

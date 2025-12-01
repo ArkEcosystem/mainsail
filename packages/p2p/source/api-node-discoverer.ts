@@ -1,6 +1,7 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
+import { Services } from "@mainsail/kernel";
 import { shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -13,7 +14,7 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.ApiNode.Factory)
 	private readonly ApiNodeFactory!: Contracts.P2P.ApiNodeFactory;
@@ -45,13 +46,13 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 		}
 	}
 
-	async populateApiNodesFromConfiguration(): Promise<any> {
+	async populateApiNodesFromConfiguration(): Promise<void> {
 		const apiNodes = this.configuration.getOptional<string[]>("apiNodes", []).map((url) => {
 			const normalizedUrl = normalizeUrl(url);
 			return this.ApiNodeFactory(normalizedUrl);
 		});
 
-		return Promise.all(
+		await Promise.all(
 			Object.values(apiNodes).map((apiNode: Contracts.P2P.ApiNode) =>
 				this.app.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service).call<{
 					apiNode: Contracts.P2P.ApiNode;
@@ -61,13 +62,13 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 		);
 	}
 
-	async discoverNewApiNodes(): Promise<any> {
+	async discoverNewApiNodes(): Promise<void> {
 		const peers = shuffle(this.peerRepository.getPeers()).slice(0, 5);
-		return Promise.all(peers.map((peer) => this.discoverApiNodes(peer)));
+		await Promise.all(peers.map((peer) => this.discoverApiNodes(peer)));
 	}
 
-	async refreshApiNodes(): Promise<any> {
-		return Promise.all(
+	async refreshApiNodes(): Promise<void> {
+		await Promise.all(
 			this.apiNodeRepository
 				.getApiNodes()
 				.filter((apiNode) =>

@@ -1,13 +1,13 @@
 import { injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { InvalidArgumentException } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
-import { ActionArguments } from "../../types/index.js";
 import { Action } from "./action.js";
 
 @injectable()
 export class Triggers {
-	readonly #triggers: Map<string, Action<any>> = new Map<string, Action<any>>();
+	readonly #triggers: Map<string, Action<unknown>> = new Map<string, Action<unknown>>();
 
 	public bind<T>(name: string, action: Action<T>): Action<T> {
 		if (this.#triggers.has(name)) {
@@ -18,7 +18,7 @@ export class Triggers {
 			throw new InvalidArgumentException(`The given trigger [${name}] is reserved.`);
 		}
 
-		this.#triggers.set(name, action);
+		this.#triggers.set(name, action as Action<unknown>);
 
 		return action;
 	}
@@ -32,7 +32,7 @@ export class Triggers {
 
 		this.#triggers.delete(name);
 
-		return trigger;
+		return trigger as Action<T>;
 	}
 
 	public rebind<T>(name: string, action: Action<T>): Action<T> {
@@ -48,13 +48,13 @@ export class Triggers {
 
 		assert.defined(trigger);
 
-		return trigger;
+		return trigger as Action<T>;
 	}
 
 	// TODO: Check implementation
 	// TODO: Add in documentation: how errors are handled, which data can each hook type expect.
 
-	public async call<T>(name: string, arguments_: ActionArguments = {}): Promise<T | undefined> {
+	public async call<T>(name: string, arguments_: Contracts.Kernel.ActionArguments = {}): Promise<T | undefined> {
 		this.#throwIfActionIsMissing(name);
 
 		let stage = "before";
@@ -88,7 +88,7 @@ export class Triggers {
 		}
 	}
 
-	async #callAfterHooks<T>(trigger: string, arguments_: ActionArguments, result: T): Promise<void> {
+	async #callAfterHooks<T>(trigger: string, arguments_: Contracts.Kernel.ActionArguments, result: T): Promise<void> {
 		const hooks = this.get(trigger)!.hooks("after");
 
 		for (const hook of hooks) {
@@ -99,7 +99,7 @@ export class Triggers {
 
 	async #callErrorHooks<T>(
 		trigger: string,
-		arguments_: ActionArguments,
+		arguments_: Contracts.Kernel.ActionArguments,
 		result: T | undefined,
 		error: Error,
 		stage: string,

@@ -1,5 +1,6 @@
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 
@@ -35,25 +36,25 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 
 	async process(proposal: Contracts.Crypto.Proposal, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
-			if (!this.hasValidBlockNumberOrRound(proposal)) {
-				return Contracts.Consensus.ProcessorResult.Skipped;
+			if (!this.hasValidBlockNumberOrRound({ blockNumber: proposal.blockHeader.number, round: proposal.round })) {
+				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
 			if (!this.isRoundInBounds(proposal)) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
+				return Enums.Consensus.ProcessorResult.Invalid;
 			}
 
 			if (!this.#hasValidProposer(proposal)) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
+				return Enums.Consensus.ProcessorResult.Invalid;
 			}
 
 			if (!(await this.#hasValidSignature(proposal))) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
+				return Enums.Consensus.ProcessorResult.Invalid;
 			}
 
-			const roundState = this.roundStateRepo.getRoundState(proposal.blockNumber, proposal.round);
+			const roundState = this.roundStateRepo.getRoundState(proposal.blockHeader.number, proposal.round);
 			if (roundState.hasProposal()) {
-				return Contracts.Consensus.ProcessorResult.Skipped;
+				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
 			roundState.addProposal(proposal);
@@ -67,7 +68,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 				void this.getConsensus().handle(roundState);
 			}, 0);
 
-			return Contracts.Consensus.ProcessorResult.Accepted;
+			return Enums.Consensus.ProcessorResult.Accepted;
 		});
 	}
 
@@ -78,35 +79,34 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 
 		if (proposal.validRound >= proposal.round) {
 			this.logger.debug(
-				`Received proposal ${proposal.blockNumber}/${proposal.round} has validRound ${proposal.validRound} >= round ${proposal.round}`,
+				`Received proposal ${proposal.blockHeader.number}/${proposal.round} has validRound ${proposal.validRound} >= round ${proposal.round}`,
 				"consensus",
 			);
 
 			return false;
 		}
 
-		const lockProof = proposal.getData().lockProof;
-		if (!lockProof) {
+		if (!proposal.lockProof) {
 			this.logger.debug(
-				`Received proposal ${proposal.blockNumber}/${proposal.round} with missing lock proof`,
+				`Received proposal ${proposal.blockHeader.number}/${proposal.round} with missing lock proof`,
 				"consensus",
 			);
 			return true;
 		}
 
 		const data = await this.messageSerializer.serializePrevoteForSignature({
-			blockHash: proposal.getData().block.header.hash,
-			blockNumber: proposal.blockNumber,
+			blockHash: proposal.blockHeader.hash,
+			blockNumber: proposal.blockHeader.number,
 			round: proposal.validRound,
-			type: Contracts.Crypto.MessageType.Prevote,
+			type: Enums.Crypto.MessageType.Prevote,
 		});
 
-		const { roundValidators } = this.configuration.getMilestone(proposal.blockNumber);
-		const verified = await this.aggregator.verify(lockProof, data, roundValidators);
+		const { roundValidators } = this.configuration.getMilestone(proposal.blockHeader.number);
+		const verified = await this.aggregator.verify(proposal.lockProof, data, roundValidators);
 
 		if (!verified) {
 			this.logger.debug(
-				`Received proposal ${proposal.blockNumber}/${proposal.round} with invalid lock proof`,
+				`Received proposal ${proposal.blockHeader.number}/${proposal.round} with invalid lock proof`,
 				"consensus",
 			);
 		}

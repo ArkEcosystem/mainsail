@@ -1,5 +1,5 @@
-import { CommitHandler } from "../crypto/commit-handler.js";
-import {
+import type { CommitHandler } from "../crypto/commit-handler.js";
+import type {
 	AccountInfo,
 	AccountInfoExtended,
 	CalculateRoundValidatorsContext,

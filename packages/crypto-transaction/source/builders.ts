@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { MissingTransactionSignatureError, ValidationFailed } from "@mainsail/exceptions";
 import { BigNumber } from "@mainsail/utils";
 
@@ -34,7 +35,7 @@ export class TransactionBuilder {
 	protected signWithSenderAsRecipient = false;
 
 	@postConstruct()
-	public postConstruct() {
+	public postConstruct(): void {
 		this.initializeData();
 
 		this.data.value = BigNumber.ZERO;
@@ -206,7 +207,7 @@ export class TransactionBuilder {
 		return data;
 	}
 
-	protected initializeData() {
+	protected initializeData(): void {
 		this.data = {
 			gasPrice: 0,
 			id: undefined,

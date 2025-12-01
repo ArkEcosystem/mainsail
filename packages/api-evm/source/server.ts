@@ -1,24 +1,24 @@
 import { badData } from "@hapi/boom";
 import { AbstractServer } from "@mainsail/api-common";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Server extends AbstractServer {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-evm")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	protected baseName(): string {
 		return "EVM API";
 	}
 
-	protected pluginConfiguration(): Providers.PluginConfiguration {
+	protected pluginConfiguration(): Contracts.Kernel.PluginConfiguration {
 		return this.configuration;
 	}
 
-	protected defaultOptions(): Record<string, any> {
+	protected defaultOptions(): Record<string, unknown> {
 		const validateContext = {
 			configuration: {
 				plugins: {},
@@ -48,9 +48,5 @@ export class Server extends AbstractServer {
 				},
 			},
 		};
-	}
-
-	protected schemas(): any {
-		return {};
 	}
 }

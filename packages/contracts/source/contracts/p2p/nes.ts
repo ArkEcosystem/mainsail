@@ -1,7 +1,7 @@
 export interface Client {
-	connect(options: any): Promise<any>;
-	disconnect(): Promise<any>;
-	request(options: any): Promise<any>;
+	connect(options: Record<string, unknown>): Promise<void>;
+	disconnect(): Promise<void>;
+	request(options: Record<string, unknown>): Promise<void>;
 }
 
 export interface Socket {

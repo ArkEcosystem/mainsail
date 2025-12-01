@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 
 import { describe } from "../../../../test-framework/source";
 import { getPeerConfig } from "./get-peer-config";

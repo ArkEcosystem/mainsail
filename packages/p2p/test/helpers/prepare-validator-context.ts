@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation";
 
 import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json";

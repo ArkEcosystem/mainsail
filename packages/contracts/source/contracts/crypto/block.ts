@@ -1,22 +1,11 @@
-import { BigNumber } from "@mainsail/utils";
+import type { BigNumber } from "@mainsail/utils";
 
-import { Mutable } from "../../utilities.js";
-import { BlockHeaderStorageData, TransactionStorageData } from "../evm/storage.js";
-import { Transaction, TransactionData, TransactionJson } from "./transactions.js";
+import type { BlockHeaderStorageData, TransactionStorageData } from "../evm/storage.js";
+import type { Transaction, TransactionData, TransactionJson } from "./transactions.js";
 
 export type BlockTag = "latest" | "finalized" | "safe";
-export type BlockHeader = Exclude<BlockData, "transactions">;
 
-export interface Block {
-	readonly data: BlockData;
-	readonly header: BlockHeader;
-	readonly serialized: string;
-	readonly transactions: Transaction[];
-}
-
-export interface BlockData {
-	readonly hash: string;
-
+export interface BlockHeaderRaw {
 	readonly timestamp: number;
 	readonly version: number;
 	readonly number: number;
@@ -31,8 +20,21 @@ export interface BlockData {
 	readonly payloadSize: number;
 	readonly transactionsRoot: string;
 	readonly proposer: string;
+}
 
+export type BlockHeader = BlockHeaderRaw & {
+	readonly hash: string;
+};
+
+export type BlockData = BlockHeader & {
 	readonly transactions: TransactionData[];
+};
+
+export interface Block {
+	readonly data: BlockData;
+	readonly header: BlockHeader;
+	readonly serialized: string;
+	readonly transactions: Transaction[];
 }
 
 export interface BlockJson {
@@ -60,7 +62,7 @@ export interface BlockJson {
 export type BlockDataSerializable = Omit<BlockData, "hash">;
 
 export interface BlockFactory {
-	make(data: Mutable<BlockDataSerializable>, transactions: Transaction[]): Promise<Block>;
+	make(data: BlockDataSerializable, transactions: Transaction[]): Promise<Block>;
 
 	fromHex(hex: string): Promise<Block>;
 	fromBytes(buff: Buffer): Promise<Block>;
@@ -72,7 +74,7 @@ export interface BlockFactory {
 export interface BlockSerializer {
 	totalSize(block: BlockDataSerializable): number;
 
-	serializeHeader(block: BlockDataSerializable): Promise<Buffer>;
+	serializeHeader(block: BlockHeaderRaw): Promise<Buffer>;
 
 	serializeWithTransactions(block: BlockDataSerializable): Promise<Buffer>;
 }

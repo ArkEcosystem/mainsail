@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 import { ConsensusAbi, parseTransactionError } from "@mainsail/evm-contracts";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
@@ -76,7 +76,7 @@ describe<{
 			abi: ConsensusAbi.abi,
 			eventName: "ValidatorResigned",
 			data: receipt?.logs[0].data as Hex,
-			topics: receipt?.logs[0].topics,
+			topics: receipt?.logs[0].topics ?? [],
 		});
 
 		assert.equal(decoded.args, {

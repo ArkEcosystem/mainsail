@@ -1,4 +1,5 @@
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers, Events } from "@mainsail/constants";
 import { Sandbox } from "@mainsail/test-framework";
 import { sleep } from "@mainsail/utils";
 
@@ -127,7 +128,7 @@ export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], blockNumber?:
 	const function_ = async (sandbox: Sandbox): Promise<void> =>
 		new Promise((resolve) => {
 			const event = Events.BlockEvent.Applied;
-			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher>(
+			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher<Contracts.Crypto.BlockData>>(
 				Identifiers.Services.EventDispatcher.Service,
 			);
 
@@ -154,7 +155,7 @@ export const snoozeForRound = async (sandbox: Sandbox | Sandbox[], round?: numbe
 	const function_ = async (sandbox: Sandbox): Promise<void> =>
 		new Promise((resolve) => {
 			const event = Events.ConsensusEvent.RoundStarted;
-			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher>(
+			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher<Contracts.Consensus.State>>(
 				Identifiers.Services.EventDispatcher.Service,
 			);
 
@@ -190,7 +191,7 @@ export async function snoozeForInvalidBlock(
 	const function_ = async (sandbox: Sandbox): Promise<InvalidBlock> =>
 		new Promise((resolve) => {
 			const event = Events.BlockEvent.Invalid;
-			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher>(
+			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher<InvalidBlock>>(
 				Identifiers.Services.EventDispatcher.Service,
 			);
 

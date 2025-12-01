@@ -4,7 +4,7 @@ import { reduceRight } from "./reduce-right";
 describe("reduceRight", async ({ assert, it, nock, loader }) => {
 	it("should work with an array", () => {
 		assert.equal(
-			reduceRight(
+			reduceRight<number[], number[]>(
 				[
 					[0, 1],
 					[2, 3],
@@ -21,7 +21,7 @@ describe("reduceRight", async ({ assert, it, nock, loader }) => {
 		assert.equal(
 			reduceRight(
 				{ a: 1, b: 2, c: 1 },
-				(result, value, key) => {
+				(result: Record<number, string[]>, value, key) => {
 					(result[value] || (result[value] = [])).push(key);
 
 					return result;

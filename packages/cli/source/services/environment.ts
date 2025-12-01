@@ -1,10 +1,10 @@
+import { EnvironmentVariables } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Constants } from "@mainsail/contracts";
 import { parse, stringify } from "envfile";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
-import { Paths } from "../contracts.js";
+import { InputValues, Paths } from "../contracts.js";
 import { envPaths as environmentPaths } from "../env-paths.js";
 import { Identifiers } from "../ioc/index.js";
 
@@ -20,24 +20,24 @@ export class Environment {
 			paths[key] = path.join(value, this.appName);
 		}
 
-		if (process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_CONFIG]) {
+		if (process.env[EnvironmentVariables.MAINSAIL_PATH_CONFIG]) {
 			paths = {
 				...paths,
-				config: path.resolve(process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_CONFIG]!, this.appName),
+				config: path.resolve(process.env[EnvironmentVariables.MAINSAIL_PATH_CONFIG]!, this.appName),
 			};
 		}
 
-		if (process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_DATA]) {
+		if (process.env[EnvironmentVariables.MAINSAIL_PATH_DATA]) {
 			paths = {
 				...paths,
-				data: path.resolve(process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_DATA]!, this.appName),
+				data: path.resolve(process.env[EnvironmentVariables.MAINSAIL_PATH_DATA]!, this.appName),
 			};
 		}
 
 		return paths;
 	}
 
-	public updateVariables(environmentFile: string, variables: Record<string, string | number>): void {
+	public updateVariables(environmentFile: string, variables: InputValues): void {
 		if (!existsSync(environmentFile)) {
 			throw new Error(`No environment file found at ${environmentFile}.`);
 		}

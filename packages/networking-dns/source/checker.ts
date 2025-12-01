@@ -1,21 +1,21 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 import { shuffle } from "@mainsail/utils";
 import dns from "dns";
-import util from "util";
+import { promisify } from "util";
 
 @injectable()
 export class Checker {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "networking-dns")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(): Promise<void> {
-		const lookupService = util.promisify(dns.lookupService);
+		const lookupService = promisify(dns.lookupService);
 
 		for (const host of shuffle(this.configuration.getRequired<string[]>("hosts"))) {
 			try {

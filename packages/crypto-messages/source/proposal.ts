@@ -1,12 +1,14 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Proposal implements Contracts.Crypto.Proposal {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messageFactory!: Contracts.Crypto.MessageFactory;
 
-	#blockNumber!: number;
+	#blockHeader!: Contracts.Crypto.BlockHeader;
+	#lockProof?: Contracts.Crypto.AggregatedSignature;
 	#round!: number;
 	#validRound?: number;
 	#dataSerialized!: string;
@@ -18,17 +20,18 @@ export class Proposal implements Contracts.Crypto.Proposal {
 	public initialize({
 		round,
 		validatorIndex,
-		blockNumber,
+		blockHeader,
+		lockProof,
 		dataSerialized,
 		validRound,
 		signature,
 		serialized,
 	}: Omit<Contracts.Crypto.ProposalData, "data"> & {
 		dataSerialized: string;
-		blockNumber: number;
 		serialized: Buffer;
 	}): Proposal {
-		this.#blockNumber = blockNumber;
+		this.#blockHeader = blockHeader;
+		this.#lockProof = lockProof;
 		this.#round = round;
 		this.#validRound = validRound;
 		this.#dataSerialized = dataSerialized;
@@ -43,8 +46,12 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		return this.#data !== undefined;
 	}
 
-	public get blockNumber(): number {
-		return this.#blockNumber;
+	public get blockHeader(): Contracts.Crypto.BlockHeader {
+		return this.#blockHeader;
+	}
+
+	public get lockProof(): Contracts.Crypto.AggregatedSignature | undefined {
+		return this.#lockProof;
 	}
 
 	public get round(): number {
@@ -85,8 +92,8 @@ export class Proposal implements Contracts.Crypto.Proposal {
 
 	public toString(): string {
 		return JSON.stringify({
-			block: this.#data?.block.header.hash,
-			blockNumber: this.#blockNumber,
+			block: this.#blockHeader.hash,
+			blockNumber: this.#blockHeader.number,
 			round: this.#round,
 			validatorIndex: this.#validatorIndex,
 		});
@@ -104,8 +111,9 @@ export class Proposal implements Contracts.Crypto.Proposal {
 
 	public toData(): Contracts.Crypto.ProposalData {
 		return {
-			blockNumber: this.#blockNumber,
+			blockHeader: this.#blockHeader,
 			data: { serialized: this.#dataSerialized },
+			lockProof: this.#lockProof,
 			round: this.#round,
 			signature: this.#signature,
 			validRound: this.#validRound,

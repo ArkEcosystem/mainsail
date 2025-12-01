@@ -1,10 +1,13 @@
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import type { WriteFileOptions } from "fs";
+import type { EnsureDirOptions } from "fs-extra";
 import { resolve } from "path";
 
 @injectable()
 export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 	// https://github.com/jprichardson/node-fs-extra/issues/743#issuecomment-580346768
+	/* eslint-disable @typescript-eslint/consistent-type-imports */
 	private fsExtra!: typeof import("fs-extra/esm");
 	private fs!: typeof import("fs");
 
@@ -89,7 +92,7 @@ export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 			.filter(async (item: string) => this.fs.lstatSync(item).isDirectory());
 	}
 
-	public async makeDirectory(path): Promise<boolean> {
+	public async makeDirectory(path: string): Promise<boolean> {
 		try {
 			await this.fsExtra.ensureDir(path);
 
@@ -109,7 +112,7 @@ export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 		}
 	}
 
-	public writeFileSync(file: string, data: string | NodeJS.ArrayBufferView, options: any): void {
+	public writeFileSync(file: string, data: string | NodeJS.ArrayBufferView, options: WriteFileOptions): void {
 		return this.fs.writeFileSync(file, data, options);
 	}
 
@@ -121,11 +124,11 @@ export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 		return this.fsExtra.removeSync(path);
 	}
 
-	public readJSONSync<T>(file: string, options?: Record<string, any>): T {
+	public readJSONSync<T>(file: string, options?: Record<string, unknown>): T {
 		return this.fsExtra.readJSONSync(file, options);
 	}
 
-	public ensureDirSync(path: string, options?: any): void {
+	public ensureDirSync(path: string, options?: EnsureDirOptions | number): void {
 		return this.fsExtra.ensureDirSync(path, options);
 	}
 }

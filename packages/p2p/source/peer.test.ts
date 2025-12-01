@@ -1,5 +1,6 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import dayjs from "dayjs";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
+import { Enums } from "@mainsail/constants";
 
 import { describe, Sandbox } from "../../test-framework/source";
 import { Peer } from "./peer";
@@ -45,7 +46,7 @@ describe<{
 		const expectedBroadcast: Contracts.P2P.PeerBroadcast = {
 			ip,
 			port: 4000,
-			protocol: Contracts.P2P.PeerProtocol.Http,
+			protocol: Enums.Api.Protocol.Http,
 		};
 
 		assert.equal(peer.toBroadcast(), expectedBroadcast);

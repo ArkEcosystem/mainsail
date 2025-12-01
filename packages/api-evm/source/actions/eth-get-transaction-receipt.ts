@@ -1,11 +1,12 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
 import { ReceiptResource } from "../resources/index.js";
 
 @injectable()
-export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action {
+export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action<[string, boolean]> {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 

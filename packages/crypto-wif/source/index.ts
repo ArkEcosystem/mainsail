@@ -1,5 +1,5 @@
+import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { WIFFactory } from "./wif.factory.js";

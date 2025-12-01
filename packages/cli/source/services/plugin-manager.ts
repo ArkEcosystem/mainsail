@@ -4,18 +4,18 @@ import { readJSONSync, removeSync } from "fs-extra/esm";
 import { glob } from "glob";
 import { join } from "path";
 
-import * as Contracts from "../contracts.js";
+import { Plugin, PluginManager as IPluginManager } from "../contracts.js";
 import { Identifiers } from "../ioc/index.js";
 import { Environment } from "./environment.js";
 import { File, Git, NPM, Source } from "./source-providers/index.js";
 
 @injectable()
-export class PluginManager implements Contracts.PluginManager {
+export class PluginManager implements IPluginManager {
 	@inject(Identifiers.Environment)
 	private readonly environment!: Environment;
 
-	public async list(): Promise<Contracts.Plugin[]> {
-		const plugins: Contracts.Plugin[] = [];
+	public async list(): Promise<Plugin[]> {
+		const plugins: Plugin[] = [];
 
 		const path = this.#getPluginsPath();
 		const packagePaths = glob
@@ -68,7 +68,7 @@ export class PluginManager implements Contracts.PluginManager {
 		return new NPM(paths).update(package_);
 	}
 
-	public async remove(package_): Promise<void> {
+	public async remove(package_: string): Promise<void> {
 		const directory: string = join(this.#getPluginsPath(), package_);
 
 		if (!existsSync(directory)) {

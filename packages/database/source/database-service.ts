@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
 @injectable()
@@ -112,7 +113,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	public async findBlocks(start: number, end: number): Promise<Contracts.Crypto.Block[]> {
-		return await this.#map<Contracts.Crypto.Block>(
+		return await this.#map(
 			await this.findCommitBuffers(start, end),
 			async (block: Buffer) => (await this.commitFactory.fromBytes(block)).block,
 		);
@@ -211,7 +212,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return transaction;
 	}
 
-	async #map<T>(data: unknown[], callback: (...arguments_: any[]) => Promise<T>): Promise<T[]> {
+	async #map<T, U>(data: U[], callback: (...arguments_: U[]) => Promise<T>): Promise<T[]> {
 		const result: T[] = [];
 		for (const [index, datum] of data.entries()) {
 			result[index] = await callback(datum);

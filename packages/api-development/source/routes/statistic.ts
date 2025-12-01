@@ -1,9 +1,10 @@
-import Hapi from "@hapi/hapi";
+import type Hapi from "@hapi/hapi";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { StatisticController } from "../controllers/statistic.js";
 
-export const register = (server: Hapi.Server<any>): void => {
+export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(StatisticController);
 	server.bind(controller);
 

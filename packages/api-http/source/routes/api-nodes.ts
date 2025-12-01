@@ -1,9 +1,10 @@
-import Hapi from "@hapi/hapi";
+import type Hapi from "@hapi/hapi";
 import { Schemas } from "@mainsail/api-common";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { ApiNodesController } from "../controllers/api-nodes.js";
+import { orderBy } from "../schemas/index.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(ApiNodesController);
@@ -21,7 +22,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			validate: {
 				query: Joi.object({
 					ip: Joi.string().ip({ version: ["ipv4", "ipv6"] }),
-					orderBy: server.app.schemas.orderBy,
+					orderBy: orderBy,
 					version: Joi.string(),
 				}).concat(Schemas.pagination),
 			},

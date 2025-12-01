@@ -1,6 +1,6 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
-export class ExecuteCallbackWhenReady implements Contracts.Kernel.EventListener {
+export class ExecuteCallbackWhenReady implements Contracts.Kernel.EventListener<Contracts.Crypto.BlockData> {
 	readonly #blockCount!: number;
 
 	readonly #callback!: () => Promise<void>;
@@ -10,8 +10,8 @@ export class ExecuteCallbackWhenReady implements Contracts.Kernel.EventListener 
 		this.#callback = callback;
 	}
 
-	public async handle({ data }): Promise<void> {
-		if (data.height % this.#blockCount === 0) {
+	public async handle({ data }: { data: Contracts.Crypto.BlockData }): Promise<void> {
+		if (data.number % this.#blockCount === 0) {
 			await this.#callback();
 		}
 	}

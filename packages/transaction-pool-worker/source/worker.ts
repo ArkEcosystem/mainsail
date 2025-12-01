@@ -1,5 +1,6 @@
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import dayjs from "dayjs";
 
 @injectable()
@@ -26,11 +27,11 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		this.eventDispatcher.listen(Events.WebhookEvent.Removed, this);
 	}
 
-	public handle(payload: { name: string; data: any }): void {
+	public handle(payload: { name: string; data: unknown }): void {
 		void this.reloadWebhooks();
 	}
 
-	public registerEventHandler(event: string, callback: Contracts.Kernel.IPC.EventCallback<any>): void {
+	public registerEventHandler<T>(event: string, callback: Contracts.Kernel.IPC.EventCallback<T>): void {
 		this.ipcSubprocess.registerEventHandler(event, callback);
 	}
 

@@ -1,4 +1,4 @@
-import { Identifiers as ID } from "@mainsail/contracts";
+import { Identifiers as ID } from "@mainsail/constants";
 
 export const Identifiers = {
 	AbortErroredProcess: Symbol.for("Action<AbortErroredProcess>"),

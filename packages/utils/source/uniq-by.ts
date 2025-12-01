@@ -1,11 +1,11 @@
-import { FunctionReturning } from "./internal/index.js";
+import type { FunctionReturning } from "./internal/index.js";
 
-export const uniqBy = <T>(iterable: T[], iteratee: FunctionReturning): T[] => {
+export const uniqBy = <T, K>(iterable: T[], iteratee: FunctionReturning<[T], K>): T[] => {
 	const result: T[] = [];
+	const set = new Set<K>();
 
-	const set: Set<T> = new Set<T>();
 	for (const element of iterable) {
-		const value: T = iteratee(element);
+		const value = iteratee(element);
 
 		if (set.has(value)) {
 			continue;

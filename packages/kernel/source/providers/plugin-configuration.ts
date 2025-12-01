@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { get, has, set, unset } from "@mainsail/utils";
 import deepmerge from "deepmerge";
 
@@ -8,7 +9,7 @@ import { ConfigRepository } from "../services/config/index.js";
 // @TODO review the implementation
 
 @injectable()
-export class PluginConfiguration {
+export class PluginConfiguration implements Contracts.Kernel.PluginConfiguration {
 	@inject(Identifiers.Config.Repository)
 	private readonly configRepository!: ConfigRepository;
 
@@ -46,14 +47,6 @@ export class PluginConfiguration {
 
 	public all(): Contracts.Types.JsonObject {
 		return this.#items;
-	}
-
-	public get<T>(key: string, defaultValue?: T): T | undefined {
-		if (defaultValue !== undefined) {
-			throw new TypeError(`DEPRECATED get(${key}, ${defaultValue}), use getOptional instead`);
-		}
-
-		return get(this.#items, key);
 	}
 
 	public getRequired<T>(key: string): T {

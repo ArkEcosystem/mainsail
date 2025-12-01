@@ -3,10 +3,10 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	TypeOrm,
 } from "@mainsail/api-database";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { NotImplemented } from "@mainsail/exceptions";
-import { Providers } from "@mainsail/kernel";
 
 import { EventListener } from "../contracts.js";
 
@@ -18,10 +18,10 @@ export enum ListenerEvent {
 export type ListenerEventMapping = { [key: string]: ListenerEvent };
 
 @injectable()
-export abstract class AbstractListener<TEventData, TEntity extends { [key: string]: any }> implements EventListener {
+export abstract class AbstractListener<TEventData, TEntity extends object> implements EventListener {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-sync")
-	private readonly pluginConfiguration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly configuration!: Contracts.Crypto.Configuration;
@@ -141,7 +141,7 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 
 			if (addedEvents.length > 0) {
 				await entityRepository.upsert(
-					[...this.#addedEvents.values()].map((event) => this.mapEventToEntity(event)),
+					[...this.#addedEvents.values()].map((event) => this.mapEventToEntity(event) as unknown as object),
 					entityRepository.metadata.primaryColumns.map((c) => c.propertyName),
 				);
 

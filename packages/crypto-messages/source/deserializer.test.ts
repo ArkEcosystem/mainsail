@@ -12,7 +12,7 @@ import {
 	serializedPrevoteNoBlock,
 	serializedProposal,
 	serializedProposalDataWithValidRound,
-} from "../test/fixtures/proposal";
+} from "../test/fixtures/index.js";
 import { assertPrecommit, assertPrevote, assertProposal } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Deserializer } from "./deserializer";

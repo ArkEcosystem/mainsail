@@ -1,10 +1,11 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { BlockResource } from "../resources/index.js";
 
 @injectable()
-export class EthGetBlockByHashAction implements Contracts.Api.RPC.Action {
+export class EthGetBlockByHashAction implements Contracts.Api.RPC.Action<[string, boolean]> {
 	public readonly name: string = "eth_getBlockByHash";
 
 	@inject(Identifiers.Application.Instance)

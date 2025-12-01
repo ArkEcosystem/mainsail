@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Constants } from "@mainsail/contracts";
+import { Units } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
 import esmock from "esmock";
 import { Options as OraOptions, Ora } from "ora";
@@ -23,7 +23,7 @@ const { DaemonizeProcess: DaemonizeProcessProxy } = await esmock("./daemonize-pr
 describe<{
 	action: DaemonizeProcess;
 }>("DaemonizeProcess", ({ beforeEach, it, assert, stub, spy }) => {
-	totalMem = 3 * Constants.Units.GIGABYTE;
+	totalMem = 3 * Units.GIGABYTE;
 
 	const options = {
 		args: "core:run --daemon",
@@ -107,7 +107,6 @@ describe<{
 				args: "core:run",
 				env: { MAINSAIL_ENV: undefined, NODE_ENV: "production" },
 				name: "ark-core",
-				node_args: undefined,
 				script: "script",
 			},
 			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
@@ -134,7 +133,6 @@ describe<{
 				args: "core:run --daemon",
 				env: { MAINSAIL_ENV: undefined, NODE_ENV: "production" },
 				name: "ark-core",
-				node_args: undefined,
 				script: "script",
 			},
 			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
@@ -161,7 +159,6 @@ describe<{
 				args: "core:run --daemon",
 				env: { MAINSAIL_ENV: undefined, NODE_ENV: "production" },
 				name: "ark-core",
-				node_args: undefined,
 				script: "script",
 			},
 			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core" },
@@ -169,7 +166,7 @@ describe<{
 	});
 
 	it("should start process should run with potato settings", ({ action }) => {
-		totalMem = 1 * Constants.Units.GIGABYTE;
+		totalMem = 1 * Units.GIGABYTE;
 
 		const spyOnHas = spy(processManager, "has");
 		const spyOnStart = spy(processManager, "start");

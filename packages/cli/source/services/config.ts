@@ -1,5 +1,6 @@
+import { Channels } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Constants, Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { ensureFileSync, readJSONSync, writeJsonSync } from "fs-extra/esm";
 
 import { Application } from "../contracts.js";
@@ -47,7 +48,7 @@ export class Config {
 		return Object.keys(this.#store).includes(key);
 	}
 
-	public load(): any {
+	public load(): void {
 		try {
 			this.#store = readJSONSync(this.#file);
 
@@ -88,7 +89,7 @@ export class Config {
 
 	#getRegistryChannel(version: string): string {
 		let channel = "rc";
-		for (const item of Constants.Channels) {
+		for (const item of Channels) {
 			if (version.includes(`-${item}`)) {
 				channel = item;
 			}

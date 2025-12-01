@@ -1,4 +1,4 @@
-import { Events, Identifiers } from "@mainsail/contracts";
+import { Identifiers, Events } from "@mainsail/constants";
 
 import crypto from "../../../../core/bin/config/devnet/core/crypto.json";
 import { Configuration } from "../../../../crypto-config/distribution/index";
@@ -48,13 +48,13 @@ describe<{
 
 		function_.neverCalled();
 
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 3 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 4 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 6 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 7 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 9 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 10 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 3 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 4 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 6 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 7 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 9 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 10 });
 
 		await delay(100);
 
@@ -75,9 +75,9 @@ describe<{
 
 		function_.neverCalled();
 
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 1 });
 
 		await delay(100);
 
@@ -98,13 +98,13 @@ describe<{
 
 		function_.neverCalled();
 
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 5 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 6 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 10 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 11 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 15 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 16 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 5 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 6 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 10 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 11 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 15 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 16 });
 
 		await delay(100);
 
@@ -125,13 +125,13 @@ describe<{
 
 		function_.neverCalled();
 
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 10 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 11 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 20 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 21 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 30 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 31 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 10 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 11 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 20 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 21 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 30 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 31 });
 
 		await delay(100);
 
@@ -152,13 +152,13 @@ describe<{
 
 		function_.neverCalled();
 
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 15 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 16 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 30 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 31 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 45 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 46 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 15 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 16 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 30 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 31 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 45 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 46 });
 
 		await delay(100);
 
@@ -179,13 +179,13 @@ describe<{
 
 		function_.neverCalled();
 
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 30 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 31 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 60 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 61 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 90 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 91 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 30 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 31 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 60 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 61 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 90 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 91 });
 
 		await delay(100);
 
@@ -206,13 +206,13 @@ describe<{
 
 		function_.neverCalled();
 
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 51 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 53 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 102 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 106 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 153 });
-		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 159 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 51 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 53 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 102 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 106 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 153 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { number: 159 });
 
 		await delay(100);
 

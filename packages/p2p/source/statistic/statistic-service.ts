@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { RoundStatistic } from "./round-statistic.js";
 
@@ -18,7 +19,7 @@ export class StatisticService implements Contracts.P2P.StatisticService {
 	#currentRoundStatistic!: RoundStatistic;
 
 	@postConstruct()
-	init() {
+	init(): void {
 		this.#currentRoundStatistic = this.app.resolve(RoundStatistic);
 	}
 

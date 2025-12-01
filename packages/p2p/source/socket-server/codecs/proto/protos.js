@@ -6491,4 +6491,13 @@ $root.shared = (function() {
     return shared;
 })();
 
-export default $root;
+export const getApiNodes = $root.getApiNodes;
+export const getBlocks = $root.getBlocks;
+export const getMessages = $root.getMessages;
+export const getPeers = $root.getPeers;
+export const getProposal = $root.getProposal;
+export const getStatus = $root.getStatus;
+export const postPrecommit = $root.postPrecommit;
+export const postPrevote = $root.postPrevote;
+export const postProposal = $root.postProposal;
+export const shared = $root.shared;

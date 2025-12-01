@@ -1,12 +1,15 @@
-import Hapi from "@hapi/hapi";
+import type Hapi from "@hapi/hapi";
 import { Schemas } from "@mainsail/api-common";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { WalletsController } from "../controllers/wallets.js";
 import {
+	transactionCriteriaSchemas,
+	transactionsOrderBy,
 	transactionSortingSchema,
 	walletCriteriaSchemaObject,
+	walletId,
 	walletParamSchema as walletParameterSchema,
 	walletSortingSchema,
 } from "../schemas/index.js";
@@ -78,12 +81,12 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				params: Joi.object({
-					id: server.app.schemas.walletId,
+					id: walletId,
 				}),
 				query: Joi.object({
-					...server.app.schemas.transactionCriteriaSchemas,
+					...transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
-					orderBy: server.app.schemas.transactionsOrderBy,
+					orderBy: transactionsOrderBy,
 				})
 					.concat(transactionSortingSchema)
 					.concat(Schemas.pagination),
@@ -103,12 +106,12 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				params: Joi.object({
-					id: server.app.schemas.walletId,
+					id: walletId,
 				}),
 				query: Joi.object({
-					...server.app.schemas.transactionCriteriaSchemas,
+					...transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
-					orderBy: server.app.schemas.transactionsOrderBy,
+					orderBy: transactionsOrderBy,
 				})
 					.concat(transactionSortingSchema)
 					.concat(Schemas.pagination),
@@ -128,12 +131,12 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				params: Joi.object({
-					id: server.app.schemas.walletId,
+					id: walletId,
 				}),
 				query: Joi.object({
-					...server.app.schemas.transactionCriteriaSchemas,
+					...transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
-					orderBy: server.app.schemas.transactionsOrderBy,
+					orderBy: transactionsOrderBy,
 				})
 					.concat(transactionSortingSchema)
 					.concat(Schemas.pagination),
@@ -153,12 +156,12 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				params: Joi.object({
-					id: server.app.schemas.walletId,
+					id: walletId,
 				}),
 				query: Joi.object({
-					...server.app.schemas.transactionCriteriaSchemas,
+					...transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
-					orderBy: server.app.schemas.transactionsOrderBy,
+					orderBy: transactionsOrderBy,
 				})
 					.concat(transactionSortingSchema)
 					.concat(Schemas.pagination),

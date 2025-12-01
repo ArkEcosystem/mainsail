@@ -1,5 +1,5 @@
 import { describe, Sandbox } from "../../test-framework/source";
-import { precommitData } from "../test/fixtures/proposal";
+import { precommitData } from "../test/fixtures/index.js";
 import { Precommit } from "./precommit";
 
 describe<{
@@ -36,9 +36,5 @@ describe<{
 			precommit.toString(),
 			`{"blockHash":"${precommitData.blockHash}","blockNumber":1,"round":1,"signature":"${precommitData.signature}","validatorIndex":0}`,
 		);
-	});
-
-	it("#toData", async () => {
-		assert.equal(precommit.toData(), precommitData);
 	});
 });

@@ -1,10 +1,11 @@
-import Hapi from "@hapi/hapi";
+import type Hapi from "@hapi/hapi";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { PeersController } from "../controllers/peers.js";
 import { orderBy, pagination } from "../schemas.js";
 
-export const register = (server: Hapi.Server<any>): void => {
+export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(PeersController);
 	server.bind(controller);
 

@@ -1,24 +1,21 @@
-import type * as types from "./proto/protos.d.ts";
-import * as _protos from "./proto/protos.js";
-
-const proto = (_protos as any).default.postProposal as typeof types.postProposal;
+import { postProposal as proto } from "./proto/protos.js";
 
 export const postProposal = {
 	request: {
-		deserialize: (payload: Buffer) => {
+		deserialize: (payload: Buffer): proto.IPostProposalRequest => {
 			const decoded = proto.PostProposalRequest.decode(payload);
 			return {
 				...decoded,
 				proposal: Buffer.from(decoded.proposal),
 			};
 		},
-		serialize: (object: types.postProposal.IPostProposalRequest): Buffer =>
+		serialize: (object: proto.IPostProposalRequest): Buffer =>
 			Buffer.from(proto.PostProposalRequest.encode(object).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): Record<string, any> =>
+		deserialize: (payload: Buffer): proto.IPostProposalResponse =>
 			proto.PostProposalResponse.toObject(proto.PostProposalResponse.decode(payload), { defaults: true }),
-		serialize: (object: types.postProposal.IPostProposalResponse): Buffer =>
+		serialize: (object: proto.IPostProposalResponse): Buffer =>
 			Buffer.from(proto.PostProposalResponse.encode(object).finish()),
 	},
 };

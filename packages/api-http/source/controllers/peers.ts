@@ -15,7 +15,7 @@ export class PeersController extends Controller {
 	@inject(ApiDatabaseIdentifiers.PeerRepositoryFactory)
 	private readonly peerRepositoryFactory!: ApiDatabaseContracts.PeerRepositoryFactory;
 
-	public async index(request: Hapi.Request) {
+	public async index(request: Hapi.Request): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.PeerCriteria = request.query;
 		const sorting = this.getListingOrder(request);
@@ -26,7 +26,7 @@ export class PeersController extends Controller {
 		return this.toPagination(peers, PeerResource);
 	}
 
-	public async show(request: Hapi.Request) {
+	public async show(request: Hapi.Request): Promise<object> {
 		const ip = request.params.ip;
 
 		const peer = await this.peerRepositoryFactory()

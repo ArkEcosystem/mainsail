@@ -1,5 +1,6 @@
 import { Container } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";

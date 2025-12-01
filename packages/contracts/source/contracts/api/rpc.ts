@@ -1,9 +1,10 @@
-import Hapi from "@hapi/hapi";
-import { SchemaObject } from "ajv";
+import type { Request as HapiRequest } from "@hapi/hapi";
+import type { Enums } from "@mainsail/constants";
+import type { SchemaObject } from "ajv";
 
 export type Processor = {
 	registerAction(action: Action): void;
-	process(request: Hapi.Request): Promise<Response | Error | (Response | Error)[]>;
+	process(request: HapiRequest): Promise<Response | Error | (Response | Error)[]>;
 };
 
 export type Id = string | number | null;
@@ -18,7 +19,7 @@ export type Request<T> = {
 export type Response = {
 	id: Id;
 	jsonrpc: "2.0";
-	result: any;
+	result: unknown;
 };
 
 export type Error = {
@@ -30,16 +31,10 @@ export type Error = {
 	};
 };
 
-export interface Action {
+export interface Action<TParameters extends unknown[] = []> {
 	name: string;
-	handle: (parameters: any) => Promise<any>;
+	handle: (parameters: TParameters) => Promise<unknown>;
 	schema: SchemaObject;
 }
 
-export enum ErrorCode {
-	ParseError = -32_700,
-	InvalidRequest = -32_600,
-	MethodNotFound = -32_601,
-	InvalidParameters = -32_602,
-	InternalError = -32_603,
-}
+export type ErrorCode = Enums.Api.RcpErrorCode;

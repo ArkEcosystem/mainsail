@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { DataSource, QueryFailedError } from "typeorm";
 
 import { Migrations as ApiDatabaseContracts_Migrations } from "./contracts.js";
@@ -28,7 +29,7 @@ export class Migrations implements ApiDatabaseContracts_Migrations {
 
 			// https://www.postgresql.org/docs/current/errcodes-appendix.html
 			// 42P07 	duplicate_table
-			if ((error as any).code !== "42P07") {
+			if (error["code"] !== "42P07") {
 				throw error;
 			}
 

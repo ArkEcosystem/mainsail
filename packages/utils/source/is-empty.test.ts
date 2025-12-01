@@ -19,7 +19,7 @@ describe("at", async ({ assert, it, nock, loader }) => {
 	});
 
 	it("should return true for undefined", () => {
-		assert.true(isEmpty());
+		assert.true(isEmpty(undefined));
 	});
 
 	it("should return true for an empty map", () => {

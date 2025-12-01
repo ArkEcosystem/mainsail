@@ -7,7 +7,7 @@ import {
 	Plugins,
 } from "@mainsail/cli";
 import { Container, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { existsSync } from "fs";
 import { readJSONSync } from "fs-extra/esm";
 import { platform } from "os";
@@ -41,7 +41,7 @@ export class CommandLineInterface {
 		const { args, flags } = InputParser.parseArgv(this.argv);
 
 		// Discover commands and commands from plugins
-		const commands: CliContracts.CommandList = await this.#discoverCommands(dirname, flags);
+		const commands: Commands.CommandList = await this.#discoverCommands(dirname, flags);
 
 		// Figure out what command we should run and offer help if necessary
 		let commandSignature = args[0] as string | undefined;
@@ -107,9 +107,9 @@ export class CommandLineInterface {
 		Module._initPaths();
 	}
 
-	async #discoverCommands(dirname: string, flags: any): Promise<CliContracts.CommandList> {
+	async #discoverCommands(dirname: string, flags: Record<string, unknown>): Promise<Commands.CommandList> {
 		const commandsDiscoverer = this.#app.resolve(Commands.DiscoverCommands);
-		const commands: CliContracts.CommandList = await commandsDiscoverer.within(path.resolve(dirname, "./commands"));
+		const commands: Commands.CommandList = await commandsDiscoverer.within(path.resolve(dirname, "./commands"));
 
 		const plugins = await this.#app.get<CliContracts.PluginManager>(Identifiers.PluginManager).list();
 

@@ -1,5 +1,5 @@
-import { State, StateData } from "./consensus/index.js";
-import { Precommit, Prevote, Proposal } from "./crypto/index.js";
+import type { State, StateData } from "./consensus/index.js";
+import type { Precommit, Prevote, Proposal } from "./crypto/index.js";
 
 export interface Service {
 	persist({

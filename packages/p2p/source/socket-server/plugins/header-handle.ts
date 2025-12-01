@@ -1,7 +1,10 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { getPeerIp } from "../../utils/get-peer-ip.js";
+
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 @injectable()
 export class HeaderHandlePlugin {

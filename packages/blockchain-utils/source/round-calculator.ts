@@ -1,12 +1,13 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { InvalidMilestoneConfigurationError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
 export interface MilestoneSearchResult {
 	found: boolean;
 	height: number;
-	data: any;
+	data: number | null;
 }
 
 @injectable()
@@ -15,7 +16,7 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	public isNewRound(height: number): boolean {
-		const milestones = this.configuration.get("milestones");
+		const milestones = this.configuration.get<Contracts.Crypto.Milestone[]>("milestones");
 		const genesisHeight = this.configuration.getGenesisHeight();
 
 		// Since milestones are merged, find the first milestone to introduce the validator count.

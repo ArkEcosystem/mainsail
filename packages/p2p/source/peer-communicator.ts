@@ -1,6 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 import { assert, http } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
@@ -17,7 +17,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.Peer.Connector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
@@ -162,7 +162,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return result.data;
 	}
 
-	#validateReply(peer: Contracts.P2P.Peer, reply: any, endpoint: string) {
+	#validateReply<T extends Contracts.P2P.Response>(peer: Contracts.P2P.Peer, reply: T, endpoint: string) {
 		const schema = replySchemas[endpoint];
 		if (schema === undefined) {
 			this.logger.error(
@@ -185,7 +185,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	async #emit<T extends Contracts.P2P.Response>(
 		peer: Contracts.P2P.Peer,
 		event: Routes,
-		payload: any,
+		payload: Record<string, unknown>,
 		options: Contracts.P2P.EmitOptions,
 	): Promise<Contracts.P2P.EmitResult<T>> {
 		const statistic: Contracts.P2P.EmitStatistic = {

@@ -1,11 +1,12 @@
+import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { RpcError } from "@mainsail/exceptions";
 import { Environment } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
 
 @injectable()
-export class EthSendRawTransactionAction implements Contracts.Api.RPC.Action {
+export class EthSendRawTransactionAction implements Contracts.Api.RPC.Action<[string]> {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
@@ -21,7 +22,7 @@ export class EthSendRawTransactionAction implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: [string]): Promise<string> {
-		const response = await http.post(this.#getUrl(), {
+		const response = await http.post<{ data: Contracts.TransactionPool.ProcessorResult }>(this.#getUrl(), {
 			body: { transactions: [parameters[0].slice(2)] },
 		});
 
@@ -29,8 +30,11 @@ export class EthSendRawTransactionAction implements Contracts.Api.RPC.Action {
 			if (response.data.data.accept.length > 0) {
 				const tx = await this.transactionFactory.fromHex(parameters[0].slice(2));
 				return `0x${tx.hash}`;
-			} else {
-				throw new RpcError(response.data.errors[0].message);
+			}
+
+			const error = response.data.data.errors?.[0];
+			if (error) {
+				throw new RpcError(error.message);
 			}
 		}
 
@@ -41,14 +45,14 @@ export class EthSendRawTransactionAction implements Contracts.Api.RPC.Action {
 	#getUrl(): string {
 		const config = {
 			http: {
-				enabled: !Environment.isTrue(Constants.EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_DISABLED),
-				host: Environment.get(Constants.EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_HOST, "0.0.0.0"),
-				port: Environment.get(Constants.EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_PORT, 4007),
+				enabled: !Environment.isTrue(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_DISABLED),
+				host: Environment.get(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_HOST, "0.0.0.0"),
+				port: Environment.get(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_PORT, 4007),
 			},
 			https: {
-				enabled: Environment.isTrue(Constants.EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_SSL),
-				host: Environment.get(Constants.EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_SSL_HOST, "0.0.0.0"),
-				port: Environment.get(Constants.EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_SSL_PORT, 8447),
+				enabled: Environment.isTrue(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_SSL),
+				host: Environment.get(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_SSL_HOST, "0.0.0.0"),
+				port: Environment.get(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_SSL_PORT, 8447),
 			},
 		};
 

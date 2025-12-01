@@ -1,12 +1,13 @@
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { get, http } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { conditions } from "./conditions.js";
 
 @injectable()
-export class Listener {
+export class Listener implements Contracts.Kernel.EventListener<{ name: string; data: Contracts.Types.JsonObject }> {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -16,7 +17,7 @@ export class Listener {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async handle({ name, data }): Promise<void> {
+	public async handle({ name, data }: { name: string; data: Contracts.Types.JsonObject }): Promise<void> {
 		// Skip own events to prevent cycling
 		if (name.includes("webhooks")) {
 			return;
@@ -33,13 +34,17 @@ export class Listener {
 		await Promise.all(promises);
 	}
 
-	public async broadcast(webhook: Contracts.Webhooks.Webhook, payload: object, timeout = 1500): Promise<void> {
+	public async broadcast(
+		webhook: Contracts.Webhooks.Webhook,
+		payload: Contracts.Types.JsonObject,
+		timeout = 1500,
+	): Promise<void> {
 		const start = performance.now();
 
 		try {
 			const { statusCode } = await http.post(webhook.target, {
 				body: {
-					data: payload as any,
+					data: payload,
 					// @TODO utils currently expects a primitive as data
 					event: webhook.event,
 					timestamp: Date.now(),

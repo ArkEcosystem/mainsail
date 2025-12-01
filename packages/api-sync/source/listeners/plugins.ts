@@ -4,8 +4,9 @@ import {
 	Models,
 	TypeOrm,
 } from "@mainsail/api-database";
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";
@@ -46,7 +47,7 @@ export class Plugins extends AbstractListener<Event, Models.Plugin> {
 		return this.pluginRepositoryFactory(dataSource);
 	}
 
-	private sanitizeConfiguration(config: Contracts.Types.JsonObject): any {
+	private sanitizeConfiguration(config: Contracts.Types.JsonObject): Contracts.Types.JsonObject {
 		for (const key in config) {
 			if (config.hasOwnProperty(key)) {
 				if (key.toLowerCase() === "password") {
@@ -56,8 +57,7 @@ export class Plugins extends AbstractListener<Event, Models.Plugin> {
 
 				const value = config[key];
 				if (typeof value === "object") {
-					// @ts-ignore
-					config[key] = this.sanitizeConfiguration(value);
+					config[key] = this.sanitizeConfiguration(value as Contracts.Types.JsonObject);
 				}
 			}
 		}

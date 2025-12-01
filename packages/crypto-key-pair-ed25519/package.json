@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-key-pair-ed25519",
-	"version": "0.0.1-evm.39",
+	"version": "0.0.1-rc.7",
 	"description": "Ed25519 key derivation for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -21,8 +21,8 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
@@ -32,6 +32,7 @@
 		"wif": "5.0.0"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",

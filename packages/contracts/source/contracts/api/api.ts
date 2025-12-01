@@ -1,23 +1,20 @@
-import Hapi from "@hapi/hapi";
+import type { Server as HapiServer } from "@hapi/hapi";
+import type { Enums } from "@mainsail/constants";
 
-import { Application } from "../kernel/application.js";
-import { Processor } from "./rpc.js";
+import type { Application } from "../kernel/application.js";
+import type { Processor } from "./rpc.js";
 
-export type ApiServer = Hapi.Server<ServerState>;
+export type ApiServer = HapiServer<ServerState>;
 
 export interface Server {
 	boot(): Promise<void>;
 	dispose(): Promise<void>;
 }
 
-export enum ServerType {
-	Http = "HTTP",
-	Https = "HTTPS",
-}
+export type ServerType = Enums.Api.ServerType;
 
 export interface ServerState {
 	app: Application;
-	schemas: any;
 	rpc: Processor;
 }
 
@@ -38,5 +35,5 @@ export type ResultsPage<T> = {
 };
 
 export interface Resource {
-	transform(resource): object;
+	transform(resource: object): object;
 }

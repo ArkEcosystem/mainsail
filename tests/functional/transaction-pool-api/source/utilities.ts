@@ -1,7 +1,8 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { Sandbox } from "@mainsail/test-framework";
 import { EvmCalls } from "@mainsail/test-transaction-builders";
-import { BigNumber, sleep } from "@mainsail/utils";
+import { assert, BigNumber, sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
 export const getAddressByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<string> => {
@@ -273,7 +274,8 @@ export const getWallets = async (sandbox: Sandbox): Promise<Contracts.Crypto.Key
 		"wallet",
 	);
 
-	const secrets = sandbox.app.config("validators.secrets");
+	const secrets = sandbox.app.config<string[]>("validators.secrets");
+	assert.defined(secrets);
 
 	const wallets: Contracts.Crypto.KeyPair[] = [];
 	for (const secret of secrets.values()) {
@@ -303,7 +305,9 @@ export const getLegacyColdWallets = async (
 		Identifiers.Cryptography.Legacy.Identity.AddressFactory,
 	);
 
-	const secrets = sandbox.app.config("validators.secrets");
+	const secrets = sandbox.app.config<string[]>("validators.secrets");
+	assert.defined(secrets);
+
 	const legacyColdWallets: {
 		keyPair: Contracts.Crypto.KeyPair;
 		mainsailAddress: string;

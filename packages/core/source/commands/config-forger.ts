@@ -1,10 +1,16 @@
 import { Commands } from "@mainsail/cli";
 import { injectable, postConstruct } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { Command as BIP38Command } from "./config-forger-bip38.js";
 import { Command as BIP39Command } from "./config-forger-bip39.js";
+
+interface Flags {
+	readonly bip39: string;
+	readonly password: string;
+	readonly method: "bip38" | "bip39";
+}
 
 @injectable()
 export class Command extends Commands.Command {
@@ -25,7 +31,7 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		let method = this.getFlag("method");
+		let method: Flags["method"] = this.getFlag("method");
 		if (!method) {
 			const response = await this.components.prompt([
 				{
@@ -39,7 +45,7 @@ export class Command extends Commands.Command {
 				},
 			]);
 
-			method = response.method;
+			method = response.method as Flags["method"];
 			if (!method) {
 				this.components.fatal("Please enter valid data and try again!");
 			}

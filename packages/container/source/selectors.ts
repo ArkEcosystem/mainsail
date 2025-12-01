@@ -1,4 +1,4 @@
-import { BindingConstraints, MetadataTag } from "inversify";
+import type { BindingConstraints, MetadataTag } from "inversify";
 
 // https://github.com/inversify/monorepo/blob/main/packages/container/libraries/container/src/binding/calculations/isBindingConstraintsWithTag.ts#L9-L10
 function isBindingConstraintsWithTag(tag: MetadataTag, value: unknown): (constraints: BindingConstraints) => boolean {

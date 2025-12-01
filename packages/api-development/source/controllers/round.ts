@@ -1,6 +1,7 @@
 import Hapi from "@hapi/hapi";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { Controller } from "./controller.js";
 
@@ -15,7 +16,7 @@ export class RoundController extends Controller {
 	@inject(Identifiers.BlockchainUtils.RoundCalculator)
 	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
 
-	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async index(request: Hapi.Request): Promise<object> {
 		const roundValidators = this.validatorSet.getRoundValidators();
 
 		const orderedValidators = Array.from(

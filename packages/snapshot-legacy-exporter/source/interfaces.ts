@@ -15,5 +15,5 @@ export interface LegacyWallet {
 	readonly ethAddress?: string; // keccak256
 	readonly balance: string; // ARK - 8 decimals
 	readonly legacyNonce: string;
-	readonly attributes?: Record<string, any>;
+	readonly attributes?: Record<string, unknown>;
 }

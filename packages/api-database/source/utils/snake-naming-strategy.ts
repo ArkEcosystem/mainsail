@@ -1,7 +1,8 @@
 // Taken from
 // https://gist.github.com/recurrence/b6a4cb04a8ddf42eda4e4be520921bd2
 
-import { DefaultNamingStrategy, NamingStrategyInterface } from "typeorm";
+import type { NamingStrategyInterface } from "typeorm";
+import { DefaultNamingStrategy } from "typeorm";
 import { snakeCase } from "typeorm/util/StringUtils.js";
 
 export class SnakeNamingStrategy extends DefaultNamingStrategy implements NamingStrategyInterface {
@@ -34,7 +35,7 @@ export class SnakeNamingStrategy extends DefaultNamingStrategy implements Naming
 		return snakeCase(tableName + "_" + (columnName ? columnName : propertyName));
 	}
 
-	public classTableInheritanceParentColumnName(parentTableName: any, parentTableIdPropertyName: any): string {
+	public classTableInheritanceParentColumnName(parentTableName: string, parentTableIdPropertyName: string): string {
 		return snakeCase(parentTableName + "_" + parentTableIdPropertyName);
 	}
 

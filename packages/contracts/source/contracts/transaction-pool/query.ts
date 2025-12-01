@@ -1,4 +1,4 @@
-import { Transaction } from "../crypto/index.js";
+import type { Transaction } from "../crypto/index.js";
 
 export type QueryPredicate = (transaction: Transaction) => Promise<boolean>;
 

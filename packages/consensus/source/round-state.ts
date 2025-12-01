@@ -1,6 +1,7 @@
 import { isMajority, isMinority } from "@mainsail/blockchain-utils";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
 @injectable()
@@ -194,7 +195,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 			return false;
 		}
 
-		return this.#isMajority(this.#getPrevoteCount(this.#proposal.getData().block.data.hash));
+		return this.#isMajority(this.#getPrevoteCount(this.#proposal.blockHeader.hash));
 	}
 
 	public hasMajorityPrevotesAny(): boolean {
@@ -210,7 +211,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 			return false;
 		}
 
-		return this.#isMajority(this.#getPrecommitCount(this.#proposal.getData().block.data.hash));
+		return this.#isMajority(this.#getPrecommitCount(this.#proposal.blockHeader.hash));
 	}
 
 	public hasMajorityPrecommitsAny(): boolean {
@@ -313,10 +314,8 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		assert.defined(this.#proposal);
 		const filtered: Map<number, { signature: string }> = new Map();
 
-		const block = this.#proposal.getData().block;
-
 		for (const [key, value] of s) {
-			if (value.blockHash === block.header.hash) {
+			if (value.blockHash === this.#proposal.blockHeader.hash) {
 				filtered.set(key, value);
 			}
 		}

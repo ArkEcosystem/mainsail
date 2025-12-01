@@ -33,7 +33,6 @@ describe<{
 					NODE_ENV: "production",
 				},
 				name: "mainsail",
-				node_args: undefined,
 				script: match.string,
 			},
 			{ "kill-timeout": 30_000, "max-restarts": 5, name: "mainsail" },

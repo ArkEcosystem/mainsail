@@ -1,18 +1,18 @@
-export type Actions<T extends Record<string, any>> = {
-	[K in keyof T]: T[K] extends (...arguments_: any[]) => any ? (ReturnType<T[K]> extends void ? K : never) : never;
-}[keyof T];
+export type MethodArguments<T, K extends keyof T> = T[K] extends (...arguments_: infer A) => unknown ? A : never;
 
-export type Requests<T extends Record<string, any>> = {
-	[K in keyof T]: T[K] extends (...arguments_: any[]) => any
-		? ReturnType<T[K]> extends Promise<any>
+export type MethodReturn<T, K extends keyof T> = T[K] extends (...arguments_: infer _A) => infer R ? R : never;
+
+export type Requests<T> = {
+	[K in keyof T]: T[K] extends (...arguments_: infer _A) => infer R
+		? R extends Promise<unknown>
 			? K
 			: never
 		: never;
 }[keyof T];
 
-export type SuccessReply = {
+export type SuccessReply<T> = {
 	id: number;
-	result: any;
+	result: T;
 };
 
 export type ErrorReply = {
@@ -25,24 +25,23 @@ export type Event = {
 	data: string;
 };
 
-export type Reply = SuccessReply | ErrorReply;
+export type Reply<T = unknown> = SuccessReply<T> | ErrorReply;
 
-export type RequestCallback<T extends Record<string, any>, K extends Requests<T>> = {
-	// @ts-ignore
-	resolve: (result: ReturnType<T[K]>) => void;
+export type RequestCallback<T = unknown> = {
+	resolve: (result: T) => void;
 	reject: (error: Error) => void;
 };
-export type RequestCallbacks<T extends Record<string, any>> = RequestCallback<T, Requests<T>>;
+export type RequestCallbacks<T = unknown> = RequestCallback<T>;
 
-export type EventCallback<T> = (data: T) => void;
+export type EventCallback<T = unknown> = (data: T) => void;
 
-export interface Handler<T extends Record<string, any>> {
+export interface Handler<T extends object> {
 	handleRequest<K extends Requests<T>>(method: K): void;
 }
 
-export interface Subprocess<T extends Record<string, any>> {
+export interface Subprocess<T> {
 	getQueueSize(): number;
 	kill(): Promise<number>;
-	sendRequest(method: string, ...arguments_: any): Promise<any>;
-	registerEventHandler(event: string, callback: EventCallback<any>): void;
+	sendRequest<T>(method: string, ...arguments_: unknown[]): Promise<T>;
+	registerEventHandler<T>(event: string, callback: EventCallback<T>): void;
 }

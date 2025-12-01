@@ -13,11 +13,11 @@ export class Output {
 
 	#realStdout: (message: string) => boolean = process.stdout.write;
 
-	public mute() {
+	public mute(): void {
 		process.stdout.write = (message: string) => true;
 	}
 
-	public unmute() {
+	public unmute(): void {
 		process.stdout.write = this.#realStdout;
 	}
 

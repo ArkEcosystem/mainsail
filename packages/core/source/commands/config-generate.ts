@@ -1,7 +1,8 @@
 import { Commands, Contracts, Identifiers as CliIdentifiers, Services } from "@mainsail/cli";
 import { ConfigurationGenerator, Identifiers, makeApplication } from "@mainsail/configuration-generator";
+import { Identifiers as AppIdentifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts as AppContracts, Identifiers as AppIdentifiers } from "@mainsail/contracts";
+import { Contracts as AppContracts } from "@mainsail/contracts";
 import envPaths from "env-paths";
 import Joi from "joi";
 import path from "path";
@@ -12,7 +13,7 @@ type Flag = {
 	description: string;
 	schema: Joi.Schema;
 	promptType?: string;
-	default?: any;
+	default?: string | number | boolean | Date;
 };
 
 type Flags = Omit<AppContracts.NetworkGenerator.Options, "peers" | "rewardAmount"> & {
@@ -204,17 +205,17 @@ export class Command extends Commands.Command {
 			.filter((flag) => flag.promptType)
 			.some((flag) => flags[flag.name] === undefined);
 
-		const defaults = this.#flagSettings.reduce<any>((accumulator: any, flag: Flag) => {
+		const defaults = this.#flagSettings.reduce((accumulator: Record<string, Flag["default"]>, flag: Flag) => {
 			accumulator[flag.name] = flag.default;
 
 			return accumulator;
 		}, {});
 
-		let options: Flags = {
+		let options = {
 			...defaults,
 			...flags,
 			packageName: this.app.get<AppContracts.Types.PackageJson>(CliIdentifiers.Package).name,
-		};
+		} as Flags;
 
 		const configurationApp = await makeApplication(this.#getConfigurationPath(options), options);
 		configurationApp.rebind(AppIdentifiers.Services.Log.Service).toConstantValue(this.logger);
@@ -249,7 +250,7 @@ export class Command extends Commands.Command {
 			...flags,
 			...response,
 			packageName: this.app.get<AppContracts.Types.PackageJson>(CliIdentifiers.Package).name,
-		};
+		} as Flags;
 
 		const path = this.#getConfigurationPath(options, configurationApp.get(CliIdentifiers.Application.Name));
 		configurationApp.rebind(Identifiers.ConfigurationPath).toConstantValue(path);

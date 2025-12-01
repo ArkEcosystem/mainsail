@@ -1,5 +1,5 @@
-import Hapi from "@hapi/hapi";
-import { Contracts } from "@mainsail/contracts";
+import type Hapi from "@hapi/hapi";
+import type { Contracts } from "@mainsail/contracts";
 
 import { BlockchainController } from "../controllers/blockchain.js";
 

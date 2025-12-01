@@ -1,7 +1,8 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { get, orderBy } from "@mainsail/utils";
 import semver from "semver";
 
@@ -16,13 +17,15 @@ export class PeersController extends Controller {
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
-	public async index(request: Hapi.Request) {
+	public async index(
+		request: Hapi.Request,
+	): Promise<Contracts.Api.ResultsPage<ReturnType<PeerResource["transform"]>> | Boom.Boom> {
 		const allPeers: Contracts.P2P.Peer[] = [...this.peerRepository.getPeers()];
 
 		let results = allPeers;
 
 		if (request.query.version) {
-			const versionRange = semver.validRange(decodeURIComponent((request.query as any).version));
+			const versionRange = semver.validRange(decodeURIComponent(request.query.version));
 
 			if (versionRange) {
 				results = results.filter((peer) => peer.version && semver.satisfies(peer.version, versionRange));
@@ -88,7 +91,7 @@ export class PeersController extends Controller {
 		return super.toPagination(resultsPage, PeerResource);
 	}
 
-	public async show(request: Hapi.Request) {
+	public async show(request: Hapi.Request): Promise<{ data: ReturnType<PeerResource["transform"]> } | Boom.Boom> {
 		if (!this.peerRepository.hasPeer(request.params.ip)) {
 			return Boom.notFound("Peer not found");
 		}
@@ -96,7 +99,9 @@ export class PeersController extends Controller {
 		return super.respondWithResource(this.peerRepository.getPeer(request.params.ip), PeerResource);
 	}
 
-	public async banned(request: Hapi.Request) {
+	public async banned(
+		request: Hapi.Request,
+	): Promise<Contracts.Api.ResultsPage<ReturnType<PeerResource["transform"]>> | Boom.Boom> {
 		const result = this.peerDisposer.bannedPeers();
 
 		const totalCount: number = result.length;

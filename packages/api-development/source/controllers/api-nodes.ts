@@ -1,6 +1,7 @@
 import Hapi from "@hapi/hapi";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { get } from "@mainsail/utils";
 
 import { PeerResource } from "../resources/index.js";
@@ -11,7 +12,7 @@ export class ApiNodesController extends Controller {
 	@inject(Identifiers.P2P.ApiNode.Repository)
 	private readonly peerRepository!: Contracts.P2P.ApiNodeRepository;
 
-	public async index(request: Hapi.Request) {
+	public async index(request: Hapi.Request): Promise<Contracts.Api.ResultsPage<object>> {
 		const allPeers: Contracts.P2P.ApiNode[] = [...this.peerRepository.getApiNodes()];
 
 		let results = allPeers;

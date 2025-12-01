@@ -1,7 +1,7 @@
-import { CommitHandler } from "../crypto/index.js";
-import { EventListener } from "../kernel/index.js";
-import { EventCallback, Subprocess } from "../kernel/ipc.js";
-import { KeyValuePair } from "../types/index.js";
+import type { CommitHandler } from "../crypto/index.js";
+import type { EventListener } from "../kernel/index.js";
+import type { EventCallback, Subprocess } from "../kernel/ipc.js";
+import type { KeyValuePair } from "../types/index.js";
 
 export type WorkerFlags = KeyValuePair;
 
@@ -26,5 +26,5 @@ export interface Worker extends Omit<WorkerScriptHandler, "commit" | "getTransac
 	getQueueSize(): number;
 	kill(): Promise<number>;
 	getTransactionBytes(): Promise<Buffer[]>;
-	registerEventHandler(event: string, callback: EventCallback<any>): void;
+	registerEventHandler<T>(event: string, callback: EventCallback<T>): void;
 }

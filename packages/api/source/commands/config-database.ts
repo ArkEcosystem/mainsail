@@ -1,5 +1,6 @@
-import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
+import { Commands, Contracts as CliContracts, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable, postConstruct } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 @injectable()
@@ -80,12 +81,12 @@ export class Command extends Commands.Command {
 		this.environment.updateVariables(environmentFile, this.#confirm(response));
 	}
 
-	#confirm(flags: Contracts.AnyObject): Contracts.AnyObject {
-		const variables: Contracts.AnyObject = {};
+	#confirm(flags: Contracts.Types.JsonObject): CliContracts.AnyObject {
+		const variables: CliContracts.AnyObject = {};
 
 		for (const option of this.#validFlags) {
 			if (flags[option] !== undefined) {
-				variables[`MAINSAIL_DB_${option.toUpperCase()}`] = flags[option];
+				variables[`MAINSAIL_DB_${option.toUpperCase()}`] = flags[option] as CliContracts.InputValue;
 			}
 		}
 

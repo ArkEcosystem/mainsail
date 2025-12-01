@@ -1,5 +1,5 @@
-import { Commit } from "./crypto/index.js";
-import { CommitKey } from "./evm/evm.js";
+import type { Commit } from "./crypto/index.js";
+import type { CommitKey } from "./evm/evm.js";
 
 export interface LegacyImporter {
 	run(genesisBlock: Commit): Promise<LegacyImportResult>;

@@ -1,5 +1,5 @@
-import { Contracts } from "@mainsail/contracts";
-import { AnySchemaObject, FuncKeywordDefinition } from "ajv";
+import type { Contracts } from "@mainsail/contracts";
+import type { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
 const parseBlockNumber = (parentSchema): number | undefined => {
 	if (!parentSchema || !parentSchema.parentData) {
@@ -37,7 +37,9 @@ const parseBlockNumber = (parentSchema): number | undefined => {
 	return Buffer.from(serialized.slice(offset, offset + 8), "hex").readUInt32LE();
 };
 
-export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
+export const makeKeywords = (
+	configuration: Contracts.Crypto.Configuration,
+): { limitToRoundValidators: FuncKeywordDefinition; isValidatorIndex: FuncKeywordDefinition } => {
 	const limitToRoundValidators: FuncKeywordDefinition = {
 		// TODO: Check type (same as bignum)
 		// @ts-ignore

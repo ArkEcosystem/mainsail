@@ -4,8 +4,9 @@ import {
 	Models,
 	TypeOrm,
 } from "@mainsail/api-database";
+import { Events } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Events } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";
@@ -34,9 +35,9 @@ export class Peers extends AbstractListener<Contracts.P2P.Peer, Models.Peer> {
 			blockNumber: event.header.blockNumber,
 			ip: event.ip,
 			latency: event.latency,
-			plugins: event.plugins as Record<string, any>,
+			plugins: event.plugins as Record<string, unknown>,
 			port: event.port,
-			ports: event.ports as Record<string, any>,
+			ports: event.ports as Record<string, unknown>,
 			version: event.version,
 		};
 	}

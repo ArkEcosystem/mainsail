@@ -1,5 +1,6 @@
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Worker implements Contracts.Evm.Worker {
@@ -24,11 +25,11 @@ export class Worker implements Contracts.Evm.Worker {
 		this.eventDispatcher.listen(Events.PeerEvent.Removed, this);
 	}
 
-	public registerEventHandler(event: string, callback: Contracts.Kernel.IPC.EventCallback<any>): void {
+	public registerEventHandler(event: string, callback: Contracts.Kernel.IPC.EventCallback): void {
 		this.ipcSubprocess.registerEventHandler(event, callback);
 	}
 
-	public handle(payload: { name: string; data: any }): void {
+	public handle(payload: { name: string; data: unknown }): void {
 		void this.setPeerCount(this.p2pRepository.getPeers().length);
 	}
 

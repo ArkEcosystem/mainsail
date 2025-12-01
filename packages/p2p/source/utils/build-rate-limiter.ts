@@ -1,7 +1,12 @@
 import { Routes } from "../enums.js";
 import { RateLimiter } from "../rate-limiter.js";
 
-export const buildRateLimiter = (options) =>
+export const buildRateLimiter = (options: {
+	roundValidators: number;
+	rateLimit: number;
+	whitelist: string[];
+	remoteAccess: string[];
+}): RateLimiter =>
 	new RateLimiter({
 		configurations: {
 			endpoints: [

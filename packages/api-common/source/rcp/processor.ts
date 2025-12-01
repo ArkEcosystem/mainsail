@@ -1,6 +1,7 @@
 import Hapi from "@hapi/hapi";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { RpcError } from "@mainsail/exceptions";
 
 import { getRcpId, prepareRcpError } from "./utilities.js";
@@ -23,10 +24,10 @@ export class Processor implements Contracts.Api.RPC.Processor {
 		Contracts.Api.RPC.Response | Contracts.Api.RPC.Error | (Contracts.Api.RPC.Response | Contracts.Api.RPC.Error)[]
 	> {
 		if (!this.#validatePayload(request)) {
-			return prepareRcpError(getRcpId(request), Contracts.Api.RPC.ErrorCode.InvalidRequest);
+			return prepareRcpError(getRcpId(request), Enums.Api.RcpErrorCode.InvalidRequest);
 		}
 
-		const payload = request.payload as Contracts.Api.RPC.Request<any>;
+		const payload = request.payload as Contracts.Api.RPC.Request<[]>;
 		if (Array.isArray(payload)) {
 			return Promise.all(payload.map(async (rcpRequest) => await this.#processSingle(rcpRequest)));
 		} else {
@@ -35,15 +36,15 @@ export class Processor implements Contracts.Api.RPC.Processor {
 	}
 
 	async #processSingle(
-		rcpRequest: Contracts.Api.RPC.Request<any>,
+		rcpRequest: Contracts.Api.RPC.Request<[]>,
 	): Promise<Contracts.Api.RPC.Response | Contracts.Api.RPC.Error> {
 		const action = this.#actions.get(rcpRequest.method);
 		if (!action) {
-			return prepareRcpError(rcpRequest.id, Contracts.Api.RPC.ErrorCode.MethodNotFound);
+			return prepareRcpError(rcpRequest.id, Enums.Api.RcpErrorCode.MethodNotFound);
 		}
 
 		if (!this.#validateParams(rcpRequest.params, action)) {
-			return prepareRcpError(rcpRequest.id, Contracts.Api.RPC.ErrorCode.InvalidParameters);
+			return prepareRcpError(rcpRequest.id, Enums.Api.RcpErrorCode.InvalidParameters);
 		}
 
 		try {
@@ -57,7 +58,7 @@ export class Processor implements Contracts.Api.RPC.Processor {
 				return prepareRcpError(rcpRequest.id, error.code, error.message);
 			}
 
-			return prepareRcpError(rcpRequest.id, Contracts.Api.RPC.ErrorCode.InternalError);
+			return prepareRcpError(rcpRequest.id, Enums.Api.RcpErrorCode.InternalError);
 		}
 	}
 
@@ -69,7 +70,7 @@ export class Processor implements Contracts.Api.RPC.Processor {
 		return !error;
 	}
 
-	#validateParams(parameters: any, action: Contracts.Api.RPC.Action): boolean {
+	#validateParams(parameters: [], action: Contracts.Api.RPC.Action): boolean {
 		if (!action.schema.$id) {
 			return true;
 		}

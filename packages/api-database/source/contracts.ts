@@ -1,6 +1,6 @@
-import { type DataSource, EntityManager, ObjectLiteral, Repository, SelectQueryBuilder } from "typeorm";
+import type { DataSource, EntityManager, ObjectLiteral, Repository, SelectQueryBuilder } from "typeorm";
 
-import {
+import type {
 	ApiNode,
 	Block,
 	Configuration,
@@ -15,8 +15,8 @@ import {
 	ValidatorRound,
 	Wallet,
 } from "./models/index.js";
-import { QueryHelper } from "./search/query-helper.js";
-import { Expression } from "./search/types/expressions.js";
+import type { QueryHelper } from "./search/query-helper.js";
+import type { Expression } from "./search/types/expressions.js";
 import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search/types/index.js";
 
 export type RepositoryDataSource = DataSource | EntityManager;
@@ -37,10 +37,10 @@ export type BlockRepositoryExtension = {
 
 export type BlockRepository = ExtendedRepository<Block> & BlockRepositoryExtension;
 
-export type ConfigurationRepositoryExtension = Record<string, any>;
+export type ConfigurationRepositoryExtension = Record<string, unknown>;
 export type ConfigurationRepository = ExtendedRepository<Configuration> & ConfigurationRepositoryExtension;
 
-export type ContractRepositoryExtension = Record<string, any>;
+export type ContractRepositoryExtension = Record<string, unknown>;
 export type ContractRepository = ExtendedRepository<Contract> & ContractRepositoryExtension;
 
 export type ApiNodeRepositoryExtension = {
@@ -87,15 +87,15 @@ export type TransactionRepositoryExtension = {
 };
 export type TransactionRepository = ExtendedRepository<Transaction> & TransactionRepositoryExtension;
 
-export type MultiPaymentRepositoryExtension = Record<string, any>;
+export type MultiPaymentRepositoryExtension = Record<string, unknown>;
 export type MultiPaymentRepository = ExtendedRepository<MultiPayment> & MultiPaymentRepositoryExtension;
-export type LegacyColdWalletRepositoryExtension = Record<string, any>;
+export type LegacyColdWalletRepositoryExtension = Record<string, unknown>;
 export type LegacyColdWalletRepository = ExtendedRepository<LegacyColdWallet> & LegacyColdWalletRepositoryExtension;
-export type ValidatorRoundRepositoryExtension = Record<string, any>;
+export type ValidatorRoundRepositoryExtension = Record<string, unknown>;
 export type ValidatorRoundRepository = ExtendedRepository<ValidatorRound> & ValidatorRoundRepositoryExtension;
-export type PluginRepositoryExtension = Record<string, any>;
+export type PluginRepositoryExtension = Record<string, unknown>;
 export type PluginRepository = ExtendedRepository<Plugin> & PluginRepositoryExtension;
-export type StateRepositoryExtension = Record<string, any>;
+export type StateRepositoryExtension = Record<string, unknown>;
 export type StateRepository = ExtendedRepository<State> & StateRepositoryExtension;
 export type SystemRepositoryExtension = {
 	inMaintenance(): Promise<boolean>;

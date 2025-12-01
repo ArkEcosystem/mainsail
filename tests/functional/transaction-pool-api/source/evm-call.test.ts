@@ -1,4 +1,5 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { describe, Sandbox } from "@mainsail/test-framework";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
@@ -47,6 +48,26 @@ describe<{
 
 		await waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
+	});
+
+	it("should not accept vm call with gas price lower than required minimum", async (context) => {
+		const randomWallet = await Utils.getRandomColdWallet(context);
+
+		const tx = await EvmCalls.makeEvmCall(context, { recipient: randomWallet.address, gasPrice: 1 ** 1e9 });
+
+		const { accept, invalid, errors } = await addTransactionsToPool(context, [tx]);
+		assert.equal(accept, []);
+		assert.equal(invalid, [0]);
+		assert.equal(errors, {
+			"0": {
+				message:
+					'Invalid transaction data: data/gasPrice must pass "transactionGasPrice" keyword validation, data must match a schema in anyOf',
+				type: "ERR_BAD_DATA",
+			},
+		});
+
+		await waitBlock(context);
+		assert.false(await isTransactionCommitted(context, tx));
 	});
 
 	it("should deploy contract and interact with it", async (context) => {

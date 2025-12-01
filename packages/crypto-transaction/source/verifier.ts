@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { InvalidLegacySecondSignatureError, MissingLegacySecondSignatureError } from "@mainsail/exceptions";
 
 import { schemas } from "./validation/schemas.js";
@@ -33,7 +34,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	public async verifySchema(
 		data: Contracts.Crypto.TransactionData,
 		strict: boolean,
-	): Promise<Contracts.Crypto.SchemaValidationResult> {
+	): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionData>> {
 		const { $id } = schemas.transaction;
 		return this.validator.validate(strict ? `${$id}Strict` : `${$id}`, data);
 	}

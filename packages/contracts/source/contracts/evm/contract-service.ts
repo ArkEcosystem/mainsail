@@ -1,12 +1,12 @@
-import { BigNumber } from "@mainsail/utils";
+import type { BigNumber } from "@mainsail/utils";
 
-import { ValidatorWallet } from "../state/wallets.js";
+import type { ValidatorWallet } from "../state/wallets.js";
 
 export interface DeployerContract {
 	readonly name: string;
 	readonly address: string;
 	readonly proxy?: "UUPS";
-	readonly implementations: { address: string; abi: Record<string, any> }[];
+	readonly implementations: { address: string; abi: Record<string, unknown>[] }[];
 	readonly activeImplementation?: string;
 }
 

@@ -11,7 +11,7 @@ import {
 	RestartRunningProcess,
 	RestartRunningProcessWithPrompt,
 } from "./actions/index.js";
-import { Application, ProcessOptions } from "./contracts.js";
+import { Application, Flags, ProcessOptions } from "./contracts.js";
 import { Identifiers } from "./ioc/index.js";
 
 @injectable()
@@ -39,7 +39,7 @@ export class ActionFactory {
 		return this.app.get<AbortUnknownProcess>(Identifiers.AbortUnknownProcess).execute(processName);
 	}
 
-	public async daemonizeProcess(options: ProcessOptions, flags): Promise<void> {
+	public async daemonizeProcess(options: ProcessOptions, flags: Flags): Promise<void> {
 		return this.app.get<DaemonizeProcess>(Identifiers.DaemonizeProcess).execute(options, flags);
 	}
 

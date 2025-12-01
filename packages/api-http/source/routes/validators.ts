@@ -1,10 +1,12 @@
-import Hapi from "@hapi/hapi";
+import type Hapi from "@hapi/hapi";
 import { Schemas } from "@mainsail/api-common";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { ValidatorsController } from "../controllers/validators.js";
 import {
+	blockCriteriaSchemas,
+	blocksOrderBy,
 	blockSortingSchema,
 	validatorCriteriaSchema,
 	validatorSortingSchema,
@@ -78,8 +80,8 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					id: walletParameterSchema,
 				}),
 				query: Joi.object({
-					...server.app.schemas.blockCriteriaSchemas,
-					orderBy: server.app.schemas.blocksOrderBy,
+					...blockCriteriaSchemas,
+					orderBy: blocksOrderBy,
 				})
 					.concat(blockSortingSchema)
 					.concat(Schemas.pagination),

@@ -6,9 +6,9 @@ import {
 	Models,
 	Search,
 } from "@mainsail/api-database";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
 import { EnrichedBlock, EnrichedTransaction } from "../resources/index.js";
@@ -17,7 +17,7 @@ import { EnrichedBlock, EnrichedTransaction } from "../resources/index.js";
 export class Controller extends AbstractController {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-http")
-	protected readonly apiConfiguration!: Providers.PluginConfiguration;
+	protected readonly apiConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
 	protected readonly stateRepositoryFactory!: ApiDatabaseContracts.StateRepositoryFactory;
@@ -75,7 +75,7 @@ export class Controller extends AbstractController {
 			return null;
 		}
 
-		const promises: Promise<any>[] = [];
+		const promises: Promise<unknown>[] = [];
 		if (!state) {
 			promises.push(
 				(async () => {
@@ -87,18 +87,20 @@ export class Controller extends AbstractController {
 		if (!generator) {
 			promises.push(
 				(async () => {
-					generator = (await this.walletRepositoryFactory()
-						.createQueryBuilder()
-						.select()
-						.where("address = :address", { address: block.proposer })
-						.getOne()) ?? {
-						address: block.proposer,
-						attributes: {},
-						balance: "0",
-						nonce: "0",
-						publicKey: "",
-						updated_at: "0",
-					};
+					generator =
+						(await this.walletRepositoryFactory()
+							.createQueryBuilder()
+							.select()
+							.where("address = :address", { address: block.proposer })
+							.getOne()) ??
+						({
+							address: block.proposer,
+							attributes: {},
+							balance: "0",
+							nonce: "0",
+							publicKey: "",
+							updated_at: "0",
+						} as Models.Wallet);
 				})(),
 			);
 		}

@@ -1,5 +1,6 @@
+import { Identifiers, LogLevels } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { assert, isEmpty } from "@mainsail/utils";
 import chalk, { ChalkInstance } from "chalk";
 import type { Color, Colorette } from "colorette";
@@ -23,9 +24,9 @@ type ColoretteColorNames = keyof Pick<
 
 @injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
-	static LOG_LEVELS: Set<string> = new Set(Constants.LogLevels);
+	static LOG_LEVELS: Set<string> = new Set(LogLevels);
 
-	static MAX_LEVEL_LENGTH = Math.max(...Constants.LogLevels.map((level) => level.length));
+	static MAX_LEVEL_LENGTH = Math.max(...LogLevels.map((level) => level.length));
 
 	static LOG_CONTEXTS: Contracts.Kernel.LoggerContext[] = ["system", "evm", "consensus", "p2p", "tx-pool", "api"];
 
@@ -58,7 +59,10 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 	#silentConsole = false;
 
-	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
+	public async make(options: {
+		levels: { console: Contracts.Kernel.LoggerContext; file: Contracts.Kernel.LoggerContext };
+		fileRotator: { interval: string };
+	}): Promise<Contracts.Kernel.Logger> {
 		this.#stream = new PassThrough();
 
 		this.#logger = pino(
@@ -88,7 +92,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			pump(
 				this.#stream,
 				split(),
-				this.#createPrettyTransport(options.levels.console, { colorize: true }),
+				this.#createPrettyTransport(options?.levels.console, { colorize: true }),
 				process.stdout,
 
 				(error) => {

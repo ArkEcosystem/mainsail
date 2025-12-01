@@ -1,4 +1,5 @@
-import { Contracts } from "@mainsail/contracts";
+import { Enums } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 
 export class Precommit implements Contracts.Crypto.Precommit {
 	#blockNumber: number;
@@ -25,7 +26,7 @@ export class Precommit implements Contracts.Crypto.Precommit {
 	}
 
 	get type(): Contracts.Crypto.MessageType {
-		return Contracts.Crypto.MessageType.Precommit;
+		return Enums.Crypto.MessageType.Precommit;
 	}
 
 	get blockNumber(): number {
@@ -68,17 +69,6 @@ export class Precommit implements Contracts.Crypto.Precommit {
 			blockNumber: this.#blockNumber,
 			round: this.#round,
 			type: this.type,
-		};
-	}
-
-	toData(): Contracts.Crypto.PrecommitData {
-		return {
-			blockHash: this.#blockHash,
-			blockNumber: this.#blockNumber,
-			round: this.#round,
-			signature: this.#signature,
-			type: this.type,
-			validatorIndex: this.#validatorIndex,
 		};
 	}
 }

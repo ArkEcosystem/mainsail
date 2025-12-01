@@ -3,11 +3,11 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 } from "@mainsail/api-database";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { parseTransactionError } from "@mainsail/evm-contracts";
-import { Providers, Types } from "@mainsail/kernel";
 import { assert, BigNumber, chunk, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
@@ -20,9 +20,9 @@ interface DeferredSync {
 	transactions: Models.Transaction[];
 	multiPayments: Models.MultiPayment[];
 	validatorRound?: Models.ValidatorRound;
-	wallets: Array<Array<any>>;
+	wallets: Array<[string, string | null, string, string, object, string]>;
 	mergedLegacyColdWallets: ({ legacyAddress: string } & Contracts.Evm.AccountMergeInfo)[];
-	newMilestones?: Record<string, any>;
+	newMilestones?: Contracts.Crypto.Milestone;
 }
 
 const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve) => queue.once("drain", resolve));
@@ -94,10 +94,11 @@ export class Sync implements Contracts.ApiSync.Service {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-sync")
-	private readonly pluginConfiguration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Services.Queue.Factory)
-	private readonly createQueue!: Types.QueueFactory;
+	private readonly createQueue!: Contracts.Kernel.QueueFactory;
+
 	#queue!: Contracts.Kernel.Queue;
 
 	@inject(Identifiers.ApiSync.Listener)
@@ -187,7 +188,8 @@ export class Sync implements Contracts.ApiSync.Service {
 
 				legacySecondSignature: data.legacySecondSignature,
 
-				logs: receipt.logs,
+				// is converted into JSONB column
+				logs: receipt.logs as unknown as string,
 
 				multiPaymentRecipients:
 					parsedMultiPayments.length > 0 ? [...new Set(parsedMultiPayments.map((mp) => mp.to))] : undefined,
@@ -283,7 +285,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				attributes,
 				header.number.toFixed(),
 			];
-		});
+		}) as DeferredSync["wallets"];
 
 		// The block validator/dirty validators might not be part of the account updates if no rewards have been distributed,
 		// thus ensure they are manually inserted.

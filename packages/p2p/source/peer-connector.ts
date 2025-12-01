@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { IpAddress } from "@mainsail/utils";
 import delay from "delay";
 
@@ -31,7 +32,12 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		}
 	}
 
-	public async emit(peer: Contracts.P2P.Peer, event: string, payload: any, timeout?: number): Promise<any> {
+	public async emit(
+		peer: Contracts.P2P.Peer,
+		event: string,
+		payload: Buffer,
+		timeout?: number,
+	): Promise<{ payload: Buffer }> {
 		const connection: Client = await this.connect(peer);
 
 		if (timeout) {

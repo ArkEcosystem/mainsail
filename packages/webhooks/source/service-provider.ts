@@ -1,11 +1,12 @@
+import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { Database } from "./database.js";
 import { Listener } from "./listener.js";
-import { Server } from "./server/index.js";
+import { Server, ServerOptions } from "./server/index.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -19,18 +20,18 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		await this.app
 			.get<Server>(Identifiers.Webhooks.Server)
-			.register(this.config().get<Contracts.Types.JsonObject>("server")!);
+			.register(this.config().getRequired<ServerOptions>("server")!);
 
 		// Setup Listeners...
 		this.#startListeners();
 	}
 
 	public async boot(): Promise<void> {
-		await this.app.get<any>(Identifiers.Webhooks.Server).boot();
+		await this.app.get<Server>(Identifiers.Webhooks.Server).boot();
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<any>(Identifiers.Webhooks.Server).dispose();
+		await this.app.get<Server>(Identifiers.Webhooks.Server).dispose();
 	}
 
 	public async bootWhen(): Promise<boolean> {

@@ -1,5 +1,6 @@
+import { Enums, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
 import { AbstractProcessor } from "./abstract-processor.js";
@@ -35,11 +36,11 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 	async process(prevote: Contracts.Crypto.Prevote, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.hasValidBlockNumberOrRound(prevote)) {
-				return Contracts.Consensus.ProcessorResult.Skipped;
+				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
 			if (!this.isRoundInBounds(prevote)) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
+				return Enums.Consensus.ProcessorResult.Invalid;
 			}
 
 			const roundState = this.roundStateRepo.getRoundState(prevote.blockNumber, prevote.round);
@@ -49,19 +50,19 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 
 				if (!existingPrevote.serialized.equals(prevote.serialized)) {
 					this.logger.warn(
-						`Conflicting prevotes for validator index ${prevote.validatorIndex} in block ${prevote.blockNumber.toLocaleString(Constants.Locale)}/${prevote.round}. Existing: ${existingPrevote.serialized.toString("hex")}, New: ${prevote.serialized.toString("hex")}`,
+						`Conflicting prevotes for validator index ${prevote.validatorIndex} in block ${prevote.blockNumber.toLocaleString(Locale)}/${prevote.round}. Existing: ${existingPrevote.serialized.toString("hex")}, New: ${prevote.serialized.toString("hex")}`,
 					);
 				}
 
-				return Contracts.Consensus.ProcessorResult.Skipped;
+				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
 			switch (await this.#signatureCheck(prevote)) {
 				case SignatureCheckResult.Skip: {
-					return Contracts.Consensus.ProcessorResult.Skipped;
+					return Enums.Consensus.ProcessorResult.Skipped;
 				}
 				case SignatureCheckResult.Invalid: {
-					return Contracts.Consensus.ProcessorResult.Invalid;
+					return Enums.Consensus.ProcessorResult.Invalid;
 				}
 			}
 
@@ -73,7 +74,7 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 
 			void this.getConsensus().handle(roundState);
 
-			return Contracts.Consensus.ProcessorResult.Accepted;
+			return Enums.Consensus.ProcessorResult.Accepted;
 		});
 	}
 

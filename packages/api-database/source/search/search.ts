@@ -1,5 +1,5 @@
-import { NumericCriteria, OrCriteria } from "./types/criteria.js";
-import {
+import type { NumericCriteria, OrCriteria } from "./types/criteria.js";
+import type {
 	AndExpression,
 	BetweenExpression,
 	EqualExpression,
@@ -83,7 +83,7 @@ export const everyOrCriteria = <TCriteria>(
 export const hasOrCriteria = <TCriteria>(criteria: OrCriteria<TCriteria>): boolean =>
 	someOrCriteria(criteria, () => true);
 
-export const handleAndCriteria = async <TEntity, TCriteria extends Record<string, any>>(
+export const handleAndCriteria = async <TEntity, TCriteria extends Record<string, unknown>>(
 	criteria: TCriteria,
 	callback: <K extends keyof TCriteria>(key: K) => Promise<Expression<TEntity>>,
 ): Promise<AndExpression<TEntity>> => {

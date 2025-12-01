@@ -1,6 +1,6 @@
-import { FunctionReturning } from "./internal/index.js";
+import type { FunctionReturning } from "./internal/index.js";
 
-export const some = <T>(iterable: T[], iteratee: FunctionReturning): boolean => {
+export const some = <T>(iterable: T[], iteratee: FunctionReturning<[T, number, T[]], unknown>): boolean => {
 	for (let index = 0; index < iterable.length; index++) {
 		if (iteratee(iterable[index], index, iterable)) {
 			return true;

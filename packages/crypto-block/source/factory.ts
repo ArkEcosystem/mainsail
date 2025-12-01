@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
+import type { Contracts, Utils } from "@mainsail/contracts";
 import { BlockSchemaError } from "@mainsail/exceptions";
 import { BigNumber } from "@mainsail/utils";
 
@@ -24,7 +25,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	private readonly validator!: Contracts.Crypto.Validator;
 
 	public async make(
-		data: Utils.Mutable<Contracts.Crypto.BlockDataSerializable>,
+		data: Contracts.Crypto.BlockDataSerializable,
 		transactions: Contracts.Crypto.Transaction[],
 	): Promise<Contracts.Crypto.Block> {
 		const block: Contracts.Crypto.BlockData = { ...data, hash: await this.hashFactory.make(data) };

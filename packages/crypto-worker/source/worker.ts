@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { sleep } from "@mainsail/utils";
 
 @injectable()
@@ -43,34 +44,44 @@ export class Worker implements Contracts.Crypto.Worker {
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.Signature[K]>
 	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
-		return this.ipcSubprocess.sendRequest("consensusSignature", method, arguments_);
+		return this.ipcSubprocess.sendRequest("consensusSignature", method, arguments_) as Promise<
+			ReturnType<Contracts.Crypto.Signature[K]>
+		>;
 	}
 
 	public async walletSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.Signature[K]>
 	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
-		return this.ipcSubprocess.sendRequest("walletSignature", method, arguments_);
+		return this.ipcSubprocess.sendRequest("walletSignature", method, arguments_) as Promise<
+			ReturnType<Contracts.Crypto.Signature[K]>
+		>;
 	}
 
 	public async blockFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.BlockFactory>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.BlockFactory[K]>
 	): Promise<ReturnType<Contracts.Crypto.BlockFactory[K]>> {
-		return this.ipcSubprocess.sendRequest("blockFactory", method, arguments_);
+		return this.ipcSubprocess.sendRequest("blockFactory", method, arguments_) as Promise<
+			ReturnType<Contracts.Crypto.BlockFactory[K]>
+		>;
 	}
 
 	public async transactionFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.TransactionFactory>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.TransactionFactory[K]>
 	): Promise<ReturnType<Contracts.Crypto.TransactionFactory[K]>> {
-		return this.ipcSubprocess.sendRequest("transactionFactory", method, arguments_);
+		return this.ipcSubprocess.sendRequest("transactionFactory", method, arguments_) as Promise<
+			ReturnType<Contracts.Crypto.TransactionFactory[K]>
+		>;
 	}
 
 	public async publicKeyFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.PublicKeyFactory>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.PublicKeyFactory[K]>
 	): Promise<ReturnType<Contracts.Crypto.PublicKeyFactory[K]>> {
-		return this.ipcSubprocess.sendRequest("publicKeyFactory", method, arguments_);
+		return this.ipcSubprocess.sendRequest("publicKeyFactory", method, arguments_) as Promise<
+			ReturnType<Contracts.Crypto.PublicKeyFactory[K]>
+		>;
 	}
 }

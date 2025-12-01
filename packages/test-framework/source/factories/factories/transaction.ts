@@ -1,14 +1,14 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
 import secrets from "../../internal/passphrases.json" with { type: "json" };
-import { FactoryBuilder } from "../factory-builder.js";
-import { EvmCallOptions, TransactionOptions, TransferOptions } from "../types.js";
+import type { FactoryBuilder } from "../factory-builder.js";
+import type { EvmCallOptions, TransactionOptions, TransferOptions } from "../types.js";
 import { generateApp } from "./generate-app.js";
 
 const AMOUNT = 1;
-export const GAS_PRICE = 5 * 1e9;
 
 interface EntityOptions {
 	entity: TransactionBuilder;
@@ -43,6 +43,8 @@ const applyModifiers = (entity: TransactionBuilder, options: TransactionOptions)
 
 	return entity;
 };
+
+export const GAS_PRICE = 5 * 1e9;
 
 export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
 	factory.set("Transfer", async ({ options }: { options: TransferOptions }) => {

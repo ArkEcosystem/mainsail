@@ -1,12 +1,13 @@
 import { ConfigurationGenerator, makeApplication } from "@mainsail/configuration-generator";
+import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { Container } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
 import { readJSONSync, removeSync } from "fs-extra/esm";
 import { join, resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { SandboxCallback } from "./contracts.js";
+import type { SandboxCallback } from "./contracts.js";
 
 export class Sandbox {
 	public readonly app: Application;
@@ -43,11 +44,11 @@ export class Sandbox {
 		this.app = new Application(this.#container);
 	}
 
-	public getConfigurationPath() {
+	public getConfigurationPath(): string {
 		return join(this.#path, this.#configurationOptions.network);
 	}
 
-	public withConfigurationOptions(options: Contracts.NetworkGenerator.Options) {
+	public withConfigurationOptions(options: Contracts.NetworkGenerator.Options): Sandbox {
 		this.#configurationOptions = { ...this.#configurationOptions, ...options };
 
 		return this;
@@ -66,7 +67,7 @@ export class Sandbox {
 		}
 
 		// Configure Application
-		process.env[Constants.EnvironmentVariables.MAINSAIL_PATH_CONFIG] = this.getConfigurationPath();
+		process.env[EnvironmentVariables.MAINSAIL_PATH_CONFIG] = this.getConfigurationPath();
 
 		if (callback) {
 			callback({
@@ -129,9 +130,9 @@ export class Sandbox {
 	}: {
 		name: string;
 		path: string;
-		klass: Contracts.Types.Class<any>;
+		klass: Contracts.Types.Class<Providers.ServiceProvider>;
 	}): Promise<this> {
-		const serviceProvider: Providers.ServiceProvider = this.app.resolve<any>(klass);
+		const serviceProvider: Providers.ServiceProvider = this.app.resolve<Providers.ServiceProvider>(klass);
 		// serviceProvider.setManifest(this.app.resolve(Providers.PluginManifest).discover(path)); // TODO: Check resolve path
 		serviceProvider.setConfig(await this.app.resolve(Providers.PluginConfiguration).discover(name, path));
 

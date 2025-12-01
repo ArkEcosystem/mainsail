@@ -162,7 +162,7 @@ export class Client {
 		});
 	}
 
-	public disconnect() {
+	public disconnect(): Promise<void> {
 		return new Promise((resolve) => this._disconnect(resolve, false));
 	}
 
@@ -170,7 +170,7 @@ export class Client {
 		return new Promise((resolve) => this._disconnect(resolve, false, true));
 	}
 
-	public request(options) {
+	public request<T>(options): Promise<T> {
 		if (typeof options === "string") {
 			options = {
 				path: options,
@@ -185,7 +185,7 @@ export class Client {
 			type: "request",
 		};
 
-		return this._send(request, true);
+		return this._send(request, true) as Promise<T>;
 	}
 
 	public _isReady() {
@@ -380,7 +380,7 @@ export class Client {
 		}, timeout);
 	}
 
-	private _send(request, track) {
+	private _send(request, track): Promise<void> {
 		if (!this._isReady()) {
 			return Promise.reject(NesError("Failed to send message - server disconnected", errorTypes.DISCONNECT));
 		}
@@ -441,7 +441,7 @@ export class Client {
 			return Promise.reject(NesError(error, errorTypes.WS));
 		}
 
-		return promise;
+		return promise as Promise<void>;
 	}
 
 	private _hello(auth) {

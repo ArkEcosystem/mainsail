@@ -21,7 +21,7 @@ export class Contract {
 		nullable: true,
 		type: "citext",
 	})
-	public readonly proxy!: string | undefined;
+	public readonly proxy: string | undefined;
 
 	@Column({
 		nullable: false,
@@ -33,5 +33,5 @@ export class Contract {
 		nullable: false,
 		type: "jsonb",
 	})
-	public readonly implementations!: { address: string; abi: Record<string, any> }[];
+	public readonly implementations!: Record<string, unknown>[];
 }

@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { stringify } from "envfile";
 import { copyFileSync, writeFileSync } from "fs";
 import { writeJSONSync } from "fs-extra/esm";
@@ -23,7 +23,7 @@ export class ConfigurationWriter {
 		writeFileSync(path.join(this.configurationPath, ".env"), stringify(environment));
 	}
 
-	writePeers(peers: { port: number; ip: string }[]) {
+	writePeers(peers: { port: number; ip: string }[]): void {
 		writeJSONSync(
 			path.join(this.configurationPath, "peers.json"),
 			{ list: peers },

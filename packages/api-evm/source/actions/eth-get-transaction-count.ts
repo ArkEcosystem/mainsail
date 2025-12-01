@@ -1,10 +1,11 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { getHistoryHeightFromBlockTag } from "../utils/resolve-block-tag.js";
 
 @injectable()
-export class EthGetTransactionCount implements Contracts.Api.RPC.Action {
+export class EthGetTransactionCount implements Contracts.Api.RPC.Action<[string, string]> {
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "rpc")
 	private readonly evm!: Contracts.Evm.Instance;

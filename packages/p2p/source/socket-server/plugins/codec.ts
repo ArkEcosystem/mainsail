@@ -1,8 +1,10 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 
 import { BasePlugin } from "./base-plugin.js";
+
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 @injectable()
 export class CodecPlugin extends BasePlugin {
@@ -14,7 +16,7 @@ export class CodecPlugin extends BasePlugin {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@multiInject(Identifiers.P2P.Routes)
 	private readonly routes!: Contracts.P2P.Route[];

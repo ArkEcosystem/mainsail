@@ -1,17 +1,23 @@
-import { FunctionReturning } from "./internal/index.js";
+import type { FunctionReturning } from "./internal/index.js";
 
-export const filterObject = <T extends Record<string, any>>(iterable: T, iteratee: FunctionReturning): T => {
-	const keys = Object.keys(iterable);
-	const length: number = keys.length;
-	const result = {};
+export const filterObject = <T extends Record<string, T[keyof T]>>(
+	iterable: T,
+	iteratee: FunctionReturning<[T[keyof T], keyof T, T], unknown>,
+): T => {
+	const result = {} as T;
 
-	for (let index = 0; index < length; index++) {
-		const key = keys[index];
+	for (const key in iterable) {
+		if (!Object.prototype.hasOwnProperty.call(iterable, key)) {
+			continue;
+		}
 
-		if (iteratee(iterable[key], key, iterable)) {
-			result[key] = iterable[key];
+		const typedKey = key as keyof T;
+		const value = iterable[typedKey];
+
+		if (iteratee(value, typedKey, iterable)) {
+			result[typedKey] = value;
 		}
 	}
 
-	return result as T;
+	return result;
 };

@@ -3,7 +3,8 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 } from "@mainsail/api-database";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers, Events } from "@mainsail/constants";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert, Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
@@ -48,9 +49,13 @@ export class Snapshot {
 
 	private listenForEvmEvents() {
 		const event = Events.EvmEvent.TransactionReceipt;
-		const eventDispatcher = this.sandbox.app.get<Contracts.Kernel.EventDispatcher>(
-			Identifiers.Services.EventDispatcher.Service,
-		);
+		const eventDispatcher = this.sandbox.app.get<
+			Contracts.Kernel.EventDispatcher<{
+				receipt: Contracts.Evm.TransactionReceipt;
+				sender: string;
+				transactionId: string;
+			}>
+		>(Identifiers.Services.EventDispatcher.Service);
 
 		const listener = {
 			handle: ({

@@ -1,10 +1,10 @@
+import { Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Constants } from "@mainsail/contracts";
 import { totalmem } from "os";
 
 import { Application } from "../application.js";
 import { Spinner } from "../components/index.js";
-import { ProcessOptions } from "../contracts.js";
+import { Flags, ProcessOptions } from "../contracts.js";
 import { Identifiers } from "../ioc/index.js";
 import { ProcessManager } from "../services/index.js";
 import { AbortRunningProcess } from "./abort-running-process.js";
@@ -18,7 +18,7 @@ export class DaemonizeProcess {
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
-	public execute(options: ProcessOptions, flags): void {
+	public execute(options: ProcessOptions, flags: Flags): void {
 		const processName: string = options.name;
 
 		if (this.processManager.has(processName)) {
@@ -41,7 +41,7 @@ export class DaemonizeProcess {
 
 			flagsProcess.name = processName;
 
-			const potato: boolean = totalmem() < 2 * Constants.Units.GIGABYTE;
+			const potato: boolean = totalmem() < 2 * Units.GIGABYTE;
 
 			this.processManager.start(
 				{
@@ -51,7 +51,7 @@ export class DaemonizeProcess {
 						MAINSAIL_ENV: flags.env,
 						NODE_ENV: "production",
 					},
-					node_args: potato ? { max_old_space_size: 500 } : undefined,
+					...(potato ? { node_args: { max_old_space_size: 500 } } : {}),
 				},
 				flagsProcess,
 			);

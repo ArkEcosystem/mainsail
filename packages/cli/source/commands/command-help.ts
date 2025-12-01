@@ -1,10 +1,21 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { blue, bold } from "kleur/colors";
 
 import { AppHeader } from "../components/index.js";
-import { Application } from "../contracts.js";
+import { Application, InputArguments } from "../contracts.js";
 import { Identifiers } from "../ioc/index.js";
+
+interface CommandInterface {
+	readonly signature: string;
+	readonly description: string | undefined;
+	readonly isHidden: boolean;
+
+	readonly definition: {
+		getArguments(): InputArguments;
+		getFlags(): InputArguments;
+	};
+}
 
 @injectable()
 export class CommandHelp {
@@ -14,7 +25,7 @@ export class CommandHelp {
 	@inject(Identifiers.Package)
 	protected readonly pkg!: Contracts.Types.PackageJson;
 
-	public render(command): string {
+	public render(command: CommandInterface): string {
 		let helpMessage = `${this.app.get<AppHeader>(Identifiers.AppHeader).render()}
 
 ${blue(bold("Description"))}
@@ -37,7 +48,7 @@ ${flags}`;
 		return helpMessage;
 	}
 
-	#buildArguments(command): string {
+	#buildArguments(command: CommandInterface): string {
 		const arguments_ = command.definition.getArguments();
 
 		if (Object.keys(arguments_).length <= 0) {
@@ -54,7 +65,7 @@ ${flags}`;
 		return output.join("\n");
 	}
 
-	#buildFlags(command): string {
+	#buildFlags(command: CommandInterface): string {
 		const flags = command.definition.getFlags();
 
 		if (Object.keys(flags).length <= 0) {
@@ -71,13 +82,13 @@ ${flags}`;
 		return output.join("\n");
 	}
 
-	#buildProperties<T extends Record<string, any>>(properties: T) {
+	#buildProperties<T extends Record<string, unknown>>(properties: T) {
 		const options: string[] = [];
 		const descriptions: string[] = [];
 
 		for (const option of Object.keys(properties)) {
 			options.push(option);
-			descriptions.push(properties[option].description);
+			descriptions.push((properties[option] as { description: string }).description);
 		}
 
 		return {

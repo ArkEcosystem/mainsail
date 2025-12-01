@@ -1,5 +1,5 @@
 import { injectable, postConstruct } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { AnySchema, FormatDefinition, KeywordDefinition, Schema } from "ajv";
 import AjvCore from "ajv/dist/2020.js";
 import formats from "ajv-formats";
@@ -25,7 +25,7 @@ export class Validator implements Contracts.Crypto.Validator {
 		formats.default(this.ajv_);
 	}
 
-	public validate<T = any>(schemaKeyReference: string | Schema, data: T): Contracts.Crypto.SchemaValidationResult<T> {
+	public validate<T>(schemaKeyReference: string | Schema, data: T): Contracts.Crypto.SchemaValidationResult<T> {
 		try {
 			this.ajv_.validate(schemaKeyReference, data);
 

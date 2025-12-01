@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 // Verifier which always accepts everything, useful when using the tx builder with invalid schema data.
 
@@ -12,7 +12,7 @@ export class AcceptAnyTransactionVerifier implements Contracts.Crypto.Transactio
 	public async verifySchema(
 		data: Contracts.Crypto.TransactionData,
 		_: boolean,
-	): Promise<Contracts.Crypto.SchemaValidationResult> {
+	): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionData>> {
 		return {
 			error: undefined,
 			errors: undefined,

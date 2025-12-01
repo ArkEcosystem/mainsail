@@ -1,14 +1,14 @@
 import Sntp from "@hapi/sntp";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 import { shuffle } from "@mainsail/utils";
 
 @injectable()
 export class Checker {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "networking-ntp")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;

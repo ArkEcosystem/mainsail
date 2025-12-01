@@ -1,4 +1,4 @@
-import {
+import type {
 	Milestone,
 	MilestoneDiff,
 	MilestoneKey,
@@ -12,9 +12,9 @@ export interface Configuration {
 
 	all(): NetworkConfig | undefined;
 
-	set<T = any>(key: string, value: T): void;
+	set<T = unknown>(key: string, value: T): void;
 
-	get<T = any>(key: string): T;
+	get<T = unknown>(key: string): T;
 
 	setHeight(value: number): void;
 
@@ -33,7 +33,7 @@ export interface Configuration {
 		key: K,
 	): MilestoneSearchResult<Milestone[K]>;
 
-	getMilestones(): any;
+	getMilestones(): Milestone[];
 
 	getRoundValidators(): number;
 }

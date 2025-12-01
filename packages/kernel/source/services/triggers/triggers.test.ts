@@ -1,12 +1,12 @@
 import * as Exceptions from "@mainsail/exceptions";
+import type { Contracts } from "@mainsail/contracts";
 
 import { describe } from "../../../../test-framework/source";
-import { ActionArguments } from "../../types";
 import { Action } from "./action";
 import { Triggers } from "./triggers";
 
 class DummyAction extends Action {
-	public execute<T>(arguments_: ActionArguments): T {
+	public execute<T>(arguments_: Contracts.Kernel.ActionArguments): T {
 		return arguments_.returnValue;
 	}
 }

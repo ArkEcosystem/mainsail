@@ -1,7 +1,10 @@
-import { Boom, notFound } from "@hapi/boom";
-import { Contracts } from "@mainsail/contracts";
+import type { Boom } from "@hapi/boom";
+import { notFound } from "@hapi/boom";
+import type { Contracts } from "@mainsail/contracts";
 
-export const transformResource = (model): Contracts.Webhooks.Webhook => ({
+export type WebhookResponse = Contracts.Webhooks.Webhook & { token?: string };
+
+export const transformResource = (model: WebhookResponse): Contracts.Webhooks.Webhook => ({
 	conditions: model.conditions,
 	enabled: model.enabled,
 	event: model.event,
@@ -10,5 +13,7 @@ export const transformResource = (model): Contracts.Webhooks.Webhook => ({
 	token: model.token,
 });
 
-export const respondWithResource = (data): { data: Contracts.Webhooks.Webhook } | Boom<Contracts.Webhooks.Webhook> =>
+export const respondWithResource = (
+	data: WebhookResponse,
+): { data: Contracts.Webhooks.Webhook } | Boom<Contracts.Webhooks.Webhook> =>
 	data ? { data: transformResource(data) } : notFound();

@@ -1,14 +1,14 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { SenderExceededMaximumTransactionCountError } from "@mainsail/exceptions";
-import { Providers } from "@mainsail/kernel";
 import { assert, BigNumber, Lock } from "@mainsail/utils";
 
 @injectable()
 export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool-service")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.TransactionPool.SenderState)
 	private readonly senderState!: Contracts.TransactionPool.SenderState;

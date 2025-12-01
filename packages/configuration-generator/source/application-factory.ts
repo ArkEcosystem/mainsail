@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 
+import { Enums, Identifiers } from "@mainsail/constants";
 import { Container } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
@@ -38,7 +39,10 @@ import {
 } from "./generators/index.js";
 import { Identifiers as InternalIdentifiers } from "./identifiers.js";
 
-export const makeApplication = async (configurationPath: string, options: Record<string, any> = {}) => {
+export const makeApplication = async (
+	configurationPath: string,
+	options: Record<string, unknown> = {},
+): Promise<Application> => {
 	options = { address: "keccak256", name: "mainsail", ...options };
 
 	const app = new Application(new Container());
@@ -55,7 +59,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({
 		existsSync: () => true,
 		get: (path: string) => readFileSync(path),
-		readJSONSync: (file: string, options?: Record<string, any>) => readJSONSync(file, options),
+		readJSONSync: (file: string, options?: Record<string, unknown>) => readJSONSync(file, options),
 	});
 	setGracefulCleanup();
 	app.rebind("path.data").toConstantValue(dirSync().name);
@@ -92,7 +96,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 		},
 		milestones: [
 			{
-				evmSpec: Contracts.Evm.SpecId.SHANGHAI,
+				evmSpec: Enums.Evm.SpecId.SHANGHAI,
 				height: 0,
 				timeouts: {
 					blockPrepareTime: 4000,

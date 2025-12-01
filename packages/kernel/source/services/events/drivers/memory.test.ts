@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { describe } from "../../../../../test-framework/source";
 import { MemoryEventDispatcher } from "./memory";

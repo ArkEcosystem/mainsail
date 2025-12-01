@@ -1,52 +1,54 @@
+import { NamedPlugin, Plugin } from "@hapi/hapi";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { AbstractServer } from "./server.js";
 import { Schemas } from "./validation/index.js";
 
-export type ServerConstructor<T extends AbstractServer> = new (...arguments_: any[]) => T;
+export type ServerConstructor<T extends AbstractServer> = new (...arguments_: unknown[]) => T;
 
 @injectable()
 export abstract class AbstractServiceProvider<T extends AbstractServer> extends Providers.ServiceProvider {
 	protected abstract httpIdentifier(): symbol;
 	protected abstract httpsIdentifier(): symbol;
 	protected abstract getServerConstructor(): ServerConstructor<T>;
-	protected abstract getHandlers(): any;
-	protected abstract getPlugins(): any[];
+	protected abstract getHandlers(): NamedPlugin<unknown>;
+	protected abstract getPlugins(): Plugin<unknown>[];
 	protected getActions(): Contracts.Api.RPC.Action[] {
 		return [];
 	}
 
 	public async register(): Promise<void> {
-		if (this.config().get("server.http.enabled")) {
-			await this.buildServer(Contracts.Api.ServerType.Http, this.httpIdentifier());
+		if (this.config().getRequired<boolean>("server.http.enabled")) {
+			await this.buildServer(Enums.Api.ServerType.Http, this.httpIdentifier());
 		}
 
-		if (this.config().get("server.https.enabled")) {
-			await this.buildServer(Contracts.Api.ServerType.Https, this.httpsIdentifier());
+		if (this.config().getRequired<boolean>("server.https.enabled")) {
+			await this.buildServer(Enums.Api.ServerType.Https, this.httpsIdentifier());
 		}
 
 		this.#registerValidation();
 	}
 
 	public async boot(): Promise<void> {
-		if (this.config().get("server.http.enabled")) {
+		if (this.config().getRequired<boolean>("server.http.enabled")) {
 			await this.app.get<T>(this.httpIdentifier()).boot();
 		}
 
-		if (this.config().get("server.https.enabled")) {
+		if (this.config().getRequired<boolean>("server.https.enabled")) {
 			await this.app.get<T>(this.httpsIdentifier()).boot();
 		}
 	}
 
 	public async dispose(): Promise<void> {
-		if (this.config().get("server.http.enabled")) {
+		if (this.config().getRequired<boolean>("server.http.enabled")) {
 			await this.app.get<T>(this.httpIdentifier()).dispose();
 		}
 
-		if (this.config().get("server.https.enabled")) {
+		if (this.config().getRequired<boolean>("server.https.enabled")) {
 			await this.app.get<T>(this.httpsIdentifier()).dispose();
 		}
 	}
@@ -87,16 +89,16 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 		const server = this.app.get<T>(id);
 
 		await server.initialize(type, {
-			...this.config().get(`server.${type.toLowerCase()}`),
+			...this.config().getRequired<Contracts.Types.JsonObject>(`server.${type.toLowerCase()}`),
 
 			routes: {
 				cors: true,
 			},
 		});
 
-		await server.register(this.getPlugins());
+		await server.registerPlugins(this.getPlugins());
 
-		await server.register({
+		await server.registerHandlers({
 			plugin: this.getHandlers(),
 			routes: { prefix: "/api" },
 		});

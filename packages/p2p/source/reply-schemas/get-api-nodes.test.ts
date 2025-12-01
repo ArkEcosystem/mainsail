@@ -1,4 +1,5 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Enums } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation/source/validator";
 
 import { describe, Sandbox } from "../../../test-framework/source";
@@ -17,7 +18,7 @@ describe<Context>("GetApiNodes Schema", ({ it, assert, beforeEach, each }) => {
 	beforeEach((context) => {
 		data = {
 			headers,
-			apiNodes: [{ ip: "127.0.0.1", port: 4003, protocol: Contracts.P2P.PeerProtocol.Http }],
+			apiNodes: [{ ip: "127.0.0.1", port: 4003, protocol: Enums.Api.Protocol.Http }],
 		};
 
 		context.sandbox = new Sandbox();

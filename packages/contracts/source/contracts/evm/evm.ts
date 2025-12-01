@@ -1,3 +1,6 @@
+import type { Enums } from "@mainsail/constants";
+import type { Log } from "viem";
+
 export interface GenesisInfo {
 	readonly account: string;
 	readonly deployerAccount: string;
@@ -25,8 +28,6 @@ export interface PreverifyTransactionResult {
 	readonly initialGasUsed: bigint;
 	readonly error?: string;
 }
-
-export type CommitResult = Record<string, any>;
 
 export interface AccountInfo {
 	readonly nonce: bigint;
@@ -194,7 +195,7 @@ export interface TransactionReceipt {
 	readonly gasRefunded: bigint;
 	readonly status: number;
 	readonly contractAddress?: string;
-	readonly logs: any;
+	readonly logs: Log[];
 	readonly output?: Buffer;
 
 	// Only present when reading receipts explicitly via `get_receipts`
@@ -202,9 +203,4 @@ export interface TransactionReceipt {
 	readonly txHash?: string;
 }
 
-// Supported EVM specs
-// https://github.com/ethereum/execution-specs
-export enum SpecId {
-	SHANGHAI = "Shanghai",
-	LATEST = "Latest",
-}
+export type SpecId = Enums.Evm.SpecId;

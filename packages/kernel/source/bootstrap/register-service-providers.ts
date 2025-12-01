@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import {
 	DependencyVersionOutOfRange,
 	InvalidPluginConfiguration,
@@ -10,7 +11,7 @@ import {
 import { assert } from "@mainsail/utils";
 import semver from "semver";
 
-import { PluginConfiguration, ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
+import { ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
 import { ValidationManager } from "../services/validation/index.js";
 
 // @TODO review the implementation
@@ -60,7 +61,7 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 		const configSchema: object = serviceProvider.configSchema();
 
 		if (Object.keys(configSchema).length > 0) {
-			const config: PluginConfiguration = serviceProvider.config();
+			const config = serviceProvider.config();
 
 			const validator = this.app.get<ValidationManager>(Identifiers.Services.Validation.Manager).driver();
 

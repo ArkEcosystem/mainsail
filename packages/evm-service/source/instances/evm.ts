@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Evm, JsCommitData, JsTransactionData, LogLevel } from "@mainsail/evm";
 import { assert, validatorSetPack } from "@mainsail/utils";
 
@@ -14,7 +15,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 	#evm!: Evm;
 
 	@postConstruct()
-	public initialize() {
+	public initialize(): void {
 		this.#evm = new Evm({
 			historySize: 256n,
 			logger: (record) => {

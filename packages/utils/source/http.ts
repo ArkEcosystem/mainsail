@@ -1,13 +1,13 @@
-import { ClientRequest, IncomingMessage, RequestOptions } from "http";
-import * as httpClient from "http";
-import * as httpsClient from "https";
-import { JsonArray, JsonObject, Primitive } from "type-fest";
+import type { ClientRequest, IncomingMessage, RequestOptions } from "http";
+import { globalAgent as httpGlobalAgent, request as httpRequest } from "http";
+import { globalAgent as httpsGlobalAgent, request as httpsRequest } from "https";
+import type { JsonArray, JsonObject, Primitive } from "type-fest";
 import { URL } from "url";
 
 import { isObject } from "./is-object.js";
 import { isUndefined } from "./is-undefined.js";
 
-const sendRequest = (method: string, url: string, options?: HttpOptions): Promise<HttpResponse> =>
+const sendRequest = <T>(method: string, url: string, options?: HttpOptions): Promise<HttpResponse<T>> =>
 	new Promise((resolve, reject) => {
 		if (!isObject(options)) {
 			options = {};
@@ -18,8 +18,10 @@ const sendRequest = (method: string, url: string, options?: HttpOptions): Promis
 			throw new Error("failed to parseURL");
 		}
 
-		const client = parsedUrl.protocol === "https:" ? httpsClient : httpClient;
-		const { globalAgent, request } = client;
+		const { globalAgent, request } =
+			parsedUrl.protocol === "https:"
+				? { globalAgent: httpsGlobalAgent, request: httpsRequest }
+				: { globalAgent: httpGlobalAgent, request: httpRequest };
 
 		options = { ...options };
 		options.host = parsedUrl.host;
@@ -89,7 +91,7 @@ const sendRequest = (method: string, url: string, options?: HttpOptions): Promis
 					return reject(new HttpError(response));
 				}
 
-				return resolve(response);
+				return resolve(response as HttpResponse<T>);
 			});
 		});
 
@@ -108,16 +110,18 @@ const sendRequest = (method: string, url: string, options?: HttpOptions): Promis
 		request_.end();
 	});
 
+export type HttpBody = Record<string, Primitive | JsonObject | JsonArray>;
+
 export type HttpOptions = RequestOptions & {
 	maxContentLength?: number;
-	body?: Record<string, Primitive | JsonObject | JsonArray>;
+	body?: HttpBody;
 };
 
-export type HttpResponse = {
+export type HttpResponse<T = unknown> = {
 	method: string | undefined;
 	statusCode: number | undefined;
 	statusMessage: string | undefined;
-	data: any;
+	data: T;
 	headers: string[];
 };
 
@@ -153,9 +157,9 @@ export class HttpError extends Error {
 
 export const http = {
 	delete: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("DELETE", url, options),
-	get: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("GET", url, options),
+	get: <T>(url: string, options?: HttpOptions): Promise<HttpResponse<T>> => sendRequest("GET", url, options),
 	head: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("HEAD", url, options),
 	patch: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("PATCH", url, options),
-	post: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("POST", url, options),
+	post: <T>(url: string, options?: HttpOptions): Promise<HttpResponse<T>> => sendRequest("POST", url, options),
 	put: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("PUT", url, options),
 };

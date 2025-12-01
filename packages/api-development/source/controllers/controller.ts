@@ -1,8 +1,8 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 
 import { SchemaObject } from "../schemas.js";
 
@@ -13,7 +13,7 @@ export class Controller {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-development")
-	protected readonly apiConfiguration!: Providers.PluginConfiguration;
+	protected readonly apiConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.State.Store)
 	protected readonly stateStore!: Contracts.State.Store;
@@ -62,7 +62,10 @@ export class Controller {
 		}));
 	}
 
-	protected async respondWithResource(data, transformer): Promise<any> {
+	protected async respondWithResource<T extends object, R extends Contracts.Api.Resource>(
+		data: T,
+		transformer: new () => R,
+	): Promise<{ data: ReturnType<R["transform"]> } | Boom.Boom> {
 		if (!data) {
 			return Boom.notFound();
 		}
@@ -70,13 +73,16 @@ export class Controller {
 		return { data: await this.toResource(data, transformer) };
 	}
 
-	protected async respondWithCollection(data, transformer): Promise<object> {
+	protected async respondWithCollection<T extends object, R extends Contracts.Api.Resource>(
+		data: T[],
+		transformer: new () => R,
+	): Promise<{ data: ReturnType<R["transform"]>[] } | Boom.Boom> {
 		return {
 			data: await this.toCollection(data, transformer),
 		};
 	}
 
-	protected async toResource<T, R extends Contracts.Api.Resource>(
+	protected async toResource<T extends object, R extends Contracts.Api.Resource>(
 		item: T,
 		transformer: new () => R,
 	): Promise<ReturnType<R["transform"]>> {
@@ -85,14 +91,14 @@ export class Controller {
 		return resource.transform(item) as ReturnType<R["transform"]>;
 	}
 
-	protected async toCollection<T, R extends Contracts.Api.Resource>(
+	protected async toCollection<T extends object, R extends Contracts.Api.Resource>(
 		items: T[],
 		transformer: new () => R,
 	): Promise<ReturnType<R["transform"]>[]> {
 		return Promise.all(items.map(async (item) => await this.toResource(item, transformer)));
 	}
 
-	protected async toPagination<T, R extends Contracts.Api.Resource>(
+	protected async toPagination<T extends object, R extends Contracts.Api.Resource>(
 		resultsPage: Contracts.Api.ResultsPage<T>,
 		transformer: new () => R,
 	): Promise<Contracts.Api.ResultsPage<ReturnType<R["transform"]>>> {

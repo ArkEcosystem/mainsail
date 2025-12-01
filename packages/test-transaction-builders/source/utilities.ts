@@ -1,24 +1,12 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder, TransactionFactory, Verifier } from "@mainsail/crypto-transaction";
-import { Sandbox } from "@mainsail/test-framework";
+import type { Sandbox } from "@mainsail/test-framework";
 import { BigNumber, sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
-import { Context, TransactionOptions } from "./types.js";
+import type { Context, TransactionOptions } from "./types.js";
 import { AcceptAnyTransactionVerifier } from "./verifier.js";
-
-export const getNonceByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<BigNumber> => {
-	const { app } = sandbox;
-
-	const address = await app
-		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-		.fromPublicKey(publicKey);
-
-	const instance = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
-	const accountInfo = await instance.getAccountInfo(address);
-
-	return BigNumber.make(accountInfo.nonce);
-};
 
 const applyCustomSignature = async (
 	sandbox: Sandbox,
@@ -67,6 +55,19 @@ const applyCustomSignatures = async (
 	// transaction.serialized = Buffer.from(transactionHex, "hex");
 };
 
+export const getNonceByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<BigNumber> => {
+	const { app } = sandbox;
+
+	const address = await app
+		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
+		.fromPublicKey(publicKey);
+
+	const instance = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+	const accountInfo = await instance.getAccountInfo(address);
+
+	return BigNumber.make(accountInfo.nonce);
+};
+
 export const buildSignedTransaction = async <TBuilder extends TransactionBuilder>(
 	sandbox: Sandbox,
 	builder: TransactionBuilder,
@@ -75,7 +76,9 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 ): Promise<Contracts.Crypto.Transaction> => {
 	// !! Overwrite verifier to accept invalid schema data
 	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
-	(builder as any).factory = sandbox.app.resolve(TransactionFactory);
+	(builder as unknown as { factory: TransactionFactory }).factory = sandbox.app.resolve(TransactionFactory);
+	(builder as unknown as { verifier: Contracts.Crypto.TransactionVerifier }).verifier =
+		sandbox.app.resolve(AcceptAnyTransactionVerifier);
 
 	if (options.multiSigKeys) {
 		throw new Error("unsupported");
@@ -146,6 +149,12 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 
 	// !! Reset
 	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
+	(builder as unknown as { factory: TransactionFactory }).factory = sandbox.app.get(
+		Identifiers.Cryptography.Transaction.Factory,
+	);
+	(builder as unknown as { verifier: Contracts.Crypto.TransactionVerifier }).verifier = sandbox.app.get(
+		Identifiers.Cryptography.Transaction.Verifier,
+	);
 
 	return transaction;
 };
@@ -159,7 +168,7 @@ export const addTransactionsToPool = async (
 	return processor.process(transactions.map((t) => t.serialized));
 };
 
-export const waitBlock = async (sandbox: Sandbox, count: number = 1) => {
+export const waitBlock = async (sandbox: Sandbox, count: number = 1): Promise<void> => {
 	const state = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
 
 	let currentBlockNumber = state.getBlockNumber();

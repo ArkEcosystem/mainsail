@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { DriverCannotBeResolved } from "@mainsail/exceptions";
 import { pascalCase } from "@mainsail/utils";
 
@@ -13,7 +14,7 @@ export abstract class InstanceManager<T> {
 	#drivers: Map<string, T> = new Map<string, T>();
 
 	@postConstruct()
-	public init() {
+	public init(): void {
 		this.#defaultDriver = this.getDefaultDriver();
 	}
 

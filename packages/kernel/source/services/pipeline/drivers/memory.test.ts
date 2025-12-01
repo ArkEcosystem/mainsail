@@ -1,5 +1,5 @@
 import { Container, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { describe } from "../../../../../test-framework/source";
 import { Application } from "../../../application";

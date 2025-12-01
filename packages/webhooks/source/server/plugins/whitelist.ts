@@ -1,9 +1,10 @@
 import Boom from "@hapi/boom";
+import type Hapi from "@hapi/hapi";
 import { isWhitelisted } from "@mainsail/utils";
 
 export const whitelist = {
 	name: "whitelist",
-	register(server, options) {
+	register(server: Hapi.Server, options: { whitelist: string[] }): void {
 		server.ext({
 			async method(request, h) {
 				if (!options.whitelist) {

@@ -1,5 +1,7 @@
-import { Application, ApplicationFactory, Commands, Identifiers, Services, Utils } from "@mainsail/cli";
+import type { Application, Commands, Services } from "@mainsail/cli";
+import { ApplicationFactory, Identifiers, Utils } from "@mainsail/cli";
 import { Container } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 
 export class Console {
 	public app: Application;
@@ -37,7 +39,7 @@ export class Console {
 		return this;
 	}
 
-	public async execute(command): Promise<void> {
+	public async execute(command: Contracts.Kernel.Container.Newable<Commands.Command>): Promise<void> {
 		this.app
 			.rebind(Identifiers.ApplicationPaths)
 			.toConstantValue(this.app.get<Services.Environment>(Identifiers.Environment).getPaths());

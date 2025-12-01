@@ -1,5 +1,6 @@
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { existsSync } from "fs";
 import { ensureFileSync } from "fs-extra/esm";
 import { LowSync } from "lowdb";
@@ -16,7 +17,7 @@ export class Database implements Contracts.Webhooks.Database {
 
 	#database!: LowSync<{ webhooks: Contracts.Webhooks.Webhook[] }>;
 
-	public boot() {
+	public boot(): void {
 		const adapterFile: string = this.app.cachePath("webhooks.json");
 
 		if (!existsSync(adapterFile)) {

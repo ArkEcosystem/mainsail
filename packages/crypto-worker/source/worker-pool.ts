@@ -1,12 +1,12 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Types } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class WorkerPool implements Contracts.Crypto.WorkerPool {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "crypto-worker")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -17,7 +17,7 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 	private workers: Contracts.Crypto.Worker[] = [];
 
 	@inject(Identifiers.Config.Flags)
-	private readonly flags!: Types.KeyValuePair;
+	private readonly flags!: Contracts.Types.KeyValuePair;
 
 	#currentWorkerIndex = 0;
 

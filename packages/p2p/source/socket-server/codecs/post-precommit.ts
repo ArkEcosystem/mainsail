@@ -1,24 +1,21 @@
-import type * as types from "./proto/protos.d.ts";
-import * as _protos from "./proto/protos.js";
-
-const proto = (_protos as any).default.postPrecommit as typeof types.postPrecommit;
+import { postPrecommit as proto } from "./proto/protos.js";
 
 export const postPrecommit = {
 	request: {
-		deserialize: (payload: Buffer) => {
+		deserialize: (payload: Buffer): proto.IPostPrecommitRequest => {
 			const decoded = proto.PostPrecommitRequest.decode(payload);
 			return {
 				...decoded,
 				precommit: Buffer.from(decoded.precommit),
 			};
 		},
-		serialize: (object: types.postPrecommit.IPostPrecommitRequest): Buffer =>
+		serialize: (object: proto.IPostPrecommitRequest): Buffer =>
 			Buffer.from(proto.PostPrecommitRequest.encode(object).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): Record<string, any> =>
+		deserialize: (payload: Buffer): proto.IPostPrecommitResponse =>
 			proto.PostPrecommitResponse.toObject(proto.PostPrecommitResponse.decode(payload), { defaults: true }),
-		serialize: (object: types.postPrecommit.IPostPrecommitResponse): Buffer =>
+		serialize: (object: proto.IPostPrecommitResponse): Buffer =>
 			Buffer.from(proto.PostPrecommitResponse.encode(object).finish()),
 	},
 };

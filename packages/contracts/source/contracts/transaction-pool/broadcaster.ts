@@ -1,11 +1,9 @@
-import { Dayjs } from "dayjs";
+import type { Enums } from "@mainsail/constants";
+import type { Dayjs } from "dayjs";
 
-import { Transaction } from "../crypto/index.js";
+import type { Transaction } from "../crypto/index.js";
 
-export enum PeerProtocol {
-	Http = 0,
-	Https = 1,
-}
+export type PeerProtocol = Enums.Api.Protocol;
 
 export interface PeerBroadcast {
 	ip: string;

@@ -1,20 +1,18 @@
-import { Contracts } from "@mainsail/contracts";
-import { AnySchema } from "joi";
+import type { Contracts } from "@mainsail/contracts";
+import type { AnySchema } from "joi";
 export type { Paths } from "env-paths";
 
-export type InputValue = any;
+export type InputValue = string | number | boolean;
 export type InputValues = Record<string, InputValue>;
 
 export type InputArgument = { description: string; schema: AnySchema };
 export type InputArguments = Record<string, InputArgument>;
 
-export type AnyObject = Record<string, any>;
+export type AnyObject = Record<string, string | number | boolean>;
 
 export type Arguments = Record<string, string | number>;
 
 export type Flags = Record<string, string | number | boolean>;
-
-export type CommandList = Record<string, any>;
 
 export interface CommandArgument {
 	description: string;
@@ -90,7 +88,21 @@ export enum ProcessState {
 
 export type ProcessIdentifier = string | number;
 
-export type ProcessDescription = Record<string, any>;
+export type ProcessDescription = {
+	readonly pid: number;
+	readonly name: string;
+	readonly pm2_env: {
+		readonly version: string;
+		readonly status: ProcessState;
+		readonly pm_uptime: number;
+		readonly pm_err_log_path: string;
+		readonly pm_out_log_path: string;
+	};
+	readonly monit: {
+		readonly cpu: number;
+		readonly memory: number;
+	};
+};
 
 export type ProcessOptions = Record<"name" | "script" | "args", string>;
 

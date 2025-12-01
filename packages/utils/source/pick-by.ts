@@ -1,5 +1,19 @@
-import { filter } from "./filter.js";
-import { FunctionReturning } from "./internal/index.js";
+export const pickBy = <T extends Record<string, unknown>>(
+	iterable: T,
+	iteratee: (value: T[keyof T], key: keyof T) => boolean,
+): Partial<T> => {
+	const result: Partial<T> = {};
 
-export const pickBy = <T>(iterable: T, iteratee: FunctionReturning): T =>
-	filter(iterable as any, (value) => iteratee(value));
+	for (const key in iterable) {
+		if (Object.prototype.hasOwnProperty.call(iterable, key)) {
+			const typedKey = key as keyof T;
+			const value = iterable[typedKey];
+
+			if (iteratee(value, typedKey)) {
+				result[typedKey] = value;
+			}
+		}
+	}
+
+	return result;
+};

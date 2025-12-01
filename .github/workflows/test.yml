@@ -65,6 +65,7 @@ jobs:
 
     unit:
         name: "Unit"
+        if: true
         needs:
             - build
         strategy:
@@ -143,6 +144,8 @@ jobs:
               run: cd packages/container && pnpm run test:coverage
             - name: Test contracts
               run: cd packages/contracts && pnpm run test:coverage
+            - name: Test constants
+              run: cd packages/constants && pnpm run test:coverage
             - name: Test core
               run: cd packages/core && pnpm run test:coverage
             - name: Test crypto-address-base58
@@ -256,6 +259,7 @@ jobs:
 
     integration:
         name: "Integration"
+        if: true
         needs:
             - build
         strategy:
@@ -312,6 +316,7 @@ jobs:
 
     e2e-consensus:
         name: "E2E Consensus"
+        if: true
         needs:
             - build
         concurrency:
@@ -396,6 +401,7 @@ jobs:
 
     e2e-clients:
         name: "E2E Clients"
+        if: true
         needs:
             - build
         concurrency:
@@ -453,6 +459,7 @@ jobs:
 
     e2e-snapshot:
         name: "E2E Snapshot"
+        if: true
         needs:
             - build
         concurrency:
@@ -529,8 +536,83 @@ jobs:
               if: always()
               run: docker logs snapshot-checks-1
 
+    e2e-sync:
+        name: "E2E Sync"
+        if: true
+        needs:
+            - build
+        concurrency:
+            cancel-in-progress: true
+            group: ${{ github.head_ref }}-e2e-${{ matrix.name }}
+        runs-on: ubuntu-latest
+
+        timeout-minutes: 15
+
+        strategy:
+            matrix:
+                node-version: [22.x]
+                name: ["sync"]
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  run_install: false
+                  version: latest
+            - name: Get pnpm store directory
+              id: pnpm-cache
+              run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+              shell: bash
+            - name: Cache pnpm modules
+              uses: actions/cache/restore@v4
+              with:
+                  key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+                  path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            - name: Cache lerna
+              uses: actions/cache/restore@v4
+              with:
+                  key: lerna-${{ github.sha }}
+                  path: ./.cache
+            - name: Install dependencies
+              run: pnpm install
+            - name: Build
+              run: pnpm run build
+
+            - name: Docker ${{ matrix.name }}
+              env:
+                  MINIMUM_BLOCKS_TO_SYNC: 5000
+              run: sudo chmod -R 777 tests/e2e/${{ matrix.name }}/nodes && cd tests/e2e/${{ matrix.name }} && docker compose up -d
+
+            - name: Running checks for ${{ matrix.name }}
+              run: |
+                  container_id=$(docker ps -a | grep 'sync-checks' | awk '{print $1}')
+                  while docker ps | grep -q $container_id; do echo "checks running..."; sleep 5; done
+                  exit_code=$(docker container inspect $container_id --format='{{.State.ExitCode}}')
+                  if [ "$exit_code" != "0" ]; then
+                    echo "Error: checks exited with code $exit_code"
+                    exit 1
+                  fi
+            - name: Show logs - checks
+              if: always()
+              run: docker logs sync-checks-1
+            - name: Show logs - sync-node
+              if: always()
+              run: |
+                  sleep 20
+                  docker logs sync-node-1
+            - name: Show logs - api-http
+              if: always()
+              run: docker logs sync-api-http-1
+
     functional:
         name: "Functional - ${{matrix.name}}"
+        if: true
         needs:
             - build
         concurrency:

@@ -1,15 +1,21 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
-let mockTransactions: Partial<Contracts.Crypto.Transaction>[] = [];
+let mockTransactions: Contracts.Crypto.Transaction[] = [];
 
-export const setTransactions = (transactions: Partial<Contracts.Crypto.Transaction>[]) => {
+class TransactionPoolQueryMock implements Partial<Contracts.TransactionPool.Query> {
+	public getFromHighestPriority(): Contracts.TransactionPool.QueryIterable {
+		return new CustomQueryIterable(mockTransactions) as unknown as Contracts.TransactionPool.QueryIterable;
+	}
+}
+
+export const setTransactions = (transactions: Contracts.Crypto.Transaction[]): void => {
 	mockTransactions = transactions;
 };
 
 export class CustomQueryIterable implements Partial<Contracts.TransactionPool.QueryIterable> {
 	public transactions: Contracts.Crypto.Transaction[];
 
-	public constructor(items) {
+	public constructor(items: Contracts.Crypto.Transaction[]) {
 		this.transactions = items;
 	}
 
@@ -19,8 +25,8 @@ export class CustomQueryIterable implements Partial<Contracts.TransactionPool.Qu
 		}
 	}
 
-	public whereHash(hash: any): any {
-		return this;
+	public whereHash(hash: string): Contracts.TransactionPool.QueryIterable {
+		return this as unknown as Contracts.TransactionPool.QueryIterable;
 	}
 
 	public async has(): Promise<boolean> {
@@ -29,12 +35,6 @@ export class CustomQueryIterable implements Partial<Contracts.TransactionPool.Qu
 
 	public async first(): Promise<Contracts.Crypto.Transaction> {
 		return this.transactions[0];
-	}
-}
-
-class TransactionPoolQueryMock implements Partial<Contracts.TransactionPool.Query> {
-	public getFromHighestPriority(): Contracts.TransactionPool.QueryIterable {
-		return new CustomQueryIterable(mockTransactions) as unknown as Contracts.TransactionPool.QueryIterable;
 	}
 }
 

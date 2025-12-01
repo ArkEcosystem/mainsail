@@ -1,8 +1,12 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services } from "@mainsail/kernel";
+import { Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
+import type { Providers, Services } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 
-type PluginConfig = { package: string; options: any };
+type PluginConfig = {
+	package: string;
+	options: { enabled?: boolean; server?: { http?: { port: number }; https?: { port: number } } };
+};
 
 const transformPlugins = (plugins: PluginConfig[]): Contracts.P2P.PeerPlugins => {
 	const result: Contracts.P2P.PeerPlugins = {};
@@ -10,7 +14,8 @@ const transformPlugins = (plugins: PluginConfig[]): Contracts.P2P.PeerPlugins =>
 	for (const pluginConfig of plugins) {
 		const name = pluginConfig.package;
 		// @README: This is a core specific convention. If a server should not be publicly discovered it should avoid this convention.
-		const options = pluginConfig.options?.server?.http || pluginConfig.options?.server?.https || {};
+		const options = pluginConfig.options?.server?.http ||
+			pluginConfig.options?.server?.https || { port: undefined };
 
 		const port = Number(options.port);
 

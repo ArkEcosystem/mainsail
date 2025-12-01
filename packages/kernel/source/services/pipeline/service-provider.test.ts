@@ -1,9 +1,8 @@
 import { Container } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 
 import { describe } from "../../../../test-framework/source";
 import { Application } from "../../application";
-import { PipelineFactory } from "../../types";
 import { MemoryPipeline } from "./drivers/memory";
 import { ServiceProvider } from "./service-provider";
 
@@ -24,6 +23,9 @@ describe<{
 	it("should create an instance of the MemoryPipeline", async (context) => {
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.instance(context.app.get<PipelineFactory>(Identifiers.Services.Pipeline.Factory)(), MemoryPipeline);
+		assert.instance(
+			context.app.get<Contracts.Kernel.PipelineFactory>(Identifiers.Services.Pipeline.Factory)(),
+			MemoryPipeline,
+		);
 	});
 });

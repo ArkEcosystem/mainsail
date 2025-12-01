@@ -1,12 +1,13 @@
-import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
+import { Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 import { Proposal } from "@mainsail/crypto-messages";
-import { Sandbox } from "@mainsail/test-framework";
+import type { Sandbox } from "@mainsail/test-framework";
 import { assert, BigNumber } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 import dayjs from "dayjs";
 
-import { Validator } from "./contracts.js";
+import type { Validator } from "./contracts.js";
 
 // To create blocks containing arbitrary transactions, the transactions have to be added
 // in serialized form as the serializer could just fail e.g. due to malformed bytes etc.
@@ -148,7 +149,7 @@ export const makeCustomProposal = async (
 	const signedProposal = Buffer.concat([serializedProposal, Buffer.from(proposalSignature, "hex")]);
 
 	const proposal = node.app.resolve(Proposal).initialize({
-		blockNumber: block.header.number,
+		blockHeader: block.header,
 		dataSerialized: proposedBytes.toString("hex"),
 		round,
 		serialized: signedProposal,

@@ -1,13 +1,13 @@
 import { http } from "@mainsail/utils";
 
-import { Client } from "../types.js";
+import type { Client } from "../types.js";
 
 export class LocalClient implements Client {
 	#id = 0;
 
 	public readonly name = "local";
 
-	public constructor(private url: string) {}
+	public constructor(private url: string) { }
 
 	public async getChainId(): Promise<number> {
 		return Number.parseInt(await this.#JSONRPCCall<string>("eth_chainId", []));
@@ -56,7 +56,7 @@ export class LocalClient implements Client {
 	}
 
 	public async call(address: string, data: string): Promise<string> {
-		return this.#JSONRPCCall<string>("eth_call", [{ to: address, data }, "latest"]);
+		return this.#JSONRPCCall<string>("eth_call", [{ data, to: address }, "latest"]);
 	}
 
 	public async sendTx(serialized: string): Promise<string> {

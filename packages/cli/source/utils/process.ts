@@ -77,7 +77,7 @@ export class Process implements IProcess {
 	public async log(showErrors: boolean, lines: number): Promise<void> {
 		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.#processName);
 
-		const proc: Record<string, any> | undefined = this.processManager.describe(this.#processName);
+		const proc = this.processManager.describe(this.#processName);
 
 		assert.defined(proc);
 

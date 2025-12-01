@@ -1,7 +1,6 @@
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-
-import { ShutdownSignal } from "../enums/index.js";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class ListenToShutdownSignals implements Contracts.Kernel.Bootstrapper {
@@ -9,8 +8,8 @@ export class ListenToShutdownSignals implements Contracts.Kernel.Bootstrapper {
 	private readonly app!: Contracts.Kernel.Application;
 
 	public async bootstrap(): Promise<void> {
-		for (const signal in ShutdownSignal) {
-			process.on(signal as any, async (code) => {
+		for (const signal in Enums.Kernel.ShutdownSignal) {
+			process.on(signal, async (code) => {
 				await this.app.terminate(signal);
 			});
 		}

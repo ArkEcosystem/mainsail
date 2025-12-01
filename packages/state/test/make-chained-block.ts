@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 export const makeChainedBlocks = (length: number, blockFactory): Contracts.Crypto.Block[] => {
 	const entitites: Contracts.Crypto.Block[] = [];

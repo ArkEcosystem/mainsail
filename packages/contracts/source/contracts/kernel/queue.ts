@@ -1,4 +1,4 @@
-import { EventEmitter } from "events";
+import type { EventEmitter } from "events";
 
 export interface QueueJob {
 	handle(): Promise<void>;
@@ -29,3 +29,5 @@ export interface Queue extends EventEmitter {
 
 	isRunning(): boolean;
 }
+
+export type QueueFactory = () => Promise<Queue>;

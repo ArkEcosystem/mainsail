@@ -1,6 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Types } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 import delay from "delay";
 
 import { RateLimiter } from "./rate-limiter.js";
@@ -10,13 +10,13 @@ import { buildRateLimiter } from "./utils/index.js";
 export class Throttle {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Services.Queue.Factory)
-	private readonly createQueue!: Types.QueueFactory;
+	private readonly createQueue!: Contracts.Kernel.QueueFactory;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;

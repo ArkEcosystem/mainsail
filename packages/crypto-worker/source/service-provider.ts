@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Ipc, Providers } from "@mainsail/kernel";
 import Joi from "joi";
 import { cpus } from "os";
@@ -22,15 +23,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.CryptoWorker.WorkerPool).to(WorkerPool).inSingletonScope();
 
-		this.app
-			.bind<() => Ipc.Subprocess<any>>(Identifiers.CryptoWorker.WorkerSubprocess.Factory)
-			.toFactory(() => () => {
-				const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {
-					stderr: true,
-					stdout: true,
-				});
-				return new Ipc.Subprocess(this.app, "system", subprocess);
+		this.app.bind<() => Ipc.Subprocess>(Identifiers.CryptoWorker.WorkerSubprocess.Factory).toFactory(() => () => {
+			const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {
+				stderr: true,
+				stdout: true,
 			});
+			return new Ipc.Subprocess(this.app, "system", subprocess);
+		});
 	}
 
 	public async boot(): Promise<void> {

@@ -1,29 +1,44 @@
 import { not, ok } from "uvu/assert";
 
-export abstract class Fake<T> {
-	protected readonly subject: any;
+import type { Fake as FakeInterface } from "./contracts.js";
 
-	public constructor(subject: T) {
+export type FakeCall<TArguments extends unknown[]> = {
+	args: TArguments;
+	calledWith(...arguments_: TArguments): boolean;
+};
+
+export type FakeLike<TArguments extends unknown[], TResult> = ((...arguments_: TArguments) => TResult) & {
+	calledWith(...arguments_: TArguments): boolean;
+	called: boolean;
+	getCall(index: number): FakeCall<TArguments>;
+	callCount: number;
+	restore(): void;
+	resetHistory(): void;
+};
+
+export abstract class Fake<TArguments extends unknown[], TResult> implements FakeInterface<TArguments, TResult> {
+	protected readonly subject: FakeLike<TArguments, TResult>;
+
+	public constructor(subject: FakeLike<TArguments, TResult>) {
 		this.subject = subject;
 	}
 
-	public call<U>(...arguments_: any[]): U {
+	public call(...arguments_: TArguments): TResult {
 		return this.subject(...arguments_);
 	}
 
 	public called(): void {
 		ok(this.subject.called);
 	}
-
-	public calledWith(...arguments_: any[]): void {
+	public calledWith(...arguments_: TArguments): void {
 		ok(this.subject.calledWith(...arguments_));
 	}
 
-	public notCalledWith(...arguments_: any[]): void {
+	public notCalledWith(...arguments_: TArguments): void {
 		not.ok(this.subject.calledWith(...arguments_));
 	}
 
-	public calledNthWith(index: number, ...arguments_: any[]): void {
+	public calledNthWith(index: number, ...arguments_: TArguments): void {
 		if (this.subject.callCount <= index) {
 			throw new Error(`Failed to get arguments for call#${index}`);
 		}
@@ -43,7 +58,7 @@ export abstract class Fake<T> {
 		this.calledTimes(0);
 	}
 
-	public getCallArgs(index: number): any[] {
+	public getCallArgs(index: number): TArguments {
 		if (this.subject.callCount > index) {
 			return this.subject.getCall(index).args;
 		}
@@ -58,7 +73,8 @@ export abstract class Fake<T> {
 	public reset(): void {
 		this.subject.resetHistory();
 	}
-	public toFunction(): T {
+
+	public toFunction(): (...arguments_: TArguments) => TResult {
 		return this.subject;
 	}
 }

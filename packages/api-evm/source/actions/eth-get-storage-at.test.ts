@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { schemas as keccak256Schemas } from "@mainsail/crypto-address-keccak256";
 import { schemas as validationSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation";

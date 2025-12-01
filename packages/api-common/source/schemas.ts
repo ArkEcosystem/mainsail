@@ -84,16 +84,17 @@ export const pagination = Joi.object({
 	page: Joi.number().integer().positive().default(1),
 });
 
-export const equalCriteria = (value: any) => value;
-export const numericCriteria = (value: any) =>
+export const equalCriteria = (value: Joi.Schema): Joi.Schema => value;
+export const numericCriteria = (value: Joi.Schema): Joi.Schema =>
 	Joi.alternatives().try(
 		value,
 		Joi.object().keys({ from: value }),
 		Joi.object().keys({ to: value }),
 		Joi.object().keys({ from: value, to: value }),
 	);
-export const containsCriteria = (value: any) => value;
-export const orCriteria = (criteria: any) => Joi.alternatives().try(criteria, Joi.array().items(criteria));
-export const orEqualCriteria = (value: any) => orCriteria(equalCriteria(value));
-export const orNumericCriteria = (value: any) => orCriteria(numericCriteria(value));
-export const orContainsCriteria = (value: any) => orCriteria(containsCriteria(value));
+export const containsCriteria = (value: Joi.Schema): Joi.Schema => value;
+export const orCriteria = (criteria: Joi.Schema): Joi.Schema =>
+	Joi.alternatives().try(criteria, Joi.array().items(criteria));
+export const orEqualCriteria = (value: Joi.Schema): Joi.Schema => orCriteria(equalCriteria(value));
+export const orNumericCriteria = (value: Joi.Schema): Joi.Schema => orCriteria(numericCriteria(value));
+export const orContainsCriteria = (value: Joi.Schema): Joi.Schema => orCriteria(containsCriteria(value));

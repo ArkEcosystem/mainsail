@@ -1,4 +1,4 @@
-import { SchemaObject } from "ajv";
+import type { SchemaObject } from "ajv";
 
 const id: SchemaObject = {
 	anyOf: [{ type: "string" }, { type: "integer" }, { type: "null" }],

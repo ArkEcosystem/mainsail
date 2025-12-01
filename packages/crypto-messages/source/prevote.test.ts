@@ -1,5 +1,5 @@
 import { describe, Sandbox } from "../../test-framework/source";
-import { prevoteData } from "../test/fixtures/proposal";
+import { prevoteData } from "../test/fixtures/index.js";
 import { Prevote } from "./prevote";
 
 describe<{
@@ -36,9 +36,5 @@ describe<{
 			prevote.toString(),
 			`{"blockHash":"${prevoteData.blockHash}","blockNumber":1,"round":1,"signature":"${prevoteData.signature}","validatorIndex":0}`,
 		);
-	});
-
-	it("#toData", async () => {
-		assert.equal(prevote.toData(), prevoteData);
 	});
 });

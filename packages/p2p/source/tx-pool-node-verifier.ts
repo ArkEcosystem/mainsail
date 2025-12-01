@@ -1,6 +1,6 @@
+import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 import { http, HttpResponse } from "@mainsail/utils";
 
 const helloWorld = { data: "Hello World from Transaction Pool API!" };
@@ -13,7 +13,7 @@ export class TxPoolNodeVerifier implements Contracts.P2P.TxPoolNodeVerifier {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	public async verify(node: Contracts.P2P.TxPoolNode): Promise<boolean> {
 		if (this.configuration.getRequired<boolean>("skipPeerStateVerification")) {
@@ -21,9 +21,9 @@ export class TxPoolNodeVerifier implements Contracts.P2P.TxPoolNodeVerifier {
 		}
 
 		try {
-			const response = await http.get(node.url, {
+			const response = await http.get<{ data: string }>(node.url, {
 				headers: {},
-				maxContentLength: 1 * Constants.Units.KILOBYTE,
+				maxContentLength: 1 * Units.KILOBYTE,
 				timeout: 5000,
 			});
 
@@ -51,7 +51,7 @@ export class TxPoolNodeVerifier implements Contracts.P2P.TxPoolNodeVerifier {
 		}
 	}
 
-	#verifyResponseBody(response: HttpResponse): void {
+	#verifyResponseBody(response: HttpResponse<{ data: string }>): void {
 		if (response.data.data !== helloWorld.data) {
 			throw new Error("Invalid response body");
 		}

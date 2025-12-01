@@ -1,5 +1,6 @@
 import { Container } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Events, Identifiers } from "@mainsail/constants";
 
 import { describe } from "../../../test-framework/source";
 import { Application } from "../application";

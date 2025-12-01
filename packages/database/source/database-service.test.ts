@@ -1,4 +1,5 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { EvmInstance } from "@mainsail/evm-service/distribution/instances/index.js";
 
 import { DatabaseService } from "../source/database-service";

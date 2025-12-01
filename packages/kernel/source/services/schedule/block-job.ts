@@ -1,5 +1,6 @@
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { performance } from "perf_hooks";
 
 import { Job } from "./interfaces.js";
@@ -8,7 +9,7 @@ import { ExecuteCallbackWhenReady } from "./listeners.js";
 @injectable()
 export class BlockJob implements Job {
 	@inject(Identifiers.Services.EventDispatcher.Service)
-	private readonly events!: Contracts.Kernel.EventDispatcher;
+	private readonly events!: Contracts.Kernel.EventDispatcher<Contracts.Crypto.BlockData>;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;

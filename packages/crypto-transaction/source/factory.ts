@@ -1,5 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import {
 	DuplicateParticipantInMultiSignatureError,
 	InvalidTransactionBytesError,
@@ -150,7 +151,10 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		try {
 			const transaction = await this.deserializer.deserialize(serialized);
 
-			await this.computeCryptoData(transaction.data, strict);
+			const { schemaError } = await this.computeCryptoData(transaction.data, strict);
+			if (schemaError) {
+				throw new TransactionSchemaError(schemaError);
+			}
 
 			return transaction;
 		} catch (error) {

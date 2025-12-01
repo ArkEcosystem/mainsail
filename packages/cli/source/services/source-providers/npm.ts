@@ -1,4 +1,4 @@
-import { Constants } from "@mainsail/contracts";
+import { EnvironmentVariables } from "@mainsail/constants";
 import { createWriteStream } from "fs";
 import { ensureFileSync, removeSync } from "fs-extra/esm";
 import got from "got";
@@ -38,8 +38,7 @@ export class NPM extends AbstractSource {
 	}
 
 	async #getPackage(value: string, version?: string): Promise<{ name: string; tarball: string }> {
-		const registry =
-			process.env[Constants.EnvironmentVariables.MAINSAIL_NPM_REGISTRY] || "https://registry.npmjs.org";
+		const registry = process.env[EnvironmentVariables.MAINSAIL_NPM_REGISTRY] || "https://registry.npmjs.org";
 		const { body } = await got(`${registry}/${value}`);
 
 		const response: {

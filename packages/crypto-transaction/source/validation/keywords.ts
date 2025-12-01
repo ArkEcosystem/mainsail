@@ -1,8 +1,16 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
-import { AnySchemaObject, FuncKeywordDefinition } from "ajv";
+import type { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
-export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
+export const makeKeywords = (
+	configuration: Contracts.Crypto.Configuration,
+): {
+	transactionType: FuncKeywordDefinition;
+	network: FuncKeywordDefinition;
+	transactionGasPrice: FuncKeywordDefinition;
+	transactionGasLimit: FuncKeywordDefinition;
+	bytecode: FuncKeywordDefinition;
+} => {
 	const transactionType: FuncKeywordDefinition = {
 		compile(schema) {
 			return (data) => data === schema;

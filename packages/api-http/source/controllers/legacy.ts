@@ -10,7 +10,7 @@ export class LegacyController extends Controller {
 	@inject(ApiDatabaseIdentifiers.LegacyColdWalletRepositoryFactory)
 	private readonly legacyColdWalletRepositoryFactory!: ApiDatabaseContracts.LegacyColdWalletRepositoryFactory;
 
-	public async coldWallets(request: Hapi.Request) {
+	public async coldWallets(request: Hapi.Request): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 
 		const [wallets, totalCount] = await this.legacyColdWalletRepositoryFactory()

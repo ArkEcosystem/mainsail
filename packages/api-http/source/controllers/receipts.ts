@@ -5,7 +5,7 @@ import {
 	Search,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { ReceiptResource } from "../resources/index.js";
 import { Controller } from "./controller.js";
@@ -15,7 +15,7 @@ export class ReceiptsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
-	public async index(request: Hapi.Request) {
+	public async index(request: Hapi.Request): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.ReceiptCriteria = request.query;
 		const sorting = this.getListingOrder(request);
@@ -48,7 +48,7 @@ export class ReceiptsController extends Controller {
 		return this.toPagination(receipts, ReceiptResource);
 	}
 
-	public async show(request: Hapi.Request) {
+	public async show(request: Hapi.Request): Promise<object> {
 		const receipt = await this.transactionRepositoryFactory()
 			.createQueryBuilder()
 			.select(this.#getReceiptColumns(request.query.fullReceipt))
@@ -58,7 +58,7 @@ export class ReceiptsController extends Controller {
 		return this.respondWithResource(receipt, ReceiptResource);
 	}
 
-	public async contracts(request: Hapi.Request) {
+	public async contracts(request: Hapi.Request): Promise<object> {
 		const criteria: Search.Criteria.ReceiptCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);

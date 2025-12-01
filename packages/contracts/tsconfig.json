@@ -2,7 +2,14 @@
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"rootDir": "source",
-		"outDir": "distribution"
+		"outDir": "distribution",
+		"emitDeclarationOnly": true,
+		"verbatimModuleSyntax": true,
+		"isolatedDeclarations": true,
+		"sourceMap": false,
+		"experimentalDecorators": false,
+		"emitDecoratorMetadata": false,
+		"esModuleInterop": false
 	},
 	"include": ["source/**/**.ts"],
 	"references": [

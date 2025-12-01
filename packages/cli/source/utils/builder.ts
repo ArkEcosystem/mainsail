@@ -1,11 +1,14 @@
 import { Container } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 
-import { AnyObject } from "../contracts.js";
+import type { AnyObject } from "../contracts.js";
 
 export const Builder = {
-	async buildApplication(context?: AnyObject): Promise<Contracts.Kernel.Application> {
+	async buildApplication(context?: {
+		flags: Contracts.Types.JsonObject;
+		plugins: Contracts.Types.JsonObject;
+	}): Promise<Contracts.Kernel.Application> {
 		const app: Contracts.Kernel.Application = new Application(new Container());
 
 		if (context) {
@@ -19,11 +22,15 @@ export const Builder = {
 
 		return app;
 	},
-	buildPeerFlags(flags: AnyObject) {
+	buildPeerFlags(flags: AnyObject): {
+		disableDiscovery: boolean;
+		ignoreMinimumNetworkReach: boolean;
+		skipDiscovery: boolean;
+	} {
 		const config = {
-			disableDiscovery: flags.disableDiscovery,
-			ignoreMinimumNetworkReach: flags.ignoreMinimumNetworkReach,
-			skipDiscovery: flags.skipDiscovery,
+			disableDiscovery: flags.disableDiscovery as boolean,
+			ignoreMinimumNetworkReach: flags.ignoreMinimumNetworkReach as boolean,
+			skipDiscovery: flags.skipDiscovery as boolean,
 		};
 
 		if (flags.launchMode === "seed") {

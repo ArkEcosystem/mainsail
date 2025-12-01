@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { schemas as blockSchemas } from "@mainsail/crypto-block";
 import { Configuration } from "@mainsail/crypto-config";
 import { schemas as consensusSchemas } from "@mainsail/crypto-consensus-bls12-381";
@@ -13,7 +13,7 @@ import {
 	prevoteData,
 	prevoteDataNoBlock,
 	proposalData,
-} from "../test/fixtures/proposal";
+} from "../test/fixtures/index.js";
 import { makeKeywords as makeMessageKeywords } from "./keywords";
 import { schemas } from "./schemas";
 

@@ -5,7 +5,7 @@ import {
 	Models,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import dayjs from "dayjs";
 
 import { Controller } from "./controller.js";
@@ -21,7 +21,7 @@ export class NodeController extends Controller {
 	@inject(ApiDatabaseIdentifiers.PeerRepositoryFactory)
 	private readonly peerRepositoryFactory!: ApiDatabaseContracts.PeerRepositoryFactory;
 
-	public async status(request: Hapi.Request) {
+	public async status(request: Hapi.Request): Promise<object> {
 		const state = await this.getState();
 		const peerBlockNumber = await this.peerRepositoryFactory().getPeerBlockNumberP90();
 		const ownBlockNumber = Number(state?.blockNumber ?? 0);
@@ -36,7 +36,7 @@ export class NodeController extends Controller {
 		};
 	}
 
-	public async syncing(request: Hapi.Request) {
+	public async syncing(request: Hapi.Request): Promise<object> {
 		const state = await this.getState();
 		const peerBlockNumber = await this.peerRepositoryFactory().getPeerBlockNumberP90();
 		const ownBlockNumber = Number(state?.blockNumber ?? 0);
@@ -51,7 +51,7 @@ export class NodeController extends Controller {
 		};
 	}
 
-	public async fees(request: Hapi.Request) {
+	public async fees(request: Hapi.Request): Promise<object> {
 		const configuration = await this.getConfiguration();
 		const cryptoConfiguration = configuration.cryptoConfiguration as Contracts.Crypto.NetworkConfig;
 		const genesisTimestamp = cryptoConfiguration.genesisBlock.block.timestamp;
@@ -70,7 +70,7 @@ export class NodeController extends Controller {
 		return { data: grouped, meta: { days: request.query.days } };
 	}
 
-	public async configuration(request: Hapi.Request) {
+	public async configuration(request: Hapi.Request): Promise<object> {
 		const configuration = await this.getConfiguration();
 		const plugins = await this.getPlugins();
 
@@ -95,7 +95,7 @@ export class NodeController extends Controller {
 		};
 	}
 
-	public async configurationCrypto(request: Hapi.Request) {
+	public async configurationCrypto(request: Hapi.Request): Promise<object> {
 		const configuration = await this.getConfiguration();
 		return {
 			data: configuration?.cryptoConfiguration ?? {},
@@ -108,7 +108,10 @@ export class NodeController extends Controller {
 
 		for (const key of keys) {
 			if (plugins[key] && plugins[key].configuration.enabled) {
-				const { configuration } = plugins[key];
+				const { configuration } = plugins[key] as unknown as {
+					configuration: { port: string; server: { enabled: boolean; port: string } };
+				};
+
 				if (configuration.server && configuration.server.enabled) {
 					result[key] = +configuration.server.port;
 					continue;

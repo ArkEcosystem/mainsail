@@ -1,9 +1,11 @@
 import kleur from "kleur";
 import sinon from "sinon";
-import { Callback, Context, suite, Test } from "uvu";
+import type { Context, Test } from "uvu";
+import { suite } from "uvu";
 import { z as schema } from "zod";
 
 import { assert } from "./assert.js";
+import type { EachCallback } from "./each.js";
 import { each, formatName } from "./each.js";
 import { runHook } from "./hooks.js";
 import { loader } from "./loader.js";
@@ -21,8 +23,11 @@ interface CallbackArguments<T> {
 	beforeAll: (callback_: ContextCallback<T>) => void;
 	beforeEach: (callback_: ContextCallback<T>) => void;
 	clock: (config?: number | Date | { now?: number | Date | undefined }) => sinon.SinonFakeTimers;
+
 	dataset: unknown;
-	each: (name: string, callback: Callback<any>, datasets: unknown[]) => void;
+
+	each: <TDataset>(name: string, callback: EachCallback<TDataset, T>, datasets: TDataset[]) => void;
+
 	it: Test<T>;
 	loader: typeof loader;
 	match: sinon.SinonMatch;
@@ -37,7 +42,6 @@ interface CallbackArguments<T> {
 	stub: (owner: object, method: string) => Stub;
 	stubFn: () => Stub;
 }
-
 type CallbackFunction<T> = (arguments_: CallbackArguments<T>) => void;
 
 const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, dataset?: unknown): void => {
@@ -87,7 +91,7 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 			return result;
 		},
 		dataset,
-		each: each(suite as any),
+		each: each(suite),
 		it: suite,
 		loader,
 		match: sinon.match,
@@ -132,5 +136,5 @@ export const describeEach = <T = Context>(title: string, callback: CallbackFunct
 	}
 };
 
-export const describeSkip = <T = Context>(title: string, callback: CallbackFunction<T>) =>
+export const describeSkip = <T = Context>(title: string, callback: CallbackFunction<T>): void =>
 	console.log(`${kleur.bold(kleur.bgYellow(kleur.black("Ignored test suite")))}: ${kleur.yellow(title)}`);

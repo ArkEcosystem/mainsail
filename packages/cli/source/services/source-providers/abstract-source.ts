@@ -3,7 +3,7 @@ import { execaSync } from "execa";
 import { ensureDirSync, moveSync, readJSONSync, removeSync } from "fs-extra/esm";
 import { join } from "path";
 
-import { Source } from "./contracts.js";
+import type { Source } from "./contracts.js";
 
 export abstract class AbstractSource implements Source {
 	protected readonly dataPath: string;

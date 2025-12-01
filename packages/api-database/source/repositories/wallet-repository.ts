@@ -1,8 +1,8 @@
-import { RepositoryDataSource, WalletRepository, WalletRepositoryExtension } from "../contracts.js";
+import type { RepositoryDataSource, WalletRepository, WalletRepositoryExtension } from "../contracts.js";
 import { Wallet } from "../models/wallet.js";
 import { WalletFilter } from "../search/filters/index.js";
 import { ValidatorFilter } from "../search/filters/validator-filter.js";
-import { Criteria, Options, Pagination, ResultsPage, SortFragment, Sorting } from "../search/types/index.js";
+import type { Criteria, Options, Pagination, ResultsPage, SortFragment, Sorting } from "../search/types/index.js";
 import { makeExtendedRepository } from "./repository-extension.js";
 
 const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting => {

@@ -1,8 +1,9 @@
-import Hapi from "@hapi/hapi";
-import { Contracts } from "@mainsail/contracts";
+import type Hapi from "@hapi/hapi";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { CommitsController } from "../controllers/commits.js";
+import { blockHash } from "../schemas/index.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(CommitsController);
@@ -14,7 +15,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		options: {
 			validate: {
 				params: Joi.object({
-					id: server.app.schemas.blockHash,
+					id: blockHash,
 				}),
 			},
 		},

@@ -1,8 +1,9 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
-export class EthGetBlockTransactionCountByHash implements Contracts.Api.RPC.Action {
+export class EthGetBlockTransactionCountByHash implements Contracts.Api.RPC.Action<[string]> {
 	public readonly name: string = "eth_getBlockTransactionCountByHash";
 
 	@inject(Identifiers.Database.Service)

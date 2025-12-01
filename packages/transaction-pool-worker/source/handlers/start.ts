@@ -1,6 +1,6 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class StartHandler {
@@ -15,17 +15,17 @@ export class StartHandler {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-transaction-pool")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	public async handle(blockNumber: number): Promise<void> {
 		this.store.setBlockNumber(blockNumber);
 		await this.transactionPoolService.reAddTransactions();
 
-		if (this.configuration.get("server.http.enabled")) {
+		if (this.configuration.getRequired<boolean>("server.http.enabled")) {
 			await this.app.get<Contracts.Api.Server>(Identifiers.TransactionPool.API.HTTP).boot();
 		}
 
-		if (this.configuration.get("server.https.enabled")) {
+		if (this.configuration.getRequired<boolean>("server.https.enabled")) {
 			await this.app.get<Contracts.Api.Server>(Identifiers.TransactionPool.API.HTTPS).boot();
 		}
 	}

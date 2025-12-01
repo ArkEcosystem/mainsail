@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 import { parseTransactionError, UsernamesAbi } from "@mainsail/evm-contracts";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
@@ -63,7 +63,7 @@ describe<{
 			abi: UsernamesAbi.abi,
 			eventName: "UsernameRegistered",
 			data: receipt?.logs[0].data as Hex,
-			topics: receipt?.logs[0].topics,
+			topics: receipt?.logs[0].topics ?? [],
 		});
 
 		assert.equal(decoded.args, {
@@ -117,7 +117,7 @@ describe<{
 			abi: UsernamesAbi.abi,
 			eventName: "UsernameResigned",
 			data: receipt?.logs[0].data as Hex,
-			topics: receipt?.logs[0].topics,
+			topics: receipt?.logs[0].topics ?? [],
 		});
 
 		assert.equal(decoded.args, {

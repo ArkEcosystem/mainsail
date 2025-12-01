@@ -1,6 +1,7 @@
 import Hapi from "@hapi/hapi";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
 import { Controller } from "./controller.js";
 
@@ -15,7 +16,7 @@ export class ConsensusController extends Controller {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	public async state(request: Hapi.Request) {
+	public async state(request: Hapi.Request): Promise<object> {
 		const state = this.consensus.getState();
 
 		const roundStates = this.roundStateRepository.getRoundStates();
@@ -58,9 +59,9 @@ export class ConsensusController extends Controller {
 				step: state.step,
 				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
 				lockedRound: state.lockedRound,
-				lockedValue: state.lockedValue ? state.lockedValue.getProposal()?.getData().block.header.hash : null,
+				lockedValue: state.lockedValue ? state.lockedValue.getProposal()?.blockHeader.hash : null,
 				validRound: state.validRound,
-				validValue: state.validValue ? state.validValue.getProposal()?.getData().block.header.hash : null,
+				validValue: state.validValue ? state.validValue.getProposal()?.blockHeader.hash : null,
 				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
 				precommits: collectMessages(precommits.sort((a, b) => b.round - a.round)),
 				prevotes: collectMessages(prevotes.sort((a, b) => b.round - a.round)),
@@ -68,7 +69,7 @@ export class ConsensusController extends Controller {
 					.sort((a, b) => b.round - a.round)
 					.map((p) => ({
 						data: p.toData(),
-						lockProof: p.isDataDeserialized ? p.getData().lockProof : undefined,
+						lockProof: p.lockProof,
 						name: validators[p.validatorIndex].toString(),
 					})),
 

@@ -1,5 +1,5 @@
-import { SpecId } from "../evm/evm.js";
-import { CommitJson } from "./commit.js";
+import type { SpecId } from "../evm/evm.js";
+import type { CommitJson } from "./commit.js";
 
 export type NetworkConfig = {
 	genesisBlock: CommitJson;
@@ -59,7 +59,6 @@ export type MilestoneSnapshot = {
 export type Milestone = {
 	height: number;
 	roundValidators: number;
-	address: Record<string, any>;
 	block: MilestoneBlock;
 	epoch: string;
 	evmSpec: SpecId;
@@ -68,6 +67,7 @@ export type Milestone = {
 	satoshi: MilestoneSatoshi;
 	timeouts: MilestoneTimeouts;
 	snapshot?: MilestoneSnapshot;
+	p2p?: { minimumVersions?: string[] };
 	validatorRegistrationFee: string;
 };
 

@@ -1,16 +1,17 @@
-import { FunctionReturning } from "./internal/index.js";
+import type { FunctionReturning } from "./internal/index.js";
 
-export const reduceObject = <T extends Record<string, any>, V>(
+export const reduceObject = <T extends Record<string, unknown>, V>(
 	iterable: T,
-	iteratee: FunctionReturning,
+	iteratee: FunctionReturning<[V, T[keyof T], keyof T, T], V>,
 	initialValue: V,
 ): V => {
-	const keys: string[] = Object.keys(iterable);
+	const keys = Object.keys(iterable) as (keyof T)[];
 
-	let result: V = initialValue;
+	let result = initialValue;
 
 	for (const key of keys) {
-		result = iteratee(result, iterable[key], key, iterable);
+		const value = iterable[key];
+		result = iteratee(result, value, key, iterable);
 	}
 
 	return result;
