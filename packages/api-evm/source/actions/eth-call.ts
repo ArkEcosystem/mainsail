@@ -70,12 +70,15 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 
 			if (receipt.status === 1) {
 				return `0x${receipt.output?.toString("hex")}`;
+			} else {
+				throw new RpcError("execution reverted", `0x${receipt.output?.toString("hex")}`);
 			}
 		} catch (ex) {
+			if (ex instanceof RpcError) {
+				throw ex;
+			}
 			throw new RpcError(`execution reverted: ${ex.message}`);
 		}
-
-		throw new RpcError("execution reverted");
 	}
 
 	#getGasLimit(data: TxData, milestone: Contracts.Crypto.Milestone): bigint {
