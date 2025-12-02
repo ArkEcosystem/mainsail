@@ -7,7 +7,7 @@ import { zeroAddress } from "viem";
 
 type TxData = {
 	from?: string;
-	to: string;
+	to?: string;
 	data: string;
 	gas?: string;
 	gasPrice?: string;
@@ -42,7 +42,7 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 					to: { $ref: "address" },
 					value: { $ref: "prefixedQuantityHex" },
 				},
-				required: ["to", "data"],
+				required: ["data"],
 				type: "object",
 			},
 			{ $ref: "blockTag" },
