@@ -71,7 +71,8 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 			if (receipt.status === 1) {
 				return `0x${receipt.output?.toString("hex")}`;
 			} else {
-				throw new RpcError("execution reverted", `0x${receipt.output?.toString("hex")}`);
+				const data = receipt.output ? `0x${receipt.output.toString("hex")}` : undefined;
+				throw new RpcError("execution reverted", data);
 			}
 		} catch (ex) {
 			if (ex instanceof RpcError) {
