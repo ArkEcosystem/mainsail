@@ -55,7 +55,7 @@ export class Processor implements Contracts.Api.RPC.Processor {
 			};
 		} catch (error) {
 			if (error instanceof RpcError) {
-				return prepareRcpError(rcpRequest.id, error.code, error.message);
+				return prepareRcpError(rcpRequest.id, error.code, error.message, error.data);
 			}
 
 			return prepareRcpError(rcpRequest.id, Enums.Api.RcpErrorCode.InternalError);

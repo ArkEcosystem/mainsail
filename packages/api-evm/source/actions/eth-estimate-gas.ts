@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 
 type TxData = {
 	from: string;
-	to: string;
+	to?: string;
 	data?: string;
 	gas?: string;
 	gasPrice?: string;
@@ -48,7 +48,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action<[TxData]> 
 					to: { $ref: "address" },
 					value: { $ref: "prefixedQuantityHex" },
 				},
-				required: ["from", "to"],
+				required: ["from"],
 				type: "object",
 			},
 		],
@@ -68,7 +68,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action<[TxData]> 
 
 		// Skip estimation if it's a vanilla transfer and recipient is not a contract
 		if (!data.data || data.data === "0x") {
-			const targetCode = await this.evm.codeAt(data.to);
+			const targetCode = await this.evm.codeAt(data.to ?? "0x0000000000000000000000000000000000000000");
 			if (targetCode === "0x") {
 				return `0x${defaultGas.toString(16)}`;
 			}

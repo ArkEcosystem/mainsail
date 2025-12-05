@@ -7,7 +7,7 @@ import { zeroAddress } from "viem";
 
 type TxData = {
 	from?: string;
-	to: string;
+	to?: string;
 	data: string;
 	gas?: string;
 	gasPrice?: string;
@@ -42,7 +42,7 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 					to: { $ref: "address" },
 					value: { $ref: "prefixedQuantityHex" },
 				},
-				required: ["to", "data"],
+				required: ["data"],
 				type: "object",
 			},
 			{ $ref: "blockTag" },
@@ -70,12 +70,16 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 
 			if (receipt.status === 1) {
 				return `0x${receipt.output?.toString("hex")}`;
+			} else {
+				const data = receipt.output ? `0x${receipt.output.toString("hex")}` : undefined;
+				throw new RpcError("execution reverted", data);
 			}
 		} catch (ex) {
+			if (ex instanceof RpcError) {
+				throw ex;
+			}
 			throw new RpcError(`execution reverted: ${ex.message}`);
 		}
-
-		throw new RpcError("execution reverted");
 	}
 
 	#getGasLimit(data: TxData, milestone: Contracts.Crypto.Milestone): bigint {

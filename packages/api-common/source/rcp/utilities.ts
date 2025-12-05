@@ -29,9 +29,11 @@ export const prepareRcpError = (
 	id: Contracts.Api.RPC.Id,
 	errorCode: Contracts.Api.RPC.ErrorCode,
 	message?: string,
+	data?: string,
 ): Contracts.Api.RPC.Error => ({
 	error: {
 		code: errorCode,
+		data,
 		message: message ?? errorMessageMap[errorCode],
 	},
 	id,
