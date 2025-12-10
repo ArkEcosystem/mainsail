@@ -5,7 +5,6 @@ import { Providers } from "@mainsail/kernel";
 
 import { Deserializer } from "./deserializer.js";
 import { Factory } from "./factory.js";
-import { makeKeywords } from "./keywords.js";
 import { schemas } from "./schemas.js";
 import { Serializer } from "./serializer.js";
 
@@ -20,10 +19,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerValidation(): void {
-		for (const keyword of Object.values(makeKeywords(this.app.get(Identifiers.Cryptography.Configuration)))) {
-			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
-		}
-
 		for (const schema of Object.values(schemas)) {
 			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
 		}
