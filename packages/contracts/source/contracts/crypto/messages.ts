@@ -10,14 +10,8 @@ export interface SignatureMessageData {
 	readonly type: MessageType;
 	readonly blockNumber: number;
 	readonly round: number;
-	readonly blockHash: string;
+	readonly blockHash?: string;
 }
-
-export type HasBlockHash = { blockHash: string };
-export type WithoutBlockHash<T> = Omit<T, "blockHash">;
-export type WithOptionalBlockHash<T extends HasBlockHash> = WithoutBlockHash<T> & Partial<Pick<T, "blockHash">>;
-export type SignaturePrevoteData = WithOptionalBlockHash<SignatureMessageData>;
-export type SignaturePrecommitData = WithOptionalBlockHash<SignatureMessageData>;
 
 export interface ProposalData {
 	readonly blockHeader: BlockHeader;
@@ -62,14 +56,14 @@ export interface MessageData {
 export interface Prevote extends MessageData {
 	readonly serialized: Buffer;
 
-	toSignatureData(): SignaturePrevoteData;
+	toSignatureData(): SignatureMessageData;
 	toString(): string;
 }
 
 export interface Precommit extends MessageData {
 	readonly serialized: Buffer;
 
-	toSignatureData(): SignaturePrecommitData;
+	toSignatureData(): SignatureMessageData;
 	toString(): string;
 }
 
@@ -108,9 +102,9 @@ export interface MessageFactory {
 export interface MessageSerializer {
 	serializeProposal(proposal: SerializableProposalData, options: SerializeProposalOptions): Promise<Buffer>;
 	serializePrevote(prevote: MessageData): Promise<Buffer>;
-	serializePrevoteForSignature(prevote: SignaturePrevoteData): Promise<Buffer>;
+	serializePrevoteForSignature(prevote: SignatureMessageData): Promise<Buffer>;
 	serializePrecommit(precommit: MessageData): Promise<Buffer>;
-	serializePrecommitForSignature(precommit: SignaturePrecommitData): Promise<Buffer>;
+	serializePrecommitForSignature(precommit: SignatureMessageData): Promise<Buffer>;
 	serializeProposed(proposedBlock: ProposedBlockSerializable): Promise<Buffer>;
 	serializeLockProof(proof: AggregatedSignature): Promise<Buffer>;
 

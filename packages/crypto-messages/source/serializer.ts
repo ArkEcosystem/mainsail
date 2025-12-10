@@ -96,8 +96,8 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 		});
 	}
 
-	public async serializePrecommitForSignature(precommit: Contracts.Crypto.SignaturePrecommitData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.SignaturePrecommitData>(precommit, {
+	public async serializePrecommitForSignature(precommit: Contracts.Crypto.SignatureMessageData): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.SignatureMessageData>(precommit, {
 			length:
 				1 + // type
 				4 + // blockNumber
@@ -123,8 +123,8 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 		});
 	}
 
-	public async serializePrevoteForSignature(prevote: Contracts.Crypto.SignaturePrevoteData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.SignaturePrevoteData>(prevote, {
+	public async serializePrevoteForSignature(prevote: Contracts.Crypto.SignatureMessageData): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.SignatureMessageData>(prevote, {
 			length:
 				1 + // type
 				4 + // blockNumber

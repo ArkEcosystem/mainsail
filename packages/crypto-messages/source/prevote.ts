@@ -63,7 +63,7 @@ export class Prevote implements Contracts.Crypto.Prevote {
 		});
 	}
 
-	toSignatureData(): Contracts.Crypto.SignaturePrevoteData {
+	toSignatureData(): Contracts.Crypto.SignatureMessageData {
 		return {
 			blockHash: this.#blockHash,
 			blockNumber: this.#blockNumber,

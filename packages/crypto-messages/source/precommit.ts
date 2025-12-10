@@ -63,7 +63,7 @@ export class Precommit implements Contracts.Crypto.Precommit {
 		});
 	}
 
-	toSignatureData(): Contracts.Crypto.SignaturePrecommitData {
+	toSignatureData(): Contracts.Crypto.SignatureMessageData {
 		return {
 			blockHash: this.#blockHash,
 			blockNumber: this.#blockNumber,
