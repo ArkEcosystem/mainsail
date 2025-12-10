@@ -107,7 +107,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	}
 
 	public async makePrevoteFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Message> {
-		const data = await this.deserializer.deserializePrevote(bytes);
+		const data = await this.deserializer.deserializeMessage(bytes);
 		return this.makePrevoteFromData(data, bytes);
 	}
 
@@ -143,7 +143,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	}
 
 	public async makePrecommitFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Message> {
-		const data = await this.deserializer.deserializePrecommit(bytes);
+		const data = await this.deserializer.deserializeMessage(bytes);
 		return this.makePrecommitFromData(data, bytes);
 	}
 

@@ -41,7 +41,7 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 		return proposal;
 	}
 
-	public async deserializePrecommit(serialized: Buffer): Promise<Contracts.Crypto.MessageData> {
+	public async deserializeMessage(serialized: Buffer): Promise<Contracts.Crypto.MessageData> {
 		const precommit = {} as Contracts.Crypto.MessageData;
 
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
@@ -71,38 +71,6 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 		});
 
 		return precommit;
-	}
-
-	public async deserializePrevote(serialized: Buffer): Promise<Contracts.Crypto.MessageData> {
-		const prevote = {} as Contracts.Crypto.MessageData;
-
-		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
-
-		await this.serializer.deserialize<Contracts.Crypto.MessageData>(buffer, prevote, {
-			schema: {
-				type: {
-					type: "uint8",
-				},
-				blockNumber: {
-					type: "uint32",
-				},
-				round: {
-					type: "uint32",
-				},
-				blockHash: {
-					type: "blockHash",
-					optional: true,
-				},
-				validatorIndex: {
-					type: "uint8",
-				},
-				signature: {
-					type: "consensusSignature",
-				},
-			},
-		});
-
-		return prevote;
 	}
 
 	public async deserializeLockProof(serialized: Buffer): Promise<Contracts.Crypto.AggregatedSignature> {

@@ -69,8 +69,7 @@ export interface MessageSerializer {
 
 export interface MessageDeserializer {
 	deserializeProposal(serialized: Buffer): Promise<ProposalData>;
-	deserializePrevote(serialized: Buffer): Promise<MessageData>;
-	deserializePrecommit(serialized: Buffer): Promise<MessageData>;
+	deserializeMessage(serialized: Buffer): Promise<MessageData>;
 	deserializeLockProof(serialized: Buffer): Promise<AggregatedSignature>;
 }
 
