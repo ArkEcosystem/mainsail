@@ -1,4 +1,5 @@
 import type { Block, BlockHeader } from "./block.js";
+import type { KeyPair } from "./identities.js";
 import type { AggregatedSignature } from "./signatures.js";
 
 export interface ProposalData {
@@ -38,4 +39,33 @@ export interface Proposal extends Omit<ProposalData, "data"> {
 	toSerializableData(): SerializableProposalData;
 	toData(): ProposalData;
 	toString(): string;
+}
+
+export type HasSignature = { signature: string };
+export type WithoutSignature<T> = Omit<T, "signature">;
+export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
+export type MakeProposalData = WithoutSignature<SerializableProposalData>;
+
+export interface ProposalFactory {
+	makeProposal(data: MakeProposalData, keyPair: KeyPair): Promise<Proposal>;
+	makeProposalFromBytes(data: Buffer): Promise<Proposal>;
+	makeProposalFromData(data: ProposalData): Promise<Proposal>;
+	makeProposedDataFromBytes(data: Buffer): Promise<ProposedData>;
+}
+
+export interface SerializeProposalOptions {
+	includeSignature?: boolean;
+}
+
+export interface ProposalSerializer {
+	serializeProposal(proposal: SerializableProposalData, options: SerializeProposalOptions): Promise<Buffer>;
+	serializeProposed(proposedBlock: ProposedBlockSerializable): Promise<Buffer>;
+	serializeLockProof(proof: AggregatedSignature): Promise<Buffer>;
+
+	lockProofSize(): number;
+}
+
+export interface ProposalDeserializer {
+	deserializeProposal(serialized: Buffer): Promise<ProposalData>;
+	deserializeLockProof(serialized: Buffer): Promise<AggregatedSignature>;
 }
