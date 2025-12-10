@@ -90,7 +90,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	}
 
 	public async makePrevote(
-		data: Contracts.Crypto.MakePrevoteData,
+		data: Contracts.Crypto.MakeMessageData,
 		keyPair: Contracts.Crypto.KeyPair,
 	): Promise<Contracts.Crypto.Message> {
 		const worker = await this.workerPool.getWorker();
@@ -125,7 +125,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	}
 
 	public async makePrecommit(
-		data: Contracts.Crypto.MakePrecommitData,
+		data: Contracts.Crypto.MakeMessageData,
 		keyPair: Contracts.Crypto.KeyPair,
 	): Promise<Contracts.Crypto.Message> {
 		const worker = await this.workerPool.getWorker();

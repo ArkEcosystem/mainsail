@@ -40,18 +40,17 @@ export type HasSignature = { signature: string };
 export type WithoutSignature<T> = Omit<T, "signature">;
 export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
 export type MakeProposalData = WithoutSignature<SerializableProposalData>;
-export type MakePrevoteData = WithoutSignature<MessageData>;
-export type MakePrecommitData = WithoutSignature<MessageData>;
+export type MakeMessageData = WithoutSignature<MessageData>;
 
 export interface MessageFactory {
 	makeProposal(data: MakeProposalData, keyPair: KeyPair): Promise<Proposal>;
 	makeProposalFromBytes(data: Buffer): Promise<Proposal>;
 	makeProposalFromData(data: ProposalData): Promise<Proposal>;
 	makeProposedDataFromBytes(data: Buffer): Promise<ProposedData>;
-	makePrevote(data: MakePrevoteData, keyPair: KeyPair): Promise<Message>;
+	makePrevote(data: MakeMessageData, keyPair: KeyPair): Promise<Message>;
 	makePrevoteFromBytes(data: Buffer): Promise<Message>;
 	makePrevoteFromData(data: MessageData): Promise<Message>;
-	makePrecommit(data: MakePrecommitData, keyPair: KeyPair): Promise<Message>;
+	makePrecommit(data: MakeMessageData, keyPair: KeyPair): Promise<Message>;
 	makePrecommitFromBytes(data: Buffer): Promise<Message>;
 	makePrecommitFromData(data: MessageData): Promise<Message>;
 }
