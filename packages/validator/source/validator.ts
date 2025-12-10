@@ -106,7 +106,7 @@ export class Validator implements Contracts.Validator.Validator {
 		round: number,
 		blockHash: string | undefined,
 	): Promise<Contracts.Crypto.Message> {
-		return this.messagesFactory.makePrevote(
+		return this.messagesFactory.makeMessage(
 			{
 				blockHash,
 				blockNumber,
@@ -124,7 +124,7 @@ export class Validator implements Contracts.Validator.Validator {
 		round: number,
 		blockHash: string | undefined,
 	): Promise<Contracts.Crypto.Message> {
-		return this.messagesFactory.makePrecommit(
+		return this.messagesFactory.makeMessage(
 			{
 				blockHash,
 				blockNumber,

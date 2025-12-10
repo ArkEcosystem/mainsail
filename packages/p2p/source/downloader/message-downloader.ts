@@ -310,7 +310,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			let firstPrevote: Contracts.Crypto.Message | undefined;
 			const prevotes: Map<number, Contracts.Crypto.Message> = new Map();
 			for (const buffer of result.prevotes) {
-				const prevote = await this.factory.makePrevoteFromBytes(buffer);
+				const prevote = await this.factory.makeMessageFromBytes(buffer);
 				prevotes.set(prevote.validatorIndex, prevote);
 
 				if (firstPrevote === undefined) {
@@ -328,7 +328,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			let firstPrecommit: Contracts.Crypto.Message | undefined;
 			const precommits: Map<number, Contracts.Crypto.Message> = new Map();
 			for (const buffer of result.precommits) {
-				const precommit = await this.factory.makePrecommitFromBytes(buffer);
+				const precommit = await this.factory.makeMessageFromBytes(buffer);
 				precommits.set(precommit.validatorIndex, precommit);
 
 				if (firstPrecommit === undefined) {

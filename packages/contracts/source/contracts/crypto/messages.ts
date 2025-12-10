@@ -47,12 +47,9 @@ export interface MessageFactory {
 	makeProposalFromBytes(data: Buffer): Promise<Proposal>;
 	makeProposalFromData(data: ProposalData): Promise<Proposal>;
 	makeProposedDataFromBytes(data: Buffer): Promise<ProposedData>;
-	makePrevote(data: MakeMessageData, keyPair: KeyPair): Promise<Message>;
-	makePrevoteFromBytes(data: Buffer): Promise<Message>;
-	makePrevoteFromData(data: MessageData): Promise<Message>;
-	makePrecommit(data: MakeMessageData, keyPair: KeyPair): Promise<Message>;
-	makePrecommitFromBytes(data: Buffer): Promise<Message>;
-	makePrecommitFromData(data: MessageData): Promise<Message>;
+	makeMessage(data: MakeMessageData, keyPair: KeyPair): Promise<Message>;
+	makeMessageFromBytes(data: Buffer): Promise<Message>;
+	makeMessageFromData(data: MessageData): Promise<Message>;
 }
 
 export interface MessageSerializer {

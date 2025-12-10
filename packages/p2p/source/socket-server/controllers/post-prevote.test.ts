@@ -12,7 +12,7 @@ describe<{
 	};
 
 	const factory = {
-		makePrevoteFromBytes: () => {},
+		makeMessageFromBytes: () => {},
 	};
 
 	const state = {

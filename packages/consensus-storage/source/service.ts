@@ -108,14 +108,14 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	public async getPrevotes(): Promise<Contracts.Crypto.Message[]> {
 		const prevotes = [...this.prevoteStorage.getRange().map((item) => item.value)];
 		return Promise.all(
-			prevotes.map((prevote) => this.messageFactory.makePrevoteFromBytes(Buffer.from(prevote, "hex"))),
+			prevotes.map((prevote) => this.messageFactory.makeMessageFromBytes(Buffer.from(prevote, "hex"))),
 		);
 	}
 
 	public async getPrecommits(): Promise<Contracts.Crypto.Message[]> {
 		const precommits = [...this.precommitStorage.getRange().map((item) => item.value)];
 		return Promise.all(
-			precommits.map((precommit) => this.messageFactory.makePrecommitFromBytes(Buffer.from(precommit, "hex"))),
+			precommits.map((precommit) => this.messageFactory.makeMessageFromBytes(Buffer.from(precommit, "hex"))),
 		);
 	}
 

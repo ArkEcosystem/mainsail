@@ -24,7 +24,7 @@ export class PostPrecommitController implements Contracts.P2P.Controller {
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.PostPrecommitResponse> {
 		try {
-			const precommit = await this.factory.makePrecommitFromBytes(request.payload.precommit);
+			const precommit = await this.factory.makeMessageFromBytes(request.payload.precommit);
 			const result = await this.precommitProcessor.process(precommit);
 
 			if (result === Enums.Consensus.ProcessorResult.Invalid) {
