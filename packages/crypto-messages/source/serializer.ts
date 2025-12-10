@@ -61,8 +61,8 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 		});
 	}
 
-	public async serializePrecommit(precommit: Contracts.Crypto.PrecommitData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.PrecommitData>(precommit, {
+	public async serializePrecommit(precommit: Contracts.Crypto.MessageData): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.MessageData>(precommit, {
 			length:
 				1 + // type
 				4 + // blockNumber

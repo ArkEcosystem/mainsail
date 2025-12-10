@@ -148,7 +148,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	}
 
 	public async makePrecommitFromData(
-		data: Contracts.Crypto.PrecommitData,
+		data: Contracts.Crypto.MessageData,
 		serialized?: Buffer,
 	): Promise<Contracts.Crypto.Precommit> {
 		this.#applySchema("precommit", data);

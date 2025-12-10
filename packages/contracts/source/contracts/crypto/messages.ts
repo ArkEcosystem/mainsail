@@ -66,16 +66,7 @@ export interface Prevote extends MessageData {
 	toString(): string;
 }
 
-export interface PrecommitData {
-	readonly type: MessageType;
-	readonly blockNumber: number;
-	readonly round: number;
-	readonly blockHash?: string;
-	readonly validatorIndex: number;
-	readonly signature: string;
-}
-
-export interface Precommit extends PrecommitData {
+export interface Precommit extends MessageData {
 	readonly serialized: Buffer;
 
 	toSignatureData(): SignaturePrecommitData;
@@ -99,7 +90,7 @@ export type WithoutSignature<T> = Omit<T, "signature">;
 export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
 export type MakeProposalData = WithoutSignature<SerializableProposalData>;
 export type MakePrevoteData = WithoutSignature<MessageData>;
-export type MakePrecommitData = WithoutSignature<PrecommitData>;
+export type MakePrecommitData = WithoutSignature<MessageData>;
 
 export interface MessageFactory {
 	makeProposal(data: MakeProposalData, keyPair: KeyPair): Promise<Proposal>;
@@ -111,14 +102,14 @@ export interface MessageFactory {
 	makePrevoteFromData(data: MessageData): Promise<Prevote>;
 	makePrecommit(data: MakePrecommitData, keyPair: KeyPair): Promise<Precommit>;
 	makePrecommitFromBytes(data: Buffer): Promise<Precommit>;
-	makePrecommitFromData(data: PrecommitData): Promise<Precommit>;
+	makePrecommitFromData(data: MessageData): Promise<Precommit>;
 }
 
 export interface MessageSerializer {
 	serializeProposal(proposal: SerializableProposalData, options: SerializeProposalOptions): Promise<Buffer>;
 	serializePrevote(prevote: MessageData): Promise<Buffer>;
 	serializePrevoteForSignature(prevote: SignaturePrevoteData): Promise<Buffer>;
-	serializePrecommit(precommit: PrecommitData): Promise<Buffer>;
+	serializePrecommit(precommit: MessageData): Promise<Buffer>;
 	serializePrecommitForSignature(precommit: SignaturePrecommitData): Promise<Buffer>;
 	serializeProposed(proposedBlock: ProposedBlockSerializable): Promise<Buffer>;
 	serializeLockProof(proof: AggregatedSignature): Promise<Buffer>;
@@ -129,7 +120,7 @@ export interface MessageSerializer {
 export interface MessageDeserializer {
 	deserializeProposal(serialized: Buffer): Promise<ProposalData>;
 	deserializePrevote(serialized: Buffer): Promise<MessageData>;
-	deserializePrecommit(serialized: Buffer): Promise<PrecommitData>;
+	deserializePrecommit(serialized: Buffer): Promise<MessageData>;
 	deserializeLockProof(serialized: Buffer): Promise<AggregatedSignature>;
 }
 

@@ -16,7 +16,7 @@ export class Precommit implements Contracts.Crypto.Precommit {
 		validatorIndex,
 		signature,
 		serialized,
-	}: Contracts.Crypto.PrecommitData & { serialized: Buffer }) {
+	}: Contracts.Crypto.MessageData & { serialized: Buffer }) {
 		this.#blockNumber = blockNumber;
 		this.#round = round;
 		this.#blockHash = blockHash;
