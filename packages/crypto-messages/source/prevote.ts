@@ -16,7 +16,7 @@ export class Prevote implements Contracts.Crypto.Prevote {
 		validatorIndex,
 		signature,
 		serialized,
-	}: Contracts.Crypto.PrevoteData & { serialized: Buffer }) {
+	}: Contracts.Crypto.MessageData & { serialized: Buffer }) {
 		this.#blockNumber = blockNumber;
 		this.#round = round;
 		this.#blockHash = blockHash;

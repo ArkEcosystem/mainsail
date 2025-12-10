@@ -150,8 +150,8 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 		});
 	}
 
-	public async serializePrevote(prevote: Contracts.Crypto.PrevoteData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.PrevoteData>(prevote, {
+	public async serializePrevote(prevote: Contracts.Crypto.MessageData): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.MessageData>(prevote, {
 			length:
 				1 + // type
 				4 + // blockNumber

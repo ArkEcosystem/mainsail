@@ -112,7 +112,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	}
 
 	public async makePrevoteFromData(
-		data: Contracts.Crypto.PrevoteData,
+		data: Contracts.Crypto.MessageData,
 		serialized?: Buffer,
 	): Promise<Contracts.Crypto.Prevote> {
 		this.#applySchema("prevote", data);

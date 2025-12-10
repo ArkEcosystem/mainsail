@@ -73,12 +73,12 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 		return precommit;
 	}
 
-	public async deserializePrevote(serialized: Buffer): Promise<Contracts.Crypto.PrevoteData> {
-		const prevote = {} as Contracts.Crypto.PrevoteData;
+	public async deserializePrevote(serialized: Buffer): Promise<Contracts.Crypto.MessageData> {
+		const prevote = {} as Contracts.Crypto.MessageData;
 
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		await this.serializer.deserialize<Contracts.Crypto.PrevoteData>(buffer, prevote, {
+		await this.serializer.deserialize<Contracts.Crypto.MessageData>(buffer, prevote, {
 			schema: {
 				type: {
 					type: "uint8",
