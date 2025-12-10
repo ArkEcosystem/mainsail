@@ -29,7 +29,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	#proposal?: Contracts.Crypto.Proposal;
 	#processorResult?: Contracts.Processor.BlockProcessorResult;
 	#accountUpdates: Array<Contracts.Evm.AccountUpdate> = [];
-	#prevotes = new Map<number, Contracts.Crypto.Prevote>();
+	#prevotes = new Map<number, Contracts.Crypto.Message>();
 	#prevotesCount = new Map<string | undefined, number>();
 	#precommits = new Map<number, Contracts.Crypto.Precommit>();
 	#precommitsCount = new Map<string | undefined, number>();
@@ -166,7 +166,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#prevotes.has(validatorIndex);
 	}
 
-	public addPrevote(prevote: Contracts.Crypto.Prevote): void {
+	public addPrevote(prevote: Contracts.Crypto.Message): void {
 		if (this.#prevotes.has(prevote.validatorIndex)) {
 			throw new Error("Prevote already exists.");
 		}
@@ -222,11 +222,11 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#hasMinorityPrevotes() || this.#hasMinorityPrecommits();
 	}
 
-	public getPrevote(validatorIndex: number): Contracts.Crypto.Prevote | undefined {
+	public getPrevote(validatorIndex: number): Contracts.Crypto.Message | undefined {
 		return this.#prevotes.get(validatorIndex);
 	}
 
-	public getPrevotes(): Contracts.Crypto.Prevote[] {
+	public getPrevotes(): Contracts.Crypto.Message[] {
 		return [...this.#prevotes.values()];
 	}
 

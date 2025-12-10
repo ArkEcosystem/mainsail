@@ -1,4 +1,4 @@
-import type { Commit, Precommit, Prevote, Proposal } from "../crypto/index.js";
+import type { Commit, Precommit, Message, Proposal } from "../crypto/index.js";
 import type { ProcessorResult } from "./enums.js";
 
 export interface ProposalProcessor {
@@ -7,7 +7,7 @@ export interface ProposalProcessor {
 }
 
 export interface PrevoteProcessor {
-	process(prevote: Prevote, broadcast?: boolean): Promise<ProcessorResult>;
+	process(prevote: Message, broadcast?: boolean): Promise<ProcessorResult>;
 }
 
 export interface PrecommitProcessor {

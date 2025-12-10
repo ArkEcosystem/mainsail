@@ -29,7 +29,7 @@ export interface MessageData {
 	readonly signature: string;
 }
 
-export interface Prevote extends MessageData {
+export interface Message extends MessageData {
 	readonly serialized: Buffer;
 
 	toSignatureData(): SignatureMessageData;
@@ -55,9 +55,9 @@ export interface MessageFactory {
 	makeProposalFromBytes(data: Buffer): Promise<Proposal>;
 	makeProposalFromData(data: ProposalData): Promise<Proposal>;
 	makeProposedDataFromBytes(data: Buffer): Promise<ProposedData>;
-	makePrevote(data: MakePrevoteData, keyPair: KeyPair): Promise<Prevote>;
-	makePrevoteFromBytes(data: Buffer): Promise<Prevote>;
-	makePrevoteFromData(data: MessageData): Promise<Prevote>;
+	makePrevote(data: MakePrevoteData, keyPair: KeyPair): Promise<Message>;
+	makePrevoteFromBytes(data: Buffer): Promise<Message>;
+	makePrevoteFromData(data: MessageData): Promise<Message>;
 	makePrecommit(data: MakePrecommitData, keyPair: KeyPair): Promise<Precommit>;
 	makePrecommitFromBytes(data: Buffer): Promise<Precommit>;
 	makePrecommitFromData(data: MessageData): Promise<Precommit>;

@@ -29,7 +29,7 @@ export class ConsensusController extends Controller {
 
 		const validators = this.validatorSet.getRoundValidators();
 
-		const collectMessages = (messages: ReadonlyArray<Contracts.Crypto.Prevote | Contracts.Crypto.Precommit>) => {
+		const collectMessages = (messages: ReadonlyArray<Contracts.Crypto.Message | Contracts.Crypto.Precommit>) => {
 			const collected = {
 				absent: validators,
 			};

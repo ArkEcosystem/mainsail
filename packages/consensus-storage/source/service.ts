@@ -52,7 +52,7 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	}: {
 		state: Contracts.Consensus.State;
 		proposals: Contracts.Crypto.Proposal[];
-		prevotes: Contracts.Crypto.Prevote[];
+		prevotes: Contracts.Crypto.Message[];
 		precommits: Contracts.Crypto.Precommit[];
 	}): Promise<void> {
 		// always overwrite existing state; we only care about state for uncommitted blocks
@@ -105,7 +105,7 @@ export class Service implements Contracts.ConsensusStorage.Service {
 		);
 	}
 
-	public async getPrevotes(): Promise<Contracts.Crypto.Prevote[]> {
+	public async getPrevotes(): Promise<Contracts.Crypto.Message[]> {
 		const prevotes = [...this.prevoteStorage.getRange().map((item) => item.value)];
 		return Promise.all(
 			prevotes.map((prevote) => this.messageFactory.makePrevoteFromBytes(Buffer.from(prevote, "hex"))),

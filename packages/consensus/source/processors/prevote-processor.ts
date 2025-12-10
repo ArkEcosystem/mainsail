@@ -33,7 +33,7 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 
 	#pendingPrevotes: Map<string, ((value: SignatureCheckResult) => void)[]> = new Map();
 
-	async process(prevote: Contracts.Crypto.Prevote, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
+	async process(prevote: Contracts.Crypto.Message, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.hasValidBlockNumberOrRound(prevote)) {
 				return Enums.Consensus.ProcessorResult.Skipped;
@@ -78,7 +78,7 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 		});
 	}
 
-	async #signatureCheck(prevote: Contracts.Crypto.Prevote): Promise<SignatureCheckResult> {
+	async #signatureCheck(prevote: Contracts.Crypto.Message): Promise<SignatureCheckResult> {
 		const serializedHex = prevote.serialized.toString("hex");
 		if (this.#pendingPrevotes.has(serializedHex)) {
 			return new Promise((resolve) => {
@@ -99,7 +99,7 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 		return hasValidSignature ? SignatureCheckResult.Accepted : SignatureCheckResult.Invalid;
 	}
 
-	async #hasValidSignature(prevote: Contracts.Crypto.Prevote): Promise<boolean> {
+	async #hasValidSignature(prevote: Contracts.Crypto.Message): Promise<boolean> {
 		const worker = await this.workerPool.getWorker();
 		return worker.consensusSignature(
 			"verify",

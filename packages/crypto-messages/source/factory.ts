@@ -92,7 +92,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	public async makePrevote(
 		data: Contracts.Crypto.MakePrevoteData,
 		keyPair: Contracts.Crypto.KeyPair,
-	): Promise<Contracts.Crypto.Prevote> {
+	): Promise<Contracts.Crypto.Message> {
 		const worker = await this.workerPool.getWorker();
 
 		const bytes = await this.serializer.serializePrevoteForSignature({
@@ -114,7 +114,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	public async makePrevoteFromData(
 		data: Contracts.Crypto.MessageData,
 		serialized?: Buffer,
-	): Promise<Contracts.Crypto.Prevote> {
+	): Promise<Contracts.Crypto.Message> {
 		this.#applySchema("prevote", data);
 
 		if (!serialized) {

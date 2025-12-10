@@ -80,7 +80,7 @@ export const makePrevote = async (
 	blockNumber: number,
 	round: number,
 	blockHash?: string,
-): Promise<Contracts.Crypto.Prevote> => {
+): Promise<Contracts.Crypto.Message> => {
 	const proposer = node.app
 		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
 		.getValidator(validator.consensusPublicKey);
