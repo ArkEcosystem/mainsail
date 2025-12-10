@@ -4,19 +4,17 @@ import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { Deserializer } from "./deserializer.js";
-import { MessageFactory } from "./factory.js";
+import { Factory } from "./factory.js";
 import { makeKeywords } from "./keywords.js";
 import { schemas } from "./schemas.js";
 import { Serializer } from "./serializer.js";
-
-export { Proposal } from "./proposal.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Cryptography.Message.Serializer).to(Serializer).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Message.Deserializer).to(Deserializer).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Message.Factory).to(MessageFactory).inSingletonScope();
+		this.app.bind(Identifiers.Cryptography.Message.Factory).to(Factory).inSingletonScope();
 
 		this.#registerValidation();
 	}
