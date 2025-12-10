@@ -1,7 +1,14 @@
 import type { Enums } from "@mainsail/constants";
 
-import type { Block, BlockHeader } from "./block.js";
 import type { KeyPair } from "./identities.js";
+import type {
+	Proposal,
+	ProposalData,
+	ProposedBlockSerializable,
+	ProposedData,
+	SerializableProposalData,
+	SerializeProposalOptions,
+} from "./proposal.js";
 import type { AggregatedSignature } from "./signatures.js";
 
 export type MessageType = Enums.Crypto.MessageType;
@@ -11,37 +18,6 @@ export interface SignatureMessageData {
 	readonly blockNumber: number;
 	readonly round: number;
 	readonly blockHash?: string;
-}
-
-export interface ProposalData {
-	readonly blockHeader: BlockHeader;
-	readonly lockProof?: AggregatedSignature;
-	readonly round: number;
-	readonly data: { serialized: string };
-	readonly validatorIndex: number;
-	readonly validRound?: number;
-	readonly signature: string;
-}
-
-export interface SerializableProposalData {
-	readonly round: number;
-	readonly validRound?: number;
-	readonly data: { serialized: string };
-	readonly validatorIndex: number;
-	readonly signature?: string;
-}
-
-export interface Proposal extends Omit<ProposalData, "data"> {
-	isDataDeserialized: boolean;
-
-	readonly serialized: Buffer;
-
-	deserializeData(): Promise<void>;
-	getData(): ProposedData;
-
-	toSerializableData(): SerializableProposalData;
-	toData(): ProposalData;
-	toString(): string;
 }
 
 export interface MessageData {
@@ -65,18 +41,6 @@ export interface Precommit extends MessageData {
 
 	toSignatureData(): SignatureMessageData;
 	toString(): string;
-}
-
-export interface ProposedData {
-	readonly block: Block;
-	readonly lockProof?: AggregatedSignature;
-	readonly serialized: string;
-}
-
-export type ProposedBlockSerializable = Omit<ProposedData, "serialized">;
-
-export interface SerializeProposalOptions {
-	includeSignature?: boolean;
 }
 
 export type HasSignature = { signature: string };
