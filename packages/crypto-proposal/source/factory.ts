@@ -11,11 +11,11 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Cryptography.Message.Serializer)
-	private readonly serializer!: Contracts.Crypto.MessageSerializer;
+	@inject(Identifiers.Cryptography.Proposal.Serializer)
+	private readonly serializer!: Contracts.Crypto.ProposalSerializer;
 
-	@inject(Identifiers.Cryptography.Message.Deserializer)
-	private readonly deserializer!: Contracts.Crypto.MessageDeserializer;
+	@inject(Identifiers.Cryptography.Proposal.Deserializer)
+	private readonly deserializer!: Contracts.Crypto.ProposalDeserializer;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;

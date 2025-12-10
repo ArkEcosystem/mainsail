@@ -47,7 +47,7 @@ export class Deserializer implements Contracts.Crypto.ProposalDeserializer {
 		const commit = {} as Contracts.Crypto.AggregatedSignature;
 
 		await this.serializer.deserialize<Contracts.Crypto.AggregatedSignature>(buffer, commit, {
-			length: this.proposalSerializer.lockProofSize(),
+			length: this.proposalSerializer.lockProofSize(), // TODO: remove from serializer
 			schema: {
 				signature: {
 					type: "consensusSignature",

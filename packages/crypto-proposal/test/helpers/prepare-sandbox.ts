@@ -18,7 +18,7 @@ import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
 import { Sandbox } from "../../../test-framework/source/index.js";
 import { Deserializer } from "../../source/deserializer.js";
-import { MessageFactory } from "../../source/factory.js";
+import { Factory } from "../../source/factory.js";
 import { makeKeywords } from "../../source/keywords.js";
 import { schemas } from "../../source/schemas.js";
 import { Serializer } from "../../source/serializer.js";
@@ -47,9 +47,9 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }): Promise<vo
 	await context.sandbox.app.resolve(CoreCryptoValidation).register();
 	await context.sandbox.app.resolve(CryptoBlock).register();
 
-	context.sandbox.app.bind(Identifiers.Cryptography.Message.Serializer).to(Serializer);
-	context.sandbox.app.bind(Identifiers.Cryptography.Message.Deserializer).to(Deserializer);
-	context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).to(MessageFactory).inSingletonScope();
+	context.sandbox.app.bind(Identifiers.Cryptography.Proposal.Serializer).to(Serializer);
+	context.sandbox.app.bind(Identifiers.Cryptography.Proposal.Deserializer).to(Deserializer);
+	context.sandbox.app.bind(Identifiers.Cryptography.Proposal.Factory).to(Factory).inSingletonScope();
 
 	for (const keyword of Object.values(
 		makeKeywords(context.sandbox.app.get(Identifiers.Cryptography.Configuration)),

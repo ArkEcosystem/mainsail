@@ -4,7 +4,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Proposal implements Contracts.Crypto.Proposal {
-	@inject(Identifiers.Cryptography.Message.Factory)
+	@inject(Identifiers.Cryptography.Proposal.Factory)
 	private readonly messageFactory!: Contracts.Crypto.MessageFactory;
 
 	#blockHeader!: Contracts.Crypto.BlockHeader;
