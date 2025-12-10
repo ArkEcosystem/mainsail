@@ -101,7 +101,7 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 		return worker.consensusSignature(
 			"verify",
 			Buffer.from(precommit.signature, "hex"),
-			await this.serializer.serializePrecommitForSignature(precommit),
+			await this.serializer.serializeMessageForSignature(precommit),
 			Buffer.from(this.validatorSet.getValidator(precommit.validatorIndex).blsPublicKey, "hex"),
 		);
 	}

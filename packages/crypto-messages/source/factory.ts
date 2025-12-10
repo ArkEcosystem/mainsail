@@ -95,14 +95,14 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	): Promise<Contracts.Crypto.Message> {
 		const worker = await this.workerPool.getWorker();
 
-		const bytes = await this.serializer.serializePrevoteForSignature({
+		const bytes = await this.serializer.serializeMessageForSignature({
 			blockHash: data.blockHash,
 			blockNumber: data.blockNumber,
 			round: data.round,
 			type: data.type,
 		});
 		const signature = await worker.consensusSignature("sign", bytes, Buffer.from(keyPair.privateKey, "hex"));
-		const serialized = await this.serializer.serializePrevote({ ...data, signature });
+		const serialized = await this.serializer.serializeMessage({ ...data, signature });
 		return this.makePrevoteFromBytes(serialized);
 	}
 
@@ -118,7 +118,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		this.#applySchema("prevote", data);
 
 		if (!serialized) {
-			serialized = await this.serializer.serializePrevote(data);
+			serialized = await this.serializer.serializeMessage(data);
 		}
 
 		return new Prevote({ ...data, serialized });
@@ -130,7 +130,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	): Promise<Contracts.Crypto.Message> {
 		const worker = await this.workerPool.getWorker();
 
-		const bytes = await this.serializer.serializePrecommitForSignature({
+		const bytes = await this.serializer.serializeMessageForSignature({
 			blockHash: data.blockHash,
 			blockNumber: data.blockNumber,
 			round: data.round,
@@ -138,7 +138,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		});
 		const signature = await worker.consensusSignature("sign", bytes, Buffer.from(keyPair.privateKey, "hex"));
 
-		const serialized = await this.serializer.serializePrecommit({ ...data, signature });
+		const serialized = await this.serializer.serializeMessage({ ...data, signature });
 		return this.makePrecommitFromBytes(serialized);
 	}
 
@@ -154,7 +154,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		this.#applySchema("precommit", data);
 
 		if (!serialized) {
-			serialized = await this.serializer.serializePrecommit(data);
+			serialized = await this.serializer.serializeMessage(data);
 		}
 
 		return new Precommit({ ...data, serialized });

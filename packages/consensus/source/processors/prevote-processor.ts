@@ -104,7 +104,7 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 		return worker.consensusSignature(
 			"verify",
 			Buffer.from(prevote.signature, "hex"),
-			await this.serializer.serializePrevoteForSignature(prevote),
+			await this.serializer.serializeMessageForSignature(prevote),
 			Buffer.from(this.validatorSet.getValidator(prevote.validatorIndex).blsPublicKey, "hex"),
 		);
 	}

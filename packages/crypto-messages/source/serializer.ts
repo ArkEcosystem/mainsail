@@ -61,15 +61,15 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 		});
 	}
 
-	public async serializePrecommit(precommit: Contracts.Crypto.MessageData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.MessageData>(precommit, {
+	public async serializeMessage(message: Contracts.Crypto.MessageData): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.MessageData>(message, {
 			length:
 				1 + // type
 				4 + // blockNumber
 				4 + // round
 				1 + // validatorIndex
 				1 +
-				(precommit.blockHash ? this.hashSize : 0) + // blockHash
+				(message.blockHash ? this.hashSize : 0) + // blockHash
 				this.signatureSize, // signature
 			skip: 0,
 			schema: {
@@ -96,14 +96,14 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 		});
 	}
 
-	public async serializePrecommitForSignature(precommit: Contracts.Crypto.SignatureMessageData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.SignatureMessageData>(precommit, {
+	public async serializeMessageForSignature(message: Contracts.Crypto.SignatureMessageData): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.SignatureMessageData>(message, {
 			length:
 				1 + // type
 				4 + // blockNumber
 				4 + // round
 				1 +
-				(precommit.blockHash ? this.hashSize : 0), // blockHash
+				(message.blockHash ? this.hashSize : 0), // blockHash
 			skip: 0,
 			schema: {
 				type: {
@@ -118,68 +118,6 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 				blockHash: {
 					type: "blockHash",
 					optional: true,
-				},
-			},
-		});
-	}
-
-	public async serializePrevoteForSignature(prevote: Contracts.Crypto.SignatureMessageData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.SignatureMessageData>(prevote, {
-			length:
-				1 + // type
-				4 + // blockNumber
-				4 + // round
-				1 +
-				(prevote.blockHash ? this.hashSize : 0), // blockHash
-			skip: 0,
-			schema: {
-				type: {
-					type: "uint8",
-				},
-				blockNumber: {
-					type: "uint32",
-				},
-				round: {
-					type: "uint32",
-				},
-				blockHash: {
-					type: "blockHash",
-					optional: true,
-				},
-			},
-		});
-	}
-
-	public async serializePrevote(prevote: Contracts.Crypto.MessageData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.MessageData>(prevote, {
-			length:
-				1 + // type
-				4 + // blockNumber
-				4 + // round
-				1 +
-				(prevote.blockHash ? this.hashSize : 0) + // blockHash
-				1 + // validatorIndex
-				this.signatureSize, // signature
-			skip: 0,
-			schema: {
-				type: {
-					type: "uint8",
-				},
-				blockNumber: {
-					type: "uint32",
-				},
-				round: {
-					type: "uint32",
-				},
-				blockHash: {
-					type: "blockHash",
-					optional: true,
-				},
-				validatorIndex: {
-					type: "uint8",
-				},
-				signature: {
-					type: "consensusSignature",
 				},
 			},
 		});

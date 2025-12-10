@@ -57,10 +57,8 @@ export interface MessageFactory {
 
 export interface MessageSerializer {
 	serializeProposal(proposal: SerializableProposalData, options: SerializeProposalOptions): Promise<Buffer>;
-	serializePrevote(prevote: MessageData): Promise<Buffer>;
-	serializePrevoteForSignature(prevote: SignatureMessageData): Promise<Buffer>;
-	serializePrecommit(precommit: MessageData): Promise<Buffer>;
-	serializePrecommitForSignature(precommit: SignatureMessageData): Promise<Buffer>;
+	serializeMessage(message: MessageData): Promise<Buffer>;
+	serializeMessageForSignature(message: SignatureMessageData): Promise<Buffer>;
 	serializeProposed(proposedBlock: ProposedBlockSerializable): Promise<Buffer>;
 	serializeLockProof(proof: AggregatedSignature): Promise<Buffer>;
 
