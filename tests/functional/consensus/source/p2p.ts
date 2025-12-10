@@ -7,7 +7,7 @@ const isApp = (node: Contracts.Kernel.Application | undefined): node is Contract
 const isProposal = (message: Message): message is Contracts.Crypto.Proposal =>
 	(message as Contracts.Crypto.Proposal).blockHeader !== undefined;
 
-export type Message = Contracts.Crypto.Proposal | Contracts.Crypto.Message | Contracts.Crypto.Precommit;
+export type Message = Contracts.Crypto.Proposal | Contracts.Crypto.Message | Contracts.Crypto.Message;
 
 export class Messages<T extends Message> {
 	#messages = new Map<string, Map<string, T>>();
@@ -47,7 +47,7 @@ export class P2PRegistry {
 
 	public proposals = new Messages<Contracts.Crypto.Proposal>();
 	public prevotes = new Messages<Contracts.Crypto.Message>();
-	public precommits = new Messages<Contracts.Crypto.Precommit>();
+	public precommits = new Messages<Contracts.Crypto.Message>();
 
 	public registerNode(id: number, node: Contracts.Kernel.Application): void {
 		if (this.#nodes.has(id)) {
@@ -96,7 +96,7 @@ export class P2PRegistry {
 		}, 0);
 	}
 
-	async postPrecommit(node: Contracts.Kernel.Application, precommit: Contracts.Crypto.Precommit): Promise<void> {
+	async postPrecommit(node: Contracts.Kernel.Application, precommit: Contracts.Crypto.Message): Promise<void> {
 		this.precommits.set(precommit);
 
 		setTimeout(async () => {
@@ -128,7 +128,7 @@ export class P2PRegistry {
 		}
 	}
 
-	async broadcastPrecommit(precommit: Contracts.Crypto.Precommit, nodes?: number[]): Promise<void> {
+	async broadcastPrecommit(precommit: Contracts.Crypto.Message, nodes?: number[]): Promise<void> {
 		for (const node of this.getNodes(nodes)) {
 			await this.postPrecommit(node, precommit);
 		}
@@ -160,7 +160,7 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 		}
 	}
 
-	async broadcastPrecommit(precommit: Contracts.Crypto.Precommit): Promise<void> {
+	async broadcastPrecommit(precommit: Contracts.Crypto.Message): Promise<void> {
 		for (const node of this.#getNodes()) {
 			await this.#p2p.postPrecommit(node, precommit);
 		}

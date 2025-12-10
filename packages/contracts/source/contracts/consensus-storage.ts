@@ -1,5 +1,5 @@
 import type { State, StateData } from "./consensus/index.js";
-import type { Precommit, Message, Proposal } from "./crypto/index.js";
+import type { Message, Message, Proposal } from "./crypto/index.js";
 
 export interface Service {
 	persist({
@@ -11,10 +11,10 @@ export interface Service {
 		state: State;
 		proposals: Proposal[];
 		prevotes: Message[];
-		precommits: Precommit[];
+		precommits: Message[];
 	}): Promise<void>;
 	getState(): Promise<StateData | undefined>;
 	getProposals(): Promise<Proposal[]>;
 	getPrevotes(): Promise<Message[]>;
-	getPrecommits(): Promise<Precommit[]>;
+	getPrecommits(): Promise<Message[]>;
 }

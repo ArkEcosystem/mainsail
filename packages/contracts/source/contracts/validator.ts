@@ -1,4 +1,4 @@
-import type { AggregatedSignature, Block, KeyPair, Precommit, Message, Proposal } from "./crypto/index.js";
+import type { AggregatedSignature, Block, KeyPair, Message, Message, Proposal } from "./crypto/index.js";
 
 export interface ValidatorKeyPair {
 	readonly publicKey: string;
@@ -27,7 +27,7 @@ export interface Validator {
 		blockHeight: number,
 		round: number,
 		blockHash: string | undefined,
-	): Promise<Precommit>;
+	): Promise<Message>;
 }
 
 export interface ValidatorRepository {

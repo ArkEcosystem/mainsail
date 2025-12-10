@@ -220,8 +220,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#checkMessage(
-		message: Contracts.Crypto.Precommit | Contracts.Crypto.Message,
-		firstMessage: Contracts.Crypto.Precommit | Contracts.Crypto.Message,
+		message: Contracts.Crypto.Message | Contracts.Crypto.Message,
+		firstMessage: Contracts.Crypto.Message | Contracts.Crypto.Message,
 		job: DownloadJob,
 	): void {
 		if (message.blockNumber !== firstMessage.blockNumber || message.round !== firstMessage.round) {
@@ -243,7 +243,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 	#checkResponse(
 		prevotesMap: Map<number, Contracts.Crypto.Message>,
-		precommitsMap: Map<number, Contracts.Crypto.Precommit>,
+		precommitsMap: Map<number, Contracts.Crypto.Message>,
 		job: DownloadJob,
 	) {
 		const prevotes = [...prevotesMap.values()];
@@ -268,7 +268,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 	#checkFullRoundResponse(
 		prevotes: Map<number, Contracts.Crypto.Message>,
-		precommits: Map<number, Contracts.Crypto.Precommit>,
+		precommits: Map<number, Contracts.Crypto.Message>,
 		job: DownloadJob,
 	) {
 		const { roundValidators } = this.cryptoConfiguration.getMilestone(job.blockNumber);
@@ -284,7 +284,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 	#checkPartialRoundResponse(
 		prevotes: Map<number, Contracts.Crypto.Message>,
-		precommits: Map<number, Contracts.Crypto.Precommit>,
+		precommits: Map<number, Contracts.Crypto.Message>,
 		job: DownloadJob,
 	) {
 		// Check if received all the requested data
@@ -326,7 +326,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			}
 
 			let firstPrecommit: Contracts.Crypto.Message | undefined;
-			const precommits: Map<number, Contracts.Crypto.Precommit> = new Map();
+			const precommits: Map<number, Contracts.Crypto.Message> = new Map();
 			for (const buffer of result.precommits) {
 				const precommit = await this.factory.makePrecommitFromBytes(buffer);
 				precommits.set(precommit.validatorIndex, precommit);

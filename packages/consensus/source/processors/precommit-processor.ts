@@ -32,10 +32,7 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 
 	#pendingPrecommits: Map<string, ((value: SignatureCheckResult) => void)[]> = new Map();
 
-	async process(
-		precommit: Contracts.Crypto.Precommit,
-		broadcast = true,
-	): Promise<Contracts.Consensus.ProcessorResult> {
+	async process(precommit: Contracts.Crypto.Message, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.hasValidBlockNumberOrRound(precommit)) {
 				return Enums.Consensus.ProcessorResult.Skipped;
@@ -78,7 +75,7 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 		});
 	}
 
-	async #signatureCheck(precommit: Contracts.Crypto.Precommit): Promise<SignatureCheckResult> {
+	async #signatureCheck(precommit: Contracts.Crypto.Message): Promise<SignatureCheckResult> {
 		const serializedHex = precommit.serialized.toString("hex");
 		if (this.#pendingPrecommits.has(serializedHex)) {
 			return new Promise((resolve) => {
@@ -99,7 +96,7 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 		return hasValidSignature ? SignatureCheckResult.Accepted : SignatureCheckResult.Invalid;
 	}
 
-	async #hasValidSignature(precommit: Contracts.Crypto.Precommit): Promise<boolean> {
+	async #hasValidSignature(precommit: Contracts.Crypto.Message): Promise<boolean> {
 		const worker = await this.workerPool.getWorker();
 		return worker.consensusSignature(
 			"verify",

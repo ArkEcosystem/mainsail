@@ -123,7 +123,7 @@ export class Validator implements Contracts.Validator.Validator {
 		blockNumber: number,
 		round: number,
 		blockHash: string | undefined,
-	): Promise<Contracts.Crypto.Precommit> {
+	): Promise<Contracts.Crypto.Message> {
 		return this.messagesFactory.makePrecommit(
 			{
 				blockHash,

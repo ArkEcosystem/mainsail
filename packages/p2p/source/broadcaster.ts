@@ -38,7 +38,7 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 		await Promise.all(promises);
 	}
 
-	async broadcastPrecommit(precommit: Contracts.Crypto.Precommit): Promise<void> {
+	async broadcastPrecommit(precommit: Contracts.Crypto.Message): Promise<void> {
 		this.state.resetLastMessageTime();
 
 		const promises = this.#getPeersForBroadcast().map((peer) =>

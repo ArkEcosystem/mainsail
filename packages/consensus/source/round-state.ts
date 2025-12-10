@@ -31,7 +31,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	#accountUpdates: Array<Contracts.Evm.AccountUpdate> = [];
 	#prevotes = new Map<number, Contracts.Crypto.Message>();
 	#prevotesCount = new Map<string | undefined, number>();
-	#precommits = new Map<number, Contracts.Crypto.Precommit>();
+	#precommits = new Map<number, Contracts.Crypto.Message>();
 	#precommitsCount = new Map<string | undefined, number>();
 	#validators = new Map<string, Contracts.State.ValidatorWallet>();
 	#validatorsSignedPrevote: boolean[] = [];
@@ -180,7 +180,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#precommits.has(validatorIndex);
 	}
 
-	public addPrecommit(precommit: Contracts.Crypto.Precommit): void {
+	public addPrecommit(precommit: Contracts.Crypto.Message): void {
 		if (this.#precommits.has(precommit.validatorIndex)) {
 			throw new Error("Precommit already exists.");
 		}
@@ -230,11 +230,11 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return [...this.#prevotes.values()];
 	}
 
-	public getPrecommit(validatorIndex: number): Contracts.Crypto.Precommit | undefined {
+	public getPrecommit(validatorIndex: number): Contracts.Crypto.Message | undefined {
 		return this.#precommits.get(validatorIndex);
 	}
 
-	public getPrecommits(): Contracts.Crypto.Precommit[] {
+	public getPrecommits(): Contracts.Crypto.Message[] {
 		return [...this.#precommits.values()];
 	}
 

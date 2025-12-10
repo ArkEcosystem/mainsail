@@ -1,4 +1,4 @@
-import type { AggregatedSignature, Commit, Precommit, Message, Proposal } from "../crypto/index.js";
+import type { AggregatedSignature, Commit, Message, Message, Proposal } from "../crypto/index.js";
 import type { ProcessableUnit } from "../processor/index.js";
 import type { ValidatorWallet } from "../state/index.js";
 import type { Step } from "./enums.js";
@@ -12,7 +12,7 @@ export interface RoundState extends ProcessableUnit {
 	hasPrecommit(validatorIndex: number): boolean;
 	addProposal(proposal: Proposal): void;
 	addPrevote(prevote: Message): void;
-	addPrecommit(precommit: Precommit): void;
+	addPrecommit(precommit: Message): void;
 	hasMajorityPrevotes(): boolean;
 	hasMajorityPrevotesAny(): boolean;
 	hasMajorityPrevotesNull(): boolean;
@@ -20,9 +20,9 @@ export interface RoundState extends ProcessableUnit {
 	hasMajorityPrecommitsAny(): boolean;
 	hasMinorityPrevotesOrPrecommits(): boolean;
 	getPrevote(validatorIndex: number): Message | undefined;
-	getPrecommit(validatorIndex: number): Precommit | undefined;
+	getPrecommit(validatorIndex: number): Message | undefined;
 	getPrevotes(): Message[];
-	getPrecommits(): Precommit[];
+	getPrecommits(): Message[];
 	getValidator(consensusPublicKey: string): ValidatorWallet;
 	getValidatorsSignedPrevote(): readonly boolean[];
 	getValidatorsSignedPrecommit(): readonly boolean[];

@@ -106,7 +106,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		return this.makePrevoteFromBytes(serialized);
 	}
 
-	public async makePrevoteFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Precommit> {
+	public async makePrevoteFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Message> {
 		const data = await this.deserializer.deserializePrevote(bytes);
 		return this.makePrevoteFromData(data, bytes);
 	}
@@ -127,7 +127,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	public async makePrecommit(
 		data: Contracts.Crypto.MakePrecommitData,
 		keyPair: Contracts.Crypto.KeyPair,
-	): Promise<Contracts.Crypto.Precommit> {
+	): Promise<Contracts.Crypto.Message> {
 		const worker = await this.workerPool.getWorker();
 
 		const bytes = await this.serializer.serializePrecommitForSignature({
@@ -142,7 +142,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		return this.makePrecommitFromBytes(serialized);
 	}
 
-	public async makePrecommitFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Precommit> {
+	public async makePrecommitFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Message> {
 		const data = await this.deserializer.deserializePrecommit(bytes);
 		return this.makePrecommitFromData(data, bytes);
 	}
@@ -150,7 +150,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	public async makePrecommitFromData(
 		data: Contracts.Crypto.MessageData,
 		serialized?: Buffer,
-	): Promise<Contracts.Crypto.Precommit> {
+	): Promise<Contracts.Crypto.Message> {
 		this.#applySchema("precommit", data);
 
 		if (!serialized) {

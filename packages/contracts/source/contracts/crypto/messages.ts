@@ -36,13 +36,6 @@ export interface Message extends MessageData {
 	toString(): string;
 }
 
-export interface Precommit extends MessageData {
-	readonly serialized: Buffer;
-
-	toSignatureData(): SignatureMessageData;
-	toString(): string;
-}
-
 export type HasSignature = { signature: string };
 export type WithoutSignature<T> = Omit<T, "signature">;
 export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
@@ -58,9 +51,9 @@ export interface MessageFactory {
 	makePrevote(data: MakePrevoteData, keyPair: KeyPair): Promise<Message>;
 	makePrevoteFromBytes(data: Buffer): Promise<Message>;
 	makePrevoteFromData(data: MessageData): Promise<Message>;
-	makePrecommit(data: MakePrecommitData, keyPair: KeyPair): Promise<Precommit>;
-	makePrecommitFromBytes(data: Buffer): Promise<Precommit>;
-	makePrecommitFromData(data: MessageData): Promise<Precommit>;
+	makePrecommit(data: MakePrecommitData, keyPair: KeyPair): Promise<Message>;
+	makePrecommitFromBytes(data: Buffer): Promise<Message>;
+	makePrecommitFromData(data: MessageData): Promise<Message>;
 }
 
 export interface MessageSerializer {
