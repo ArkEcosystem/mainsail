@@ -1,4 +1,4 @@
-import type { Message, Message, Proposal } from "../crypto/index.js";
+import type { Message, Proposal } from "../crypto/index.js";
 
 export interface Broadcaster {
 	broadcastProposal(proposal: Proposal): Promise<void>;

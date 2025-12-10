@@ -1,4 +1,4 @@
-import type { Commit, Message, Message, Proposal } from "../crypto/index.js";
+import type { Commit, Message, Proposal } from "../crypto/index.js";
 import type { ProcessorResult } from "./enums.js";
 
 export interface ProposalProcessor {

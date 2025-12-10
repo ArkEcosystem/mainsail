@@ -1,4 +1,4 @@
-import type { AggregatedSignature, Commit, Message, Message, Proposal } from "../crypto/index.js";
+import type { AggregatedSignature, Commit, Message, Proposal } from "../crypto/index.js";
 import type { ProcessableUnit } from "../processor/index.js";
 import type { ValidatorWallet } from "../state/index.js";
 import type { Step } from "./enums.js";

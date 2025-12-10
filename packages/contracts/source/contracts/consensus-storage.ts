@@ -1,5 +1,5 @@
 import type { State, StateData } from "./consensus/index.js";
-import type { Message, Message, Proposal } from "./crypto/index.js";
+import type { Message, Proposal } from "./crypto/index.js";
 
 export interface Service {
 	persist({

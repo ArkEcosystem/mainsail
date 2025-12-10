@@ -1,4 +1,4 @@
-import type { AggregatedSignature, Block, KeyPair, Message, Message, Proposal } from "./crypto/index.js";
+import type { AggregatedSignature, Block, KeyPair, Message, Proposal } from "./crypto/index.js";
 
 export interface ValidatorKeyPair {
 	readonly publicKey: string;
