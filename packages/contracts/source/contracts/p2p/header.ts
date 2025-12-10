@@ -1,4 +1,4 @@
-import type { Proposal } from "../crypto/messages.js";
+import type { Proposal } from "../crypto/proposal.js";
 
 export type HeaderData = {
 	version: string;

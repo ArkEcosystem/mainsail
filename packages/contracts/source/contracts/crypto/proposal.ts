@@ -2,6 +2,9 @@ import type { Block, BlockHeader } from "./block.js";
 import type { KeyPair } from "./identities.js";
 import type { AggregatedSignature } from "./signatures.js";
 
+type WithoutSignature<T> = Omit<T, "signature">;
+export type MakeProposalData = WithoutSignature<SerializableProposalData>;
+
 export interface ProposalData {
 	readonly blockHeader: BlockHeader;
 	readonly lockProof?: AggregatedSignature;
@@ -40,11 +43,6 @@ export interface Proposal extends Omit<ProposalData, "data"> {
 	toData(): ProposalData;
 	toString(): string;
 }
-
-export type HasSignature = { signature: string };
-export type WithoutSignature<T> = Omit<T, "signature">;
-export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
-export type MakeProposalData = WithoutSignature<SerializableProposalData>;
 
 export interface ProposalFactory {
 	makeProposal(data: MakeProposalData, keyPair: KeyPair): Promise<Proposal>;
