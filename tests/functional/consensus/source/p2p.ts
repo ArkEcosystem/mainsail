@@ -22,10 +22,12 @@ export class Messages<T extends Message> {
 		return this.#messages.get(key)!;
 	}
 
-
 	set(message: T): void {
 		if (isProposal(message)) {
-			this.getMessagesMap(message.blockHeader.number, message.round).set(message.serialized.toString("hex"), message);
+			this.getMessagesMap(message.blockHeader.number, message.round).set(
+				message.serialized.toString("hex"),
+				message,
+			);
 		} else {
 			this.getMessagesMap(message.blockNumber, message.round).set(message.serialized.toString("hex"), message);
 		}
@@ -81,7 +83,7 @@ export class P2PRegistry {
 		setTimeout(async () => {
 			// simulate post-proposal controller
 			const deserializedProposal = await node
-				.get<Contracts.Crypto.MessageFactory>(Identifiers.Cryptography.Message.Factory)
+				.get<Contracts.Crypto.ProposalFactory>(Identifiers.Cryptography.Proposal.Factory)
 				.makeProposalFromBytes(proposal.serialized);
 
 			const result = await node
