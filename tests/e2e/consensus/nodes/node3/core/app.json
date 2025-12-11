@@ -52,6 +52,9 @@
 			"package": "@mainsail/logger-pino"
 		},
 		{
+			"package": "@mainsail/networking-ntp"
+		},
+		{
 			"package": "@mainsail/state"
 		},
 		{
@@ -68,6 +71,9 @@
 		},
 		{
 			"package": "@mainsail/transaction-pool-worker"
+		},
+		{
+			"package": "@mainsail/crypto-proposal"
 		},
 		{
 			"package": "@mainsail/crypto-messages"
@@ -107,9 +113,6 @@
 		}
 	],
 	"crypto-worker": [
-		{
-			"package": "@mainsail/logger-pino"
-		},
 		{
 			"package": "@mainsail/validation"
 		},
@@ -151,9 +154,6 @@
 		}
 	],
 	"transaction-pool": [
-		{
-			"package": "@mainsail/logger-pino"
-		},
 		{
 			"package": "@mainsail/validation"
 		},
@@ -223,9 +223,6 @@
 	],
 	"evm-api": [
 		{
-			"package": "@mainsail/logger-pino"
-		},
-		{
 			"package": "@mainsail/validation"
 		},
 		{
@@ -262,6 +259,9 @@
 			"package": "@mainsail/crypto-block"
 		},
 		{
+			"package": "@mainsail/crypto-proposal"
+		},
+		{
 			"package": "@mainsail/crypto-messages"
 		},
 		{
@@ -277,10 +277,10 @@
 			"package": "@mainsail/state"
 		},
 		{
-			"package": "@mainsail/database"
+			"package": "@mainsail/evm-service"
 		},
 		{
-			"package": "@mainsail/evm-service"
+			"package": "@mainsail/database"
 		},
 		{
 			"package": "@mainsail/evm-state"
