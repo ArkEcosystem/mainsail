@@ -1664,6 +1664,9 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-proposal':
+        specifier: workspace:*
+        version: link:../crypto-proposal
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa

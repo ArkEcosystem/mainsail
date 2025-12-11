@@ -4,16 +4,12 @@ import {
 	precommitDataNoBlock,
 	prevoteData,
 	prevoteDataNoBlock,
-	proposalData,
-	proposalDataWithValidRound,
 	serializedPrecommit,
 	serializedPrecommitNoBlock,
 	serializedPrevote,
 	serializedPrevoteNoBlock,
-	serializedProposal,
-	serializedProposalDataWithValidRound,
 } from "../test/fixtures/index.js";
-import { assertPrecommit, assertPrevote, assertProposal } from "../test/helpers/asserts";
+import { assertPrecommit, assertPrevote } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Deserializer } from "./deserializer";
 
@@ -25,18 +21,6 @@ describe<{
 		await prepareSandbox(context);
 
 		context.deserializer = context.sandbox.app.resolve(Deserializer);
-	});
-
-	it("#deserializeProposal - should correctly deserialize", async ({ deserializer }) => {
-		const deserialized = await deserializer.deserializeProposal(Buffer.from(serializedProposal, "hex"));
-		assertProposal(assert, deserialized, proposalData);
-	});
-
-	it("#deserializeProposal - should correctly deserialize, with validRound", async ({ deserializer }) => {
-		const deserialized = await deserializer.deserializeProposal(
-			Buffer.from(serializedProposalDataWithValidRound, "hex"),
-		);
-		assertProposal(assert, deserialized, proposalDataWithValidRound);
 	});
 
 	it("#deserializePrecommit - should correctly deserialize", async ({ deserializer }) => {
