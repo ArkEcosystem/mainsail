@@ -51,6 +51,12 @@
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/validation": "workspace:*",
+		"@mainsail/crypto-proposal": "workspace:*",
+		"@mainsail/crypto-block": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/crypto-transaction": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/test-framework": "workspace:*",
 		"@types/fs-extra": "11.0.4",
 		"@types/hapi__sntp": "3.1.4",
 		"@types/ip": "1.1.3",

@@ -2609,6 +2609,24 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-block':
+        specifier: workspace:*
+        version: link:../crypto-block
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
+      '@mainsail/crypto-proposal':
+        specifier: workspace:*
+        version: link:../crypto-proposal
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../crypto-transaction
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../crypto-validation
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
