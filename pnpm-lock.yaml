@@ -3651,6 +3651,9 @@ importers:
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../../../packages/crypto-messages
+      '@mainsail/crypto-proposal':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-proposal
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../../../packages/crypto-signature-ecdsa
