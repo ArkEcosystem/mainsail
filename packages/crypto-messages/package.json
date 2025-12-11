@@ -30,7 +30,6 @@
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/crypto-proposal": "workspace:*",
 		"@mainsail/crypto-address-base58": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",
@@ -38,6 +37,7 @@
 		"@mainsail/crypto-consensus-bls12-381": "workspace:*",
 		"@mainsail/crypto-hash-bcrypto": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
+		"@mainsail/crypto-proposal": "workspace:*",
 		"@mainsail/crypto-signature-ecdsa": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
