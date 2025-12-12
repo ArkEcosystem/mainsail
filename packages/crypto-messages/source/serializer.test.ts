@@ -1,10 +1,10 @@
 import { describe, Sandbox } from "../../test-framework/source";
 import {
-	precommitData,
-	precommitDataNoBlock,
-	serializedPrecommit,
-	serializedPrecommitForSignature,
-	serializedPrecommitNoBlock,
+	prevoteData,
+	prevoteDataNoBlock,
+	serializedPrevote,
+	serializedPrevoteForSignature,
+	serializedPrevoteNoBlock,
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Deserializer } from "./deserializer";
@@ -23,17 +23,17 @@ describe<{
 	});
 
 	it("#serializeMessage - should correctly serialize for signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializeMessageForSignature(precommitData)).toString("hex");
-		assert.equal(serialized, serializedPrecommitForSignature);
+		const serialized = (await serializer.serializeMessageForSignature(prevoteData)).toString("hex");
+		assert.equal(serialized, serializedPrevoteForSignature);
 	});
 
 	it("#serializeMessage - should correctly serialize with signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializeMessage(precommitData)).toString("hex");
-		assert.equal(serialized, serializedPrecommit);
+		const serialized = (await serializer.serializeMessage(prevoteData)).toString("hex");
+		assert.equal(serialized, serializedPrevote);
 	});
 
 	it("#serializeMessage - should correctly serialize without block", async ({ serializer }) => {
-		const serialized = (await serializer.serializeMessage(precommitDataNoBlock)).toString("hex");
-		assert.equal(serialized, serializedPrecommitNoBlock);
+		const serialized = (await serializer.serializeMessage(prevoteDataNoBlock)).toString("hex");
+		assert.equal(serialized, serializedPrevoteNoBlock);
 	});
 });

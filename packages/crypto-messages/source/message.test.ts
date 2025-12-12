@@ -4,36 +4,36 @@ import { Message } from "./message.js";
 
 describe<{
 	sandbox: Sandbox;
-}>("Prevote", ({ it, assert }) => {
-	const prevote = new Message({ ...prevoteData, serialized: Buffer.from("dead", "hex") });
+}>("Message", ({ it, assert }) => {
+	const message = new Message({ ...prevoteData, serialized: Buffer.from("dead", "hex") });
 
 	it("#blockNumber", async () => {
-		assert.equal(prevote.blockNumber, 1);
+		assert.equal(message.blockNumber, 1);
 	});
 
 	it("#round", async () => {
-		assert.equal(prevote.round, 1);
+		assert.equal(message.round, 1);
 	});
 
 	it("#blockHash", async () => {
-		assert.equal(prevote.blockHash, prevoteData.blockHash);
+		assert.equal(message.blockHash, prevoteData.blockHash);
 	});
 
 	it("#validatorIndex", async () => {
-		assert.equal(prevote.validatorIndex, 0);
+		assert.equal(message.validatorIndex, 0);
 	});
 
 	it("#signature", async () => {
-		assert.equal(prevote.signature, prevoteData.signature);
+		assert.equal(message.signature, prevoteData.signature);
 	});
 
 	it("#serialized", async () => {
-		assert.equal(prevote.serialized.toString("hex"), "dead");
+		assert.equal(message.serialized.toString("hex"), "dead");
 	});
 
 	it("#toString", async () => {
 		assert.equal(
-			prevote.toString(),
+			message.toString(),
 			`{"blockHash":"${prevoteData.blockHash}","blockNumber":1,"round":1,"signature":"${prevoteData.signature}","validatorIndex":0}`,
 		);
 	});

@@ -1,9 +1,9 @@
 import { describe, Sandbox } from "../../test-framework/source";
 import {
-	precommitData,
-	precommitDataNoBlock,
-	serializedPrecommit,
-	serializedPrecommitNoBlock,
+	prevoteData,
+	prevoteDataNoBlock,
+	serializedPrevote,
+	serializedPrevoteNoBlock,
 } from "../test/fixtures/index.js";
 import { assertPrecommit } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -19,13 +19,13 @@ describe<{
 		context.deserializer = context.sandbox.app.resolve(Deserializer);
 	});
 
-	it("#deserializePrecommit - should correctly deserialize", async ({ deserializer }) => {
-		const deserialized = await deserializer.deserializeMessage(Buffer.from(serializedPrecommit, "hex"));
-		assertPrecommit(assert, deserialized, precommitData);
+	it("#deserializeMessage - should correctly deserialize", async ({ deserializer }) => {
+		const deserialized = await deserializer.deserializeMessage(Buffer.from(serializedPrevote, "hex"));
+		assertPrecommit(assert, deserialized, prevoteData);
 	});
 
-	it("#deserializePrecommit - should correctly deserialize without block", async ({ deserializer }) => {
-		const deserialized = await deserializer.deserializeMessage(Buffer.from(serializedPrecommitNoBlock, "hex"));
-		assertPrecommit(assert, deserialized, precommitDataNoBlock);
+	it("#deserializeMessage - should correctly deserialize without block", async ({ deserializer }) => {
+		const deserialized = await deserializer.deserializeMessage(Buffer.from(serializedPrevoteNoBlock, "hex"));
+		assertPrecommit(assert, deserialized, prevoteDataNoBlock);
 	});
 });

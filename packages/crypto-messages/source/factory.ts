@@ -45,7 +45,7 @@ export class Factory implements Contracts.Crypto.MessageFactory {
 		data: Contracts.Crypto.MessageData,
 		serialized?: Buffer,
 	): Promise<Contracts.Crypto.Message> {
-		this.#applySchema("prevote", data);
+		this.#applySchema("message", data);
 
 		if (!serialized) {
 			serialized = await this.serializer.serializeMessage(data);
