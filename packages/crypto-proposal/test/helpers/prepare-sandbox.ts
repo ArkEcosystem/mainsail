@@ -50,6 +50,19 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }): Promise<vo
 	context.sandbox.app.bind(Identifiers.Cryptography.Proposal.Serializer).to(Serializer);
 	context.sandbox.app.bind(Identifiers.Cryptography.Proposal.Deserializer).to(Deserializer);
 	context.sandbox.app.bind(Identifiers.Cryptography.Proposal.Factory).to(Factory).inSingletonScope();
+	context.sandbox.app.bind(Identifiers.Cryptography.Proposal.LockProofSize).toConstantValue(() => {
+		const signatureSize = context.sandbox!.app.getTagged<number>(
+			Identifiers.Cryptography.Signature.Size,
+			"type",
+			"consensus",
+		);
+
+		return (
+			signatureSize + // signature
+			1 +
+			8 // validator set bitmap
+		);
+	});
 
 	for (const keyword of Object.values(
 		makeKeywords(context.sandbox.app.get(Identifiers.Cryptography.Configuration)),
