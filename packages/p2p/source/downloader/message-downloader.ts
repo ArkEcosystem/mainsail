@@ -219,11 +219,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		return roundsByBlockNumber.get(round)!;
 	}
 
-	#checkMessage(
-		message: Contracts.Crypto.Message | Contracts.Crypto.Message,
-		firstMessage: Contracts.Crypto.Message | Contracts.Crypto.Message,
-		job: DownloadJob,
-	): void {
+	#checkMessage(message: Contracts.Crypto.Message, firstMessage: Contracts.Crypto.Message, job: DownloadJob): void {
 		if (message.blockNumber !== firstMessage.blockNumber || message.round !== firstMessage.round) {
 			throw new Error(
 				`Received message blockNumber ${message.blockNumber} and round ${message.round} does not match expected blockNumber ${firstMessage.blockNumber} and round ${firstMessage.round}`,
