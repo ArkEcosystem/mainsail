@@ -18,6 +18,20 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Proposal.Deserializer).to(Deserializer).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Proposal.Factory).to(Factory).inSingletonScope();
 
+		this.app.bind(Identifiers.Cryptography.Proposal.LockProofSize).toConstantValue(() => {
+			const signatureSize = this.app.getTagged<number>(
+				Identifiers.Cryptography.Signature.Size,
+				"type",
+				"consensus",
+			);
+
+			return (
+				signatureSize + // signature
+				1 +
+				8 // validator set bitmap
+			);
+		});
+
 		this.#registerValidation();
 	}
 

@@ -59,8 +59,6 @@ export interface ProposalSerializer {
 	serializeProposal(proposal: SerializableProposalData, options: SerializeProposalOptions): Promise<Buffer>;
 	serializeProposed(proposedBlock: ProposedBlockSerializable): Promise<Buffer>;
 	serializeLockProof(proof: AggregatedSignature): Promise<Buffer>;
-
-	lockProofSize(): number;
 }
 
 export interface ProposalDeserializer {

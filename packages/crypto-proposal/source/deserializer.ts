@@ -9,8 +9,8 @@ export class Deserializer implements Contracts.Crypto.ProposalDeserializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	private readonly serializer!: Contracts.Serializer.Serializer;
 
-	@inject(Identifiers.Cryptography.Proposal.Serializer)
-	private readonly proposalSerializer!: Contracts.Crypto.ProposalSerializer;
+	@inject(Identifiers.Cryptography.Proposal.LockProofSize)
+	private readonly lockProofSize!: () => number;
 
 	public async deserializeProposal(serialized: Buffer): Promise<Contracts.Crypto.ProposalData> {
 		const proposal = {} as Contracts.Crypto.ProposalData;
@@ -47,7 +47,7 @@ export class Deserializer implements Contracts.Crypto.ProposalDeserializer {
 		const commit = {} as Contracts.Crypto.AggregatedSignature;
 
 		await this.serializer.deserialize<Contracts.Crypto.AggregatedSignature>(buffer, commit, {
-			length: this.proposalSerializer.lockProofSize(), // TODO: remove from serializer
+			length: this.lockProofSize(),
 			schema: {
 				signature: {
 					type: "consensusSignature",

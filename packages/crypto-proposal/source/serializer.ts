@@ -12,13 +12,8 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 	@tagged("type", "consensus")
 	private readonly signatureSize!: number;
 
-	public lockProofSize(): number {
-		return (
-			this.signatureSize + // signature
-			1 +
-			8 // validator set bitmap
-		);
-	}
+	@inject(Identifiers.Cryptography.Proposal.LockProofSize)
+	private readonly lockProofSize!: () => number;
 
 	public async serializeProposal(
 		proposal: Contracts.Crypto.SerializableProposalData,
