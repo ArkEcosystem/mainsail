@@ -1,7 +1,7 @@
-import { Enums } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 
 export class Message implements Contracts.Crypto.Message {
+	#type: Contracts.Crypto.MessageType;
 	#blockNumber: number;
 	#round: number;
 	#blockHash: string | undefined;
@@ -10,6 +10,7 @@ export class Message implements Contracts.Crypto.Message {
 	#serialized: Buffer;
 
 	constructor({
+		type,
 		blockNumber,
 		round,
 		blockHash,
@@ -17,6 +18,7 @@ export class Message implements Contracts.Crypto.Message {
 		signature,
 		serialized,
 	}: Contracts.Crypto.MessageData & { serialized: Buffer }) {
+		this.#type = type;
 		this.#blockNumber = blockNumber;
 		this.#round = round;
 		this.#blockHash = blockHash;
@@ -26,7 +28,7 @@ export class Message implements Contracts.Crypto.Message {
 	}
 
 	get type(): Contracts.Crypto.MessageType {
-		return Enums.Crypto.MessageType.Prevote;
+		return this.#type;
 	}
 
 	get blockNumber(): number {

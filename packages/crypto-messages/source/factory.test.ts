@@ -11,6 +11,8 @@ import {
 	serializedPrevote,
 	serializedPrecommit,
 	serializedPrevoteNoBlock,
+	serializedPrecommitNoBlock,
+	precommitDataNoBlock,
 	validatorMnemonic,
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -128,9 +130,15 @@ describe<{
 		assert.equal(toData(precommit), precommitData);
 	});
 
-	it("#makeMessageFromBytes - should be ok with no block", async ({ factory }) => {
+	it("#makeMessageFromBytes - should be ok for prevote with no block", async ({ factory }) => {
 		const prevote = await factory.makeMessageFromBytes(Buffer.from(serializedPrevoteNoBlock, "hex"));
 
 		assert.equal(toData(prevote), prevoteDataNoBlock);
+	});
+
+	it("#makeMessageFromBytes - should be ok for precommit with no block", async ({ factory }) => {
+		const precommit = await factory.makeMessageFromBytes(Buffer.from(serializedPrecommitNoBlock, "hex"));
+
+		assert.equal(toData(precommit), precommitDataNoBlock);
 	});
 });
