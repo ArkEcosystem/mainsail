@@ -7,6 +7,7 @@ import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreConsensusBls12381 } from "@mainsail/crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
+import { makeKeywords } from "@mainsail/crypto-proposal/source/keywords.js";
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
@@ -18,8 +19,7 @@ import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
 import { Sandbox } from "../../../test-framework/source/index.js";
 import { Deserializer } from "../../source/deserializer.js";
-import { MessageFactory } from "../../source/factory.js";
-import { makeKeywords } from "../../source/keywords.js";
+import { Factory } from "../../source/factory.js";
 import { schemas } from "../../source/schemas.js";
 import { Serializer } from "../../source/serializer.js";
 
@@ -49,7 +49,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }): Promise<vo
 
 	context.sandbox.app.bind(Identifiers.Cryptography.Message.Serializer).to(Serializer);
 	context.sandbox.app.bind(Identifiers.Cryptography.Message.Deserializer).to(Deserializer);
-	context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).to(MessageFactory).inSingletonScope();
+	context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).to(Factory).inSingletonScope();
 
 	for (const keyword of Object.values(
 		makeKeywords(context.sandbox.app.get(Identifiers.Cryptography.Configuration)),

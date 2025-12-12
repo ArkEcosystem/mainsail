@@ -1,13 +1,13 @@
 import { Identifiers } from "@mainsail/constants";
-import { Validator } from "@mainsail/validation";
+import { schemas as cryptoBlockSchemas } from "@mainsail/crypto-block/distribution/index.js";
+import { Configuration } from "@mainsail/crypto-config/distribution/index.js";
+import { makeKeywords as makeProposalKeywords } from "@mainsail/crypto-proposal/distribution/keywords.js";
+import { schemas as cryptoTransactionSchemas } from "@mainsail/crypto-transaction/distribution/index.js";
+import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation/distribution/index.js";
+import type { Sandbox } from "@mainsail/test-framework/source/index.js";
+import type { Validator } from "@mainsail/validation";
 
-import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json";
-import { schemas as cryptoBlockSchemas } from "../../../crypto-block/distribution/index.js";
-import { Configuration } from "../../../crypto-config/distribution/index.js";
-import { makeKeywords as makeMessageKeywords } from "../../../crypto-messages/distribution/keywords.js";
-import { schemas as cryptoTransactionSchemas } from "../../../crypto-transaction/distribution/index.js";
-import { schemas as cryptoValidationSchemas } from "../../../crypto-validation/distribution/index.js";
-import { Sandbox } from "../../../test-framework/source/index.js";
+import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
 import { makeKeywords } from "../../source/validation/keywords.js";
 
 type Context = {
@@ -24,7 +24,7 @@ export const prepareValidatorContext = (context: Context) => {
 	context.validator.addKeyword(keywords.buffer);
 
 	const configuration = context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
-	const messageKeywords = makeMessageKeywords(configuration);
+	const messageKeywords = makeProposalKeywords(configuration);
 	context.validator.addKeyword(messageKeywords.limitToRoundValidators);
 	context.validator.addKeyword(messageKeywords.isValidatorIndex);
 

@@ -115,6 +115,12 @@ export const Identifiers = {
 			Factory: Symbol("Crypto<Message.Factory>"),
 			Serializer: Symbol("Crypto<Message.Serializer>"),
 		},
+		Proposal: {
+			Deserializer: Symbol("Crypto<Proposal.Deserializer>"),
+			Factory: Symbol("Crypto<Proposal.Factory>"),
+			LockProofSize: Symbol("Crypto<Proposal.LockProofSize>"),
+			Serializer: Symbol("Crypto<Proposal.Serializer>"),
+		},
 		Serializer: Symbol("Crypto<Serializer>"),
 		Signature: {
 			Instance: Symbol("Crypto<Signature.Instance>"),

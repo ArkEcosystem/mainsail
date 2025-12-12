@@ -34,17 +34,6 @@ function deepEqual(object1, object2) {
 	return true;
 }
 
-export const assertProposal = (assert, data1, data2) => {
-	const fields = ["round", "data", "validatorIndex", "signature"];
-	for (const field of fields) {
-		assert.equal(data1[field].toString(), data2[field].toString());
-	}
-};
-
-export const assertProposedData = (assert, data1, data2) => {
-	assert.true(deepEqual(data1, data2));
-};
-
 export const assertPrecommit = (assert, data1, data2) => {
 	assertPrecommitOrPrevote(assert, data1, data2);
 };

@@ -1,0 +1,41 @@
+import type { AnySchemaObject } from "ajv";
+
+export const schemas: Record<"proposal" | "proposalLockProof" | "validatorBitmap", AnySchemaObject> = {
+	proposal: {
+		$id: "proposal",
+		properties: {
+			data: {
+				properties: {
+					serialized: { $ref: "hex" },
+				},
+				required: ["serialized"],
+				type: "object",
+			},
+			round: { minimum: 0, type: "integer" },
+			signature: { $ref: "consensusSignature" },
+			validRound: { minimum: 0, type: "integer" },
+			validatorIndex: { isValidatorIndex: {} },
+		},
+		required: ["round", "data", "validatorIndex", "signature"],
+		type: "object",
+	},
+	proposalLockProof: {
+		$id: "lockProof",
+		properties: {
+			signature: { $ref: "consensusSignature" },
+			validators: {
+				$ref: "validatorBitmap",
+			},
+		},
+		required: ["signature", "validators"],
+		type: "object",
+	},
+	validatorBitmap: {
+		$id: "validatorBitmap",
+		items: {
+			buffer: {},
+		},
+		limitToRoundValidators: {},
+		type: "array",
+	},
+};

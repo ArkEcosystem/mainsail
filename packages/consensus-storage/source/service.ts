@@ -24,6 +24,9 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
+	@inject(Identifiers.Cryptography.Proposal.Factory)
+	private readonly proposalFactory!: Contracts.Crypto.ProposalFactory;
+
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messageFactory!: Contracts.Crypto.MessageFactory;
 
@@ -101,7 +104,7 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	public async getProposals(): Promise<Contracts.Crypto.Proposal[]> {
 		const proposals = [...this.proposalStorage.getRange().map((item) => item.value)];
 		return Promise.all(
-			proposals.map((proposal) => this.messageFactory.makeProposalFromBytes(Buffer.from(proposal, "hex"))),
+			proposals.map((proposal) => this.proposalFactory.makeProposalFromBytes(Buffer.from(proposal, "hex"))),
 		);
 	}
 

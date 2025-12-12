@@ -6,6 +6,9 @@ import { AbstractProcessor } from "./abstract-processor.js";
 
 @injectable()
 export class ProposalProcessor extends AbstractProcessor implements Contracts.Consensus.ProposalProcessor {
+	@inject(Identifiers.Cryptography.Proposal.Serializer)
+	private readonly proposalSerializer!: Contracts.Crypto.ProposalSerializer;
+
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly messageSerializer!: Contracts.Crypto.MessageSerializer;
 
@@ -121,7 +124,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	async #hasValidSignature(proposal: Contracts.Crypto.Proposal): Promise<boolean> {
 		return this.consensusSignature.verify(
 			Buffer.from(proposal.signature, "hex"),
-			await this.messageSerializer.serializeProposal(proposal.toSerializableData(), { includeSignature: false }),
+			await this.proposalSerializer.serializeProposal(proposal.toSerializableData(), { includeSignature: false }),
 			Buffer.from(this.validatorSet.getValidator(proposal.validatorIndex).blsPublicKey, "hex"),
 		);
 	}

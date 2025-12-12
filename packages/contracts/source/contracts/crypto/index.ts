@@ -8,6 +8,7 @@ export * from "./identities.js";
 export * from "./legacy.js";
 export * from "./messages.js";
 export * from "./networks.js";
+export * from "./proposal.js";
 export * from "./signatures.js";
 export * from "./transactions.js";
 export * from "./validator.js";

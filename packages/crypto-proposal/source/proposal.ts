@@ -4,8 +4,8 @@ import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Proposal implements Contracts.Crypto.Proposal {
-	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly messageFactory!: Contracts.Crypto.MessageFactory;
+	@inject(Identifiers.Cryptography.Proposal.Factory)
+	private readonly proposalFactory!: Contracts.Crypto.ProposalFactory;
 
 	#blockHeader!: Contracts.Crypto.BlockHeader;
 	#lockProof?: Contracts.Crypto.AggregatedSignature;
@@ -79,7 +79,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 			return;
 		}
 
-		this.#data = await this.messageFactory.makeProposedDataFromBytes(Buffer.from(this.#dataSerialized, "hex"));
+		this.#data = await this.proposalFactory.makeProposedDataFromBytes(Buffer.from(this.#dataSerialized, "hex"));
 	}
 
 	public getData(): Contracts.Crypto.ProposedData {

@@ -1,7 +1,7 @@
 import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
-import { Proposal } from "@mainsail/crypto-messages";
+import { Proposal } from "@mainsail/crypto-proposal";
 import type { Sandbox } from "@mainsail/test-framework";
 import { assert, BigNumber } from "@mainsail/utils";
 import { randomBytes } from "crypto";
@@ -123,8 +123,8 @@ export const makeCustomProposal = async (
 		transactions,
 	);
 
-	const messageSerializer = node.app.get<Contracts.Crypto.MessageSerializer>(
-		Identifiers.Cryptography.Message.Serializer,
+	const messageSerializer = node.app.get<Contracts.Crypto.ProposalSerializer>(
+		Identifiers.Cryptography.Proposal.Serializer,
 	);
 
 	const proposedBytes = await messageSerializer.serializeProposed({
