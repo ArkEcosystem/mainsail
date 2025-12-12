@@ -6,8 +6,10 @@ import { describe, Factories, Sandbox } from "../../test-framework/source";
 import { Types } from "../../test-framework/source/factories";
 import {
 	prevoteData,
+	precommitData,
 	prevoteDataNoBlock,
 	serializedPrevote,
+	serializedPrecommit,
 	serializedPrevoteNoBlock,
 	validatorMnemonic,
 } from "../test/fixtures/index.js";
@@ -66,10 +68,16 @@ describe<{
 		context.identity = identity;
 	});
 
-	it("#makeMessage - should correctly make signed message", async ({ factory, identity }) => {
+	it("#makeMessage - should correctly make signed prevote", async ({ factory, identity }) => {
 		const message = await factory.makeMessage(prevoteData, identity.keys);
 
 		assert.equal(message.signature, prevoteData.signature);
+	});
+
+	it("#makeMessage - should correctly make signed precommit", async ({ factory, identity }) => {
+		const message = await factory.makeMessage(precommitData, identity.keys);
+
+		assert.equal(message.signature, precommitData.signature);
 	});
 
 	it("#makeMessage - should correctly make signed prevote no block", async ({ factory, identity }) => {
@@ -90,10 +98,34 @@ describe<{
 		);
 	});
 
-	it("#makeMessageFromBytes - should be ok", async ({ factory }) => {
+	it("#makeMessage - should correctly make signed precommit no block", async ({ factory, identity }) => {
+		const message = await factory.makeMessage(
+			{
+				blockHash: undefined,
+				blockNumber: 1,
+				round: 1,
+				type: Enums.Crypto.MessageType.Precommit,
+				validatorIndex: 0,
+			},
+			identity.keys,
+		);
+
+		assert.equal(
+			message.signature,
+			"904c8055242bd7736a1cf7ce20c8fedeee5f2f8fe3f6cab6a166c36c1be0f616c2b7a333912becfa3ecb799c8cd420a012bf41018f5c52f67a2858a6d5bd016e8ef6f56a84d8a734ba6ce5f9a5260201fd9d73ce8688ff0019df2c07a1c33c4d",
+		);
+	});
+
+	it("#makeMessageFromBytes - should be ok for prevote", async ({ factory }) => {
 		const prevote = await factory.makeMessageFromBytes(Buffer.from(serializedPrevote, "hex"));
 
 		assert.equal(toData(prevote), prevoteData);
+	});
+
+	it("#makeMessageFromBytes - should be ok for precommit", async ({ factory }) => {
+		const precommit = await factory.makeMessageFromBytes(Buffer.from(serializedPrecommit, "hex"));
+
+		assert.equal(toData(precommit), precommitData);
 	});
 
 	it("#makeMessageFromBytes - should be ok with no block", async ({ factory }) => {
