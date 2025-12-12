@@ -46,6 +46,7 @@
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/transaction-pool-service": "workspace:*",
 		"@mainsail/transaction-pool-worker": "workspace:*",
+		"@mainsail/crypto-proposal": "workspace:*",
 		"@mainsail/crypto-messages": "workspace:*",
 		"@mainsail/crypto-commit": "workspace:*",
 		"@mainsail/processor": "workspace:*",

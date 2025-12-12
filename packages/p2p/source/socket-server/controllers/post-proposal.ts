@@ -10,8 +10,8 @@ export class PostProposalController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Consensus.Processor.Proposal)
 	private readonly proposalProcessor!: Contracts.Consensus.ProposalProcessor;
 
-	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly factory!: Contracts.Crypto.MessageFactory;
+	@inject(Identifiers.Cryptography.Proposal.Factory)
+	private readonly factory!: Contracts.Crypto.ProposalFactory;
 
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
