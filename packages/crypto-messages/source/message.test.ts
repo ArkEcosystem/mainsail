@@ -46,12 +46,12 @@ describe<{
 	it("#toString", async () => {
 		assert.equal(
 			prevote.toString(),
-			`{"blockHash":"${prevoteData.blockHash}","blockNumber":1,"round":1,"signature":"${prevoteData.signature}","validatorIndex":0}`,
+			`{"blockHash":"${prevoteData.blockHash}","blockNumber":1,"round":1,"signature":"${prevoteData.signature}","type":1,"validatorIndex":0}`,
 		);
 
 		assert.equal(
 			precommit.toString(),
-			`{"blockHash":"${precommitData.blockHash}","blockNumber":1,"round":1,"signature":"${precommitData.signature}","validatorIndex":0}`,
+			`{"blockHash":"${precommitData.blockHash}","blockNumber":1,"round":1,"signature":"${precommitData.signature}","type":2,"validatorIndex":0}`,
 		);
 	});
 });

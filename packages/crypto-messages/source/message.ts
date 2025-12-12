@@ -61,6 +61,7 @@ export class Message implements Contracts.Crypto.Message {
 			blockNumber: this.#blockNumber,
 			round: this.#round,
 			signature: this.#signature,
+			type: this.#type,
 			validatorIndex: this.#validatorIndex,
 		});
 	}
