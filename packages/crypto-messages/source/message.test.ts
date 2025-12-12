@@ -1,11 +1,11 @@
 import { describe, Sandbox } from "../../test-framework/source";
 import { prevoteData } from "../test/fixtures/index.js";
-import { Prevote } from "./prevote";
+import { Message } from "./message.js";
 
 describe<{
 	sandbox: Sandbox;
 }>("Prevote", ({ it, assert }) => {
-	const prevote = new Prevote({ ...prevoteData, serialized: Buffer.from("dead", "hex") });
+	const prevote = new Message({ ...prevoteData, serialized: Buffer.from("dead", "hex") });
 
 	it("#blockNumber", async () => {
 		assert.equal(prevote.blockNumber, 1);

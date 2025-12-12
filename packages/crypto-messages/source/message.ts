@@ -1,7 +1,7 @@
 import { Enums } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 
-export class Prevote implements Contracts.Crypto.Message {
+export class Message implements Contracts.Crypto.Message {
 	#blockNumber: number;
 	#round: number;
 	#blockHash: string | undefined;

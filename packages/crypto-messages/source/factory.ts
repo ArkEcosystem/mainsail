@@ -3,7 +3,7 @@ import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { MessageSchemaError } from "@mainsail/exceptions";
 
-import { Prevote } from "./prevote.js";
+import { Message } from "./message.js";
 
 @injectable()
 export class Factory implements Contracts.Crypto.MessageFactory {
@@ -51,7 +51,7 @@ export class Factory implements Contracts.Crypto.MessageFactory {
 			serialized = await this.serializer.serializeMessage(data);
 		}
 
-		return new Prevote({ ...data, serialized });
+		return new Message({ ...data, serialized });
 	}
 
 	#applySchema<T>(schema: string, data: T): T {
