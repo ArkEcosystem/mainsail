@@ -3,7 +3,7 @@
 MAINSAIL="/mainsail/packages/core/bin/run.js"
 
 SNAP=$(curl -s -L -H "Accept: application/vnd.github+json" "https://api.github.com/repos/ArkEcosystem/mainsail-network-config/contents/testnet/mainsail/" | grep  compressed | grep download_url | awk '{ print $2 }' | tr -d ",")
-node $MAINSAIL config:publish:custom --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/app.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/peers.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/crypto.json --snapshot=${SNAP} --overwrite
+node $MAINSAIL config:publish:custom --app=file:///mainsail/packages/core/bin/config/devnet/core/app.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/peers.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/refs/heads/main/testnet/mainsail/crypto.json --snapshot=${SNAP} --overwrite
 
 node $MAINSAIL env:paths
 
