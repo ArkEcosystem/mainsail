@@ -134,10 +134,6 @@ export class Restore {
 	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
 
 	public async restore(): Promise<void> {
-		if (this.snapshotImporter) {
-			await this.snapshotImporter.prepareRestore();
-		}
-
 		const isEmpty = await this.databaseService.isEmpty();
 		const mostRecentCommit = await (isEmpty
 			? this.stateStore.getGenesisCommit()
@@ -145,6 +141,13 @@ export class Restore {
 
 		const genesisBlockNumber = this.configuration.getGenesisHeight();
 		const blocksToRestore = mostRecentCommit.block.header.number - genesisBlockNumber + 1;
+
+		if (this.snapshotImporter) {
+			const milestone = this.configuration.getMilestone(genesisBlockNumber);
+			if (milestone.snapshot) {
+				await this.snapshotImporter.prepareRestore();
+			}
+		}
 
 		this.logger.info(
 			`Performing database restore of ${blocksToRestore.toLocaleString()} blocks. this might take a while.`,
