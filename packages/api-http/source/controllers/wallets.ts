@@ -112,6 +112,52 @@ export class WalletsController extends Controller {
 	}
 
 	public async tokens(request: Hapi.Request): Promise<object> {
+		const walletAddresses = Array.isArray(request.query.addresses)
+			? request.query.addresses
+			: [request.query.addresses];
+
+		const rows = await this.tokenHolderRepositoryFactory()
+			.createQueryBuilder()
+			.select(["token_address AS token", "address", "balance"])
+			.where("address IN (:...wallets)", { wallets: walletAddresses })
+			.andWhere("balance > 0")
+			.addOrderBy("token", "ASC")
+			.addOrderBy("balance", "DESC")
+			.addOrderBy("address", "ASC")
+			.getRawMany<{ token: string; address: string; balance: string }>();
+
+		// [
+		//   { token: "0xabc", wallet: "0xa", balance: "12000000" },
+		//   { token: "0xabc", wallet: "0xb", balance: "10000000" },
+		//   ...
+		// ]
+		const result = Object.entries(
+			rows.reduce<Record<string, Record<string, string>>>((accumulator, r) => {
+				const token = r.token;
+				const wallet = r.address;
+				const balance = r.balance;
+
+				if (!accumulator[token]) {
+					accumulator[token] = {};
+				}
+
+				accumulator[token][wallet] = balance;
+
+				return accumulator;
+			}, {}),
+		).map(([token, addresses]) => ({ addresses, token }));
+
+		// [
+		//   {
+		//     addresses: { "0xa": 12000000, "0xb": 10000000 }
+		//     token: "0xabc",
+		//   }
+		// ]
+
+		return { data: result };
+	}
+
+	public async tokensShow(request: Hapi.Request): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);

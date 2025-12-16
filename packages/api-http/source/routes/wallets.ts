@@ -8,6 +8,7 @@ import {
 	transactionCriteriaSchemas,
 	transactionsOrderBy,
 	transactionSortingSchema,
+	walletAddressSchema,
 	walletCriteriaSchemaObject,
 	walletId,
 	walletParamSchema as walletParameterSchema,
@@ -172,6 +173,20 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 
 	server.route({
 		handler: (request: Hapi.Request) => controller.tokens(request),
+		method: "GET",
+		options: {
+			plugins: {},
+			validate: {
+				query: Joi.object({
+					addresses: Schemas.orEqualCriteria(walletAddressSchema),
+				}),
+			},
+		},
+		path: "/wallets/tokens",
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.tokensShow(request),
 		method: "GET",
 		options: {
 			plugins: {
