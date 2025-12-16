@@ -42,6 +42,14 @@ const tokenCache: LRUCache<string, Models.Token> = new LRUCache({
 	max: 256,
 });
 
+function isTokenMetadataCall(call: Erc20Call | Erc20MetadataCall): call is Erc20MetadataCall {
+	return erc20MetadataFunctions.some((m) => m.name === call.functionName);
+}
+
+function hasRequiredTokenMetadata(tokenMetadata: TokenMetadataOptional): tokenMetadata is TokenMetadata {
+	return Object.values(tokenMetadata).every((v) => v !== undefined);
+}
+
 @injectable()
 export class TokenParser {
 	@inject(Identifiers.Evm.Instance)
@@ -306,12 +314,4 @@ export class TokenParser {
 
 		return "0";
 	}
-}
-
-function isTokenMetadataCall(call: Erc20Call | Erc20MetadataCall): call is Erc20MetadataCall {
-	return erc20MetadataFunctions.some((m) => m.name === call.functionName);
-}
-
-function hasRequiredTokenMetadata(tokenMetadata: TokenMetadataOptional): tokenMetadata is TokenMetadata {
-	return Object.values(tokenMetadata).every((v) => v !== undefined);
 }

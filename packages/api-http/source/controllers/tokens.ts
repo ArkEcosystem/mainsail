@@ -15,7 +15,7 @@ export class TokensController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TokenHolderRepositoryFactory)
 	private readonly tokenHolderRepositoryFactory!: ApiDatabaseContracts.TokenHolderRepositoryFactory;
 
-	public async index(request: Hapi.Request) {
+	public async index(request: Hapi.Request): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 
 		const [tokens, totalCount] = await this.tokenRepositoryFactory()
@@ -35,7 +35,7 @@ export class TokensController extends Controller {
 		);
 	}
 
-	public async show(request: Hapi.Request) {
+	public async show(request: Hapi.Request): Promise<object> {
 		const token = await this.tokenRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -49,7 +49,7 @@ export class TokensController extends Controller {
 		return this.respondWithResource(token, TokenResource);
 	}
 
-	public async holders(request: Hapi.Request) {
+	public async holders(request: Hapi.Request): Promise<object> {
 		const [tokenHolders, totalCount] = await this.tokenHolderRepositoryFactory()
 			.createQueryBuilder()
 			.select()
