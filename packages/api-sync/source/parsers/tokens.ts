@@ -1,12 +1,12 @@
-import type { Models, Contracts as ApiDatabaseContracts } from "@mainsail/api-database";
+import type { Contracts as ApiDatabaseContracts, Models } from "@mainsail/api-database";
 import { Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
-import { inject, injectable, tagged } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
+import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+import { assert } from "@mainsail/utils";
+import { LRUCache } from "lru-cache";
 import type { ContractFunctionParameters, EncodeFunctionDataParameters } from "viem";
 import { decodeFunctionResult, encodeFunctionData, parseAbi, parseEventLogs, toHex, zeroAddress } from "viem";
-import { LRUCache } from "lru-cache";
-import { assert } from "@mainsail/utils";
 
 const erc20AbiFunctions = parseAbi([
 	"function totalSupply() view returns (uint256)",
@@ -130,7 +130,7 @@ export class TokenParser {
 			}
 		}
 
-		return { tokens, tokenHolders };
+		return { tokenHolders, tokens };
 	}
 
 	async #getTokens(
@@ -147,19 +147,19 @@ export class TokenParser {
 		for (const address of addresses) {
 			const fromCache = tokenCache.get(address);
 			if (fromCache) {
-				result.set(address, { token: fromCache, isNew: false });
+				result.set(address, { isNew: false, token: fromCache });
 				continue;
 			}
 
 			// Postgres might already have the contract, load it and bail early.
-			const dbToken = await tokenRepository
+			const databaseToken = await tokenRepository
 				.createQueryBuilder()
 				.where("address = :address", { address })
 				.getOne();
 
-			if (dbToken) {
+			if (databaseToken) {
 				this.logger.debug(`Found ERC20 token contract in postgres: ${address}`);
-				result.set(address, { token: dbToken, isNew: false });
+				result.set(address, { isNew: false, token: databaseToken });
 				continue;
 			}
 
@@ -170,12 +170,12 @@ export class TokenParser {
 				this.logger.debug(`Detected ERC20 token contract: ${address}`);
 
 				result.set(address, {
+					isNew: true,
 					token: {
 						address,
 						deploymentHash: transaction.data.to === undefined ? transaction.hash : undefined,
 						...parsed,
 					},
-					isNew: true,
 				});
 
 				continue;
