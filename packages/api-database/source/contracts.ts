@@ -100,9 +100,9 @@ export type PluginRepository = ExtendedRepository<Plugin> & PluginRepositoryExte
 export type StateRepositoryExtension = Record<string, unknown>;
 export type StateRepository = ExtendedRepository<State> & StateRepositoryExtension;
 
-export type TokenRepositoryExtension = Record<string, any>;
+export type TokenRepositoryExtension = Record<string, unknown>;
 export type TokenRepository = ExtendedRepository<Token> & TokenRepositoryExtension;
-export type TokenHolderRepositoryExtension = Record<string, any>;
+export type TokenHolderRepositoryExtension = Record<string, unknown>;
 export type TokenHolderRepository = ExtendedRepository<TokenHolder> & TokenHolderRepositoryExtension;
 
 export type SystemRepositoryExtension = {
