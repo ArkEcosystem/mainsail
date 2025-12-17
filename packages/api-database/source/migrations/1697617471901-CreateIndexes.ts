@@ -52,6 +52,8 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 
             CREATE UNIQUE INDEX legacy_cold_wallets_unique_merge_address ON legacy_cold_wallets (merge_info_wallet_address)
             WHERE merge_info_wallet_address IS NOT NULL;
+
+            CREATE INDEX token_holders_address_token ON token_holders ("address", "token_address");
         `);
 	}
 
@@ -100,6 +102,8 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX wallets_unique_public_key;
 
             DROP INDEX legacy_cold_wallets_unique_merge_address;
+
+            DROP INDEX token_holders_address_token;
         `);
 	}
 }
