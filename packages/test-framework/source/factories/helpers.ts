@@ -17,7 +17,7 @@ const createFactory = memoizee(async (config: Contracts.Crypto.NetworkConfigPart
 	return factory;
 });
 
-export const factory = async (name: string, config: Contracts.Crypto.NetworkConfigPartial): Promise<Factory> => {
+export const factory = async <T>(name: string, config: Contracts.Crypto.NetworkConfigPartial): Promise<Factory<T>> => {
 	const factoryBuilder = await createFactory(config);
 	return factoryBuilder.get(name);
 };
