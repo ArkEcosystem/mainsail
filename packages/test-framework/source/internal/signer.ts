@@ -1,16 +1,10 @@
 import type { Contracts } from "@mainsail/contracts";
+import { type TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
 import { registerTransactionFactory } from "../factories/factories/transaction.js";
 import { FactoryBuilder } from "../factories/factory-builder.js";
-import type {
-	EvmCallOptions,
-	MultiPaymentOptions,
-	MultiSignatureOptions,
-	TransferOptions,
-	ValidatorRegistrationOptions,
-	VoteOptions,
-} from "../factories/types.js";
+import type { TransferOptions } from "../factories/types.js";
 
 export class Signer {
 	#config: Contracts.Crypto.NetworkConfig;
@@ -34,73 +28,10 @@ export class Signer {
 		const states = ["sign"];
 
 		const builder = await this.#factoryBuilder
-			.get("Transfer")
+			.get<TransactionBuilder>("Transfer")
 			.withOptions(options)
 			.withStates(...states)
 			.make();
-
-		this.#incrementNonce();
-		return builder.build();
-	}
-
-	public async makeValidator(options: ValidatorRegistrationOptions): Promise<Contracts.Crypto.Transaction> {
-		await this.#initialize();
-
-		options = { ...options, nonce: this.#nonce.toFixed() };
-
-		const builder = await this.#factoryBuilder
-			.get("ValidatorRegistration")
-			.withOptions(options)
-			.withStates("sign")
-			.make();
-
-		this.#incrementNonce();
-		return await builder.build();
-	}
-
-	public async makeVote(options: VoteOptions): Promise<Contracts.Crypto.Transaction> {
-		await this.#initialize();
-
-		options = { ...options, nonce: this.#nonce.toFixed() };
-
-		const builder = await this.#factoryBuilder.get("Vote").withOptions(options).withStates("sign").make();
-
-		this.#incrementNonce();
-		return builder.build();
-	}
-
-	public async makeMultiSignatureRegistration(options: MultiSignatureOptions): Promise<Contracts.Crypto.Transaction> {
-		await this.#initialize();
-
-		options = { ...options, nonce: this.#nonce.toFixed() };
-
-		const builder = await this.#factoryBuilder
-			.get("MultiSignature")
-			.withOptions(options)
-			.withStates("sign", "multiSign")
-			.make();
-
-		this.#incrementNonce();
-		return builder.build();
-	}
-
-	public async makeMultipayment(options: MultiPaymentOptions): Promise<Contracts.Crypto.Transaction> {
-		await this.#initialize();
-
-		options = { ...options, nonce: this.#nonce.toFixed() };
-
-		const builder = await this.#factoryBuilder.get("MultiPayment").withOptions(options).withStates("sign").make();
-
-		this.#incrementNonce();
-		return builder.build();
-	}
-
-	public async makeEvmCall(options: EvmCallOptions): Promise<Contracts.Crypto.Transaction> {
-		await this.#initialize();
-
-		options = { nonce: this.#nonce.toFixed(), ...options };
-
-		const builder = await this.#factoryBuilder.get("EvmCall").withOptions(options).withStates("sign").make();
 
 		this.#incrementNonce();
 		return builder.build();

@@ -1,4 +1,4 @@
-import type { Contracts } from "@mainsail/contracts";
+import type { TransactionBuilder } from "@mainsail/crypto-transaction";
 import clone from "lodash.clone";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
@@ -8,7 +8,7 @@ import { sealBlock } from "./block";
 
 describe<{}>("Block", ({ it, assert }) => {
 	it("#sealBlock - should seal block", async () => {
-		const transactionFactory = await Factories.factory("Transfer", crypto);
+		const transactionFactory = await Factories.factory<TransactionBuilder>("Transfer", crypto);
 
 		const transactionBuilder1 = await transactionFactory.withStates("sign").make();
 		const transactionBuilder2 = await transactionFactory.withOptions({ nonce: 1 }).withStates("sign").make();
