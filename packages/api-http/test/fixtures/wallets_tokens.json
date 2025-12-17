@@ -1,0 +1,26 @@
+[
+    {
+        "address": "0x432b093d9542B905C87587607491C369408475b4",
+        "publicKey": "02f6c8d7535868003c26ec21e82b2941ed56458de25f3dd0941396819ff1e36bd1",
+        "balance": "2358240547181890849056603",
+        "nonce": "17",
+        "attributes": {
+            "vote": "0x432b093d9542B905C87587607491C369408475b4",
+            "validatorFee": "250000000000000000000",
+            "validatorRank": 53,
+            "validatorApproval": 0.0189,
+            "validatorResigned": false,
+            "validatorLastBlock": {
+                "hash": "a8764139ef6ea277bd1bbec75db8c7e9a30d7dee435f1122ad7d9f168df75029",
+                "number": 738,
+                "timestamp": 1765934876331
+            },
+            "validatorPublicKey": "993470b7be9423b78a8ec3a6e2b4ca12f387c9caddcf4ab8be1c6b3ec47710bc24332552bbf3780447cac8a1f2b32d66",
+            "validatorVoteBalance": "2358240547181890849056603",
+            "validatorVotersCount": 1,
+            "validatorProducedBlocks": 14
+        },
+        "updated_at": "738",
+        "tokenCount": 2
+    }
+]

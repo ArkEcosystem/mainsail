@@ -144,6 +144,18 @@ export class ApiContext {
 		)();
 	}
 
+	public get tokenRepository(): ApiDatabaseContracts.TokenRepository {
+		return this.app.get<ApiDatabaseContracts.TokenRepositoryFactory>(
+			ApiDatabaseIdentifiers.TokenRepositoryFactory,
+		)();
+	}
+
+	public get tokenHolderRepository(): ApiDatabaseContracts.TokenHolderRepository {
+		return this.app.get<ApiDatabaseContracts.TokenHolderRepositoryFactory>(
+			ApiDatabaseIdentifiers.TokenHolderRepositoryFactory,
+		)();
+	}
+
 	public async reset() {
 		const dataSource = this.app.get<any>(ApiDatabaseIdentifiers.DataSource);
 		await dataSource.dropDatabase();

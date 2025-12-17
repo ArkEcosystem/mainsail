@@ -1,6 +1,10 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
-import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Models,
+} from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
 import { TokenResource } from "../resources/token.js";
@@ -36,11 +40,7 @@ export class TokensController extends Controller {
 	}
 
 	public async show(request: Hapi.Request): Promise<object> {
-		const token = await this.tokenRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.where("address = :address", { address: request.params.address })
-			.getOne();
+		const token = await this.getToken(request.params.address);
 
 		if (!token) {
 			return Boom.notFound("Token not found");
@@ -50,12 +50,18 @@ export class TokensController extends Controller {
 	}
 
 	public async holders(request: Hapi.Request): Promise<object> {
+		const token = await this.getToken(request.params.address);
+
+		if (!token) {
+			return Boom.notFound("Token not found");
+		}
+
 		const [tokenHolders, totalCount] = await this.tokenHolderRepositoryFactory()
 			.createQueryBuilder()
 			.select()
 			.where("token_address = :address", { address: request.params.address })
 			.orderBy("balance", "DESC")
-			.addOrderBy("address")
+			.addOrderBy("address", "ASC")
 			.getManyAndCount();
 
 		return this.toPagination(
@@ -66,5 +72,13 @@ export class TokensController extends Controller {
 			},
 			TokenHolderResource,
 		);
+	}
+
+	private async getToken(address: string): Promise<Models.Token | null> {
+		return this.tokenRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.where("address = :address", { address })
+			.getOne();
 	}
 }
