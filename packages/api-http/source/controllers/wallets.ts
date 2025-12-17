@@ -14,6 +14,16 @@ import { TokenHolderResource } from "../resources/token-holder.js";
 import { EnrichedWallet, WalletResource } from "../resources/wallet.js";
 import { Controller } from "./controller.js";
 
+type TokenHolderRow = {
+	token: string;
+	address: string;
+	balance: string;
+	symbol: string;
+	name: string;
+	decimals: number;
+	supply: string;
+};
+
 @injectable()
 export class WalletsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
@@ -117,44 +127,84 @@ export class WalletsController extends Controller {
 			: [request.query.addresses];
 
 		const rows = await this.tokenHolderRepositoryFactory()
-			.createQueryBuilder()
-			.select(["token_address AS token", "address", "balance"])
-			.where("address IN (:...wallets)", { wallets: walletAddresses })
-			.andWhere("balance > 0")
-			.addOrderBy("token", "ASC")
-			.addOrderBy("balance", "DESC")
-			.addOrderBy("address", "ASC")
-			.getRawMany<{ token: string; address: string; balance: string }>();
-
-		// [
-		//   { token: "0xabc", wallet: "0xa", balance: "12000000" },
-		//   { token: "0xabc", wallet: "0xb", balance: "10000000" },
-		//   ...
-		// ]
-		const result = Object.entries(
-			rows.reduce<Record<string, Record<string, string>>>((accumulator, r) => {
-				const token = r.token;
-				const wallet = r.address;
-				const balance = r.balance;
-
-				if (!accumulator[token]) {
-					accumulator[token] = {};
-				}
-
-				accumulator[token][wallet] = balance;
-
-				return accumulator;
-			}, {}),
-		).map(([token, addresses]) => ({ addresses, token }));
+			.createQueryBuilder("th")
+			.innerJoin("tokens", "t", "t.address = th.token_address")
+			.select([
+				"th.token_address AS token",
+				"th.address AS address",
+				"th.balance AS balance",
+				"t.symbol AS symbol",
+				"t.name AS name",
+				"t.decimals AS decimals",
+				"t.total_supply AS supply",
+			])
+			.where("th.address IN (:...addresses)", { addresses: walletAddresses })
+			.andWhere("th.balance > 0")
+			.orderBy("th.token_address", "ASC")
+			.addOrderBy("th.balance", "DESC")
+			.addOrderBy("th.address", "ASC")
+			.getRawMany<TokenHolderRow>();
 
 		// [
 		//   {
-		//     addresses: { "0xa": 12000000, "0xb": 10000000 }
 		//     token: "0xabc",
-		//   }
+		//     wallet: "0xa",
+		//     balance: "12000000",
+		//     symbol: "USDC",
+		//     name: "USD Coin",
+		//	   decimals: 6,
+		//     supply: "1000000000000000"
+		//   },
+		//   {
+		//     token: "0xabc",
+		//     wallet: "0xb",
+		//     balance: "10000000",
+		//     symbol: "USDC",
+		//     name: "USD Coin",
+		//	   decimals: 6,
+		//     supply: "1000000000000000"
+		//   },
+		//   ...
 		// ]
+		const byToken = rows.reduce<
+			Record<
+				string,
+				{
+					token: string;
+					symbol: string;
+					name: string;
+					supply: string;
+					decimals: number;
+					addresses: Record<string, string>;
+				}
+			>
+		>((accumulator, row: TokenHolderRow) => {
+			if (!accumulator[row.token]) {
+				accumulator[row.token] = {
+					addresses: {},
+					decimals: row.decimals,
+					name: row.name,
+					supply: row.supply,
+					symbol: row.symbol,
+					token: row.token,
+				};
+			}
 
-		return { data: result };
+			accumulator[row.token].addresses[row.address] = row.balance;
+			return accumulator;
+		}, {});
+
+		// [
+		// 	{
+		// 		token: "0xabc",
+		// 		symbol: "USDC",
+		// 		name: "USD Coin",
+		// 		supply: "1000000000000000",
+		//      decimals: 6,
+		// 		addresses: { "0xa": 12000000, "0xb": 10000000 },
+		// 	},
+		// ];
+		return { data: Object.values(byToken) };
 	}
 
 	public async tokensShow(request: Hapi.Request): Promise<object> {
