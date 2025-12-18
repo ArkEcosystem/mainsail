@@ -74,6 +74,12 @@ export default [
 			"@typescript-eslint/restrict-plus-operands": "off",
 			"@typescript-eslint/restrict-template-expressions": "off",
 			"@typescript-eslint/unbound-method": "warn",
+			"@typescript-eslint/typedef": [
+				"error",
+				{
+					"parameter": true
+				},			
+			],
 			"arrow-body-style": ["warn", "as-needed"],
 			curly: "warn",
 			"import/default": "error",
