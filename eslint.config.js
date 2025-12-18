@@ -77,8 +77,8 @@ export default [
 			"@typescript-eslint/typedef": [
 				"error",
 				{
-					"parameter": true
-				},			
+					parameter: true,
+				},
 			],
 			"arrow-body-style": ["warn", "as-needed"],
 			curly: "warn",
