@@ -32,7 +32,7 @@ export class Logger {
 		this.log(message, "debug");
 	}
 
-	public log(message: string | Error, method = "log"): void {
+	public log(message: string | Error, method: "log" | "info" | "debug" | "warn" | "error" = "log"): void {
 		if (this.output.isQuiet()) {
 			return;
 		}

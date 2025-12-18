@@ -1,3 +1,4 @@
+import type Hapi from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -14,12 +15,12 @@ export class AcceptPeerPlugin {
 	@inject(Identifiers.P2P.Peer.Processor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 
-	public register(server) {
+	public register(server: Hapi.Server) {
 		const peerProcessor = this.peerProcessor;
 
 		server.ext({
-			async method(request: Contracts.P2P.Request, h) {
-				const ip = getPeerIp(request);
+			async method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+				const ip = getPeerIp(request as Contracts.P2P.Request);
 				void peerProcessor.validateAndAcceptPeer(ip);
 
 				return h.continue;

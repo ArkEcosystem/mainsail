@@ -56,7 +56,7 @@ export class Factory<T> {
 		return this;
 	}
 
-	public async make(resetModifiers = true): Promise<T> {
+	public async make(resetModifiers: boolean = true): Promise<T> {
 		const states: string[] = [...this.#modifiers.states.values()];
 		const initialState: string | undefined = states.shift();
 

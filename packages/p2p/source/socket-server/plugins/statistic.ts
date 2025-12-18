@@ -4,6 +4,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { performance } from "perf_hooks";
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/typedef */
 
 @injectable()
 export class StatisticPlugin {

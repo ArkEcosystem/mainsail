@@ -53,7 +53,7 @@ export const rateLimit = {
 		});
 
 		server.ext({
-			async method(request, h) {
+			async method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 				try {
 					const rateLimitRes: RateLimiterRes = await rateLimiter.consume(
 						getIp(request, options.trustProxy),

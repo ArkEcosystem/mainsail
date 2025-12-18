@@ -43,7 +43,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		return this.#fromSerialized(Buffer.from(hex, "hex"));
 	}
 
-	public async fromBytes(buff: Buffer, strict = true): Promise<Contracts.Crypto.Transaction> {
+	public async fromBytes(buff: Buffer, strict: boolean = true): Promise<Contracts.Crypto.Transaction> {
 		return this.#fromSerialized(buff, strict);
 	}
 
@@ -94,7 +94,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 
 	public async computeCryptoData(
 		data: Contracts.Crypto.TransactionData,
-		strict = true,
+		strict: boolean = true,
 	): Promise<Contracts.Crypto.TransactionCryptoData> {
 		assert.number(data.v);
 		assert.string(data.r);
@@ -147,7 +147,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		};
 	}
 
-	async #fromSerialized(serialized: Buffer, strict = true): Promise<Contracts.Crypto.Transaction> {
+	async #fromSerialized(serialized: Buffer, strict: boolean = true): Promise<Contracts.Crypto.Transaction> {
 		try {
 			const transaction = await this.deserializer.deserialize(serialized);
 

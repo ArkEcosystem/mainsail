@@ -97,8 +97,8 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	async #validateTransaction(
 		transaction: Contracts.Crypto.Transaction,
-		nonceOffset = BigNumber.ZERO,
-		refund = BigNumber.ZERO,
+		nonceOffset: BigNumber = BigNumber.ZERO,
+		refund: BigNumber = BigNumber.ZERO,
 	): Promise<void> {
 		const maxTransactionBytes: number = this.configuration.getRequired<number>("maxTransactionBytes");
 		if (transaction.serialized.length > maxTransactionBytes) {

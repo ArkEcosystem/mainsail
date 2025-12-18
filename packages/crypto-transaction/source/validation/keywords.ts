@@ -5,33 +5,19 @@ import type { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
 ): {
-	transactionType: FuncKeywordDefinition;
 	network: FuncKeywordDefinition;
 	transactionGasPrice: FuncKeywordDefinition;
 	transactionGasLimit: FuncKeywordDefinition;
 	bytecode: FuncKeywordDefinition;
 } => {
-	const transactionType: FuncKeywordDefinition = {
-		compile(schema) {
-			return (data) => data === schema;
-		},
-
-		errors: false,
-		keyword: "transactionType",
-		metaSchema: {
-			minimum: 0,
-			type: "integer",
-		},
-	};
-
 	const network: FuncKeywordDefinition = {
-		compile(schema) {
+		compile() {
 			return (data) => {
 				const chainId = configuration.get("network.chainId");
 				if (!chainId) {
 					return true;
 				}
-				return schema && data === chainId;
+				return data === chainId;
 			};
 		},
 		errors: false,
@@ -43,7 +29,7 @@ export const makeKeywords = (
 
 	const transactionGasPrice: FuncKeywordDefinition = {
 		// @ts-ignore
-		compile(schema) {
+		compile() {
 			// Used as lazy cache
 			const genesisTransactionsLookup: Set<string> = new Set();
 
@@ -103,7 +89,7 @@ export const makeKeywords = (
 
 	const transactionGasLimit: FuncKeywordDefinition = {
 		// @ts-ignore
-		compile(schema) {
+		compile() {
 			return (data) => {
 				const {
 					gas: { minimumGasLimit, maximumGasLimit },
@@ -135,7 +121,7 @@ export const makeKeywords = (
 
 	const bytecode: FuncKeywordDefinition = {
 		// @ts-ignore
-		compile(schema) {
+		compile() {
 			return (data, parentSchema: AnySchemaObject) => {
 				const {
 					gas: { maximumGasLimit },
@@ -178,6 +164,5 @@ export const makeKeywords = (
 		network,
 		transactionGasLimit,
 		transactionGasPrice,
-		transactionType,
 	};
 };

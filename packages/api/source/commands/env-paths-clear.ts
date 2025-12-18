@@ -51,7 +51,7 @@ export class Command extends Commands.Command {
 		}
 	}
 
-	async #clear(name, path: string) {
+	async #clear(name: string, path: string) {
 		if (existsSync(path) && readdirSync(path).length > 0) {
 			emptyDirSync(path);
 

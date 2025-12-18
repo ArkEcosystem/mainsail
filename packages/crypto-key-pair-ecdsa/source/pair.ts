@@ -9,11 +9,11 @@ export class KeyPairFactory implements Contracts.Crypto.KeyPairFactory {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	public async fromMnemonic(mnemonic: string, compressed = true): Promise<Contracts.Crypto.KeyPair> {
+	public async fromMnemonic(mnemonic: string, compressed: boolean = true): Promise<Contracts.Crypto.KeyPair> {
 		return this.fromPrivateKey(SHA256.digest(Buffer.from(mnemonic, "utf8")), compressed);
 	}
 
-	public async fromPrivateKey(privateKey: Buffer, compressed = true): Promise<Contracts.Crypto.KeyPair> {
+	public async fromPrivateKey(privateKey: Buffer, compressed: boolean = true): Promise<Contracts.Crypto.KeyPair> {
 		return {
 			compressed,
 			privateKey: privateKey.toString("hex"),

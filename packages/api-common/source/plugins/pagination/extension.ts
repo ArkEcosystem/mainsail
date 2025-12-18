@@ -132,7 +132,16 @@ export class Extension {
 		return pagination.enabled !== undefined ? pagination.enabled : true;
 	}
 
-	private getRoutePaginationOptions(request) {
-		return request.route.settings.plugins.pagination;
+	private getRoutePaginationOptions(request: Hapi.Request): { enabled: boolean } | undefined {
+		const { plugins } = request.route.settings;
+		if (!plugins) {
+			return undefined;
+		}
+
+		if (!("pagination" in plugins)) {
+			return undefined;
+		}
+
+		return plugins["pagination"] as { enabled: boolean };
 	}
 }

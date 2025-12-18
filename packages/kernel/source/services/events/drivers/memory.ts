@@ -9,7 +9,7 @@ class OnceListener implements Contracts.Kernel.EventListener {
 		private readonly listener: Contracts.Kernel.EventListener,
 	) {}
 
-	public async handle({ name }): Promise<void> {
+	public async handle({ name }: { name: string }): Promise<void> {
 		this.dispatcher.forget(name, this.listener);
 	}
 }

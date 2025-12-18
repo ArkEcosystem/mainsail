@@ -125,7 +125,7 @@ export class GenesisBlockGenerator extends Generator {
 		recipient: Wallet,
 		amount: string,
 		chainId: number,
-		nonce = 0,
+		nonce: number = 0,
 	): Promise<Contracts.Crypto.Transaction> {
 		return await (
 			await this.app

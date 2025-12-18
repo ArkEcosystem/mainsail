@@ -6,7 +6,7 @@ export const whitelist = {
 	name: "whitelist",
 	register(server: Hapi.Server, options: { whitelist: string[] }): void {
 		server.ext({
-			async method(request, h) {
+			async method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 				if (!options.whitelist) {
 					return h.continue;
 				}

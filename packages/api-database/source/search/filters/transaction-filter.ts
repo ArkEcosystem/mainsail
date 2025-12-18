@@ -18,7 +18,7 @@ export class TransactionFilter {
 
 	private static async handleTransactionCriteria(
 		criteria: TransactionCriteria,
-		walletRepository,
+		walletRepository: WalletRepository,
 	): Promise<Expression<Transaction>> {
 		const expression: Expression<Transaction> = await handleAndCriteria(criteria, async (key) => {
 			switch (key) {
