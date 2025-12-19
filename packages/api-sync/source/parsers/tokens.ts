@@ -166,20 +166,20 @@ export class TokenParser {
 			// Perform calls on the contract to check if it conform to the ERC20 ABI.
 			// This should work regardless of what kind of ERC20 contract it is (Vanilla, Proxy, etc.)
 			const parsed = await this.#parseErc20Contract(address);
-			if (parsed) {
-				this.logger.debug(`Detected ERC20 token contract: ${address}`);
-
-				result.set(address, {
-					isNew: true,
-					token: {
-						address,
-						deploymentHash: transaction.data.to === undefined ? transaction.hash : undefined,
-						...parsed,
-					},
-				});
-
+			if (!parsed) {
 				continue;
 			}
+
+			this.logger.debug(`Detected ERC20 token contract: ${address}`);
+
+			result.set(address, {
+				isNew: true,
+				token: {
+					address,
+					deploymentHash: transaction.data.to === undefined ? transaction.hash : undefined,
+					...parsed,
+				},
+			});
 		}
 
 		return result;
@@ -258,7 +258,7 @@ export class TokenParser {
 					if (isTokenMetadataCall(call)) {
 						const decoded = decodeFunctionResult({
 							abi: erc20MetadataFunctions,
-							data: toHex(result.output!),
+							data: toHex(result.output),
 							functionName: call.functionName,
 						});
 
@@ -301,9 +301,16 @@ export class TokenParser {
 				to: contract,
 			});
 
+			if (!result.success) {
+				this.logger.warn(`Failed to call balanceOf on '${contract}' for ${account}`);
+				return "0";
+			}
+
+			assert.defined(result.output);
+
 			const decoded = decodeFunctionResult({
 				abi: erc20AbiFunctions,
-				data: toHex(result.output!),
+				data: toHex(result.output),
 				functionName: "balanceOf",
 			});
 

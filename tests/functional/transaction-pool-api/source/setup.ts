@@ -212,7 +212,7 @@ const bootstrap = async (sandbox: Sandbox) => {
 	await blockProcessor.commit(commitState);
 
 	const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
-	validatorSet.restore();
+	await validatorSet.restore();
 
 	await sandbox.app.get<Contracts.ApiSync.Service>(Identifiers.ApiSync.Service).bootstrap();
 
