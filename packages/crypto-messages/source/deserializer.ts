@@ -9,35 +9,6 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	private readonly serializer!: Contracts.Serializer.Serializer;
 
-	public async deserializeProposal(serialized: Buffer): Promise<Contracts.Crypto.ProposalData> {
-		const proposal = {} as Contracts.Crypto.ProposalData;
-
-		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
-
-		await this.serializer.deserialize<Contracts.Crypto.ProposalData>(buffer, proposal, {
-			schema: {
-				round: {
-					type: "uint32",
-				},
-				validRound: {
-					optional: true,
-					type: "uint32",
-				},
-				data: {
-					type: "hex",
-				},
-				validatorIndex: {
-					type: "uint8",
-				},
-				signature: {
-					type: "consensusSignature",
-				},
-			},
-		});
-
-		return proposal;
-	}
-
 	public async deserializeMessage(serialized: Buffer): Promise<Contracts.Crypto.MessageData> {
 		const precommit = {} as Contracts.Crypto.MessageData;
 
