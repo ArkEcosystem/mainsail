@@ -58,7 +58,7 @@ describe<{
 			Identifiers.Cryptography.Block.Factory,
 		);
 
-		const identityFactory = await Factories.factory("Identity", crypto);
+		const identityFactory = await Factories.factory<Factories.Types.Identity>("Identity", crypto);
 		const identity = await identityFactory
 			.withOptions({
 				app: context.sandbox.app,
