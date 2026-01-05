@@ -3,7 +3,7 @@ import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
 
-import { messageSchema } from "./serializer-schemas.js";
+import { schema } from "./serializer-schemas.js";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.MessageDeserializer {
@@ -16,7 +16,7 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
 		await this.serializer.deserialize<Contracts.Crypto.MessageData>(buffer, precommit, {
-			schema: messageSchema,
+			schema,
 		});
 
 		return precommit;

@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
-import { messageSchema, messageSchemaForSignature } from "./serializer-schemas.js";
+import { schema, schemaForSignature } from "./serializer-schemas.js";
 
 @injectable()
 export class Serializer implements Contracts.Crypto.MessageSerializer {
@@ -26,7 +26,7 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 				1 +
 				(message.blockHash ? this.hashSize : 0) + // blockHash
 				this.signatureSize, // signature
-			schema: messageSchema,
+			schema,
 			skip: 0,
 		});
 	}
@@ -39,7 +39,7 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 				4 + // round
 				1 +
 				(message.blockHash ? this.hashSize : 0), // blockHash
-			schema: messageSchemaForSignature,
+			schema: schemaForSignature,
 			skip: 0,
 		});
 	}

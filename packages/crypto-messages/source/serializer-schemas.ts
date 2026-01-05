@@ -1,7 +1,7 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import type { Contracts } from "@mainsail/contracts";
 
-export const messageSchemaForSignature: Record<string, Contracts.Serializer.SerializationSchema> = {
+export const schemaForSignature: Record<string, Contracts.Serializer.SerializationSchema> = {
 	type: {
 		type: "uint8",
 	},
@@ -17,8 +17,8 @@ export const messageSchemaForSignature: Record<string, Contracts.Serializer.Seri
 	},
 };
 
-export const messageSchema: Record<string, Contracts.Serializer.SerializationSchema> = {
-	...messageSchemaForSignature,
+export const schema: Record<string, Contracts.Serializer.SerializationSchema> = {
+	...schemaForSignature,
 	validatorIndex: {
 		type: "uint8",
 	},
