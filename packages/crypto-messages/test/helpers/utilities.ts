@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
-export const toData = (message: Contracts.Crypto.Precommit): Contracts.Crypto.PrecommitData => ({
+export const toData = (message: Contracts.Crypto.Message): Contracts.Crypto.MessageData => ({
 	blockHash: message.blockHash,
 	blockNumber: message.blockNumber,
 	round: message.round,

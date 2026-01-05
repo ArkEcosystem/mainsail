@@ -12,7 +12,7 @@ describe<{
 	};
 
 	const factory = {
-		makePrecommitFromBytes: () => {},
+		makeMessageFromBytes: () => {},
 	};
 
 	const state = {
@@ -32,7 +32,7 @@ describe<{
 	});
 
 	it("#handle - should call processor", async ({ controller }) => {
-		const spyOnFactory = spy(factory, "makePrecommitFromBytes");
+		const spyOnFactory = spy(factory, "makeMessageFromBytes");
 		const spyOnProcess = spy(processor, "process");
 		const spyOnResetLastMessageTime = spy(state, "resetLastMessageTime");
 

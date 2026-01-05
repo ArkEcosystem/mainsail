@@ -24,7 +24,7 @@ export class PostPrevoteController implements Contracts.P2P.Controller {
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.PostPrevoteResponse> {
 		try {
-			const prevote = await this.factory.makePrevoteFromBytes(request.payload.prevote);
+			const prevote = await this.factory.makeMessageFromBytes(request.payload.prevote);
 
 			const result = await this.prevoteProcessor.process(prevote);
 

@@ -7,16 +7,14 @@ export interface SignatureMessageData {
 	readonly type: MessageType;
 	readonly blockNumber: number;
 	readonly round: number;
-	readonly blockHash: string;
+	readonly blockHash?: string;
 }
 
 export type HasBlockHash = { blockHash: string };
 export type WithoutBlockHash<T> = Omit<T, "blockHash">;
 export type WithOptionalBlockHash<T extends HasBlockHash> = WithoutBlockHash<T> & Partial<Pick<T, "blockHash">>;
-export type SignaturePrevoteData = WithOptionalBlockHash<SignatureMessageData>;
-export type SignaturePrecommitData = WithOptionalBlockHash<SignatureMessageData>;
 
-export interface PrevoteData {
+export interface MessageData {
 	readonly type: MessageType;
 	readonly blockNumber: number;
 	readonly round: number;
@@ -25,54 +23,31 @@ export interface PrevoteData {
 	readonly signature: string;
 }
 
-export interface Prevote extends PrevoteData {
+export interface Message extends MessageData {
 	readonly serialized: Buffer;
 
-	toSignatureData(): SignaturePrevoteData;
-	toString(): string;
-}
-
-export interface PrecommitData {
-	readonly type: MessageType;
-	readonly blockNumber: number;
-	readonly round: number;
-	readonly blockHash?: string;
-	readonly validatorIndex: number;
-	readonly signature: string;
-}
-
-export interface Precommit extends PrecommitData {
-	readonly serialized: Buffer;
-
-	toSignatureData(): SignaturePrecommitData;
+	toSignatureData(): SignatureMessageData;
 	toString(): string;
 }
 
 export type HasSignature = { signature: string };
 export type WithoutSignature<T> = Omit<T, "signature">;
 export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
-export type MakePrevoteData = WithoutSignature<PrevoteData>;
-export type MakePrecommitData = WithoutSignature<PrecommitData>;
+export type MakeMessageData = WithoutSignature<MessageData>;
 
 export interface MessageFactory {
-	makePrevote(data: MakePrevoteData, keyPair: KeyPair): Promise<Prevote>;
-	makePrevoteFromBytes(data: Buffer): Promise<Prevote>;
-	makePrevoteFromData(data: PrevoteData): Promise<Prevote>;
-	makePrecommit(data: MakePrecommitData, keyPair: KeyPair): Promise<Precommit>;
-	makePrecommitFromBytes(data: Buffer): Promise<Precommit>;
-	makePrecommitFromData(data: PrecommitData): Promise<Precommit>;
+	makeMessage(data: MakeMessageData, keyPair: KeyPair): Promise<Message>;
+	makeMessageFromBytes(data: Buffer): Promise<Message>;
+	makeMessageFromData(data: MessageData): Promise<Message>;
 }
 
 export interface MessageSerializer {
-	serializePrevote(prevote: PrevoteData): Promise<Buffer>;
-	serializePrevoteForSignature(prevote: SignaturePrevoteData): Promise<Buffer>;
-	serializePrecommit(precommit: PrecommitData): Promise<Buffer>;
-	serializePrecommitForSignature(precommit: SignaturePrecommitData): Promise<Buffer>;
+	serializeMessage(message: MessageData): Promise<Buffer>;
+	serializeMessageForSignature(message: SignatureMessageData): Promise<Buffer>;
 }
 
 export interface MessageDeserializer {
-	deserializePrevote(serialized: Buffer): Promise<PrevoteData>;
-	deserializePrecommit(serialized: Buffer): Promise<PrecommitData>;
+	deserializeMessage(serialized: Buffer): Promise<MessageData>;
 }
 
 export interface MessageVerificationResult {
