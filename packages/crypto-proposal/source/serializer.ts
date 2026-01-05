@@ -1,7 +1,8 @@
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { lockProofSchema, schema, schemaForSignature } from "./serializer-schemas.js";
 
 @injectable()
 export class Serializer implements Contracts.Crypto.ProposalSerializer {
@@ -27,44 +28,16 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 				proposal.data.serialized.length / 2 + // serialized data
 				1 + // validatorIndex
 				(options.includeSignature ? this.signatureSize : 0), // signature
+			schema: options.includeSignature ? schema : schemaForSignature,
 			skip: 0,
-			schema: {
-				round: {
-					type: "uint32",
-				},
-				validRound: {
-					optional: true,
-					type: "uint32",
-				},
-				data: {
-					type: "hex",
-				},
-				validatorIndex: {
-					type: "uint8",
-				},
-				...(options.includeSignature
-					? {
-							signature: {
-								type: "consensusSignature",
-							},
-						}
-					: {}),
-			},
 		});
 	}
 
 	public async serializeLockProof(lockProof: Contracts.Crypto.AggregatedSignature): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.AggregatedSignature>(lockProof, {
 			length: this.lockProofSize(),
+			schema: lockProofSchema,
 			skip: 0,
-			schema: {
-				signature: {
-					type: "consensusSignature",
-				},
-				validators: {
-					type: "validatorSet",
-				},
-			},
 		});
 	}
 

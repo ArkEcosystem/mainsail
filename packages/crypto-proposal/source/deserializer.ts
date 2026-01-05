@@ -1,8 +1,9 @@
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
+
+import { lockProofSchema, schema } from "./serializer-schemas.js";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.ProposalDeserializer {
@@ -18,24 +19,7 @@ export class Deserializer implements Contracts.Crypto.ProposalDeserializer {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
 		await this.serializer.deserialize<Contracts.Crypto.ProposalData>(buffer, proposal, {
-			schema: {
-				round: {
-					type: "uint32",
-				},
-				validRound: {
-					optional: true,
-					type: "uint32",
-				},
-				data: {
-					type: "hex",
-				},
-				validatorIndex: {
-					type: "uint8",
-				},
-				signature: {
-					type: "consensusSignature",
-				},
-			},
+			schema,
 		});
 
 		return proposal;
@@ -48,14 +32,7 @@ export class Deserializer implements Contracts.Crypto.ProposalDeserializer {
 
 		await this.serializer.deserialize<Contracts.Crypto.AggregatedSignature>(buffer, commit, {
 			length: this.lockProofSize(),
-			schema: {
-				signature: {
-					type: "consensusSignature",
-				},
-				validators: {
-					type: "validatorSet",
-				},
-			},
+			schema: lockProofSchema,
 		});
 
 		return commit;
