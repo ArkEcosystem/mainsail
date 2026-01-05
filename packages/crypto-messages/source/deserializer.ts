@@ -1,8 +1,9 @@
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
+
+import { messageSchema } from "./serializer-schemas.js";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.MessageDeserializer {
@@ -15,27 +16,7 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
 		await this.serializer.deserialize<Contracts.Crypto.MessageData>(buffer, precommit, {
-			schema: {
-				type: {
-					type: "uint8",
-				},
-				blockNumber: {
-					type: "uint32",
-				},
-				round: {
-					type: "uint32",
-				},
-				blockHash: {
-					type: "blockHash",
-					optional: true,
-				},
-				validatorIndex: {
-					type: "uint8",
-				},
-				signature: {
-					type: "consensusSignature",
-				},
-			},
+			schema: messageSchema,
 		});
 
 		return precommit;
