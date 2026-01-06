@@ -25,10 +25,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	private readonly proposalProcessor!: Contracts.Consensus.ProposalProcessor;
 
 	@inject(Identifiers.Consensus.Processor.Message)
-	private readonly prevoteProcessor!: Contracts.Consensus.MessageProcessor;
-
-	@inject(Identifiers.Consensus.Processor.Message)
-	private readonly precommitProcessor!: Contracts.Consensus.MessageProcessor;
+	private readonly messageProcessor!: Contracts.Consensus.MessageProcessor;
 
 	@inject(Identifiers.Consensus.Scheduler)
 	private readonly scheduler!: Contracts.Consensus.Scheduler;
@@ -550,7 +547,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 			const prevote = await localValidator.prevote(validatorIndex, this.#blockNumber, this.#round, value);
 
-			void this.prevoteProcessor.process(prevote);
+			void this.messageProcessor.process(prevote);
 		}
 	}
 
@@ -569,7 +566,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 			const precommit = await localValidator.precommit(validatorIndex, this.#blockNumber, this.#round, value);
 
-			void this.precommitProcessor.process(precommit);
+			void this.messageProcessor.process(precommit);
 		}
 	}
 
