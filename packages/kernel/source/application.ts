@@ -75,7 +75,7 @@ export class Application implements Contracts.Kernel.Application {
 		return this.get(Identifiers.Application.Thread);
 	}
 
-	public dataPath(path = ""): string {
+	public dataPath(path: string = ""): string {
 		return join(this.#getPath("data"), path);
 	}
 
@@ -83,7 +83,7 @@ export class Application implements Contracts.Kernel.Application {
 		this.#usePath("data", path);
 	}
 
-	public configPath(path = ""): string {
+	public configPath(path: string = ""): string {
 		return join(this.#getPath("config"), path);
 	}
 
@@ -91,7 +91,7 @@ export class Application implements Contracts.Kernel.Application {
 		this.#usePath("config", path);
 	}
 
-	public cachePath(path = ""): string {
+	public cachePath(path: string = ""): string {
 		return join(this.#getPath("cache"), path);
 	}
 
@@ -99,7 +99,7 @@ export class Application implements Contracts.Kernel.Application {
 		this.#usePath("cache", path);
 	}
 
-	public logPath(path = ""): string {
+	public logPath(path: string = ""): string {
 		return join(this.#getPath("log"), path);
 	}
 
@@ -107,7 +107,7 @@ export class Application implements Contracts.Kernel.Application {
 		this.#usePath("log", path);
 	}
 
-	public tempPath(path = ""): string {
+	public tempPath(path: string = ""): string {
 		return join(this.#getPath("temp"), path);
 	}
 

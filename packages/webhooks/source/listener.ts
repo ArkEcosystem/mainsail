@@ -37,7 +37,7 @@ export class Listener implements Contracts.Kernel.EventListener<{ name: string; 
 	public async broadcast(
 		webhook: Contracts.Webhooks.Webhook,
 		payload: Contracts.Types.JsonObject,
-		timeout = 1500,
+		timeout: number = 1500,
 	): Promise<void> {
 		const start = performance.now();
 

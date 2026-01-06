@@ -10,7 +10,10 @@ export const extendSchema = (
 	properties: { unevaluatedProperties?: boolean; required?: string[] },
 ): Contracts.Crypto.TransactionSchema =>
 	merge(parent, properties, {
-		arrayMerge(target, source, options) {
+		arrayMerge(
+			target: Contracts.Crypto.TransactionSchema[],
+			source: Contracts.Crypto.TransactionSchema[],
+		): Contracts.Crypto.TransactionSchema[] {
 			const result = source;
 
 			for (const item of target) {

@@ -33,7 +33,10 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 
 	#pendingPrevotes: Map<string, ((value: SignatureCheckResult) => void)[]> = new Map();
 
-	async process(prevote: Contracts.Crypto.Message, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
+	async process(
+		prevote: Contracts.Crypto.Message,
+		broadcast: boolean = true,
+	): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.hasValidBlockNumberOrRound(prevote)) {
 				return Enums.Consensus.ProcessorResult.Skipped;

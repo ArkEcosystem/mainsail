@@ -5,6 +5,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { BasePlugin } from "./base-plugin.js";
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/typedef */
 
 @injectable()
 export class CodecPlugin extends BasePlugin {

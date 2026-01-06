@@ -71,7 +71,7 @@ export class Updater implements Contracts_Updater {
 		return lt(this.#packageVersion, this.#latestVersion);
 	}
 
-	public async update(updateProcessManager = false, force = false): Promise<boolean> {
+	public async update(updateProcessManager: boolean = false, force: boolean = false): Promise<boolean> {
 		if (this.#latestVersion === undefined) {
 			return false;
 		}

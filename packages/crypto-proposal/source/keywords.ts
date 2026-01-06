@@ -43,7 +43,7 @@ export const makeKeywords = (
 	const limitToRoundValidators: FuncKeywordDefinition = {
 		// TODO: Check type (same as bignum)
 		// @ts-ignore
-		compile(schema) {
+		compile(schema: { minimum?: number }) {
 			return (data, parentSchema: AnySchemaObject) => {
 				if (!Array.isArray(data)) {
 					return false;

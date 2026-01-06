@@ -1,4 +1,5 @@
 import Boom, { badData } from "@hapi/boom";
+import type Hapi from "@hapi/hapi";
 import { Request as HapiRequest, Server as HapiServer, ServerInjectOptions, ServerInjectResponse } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
@@ -39,7 +40,7 @@ export class Server {
 		this.#server.app.database = this.database;
 
 		this.#server.ext({
-			async method(request, h) {
+			async method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 				request.headers["content-type"] = "application/json";
 
 				return h.continue;
@@ -93,13 +94,13 @@ export class Server {
 			routes: {
 				/* c8 ignore next 3 */
 				payload: {
-					async failAction(request, h, error) {
+					async failAction(request: Hapi.Request, h: Hapi.ResponseToolkit, error: Error) {
 						return badData(error.message);
 					},
 				},
 				/* c8 ignore next 3 */
 				validate: {
-					async failAction(request, h, error) {
+					async failAction(request: Hapi.Request, h: Hapi.ResponseToolkit, error: Error) {
 						return badData(error.message);
 					},
 				},
@@ -140,7 +141,7 @@ export class Server {
 		});
 
 		this.#server.route({
-			handler(request: WebhookRequest, h) {
+			handler(request: WebhookRequest, h: Hapi.ResponseToolkit) {
 				const token: string = randomBytes(32).toString("hex");
 
 				return h
@@ -168,7 +169,7 @@ export class Server {
 		});
 
 		this.#server.route({
-			async handler(request) {
+			async handler(request: Hapi.Request) {
 				// @ts-ignore TODO: check typings
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();
@@ -196,7 +197,7 @@ export class Server {
 		});
 
 		this.#server.route({
-			handler: (request, h) => {
+			handler: (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
 				// @ts-ignore TODO: check typings
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();
@@ -215,7 +216,7 @@ export class Server {
 		});
 
 		this.#server.route({
-			handler: (request, h) => {
+			handler: (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
 				// @ts-ignore TODO: check typings
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();

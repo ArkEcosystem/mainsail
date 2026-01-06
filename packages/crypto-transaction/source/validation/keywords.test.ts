@@ -22,28 +22,10 @@ describe<{
 		configuration.setHeight(0);
 
 		const keywords = makeKeywords(configuration);
-		context.validator.addKeyword(keywords.transactionType);
 		context.validator.addKeyword(keywords.network);
 		context.validator.addKeyword(keywords.transactionGasLimit);
 		context.validator.addKeyword(keywords.transactionGasPrice);
 		context.validator.addKeyword(keywords.bytecode);
-	});
-
-	it("keyword transactionType should be ok", (context) => {
-		const schema = {
-			$id: "test",
-			transactionType: 0,
-		};
-		context.validator.addSchema(schema);
-
-		assert.undefined(context.validator.validate("test", 0).error);
-
-		assert.defined(context.validator.validate("test", 3).error);
-		assert.defined(context.validator.validate("test", -1).error);
-		assert.defined(context.validator.validate("test", "").error);
-		assert.defined(context.validator.validate("test", "0").error);
-		assert.defined(context.validator.validate("test", null).error);
-		assert.defined(context.validator.validate("test").error);
 	});
 
 	it("keyword network should be ok", (context) => {

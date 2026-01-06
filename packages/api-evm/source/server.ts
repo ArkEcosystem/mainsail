@@ -1,4 +1,5 @@
 import { badData } from "@hapi/boom";
+import type Hapi from "@hapi/hapi";
 import { AbstractServer } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
@@ -32,13 +33,13 @@ export class Server extends AbstractServer {
 			routes: {
 				payload: {
 					/* istanbul ignore next */
-					async failAction(request, h, error) {
+					async failAction(request: Hapi.Request, h: Hapi.ResponseToolkit, error: Error) {
 						return badData(error.message);
 					},
 				},
 				validate: {
 					/* istanbul ignore next */
-					async failAction(request, h, error) {
+					async failAction(request: Hapi.Request, h: Hapi.ResponseToolkit, error: Error) {
 						return badData(error.message);
 					},
 

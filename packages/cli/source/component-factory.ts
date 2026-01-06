@@ -105,7 +105,7 @@ export class ComponentFactory {
 		return this.app.get<MultiSelect>(Identifiers.MultiSelect).render(message, choices, options);
 	}
 
-	public newLine(count = 1): void {
+	public newLine(count: number = 1): void {
 		return this.app.get<NewLine>(Identifiers.NewLine).render(count);
 	}
 
