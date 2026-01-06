@@ -204,16 +204,15 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		if (type === Enums.Crypto.MessageType.Prevote) {
 			return this.#prevotes.get(validatorIndex);
 		}
-
 		return this.#precommits.get(validatorIndex);
 	}
 
 	public addMessage(message: Contracts.Crypto.Message): void {
 		if (message.type === Enums.Crypto.MessageType.Prevote) {
 			this.addPrevote(message);
+		} else {
+			this.addPrecommit(message);
 		}
-
-		this.addPrecommit(message);
 	}
 
 	public hasMajorityPrevotes(): boolean {
