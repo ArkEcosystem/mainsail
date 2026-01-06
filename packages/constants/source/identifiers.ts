@@ -30,8 +30,7 @@ export const Identifiers = {
 		},
 		Processor: {
 			Commit: Symbol("Consensus<Processor.Commit>"),
-			PreCommit: Symbol("Consensus<Processor.PreCommit>"),
-			PreVote: Symbol("Consensus<Processor.PreVote>"),
+			Message: Symbol("Consensus<Processor.Message>"),
 			Proposal: Symbol("Consensus<Processor.Proposal>"),
 		},
 		RoundStateRepository: Symbol("Consensus<RoundStateRepository>"),

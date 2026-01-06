@@ -19,8 +19,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.RoundStateRepository).to(RoundStateRepository).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Scheduler).to(Scheduler).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Processor.Proposal).to(ProposalProcessor).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.Processor.PreVote).to(MessageProcessor).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.Processor.PreCommit).to(MessageProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Processor.Message).to(MessageProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Processor.Commit).to(CommitProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Lock());
 
