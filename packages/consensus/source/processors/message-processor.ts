@@ -1,6 +1,7 @@
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+import { assert } from "@mainsail/utils";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 
@@ -82,7 +83,9 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 		const serializedHex = message.serialized.toString("hex");
 		if (this.#pendingMessages.has(serializedHex)) {
 			return new Promise((resolve) => {
-				this.#pendingMessages.get(serializedHex)!.push(resolve);
+				const pendingMessages = this.#pendingMessages.get(serializedHex);
+				assert.defined(pendingMessages);
+				pendingMessages.push(resolve);
 			});
 		} else {
 			this.#pendingMessages.set(serializedHex, []);
@@ -90,7 +93,9 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 
 		const hasValidSignature = await this.#hasValidSignature(message);
 
-		for (const resolve of this.#pendingMessages.get(serializedHex)!) {
+		const pendingMessages = this.#pendingMessages.get(serializedHex);
+		assert.defined(pendingMessages);
+		for (const resolve of pendingMessages) {
 			resolve(hasValidSignature ? SignatureCheckResult.Skip : SignatureCheckResult.Invalid);
 		}
 
