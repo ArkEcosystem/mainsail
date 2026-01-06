@@ -46,11 +46,11 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 			}
 
 			const roundState = this.roundStateRepo.getRoundState(message.blockNumber, message.round);
-			if (roundState.hasPrecommit(message.validatorIndex)) {
+			if (roundState.hasMessage(message)) {
 				const existingPrecommit = roundState.getPrecommit(message.validatorIndex);
 				if (existingPrecommit && !existingPrecommit.serialized.equals(message.serialized)) {
 					this.logger.warn(
-						`Conflicting precommits for validator index ${message.validatorIndex} in block ${message.blockNumber}/${message.round}. Existing: ${existingPrecommit.serialized.toString("hex")}, New: ${message.serialized.toString("hex")}`,
+						`Conflicting ${message.type === Enums.Crypto.MessageType.Prevote ? "prevote" : "precommit"} for validator index ${message.validatorIndex} in block ${message.blockNumber}/${message.round}. Existing: ${existingPrecommit.serialized.toString("hex")}, New: ${message.serialized.toString("hex")}`,
 					);
 				}
 
@@ -66,7 +66,7 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 				}
 			}
 
-			roundState.addPrecommit(message);
+			roundState.addMessage(message);
 
 			if (broadcast) {
 				void this.broadcaster.broadcastPrecommit(message);
