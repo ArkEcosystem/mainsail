@@ -25,10 +25,10 @@ export class Consensus implements Contracts.Consensus.Service {
 	private readonly proposalProcessor!: Contracts.Consensus.ProposalProcessor;
 
 	@inject(Identifiers.Consensus.Processor.PreVote)
-	private readonly prevoteProcessor!: Contracts.Consensus.PrevoteProcessor;
+	private readonly prevoteProcessor!: Contracts.Consensus.MessageProcessor;
 
 	@inject(Identifiers.Consensus.Processor.PreCommit)
-	private readonly precommitProcessor!: Contracts.Consensus.PrecommitProcessor;
+	private readonly precommitProcessor!: Contracts.Consensus.MessageProcessor;
 
 	@inject(Identifiers.Consensus.Scheduler)
 	private readonly scheduler!: Contracts.Consensus.Scheduler;

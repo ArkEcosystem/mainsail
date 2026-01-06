@@ -11,7 +11,7 @@ enum SignatureCheckResult {
 }
 
 @injectable()
-export class PrecommitProcessor extends AbstractProcessor implements Contracts.Consensus.PrecommitProcessor {
+export class MessageProcessor extends AbstractProcessor implements Contracts.Consensus.MessageProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer!: Contracts.Crypto.MessageSerializer;
 
