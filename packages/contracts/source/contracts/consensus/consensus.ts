@@ -13,6 +13,8 @@ export interface RoundState extends ProcessableUnit {
 	addProposal(proposal: Proposal): void;
 	addPrevote(prevote: Message): void;
 	addPrecommit(precommit: Message): void;
+	hasMessage(message: Message): boolean;
+	addMessage(message: Message): void;
 	hasMajorityPrevotes(): boolean;
 	hasMajorityPrevotesAny(): boolean;
 	hasMajorityPrevotesNull(): boolean;

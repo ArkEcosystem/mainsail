@@ -1,5 +1,5 @@
 import { isMajority, isMinority } from "@mainsail/blockchain-utils";
-import { Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
@@ -188,6 +188,22 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		this.#precommits.set(precommit.validatorIndex, precommit);
 		this.#validatorsSignedPrecommit[precommit.validatorIndex] = true;
 		this.#increasePrecommitCount(precommit.blockHash);
+	}
+
+	public hasMessage(message: Contracts.Crypto.Message): boolean {
+		if (message.type === Enums.Crypto.MessageType.Prevote) {
+			return this.#prevotes.has(message.validatorIndex);
+		} else {
+			return this.#precommits.has(message.validatorIndex);
+		}
+	}
+
+	public addMessage(message: Contracts.Crypto.Message): void {
+		if (message.type === Enums.Crypto.MessageType.Prevote) {
+			this.addPrevote(message);
+		} else {
+			this.addPrecommit(message);
+		}
 	}
 
 	public hasMajorityPrevotes(): boolean {
