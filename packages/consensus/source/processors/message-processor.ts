@@ -48,10 +48,10 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 
 			const roundState = this.roundStateRepo.getRoundState(message.blockNumber, message.round);
 			if (roundState.hasMessage(message)) {
-				const existingPrecommit = roundState.getPrecommit(message.validatorIndex);
-				if (existingPrecommit && !existingPrecommit.serialized.equals(message.serialized)) {
+				const existingMessage = roundState.getMessage(message.validatorIndex, message.type);
+				if (existingMessage && !existingMessage.serialized.equals(message.serialized)) {
 					this.logger.warn(
-						`Conflicting ${message.type === Enums.Crypto.MessageType.Prevote ? "prevote" : "precommit"} for validator index ${message.validatorIndex} in block ${message.blockNumber}/${message.round}. Existing: ${existingPrecommit.serialized.toString("hex")}, New: ${message.serialized.toString("hex")}`,
+						`Conflicting ${message.type === Enums.Crypto.MessageType.Prevote ? "prevote" : "precommit"} for validator index ${message.validatorIndex} in block ${message.blockNumber}/${message.round}. Existing: ${existingMessage.serialized.toString("hex")}, New: ${message.serialized.toString("hex")}`,
 					);
 				}
 
