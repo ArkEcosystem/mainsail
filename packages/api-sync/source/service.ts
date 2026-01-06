@@ -11,9 +11,9 @@ import { parseTransactionError } from "@mainsail/evm-contracts";
 import { assert, BigNumber, chunk, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
-import { Listeners } from "./contracts.js";
+import { Listeners, TokenParser } from "./contracts.js";
+import { Identifiers as ApiSyncIdentifiers } from "./identifiers.js";
 import { parseMultiPayments } from "./parsers/index.js";
-import { TokenParser } from "./parsers/tokens.js";
 import { Restore } from "./restore.js";
 
 interface DeferredSync {
@@ -113,6 +113,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.ApiSync.Listener)
 	private readonly listeners!: Listeners;
 
+	@inject(ApiSyncIdentifiers.TokenParser)
+	private readonly tokenParser!: TokenParser;
+
 	public async bootstrap(): Promise<void> {
 		await this.migrations.synchronizeEntities();
 		await this.#resetDatabaseIfNecessary();
@@ -159,8 +162,6 @@ export class Sync implements Contracts.ApiSync.Service {
 			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
 		);
 
-		const tokenParser = this.app.resolve(TokenParser);
-
 		for (const transaction of blockTransactions) {
 			const {
 				data,
@@ -176,7 +177,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			assert.defined(receipt);
 
 			const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
-			const { tokens: parsedTokens, tokenHolders: parsedTokenHolders } = await tokenParser.parseReceipt(
+			const { tokens: parsedTokens, tokenHolders: parsedTokenHolders } = await this.tokenParser.parseReceipt(
 				transaction,
 				receipt,
 			);

@@ -11,8 +11,9 @@ import { parseTransactionError } from "@mainsail/evm-contracts";
 import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
+import { TokenParser } from "./contracts.js";
+import { Identifiers as ApiSyncIdentifiers } from "./identifiers.js";
 import { parseMultiPayments, parseUsernames } from "./parsers/index.js";
-import { TokenParser } from "./parsers/tokens.js";
 
 interface RepositoryContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;
@@ -137,6 +138,9 @@ export class Restore {
 
 	@inject(Identifiers.Evm.ContractService.Consensus)
 	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
+
+	@inject(ApiSyncIdentifiers.TokenParser)
+	private readonly tokenParser!: TokenParser;
 
 	@inject(Identifiers.Snapshot.Legacy.Importer)
 	@optional()
@@ -289,8 +293,6 @@ export class Restore {
 
 		const usernameContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Usernames);
 
-		const tokenParser = this.app.resolve(TokenParser);
-
 		do {
 			const fromBlockNumber = Math.min(currentBlockNumber, mostRecentCommit.block.header.number);
 			const toBlockNumber = Math.min(currentBlockNumber + BATCH_SIZE - 1, mostRecentCommit.block.header.number);
@@ -397,11 +399,8 @@ export class Restore {
 					const { senderPublicKey } = data;
 					const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
 					const parsedUsernames = parseUsernames(usernameContractAddress, transaction, receipt);
-					const { tokens: parsedTokens, tokenHolders: parsedTokenHolders } = await tokenParser.parseReceipt(
-						transaction,
-						receipt,
-						tokenRepository,
-					);
+					const { tokens: parsedTokens, tokenHolders: parsedTokenHolders } =
+						await this.tokenParser.parseReceipt(transaction, receipt, tokenRepository);
 
 					if (!context.publicKeyToAddress[senderPublicKey]) {
 						const address = await this.addressFactory.fromPublicKey(senderPublicKey);

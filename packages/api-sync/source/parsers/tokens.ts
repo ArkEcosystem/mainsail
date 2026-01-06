@@ -8,6 +8,8 @@ import { LRUCache } from "lru-cache";
 import type { ContractFunctionParameters, EncodeFunctionDataParameters } from "viem";
 import { decodeFunctionResult, encodeFunctionData, parseAbi, parseEventLogs, toHex, zeroAddress } from "viem";
 
+import { TokenParser } from "../contracts.js";
+
 const erc20AbiFunctions = parseAbi([
 	"function totalSupply() view returns (uint256)",
 	"function balanceOf(address account) view returns (uint256)",
@@ -38,10 +40,6 @@ type TokenMetadata = {
 
 type TokenMetadataOptional = Partial<TokenMetadata>;
 
-const tokenCache: LRUCache<string, Models.Token> = new LRUCache({
-	max: 256,
-});
-
 function isTokenMetadataCall(call: Erc20Call | Erc20MetadataCall): call is Erc20MetadataCall {
 	return erc20MetadataFunctions.some((m) => m.name === call.functionName);
 }
@@ -51,7 +49,7 @@ function hasRequiredTokenMetadata(tokenMetadata: TokenMetadataOptional): tokenMe
 }
 
 @injectable()
-export class TokenParser {
+export class TokenParserService implements TokenParser {
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
@@ -64,6 +62,10 @@ export class TokenParser {
 
 	@inject(ApiDatabaseIdentifiers.TokenRepositoryFactory)
 	private readonly tokenRepositoryFactory!: ApiDatabaseContracts.TokenRepositoryFactory;
+
+	#tokenCache: LRUCache<string, Models.Token> = new LRUCache({
+		max: 256,
+	});
 
 	public async parseReceipt(
 		transaction: Contracts.Crypto.Transaction,
@@ -107,15 +109,15 @@ export class TokenParser {
 					continue;
 				} else {
 					this.logger.debug(
-						`Detected ERC20 transfer affecting '${account}' in contract '${contract}' (cached: ${tokenCache.has(contract)})`,
+						`Detected ERC20 transfer affecting '${account}' in contract '${contract}' (cached: ${this.#tokenCache.has(contract)})`,
 					);
 				}
 
-				if (!tokenCache.has(contract)) {
+				if (!this.#tokenCache.has(contract)) {
 					const foundToken = foundTokens.get(contract);
 					assert.defined(foundToken);
 					const { token, isNew } = foundToken;
-					tokenCache.set(contract, token);
+					this.#tokenCache.set(contract, token);
 
 					if (isNew) {
 						tokens.push(token);
@@ -145,7 +147,7 @@ export class TokenParser {
 		const result = new Map<string, { readonly token: Models.Token; readonly isNew: boolean }>();
 
 		for (const address of addresses) {
-			const fromCache = tokenCache.get(address);
+			const fromCache = this.#tokenCache.get(address);
 			if (fromCache) {
 				result.set(address, { isNew: false, token: fromCache });
 				continue;

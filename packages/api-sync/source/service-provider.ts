@@ -3,7 +3,9 @@ import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
+import { Identifiers as ApiSyncIdentifiers } from "./identifiers.js";
 import { Listeners } from "./listeners.js";
+import { TokenParserService } from "./parsers/tokens.js";
 import { Sync } from "./service.js";
 
 @injectable()
@@ -12,6 +14,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		if (!this.#isEnabled()) {
 			return;
 		}
+
+		this.app.bind(ApiSyncIdentifiers.TokenParser).to(TokenParserService).inSingletonScope();
 
 		this.app.bind(Identifiers.ApiSync.Listener).to(Listeners).inSingletonScope();
 		this.app.bind(Identifiers.ApiSync.Service).to(Sync).inSingletonScope();
