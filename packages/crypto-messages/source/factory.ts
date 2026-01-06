@@ -3,8 +3,7 @@ import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { MessageSchemaError } from "@mainsail/exceptions";
 
-import { Precommit } from "./precommit.js";
-import { Prevote } from "./prevote.js";
+import { Message } from "./message.js";
 
 @injectable()
 export class Factory implements Contracts.Crypto.MessageFactory {
@@ -20,75 +19,39 @@ export class Factory implements Contracts.Crypto.MessageFactory {
 	@inject(Identifiers.CryptoWorker.WorkerPool)
 	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
-	public async makePrevote(
-		data: Contracts.Crypto.MakePrevoteData,
+	public async makeMessage(
+		data: Contracts.Crypto.MakeMessageData,
 		keyPair: Contracts.Crypto.KeyPair,
-	): Promise<Contracts.Crypto.Prevote> {
+	): Promise<Contracts.Crypto.Message> {
 		const worker = await this.workerPool.getWorker();
 
-		const bytes = await this.serializer.serializePrevoteForSignature({
+		const bytes = await this.serializer.serializeMessageForSignature({
 			blockHash: data.blockHash,
 			blockNumber: data.blockNumber,
 			round: data.round,
 			type: data.type,
 		});
 		const signature = await worker.consensusSignature("sign", bytes, Buffer.from(keyPair.privateKey, "hex"));
-		const serialized = await this.serializer.serializePrevote({ ...data, signature });
-		return this.makePrevoteFromBytes(serialized);
+		const serialized = await this.serializer.serializeMessage({ ...data, signature });
+		return this.makeMessageFromBytes(serialized);
 	}
 
-	public async makePrevoteFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Precommit> {
-		const data = await this.deserializer.deserializePrevote(bytes);
-		return this.makePrevoteFromData(data, bytes);
+	public async makeMessageFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Message> {
+		const data = await this.deserializer.deserializeMessage(bytes);
+		return this.makeMessageFromData(data, bytes);
 	}
 
-	public async makePrevoteFromData(
-		data: Contracts.Crypto.PrevoteData,
+	public async makeMessageFromData(
+		data: Contracts.Crypto.MessageData,
 		serialized?: Buffer,
-	): Promise<Contracts.Crypto.Prevote> {
-		this.#applySchema("prevote", data);
+	): Promise<Contracts.Crypto.Message> {
+		this.#applySchema("message", data);
 
 		if (!serialized) {
-			serialized = await this.serializer.serializePrevote(data);
+			serialized = await this.serializer.serializeMessage(data);
 		}
 
-		return new Prevote({ ...data, serialized });
-	}
-
-	public async makePrecommit(
-		data: Contracts.Crypto.MakePrecommitData,
-		keyPair: Contracts.Crypto.KeyPair,
-	): Promise<Contracts.Crypto.Precommit> {
-		const worker = await this.workerPool.getWorker();
-
-		const bytes = await this.serializer.serializePrecommitForSignature({
-			blockHash: data.blockHash,
-			blockNumber: data.blockNumber,
-			round: data.round,
-			type: data.type,
-		});
-		const signature = await worker.consensusSignature("sign", bytes, Buffer.from(keyPair.privateKey, "hex"));
-
-		const serialized = await this.serializer.serializePrecommit({ ...data, signature });
-		return this.makePrecommitFromBytes(serialized);
-	}
-
-	public async makePrecommitFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Precommit> {
-		const data = await this.deserializer.deserializePrecommit(bytes);
-		return this.makePrecommitFromData(data, bytes);
-	}
-
-	public async makePrecommitFromData(
-		data: Contracts.Crypto.PrecommitData,
-		serialized?: Buffer,
-	): Promise<Contracts.Crypto.Precommit> {
-		this.#applySchema("precommit", data);
-
-		if (!serialized) {
-			serialized = await this.serializer.serializePrecommit(data);
-		}
-
-		return new Precommit({ ...data, serialized });
+		return new Message({ ...data, serialized });
 	}
 
 	#applySchema<T>(schema: string, data: T): T {

@@ -5,14 +5,14 @@ import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { describe, Factories, Sandbox } from "../../test-framework/source";
 import { Types } from "../../test-framework/source/factories";
 import {
-	precommitData,
-	precommitDataNoBlock,
 	prevoteData,
+	precommitData,
 	prevoteDataNoBlock,
-	serializedPrecommit,
-	serializedPrecommitNoBlock,
 	serializedPrevote,
+	serializedPrecommit,
 	serializedPrevoteNoBlock,
+	serializedPrecommitNoBlock,
+	precommitDataNoBlock,
 	validatorMnemonic,
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -58,7 +58,7 @@ describe<{
 			Identifiers.Cryptography.Block.Factory,
 		);
 
-		const identityFactory = await Factories.factory("Identity", crypto);
+		const identityFactory = await Factories.factory<Factories.Types.Identity>("Identity", crypto);
 		const identity = await identityFactory
 			.withOptions({
 				app: context.sandbox.app,
@@ -70,38 +70,20 @@ describe<{
 		context.identity = identity;
 	});
 
-	it("#makePrecommit - should correctly make signed precommit", async ({ factory, identity }) => {
-		const precommit = await factory.makePrecommit(precommitData, identity.keys);
+	it("#makeMessage - should correctly make signed prevote", async ({ factory, identity }) => {
+		const message = await factory.makeMessage(prevoteData, identity.keys);
 
-		assert.equal(precommit.signature, precommitData.signature);
+		assert.equal(message.signature, prevoteData.signature);
 	});
 
-	it("#makePrecommit - should correctly make signed precommit no block", async ({ factory, identity }) => {
-		const precommit = await factory.makePrecommit(
-			{
-				blockHash: undefined,
-				blockNumber: 1,
-				round: 1,
-				type: Enums.Crypto.MessageType.Precommit,
-				validatorIndex: 0,
-			},
-			identity.keys,
-		);
+	it("#makeMessage - should correctly make signed precommit", async ({ factory, identity }) => {
+		const message = await factory.makeMessage(precommitData, identity.keys);
 
-		assert.equal(
-			precommit.signature,
-			"904c8055242bd7736a1cf7ce20c8fedeee5f2f8fe3f6cab6a166c36c1be0f616c2b7a333912becfa3ecb799c8cd420a012bf41018f5c52f67a2858a6d5bd016e8ef6f56a84d8a734ba6ce5f9a5260201fd9d73ce8688ff0019df2c07a1c33c4d",
-		);
+		assert.equal(message.signature, precommitData.signature);
 	});
 
-	it("#makePrevote - should correctly make signed prevote", async ({ factory, identity }) => {
-		const prevote = await factory.makePrevote(prevoteData, identity.keys);
-
-		assert.equal(prevote.signature, prevoteData.signature);
-	});
-
-	it("#makePrevote - should correctly make signed prevote no block", async ({ factory, identity }) => {
-		const prevote = await factory.makePrevote(
+	it("#makeMessage - should correctly make signed prevote no block", async ({ factory, identity }) => {
+		const message = await factory.makeMessage(
 			{
 				blockHash: undefined,
 				blockNumber: 1,
@@ -113,31 +95,50 @@ describe<{
 		);
 
 		assert.equal(
-			prevote.signature,
+			message.signature,
 			"927628d67c385fe216aa800def9cce0c09f5f9fbf836583d7c07ab6a98e1b5681802c92f81ad54984236a07fa389dbab1519f3c91ad39a505a61c3624a88c65da71fe721d7af0ed452516771b94d027be713dba68e14fa2c9680e35b63f0e038",
 		);
 	});
 
-	it("#makePrevoteFromBytes - should be ok", async ({ factory }) => {
-		const prevote = await factory.makePrevoteFromBytes(Buffer.from(serializedPrevote, "hex"));
+	it("#makeMessage - should correctly make signed precommit no block", async ({ factory, identity }) => {
+		const message = await factory.makeMessage(
+			{
+				blockHash: undefined,
+				blockNumber: 1,
+				round: 1,
+				type: Enums.Crypto.MessageType.Precommit,
+				validatorIndex: 0,
+			},
+			identity.keys,
+		);
+
+		assert.equal(
+			message.signature,
+			"904c8055242bd7736a1cf7ce20c8fedeee5f2f8fe3f6cab6a166c36c1be0f616c2b7a333912becfa3ecb799c8cd420a012bf41018f5c52f67a2858a6d5bd016e8ef6f56a84d8a734ba6ce5f9a5260201fd9d73ce8688ff0019df2c07a1c33c4d",
+		);
+	});
+
+	it("#makeMessageFromBytes - should be ok for prevote", async ({ factory }) => {
+		const prevote = await factory.makeMessageFromBytes(Buffer.from(serializedPrevote, "hex"));
 
 		assert.equal(toData(prevote), prevoteData);
 	});
 
-	it("#makePrevoteFromBytes - should be ok with no block", async ({ factory }) => {
-		const prevote = await factory.makePrevoteFromBytes(Buffer.from(serializedPrevoteNoBlock, "hex"));
-
-		assert.equal(toData(prevote), prevoteDataNoBlock);
-	});
-
-	it("#makePrecommitFromBytes - should be ok", async ({ factory }) => {
-		const precommit = await factory.makePrecommitFromBytes(Buffer.from(serializedPrecommit, "hex"));
+	it("#makeMessageFromBytes - should be ok for precommit", async ({ factory }) => {
+		const precommit = await factory.makeMessageFromBytes(Buffer.from(serializedPrecommit, "hex"));
 
 		assert.equal(toData(precommit), precommitData);
 	});
 
-	it("#makePrecommitFromBytes - should be ok with no block", async ({ factory }) => {
-		const precommit = await factory.makePrecommitFromBytes(Buffer.from(serializedPrecommitNoBlock, "hex"));
+	it("#makeMessageFromBytes - should be ok for prevote with no block", async ({ factory }) => {
+		const prevote = await factory.makeMessageFromBytes(Buffer.from(serializedPrevoteNoBlock, "hex"));
+
+		assert.equal(toData(prevote), prevoteDataNoBlock);
+	});
+
+	it("#makeMessageFromBytes - should be ok for precommit with no block", async ({ factory }) => {
+		const precommit = await factory.makeMessageFromBytes(Buffer.from(serializedPrecommitNoBlock, "hex"));
+
 		assert.equal(toData(precommit), precommitDataNoBlock);
 	});
 });

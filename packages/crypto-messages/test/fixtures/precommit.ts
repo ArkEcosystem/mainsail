@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { blockData } from "./block.js";
 
-export const precommitData: Contracts.Crypto.PrecommitData = {
+export const precommitData: Contracts.Crypto.MessageData = {
 	blockHash: blockData.hash,
 	blockNumber: 1,
 	round: 1,
@@ -19,7 +19,7 @@ export const serializedPrecommit =
 export const serializedPrecommitForSignature =
 	"0201000000010000000182139a7708157c8e2b78f0db38216924c8a17f82e77d5997fb280b1435a6cc97";
 
-export const precommitDataNoBlock: Contracts.Crypto.PrecommitData = {
+export const precommitDataNoBlock: Contracts.Crypto.MessageData = {
 	blockHash: undefined,
 	blockNumber: 1,
 	round: 1,

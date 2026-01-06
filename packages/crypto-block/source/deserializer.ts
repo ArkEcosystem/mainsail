@@ -1,4 +1,3 @@
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -6,6 +5,7 @@ import { TransactionSchemaError } from "@mainsail/exceptions";
 import { ByteBuffer, sleep } from "@mainsail/utils";
 
 import { HashFactory } from "./hash.factory.js";
+import { schema, transactionsSchema } from "./serializer-schemas.js";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.BlockDeserializer {
@@ -66,51 +66,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 			{},
 			{
 				length: this.headerSize(),
-				schema: {
-					version: {
-						type: "uint8",
-					},
-					timestamp: {
-						type: "uint48",
-					},
-					number: {
-						type: "uint32",
-					},
-					round: {
-						type: "uint32",
-					},
-					parentHash: {
-						type: "hash",
-					},
-					stateRoot: {
-						type: "hash",
-					},
-					logsBloom: {
-						type: "hash",
-						size: 256,
-					},
-					transactionsCount: {
-						type: "uint16",
-					},
-					gasUsed: {
-						type: "uint32",
-					},
-					fee: {
-						type: "uint256",
-					},
-					reward: {
-						type: "uint256",
-					},
-					payloadSize: {
-						type: "uint32",
-					},
-					transactionsRoot: {
-						type: "hash",
-					},
-					proposer: {
-						type: "address",
-					},
-				},
+				schema,
 			},
 		);
 	}
@@ -124,11 +80,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 			{ ...header },
 			{
 				length: header.payloadSize,
-				schema: {
-					transactions: {
-						type: "transactions",
-					},
-				},
+				schema: transactionsSchema,
 			},
 		);
 

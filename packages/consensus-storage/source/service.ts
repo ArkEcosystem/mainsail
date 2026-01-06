@@ -55,8 +55,8 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	}: {
 		state: Contracts.Consensus.State;
 		proposals: Contracts.Crypto.Proposal[];
-		prevotes: Contracts.Crypto.Prevote[];
-		precommits: Contracts.Crypto.Precommit[];
+		prevotes: Contracts.Crypto.Message[];
+		precommits: Contracts.Crypto.Message[];
 	}): Promise<void> {
 		// always overwrite existing state; we only care about state for uncommitted blocks
 		await this.rootStorage.transaction(async () => {
@@ -108,17 +108,17 @@ export class Service implements Contracts.ConsensusStorage.Service {
 		);
 	}
 
-	public async getPrevotes(): Promise<Contracts.Crypto.Prevote[]> {
+	public async getPrevotes(): Promise<Contracts.Crypto.Message[]> {
 		const prevotes = [...this.prevoteStorage.getRange().map((item) => item.value)];
 		return Promise.all(
-			prevotes.map((prevote) => this.messageFactory.makePrevoteFromBytes(Buffer.from(prevote, "hex"))),
+			prevotes.map((prevote) => this.messageFactory.makeMessageFromBytes(Buffer.from(prevote, "hex"))),
 		);
 	}
 
-	public async getPrecommits(): Promise<Contracts.Crypto.Precommit[]> {
+	public async getPrecommits(): Promise<Contracts.Crypto.Message[]> {
 		const precommits = [...this.precommitStorage.getRange().map((item) => item.value)];
 		return Promise.all(
-			precommits.map((precommit) => this.messageFactory.makePrecommitFromBytes(Buffer.from(precommit, "hex"))),
+			precommits.map((precommit) => this.messageFactory.makeMessageFromBytes(Buffer.from(precommit, "hex"))),
 		);
 	}
 

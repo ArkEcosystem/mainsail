@@ -1,7 +1,8 @@
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { schema, schemaWithTransactions } from "./serializer-schemas.js";
 
 @injectable()
 export class Serializer implements Contracts.Crypto.BlockSerializer {
@@ -18,105 +19,16 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 	public async serializeHeader(header: Contracts.Crypto.BlockHeaderRaw): Promise<Buffer> {
 		return this.serializer.serialize(header, {
 			length: this.headerSize(),
+			schema,
 			skip: 0,
-			schema: {
-				version: {
-					type: "uint8",
-				},
-				timestamp: {
-					type: "uint48",
-				},
-				number: {
-					type: "uint32",
-				},
-				round: {
-					type: "uint32",
-				},
-				parentHash: {
-					type: "hash",
-				},
-				stateRoot: {
-					type: "hash",
-				},
-				logsBloom: {
-					type: "hash",
-				},
-				transactionsCount: {
-					type: "uint16",
-				},
-				gasUsed: {
-					type: "uint32",
-				},
-				fee: {
-					type: "uint256",
-				},
-				reward: {
-					type: "uint256",
-				},
-				payloadSize: {
-					type: "uint32",
-				},
-				transactionsRoot: {
-					type: "hash",
-				},
-				proposer: {
-					type: "address",
-				},
-			},
 		});
 	}
 
 	public async serializeWithTransactions(block: Contracts.Crypto.BlockDataSerializable): Promise<Buffer> {
 		return this.serializer.serialize(block, {
 			length: this.totalSize(block),
+			schema: schemaWithTransactions,
 			skip: 0,
-			schema: {
-				version: {
-					type: "uint8",
-				},
-				timestamp: {
-					type: "uint48",
-				},
-				number: {
-					type: "uint32",
-				},
-				round: {
-					type: "uint32",
-				},
-				parentHash: {
-					type: "hash",
-				},
-				stateRoot: {
-					type: "hash",
-				},
-				logsBloom: {
-					type: "hash",
-				},
-				transactionsCount: {
-					type: "uint16",
-				},
-				gasUsed: {
-					type: "uint32",
-				},
-				fee: {
-					type: "uint256",
-				},
-				reward: {
-					type: "uint256",
-				},
-				payloadSize: {
-					type: "uint32",
-				},
-				transactionsRoot: {
-					type: "hash",
-				},
-				proposer: {
-					type: "address",
-				},
-				transactions: {
-					type: "transactions",
-				},
-			},
 		});
 	}
 }
