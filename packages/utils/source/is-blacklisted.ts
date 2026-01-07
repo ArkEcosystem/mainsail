@@ -1,4 +1,4 @@
-import nm from "nanomatch";
+import mm from "micromatch";
 
 // @TODO review the implementation
 export const isBlacklisted = (blacklist: string[], remoteAddress: string): boolean => {
@@ -8,7 +8,7 @@ export const isBlacklisted = (blacklist: string[], remoteAddress: string): boole
 
 	for (const ip of blacklist) {
 		try {
-			if (nm.isMatch(remoteAddress, ip)) {
+			if (mm.isMatch(remoteAddress, ip)) {
 				return true;
 			}
 		} catch {}
