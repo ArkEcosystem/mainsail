@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
-import mm from "nanomatch";
+import mm from "micromatch";
 
 class OnceListener implements Contracts.Kernel.EventListener {
 	public constructor(
