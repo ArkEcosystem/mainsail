@@ -2975,9 +2975,6 @@ importers:
       sinon:
         specifier: 21.0.0
         version: 21.0.0
-      string-kit:
-        specifier: 0.19.2
-        version: 0.19.2
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -10139,10 +10136,6 @@ packages:
   string-argv@0.3.2:
     resolution: {integrity: sha512-aqD2Q0144Z+/RqG52NeHEkZauTAUWJO8c6yTftGJKO3Tja5tUgIfmIl6kExvhtxSDP7fXB6DvzkfMpCd/F3G+Q==}
     engines: {node: '>=0.6.19'}
-
-  string-kit@0.19.2:
-    resolution: {integrity: sha512-o5rhsZy4WS76+uMc4fkcQYM7dcdxe8wKCoLeLqCcGZxbUmtawkBE8G0JS6ooBnBOy+j1MpZ1IgWIuojIr71vPw==}
-    engines: {node: '>=14.15.0'}
 
   string-width@1.0.2:
     resolution: {integrity: sha512-0XsVpQLnVCXHJfyEs8tC0zpTVIr5PKKsQtkT29IwupnPTjtPmQ3xT/4yCREF9hYkV/3M3kzcUTSAZT6a6h81tw==}
@@ -18301,8 +18294,6 @@ snapshots:
   strict-event-emitter@0.5.1: {}
 
   string-argv@0.3.2: {}
-
-  string-kit@0.19.2: {}
 
   string-width@1.0.2:
     dependencies:
