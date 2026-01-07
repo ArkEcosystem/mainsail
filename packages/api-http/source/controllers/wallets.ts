@@ -14,10 +14,14 @@ import { TokenHolderResource } from "../resources/token-holder.js";
 import { EnrichedWallet, WalletResource } from "../resources/wallet.js";
 import { Controller } from "./controller.js";
 
-type TokenHolderRow = {
+type TokenHolderRaw = {
 	token: string;
 	address: string;
 	balance: string;
+};
+
+type TokenMetadata = {
+	token: string;
 	symbol: string;
 	name: string;
 	decimals: number;
@@ -28,6 +32,9 @@ type TokenHolderRow = {
 export class WalletsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
+
+	@inject(ApiDatabaseIdentifiers.TokenRepositoryFactory)
+	private readonly tokenRepositoryFactory!: ApiDatabaseContracts.TokenRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.TokenHolderRepositoryFactory)
 	private readonly tokenHolderRepositoryFactory!: ApiDatabaseContracts.TokenHolderRepositoryFactory;
@@ -126,24 +133,66 @@ export class WalletsController extends Controller {
 			? request.query.addresses
 			: [request.query.addresses];
 
-		const rows = await this.tokenHolderRepositoryFactory()
+		const pagination = this.getListingPage(request);
+
+		const tokenPaginatedQuery = this.tokenRepositoryFactory()
+			.createQueryBuilder("t")
+			.where(
+				`EXISTS (
+					SELECT 1
+					FROM token_holders th
+					WHERE th.token_address = t.address
+						AND th.address IN (:...addresses)
+						AND th.balance > 0
+					LIMIT 1
+	    	)`,
+				{ addresses: walletAddresses },
+			);
+
+		const [pageTokensRows, totalCountRow] = await Promise.all([
+			tokenPaginatedQuery
+				.clone()
+				.select([
+					"t.address AS token",
+					"t.symbol AS symbol",
+					"t.name AS name",
+					"t.decimals AS decimals",
+					"t.total_supply AS supply",
+				])
+				.offset(pagination.offset)
+				.limit(pagination.limit)
+				.orderBy("t.address", "ASC")
+				.getRawMany<TokenMetadata>(),
+
+			tokenPaginatedQuery.clone().select("COUNT(DISTINCT t.address)", "cnt").getRawOne<{ cnt: string }>(),
+		]);
+
+		const tokenMetadata = pageTokensRows.reduce<Record<string, TokenMetadata>>(
+			(accumulator, row: TokenMetadata) => {
+				if (!accumulator[row.token]) {
+					accumulator[row.token] = row;
+				}
+
+				return accumulator;
+			},
+			{},
+		);
+
+		const totalCount = Number(totalCountRow?.cnt ?? 0);
+
+		const tokenHoldersQuery = this.tokenHolderRepositoryFactory()
 			.createQueryBuilder("th")
-			.innerJoin("tokens", "t", "t.address = th.token_address")
-			.select([
-				"th.token_address AS token",
-				"th.address AS address",
-				"th.balance AS balance",
-				"t.symbol AS symbol",
-				"t.name AS name",
-				"t.decimals AS decimals",
-				"t.total_supply AS supply",
-			])
+			.select(["th.token_address AS token", "th.address AS address", "th.balance AS balance"])
 			.where("th.address IN (:...addresses)", { addresses: walletAddresses })
 			.andWhere("th.balance > 0")
+			.andWhere("th.token_address IN (:...tokenAddresses)", {
+				tokenAddresses: Object.keys(tokenMetadata),
+			})
 			.orderBy("th.token_address", "ASC")
 			.addOrderBy("th.balance", "DESC")
-			.addOrderBy("th.address", "ASC")
-			.getRawMany<TokenHolderRow>();
+			.addOrderBy("th.address", "ASC");
+
+		const rows = Object.keys(tokenMetadata).length > 0 ? await tokenHoldersQuery.getRawMany<TokenHolderRaw>() : [];
 
 		// [
 		//   {
@@ -166,33 +215,14 @@ export class WalletsController extends Controller {
 		//   },
 		//   ...
 		// ]
-		const byToken = rows.reduce<
-			Record<
-				string,
-				{
-					token: string;
-					symbol: string;
-					name: string;
-					supply: string;
-					decimals: number;
-					addresses: Record<string, string>;
-				}
-			>
-		>((accumulator, row: TokenHolderRow) => {
-			if (!accumulator[row.token]) {
-				accumulator[row.token] = {
-					addresses: {},
-					decimals: row.decimals,
-					name: row.name,
-					supply: row.supply,
-					symbol: row.symbol,
-					token: row.token,
-				};
+		for (const row of rows) {
+			const metadata = tokenMetadata[row.token];
+			if (!("addresses" in metadata)) {
+				metadata["addresses"] = {};
 			}
 
-			accumulator[row.token].addresses[row.address] = row.balance;
-			return accumulator;
-		}, {});
+			metadata["addresses"][row.address] = row.balance;
+		}
 
 		// [
 		// 	{
@@ -204,7 +234,10 @@ export class WalletsController extends Controller {
 		// 		addresses: { "0xa": 12000000, "0xb": 10000000 },
 		// 	},
 		// ];
-		return { data: Object.values(byToken) };
+		return this.toPagination(
+			{ meta: { totalCountIsEstimate: false }, results: Object.values(tokenMetadata), totalCount },
+			TokenHolderResource,
+		);
 	}
 
 	public async tokensShow(request: Hapi.Request): Promise<object> {

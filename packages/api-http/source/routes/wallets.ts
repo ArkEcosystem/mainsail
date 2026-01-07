@@ -175,11 +175,15 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		handler: (request: Hapi.Request) => controller.tokens(request),
 		method: "GET",
 		options: {
-			plugins: {},
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
 			validate: {
 				query: Joi.object({
 					addresses: Schemas.orEqualCriteria(walletAddressSchema),
-				}),
+				}).concat(Schemas.pagination),
 			},
 		},
 		path: "/wallets/tokens",
