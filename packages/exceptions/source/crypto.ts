@@ -57,12 +57,6 @@ export class MessageSchemaError extends Exception {
 	}
 }
 
-export class TransactionTypeError extends Exception {
-	public constructor(given: string) {
-		super(`Type ${given} not supported.`);
-	}
-}
-
 export class InvalidTransactionBytesError extends Exception {
 	public constructor(message: string) {
 		super(`Failed to deserialize transaction, encountered invalid bytes: ${message}`);
@@ -102,12 +96,6 @@ export class TransactionKeyAlreadyRegisteredError extends Exception {
 export class TransactionVersionAlreadyRegisteredError extends Exception {
 	public constructor(name: string, version: number) {
 		super(`Transaction type ${name} is already registered in version ${version}.`);
-	}
-}
-
-export class CoreTransactionTypeGroupImmutableError extends Exception {
-	public constructor() {
-		super(`The Core transaction type group is immutable.`);
 	}
 }
 
@@ -184,12 +172,6 @@ export class InvalidMultiSignatureAssetError extends Exception {
 export class DuplicateParticipantInMultiSignatureError extends Exception {
 	public constructor() {
 		super(`Invalid multi signature, because duplicate participant found.`);
-	}
-}
-
-export class InvalidTransactionTypeError extends Exception {
-	public constructor(type: number) {
-		super(`Transaction type ${type.toString()} does not exist.`);
 	}
 }
 

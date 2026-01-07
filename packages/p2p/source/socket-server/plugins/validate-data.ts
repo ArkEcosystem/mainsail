@@ -7,6 +7,7 @@ import { isValidVersion } from "../../utils/index.js";
 import { BasePlugin } from "./base-plugin.js";
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/typedef */
 
 @injectable()
 export class ValidateDataPlugin extends BasePlugin {

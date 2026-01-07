@@ -21,7 +21,7 @@ export class Console {
 
 	#useDefaultFlags: boolean;
 
-	public constructor(useDefaultFlags = true) {
+	public constructor(useDefaultFlags: boolean = true) {
 		this.#useDefaultFlags = useDefaultFlags;
 		this.app = this.#createApplication();
 	}

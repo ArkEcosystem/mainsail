@@ -32,7 +32,10 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 
 	#pendingPrecommits: Map<string, ((value: SignatureCheckResult) => void)[]> = new Map();
 
-	async process(precommit: Contracts.Crypto.Message, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
+	async process(
+		precommit: Contracts.Crypto.Message,
+		broadcast: boolean = true,
+	): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.hasValidBlockNumberOrRound(precommit)) {
 				return Enums.Consensus.ProcessorResult.Skipped;
