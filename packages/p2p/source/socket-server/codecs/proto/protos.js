@@ -5162,25 +5162,25 @@ $root.postMessage = (function() {
      */
     var postMessage = {};
 
-    postMessage.PostPrevoteRequest = (function() {
+    postMessage.PostMessageRequest = (function() {
 
         /**
-         * Properties of a PostPrevoteRequest.
+         * Properties of a PostMessageRequest.
          * @memberof postMessage
-         * @interface IPostPrevoteRequest
-         * @property {Uint8Array|null} [prevote] PostPrevoteRequest prevote
-         * @property {shared.IHeaders|null} [headers] PostPrevoteRequest headers
+         * @interface IPostMessageRequest
+         * @property {Uint8Array|null} [prevote] PostMessageRequest prevote
+         * @property {shared.IHeaders|null} [headers] PostMessageRequest headers
          */
 
         /**
-         * Constructs a new PostPrevoteRequest.
+         * Constructs a new PostMessageRequest.
          * @memberof postMessage
-         * @classdesc Represents a PostPrevoteRequest.
-         * @implements IPostPrevoteRequest
+         * @classdesc Represents a PostMessageRequest.
+         * @implements IPostMessageRequest
          * @constructor
-         * @param {postMessage.IPostPrevoteRequest=} [properties] Properties to set
+         * @param {postMessage.IPostMessageRequest=} [properties] Properties to set
          */
-        function PostPrevoteRequest(properties) {
+        function PostMessageRequest(properties) {
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -5188,43 +5188,43 @@ $root.postMessage = (function() {
         }
 
         /**
-         * PostPrevoteRequest prevote.
+         * PostMessageRequest prevote.
          * @member {Uint8Array} prevote
-         * @memberof postMessage.PostPrevoteRequest
+         * @memberof postMessage.PostMessageRequest
          * @instance
          */
-        PostPrevoteRequest.prototype.prevote = $util.newBuffer([]);
+        PostMessageRequest.prototype.prevote = $util.newBuffer([]);
 
         /**
-         * PostPrevoteRequest headers.
+         * PostMessageRequest headers.
          * @member {shared.IHeaders|null|undefined} headers
-         * @memberof postMessage.PostPrevoteRequest
+         * @memberof postMessage.PostMessageRequest
          * @instance
          */
-        PostPrevoteRequest.prototype.headers = null;
+        PostMessageRequest.prototype.headers = null;
 
         /**
-         * Creates a new PostPrevoteRequest instance using the specified properties.
+         * Creates a new PostMessageRequest instance using the specified properties.
          * @function create
-         * @memberof postMessage.PostPrevoteRequest
+         * @memberof postMessage.PostMessageRequest
          * @static
-         * @param {postMessage.IPostPrevoteRequest=} [properties] Properties to set
-         * @returns {postMessage.PostPrevoteRequest} PostPrevoteRequest instance
+         * @param {postMessage.IPostMessageRequest=} [properties] Properties to set
+         * @returns {postMessage.PostMessageRequest} PostMessageRequest instance
          */
-        PostPrevoteRequest.create = function create(properties) {
-            return new PostPrevoteRequest(properties);
+        PostMessageRequest.create = function create(properties) {
+            return new PostMessageRequest(properties);
         };
 
         /**
-         * Encodes the specified PostPrevoteRequest message. Does not implicitly {@link postMessage.PostPrevoteRequest.verify|verify} messages.
+         * Encodes the specified PostMessageRequest message. Does not implicitly {@link postMessage.PostMessageRequest.verify|verify} messages.
          * @function encode
-         * @memberof postMessage.PostPrevoteRequest
+         * @memberof postMessage.PostMessageRequest
          * @static
-         * @param {postMessage.IPostPrevoteRequest} message PostPrevoteRequest message or plain object to encode
+         * @param {postMessage.IPostMessageRequest} message PostMessageRequest message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        PostPrevoteRequest.encode = function encode(message, writer) {
+        PostMessageRequest.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
             if (message.prevote != null && Object.hasOwnProperty.call(message, "prevote"))
@@ -5235,33 +5235,33 @@ $root.postMessage = (function() {
         };
 
         /**
-         * Encodes the specified PostPrevoteRequest message, length delimited. Does not implicitly {@link postMessage.PostPrevoteRequest.verify|verify} messages.
+         * Encodes the specified PostMessageRequest message, length delimited. Does not implicitly {@link postMessage.PostMessageRequest.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof postMessage.PostPrevoteRequest
+         * @memberof postMessage.PostMessageRequest
          * @static
-         * @param {postMessage.IPostPrevoteRequest} message PostPrevoteRequest message or plain object to encode
+         * @param {postMessage.IPostMessageRequest} message PostMessageRequest message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        PostPrevoteRequest.encodeDelimited = function encodeDelimited(message, writer) {
+        PostMessageRequest.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a PostPrevoteRequest message from the specified reader or buffer.
+         * Decodes a PostMessageRequest message from the specified reader or buffer.
          * @function decode
-         * @memberof postMessage.PostPrevoteRequest
+         * @memberof postMessage.PostMessageRequest
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {postMessage.PostPrevoteRequest} PostPrevoteRequest
+         * @returns {postMessage.PostMessageRequest} PostMessageRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        PostPrevoteRequest.decode = function decode(reader, length, error) {
+        PostMessageRequest.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postMessage.PostPrevoteRequest();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postMessage.PostMessageRequest();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 if (tag === error)
@@ -5284,30 +5284,30 @@ $root.postMessage = (function() {
         };
 
         /**
-         * Decodes a PostPrevoteRequest message from the specified reader or buffer, length delimited.
+         * Decodes a PostMessageRequest message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof postMessage.PostPrevoteRequest
+         * @memberof postMessage.PostMessageRequest
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {postMessage.PostPrevoteRequest} PostPrevoteRequest
+         * @returns {postMessage.PostMessageRequest} PostMessageRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        PostPrevoteRequest.decodeDelimited = function decodeDelimited(reader) {
+        PostMessageRequest.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a PostPrevoteRequest message.
+         * Verifies a PostMessageRequest message.
          * @function verify
-         * @memberof postMessage.PostPrevoteRequest
+         * @memberof postMessage.PostMessageRequest
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        PostPrevoteRequest.verify = function verify(message) {
+        PostMessageRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.prevote != null && message.hasOwnProperty("prevote"))
@@ -5322,17 +5322,17 @@ $root.postMessage = (function() {
         };
 
         /**
-         * Creates a PostPrevoteRequest message from a plain object. Also converts values to their respective internal types.
+         * Creates a PostMessageRequest message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof postMessage.PostPrevoteRequest
+         * @memberof postMessage.PostMessageRequest
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {postMessage.PostPrevoteRequest} PostPrevoteRequest
+         * @returns {postMessage.PostMessageRequest} PostMessageRequest
          */
-        PostPrevoteRequest.fromObject = function fromObject(object) {
-            if (object instanceof $root.postMessage.PostPrevoteRequest)
+        PostMessageRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.postMessage.PostMessageRequest)
                 return object;
-            var message = new $root.postMessage.PostPrevoteRequest();
+            var message = new $root.postMessage.PostMessageRequest();
             if (object.prevote != null)
                 if (typeof object.prevote === "string")
                     $util.base64.decode(object.prevote, message.prevote = $util.newBuffer($util.base64.length(object.prevote)), 0);
@@ -5340,22 +5340,22 @@ $root.postMessage = (function() {
                     message.prevote = object.prevote;
             if (object.headers != null) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".postMessage.PostPrevoteRequest.headers: object expected");
+                    throw TypeError(".postMessage.PostMessageRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
         };
 
         /**
-         * Creates a plain object from a PostPrevoteRequest message. Also converts values to other types if specified.
+         * Creates a plain object from a PostMessageRequest message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof postMessage.PostPrevoteRequest
+         * @memberof postMessage.PostMessageRequest
          * @static
-         * @param {postMessage.PostPrevoteRequest} message PostPrevoteRequest
+         * @param {postMessage.PostMessageRequest} message PostMessageRequest
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        PostPrevoteRequest.toObject = function toObject(message, options) {
+        PostMessageRequest.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
@@ -5377,32 +5377,32 @@ $root.postMessage = (function() {
         };
 
         /**
-         * Converts this PostPrevoteRequest to JSON.
+         * Converts this PostMessageRequest to JSON.
          * @function toJSON
-         * @memberof postMessage.PostPrevoteRequest
+         * @memberof postMessage.PostMessageRequest
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        PostPrevoteRequest.prototype.toJSON = function toJSON() {
+        PostMessageRequest.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for PostPrevoteRequest
+         * Gets the default type url for PostMessageRequest
          * @function getTypeUrl
-         * @memberof postMessage.PostPrevoteRequest
+         * @memberof postMessage.PostMessageRequest
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        PostPrevoteRequest.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        PostMessageRequest.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/postMessage.PostPrevoteRequest";
+            return typeUrlPrefix + "/postMessage.PostMessageRequest";
         };
 
-        return PostPrevoteRequest;
+        return PostMessageRequest;
     })();
 
     postMessage.PostPrevoteResponse = (function() {

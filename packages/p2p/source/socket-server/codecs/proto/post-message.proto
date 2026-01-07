@@ -4,7 +4,7 @@ import "shared.proto";
 
 package postMessage;
 
-message PostPrevoteRequest {
+message PostMessageRequest {
     bytes prevote = 1;
     shared.Headers headers = 2;
 }

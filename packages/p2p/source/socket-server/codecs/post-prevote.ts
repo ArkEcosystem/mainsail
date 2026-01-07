@@ -2,15 +2,15 @@ import { postMessage as proto } from "./proto/protos.js";
 
 export const postPrevote = {
 	request: {
-		deserialize: (payload: Buffer): proto.IPostPrevoteRequest => {
-			const decoded = proto.PostPrevoteRequest.decode(payload);
+		deserialize: (payload: Buffer): proto.IPostMessageRequest => {
+			const decoded = proto.PostMessageRequest.decode(payload);
 			return {
 				...decoded,
 				prevote: Buffer.from(decoded.prevote),
 			};
 		},
-		serialize: (object: proto.IPostPrevoteRequest): Buffer =>
-			Buffer.from(proto.PostPrevoteRequest.encode(object).finish()),
+		serialize: (object: proto.IPostMessageRequest): Buffer =>
+			Buffer.from(proto.PostMessageRequest.encode(object).finish()),
 	},
 	response: {
 		deserialize: (payload: Buffer): proto.IPostPrevoteResponse =>
