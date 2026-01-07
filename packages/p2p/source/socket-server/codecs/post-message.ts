@@ -1,6 +1,6 @@
 import { postMessage as proto } from "./proto/protos.js";
 
-export const postMsg = {
+export const postMessage = {
 	request: {
 		deserialize: (payload: Buffer): proto.IPostMessageRequest => {
 			const decoded = proto.PostMessageRequest.decode(payload);

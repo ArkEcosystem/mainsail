@@ -208,6 +208,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				event,
 				codec.request.serialize({
 					...payload,
+					// @ts-ignore
 					headers: {
 						...this.headerFactory().toData(),
 					},

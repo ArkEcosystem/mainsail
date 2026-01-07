@@ -4,7 +4,7 @@ import { getMessages } from "./get-messages.js";
 import { getPeers } from "./get-peers.js";
 import { getProposal } from "./get-proposal.js";
 import { getStatus } from "./get-status.js";
-import { postMsg } from "./post-message.js";
+import { postMessage } from "./post-message.js";
 import { postProposal } from "./post-proposal.js";
 
 export const Codecs = {
@@ -14,6 +14,6 @@ export const Codecs = {
 	getPeers,
 	getProposal,
 	getStatus,
-	postMsg,
+	postMessage,
 	postProposal,
 };
