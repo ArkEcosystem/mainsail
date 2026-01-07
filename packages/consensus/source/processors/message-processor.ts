@@ -70,11 +70,7 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 			roundState.addMessage(message);
 
 			if (broadcast) {
-				if (message.type === Enums.Crypto.MessageType.Prevote) {
-					void this.broadcaster.broadcastPrevote(message);
-				} else {
-					void this.broadcaster.broadcastPrecommit(message);
-				}
+				void this.broadcaster.broadcastPrevote(message);
 			}
 
 			void this.getConsensus().handle(roundState);

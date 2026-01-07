@@ -38,7 +38,6 @@ import {
 	GetPeersRoute,
 	GetProposalRoute,
 	GetStatusRoute,
-	PostPrecommitRoute,
 	PostPrevoteRoute,
 	PostProposalRoute,
 } from "./socket-server/routes/index.js";
@@ -198,7 +197,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			GetPeersRoute,
 			GetProposalRoute,
 			GetStatusRoute,
-			PostPrecommitRoute,
 			PostPrevoteRoute,
 			PostProposalRoute,
 		]) {

@@ -32,10 +32,6 @@ export const buildRateLimiter = (options: {
 					rateLimit: options.roundValidators,
 				},
 				{
-					endpoint: Routes.PostPrecommit,
-					rateLimit: options.roundValidators,
-				},
-				{
 					endpoint: Routes.GetMessages,
 					rateLimit: 5,
 				},

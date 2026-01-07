@@ -15,7 +15,6 @@ export type EmitOptions = {
 export interface PeerCommunicator {
 	postProposal(peer: Peer, proposal: Buffer): Promise<void>;
 	postPrevote(peer: Peer, prevote: Buffer): Promise<void>;
-	postPrecommit(peer: Peer, prevote: Buffer): Promise<void>;
 
 	pingPorts(peer: Peer): Promise<void>;
 

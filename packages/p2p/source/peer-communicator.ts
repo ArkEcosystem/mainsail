@@ -58,14 +58,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 	}
 
-	public async postPrecommit(peer: Contracts.P2P.Peer, precommit: Buffer): Promise<void> {
-		try {
-			await this.#emit(peer, Routes.PostPrecommit, { precommit }, { timeout: 6000 });
-		} catch (error) {
-			this.#handleSocketError(peer, error);
-		}
-	}
-
 	public async pingPorts(peer: Contracts.P2P.Peer): Promise<void> {
 		await Promise.all(
 			Object.entries(peer.plugins).map(async ([name, plugin]) => {

@@ -38,16 +38,6 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 		await Promise.all(promises);
 	}
 
-	async broadcastPrecommit(precommit: Contracts.Crypto.Message): Promise<void> {
-		this.state.resetLastMessageTime();
-
-		const promises = this.#getPeersForBroadcast().map((peer) =>
-			this.communicator.postPrecommit(peer, precommit.serialized),
-		);
-
-		await Promise.all(promises);
-	}
-
 	#getPeersForBroadcast(): Contracts.P2P.Peer[] {
 		const maxPeersBroadcast: number = this.configuration.getRequired<number>("maxPeersBroadcast");
 		const peers: Contracts.P2P.Peer[] = take(shuffle(this.repository.getPeers()), maxPeersBroadcast);
