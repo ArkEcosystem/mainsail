@@ -5168,7 +5168,7 @@ $root.postMessage = (function() {
          * Properties of a PostMessageRequest.
          * @memberof postMessage
          * @interface IPostMessageRequest
-         * @property {Uint8Array|null} [prevote] PostMessageRequest prevote
+         * @property {Uint8Array|null} [message] PostMessageRequest message
          * @property {shared.IHeaders|null} [headers] PostMessageRequest headers
          */
 
@@ -5188,12 +5188,12 @@ $root.postMessage = (function() {
         }
 
         /**
-         * PostMessageRequest prevote.
-         * @member {Uint8Array} prevote
+         * PostMessageRequest message.
+         * @member {Uint8Array} message
          * @memberof postMessage.PostMessageRequest
          * @instance
          */
-        PostMessageRequest.prototype.prevote = $util.newBuffer([]);
+        PostMessageRequest.prototype.message = $util.newBuffer([]);
 
         /**
          * PostMessageRequest headers.
@@ -5227,8 +5227,8 @@ $root.postMessage = (function() {
         PostMessageRequest.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.prevote != null && Object.hasOwnProperty.call(message, "prevote"))
-                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.prevote);
+            if (message.message != null && Object.hasOwnProperty.call(message, "message"))
+                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.message);
             if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
                 $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             return writer;
@@ -5268,7 +5268,7 @@ $root.postMessage = (function() {
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        message.prevote = reader.bytes();
+                        message.message = reader.bytes();
                         break;
                     }
                 case 2: {
@@ -5310,9 +5310,9 @@ $root.postMessage = (function() {
         PostMessageRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.prevote != null && message.hasOwnProperty("prevote"))
-                if (!(message.prevote && typeof message.prevote.length === "number" || $util.isString(message.prevote)))
-                    return "prevote: buffer expected";
+            if (message.message != null && message.hasOwnProperty("message"))
+                if (!(message.message && typeof message.message.length === "number" || $util.isString(message.message)))
+                    return "message: buffer expected";
             if (message.headers != null && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
@@ -5333,11 +5333,11 @@ $root.postMessage = (function() {
             if (object instanceof $root.postMessage.PostMessageRequest)
                 return object;
             var message = new $root.postMessage.PostMessageRequest();
-            if (object.prevote != null)
-                if (typeof object.prevote === "string")
-                    $util.base64.decode(object.prevote, message.prevote = $util.newBuffer($util.base64.length(object.prevote)), 0);
-                else if (object.prevote.length >= 0)
-                    message.prevote = object.prevote;
+            if (object.message != null)
+                if (typeof object.message === "string")
+                    $util.base64.decode(object.message, message.message = $util.newBuffer($util.base64.length(object.message)), 0);
+                else if (object.message.length >= 0)
+                    message.message = object.message;
             if (object.headers != null) {
                 if (typeof object.headers !== "object")
                     throw TypeError(".postMessage.PostMessageRequest.headers: object expected");
@@ -5361,16 +5361,16 @@ $root.postMessage = (function() {
             var object = {};
             if (options.defaults) {
                 if (options.bytes === String)
-                    object.prevote = "";
+                    object.message = "";
                 else {
-                    object.prevote = [];
+                    object.message = [];
                     if (options.bytes !== Array)
-                        object.prevote = $util.newBuffer(object.prevote);
+                        object.message = $util.newBuffer(object.message);
                 }
                 object.headers = null;
             }
-            if (message.prevote != null && message.hasOwnProperty("prevote"))
-                object.prevote = options.bytes === String ? $util.base64.encode(message.prevote, 0, message.prevote.length) : options.bytes === Array ? Array.prototype.slice.call(message.prevote) : message.prevote;
+            if (message.message != null && message.hasOwnProperty("message"))
+                object.message = options.bytes === String ? $util.base64.encode(message.message, 0, message.message.length) : options.bytes === Array ? Array.prototype.slice.call(message.message) : message.message;
             if (message.headers != null && message.hasOwnProperty("headers"))
                 object.headers = $root.shared.Headers.toObject(message.headers, options);
             return object;

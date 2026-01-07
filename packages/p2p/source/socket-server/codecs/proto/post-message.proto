@@ -5,7 +5,7 @@ import "shared.proto";
 package postMessage;
 
 message PostMessageRequest {
-    bytes prevote = 1;
+    bytes message = 1;
     shared.Headers headers = 2;
 }
 

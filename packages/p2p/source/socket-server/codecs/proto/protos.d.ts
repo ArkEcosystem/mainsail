@@ -2154,8 +2154,8 @@ export namespace postMessage {
     /** Properties of a PostMessageRequest. */
     interface IPostMessageRequest {
 
-        /** PostMessageRequest prevote */
-        prevote?: (Uint8Array|null);
+        /** PostMessageRequest message */
+        message?: (Uint8Array|null);
 
         /** PostMessageRequest headers */
         headers?: (shared.IHeaders|null);
@@ -2170,8 +2170,8 @@ export namespace postMessage {
          */
         constructor(properties?: postMessage.IPostMessageRequest);
 
-        /** PostMessageRequest prevote. */
-        public prevote: Uint8Array;
+        /** PostMessageRequest message. */
+        public message: Uint8Array;
 
         /** PostMessageRequest headers. */
         public headers?: (shared.IHeaders|null);
