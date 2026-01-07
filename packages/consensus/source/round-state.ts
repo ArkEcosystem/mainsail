@@ -191,27 +191,49 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	}
 
 	public hasMessage(message: Contracts.Crypto.Message): boolean {
-		if (message.type === Enums.Crypto.MessageType.Prevote) {
-			return this.#prevotes.has(message.validatorIndex);
+		switch (message.type) {
+			case Enums.Crypto.MessageType.Prevote: {
+				return this.#prevotes.has(message.validatorIndex);
+			}
+			case Enums.Crypto.MessageType.Precommit: {
+				return this.#precommits.has(message.validatorIndex);
+			}
+			default: {
+				throw new Error(`Invalid message type: ${message.type}`);
+			}
 		}
-		return this.#precommits.has(message.validatorIndex);
 	}
 
 	public getMessage(
 		validatorIndex: number,
 		type: Contracts.Crypto.MessageType,
 	): Contracts.Crypto.Message | undefined {
-		if (type === Enums.Crypto.MessageType.Prevote) {
-			return this.#prevotes.get(validatorIndex);
+		switch (type) {
+			case Enums.Crypto.MessageType.Prevote: {
+				return this.#prevotes.get(validatorIndex);
+			}
+			case Enums.Crypto.MessageType.Precommit: {
+				return this.#precommits.get(validatorIndex);
+			}
+			default: {
+				throw new Error(`Invalid message type: ${type}`);
+			}
 		}
-		return this.#precommits.get(validatorIndex);
 	}
 
 	public addMessage(message: Contracts.Crypto.Message): void {
-		if (message.type === Enums.Crypto.MessageType.Prevote) {
-			this.addPrevote(message);
-		} else {
-			this.addPrecommit(message);
+		switch (message.type) {
+			case Enums.Crypto.MessageType.Prevote: {
+				this.addPrevote(message);
+				break;
+			}
+			case Enums.Crypto.MessageType.Precommit: {
+				this.addPrecommit(message);
+				break;
+			}
+			default: {
+				throw new Error(`Invalid message type: ${message.type}`);
+			}
 		}
 	}
 
