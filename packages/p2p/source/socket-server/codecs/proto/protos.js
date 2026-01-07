@@ -692,6 +692,683 @@ $root.getApiNodes = (function() {
     return getApiNodes;
 })();
 
+$root.shared = (function() {
+
+    /**
+     * Namespace shared.
+     * @exports shared
+     * @namespace
+     */
+    var shared = {};
+
+    shared.Headers = (function() {
+
+        /**
+         * Properties of a Headers.
+         * @memberof shared
+         * @interface IHeaders
+         * @property {string|null} [version] Headers version
+         * @property {number|null} [blockNumber] Headers blockNumber
+         * @property {number|null} [round] Headers round
+         * @property {number|null} [step] Headers step
+         * @property {string|null} [proposedBlockHash] Headers proposedBlockHash
+         * @property {Array.<boolean>|null} [validatorsSignedPrevote] Headers validatorsSignedPrevote
+         * @property {Array.<boolean>|null} [validatorsSignedPrecommit] Headers validatorsSignedPrecommit
+         */
+
+        /**
+         * Constructs a new Headers.
+         * @memberof shared
+         * @classdesc Represents a Headers.
+         * @implements IHeaders
+         * @constructor
+         * @param {shared.IHeaders=} [properties] Properties to set
+         */
+        function Headers(properties) {
+            this.validatorsSignedPrevote = [];
+            this.validatorsSignedPrecommit = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Headers version.
+         * @member {string} version
+         * @memberof shared.Headers
+         * @instance
+         */
+        Headers.prototype.version = "";
+
+        /**
+         * Headers blockNumber.
+         * @member {number} blockNumber
+         * @memberof shared.Headers
+         * @instance
+         */
+        Headers.prototype.blockNumber = 0;
+
+        /**
+         * Headers round.
+         * @member {number} round
+         * @memberof shared.Headers
+         * @instance
+         */
+        Headers.prototype.round = 0;
+
+        /**
+         * Headers step.
+         * @member {number} step
+         * @memberof shared.Headers
+         * @instance
+         */
+        Headers.prototype.step = 0;
+
+        /**
+         * Headers proposedBlockHash.
+         * @member {string|null|undefined} proposedBlockHash
+         * @memberof shared.Headers
+         * @instance
+         */
+        Headers.prototype.proposedBlockHash = null;
+
+        /**
+         * Headers validatorsSignedPrevote.
+         * @member {Array.<boolean>} validatorsSignedPrevote
+         * @memberof shared.Headers
+         * @instance
+         */
+        Headers.prototype.validatorsSignedPrevote = $util.emptyArray;
+
+        /**
+         * Headers validatorsSignedPrecommit.
+         * @member {Array.<boolean>} validatorsSignedPrecommit
+         * @memberof shared.Headers
+         * @instance
+         */
+        Headers.prototype.validatorsSignedPrecommit = $util.emptyArray;
+
+        // OneOf field names bound to virtual getters and setters
+        var $oneOfFields;
+
+        /**
+         * Headers _proposedBlockHash.
+         * @member {"proposedBlockHash"|undefined} _proposedBlockHash
+         * @memberof shared.Headers
+         * @instance
+         */
+        Object.defineProperty(Headers.prototype, "_proposedBlockHash", {
+            get: $util.oneOfGetter($oneOfFields = ["proposedBlockHash"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
+        /**
+         * Creates a new Headers instance using the specified properties.
+         * @function create
+         * @memberof shared.Headers
+         * @static
+         * @param {shared.IHeaders=} [properties] Properties to set
+         * @returns {shared.Headers} Headers instance
+         */
+        Headers.create = function create(properties) {
+            return new Headers(properties);
+        };
+
+        /**
+         * Encodes the specified Headers message. Does not implicitly {@link shared.Headers.verify|verify} messages.
+         * @function encode
+         * @memberof shared.Headers
+         * @static
+         * @param {shared.IHeaders} message Headers message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Headers.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.version != null && Object.hasOwnProperty.call(message, "version"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);
+            if (message.blockNumber != null && Object.hasOwnProperty.call(message, "blockNumber"))
+                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.blockNumber);
+            if (message.round != null && Object.hasOwnProperty.call(message, "round"))
+                writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.round);
+            if (message.step != null && Object.hasOwnProperty.call(message, "step"))
+                writer.uint32(/* id 4, wireType 0 =*/32).uint32(message.step);
+            if (message.proposedBlockHash != null && Object.hasOwnProperty.call(message, "proposedBlockHash"))
+                writer.uint32(/* id 5, wireType 2 =*/42).string(message.proposedBlockHash);
+            if (message.validatorsSignedPrevote != null && message.validatorsSignedPrevote.length) {
+                writer.uint32(/* id 6, wireType 2 =*/50).fork();
+                for (var i = 0; i < message.validatorsSignedPrevote.length; ++i)
+                    writer.bool(message.validatorsSignedPrevote[i]);
+                writer.ldelim();
+            }
+            if (message.validatorsSignedPrecommit != null && message.validatorsSignedPrecommit.length) {
+                writer.uint32(/* id 7, wireType 2 =*/58).fork();
+                for (var i = 0; i < message.validatorsSignedPrecommit.length; ++i)
+                    writer.bool(message.validatorsSignedPrecommit[i]);
+                writer.ldelim();
+            }
+            return writer;
+        };
+
+        /**
+         * Encodes the specified Headers message, length delimited. Does not implicitly {@link shared.Headers.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof shared.Headers
+         * @static
+         * @param {shared.IHeaders} message Headers message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Headers.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a Headers message from the specified reader or buffer.
+         * @function decode
+         * @memberof shared.Headers
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {shared.Headers} Headers
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Headers.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.Headers();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.version = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.blockNumber = reader.uint32();
+                        break;
+                    }
+                case 3: {
+                        message.round = reader.uint32();
+                        break;
+                    }
+                case 4: {
+                        message.step = reader.uint32();
+                        break;
+                    }
+                case 5: {
+                        message.proposedBlockHash = reader.string();
+                        break;
+                    }
+                case 6: {
+                        if (!(message.validatorsSignedPrevote && message.validatorsSignedPrevote.length))
+                            message.validatorsSignedPrevote = [];
+                        if ((tag & 7) === 2) {
+                            var end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.validatorsSignedPrevote.push(reader.bool());
+                        } else
+                            message.validatorsSignedPrevote.push(reader.bool());
+                        break;
+                    }
+                case 7: {
+                        if (!(message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length))
+                            message.validatorsSignedPrecommit = [];
+                        if ((tag & 7) === 2) {
+                            var end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.validatorsSignedPrecommit.push(reader.bool());
+                        } else
+                            message.validatorsSignedPrecommit.push(reader.bool());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a Headers message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof shared.Headers
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {shared.Headers} Headers
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Headers.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a Headers message.
+         * @function verify
+         * @memberof shared.Headers
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        Headers.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            var properties = {};
+            if (message.version != null && message.hasOwnProperty("version"))
+                if (!$util.isString(message.version))
+                    return "version: string expected";
+            if (message.blockNumber != null && message.hasOwnProperty("blockNumber"))
+                if (!$util.isInteger(message.blockNumber))
+                    return "blockNumber: integer expected";
+            if (message.round != null && message.hasOwnProperty("round"))
+                if (!$util.isInteger(message.round))
+                    return "round: integer expected";
+            if (message.step != null && message.hasOwnProperty("step"))
+                if (!$util.isInteger(message.step))
+                    return "step: integer expected";
+            if (message.proposedBlockHash != null && message.hasOwnProperty("proposedBlockHash")) {
+                properties._proposedBlockHash = 1;
+                if (!$util.isString(message.proposedBlockHash))
+                    return "proposedBlockHash: string expected";
+            }
+            if (message.validatorsSignedPrevote != null && message.hasOwnProperty("validatorsSignedPrevote")) {
+                if (!Array.isArray(message.validatorsSignedPrevote))
+                    return "validatorsSignedPrevote: array expected";
+                for (var i = 0; i < message.validatorsSignedPrevote.length; ++i)
+                    if (typeof message.validatorsSignedPrevote[i] !== "boolean")
+                        return "validatorsSignedPrevote: boolean[] expected";
+            }
+            if (message.validatorsSignedPrecommit != null && message.hasOwnProperty("validatorsSignedPrecommit")) {
+                if (!Array.isArray(message.validatorsSignedPrecommit))
+                    return "validatorsSignedPrecommit: array expected";
+                for (var i = 0; i < message.validatorsSignedPrecommit.length; ++i)
+                    if (typeof message.validatorsSignedPrecommit[i] !== "boolean")
+                        return "validatorsSignedPrecommit: boolean[] expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates a Headers message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof shared.Headers
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {shared.Headers} Headers
+         */
+        Headers.fromObject = function fromObject(object) {
+            if (object instanceof $root.shared.Headers)
+                return object;
+            var message = new $root.shared.Headers();
+            if (object.version != null)
+                message.version = String(object.version);
+            if (object.blockNumber != null)
+                message.blockNumber = object.blockNumber >>> 0;
+            if (object.round != null)
+                message.round = object.round >>> 0;
+            if (object.step != null)
+                message.step = object.step >>> 0;
+            if (object.proposedBlockHash != null)
+                message.proposedBlockHash = String(object.proposedBlockHash);
+            if (object.validatorsSignedPrevote) {
+                if (!Array.isArray(object.validatorsSignedPrevote))
+                    throw TypeError(".shared.Headers.validatorsSignedPrevote: array expected");
+                message.validatorsSignedPrevote = [];
+                for (var i = 0; i < object.validatorsSignedPrevote.length; ++i)
+                    message.validatorsSignedPrevote[i] = Boolean(object.validatorsSignedPrevote[i]);
+            }
+            if (object.validatorsSignedPrecommit) {
+                if (!Array.isArray(object.validatorsSignedPrecommit))
+                    throw TypeError(".shared.Headers.validatorsSignedPrecommit: array expected");
+                message.validatorsSignedPrecommit = [];
+                for (var i = 0; i < object.validatorsSignedPrecommit.length; ++i)
+                    message.validatorsSignedPrecommit[i] = Boolean(object.validatorsSignedPrecommit[i]);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a Headers message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof shared.Headers
+         * @static
+         * @param {shared.Headers} message Headers
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        Headers.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults) {
+                object.validatorsSignedPrevote = [];
+                object.validatorsSignedPrecommit = [];
+            }
+            if (options.defaults) {
+                object.version = "";
+                object.blockNumber = 0;
+                object.round = 0;
+                object.step = 0;
+            }
+            if (message.version != null && message.hasOwnProperty("version"))
+                object.version = message.version;
+            if (message.blockNumber != null && message.hasOwnProperty("blockNumber"))
+                object.blockNumber = message.blockNumber;
+            if (message.round != null && message.hasOwnProperty("round"))
+                object.round = message.round;
+            if (message.step != null && message.hasOwnProperty("step"))
+                object.step = message.step;
+            if (message.proposedBlockHash != null && message.hasOwnProperty("proposedBlockHash")) {
+                object.proposedBlockHash = message.proposedBlockHash;
+                if (options.oneofs)
+                    object._proposedBlockHash = "proposedBlockHash";
+            }
+            if (message.validatorsSignedPrevote && message.validatorsSignedPrevote.length) {
+                object.validatorsSignedPrevote = [];
+                for (var j = 0; j < message.validatorsSignedPrevote.length; ++j)
+                    object.validatorsSignedPrevote[j] = message.validatorsSignedPrevote[j];
+            }
+            if (message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length) {
+                object.validatorsSignedPrecommit = [];
+                for (var j = 0; j < message.validatorsSignedPrecommit.length; ++j)
+                    object.validatorsSignedPrecommit[j] = message.validatorsSignedPrecommit[j];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this Headers to JSON.
+         * @function toJSON
+         * @memberof shared.Headers
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        Headers.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for Headers
+         * @function getTypeUrl
+         * @memberof shared.Headers
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        Headers.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/shared.Headers";
+        };
+
+        return Headers;
+    })();
+
+    shared.PeerLike = (function() {
+
+        /**
+         * Properties of a PeerLike.
+         * @memberof shared
+         * @interface IPeerLike
+         * @property {string|null} [ip] PeerLike ip
+         * @property {number|null} [port] PeerLike port
+         * @property {number|null} [protocol] PeerLike protocol
+         */
+
+        /**
+         * Constructs a new PeerLike.
+         * @memberof shared
+         * @classdesc Represents a PeerLike.
+         * @implements IPeerLike
+         * @constructor
+         * @param {shared.IPeerLike=} [properties] Properties to set
+         */
+        function PeerLike(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * PeerLike ip.
+         * @member {string} ip
+         * @memberof shared.PeerLike
+         * @instance
+         */
+        PeerLike.prototype.ip = "";
+
+        /**
+         * PeerLike port.
+         * @member {number} port
+         * @memberof shared.PeerLike
+         * @instance
+         */
+        PeerLike.prototype.port = 0;
+
+        /**
+         * PeerLike protocol.
+         * @member {number} protocol
+         * @memberof shared.PeerLike
+         * @instance
+         */
+        PeerLike.prototype.protocol = 0;
+
+        /**
+         * Creates a new PeerLike instance using the specified properties.
+         * @function create
+         * @memberof shared.PeerLike
+         * @static
+         * @param {shared.IPeerLike=} [properties] Properties to set
+         * @returns {shared.PeerLike} PeerLike instance
+         */
+        PeerLike.create = function create(properties) {
+            return new PeerLike(properties);
+        };
+
+        /**
+         * Encodes the specified PeerLike message. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
+         * @function encode
+         * @memberof shared.PeerLike
+         * @static
+         * @param {shared.IPeerLike} message PeerLike message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PeerLike.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.ip != null && Object.hasOwnProperty.call(message, "ip"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.ip);
+            if (message.port != null && Object.hasOwnProperty.call(message, "port"))
+                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.port);
+            if (message.protocol != null && Object.hasOwnProperty.call(message, "protocol"))
+                writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.protocol);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified PeerLike message, length delimited. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof shared.PeerLike
+         * @static
+         * @param {shared.IPeerLike} message PeerLike message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PeerLike.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a PeerLike message from the specified reader or buffer.
+         * @function decode
+         * @memberof shared.PeerLike
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {shared.PeerLike} PeerLike
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PeerLike.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.PeerLike();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.ip = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.port = reader.uint32();
+                        break;
+                    }
+                case 3: {
+                        message.protocol = reader.uint32();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a PeerLike message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof shared.PeerLike
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {shared.PeerLike} PeerLike
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PeerLike.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a PeerLike message.
+         * @function verify
+         * @memberof shared.PeerLike
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        PeerLike.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.ip != null && message.hasOwnProperty("ip"))
+                if (!$util.isString(message.ip))
+                    return "ip: string expected";
+            if (message.port != null && message.hasOwnProperty("port"))
+                if (!$util.isInteger(message.port))
+                    return "port: integer expected";
+            if (message.protocol != null && message.hasOwnProperty("protocol"))
+                if (!$util.isInteger(message.protocol))
+                    return "protocol: integer expected";
+            return null;
+        };
+
+        /**
+         * Creates a PeerLike message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof shared.PeerLike
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {shared.PeerLike} PeerLike
+         */
+        PeerLike.fromObject = function fromObject(object) {
+            if (object instanceof $root.shared.PeerLike)
+                return object;
+            var message = new $root.shared.PeerLike();
+            if (object.ip != null)
+                message.ip = String(object.ip);
+            if (object.port != null)
+                message.port = object.port >>> 0;
+            if (object.protocol != null)
+                message.protocol = object.protocol >>> 0;
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a PeerLike message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof shared.PeerLike
+         * @static
+         * @param {shared.PeerLike} message PeerLike
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        PeerLike.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.ip = "";
+                object.port = 0;
+                object.protocol = 0;
+            }
+            if (message.ip != null && message.hasOwnProperty("ip"))
+                object.ip = message.ip;
+            if (message.port != null && message.hasOwnProperty("port"))
+                object.port = message.port;
+            if (message.protocol != null && message.hasOwnProperty("protocol"))
+                object.protocol = message.protocol;
+            return object;
+        };
+
+        /**
+         * Converts this PeerLike to JSON.
+         * @function toJSON
+         * @memberof shared.PeerLike
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        PeerLike.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for PeerLike
+         * @function getTypeUrl
+         * @memberof shared.PeerLike
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        PeerLike.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/shared.PeerLike";
+        };
+
+        return PeerLike;
+    })();
+
+    return shared;
+})();
+
 $root.getBlocks = (function() {
 
     /**
@@ -5869,683 +6546,6 @@ $root.postProposal = (function() {
     })();
 
     return postProposal;
-})();
-
-$root.shared = (function() {
-
-    /**
-     * Namespace shared.
-     * @exports shared
-     * @namespace
-     */
-    var shared = {};
-
-    shared.Headers = (function() {
-
-        /**
-         * Properties of a Headers.
-         * @memberof shared
-         * @interface IHeaders
-         * @property {string|null} [version] Headers version
-         * @property {number|null} [blockNumber] Headers blockNumber
-         * @property {number|null} [round] Headers round
-         * @property {number|null} [step] Headers step
-         * @property {string|null} [proposedBlockHash] Headers proposedBlockHash
-         * @property {Array.<boolean>|null} [validatorsSignedPrevote] Headers validatorsSignedPrevote
-         * @property {Array.<boolean>|null} [validatorsSignedPrecommit] Headers validatorsSignedPrecommit
-         */
-
-        /**
-         * Constructs a new Headers.
-         * @memberof shared
-         * @classdesc Represents a Headers.
-         * @implements IHeaders
-         * @constructor
-         * @param {shared.IHeaders=} [properties] Properties to set
-         */
-        function Headers(properties) {
-            this.validatorsSignedPrevote = [];
-            this.validatorsSignedPrecommit = [];
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * Headers version.
-         * @member {string} version
-         * @memberof shared.Headers
-         * @instance
-         */
-        Headers.prototype.version = "";
-
-        /**
-         * Headers blockNumber.
-         * @member {number} blockNumber
-         * @memberof shared.Headers
-         * @instance
-         */
-        Headers.prototype.blockNumber = 0;
-
-        /**
-         * Headers round.
-         * @member {number} round
-         * @memberof shared.Headers
-         * @instance
-         */
-        Headers.prototype.round = 0;
-
-        /**
-         * Headers step.
-         * @member {number} step
-         * @memberof shared.Headers
-         * @instance
-         */
-        Headers.prototype.step = 0;
-
-        /**
-         * Headers proposedBlockHash.
-         * @member {string|null|undefined} proposedBlockHash
-         * @memberof shared.Headers
-         * @instance
-         */
-        Headers.prototype.proposedBlockHash = null;
-
-        /**
-         * Headers validatorsSignedPrevote.
-         * @member {Array.<boolean>} validatorsSignedPrevote
-         * @memberof shared.Headers
-         * @instance
-         */
-        Headers.prototype.validatorsSignedPrevote = $util.emptyArray;
-
-        /**
-         * Headers validatorsSignedPrecommit.
-         * @member {Array.<boolean>} validatorsSignedPrecommit
-         * @memberof shared.Headers
-         * @instance
-         */
-        Headers.prototype.validatorsSignedPrecommit = $util.emptyArray;
-
-        // OneOf field names bound to virtual getters and setters
-        var $oneOfFields;
-
-        /**
-         * Headers _proposedBlockHash.
-         * @member {"proposedBlockHash"|undefined} _proposedBlockHash
-         * @memberof shared.Headers
-         * @instance
-         */
-        Object.defineProperty(Headers.prototype, "_proposedBlockHash", {
-            get: $util.oneOfGetter($oneOfFields = ["proposedBlockHash"]),
-            set: $util.oneOfSetter($oneOfFields)
-        });
-
-        /**
-         * Creates a new Headers instance using the specified properties.
-         * @function create
-         * @memberof shared.Headers
-         * @static
-         * @param {shared.IHeaders=} [properties] Properties to set
-         * @returns {shared.Headers} Headers instance
-         */
-        Headers.create = function create(properties) {
-            return new Headers(properties);
-        };
-
-        /**
-         * Encodes the specified Headers message. Does not implicitly {@link shared.Headers.verify|verify} messages.
-         * @function encode
-         * @memberof shared.Headers
-         * @static
-         * @param {shared.IHeaders} message Headers message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        Headers.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.version != null && Object.hasOwnProperty.call(message, "version"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);
-            if (message.blockNumber != null && Object.hasOwnProperty.call(message, "blockNumber"))
-                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.blockNumber);
-            if (message.round != null && Object.hasOwnProperty.call(message, "round"))
-                writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.round);
-            if (message.step != null && Object.hasOwnProperty.call(message, "step"))
-                writer.uint32(/* id 4, wireType 0 =*/32).uint32(message.step);
-            if (message.proposedBlockHash != null && Object.hasOwnProperty.call(message, "proposedBlockHash"))
-                writer.uint32(/* id 5, wireType 2 =*/42).string(message.proposedBlockHash);
-            if (message.validatorsSignedPrevote != null && message.validatorsSignedPrevote.length) {
-                writer.uint32(/* id 6, wireType 2 =*/50).fork();
-                for (var i = 0; i < message.validatorsSignedPrevote.length; ++i)
-                    writer.bool(message.validatorsSignedPrevote[i]);
-                writer.ldelim();
-            }
-            if (message.validatorsSignedPrecommit != null && message.validatorsSignedPrecommit.length) {
-                writer.uint32(/* id 7, wireType 2 =*/58).fork();
-                for (var i = 0; i < message.validatorsSignedPrecommit.length; ++i)
-                    writer.bool(message.validatorsSignedPrecommit[i]);
-                writer.ldelim();
-            }
-            return writer;
-        };
-
-        /**
-         * Encodes the specified Headers message, length delimited. Does not implicitly {@link shared.Headers.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof shared.Headers
-         * @static
-         * @param {shared.IHeaders} message Headers message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        Headers.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a Headers message from the specified reader or buffer.
-         * @function decode
-         * @memberof shared.Headers
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {shared.Headers} Headers
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        Headers.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.Headers();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.version = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.blockNumber = reader.uint32();
-                        break;
-                    }
-                case 3: {
-                        message.round = reader.uint32();
-                        break;
-                    }
-                case 4: {
-                        message.step = reader.uint32();
-                        break;
-                    }
-                case 5: {
-                        message.proposedBlockHash = reader.string();
-                        break;
-                    }
-                case 6: {
-                        if (!(message.validatorsSignedPrevote && message.validatorsSignedPrevote.length))
-                            message.validatorsSignedPrevote = [];
-                        if ((tag & 7) === 2) {
-                            var end2 = reader.uint32() + reader.pos;
-                            while (reader.pos < end2)
-                                message.validatorsSignedPrevote.push(reader.bool());
-                        } else
-                            message.validatorsSignedPrevote.push(reader.bool());
-                        break;
-                    }
-                case 7: {
-                        if (!(message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length))
-                            message.validatorsSignedPrecommit = [];
-                        if ((tag & 7) === 2) {
-                            var end2 = reader.uint32() + reader.pos;
-                            while (reader.pos < end2)
-                                message.validatorsSignedPrecommit.push(reader.bool());
-                        } else
-                            message.validatorsSignedPrecommit.push(reader.bool());
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a Headers message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof shared.Headers
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {shared.Headers} Headers
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        Headers.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a Headers message.
-         * @function verify
-         * @memberof shared.Headers
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        Headers.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            var properties = {};
-            if (message.version != null && message.hasOwnProperty("version"))
-                if (!$util.isString(message.version))
-                    return "version: string expected";
-            if (message.blockNumber != null && message.hasOwnProperty("blockNumber"))
-                if (!$util.isInteger(message.blockNumber))
-                    return "blockNumber: integer expected";
-            if (message.round != null && message.hasOwnProperty("round"))
-                if (!$util.isInteger(message.round))
-                    return "round: integer expected";
-            if (message.step != null && message.hasOwnProperty("step"))
-                if (!$util.isInteger(message.step))
-                    return "step: integer expected";
-            if (message.proposedBlockHash != null && message.hasOwnProperty("proposedBlockHash")) {
-                properties._proposedBlockHash = 1;
-                if (!$util.isString(message.proposedBlockHash))
-                    return "proposedBlockHash: string expected";
-            }
-            if (message.validatorsSignedPrevote != null && message.hasOwnProperty("validatorsSignedPrevote")) {
-                if (!Array.isArray(message.validatorsSignedPrevote))
-                    return "validatorsSignedPrevote: array expected";
-                for (var i = 0; i < message.validatorsSignedPrevote.length; ++i)
-                    if (typeof message.validatorsSignedPrevote[i] !== "boolean")
-                        return "validatorsSignedPrevote: boolean[] expected";
-            }
-            if (message.validatorsSignedPrecommit != null && message.hasOwnProperty("validatorsSignedPrecommit")) {
-                if (!Array.isArray(message.validatorsSignedPrecommit))
-                    return "validatorsSignedPrecommit: array expected";
-                for (var i = 0; i < message.validatorsSignedPrecommit.length; ++i)
-                    if (typeof message.validatorsSignedPrecommit[i] !== "boolean")
-                        return "validatorsSignedPrecommit: boolean[] expected";
-            }
-            return null;
-        };
-
-        /**
-         * Creates a Headers message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof shared.Headers
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {shared.Headers} Headers
-         */
-        Headers.fromObject = function fromObject(object) {
-            if (object instanceof $root.shared.Headers)
-                return object;
-            var message = new $root.shared.Headers();
-            if (object.version != null)
-                message.version = String(object.version);
-            if (object.blockNumber != null)
-                message.blockNumber = object.blockNumber >>> 0;
-            if (object.round != null)
-                message.round = object.round >>> 0;
-            if (object.step != null)
-                message.step = object.step >>> 0;
-            if (object.proposedBlockHash != null)
-                message.proposedBlockHash = String(object.proposedBlockHash);
-            if (object.validatorsSignedPrevote) {
-                if (!Array.isArray(object.validatorsSignedPrevote))
-                    throw TypeError(".shared.Headers.validatorsSignedPrevote: array expected");
-                message.validatorsSignedPrevote = [];
-                for (var i = 0; i < object.validatorsSignedPrevote.length; ++i)
-                    message.validatorsSignedPrevote[i] = Boolean(object.validatorsSignedPrevote[i]);
-            }
-            if (object.validatorsSignedPrecommit) {
-                if (!Array.isArray(object.validatorsSignedPrecommit))
-                    throw TypeError(".shared.Headers.validatorsSignedPrecommit: array expected");
-                message.validatorsSignedPrecommit = [];
-                for (var i = 0; i < object.validatorsSignedPrecommit.length; ++i)
-                    message.validatorsSignedPrecommit[i] = Boolean(object.validatorsSignedPrecommit[i]);
-            }
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a Headers message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof shared.Headers
-         * @static
-         * @param {shared.Headers} message Headers
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        Headers.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.arrays || options.defaults) {
-                object.validatorsSignedPrevote = [];
-                object.validatorsSignedPrecommit = [];
-            }
-            if (options.defaults) {
-                object.version = "";
-                object.blockNumber = 0;
-                object.round = 0;
-                object.step = 0;
-            }
-            if (message.version != null && message.hasOwnProperty("version"))
-                object.version = message.version;
-            if (message.blockNumber != null && message.hasOwnProperty("blockNumber"))
-                object.blockNumber = message.blockNumber;
-            if (message.round != null && message.hasOwnProperty("round"))
-                object.round = message.round;
-            if (message.step != null && message.hasOwnProperty("step"))
-                object.step = message.step;
-            if (message.proposedBlockHash != null && message.hasOwnProperty("proposedBlockHash")) {
-                object.proposedBlockHash = message.proposedBlockHash;
-                if (options.oneofs)
-                    object._proposedBlockHash = "proposedBlockHash";
-            }
-            if (message.validatorsSignedPrevote && message.validatorsSignedPrevote.length) {
-                object.validatorsSignedPrevote = [];
-                for (var j = 0; j < message.validatorsSignedPrevote.length; ++j)
-                    object.validatorsSignedPrevote[j] = message.validatorsSignedPrevote[j];
-            }
-            if (message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length) {
-                object.validatorsSignedPrecommit = [];
-                for (var j = 0; j < message.validatorsSignedPrecommit.length; ++j)
-                    object.validatorsSignedPrecommit[j] = message.validatorsSignedPrecommit[j];
-            }
-            return object;
-        };
-
-        /**
-         * Converts this Headers to JSON.
-         * @function toJSON
-         * @memberof shared.Headers
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        Headers.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for Headers
-         * @function getTypeUrl
-         * @memberof shared.Headers
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        Headers.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/shared.Headers";
-        };
-
-        return Headers;
-    })();
-
-    shared.PeerLike = (function() {
-
-        /**
-         * Properties of a PeerLike.
-         * @memberof shared
-         * @interface IPeerLike
-         * @property {string|null} [ip] PeerLike ip
-         * @property {number|null} [port] PeerLike port
-         * @property {number|null} [protocol] PeerLike protocol
-         */
-
-        /**
-         * Constructs a new PeerLike.
-         * @memberof shared
-         * @classdesc Represents a PeerLike.
-         * @implements IPeerLike
-         * @constructor
-         * @param {shared.IPeerLike=} [properties] Properties to set
-         */
-        function PeerLike(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * PeerLike ip.
-         * @member {string} ip
-         * @memberof shared.PeerLike
-         * @instance
-         */
-        PeerLike.prototype.ip = "";
-
-        /**
-         * PeerLike port.
-         * @member {number} port
-         * @memberof shared.PeerLike
-         * @instance
-         */
-        PeerLike.prototype.port = 0;
-
-        /**
-         * PeerLike protocol.
-         * @member {number} protocol
-         * @memberof shared.PeerLike
-         * @instance
-         */
-        PeerLike.prototype.protocol = 0;
-
-        /**
-         * Creates a new PeerLike instance using the specified properties.
-         * @function create
-         * @memberof shared.PeerLike
-         * @static
-         * @param {shared.IPeerLike=} [properties] Properties to set
-         * @returns {shared.PeerLike} PeerLike instance
-         */
-        PeerLike.create = function create(properties) {
-            return new PeerLike(properties);
-        };
-
-        /**
-         * Encodes the specified PeerLike message. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
-         * @function encode
-         * @memberof shared.PeerLike
-         * @static
-         * @param {shared.IPeerLike} message PeerLike message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PeerLike.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.ip != null && Object.hasOwnProperty.call(message, "ip"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.ip);
-            if (message.port != null && Object.hasOwnProperty.call(message, "port"))
-                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.port);
-            if (message.protocol != null && Object.hasOwnProperty.call(message, "protocol"))
-                writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.protocol);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified PeerLike message, length delimited. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof shared.PeerLike
-         * @static
-         * @param {shared.IPeerLike} message PeerLike message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PeerLike.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a PeerLike message from the specified reader or buffer.
-         * @function decode
-         * @memberof shared.PeerLike
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {shared.PeerLike} PeerLike
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PeerLike.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.PeerLike();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.ip = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.port = reader.uint32();
-                        break;
-                    }
-                case 3: {
-                        message.protocol = reader.uint32();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a PeerLike message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof shared.PeerLike
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {shared.PeerLike} PeerLike
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PeerLike.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a PeerLike message.
-         * @function verify
-         * @memberof shared.PeerLike
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        PeerLike.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.ip != null && message.hasOwnProperty("ip"))
-                if (!$util.isString(message.ip))
-                    return "ip: string expected";
-            if (message.port != null && message.hasOwnProperty("port"))
-                if (!$util.isInteger(message.port))
-                    return "port: integer expected";
-            if (message.protocol != null && message.hasOwnProperty("protocol"))
-                if (!$util.isInteger(message.protocol))
-                    return "protocol: integer expected";
-            return null;
-        };
-
-        /**
-         * Creates a PeerLike message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof shared.PeerLike
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {shared.PeerLike} PeerLike
-         */
-        PeerLike.fromObject = function fromObject(object) {
-            if (object instanceof $root.shared.PeerLike)
-                return object;
-            var message = new $root.shared.PeerLike();
-            if (object.ip != null)
-                message.ip = String(object.ip);
-            if (object.port != null)
-                message.port = object.port >>> 0;
-            if (object.protocol != null)
-                message.protocol = object.protocol >>> 0;
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a PeerLike message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof shared.PeerLike
-         * @static
-         * @param {shared.PeerLike} message PeerLike
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        PeerLike.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.ip = "";
-                object.port = 0;
-                object.protocol = 0;
-            }
-            if (message.ip != null && message.hasOwnProperty("ip"))
-                object.ip = message.ip;
-            if (message.port != null && message.hasOwnProperty("port"))
-                object.port = message.port;
-            if (message.protocol != null && message.hasOwnProperty("protocol"))
-                object.protocol = message.protocol;
-            return object;
-        };
-
-        /**
-         * Converts this PeerLike to JSON.
-         * @function toJSON
-         * @memberof shared.PeerLike
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        PeerLike.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for PeerLike
-         * @function getTypeUrl
-         * @memberof shared.PeerLike
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        PeerLike.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/shared.PeerLike";
-        };
-
-        return PeerLike;
-    })();
-
-    return shared;
 })();
 
 export const getApiNodes = $root.getApiNodes;

@@ -301,6 +301,255 @@ export namespace getApiNodes {
     }
 }
 
+/** Namespace shared. */
+export namespace shared {
+
+    /** Properties of a Headers. */
+    interface IHeaders {
+
+        /** Headers version */
+        version?: (string|null);
+
+        /** Headers blockNumber */
+        blockNumber?: (number|null);
+
+        /** Headers round */
+        round?: (number|null);
+
+        /** Headers step */
+        step?: (number|null);
+
+        /** Headers proposedBlockHash */
+        proposedBlockHash?: (string|null);
+
+        /** Headers validatorsSignedPrevote */
+        validatorsSignedPrevote?: (boolean[]|null);
+
+        /** Headers validatorsSignedPrecommit */
+        validatorsSignedPrecommit?: (boolean[]|null);
+    }
+
+    /** Represents a Headers. */
+    class Headers implements IHeaders {
+
+        /**
+         * Constructs a new Headers.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: shared.IHeaders);
+
+        /** Headers version. */
+        public version: string;
+
+        /** Headers blockNumber. */
+        public blockNumber: number;
+
+        /** Headers round. */
+        public round: number;
+
+        /** Headers step. */
+        public step: number;
+
+        /** Headers proposedBlockHash. */
+        public proposedBlockHash?: (string|null);
+
+        /** Headers validatorsSignedPrevote. */
+        public validatorsSignedPrevote: boolean[];
+
+        /** Headers validatorsSignedPrecommit. */
+        public validatorsSignedPrecommit: boolean[];
+
+        /** Headers _proposedBlockHash. */
+        public _proposedBlockHash?: "proposedBlockHash";
+
+        /**
+         * Creates a new Headers instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Headers instance
+         */
+        public static create(properties?: shared.IHeaders): shared.Headers;
+
+        /**
+         * Encodes the specified Headers message. Does not implicitly {@link shared.Headers.verify|verify} messages.
+         * @param message Headers message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: shared.IHeaders, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified Headers message, length delimited. Does not implicitly {@link shared.Headers.verify|verify} messages.
+         * @param message Headers message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: shared.IHeaders, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a Headers message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Headers
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.Headers;
+
+        /**
+         * Decodes a Headers message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Headers
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.Headers;
+
+        /**
+         * Verifies a Headers message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a Headers message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns Headers
+         */
+        public static fromObject(object: { [k: string]: any }): shared.Headers;
+
+        /**
+         * Creates a plain object from a Headers message. Also converts values to other types if specified.
+         * @param message Headers
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: shared.Headers, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this Headers to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for Headers
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a PeerLike. */
+    interface IPeerLike {
+
+        /** PeerLike ip */
+        ip?: (string|null);
+
+        /** PeerLike port */
+        port?: (number|null);
+
+        /** PeerLike protocol */
+        protocol?: (number|null);
+    }
+
+    /** Represents a PeerLike. */
+    class PeerLike implements IPeerLike {
+
+        /**
+         * Constructs a new PeerLike.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: shared.IPeerLike);
+
+        /** PeerLike ip. */
+        public ip: string;
+
+        /** PeerLike port. */
+        public port: number;
+
+        /** PeerLike protocol. */
+        public protocol: number;
+
+        /**
+         * Creates a new PeerLike instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PeerLike instance
+         */
+        public static create(properties?: shared.IPeerLike): shared.PeerLike;
+
+        /**
+         * Encodes the specified PeerLike message. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
+         * @param message PeerLike message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: shared.IPeerLike, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PeerLike message, length delimited. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
+         * @param message PeerLike message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: shared.IPeerLike, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PeerLike message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PeerLike
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.PeerLike;
+
+        /**
+         * Decodes a PeerLike message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PeerLike
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.PeerLike;
+
+        /**
+         * Verifies a PeerLike message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PeerLike message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PeerLike
+         */
+        public static fromObject(object: { [k: string]: any }): shared.PeerLike;
+
+        /**
+         * Creates a plain object from a PeerLike message. Also converts values to other types if specified.
+         * @param message PeerLike
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: shared.PeerLike, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PeerLike to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for PeerLike
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+}
+
 /** Namespace getBlocks. */
 export namespace getBlocks {
 
@@ -2504,255 +2753,6 @@ export namespace postProposal {
 
         /**
          * Gets the default type url for PostProposalResponse
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
-         */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-}
-
-/** Namespace shared. */
-export namespace shared {
-
-    /** Properties of a Headers. */
-    interface IHeaders {
-
-        /** Headers version */
-        version?: (string|null);
-
-        /** Headers blockNumber */
-        blockNumber?: (number|null);
-
-        /** Headers round */
-        round?: (number|null);
-
-        /** Headers step */
-        step?: (number|null);
-
-        /** Headers proposedBlockHash */
-        proposedBlockHash?: (string|null);
-
-        /** Headers validatorsSignedPrevote */
-        validatorsSignedPrevote?: (boolean[]|null);
-
-        /** Headers validatorsSignedPrecommit */
-        validatorsSignedPrecommit?: (boolean[]|null);
-    }
-
-    /** Represents a Headers. */
-    class Headers implements IHeaders {
-
-        /**
-         * Constructs a new Headers.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: shared.IHeaders);
-
-        /** Headers version. */
-        public version: string;
-
-        /** Headers blockNumber. */
-        public blockNumber: number;
-
-        /** Headers round. */
-        public round: number;
-
-        /** Headers step. */
-        public step: number;
-
-        /** Headers proposedBlockHash. */
-        public proposedBlockHash?: (string|null);
-
-        /** Headers validatorsSignedPrevote. */
-        public validatorsSignedPrevote: boolean[];
-
-        /** Headers validatorsSignedPrecommit. */
-        public validatorsSignedPrecommit: boolean[];
-
-        /** Headers _proposedBlockHash. */
-        public _proposedBlockHash?: "proposedBlockHash";
-
-        /**
-         * Creates a new Headers instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns Headers instance
-         */
-        public static create(properties?: shared.IHeaders): shared.Headers;
-
-        /**
-         * Encodes the specified Headers message. Does not implicitly {@link shared.Headers.verify|verify} messages.
-         * @param message Headers message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: shared.IHeaders, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified Headers message, length delimited. Does not implicitly {@link shared.Headers.verify|verify} messages.
-         * @param message Headers message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: shared.IHeaders, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a Headers message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns Headers
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.Headers;
-
-        /**
-         * Decodes a Headers message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns Headers
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.Headers;
-
-        /**
-         * Verifies a Headers message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a Headers message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns Headers
-         */
-        public static fromObject(object: { [k: string]: any }): shared.Headers;
-
-        /**
-         * Creates a plain object from a Headers message. Also converts values to other types if specified.
-         * @param message Headers
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: shared.Headers, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this Headers to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-
-        /**
-         * Gets the default type url for Headers
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
-         */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-
-    /** Properties of a PeerLike. */
-    interface IPeerLike {
-
-        /** PeerLike ip */
-        ip?: (string|null);
-
-        /** PeerLike port */
-        port?: (number|null);
-
-        /** PeerLike protocol */
-        protocol?: (number|null);
-    }
-
-    /** Represents a PeerLike. */
-    class PeerLike implements IPeerLike {
-
-        /**
-         * Constructs a new PeerLike.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: shared.IPeerLike);
-
-        /** PeerLike ip. */
-        public ip: string;
-
-        /** PeerLike port. */
-        public port: number;
-
-        /** PeerLike protocol. */
-        public protocol: number;
-
-        /**
-         * Creates a new PeerLike instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns PeerLike instance
-         */
-        public static create(properties?: shared.IPeerLike): shared.PeerLike;
-
-        /**
-         * Encodes the specified PeerLike message. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
-         * @param message PeerLike message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: shared.IPeerLike, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified PeerLike message, length delimited. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
-         * @param message PeerLike message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: shared.IPeerLike, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a PeerLike message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns PeerLike
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.PeerLike;
-
-        /**
-         * Decodes a PeerLike message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns PeerLike
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.PeerLike;
-
-        /**
-         * Verifies a PeerLike message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a PeerLike message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns PeerLike
-         */
-        public static fromObject(object: { [k: string]: any }): shared.PeerLike;
-
-        /**
-         * Creates a plain object from a PeerLike message. Also converts values to other types if specified.
-         * @param message PeerLike
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: shared.PeerLike, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this PeerLike to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-
-        /**
-         * Gets the default type url for PeerLike
          * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns The default type url
          */
