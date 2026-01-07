@@ -1,4 +1,5 @@
-import { format } from "concordance";
+import { inspect } from "node:util";
+
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { join } from "path";
 import type { Message } from "uvu/assert";
@@ -27,6 +28,15 @@ const normalize = (value: unknown): unknown => {
 
 	return value;
 };
+
+const serialize = (value: unknown): string =>
+	inspect(value, {
+		breakLength: Infinity,
+		colors: false,
+		compact: false,
+		depth: Infinity,
+		sorted: true,
+	}) + "\n";
 
 // Overrides: snapshot, equal, throws, not.equal, not.throws
 
@@ -141,10 +151,10 @@ export const assert = {
 		}
 
 		if (!existsSync(snapshot)) {
-			writeFileSync(snapshot, format(value));
+			writeFileSync(snapshot, serialize(value));
 		}
 
-		assert.is(format(value), readFileSync(snapshot).toString());
+		assert.equal(serialize(value), readFileSync(snapshot, "utf8"));
 	},
 	startsWith: (value: string, prefix: string): void => ok(value.startsWith(prefix)),
 	string: (value: unknown): void => type(value, "string"),
