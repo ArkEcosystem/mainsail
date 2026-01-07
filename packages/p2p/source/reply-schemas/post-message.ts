@@ -1,6 +1,6 @@
 import { headers } from "./headers.js";
 
-export const postPrevote = {
+export const postMessage = {
 	properties: {
 		headers,
 	},

@@ -38,7 +38,7 @@ import {
 	GetPeersRoute,
 	GetProposalRoute,
 	GetStatusRoute,
-	PostPrevoteRoute,
+	PostMessageRoute,
 	PostProposalRoute,
 } from "./socket-server/routes/index.js";
 import { Server } from "./socket-server/server.js";
@@ -197,7 +197,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			GetPeersRoute,
 			GetProposalRoute,
 			GetStatusRoute,
-			PostPrevoteRoute,
+			PostMessageRoute,
 			PostProposalRoute,
 		]) {
 			this.app.bind(Identifiers.P2P.Routes).to(route).inSingletonScope();

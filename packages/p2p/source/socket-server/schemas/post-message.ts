@@ -3,7 +3,7 @@ import Joi from "joi";
 
 import { makeHeaders } from "./shared.js";
 
-export const postPrevote = (configuration: Contracts.Crypto.Configuration): Joi.ObjectSchema =>
+export const postMessage = (configuration: Contracts.Crypto.Configuration): Joi.ObjectSchema =>
 	Joi.object({
 		headers: makeHeaders(configuration),
 		prevote: Joi.binary(),

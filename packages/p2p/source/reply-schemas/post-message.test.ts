@@ -1,9 +1,9 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework/source";
 import { headers } from "../../test/fixtures/responses/headers";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
-import { postPrevote } from "./post-prevote";
+import { postMessage } from "./post-message.js";
 
 type Context = {
 	sandbox: Sandbox;
@@ -24,13 +24,13 @@ describe<Context>("PostPrevote Schema", ({ it, assert, beforeEach, each }) => {
 	});
 
 	it("should pass validation", ({ validator }) => {
-		const result = validator.validate(postPrevote, data);
+		const result = validator.validate(postMessage, data);
 
 		assert.undefined(result.error);
 	});
 
 	it("should not pass if headers are undefined", ({ validator }) => {
-		const result = validator.validate(postPrevote, {});
+		const result = validator.validate(postMessage, {});
 
 		assert.defined(result.error);
 	});

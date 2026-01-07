@@ -32,7 +32,7 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 		this.state.resetLastMessageTime();
 
 		const promises = this.#getPeersForBroadcast().map((peer) =>
-			this.communicator.postPrevote(peer, prevote.serialized),
+			this.communicator.postMessage(peer, prevote.serialized),
 		);
 
 		await Promise.all(promises);

@@ -18,6 +18,6 @@ export enum Routes {
 	GetProposal = "getProposal",
 	GetPeers = "getPeers",
 	GetStatus = "getStatus",
-	PostPrevote = "postPrevote",
+	PostMessage = "postMessage",
 	PostProposal = "postProposal",
 }

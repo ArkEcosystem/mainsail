@@ -50,9 +50,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 	}
 
-	public async postPrevote(peer: Contracts.P2P.Peer, prevote: Buffer): Promise<void> {
+	public async postMessage(peer: Contracts.P2P.Peer, message: Buffer): Promise<void> {
 		try {
-			await this.#emit(peer, Routes.PostPrevote, { prevote }, { timeout: 6000 });
+			await this.#emit(peer, Routes.PostMessage, { message }, { timeout: 6000 });
 		} catch (error) {
 			this.#handleSocketError(peer, error);
 		}

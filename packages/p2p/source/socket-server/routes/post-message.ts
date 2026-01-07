@@ -4,24 +4,24 @@ import type { Contracts } from "@mainsail/contracts";
 import { constants } from "../../constants.js";
 import { Routes } from "../../enums.js";
 import { Codecs } from "../codecs/index.js";
-import { PostPrevoteController } from "../controllers/index.js";
+import { PostMessageController } from "../controllers/index.js";
 import { Schemas } from "../schemas/index.js";
 import { Route } from "./route.js";
 
 @injectable()
-export class PostPrevoteRoute extends Route {
+export class PostMessageRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: Contracts.P2P.RouteConfig } {
 		return {
-			"/postPrevote": {
+			"/postMessage": {
 				codec: Codecs.postPrevote,
-				id: Routes.PostPrevote,
+				id: Routes.PostMessage,
 				maxBytes: constants.MAX_PAYLOAD_SERVER,
-				validation: Schemas.postPrevote(this.cryptoConfiguration),
+				validation: Schemas.postMessage(this.cryptoConfiguration),
 			},
 		};
 	}
 
-	protected getController(): PostPrevoteController {
-		return this.app.resolve(PostPrevoteController);
+	protected getController(): PostMessageController {
+		return this.app.resolve(PostMessageController);
 	}
 }
