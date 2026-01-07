@@ -2148,8 +2148,8 @@ export namespace getStatus {
     }
 }
 
-/** Namespace postPrevote. */
-export namespace postPrevote {
+/** Namespace postMessage. */
+export namespace postMessage {
 
     /** Properties of a PostPrevoteRequest. */
     interface IPostPrevoteRequest {
@@ -2168,7 +2168,7 @@ export namespace postPrevote {
          * Constructs a new PostPrevoteRequest.
          * @param [properties] Properties to set
          */
-        constructor(properties?: postPrevote.IPostPrevoteRequest);
+        constructor(properties?: postMessage.IPostPrevoteRequest);
 
         /** PostPrevoteRequest prevote. */
         public prevote: Uint8Array;
@@ -2181,23 +2181,23 @@ export namespace postPrevote {
          * @param [properties] Properties to set
          * @returns PostPrevoteRequest instance
          */
-        public static create(properties?: postPrevote.IPostPrevoteRequest): postPrevote.PostPrevoteRequest;
+        public static create(properties?: postMessage.IPostPrevoteRequest): postMessage.PostPrevoteRequest;
 
         /**
-         * Encodes the specified PostPrevoteRequest message. Does not implicitly {@link postPrevote.PostPrevoteRequest.verify|verify} messages.
+         * Encodes the specified PostPrevoteRequest message. Does not implicitly {@link postMessage.PostPrevoteRequest.verify|verify} messages.
          * @param message PostPrevoteRequest message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: postPrevote.IPostPrevoteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: postMessage.IPostPrevoteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified PostPrevoteRequest message, length delimited. Does not implicitly {@link postPrevote.PostPrevoteRequest.verify|verify} messages.
+         * Encodes the specified PostPrevoteRequest message, length delimited. Does not implicitly {@link postMessage.PostPrevoteRequest.verify|verify} messages.
          * @param message PostPrevoteRequest message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: postPrevote.IPostPrevoteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: postMessage.IPostPrevoteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a PostPrevoteRequest message from the specified reader or buffer.
@@ -2207,7 +2207,7 @@ export namespace postPrevote {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postPrevote.PostPrevoteRequest;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postMessage.PostPrevoteRequest;
 
         /**
          * Decodes a PostPrevoteRequest message from the specified reader or buffer, length delimited.
@@ -2216,7 +2216,7 @@ export namespace postPrevote {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postPrevote.PostPrevoteRequest;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postMessage.PostPrevoteRequest;
 
         /**
          * Verifies a PostPrevoteRequest message.
@@ -2230,7 +2230,7 @@ export namespace postPrevote {
          * @param object Plain object
          * @returns PostPrevoteRequest
          */
-        public static fromObject(object: { [k: string]: any }): postPrevote.PostPrevoteRequest;
+        public static fromObject(object: { [k: string]: any }): postMessage.PostPrevoteRequest;
 
         /**
          * Creates a plain object from a PostPrevoteRequest message. Also converts values to other types if specified.
@@ -2238,7 +2238,7 @@ export namespace postPrevote {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: postPrevote.PostPrevoteRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: postMessage.PostPrevoteRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this PostPrevoteRequest to JSON.
@@ -2268,7 +2268,7 @@ export namespace postPrevote {
          * Constructs a new PostPrevoteResponse.
          * @param [properties] Properties to set
          */
-        constructor(properties?: postPrevote.IPostPrevoteResponse);
+        constructor(properties?: postMessage.IPostPrevoteResponse);
 
         /** PostPrevoteResponse headers. */
         public headers?: (shared.IHeaders|null);
@@ -2278,23 +2278,23 @@ export namespace postPrevote {
          * @param [properties] Properties to set
          * @returns PostPrevoteResponse instance
          */
-        public static create(properties?: postPrevote.IPostPrevoteResponse): postPrevote.PostPrevoteResponse;
+        public static create(properties?: postMessage.IPostPrevoteResponse): postMessage.PostPrevoteResponse;
 
         /**
-         * Encodes the specified PostPrevoteResponse message. Does not implicitly {@link postPrevote.PostPrevoteResponse.verify|verify} messages.
+         * Encodes the specified PostPrevoteResponse message. Does not implicitly {@link postMessage.PostPrevoteResponse.verify|verify} messages.
          * @param message PostPrevoteResponse message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: postPrevote.IPostPrevoteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: postMessage.IPostPrevoteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified PostPrevoteResponse message, length delimited. Does not implicitly {@link postPrevote.PostPrevoteResponse.verify|verify} messages.
+         * Encodes the specified PostPrevoteResponse message, length delimited. Does not implicitly {@link postMessage.PostPrevoteResponse.verify|verify} messages.
          * @param message PostPrevoteResponse message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: postPrevote.IPostPrevoteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: postMessage.IPostPrevoteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a PostPrevoteResponse message from the specified reader or buffer.
@@ -2304,7 +2304,7 @@ export namespace postPrevote {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postPrevote.PostPrevoteResponse;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postMessage.PostPrevoteResponse;
 
         /**
          * Decodes a PostPrevoteResponse message from the specified reader or buffer, length delimited.
@@ -2313,7 +2313,7 @@ export namespace postPrevote {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postPrevote.PostPrevoteResponse;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postMessage.PostPrevoteResponse;
 
         /**
          * Verifies a PostPrevoteResponse message.
@@ -2327,7 +2327,7 @@ export namespace postPrevote {
          * @param object Plain object
          * @returns PostPrevoteResponse
          */
-        public static fromObject(object: { [k: string]: any }): postPrevote.PostPrevoteResponse;
+        public static fromObject(object: { [k: string]: any }): postMessage.PostPrevoteResponse;
 
         /**
          * Creates a plain object from a PostPrevoteResponse message. Also converts values to other types if specified.
@@ -2335,7 +2335,7 @@ export namespace postPrevote {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: postPrevote.PostPrevoteResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: postMessage.PostPrevoteResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this PostPrevoteResponse to JSON.

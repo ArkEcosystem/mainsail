@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "shared.proto";
 
-package postPrevote;
+package postMessage;
 
 message PostPrevoteRequest {
     bytes prevote = 1;
