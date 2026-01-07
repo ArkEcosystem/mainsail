@@ -2533,10 +2533,10 @@ export namespace shared {
         proposedBlockHash?: (string|null);
 
         /** Headers validatorsSignedPrevote */
-        readonly validatorsSignedPrevote?: (readonly boolean[]|null);
+        validatorsSignedPrevote?: (boolean[]|null);
 
         /** Headers validatorsSignedPrecommit */
-        readonly validatorsSignedPrecommit?: (readonly boolean[]|null);
+        validatorsSignedPrecommit?: (boolean[]|null);
     }
 
     /** Represents a Headers. */
@@ -2568,6 +2568,9 @@ export namespace shared {
 
         /** Headers validatorsSignedPrecommit. */
         public validatorsSignedPrecommit: boolean[];
+
+        /** Headers _proposedBlockHash. */
+        public _proposedBlockHash?: "proposedBlockHash";
 
         /**
          * Creates a new Headers instance using the specified properties.
