@@ -10,7 +10,7 @@ type Context = {
 	validator: Validator;
 };
 
-describe<Context>("PostPrevote Schema", ({ it, assert, beforeEach, each }) => {
+describe<Context>("PostMessage Schema", ({ it, assert, beforeEach, each }) => {
 	const data = {
 		headers,
 	};

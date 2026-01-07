@@ -1,12 +1,12 @@
 import { Identifiers } from "@mainsail/constants";
 
 import { describe, Sandbox } from "../../../../test-framework/source";
-import { PostPrevoteController } from "./post-prevote";
+import { PostMessageController } from "./post-message.js";
 
 describe<{
 	sandbox: Sandbox;
-	controller: PostPrevoteController;
-}>("PostPrevoteController", ({ it, beforeEach, spy }) => {
+	controller: PostMessageController;
+}>("PostMessageController", ({ it, beforeEach, spy }) => {
 	const processor = {
 		process: () => {},
 	};
@@ -28,7 +28,7 @@ describe<{
 		context.sandbox.app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.P2P.State).toConstantValue(state);
 
-		context.controller = context.sandbox.app.resolve(PostPrevoteController);
+		context.controller = context.sandbox.app.resolve(PostMessageController);
 	});
 
 	it("#handle - should call processor", async ({ controller }) => {
