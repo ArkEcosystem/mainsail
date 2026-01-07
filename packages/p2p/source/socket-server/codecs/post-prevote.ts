@@ -13,11 +13,11 @@ export const postPrevote = {
 			Buffer.from(proto.PostMessageRequest.encode(object).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): proto.IPostPrevoteResponse =>
-			proto.PostPrevoteResponse.toObject(proto.PostPrevoteResponse.decode(payload), {
+		deserialize: (payload: Buffer): proto.IPostMessageResponse =>
+			proto.PostMessageResponse.toObject(proto.PostMessageResponse.decode(payload), {
 				defaults: true,
 			}),
-		serialize: (object: proto.IPostPrevoteResponse): Buffer =>
-			Buffer.from(proto.PostPrevoteResponse.encode(object).finish()),
+		serialize: (object: proto.IPostMessageResponse): Buffer =>
+			Buffer.from(proto.PostMessageResponse.encode(object).finish()),
 	},
 };

@@ -2254,97 +2254,97 @@ export namespace postMessage {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
-    /** Properties of a PostPrevoteResponse. */
-    interface IPostPrevoteResponse {
+    /** Properties of a PostMessageResponse. */
+    interface IPostMessageResponse {
 
-        /** PostPrevoteResponse headers */
+        /** PostMessageResponse headers */
         headers?: (shared.IHeaders|null);
     }
 
-    /** Represents a PostPrevoteResponse. */
-    class PostPrevoteResponse implements IPostPrevoteResponse {
+    /** Represents a PostMessageResponse. */
+    class PostMessageResponse implements IPostMessageResponse {
 
         /**
-         * Constructs a new PostPrevoteResponse.
+         * Constructs a new PostMessageResponse.
          * @param [properties] Properties to set
          */
-        constructor(properties?: postMessage.IPostPrevoteResponse);
+        constructor(properties?: postMessage.IPostMessageResponse);
 
-        /** PostPrevoteResponse headers. */
+        /** PostMessageResponse headers. */
         public headers?: (shared.IHeaders|null);
 
         /**
-         * Creates a new PostPrevoteResponse instance using the specified properties.
+         * Creates a new PostMessageResponse instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns PostPrevoteResponse instance
+         * @returns PostMessageResponse instance
          */
-        public static create(properties?: postMessage.IPostPrevoteResponse): postMessage.PostPrevoteResponse;
+        public static create(properties?: postMessage.IPostMessageResponse): postMessage.PostMessageResponse;
 
         /**
-         * Encodes the specified PostPrevoteResponse message. Does not implicitly {@link postMessage.PostPrevoteResponse.verify|verify} messages.
-         * @param message PostPrevoteResponse message or plain object to encode
+         * Encodes the specified PostMessageResponse message. Does not implicitly {@link postMessage.PostMessageResponse.verify|verify} messages.
+         * @param message PostMessageResponse message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: postMessage.IPostPrevoteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: postMessage.IPostMessageResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified PostPrevoteResponse message, length delimited. Does not implicitly {@link postMessage.PostPrevoteResponse.verify|verify} messages.
-         * @param message PostPrevoteResponse message or plain object to encode
+         * Encodes the specified PostMessageResponse message, length delimited. Does not implicitly {@link postMessage.PostMessageResponse.verify|verify} messages.
+         * @param message PostMessageResponse message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: postMessage.IPostPrevoteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: postMessage.IPostMessageResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a PostPrevoteResponse message from the specified reader or buffer.
+         * Decodes a PostMessageResponse message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns PostPrevoteResponse
+         * @returns PostMessageResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postMessage.PostPrevoteResponse;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postMessage.PostMessageResponse;
 
         /**
-         * Decodes a PostPrevoteResponse message from the specified reader or buffer, length delimited.
+         * Decodes a PostMessageResponse message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns PostPrevoteResponse
+         * @returns PostMessageResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postMessage.PostPrevoteResponse;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postMessage.PostMessageResponse;
 
         /**
-         * Verifies a PostPrevoteResponse message.
+         * Verifies a PostMessageResponse message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a PostPrevoteResponse message from a plain object. Also converts values to their respective internal types.
+         * Creates a PostMessageResponse message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns PostPrevoteResponse
+         * @returns PostMessageResponse
          */
-        public static fromObject(object: { [k: string]: any }): postMessage.PostPrevoteResponse;
+        public static fromObject(object: { [k: string]: any }): postMessage.PostMessageResponse;
 
         /**
-         * Creates a plain object from a PostPrevoteResponse message. Also converts values to other types if specified.
-         * @param message PostPrevoteResponse
+         * Creates a plain object from a PostMessageResponse message. Also converts values to other types if specified.
+         * @param message PostMessageResponse
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: postMessage.PostPrevoteResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: postMessage.PostMessageResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this PostPrevoteResponse to JSON.
+         * Converts this PostMessageResponse to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for PostPrevoteResponse
+         * Gets the default type url for PostMessageResponse
          * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns The default type url
          */

@@ -9,6 +9,6 @@ message PostMessageRequest {
     shared.Headers headers = 2;
 }
 
-message PostPrevoteResponse {
+message PostMessageResponse {
 	shared.Headers headers = 1;
 }
