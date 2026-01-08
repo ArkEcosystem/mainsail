@@ -281,6 +281,10 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#precommits.get(validatorIndex);
 	}
 
+	public getMessages(): Contracts.Crypto.Message[] {
+		return [...this.#prevotes.values(), ...this.#precommits.values()];
+	}
+
 	public getPrecommits(): Contracts.Crypto.Message[] {
 		return [...this.#precommits.values()];
 	}

@@ -47,11 +47,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		const storage = this.app.get<Service>(Identifiers.ConsensusStorage.Service);
 
-		const precommits = roundStates.flatMap((roundState) => roundState.getPrecommits());
-		const prevotes = roundStates.flatMap((roundState) => roundState.getPrevotes());
-
 		await storage.persist({
-			messages: [...prevotes, ...precommits],
+			messages: roundStates.flatMap((roundState) => roundState.getMessages()),
 			proposals: roundStates
 				.map((roundState) => roundState.getProposal())
 				.filter((proposal): proposal is Contracts.Crypto.Proposal => !!proposal),
