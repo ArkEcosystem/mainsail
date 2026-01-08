@@ -1,5 +1,5 @@
 import { isMajority, isMinority } from "@mainsail/blockchain-utils";
-import { Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
@@ -188,6 +188,53 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		this.#precommits.set(precommit.validatorIndex, precommit);
 		this.#validatorsSignedPrecommit[precommit.validatorIndex] = true;
 		this.#increasePrecommitCount(precommit.blockHash);
+	}
+
+	public hasMessage(message: Contracts.Crypto.Message): boolean {
+		switch (message.type) {
+			case Enums.Crypto.MessageType.Prevote: {
+				return this.#prevotes.has(message.validatorIndex);
+			}
+			case Enums.Crypto.MessageType.Precommit: {
+				return this.#precommits.has(message.validatorIndex);
+			}
+			default: {
+				throw new Error(`Invalid message type: ${message.type}`);
+			}
+		}
+	}
+
+	public getMessage(
+		validatorIndex: number,
+		type: Contracts.Crypto.MessageType,
+	): Contracts.Crypto.Message | undefined {
+		switch (type) {
+			case Enums.Crypto.MessageType.Prevote: {
+				return this.#prevotes.get(validatorIndex);
+			}
+			case Enums.Crypto.MessageType.Precommit: {
+				return this.#precommits.get(validatorIndex);
+			}
+			default: {
+				throw new Error(`Invalid message type: ${type}`);
+			}
+		}
+	}
+
+	public addMessage(message: Contracts.Crypto.Message): void {
+		switch (message.type) {
+			case Enums.Crypto.MessageType.Prevote: {
+				this.addPrevote(message);
+				break;
+			}
+			case Enums.Crypto.MessageType.Precommit: {
+				this.addPrecommit(message);
+				break;
+			}
+			default: {
+				throw new Error(`Invalid message type: ${message.type}`);
+			}
+		}
 	}
 
 	public hasMajorityPrevotes(): boolean {

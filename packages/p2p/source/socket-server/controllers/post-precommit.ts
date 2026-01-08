@@ -7,8 +7,8 @@ import { getPeerIp } from "../../utils/index.js";
 
 @injectable()
 export class PostPrecommitController implements Contracts.P2P.Controller {
-	@inject(Identifiers.Consensus.Processor.PreCommit)
-	private readonly precommitProcessor!: Contracts.Consensus.PrecommitProcessor;
+	@inject(Identifiers.Consensus.Processor.Message)
+	private readonly messageProcessor!: Contracts.Consensus.MessageProcessor;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.MessageFactory;
@@ -25,7 +25,7 @@ export class PostPrecommitController implements Contracts.P2P.Controller {
 	): Promise<Contracts.P2P.PostPrecommitResponse> {
 		try {
 			const precommit = await this.factory.makeMessageFromBytes(request.payload.precommit);
-			const result = await this.precommitProcessor.process(precommit);
+			const result = await this.messageProcessor.process(precommit);
 
 			if (result === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error("Invalid precommit");

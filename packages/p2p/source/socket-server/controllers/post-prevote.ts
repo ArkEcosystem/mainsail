@@ -7,8 +7,8 @@ import { getPeerIp } from "../../utils/index.js";
 
 @injectable()
 export class PostPrevoteController implements Contracts.P2P.Controller {
-	@inject(Identifiers.Consensus.Processor.PreVote)
-	private readonly prevoteProcessor!: Contracts.Consensus.PrevoteProcessor;
+	@inject(Identifiers.Consensus.Processor.Message)
+	private readonly messageProcessor!: Contracts.Consensus.MessageProcessor;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.MessageFactory;
@@ -26,7 +26,7 @@ export class PostPrevoteController implements Contracts.P2P.Controller {
 		try {
 			const prevote = await this.factory.makeMessageFromBytes(request.payload.prevote);
 
-			const result = await this.prevoteProcessor.process(prevote);
+			const result = await this.messageProcessor.process(prevote);
 
 			if (result === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error("Invalid prevote");
