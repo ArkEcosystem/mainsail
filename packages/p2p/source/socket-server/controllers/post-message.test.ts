@@ -36,7 +36,7 @@ describe<{
 		const spyOnProcess = spy(processor, "process");
 		const spyOnResetLastMessageTime = spy(state, "resetLastMessageTime");
 
-		await controller.handle({ payload: { prevote: Buffer.from("") } }, {});
+		await controller.handle({ payload: { message: Buffer.from("") } }, {});
 		spyOnProcess.calledOnce();
 		spyOnFactory.calledOnce();
 		spyOnFactory.calledWith(Buffer.from(""));
