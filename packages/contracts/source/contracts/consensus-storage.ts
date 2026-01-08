@@ -5,16 +5,13 @@ export interface Service {
 	persist({
 		state,
 		proposals,
-		precommits,
-		prevotes,
+		messages,
 	}: {
 		state: State;
 		proposals: Proposal[];
-		prevotes: Message[];
-		precommits: Message[];
+		messages: Message[];
 	}): Promise<void>;
 	getState(): Promise<StateData | undefined>;
 	getProposals(): Promise<Proposal[]>;
-	getPrevotes(): Promise<Message[]>;
-	getPrecommits(): Promise<Message[]>;
+	getMessages(): Promise<Message[]>;
 }

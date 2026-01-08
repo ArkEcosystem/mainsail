@@ -33,11 +33,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.bind(Identifiers.ConsensusStorage.Storage.Proposal)
 			.toConstantValue(storage.openDB({ name: "proposals" }));
 		this.app
-			.bind(Identifiers.ConsensusStorage.Storage.PreVote)
-			.toConstantValue(storage.openDB({ name: "prevotes" }));
-		this.app
-			.bind(Identifiers.ConsensusStorage.Storage.PreCommit)
-			.toConstantValue(storage.openDB({ name: "precommits" }));
+			.bind(Identifiers.ConsensusStorage.Storage.Message)
+			.toConstantValue(storage.openDB({ name: "message" }));
 		this.app
 			.bind(Identifiers.ConsensusStorage.Storage.ConsensusState)
 			.toConstantValue(storage.openDB({ name: "consensus" }));
@@ -50,9 +47,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		const storage = this.app.get<Service>(Identifiers.ConsensusStorage.Service);
 
+		const precommits = roundStates.flatMap((roundState) => roundState.getPrecommits());
+		const prevotes = roundStates.flatMap((roundState) => roundState.getPrevotes());
+
 		await storage.persist({
-			precommits: roundStates.flatMap((roundState) => roundState.getPrecommits()),
-			prevotes: roundStates.flatMap((roundState) => roundState.getPrevotes()),
+			messages: [...prevotes, ...precommits],
 			proposals: roundStates
 				.map((roundState) => roundState.getProposal())
 				.filter((proposal): proposal is Contracts.Crypto.Proposal => !!proposal),
