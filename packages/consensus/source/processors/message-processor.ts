@@ -70,7 +70,7 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 			roundState.addMessage(message);
 
 			if (broadcast) {
-				void this.broadcaster.broadcastPrevote(message);
+				void this.broadcaster.broadcastMessage(message);
 			}
 
 			void this.getConsensus().handle(roundState);

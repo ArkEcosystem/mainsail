@@ -28,11 +28,11 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 		await Promise.all(promises);
 	}
 
-	public async broadcastPrevote(prevote: Contracts.Crypto.Message): Promise<void> {
+	async broadcastMessage(message: Contracts.Crypto.Message): Promise<void> {
 		this.state.resetLastMessageTime();
 
 		const promises = this.#getPeersForBroadcast().map((peer) =>
-			this.communicator.postMessage(peer, prevote.serialized),
+			this.communicator.postMessage(peer, message.serialized),
 		);
 
 		await Promise.all(promises);
