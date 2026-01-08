@@ -75,23 +75,14 @@ export interface GetProposalResponse extends Response {
 	proposal: Buffer;
 }
 
-export interface PostPrecommitRequest extends Request {
+export interface PostMessageRequest extends Request {
 	payload: {
 		headers: HeaderData;
-		precommit: Buffer;
+		message: Buffer;
 	};
 }
 
-export type PostPrecommitResponse = Response;
-
-export interface PostPrevoteRequest extends Request {
-	payload: {
-		headers: HeaderData;
-		prevote: Buffer;
-	};
-}
-
-export type PostPrevoteResponse = Response;
+export type PostMessageResponse = Response;
 
 export interface PostProposalRequest extends Request {
 	payload: {

@@ -6,7 +6,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { getPeerIp } from "../../utils/index.js";
 
 @injectable()
-export class PostPrevoteController implements Contracts.P2P.Controller {
+export class PostMessageController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Consensus.Processor.Message)
 	private readonly messageProcessor!: Contracts.Consensus.MessageProcessor;
 
@@ -20,16 +20,16 @@ export class PostPrevoteController implements Contracts.P2P.Controller {
 	private readonly state!: Contracts.P2P.State;
 
 	public async handle(
-		request: Contracts.P2P.PostPrevoteRequest,
+		request: Contracts.P2P.PostMessageRequest,
 		h: Hapi.ResponseToolkit,
-	): Promise<Contracts.P2P.PostPrevoteResponse> {
+	): Promise<Contracts.P2P.PostMessageResponse> {
 		try {
-			const prevote = await this.factory.makeMessageFromBytes(request.payload.prevote);
+			const message = await this.factory.makeMessageFromBytes(request.payload.message);
 
-			const result = await this.messageProcessor.process(prevote);
+			const result = await this.messageProcessor.process(message);
 
 			if (result === Enums.Consensus.ProcessorResult.Invalid) {
-				throw new Error("Invalid prevote");
+				throw new Error("Invalid message");
 			}
 
 			this.state.resetLastMessageTime();

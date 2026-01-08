@@ -4,24 +4,24 @@ import type { Contracts } from "@mainsail/contracts";
 import { constants } from "../../constants.js";
 import { Routes } from "../../enums.js";
 import { Codecs } from "../codecs/index.js";
-import { PostPrecommitController } from "../controllers/index.js";
+import { PostMessageController } from "../controllers/index.js";
 import { Schemas } from "../schemas/index.js";
 import { Route } from "./route.js";
 
 @injectable()
-export class PostPrecommitRoute extends Route {
+export class PostMessageRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: Contracts.P2P.RouteConfig } {
 		return {
-			"/postPrecommit": {
-				codec: Codecs.postPrecommit,
-				id: Routes.PostPrecommit,
+			"/postMessage": {
+				codec: Codecs.postMessage,
+				id: Routes.PostMessage,
 				maxBytes: constants.MAX_PAYLOAD_SERVER,
-				validation: Schemas.postPrecommit(this.cryptoConfiguration),
+				validation: Schemas.postMessage(this.cryptoConfiguration),
 			},
 		};
 	}
 
-	protected getController(): PostPrecommitController {
-		return this.app.resolve(PostPrecommitController);
+	protected getController(): PostMessageController {
+		return this.app.resolve(PostMessageController);
 	}
 }

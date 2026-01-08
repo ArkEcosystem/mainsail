@@ -31,10 +31,8 @@ const setup = async () => {
 		persist: async () => {},
 	});
 
-	// TODO:
 	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({
-		broadcastPrecommit: async () => {},
-		broadcastPrevote: async () => {},
+		broadcastMessage: async () => {},
 		broadcastProposal: async () => {},
 	});
 	sandbox.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => {} });
