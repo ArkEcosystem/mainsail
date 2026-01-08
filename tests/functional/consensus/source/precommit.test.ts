@@ -98,7 +98,7 @@ describe<{
 
 		stubPrecommit.callsFake(async () => {
 			stubPrecommit.restore();
-			await p2p.broadcastPrecommit(precommit);
+			await p2p.broadcastMessage(precommit);
 		});
 
 		await runMany(nodes);
@@ -148,7 +148,7 @@ describe<{
 		const precommit1 = await makePrecommit(node1, validators[1], 1, 0);
 		stubPrecommit1.callsFake(async () => {
 			stubPrecommit1.restore();
-			await p2p.broadcastPrecommit(precommit1);
+			await p2p.broadcastMessage(precommit1);
 		});
 
 		await runMany(nodes);
@@ -199,7 +199,7 @@ describe<{
 		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal.getData().block.data.hash);
 		stubPrecommit1.callsFake(async () => {
 			stubPrecommit1.restore();
-			await p2p.broadcastPrecommit(precommit1);
+			await p2p.broadcastMessage(precommit1);
 		});
 
 		await runMany(nodes);
@@ -263,11 +263,11 @@ describe<{
 		const precommit4 = await makePrecommit(node1, validators[1], 1, 0, proposal4.getData().block.data.hash);
 		stubPrecommit1.callsFake(async () => {
 			stubPrecommit1.restore();
-			await p2p.broadcastPrecommit(precommit0);
-			await p2p.broadcastPrecommit(precommit1);
-			await p2p.broadcastPrecommit(precommit2);
-			await p2p.broadcastPrecommit(precommit3);
-			await p2p.broadcastPrecommit(precommit4);
+			await p2p.broadcastMessage(precommit0);
+			await p2p.broadcastMessage(precommit1);
+			await p2p.broadcastMessage(precommit2);
+			await p2p.broadcastMessage(precommit3);
+			await p2p.broadcastMessage(precommit4);
 		});
 
 		await runMany(nodes);

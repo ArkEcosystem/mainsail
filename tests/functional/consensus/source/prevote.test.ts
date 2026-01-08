@@ -99,7 +99,7 @@ describe<{
 
 		stubPrevote.callsFake(async () => {
 			stubPrevote.restore();
-			await p2p.broadcastPrevote(prevote);
+			await p2p.broadcastMessage(prevote);
 		});
 
 		await runMany(nodes);
@@ -144,7 +144,7 @@ describe<{
 
 		stubPrevote0.callsFake(async () => {
 			stubPrevote0.restore();
-			await p2p.broadcastPrevote(prevote0);
+			await p2p.broadcastMessage(prevote0);
 		});
 
 		const node1 = nodes[1];
@@ -153,7 +153,7 @@ describe<{
 
 		stubPrevote1.callsFake(async () => {
 			stubPrevote1.restore();
-			await p2p.broadcastPrevote(prevote1);
+			await p2p.broadcastMessage(prevote1);
 		});
 
 		await runMany(nodes);
@@ -195,7 +195,7 @@ describe<{
 
 		stubPrevote.callsFake(async () => {
 			stubPrevote.restore();
-			await p2p.broadcastPrevote(prevote);
+			await p2p.broadcastMessage(prevote);
 		});
 
 		await runMany(nodes);
@@ -242,14 +242,14 @@ describe<{
 		const stubPrevote0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote0.callsFake(async () => {
 			stubPrevote0.restore();
-			await p2p.broadcastPrevote(prevote0);
+			await p2p.broadcastMessage(prevote0);
 		});
 
 		const prevote1 = await makePrevote(node1, validators[1], 1, 0, proposal.getData().block.data.hash);
 		const stubPrevote1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote1.callsFake(async () => {
 			stubPrevote1.restore();
-			await p2p.broadcastPrevote(prevote1);
+			await p2p.broadcastMessage(prevote1);
 		});
 
 		await runMany(nodes);
@@ -305,11 +305,11 @@ describe<{
 
 		stubPrevote.callsFake(async () => {
 			stubPrevote.restore();
-			await p2p.broadcastPrevote(prevote0);
-			await p2p.broadcastPrevote(prevote1);
-			await p2p.broadcastPrevote(prevote2);
-			await p2p.broadcastPrevote(prevote3);
-			await p2p.broadcastPrevote(prevote4);
+			await p2p.broadcastMessage(prevote0);
+			await p2p.broadcastMessage(prevote1);
+			await p2p.broadcastMessage(prevote2);
+			await p2p.broadcastMessage(prevote3);
+			await p2p.broadcastMessage(prevote4);
 		});
 
 		await runMany(nodes);
