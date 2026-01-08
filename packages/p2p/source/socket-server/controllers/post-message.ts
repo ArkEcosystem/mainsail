@@ -24,12 +24,12 @@ export class PostMessageController implements Contracts.P2P.Controller {
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.PostMessageResponse> {
 		try {
-			const prevote = await this.factory.makeMessageFromBytes(request.payload.prevote);
+			const message = await this.factory.makeMessageFromBytes(request.payload.message);
 
-			const result = await this.messageProcessor.process(prevote);
+			const result = await this.messageProcessor.process(message);
 
 			if (result === Enums.Consensus.ProcessorResult.Invalid) {
-				throw new Error("Invalid prevote");
+				throw new Error("Invalid message");
 			}
 
 			this.state.resetLastMessageTime();
