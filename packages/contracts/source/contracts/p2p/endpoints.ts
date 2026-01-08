@@ -78,7 +78,7 @@ export interface GetProposalResponse extends Response {
 export interface PostMessageRequest extends Request {
 	payload: {
 		headers: HeaderData;
-		prevote: Buffer;
+		message: Buffer;
 	};
 }
 
