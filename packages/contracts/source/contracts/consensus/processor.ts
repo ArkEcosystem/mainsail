@@ -6,12 +6,8 @@ export interface ProposalProcessor {
 	hasValidLockProof(proposal: Proposal): Promise<boolean>;
 }
 
-export interface PrevoteProcessor {
-	process(prevote: Message, broadcast?: boolean): Promise<ProcessorResult>;
-}
-
-export interface PrecommitProcessor {
-	process(prevote: Message, broadcast?: boolean): Promise<ProcessorResult>;
+export interface MessageProcessor {
+	process(message: Message, broadcast?: boolean): Promise<ProcessorResult>;
 }
 
 export interface CommitProcessor {

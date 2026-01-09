@@ -6,9 +6,9 @@ import type { Contracts } from "@mainsail/contracts";
 import { getPeerIp } from "../../utils/index.js";
 
 @injectable()
-export class PostPrecommitController implements Contracts.P2P.Controller {
-	@inject(Identifiers.Consensus.Processor.PreCommit)
-	private readonly precommitProcessor!: Contracts.Consensus.PrecommitProcessor;
+export class PostMessageController implements Contracts.P2P.Controller {
+	@inject(Identifiers.Consensus.Processor.Message)
+	private readonly messageProcessor!: Contracts.Consensus.MessageProcessor;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.MessageFactory;
@@ -20,15 +20,16 @@ export class PostPrecommitController implements Contracts.P2P.Controller {
 	private readonly state!: Contracts.P2P.State;
 
 	public async handle(
-		request: Contracts.P2P.PostPrecommitRequest,
+		request: Contracts.P2P.PostMessageRequest,
 		h: Hapi.ResponseToolkit,
-	): Promise<Contracts.P2P.PostPrecommitResponse> {
+	): Promise<Contracts.P2P.PostMessageResponse> {
 		try {
-			const precommit = await this.factory.makeMessageFromBytes(request.payload.precommit);
-			const result = await this.precommitProcessor.process(precommit);
+			const message = await this.factory.makeMessageFromBytes(request.payload.message);
+
+			const result = await this.messageProcessor.process(message);
 
 			if (result === Enums.Consensus.ProcessorResult.Invalid) {
-				throw new Error("Invalid precommit");
+				throw new Error("Invalid message");
 			}
 
 			this.state.resetLastMessageTime();

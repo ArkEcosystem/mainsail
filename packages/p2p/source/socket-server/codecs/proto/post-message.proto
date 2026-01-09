@@ -2,13 +2,13 @@ syntax = "proto3";
 
 import "shared.proto";
 
-package postProposal;
+package postMessage;
 
-message PostProposalRequest {
-    bytes proposal = 1;
+message PostMessageRequest {
+    bytes message = 1;
     shared.Headers headers = 2;
 }
 
-message PostProposalResponse {
+message PostMessageResponse {
 	shared.Headers headers = 1;
 }

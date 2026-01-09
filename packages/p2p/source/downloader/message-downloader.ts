@@ -43,11 +43,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
-	@inject(Identifiers.Consensus.Processor.PreVote)
-	private readonly prevoteProcessor!: Contracts.Consensus.PrevoteProcessor;
-
-	@inject(Identifiers.Consensus.Processor.PreCommit)
-	private readonly precommitProcessor!: Contracts.Consensus.PrecommitProcessor;
+	@inject(Identifiers.Consensus.Processor.Message)
+	private readonly messageProcessor!: Contracts.Consensus.MessageProcessor;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.MessageFactory;
@@ -314,7 +311,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				}
 				this.#checkMessage(prevote, firstPrevote, job);
 
-				const response = await this.prevoteProcessor.process(prevote, false);
+				const response = await this.messageProcessor.process(prevote, false);
 
 				if (response === Enums.Consensus.ProcessorResult.Invalid) {
 					throw new Error(`Received prevote is invalid`);
@@ -332,7 +329,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				}
 				this.#checkMessage(precommit, firstPrecommit, job);
 
-				const response = await this.precommitProcessor.process(precommit, false);
+				const response = await this.messageProcessor.process(precommit, false);
 
 				if (response === Enums.Consensus.ProcessorResult.Invalid) {
 					throw new Error(`Received precommit is invalid`);

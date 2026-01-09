@@ -1,6 +1,7 @@
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+import { assert } from "@mainsail/utils";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 
@@ -11,7 +12,7 @@ enum SignatureCheckResult {
 }
 
 @injectable()
-export class PrecommitProcessor extends AbstractProcessor implements Contracts.Consensus.PrecommitProcessor {
+export class MessageProcessor extends AbstractProcessor implements Contracts.Consensus.MessageProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer!: Contracts.Crypto.MessageSerializer;
 
@@ -30,34 +31,34 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	#pendingPrecommits: Map<string, ((value: SignatureCheckResult) => void)[]> = new Map();
+	#pendingMessages: Map<string, ((value: SignatureCheckResult) => void)[]> = new Map();
 
 	async process(
-		precommit: Contracts.Crypto.Message,
+		message: Contracts.Crypto.Message,
 		broadcast: boolean = true,
 	): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
-			if (!this.hasValidBlockNumberOrRound(precommit)) {
+			if (!this.hasValidBlockNumberOrRound(message)) {
 				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
-			if (!this.isRoundInBounds(precommit)) {
+			if (!this.isRoundInBounds(message)) {
 				return Enums.Consensus.ProcessorResult.Invalid;
 			}
 
-			const roundState = this.roundStateRepo.getRoundState(precommit.blockNumber, precommit.round);
-			if (roundState.hasPrecommit(precommit.validatorIndex)) {
-				const existingPrecommit = roundState.getPrecommit(precommit.validatorIndex);
-				if (existingPrecommit && !existingPrecommit.serialized.equals(precommit.serialized)) {
+			const roundState = this.roundStateRepo.getRoundState(message.blockNumber, message.round);
+			if (roundState.hasMessage(message)) {
+				const existingMessage = roundState.getMessage(message.validatorIndex, message.type);
+				if (existingMessage && !existingMessage.serialized.equals(message.serialized)) {
 					this.logger.warn(
-						`Conflicting precommits for validator index ${precommit.validatorIndex} in block ${precommit.blockNumber}/${precommit.round}. Existing: ${existingPrecommit.serialized.toString("hex")}, New: ${precommit.serialized.toString("hex")}`,
+						`Conflicting ${message.type === Enums.Crypto.MessageType.Prevote ? "prevote" : "precommit"} for validator index ${message.validatorIndex} in block ${message.blockNumber}/${message.round}. Existing: ${existingMessage.serialized.toString("hex")}, New: ${message.serialized.toString("hex")}`,
 					);
 				}
 
 				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
-			switch (await this.#signatureCheck(precommit)) {
+			switch (await this.#signatureCheck(message)) {
 				case SignatureCheckResult.Skip: {
 					return Enums.Consensus.ProcessorResult.Skipped;
 				}
@@ -66,10 +67,10 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 				}
 			}
 
-			roundState.addPrecommit(precommit);
+			roundState.addMessage(message);
 
 			if (broadcast) {
-				void this.broadcaster.broadcastPrecommit(precommit);
+				void this.broadcaster.broadcastMessage(message);
 			}
 
 			void this.getConsensus().handle(roundState);
@@ -78,34 +79,38 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 		});
 	}
 
-	async #signatureCheck(precommit: Contracts.Crypto.Message): Promise<SignatureCheckResult> {
-		const serializedHex = precommit.serialized.toString("hex");
-		if (this.#pendingPrecommits.has(serializedHex)) {
+	async #signatureCheck(message: Contracts.Crypto.Message): Promise<SignatureCheckResult> {
+		const serializedHex = message.serialized.toString("hex");
+		if (this.#pendingMessages.has(serializedHex)) {
 			return new Promise((resolve) => {
-				this.#pendingPrecommits.get(serializedHex)!.push(resolve);
+				const pendingMessages = this.#pendingMessages.get(serializedHex);
+				assert.defined(pendingMessages);
+				pendingMessages.push(resolve);
 			});
 		} else {
-			this.#pendingPrecommits.set(serializedHex, []);
+			this.#pendingMessages.set(serializedHex, []);
 		}
 
-		const hasValidSignature = await this.#hasValidSignature(precommit);
+		const hasValidSignature = await this.#hasValidSignature(message);
 
-		for (const resolve of this.#pendingPrecommits.get(serializedHex)!) {
+		const pendingMessages = this.#pendingMessages.get(serializedHex);
+		assert.defined(pendingMessages);
+		for (const resolve of pendingMessages) {
 			resolve(hasValidSignature ? SignatureCheckResult.Skip : SignatureCheckResult.Invalid);
 		}
 
-		this.#pendingPrecommits.delete(serializedHex);
+		this.#pendingMessages.delete(serializedHex);
 
 		return hasValidSignature ? SignatureCheckResult.Accepted : SignatureCheckResult.Invalid;
 	}
 
-	async #hasValidSignature(precommit: Contracts.Crypto.Message): Promise<boolean> {
+	async #hasValidSignature(message: Contracts.Crypto.Message): Promise<boolean> {
 		const worker = await this.workerPool.getWorker();
 		return worker.consensusSignature(
 			"verify",
-			Buffer.from(precommit.signature, "hex"),
-			await this.serializer.serializeMessageForSignature(precommit),
-			Buffer.from(this.validatorSet.getValidator(precommit.validatorIndex).blsPublicKey, "hex"),
+			Buffer.from(message.signature, "hex"),
+			await this.serializer.serializeMessageForSignature(message),
+			Buffer.from(this.validatorSet.getValidator(message.validatorIndex).blsPublicKey, "hex"),
 		);
 	}
 }

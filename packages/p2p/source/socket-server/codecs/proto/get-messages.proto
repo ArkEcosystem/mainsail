@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "shared.proto";
+
 package getMessages;
 
 message GetMessagesRequest {

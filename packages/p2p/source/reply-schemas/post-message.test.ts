@@ -1,16 +1,16 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework/source";
 import { headers } from "../../test/fixtures/responses/headers";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
-import { postPrecommit } from "./post-precommit";
+import { postMessage } from "./post-message.js";
 
 type Context = {
 	sandbox: Sandbox;
 	validator: Validator;
 };
 
-describe<Context>("PostPrecommit Schema", ({ it, assert, beforeEach, each }) => {
+describe<Context>("PostMessage Schema", ({ it, assert, beforeEach, each }) => {
 	const data = {
 		headers,
 	};
@@ -24,13 +24,13 @@ describe<Context>("PostPrecommit Schema", ({ it, assert, beforeEach, each }) => 
 	});
 
 	it("should pass validation", ({ validator }) => {
-		const result = validator.validate(postPrecommit, data);
+		const result = validator.validate(postMessage, data);
 
 		assert.undefined(result.error);
 	});
 
 	it("should not pass if headers are undefined", ({ validator }) => {
-		const result = validator.validate(postPrecommit, {});
+		const result = validator.validate(postMessage, {});
 
 		assert.defined(result.error);
 	});
