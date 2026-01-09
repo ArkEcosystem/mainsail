@@ -26,6 +26,7 @@ export interface RoundState extends ProcessableUnit {
 	getPrecommit(validatorIndex: number): Message | undefined;
 	getPrevotes(): Message[];
 	getPrecommits(): Message[];
+	getMessages(): Message[];
 	getValidator(consensusPublicKey: string): ValidatorWallet;
 	getValidatorsSignedPrevote(): readonly boolean[];
 	getValidatorsSignedPrecommit(): readonly boolean[];

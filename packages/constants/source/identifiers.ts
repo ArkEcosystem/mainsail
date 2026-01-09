@@ -43,8 +43,7 @@ export const Identifiers = {
 
 		Storage: {
 			ConsensusState: Symbol("ConsensusStorage<Storage.ConsensusState>"),
-			PreCommit: Symbol("ConsensusStorage<Storage.PreCommit>"),
-			PreVote: Symbol("ConsensusStorage<Storage.PreVote>"),
+			Message: Symbol("ConsensusStorage<Storage.Message>"),
 			Proposal: Symbol("ConsensusStorage<Storage.Proposal>"),
 		},
 	},

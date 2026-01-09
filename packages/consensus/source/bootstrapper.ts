@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts, Utils } from "@mainsail/contracts";
 
@@ -23,20 +23,18 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 			roundState.addProposal(proposal);
 		}
 
-		const prevotes = await this.storage.getPrevotes();
+		const messages = await this.storage.getMessages();
 
-		this.logger.info(`Consensus Bootstrap - Prevotes: ${prevotes.length}`, "consensus");
-		for (const prevote of prevotes) {
-			const roundState = this.roundStateRepo.getRoundState(prevote.blockNumber, prevote.round);
-			roundState.addPrevote(prevote);
-		}
+		const prevotes = messages.filter((message) => message.type === Enums.Crypto.MessageType.Prevote);
+		const precommits = messages.filter((message) => message.type === Enums.Crypto.MessageType.Precommit);
 
-		const precommits = await this.storage.getPrecommits();
-
-		this.logger.info(`Consensus Bootstrap - Precommits: ${precommits.length}`, "consensus");
-		for (const precommit of precommits) {
-			const roundState = this.roundStateRepo.getRoundState(precommit.blockNumber, precommit.round);
-			roundState.addPrecommit(precommit);
+		this.logger.info(
+			`Consensus Bootstrap - Prevotes: ${prevotes.length}, Precommits: ${precommits.length}`,
+			"consensus",
+		);
+		for (const message of messages) {
+			const roundState = this.roundStateRepo.getRoundState(message.blockNumber, message.round);
+			roundState.addMessage(message);
 		}
 
 		const state = (await this.storage.getState()) as Utils.Mutable<Contracts.Consensus.State> | undefined;
