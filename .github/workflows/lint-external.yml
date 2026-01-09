@@ -1,9 +1,6 @@
 name: Linting (External)
 
-on:
-    pull_request:
-    push:
-      branches: [develop, main]
+on: pull_request
 
 permissions:
     contents: read
