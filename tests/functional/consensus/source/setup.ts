@@ -30,8 +30,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	sandbox.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => {} });
 
 	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
-		getPrecommits: async () => [],
-		getPrevotes: async () => [],
+		getMessages: async () => [],
 		getProposals: async () => [],
 		getState: async () => {},
 		persist: async () => {},
