@@ -100,23 +100,17 @@ export class P2PRegistry {
 		}, 0);
 	}
 
-	async postPrecommit(node: Contracts.Kernel.Application, precommit: Contracts.Crypto.Message): Promise<void> {
-		this.precommits.set(precommit);
+	async postMessage(node: Contracts.Kernel.Application, message: Contracts.Crypto.Message): Promise<void> {
+		if (message.type === Enums.Crypto.MessageType.Prevote) {
+			this.prevotes.set(message);
+		} else {
+			this.precommits.set(message);
+		}
 
 		setTimeout(() => {
 			void node
 				.get<Contracts.Consensus.MessageProcessor>(Identifiers.Consensus.Processor.Message)
-				.process(precommit);
-		}, 0);
-	}
-
-	async postPrevote(node: Contracts.Kernel.Application, prevote: Contracts.Crypto.Message): Promise<void> {
-		this.prevotes.set(prevote);
-
-		setTimeout(() => {
-			void node
-				.get<Contracts.Consensus.MessageProcessor>(Identifiers.Consensus.Processor.Message)
-				.process(prevote);
+				.process(message);
 		}, 0);
 	}
 
@@ -132,15 +126,9 @@ export class P2PRegistry {
 		}
 	}
 
-	async broadcastPrecommit(precommit: Contracts.Crypto.Message, nodes?: number[]): Promise<void> {
+	async broadcastMessage(message: Contracts.Crypto.Message, nodes?: number[]): Promise<void> {
 		for (const node of this.getNodes(nodes)) {
-			await this.postPrecommit(node, precommit);
-		}
-	}
-
-	async broadcastPrevote(prevote: Contracts.Crypto.Message, nodes?: number[]): Promise<void> {
-		for (const node of this.getNodes(nodes)) {
-			await this.postPrevote(node, prevote);
+			await this.postMessage(node, message);
 		}
 	}
 }
@@ -164,15 +152,9 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 		}
 	}
 
-	async broadcastPrecommit(precommit: Contracts.Crypto.Message): Promise<void> {
+	async broadcastMessage(message: Contracts.Crypto.Message): Promise<void> {
 		for (const node of this.#getNodes()) {
-			await this.#p2p.postPrecommit(node, precommit);
-		}
-	}
-
-	async broadcastPrevote(prevote: Contracts.Crypto.Message): Promise<void> {
-		for (const node of this.#getNodes()) {
-			await this.#p2p.postPrevote(node, prevote);
+			await this.#p2p.postMessage(node, message);
 		}
 	}
 

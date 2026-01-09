@@ -301,6 +301,255 @@ export namespace getApiNodes {
     }
 }
 
+/** Namespace shared. */
+export namespace shared {
+
+    /** Properties of a Headers. */
+    interface IHeaders {
+
+        /** Headers version */
+        version?: (string|null);
+
+        /** Headers blockNumber */
+        blockNumber?: (number|null);
+
+        /** Headers round */
+        round?: (number|null);
+
+        /** Headers step */
+        step?: (number|null);
+
+        /** Headers proposedBlockHash */
+        proposedBlockHash?: (string|null);
+
+        /** Headers validatorsSignedPrevote */
+        validatorsSignedPrevote?: (boolean[]|null);
+
+        /** Headers validatorsSignedPrecommit */
+        validatorsSignedPrecommit?: (boolean[]|null);
+    }
+
+    /** Represents a Headers. */
+    class Headers implements IHeaders {
+
+        /**
+         * Constructs a new Headers.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: shared.IHeaders);
+
+        /** Headers version. */
+        public version: string;
+
+        /** Headers blockNumber. */
+        public blockNumber: number;
+
+        /** Headers round. */
+        public round: number;
+
+        /** Headers step. */
+        public step: number;
+
+        /** Headers proposedBlockHash. */
+        public proposedBlockHash?: (string|null);
+
+        /** Headers validatorsSignedPrevote. */
+        public validatorsSignedPrevote: boolean[];
+
+        /** Headers validatorsSignedPrecommit. */
+        public validatorsSignedPrecommit: boolean[];
+
+        /** Headers _proposedBlockHash. */
+        public _proposedBlockHash?: "proposedBlockHash";
+
+        /**
+         * Creates a new Headers instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Headers instance
+         */
+        public static create(properties?: shared.IHeaders): shared.Headers;
+
+        /**
+         * Encodes the specified Headers message. Does not implicitly {@link shared.Headers.verify|verify} messages.
+         * @param message Headers message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: shared.IHeaders, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified Headers message, length delimited. Does not implicitly {@link shared.Headers.verify|verify} messages.
+         * @param message Headers message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: shared.IHeaders, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a Headers message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Headers
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.Headers;
+
+        /**
+         * Decodes a Headers message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Headers
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.Headers;
+
+        /**
+         * Verifies a Headers message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a Headers message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns Headers
+         */
+        public static fromObject(object: { [k: string]: any }): shared.Headers;
+
+        /**
+         * Creates a plain object from a Headers message. Also converts values to other types if specified.
+         * @param message Headers
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: shared.Headers, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this Headers to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for Headers
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a PeerLike. */
+    interface IPeerLike {
+
+        /** PeerLike ip */
+        ip?: (string|null);
+
+        /** PeerLike port */
+        port?: (number|null);
+
+        /** PeerLike protocol */
+        protocol?: (number|null);
+    }
+
+    /** Represents a PeerLike. */
+    class PeerLike implements IPeerLike {
+
+        /**
+         * Constructs a new PeerLike.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: shared.IPeerLike);
+
+        /** PeerLike ip. */
+        public ip: string;
+
+        /** PeerLike port. */
+        public port: number;
+
+        /** PeerLike protocol. */
+        public protocol: number;
+
+        /**
+         * Creates a new PeerLike instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PeerLike instance
+         */
+        public static create(properties?: shared.IPeerLike): shared.PeerLike;
+
+        /**
+         * Encodes the specified PeerLike message. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
+         * @param message PeerLike message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: shared.IPeerLike, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PeerLike message, length delimited. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
+         * @param message PeerLike message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: shared.IPeerLike, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PeerLike message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PeerLike
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.PeerLike;
+
+        /**
+         * Decodes a PeerLike message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PeerLike
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.PeerLike;
+
+        /**
+         * Verifies a PeerLike message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PeerLike message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PeerLike
+         */
+        public static fromObject(object: { [k: string]: any }): shared.PeerLike;
+
+        /**
+         * Creates a plain object from a PeerLike message. Also converts values to other types if specified.
+         * @param message PeerLike
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: shared.PeerLike, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PeerLike to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for PeerLike
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+}
+
 /** Namespace getBlocks. */
 export namespace getBlocks {
 
@@ -1899,407 +2148,203 @@ export namespace getStatus {
     }
 }
 
-/** Namespace postPrecommit. */
-export namespace postPrecommit {
+/** Namespace postMessage. */
+export namespace postMessage {
 
-    /** Properties of a PostPrecommitRequest. */
-    interface IPostPrecommitRequest {
+    /** Properties of a PostMessageRequest. */
+    interface IPostMessageRequest {
 
-        /** PostPrecommitRequest precommit */
-        precommit?: (Uint8Array|null);
+        /** PostMessageRequest message */
+        message?: (Uint8Array|null);
 
-        /** PostPrecommitRequest headers */
+        /** PostMessageRequest headers */
         headers?: (shared.IHeaders|null);
     }
 
-    /** Represents a PostPrecommitRequest. */
-    class PostPrecommitRequest implements IPostPrecommitRequest {
+    /** Represents a PostMessageRequest. */
+    class PostMessageRequest implements IPostMessageRequest {
 
         /**
-         * Constructs a new PostPrecommitRequest.
+         * Constructs a new PostMessageRequest.
          * @param [properties] Properties to set
          */
-        constructor(properties?: postPrecommit.IPostPrecommitRequest);
+        constructor(properties?: postMessage.IPostMessageRequest);
 
-        /** PostPrecommitRequest precommit. */
-        public precommit: Uint8Array;
+        /** PostMessageRequest message. */
+        public message: Uint8Array;
 
-        /** PostPrecommitRequest headers. */
+        /** PostMessageRequest headers. */
         public headers?: (shared.IHeaders|null);
 
         /**
-         * Creates a new PostPrecommitRequest instance using the specified properties.
+         * Creates a new PostMessageRequest instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns PostPrecommitRequest instance
+         * @returns PostMessageRequest instance
          */
-        public static create(properties?: postPrecommit.IPostPrecommitRequest): postPrecommit.PostPrecommitRequest;
+        public static create(properties?: postMessage.IPostMessageRequest): postMessage.PostMessageRequest;
 
         /**
-         * Encodes the specified PostPrecommitRequest message. Does not implicitly {@link postPrecommit.PostPrecommitRequest.verify|verify} messages.
-         * @param message PostPrecommitRequest message or plain object to encode
+         * Encodes the specified PostMessageRequest message. Does not implicitly {@link postMessage.PostMessageRequest.verify|verify} messages.
+         * @param message PostMessageRequest message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: postPrecommit.IPostPrecommitRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: postMessage.IPostMessageRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified PostPrecommitRequest message, length delimited. Does not implicitly {@link postPrecommit.PostPrecommitRequest.verify|verify} messages.
-         * @param message PostPrecommitRequest message or plain object to encode
+         * Encodes the specified PostMessageRequest message, length delimited. Does not implicitly {@link postMessage.PostMessageRequest.verify|verify} messages.
+         * @param message PostMessageRequest message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: postPrecommit.IPostPrecommitRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: postMessage.IPostMessageRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a PostPrecommitRequest message from the specified reader or buffer.
+         * Decodes a PostMessageRequest message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns PostPrecommitRequest
+         * @returns PostMessageRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postPrecommit.PostPrecommitRequest;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postMessage.PostMessageRequest;
 
         /**
-         * Decodes a PostPrecommitRequest message from the specified reader or buffer, length delimited.
+         * Decodes a PostMessageRequest message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns PostPrecommitRequest
+         * @returns PostMessageRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postPrecommit.PostPrecommitRequest;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postMessage.PostMessageRequest;
 
         /**
-         * Verifies a PostPrecommitRequest message.
+         * Verifies a PostMessageRequest message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a PostPrecommitRequest message from a plain object. Also converts values to their respective internal types.
+         * Creates a PostMessageRequest message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns PostPrecommitRequest
+         * @returns PostMessageRequest
          */
-        public static fromObject(object: { [k: string]: any }): postPrecommit.PostPrecommitRequest;
+        public static fromObject(object: { [k: string]: any }): postMessage.PostMessageRequest;
 
         /**
-         * Creates a plain object from a PostPrecommitRequest message. Also converts values to other types if specified.
-         * @param message PostPrecommitRequest
+         * Creates a plain object from a PostMessageRequest message. Also converts values to other types if specified.
+         * @param message PostMessageRequest
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: postPrecommit.PostPrecommitRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: postMessage.PostMessageRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this PostPrecommitRequest to JSON.
+         * Converts this PostMessageRequest to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for PostPrecommitRequest
+         * Gets the default type url for PostMessageRequest
          * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns The default type url
          */
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
-    /** Properties of a PostPrecommitResponse. */
-    interface IPostPrecommitResponse {
+    /** Properties of a PostMessageResponse. */
+    interface IPostMessageResponse {
 
-        /** PostPrecommitResponse headers */
+        /** PostMessageResponse headers */
         headers?: (shared.IHeaders|null);
     }
 
-    /** Represents a PostPrecommitResponse. */
-    class PostPrecommitResponse implements IPostPrecommitResponse {
+    /** Represents a PostMessageResponse. */
+    class PostMessageResponse implements IPostMessageResponse {
 
         /**
-         * Constructs a new PostPrecommitResponse.
+         * Constructs a new PostMessageResponse.
          * @param [properties] Properties to set
          */
-        constructor(properties?: postPrecommit.IPostPrecommitResponse);
+        constructor(properties?: postMessage.IPostMessageResponse);
 
-        /** PostPrecommitResponse headers. */
+        /** PostMessageResponse headers. */
         public headers?: (shared.IHeaders|null);
 
         /**
-         * Creates a new PostPrecommitResponse instance using the specified properties.
+         * Creates a new PostMessageResponse instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns PostPrecommitResponse instance
+         * @returns PostMessageResponse instance
          */
-        public static create(properties?: postPrecommit.IPostPrecommitResponse): postPrecommit.PostPrecommitResponse;
+        public static create(properties?: postMessage.IPostMessageResponse): postMessage.PostMessageResponse;
 
         /**
-         * Encodes the specified PostPrecommitResponse message. Does not implicitly {@link postPrecommit.PostPrecommitResponse.verify|verify} messages.
-         * @param message PostPrecommitResponse message or plain object to encode
+         * Encodes the specified PostMessageResponse message. Does not implicitly {@link postMessage.PostMessageResponse.verify|verify} messages.
+         * @param message PostMessageResponse message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: postPrecommit.IPostPrecommitResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: postMessage.IPostMessageResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified PostPrecommitResponse message, length delimited. Does not implicitly {@link postPrecommit.PostPrecommitResponse.verify|verify} messages.
-         * @param message PostPrecommitResponse message or plain object to encode
+         * Encodes the specified PostMessageResponse message, length delimited. Does not implicitly {@link postMessage.PostMessageResponse.verify|verify} messages.
+         * @param message PostMessageResponse message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: postPrecommit.IPostPrecommitResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: postMessage.IPostMessageResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a PostPrecommitResponse message from the specified reader or buffer.
+         * Decodes a PostMessageResponse message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns PostPrecommitResponse
+         * @returns PostMessageResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postPrecommit.PostPrecommitResponse;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postMessage.PostMessageResponse;
 
         /**
-         * Decodes a PostPrecommitResponse message from the specified reader or buffer, length delimited.
+         * Decodes a PostMessageResponse message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns PostPrecommitResponse
+         * @returns PostMessageResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postPrecommit.PostPrecommitResponse;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postMessage.PostMessageResponse;
 
         /**
-         * Verifies a PostPrecommitResponse message.
+         * Verifies a PostMessageResponse message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a PostPrecommitResponse message from a plain object. Also converts values to their respective internal types.
+         * Creates a PostMessageResponse message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns PostPrecommitResponse
+         * @returns PostMessageResponse
          */
-        public static fromObject(object: { [k: string]: any }): postPrecommit.PostPrecommitResponse;
+        public static fromObject(object: { [k: string]: any }): postMessage.PostMessageResponse;
 
         /**
-         * Creates a plain object from a PostPrecommitResponse message. Also converts values to other types if specified.
-         * @param message PostPrecommitResponse
+         * Creates a plain object from a PostMessageResponse message. Also converts values to other types if specified.
+         * @param message PostMessageResponse
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: postPrecommit.PostPrecommitResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: postMessage.PostMessageResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this PostPrecommitResponse to JSON.
+         * Converts this PostMessageResponse to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for PostPrecommitResponse
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
-         */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-}
-
-/** Namespace postPrevote. */
-export namespace postPrevote {
-
-    /** Properties of a PostPrevoteRequest. */
-    interface IPostPrevoteRequest {
-
-        /** PostPrevoteRequest prevote */
-        prevote?: (Uint8Array|null);
-
-        /** PostPrevoteRequest headers */
-        headers?: (shared.IHeaders|null);
-    }
-
-    /** Represents a PostPrevoteRequest. */
-    class PostPrevoteRequest implements IPostPrevoteRequest {
-
-        /**
-         * Constructs a new PostPrevoteRequest.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: postPrevote.IPostPrevoteRequest);
-
-        /** PostPrevoteRequest prevote. */
-        public prevote: Uint8Array;
-
-        /** PostPrevoteRequest headers. */
-        public headers?: (shared.IHeaders|null);
-
-        /**
-         * Creates a new PostPrevoteRequest instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns PostPrevoteRequest instance
-         */
-        public static create(properties?: postPrevote.IPostPrevoteRequest): postPrevote.PostPrevoteRequest;
-
-        /**
-         * Encodes the specified PostPrevoteRequest message. Does not implicitly {@link postPrevote.PostPrevoteRequest.verify|verify} messages.
-         * @param message PostPrevoteRequest message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: postPrevote.IPostPrevoteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified PostPrevoteRequest message, length delimited. Does not implicitly {@link postPrevote.PostPrevoteRequest.verify|verify} messages.
-         * @param message PostPrevoteRequest message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: postPrevote.IPostPrevoteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a PostPrevoteRequest message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns PostPrevoteRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postPrevote.PostPrevoteRequest;
-
-        /**
-         * Decodes a PostPrevoteRequest message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns PostPrevoteRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postPrevote.PostPrevoteRequest;
-
-        /**
-         * Verifies a PostPrevoteRequest message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a PostPrevoteRequest message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns PostPrevoteRequest
-         */
-        public static fromObject(object: { [k: string]: any }): postPrevote.PostPrevoteRequest;
-
-        /**
-         * Creates a plain object from a PostPrevoteRequest message. Also converts values to other types if specified.
-         * @param message PostPrevoteRequest
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: postPrevote.PostPrevoteRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this PostPrevoteRequest to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-
-        /**
-         * Gets the default type url for PostPrevoteRequest
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
-         */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-
-    /** Properties of a PostPrevoteResponse. */
-    interface IPostPrevoteResponse {
-
-        /** PostPrevoteResponse headers */
-        headers?: (shared.IHeaders|null);
-    }
-
-    /** Represents a PostPrevoteResponse. */
-    class PostPrevoteResponse implements IPostPrevoteResponse {
-
-        /**
-         * Constructs a new PostPrevoteResponse.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: postPrevote.IPostPrevoteResponse);
-
-        /** PostPrevoteResponse headers. */
-        public headers?: (shared.IHeaders|null);
-
-        /**
-         * Creates a new PostPrevoteResponse instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns PostPrevoteResponse instance
-         */
-        public static create(properties?: postPrevote.IPostPrevoteResponse): postPrevote.PostPrevoteResponse;
-
-        /**
-         * Encodes the specified PostPrevoteResponse message. Does not implicitly {@link postPrevote.PostPrevoteResponse.verify|verify} messages.
-         * @param message PostPrevoteResponse message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: postPrevote.IPostPrevoteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified PostPrevoteResponse message, length delimited. Does not implicitly {@link postPrevote.PostPrevoteResponse.verify|verify} messages.
-         * @param message PostPrevoteResponse message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: postPrevote.IPostPrevoteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a PostPrevoteResponse message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns PostPrevoteResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postPrevote.PostPrevoteResponse;
-
-        /**
-         * Decodes a PostPrevoteResponse message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns PostPrevoteResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postPrevote.PostPrevoteResponse;
-
-        /**
-         * Verifies a PostPrevoteResponse message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a PostPrevoteResponse message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns PostPrevoteResponse
-         */
-        public static fromObject(object: { [k: string]: any }): postPrevote.PostPrevoteResponse;
-
-        /**
-         * Creates a plain object from a PostPrevoteResponse message. Also converts values to other types if specified.
-         * @param message PostPrevoteResponse
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: postPrevote.PostPrevoteResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this PostPrevoteResponse to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-
-        /**
-         * Gets the default type url for PostPrevoteResponse
+         * Gets the default type url for PostMessageResponse
          * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns The default type url
          */
@@ -2504,252 +2549,6 @@ export namespace postProposal {
 
         /**
          * Gets the default type url for PostProposalResponse
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
-         */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-}
-
-/** Namespace shared. */
-export namespace shared {
-
-    /** Properties of a Headers. */
-    interface IHeaders {
-
-        /** Headers version */
-        version?: (string|null);
-
-        /** Headers blockNumber */
-        blockNumber?: (number|null);
-
-        /** Headers round */
-        round?: (number|null);
-
-        /** Headers step */
-        step?: (number|null);
-
-        /** Headers proposedBlockHash */
-        proposedBlockHash?: (string|null);
-
-        /** Headers validatorsSignedPrevote */
-        readonly validatorsSignedPrevote?: (readonly boolean[]|null);
-
-        /** Headers validatorsSignedPrecommit */
-        readonly validatorsSignedPrecommit?: (readonly boolean[]|null);
-    }
-
-    /** Represents a Headers. */
-    class Headers implements IHeaders {
-
-        /**
-         * Constructs a new Headers.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: shared.IHeaders);
-
-        /** Headers version. */
-        public version: string;
-
-        /** Headers blockNumber. */
-        public blockNumber: number;
-
-        /** Headers round. */
-        public round: number;
-
-        /** Headers step. */
-        public step: number;
-
-        /** Headers proposedBlockHash. */
-        public proposedBlockHash?: (string|null);
-
-        /** Headers validatorsSignedPrevote. */
-        public validatorsSignedPrevote: boolean[];
-
-        /** Headers validatorsSignedPrecommit. */
-        public validatorsSignedPrecommit: boolean[];
-
-        /**
-         * Creates a new Headers instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns Headers instance
-         */
-        public static create(properties?: shared.IHeaders): shared.Headers;
-
-        /**
-         * Encodes the specified Headers message. Does not implicitly {@link shared.Headers.verify|verify} messages.
-         * @param message Headers message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: shared.IHeaders, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified Headers message, length delimited. Does not implicitly {@link shared.Headers.verify|verify} messages.
-         * @param message Headers message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: shared.IHeaders, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a Headers message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns Headers
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.Headers;
-
-        /**
-         * Decodes a Headers message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns Headers
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.Headers;
-
-        /**
-         * Verifies a Headers message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a Headers message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns Headers
-         */
-        public static fromObject(object: { [k: string]: any }): shared.Headers;
-
-        /**
-         * Creates a plain object from a Headers message. Also converts values to other types if specified.
-         * @param message Headers
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: shared.Headers, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this Headers to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-
-        /**
-         * Gets the default type url for Headers
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
-         */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-
-    /** Properties of a PeerLike. */
-    interface IPeerLike {
-
-        /** PeerLike ip */
-        ip?: (string|null);
-
-        /** PeerLike port */
-        port?: (number|null);
-
-        /** PeerLike protocol */
-        protocol?: (number|null);
-    }
-
-    /** Represents a PeerLike. */
-    class PeerLike implements IPeerLike {
-
-        /**
-         * Constructs a new PeerLike.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: shared.IPeerLike);
-
-        /** PeerLike ip. */
-        public ip: string;
-
-        /** PeerLike port. */
-        public port: number;
-
-        /** PeerLike protocol. */
-        public protocol: number;
-
-        /**
-         * Creates a new PeerLike instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns PeerLike instance
-         */
-        public static create(properties?: shared.IPeerLike): shared.PeerLike;
-
-        /**
-         * Encodes the specified PeerLike message. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
-         * @param message PeerLike message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: shared.IPeerLike, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified PeerLike message, length delimited. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
-         * @param message PeerLike message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: shared.IPeerLike, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a PeerLike message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns PeerLike
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.PeerLike;
-
-        /**
-         * Decodes a PeerLike message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns PeerLike
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.PeerLike;
-
-        /**
-         * Verifies a PeerLike message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a PeerLike message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns PeerLike
-         */
-        public static fromObject(object: { [k: string]: any }): shared.PeerLike;
-
-        /**
-         * Creates a plain object from a PeerLike message. Also converts values to other types if specified.
-         * @param message PeerLike
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: shared.PeerLike, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this PeerLike to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-
-        /**
-         * Gets the default type url for PeerLike
          * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns The default type url
          */
