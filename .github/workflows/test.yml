@@ -6,6 +6,8 @@ on:
         - "Linting (Internal)"
         - "Linting (External)"
       types: [completed]
+    push:
+      branches: [develop, main]
 
 permissions:
     contents: read
