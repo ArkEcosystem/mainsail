@@ -1,4 +1,4 @@
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { ProcessDescription } from "../contracts";
 import { execa } from "../execa";
 import { ProcessManager } from "./process-manager";

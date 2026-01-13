@@ -1,7 +1,7 @@
 import { writeFileSync } from "fs";
 import { setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { Config } from "./config";
 import { Identifiers } from "../ioc/index.js";
 

@@ -1,4 +1,4 @@
-import { Console, describe } from "../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { ActionFactory } from "./action-factory";
 import { Identifiers } from "./ioc";
 

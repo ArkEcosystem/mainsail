@@ -1,6 +1,6 @@
 import { Container } from "@mainsail/container";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { Application, ApplicationFactory, Identifiers, Utils } from "./index";
 
 describe("ApplicationFactory", ({ it, stub, assert }) => {

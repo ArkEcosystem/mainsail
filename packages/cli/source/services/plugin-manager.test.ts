@@ -3,7 +3,7 @@ import esmock from "esmock";
 import { join } from "path";
 import { setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { Identifiers } from "../ioc/index.js";
 import { PluginManager } from "./plugin-manager";
 import { File, Git, NPM } from "./source-providers";

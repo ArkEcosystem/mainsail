@@ -1,6 +1,6 @@
 import { bgYellow, white } from "kleur/colors";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { Identifiers } from "../ioc/index.js";
 import { Warning } from "./warning";
 

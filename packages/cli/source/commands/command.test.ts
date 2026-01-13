@@ -1,7 +1,7 @@
 import { injectable, postConstruct } from "@mainsail/container";
 import Joi from "joi";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { Identifiers } from "../ioc/index.js";
 import { Output } from "../output";
 import { Command } from "./command";

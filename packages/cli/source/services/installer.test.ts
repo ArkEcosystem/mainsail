@@ -1,6 +1,6 @@
 import { setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { execa } from "../execa";
 import { Installer } from "./installer";
 

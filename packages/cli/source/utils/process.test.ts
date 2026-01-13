@@ -2,7 +2,7 @@ import Tail from "nodejs-tail";
 import { fileSync, setGracefulCleanup } from "tmp";
 
 import type { Contracts } from "@mainsail/contracts";
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { Identifiers } from "../ioc";
 import { ProcessManager } from "../services";
 import { Process } from "./process";

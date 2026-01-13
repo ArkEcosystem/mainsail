@@ -1,6 +1,6 @@
 import prompts from "prompts";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { Identifiers } from "../ioc/index.js";
 import { Prompt } from "./prompt.js";
 

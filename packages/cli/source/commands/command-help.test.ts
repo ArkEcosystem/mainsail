@@ -1,6 +1,6 @@
 import { setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { Command, CommandWithoutDefinition } from "../../test/stubs";
 import { CommandHelp } from "./command-help";
 

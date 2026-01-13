@@ -51,6 +51,7 @@
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
+		"@mainsail/test-framework": "workspace:*",
 		"@types/fast-levenshtein": "0.0.4",
 		"@types/fs-extra": "11.0.4",
 		"@types/is-ci": "3.0.4",

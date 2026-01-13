@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { InputValidator } from "./validator";
 
 describe<{
