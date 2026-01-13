@@ -8,7 +8,6 @@ export * from "./cli/index.js";
 // Generators for commonly used entities like blocks and wallets
 export * as Factories from "./factories/index.js";
 // Utilities for common tasks like sending HTTP requests or altering wallets
-export * as Mocks from "./mocks/index.js"; // @TODO export as Utils
 export * from "./utils/index.js"; // @TODO export as Utils
 // internals are also useful for bridgechains
 export * from "./internal/index.js";
