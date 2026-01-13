@@ -14,7 +14,7 @@ import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { ServiceProvider as CoreCryptoTransaction } from "../../source/service-provider.js";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
-import { Sandbox } from "../../../test-framework/source/index.js";
+import { Sandbox } from "@mainsail/test-framework";
 
 export const prepareSandbox = async (context: { sandbox: Sandbox }) => {
 	context.sandbox = new Sandbox();

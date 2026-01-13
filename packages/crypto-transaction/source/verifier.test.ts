@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import {
 	serializedTransactionContractCall,
 	serializedTransactionContractCallWithSecondSignature,

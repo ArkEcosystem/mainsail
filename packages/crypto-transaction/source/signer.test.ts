@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import { BigNumber } from "@mainsail/utils";
 
 import { TransactionBuilder } from "../source/builders.js";
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{

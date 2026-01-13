@@ -3,7 +3,7 @@ import { Configuration } from "@mainsail/crypto-config";
 import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json";
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { makeKeywords } from "./keywords";
 
 describe<{

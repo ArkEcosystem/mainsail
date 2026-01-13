@@ -4,7 +4,7 @@ import { Configuration } from "@mainsail/crypto-config";
 import { BigNumber } from "@mainsail/utils";
 import { zeroAddress } from "viem";
 
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
