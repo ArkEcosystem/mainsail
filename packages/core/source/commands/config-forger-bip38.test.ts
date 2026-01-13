@@ -3,7 +3,7 @@ import { Keystore } from "@chainsafe/bls-keystore";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { Command } from "./config-forger-bip38";
 import { Command as BIP39Command } from "./config-forger-bip39";
 

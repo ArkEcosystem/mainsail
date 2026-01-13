@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/cli";
 import fs from "fs";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { Command } from "./config-publish";
 
 describe<{

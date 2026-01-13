@@ -3,7 +3,7 @@ import { writeFileSync } from "fs";
 import { ensureDirSync, ensureFileSync } from "fs-extra/esm";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { Command } from "./env-get";
 
 describe<{

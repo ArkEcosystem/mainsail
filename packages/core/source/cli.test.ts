@@ -1,9 +1,7 @@
-import { Commands, Services } from "@mainsail/cli";
-import envPaths from "env-paths";
-import { join } from "path";
+import { Services } from "@mainsail/cli";
 import prompts from "prompts";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { CommandLineInterface } from "./cli";
 
 describe("CLI", ({ beforeEach, it, assert, stub }) => {

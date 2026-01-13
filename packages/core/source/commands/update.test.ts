@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/cli";
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 
 import { Command } from "./update";
 

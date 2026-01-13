@@ -2,7 +2,7 @@ import { ensureDirSync, writeJSONSync, readJSONSync } from "fs-extra/esm";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console, describe } from "@mainsail/test-framework";
 import { Command } from "./config-forger-bip39";
 
 describe<{
