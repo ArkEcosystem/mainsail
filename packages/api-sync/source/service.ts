@@ -367,8 +367,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			mergedLegacyColdWallets,
 			multiPayments,
 			tokenHolders: [...tokenHolders.values()],
-			tokens: [...tokens.values()],
 			tokenTransfers: [...tokenTransfers.values()],
+			tokens: [...tokens.values()],
 			transactions,
 			wallets,
 
