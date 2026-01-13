@@ -5,6 +5,7 @@ import Joi from "joi";
 
 import { TokensController } from "../controllers/tokens.js";
 import { address } from "../schemas/schemas.js";
+import { walletAddressSchema } from "../schemas/wallets.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(TokensController);
@@ -27,6 +28,25 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
+		handler: (request: Hapi.Request) => controller.transfers(request),
+		method: "GET",
+		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
+			validate: {
+				query: Joi.object({
+					from: Schemas.orEqualCriteria(walletAddressSchema),
+					to: Schemas.orEqualCriteria(walletAddressSchema),
+				}).concat(Schemas.pagination),
+			},
+		},
+		path: "/tokens/transfers",
+	});
+
+	server.route({
 		handler: (request: Hapi.Request) => controller.show(request),
 		method: "GET",
 		options: {
@@ -37,6 +57,23 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 		},
 		path: "/tokens/{address}",
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.tokenTransfers(request),
+		method: "GET",
+		options: {
+			validate: {
+				params: Joi.object({
+					address,
+				}),
+				query: Joi.object({
+					from: Schemas.orEqualCriteria(walletAddressSchema),
+					to: Schemas.orEqualCriteria(walletAddressSchema),
+				}).concat(Schemas.pagination),
+			},
+		},
+		path: "/tokens/{address}/transfers",
 	});
 
 	server.route({
