@@ -13,7 +13,11 @@ export interface Listeners {
 	dispose(): Promise<void>;
 }
 
-export type TokenParserResult = { tokens: Models.Token[]; tokenHolders: Models.TokenHolder[] };
+export type TokenParserResult = {
+	tokens: Models.Token[];
+	tokenHolders: Models.TokenHolder[];
+	tokenTransfers: Models.TokenTransfer[];
+};
 export interface TokenParser {
 	parseReceipt(
 		transaction: Contracts.Crypto.Transaction,

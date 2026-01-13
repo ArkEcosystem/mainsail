@@ -25,6 +25,7 @@ interface RepositoryContext {
 	readonly multiPaymentRepository: ApiDatabaseContracts.MultiPaymentRepository;
 	readonly tokenRepository: ApiDatabaseContracts.TokenRepository;
 	readonly tokenHolderRepository: ApiDatabaseContracts.TokenHolderRepository;
+	readonly tokenTransferRepository: ApiDatabaseContracts.TokenTransferRepository;
 	readonly validatorRoundRepository: ApiDatabaseContracts.ValidatorRoundRepository;
 	readonly walletRepository: ApiDatabaseContracts.WalletRepository;
 	readonly legacyColdWalletRepository: ApiDatabaseContracts.LegacyColdWalletRepository;
@@ -127,6 +128,9 @@ export class Restore {
 	@inject(ApiDatabaseIdentifiers.TokenHolderRepositoryFactory)
 	private readonly tokenHolderRepositoryFactory!: ApiDatabaseContracts.TokenHolderRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.TokenTransferRepositoryFactory)
+	private readonly tokenTransferRepositoryFactory!: ApiDatabaseContracts.TokenTransferRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
 	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.ValidatorRoundRepositoryFactory;
 
@@ -187,8 +191,9 @@ export class Restore {
 				stateRepository: this.stateRepositoryFactory(entityManager),
 
 				tokenHolderRepository: this.tokenHolderRepositoryFactory(entityManager),
-
 				tokenRepository: this.tokenRepositoryFactory(entityManager),
+				tokenTransferRepository: this.tokenTransferRepositoryFactory(entityManager),
+
 				totalSupply: BigNumber.ZERO,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				userAttributes: {},
@@ -248,6 +253,7 @@ export class Restore {
 				stateRepository: this.stateRepositoryFactory(entityManager),
 				tokenHolderRepository: this.tokenHolderRepositoryFactory(entityManager),
 				tokenRepository: this.tokenRepositoryFactory(entityManager),
+				tokenTransferRepository: this.tokenTransferRepositoryFactory(entityManager),
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
 				walletRepository: this.walletRepositoryFactory(entityManager),
@@ -274,6 +280,7 @@ export class Restore {
 			multiPaymentRepository,
 			tokenRepository,
 			tokenHolderRepository,
+			tokenTransferRepository,
 			mostRecentCommit,
 		} = context;
 
@@ -304,6 +311,7 @@ export class Restore {
 			const multiPayments: Models.MultiPayment[] = [];
 			const tokens: Map<string, Models.Token> = new Map();
 			const tokenHolders: Map<string, Models.TokenHolder> = new Map();
+			const tokenTransfers: Models.TokenTransfer[] = [];
 
 			const insertTransactions = async () => {
 				if (transactions.length === 0) {
@@ -346,6 +354,17 @@ export class Restore {
 						.execute();
 
 					tokenHolders.clear();
+				}
+
+				if (tokenTransfers.length > 0) {
+					await tokenTransferRepository
+						.createQueryBuilder()
+						.insert()
+						.orIgnore()
+						.values(tokenTransfers)
+						.execute();
+
+					tokenTransfers.length = 0;
 				}
 			};
 
@@ -399,8 +418,11 @@ export class Restore {
 					const { senderPublicKey } = data;
 					const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
 					const parsedUsernames = parseUsernames(usernameContractAddress, transaction, receipt);
-					const { tokens: parsedTokens, tokenHolders: parsedTokenHolders } =
-						await this.tokenParser.parseReceipt(transaction, receipt, tokenRepository);
+					const {
+						tokens: parsedTokens,
+						tokenHolders: parsedTokenHolders,
+						tokenTransfers: parsedTokenTransfers,
+					} = await this.tokenParser.parseReceipt(transaction, receipt, tokenRepository);
 
 					if (!context.publicKeyToAddress[senderPublicKey]) {
 						const address = await this.addressFactory.fromPublicKey(senderPublicKey);
@@ -462,6 +484,7 @@ export class Restore {
 					});
 
 					multiPayments.push(...parsedMultiPayments);
+					tokenTransfers.push(...parsedTokenTransfers);
 
 					for (const token of parsedTokens) {
 						tokens.set(token.address, token);
@@ -479,7 +502,7 @@ export class Restore {
 						await insertMultiPayments();
 					}
 
-					if (tokens.size + tokenHolders.size >= CHUNK_SIZE) {
+					if (tokens.size + tokenHolders.size + tokenTransfers.length >= CHUNK_SIZE) {
 						await insertTokens();
 					}
 

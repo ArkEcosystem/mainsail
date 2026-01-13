@@ -21,6 +21,7 @@ interface DeferredSync {
 	transactions: Models.Transaction[];
 	multiPayments: Models.MultiPayment[];
 	tokens: Models.Token[];
+	tokenTransfers: Models.TokenTransfer[];
 	tokenHolders: Models.TokenHolder[];
 	validatorRound?: Models.ValidatorRound;
 	wallets: Array<[string, string | null, string, string, object, string]>;
@@ -79,6 +80,9 @@ export class Sync implements Contracts.ApiSync.Service {
 
 	@inject(ApiDatabaseIdentifiers.TokenHolderRepositoryFactory)
 	private readonly tokenHolderRepositoryFactory!: ApiDatabaseContracts.TokenHolderRepositoryFactory;
+
+	@inject(ApiDatabaseIdentifiers.TokenTransferRepositoryFactory)
+	private readonly tokenTransferRepositoryFactory!: ApiDatabaseContracts.TokenTransferRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
 	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.ValidatorRoundRepositoryFactory;
@@ -155,6 +159,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		const multiPayments: Models.MultiPayment[] = [];
 		const tokens: Map<string, Models.Token> = new Map();
 		const tokenHolders: Map<string, Models.TokenHolder> = new Map();
+		const tokenTransfers: Models.TokenTransfer[] = [];
 
 		const receipts = unit.getProcessorResult().receipts;
 
@@ -177,10 +182,11 @@ export class Sync implements Contracts.ApiSync.Service {
 			assert.defined(receipt);
 
 			const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
-			const { tokens: parsedTokens, tokenHolders: parsedTokenHolders } = await this.tokenParser.parseReceipt(
-				transaction,
-				receipt,
-			);
+			const {
+				tokens: parsedTokens,
+				tokenHolders: parsedTokenHolders,
+				tokenTransfers: parsedTokenTransfers,
+			} = await this.tokenParser.parseReceipt(transaction, receipt);
 
 			transactions.push({
 				blockHash: header.hash,
@@ -225,6 +231,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			});
 
 			multiPayments.push(...parsedMultiPayments);
+			tokenTransfers.push(...parsedTokenTransfers);
 
 			for (const token of parsedTokens) {
 				tokens.set(token.address, token);
@@ -361,6 +368,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			multiPayments,
 			tokenHolders: [...tokenHolders.values()],
 			tokens: [...tokens.values()],
+			tokenTransfers: [...tokenTransfers.values()],
 			transactions,
 			wallets,
 
@@ -449,6 +457,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			const legacyColdwalletRepository = this.legacyColdWalletRepositoryFactory(entityManager);
 			const tokenRepository = this.tokenRepositoryFactory(entityManager);
 			const tokenHolderRepository = this.tokenHolderRepositoryFactory(entityManager);
+			const tokenTransferRepository = this.tokenTransferRepositoryFactory(entityManager);
 
 			await blockRepository.createQueryBuilder().insert().orIgnore().values(deferred.block).execute();
 
@@ -506,6 +515,10 @@ export class Sync implements Contracts.ApiSync.Service {
 						.values(toUpsert)
 						.execute();
 				}
+			}
+
+			for (const batch of chunk(deferred.tokenTransfers, 256)) {
+				await tokenTransferRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
 			if (deferred.validatorRound) {
@@ -652,6 +665,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			const multiPaymentRepository = this.multiPaymentRepositoryFactory(entityManager);
 			const tokenRepository = this.tokenRepositoryFactory(entityManager);
 			const tokenHolderRepository = this.tokenHolderRepositoryFactory(entityManager);
+			const tokenTransferRepository = this.tokenTransferRepositoryFactory(entityManager);
 
 			// Ensure all tables are truncated (already supposed to be idempotent, but it's cleaner)
 			await Promise.all(
@@ -666,6 +680,7 @@ export class Sync implements Contracts.ApiSync.Service {
 					multiPaymentRepository,
 					tokenRepository,
 					tokenHolderRepository,
+					tokenTransferRepository,
 				].map((repo) => repo.clear()),
 			);
 		});

@@ -71,9 +71,13 @@ export class TokenParserService implements TokenParser {
 		transaction: Contracts.Crypto.Transaction,
 		receipt: Contracts.Evm.TransactionReceipt,
 		tokenRepository?: ApiDatabaseContracts.TokenRepository,
-	): Promise<{ tokens: Models.Token[]; tokenHolders: Models.TokenHolder[] }> {
+	): Promise<{ tokens: Models.Token[]; tokenHolders: Models.TokenHolder[]; tokenTransfers: Models.TokenTransfer[] }> {
 		const tokens: Models.Token[] = [];
 		const tokenHolders: Models.TokenHolder[] = [];
+		const tokenTransfers: Models.TokenTransfer[] = [];
+
+		assert.defined(transaction.data.blockNumber);
+		const blockNumber = transaction.data.blockNumber.toString();
 
 		const eventLogs = parseEventLogs({
 			abi: erc20AbiEvents,
@@ -84,12 +88,29 @@ export class TokenParserService implements TokenParser {
 		const dirtyAccounts = new Map<`0x${string}`, string>();
 		const dirtyContractAddresses = new Set<string>();
 
+		const transferIndexes = new Map<`0x${string}`, number>();
+
 		for (const event of eventLogs) {
-			const { from, to } = event.args;
+			const { from, to, value } = event.args;
 
 			dirtyAccounts.set(from, event.address);
 			dirtyAccounts.set(to, event.address);
 			dirtyContractAddresses.add(event.address);
+
+			// Emitted events during deployment can have a event.logIndex of undefined and
+			// we only care about having a accurate sort order, so we manage an index manually.
+			const transferIndex = (transferIndexes.get(event.address) ?? -1) + 1;
+			transferIndexes.set(event.address, transferIndex);
+
+			tokenTransfers.push({
+				address: event.address,
+				blockNumber,
+				from,
+				index: transferIndex,
+				to,
+				transactionHash: transaction.hash,
+				value: value.toString(),
+			});
 		}
 
 		if (dirtyAccounts.size > 0) {
@@ -132,7 +153,7 @@ export class TokenParserService implements TokenParser {
 			}
 		}
 
-		return { tokenHolders, tokens };
+		return { tokenHolders, tokenTransfers, tokens };
 	}
 
 	async #getTokens(
