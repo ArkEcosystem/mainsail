@@ -40,6 +40,7 @@
 		"@mainsail/crypto-block": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
+		"@mainsail/test-framework": "workspace:*",
 		"@types/semver": "7.7.0",
 		"uvu": "0.5.6"
 	},

@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation";
 import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation";
 
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { Web3Sha3 } from "./index.js";
 
 describe<{

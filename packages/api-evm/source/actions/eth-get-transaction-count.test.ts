@@ -3,7 +3,7 @@ import { schemas as keccak256Schemas } from "@mainsail/crypto-address-keccak256"
 import { schemas as validationSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation";
 
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { schemas } from "../validation/index.js";
 import { EthGetTransactionCount } from "./index.js";
 
