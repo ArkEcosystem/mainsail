@@ -2,8 +2,9 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
-import { describe, Factories, Sandbox } from "../../test-framework/source";
-import { Types } from "../../test-framework/source/factories";
+import { describe, Sandbox } from "@mainsail/test-framework";
+import { Factories } from "../../test-factories/source/index.js";
+import { Types } from "../../test-factories/source/factories";
 import {
 	blockData,
 	proposalData,
