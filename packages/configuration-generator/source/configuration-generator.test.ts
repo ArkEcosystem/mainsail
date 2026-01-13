@@ -4,7 +4,7 @@ import envPaths from "env-paths";
 import fs from "fs-extra/esm";
 import { join } from "path";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { makeApplication } from "./application-factory";
 import { ConfigurationGenerator } from "./configuration-generator";
 import { Identifiers as InternalIdentifiers } from "./identifiers";

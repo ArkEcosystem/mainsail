@@ -3,7 +3,7 @@ import { readJSONSync } from "fs-extra/esm";
 import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { makeApplication } from "./application-factory";
 import { ConfigurationWriter } from "./configuration-writer";
 import { Identifiers } from "./identifiers";
