@@ -44,6 +44,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/test-framework": "workspace:*",
 		"@types/fs-extra": "11.0.4",
 		"@types/prompts": "2.4.9",
 		"@types/tmp": "0.2.6",
