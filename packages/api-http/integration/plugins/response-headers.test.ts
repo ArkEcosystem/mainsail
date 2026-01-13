@@ -1,6 +1,6 @@
 import got from "got";
 
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import blocks from "../../test/fixtures/blocks.json";
 import { ApiContext, prepareSandbox } from "../../test/helpers/prepare-sandbox";
 

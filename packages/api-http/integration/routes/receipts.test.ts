@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import receipts from "../../test/fixtures/receipts.json";
 import receiptsResult from "../../test/fixtures/receipts_result.json";
 import receiptTransactions from "../../test/fixtures/receipt_transactions.json";

@@ -37,6 +37,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/test-framework": "workspace:*",
 		"@types/ip": "1.1.3",
 		"@types/semver": "7.7.0",
 		"got": "14.4.7",

@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import apiNodes from "../../test/fixtures/api-nodes.json";
 import { ApiContext, prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
