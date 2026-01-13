@@ -15,8 +15,7 @@ import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-valida
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
-
-import { Sandbox } from "../../app/sandbox.js";
+import { Sandbox } from "@mainsail/test-framework";
 
 export const generateApp = async (
 	config: Contracts.Crypto.NetworkConfigPartial,

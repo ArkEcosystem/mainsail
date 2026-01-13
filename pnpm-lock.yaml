@@ -2855,6 +2855,115 @@ importers:
         specifier: 0.5.6
         version: 0.5.6
 
+  packages/test-factories:
+    dependencies:
+      '@mainsail/cli':
+        specifier: workspace:*
+        version: link:../cli
+      '@mainsail/configuration-generator':
+        specifier: workspace:*
+        version: link:../configuration-generator
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
+      '@mainsail/crypto-address-keccak256':
+        specifier: workspace:*
+        version: link:../crypto-address-keccak256
+      '@mainsail/crypto-block':
+        specifier: workspace:*
+        version: link:../crypto-block
+      '@mainsail/crypto-commit':
+        specifier: workspace:*
+        version: link:../crypto-commit
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
+      '@mainsail/crypto-consensus-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-consensus-bls12-381
+      '@mainsail/crypto-hash-bcrypto':
+        specifier: workspace:*
+        version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-ecdsa':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-messages':
+        specifier: workspace:*
+        version: link:../crypto-messages
+      '@mainsail/crypto-signature-ecdsa':
+        specifier: workspace:*
+        version: link:../crypto-signature-ecdsa
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../crypto-transaction
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../crypto-validation
+      '@mainsail/crypto-wif':
+        specifier: workspace:*
+        version: link:../crypto-wif
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/serializer':
+        specifier: workspace:*
+        version: link:../serializer
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
+      bip39:
+        specifier: 3.1.0
+        version: 3.1.0
+      dayjs:
+        specifier: 1.11.13
+        version: 1.11.13
+      fs-extra:
+        specifier: 11.3.1
+        version: 11.3.1
+      memoizee:
+        specifier: 0.4.17
+        version: 0.4.17
+      tmp:
+        specifier: 0.2.5
+        version: 0.2.5
+    devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@types/chance':
+        specifier: 1.1.7
+        version: 1.1.7
+      '@types/fs-extra':
+        specifier: 11.0.4
+        version: 11.0.4
+      '@types/memoizee':
+        specifier: 0.4.12
+        version: 0.4.12
+      '@types/tmp':
+        specifier: 0.2.6
+        version: 0.2.6
+      joi:
+        specifier: 18.0.0
+        version: 18.0.0
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
+
   packages/test-framework:
     dependencies:
       '@mainsail/cli':
@@ -13366,7 +13475,7 @@ snapshots:
 
   bip39@3.1.0:
     dependencies:
-      '@noble/hashes': 1.7.1
+      '@noble/hashes': 1.8.0
 
   bl@4.1.0:
     dependencies:
@@ -16118,7 +16227,7 @@ snapshots:
 
   load-json-file@4.0.0:
     dependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       parse-json: 4.0.0
       pify: 3.0.0
       strip-bom: 3.0.0
@@ -16673,7 +16782,7 @@ snapshots:
       env-paths: 2.2.1
       exponential-backoff: 3.1.2
       glob: 7.2.3
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       make-fetch-happen: 10.2.1
       nopt: 6.0.0
       npmlog: 6.0.2

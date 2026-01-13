@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import cryptoConfig from "../../../../core/bin/config/devnet/core/crypto.json";
-import { describe } from "../../index";
+import { describe } from "@mainsail/test-framework";
 import { FactoryBuilder } from "../factory-builder";
 import { registerTransactionFactory } from "./transaction";
 
