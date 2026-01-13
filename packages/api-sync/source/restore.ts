@@ -422,7 +422,7 @@ export class Restore {
 						tokens: parsedTokens,
 						tokenHolders: parsedTokenHolders,
 						tokenTransfers: parsedTokenTransfers,
-					} = await this.tokenParser.parseReceipt(transaction, receipt, tokenRepository);
+					} = await this.tokenParser.parseReceipt(block.header, transaction, receipt, tokenRepository);
 
 					if (!context.publicKeyToAddress[senderPublicKey]) {
 						const address = await this.addressFactory.fromPublicKey(senderPublicKey);

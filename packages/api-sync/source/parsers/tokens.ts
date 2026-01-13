@@ -68,6 +68,7 @@ export class TokenParserService implements TokenParser {
 	});
 
 	public async parseReceipt(
+		header: Contracts.Crypto.BlockHeader,
 		transaction: Contracts.Crypto.Transaction,
 		receipt: Contracts.Evm.TransactionReceipt,
 		tokenRepository?: ApiDatabaseContracts.TokenRepository,
@@ -76,8 +77,7 @@ export class TokenParserService implements TokenParser {
 		const tokenHolders: Models.TokenHolder[] = [];
 		const tokenTransfers: Models.TokenTransfer[] = [];
 
-		assert.defined(transaction.data.blockNumber);
-		const blockNumber = transaction.data.blockNumber.toString();
+		const blockNumber = header.number.toString();
 
 		const eventLogs = parseEventLogs({
 			abi: erc20AbiEvents,

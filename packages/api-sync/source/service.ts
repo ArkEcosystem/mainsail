@@ -186,7 +186,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				tokens: parsedTokens,
 				tokenHolders: parsedTokenHolders,
 				tokenTransfers: parsedTokenTransfers,
-			} = await this.tokenParser.parseReceipt(transaction, receipt);
+			} = await this.tokenParser.parseReceipt(header, transaction, receipt);
 
 			transactions.push({
 				blockHash: header.hash,

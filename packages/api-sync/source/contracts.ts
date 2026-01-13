@@ -20,6 +20,7 @@ export type TokenParserResult = {
 };
 export interface TokenParser {
 	parseReceipt(
+		header: Contracts.Crypto.BlockHeader,
 		transaction: Contracts.Crypto.Transaction,
 		receipt: Contracts.Evm.TransactionReceipt,
 		tokenRepository?: ApiDatabaseContracts.TokenRepository,
