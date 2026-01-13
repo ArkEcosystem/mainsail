@@ -1,5 +1,5 @@
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { Configuration } from "./configuration";
 
 describe<{

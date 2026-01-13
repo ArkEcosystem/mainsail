@@ -1417,6 +1417,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
       '@types/lodash.clone':
         specifier: 4.5.9
         version: 4.5.9
