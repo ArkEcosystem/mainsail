@@ -2911,9 +2911,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/p2p':
-        specifier: workspace:*
-        version: link:../p2p
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer

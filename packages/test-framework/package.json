@@ -39,7 +39,6 @@
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/p2p": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/utils": "workspace:*",
