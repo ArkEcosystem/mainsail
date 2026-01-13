@@ -2052,6 +2052,9 @@ importers:
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
       uvu:
         specifier: 0.5.6
         version: 0.5.6
