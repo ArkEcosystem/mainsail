@@ -1,12 +1,12 @@
 import { Identifiers } from "@mainsail/constants";
 
 import { describe, Sandbox } from "../../test-framework/source";
-import { ServiceProvider } from "./index";
+import { ServiceProvider } from "./service-provider.js";
 
 describe<{
 	sandbox: Sandbox;
 	serviceProvider: ServiceProvider;
-}>("Index", ({ beforeEach, it, assert, spy }) => {
+}>("ServiceProvider", ({ beforeEach, it, assert, spy }) => {
 	const validator = {
 		addSchema: () => {},
 	};
