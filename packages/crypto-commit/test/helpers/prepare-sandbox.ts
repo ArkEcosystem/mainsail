@@ -15,8 +15,9 @@ import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
+import { Sandbox } from "@mainsail/test-framework";
+
 import crypto from "../../../core/bin/config/devnet/core/crypto.json";
-import { Sandbox } from "../../../test-framework/source";
 import { Deserializer } from "../../source/deserializer";
 import { Serializer } from "../../source/serializer";
 
