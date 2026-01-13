@@ -12,11 +12,8 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	@inject(Identifiers.ConsensusStorage.Storage.Proposal)
 	private readonly proposalStorage!: Database<string>;
 
-	@inject(Identifiers.ConsensusStorage.Storage.PreVote)
-	private readonly prevoteStorage!: Database<string>;
-
-	@inject(Identifiers.ConsensusStorage.Storage.PreCommit)
-	private readonly precommitStorage!: Database<string>;
+	@inject(Identifiers.ConsensusStorage.Storage.Message)
+	private readonly messageStorage!: Database<string>;
 
 	@inject(Identifiers.ConsensusStorage.Storage.ConsensusState)
 	private readonly stateStorage!: Database<Contracts.Consensus.StateData>;
@@ -50,13 +47,11 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	public async persist({
 		state,
 		proposals,
-		prevotes,
-		precommits,
+		messages,
 	}: {
 		state: Contracts.Consensus.State;
 		proposals: Contracts.Crypto.Proposal[];
-		prevotes: Contracts.Crypto.Message[];
-		precommits: Contracts.Crypto.Message[];
+		messages: Contracts.Crypto.Message[];
 	}): Promise<void> {
 		// always overwrite existing state; we only care about state for uncommitted blocks
 		await this.rootStorage.transaction(async () => {
@@ -81,21 +76,12 @@ export class Service implements Contracts.ConsensusStorage.Service {
 				);
 			}
 
-			// Prevotes
-			for (const prevote of prevotes) {
-				const validator = this.validatorSet.getValidator(prevote.validatorIndex);
-				this.prevoteStorage.putSync(
-					`${prevote.round}-${validator.blsPublicKey}`,
-					prevote.serialized.toString("hex"),
-				);
-			}
-
-			// Precommits
-			for (const precommit of precommits) {
-				const validator = this.validatorSet.getValidator(precommit.validatorIndex);
-				this.precommitStorage.putSync(
-					`${precommit.round}-${validator.blsPublicKey}`,
-					precommit.serialized.toString("hex"),
+			// Messages
+			for (const message of messages) {
+				const validator = this.validatorSet.getValidator(message.validatorIndex);
+				this.messageStorage.putSync(
+					`${message.round}-${validator.blsPublicKey}-${message.type}`,
+					message.serialized.toString("hex"),
 				);
 			}
 		});
@@ -108,24 +94,16 @@ export class Service implements Contracts.ConsensusStorage.Service {
 		);
 	}
 
-	public async getPrevotes(): Promise<Contracts.Crypto.Message[]> {
-		const prevotes = [...this.prevoteStorage.getRange().map((item) => item.value)];
+	public async getMessages(): Promise<Contracts.Crypto.Message[]> {
+		const messages = [...this.messageStorage.getRange().map((item) => item.value)];
 		return Promise.all(
-			prevotes.map((prevote) => this.messageFactory.makeMessageFromBytes(Buffer.from(prevote, "hex"))),
-		);
-	}
-
-	public async getPrecommits(): Promise<Contracts.Crypto.Message[]> {
-		const precommits = [...this.precommitStorage.getRange().map((item) => item.value)];
-		return Promise.all(
-			precommits.map((precommit) => this.messageFactory.makeMessageFromBytes(Buffer.from(precommit, "hex"))),
+			messages.map((message) => this.messageFactory.makeMessageFromBytes(Buffer.from(message, "hex"))),
 		);
 	}
 
 	#clear(): void {
 		this.proposalStorage.clearSync();
-		this.prevoteStorage.clearSync();
-		this.precommitStorage.clearSync();
+		this.messageStorage.clearSync();
 		this.stateStorage.clearSync();
 	}
 }
