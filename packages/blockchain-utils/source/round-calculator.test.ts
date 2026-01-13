@@ -3,7 +3,7 @@ import * as Exceptions from "@mainsail/exceptions";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { Configuration } from "../../crypto-config/distribution/index";
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { RoundCalculator } from "./round-calculator";
 
 type Context = {
