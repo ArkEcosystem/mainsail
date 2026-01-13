@@ -42,6 +42,7 @@
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/validation": "workspace:*",
+		"@mainsail/test-framework": "workspace:*",
 		"@types/lodash.clone": "4.5.9",
 		"@types/lodash.clonedeep": "4.5.9",
 		"lodash.clone": "4.5.0",

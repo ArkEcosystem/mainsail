@@ -1295,6 +1295,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
