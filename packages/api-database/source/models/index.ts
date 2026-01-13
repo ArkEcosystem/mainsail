@@ -10,6 +10,7 @@ export * from "./state.js";
 export * from "./system.js";
 export * from "./token.js";
 export * from "./token_holder.js";
+export * from "./token_transfers.js";
 export * from "./transaction.js";
 export * from "./validator-round.js";
 export * from "./wallet.js";

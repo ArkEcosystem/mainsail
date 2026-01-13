@@ -13,6 +13,7 @@ import type {
 	System,
 	Token,
 	TokenHolder,
+	TokenTransfer,
 	Transaction,
 	ValidatorRound,
 	Wallet,
@@ -104,6 +105,8 @@ export type TokenRepositoryExtension = Record<string, unknown>;
 export type TokenRepository = ExtendedRepository<Token> & TokenRepositoryExtension;
 export type TokenHolderRepositoryExtension = Record<string, unknown>;
 export type TokenHolderRepository = ExtendedRepository<TokenHolder> & TokenHolderRepositoryExtension;
+export type TokenTransferRepositoryExtension = Record<string, unknown>;
+export type TokenTransferRepository = ExtendedRepository<TokenTransfer> & TokenTransferRepositoryExtension;
 
 export type SystemRepositoryExtension = {
 	inMaintenance(): Promise<boolean>;
@@ -136,6 +139,7 @@ export type PeerRepositoryFactory = (customDataSource?: RepositoryDataSource) =>
 export type TransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => TransactionRepository;
 export type TokenRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenRepository;
 export type TokenHolderRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenHolderRepository;
+export type TokenTransferRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenTransferRepository;
 export type MultiPaymentRepositoryFactory = (customDataSource?: RepositoryDataSource) => MultiPaymentRepository;
 export type ValidatorRoundRepositoryFactory = (customDataSource?: RepositoryDataSource) => ValidatorRoundRepository;
 export type PluginRepositoryFactory = (customDataSource?: RepositoryDataSource) => PluginRepository;
