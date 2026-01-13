@@ -1,4 +1,5 @@
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
+
 import {
 	prevoteData,
 	precommitData,

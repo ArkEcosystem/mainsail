@@ -6,7 +6,7 @@ import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mains
 import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { prevoteData, prevoteDataNoBlock } from "../test/fixtures/index.js";
 import { makeKeywords as makeProposalKeywords } from "@mainsail/crypto-proposal/source/keywords.js";
 import { schemas } from "./schemas";
