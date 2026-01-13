@@ -826,6 +826,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
       esmock:
         specifier: 2.7.1
         version: 2.7.1
