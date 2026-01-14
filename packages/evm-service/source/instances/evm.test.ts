@@ -19,7 +19,7 @@ import {
 	zeroHash,
 } from "viem";
 
-import { describe, Sandbox } from "../../../test-framework/distribution";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import * as MainsailERC20 from "../../test/fixtures/MainsailERC20.json";
 import * as MainsailGlobals from "../../test/fixtures/MainsailGlobals.json";
 import { wallets } from "../../test/fixtures/wallets";
