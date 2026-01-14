@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 
-import { describe } from "../../../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { Application } from "../../application";
 import { MemoryLogger } from "./drivers/memory";
 import { ServiceProvider } from "./service-provider";

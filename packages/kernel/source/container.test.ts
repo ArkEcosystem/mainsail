@@ -1,6 +1,6 @@
 import { Container, injectable } from "@mainsail/container";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { container } from "./container";
 
 @injectable()

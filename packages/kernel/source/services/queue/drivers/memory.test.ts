@@ -4,7 +4,7 @@ import { sleep } from "@mainsail/utils";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 
-import { describe, Sandbox } from "../../../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { MemoryQueue } from "./memory";
 
 EventEmitter.prototype.constructor = Object.prototype.constructor;

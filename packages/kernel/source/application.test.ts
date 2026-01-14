@@ -5,7 +5,7 @@ import { setMaxListeners } from "events";
 import { join } from "path";
 import { dirSync } from "tmp";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { Application } from "./application";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
 import { ConfigRepository } from "./services/config";

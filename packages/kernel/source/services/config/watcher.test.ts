@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import { writeFileSync } from "fs";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { Application } from "../../application";
 import { MemoryEventDispatcher } from "../events";
 import { Watcher } from "./watcher";

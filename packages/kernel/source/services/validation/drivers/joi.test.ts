@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-import { describe } from "../../../../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { JoiValidator } from "./joi";
 
 const schema = Joi.object({

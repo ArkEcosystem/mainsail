@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
-import { describeSkip } from "../../../test-framework/source";
+import { describeSkip } from "@mainsail/test-framework";
 import { Application } from "../application";
 import { ServiceProvider, ServiceProviderRepository } from "../providers";
 import { ConfigRepository } from "../services/config";

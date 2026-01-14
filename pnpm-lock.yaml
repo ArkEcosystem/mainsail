@@ -2432,6 +2432,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
       '@types/capture-console':
         specifier: 1.0.5
         version: 1.0.5
