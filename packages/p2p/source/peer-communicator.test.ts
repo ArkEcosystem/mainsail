@@ -3,7 +3,7 @@ import * as Exceptions from "@mainsail/exceptions";
 import { Providers } from "@mainsail/kernel";
 import esmock from "esmock";
 
-import { describeSkip, Sandbox } from "../../test-framework/source";
+import { describeSkip, Sandbox } from "@mainsail/test-framework";
 import { defaults } from "./defaults";
 import { Routes } from "./enums";
 import { Peer } from "./peer";

@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 
-import { describe, Sandbox } from "../../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { GetStatusController } from "./get-status";
 
 const { GetStatusController: GetStatusControllerProxy } = await esmock("./get-status", {

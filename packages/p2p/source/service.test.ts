@@ -4,7 +4,7 @@ import { Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import importFresh from "import-fresh";
 
-import { describeSkip, Sandbox } from "../../test-framework/source";
+import { describeSkip, Sandbox } from "@mainsail/test-framework";
 import { Peer } from "./peer";
 import { Service } from "./service";
 

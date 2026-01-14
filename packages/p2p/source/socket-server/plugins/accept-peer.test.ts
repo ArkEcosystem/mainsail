@@ -2,7 +2,7 @@ import { Server } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 
-import { describe, Sandbox } from "../../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { defaults as transactionPoolDefaults } from "../../../../transaction-pool-service/source/defaults";
 import { defaults } from "../../defaults";
 import { AcceptPeerPlugin } from "./accept-peer";

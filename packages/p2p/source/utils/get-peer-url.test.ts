@@ -1,6 +1,6 @@
 import { Enums } from "@mainsail/constants";
 
-import { describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { getPeerUrl } from "./get-peer-url";
 
 describe("getPeerUrl", ({ each, assert }) => {

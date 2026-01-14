@@ -1,7 +1,7 @@
 import { Identifiers, Events } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 
-import { describeSkip, Sandbox } from "../../test-framework/source";
+import { describeSkip, Sandbox } from "@mainsail/test-framework";
 import { defaults } from "./defaults";
 import { Peer } from "./peer";
 import { PeerProcessor } from "./peer-processor";

@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { Peer } from "./peer";
 import { PeerRepository } from "./peer-repository";
 
