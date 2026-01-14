@@ -3505,6 +3505,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
