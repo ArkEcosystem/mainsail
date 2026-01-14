@@ -5,7 +5,7 @@ import { Configuration } from "@mainsail/crypto-config";
 import { BigNumber } from "@mainsail/utils";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { Processor } from "./processor";
 
 describe<{

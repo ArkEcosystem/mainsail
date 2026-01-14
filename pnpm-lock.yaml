@@ -3220,6 +3220,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
       '@types/better-sqlite3':
         specifier: 7.6.13
         version: 7.6.13

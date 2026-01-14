@@ -1,7 +1,7 @@
 import * as Exceptions from "@mainsail/exceptions";
 import { BigNumber } from "@mainsail/utils";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 
 describe<{
 	transaction: any;
