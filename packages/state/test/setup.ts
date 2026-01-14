@@ -21,7 +21,7 @@ import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
 import { PublicKeySerializer } from "../../crypto-key-pair-schnorr/source/serializer";
 import { Signature } from "../../crypto-signature-schnorr/source/signature";
 import { ProposalCalculator } from "../../crypto.utils/source/proposal-calculator";
-import { Factories, Sandbox } from "../../test-framework/source";
+import { Factories, Sandbox } from "@mainsail/test-framework";
 import { Validator } from "../../validation/source/validator";
 import { AttributeRepository } from "../source/attributes";
 import { store } from "../source/state-store";

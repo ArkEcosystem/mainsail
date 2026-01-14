@@ -2941,6 +2941,9 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
