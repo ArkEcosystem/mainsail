@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { toLower } from "./to-lower";
 
 describe("toLower", async ({ assert, it, nock, loader }) => {

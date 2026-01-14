@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { chunk } from "./chunk";
 
 describe("#chunk", ({ it, assert }) => {

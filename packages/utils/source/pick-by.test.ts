@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { isNumber } from "./is-number";
 import { pickBy } from "./pick-by";
 

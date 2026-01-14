@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { cleanAddress, isIPv6Address, isValidAddress, normalizeAddress } from "./ip-address";
 
 describe("isValidAddress", ({ assert, it }) => {

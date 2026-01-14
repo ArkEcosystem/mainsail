@@ -1,4 +1,4 @@
-import { describeWithContext } from "../../test-framework/source";
+import { describeWithContext } from "@mainsail/test-runner";
 import { lowerFirst } from "./lower-first";
 
 describeWithContext(

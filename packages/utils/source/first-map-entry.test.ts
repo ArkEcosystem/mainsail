@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { firstMapEntry } from "./first-map-entry";
 
 describe("#firstMapEntry", ({ it, assert }) => {

@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { hex } from "./hex";
 
 describe("hex", async ({ assert, it, nock, loader }) => {

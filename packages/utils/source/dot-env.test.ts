@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/prevent-abbreviations */
 import { join } from "path";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { dotenv } from "./dot-env";
 
 describe("#DotEnv", ({ it, assert }) => {

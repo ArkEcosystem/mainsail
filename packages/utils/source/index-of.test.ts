@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { indexOf } from "./index-of";
 
 describe("indexOf", async ({ assert, it, nock, loader }) => {
