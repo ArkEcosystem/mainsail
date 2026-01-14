@@ -1,6 +1,6 @@
 import Ajv from "ajv/dist/2020";
 
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { Validator } from "./validator";
 
 describe<{
