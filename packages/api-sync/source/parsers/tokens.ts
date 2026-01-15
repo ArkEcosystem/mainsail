@@ -1,7 +1,7 @@
 import type { Contracts as ApiDatabaseContracts, Models } from "@mainsail/api-database";
 import { Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 import { LRUCache } from "lru-cache";
@@ -28,6 +28,8 @@ const erc20MetadataFunctions = parseAbi([
 
 type Erc20Call = Omit<ContractFunctionParameters<typeof erc20AbiFunctions>, "address">;
 type Erc20MetadataCall = Omit<ContractFunctionParameters<typeof erc20MetadataFunctions>, "address">;
+
+type PreparedErc20Call = { call: Erc20Call | Erc20MetadataCall; data: string };
 
 const erc20AbiEvents = parseAbi(["event Transfer(address indexed from, address indexed to, uint256 value)"] as const);
 
@@ -66,6 +68,64 @@ export class TokenParserService implements TokenParser {
 	#tokenCache: LRUCache<string, Models.Token> = new LRUCache({
 		max: 256,
 	});
+
+	#preparedFunctionCalls: PreparedErc20Call[] = [];
+
+	@postConstruct()
+	public initialize(): void {
+		const calls: (Erc20Call | Erc20MetadataCall)[] = [
+			{
+				abi: erc20AbiFunctions,
+				args: undefined,
+				functionName: "totalSupply",
+			},
+			{
+				abi: erc20MetadataFunctions,
+				args: undefined,
+				functionName: "name",
+			},
+			{
+				abi: erc20MetadataFunctions,
+				args: undefined,
+				functionName: "symbol",
+			},
+			{
+				abi: erc20MetadataFunctions,
+				args: undefined,
+				functionName: "decimals",
+			},
+			{
+				abi: erc20AbiFunctions,
+				args: [zeroAddress, zeroAddress],
+				functionName: "allowance",
+			},
+			{
+				abi: erc20AbiFunctions,
+				args: [zeroAddress],
+				functionName: "balanceOf",
+			},
+			{
+				abi: erc20AbiFunctions,
+				args: [zeroAddress, 1n],
+				functionName: "transfer",
+			},
+			{
+				abi: erc20AbiFunctions,
+				args: [zeroAddress, zeroAddress, 1n],
+				functionName: "transferFrom",
+			},
+			{
+				abi: erc20AbiFunctions,
+				args: [zeroAddress, 1n],
+				functionName: "approve",
+			},
+		];
+
+		for (const call of calls) {
+			const data = encodeFunctionData(call as EncodeFunctionDataParameters).slice(2);
+			this.#preparedFunctionCalls.push({ call, data });
+		}
+	}
 
 	public async parseReceipt(
 		header: Contracts.Crypto.BlockHeader,
@@ -218,57 +278,7 @@ export class TokenParserService implements TokenParser {
 			totalSupply: undefined,
 		};
 
-		const calls: (Erc20Call | Erc20MetadataCall)[] = [
-			{
-				abi: erc20AbiFunctions,
-				args: undefined,
-				functionName: "totalSupply",
-			},
-			{
-				abi: erc20MetadataFunctions,
-				args: undefined,
-				functionName: "name",
-			},
-			{
-				abi: erc20MetadataFunctions,
-				args: undefined,
-				functionName: "symbol",
-			},
-			{
-				abi: erc20MetadataFunctions,
-				args: undefined,
-				functionName: "decimals",
-			},
-			{
-				abi: erc20AbiFunctions,
-				args: [zeroAddress, zeroAddress],
-				functionName: "allowance",
-			},
-			{
-				abi: erc20AbiFunctions,
-				args: [zeroAddress],
-				functionName: "balanceOf",
-			},
-			{
-				abi: erc20AbiFunctions,
-				args: [zeroAddress, 1n],
-				functionName: "transfer",
-			},
-			{
-				abi: erc20AbiFunctions,
-				args: [zeroAddress, zeroAddress, 1n],
-				functionName: "transferFrom",
-			},
-			{
-				abi: erc20AbiFunctions,
-				args: [zeroAddress, 1n],
-				functionName: "approve",
-			},
-		];
-
-		for (const call of calls) {
-			const data = encodeFunctionData(call as EncodeFunctionDataParameters).slice(2);
-
+		for (const { call, data } of this.#preparedFunctionCalls) {
 			try {
 				const result = await this.evm.view({
 					data: Buffer.from(data, "hex"),
