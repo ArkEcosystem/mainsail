@@ -1,4 +1,5 @@
-import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
+import { Commands, Contracts, Services } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import Joi from "joi";
 
@@ -12,7 +13,7 @@ interface Flags {
 
 @injectable()
 export class Command extends Commands.Command {
-	@inject(Identifiers.Environment)
+	@inject(Identifiers.Cli.Service.Environment)
 	private readonly environment!: Services.Environment;
 
 	public signature = "config:database";

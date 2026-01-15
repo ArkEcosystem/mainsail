@@ -1,12 +1,12 @@
-import { Commands, Identifiers, Services } from "@mainsail/cli";
-import { BuildPackages, Channels } from "@mainsail/constants";
+import { Commands, Services } from "@mainsail/cli";
+import { BuildPackages, Channels, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
-	@inject(Identifiers.Installer)
+	@inject(Identifiers.Cli.Service.Installer)
 	private readonly installer!: Services.Installer;
 
 	public signature = "config:cli";
