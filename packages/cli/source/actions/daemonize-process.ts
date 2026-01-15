@@ -11,7 +11,7 @@ import { AbortUnknownProcess } from "./abort-unknown-process.js";
 
 @injectable()
 export class DaemonizeProcess {
-	@inject(Identifiers.Application.Instance)
+	@inject(Identifiers.Cli.Application.Instance)
 	private readonly app!: Application;
 
 	@inject(Identifiers.Cli.Service.ProcessManager)

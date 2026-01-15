@@ -15,7 +15,7 @@ const ONE_HOUR = 1000 * 60 * 60;
 
 @injectable()
 export class Updater implements Contracts_Updater {
-	@inject(Identifiers.Application.Instance)
+	@inject(Identifiers.Cli.Application.Instance)
 	private readonly app!: Application;
 
 	@inject(Identifiers.Cli.Service.Config)

@@ -13,7 +13,7 @@ import { Warning } from "../components/warning.js";
 
 @injectable()
 export class SuggestCommand {
-	@inject(Identifiers.Application.Instance)
+	@inject(Identifiers.Cli.Application.Instance)
 	private readonly app!: Application;
 
 	public async execute(context: Contracts.Types.JsonObject): Promise<string | undefined> {

@@ -38,7 +38,7 @@ import { Application } from "./contracts.js";
 
 @injectable()
 export class ComponentFactory {
-	@inject(Identifiers.Application.Instance)
+	@inject(Identifiers.Cli.Application.Instance)
 	protected readonly app!: Application;
 
 	public appHeader(): string {

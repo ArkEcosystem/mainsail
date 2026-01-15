@@ -8,7 +8,7 @@ import { RestartProcess } from "./restart-process.js";
 
 @injectable()
 export class RestartRunningProcessWithPrompt {
-	@inject(Identifiers.Application.Instance)
+	@inject(Identifiers.Cli.Application.Instance)
 	private readonly app!: Application;
 
 	@inject(Identifiers.Cli.Service.ProcessManager)

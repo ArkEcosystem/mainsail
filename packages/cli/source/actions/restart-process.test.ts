@@ -33,7 +33,7 @@ describe<{
 		spyOnSpinnerStop = spy(ora, "stop");
 
 		const container = new Container();
-		container.bind(Identifiers.Application.Instance).toConstantValue(container);
+		container.bind(Identifiers.Cli.Application.Instance).toConstantValue(container);
 		container.bind(Identifiers.ProcessManager).toConstantValue(processManager);
 		container.bind(Identifiers.Spinner).toConstantValue(spinner);
 		context.action = container.get(RestartProcess, { autobind: true });

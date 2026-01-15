@@ -33,7 +33,7 @@ describe<{
 		spyOnExecute = spy(restartProcess, "execute");
 
 		const container = new Container();
-		container.bind(Identifiers.Application.Instance).toConstantValue(container);
+		container.bind(Identifiers.Cli.Application.Instance).toConstantValue(container);
 		container.bind(Identifiers.ProcessManager).toConstantValue(processManager);
 		container.bind(Identifiers.RestartProcess).toConstantValue(restartProcess);
 		container.bind(Identifiers.Prompt).toConstantValue(prompt);

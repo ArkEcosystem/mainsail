@@ -16,7 +16,7 @@ import { Application, Flags, ProcessOptions } from "./contracts.js";
 
 @injectable()
 export class ActionFactory {
-	@inject(Identifiers.Application.Instance)
+	@inject(Identifiers.Cli.Application.Instance)
 	protected readonly app!: Application;
 
 	public abortErroredProcess(processName: string): void {

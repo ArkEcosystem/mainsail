@@ -19,7 +19,7 @@ interface CommandInterface {
 
 @injectable()
 export class CommandHelp {
-	@inject(Identifiers.Application.Instance)
+	@inject(Identifiers.Cli.Application.Instance)
 	protected readonly app!: Application;
 
 	@inject(Identifiers.Cli.Package)

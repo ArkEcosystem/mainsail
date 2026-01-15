@@ -13,7 +13,7 @@ import type { ProcessManager } from "../services/index.js";
 
 @injectable()
 export class Process implements IProcess {
-	@inject(Identifiers.Application.Instance)
+	@inject(Identifiers.Cli.Application.Instance)
 	private readonly app!: Application;
 
 	@inject(Identifiers.Cli.Service.ProcessManager)

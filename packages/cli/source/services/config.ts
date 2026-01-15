@@ -7,7 +7,7 @@ import { Application } from "../contracts.js";
 
 @injectable()
 export class Config {
-	@inject(Identifiers.Application.Instance)
+	@inject(Identifiers.Cli.Application.Instance)
 	private readonly app!: Application;
 
 	#file!: string;

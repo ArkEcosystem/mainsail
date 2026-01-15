@@ -16,7 +16,7 @@ export type CommandList = Record<string, Command>;
 
 @injectable()
 export abstract class Command {
-	@inject(Identifiers.Application.Instance)
+	@inject(Identifiers.Cli.Application.Instance)
 	protected readonly app!: Application;
 
 	@inject(Identifiers.Cli.Service.Environment)

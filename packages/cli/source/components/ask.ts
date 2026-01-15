@@ -6,7 +6,7 @@ import { Prompt } from "./prompt.js";
 
 @injectable()
 export class Ask {
-	@inject(Identifiers.Application.Instance)
+	@inject(Identifiers.Cli.Application.Instance)
 	private readonly app!: Application;
 
 	public async render(message: string, options: object = {}): Promise<string> {
