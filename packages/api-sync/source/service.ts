@@ -12,7 +12,6 @@ import { assert, BigNumber, chunk, formatEcdsaSignature, sleep, validatorSetPack
 import { performance } from "perf_hooks";
 
 import { Listeners, TokenParser } from "./contracts.js";
-import { Identifiers as ApiSyncIdentifiers } from "./identifiers.js";
 import { parseMultiPayments } from "./parsers/index.js";
 import { Restore } from "./restore.js";
 
@@ -117,7 +116,7 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.ApiSync.Listener)
 	private readonly listeners!: Listeners;
 
-	@inject(ApiSyncIdentifiers.TokenParser)
+	@inject(Identifiers.ApiSync.TokenParser)
 	private readonly tokenParser!: TokenParser;
 
 	public async bootstrap(): Promise<void> {

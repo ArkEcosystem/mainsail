@@ -12,7 +12,6 @@ import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from
 import { performance } from "perf_hooks";
 
 import { TokenParser } from "./contracts.js";
-import { Identifiers as ApiSyncIdentifiers } from "./identifiers.js";
 import { parseMultiPayments, parseUsernames } from "./parsers/index.js";
 
 interface RepositoryContext {
@@ -143,7 +142,7 @@ export class Restore {
 	@inject(Identifiers.Evm.ContractService.Consensus)
 	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
 
-	@inject(ApiSyncIdentifiers.TokenParser)
+	@inject(Identifiers.ApiSync.TokenParser)
 	private readonly tokenParser!: TokenParser;
 
 	@inject(Identifiers.Snapshot.Legacy.Importer)
