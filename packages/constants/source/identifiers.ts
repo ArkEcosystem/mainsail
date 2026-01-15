@@ -1,4 +1,7 @@
+import { CliIdentifiers } from "./cli-identifiers.js";
+
 export const Identifiers = {
+	...CliIdentifiers,
 	ApiSync: {
 		Listener: Symbol("ApiSync<Listener>"),
 		Service: Symbol("ApiSync<Service>"),
