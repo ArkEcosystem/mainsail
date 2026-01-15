@@ -1,8 +1,8 @@
 import { injectable, postConstruct } from "@mainsail/container";
+import { Identifiers } from "@mainsail/constants";
 import Joi from "joi";
 
 import { Console, describe } from "../../../test-framework/source";
-import { Identifiers } from "../ioc/index.js";
 import { Output } from "../output";
 import { Command } from "./command";
 
@@ -41,8 +41,8 @@ describe<{
 	beforeEach((context) => {
 		const cli = new Console();
 
-		cli.app.rebind(Identifiers.Output).toConstantValue(output);
-		cli.app.rebind(Identifiers.Box).toConstantValue(box);
+		cli.app.rebind(Identifiers.Cli.Output.Instance).toConstantValue(output);
+		cli.app.rebind(Identifiers.Cli.Component.Box).toConstantValue(box);
 
 		context.cmd = cli.app.resolve(StubCommand);
 		context.cmd.register(["env:paths", "john", "doe", "--hello=world"]);

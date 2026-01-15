@@ -1,7 +1,7 @@
 import prompts from "prompts";
+import { Identifiers } from "@mainsail/constants";
 
 import { Console, describe } from "../../../test-framework/source";
-import { Identifiers } from "../ioc/index.js";
 import { Confirm } from "./confirm";
 
 describe<{
@@ -10,8 +10,8 @@ describe<{
 }>("Confirm", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Confirm).to(Confirm).inSingletonScope();
-		context.component = context.cli.app.get(Identifiers.Confirm);
+		context.cli.app.rebind(Identifiers.Cli.Component.Confirm).to(Confirm).inSingletonScope();
+		context.component = context.cli.app.get(Identifiers.Cli.Component.Confirm);
 	});
 
 	it("should render the component", async ({ component, cli }) => {

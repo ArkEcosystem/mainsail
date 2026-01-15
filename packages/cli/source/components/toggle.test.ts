@@ -1,7 +1,7 @@
 import prompts from "prompts";
 
 import { Console, describe } from "../../../test-framework/source";
-import { Identifiers } from "../ioc/index.js";
+import { Identifiers } from "@mainsail/constants";
 import { Toggle } from "./toggle";
 
 describe<{
@@ -10,8 +10,8 @@ describe<{
 }>("Log", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Toggle).to(Toggle).inSingletonScope();
-		context.component = context.cli.app.get(Identifiers.Toggle);
+		context.cli.app.rebind(Identifiers.Cli.Component.Toggle).to(Toggle).inSingletonScope();
+		context.component = context.cli.app.get(Identifiers.Cli.Component.Toggle);
 	});
 
 	it("should render the component", async ({ component, cli }) => {

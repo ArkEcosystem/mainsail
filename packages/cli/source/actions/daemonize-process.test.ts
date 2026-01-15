@@ -1,13 +1,13 @@
 import { Container } from "@mainsail/container";
 import { Units } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
+import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 import { Options as OraOptions, Ora } from "ora";
 import os from "os";
 
 import { Spinner } from "../components";
 import { ProcessIdentifier } from "../contracts";
-import { Identifiers } from "../ioc/index.js";
 import { ProcessManager } from "../services";
 import { AbortRunningProcess } from "./abort-running-process";
 import { AbortUnknownProcess } from "./abort-unknown-process";
@@ -56,10 +56,10 @@ describe<{
 	beforeEach((context) => {
 		const container = new Container();
 		container.bind(Identifiers.Cli.Application.Instance).toConstantValue(container);
-		container.bind(Identifiers.ProcessManager).toConstantValue(processManager);
-		container.bind(Identifiers.AbortUnknownProcess).toConstantValue(abortUnknownProcess);
-		container.bind(Identifiers.AbortRunningProcess).toConstantValue(abortRunningProcess);
-		container.bind(Identifiers.Spinner).toConstantValue(spinner);
+		container.bind(Identifiers.Cli.Service.ProcessManager).toConstantValue(processManager);
+		container.bind(Identifiers.Cli.Action.AbortUnknownProcess).toConstantValue(abortUnknownProcess);
+		container.bind(Identifiers.Cli.Action.AbortRunningProcess).toConstantValue(abortRunningProcess);
+		container.bind(Identifiers.Cli.Component.Spinner).toConstantValue(spinner);
 		context.action = container.get(DaemonizeProcessProxy, { autobind: true });
 	});
 

@@ -1,10 +1,10 @@
 import { Container } from "@mainsail/container";
+import { Identifiers } from "@mainsail/constants";
 import { Options as OraOptions, Ora } from "ora";
 
 import { describe } from "../../../test-framework/source";
 import { Spinner } from "../components";
 import { ProcessIdentifier } from "../contracts";
-import { Identifiers } from "../ioc/index.js";
 import { ProcessManager } from "../services";
 import { RestartProcess } from "./restart-process";
 
@@ -34,8 +34,8 @@ describe<{
 
 		const container = new Container();
 		container.bind(Identifiers.Cli.Application.Instance).toConstantValue(container);
-		container.bind(Identifiers.ProcessManager).toConstantValue(processManager);
-		container.bind(Identifiers.Spinner).toConstantValue(spinner);
+		container.bind(Identifiers.Cli.Service.ProcessManager).toConstantValue(processManager);
+		container.bind(Identifiers.Cli.Component.Spinner).toConstantValue(spinner);
 		context.action = container.get(RestartProcess, { autobind: true });
 	});
 

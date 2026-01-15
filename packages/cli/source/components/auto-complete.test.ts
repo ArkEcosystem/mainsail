@@ -1,7 +1,7 @@
 import prompts from "prompts";
+import { Identifiers } from "@mainsail/constants";
 
 import { Console, describe } from "../../../test-framework/source";
-import { Identifiers } from "../ioc/index.js";
 import { AutoComplete } from "./auto-complete";
 
 describe<{
@@ -9,8 +9,8 @@ describe<{
 }>("AutoComplete", ({ beforeEach, it, assert }) => {
 	beforeEach((context) => {
 		const cli = new Console();
-		cli.app.rebind(Identifiers.AutoComplete).to(AutoComplete).inSingletonScope();
-		context.component = cli.app.get(Identifiers.AutoComplete);
+		cli.app.rebind(Identifiers.Cli.Component.AutoComplete).to(AutoComplete).inSingletonScope();
+		context.component = cli.app.get(Identifiers.Cli.Component.AutoComplete);
 	});
 
 	it("should render the component", async ({ component }) => {
