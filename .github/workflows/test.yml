@@ -1,9 +1,13 @@
 name: Test
 
 on:
-    pull_request:
+    workflow_run:
+      workflows:
+        - "Linting (Internal)"
+        - "Linting (External)"
+      types: [completed]
     push:
-        branches: [develop, main]
+      branches: [develop, main]
 
 permissions:
     contents: read
@@ -19,13 +23,13 @@ jobs:
                 node-version: [22.x]
         concurrency:
             cancel-in-progress: true
-            group: ${{ github.head_ref }}-unit
+            group: ${{ github.event.workflow_run.head_sha }}-unit
         runs-on: ubuntu-latest
 
         steps:
             - uses: actions/checkout@v4
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.workflow_run.head_sha }}
             - uses: actions/setup-node@v4
               with:
                   node-version: ${{ matrix.node-version }}
@@ -73,12 +77,12 @@ jobs:
                 node-version: [22.x]
         concurrency:
             cancel-in-progress: true
-            group: ${{ github.head_ref }}-unit
+            group: ${{ github.event.workflow_run.head_sha }}-unit
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.workflow_run.head_sha }}
             - uses: actions/setup-node@v4
               with:
                   node-version: ${{ matrix.node-version }}
@@ -267,7 +271,7 @@ jobs:
                 node-version: [22.x]
         concurrency:
             cancel-in-progress: true
-            group: ${{ github.head_ref }}-integration
+            group: ${{ github.event.workflow_run.head_sha }}-integration
         runs-on: ubuntu-latest
         services:
             postgres:
@@ -283,7 +287,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.workflow_run.head_sha }}
             - uses: actions/setup-node@v4
               with:
                   node-version: ${{ matrix.node-version }}
@@ -321,7 +325,7 @@ jobs:
             - build
         concurrency:
             cancel-in-progress: true
-            group: ${{ github.head_ref }}-e2e-${{ matrix.name }}
+            group: ${{ github.event.workflow_run.head_sha }}-e2e-${{ matrix.name }}
         runs-on: ubuntu-latest
 
         timeout-minutes: 15
@@ -334,7 +338,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.workflow_run.head_sha }}
             - uses: actions/setup-node@v4
               with:
                   node-version: ${{ matrix.node-version }}
@@ -406,7 +410,7 @@ jobs:
             - build
         concurrency:
             cancel-in-progress: true
-            group: ${{ github.head_ref }}-e2e-${{ matrix.name }}
+            group: ${{ github.event.workflow_run.head_sha }}-e2e-${{ matrix.name }}
         runs-on: ubuntu-latest
 
         timeout-minutes: 10
@@ -419,7 +423,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.workflow_run.head_sha }}
             - uses: actions/setup-node@v4
               with:
                   node-version: ${{ matrix.node-version }}
@@ -464,7 +468,7 @@ jobs:
             - build
         concurrency:
             cancel-in-progress: true
-            group: ${{ github.head_ref }}-e2e-${{ matrix.name }}
+            group: ${{ github.event.workflow_run.head_sha }}-e2e-${{ matrix.name }}
         runs-on: ubuntu-latest
 
         timeout-minutes: 15
@@ -477,7 +481,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.workflow_run.head_sha }}
             - uses: actions/setup-node@v4
               with:
                   node-version: ${{ matrix.node-version }}
@@ -543,7 +547,7 @@ jobs:
             - build
         concurrency:
             cancel-in-progress: true
-            group: ${{ github.head_ref }}-e2e-${{ matrix.name }}
+            group: ${{ github.event.workflow_run.head_sha }}-e2e-${{ matrix.name }}
         runs-on: ubuntu-latest
 
         timeout-minutes: 15
@@ -556,7 +560,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.workflow_run.head_sha }}
             - uses: actions/setup-node@v4
               with:
                   node-version: ${{ matrix.node-version }}
@@ -617,7 +621,7 @@ jobs:
             - build
         concurrency:
             cancel-in-progress: true
-            group: ${{ github.head_ref }}-functional-${{matrix.name}}
+            group: ${{ github.event.workflow_run.head_sha }}-functional-${{matrix.name}}
         runs-on: ubuntu-latest
 
         strategy:
@@ -639,7 +643,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.workflow_run.head_sha }}
             - uses: actions/setup-node@v4
               with:
                   node-version: ${{ matrix.node-version }}
