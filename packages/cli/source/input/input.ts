@@ -12,7 +12,7 @@ export class Input {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Application;
 
-	@inject(Identifiers.Cli.InputValidator)
+	@inject(Identifiers.Cli.Input.Validator)
 	protected readonly validator!: InputValidator;
 
 	public args: InputValues = {};

@@ -17,13 +17,17 @@ export const CliIdentifiers = {
 			Setup: Symbol.for("Setup"),
 			Updater: Symbol.for("Updater"),
 		},
+		Input: {
+			Instance: Symbol.for("Input<Instance>"),
+			Factory: Symbol.for("Factory<Input>"),
+			Validator: Symbol.for("Input<Validator>"),
+		},
+		Output: {
+			Instance: Symbol.for("Output<Instance>"),
+		},
 		ApplicationPaths: Symbol.for("Paths<Application>"),
 		Commands: Symbol.for("Commands"),
 		ConsolePaths: Symbol.for("Paths<Console>"),
-		Input: Symbol.for("Input"),
-		InputFactory: Symbol.for("Factory<Input>"),
-		InputValidator: Symbol.for("Input<Validator>"),
-		Output: Symbol.for("Output"),
 		Package: Symbol.for("Package"),
 		ProcessFactory: Symbol.for("Factory<Process>"),
 		Action: {

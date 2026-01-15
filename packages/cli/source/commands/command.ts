@@ -22,7 +22,7 @@ export abstract class Command {
 	@inject(Identifiers.Cli.Service.Environment)
 	protected readonly env!: Environment;
 
-	@inject(Identifiers.Cli.Output)
+	@inject(Identifiers.Cli.Output.Instance)
 	protected readonly output!: Output;
 
 	@inject(Identifiers.Cli.Service.Config)

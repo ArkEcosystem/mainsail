@@ -5,7 +5,7 @@ import { Output } from "../output/index.js";
 
 @injectable()
 export class Logger {
-	@inject(Identifiers.Cli.Output)
+	@inject(Identifiers.Cli.Output.Instance)
 	private readonly output!: Output;
 
 	public alert(message: string | Error): void {

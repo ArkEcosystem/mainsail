@@ -92,7 +92,6 @@ export class ApplicationFactory {
 		);
 
 		// Services
-		app.bind(Identifiers.Cli.Output).to(Output).inSingletonScope();
 		app.bind(Identifiers.Cli.Service.Logger).to(Logger).inSingletonScope();
 		app.bind(Identifiers.Cli.Service.Config).to(Config).inSingletonScope();
 		app.bind(Identifiers.Cli.Service.Updater).to(Updater).inSingletonScope();
@@ -102,9 +101,12 @@ export class ApplicationFactory {
 		app.bind(Identifiers.Cli.Service.Environment).to(Environment).inSingletonScope();
 		app.bind(Identifiers.Cli.Service.Setup).to(Setup).inSingletonScope();
 
+		// Output
+		app.bind(Identifiers.Cli.Output.Instance).to(Output).inSingletonScope();
+
 		// Input
-		app.bind(Identifiers.Cli.Input).to(Input).inSingletonScope();
-		app.bind(Identifiers.Cli.InputValidator).to(InputValidator).inSingletonScope();
+		app.bind(Identifiers.Cli.Input.Instance).to(Input).inSingletonScope();
+		app.bind(Identifiers.Cli.Input.Validator).to(InputValidator).inSingletonScope();
 
 		// Actions
 		app.bind(Identifiers.Cli.Action.AbortErroredProcess).to(AbortErroredProcess).inSingletonScope();
