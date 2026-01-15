@@ -1,4 +1,5 @@
-import { Identifiers, Services } from "@mainsail/cli";
+import { Services } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { Console, describe } from "../../../test-framework/source";
 
 import { Command } from "./top";
@@ -9,7 +10,7 @@ describe<{
 }>("TopCommand", ({ beforeEach, it, stub, assert }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.processManager = context.cli.app.get(Identifiers.ProcessManager);
+		context.processManager = context.cli.app.get(Identifiers.Cli.Service.ProcessManager);
 	});
 
 	it("should render a table with process information", async ({ processManager, cli }) => {

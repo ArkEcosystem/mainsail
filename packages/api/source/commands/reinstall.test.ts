@@ -1,4 +1,5 @@
-import { Identifiers, Services } from "@mainsail/cli";
+import { Services } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { Console, describe } from "../../../test-framework/source";
 import prompts from "prompts";
 
@@ -11,8 +12,8 @@ describe<{
 }>("ReinstallCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.processManager = context.cli.app.get(Identifiers.ProcessManager);
-		context.installer = context.cli.app.get(Identifiers.Installer);
+		context.processManager = context.cli.app.get(Identifiers.Cli.Service.ProcessManager);
+		context.installer = context.cli.app.get(Identifiers.Cli.Service.Installer);
 	});
 
 	it("should reinstall without a prompt if the [--force] flag is used", async ({
