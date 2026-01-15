@@ -42,13 +42,13 @@ export class Application {
 	}
 
 	public getCorePath(type: string, file?: string): string {
-		const path: string = this.get<Paths>(Identifiers.Cli.ApplicationPaths)[type];
+		const path: string = this.get<Paths>(Identifiers.Cli.Paths.Application)[type];
 
 		return resolve(file ? `${path}/${file}` : path);
 	}
 
 	public getConsolePath(type: string, file?: string): string {
-		const path: string = this.get<Paths>(Identifiers.Cli.ConsolePaths)[type];
+		const path: string = this.get<Paths>(Identifiers.Cli.Paths.Console)[type];
 
 		return resolve(file ? `${path}/${file}` : path);
 	}

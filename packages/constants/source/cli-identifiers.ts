@@ -25,9 +25,10 @@ export const CliIdentifiers = {
 		Output: {
 			Instance: Symbol.for("Output<Instance>"),
 		},
-		ApplicationPaths: Symbol.for("Paths<Application>"),
-		Commands: Symbol.for("Commands"),
-		ConsolePaths: Symbol.for("Paths<Console>"),
+		Paths: {
+			Application: Symbol.for("Paths<Application>"),
+			Console: Symbol.for("Paths<Console>"),
+		},
 		Package: Symbol.for("Package"),
 		ProcessFactory: Symbol.for("Factory<Process>"),
 		Action: {

@@ -69,7 +69,7 @@ export class ApplicationFactory {
 
 		// Paths
 		assert.string(package_.name);
-		app.bind(Identifiers.Cli.ConsolePaths).toConstantValue(environmentPaths.get(package_.name));
+		app.bind(Identifiers.Cli.Paths.Console).toConstantValue(environmentPaths.get(package_.name));
 
 		const applicationName = package_.name?.split("/")[1];
 		assert.string(applicationName);
@@ -149,7 +149,7 @@ export class ApplicationFactory {
 		app.bind(Identifiers.Cli.Component.Toggle).to(Toggle).inSingletonScope();
 		app.bind(Identifiers.Cli.Component.Warning).to(Warning).inSingletonScope();
 
-		app.rebind(Identifiers.Cli.ApplicationPaths).toConstantValue(
+		app.rebind(Identifiers.Cli.Paths.Application).toConstantValue(
 			app.get<Environment>(Identifiers.Cli.Service.Environment).getPaths(),
 		);
 
