@@ -145,7 +145,7 @@ export class TokenParserService implements TokenParser {
 			logs: receipt.logs ?? [],
 		});
 
-		const dirtyAccounts = new Map<`0x${string}`, string>();
+		const dirtyAccounts = new Map<`0x${string}`, Set<string>>();
 		const dirtyContractAddresses = new Set<string>();
 
 		const transferIndexes = new Map<`0x${string}`, number>();
@@ -153,8 +153,14 @@ export class TokenParserService implements TokenParser {
 		for (const event of eventLogs) {
 			const { from, to, value } = event.args;
 
-			dirtyAccounts.set(from, event.address);
-			dirtyAccounts.set(to, event.address);
+			for (const account of [from, to]) {
+				if (!dirtyAccounts.has(account)) {
+					dirtyAccounts.set(account, new Set());
+				}
+			}
+
+			dirtyAccounts.get(from)?.add(event.address);
+			dirtyAccounts.get(to)?.add(event.address);
 			dirtyContractAddresses.add(event.address);
 
 			// Emitted events during deployment can have a event.logIndex of undefined and
@@ -181,35 +187,37 @@ export class TokenParserService implements TokenParser {
 				tokenRepository,
 			);
 
-			for (const [account, contract] of dirtyAccounts) {
-				// Skip anything if not deemed a token.
-				if (!foundTokens.has(contract)) {
-					this.logger.debug(
-						`Ignoring transfer in contract '${receipt.contractAddress}' because it does not implemented expected ERC20 ABI.`,
-					);
-					continue;
-				} else {
-					this.logger.debug(
-						`Detected ERC20 transfer affecting '${account}' in contract '${contract}' (cached: ${this.#tokenCache.has(contract)})`,
-					);
-				}
-
-				if (!this.#tokenCache.has(contract)) {
-					const foundToken = foundTokens.get(contract);
-					assert.defined(foundToken);
-					const { token, isNew } = foundToken;
-					this.#tokenCache.set(contract, token);
-
-					if (isNew) {
-						tokens.push(token);
+			for (const [account, contracts] of dirtyAccounts) {
+				for (const contract of [...contracts.values()]) {
+					// Skip anything if not deemed a token.
+					if (!foundTokens.has(contract)) {
+						this.logger.debug(
+							`Ignoring transfer in contract '${receipt.contractAddress}' because it does not implemented expected ERC20 ABI.`,
+						);
+						continue;
+					} else {
+						this.logger.debug(
+							`Detected ERC20 transfer affecting '${account}' in contract '${contract}' (cached: ${this.#tokenCache.has(contract)})`,
+						);
 					}
-				}
 
-				tokenHolders.push({
-					address: account,
-					balance: await this.#getTokenBalance(contract, account),
-					tokenAddress: contract,
-				});
+					if (!this.#tokenCache.has(contract)) {
+						const foundToken = foundTokens.get(contract);
+						assert.defined(foundToken);
+						const { token, isNew } = foundToken;
+						this.#tokenCache.set(contract, token);
+
+						if (isNew) {
+							tokens.push(token);
+						}
+					}
+
+					tokenHolders.push({
+						address: account,
+						balance: await this.#getTokenBalance(contract, account),
+						tokenAddress: contract,
+					});
+				}
 			}
 		}
 
