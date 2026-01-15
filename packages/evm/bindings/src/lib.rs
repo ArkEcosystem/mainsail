@@ -116,10 +116,10 @@ impl EvmInner {
 
         Ok(match result {
             Ok(r) => {
-                if !r.is_success() {
-                    self.logger
-                        .log(LogLevel::Warn, format!("view call failed: {:?}", r));
-                }
+                // if !r.is_success() {
+                //     self.logger
+                //         .log(LogLevel::Warn, format!("view call failed: {:?}", r));
+                // }
 
                 TxViewResult {
                     success: r.is_success(),

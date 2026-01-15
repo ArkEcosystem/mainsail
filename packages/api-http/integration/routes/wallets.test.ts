@@ -10,6 +10,11 @@ import multiPayments from "../../test/fixtures/multi_payments.json";
 import multiPaymentTransactions from "../../test/fixtures/multi_payments.transactions.json";
 import multiPaymentWallets from "../../test/fixtures/multi_payments.wallets.json";
 import multiPaymentTransactionsResponse from "../../test/fixtures/multi_payments.transactions.response.json";
+import tokens from "../../test/fixtures/tokens.json";
+import tokenHolders from "../../test/fixtures/token_holders.json";
+import walletsTokens from "../../test/fixtures/wallets_tokens.json";
+import walletTokensResponse from "../../test/fixtures/wallet_tokens.response.json";
+import walletTokenHoldersResponse from "../../test/fixtures/wallet_token_holders.response.json";
 
 describe<{
 	sandbox: Sandbox;
@@ -98,11 +103,11 @@ describe<{
 		const testCases = [
 			{
 				id: wallet.address,
-				result: wallet,
+				result: { ...wallet, tokenCount: 0 },
 			},
 			{
 				id: wallet.publicKey,
-				result: wallet,
+				result: { ...wallet, tokenCount: 0 },
 			},
 			// {
 			// 	id: wallet.attributes.username,
@@ -247,5 +252,84 @@ describe<{
 
 		assert.equal(statusCode, 200);
 		assert.empty(data.data);
+	});
+
+	it("/wallets/{}/tokens", async () => {
+		await apiContext.walletRepository.save(walletsTokens);
+		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenHolderRepository.save(tokenHolders);
+
+		const testCases = [
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens`,
+				result: walletTokensResponse,
+			},
+			{
+				path: "/wallets/tokens?addresses=0x0000000000000000000000000000000000000000",
+				result: [],
+			},
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
+	});
+
+	it("/wallets/tokens?addresses", async () => {
+		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenHolderRepository.save(tokenHolders);
+
+		const testCases = [
+			{
+				path: "/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: walletTokenHoldersResponse,
+			},
+			{
+				path: "/wallets/tokens?addresses=0x0000000000000000000000000000000000000000",
+				result: [],
+			},
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
+	});
+
+	it("/wallets/tokens pagination", async () => {
+		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenHolderRepository.save(tokenHolders);
+
+		const testCases = [
+			{
+				path: "/wallets/tokens?limit=1&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: walletTokenHoldersResponse.slice(0, 1),
+			},
+			{
+				path: "/wallets/tokens?limit=10&offset=1&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: walletTokenHoldersResponse.slice(1, 3),
+			},
+			{
+				path: "/wallets/tokens?limit=10&offset=2&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: walletTokenHoldersResponse.slice(2, 4),
+			},
+			{
+				path: "/wallets/tokens?limit=5&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: walletTokenHoldersResponse,
+			},
+			{
+				path: "/wallets/tokens?offset=5&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: [],
+			},
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
 	});
 });

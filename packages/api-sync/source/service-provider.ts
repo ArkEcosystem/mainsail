@@ -4,6 +4,7 @@ import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { Listeners } from "./listeners.js";
+import { TokenParserService } from "./parsers/tokens.js";
 import { Sync } from "./service.js";
 
 @injectable()
@@ -13,6 +14,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			return;
 		}
 
+		this.app.bind(Identifiers.ApiSync.TokenParser).to(TokenParserService).inSingletonScope();
 		this.app.bind(Identifiers.ApiSync.Listener).to(Listeners).inSingletonScope();
 		this.app.bind(Identifiers.ApiSync.Service).to(Sync).inSingletonScope();
 
@@ -30,7 +32,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): Joi.ObjectSchema {
 		return Joi.object({
-			syncInterval: Joi.number().required(),
+			syncInterval: Joi.number().positive().required(),
+			tokenCacheSize: Joi.number().positive().required(),
 		}).unknown(true);
 	}
 
