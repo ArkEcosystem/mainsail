@@ -5,7 +5,7 @@ import type { ProcessManager } from "../services/index.js";
 
 @injectable()
 export class AbortErroredProcess {
-	@inject(Identifiers.Cli.ProcessManager)
+	@inject(Identifiers.Cli.Service.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
 	public execute(processName: string): void {

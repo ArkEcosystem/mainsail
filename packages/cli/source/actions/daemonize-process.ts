@@ -14,7 +14,7 @@ export class DaemonizeProcess {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
-	@inject(Identifiers.Cli.ProcessManager)
+	@inject(Identifiers.Cli.Service.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
 	public execute(options: ProcessOptions, flags: Flags): void {

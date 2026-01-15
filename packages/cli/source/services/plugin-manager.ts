@@ -11,7 +11,7 @@ import { File, Git, NPM, Source } from "./source-providers/index.js";
 
 @injectable()
 export class PluginManager implements IPluginManager {
-	@inject(Identifiers.Cli.Environment)
+	@inject(Identifiers.Cli.Service.Environment)
 	private readonly environment!: Environment;
 
 	public async list(): Promise<Plugin[]> {

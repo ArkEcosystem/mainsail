@@ -6,7 +6,7 @@ import type { Logger } from "../services/logger.js";
 
 @injectable()
 export class Table {
-	@inject(Identifiers.Cli.Logger)
+	@inject(Identifiers.Cli.Service.Logger)
 	private readonly logger!: Logger;
 
 	public render(head: string[], callback: (table: Table3.Table) => void, options: object = {}): void {

@@ -19,13 +19,13 @@ export abstract class Command {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Application;
 
-	@inject(Identifiers.Cli.Environment)
+	@inject(Identifiers.Cli.Service.Environment)
 	protected readonly env!: Environment;
 
 	@inject(Identifiers.Cli.Output)
 	protected readonly output!: Output;
 
-	@inject(Identifiers.Cli.Config)
+	@inject(Identifiers.Cli.Service.Config)
 	protected readonly config!: Config;
 
 	@inject(Identifiers.Cli.Package)

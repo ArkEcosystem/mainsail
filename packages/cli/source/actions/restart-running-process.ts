@@ -10,7 +10,7 @@ export class RestartRunningProcess {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
-	@inject(Identifiers.Cli.ProcessManager)
+	@inject(Identifiers.Cli.Service.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
 	public execute(processName: string): void {

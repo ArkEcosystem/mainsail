@@ -11,7 +11,7 @@ export class RestartRunningProcessWithPrompt {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
-	@inject(Identifiers.Cli.ProcessManager)
+	@inject(Identifiers.Cli.Service.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
 	public async execute(processName: string): Promise<void> {

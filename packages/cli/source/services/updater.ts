@@ -18,16 +18,16 @@ export class Updater implements Contracts_Updater {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
-	@inject(Identifiers.Cli.Config)
+	@inject(Identifiers.Cli.Service.Config)
 	private readonly config!: Config;
 
 	@inject(Identifiers.Cli.Package)
 	private readonly pkg!: Contracts.Types.PackageJson;
 
-	@inject(Identifiers.Cli.Installer)
+	@inject(Identifiers.Cli.Service.Installer)
 	private readonly installer!: Installer;
 
-	@inject(Identifiers.Cli.ProcessManager)
+	@inject(Identifiers.Cli.Service.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
 	#updateCheckInterval: number = ONE_HOUR;

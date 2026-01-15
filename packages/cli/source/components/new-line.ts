@@ -5,7 +5,7 @@ import type { Logger } from "../services/logger.js";
 
 @injectable()
 export class NewLine {
-	@inject(Identifiers.Cli.Logger)
+	@inject(Identifiers.Cli.Service.Logger)
 	private readonly logger!: Logger;
 
 	public render(count: number = 1): void {

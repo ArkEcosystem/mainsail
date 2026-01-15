@@ -6,7 +6,7 @@ import type { Logger } from "../services/logger.js";
 
 @injectable()
 export class Title {
-	@inject(Identifiers.Cli.Logger)
+	@inject(Identifiers.Cli.Service.Logger)
 	private readonly logger!: Logger;
 
 	public async render(title: string): Promise<void> {

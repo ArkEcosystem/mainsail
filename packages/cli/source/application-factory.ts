@@ -93,14 +93,14 @@ export class ApplicationFactory {
 
 		// Services
 		app.bind(Identifiers.Cli.Output).to(Output).inSingletonScope();
-		app.bind(Identifiers.Cli.Logger).to(Logger).inSingletonScope();
-		app.bind(Identifiers.Cli.Config).to(Config).inSingletonScope();
-		app.bind(Identifiers.Cli.Updater).to(Updater).inSingletonScope();
-		app.bind(Identifiers.Cli.ProcessManager).to(ProcessManager).inSingletonScope();
-		app.bind(Identifiers.Cli.PluginManager).to(PluginManager).inSingletonScope();
-		app.bind(Identifiers.Cli.Installer).to(Installer).inSingletonScope();
-		app.bind(Identifiers.Cli.Environment).to(Environment).inSingletonScope();
-		app.bind(Identifiers.Cli.Setup).to(Setup).inSingletonScope();
+		app.bind(Identifiers.Cli.Service.Logger).to(Logger).inSingletonScope();
+		app.bind(Identifiers.Cli.Service.Config).to(Config).inSingletonScope();
+		app.bind(Identifiers.Cli.Service.Updater).to(Updater).inSingletonScope();
+		app.bind(Identifiers.Cli.Service.ProcessManager).to(ProcessManager).inSingletonScope();
+		app.bind(Identifiers.Cli.Service.PluginManager).to(PluginManager).inSingletonScope();
+		app.bind(Identifiers.Cli.Service.Installer).to(Installer).inSingletonScope();
+		app.bind(Identifiers.Cli.Service.Environment).to(Environment).inSingletonScope();
+		app.bind(Identifiers.Cli.Service.Setup).to(Setup).inSingletonScope();
 
 		// Input
 		app.bind(Identifiers.Cli.Input).to(Input).inSingletonScope();
@@ -148,7 +148,7 @@ export class ApplicationFactory {
 		app.bind(Identifiers.Cli.Component.Warning).to(Warning).inSingletonScope();
 
 		app.rebind(Identifiers.Cli.ApplicationPaths).toConstantValue(
-			app.get<Environment>(Identifiers.Cli.Environment).getPaths(),
+			app.get<Environment>(Identifiers.Cli.Service.Environment).getPaths(),
 		);
 
 		return app;
