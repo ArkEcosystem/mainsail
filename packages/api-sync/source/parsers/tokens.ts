@@ -65,14 +65,20 @@ export class TokenParserService implements TokenParser {
 	@inject(ApiDatabaseIdentifiers.TokenRepositoryFactory)
 	private readonly tokenRepositoryFactory!: ApiDatabaseContracts.TokenRepositoryFactory;
 
-	#tokenCache: LRUCache<string, Models.Token> = new LRUCache({
-		max: 256,
-	});
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "api-sync")
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
+
+	#tokenCache!: LRUCache<string, Models.Token>;
 
 	#preparedFunctionCalls: PreparedErc20Call[] = [];
 
 	@postConstruct()
 	public initialize(): void {
+		this.#tokenCache = new LRUCache({
+			max: this.pluginConfiguration.getRequired<number>("tokenCacheSize"),
+		});
+
 		const calls: (Erc20Call | Erc20MetadataCall)[] = [
 			{
 				abi: erc20AbiFunctions,
