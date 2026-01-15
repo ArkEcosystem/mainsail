@@ -7,7 +7,6 @@ export * as Components from "./component-factory.js";
 export * from "./component-factory.js";
 export * as Contracts from "./contracts.js";
 export * from "./input/index.js";
-export * from "./ioc/index.js";
 export * from "./output/index.js";
 export * as Plugins from "./plugins/index.js";
 export * as Services from "./services/index.js";

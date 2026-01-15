@@ -1,3 +1,4 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
 import {
@@ -12,7 +13,6 @@ import {
 	RestartRunningProcessWithPrompt,
 } from "./actions/index.js";
 import { Application, Flags, ProcessOptions } from "./contracts.js";
-import { Identifiers } from "./ioc/index.js";
 
 @injectable()
 export class ActionFactory {
@@ -20,40 +20,40 @@ export class ActionFactory {
 	protected readonly app!: Application;
 
 	public abortErroredProcess(processName: string): void {
-		return this.app.get<AbortErroredProcess>(Identifiers.AbortErroredProcess).execute(processName);
+		return this.app.get<AbortErroredProcess>(Identifiers.Cli.Action.AbortErroredProcess).execute(processName);
 	}
 
 	public abortMissingProcess(processName: string): void {
-		return this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(processName);
+		return this.app.get<AbortMissingProcess>(Identifiers.Cli.Action.AbortMissingProcess).execute(processName);
 	}
 
 	public abortRunningProcess(processName: string): void {
-		return this.app.get<AbortRunningProcess>(Identifiers.AbortRunningProcess).execute(processName);
+		return this.app.get<AbortRunningProcess>(Identifiers.Cli.Action.AbortRunningProcess).execute(processName);
 	}
 
 	public abortStoppedProcess(processName: string): void {
-		return this.app.get<AbortStoppedProcess>(Identifiers.AbortStoppedProcess).execute(processName);
+		return this.app.get<AbortStoppedProcess>(Identifiers.Cli.Action.AbortStoppedProcess).execute(processName);
 	}
 
 	public abortUnknownProcess(processName: string): void {
-		return this.app.get<AbortUnknownProcess>(Identifiers.AbortUnknownProcess).execute(processName);
+		return this.app.get<AbortUnknownProcess>(Identifiers.Cli.Action.AbortUnknownProcess).execute(processName);
 	}
 
 	public async daemonizeProcess(options: ProcessOptions, flags: Flags): Promise<void> {
-		return this.app.get<DaemonizeProcess>(Identifiers.DaemonizeProcess).execute(options, flags);
+		return this.app.get<DaemonizeProcess>(Identifiers.Cli.Action.DaemonizeProcess).execute(options, flags);
 	}
 
 	public restartProcess(processName: string): void {
-		return this.app.get<RestartProcess>(Identifiers.RestartProcess).execute(processName);
+		return this.app.get<RestartProcess>(Identifiers.Cli.Action.RestartProcess).execute(processName);
 	}
 
 	public async restartRunningProcessWithPrompt(processName: string): Promise<void> {
 		return this.app
-			.get<RestartRunningProcessWithPrompt>(Identifiers.RestartRunningProcessWithPrompt)
+			.get<RestartRunningProcessWithPrompt>(Identifiers.Cli.Action.RestartRunningProcessWithPrompt)
 			.execute(processName);
 	}
 
 	public restartRunningProcess(processName: string): void {
-		return this.app.get<RestartRunningProcess>(Identifiers.RestartRunningProcess).execute(processName);
+		return this.app.get<RestartRunningProcess>(Identifiers.Cli.Action.RestartRunningProcess).execute(processName);
 	}
 }

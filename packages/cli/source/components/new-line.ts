@@ -1,11 +1,11 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
-import { Identifiers } from "../ioc/index.js";
 import type { Logger } from "../services/logger.js";
 
 @injectable()
 export class NewLine {
-	@inject(Identifiers.Logger)
+	@inject(Identifiers.Cli.Logger)
 	private readonly logger!: Logger;
 
 	public render(count: number = 1): void {

@@ -1,13 +1,13 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { lstatSync, readdirSync } from "fs";
 
 import { Application } from "../contracts.js";
-import { Identifiers } from "../ioc/index.js";
 import { Command, CommandList } from "./command.js";
 
 @injectable()
 export class DiscoverCommands {
-	@inject(Identifiers.Application.Instance)
+	@inject(Identifiers.Cli.Application.Instance)
 	private readonly app!: Application;
 
 	public async within(path: string): Promise<CommandList> {

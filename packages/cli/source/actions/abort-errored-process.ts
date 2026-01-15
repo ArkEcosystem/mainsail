@@ -1,11 +1,11 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
-import { Identifiers } from "../ioc/index.js";
 import type { ProcessManager } from "../services/index.js";
 
 @injectable()
 export class AbortErroredProcess {
-	@inject(Identifiers.ProcessManager)
+	@inject(Identifiers.Cli.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
 	public execute(processName: string): void {

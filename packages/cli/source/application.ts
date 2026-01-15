@@ -1,12 +1,12 @@
+import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { resolve } from "path";
 
 import type { Paths } from "./contracts.js";
-import { Identifiers } from "./ioc/index.js";
 
 export class Application {
 	public constructor(private readonly container: Contracts.Kernel.Container.Container) {
-		this.container.bind(Identifiers.Application.Instance).toConstantValue(this);
+		this.container.bind(Identifiers.Cli.Application.Instance).toConstantValue(this);
 	}
 
 	public bind<T>(
@@ -42,13 +42,13 @@ export class Application {
 	}
 
 	public getCorePath(type: string, file?: string): string {
-		const path: string = this.get<Paths>(Identifiers.ApplicationPaths)[type];
+		const path: string = this.get<Paths>(Identifiers.Cli.ApplicationPaths)[type];
 
 		return resolve(file ? `${path}/${file}` : path);
 	}
 
 	public getConsolePath(type: string, file?: string): string {
-		const path: string = this.get<Paths>(Identifiers.ConsolePaths)[type];
+		const path: string = this.get<Paths>(Identifiers.Cli.ConsolePaths)[type];
 
 		return resolve(file ? `${path}/${file}` : path);
 	}

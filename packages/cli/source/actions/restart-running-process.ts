@@ -1,7 +1,7 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
 import { Application } from "../application.js";
-import { Identifiers } from "../ioc/index.js";
 import { ProcessManager } from "../services/index.js";
 import { RestartProcess } from "./restart-process.js";
 
@@ -10,12 +10,12 @@ export class RestartRunningProcess {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
-	@inject(Identifiers.ProcessManager)
+	@inject(Identifiers.Cli.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
 	public execute(processName: string): void {
 		if (this.processManager.isOnline(processName)) {
-			this.app.get<RestartProcess>(Identifiers.RestartProcess).execute(processName);
+			this.app.get<RestartProcess>(Identifiers.Cli.Action.RestartProcess).execute(processName);
 		}
 	}
 }

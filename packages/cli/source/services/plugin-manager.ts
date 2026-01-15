@@ -1,3 +1,4 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { existsSync } from "fs";
 import { readJSONSync, removeSync } from "fs-extra/esm";
@@ -5,13 +6,12 @@ import { glob } from "glob";
 import { join } from "path";
 
 import { Plugin, PluginManager as IPluginManager } from "../contracts.js";
-import { Identifiers } from "../ioc/index.js";
 import { Environment } from "./environment.js";
 import { File, Git, NPM, Source } from "./source-providers/index.js";
 
 @injectable()
 export class PluginManager implements IPluginManager {
-	@inject(Identifiers.Environment)
+	@inject(Identifiers.Cli.Environment)
 	private readonly environment!: Environment;
 
 	public async list(): Promise<Plugin[]> {

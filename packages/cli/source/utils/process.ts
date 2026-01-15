@@ -1,3 +1,4 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { assert, prettyBytes, prettyTime } from "@mainsail/utils";
 import dayjs from "dayjs";
@@ -8,7 +9,6 @@ import type { AbortMissingProcess, AbortStoppedProcess, AbortUnknownProcess } fr
 import { Application } from "../application.js";
 import { Clear, Spinner, Table } from "../components/index.js";
 import { Process as IProcess, ProcessDescription } from "../contracts.js";
-import { Identifiers } from "../ioc/index.js";
 import type { ProcessManager } from "../services/index.js";
 
 @injectable()
@@ -16,7 +16,7 @@ export class Process implements IProcess {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
-	@inject(Identifiers.ProcessManager)
+	@inject(Identifiers.Cli.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
 	#processName!: string;
@@ -26,12 +26,13 @@ export class Process implements IProcess {
 	}
 
 	public stop(daemon: boolean): void {
-		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.#processName);
-		this.app.get<AbortUnknownProcess>(Identifiers.AbortUnknownProcess).execute(this.#processName);
-		this.app.get<AbortStoppedProcess>(Identifiers.AbortStoppedProcess).execute(this.#processName);
+		this.app.get<AbortMissingProcess>(Identifiers.Cli.Action.AbortMissingProcess).execute(this.#processName);
+		this.app.get<AbortUnknownProcess>(Identifiers.Cli.Action.AbortUnknownProcess).execute(this.#processName);
+		this.app.get<AbortStoppedProcess>(Identifiers.Cli.Action.AbortStoppedProcess).execute(this.#processName);
 
-		const spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Stopping ${this.#processName}`);
-
+		const spinner = this.app
+			.get<Spinner>(Identifiers.Cli.Component.Spinner)
+			.render(`Stopping ${this.#processName}`);
 		spinner.start();
 
 		this.processManager[daemon ? "delete" : "stop"](this.#processName);
@@ -40,10 +41,12 @@ export class Process implements IProcess {
 	}
 
 	public restart(): void {
-		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.#processName);
-		this.app.get<AbortStoppedProcess>(Identifiers.AbortStoppedProcess).execute(this.#processName);
+		this.app.get<AbortMissingProcess>(Identifiers.Cli.Action.AbortMissingProcess).execute(this.#processName);
+		this.app.get<AbortStoppedProcess>(Identifiers.Cli.Action.AbortStoppedProcess).execute(this.#processName);
 
-		const spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Restarting ${this.#processName}`);
+		const spinner = this.app
+			.get<Spinner>(Identifiers.Cli.Component.Spinner)
+			.render(`Restarting ${this.#processName}`);
 
 		spinner.start();
 
@@ -53,10 +56,10 @@ export class Process implements IProcess {
 	}
 
 	public status(): void {
-		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.#processName);
+		this.app.get<AbortMissingProcess>(Identifiers.Cli.Action.AbortMissingProcess).execute(this.#processName);
 
 		this.app
-			.get<Table>(Identifiers.Table)
+			.get<Table>(Identifiers.Cli.Component.Table)
 			.render(["ID", "Name", "Version", "Status", "Uptime", "CPU", "RAM"], (table) => {
 				const app: ProcessDescription | undefined = this.processManager.describe(this.#processName);
 
@@ -75,7 +78,7 @@ export class Process implements IProcess {
 	}
 
 	public async log(showErrors: boolean, lines: number): Promise<void> {
-		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.#processName);
+		this.app.get<AbortMissingProcess>(Identifiers.Cli.Action.AbortMissingProcess).execute(this.#processName);
 
 		const proc = this.processManager.describe(this.#processName);
 
@@ -83,7 +86,7 @@ export class Process implements IProcess {
 
 		const file = showErrors ? proc.pm2_env.pm_err_log_path : proc.pm2_env.pm_out_log_path;
 
-		this.app.get<Clear>(Identifiers.Clear).render();
+		this.app.get<Clear>(Identifiers.Cli.Component.Clear).render();
 
 		console.log(
 			`Tailing last ${lines} lines for [${this.#processName}] process (change the value with --lines option)`,

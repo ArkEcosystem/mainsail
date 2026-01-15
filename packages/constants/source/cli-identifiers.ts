@@ -1,11 +1,12 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 export const CliIdentifiers = {
 	Cli: {
-		AppHeader: Symbol.for("Cli<Component<AppHeader>>"),
-		// Application: {
-		// 	Instance: ID.Application.Instance,
-		// 	Name: ID.Application.Name,
-		// },
+		Application: {
+			// Instance: ID.Application.Instance,
+			// Name: ID.Application.Name,
+			Instance: Symbol.for("Cli<Application<Instance>>"),
+			Name: Symbol.for("Cli<Application>Name"),
+		},
 		ApplicationPaths: Symbol.for("Paths<Application>"),
 		Commands: Symbol.for("Commands"),
 		Config: Symbol.for("Config"),
@@ -36,6 +37,7 @@ export const CliIdentifiers = {
 			RestartRunningProcessWithPrompt: Symbol.for("Action<RestartRunningProcessWithPrompt>"),
 		},
 		Component: {
+			AppHeader: Symbol.for("Cli<Component<AppHeader>>"),
 			Ask: Symbol.for("Component<Ask>"),
 			AskDate: Symbol.for("Component<AskDate>"),
 			AskHidden: Symbol.for("Component<AskHidden>"),

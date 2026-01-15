@@ -1,8 +1,8 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
 import { Application } from "../application.js";
 import { InputArguments, InputValue, InputValues } from "../contracts.js";
-import { Identifiers } from "../ioc/index.js";
 import { InputDefinition } from "./definition.js";
 import { InputParser } from "./parser.js";
 import { InputValidator } from "./validator.js";
@@ -12,7 +12,7 @@ export class Input {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Application;
 
-	@inject(Identifiers.InputValidator)
+	@inject(Identifiers.Cli.InputValidator)
 	protected readonly validator!: InputValidator;
 
 	public args: InputValues = {};

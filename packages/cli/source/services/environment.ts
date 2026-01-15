@@ -1,4 +1,4 @@
-import { EnvironmentVariables } from "@mainsail/constants";
+import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { parse, stringify } from "envfile";
 import { existsSync, readFileSync, writeFileSync } from "fs";
@@ -6,11 +6,10 @@ import path from "path";
 
 import { InputValues, Paths } from "../contracts.js";
 import { envPaths as environmentPaths } from "../env-paths.js";
-import { Identifiers } from "../ioc/index.js";
 
 @injectable()
 export class Environment {
-	@inject(Identifiers.Application.Name)
+	@inject(Identifiers.Cli.Application.Name)
 	private readonly appName!: string;
 
 	public getPaths(): Paths {
