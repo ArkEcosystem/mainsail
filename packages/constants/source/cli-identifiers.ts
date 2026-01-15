@@ -1,36 +1,5 @@
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 export const CliIdentifiers = {
 	Cli: {
-		Application: {
-			// Instance: ID.Application.Instance,
-			// Name: ID.Application.Name,
-			Instance: Symbol.for("Cli<Application<Instance>>"),
-			Name: Symbol.for("Cli<Application>Name"),
-		},
-		Service: {
-			Config: Symbol.for("Config"),
-			Environment: Symbol.for("Environment"),
-			Installer: Symbol.for("Installer"),
-			Logger: Symbol.for("Logger"),
-			PluginManager: Symbol.for("PluginManager"),
-			ProcessManager: Symbol.for("ProcessManager"),
-			Setup: Symbol.for("Setup"),
-			Updater: Symbol.for("Updater"),
-		},
-		Input: {
-			Instance: Symbol.for("Input<Instance>"),
-			Factory: Symbol.for("Factory<Input>"),
-			Validator: Symbol.for("Input<Validator>"),
-		},
-		Output: {
-			Instance: Symbol.for("Output<Instance>"),
-		},
-		Paths: {
-			Application: Symbol.for("Paths<Application>"),
-			Console: Symbol.for("Paths<Console>"),
-		},
-		Package: Symbol.for("Package"),
-		ProcessFactory: Symbol.for("Factory<Process>"),
 		Action: {
 			AbortErroredProcess: Symbol.for("Cli<Action<AbortErroredProcess>>"),
 			AbortMissingProcess: Symbol.for("Cli<Action<AbortMissingProcess>>"),
@@ -42,6 +11,10 @@ export const CliIdentifiers = {
 			RestartProcess: Symbol.for("Action<RestartProcess>"),
 			RestartRunningProcess: Symbol.for("Action<RestartRunningProcess>"),
 			RestartRunningProcessWithPrompt: Symbol.for("Action<RestartRunningProcessWithPrompt>"),
+		},
+		Application: {
+			Instance: Symbol.for("Cli<Application<Instance>>"),
+			Name: Symbol.for("Cli<Application>Name"),
 		},
 		Component: {
 			AppHeader: Symbol.for("Cli<Component<AppHeader>>"),
@@ -55,12 +28,12 @@ export const CliIdentifiers = {
 			Clear: Symbol.for("Component<Clear>"),
 			Confirm: Symbol.for("Component<Confirm>"),
 			Error: Symbol.for("Component<Error>"),
+			Factory: Symbol.for("Component<Factory>"),
 			Fatal: Symbol.for("Component<Fatal>"),
 			Info: Symbol.for("Component<Info>"),
 			Listing: Symbol.for("Component<Listing>"),
 			Log: Symbol.for("Component<Log>"),
 			MultiSelect: Symbol.for("Component<MultiSelect>"),
-			Factory: Symbol.for("Component<Factory>"),
 			NewLine: Symbol.for("Component<NewLine>"),
 			Prompt: Symbol.for("Component<Prompt>"),
 			Select: Symbol.for("Component<Select>"),
@@ -71,6 +44,30 @@ export const CliIdentifiers = {
 			Title: Symbol.for("Component<Title>"),
 			Toggle: Symbol.for("Component<Toggle>"),
 			Warning: Symbol.for("Component<Warning>"),
+		},
+		Input: {
+			Factory: Symbol.for("Factory<Input>"),
+			Instance: Symbol.for("Input<Instance>"),
+			Validator: Symbol.for("Input<Validator>"),
+		},
+		Output: {
+			Instance: Symbol.for("Output<Instance>"),
+		},
+		Package: Symbol.for("Package"),
+		Paths: {
+			Application: Symbol.for("Paths<Application>"),
+			Console: Symbol.for("Paths<Console>"),
+		},
+		ProcessFactory: Symbol.for("Factory<Process>"),
+		Service: {
+			Config: Symbol.for("Config"),
+			Environment: Symbol.for("Environment"),
+			Installer: Symbol.for("Installer"),
+			Logger: Symbol.for("Logger"),
+			PluginManager: Symbol.for("PluginManager"),
+			ProcessManager: Symbol.for("ProcessManager"),
+			Setup: Symbol.for("Setup"),
+			Updater: Symbol.for("Updater"),
 		},
 	},
 } as const;
