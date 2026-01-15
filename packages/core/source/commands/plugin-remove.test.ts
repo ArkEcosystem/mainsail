@@ -1,4 +1,5 @@
-import { Identifiers, Services } from "@mainsail/cli";
+import { Services } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { Console, describe } from "../../../test-framework/source";
 
 import { Command } from "./plugin-remove";
@@ -12,7 +13,7 @@ describe<{
 	beforeEach((context) => {
 		context.cli = new Console();
 
-		context.pluginManager = context.cli.app.get(Identifiers.PluginManager);
+		context.pluginManager = context.cli.app.get(Identifiers.Cli.Service.PluginManager);
 	});
 
 	it("should throw when package name is not provided", async ({ cli, pluginManager }) => {

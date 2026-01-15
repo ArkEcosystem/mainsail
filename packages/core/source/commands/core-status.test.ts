@@ -1,4 +1,5 @@
-import { Identifiers, Services } from "@mainsail/cli";
+import { Services } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { Console, describe } from "../../../test-framework/source";
 
 import { Command } from "./core-status";
@@ -9,7 +10,7 @@ describe<{
 }>("CoreStatusCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.processManager = context.cli.app.get(Identifiers.ProcessManager);
+		context.processManager = context.cli.app.get(Identifiers.Cli.Service.ProcessManager);
 	});
 
 	it("should throw if the process does not exist", async ({ cli }) => {
