@@ -1,4 +1,5 @@
-import { Commands, Contracts, Identifiers } from "@mainsail/cli";
+import { Commands, Contracts } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { injectable, postConstruct } from "@mainsail/container";
 import Joi from "joi";
 
@@ -17,7 +18,7 @@ export class Command extends Commands.Command {
 
 	public async execute(): Promise<void> {
 		this.app
-			.get<Contracts.ProcessFactory>(Identifiers.ProcessFactory)("mainsail-api")
+			.get<Contracts.ProcessFactory>(Identifiers.Cli.ProcessFactory)("mainsail-api")
 			.log(this.getFlag<boolean>("error"), this.getFlag<number>("lines"));
 	}
 }

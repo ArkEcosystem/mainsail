@@ -16,6 +16,7 @@ export const CliIdentifiers = {
 			Instance: Symbol.for("Cli<Application<Instance>>"),
 			Name: Symbol.for("Cli<Application>Name"),
 		},
+		Commands: Symbol.for("Cli<Commands>"),
 		Component: {
 			AppHeader: Symbol.for("Cli<Component<AppHeader>>"),
 			Ask: Symbol.for("Component<Ask>"),

@@ -1,4 +1,5 @@
-import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
+import { Commands, Contracts, Services } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { existsSync } from "fs";
 import { copySync, ensureDirSync, removeSync } from "fs-extra/esm";
@@ -7,7 +8,7 @@ import { resolve } from "path";
 
 @injectable()
 export class Command extends Commands.Command {
-	@inject(Identifiers.Environment)
+	@inject(Identifiers.Cli.Service.Environment)
 	private readonly environment!: Services.Environment;
 
 	public signature = "config:publish";
@@ -28,7 +29,7 @@ export class Command extends Commands.Command {
 	}
 
 	async #performPublishment(flags: Contracts.AnyObject): Promise<void> {
-		this.app.rebind(Identifiers.ApplicationPaths).toConstantValue(this.environment.getPaths());
+		this.app.rebind(Identifiers.Cli.Paths.Application).toConstantValue(this.environment.getPaths());
 
 		const configDestination = this.app.getCorePath("config");
 		const configSource = resolve(

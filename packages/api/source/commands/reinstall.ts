@@ -1,15 +1,15 @@
-import { Commands, Identifiers, Services } from "@mainsail/cli";
-import { BuildPackages } from "@mainsail/constants";
+import { Commands, Services } from "@mainsail/cli";
+import { BuildPackages, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
-	@inject(Identifiers.Installer)
+	@inject(Identifiers.Cli.Service.Installer)
 	private readonly installer!: Services.Installer;
 
-	@inject(Identifiers.ProcessManager)
+	@inject(Identifiers.Cli.Service.ProcessManager)
 	private readonly processManager!: Services.ProcessManager;
 
 	public signature = "reinstall";
