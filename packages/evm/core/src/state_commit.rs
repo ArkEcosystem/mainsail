@@ -232,9 +232,41 @@ fn test_apply_rewards() {
     let result = self::apply_rewards(&mut db, &mut pending, rewards);
     assert!(result.is_ok());
 
-    assert!(pending.cache.accounts.contains_key(&account1));
-    assert!(!pending.cache.accounts.contains_key(&account2));
+    let cache_account1 = pending.cache.accounts.get(&account1).expect("account1");
+    assert!(cache_account1.account.is_some());
+    assert_eq!(
+        cache_account1.status,
+        revm::database::AccountStatus::InMemoryChange
+    );
 
-    assert!(pending.transitions.transitions.contains_key(&account1));
-    assert!(!pending.transitions.transitions.contains_key(&account2));
+    let cache_account2 = pending.cache.accounts.get(&account2).expect("account2");
+    assert!(cache_account2.account.is_none());
+    assert_eq!(
+        cache_account2.status,
+        revm::database::AccountStatus::Destroyed
+    );
+
+    let transition_account1 = pending
+        .transitions
+        .transitions
+        .get(&account1)
+        .expect("transition_account1");
+    assert!(transition_account1.info.is_some());
+    assert_eq!(
+        transition_account1.status,
+        revm::database::AccountStatus::InMemoryChange
+    );
+    assert_eq!(transition_account1.storage_was_destroyed, false);
+
+    let transition_account2 = pending
+        .transitions
+        .transitions
+        .get(&account2)
+        .expect("transition_account2");
+    assert!(transition_account2.info.is_none());
+    assert_eq!(
+        transition_account2.status,
+        revm::database::AccountStatus::Destroyed
+    );
+    assert_eq!(transition_account2.storage_was_destroyed, true);
 }
