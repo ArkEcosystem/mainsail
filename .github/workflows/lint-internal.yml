@@ -10,10 +10,10 @@ jobs:
     source:
         runs-on: ubuntu-latest
         if: github.event.pull_request.head.repo.full_name == github.repository
-        
+
         permissions:
           contents: write
-        
+
         strategy:
             matrix:
                 node-version: [22.x]
@@ -68,6 +68,6 @@ jobs:
               run: |
                   forge fmt
 
-            - uses: stefanzweifel/git-auto-commit-action@v5
+            - uses: stefanzweifel/git-auto-commit-action@v7
               with:
                   commit_message: "style: resolve style guide violations"
