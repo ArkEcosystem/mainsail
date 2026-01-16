@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use alloy_sol_types::SolEvent;
 use revm::{
     context::result::ExecutionResult,
-    database::WrapDatabaseRef,
+    database::{DatabaseCommitExt, WrapDatabaseRef},
     primitives::{Address, B256, map::HashMap},
 };
 
@@ -58,13 +58,15 @@ pub fn apply_rewards(
         .with_database(WrapDatabaseRef(&db))
         .build();
 
-    state.increment_balances(rewards)?;
+    state
+        .increment_balances(rewards)
+        .map_err(|err| crate::db::Error::State(format!("increment balances err={}", err)))?;
 
     if let Some(transition_state) = state.transition_state.take() {
         // println!("transition state {:#?}", transition_state);
         pending
             .transitions
-            .add_transitions(transition_state.transitions.into_iter().collect());
+            .add_transitions(transition_state.transitions.into_iter());
     }
 
     pending.cache = std::mem::take(&mut state.cache);
