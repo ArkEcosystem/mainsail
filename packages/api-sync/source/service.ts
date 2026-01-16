@@ -101,8 +101,8 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.BlockchainUtils.ProposerCalculator)
 	private readonly proposerCalculator!: Contracts.BlockchainUtils.ProposerCalculator;
 
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
+	@inject(Identifiers.ApiSync.Logger)
+	private readonly logger!: Contracts.ApiSync.Logger;
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-sync")

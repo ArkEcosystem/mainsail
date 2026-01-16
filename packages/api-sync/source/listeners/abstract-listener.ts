@@ -32,8 +32,8 @@ export abstract class AbstractListener<TEventData, TEntity extends object> imple
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	protected readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.Services.Log.Service)
-	protected readonly logger!: Contracts.Kernel.Logger;
+	@inject(Identifiers.ApiSync.Logger)
+	protected readonly logger!: Contracts.ApiSync.Logger;
 
 	#syncInterval?: NodeJS.Timeout;
 	#addedEvents: Map<string, TEventData> = new Map();
