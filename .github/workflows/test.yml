@@ -1,13 +1,8 @@
 name: Test
 
 on:
-    workflow_run:
-      workflows:
-        - "Linting (Internal)"
-        - "Linting (External)"
-      types: [completed]
-    push:
-      branches: [develop, main]
+	push:
+        branches: [develop, main]
 
 permissions:
     contents: read
