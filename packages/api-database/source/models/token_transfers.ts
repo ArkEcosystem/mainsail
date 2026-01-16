@@ -18,7 +18,7 @@ export class TokenTransfer {
 
 	@Column({
 		primary: true,
-		type: "citext",
+		type: "smallint",
 	})
 	public readonly index!: number;
 
