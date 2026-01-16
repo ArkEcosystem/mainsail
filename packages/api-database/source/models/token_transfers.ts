@@ -12,15 +12,15 @@ export class TokenTransfer {
 
 	@Column({
 		primary: true,
-		type: "citext",
-	})
-	public readonly index!: number;
-
-	@Column({
-		nullable: false,
 		type: "bigint",
 	})
 	public readonly blockNumber!: string;
+
+	@Column({
+		primary: true,
+		type: "smallint",
+	})
+	public readonly index!: number;
 
 	@Column({
 		nullable: false,
