@@ -88,8 +88,8 @@ export class Restore {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
+	@inject(Identifiers.ApiSync.Logger)
+	private readonly logger!: Contracts.ApiSync.Logger;
 
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;

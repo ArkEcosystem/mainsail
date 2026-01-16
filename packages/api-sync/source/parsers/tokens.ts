@@ -56,8 +56,8 @@ export class TokenParserService implements TokenParser {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
+	@inject(Identifiers.ApiSync.Logger)
+	private readonly logger!: Contracts.ApiSync.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
@@ -197,12 +197,12 @@ export class TokenParserService implements TokenParser {
 				for (const contract of [...contracts.values()]) {
 					// Skip anything if not deemed a token.
 					if (!foundTokens.has(contract)) {
-						this.logger.debug(
+						this.logger.debugExtra(
 							`Ignoring transfer in contract '${receipt.contractAddress}' because it does not implemented expected ERC20 ABI.`,
 						);
 						continue;
 					} else {
-						this.logger.debug(
+						this.logger.debugExtra(
 							`Detected ERC20 transfer affecting '${account}' in contract '${contract}' (cached: ${this.#tokenCache.has(contract)})`,
 						);
 					}
@@ -255,7 +255,7 @@ export class TokenParserService implements TokenParser {
 				.getOne();
 
 			if (databaseToken) {
-				this.logger.debug(`Found ERC20 token contract in postgres: ${address}`);
+				this.logger.debugExtra(`Found ERC20 token contract in postgres: ${address}`);
 				result.set(address, { isNew: false, token: databaseToken });
 				continue;
 			}
@@ -267,7 +267,7 @@ export class TokenParserService implements TokenParser {
 				continue;
 			}
 
-			this.logger.debug(`Detected ERC20 token contract: ${address}`);
+			this.logger.debugExtra(`Detected ERC20 token contract: ${address}`);
 
 			result.set(address, {
 				isNew: true,
