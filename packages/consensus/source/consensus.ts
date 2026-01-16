@@ -79,7 +79,9 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	// TODO: Only for tests
-	public setRound(round: number): void { this.#round = round;}
+	public setRound(round: number): void {
+		this.#round = round;
+	}
 
 	public getStep(): Contracts.Consensus.Step {
 		return this.#step;
