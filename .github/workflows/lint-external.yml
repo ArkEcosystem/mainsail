@@ -1,7 +1,6 @@
 name: Linting (External)
 
-on:
-    pull_request:
+on: pull_request
 
 permissions:
     contents: read
