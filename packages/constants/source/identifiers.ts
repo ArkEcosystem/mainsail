@@ -1,6 +1,7 @@
 export const Identifiers = {
 	ApiSync: {
 		Listener: Symbol("ApiSync<Listener>"),
+		Logger: Symbol("ApiSync<Logger>"),
 		Service: Symbol("ApiSync<Service>"),
 		TokenParser: Symbol.for("ApiSync<TokenParser>"),
 	},

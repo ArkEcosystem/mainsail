@@ -4,6 +4,7 @@ import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { Listeners } from "./listeners.js";
+import { Logger } from "./logger.js";
 import { TokenParserService } from "./parsers/tokens.js";
 import { Sync } from "./service.js";
 
@@ -14,8 +15,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			return;
 		}
 
-		this.app.bind(Identifiers.ApiSync.TokenParser).to(TokenParserService).inSingletonScope();
 		this.app.bind(Identifiers.ApiSync.Listener).to(Listeners).inSingletonScope();
+		this.app.bind(Identifiers.ApiSync.Logger).to(Logger).inSingletonScope();
+		this.app.bind(Identifiers.ApiSync.TokenParser).to(TokenParserService).inSingletonScope();
 		this.app.bind(Identifiers.ApiSync.Service).to(Sync).inSingletonScope();
 
 		// Listen to events during register, so we can catch all boot events.
