@@ -70,6 +70,8 @@ export class TokenParserService implements TokenParser {
 	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	#tokenCache!: LRUCache<string, Models.Token>;
+	#transferIndexes: Map<`0x${string}`, number> = new Map<`0x${string}`, number>();
+	#previousBlockNumber!: number;
 
 	#preparedFunctionCalls: PreparedErc20Call[] = [];
 
@@ -131,6 +133,8 @@ export class TokenParserService implements TokenParser {
 			const data = encodeFunctionData(call as EncodeFunctionDataParameters).slice(2);
 			this.#preparedFunctionCalls.push({ call, data });
 		}
+
+		this.#resetTransferIndexes();
 	}
 
 	public async parseReceipt(
@@ -143,6 +147,10 @@ export class TokenParserService implements TokenParser {
 		const tokenHolders: Models.TokenHolder[] = [];
 		const tokenTransfers: Models.TokenTransfer[] = [];
 
+		if (this.#previousBlockNumber !== header.number) {
+			this.#resetTransferIndexes(header.number);
+		}
+
 		const blockNumber = header.number.toString();
 
 		const eventLogs = parseEventLogs({
@@ -153,8 +161,6 @@ export class TokenParserService implements TokenParser {
 
 		const dirtyAccounts = new Map<`0x${string}`, Set<string>>();
 		const dirtyContractAddresses = new Set<string>();
-
-		const transferIndexes = new Map<`0x${string}`, number>();
 
 		for (const event of eventLogs) {
 			const { from, to, value } = event.args;
@@ -171,8 +177,8 @@ export class TokenParserService implements TokenParser {
 
 			// Emitted events during deployment can have a event.logIndex of undefined and
 			// we only care about having a accurate sort order, so we manage an index manually.
-			const transferIndex = (transferIndexes.get(event.address) ?? -1) + 1;
-			transferIndexes.set(event.address, transferIndex);
+			const transferIndex = (this.#transferIndexes.get(event.address) ?? -1) + 1;
+			this.#transferIndexes.set(event.address, transferIndex);
 
 			tokenTransfers.push({
 				address: event.address,
@@ -367,5 +373,11 @@ export class TokenParserService implements TokenParser {
 		}
 
 		return "0";
+	}
+
+	#resetTransferIndexes(blockNumber: number = -1): void {
+		this.logger.info(`resetTransferIndexes ${this.#previousBlockNumber} - ${blockNumber}`);
+		this.#transferIndexes.clear();
+		this.#previousBlockNumber = blockNumber;
 	}
 }
