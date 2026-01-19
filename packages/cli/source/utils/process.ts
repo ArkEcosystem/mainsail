@@ -61,7 +61,9 @@ export class Process implements Contracts.Cli.Process {
 		this.app
 			.get<Table>(Identifiers.Cli.Component.Table)
 			.render(["ID", "Name", "Version", "Status", "Uptime", "CPU", "RAM"], (table) => {
-				const app: Contracts.Cli.ProcessDescription | undefined = this.processManager.describe(this.#processName);
+				const app: Contracts.Cli.ProcessDescription | undefined = this.processManager.describe(
+					this.#processName,
+				);
 
 				assert.defined(app);
 

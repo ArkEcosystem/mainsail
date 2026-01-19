@@ -69,7 +69,10 @@ export class ProcessManager {
 		return this.#shellSync(command);
 	}
 
-	public restart(id: Contracts.Cli.ProcessIdentifier, flags: Contracts.Cli.AnyObject = { "update-env": true }): SyncResult {
+	public restart(
+		id: Contracts.Cli.ProcessIdentifier,
+		flags: Contracts.Cli.AnyObject = { "update-env": true },
+	): SyncResult {
 		let command = `pm2 restart ${id}`;
 
 		if (Object.keys(flags).length > 0) {
@@ -107,7 +110,11 @@ export class ProcessManager {
 		return this.#shellSync("pm2 update");
 	}
 
-	public async trigger(id: Contracts.Cli.ProcessIdentifier, processActionName: string, parameter?: string): Promise<Result> {
+	public async trigger(
+		id: Contracts.Cli.ProcessIdentifier,
+		processActionName: string,
+		parameter?: string,
+	): Promise<Result> {
 		return this.#shell(`pm2 trigger ${id} ${processActionName} ${parameter}`);
 	}
 

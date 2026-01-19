@@ -110,13 +110,9 @@ export interface Process {
 export type ProcessFactory = (name: string) => Process;
 
 export interface Application {
-	bind<T>(
-		serviceIdentifier: Container.ServiceIdentifier<T>,
-	): Container.BindToFluentSyntax<T>;
+	bind<T>(serviceIdentifier: Container.ServiceIdentifier<T>): Container.BindToFluentSyntax<T>;
 
-	rebind<T>(
-		serviceIdentifier: Container.ServiceIdentifier<T>,
-	): Container.BindToFluentSyntax<T>;
+	rebind<T>(serviceIdentifier: Container.ServiceIdentifier<T>): Container.BindToFluentSyntax<T>;
 
 	unbind<T>(serviceIdentifier: Container.ServiceIdentifier<T>): void;
 

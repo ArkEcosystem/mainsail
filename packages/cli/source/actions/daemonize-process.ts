@@ -9,7 +9,6 @@ import { ProcessManager } from "../services/index.js";
 import { AbortRunningProcess } from "./abort-running-process.js";
 import { AbortUnknownProcess } from "./abort-unknown-process.js";
 
-
 @injectable()
 export class DaemonizeProcess {
 	@inject(Identifiers.Cli.Application.Instance)

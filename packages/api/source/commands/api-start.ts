@@ -1,4 +1,4 @@
-import { Commands,  Utils } from "@mainsail/cli";
+import { Commands, Utils } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";

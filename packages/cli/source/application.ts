@@ -2,7 +2,6 @@ import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { resolve } from "path";
 
-
 export class Application {
 	public constructor(private readonly container: Contracts.Kernel.Container.Container) {
 		this.container.bind(Identifiers.Cli.Application.Instance).toConstantValue(this);

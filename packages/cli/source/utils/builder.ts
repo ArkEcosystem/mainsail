@@ -2,7 +2,6 @@ import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 
-
 export const Builder = {
 	async buildApplication(context?: {
 		flags: Contracts.Types.JsonObject;

@@ -1,4 +1,4 @@
-import {Identifiers } from "@mainsail/constants";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
@@ -17,7 +17,7 @@ import {
 @injectable()
 export class ActionFactory {
 	@inject(Identifiers.Cli.Application.Instance)
-	protected readonly app!:Contracts.Cli.Application;
+	protected readonly app!: Contracts.Cli.Application;
 
 	public abortErroredProcess(processName: string): void {
 		return this.app.get<AbortErroredProcess>(Identifiers.Cli.Action.AbortErroredProcess).execute(processName);
