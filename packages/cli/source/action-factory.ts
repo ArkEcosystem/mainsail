@@ -1,5 +1,6 @@
-import { Identifiers } from "@mainsail/constants";
+import {Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 
 import {
 	AbortErroredProcess,
@@ -12,12 +13,11 @@ import {
 	RestartRunningProcess,
 	RestartRunningProcessWithPrompt,
 } from "./actions/index.js";
-import { Application, Flags, ProcessOptions } from "./contracts.js";
 
 @injectable()
 export class ActionFactory {
 	@inject(Identifiers.Cli.Application.Instance)
-	protected readonly app!: Application;
+	protected readonly app!:Contracts.Cli.Application;
 
 	public abortErroredProcess(processName: string): void {
 		return this.app.get<AbortErroredProcess>(Identifiers.Cli.Action.AbortErroredProcess).execute(processName);
@@ -39,7 +39,7 @@ export class ActionFactory {
 		return this.app.get<AbortUnknownProcess>(Identifiers.Cli.Action.AbortUnknownProcess).execute(processName);
 	}
 
-	public async daemonizeProcess(options: ProcessOptions, flags: Flags): Promise<void> {
+	public async daemonizeProcess(options: Contracts.Cli.ProcessOptions, flags: Contracts.Cli.Flags): Promise<void> {
 		return this.app.get<DaemonizeProcess>(Identifiers.Cli.Action.DaemonizeProcess).execute(options, flags);
 	}
 

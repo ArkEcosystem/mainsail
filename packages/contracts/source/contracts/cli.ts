@@ -1,5 +1,7 @@
-import type { Contracts } from "@mainsail/contracts";
+import type { Enums } from "@mainsail/constants";
 import type { AnySchema } from "joi";
+
+import type { Container } from "./kernel/index.js";
 export type { Paths } from "env-paths";
 
 export type InputValue = string | number | boolean;
@@ -76,17 +78,9 @@ export interface PluginManager {
 	remove(package_: string): Promise<void>;
 }
 
-export enum ProcessState {
-	Online = "online",
-	Stopped = "stopped",
-	Stopping = "stopping",
-	Waiting = "waiting restart",
-	Launching = "launching",
-	Errored = "errored",
-	OneLaunch = "one-launch-status",
-}
-
 export type ProcessIdentifier = string | number;
+
+export type ProcessState = Enums.Cli.ProcessState;
 
 export type ProcessDescription = {
 	readonly pid: number;
@@ -115,23 +109,22 @@ export interface Process {
 
 export type ProcessFactory = (name: string) => Process;
 
-// APPLICATION
 export interface Application {
 	bind<T>(
-		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
-	): Contracts.Kernel.Container.BindToFluentSyntax<T>;
+		serviceIdentifier: Container.ServiceIdentifier<T>,
+	): Container.BindToFluentSyntax<T>;
 
 	rebind<T>(
-		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
-	): Contracts.Kernel.Container.BindToFluentSyntax<T>;
+		serviceIdentifier: Container.ServiceIdentifier<T>,
+	): Container.BindToFluentSyntax<T>;
 
-	unbind<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): void;
+	unbind<T>(serviceIdentifier: Container.ServiceIdentifier<T>): void;
 
-	get<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): T;
+	get<T>(serviceIdentifier: Container.ServiceIdentifier<T>): T;
 
-	isBound<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): boolean;
+	isBound<T>(serviceIdentifier: Container.ServiceIdentifier<T>): boolean;
 
-	resolve<T>(constructorFunction: Contracts.Kernel.Container.Newable<T>): T;
+	resolve<T>(constructorFunction: Container.Newable<T>): T;
 
 	getCorePath(type: string, file?: string): string;
 

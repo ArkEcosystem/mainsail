@@ -2,7 +2,6 @@ import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { resolve } from "path";
 
-import type { Paths } from "./contracts.js";
 
 export class Application {
 	public constructor(private readonly container: Contracts.Kernel.Container.Container) {
@@ -42,13 +41,13 @@ export class Application {
 	}
 
 	public getCorePath(type: string, file?: string): string {
-		const path: string = this.get<Paths>(Identifiers.Cli.Paths.Application)[type];
+		const path: string = this.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application)[type];
 
 		return resolve(file ? `${path}/${file}` : path);
 	}
 
 	public getConsolePath(type: string, file?: string): string {
-		const path: string = this.get<Paths>(Identifiers.Cli.Paths.Console)[type];
+		const path: string = this.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Console)[type];
 
 		return resolve(file ? `${path}/${file}` : path);
 	}

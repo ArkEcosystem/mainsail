@@ -1,13 +1,14 @@
 import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { totalmem } from "os";
 
 import { Application } from "../application.js";
 import { Spinner } from "../components/index.js";
-import { Flags, ProcessOptions } from "../contracts.js";
 import { ProcessManager } from "../services/index.js";
 import { AbortRunningProcess } from "./abort-running-process.js";
 import { AbortUnknownProcess } from "./abort-unknown-process.js";
+
 
 @injectable()
 export class DaemonizeProcess {
@@ -17,7 +18,7 @@ export class DaemonizeProcess {
 	@inject(Identifiers.Cli.Service.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
-	public execute(options: ProcessOptions, flags: Flags): void {
+	public execute(options: Contracts.Cli.ProcessOptions, flags: Contracts.Cli.Flags): void {
 		const processName: string = options.name;
 
 		if (this.processManager.has(processName)) {

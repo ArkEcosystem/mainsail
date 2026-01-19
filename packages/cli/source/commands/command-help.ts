@@ -4,7 +4,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { blue, bold } from "kleur/colors";
 
 import { AppHeader } from "../components/index.js";
-import { Application, InputArguments } from "../contracts.js";
 
 interface CommandInterface {
 	readonly signature: string;
@@ -12,15 +11,15 @@ interface CommandInterface {
 	readonly isHidden: boolean;
 
 	readonly definition: {
-		getArguments(): InputArguments;
-		getFlags(): InputArguments;
+		getArguments(): Contracts.Cli.InputArguments;
+		getFlags(): Contracts.Cli.InputArguments;
 	};
 }
 
 @injectable()
 export class CommandHelp {
 	@inject(Identifiers.Cli.Application.Instance)
-	protected readonly app!: Application;
+	protected readonly app!: Contracts.Cli.Application;
 
 	@inject(Identifiers.Cli.Package)
 	protected readonly pkg!: Contracts.Types.PackageJson;

@@ -1,21 +1,21 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { existsSync } from "fs";
 import { readJSONSync, removeSync } from "fs-extra/esm";
 import { glob } from "glob";
 import { join } from "path";
 
-import { Plugin, PluginManager as IPluginManager } from "../contracts.js";
 import { Environment } from "./environment.js";
 import { File, Git, NPM, Source } from "./source-providers/index.js";
 
 @injectable()
-export class PluginManager implements IPluginManager {
+export class PluginManager implements Contracts.Cli.PluginManager {
 	@inject(Identifiers.Cli.Service.Environment)
 	private readonly environment!: Environment;
 
-	public async list(): Promise<Plugin[]> {
-		const plugins: Plugin[] = [];
+	public async list(): Promise<Contracts.Cli.Plugin[]> {
+		const plugins: Contracts.Cli.Plugin[] = [];
 
 		const path = this.#getPluginsPath();
 		const packagePaths = glob

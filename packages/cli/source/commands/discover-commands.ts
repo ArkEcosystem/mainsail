@@ -1,14 +1,14 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { lstatSync, readdirSync } from "fs";
 
-import { Application } from "../contracts.js";
 import { Command, CommandList } from "./command.js";
 
 @injectable()
 export class DiscoverCommands {
 	@inject(Identifiers.Cli.Application.Instance)
-	private readonly app!: Application;
+	private readonly app!: Contracts.Cli.Application;
 
 	public async within(path: string): Promise<CommandList> {
 		const commandFiles: string[] = readdirSync(path)

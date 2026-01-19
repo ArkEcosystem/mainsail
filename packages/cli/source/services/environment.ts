@@ -1,10 +1,10 @@
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { parse, stringify } from "envfile";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
-import { InputValues, Paths } from "../contracts.js";
 import { envPaths as environmentPaths } from "../env-paths.js";
 
 @injectable()
@@ -12,8 +12,8 @@ export class Environment {
 	@inject(Identifiers.Cli.Application.Name)
 	private readonly appName!: string;
 
-	public getPaths(): Paths {
-		let paths: Paths = environmentPaths.get("mainsail", { suffix: "" });
+	public getPaths(): Contracts.Cli.Paths {
+		let paths: Contracts.Cli.Paths = environmentPaths.get("mainsail", { suffix: "" });
 
 		for (const [key, value] of Object.entries(paths)) {
 			paths[key] = path.join(value, this.appName);
@@ -36,7 +36,7 @@ export class Environment {
 		return paths;
 	}
 
-	public updateVariables(environmentFile: string, variables: InputValues): void {
+	public updateVariables(environmentFile: string, variables: Contracts.Cli.InputValues): void {
 		if (!existsSync(environmentFile)) {
 			throw new Error(`No environment file found at ${environmentFile}.`);
 		}

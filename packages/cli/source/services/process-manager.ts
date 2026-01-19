@@ -1,13 +1,13 @@
+import { Enums } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 
-import { AnyObject, ProcessDescription, ProcessIdentifier, ProcessState } from "../contracts.js";
 import { execa, Result, SyncResult } from "../execa.js";
 import { Flags } from "../utils/flags.js";
 
 @injectable()
 export class ProcessManager {
-	public list(): ProcessDescription[] {
+	public list(): Contracts.Cli.ProcessDescription[] {
 		try {
 			const { stdout } = this.#shellSync("pm2 jlist");
 
@@ -31,21 +31,21 @@ export class ProcessManager {
 		}
 	}
 
-	public describe(id: ProcessIdentifier): ProcessDescription | undefined {
-		const processes: ProcessDescription[] | undefined = this.list();
+	public describe(id: Contracts.Cli.ProcessIdentifier): Contracts.Cli.ProcessDescription | undefined {
+		const processes: Contracts.Cli.ProcessDescription[] | undefined = this.list();
 
 		if (processes.length <= 0) {
 			return undefined;
 		}
 
-		return processes.find((process: ProcessDescription) => [process.pid, process.name].includes(id));
+		return processes.find((process: Contracts.Cli.ProcessDescription) => [process.pid, process.name].includes(id));
 	}
 
-	public start(options: Contracts.Types.JsonObject, flags: AnyObject): SyncResult {
+	public start(options: Contracts.Types.JsonObject, flags: Contracts.Cli.AnyObject): SyncResult {
 		let command = `pm2 start ${options.script}`;
 
 		if (options.node_args) {
-			command += ` --node-args="${Flags.castFlagsToString(options.node_args as unknown as AnyObject)}"`;
+			command += ` --node-args="${Flags.castFlagsToString(options.node_args as unknown as Contracts.Cli.AnyObject)}"`;
 		}
 
 		if (flags !== undefined && Object.keys(flags).length > 0) {
@@ -59,7 +59,7 @@ export class ProcessManager {
 		return this.#shellSync(command);
 	}
 
-	public stop(id: ProcessIdentifier, flags: AnyObject = {}): SyncResult {
+	public stop(id: Contracts.Cli.ProcessIdentifier, flags: Contracts.Cli.AnyObject = {}): SyncResult {
 		let command = `pm2 stop ${id}`;
 
 		if (Object.keys(flags).length > 0) {
@@ -69,7 +69,7 @@ export class ProcessManager {
 		return this.#shellSync(command);
 	}
 
-	public restart(id: ProcessIdentifier, flags: AnyObject = { "update-env": true }): SyncResult {
+	public restart(id: Contracts.Cli.ProcessIdentifier, flags: Contracts.Cli.AnyObject = { "update-env": true }): SyncResult {
 		let command = `pm2 restart ${id}`;
 
 		if (Object.keys(flags).length > 0) {
@@ -79,15 +79,15 @@ export class ProcessManager {
 		return this.#shellSync(command);
 	}
 
-	public reload(id: ProcessIdentifier): SyncResult {
+	public reload(id: Contracts.Cli.ProcessIdentifier): SyncResult {
 		return this.#shellSync(`pm2 reload ${id}`);
 	}
 
-	public reset(id: ProcessIdentifier): SyncResult {
+	public reset(id: Contracts.Cli.ProcessIdentifier): SyncResult {
 		return this.#shellSync(`pm2 reset ${id}`);
 	}
 
-	public delete(id: ProcessIdentifier): SyncResult {
+	public delete(id: Contracts.Cli.ProcessIdentifier): SyncResult {
 		return this.#shellSync(`pm2 delete ${id}`);
 	}
 
@@ -107,55 +107,55 @@ export class ProcessManager {
 		return this.#shellSync("pm2 update");
 	}
 
-	public async trigger(id: ProcessIdentifier, processActionName: string, parameter?: string): Promise<Result> {
+	public async trigger(id: Contracts.Cli.ProcessIdentifier, processActionName: string, parameter?: string): Promise<Result> {
 		return this.#shell(`pm2 trigger ${id} ${processActionName} ${parameter}`);
 	}
 
-	public status(id: ProcessIdentifier): ProcessState | undefined {
-		const process: ProcessDescription | undefined = this.describe(id);
+	public status(id: Contracts.Cli.ProcessIdentifier): Contracts.Cli.ProcessState | undefined {
+		const process: Contracts.Cli.ProcessDescription | undefined = this.describe(id);
 
 		return process ? process.pm2_env.status : undefined;
 	}
 
-	public isOnline(id: ProcessIdentifier): boolean {
-		return this.status(id) === ProcessState.Online;
+	public isOnline(id: Contracts.Cli.ProcessIdentifier): boolean {
+		return this.status(id) === Enums.Cli.ProcessState.Online;
 	}
 
-	public isStopped(id: ProcessIdentifier): boolean {
-		return this.status(id) === ProcessState.Stopped;
+	public isStopped(id: Contracts.Cli.ProcessIdentifier): boolean {
+		return this.status(id) === Enums.Cli.ProcessState.Stopped;
 	}
 
-	public isStopping(id: ProcessIdentifier): boolean {
-		return this.status(id) === ProcessState.Stopping;
+	public isStopping(id: Contracts.Cli.ProcessIdentifier): boolean {
+		return this.status(id) === Enums.Cli.ProcessState.Stopping;
 	}
 
-	public isWaiting(id: ProcessIdentifier): boolean {
-		return this.status(id) === ProcessState.Waiting;
+	public isWaiting(id: Contracts.Cli.ProcessIdentifier): boolean {
+		return this.status(id) === Enums.Cli.ProcessState.Waiting;
 	}
 
-	public isLaunching(id: ProcessIdentifier): boolean {
-		return this.status(id) === ProcessState.Launching;
+	public isLaunching(id: Contracts.Cli.ProcessIdentifier): boolean {
+		return this.status(id) === Enums.Cli.ProcessState.Launching;
 	}
 
-	public isErrored(id: ProcessIdentifier): boolean {
-		return this.status(id) === ProcessState.Errored;
+	public isErrored(id: Contracts.Cli.ProcessIdentifier): boolean {
+		return this.status(id) === Enums.Cli.ProcessState.Errored;
 	}
 
-	public isOneLaunch(id: ProcessIdentifier): boolean {
-		return this.status(id) === ProcessState.OneLaunch;
+	public isOneLaunch(id: Contracts.Cli.ProcessIdentifier): boolean {
+		return this.status(id) === Enums.Cli.ProcessState.OneLaunch;
 	}
 
-	public isUnknown(id: ProcessIdentifier): boolean {
-		const processState: ProcessState | undefined = this.status(id);
+	public isUnknown(id: Contracts.Cli.ProcessIdentifier): boolean {
+		const processState: Contracts.Cli.ProcessState | undefined = this.status(id);
 
 		if (processState === undefined) {
 			return true;
 		}
 
-		return !Object.values(ProcessState).includes(processState);
+		return !Object.values(Enums.Cli.ProcessState).includes(processState);
 	}
 
-	public has(id: ProcessIdentifier): boolean {
+	public has(id: Contracts.Cli.ProcessIdentifier): boolean {
 		try {
 			const { stdout } = this.#shellSync(`pm2 id ${id} | awk '{ print $2 }'`);
 
@@ -165,7 +165,7 @@ export class ProcessManager {
 		}
 	}
 
-	public missing(id: ProcessIdentifier): boolean {
+	public missing(id: Contracts.Cli.ProcessIdentifier): boolean {
 		return !this.has(id);
 	}
 

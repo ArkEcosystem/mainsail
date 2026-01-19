@@ -3,12 +3,10 @@ import { inject, injectable, postConstruct } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { ensureFileSync, readJSONSync, writeJsonSync } from "fs-extra/esm";
 
-import { Application } from "../contracts.js";
-
 @injectable()
 export class Config {
 	@inject(Identifiers.Cli.Application.Instance)
-	private readonly app!: Application;
+	private readonly app!: Contracts.Cli.Application;
 
 	#file!: string;
 

@@ -34,12 +34,11 @@ import {
 	Toggle,
 	Warning,
 } from "./components/index.js";
-import { Application } from "./contracts.js";
 
 @injectable()
 export class ComponentFactory {
 	@inject(Identifiers.Cli.Application.Instance)
-	protected readonly app!: Application;
+	protected readonly app!: Contracts.Cli.Application;
 
 	public appHeader(): string {
 		return this.app.get<AppHeader>(Identifiers.Cli.Component.AppHeader).render();

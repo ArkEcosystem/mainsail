@@ -7,19 +7,18 @@ import { lt, lte } from "semver";
 
 import { Application } from "../application.js";
 import { Confirm, Spinner, Warning } from "../components/index.js";
-import { Config, Updater as Contracts_Updater } from "../contracts.js";
 import { Installer } from "./installer.js";
 import { ProcessManager } from "./process-manager.js";
 
 const ONE_HOUR = 1000 * 60 * 60;
 
 @injectable()
-export class Updater implements Contracts_Updater {
+export class Updater implements Contracts.Cli.Updater {
 	@inject(Identifiers.Cli.Application.Instance)
 	private readonly app!: Application;
 
 	@inject(Identifiers.Cli.Service.Config)
-	private readonly config!: Config;
+	private readonly config!: Contracts.Cli.Config;
 
 	@inject(Identifiers.Cli.Package)
 	private readonly pkg!: Contracts.Types.PackageJson;

@@ -1,5 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { assert, prettyBytes, prettyTime } from "@mainsail/utils";
 import dayjs from "dayjs";
 import Tail from "nodejs-tail";
@@ -8,11 +9,10 @@ import readLastLines from "read-last-lines";
 import type { AbortMissingProcess, AbortStoppedProcess, AbortUnknownProcess } from "../actions/index.js";
 import { Application } from "../application.js";
 import { Clear, Spinner, Table } from "../components/index.js";
-import { Process as IProcess, ProcessDescription } from "../contracts.js";
 import type { ProcessManager } from "../services/index.js";
 
 @injectable()
-export class Process implements IProcess {
+export class Process implements Contracts.Cli.Process {
 	@inject(Identifiers.Cli.Application.Instance)
 	private readonly app!: Application;
 
@@ -61,7 +61,7 @@ export class Process implements IProcess {
 		this.app
 			.get<Table>(Identifiers.Cli.Component.Table)
 			.render(["ID", "Name", "Version", "Status", "Uptime", "CPU", "RAM"], (table) => {
-				const app: ProcessDescription | undefined = this.processManager.describe(this.#processName);
+				const app: Contracts.Cli.ProcessDescription | undefined = this.processManager.describe(this.#processName);
 
 				assert.defined(app);
 

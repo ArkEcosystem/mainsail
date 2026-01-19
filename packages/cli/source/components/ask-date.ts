@@ -1,13 +1,13 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 
-import { Application } from "../contracts.js";
 import { Prompt } from "./prompt.js";
 
 @injectable()
 export class AskDate {
 	@inject(Identifiers.Cli.Application.Instance)
-	private readonly app!: Application;
+	private readonly app!: Contracts.Cli.Application;
 
 	public async render(message: string, options: object = {}): Promise<string> {
 		const { value } = await this.app.get<Prompt>(Identifiers.Cli.Component.Prompt).render({

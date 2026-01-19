@@ -876,6 +876,9 @@ importers:
       dayjs:
         specifier: 1.11.13
         version: 1.11.13
+      env-paths:
+        specifier: 3.0.0
+        version: 3.0.0
       inversify:
         specifier: 7.10.3
         version: 7.10.3(reflect-metadata@0.2.2)

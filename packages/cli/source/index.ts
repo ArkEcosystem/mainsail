@@ -5,7 +5,6 @@ export * from "./application-factory.js";
 export * as Commands from "./commands/index.js";
 export * as Components from "./component-factory.js";
 export * from "./component-factory.js";
-export * as Contracts from "./contracts.js";
 export * from "./input/index.js";
 export * from "./output/index.js";
 export * as Plugins from "./plugins/index.js";
