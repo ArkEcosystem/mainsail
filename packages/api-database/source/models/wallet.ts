@@ -1,4 +1,5 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
+import { WalletTokenCount } from "./wallet-token-count.js";
 
 @Entity({
 	name: "wallets",
@@ -35,6 +36,10 @@ export class Wallet {
 		type: "jsonb",
 	})
 	public attributes: string | undefined;
+
+	@OneToOne(() => WalletTokenCount, { eager: false })
+	@JoinColumn({ name: "address", referencedColumnName: "address" })
+	public tokenCount: WalletTokenCount | undefined;
 
 	@Column({
 		nullable: false,
