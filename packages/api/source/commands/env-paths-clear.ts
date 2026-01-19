@@ -1,7 +1,8 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
-import { Commands, Contracts } from "@mainsail/cli";
+import { Commands } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { injectable, postConstruct } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { existsSync, readdirSync } from "fs";
 import { emptyDirSync } from "fs-extra/esm";
 import Joi from "joi";
@@ -26,28 +27,28 @@ export class Command extends Commands.Command {
 
 	public async execute(): Promise<void> {
 		if (this.hasFlag("data") || this.hasFlag("all")) {
-			await this.#clear("Data", this.app.get<Contracts.Paths>(Identifiers.Cli.Paths.Application).data);
+			await this.#clear("Data", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).data);
 		}
 
 		if (this.hasFlag("config") || this.hasFlag("all")) {
-			await this.#clear("Config", this.app.get<Contracts.Paths>(Identifiers.Cli.Paths.Application).config);
+			await this.#clear("Config", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).config);
 		}
 
 		if (this.hasFlag("cache") || this.hasFlag("all")) {
-			await this.#clear("Cache", this.app.get<Contracts.Paths>(Identifiers.Cli.Paths.Application).cache);
+			await this.#clear("Cache", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).cache);
 		}
 
 		if (this.hasFlag("log") || this.hasFlag("all")) {
-			await this.#clear("Log", this.app.get<Contracts.Paths>(Identifiers.Cli.Paths.Application).log);
+			await this.#clear("Log", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).log);
 		}
 		if (this.hasFlag("temp") || this.hasFlag("all")) {
-			await this.#clear("Temp", this.app.get<Contracts.Paths>(Identifiers.Cli.Paths.Application).temp);
+			await this.#clear("Temp", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).temp);
 		}
 
 		if (this.hasFlag("plugins")) {
 			await this.#clear(
 				"Plugins",
-				join(this.app.get<Contracts.Paths>(Identifiers.Cli.Paths.Application).data, "plugins"),
+				join(this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).data, "plugins"),
 			);
 		}
 	}

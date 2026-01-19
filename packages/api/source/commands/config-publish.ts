@@ -1,6 +1,7 @@
-import { Commands, Contracts, Services } from "@mainsail/cli";
+import { Commands, Services } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { existsSync } from "fs";
 import { copySync, ensureDirSync, removeSync } from "fs-extra/esm";
 import Joi from "joi";
@@ -28,7 +29,7 @@ export class Command extends Commands.Command {
 		await this.#performPublishment(this.getFlags());
 	}
 
-	async #performPublishment(flags: Contracts.AnyObject): Promise<void> {
+	async #performPublishment(flags: Contracts.Cli.AnyObject): Promise<void> {
 		this.app.rebind(Identifiers.Cli.Paths.Application).toConstantValue(this.environment.getPaths());
 
 		const configDestination = this.app.getCorePath("config");

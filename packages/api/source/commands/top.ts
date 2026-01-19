@@ -1,6 +1,7 @@
-import { Commands, Contracts, Services } from "@mainsail/cli";
+import { Commands, Services } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { prettyBytes, prettyTime } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -14,8 +15,8 @@ export class Command extends Commands.Command {
 	public description = "List all Core daemons.";
 
 	public async execute(): Promise<void> {
-		const processes: Contracts.ProcessDescription[] = (this.processManager.list() || []).filter(
-			(p: Contracts.ProcessDescription) => p.name.startsWith("mainsail"),
+		const processes: Contracts.Cli.ProcessDescription[] = (this.processManager.list() || []).filter(
+			(p: Contracts.Cli.ProcessDescription) => p.name.startsWith("mainsail"),
 		);
 
 		if (!processes || Object.keys(processes).length === 0) {

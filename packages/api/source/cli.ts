@@ -1,4 +1,4 @@
-import { ApplicationFactory, Commands, Contracts as CliContracts, Flags, InputParser, Plugins } from "@mainsail/cli";
+import { ApplicationFactory, Commands, Flags, InputParser, Plugins } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { Container, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -9,7 +9,7 @@ import path from "path";
 
 @injectable()
 export class CommandLineInterface {
-	#app!: CliContracts.Application;
+	#app!: Contracts.Cli.Application;
 
 	public constructor(private readonly argv: string[]) {}
 
@@ -28,7 +28,7 @@ export class CommandLineInterface {
 		this.#app = ApplicationFactory.make(new Container(), package_);
 
 		// Check for updates
-		await this.#app.get<CliContracts.Updater>(Identifiers.Cli.Service.Updater).check();
+		await this.#app.get<Contracts.Cli.Updater>(Identifiers.Cli.Service.Updater).check();
 
 		// Parse arguments and flags
 		const { args, flags } = InputParser.parseArgv(this.argv);
@@ -104,7 +104,7 @@ export class CommandLineInterface {
 		const commandsDiscoverer = this.#app.resolve(Commands.DiscoverCommands);
 		const commands: Commands.CommandList = await commandsDiscoverer.within(path.resolve(dirname, "./commands"));
 
-		const plugins = await this.#app.get<CliContracts.PluginManager>(Identifiers.Cli.Service.PluginManager).list();
+		const plugins = await this.#app.get<Contracts.Cli.PluginManager>(Identifiers.Cli.Service.PluginManager).list();
 
 		const commandsFromPlugins = await commandsDiscoverer.from(plugins.map((plugin) => plugin.path));
 

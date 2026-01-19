@@ -1,12 +1,13 @@
-import { Commands, Contracts, Utils } from "@mainsail/cli";
+import { Commands,  Utils } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
 	@inject(Identifiers.Cli.Service.Setup)
-	private readonly setup!: Contracts.Setup;
+	private readonly setup!: Contracts.Cli.Setup;
 
 	public signature = "api:start";
 
@@ -21,7 +22,7 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const flags: Contracts.AnyObject = { ...this.getFlags() };
+		const flags: Contracts.Cli.AnyObject = { ...this.getFlags() };
 
 		this.actions.abortRunningProcess(`mainsail-api`);
 
