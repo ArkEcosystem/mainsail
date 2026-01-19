@@ -43,6 +43,7 @@ import {
 	Transaction,
 	ValidatorRound,
 	Wallet,
+	WalletTokenCount,
 } from "./models/index.js";
 import {
 	makeApiNodeRepository,
@@ -109,6 +110,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					MultiPayment,
 					ValidatorRound,
 					Wallet,
+					WalletTokenCount,
 					LegacyColdWallet,
 				],
 				migrations: [new URL(".", import.meta.url).pathname + "/migrations/*.js"],

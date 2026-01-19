@@ -260,6 +260,7 @@ export class Restore {
 
 			await this.#analyzeTables(context);
 			await this.#updateValidatorRanks(context);
+			await this.#updateWalletTokenCounts(context);
 		});
 
 		const t2 = performance.now();
@@ -685,6 +686,7 @@ export class Restore {
 					balance: BigNumber.make(account.balance).toFixed(),
 					nonce: BigNumber.make(account.nonce).toFixed(),
 					publicKey: context.addressToPublicKey[account.address] ?? null,
+					tokenCount: undefined,
 					updated_at: "0",
 				});
 
@@ -873,6 +875,10 @@ export class Restore {
 
 	async #updateValidatorRanks(context: RepositoryContext): Promise<void> {
 		await context.entityManager.query("SELECT update_validator_ranks();", []);
+	}
+
+	async #updateWalletTokenCounts(context: RepositoryContext): Promise<void> {
+		await context.entityManager.query("SELECT update_wallet_token_counts();", []);
 	}
 
 	async #analyzeTables({

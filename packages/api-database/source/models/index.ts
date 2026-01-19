@@ -14,3 +14,4 @@ export * from "./token_transfers.js";
 export * from "./transaction.js";
 export * from "./validator-round.js";
 export * from "./wallet.js";
+export * from "./wallet-token-count.js";

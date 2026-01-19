@@ -2,6 +2,7 @@ import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
+	TypeOrm,
 } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
@@ -55,9 +56,6 @@ export class Sync implements Contracts.ApiSync.Service {
 
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
-
-	@inject(ApiDatabaseIdentifiers.ContractRepositoryFactory)
-	private readonly contractRepositoryFactory!: ApiDatabaseContracts.ContractRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.ConfigurationRepositoryFactory)
 	private readonly configurationRepositoryFactory!: ApiDatabaseContracts.ConfigurationRepositoryFactory;
@@ -653,35 +651,13 @@ export class Sync implements Contracts.ApiSync.Service {
 			this.logger.warn(`Clearing API database for full restore.`);
 		}
 
-		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
-			const blockRepository = this.blockRepositoryFactory(entityManager);
-			const contractRepository = this.contractRepositoryFactory(entityManager);
-			const stateRepository = this.stateRepositoryFactory(entityManager);
-			const transactionRepository = this.transactionRepositoryFactory(entityManager);
-			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
-			const walletRepository = this.walletRepositoryFactory(entityManager);
-			const legacyColdwalletRepository = this.legacyColdWalletRepositoryFactory(entityManager);
-			const multiPaymentRepository = this.multiPaymentRepositoryFactory(entityManager);
-			const tokenRepository = this.tokenRepositoryFactory(entityManager);
-			const tokenHolderRepository = this.tokenHolderRepositoryFactory(entityManager);
-			const tokenTransferRepository = this.tokenTransferRepositoryFactory(entityManager);
-
-			// Ensure all tables are truncated (already supposed to be idempotent, but it's cleaner)
-			await Promise.all(
-				[
-					blockRepository,
-					contractRepository,
-					stateRepository,
-					transactionRepository,
-					validatorRoundRepository,
-					walletRepository,
-					legacyColdwalletRepository,
-					multiPaymentRepository,
-					tokenRepository,
-					tokenHolderRepository,
-					tokenTransferRepository,
-				].map((repo) => repo.clear()),
-			);
-		});
+		try {
+			await (this.dataSource as TypeOrm.DataSource).synchronize(true);
+			await (this.dataSource as TypeOrm.DataSource)
+				.createQueryRunner()
+				.query("CREATE EXTENSION IF NOT EXISTS citext;");
+		} catch (error) {
+			await this.app.terminate("failed to reset database", error);
+		}
 	}
 }
