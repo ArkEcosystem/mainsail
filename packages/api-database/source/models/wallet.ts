@@ -1,5 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
-import { WalletTokenCount } from "./wallet-token-count.js";
+import { Column, Entity, VirtualColumn } from "typeorm";
 
 @Entity({
 	name: "wallets",
@@ -37,9 +36,18 @@ export class Wallet {
 	})
 	public attributes: string | undefined;
 
-	@OneToOne(() => WalletTokenCount, { eager: false })
-	@JoinColumn({ name: "address", referencedColumnName: "address" })
-	public tokenCount: WalletTokenCount | undefined;
+	@VirtualColumn({
+		query: (alias) => `
+		COALESCE(
+			(SELECT tc.token_count
+			FROM wallet_token_counts tc
+			WHERE tc.address = ${alias}.address
+			LIMIT 1),
+			0
+			)`,
+		type: "integer",
+	})
+	public tokenCount: number | undefined;
 
 	@Column({
 		nullable: false,

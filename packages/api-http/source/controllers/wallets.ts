@@ -11,7 +11,7 @@ import { FunctionSigs } from "@mainsail/evm-contracts";
 
 import { TransactionResource } from "../resources/index.js";
 import { TokenHolderResource } from "../resources/token-holder.js";
-import { EnrichedWallet, WalletResource } from "../resources/wallet.js";
+import { WalletResource } from "../resources/wallet.js";
 import { Controller } from "./controller.js";
 
 type TokenHolderRaw = {
@@ -65,10 +65,6 @@ export class WalletsController extends Controller {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
-
-		if (wallet) {
-			(wallet as EnrichedWallet).tokenCount = await this.getTokenCount(wallet.address);
-		}
 
 		return this.respondWithResource(wallet, WalletResource);
 	}
@@ -302,14 +298,5 @@ export class WalletsController extends Controller {
 			.orWhere("public_key = :publicKey", { publicKey: walletId })
 			.orWhere("attributes @> :username", { username: { username: walletId } })
 			.getOne();
-	}
-
-	private async getTokenCount(address: string): Promise<number> {
-		const tokenCount = await this.tokenHolderRepositoryFactory()
-			.createQueryBuilder()
-			.where("address = :address", { address })
-			.getCount();
-
-		return tokenCount;
 	}
 }
