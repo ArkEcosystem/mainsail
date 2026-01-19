@@ -376,7 +376,6 @@ export class TokenParserService implements TokenParser {
 	}
 
 	#resetTransferIndexes(blockNumber: number = -1): void {
-		this.logger.info(`resetTransferIndexes ${this.#previousBlockNumber} - ${blockNumber}`);
 		this.#transferIndexes.clear();
 		this.#previousBlockNumber = blockNumber;
 	}
