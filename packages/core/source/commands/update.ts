@@ -1,12 +1,13 @@
-import { Commands, Contracts } from "@mainsail/cli";
+import { Commands } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
 	@inject(Identifiers.Cli.Service.Updater)
-	private readonly updater!: Contracts.Updater;
+	private readonly updater!: Contracts.Cli.Updater;
 
 	public signature = "update";
 

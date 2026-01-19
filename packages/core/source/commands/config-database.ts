@@ -1,4 +1,6 @@
-import { Commands, Contracts, Services } from "@mainsail/cli";
+import { Commands, Services } from "@mainsail/cli";
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import Joi from "joi";
@@ -89,8 +91,8 @@ export class Command extends Commands.Command {
 		this.environment.updateVariables(environmentFile, this.#confirm(response as unknown as Flags));
 	}
 
-	#confirm(flags: Flags): Contracts.AnyObject {
-		const variables: Contracts.AnyObject = {};
+	#confirm(flags: Flags): Contracts.Cli.AnyObject {
+		const variables: Contracts.Cli.AnyObject = {};
 
 		for (const option of this.#validFlags) {
 			if (flags[option] !== undefined) {

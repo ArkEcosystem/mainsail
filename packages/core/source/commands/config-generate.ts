@@ -1,7 +1,8 @@
-import { Commands, Contracts, Services } from "@mainsail/cli";
+import { Commands, Services } from "@mainsail/cli";
 import { ConfigurationGenerator, Identifiers, makeApplication } from "@mainsail/configuration-generator";
 import { Identifiers as AppIdentifiers, Identifiers as CliIdentifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { Contracts as AppContracts } from "@mainsail/contracts";
 import envPaths from "env-paths";
 import Joi from "joi";
@@ -199,7 +200,7 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const flags: Contracts.AnyObject = this.getFlags();
+		const flags: Contracts.Cli.AnyObject = this.getFlags();
 
 		const allFlagsSet = !this.#flagSettings
 			.filter((flag) => flag.promptType)
