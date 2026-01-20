@@ -973,6 +973,9 @@ importers:
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
+      '@mainsail/crypto-proposal':
+        specifier: workspace:*
+        version: link:../crypto-proposal
       '@mainsail/crypto-signature-schnorr':
         specifier: workspace:*
         version: link:../crypto-signature-schnorr
