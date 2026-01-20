@@ -48,7 +48,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					.configure(
 						await new BIP38().configure(
 							parsed,
-							configuration.getOptional<string | undefined>("validatorKeystorePassword", undefined)!,
+							configuration.getRequired<string>("validatorKeystorePassword"),
 						),
 					),
 			);
