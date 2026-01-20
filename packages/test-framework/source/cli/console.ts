@@ -1,11 +1,10 @@
-import type { Application } from "@mainsail/cli";
 import { ApplicationFactory, Utils } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
 export class Console {
-	public app: Application;
+	public app: Contracts.Cli.Application;
 
 	public pkg = {
 		bin: {
@@ -64,7 +63,7 @@ export class Console {
 		this.flags = this.#useDefaultFlags ? { network: "devnet", token: "ark" } : {};
 	}
 
-	#createApplication(): Application {
+	#createApplication(): Contracts.Cli.Application {
 		const app = ApplicationFactory.make(new Container(), this.pkg);
 
 		this.flags = this.#useDefaultFlags ? { network: "devnet", token: "ark" } : {};

@@ -3,9 +3,6 @@ import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { lstatSync, readdirSync } from "fs";
 
-import { Command } from "./command.js";
-
-
 @injectable()
 export class DiscoverCommands implements Contracts.Cli.DiscoverCommands {
 	@inject(Identifiers.Cli.Application.Instance)

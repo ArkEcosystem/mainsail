@@ -61,7 +61,7 @@ import {
 import { Process } from "./utils/index.js";
 
 export class ApplicationFactory {
-	public static make(container: Container, package_: Contracts.Types.PackageJson): Application {
+	public static make(container: Container, package_: Contracts.Types.PackageJson): Contracts.Cli.Application {
 		const app: Application = new Application(container);
 
 		// Package
