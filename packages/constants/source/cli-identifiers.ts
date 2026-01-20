@@ -1,3 +1,5 @@
+import { AppIdentifiers } from "./app-identifiers.js";
+
 export const CliIdentifiers = {
 	Cli: {
 		Action: {
@@ -13,8 +15,8 @@ export const CliIdentifiers = {
 			RestartRunningProcessWithPrompt: Symbol.for("Action<RestartRunningProcessWithPrompt>"),
 		},
 		Application: {
-			Instance: Symbol.for("Cli<Application<Instance>>"),
-			Name: Symbol.for("Cli<Application>Name"),
+			Instance: AppIdentifiers.Instance,
+			Name: AppIdentifiers.Name,
 		},
 		Commands: Symbol.for("Cli<Commands>"),
 		Component: {
