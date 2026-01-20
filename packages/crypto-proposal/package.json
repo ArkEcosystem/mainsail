@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-proposal",
-	"version": "0.0.1-rc.8",
+	"version": "0.0.1-evm.42",
 	"description": "Crypto proposal utilities for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
