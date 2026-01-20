@@ -1,4 +1,4 @@
-import type { InputValue, InputValues } from "./cli.js"
+import type { InputValue, InputValues } from "./cli.js";
 
 export interface Command {
 	signature: string;

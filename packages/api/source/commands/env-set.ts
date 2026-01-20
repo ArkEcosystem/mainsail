@@ -5,7 +5,6 @@ import { inject, injectable, postConstruct } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-
 @injectable()
 export class Command extends Commands.Command {
 	@inject(Identifiers.Cli.Service.Environment)

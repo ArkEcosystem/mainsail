@@ -7,7 +7,6 @@ import { copySync, ensureDirSync, removeSync } from "fs-extra/esm";
 import Joi from "joi";
 import { resolve } from "path";
 
-
 @injectable()
 export class Command extends Commands.Command {
 	@inject(Identifiers.Cli.Service.Environment)

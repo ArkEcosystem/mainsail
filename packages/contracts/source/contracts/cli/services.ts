@@ -1,10 +1,9 @@
 import type { Enums } from "@mainsail/constants";
-import type { Result,SyncResult } from "execa";
+import type { Result, SyncResult } from "execa";
 
 import type { JsonObject } from "../types/index.js";
-import type { AnyObject,InputValues } from "./cli.js";
+import type { AnyObject, InputValues } from "./cli.js";
 import type { Paths } from "./paths.js";
-
 
 export interface Config {
 	all: object;
@@ -22,7 +21,6 @@ export interface Environment {
 	updateVariables(environmentFile: string, variables: InputValues): void;
 }
 
-
 export interface Installer {
 	install(package_: string, buildPackages: readonly string[] | undefined, tag: string | undefined): void;
 	installPeerDependencies(package_: string, tag: string): void;
@@ -38,7 +36,6 @@ export interface Logger {
 	debug(message: string): void;
 }
 
-
 export interface Plugin {
 	path: string;
 	name: string;
@@ -51,7 +48,6 @@ export interface PluginManager {
 	update(package_: string): Promise<void>;
 	remove(package_: string): Promise<void>;
 }
-
 
 export interface Setup {
 	isGlobal(): boolean;
@@ -110,7 +106,7 @@ export interface ProcessManager {
 	reloadLogs(id: ProcessIdentifier): SyncResult;
 	ping(): SyncResult;
 	update(): SyncResult;
-	trigger(id: ProcessIdentifier, processActionName: string, parameter?: string,): Promise<Result>;
+	trigger(id: ProcessIdentifier, processActionName: string, parameter?: string): Promise<Result>;
 	status(id: ProcessIdentifier): ProcessState | undefined;
 	isOnline(id: ProcessIdentifier): boolean;
 	isStopped(id: ProcessIdentifier): boolean;

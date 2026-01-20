@@ -102,7 +102,9 @@ export class CommandLineInterface {
 
 	async #discoverCommands(dirname: string, flags: Flags): Promise<Contracts.Cli.CommandList> {
 		const commandsDiscoverer = this.#app.resolve(Commands.DiscoverCommands);
-		const commands: Contracts.Cli.CommandList = await commandsDiscoverer.within(path.resolve(dirname, "./commands"));
+		const commands: Contracts.Cli.CommandList = await commandsDiscoverer.within(
+			path.resolve(dirname, "./commands"),
+		);
 
 		const plugins = await this.#app.get<Contracts.Cli.PluginManager>(Identifiers.Cli.Service.PluginManager).list();
 

@@ -25,6 +25,3 @@ export interface CommandFlag {
 }
 
 export type CommandFlags = Record<string, CommandFlag>;
-
-
-

@@ -5,7 +5,6 @@ import type { Contracts } from "@mainsail/contracts";
 import boxen from "boxen";
 import { blue, bold, cyan } from "kleur/colors";
 
-
 @injectable()
 export class Command extends Commands.Command {
 	public signature = "help";
