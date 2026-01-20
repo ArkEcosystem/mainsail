@@ -1,6 +1,4 @@
-import { Commands, Services } from "@mainsail/cli";
-import envPaths from "env-paths";
-import { join } from "path";
+import { Services } from "@mainsail/cli";
 import prompts from "prompts";
 
 import { describe } from "../../test-framework/source";
