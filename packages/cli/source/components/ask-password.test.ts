@@ -1,7 +1,7 @@
 import prompts from "prompts";
+import { Identifiers } from "@mainsail/constants";
 
 import { Console, describe } from "../../../test-framework/source";
-import { Identifiers } from "../ioc/index.js";
 import { AskPassword } from "./ask-password";
 
 describe<{
@@ -9,8 +9,8 @@ describe<{
 }>("AskPassword", ({ beforeEach, it, assert }) => {
 	beforeEach((context) => {
 		const cli = new Console();
-		cli.app.rebind(Identifiers.AskPassword).to(AskPassword).inSingletonScope();
-		context.component = cli.app.get(Identifiers.AskPassword);
+		cli.app.rebind(Identifiers.Cli.Component.AskPassword).to(AskPassword).inSingletonScope();
+		context.component = cli.app.get(Identifiers.Cli.Component.AskPassword);
 	});
 
 	it("should render the component", async ({ component }) => {

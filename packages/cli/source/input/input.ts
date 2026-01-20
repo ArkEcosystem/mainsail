@@ -1,23 +1,23 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 
 import { Application } from "../application.js";
-import { InputArguments, InputValue, InputValues } from "../contracts.js";
-import { Identifiers } from "../ioc/index.js";
 import { InputDefinition } from "./definition.js";
 import { InputParser } from "./parser.js";
 import { InputValidator } from "./validator.js";
 
 @injectable()
 export class Input {
-	@inject(Identifiers.Application.Instance)
+	@inject(Identifiers.Cli.Application.Instance)
 	protected readonly app!: Application;
 
-	@inject(Identifiers.InputValidator)
+	@inject(Identifiers.Cli.Input.Validator)
 	protected readonly validator!: InputValidator;
 
-	public args: InputValues = {};
+	public args: Contracts.Cli.InputValues = {};
 
-	public flags: InputValues = {};
+	public flags: Contracts.Cli.InputValues = {};
 
 	public interactive = true;
 
@@ -44,11 +44,11 @@ export class Input {
 			this.args[key] = values[index];
 		}
 
-		this.flags = this.#rawFlags as InputValues;
+		this.flags = this.#rawFlags as Contracts.Cli.InputValues;
 	}
 
 	public validate(): void {
-		const definitionToSchema = (definition: InputArguments): object => {
+		const definitionToSchema = (definition: Contracts.Cli.InputArguments): object => {
 			const schema: object = {};
 
 			for (const [key, value] of Object.entries(definition)) {
@@ -62,24 +62,24 @@ export class Input {
 			this.args = this.validator.validate(
 				this.args,
 				definitionToSchema(this.#definition.getArguments()),
-			) as InputValues;
+			) as Contracts.Cli.InputValues;
 		}
 
 		this.flags = this.validator.validate(
 			this.flags,
 			definitionToSchema(this.#definition.getFlags()),
-		) as InputValues;
+		) as Contracts.Cli.InputValues;
 	}
 
-	public getArguments(values?: object): InputValues {
+	public getArguments(values?: object): Contracts.Cli.InputValues {
 		return values ? { ...values, ...this.args } : this.args;
 	}
 
-	public getArgument(name: string): InputValue {
+	public getArgument(name: string): Contracts.Cli.InputValue {
 		return this.args[name];
 	}
 
-	public setArgument(name: string, value: InputValue): void {
+	public setArgument(name: string, value: Contracts.Cli.InputValue): void {
 		this.args[name] = value;
 	}
 
@@ -87,15 +87,15 @@ export class Input {
 		return this.args[name] !== undefined;
 	}
 
-	public getFlags(values?: object): InputValues {
+	public getFlags(values?: object): Contracts.Cli.InputValues {
 		return values ? { ...values, ...this.flags } : this.flags;
 	}
 
-	public getFlag<T = InputValue>(name: string): T {
+	public getFlag<T = Contracts.Cli.InputValue>(name: string): T {
 		return this.flags[name] as T;
 	}
 
-	public setFlag(name: string, value: InputValue): void {
+	public setFlag(name: string, value: Contracts.Cli.InputValue): void {
 		this.flags[name] = value;
 	}
 

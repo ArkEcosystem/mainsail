@@ -1,9 +1,9 @@
 import { Container } from "@mainsail/container";
+import { Identifiers } from "@mainsail/constants";
 
 import { describe } from "../../../test-framework/source";
 import { Prompt } from "../components";
 import { ProcessIdentifier } from "../contracts";
-import { Identifiers } from "../ioc/index.js";
 import { ProcessManager } from "../services";
 import { RestartProcess } from "./restart-process";
 import { RestartRunningProcessWithPrompt } from "./restart-running-process-with-prompt";
@@ -33,10 +33,10 @@ describe<{
 		spyOnExecute = spy(restartProcess, "execute");
 
 		const container = new Container();
-		container.bind(Identifiers.Application.Instance).toConstantValue(container);
-		container.bind(Identifiers.ProcessManager).toConstantValue(processManager);
-		container.bind(Identifiers.RestartProcess).toConstantValue(restartProcess);
-		container.bind(Identifiers.Prompt).toConstantValue(prompt);
+		container.bind(Identifiers.Cli.Application.Instance).toConstantValue(container);
+		container.bind(Identifiers.Cli.Service.ProcessManager).toConstantValue(processManager);
+		container.bind(Identifiers.Cli.Action.RestartProcess).toConstantValue(restartProcess);
+		container.bind(Identifiers.Cli.Component.Prompt).toConstantValue(prompt);
 		context.action = container.get(RestartRunningProcessWithPrompt, { autobind: true });
 	});
 

@@ -1,6 +1,6 @@
 import { Console, describe } from "../../test-framework/source";
 import { ComponentFactory } from "./component-factory";
-import { Identifiers } from "./ioc";
+import { Identifiers } from "@mainsail/constants";
 
 describe("ComponentFactory", ({ assert, beforeEach, each, it, stub }) => {
 	beforeEach((context) => {
@@ -21,32 +21,32 @@ describe("ComponentFactory", ({ assert, beforeEach, each, it, stub }) => {
 			spy.calledOnce();
 		},
 		[
-			["appHeader", Identifiers.AppHeader],
-			["ask", Identifiers.Ask],
-			["askDate", Identifiers.AskDate],
-			["askHidden", Identifiers.AskHidden],
-			["askNumber", Identifiers.AskNumber],
-			["askPassword", Identifiers.AskPassword],
-			["autoComplete", Identifiers.AutoComplete],
-			["box", Identifiers.Box],
-			["clear", Identifiers.Clear],
-			["confirm", Identifiers.Confirm],
-			["error", Identifiers.Error],
-			["fatal", Identifiers.Fatal],
-			["info", Identifiers.Info],
-			["listing", Identifiers.Listing],
-			["log", Identifiers.Log],
-			["multiSelect", Identifiers.MultiSelect],
-			["newLine", Identifiers.NewLine],
-			["prompt", Identifiers.Prompt],
-			["select", Identifiers.Select],
-			["spinner", Identifiers.Spinner],
-			["success", Identifiers.Success],
-			["table", Identifiers.Table],
-			["taskList", Identifiers.TaskList],
-			["title", Identifiers.Title],
-			["toggle", Identifiers.Toggle],
-			["warning", Identifiers.Warning],
+			["appHeader", Identifiers.Cli.Component.AppHeader],
+			["ask", Identifiers.Cli.Component.Ask],
+			["askDate", Identifiers.Cli.Component.AskDate],
+			["askHidden", Identifiers.Cli.Component.AskHidden],
+			["askNumber", Identifiers.Cli.Component.AskNumber],
+			["askPassword", Identifiers.Cli.Component.AskPassword],
+			["autoComplete", Identifiers.Cli.Component.AutoComplete],
+			["box", Identifiers.Cli.Component.Box],
+			["clear", Identifiers.Cli.Component.Clear],
+			["confirm", Identifiers.Cli.Component.Confirm],
+			["error", Identifiers.Cli.Component.Error],
+			["fatal", Identifiers.Cli.Component.Fatal],
+			["info", Identifiers.Cli.Component.Info],
+			["listing", Identifiers.Cli.Component.Listing],
+			["log", Identifiers.Cli.Component.Log],
+			["multiSelect", Identifiers.Cli.Component.MultiSelect],
+			["newLine", Identifiers.Cli.Component.NewLine],
+			["prompt", Identifiers.Cli.Component.Prompt],
+			["select", Identifiers.Cli.Component.Select],
+			["spinner", Identifiers.Cli.Component.Spinner],
+			["success", Identifiers.Cli.Component.Success],
+			["table", Identifiers.Cli.Component.Table],
+			["taskList", Identifiers.Cli.Component.TaskList],
+			["title", Identifiers.Cli.Component.Title],
+			["toggle", Identifiers.Cli.Component.Toggle],
+			["warning", Identifiers.Cli.Component.Warning],
 		],
 	);
 });

@@ -1,13 +1,12 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
 import { ActionFactory } from "../action-factory.js";
 import { ComponentFactory } from "../component-factory.js";
 import { Box } from "../components/index.js";
-import { Application, InputValue, InputValues } from "../contracts.js";
 import { InputDefinition } from "../input/definition.js";
 import { Input } from "../input/index.js";
-import { Identifiers } from "../ioc/index.js";
 import { Output } from "../output/index.js";
 import { Config, Environment } from "../services/index.js";
 import { CommandHelp } from "./command-help.js";
@@ -16,25 +15,25 @@ export type CommandList = Record<string, Command>;
 
 @injectable()
 export abstract class Command {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Application;
+	@inject(Identifiers.Cli.Application.Instance)
+	protected readonly app!: Contracts.Cli.Application;
 
-	@inject(Identifiers.Environment)
+	@inject(Identifiers.Cli.Service.Environment)
 	protected readonly env!: Environment;
 
-	@inject(Identifiers.Output)
+	@inject(Identifiers.Cli.Output.Instance)
 	protected readonly output!: Output;
 
-	@inject(Identifiers.Config)
+	@inject(Identifiers.Cli.Service.Config)
 	protected readonly config!: Config;
 
-	@inject(Identifiers.Package)
+	@inject(Identifiers.Cli.Package)
 	protected readonly pkg!: Contracts.Types.PackageJson;
 
-	@inject(Identifiers.ActionFactory)
+	@inject(Identifiers.Cli.Action.Factory)
 	protected readonly actions!: ActionFactory;
 
-	@inject(Identifiers.ComponentFactory)
+	@inject(Identifiers.Cli.Component.Factory)
 	protected readonly components!: ComponentFactory;
 
 	public signature!: string;
@@ -87,10 +86,10 @@ export abstract class Command {
 	}
 
 	public showHelp(): void {
-		this.app.get<Box>(Identifiers.Box).render(this.app.resolve(CommandHelp).render(this));
+		this.app.get<Box>(Identifiers.Cli.Component.Box).render(this.app.resolve(CommandHelp).render(this));
 	}
 
-	public getArguments(): InputValues {
+	public getArguments(): Contracts.Cli.InputValues {
 		return this.input.getArguments();
 	}
 
@@ -98,7 +97,7 @@ export abstract class Command {
 		return this.input.getArgument(name) as string;
 	}
 
-	public setArgument(name: string, value: InputValue): void {
+	public setArgument(name: string, value: Contracts.Cli.InputValue): void {
 		return this.input.setArgument(name, value);
 	}
 
@@ -106,15 +105,15 @@ export abstract class Command {
 		return this.input.hasArgument(name);
 	}
 
-	public getFlags<T = InputValues>(): T {
+	public getFlags<T = Contracts.Cli.InputValues>(): T {
 		return this.input.getFlags() as T;
 	}
 
-	public getFlag<T = InputValue>(name: string): T {
+	public getFlag<T = Contracts.Cli.InputValue>(name: string): T {
 		return this.input.getFlag(name);
 	}
 
-	public setFlag(name: string, value: InputValue): void {
+	public setFlag(name: string, value: Contracts.Cli.InputValue): void {
 		return this.input.setFlag(name, value);
 	}
 

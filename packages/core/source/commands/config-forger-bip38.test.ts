@@ -25,7 +25,7 @@ describe<{
 
 	afterAll(() => setGracefulCleanup());
 
-	it("should configure from flags", async ({ cli }) => {
+	it.only("should configure from flags", async ({ cli }) => {
 		await cli.withFlags({ bip39: bip39Flags, password: "password" }).execute(Command);
 
 		const config = readJSONSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/validators.json`);

@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { Console, describe } from "../../../test-framework/source";
 
 import { Command } from "./core-log";
@@ -13,7 +13,7 @@ describe<{
 	beforeEach((context) => {
 		context.cli = new Console();
 
-		context.cli.app.rebind(Identifiers.ProcessFactory).toFactory(() => () => process);
+		context.cli.app.rebind(Identifiers.Cli.ProcessFactory).toFactory(() => () => process);
 	});
 
 	it("should call process log", async ({ cli }) => {

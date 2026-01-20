@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { Console, describe } from "../../../test-framework/source";
 
 import { Command } from "./update";
@@ -18,8 +18,8 @@ describe<{
 
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Updater).toConstantValue(updater);
-		context.cli.app.rebind(Identifiers.ActionFactory).toConstantValue(actionFactory);
+		context.cli.app.rebind(Identifiers.Cli.Service.Updater).toConstantValue(updater);
+		context.cli.app.rebind(Identifiers.Cli.Action.Factory).toConstantValue(actionFactory);
 	});
 
 	it("should not update if check returns false", async ({ cli }) => {

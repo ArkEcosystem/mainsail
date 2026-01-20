@@ -1,4 +1,8 @@
+import { AppIdentifiers } from "./app-identifiers.js";
+import { CliIdentifiers } from "./cli-identifiers.js";
+
 export const Identifiers = {
+	...CliIdentifiers,
 	ApiSync: {
 		Listener: Symbol("ApiSync<Listener>"),
 		Logger: Symbol("ApiSync<Logger>"),
@@ -7,8 +11,8 @@ export const Identifiers = {
 	},
 	Application: {
 		Environment: Symbol("Application<Environment>"),
-		Instance: Symbol("Application<Instance>"),
-		Name: Symbol("Application<Name>"),
+		Instance: AppIdentifiers.Instance,
+		Name: AppIdentifiers.Name,
 		Thread: Symbol("Application<Thread>"),
 		Version: Symbol("Application<Version>"),
 	},

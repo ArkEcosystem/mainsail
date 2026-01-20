@@ -1,7 +1,8 @@
 import { Container } from "@mainsail/container";
 
 import { describe } from "../../test-framework/source";
-import { Application, ApplicationFactory, Identifiers, Utils } from "./index";
+import { Identifiers } from "@mainsail/constants";
+import { Application, ApplicationFactory, Utils } from "./index";
 
 describe("ApplicationFactory", ({ it, stub, assert }) => {
 	it("should create an application instance with the given container", () => {
@@ -28,6 +29,6 @@ describe("ApplicationFactory", ({ it, stub, assert }) => {
 			},
 		});
 
-		assert.instance(app.get<any>(Identifiers.ProcessFactory)("ark", "core"), Utils.Process);
+		assert.instance(app.get<any>(Identifiers.Cli.ProcessFactory)("ark", "core"), Utils.Process);
 	});
 });

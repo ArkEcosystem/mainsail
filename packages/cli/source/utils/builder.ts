@@ -2,8 +2,6 @@ import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 
-import type { AnyObject } from "../contracts.js";
-
 export const Builder = {
 	async buildApplication(context?: {
 		flags: Contracts.Types.JsonObject;
@@ -22,7 +20,7 @@ export const Builder = {
 
 		return app;
 	},
-	buildPeerFlags(flags: AnyObject): {
+	buildPeerFlags(flags: Contracts.Cli.AnyObject): {
 		disableDiscovery: boolean;
 		ignoreMinimumNetworkReach: boolean;
 		skipDiscovery: boolean;

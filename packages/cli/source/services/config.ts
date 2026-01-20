@@ -1,15 +1,12 @@
-import { Channels } from "@mainsail/constants";
+import { Channels, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { ensureFileSync, readJSONSync, writeJsonSync } from "fs-extra/esm";
 
-import { Application } from "../contracts.js";
-import { Identifiers } from "../ioc/index.js";
-
 @injectable()
 export class Config {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Application;
+	@inject(Identifiers.Cli.Application.Instance)
+	private readonly app!: Contracts.Cli.Application;
 
 	#file!: string;
 
@@ -76,7 +73,9 @@ export class Config {
 		if (!this.has("channel")) {
 			this.set(
 				"channel",
-				this.#getRegistryChannel(this.app.get<Contracts.Types.PackageJson>(Identifiers.Package).version ?? ""),
+				this.#getRegistryChannel(
+					this.app.get<Contracts.Types.PackageJson>(Identifiers.Cli.Package).version ?? "",
+				),
 			);
 		}
 

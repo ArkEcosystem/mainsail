@@ -3,7 +3,7 @@ import { fileSync, setGracefulCleanup } from "tmp";
 
 import type { Contracts } from "@mainsail/contracts";
 import { Console, describe } from "../../../test-framework/source";
-import { Identifiers } from "../ioc";
+import { Identifiers } from "@mainsail/constants";
 import { ProcessManager } from "../services";
 import { Process } from "./process";
 
@@ -14,10 +14,10 @@ describe<{
 }>("Process", ({ beforeEach, afterAll, it, assert, stub, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.processManager = context.cli.app.get(Identifiers.ProcessManager);
+		context.processManager = context.cli.app.get(Identifiers.Cli.Service.ProcessManager);
 
 		context.cli.app
-			.rebind<(token: string, type: string) => Process>(Identifiers.ProcessFactory)
+			.rebind<(token: string, type: string) => Process>(Identifiers.Cli.ProcessFactory)
 			.toFactory(
 				(context: Contracts.Kernel.Container.ResolutionContext) =>
 					(token: string, type: string): Process => {
@@ -28,7 +28,7 @@ describe<{
 					},
 			);
 
-		context.process = context.cli.app.get(Identifiers.ProcessFactory)("mainsail");
+		context.process = context.cli.app.get(Identifiers.Cli.ProcessFactory)("mainsail");
 	});
 
 	afterAll(() => setGracefulCleanup());
@@ -147,7 +147,7 @@ describe<{
 	});
 
 	it("#log - should log to pm_out_log_path", async ({ cli, process, processManager }) => {
-		stub(cli.app.get(Identifiers.AbortMissingProcess), "execute");
+		stub(cli.app.get(Identifiers.Cli.Action.AbortMissingProcess), "execute");
 		stub(processManager, "describe").returnValue({
 			monit: { cpu: 2, memory: 2048 },
 			name: "mainsail",
@@ -170,7 +170,7 @@ describe<{
 	});
 
 	it("#log - should log to pm_err_log_path", async ({ cli, process, processManager }) => {
-		stub(cli.app.get(Identifiers.AbortMissingProcess), "execute");
+		stub(cli.app.get(Identifiers.Cli.Action.AbortMissingProcess), "execute");
 		stub(processManager, "describe").returnValue({
 			monit: { cpu: 2, memory: 2048 },
 			name: "mainsail",
