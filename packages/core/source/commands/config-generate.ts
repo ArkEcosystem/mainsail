@@ -1,4 +1,4 @@
-import { Commands, Services } from "@mainsail/cli";
+import { Commands } from "@mainsail/cli";
 import { ConfigurationGenerator, Identifiers, makeApplication } from "@mainsail/configuration-generator";
 import { Identifiers as AppIdentifiers, Identifiers as CliIdentifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
@@ -29,7 +29,7 @@ type Flags = Omit<AppContracts.NetworkGenerator.Options, "peers" | "rewardAmount
 @injectable()
 export class Command extends Commands.Command {
 	@inject(CliIdentifiers.Cli.Service.Logger)
-	private readonly logger!: Services.Logger;
+	private readonly logger!: Contracts.Cli.Logger;
 
 	public signature = "config:generate";
 

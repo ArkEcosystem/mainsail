@@ -6,7 +6,7 @@ import { execa, Result, SyncResult } from "../execa.js";
 import { Flags } from "../utils/flags.js";
 
 @injectable()
-export class ProcessManager {
+export class ProcessManager implements Contracts.Cli.ProcessManager {
 	public list(): Contracts.Cli.ProcessDescription[] {
 		try {
 			const { stdout } = this.#shellSync("pm2 jlist");

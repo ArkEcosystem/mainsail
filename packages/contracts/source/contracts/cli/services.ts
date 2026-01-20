@@ -1,6 +1,8 @@
 import type { Enums } from "@mainsail/constants";
+import type { Result,SyncResult } from "execa";
 
-import type { InputValues } from "./cli.js";
+import type { JsonObject } from "../types/index.js";
+import type { AnyObject,InputValues } from "./cli.js";
 import type { Paths } from "./paths.js";
 
 
@@ -22,7 +24,7 @@ export interface Environment {
 
 
 export interface Installer {
-	install(package_: string): void;
+	install(package_: string, buildPackages: readonly string[] | undefined, tag: string | undefined): void;
 	installPeerDependencies(package_: string, tag: string): void;
 	installRangeLatest(package_: string, range: string): void;
 }
@@ -94,3 +96,30 @@ export interface Process {
 }
 
 export type ProcessFactory = (name: string) => Process;
+
+export interface ProcessManager {
+	list(): ProcessDescription[];
+	describe(id: ProcessIdentifier): ProcessDescription | undefined;
+	start(options: JsonObject, flags: AnyObject): SyncResult;
+	stop(id: ProcessIdentifier, flags?: AnyObject): SyncResult;
+	restart(id: ProcessIdentifier, flags?: AnyObject): SyncResult;
+	reload(id: ProcessIdentifier): SyncResult;
+	reset(id: ProcessIdentifier): SyncResult;
+	delete(id: ProcessIdentifier): SyncResult;
+	flush(): SyncResult;
+	reloadLogs(id: ProcessIdentifier): SyncResult;
+	ping(): SyncResult;
+	update(): SyncResult;
+	trigger(id: ProcessIdentifier, processActionName: string, parameter?: string,): Promise<Result>;
+	status(id: ProcessIdentifier): ProcessState | undefined;
+	isOnline(id: ProcessIdentifier): boolean;
+	isStopped(id: ProcessIdentifier): boolean;
+	isStopping(id: ProcessIdentifier): boolean;
+	isWaiting(id: ProcessIdentifier): boolean;
+	isLaunching(id: ProcessIdentifier): boolean;
+	isErrored(id: ProcessIdentifier): boolean;
+	isOneLaunch(id: ProcessIdentifier): boolean;
+	isUnknown(id: ProcessIdentifier): boolean;
+	has(id: ProcessIdentifier): boolean;
+	missing(id: ProcessIdentifier): boolean;
+}

@@ -1,6 +1,7 @@
-import { Commands, Services } from "@mainsail/cli";
+import { Commands } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { http } from "@mainsail/utils";
 import { createWriteStream, existsSync, readFileSync, writeFileSync } from "fs";
 import { ensureDirSync, removeSync } from "fs-extra/esm";
@@ -43,7 +44,7 @@ interface Flags {
 @injectable()
 export class Command extends Commands.Command {
 	@inject(Identifiers.Cli.Service.Environment)
-	private readonly environment!: Services.Environment;
+	private readonly environment!: Contracts.Cli.Environment;
 
 	public signature = "config:publish:custom";
 
