@@ -76,6 +76,9 @@
 			"package": "@mainsail/transaction-pool-worker"
 		},
 		{
+			"package": "@mainsail/crypto-proposal"
+		},
+		{
 			"package": "@mainsail/crypto-messages"
 		},
 		{
@@ -257,6 +260,9 @@
 		},
 		{
 			"package": "@mainsail/crypto-block"
+		},
+		{
+			"package": "@mainsail/crypto-proposal"
 		},
 		{
 			"package": "@mainsail/crypto-messages"

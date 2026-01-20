@@ -1,8 +1,8 @@
-import { format as concordance } from "concordance";
-import kit from "string-kit";
+import { format as printf } from "node:util";
+
 import type { Test } from "uvu";
 
-export const formatName = (name: string, dataset: unknown): string => kit.format(name, concordance(dataset));
+export const formatName = (template: string, ...arguments_: unknown[]): string => printf(template, ...arguments_);
 
 export type EachCallback<TDataset, TContext> = (arguments_: {
 	context: TContext;

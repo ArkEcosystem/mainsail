@@ -7,7 +7,7 @@ const isApp = (node: Contracts.Kernel.Application | undefined): node is Contract
 const isProposal = (message: Message): message is Contracts.Crypto.Proposal =>
 	(message as Contracts.Crypto.Proposal).blockHeader !== undefined;
 
-export type Message = Contracts.Crypto.Proposal | Contracts.Crypto.Prevote | Contracts.Crypto.Precommit;
+export type Message = Contracts.Crypto.Proposal | Contracts.Crypto.Message;
 
 export class Messages<T extends Message> {
 	#messages = new Map<string, Map<string, T>>();
@@ -22,10 +22,12 @@ export class Messages<T extends Message> {
 		return this.#messages.get(key)!;
 	}
 
-
 	set(message: T): void {
 		if (isProposal(message)) {
-			this.getMessagesMap(message.blockHeader.number, message.round).set(message.serialized.toString("hex"), message);
+			this.getMessagesMap(message.blockHeader.number, message.round).set(
+				message.serialized.toString("hex"),
+				message,
+			);
 		} else {
 			this.getMessagesMap(message.blockNumber, message.round).set(message.serialized.toString("hex"), message);
 		}
@@ -44,8 +46,8 @@ export class P2PRegistry {
 	#nodes = new Map<number, Contracts.Kernel.Application>();
 
 	public proposals = new Messages<Contracts.Crypto.Proposal>();
-	public prevotes = new Messages<Contracts.Crypto.Prevote>();
-	public precommits = new Messages<Contracts.Crypto.Precommit>();
+	public prevotes = new Messages<Contracts.Crypto.Message>();
+	public precommits = new Messages<Contracts.Crypto.Message>();
 
 	public registerNode(id: number, node: Contracts.Kernel.Application): void {
 		if (this.#nodes.has(id)) {
@@ -78,10 +80,10 @@ export class P2PRegistry {
 	async postProposal(node: Contracts.Kernel.Application, proposal: Contracts.Crypto.Proposal): Promise<void> {
 		this.proposals.set(proposal);
 
-		setTimeout(async () => {
+		const handle = async () => {
 			// simulate post-proposal controller
 			const deserializedProposal = await node
-				.get<Contracts.Crypto.MessageFactory>(Identifiers.Cryptography.Message.Factory)
+				.get<Contracts.Crypto.ProposalFactory>(Identifiers.Cryptography.Proposal.Factory)
 				.makeProposalFromBytes(proposal.serialized);
 
 			const result = await node
@@ -91,32 +93,30 @@ export class P2PRegistry {
 			if (result === Enums.Consensus.ProcessorResult.Invalid) {
 				console.log("postProposal process failed");
 			}
+		};
+
+		setTimeout(() => {
+			void handle();
 		}, 0);
 	}
 
-	async postPrecommit(node: Contracts.Kernel.Application, precommit: Contracts.Crypto.Precommit): Promise<void> {
-		this.precommits.set(precommit);
+	async postMessage(node: Contracts.Kernel.Application, message: Contracts.Crypto.Message): Promise<void> {
+		if (message.type === Enums.Crypto.MessageType.Prevote) {
+			this.prevotes.set(message);
+		} else {
+			this.precommits.set(message);
+		}
 
-		setTimeout(async () => {
-			await node
-				.get<Contracts.Consensus.PrecommitProcessor>(Identifiers.Consensus.Processor.PreCommit)
-				.process(precommit);
-		}, 0);
-	}
-
-	async postPrevote(node: Contracts.Kernel.Application, prevote: Contracts.Crypto.Prevote): Promise<void> {
-		this.prevotes.set(prevote);
-
-		setTimeout(async () => {
-			await node
-				.get<Contracts.Consensus.PrevoteProcessor>(Identifiers.Consensus.Processor.PreVote)
-				.process(prevote);
+		setTimeout(() => {
+			void node
+				.get<Contracts.Consensus.MessageProcessor>(Identifiers.Consensus.Processor.Message)
+				.process(message);
 		}, 0);
 	}
 
 	async postCommit(node: Contracts.Kernel.Application, commit: Contracts.Crypto.Commit): Promise<void> {
-		setTimeout(async () => {
-			await node.get<Contracts.Consensus.CommitProcessor>(Identifiers.Consensus.Processor.Commit).process(commit);
+		setTimeout(() => {
+			void node.get<Contracts.Consensus.CommitProcessor>(Identifiers.Consensus.Processor.Commit).process(commit);
 		}, 0);
 	}
 
@@ -126,15 +126,9 @@ export class P2PRegistry {
 		}
 	}
 
-	async broadcastPrecommit(precommit: Contracts.Crypto.Precommit, nodes?: number[]): Promise<void> {
+	async broadcastMessage(message: Contracts.Crypto.Message, nodes?: number[]): Promise<void> {
 		for (const node of this.getNodes(nodes)) {
-			await this.postPrecommit(node, precommit);
-		}
-	}
-
-	async broadcastPrevote(prevote: Contracts.Crypto.Prevote, nodes?: number[]): Promise<void> {
-		for (const node of this.getNodes(nodes)) {
-			await this.postPrevote(node, prevote);
+			await this.postMessage(node, message);
 		}
 	}
 }
@@ -158,15 +152,9 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 		}
 	}
 
-	async broadcastPrecommit(precommit: Contracts.Crypto.Precommit): Promise<void> {
+	async broadcastMessage(message: Contracts.Crypto.Message): Promise<void> {
 		for (const node of this.#getNodes()) {
-			await this.#p2p.postPrecommit(node, precommit);
-		}
-	}
-
-	async broadcastPrevote(prevote: Contracts.Crypto.Prevote): Promise<void> {
-		for (const node of this.#getNodes()) {
-			await this.#p2p.postPrevote(node, prevote);
+			await this.#p2p.postMessage(node, message);
 		}
 	}
 

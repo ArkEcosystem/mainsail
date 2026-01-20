@@ -17,8 +17,8 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
-	@inject(Identifiers.Cryptography.Message.Serializer)
-	private readonly messageSerializer!: Contracts.Crypto.MessageSerializer;
+	@inject(Identifiers.Cryptography.Proposal.Serializer)
+	private readonly proposalSerializer!: Contracts.Crypto.ProposalSerializer;
 
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
@@ -27,7 +27,10 @@ export class Validator implements Contracts.Validator.Validator {
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly messagesFactory!: Contracts.Crypto.MessageFactory;
+	private readonly messageFactory!: Contracts.Crypto.MessageFactory;
+
+	@inject(Identifiers.Cryptography.Proposal.Factory)
+	private readonly proposalFactory!: Contracts.Crypto.ProposalFactory;
 
 	@inject(Identifiers.BlockchainUtils.RoundCalculator)
 	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
@@ -88,8 +91,8 @@ export class Validator implements Contracts.Validator.Validator {
 		block: Contracts.Crypto.Block,
 		lockProof?: Contracts.Crypto.AggregatedSignature,
 	): Promise<Contracts.Crypto.Proposal> {
-		const serializedProposedBlock = await this.messageSerializer.serializeProposed({ block, lockProof });
-		return this.messagesFactory.makeProposal(
+		const serializedProposedBlock = await this.proposalSerializer.serializeProposed({ block, lockProof });
+		return this.proposalFactory.makeProposal(
 			{
 				data: { serialized: serializedProposedBlock.toString("hex") },
 				round,
@@ -105,8 +108,8 @@ export class Validator implements Contracts.Validator.Validator {
 		blockNumber: number,
 		round: number,
 		blockHash: string | undefined,
-	): Promise<Contracts.Crypto.Prevote> {
-		return this.messagesFactory.makePrevote(
+	): Promise<Contracts.Crypto.Message> {
+		return this.messageFactory.makeMessage(
 			{
 				blockHash,
 				blockNumber,
@@ -123,8 +126,8 @@ export class Validator implements Contracts.Validator.Validator {
 		blockNumber: number,
 		round: number,
 		blockHash: string | undefined,
-	): Promise<Contracts.Crypto.Precommit> {
-		return this.messagesFactory.makePrecommit(
+	): Promise<Contracts.Crypto.Message> {
+		return this.messageFactory.makeMessage(
 			{
 				blockHash,
 				blockNumber,

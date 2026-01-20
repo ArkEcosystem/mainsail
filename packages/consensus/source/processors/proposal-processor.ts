@@ -6,6 +6,9 @@ import { AbstractProcessor } from "./abstract-processor.js";
 
 @injectable()
 export class ProposalProcessor extends AbstractProcessor implements Contracts.Consensus.ProposalProcessor {
+	@inject(Identifiers.Cryptography.Proposal.Serializer)
+	private readonly proposalSerializer!: Contracts.Crypto.ProposalSerializer;
+
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly messageSerializer!: Contracts.Crypto.MessageSerializer;
 
@@ -34,7 +37,10 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	async process(proposal: Contracts.Crypto.Proposal, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
+	async process(
+		proposal: Contracts.Crypto.Proposal,
+		broadcast: boolean = true,
+	): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.hasValidBlockNumberOrRound({ blockNumber: proposal.blockHeader.number, round: proposal.round })) {
 				return Enums.Consensus.ProcessorResult.Skipped;
@@ -94,7 +100,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			return true;
 		}
 
-		const data = await this.messageSerializer.serializePrevoteForSignature({
+		const data = await this.messageSerializer.serializeMessageForSignature({
 			blockHash: proposal.blockHeader.hash,
 			blockNumber: proposal.blockHeader.number,
 			round: proposal.validRound,
@@ -121,7 +127,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	async #hasValidSignature(proposal: Contracts.Crypto.Proposal): Promise<boolean> {
 		return this.consensusSignature.verify(
 			Buffer.from(proposal.signature, "hex"),
-			await this.messageSerializer.serializeProposal(proposal.toSerializableData(), { includeSignature: false }),
+			await this.proposalSerializer.serializeProposal(proposal.toSerializableData(), { includeSignature: false }),
 			Buffer.from(this.validatorSet.getValidator(proposal.validatorIndex).blsPublicKey, "hex"),
 		);
 	}

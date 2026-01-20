@@ -50,17 +50,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 	}
 
-	public async postPrevote(peer: Contracts.P2P.Peer, prevote: Buffer): Promise<void> {
+	public async postMessage(peer: Contracts.P2P.Peer, message: Buffer): Promise<void> {
 		try {
-			await this.#emit(peer, Routes.PostPrevote, { prevote }, { timeout: 6000 });
-		} catch (error) {
-			this.#handleSocketError(peer, error);
-		}
-	}
-
-	public async postPrecommit(peer: Contracts.P2P.Peer, precommit: Buffer): Promise<void> {
-		try {
-			await this.#emit(peer, Routes.PostPrecommit, { precommit }, { timeout: 6000 });
+			await this.#emit(peer, Routes.PostMessage, { message }, { timeout: 6000 });
 		} catch (error) {
 			this.#handleSocketError(peer, error);
 		}
@@ -216,6 +208,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				event,
 				codec.request.serialize({
 					...payload,
+					// @ts-ignore
 					headers: {
 						...this.headerFactory().toData(),
 					},

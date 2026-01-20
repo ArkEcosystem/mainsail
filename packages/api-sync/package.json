@@ -30,6 +30,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"joi": "18.0.0",
+		"lru-cache": "11.2.2",
 		"viem": "2.34.0"
 	},
 	"devDependencies": {

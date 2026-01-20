@@ -11,6 +11,9 @@ import type {
 	Plugin,
 	State,
 	System,
+	Token,
+	TokenHolder,
+	TokenTransfer,
 	Transaction,
 	ValidatorRound,
 	Wallet,
@@ -97,6 +100,14 @@ export type PluginRepositoryExtension = Record<string, unknown>;
 export type PluginRepository = ExtendedRepository<Plugin> & PluginRepositoryExtension;
 export type StateRepositoryExtension = Record<string, unknown>;
 export type StateRepository = ExtendedRepository<State> & StateRepositoryExtension;
+
+export type TokenRepositoryExtension = Record<string, unknown>;
+export type TokenRepository = ExtendedRepository<Token> & TokenRepositoryExtension;
+export type TokenHolderRepositoryExtension = Record<string, unknown>;
+export type TokenHolderRepository = ExtendedRepository<TokenHolder> & TokenHolderRepositoryExtension;
+export type TokenTransferRepositoryExtension = Record<string, unknown>;
+export type TokenTransferRepository = ExtendedRepository<TokenTransfer> & TokenTransferRepositoryExtension;
+
 export type SystemRepositoryExtension = {
 	inMaintenance(): Promise<boolean>;
 	setMaintenance(enabled: boolean): Promise<void>;
@@ -126,6 +137,9 @@ export type ConfigurationRepositoryFactory = (customDataSource?: RepositoryDataS
 export type ContractRepositoryFactory = (customDataSource?: RepositoryDataSource) => ContractRepository;
 export type PeerRepositoryFactory = (customDataSource?: RepositoryDataSource) => PeerRepository;
 export type TransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => TransactionRepository;
+export type TokenRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenRepository;
+export type TokenHolderRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenHolderRepository;
+export type TokenTransferRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenTransferRepository;
 export type MultiPaymentRepositoryFactory = (customDataSource?: RepositoryDataSource) => MultiPaymentRepository;
 export type ValidatorRoundRepositoryFactory = (customDataSource?: RepositoryDataSource) => ValidatorRoundRepository;
 export type PluginRepositoryFactory = (customDataSource?: RepositoryDataSource) => PluginRepository;

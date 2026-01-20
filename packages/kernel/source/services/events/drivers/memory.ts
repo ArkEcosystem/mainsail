@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
-import mm from "nanomatch";
+import mm from "micromatch";
 
 class OnceListener implements Contracts.Kernel.EventListener {
 	public constructor(
@@ -9,7 +9,7 @@ class OnceListener implements Contracts.Kernel.EventListener {
 		private readonly listener: Contracts.Kernel.EventListener,
 	) {}
 
-	public async handle({ name }): Promise<void> {
+	public async handle({ name }: { name: string }): Promise<void> {
 		this.dispatcher.forget(name, this.listener);
 	}
 }

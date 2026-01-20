@@ -316,6 +316,8 @@ pub enum Error {
     IO(#[from] std::io::Error),
     #[error("heed error: {0}")]
     Heed(#[from] heed::Error),
+    #[error("state error: {0}")]
+    State(String),
     #[error("db full error")]
     DbFull,
     #[error("bincode error: {0}")]

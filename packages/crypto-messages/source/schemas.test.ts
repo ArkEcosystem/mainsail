@@ -7,14 +7,8 @@ import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { describe, Sandbox } from "../../test-framework/source";
-import {
-	precommitData,
-	precommitDataNoBlock,
-	prevoteData,
-	prevoteDataNoBlock,
-	proposalData,
-} from "../test/fixtures/index.js";
-import { makeKeywords as makeMessageKeywords } from "./keywords";
+import { prevoteData, prevoteDataNoBlock } from "../test/fixtures/index.js";
+import { makeKeywords as makeProposalKeywords } from "@mainsail/crypto-proposal/source/keywords.js";
 import { schemas } from "./schemas";
 
 describe<{
@@ -31,7 +25,7 @@ describe<{
 
 		for (const keyword of Object.values({
 			...makeBaseKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
-			...makeMessageKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeProposalKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
 		})) {
 			context.validator.addKeyword(keyword);
 		}
@@ -46,28 +40,13 @@ describe<{
 		}
 	});
 
-	it("proposal - should be ok", ({ validator }) => {
-		const result = validator.validate("proposal", proposalData);
+	it("message - should be ok", async ({ validator }) => {
+		const result = validator.validate("message", prevoteData);
 		assert.undefined(result.error);
 	});
 
-	it("prevote - should be ok", async ({ validator }) => {
-		const result = validator.validate("prevote", prevoteData);
-		assert.undefined(result.error);
-	});
-
-	it("prevote - should be ok without block", async ({ validator }) => {
-		const result = validator.validate("prevote", prevoteDataNoBlock);
-		assert.undefined(result.error);
-	});
-
-	it("precommit - should be ok", async ({ validator }) => {
-		const result = validator.validate("precommit", precommitData);
-		assert.undefined(result.error);
-	});
-
-	it("precommit - should be ok without block", async ({ validator }) => {
-		const result = validator.validate("precommit", precommitDataNoBlock);
+	it("message - should be ok without block", async ({ validator }) => {
+		const result = validator.validate("message", prevoteDataNoBlock);
 		assert.undefined(result.error);
 	});
 });

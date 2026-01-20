@@ -77,7 +77,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 					warn: 2,
 				},
 				formatters: {
-					level(label, number) {
+					level(label: string, number: number) {
 						return { level: label, pid: process.pid };
 					},
 				},
@@ -230,7 +230,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		const formatLevel = (level: string): string => this.#levelStyles[level](level.toUpperCase());
 
 		return new Transform({
-			transform(chunk, enc, callback) {
+			transform(chunk: string, enc: BufferEncoding, callback: (error?: Error | null, data?: string) => void) {
 				try {
 					const json = JSON.parse(chunk);
 

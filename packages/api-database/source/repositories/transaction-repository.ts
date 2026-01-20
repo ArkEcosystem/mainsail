@@ -61,7 +61,7 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): Tra
 		async getFeeStatistics(
 			genesisTimestamp: number,
 			days?: number,
-			minGasPrice = 0,
+			minGasPrice: number = 0,
 		): Promise<FeeStatistics | undefined> {
 			if (days) {
 				const age = Math.max(dayjs().subtract(days, "day").valueOf() - 1, genesisTimestamp);

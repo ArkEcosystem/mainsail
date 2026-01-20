@@ -1,7 +1,6 @@
-import type { Precommit, Prevote, Proposal } from "../crypto/index.js";
+import type { Message, Proposal } from "../crypto/index.js";
 
 export interface Broadcaster {
 	broadcastProposal(proposal: Proposal): Promise<void>;
-	broadcastPrevote(prevote: Prevote): Promise<void>;
-	broadcastPrecommit(precommit: Precommit): Promise<void>;
+	broadcastMessage(message: Message): Promise<void>;
 }

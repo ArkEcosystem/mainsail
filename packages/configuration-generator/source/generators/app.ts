@@ -5,7 +5,7 @@ import { resolve } from "path";
 
 @injectable()
 export class AppGenerator {
-	generateDefault(packageName = "core"): Contracts.Types.JsonObject {
+	generateDefault(packageName: string = "core"): Contracts.Types.JsonObject {
 		packageName = packageName.replace("@mainsail/", "");
 
 		return readJSONSync(

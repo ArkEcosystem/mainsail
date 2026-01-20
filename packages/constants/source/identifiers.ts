@@ -1,7 +1,9 @@
 export const Identifiers = {
 	ApiSync: {
 		Listener: Symbol("ApiSync<Listener>"),
+		Logger: Symbol("ApiSync<Logger>"),
 		Service: Symbol("ApiSync<Service>"),
+		TokenParser: Symbol.for("ApiSync<TokenParser>"),
 	},
 	Application: {
 		Environment: Symbol("Application<Environment>"),
@@ -30,8 +32,7 @@ export const Identifiers = {
 		},
 		Processor: {
 			Commit: Symbol("Consensus<Processor.Commit>"),
-			PreCommit: Symbol("Consensus<Processor.PreCommit>"),
-			PreVote: Symbol("Consensus<Processor.PreVote>"),
+			Message: Symbol("Consensus<Processor.Message>"),
 			Proposal: Symbol("Consensus<Processor.Proposal>"),
 		},
 		RoundStateRepository: Symbol("Consensus<RoundStateRepository>"),
@@ -44,8 +45,7 @@ export const Identifiers = {
 
 		Storage: {
 			ConsensusState: Symbol("ConsensusStorage<Storage.ConsensusState>"),
-			PreCommit: Symbol("ConsensusStorage<Storage.PreCommit>"),
-			PreVote: Symbol("ConsensusStorage<Storage.PreVote>"),
+			Message: Symbol("ConsensusStorage<Storage.Message>"),
 			Proposal: Symbol("ConsensusStorage<Storage.Proposal>"),
 		},
 	},
@@ -114,6 +114,12 @@ export const Identifiers = {
 			Deserializer: Symbol("Crypto<Message.Deserializer>"),
 			Factory: Symbol("Crypto<Message.Factory>"),
 			Serializer: Symbol("Crypto<Message.Serializer>"),
+		},
+		Proposal: {
+			Deserializer: Symbol("Crypto<Proposal.Deserializer>"),
+			Factory: Symbol("Crypto<Proposal.Factory>"),
+			LockProofSize: Symbol("Crypto<Proposal.LockProofSize>"),
+			Serializer: Symbol("Crypto<Proposal.Serializer>"),
 		},
 		Serializer: Symbol("Crypto<Serializer>"),
 		Signature: {

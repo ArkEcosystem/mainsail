@@ -43,11 +43,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
-	@inject(Identifiers.Consensus.Processor.PreVote)
-	private readonly prevoteProcessor!: Contracts.Consensus.PrevoteProcessor;
-
-	@inject(Identifiers.Consensus.Processor.PreCommit)
-	private readonly precommitProcessor!: Contracts.Consensus.PrecommitProcessor;
+	@inject(Identifiers.Consensus.Processor.Message)
+	private readonly messageProcessor!: Contracts.Consensus.MessageProcessor;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.MessageFactory;
@@ -219,11 +216,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		return roundsByBlockNumber.get(round)!;
 	}
 
-	#checkMessage(
-		message: Contracts.Crypto.Precommit | Contracts.Crypto.Prevote,
-		firstMessage: Contracts.Crypto.Precommit | Contracts.Crypto.Prevote,
-		job: DownloadJob,
-	): void {
+	#checkMessage(message: Contracts.Crypto.Message, firstMessage: Contracts.Crypto.Message, job: DownloadJob): void {
 		if (message.blockNumber !== firstMessage.blockNumber || message.round !== firstMessage.round) {
 			throw new Error(
 				`Received message blockNumber ${message.blockNumber} and round ${message.round} does not match expected blockNumber ${firstMessage.blockNumber} and round ${firstMessage.round}`,
@@ -242,8 +235,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#checkResponse(
-		prevotesMap: Map<number, Contracts.Crypto.Prevote>,
-		precommitsMap: Map<number, Contracts.Crypto.Precommit>,
+		prevotesMap: Map<number, Contracts.Crypto.Message>,
+		precommitsMap: Map<number, Contracts.Crypto.Message>,
 		job: DownloadJob,
 	) {
 		const prevotes = [...prevotesMap.values()];
@@ -267,8 +260,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#checkFullRoundResponse(
-		prevotes: Map<number, Contracts.Crypto.Prevote>,
-		precommits: Map<number, Contracts.Crypto.Precommit>,
+		prevotes: Map<number, Contracts.Crypto.Message>,
+		precommits: Map<number, Contracts.Crypto.Message>,
 		job: DownloadJob,
 	) {
 		const { roundValidators } = this.cryptoConfiguration.getMilestone(job.blockNumber);
@@ -283,8 +276,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#checkPartialRoundResponse(
-		prevotes: Map<number, Contracts.Crypto.Prevote>,
-		precommits: Map<number, Contracts.Crypto.Precommit>,
+		prevotes: Map<number, Contracts.Crypto.Message>,
+		precommits: Map<number, Contracts.Crypto.Message>,
 		job: DownloadJob,
 	) {
 		// Check if received all the requested data
@@ -307,10 +300,10 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		try {
 			const result = await this.communicator.getMessages(job.peer);
 
-			let firstPrevote: Contracts.Crypto.Prevote | undefined;
-			const prevotes: Map<number, Contracts.Crypto.Prevote> = new Map();
+			let firstPrevote: Contracts.Crypto.Message | undefined;
+			const prevotes: Map<number, Contracts.Crypto.Message> = new Map();
 			for (const buffer of result.prevotes) {
-				const prevote = await this.factory.makePrevoteFromBytes(buffer);
+				const prevote = await this.factory.makeMessageFromBytes(buffer);
 				prevotes.set(prevote.validatorIndex, prevote);
 
 				if (firstPrevote === undefined) {
@@ -318,17 +311,17 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				}
 				this.#checkMessage(prevote, firstPrevote, job);
 
-				const response = await this.prevoteProcessor.process(prevote, false);
+				const response = await this.messageProcessor.process(prevote, false);
 
 				if (response === Enums.Consensus.ProcessorResult.Invalid) {
 					throw new Error(`Received prevote is invalid`);
 				}
 			}
 
-			let firstPrecommit: Contracts.Crypto.Prevote | undefined;
-			const precommits: Map<number, Contracts.Crypto.Precommit> = new Map();
+			let firstPrecommit: Contracts.Crypto.Message | undefined;
+			const precommits: Map<number, Contracts.Crypto.Message> = new Map();
 			for (const buffer of result.precommits) {
-				const precommit = await this.factory.makePrecommitFromBytes(buffer);
+				const precommit = await this.factory.makeMessageFromBytes(buffer);
 				precommits.set(precommit.validatorIndex, precommit);
 
 				if (firstPrecommit === undefined) {
@@ -336,7 +329,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				}
 				this.#checkMessage(precommit, firstPrecommit, job);
 
-				const response = await this.precommitProcessor.process(precommit, false);
+				const response = await this.messageProcessor.process(precommit, false);
 
 				if (response === Enums.Consensus.ProcessorResult.Invalid) {
 					throw new Error(`Received precommit is invalid`);

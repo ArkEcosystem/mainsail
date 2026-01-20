@@ -168,7 +168,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		throw new FileException(`Failed to discovery any files matching [${files.join(", ")}].`);
 	}
 
-	#skipFileIfNotExists(filename: string, alwaysOptional = false): boolean {
+	#skipFileIfNotExists(filename: string, alwaysOptional: boolean = false): boolean {
 		if (!existsSync(this.app.configPath(filename))) {
 			return alwaysOptional || this.configFlags.allowMissingConfigFiles === true;
 		}

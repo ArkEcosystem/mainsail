@@ -98,6 +98,8 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 			if (userGasLimit < minimumGasLimit) {
 				return BigInt(minimumGasLimit);
 			}
+
+			return userGasLimit;
 		}
 
 		return BigInt(maximumGasLimit);
@@ -124,6 +126,8 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 			if (userGasPrice > maximumGasPrice) {
 				return BigInt(maximumGasPrice);
 			}
+
+			return userGasPrice;
 		}
 
 		return 0n;

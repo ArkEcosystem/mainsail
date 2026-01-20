@@ -3,7 +3,7 @@ export class CappedSet<T> {
 	readonly #data: Set<T> = new Set<T>();
 	#maxSize: number;
 
-	public constructor(maxSize = 16_384) {
+	public constructor(maxSize: number = 16_384) {
 		this.#maxSize = maxSize;
 	}
 

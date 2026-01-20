@@ -17,6 +17,9 @@ import {
 	RepositoryDataSource,
 	StateRepository,
 	SystemRepository,
+	TokenHolderRepository,
+	TokenRepository,
+	TokenTransferRepository,
 	TransactionRepository,
 	ValidatorRoundRepository,
 	WalletRepository,
@@ -34,9 +37,13 @@ import {
 	Plugin,
 	State,
 	System,
+	Token,
+	TokenHolder,
+	TokenTransfer,
 	Transaction,
 	ValidatorRound,
 	Wallet,
+	WalletTokenCount,
 } from "./models/index.js";
 import {
 	makeApiNodeRepository,
@@ -48,6 +55,9 @@ import {
 	makePluginRepository,
 	makeStateRepository,
 	makeSystemRepository,
+	makeTokenHolderRepository,
+	makeTokenRepository,
+	makeTokenTransferRepository,
 	makeTransactionRepository,
 	makeValidatorRoundRepository,
 	makeWalletRepository,
@@ -84,7 +94,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		try {
 			const dataSource = new DataSource({
 				...options,
-				// TODO: allow entities to be extended by plugins
 				entities: [
 					ApiNode,
 					Block,
@@ -95,9 +104,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					State,
 					System,
 					Transaction,
+					Token,
+					TokenHolder,
+					TokenTransfer,
 					MultiPayment,
 					ValidatorRound,
 					Wallet,
+					WalletTokenCount,
 					LegacyColdWallet,
 				],
 				migrations: [new URL(".", import.meta.url).pathname + "/migrations/*.js"],
@@ -183,6 +196,27 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeMultiPaymentRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind<() => TokenRepository>(Identifiers.TokenRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeTokenRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind<() => TokenHolderRepository>(Identifiers.TokenHolderRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeTokenHolderRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind<() => TokenTransferRepository>(Identifiers.TokenTransferRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeTokenTransferRepository(customDataSource ?? dataSource),
 				);
 
 			this.app

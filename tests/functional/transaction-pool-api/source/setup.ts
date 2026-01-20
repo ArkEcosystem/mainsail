@@ -24,17 +24,14 @@ const setup = async () => {
 		.inSingletonScope();
 
 	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
-		getPrecommits: async () => [],
-		getPrevotes: async () => [],
+		getMessages: async () => [],
 		getProposals: async () => [],
 		getState: async () => {},
 		persist: async () => {},
 	});
 
-	// TODO:
 	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({
-		broadcastPrecommit: async () => {},
-		broadcastPrevote: async () => {},
+		broadcastMessage: async () => {},
 		broadcastProposal: async () => {},
 	});
 	sandbox.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => {} });
@@ -107,6 +104,7 @@ const setup = async () => {
 		"@mainsail/state",
 		"@mainsail/transactions",
 		"@mainsail/transaction-pool-service",
+		"@mainsail/crypto-proposal",
 		"@mainsail/crypto-messages",
 		"@mainsail/crypto-commit",
 		"@mainsail/processor",
@@ -211,7 +209,7 @@ const bootstrap = async (sandbox: Sandbox) => {
 	await blockProcessor.commit(commitState);
 
 	const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
-	validatorSet.restore();
+	await validatorSet.restore();
 
 	await sandbox.app.get<Contracts.ApiSync.Service>(Identifiers.ApiSync.Service).bootstrap();
 

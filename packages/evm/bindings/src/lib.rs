@@ -31,10 +31,10 @@ use result::{
 use revm::{
     Database, DatabaseCommit, ExecuteEvm, MainBuilder, MainContext,
     context::{
-        BlockEnv, Cfg, ContextTr, TxEnv,
+        BlockEnv, ContextTr, TxEnv,
         result::{EVMError, ExecutionResult, ResultAndState},
     },
-    database::{State, TransitionAccount, WrapDatabaseRef},
+    database::{State, TransitionAccount, WrapDatabaseRef, bal::EvmDatabaseError},
     handler::EvmTr,
     primitives::{Address, B256, Bytes, TxKind, U256, hex::ToHexExt, map::HashMap},
     state::{AccountInfo, Bytecode},
@@ -116,10 +116,10 @@ impl EvmInner {
 
         Ok(match result {
             Ok(r) => {
-                if !r.is_success() {
-                    self.logger
-                        .log(LogLevel::Warn, format!("view call failed: {:?}", r));
-                }
+                // if !r.is_success() {
+                //     self.logger
+                //         .log(LogLevel::Warn, format!("view call failed: {:?}", r));
+                // }
 
                 TxViewResult {
                     success: r.is_success(),
@@ -656,7 +656,7 @@ impl EvmInner {
         let ctx = evm.ctx_ref();
         let result = revm::handler::validation::validate_initial_tx_gas(
             ctx.tx(),
-            ctx.cfg().spec().into(),
+            (*ctx.cfg().spec()).into(),
             false,
         );
 
@@ -1009,7 +1009,10 @@ impl EvmInner {
     fn transact_evm(
         &mut self,
         ctx: ExecutionContext,
-    ) -> std::result::Result<ExecutionResult, EVMError<mainsail_evm_core::db::Error>> {
+    ) -> std::result::Result<
+        ExecutionResult,
+        EVMError<EvmDatabaseError<mainsail_evm_core::db::Error>>,
+    > {
         let mut state_builder = State::builder().with_bundle_update();
 
         if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key)

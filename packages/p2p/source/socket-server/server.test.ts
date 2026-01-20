@@ -60,8 +60,7 @@ describeSkip<{ sandbox: Sandbox; server: ServerProxy }>("Server", ({ it, assert,
 		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Consensus.Processor.Proposal).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Consensus.Processor.PreVote).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Consensus.Processor.PreCommit).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Consensus.Processor.Message).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Message.Serializer).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.P2P.Header.Service).toConstantValue({});

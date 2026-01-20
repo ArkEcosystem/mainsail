@@ -1,5 +1,5 @@
 import { isMajority, isMinority } from "@mainsail/blockchain-utils";
-import { Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
@@ -29,9 +29,9 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	#proposal?: Contracts.Crypto.Proposal;
 	#processorResult?: Contracts.Processor.BlockProcessorResult;
 	#accountUpdates: Array<Contracts.Evm.AccountUpdate> = [];
-	#prevotes = new Map<number, Contracts.Crypto.Prevote>();
+	#prevotes = new Map<number, Contracts.Crypto.Message>();
 	#prevotesCount = new Map<string | undefined, number>();
-	#precommits = new Map<number, Contracts.Crypto.Precommit>();
+	#precommits = new Map<number, Contracts.Crypto.Message>();
 	#precommitsCount = new Map<string | undefined, number>();
 	#validators = new Map<string, Contracts.State.ValidatorWallet>();
 	#validatorsSignedPrevote: boolean[] = [];
@@ -166,7 +166,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#prevotes.has(validatorIndex);
 	}
 
-	public addPrevote(prevote: Contracts.Crypto.Prevote): void {
+	public addPrevote(prevote: Contracts.Crypto.Message): void {
 		if (this.#prevotes.has(prevote.validatorIndex)) {
 			throw new Error("Prevote already exists.");
 		}
@@ -180,7 +180,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#precommits.has(validatorIndex);
 	}
 
-	public addPrecommit(precommit: Contracts.Crypto.Precommit): void {
+	public addPrecommit(precommit: Contracts.Crypto.Message): void {
 		if (this.#precommits.has(precommit.validatorIndex)) {
 			throw new Error("Precommit already exists.");
 		}
@@ -188,6 +188,53 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		this.#precommits.set(precommit.validatorIndex, precommit);
 		this.#validatorsSignedPrecommit[precommit.validatorIndex] = true;
 		this.#increasePrecommitCount(precommit.blockHash);
+	}
+
+	public hasMessage(message: Contracts.Crypto.Message): boolean {
+		switch (message.type) {
+			case Enums.Crypto.MessageType.Prevote: {
+				return this.#prevotes.has(message.validatorIndex);
+			}
+			case Enums.Crypto.MessageType.Precommit: {
+				return this.#precommits.has(message.validatorIndex);
+			}
+			default: {
+				throw new Error(`Invalid message type: ${message.type}`);
+			}
+		}
+	}
+
+	public getMessage(
+		validatorIndex: number,
+		type: Contracts.Crypto.MessageType,
+	): Contracts.Crypto.Message | undefined {
+		switch (type) {
+			case Enums.Crypto.MessageType.Prevote: {
+				return this.#prevotes.get(validatorIndex);
+			}
+			case Enums.Crypto.MessageType.Precommit: {
+				return this.#precommits.get(validatorIndex);
+			}
+			default: {
+				throw new Error(`Invalid message type: ${type}`);
+			}
+		}
+	}
+
+	public addMessage(message: Contracts.Crypto.Message): void {
+		switch (message.type) {
+			case Enums.Crypto.MessageType.Prevote: {
+				this.addPrevote(message);
+				break;
+			}
+			case Enums.Crypto.MessageType.Precommit: {
+				this.addPrecommit(message);
+				break;
+			}
+			default: {
+				throw new Error(`Invalid message type: ${message.type}`);
+			}
+		}
 	}
 
 	public hasMajorityPrevotes(): boolean {
@@ -222,19 +269,23 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#hasMinorityPrevotes() || this.#hasMinorityPrecommits();
 	}
 
-	public getPrevote(validatorIndex: number): Contracts.Crypto.Prevote | undefined {
+	public getPrevote(validatorIndex: number): Contracts.Crypto.Message | undefined {
 		return this.#prevotes.get(validatorIndex);
 	}
 
-	public getPrevotes(): Contracts.Crypto.Prevote[] {
+	public getPrevotes(): Contracts.Crypto.Message[] {
 		return [...this.#prevotes.values()];
 	}
 
-	public getPrecommit(validatorIndex: number): Contracts.Crypto.Precommit | undefined {
+	public getPrecommit(validatorIndex: number): Contracts.Crypto.Message | undefined {
 		return this.#precommits.get(validatorIndex);
 	}
 
-	public getPrecommits(): Contracts.Crypto.Precommit[] {
+	public getMessages(): Contracts.Crypto.Message[] {
+		return [...this.#prevotes.values(), ...this.#precommits.values()];
+	}
+
+	public getPrecommits(): Contracts.Crypto.Message[] {
 		return [...this.#precommits.values()];
 	}
 

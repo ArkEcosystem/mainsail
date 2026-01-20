@@ -1,10 +1,9 @@
-import type { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { assert } from "@mainsail/utils";
 import { strictEqual } from "assert";
 
 import type { FactoryFunction, FactoryFunctionOptions, HookFunction } from "./types.js";
 
-export class Factory {
+export class Factory<T> {
 	readonly #states: Map<string, FactoryFunction> = new Map<string, FactoryFunction>();
 
 	readonly #hooks: Map<string, Set<HookFunction>> = new Map<string, Set<HookFunction>>();
@@ -57,13 +56,13 @@ export class Factory {
 		return this;
 	}
 
-	public async make(resetModifiers = true): Promise<TransactionBuilder> {
+	public async make(resetModifiers: boolean = true): Promise<T> {
 		const states: string[] = [...this.#modifiers.states.values()];
 		const initialState: string | undefined = states.shift();
 
 		assert.string(initialState);
 
-		const function_ = this.#states.get(initialState) as FactoryFunction<TransactionBuilder, TransactionBuilder>;
+		const function_ = this.#states.get(initialState) as FactoryFunction<T, T>;
 
 		assert.defined(function_);
 
@@ -76,7 +75,7 @@ export class Factory {
 
 		// We apply all states in order of insertion to guarantee consistency.
 		for (const state of states) {
-			const function_ = this.#states.get(state) as FactoryFunction<TransactionBuilder, TransactionBuilder>;
+			const function_ = this.#states.get(state) as FactoryFunction<T, T>;
 
 			assert.defined(function_);
 
@@ -100,8 +99,8 @@ export class Factory {
 		return result;
 	}
 
-	public async makeMany(count: number): Promise<TransactionBuilder[]> {
-		const entities: TransactionBuilder[] = [];
+	public async makeMany(count: number): Promise<T[]> {
+		const entities: T[] = [];
 
 		for (let index = 0; index < count; index++) {
 			entities.push(await this.make(false));

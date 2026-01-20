@@ -1,4 +1,5 @@
 import type { Boom } from "@hapi/boom";
+import type Hapi from "@hapi/hapi";
 import type { ResponseObject, Server as HapiServer } from "@hapi/hapi";
 import { Enums } from "@mainsail/constants";
 
@@ -10,7 +11,7 @@ export const rpcResponseHandler = {
 	name: "rcpResponseHandler",
 	register: (server: HapiServer): void => {
 		server.ext({
-			method(request, h) {
+			method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 				const response = request.response;
 
 				if (responseIsBoom(response) && request.method === "post" && request.path === "") {

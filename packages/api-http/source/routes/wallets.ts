@@ -8,6 +8,7 @@ import {
 	transactionCriteriaSchemas,
 	transactionsOrderBy,
 	transactionSortingSchema,
+	walletAddressSchema,
 	walletCriteriaSchemaObject,
 	walletId,
 	walletParamSchema as walletParameterSchema,
@@ -170,5 +171,40 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		path: "/wallets/{id}/votes",
 	});
 
-	// TODO: locks
+	server.route({
+		handler: (request: Hapi.Request) => controller.tokens(request),
+		method: "GET",
+		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
+			validate: {
+				query: Joi.object({
+					addresses: Schemas.orEqualCriteria(walletAddressSchema),
+				}).concat(Schemas.pagination),
+			},
+		},
+		path: "/wallets/tokens",
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.tokensShow(request),
+		method: "GET",
+		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
+			validate: {
+				params: Joi.object({
+					id: walletParameterSchema,
+				}),
+				query: Joi.object({}).concat(Schemas.pagination),
+			},
+		},
+		path: "/wallets/{id}/tokens",
+	});
 };
