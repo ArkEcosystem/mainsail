@@ -4,7 +4,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { ensureFileSync, readJSONSync, writeJsonSync } from "fs-extra/esm";
 
 @injectable()
-export class Config {
+export class Config implements Contracts.Cli.Config {
 	@inject(Identifiers.Cli.Application.Instance)
 	private readonly app!: Contracts.Cli.Application;
 

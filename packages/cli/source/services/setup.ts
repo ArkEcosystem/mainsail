@@ -1,10 +1,11 @@
 import { injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { join } from "path";
 
 import { execa } from "../execa.js";
 
 @injectable()
-export class Setup {
+export class Setup implements Contracts.Cli.Setup {
 	public isGlobal(): boolean {
 		try {
 			return this.getEntrypoint().startsWith(this.getGlobalRootDir().replace("node_modules", ""));
