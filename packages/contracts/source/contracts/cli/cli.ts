@@ -1,7 +1,7 @@
 import type { Enums } from "@mainsail/constants";
 import type { AnySchema } from "joi";
 
-import type { Container } from "./kernel/index.js";
+import type { Container } from "../kernel/index.js";
 export type { Paths } from "env-paths";
 
 export type InputValue = string | number | boolean;
