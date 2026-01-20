@@ -35,7 +35,7 @@ export class CommandLineInterface {
 		const { args, flags } = InputParser.parseArgv(this.argv);
 
 		// Discover commands and commands from plugins
-		const commands: Commands.CommandList = await this.#discoverCommands(dirname, flags);
+		const commands = await this.#discoverCommands(dirname, flags);
 
 		// Figure out what command we should run and offer help if necessary
 		let commandSignature = args[0] as string | undefined;
@@ -47,7 +47,7 @@ export class CommandLineInterface {
 			return;
 		}
 
-		let commandInstance: Commands.Command = commands[commandSignature];
+		let commandInstance: Contracts.Cli.Command = commands[commandSignature];
 
 		if (!commandInstance) {
 			commandSignature = await this.#app.resolve(Plugins.SuggestCommand).execute({
@@ -101,9 +101,9 @@ export class CommandLineInterface {
 		Module._initPaths();
 	}
 
-	async #discoverCommands(dirname: string, flags: Record<string, unknown>): Promise<Commands.CommandList> {
+	async #discoverCommands(dirname: string, flags: Record<string, unknown>): Promise<Contracts.Cli.CommandList> {
 		const commandsDiscoverer = this.#app.resolve(Commands.DiscoverCommands);
-		const commands: Commands.CommandList = await commandsDiscoverer.within(path.resolve(dirname, "./commands"));
+		const commands = await commandsDiscoverer.within(path.resolve(dirname, "./commands"));
 
 		const plugins = await this.#app.get<Contracts.Cli.PluginManager>(Identifiers.Cli.Service.PluginManager).list();
 

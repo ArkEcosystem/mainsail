@@ -5,6 +5,7 @@ import { lstatSync, readdirSync } from "fs";
 
 import { Command } from "./command.js";
 
+
 @injectable()
 export class DiscoverCommands implements Contracts.Cli.DiscoverCommands {
 	@inject(Identifiers.Cli.Application.Instance)
@@ -20,7 +21,7 @@ export class DiscoverCommands implements Contracts.Cli.DiscoverCommands {
 
 		for (const file of commandFiles) {
 			const { Command } = await import(file);
-			const commandInstance: Command = this.app.resolve(Command);
+			const commandInstance = this.app.resolve<Contracts.Cli.Command>(Command);
 
 			if (!commandInstance.isHidden) {
 				commands[commandInstance.signature] = commandInstance;
@@ -41,7 +42,7 @@ export class DiscoverCommands implements Contracts.Cli.DiscoverCommands {
 			try {
 				const { Commands } = await import(package_);
 				for (const CMD of Commands) {
-					const commandInstance: Command = this.app.resolve(CMD);
+					const commandInstance = this.app.resolve<Contracts.Cli.Command>(CMD);
 
 					if (!commandInstance.isHidden) {
 						commands[commandInstance.signature] = commandInstance;

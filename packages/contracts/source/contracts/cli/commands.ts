@@ -1,6 +1,9 @@
 import type { InputValue, InputValues } from "./cli.js"
 
 export interface Command {
+	signature: string;
+	description?: string;
+	isHidden: boolean;
 	register(argv: string[]): void;
 	initialize(): Promise<void>;
 	interact(): Promise<void>;

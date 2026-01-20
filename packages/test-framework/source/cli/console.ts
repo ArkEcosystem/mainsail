@@ -1,4 +1,4 @@
-import type { Application, Commands } from "@mainsail/cli";
+import type { Application } from "@mainsail/cli";
 import { ApplicationFactory, Utils } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { Container } from "@mainsail/container";
@@ -40,12 +40,12 @@ export class Console {
 		return this;
 	}
 
-	public async execute(command: Contracts.Kernel.Container.Newable<Commands.Command>): Promise<void> {
+	public async execute(command: Contracts.Kernel.Container.Newable<Contracts.Cli.Command>): Promise<void> {
 		this.app
 			.rebind(Identifiers.Cli.Paths.Application)
 			.toConstantValue(this.app.get<Contracts.Cli.Environment>(Identifiers.Cli.Service.Environment).getPaths());
 
-		const cmd = this.app.resolve<Commands.Command>(command);
+		const cmd = this.app.resolve<Contracts.Cli.Command>(command);
 
 		const castedFlags = Utils.Flags.castFlagsToString(this.flags)
 			.split("--")
