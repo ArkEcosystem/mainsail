@@ -8,7 +8,7 @@ import path from "path";
 import { envPaths as environmentPaths } from "../env-paths.js";
 
 @injectable()
-export class Environment {
+export class Environment implements Contracts.Cli.Environment {
 	@inject(Identifiers.Cli.Application.Name)
 	private readonly appName!: string;
 

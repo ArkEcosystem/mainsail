@@ -1,11 +1,10 @@
-import type { Application, Commands, Services } from "@mainsail/cli";
 import { ApplicationFactory, Utils } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
 export class Console {
-	public app: Application;
+	public app: Contracts.Cli.Application;
 
 	public pkg = {
 		bin: {
@@ -40,12 +39,12 @@ export class Console {
 		return this;
 	}
 
-	public async execute(command: Contracts.Kernel.Container.Newable<Commands.Command>): Promise<void> {
+	public async execute(command: Contracts.Kernel.Container.Newable<Contracts.Cli.Command>): Promise<void> {
 		this.app
 			.rebind(Identifiers.Cli.Paths.Application)
-			.toConstantValue(this.app.get<Services.Environment>(Identifiers.Cli.Service.Environment).getPaths());
+			.toConstantValue(this.app.get<Contracts.Cli.Environment>(Identifiers.Cli.Service.Environment).getPaths());
 
-		const cmd = this.app.resolve<Commands.Command>(command);
+		const cmd = this.app.resolve<Contracts.Cli.Command>(command);
 
 		const castedFlags = Utils.Flags.castFlagsToString(this.flags)
 			.split("--")
@@ -64,7 +63,7 @@ export class Console {
 		this.flags = this.#useDefaultFlags ? { network: "devnet", token: "ark" } : {};
 	}
 
-	#createApplication(): Application {
+	#createApplication(): Contracts.Cli.Application {
 		const app = ApplicationFactory.make(new Container(), this.pkg);
 
 		this.flags = this.#useDefaultFlags ? { network: "devnet", token: "ark" } : {};

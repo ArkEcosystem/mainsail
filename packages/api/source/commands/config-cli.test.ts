@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/cli";
+import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import * as execa from "execa";
 
@@ -7,11 +7,11 @@ import { Command } from "./config-cli";
 
 describe<{
 	cli: Console;
-	config: Contracts.Config;
+	config: Contracts.Cli.Config;
 }>("ConfigCliCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.config = context.cli.app.get<Contracts.Config>(Identifiers.Cli.Service.Config);
+		context.config = context.cli.app.get<Contracts.Cli.Config>(Identifiers.Cli.Service.Config);
 	});
 
 	it("should not set config token if no token is passed to command", async ({ config }) => {

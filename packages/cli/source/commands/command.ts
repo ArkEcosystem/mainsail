@@ -11,10 +11,8 @@ import { Output } from "../output/index.js";
 import { Config, Environment } from "../services/index.js";
 import { CommandHelp } from "./command-help.js";
 
-export type CommandList = Record<string, Command>;
-
 @injectable()
-export abstract class Command {
+export abstract class Command implements Contracts.Cli.Command {
 	@inject(Identifiers.Cli.Application.Instance)
 	protected readonly app!: Contracts.Cli.Application;
 
