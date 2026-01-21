@@ -1,4 +1,4 @@
-import { BuildPackages } from "@mainsail/constants";
+import { BuildPackages, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { dim, green, reset } from "kleur/colors";
@@ -7,28 +7,26 @@ import { lt, lte } from "semver";
 
 import { Application } from "../application.js";
 import { Confirm, Spinner, Warning } from "../components/index.js";
-import { Config, Updater as Contracts_Updater } from "../contracts.js";
-import { Identifiers } from "../ioc/index.js";
 import { Installer } from "./installer.js";
 import { ProcessManager } from "./process-manager.js";
 
 const ONE_HOUR = 1000 * 60 * 60;
 
 @injectable()
-export class Updater implements Contracts_Updater {
-	@inject(Identifiers.Application.Instance)
+export class Updater implements Contracts.Cli.Updater {
+	@inject(Identifiers.Cli.Application.Instance)
 	private readonly app!: Application;
 
-	@inject(Identifiers.Config)
-	private readonly config!: Config;
+	@inject(Identifiers.Cli.Service.Config)
+	private readonly config!: Contracts.Cli.Config;
 
-	@inject(Identifiers.Package)
+	@inject(Identifiers.Cli.Package)
 	private readonly pkg!: Contracts.Types.PackageJson;
 
-	@inject(Identifiers.Installer)
+	@inject(Identifiers.Cli.Service.Installer)
 	private readonly installer!: Installer;
 
-	@inject(Identifiers.ProcessManager)
+	@inject(Identifiers.Cli.Service.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
 	#updateCheckInterval: number = ONE_HOUR;
@@ -38,7 +36,7 @@ export class Updater implements Contracts_Updater {
 	public async logStatus(): Promise<void> {
 		if (await this.check()) {
 			this.app
-				.get<Warning>(Identifiers.Warning)
+				.get<Warning>(Identifiers.Cli.Component.Warning)
 				.render(
 					`${reset(" An update is available")} ${dim(this.#packageVersion)} ${reset(" → ")} ${green(
 						this.#latestVersion || "",
@@ -78,7 +76,7 @@ export class Updater implements Contracts_Updater {
 
 		if (!force) {
 			const confirm = await this.app
-				.get<Confirm>(Identifiers.Confirm)
+				.get<Confirm>(Identifiers.Cli.Component.Confirm)
 				.render(
 					`Update available ${dim(this.#packageVersion)} ${reset(" → ")} ${green(
 						this.#latestVersion,
@@ -90,7 +88,9 @@ export class Updater implements Contracts_Updater {
 			}
 		}
 
-		const spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Installing ${this.#latestVersion}`);
+		const spinner = this.app
+			.get<Spinner>(Identifiers.Cli.Component.Spinner)
+			.render(`Installing ${this.#latestVersion}`);
 
 		spinner.start();
 
@@ -118,7 +118,7 @@ export class Updater implements Contracts_Updater {
 			return latest;
 		} catch {
 			this.app
-				.get<Warning>(Identifiers.Warning)
+				.get<Warning>(Identifiers.Cli.Component.Warning)
 				.render(`We were unable to find any releases for the "${this.#packageChannel}" channel.`);
 
 			return undefined;

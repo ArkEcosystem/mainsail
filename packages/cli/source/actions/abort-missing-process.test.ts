@@ -1,8 +1,8 @@
 import { Container } from "@mainsail/container";
+import { Identifiers } from "@mainsail/constants";
 
 import { describe } from "@mainsail/test-framework";
 import { ProcessIdentifier } from "../contracts";
-import { Identifiers } from "../ioc/index.js";
 import { ProcessManager } from "../services";
 import { AbortMissingProcess } from "./abort-missing-process";
 
@@ -17,7 +17,7 @@ describe<{
 
 	beforeEach((context) => {
 		const container = new Container();
-		container.bind(Identifiers.ProcessManager).toConstantValue(processManager);
+		container.bind(Identifiers.Cli.Service.ProcessManager).toConstantValue(processManager);
 		context.action = container.get(AbortMissingProcess, { autobind: true });
 	});
 

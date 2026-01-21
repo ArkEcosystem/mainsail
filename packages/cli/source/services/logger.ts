@@ -1,11 +1,12 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 
-import { Identifiers } from "../ioc/index.js";
 import { Output } from "../output/index.js";
 
 @injectable()
-export class Logger {
-	@inject(Identifiers.Output)
+export class Logger implements Contracts.Cli.Logger {
+	@inject(Identifiers.Cli.Output.Instance)
 	private readonly output!: Output;
 
 	public alert(message: string | Error): void {

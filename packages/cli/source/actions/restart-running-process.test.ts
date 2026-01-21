@@ -1,8 +1,8 @@
 import { Container } from "@mainsail/container";
+import { Identifiers } from "@mainsail/constants";
 
 import { describe } from "@mainsail/test-framework";
 import { ProcessIdentifier } from "../contracts";
-import { Identifiers } from "../ioc/index.js";
 import { ProcessManager } from "../services";
 import { RestartProcess } from "./restart-process";
 import { RestartRunningProcess } from "./restart-running-process";
@@ -22,9 +22,9 @@ describe<{
 
 	beforeEach((context) => {
 		const container = new Container();
-		container.bind(Identifiers.Application.Instance).toConstantValue(container);
-		container.bind(Identifiers.ProcessManager).toConstantValue(processManager);
-		container.bind(Identifiers.RestartProcess).toConstantValue(restartProcess);
+		container.bind(Identifiers.Cli.Application.Instance).toConstantValue(container);
+		container.bind(Identifiers.Cli.Service.ProcessManager).toConstantValue(processManager);
+		container.bind(Identifiers.Cli.Action.RestartProcess).toConstantValue(restartProcess);
 		context.action = container.get(RestartRunningProcess, { autobind: true });
 	});
 

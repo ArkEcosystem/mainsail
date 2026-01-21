@@ -1,5 +1,6 @@
-import { Identifiers, Services } from "@mainsail/cli";
+import { Services } from "@mainsail/cli";
 import { Console, describe } from "@mainsail/test-framework";
+import { Identifiers } from "@mainsail/constants";
 
 import { Command } from "./api-stop";
 
@@ -9,7 +10,7 @@ describe<{
 }>("ApiStopCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.processManager = context.cli.app.get(Identifiers.ProcessManager);
+		context.processManager = context.cli.app.get(Identifiers.Cli.Service.ProcessManager);
 	});
 
 	it("should throw if the process does not exist", async ({ processManager, cli }) => {

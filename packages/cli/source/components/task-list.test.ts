@@ -1,5 +1,5 @@
 import { Console, describe } from "@mainsail/test-framework";
-import { Identifiers } from "../ioc/index.js";
+import { Identifiers } from "@mainsail/constants";
 import { TaskList } from "./task-list";
 
 describe<{
@@ -8,8 +8,8 @@ describe<{
 }>("TaskList", ({ beforeEach, it, assert, spyFn }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.TaskList).to(TaskList).inSingletonScope();
-		context.component = context.cli.app.get(Identifiers.TaskList);
+		context.cli.app.rebind(Identifiers.Cli.Component.TaskList).to(TaskList).inSingletonScope();
+		context.component = context.cli.app.get(Identifiers.Cli.Component.TaskList);
 	});
 
 	it("should render the component", async ({ component, cli }) => {

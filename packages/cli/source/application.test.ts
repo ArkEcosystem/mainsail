@@ -3,7 +3,7 @@ import { Container, injectable } from "@mainsail/container";
 import { describe } from "@mainsail/test-framework";
 import { envPaths as environmentPaths } from "./env-paths";
 import { Application } from "./index";
-import { Identifiers } from "./ioc";
+import { Identifiers } from "@mainsail/constants";
 
 @injectable()
 class StubClass {}
@@ -59,7 +59,7 @@ describe<{
 	it("should get core paths", ({ app }) => {
 		const paths = environmentPaths.get("ark", { suffix: "core" });
 
-		app.bind(Identifiers.ApplicationPaths).toConstantValue(paths);
+		app.bind(Identifiers.Cli.Paths.Application).toConstantValue(paths);
 
 		assert.equal(app.getCorePath("data"), paths.data);
 		assert.equal(app.getCorePath("config"), paths.config);
@@ -71,7 +71,7 @@ describe<{
 	it("should get console paths with a file", ({ app }) => {
 		const paths = environmentPaths.get("ark", { suffix: "core" });
 
-		app.bind(Identifiers.ApplicationPaths).toConstantValue(paths);
+		app.bind(Identifiers.Cli.Paths.Application).toConstantValue(paths);
 
 		assert.equal(app.getCorePath("data", "file"), `${paths.data}/file`);
 		assert.equal(app.getCorePath("config", "file"), `${paths.config}/file`);
@@ -83,7 +83,7 @@ describe<{
 	it("should get console paths", ({ app }) => {
 		const paths = environmentPaths.get("ark", { suffix: "core" });
 
-		app.bind(Identifiers.ConsolePaths).toConstantValue(paths);
+		app.bind(Identifiers.Cli.Paths.Console).toConstantValue(paths);
 
 		assert.equal(app.getConsolePath("data"), paths.data);
 		assert.equal(app.getConsolePath("config"), paths.config);
@@ -95,7 +95,7 @@ describe<{
 	it("should get console paths with a file", ({ app }) => {
 		const paths = environmentPaths.get("ark", { suffix: "core" });
 
-		app.bind(Identifiers.ConsolePaths).toConstantValue(paths);
+		app.bind(Identifiers.Cli.Paths.Console).toConstantValue(paths);
 
 		assert.equal(app.getConsolePath("data", "file"), `${paths.data}/file`);
 		assert.equal(app.getConsolePath("config", "file"), `${paths.config}/file`);

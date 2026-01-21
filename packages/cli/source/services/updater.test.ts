@@ -2,7 +2,7 @@ import prompts from "prompts";
 
 import { Console, describe } from "@mainsail/test-framework";
 import { versionNext } from "../../test/fixtures/latest-version";
-import { Identifiers } from "../ioc/index.js";
+import { Identifiers } from "@mainsail/constants";
 import { Config } from "./config";
 import { Updater } from "./updater";
 
@@ -16,7 +16,7 @@ describe<{
 
 		context.cli = new Console();
 		context.updater = context.cli.app.resolve(Updater);
-		context.config = context.cli.app.get(Identifiers.Config);
+		context.config = context.cli.app.get(Identifiers.Cli.Service.Config);
 	});
 
 	beforeAll(() => nock.disableNetConnect());
@@ -25,7 +25,7 @@ describe<{
 
 	it("#logStatus - should render update message if update is available", async ({ cli, updater }) => {
 		stub(updater, "check").resolvedValue(true);
-		const spyWarning = spy(cli.app.get(Identifiers.Warning), "render");
+		const spyWarning = spy(cli.app.get(Identifiers.Cli.Component.Warning), "render");
 
 		await updater.logStatus();
 
@@ -34,7 +34,7 @@ describe<{
 
 	it("#logStatus - should not render update message if update is not available", async ({ cli, updater }) => {
 		stub(updater, "check").resolvedValue(false);
-		const spyWarning = spy(cli.app.get(Identifiers.Warning), "render");
+		const spyWarning = spy(cli.app.get(Identifiers.Cli.Component.Warning), "render");
 
 		await updater.logStatus();
 
@@ -44,7 +44,7 @@ describe<{
 	it("#check - should return false if the latest version cannot be retrieved", async ({ cli, updater }) => {
 		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, {});
 
-		const spyWarning = spy(cli.app.get(Identifiers.Warning), "render");
+		const spyWarning = spy(cli.app.get(Identifiers.Cli.Component.Warning), "render");
 
 		assert.false(await updater.check());
 		spyWarning.calledWith('We were unable to find any releases for the "next" channel.');
@@ -115,12 +115,12 @@ describe<{
 
 		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, response);
 
-		const spySpinner = stub(cli.app.get(Identifiers.Spinner), "render").returnValue({
+		const spySpinner = stub(cli.app.get(Identifiers.Cli.Component.Spinner), "render").returnValue({
 			start: () => {},
 			succeed: () => {},
 		});
-		const spyInstaller = stub(cli.app.get(Identifiers.Installer), "install");
-		const spyProcessManager = stub(cli.app.get(Identifiers.ProcessManager), "update");
+		const spyInstaller = stub(cli.app.get(Identifiers.Cli.Service.Installer), "install");
+		const spyProcessManager = stub(cli.app.get(Identifiers.Cli.Service.ProcessManager), "update");
 
 		// Act...
 		await updater.check();
@@ -146,12 +146,12 @@ describe<{
 
 		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, response);
 
-		const spySpinner = stub(cli.app.get(Identifiers.Spinner), "render").returnValue({
+		const spySpinner = stub(cli.app.get(Identifiers.Cli.Component.Spinner), "render").returnValue({
 			start: () => {},
 			succeed: () => {},
 		});
-		const spyInstaller = stub(cli.app.get(Identifiers.Installer), "install");
-		const spyProcessManager = stub(cli.app.get(Identifiers.ProcessManager), "update");
+		const spyInstaller = stub(cli.app.get(Identifiers.Cli.Service.Installer), "install");
+		const spyProcessManager = stub(cli.app.get(Identifiers.Cli.Service.ProcessManager), "update");
 
 		prompts.inject([true]);
 
@@ -179,12 +179,12 @@ describe<{
 
 		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, response);
 
-		const spySpinner = stub(cli.app.get(Identifiers.Spinner), "render").returnValue({
+		const spySpinner = stub(cli.app.get(Identifiers.Cli.Component.Spinner), "render").returnValue({
 			start: () => {},
 			succeed: () => {},
 		});
-		const spyInstaller = stub(cli.app.get(Identifiers.Installer), "install");
-		const spyProcessManager = stub(cli.app.get(Identifiers.ProcessManager), "update");
+		const spyInstaller = stub(cli.app.get(Identifiers.Cli.Service.Installer), "install");
+		const spyProcessManager = stub(cli.app.get(Identifiers.Cli.Service.ProcessManager), "update");
 
 		prompts.inject([false]);
 

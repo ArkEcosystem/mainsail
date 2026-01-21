@@ -1,7 +1,7 @@
 import { bgGreen, white } from "kleur/colors";
 
 import { Console, describe } from "@mainsail/test-framework";
-import { Identifiers } from "../ioc/index.js";
+import { Identifiers } from "@mainsail/constants";
 import { Success } from "./success";
 
 describe<{
@@ -10,12 +10,12 @@ describe<{
 }>("Success", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Success).to(Success).inSingletonScope();
-		context.component = context.cli.app.get(Identifiers.Success);
+		context.cli.app.rebind(Identifiers.Cli.Component.Success).to(Success).inSingletonScope();
+		context.component = context.cli.app.get(Identifiers.Cli.Component.Success);
 	});
 
 	it("should render the component", async ({ component, cli }) => {
-		const spyOnLog = spy(cli.app.get(Identifiers.Logger), "log");
+		const spyOnLog = spy(cli.app.get(Identifiers.Cli.Service.Logger), "log");
 
 		component.render("Hello World");
 

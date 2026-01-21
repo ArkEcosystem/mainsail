@@ -2,7 +2,7 @@ import { blue, red } from "kleur/colors";
 import prompts from "prompts";
 
 import { Console, describe } from "@mainsail/test-framework";
-import { Identifiers } from "../ioc/index.js";
+import { Identifiers } from "@mainsail/constants";
 import { SuggestCommand } from "./suggest";
 
 describe<{
@@ -23,7 +23,7 @@ describe<{
 	});
 
 	it("should update the bin help if a topic is found", async ({ cli, cmd }) => {
-		const spyWarning = spy(cli.app.get(Identifiers.Warning), "render");
+		const spyWarning = spy(cli.app.get(Identifiers.Cli.Component.Warning), "render");
 
 		prompts.inject([true]);
 
@@ -33,7 +33,7 @@ describe<{
 	});
 
 	it("should throw if suggestion is not confirmed", async ({ cli, cmd }) => {
-		const spyInfo = spy(cli.app.get(Identifiers.Info), "render");
+		const spyInfo = spy(cli.app.get(Identifiers.Cli.Component.Info), "render");
 
 		prompts.inject([false]);
 

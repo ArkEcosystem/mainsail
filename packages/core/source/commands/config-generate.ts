@@ -1,7 +1,8 @@
-import { Commands, Contracts, Identifiers as CliIdentifiers, Services } from "@mainsail/cli";
+import { Commands } from "@mainsail/cli";
 import { ConfigurationGenerator, Identifiers, makeApplication } from "@mainsail/configuration-generator";
-import { Identifiers as AppIdentifiers } from "@mainsail/constants";
+import { Identifiers as AppIdentifiers, Identifiers as CliIdentifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { Contracts as AppContracts } from "@mainsail/contracts";
 import envPaths from "env-paths";
 import Joi from "joi";
@@ -27,8 +28,8 @@ type Flags = Omit<AppContracts.NetworkGenerator.Options, "peers" | "rewardAmount
 
 @injectable()
 export class Command extends Commands.Command {
-	@inject(CliIdentifiers.Logger)
-	private readonly logger!: Services.Logger;
+	@inject(CliIdentifiers.Cli.Service.Logger)
+	private readonly logger!: Contracts.Cli.Logger;
 
 	public signature = "config:generate";
 
@@ -199,7 +200,7 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const flags: Contracts.AnyObject = this.getFlags();
+		const flags: Contracts.Cli.AnyObject = this.getFlags();
 
 		const allFlagsSet = !this.#flagSettings
 			.filter((flag) => flag.promptType)
@@ -214,7 +215,7 @@ export class Command extends Commands.Command {
 		let options = {
 			...defaults,
 			...flags,
-			packageName: this.app.get<AppContracts.Types.PackageJson>(CliIdentifiers.Package).name,
+			packageName: this.app.get<AppContracts.Types.PackageJson>(CliIdentifiers.Cli.Package).name,
 		} as Flags;
 
 		const configurationApp = await makeApplication(this.#getConfigurationPath(options), options);
@@ -249,10 +250,10 @@ export class Command extends Commands.Command {
 			...defaults,
 			...flags,
 			...response,
-			packageName: this.app.get<AppContracts.Types.PackageJson>(CliIdentifiers.Package).name,
+			packageName: this.app.get<AppContracts.Types.PackageJson>(CliIdentifiers.Cli.Package).name,
 		} as Flags;
 
-		const path = this.#getConfigurationPath(options, configurationApp.get(CliIdentifiers.Application.Name));
+		const path = this.#getConfigurationPath(options, configurationApp.get(CliIdentifiers.Cli.Application.Name));
 		configurationApp.rebind(Identifiers.ConfigurationPath).toConstantValue(path);
 
 		if (!response.confirm) {

@@ -1,5 +1,7 @@
-import { Commands, Identifiers, Services } from "@mainsail/cli";
+import { Commands } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { http } from "@mainsail/utils";
 import { createWriteStream, existsSync, readFileSync, writeFileSync } from "fs";
 import { ensureDirSync, removeSync } from "fs-extra/esm";
@@ -41,8 +43,8 @@ interface Flags {
 
 @injectable()
 export class Command extends Commands.Command {
-	@inject(Identifiers.Environment)
-	private readonly environment!: Services.Environment;
+	@inject(Identifiers.Cli.Service.Environment)
+	private readonly environment!: Contracts.Cli.Environment;
 
 	public signature = "config:publish:custom";
 
@@ -68,7 +70,7 @@ export class Command extends Commands.Command {
 			throw new Error("You must provide the --app and --crypto flags to publish the configuration.");
 		}
 
-		this.app.rebind(Identifiers.ApplicationPaths).toConstantValue(this.environment.getPaths());
+		this.app.rebind(Identifiers.Cli.Paths.Application).toConstantValue(this.environment.getPaths());
 
 		const configDestination = this.app.getCorePath("config");
 

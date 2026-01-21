@@ -1,5 +1,5 @@
 import { Console, describe } from "@mainsail/test-framework";
-import { Identifiers } from "../ioc/index.js";
+import { Identifiers } from "@mainsail/constants";
 import { Clear } from "./clear";
 
 describe<{
@@ -8,8 +8,8 @@ describe<{
 }>("Clear", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Clear).to(Clear).inSingletonScope();
-		context.component = context.cli.app.get(Identifiers.Clear);
+		context.cli.app.rebind(Identifiers.Cli.Component.Clear).to(Clear).inSingletonScope();
+		context.component = context.cli.app.get(Identifiers.Cli.Component.Clear);
 	});
 
 	it("should render the component", async ({ component, cli }) => {

@@ -1,5 +1,5 @@
 import { Console, describe } from "@mainsail/test-framework";
-import { Identifiers } from "../ioc/index.js";
+import { Identifiers } from "@mainsail/constants";
 import { Spinner } from "./spinner";
 
 describe<{
@@ -8,8 +8,8 @@ describe<{
 }>("Spinner", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Spinner).to(Spinner).inSingletonScope();
-		context.component = context.cli.app.get(Identifiers.Spinner);
+		context.cli.app.rebind(Identifiers.Cli.Component.Spinner).to(Spinner).inSingletonScope();
+		context.component = context.cli.app.get(Identifiers.Cli.Component.Spinner);
 	});
 
 	it("should render the component", async ({ component, cli }) => {

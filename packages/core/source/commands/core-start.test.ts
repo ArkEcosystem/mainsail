@@ -1,4 +1,5 @@
-import { Identifiers, Services } from "@mainsail/cli";
+import { Services } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { writeJSONSync } from "fs-extra/esm";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -15,7 +16,7 @@ describe<{
 		writeJSONSync(`${process.env.MAINSAIL_PATH_CONFIG}/delegates.json`, { secrets: ["bip39"] });
 
 		context.cli = new Console();
-		context.processManager = context.cli.app.get(Identifiers.ProcessManager);
+		context.processManager = context.cli.app.get(Identifiers.Cli.Service.ProcessManager);
 	});
 
 	afterAll(() => setGracefulCleanup());

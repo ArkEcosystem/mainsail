@@ -1,7 +1,7 @@
 import { bgRed, white } from "kleur/colors";
+import { Identifiers } from "@mainsail/constants";
 
 import { Console, describe } from "@mainsail/test-framework";
-import { Identifiers } from "../ioc/index.js";
 import { Fatal } from "./fatal";
 
 describe<{
@@ -10,12 +10,12 @@ describe<{
 }>("Fatal", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Fatal).to(Fatal).inSingletonScope();
-		context.component = context.cli.app.get(Identifiers.Fatal);
+		context.cli.app.rebind(Identifiers.Cli.Component.Fatal).to(Fatal).inSingletonScope();
+		context.component = context.cli.app.get(Identifiers.Cli.Component.Fatal);
 	});
 
 	it("should render the component", async ({ component, cli }) => {
-		const spyOnError = spy(cli.app.get(Identifiers.Logger), "error");
+		const spyOnError = spy(cli.app.get(Identifiers.Cli.Service.Logger), "error");
 
 		assert.throws(() => component.render("Hello World"), "Hello World");
 

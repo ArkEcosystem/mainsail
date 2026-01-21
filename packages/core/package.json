@@ -55,6 +55,7 @@
 		"@mainsail/crypto-key-pair-bls12-381": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-messages": "workspace:*",
+		"@mainsail/crypto-proposal": "workspace:*",
 		"@mainsail/crypto-signature-schnorr": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",

@@ -1,7 +1,7 @@
 import { bgYellow, white } from "kleur/colors";
 
 import { Console, describe } from "@mainsail/test-framework";
-import { Identifiers } from "../ioc/index.js";
+import { Identifiers } from "@mainsail/constants";
 import { Warning } from "./warning";
 
 describe<{
@@ -10,12 +10,12 @@ describe<{
 }>("Warning", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Warning).to(Warning).inSingletonScope();
-		context.component = context.cli.app.get(Identifiers.Warning);
+		context.cli.app.rebind(Identifiers.Cli.Component.Warning).to(Warning).inSingletonScope();
+		context.component = context.cli.app.get(Identifiers.Cli.Component.Warning);
 	});
 
 	it("should render the component", async ({ component, cli }) => {
-		const spyOnLog = spy(cli.app.get(Identifiers.Logger), "warn");
+		const spyOnLog = spy(cli.app.get(Identifiers.Cli.Service.Logger), "warn");
 
 		component.render("Hello World");
 

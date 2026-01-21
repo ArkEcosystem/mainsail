@@ -1,12 +1,5 @@
-import {
-	ApplicationFactory,
-	Commands,
-	Contracts as CliContracts,
-	Flags,
-	Identifiers,
-	InputParser,
-	Plugins,
-} from "@mainsail/cli";
+import { ApplicationFactory, Commands, Flags, InputParser, Plugins } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { Container, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { existsSync } from "fs";
@@ -16,7 +9,7 @@ import path from "path";
 
 @injectable()
 export class CommandLineInterface {
-	#app!: CliContracts.Application;
+	#app!: Contracts.Cli.Application;
 
 	public constructor(private readonly argv: string[]) {}
 
@@ -35,13 +28,13 @@ export class CommandLineInterface {
 		this.#app = ApplicationFactory.make(new Container(), package_);
 
 		// Check for updates
-		await this.#app.get<CliContracts.Updater>(Identifiers.Updater).check();
+		await this.#app.get<Contracts.Cli.Updater>(Identifiers.Cli.Service.Updater).check();
 
 		// Parse arguments and flags
 		const { args, flags } = InputParser.parseArgv(this.argv);
 
 		// Discover commands and commands from plugins
-		const commands: Commands.CommandList = await this.#discoverCommands(dirname, flags);
+		const commands: Contracts.Cli.CommandList = await this.#discoverCommands(dirname, flags);
 
 		// Figure out what command we should run and offer help if necessary
 		let commandSignature = args[0] as string | undefined;
@@ -53,7 +46,7 @@ export class CommandLineInterface {
 			return;
 		}
 
-		let commandInstance: Commands.Command = commands[commandSignature];
+		let commandInstance: Contracts.Cli.Command = commands[commandSignature];
 
 		if (!commandInstance) {
 			commandSignature = await this.#app.resolve(Plugins.SuggestCommand).execute({
@@ -107,11 +100,13 @@ export class CommandLineInterface {
 		Module._initPaths();
 	}
 
-	async #discoverCommands(dirname: string, flags: Flags): Promise<Commands.CommandList> {
+	async #discoverCommands(dirname: string, flags: Flags): Promise<Contracts.Cli.CommandList> {
 		const commandsDiscoverer = this.#app.resolve(Commands.DiscoverCommands);
-		const commands: Commands.CommandList = await commandsDiscoverer.within(path.resolve(dirname, "./commands"));
+		const commands: Contracts.Cli.CommandList = await commandsDiscoverer.within(
+			path.resolve(dirname, "./commands"),
+		);
 
-		const plugins = await this.#app.get<CliContracts.PluginManager>(Identifiers.PluginManager).list();
+		const plugins = await this.#app.get<Contracts.Cli.PluginManager>(Identifiers.Cli.Service.PluginManager).list();
 
 		const commandsFromPlugins = await commandsDiscoverer.from(plugins.map((plugin) => plugin.path));
 
@@ -119,7 +114,7 @@ export class CommandLineInterface {
 			commands[key] = value;
 		}
 
-		this.#app.bind<Commands.CommandList>(Identifiers.Commands).toConstantValue(commands);
+		this.#app.bind<Contracts.Cli.CommandList>(Identifiers.Cli.Commands).toConstantValue(commands);
 		return commands;
 	}
 }

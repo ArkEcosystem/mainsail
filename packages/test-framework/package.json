@@ -26,6 +26,7 @@
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
+		"@mainsail/serializer": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"fs-extra": "11.3.1",
 		"tmp": "0.2.5"

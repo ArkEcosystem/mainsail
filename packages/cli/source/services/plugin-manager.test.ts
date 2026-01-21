@@ -4,7 +4,7 @@ import { join } from "path";
 import { setGracefulCleanup } from "tmp";
 
 import { Console, describe } from "@mainsail/test-framework";
-import { Identifiers } from "../ioc/index.js";
+import { Identifiers } from "@mainsail/constants";
 import { PluginManager } from "./plugin-manager";
 import { File, Git, NPM } from "./source-providers";
 
@@ -38,7 +38,7 @@ describe<{
 	it("#discover - should discover packages containing package.json", async ({ cli, pluginManager }) => {
 		const pluginsPath: string = join(import.meta.dirname, "../../test/plugins");
 
-		stub(cli.app.get(Identifiers.Environment), "getPaths").returnValue({
+		stub(cli.app.get(Identifiers.Cli.Service.Environment), "getPaths").returnValue({
 			data: join(import.meta.dirname, "../../test"),
 		});
 
