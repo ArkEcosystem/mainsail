@@ -188,6 +188,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			transactions.push({
 				blockHash: header.hash,
 				blockNumber: header.number.toFixed(),
+				cumulativeGasUsed: Number(receipt.cumulativeGasUsed),
+
 				data: data.data,
 
 				decodedError: parseTransactionError(transaction, receipt),
@@ -200,8 +202,6 @@ export class Sync implements Contracts.ApiSync.Service {
 				gas: data.gasLimit,
 
 				gasPrice: data.gasPrice,
-				
-				cumulativeGasUsed: Number(receipt.cumulativeGasUsed),
 
 				gasRefunded: Number(receipt.gasRefunded),
 

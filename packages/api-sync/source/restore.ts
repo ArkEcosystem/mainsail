@@ -443,6 +443,8 @@ export class Restore {
 					transactions.push({
 						blockHash: block.header.hash,
 						blockNumber: block.header.number.toFixed(),
+						cumulativeGasUsed: Number(receipt.cumulativeGasUsed),
+
 						data: data.data,
 
 						decodedError: parseTransactionError(transaction, receipt),
@@ -457,8 +459,6 @@ export class Restore {
 						gasPrice: data.gasPrice,
 
 						gasRefunded: Number(receipt.gasRefunded),
-
-						cumulativeGasUsed: Number(receipt.cumulativeGasUsed),
 
 						gasUsed: Number(receipt.gasUsed),
 
