@@ -16,7 +16,7 @@ use crate::{
 pub struct StateCommit {
     pub key: CommitKey,
     pub change_set: state_changes::StateChangeset,
-    pub results: BTreeMap<B256, ExecutionResult>,
+    pub results: BTreeMap<B256, (ExecutionResult, u64)>,
 }
 
 pub fn build_commit(pending_commit: &mut PendingCommit) -> Result<StateCommit, crate::db::Error> {
@@ -133,7 +133,7 @@ fn collect_dirty_accounts(
     }
 
     if let Some(info) = genesis_info {
-        for receipt in commit.results.values() {
+        for (receipt, _) in commit.results.values() {
             match receipt {
                 ExecutionResult::Success { logs, .. } => {
                     for log in logs {

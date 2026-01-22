@@ -43,6 +43,7 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): Tra
 					"Transaction.status",
 					"Transaction.gasUsed",
 					"Transaction.gasRefunded",
+					"Transaction.cumulativeGasUsed",
 					"Transaction.deployedContractAddress",
 					"Transaction.decodedError",
 				];
