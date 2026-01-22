@@ -14,6 +14,7 @@
 		"value": "1000000000",
 		"timestamp": "1695350067153",
 		"receipt": {
+			"cumulativeGasUsed": 116802,
 			"gasRefunded": 0,
 			"gasUsed": 116802,
 			"status": 1
@@ -34,6 +35,7 @@
 		"value": "1000000000",
 		"timestamp": "1695350059144",
 		"receipt": {
+			"cumulativeGasUsed": 116802,
 			"gasRefunded": 0,
 			"gasUsed": 116802,
 			"status": 1
@@ -54,6 +56,7 @@
 		"value": "1000000000",
 		"timestamp": "1695350051134",
 		"receipt": {
+			"cumulativeGasUsed": 116802,
 			"gasRefunded": 0,
 			"gasUsed": 116802,
 			"status": 1
