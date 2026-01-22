@@ -1,4 +1,5 @@
-import { Console, describe } from "@mainsail/test-framework";
+import { Console } from "@mainsail/cli";
+import { describe } from "@mainsail/test-framework";
 import { Identifiers } from "@mainsail/constants";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";

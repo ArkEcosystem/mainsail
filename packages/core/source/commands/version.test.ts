@@ -1,10 +1,11 @@
-import { Console, describe } from "@mainsail/test-framework";
+import { Console } from "@mainsail/cli";
+import { describe } from "@mainsail/test-framework";
 
 import { Command } from "./version";
 
 describe<{
 	cli: Console;
-}>("VersionCommand", ({ beforeEach, it, assert, spy }) => {
+}>("VersionCommand", ({ beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 	});
