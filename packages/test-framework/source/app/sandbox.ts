@@ -2,7 +2,6 @@ import { Identifiers } from "@mainsail/constants";
 import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
-import { removeSync } from "fs-extra/esm";
 import { join, resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -12,7 +11,6 @@ export class Sandbox {
 	public readonly app: Application;
 	readonly #container: Container;
 
-	#configApp?: Application;
 	#path = dirSync().name;
 
 	#configurationOptions: Contracts.NetworkGenerator.Options = {
@@ -78,49 +76,49 @@ export class Sandbox {
 	// 	}
 	// }
 
-	public async dispose(callback?: SandboxCallback): Promise<void> {
-		try {
-			// Terminate calls process.exit(), which we cannot do during unit tests.
-			// However, due to exceptions it never gets that far currently so it happens to "work".
-			// await this.app.terminate();
-			//
-			// Furthermore, most unit tests fail to shutdown the sandbox correctly as the registered services are not tracked in
-			// the service registry meaning `#disposeServiceProviders` does not actually dispose them.
-			//
-			// Therefore, for now we simply manually dispose the services that are known to require explicit closing such as the EVM.
-			// In the future, we should automate this by tracking.
-			for (const tag of ["evm", "validator", "transaction-pool", "rpc"]) {
-				if (this.#configApp?.isBoundTagged(Identifiers.Evm.Instance, "instance", tag)) {
-					{
-						await this.#configApp
-							?.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", tag)
-							.dispose();
-					}
-				}
-			}
-		} catch (error) {
-			console.log("ex", error);
-			// We encountered a unexpected error.
-		}
+	// public async dispose(callback?: SandboxCallback): Promise<void> {
+	// 	try {
+	// 		// Terminate calls process.exit(), which we cannot do during unit tests.
+	// 		// However, due to exceptions it never gets that far currently so it happens to "work".
+	// 		// await this.app.terminate();
+	// 		//
+	// 		// Furthermore, most unit tests fail to shutdown the sandbox correctly as the registered services are not tracked in
+	// 		// the service registry meaning `#disposeServiceProviders` does not actually dispose them.
+	// 		//
+	// 		// Therefore, for now we simply manually dispose the services that are known to require explicit closing such as the EVM.
+	// 		// In the future, we should automate this by tracking.
+	// 		for (const tag of ["evm", "validator", "transaction-pool", "rpc"]) {
+	// 			if (this.#configApp?.isBoundTagged(Identifiers.Evm.Instance, "instance", tag)) {
+	// 				{
+	// 					await this.#configApp
+	// 						?.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", tag)
+	// 						.dispose();
+	// 				}
+	// 			}
+	// 		}
+	// 	} catch (error) {
+	// 		console.log("ex", error);
+	// 		// We encountered a unexpected error.
+	// 	}
 
-		removeSync(this.#path);
+	// 	removeSync(this.#path);
 
-		if (callback) {
-			callback({ app: this.app, container: this.#container });
-		}
-	}
+	// 	if (callback) {
+	// 		callback({ app: this.app, container: this.#container });
+	// 	}
+	// }
 
-	public snapshot(): void {
-		this.#container.snapshot();
-	}
+	// public snapshot(): void {
+	// 	this.#container.snapshot();
+	// }
 
-	public restore(): void {
-		try {
-			this.#container.restore();
-		} catch {
-			// No snapshot available to restore.
-		}
-	}
+	// public restore(): void {
+	// 	try {
+	// 		this.#container.restore();
+	// 	} catch {
+	// 		// No snapshot available to restore.
+	// 	}
+	// }
 
 	public async registerServiceProvider({
 		name,
