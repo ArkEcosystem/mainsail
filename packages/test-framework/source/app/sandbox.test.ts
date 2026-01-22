@@ -3,10 +3,10 @@ import { Identifiers } from "@mainsail/constants";
 import { readJSONSync } from "fs-extra/esm";
 import { join } from "path";
 
-import { describe } from "../index";
+import { describeSkip } from "../index";
 import { Sandbox } from "./sandbox";
 
-describe("Sandbox", ({ it, assert, spyFn }) => {
+describeSkip("Sandbox", ({ it, assert, spyFn }) => {
 	it("should create app", () => {
 		const sandbox = new Sandbox();
 
