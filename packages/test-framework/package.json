@@ -21,12 +21,10 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
-		"@mainsail/cli": "workspace:*",
 		"@mainsail/configuration-generator": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/serializer": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"fs-extra": "11.3.1",
 		"tmp": "0.2.5"

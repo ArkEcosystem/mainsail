@@ -3056,9 +3056,6 @@ importers:
 
   packages/test-framework:
     dependencies:
-      '@mainsail/cli':
-        specifier: workspace:*
-        version: link:../cli
       '@mainsail/configuration-generator':
         specifier: workspace:*
         version: link:../configuration-generator
@@ -3071,9 +3068,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/serializer':
-        specifier: workspace:*
-        version: link:../serializer
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
