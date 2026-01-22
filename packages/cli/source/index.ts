@@ -9,4 +9,5 @@ export * from "./input/index.js";
 export * from "./output/index.js";
 export * as Plugins from "./plugins/index.js";
 export * as Services from "./services/index.js";
+export * as Test from "./test/index.js";
 export * as Utils from "./utils/index.js";
