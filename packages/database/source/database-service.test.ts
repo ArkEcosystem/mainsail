@@ -15,7 +15,6 @@ describe<{
 	afterAll(() => setGracefulCleanup());
 
 	afterEach(async (context) => {
-		await context.sandbox.dispose();
 		await context.evm.dispose();
 	});
 
