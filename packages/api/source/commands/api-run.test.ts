@@ -1,7 +1,8 @@
 import { Utils } from "@mainsail/cli";
 import { sleep } from "@mainsail/utils";
 import { dirSync, setGracefulCleanup } from "tmp";
-import { Console, describe } from "@mainsail/test-framework";
+import { Console } from "@mainsail/cli";
+import { describe } from "@mainsail/test-framework";
 import { Command } from "./api-run";
 
 describe<{

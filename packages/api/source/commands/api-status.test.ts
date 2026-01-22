@@ -1,5 +1,5 @@
-import { Services } from "@mainsail/cli";
-import { Console, describe } from "@mainsail/test-framework";
+import { Services, Console } from "@mainsail/cli";
+import { describe } from "@mainsail/test-framework";
 import { Identifiers } from "@mainsail/constants";
 
 import { Command } from "./api-status";
