@@ -247,8 +247,10 @@ pub struct CommitData {
 pub struct PendingCommit {
     pub key: CommitKey,
     pub cache: CacheState,
-    pub results: BTreeMap<B256, ExecutionResult>,
+    pub results: BTreeMap<B256, (ExecutionResult, u64)>,
     pub transitions: TransitionState,
+
+    pub cumulative_gas_used: u64,
 
     // Map of legacy attributes
     pub legacy_attributes: BTreeMap<Address, LegacyAccountAttributes>,
@@ -830,7 +832,7 @@ impl PersistentDB {
         key: &CommitKey,
         change_set: &mut state_changes::StateChangeset,
         commit_data: &Option<CommitData>,
-        results: &BTreeMap<B256, ExecutionResult>,
+        results: &BTreeMap<B256, (ExecutionResult, u64)>,
     ) -> Result<(), Error> {
         assert!(!self.is_block_committed(key.0));
 
@@ -1052,8 +1054,20 @@ impl PersistentDB {
 
             // Finalize commit
             let mut tx_receipts = HashMap::default();
-            for (k, result) in results {
-                tx_receipts.insert(k.clone(), map_execution_result(result.clone()));
+            let mut calculated_cumulative_gas_used = 0;
+            for (k, (result, cumulative_gas_used)) in results {
+                let receipt = map_execution_result(result.clone(), *cumulative_gas_used);
+                self.logger.log(
+                    LogLevel::Info,
+                    format!(
+                        "cum: {} ccum: {} gas_used: {}",
+                        *cumulative_gas_used, calculated_cumulative_gas_used, receipt.gas_used
+                    ),
+                );
+
+                calculated_cumulative_gas_used += receipt.gas_used;
+
+                tx_receipts.insert(k.clone(), receipt);
             }
 
             inner.commits.put(
@@ -1219,6 +1233,7 @@ impl PendingCommit {
         Self {
             key,
             cache: Default::default(),
+            cumulative_gas_used: Default::default(),
             results: Default::default(),
             transitions: Default::default(),
             legacy_attributes: Default::default(),
