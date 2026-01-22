@@ -1,6 +1,7 @@
-import { Console, describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { Identifiers } from "@mainsail/constants";
 import { NewLine } from "./new-line";
+import { Console } from "../test/index.js";
 
 describe<{
 	component: NewLine;

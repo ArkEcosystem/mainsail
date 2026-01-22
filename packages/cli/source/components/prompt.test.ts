@@ -1,8 +1,9 @@
 import prompts from "prompts";
 
-import { Console, describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { Identifiers } from "@mainsail/constants";
 import { Prompt } from "./prompt.js";
+import { Console } from "../test/index.js";
 
 describe<{
 	component: Prompt;

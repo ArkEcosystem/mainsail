@@ -1,8 +1,9 @@
 import { bgYellow, white } from "kleur/colors";
 
-import { Console, describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { Identifiers } from "@mainsail/constants";
 import { Warning } from "./warning";
+import { Console } from "../test/index.js";
 
 describe<{
 	component: Warning;

@@ -1,6 +1,6 @@
 import cryptoConfig from "../../../core/bin/config/devnet/core/crypto.json";
 import { Types } from "../factories";
-import { describe } from "../index";
+import { describe } from "@mainsail/test-framework";
 import passphrases from "./passphrases.json";
 import { Signer } from "./signer";
 

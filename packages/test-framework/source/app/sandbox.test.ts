@@ -29,6 +29,7 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 
 		const coreOptions: Contracts.NetworkGenerator.Options = {
 			blockTime: 8000,
+			chainId: 1000,
 			distribute: true,
 			explorer: "http://dexplorer.ark.io",
 			maxBlockPayload: 2_097_152,

@@ -2,7 +2,8 @@ import type { TransactionBuilder } from "@mainsail/crypto-transaction";
 import clone from "lodash.clone";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
-import { describe, Factories } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
+import { Factories } from "../../test-factories/source/index.js";
 import { blockData } from "../test/fixtures/block";
 import { sealBlock } from "./block";
 

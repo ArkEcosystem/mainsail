@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers, Events, Enums } from "@mainsail/constants";
 import { Lock } from "@mainsail/utils";
 
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { Consensus } from "./consensus";
 
 type Context = {

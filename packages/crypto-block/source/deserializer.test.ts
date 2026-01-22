@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { blockData, blockDataWithTransactions, serialized, serializedWithTransactions } from "../test/fixtures/block";
 import { assertBlockData, assertTransactionData } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";

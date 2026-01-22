@@ -1,8 +1,11 @@
-import { ApplicationFactory, Utils } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
+import { ApplicationFactory } from "../application-factory.js";
+import { Flags } from "../utils/index.js";
+
+// Class support for tests
 export class Console {
 	public app: Contracts.Cli.Application;
 
@@ -46,7 +49,7 @@ export class Console {
 
 		const cmd = this.app.resolve<Contracts.Cli.Command>(command);
 
-		const castedFlags = Utils.Flags.castFlagsToString(this.flags)
+		const castedFlags = Flags.castFlagsToString(this.flags)
 			.split("--")
 			.filter(Boolean)
 			.map((flag: string) => `--${flag}`.trim());

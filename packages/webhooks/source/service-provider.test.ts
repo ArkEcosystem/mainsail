@@ -5,7 +5,7 @@ import { NullEventDispatcher } from "@mainsail/kernel/source/services/events/dri
 import { AnySchema } from "joi";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { defaults } from "./defaults";
 import { ServiceProvider } from "./service-provider";
 

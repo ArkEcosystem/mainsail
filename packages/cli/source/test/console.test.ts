@@ -1,9 +1,9 @@
-import { Commands } from "@mainsail/cli";
+import { Command as BaseCommand } from "../commands/index.js";
 import { injectable, postConstruct } from "@mainsail/container";
 import Joi from "joi";
 
-import { describe } from "../index";
-import { Console } from "./console";
+import { describe } from "@mainsail/test-runner";
+import { Console } from "./console.js";
 
 describe("Console", ({ beforeEach, it, assert, spyFn }) => {
 	let spyOnGetFlag;
@@ -12,7 +12,7 @@ describe("Console", ({ beforeEach, it, assert, spyFn }) => {
 	let spyOnGetArgument;
 
 	@injectable()
-	class Command extends Commands.Command {
+	class Command extends BaseCommand {
 		/**
 		 * The console command signature.
 		 *

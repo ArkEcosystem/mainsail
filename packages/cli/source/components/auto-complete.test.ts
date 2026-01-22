@@ -1,8 +1,9 @@
 import prompts from "prompts";
 import { Identifiers } from "@mainsail/constants";
 
-import { Console, describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { AutoComplete } from "./auto-complete";
+import { Console } from "../test/index.js";
 
 describe<{
 	component: AutoComplete;

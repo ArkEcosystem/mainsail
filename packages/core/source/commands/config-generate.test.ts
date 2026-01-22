@@ -4,7 +4,8 @@ import fs from "fs";
 import { join } from "path";
 import prompts from "prompts";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console } from "@mainsail/cli";
+import { describe } from "@mainsail/test-framework";
 import { Command } from "./config-generate";
 
 describe<{

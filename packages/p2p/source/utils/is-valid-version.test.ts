@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { defaults } from "../defaults";
 import { isValidVersion } from "./is-valid-version";
 

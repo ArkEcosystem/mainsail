@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 

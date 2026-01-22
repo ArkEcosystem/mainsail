@@ -4,7 +4,7 @@ import { Configuration } from "@mainsail/crypto-config/distribution/index.js";
 import { makeKeywords as makeProposalKeywords } from "@mainsail/crypto-proposal/distribution/keywords.js";
 import { schemas as cryptoTransactionSchemas } from "@mainsail/crypto-transaction/distribution/index.js";
 import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation/distribution/index.js";
-import type { Sandbox } from "@mainsail/test-framework/source/index.js";
+import type { Sandbox } from "@mainsail/test-framework";
 import type { Validator } from "@mainsail/validation";
 
 import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };

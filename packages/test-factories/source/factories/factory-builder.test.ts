@@ -1,4 +1,4 @@
-import { describe } from "../index";
+import { describe } from "@mainsail/test-framework";
 import { FactoryBuilder } from "./factory-builder";
 
 describe<{

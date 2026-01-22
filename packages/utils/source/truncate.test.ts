@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { truncate } from "./truncate";
 
 describe("truncate", async ({ assert, it, nock, loader }) => {

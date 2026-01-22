@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { isEmptyArray } from "./is-empty-array";
 
 describe("isEmptyArray", async ({ assert, it }) => {

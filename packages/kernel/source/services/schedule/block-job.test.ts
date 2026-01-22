@@ -2,7 +2,7 @@ import { Identifiers, Events } from "@mainsail/constants";
 
 import crypto from "../../../../core/bin/config/devnet/core/crypto.json";
 import { Configuration } from "../../../../crypto-config/distribution/index";
-import { describe, Sandbox } from "../../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { MemoryEventDispatcher } from "../events";
 import { BlockJob } from "./block-job";
 

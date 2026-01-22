@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 
-import { describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { ProcessIdentifier } from "../contracts";
 import { ProcessManager } from "../services";
 import { AbortMissingProcess } from "./abort-missing-process";

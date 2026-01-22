@@ -1,8 +1,7 @@
-import { Services } from "@mainsail/cli";
+import { Services, Console } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { dirSync, setGracefulCleanup } from "tmp";
-
-import { Console, describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { Command } from "./api-start";
 
 describe<{

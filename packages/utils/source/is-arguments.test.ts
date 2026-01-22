@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { isArguments } from "./is-arguments";
 
 describe("#isArguments", ({ it, assert }) => {

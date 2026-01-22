@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 
-import { describe } from "../../../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { getHeaders } from "./get-headers";
 
 describe("getHeaders", ({ it, assert }) => {

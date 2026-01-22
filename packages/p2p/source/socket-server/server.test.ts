@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 import esmock from "esmock";
 
-import { describeSkip, Sandbox } from "../../../test-framework/source";
+import { describeSkip, Sandbox } from "@mainsail/test-framework";
 import { defaults as transactionPoolDefaults } from "../../../transaction-pool-service/source/defaults";
 import { defaults } from "../defaults";
 

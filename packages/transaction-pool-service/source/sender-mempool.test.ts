@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 
-import { describeSkip } from "../../test-framework/source";
+import { describeSkip } from "@mainsail/test-framework";
 import { BigNumber } from "../../utils/source/big-number";
 import { SenderMempool } from ".";
 

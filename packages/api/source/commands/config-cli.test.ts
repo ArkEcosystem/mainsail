@@ -1,8 +1,9 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
+import { Console } from "@mainsail/cli";
 import * as execa from "execa";
 
-import { Console, describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { Command } from "./config-cli";
 
 describe<{

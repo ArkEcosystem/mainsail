@@ -17,7 +17,7 @@ import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
-import { Sandbox } from "../../../test-framework/source/index.js";
+import { Sandbox } from "@mainsail/test-framework";
 import { Deserializer } from "../../source/deserializer.js";
 import { Factory } from "../../source/factory.js";
 import { schemas } from "../../source/schemas.js";

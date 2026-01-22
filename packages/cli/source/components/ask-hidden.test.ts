@@ -1,8 +1,9 @@
 import prompts from "prompts";
 import { Identifiers } from "@mainsail/constants";
 
-import { Console, describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { AskHidden } from "./ask-hidden";
+import { Console } from "../test/index.js";
 
 describe<{
 	component: AskHidden;

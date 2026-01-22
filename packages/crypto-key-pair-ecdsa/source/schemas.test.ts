@@ -5,7 +5,7 @@ import { Validator } from "@mainsail/validation/source/validator";
 import { generateMnemonic } from "bip39";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { KeyPairFactory } from "./pair";
 import { schemas } from "./schemas";
 

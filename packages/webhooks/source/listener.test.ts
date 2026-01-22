@@ -5,7 +5,7 @@ import { Application } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { dummyWebhook } from "../test/fixtures/assets";
 import { conditions } from "./conditions";
 import { Database } from "./database";

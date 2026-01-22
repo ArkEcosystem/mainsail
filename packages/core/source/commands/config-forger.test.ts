@@ -3,7 +3,8 @@ import { ensureDirSync, readJSONSync, writeJSONSync } from "fs-extra/esm";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console } from "@mainsail/cli";
+import { describe } from "@mainsail/test-framework";
 import { Command } from "./config-forger";
 
 describe<{

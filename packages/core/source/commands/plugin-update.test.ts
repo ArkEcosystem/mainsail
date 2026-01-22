@@ -1,6 +1,7 @@
+import { Console } from "@mainsail/cli";
+import { describe } from "@mainsail/test-framework";
 import { Services } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
-import { Console, describe } from "../../../test-framework/source";
 
 import { Command } from "./plugin-update";
 

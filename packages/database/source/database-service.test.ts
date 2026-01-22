@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import { EvmInstance } from "@mainsail/evm-service/distribution/instances/index.js";
 
 import { DatabaseService } from "../source/database-service";
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { setGracefulCleanup } from "tmp";
 

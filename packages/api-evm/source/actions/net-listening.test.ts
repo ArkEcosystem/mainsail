@@ -1,6 +1,6 @@
 import { Validator } from "@mainsail/validation";
 
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { NetListeningAction } from "./index.js";
 
 describe<{

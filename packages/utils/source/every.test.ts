@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { every } from "./every";
 import { isBoolean } from "./is-boolean";
 

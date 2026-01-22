@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { isGreaterThan } from "./is-greater-than";
 
 describe("isGreaterThan", async ({ assert, it, nock, loader }) => {

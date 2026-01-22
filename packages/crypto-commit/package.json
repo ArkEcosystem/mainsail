@@ -41,6 +41,7 @@
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
+		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"uvu": "0.5.6"
 	},

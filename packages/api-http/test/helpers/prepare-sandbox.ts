@@ -4,7 +4,7 @@ import { Identifiers } from "@mainsail/constants";
 import type { Application } from "@mainsail/kernel";
 import { Providers } from "@mainsail/kernel";
 
-import { Sandbox } from "../../../test-framework/source/index.js";
+import { Sandbox } from "@mainsail/test-framework";
 import { ServiceProvider as CoreApiHttp } from "../../source/service-provider.js";
 
 const setupDatabase = async (app: Application): Promise<CoreApiDatabase> => {

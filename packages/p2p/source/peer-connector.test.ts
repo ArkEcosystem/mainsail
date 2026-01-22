@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 
-import { describeSkip, Sandbox } from "../../test-framework/source";
+import { describeSkip, Sandbox } from "@mainsail/test-framework";
 import { Peer } from "./peer";
 import { PeerConnector } from "./peer-connector";
 

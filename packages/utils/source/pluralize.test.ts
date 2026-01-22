@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { pluralize } from "./pluralize";
 
 describe("pluralize", async ({ assert, it, nock, loader }) => {

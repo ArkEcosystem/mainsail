@@ -1,7 +1,8 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa";
-import { describe, Factories, Sandbox } from "@mainsail/test-framework";
+import { describe, Sandbox } from "@mainsail/test-framework";
+import { Factories } from "@mainsail/test-factories";
 import { ethers } from "ethers";
 
 import crypto from "../config/core/crypto.json";

@@ -1,10 +1,11 @@
 import prompts from "prompts";
 
-import { Console, describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { versionNext } from "../../test/fixtures/latest-version";
 import { Identifiers } from "@mainsail/constants";
 import { Config } from "./config";
 import { Updater } from "./updater";
+import { Console } from "../test/index.js";
 
 describe<{
 	cli: Console;

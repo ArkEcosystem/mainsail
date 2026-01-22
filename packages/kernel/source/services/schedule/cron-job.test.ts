@@ -1,7 +1,7 @@
 import { Events, Identifiers } from "@mainsail/constants";
 import moment from "moment-timezone";
 
-import { describe, Sandbox } from "../../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { CronJob } from "./cron-job";
 
 const days: Record<string, string> = {

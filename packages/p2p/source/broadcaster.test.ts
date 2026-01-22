@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { BigNumber, cloneDeep } from "@mainsail/utils";
 
-import { describeSkip, Sandbox } from "../../test-framework/source";
+import { describeSkip, Sandbox } from "@mainsail/test-framework";
 import { Broadcaster } from "./broadcaster";
 import { Peer } from "./peer";
 

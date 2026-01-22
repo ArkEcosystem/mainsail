@@ -4,7 +4,7 @@ import esmock from "esmock";
 import { dirSync, fileSync, setGracefulCleanup } from "tmp";
 import type { Contracts } from "@mainsail/test-runner";
 
-import { describe } from "../../../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { File } from "./file";
 
 let removeSyncStub: Contracts.Stub;

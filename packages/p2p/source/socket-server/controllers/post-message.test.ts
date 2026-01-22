@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 
-import { describe, Sandbox } from "../../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { PostMessageController } from "./post-message.js";
 
 describe<{

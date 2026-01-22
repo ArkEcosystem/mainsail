@@ -2,7 +2,8 @@ import { injectable, postConstruct } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import Joi from "joi";
 
-import { Console, describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
+import { Console } from "../test/index.js";
 import { Output } from "../output";
 import { Command } from "./command";
 

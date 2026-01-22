@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { reduceRightArray } from "./reduce-right-array";
 
 describe("reduceRightArray", async ({ assert, it, nock, loader }) => {

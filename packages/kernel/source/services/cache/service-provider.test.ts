@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 
-import { describe } from "../../../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { Application } from "../../application";
 import { MemoryEventDispatcher } from "../events";
 import { MemoryCacheStore } from "./drivers";

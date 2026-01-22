@@ -1,5 +1,5 @@
 import * as index from "./index";
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 
 describe("Index", ({ assert, it }) => {
 	it("should export ServiceProvider", () => {

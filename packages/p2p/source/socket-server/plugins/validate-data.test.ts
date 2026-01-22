@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 import Joi from "joi";
 
-import { describe, Sandbox } from "../../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { ValidateDataPlugin } from "./validate-data";
 
 const utils = {

@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { findIndex } from "./find-index";
 
 describe("#findIndex", ({ it, assert }) => {

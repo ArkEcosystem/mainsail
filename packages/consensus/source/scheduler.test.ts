@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { Scheduler } from "./scheduler";
 
 let currentTimestamp: number;

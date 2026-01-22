@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { blockData, blockDataWithTransactions } from "../test/fixtures/block";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { HashFactory } from "./hash.factory";

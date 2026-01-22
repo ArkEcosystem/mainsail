@@ -1,4 +1,4 @@
-import { describeSkip, Sandbox } from "../../../test-framework/source";
+import { describeSkip, Sandbox } from "@mainsail/test-framework";
 
 import * as Hapi from "@hapi/hapi";
 import * as Hoek from "@hapi/hoek";

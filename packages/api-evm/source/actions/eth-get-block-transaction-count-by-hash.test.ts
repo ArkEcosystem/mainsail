@@ -3,7 +3,7 @@ import { schemas as cryptoBlockSchemas } from "@mainsail/crypto-block";
 import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation";
 
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { EthGetBlockTransactionCountByHash } from "./index.js";
 
 describe<{

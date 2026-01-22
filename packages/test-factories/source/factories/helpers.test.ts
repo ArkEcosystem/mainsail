@@ -1,5 +1,5 @@
 import cryptoConfig from "../../../core/bin/config/devnet/core/crypto.json";
-import { describe } from "../index";
+import { describe } from "@mainsail/test-framework";
 import { factory } from "./helpers";
 
 describe("Helpers", ({ it, assert }) => {

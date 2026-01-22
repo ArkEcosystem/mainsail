@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { InstanceManager } from "./instance-manager";
 import { injectable } from "@mainsail/container";
 

@@ -2,10 +2,11 @@ import Tail from "nodejs-tail";
 import { fileSync, setGracefulCleanup } from "tmp";
 
 import type { Contracts } from "@mainsail/contracts";
-import { Console, describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { Identifiers } from "@mainsail/constants";
 import { ProcessManager } from "../services";
 import { Process } from "./process";
+import { Console } from "../test/index.js";
 
 describe<{
 	cli: Console;

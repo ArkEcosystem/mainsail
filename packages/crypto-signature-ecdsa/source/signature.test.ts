@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { Signature } from "./signature";
 import { secp256k1 } from "bcrypto";
 

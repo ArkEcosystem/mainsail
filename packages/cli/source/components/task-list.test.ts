@@ -1,6 +1,7 @@
-import { Console, describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { Identifiers } from "@mainsail/constants";
 import { TaskList } from "./task-list";
+import { Console } from "../test/index.js";
 
 describe<{
 	component: TaskList;

@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 
-import { describe, Sandbox } from "../../test-framework/source";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { assertCommitProofData } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Deserializer } from "./deserializer";

@@ -1,4 +1,5 @@
-import { Console, describe } from "../../../test-framework/source";
+import { Console } from "@mainsail/cli";
+import { describe } from "@mainsail/test-framework";
 
 import { Command } from "./uninstall";
 

@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { groupBy } from "./group-by";
 
 describe("groupBy", async ({ assert, it, nock, loader }) => {

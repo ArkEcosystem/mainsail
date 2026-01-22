@@ -30,6 +30,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/test-framework": "workspace:*",
 		"esmock": "2.7.1",
 		"uvu": "0.5.6"
 	},

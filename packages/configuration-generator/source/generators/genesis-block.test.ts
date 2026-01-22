@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Enums, Identifiers as AppIdentifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 
-import { describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { makeApplication } from "../application-factory";
 import { Identifiers } from "../identifiers";
 import { GenesisBlockGenerator } from "./genesis-block";

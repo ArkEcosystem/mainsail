@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 
-import { describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import {
 	InvalidConfigurationServiceProvider,
 	OptionalDependencyCannotBeFoundServiceProvider,

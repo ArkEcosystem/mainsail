@@ -1,5 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-framework";
 import { parseTransactionError } from "./transaction-error";
 
 describe("TransactionError", ({ it, assert }) => {

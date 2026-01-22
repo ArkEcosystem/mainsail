@@ -39,6 +39,7 @@
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/semver": "7.7.0",
 		"uvu": "0.5.6"
