@@ -16,9 +16,9 @@ export class ReceiptResource {
 			blockNumber: `0x${transaction.blockNumber?.toString(16)}`,
 			from: transaction.from,
 			to: transaction.to,
-			// TODO: Calculate
-			cumulativeGasUsed: "0x0", // The sum of the base fee and tip paid per unit of gas.
-			effectiveGasUsed: "0x0", // The total amount of gas used when this transaction was executed in the block.
+			cumulativeGasUsed: `0x${receipt.cumulativeGasUsed.toString(16)}`,
+			// For non-EIP1559 tx effectiveGasUsed == gasUsed
+			effectiveGasUsed: `0x${receipt.gasUsed.toString(16)}`,
 			gasUsed: `0x${receipt.gasUsed.toString(16)}`,
 			contractAddress: receipt.contractAddress,
 			logs: receipt.logs,

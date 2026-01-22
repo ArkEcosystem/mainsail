@@ -200,6 +200,8 @@ export class Sync implements Contracts.ApiSync.Service {
 				gas: data.gasLimit,
 
 				gasPrice: data.gasPrice,
+				
+				cumulativeGasUsed: Number(receipt.cumulativeGasUsed),
 
 				gasRefunded: Number(receipt.gasRefunded),
 

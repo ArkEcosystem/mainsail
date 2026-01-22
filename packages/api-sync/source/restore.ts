@@ -458,6 +458,8 @@ export class Restore {
 
 						gasRefunded: Number(receipt.gasRefunded),
 
+						cumulativeGasUsed: Number(receipt.cumulativeGasUsed),
+
 						gasUsed: Number(receipt.gasUsed),
 
 						hash: data.hash,
