@@ -12,6 +12,7 @@ export class ReceiptResource implements Contracts.Api.Resource {
 		return {
 			blockNumber: resource.blockNumber,
 			contractAddress: resource.deployedContractAddress,
+			cumulativeGasUsed: resource.cumulativeGasUsed,
 			gasRefunded: resource.gasRefunded,
 			gasUsed: resource.gasUsed,
 			logs: resource.logs,

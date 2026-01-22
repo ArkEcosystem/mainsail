@@ -45,6 +45,7 @@ export class TransactionResource implements Contracts.Api.Resource {
 			...(resource.legacySecondSignature ? { legacySecondSignature: resource.legacySecondSignature } : {}),
 
 			receipt: {
+				cumulativeGasUsed: resource.cumulativeGasUsed,
 				gasRefunded: resource.gasRefunded,
 				gasUsed: resource.gasUsed,
 				status: resource.status,

@@ -443,6 +443,8 @@ export class Restore {
 					transactions.push({
 						blockHash: block.header.hash,
 						blockNumber: block.header.number.toFixed(),
+						cumulativeGasUsed: Number(receipt.cumulativeGasUsed),
+
 						data: data.data,
 
 						decodedError: parseTransactionError(transaction, receipt),

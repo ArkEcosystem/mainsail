@@ -15,6 +15,7 @@
 		"timestamp": "1728618018574",
 		"receipt": {
 			"status": 1,
+			"cumulativeGasUsed": 116802,
 			"gasRefunded": 0,
 			"gasUsed": 116802
 		}
@@ -35,6 +36,7 @@
 		"timestamp": "1728618018574",
 		"receipt": {
 			"status": 1,
+			"cumulativeGasUsed": 116802,
 			"gasRefunded": 0,
 			"gasUsed": 116802
 		}

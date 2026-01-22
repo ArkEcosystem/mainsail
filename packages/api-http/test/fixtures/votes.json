@@ -16,6 +16,7 @@
 		"signature": "ed00a08529b14053cabe409572189a398968afae3682be0ef2be8adb33f598f00e9f6cfd2ccbe892313cb70d9a204421b20e17ff3808de9981bb8d93e5cfb85501",
 		"legacySecondSignature": null,
 		"status": 1,
+		"cumulativeGasUsed": 116802,
 		"gasUsed": 116802,
 		"gasRefunded": 0,
 		"logs": [

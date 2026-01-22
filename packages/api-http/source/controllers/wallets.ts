@@ -272,18 +272,40 @@ export class WalletsController extends Controller {
 	private async getTokens(request: Hapi.Request, wallet: Models.Wallet) {
 		const pagination = this.getListingPage(request);
 
-		const [tokens, totalCount] = await this.tokenHolderRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.where("address = :address", { address: wallet.address })
-			.offset(pagination.offset)
-			.limit(pagination.limit)
-			.getManyAndCount();
+		const tokenHoldersQuery = this.tokenHolderRepositoryFactory()
+			.createQueryBuilder("th")
+			.where("th.address = :address", { address: wallet.address })
+			.andWhere("th.balance > 0");
+
+		const [pageTokenHolderRows, totalCountRow] = await Promise.all([
+			tokenHoldersQuery
+				.clone()
+				.select([
+					`th.token_address AS "tokenAddress"`,
+					"th.address AS address",
+					"th.balance AS balance",
+					"tok.name AS name",
+					"tok.symbol AS symbol",
+					"tok.decimals AS decimals",
+					"tok.total_supply AS supply",
+				])
+				.innerJoin(Models.Token, "tok", "tok.address = th.token_address")
+				.offset(pagination.offset)
+				.limit(pagination.limit)
+				.orderBy("th.token_address", "ASC")
+				.addOrderBy("th.balance", "DESC")
+				.addOrderBy("th.address", "ASC")
+				.getRawMany(),
+
+			tokenHoldersQuery.clone().select("COUNT(DISTINCT th.address)", "cnt").getRawOne<{ cnt: string }>(),
+		]);
+
+		const totalCount = Number(totalCountRow?.cnt ?? 0);
 
 		return this.toPagination(
 			{
 				meta: { totalCountIsEstimate: false },
-				results: tokens,
+				results: pageTokenHolderRows,
 				totalCount,
 			},
 			TokenHolderResource,

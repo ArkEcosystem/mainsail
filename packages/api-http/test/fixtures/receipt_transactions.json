@@ -16,6 +16,7 @@
 		"signature": "ba8d91c5f53cd0a9d2f99f0cd3da64acb72fbe5a0db3a2c6c1f0a0f63e8591b90a6ac67b963fef50f7d9e602b060ce425c8e151144b186730eddc665b8da6890",
 		"legacySecondSignature": null,
 		"status": 1,
+		"cumulativeGasUsed": 116802,
 		"gasUsed": 116802,
 		"gasRefunded": 0,
 		"logs": [
@@ -44,6 +45,7 @@
 		"signature": "df8aaa778e54b48674982dd8910200bf76506b13d8d66156e40458ca20b0fb2d7ba80597a2623cdaf33b25a85fed345d55eca43cdf695c447d5bb3a083553d8a",
 		"legacySecondSignature": null,
 		"status": 1,
+		"cumulativeGasUsed": 116802,
 		"gasUsed": 116802,
 		"gasRefunded": 0,
 		"deployedContractAddress": "0x0a26D3630D5EC868767d7F4563Fab98D31601A6e",
