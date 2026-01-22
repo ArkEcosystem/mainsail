@@ -30,8 +30,8 @@
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
-		"@mainsail/validation": "workspace:*",
 		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"uvu": "0.5.6"
 	},
 	"engines": {
