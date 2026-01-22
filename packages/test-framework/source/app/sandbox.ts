@@ -1,9 +1,8 @@
-import { ConfigurationGenerator, makeApplication } from "@mainsail/configuration-generator";
-import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
+import { Identifiers } from "@mainsail/constants";
 import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
-import { readJSONSync, removeSync } from "fs-extra/esm";
+import { removeSync } from "fs-extra/esm";
 import { join, resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -54,30 +53,30 @@ export class Sandbox {
 		return this;
 	}
 
-	public async boot(callback?: SandboxCallback): Promise<void> {
-		const configApp = await makeApplication(this.getConfigurationPath());
-		await configApp.resolve(ConfigurationGenerator).generate(this.#configurationOptions);
+	// public async boot(callback?: SandboxCallback): Promise<void> {
+	// 	const configApp = await makeApplication(this.getConfigurationPath());
+	// 	await configApp.resolve(ConfigurationGenerator).generate(this.#configurationOptions);
 
-		this.#configApp = configApp;
+	// 	this.#configApp = configApp;
 
-		if (this.app.isBound(Identifiers.Cryptography.Configuration)) {
-			this.app
-				.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-				.setConfig(readJSONSync(join(this.#configurationOptions.configPath ?? "", "crypto.json")));
-		}
+	// 	if (this.app.isBound(Identifiers.Cryptography.Configuration)) {
+	// 		this.app
+	// 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+	// 			.setConfig(readJSONSync(join(this.#configurationOptions.configPath ?? "", "crypto.json")));
+	// 	}
 
-		// Configure Application
-		process.env[EnvironmentVariables.MAINSAIL_PATH_CONFIG] = this.getConfigurationPath();
+	// 	// Configure Application
+	// 	process.env[EnvironmentVariables.MAINSAIL_PATH_CONFIG] = this.getConfigurationPath();
 
-		if (callback) {
-			callback({
-				app: this.app,
-				container: this.#container,
-			});
+	// 	if (callback) {
+	// 		callback({
+	// 			app: this.app,
+	// 			container: this.#container,
+	// 		});
 
-			this.snapshot();
-		}
-	}
+	// 		this.snapshot();
+	// 	}
+	// }
 
 	public async dispose(callback?: SandboxCallback): Promise<void> {
 		try {
