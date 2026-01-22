@@ -14,6 +14,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/test-factories": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",

@@ -3544,6 +3544,9 @@ importers:
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../../../packages/evm-contracts
+      '@mainsail/test-factories':
+        specifier: workspace:*
+        version: link:../../../packages/test-factories
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../../../packages/test-framework
