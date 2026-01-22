@@ -1,7 +1,8 @@
 import Joi from "joi";
 
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { InputValidator } from "./validator";
+import { Console } from "../test/index.js";
 
 describe<{
 	validator: InputValidator;

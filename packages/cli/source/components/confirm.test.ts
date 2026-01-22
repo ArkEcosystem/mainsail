@@ -1,8 +1,9 @@
 import prompts from "prompts";
 import { Identifiers } from "@mainsail/constants";
 
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Confirm } from "./confirm";
+import { Console } from "../test/index.js";
 
 describe<{
 	component: Confirm;

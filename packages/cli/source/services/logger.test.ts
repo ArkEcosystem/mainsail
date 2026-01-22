@@ -1,7 +1,8 @@
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Identifiers } from "@mainsail/constants";
 import { Output } from "../output";
 import { Logger } from "./logger";
+import { Console } from "../test/index.js";
 
 describe<{
 	logger: Logger;

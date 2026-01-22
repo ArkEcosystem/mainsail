@@ -1,8 +1,9 @@
 import { readFileSync } from "fs";
 import { ensureFileSync, removeSync } from "fs-extra/esm";
 
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Environment } from "./environment";
+import { Console } from "../test/index.js";
 
 describe<{
 	environment: Environment;

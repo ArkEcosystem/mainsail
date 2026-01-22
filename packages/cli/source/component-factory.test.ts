@@ -1,6 +1,7 @@
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { ComponentFactory } from "./component-factory";
 import { Identifiers } from "@mainsail/constants";
+import { Console } from "./test/index";
 
 describe("ComponentFactory", ({ assert, beforeEach, each, it, stub }) => {
 	beforeEach((context) => {

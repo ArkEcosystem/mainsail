@@ -1,7 +1,8 @@
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { ProcessDescription } from "../contracts";
 import { execa } from "../execa";
 import { ProcessManager } from "./process-manager";
+import { Console } from "../test/index.js";
 
 describe<{
 	processManager: ProcessManager;

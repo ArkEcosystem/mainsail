@@ -1,8 +1,9 @@
 import { setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { execa } from "../execa";
 import { Installer } from "./installer";
+import { Console } from "../test/index.js";
 
 describe<{
 	installer: Installer;

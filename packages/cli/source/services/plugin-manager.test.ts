@@ -3,10 +3,11 @@ import esmock from "esmock";
 import { join } from "path";
 import { setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Identifiers } from "@mainsail/constants";
 import { PluginManager } from "./plugin-manager";
 import { File, Git, NPM } from "./source-providers";
+import { Console } from "../test/index.js";
 
 let existSyncStub: Contracts.Stub;
 let removeSyncStub: Contracts.Stub;

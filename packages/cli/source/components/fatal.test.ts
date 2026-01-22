@@ -1,8 +1,9 @@
 import { bgRed, white } from "kleur/colors";
 import { Identifiers } from "@mainsail/constants";
 
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Fatal } from "./fatal";
+import { Console } from "../test/index.js";
 
 describe<{
 	component: Fatal;

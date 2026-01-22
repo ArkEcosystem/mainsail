@@ -1,5 +1,6 @@
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Output } from "./output";
+import { Console } from "../test/index.js";
 
 describe<{
 	output: Output;

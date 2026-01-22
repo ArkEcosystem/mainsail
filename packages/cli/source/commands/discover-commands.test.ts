@@ -1,8 +1,9 @@
 import { resolve } from "path";
 import { setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { DiscoverCommands } from "./discover-commands";
+import { Console } from "../test/index";
 
 describe<{ DiscoverCommands; cmd: DiscoverCommands }>("DiscoverCommands", ({ beforeEach, afterAll, it, assert }) => {
 	beforeEach((context) => {

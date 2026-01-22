@@ -1,6 +1,7 @@
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Identifiers } from "@mainsail/constants";
 import { ActionFactory } from "./action-factory";
+import { Console } from "./test/index.js";
 
 describe<{
 	cli: Console;

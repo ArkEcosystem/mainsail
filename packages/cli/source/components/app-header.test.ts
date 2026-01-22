@@ -2,8 +2,9 @@ import { bold, red, white } from "kleur/colors";
 import os from "os";
 import { Identifiers } from "@mainsail/constants";
 
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { AppHeader } from "./app-header";
+import { Console } from "../test/index.ts";
 
 describe<{
 	component: AppHeader;

@@ -1,8 +1,8 @@
-import { Command as BaseCommand } from "./commands/index.js";
+import { Command as BaseCommand } from "../commands/index.js";
 import { injectable, postConstruct } from "@mainsail/container";
 import Joi from "joi";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Console } from "./console.js";
 
 describe("Console", ({ beforeEach, it, assert, spyFn }) => {

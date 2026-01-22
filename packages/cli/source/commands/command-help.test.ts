@@ -1,8 +1,9 @@
 import { setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Command, CommandWithoutDefinition } from "../../test/stubs";
 import { CommandHelp } from "./command-help";
+import { Console } from "../test/index.ts";
 
 describe<{
 	cli: Console;

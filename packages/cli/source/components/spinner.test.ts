@@ -1,6 +1,7 @@
-import { Console, describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Identifiers } from "@mainsail/constants";
 import { Spinner } from "./spinner";
+import { Console } from "../test/index.js";
 
 describe<{
 	component: Spinner;
