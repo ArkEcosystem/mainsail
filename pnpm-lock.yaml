@@ -3093,9 +3093,6 @@ importers:
       '@types/tmp':
         specifier: 0.2.6
         version: 0.2.6
-      joi:
-        specifier: 18.0.0
-        version: 18.0.0
       uvu:
         specifier: 0.5.6
         version: 0.5.6
