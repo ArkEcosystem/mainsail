@@ -109,6 +109,12 @@ const EXCEPTIONS = {
 	"@mainsail/crypto-key-pair-bls12-381": {
 		dependencies: ["@chainsafe/blst"],
 	},
+	"@mainsail/test-factories": {
+		dependencies: [
+			"@mainsail/configuration-generator",
+		],
+		devDependencies: [],
+	},	
 };
 
 class Package {

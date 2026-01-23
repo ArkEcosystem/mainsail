@@ -2974,6 +2974,9 @@ importers:
 
   packages/test-factories:
     dependencies:
+      '@mainsail/configuration-generator':
+        specifier: workspace:*
+        version: link:../configuration-generator
       '@mainsail/constants':
         specifier: workspace:*
         version: link:../constants
