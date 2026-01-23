@@ -5,7 +5,7 @@ import { NullEventDispatcher } from "@mainsail/kernel/source/services/events/dri
 import { AnySchema } from "joi";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { defaults } from "./defaults";
 import { ServiceProvider } from "./service-provider";
 
@@ -18,10 +18,10 @@ type Context = {
 
 const init = (context: Context) => {
 	const logger = {
-		info: () => {},
-		debug: () => {},
-		error: () => {},
-		notice: () => {},
+		info: () => { },
+		debug: () => { },
+		error: () => { },
+		notice: () => { },
 	};
 
 	const app = new Application(new Container());

@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel/source/application";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { dummyWebhook } from "../test/fixtures/assets";
 import { Database } from "./database";
 
@@ -16,7 +16,7 @@ describe<{
 
 		app.bind<Database>(Identifiers.Webhooks.Database).to(Database).inSingletonScope();
 		app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
-		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatch: () => {} });
+		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatch: () => { } });
 
 		const database = app.get<Database>(Identifiers.Webhooks.Database);
 		database.boot();

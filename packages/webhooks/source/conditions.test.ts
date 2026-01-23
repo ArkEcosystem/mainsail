@@ -1,4 +1,4 @@
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { conditions } from "./conditions";
 const { between, contains, eq, falsy, gt, gte, lt, lte, ne, notBetween, regexp, truthy } = conditions;
 

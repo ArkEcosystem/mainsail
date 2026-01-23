@@ -5,7 +5,7 @@ import { Application } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { dummyWebhook } from "../test/fixtures/assets";
 import { conditions } from "./conditions";
 import { Database } from "./database";
@@ -18,12 +18,12 @@ describe<{
 	let webhook: Contracts.Webhooks.Webhook;
 
 	const logger = {
-		debug: () => {},
-		error: () => {},
+		debug: () => { },
+		error: () => { },
 	};
 
 	const eventDispatcher = {
-		dispatch: () => {},
+		dispatch: () => { },
 	};
 
 	const expectFinishedEventData = ({ executionTime, webhook, payload }) => {

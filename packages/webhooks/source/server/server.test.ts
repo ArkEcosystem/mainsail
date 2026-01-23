@@ -1,6 +1,6 @@
 import { Events } from "@mainsail/constants";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Context, ServerHelper } from "../../test/helpers/server";
 
 describe<Context>("Server", ({ beforeEach, afterEach, afterAll, it, assert }) => {
