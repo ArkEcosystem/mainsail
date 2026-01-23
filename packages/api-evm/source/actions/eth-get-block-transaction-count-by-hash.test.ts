@@ -2,12 +2,13 @@ import { Identifiers } from "@mainsail/constants";
 import { schemas as cryptoBlockSchemas } from "@mainsail/crypto-block";
 import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation";
-
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { EthGetBlockTransactionCountByHash } from "./index.js";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	action: EthGetBlockTransactionCountByHash;
 	validator: Validator;
 	database: any;
@@ -17,12 +18,11 @@ describe<{
 			getBlockHeaderByHash: async () => undefined,
 		};
 
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
+		context.app.bind(Identifiers.Database.Service).toConstantValue(context.database);
 
-		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue(context.database);
-
-		context.action = context.sandbox.app.resolve(EthGetBlockTransactionCountByHash);
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.action = context.app.resolve(EthGetBlockTransactionCountByHash);
+		context.validator = context.app.resolve(Validator);
 	});
 
 	it("should have a name", ({ action }) => {

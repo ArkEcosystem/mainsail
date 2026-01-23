@@ -1,25 +1,26 @@
 import { Identifiers } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation";
-
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { NetVersion } from "./index.js";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	action: NetVersion;
 	validator: Validator;
 }>("NetVersion", ({ beforeEach, it, assert }) => {
 	const version = "0.0.1";
 
 	beforeEach(async (context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
 			get: () => "nethash",
 		});
 
-		context.action = context.sandbox.app.resolve(NetVersion);
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.action = context.app.resolve(NetVersion);
+		context.validator = context.app.resolve(Validator);
 	});
 
 	it("should have a name", ({ action }) => {

@@ -1,24 +1,24 @@
 import { Identifiers } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation";
 import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation";
-
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { Web3Sha3 } from "./index.js";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	action: Web3Sha3;
 	validator: Validator;
 }>("Web3Sha3", ({ beforeEach, it, assert }) => {
 	const version = "0.0.1";
 
 	beforeEach(async (context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
+		context.app.bind(Identifiers.Application.Version).toConstantValue(version);
 
-		context.sandbox.app.bind(Identifiers.Application.Version).toConstantValue(version);
-
-		context.action = context.sandbox.app.resolve(Web3Sha3);
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.action = context.app.resolve(Web3Sha3);
+		context.validator = context.app.resolve(Validator);
 	});
 
 	it("should have a name", ({ action }) => {

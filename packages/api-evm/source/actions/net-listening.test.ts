@@ -1,18 +1,20 @@
 import { Validator } from "@mainsail/validation";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { NetListeningAction } from "./index.js";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	action: NetListeningAction;
 	validator: Validator;
 }>("NetListeningAction", ({ beforeEach, it, assert }) => {
 	beforeEach(async (context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.action = context.sandbox.app.resolve(NetListeningAction);
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.action = context.app.resolve(NetListeningAction);
+		context.validator = context.app.resolve(Validator);
 	});
 
 	it("should have a name", ({ action }) => {
