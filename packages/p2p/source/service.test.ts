@@ -1,11 +1,9 @@
-import type { Contracts } from "@mainsail/contracts";
 import { Identifiers, Events } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import importFresh from "import-fresh";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describeSkip } from "@mainsail/test-runner";
 import { Peer } from "./peer";
 import { Service } from "./service";
@@ -33,7 +31,7 @@ describeSkip<{
 	const slots = { getSlotNumber: () => 0 };
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)

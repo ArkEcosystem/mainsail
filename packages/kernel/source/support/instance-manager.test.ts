@@ -1,6 +1,6 @@
 import { describe } from "@mainsail/test-runner";
 import { InstanceManager } from "./instance-manager";
-import { Container, injectable } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import { Application } from "../application";
 
 interface MyDriver {}
@@ -38,7 +38,7 @@ describe<{
 	app: Application;
 }>("ClassManager", ({ beforeEach, assert, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 	});
 
 	it("should throw when default driver cannot be created", async ({ app }) => {

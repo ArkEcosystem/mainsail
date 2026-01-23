@@ -1,4 +1,4 @@
-import { Container, injectable } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 
 import { describe } from "@mainsail/test-runner";
 import { envPaths as environmentPaths } from "./env-paths";
@@ -12,7 +12,7 @@ describe<{
 	app: Application;
 }>("ActionFactory", ({ beforeEach, it, assert }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 	});
 
 	it("should bind a value to the IoC container", ({ app }) => {

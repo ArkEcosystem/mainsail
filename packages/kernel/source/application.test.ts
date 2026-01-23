@@ -39,7 +39,7 @@ describe<{
 
 		context.container = new Container();
 
-		context.app = new Application(context.container);
+		context.app = new Application();
 
 		context.logger = {
 			debug: () => {},

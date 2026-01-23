@@ -1,7 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
@@ -24,7 +23,7 @@ import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { dirSync } from "tmp";
 
 export const prepareSandbox = async (context: { app?: Application }) => {
-	context.app = new Application(new Container());
+	context.app = new Application();
 
 	await context.app.resolve(CoreTriggers).register();
 	await context.app.resolve(CoreEvents).register();

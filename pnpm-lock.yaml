@@ -2980,9 +2980,6 @@ importers:
       '@mainsail/constants':
         specifier: workspace:*
         version: link:../constants
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58

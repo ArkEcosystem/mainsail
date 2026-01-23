@@ -1,5 +1,4 @@
 import { Identifiers } from "@mainsail/constants";
-import { Container } from "@mainsail/container";
 import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
@@ -20,7 +19,7 @@ describeSkip<{
 	serviceProviderRepository: ServiceProviderRepository;
 }>("LoadServiceProviders", ({ assert, beforeEach, it, stub }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
 		context.app
 			.bind(Identifiers.Services.Filesystem.Service)

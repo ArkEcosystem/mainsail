@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from "./service-provider.js";
 
@@ -14,7 +13,7 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
 
 		context.serviceProvider = context.app.resolve(ServiceProvider);

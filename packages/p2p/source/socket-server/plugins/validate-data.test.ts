@@ -4,7 +4,6 @@ import esmock from "esmock";
 import Joi from "joi";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { ValidateDataPlugin } from "./validate-data";
 
@@ -41,7 +40,7 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(configuration);

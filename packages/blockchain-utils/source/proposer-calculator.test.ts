@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { ProposerCalculator } from "./proposer-calculator";
 
@@ -14,7 +13,7 @@ type Context = {
 
 describe<Context>("ProposerCalculator", ({ assert, it, beforeEach }) => {
 	beforeEach((context: Context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.stateStore = {
 			getTotalRound: () => 0,

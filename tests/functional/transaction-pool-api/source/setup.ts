@@ -1,5 +1,4 @@
 import { Identifiers } from "@mainsail/constants";
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Application, Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { resolve } from "path";
@@ -12,7 +11,7 @@ import { Worker } from "./worker.js";
 type PluginOptions = Record<string, any>;
 
 const setup = async (): Promise<Contracts.Kernel.Application> => {
-	const app = new Application(new Container());
+	const app = new Application();
 
 	app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
 	app.bind(Identifiers.Application.Version).toConstantValue("1.0");

@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 
 import { describe } from "@mainsail/test-runner";
@@ -10,7 +9,7 @@ describe<{
 	app: Application;
 }>("PipelineServiceProvider", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 	});
 	it("should register the service", async (context) => {
 		assert.false(context.app.isBound(Identifiers.Services.Pipeline.Factory));

@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { Peer } from "./peer";
 import { PeerRepository } from "./peer-repository";
@@ -15,7 +14,7 @@ describe<{
 	const statisticService = { getCurrentRoundStatistic: () => roundStatistic };
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
 		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({});

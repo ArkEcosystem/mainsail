@@ -2,7 +2,6 @@ import { Identifiers } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation";
 import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { Web3Sha3 } from "./index.js";
 
@@ -14,7 +13,7 @@ describe<{
 	const version = "0.0.1";
 
 	beforeEach(async (context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Application.Version).toConstantValue(version);
 
 		context.action = context.app.resolve(Web3Sha3);

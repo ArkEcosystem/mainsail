@@ -1,5 +1,4 @@
 import { Identifiers } from "@mainsail/constants";
-import type { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
@@ -61,8 +60,8 @@ import {
 import { Process } from "./utils/index.js";
 
 export class ApplicationFactory {
-	public static make(container: Container, package_: Contracts.Types.PackageJson): Contracts.Cli.Application {
-		const app: Application = new Application(container);
+	public static make(package_: Contracts.Types.PackageJson): Contracts.Cli.Application {
+		const app: Application = new Application();
 
 		// Package
 		app.bind(Identifiers.Cli.Package).toConstantValue(package_);
@@ -84,7 +83,7 @@ export class ApplicationFactory {
 		app.bind<(type: string) => Process>(Identifiers.Cli.ProcessFactory).toFactory(
 			(context: Contracts.Kernel.Container.ResolutionContext) =>
 				(type: string): Process => {
-					const process: Process = container.get(Process, { autobind: true });
+					const process: Process = context.get(Process, { autobind: true });
 					process.initialize(type);
 
 					return process;

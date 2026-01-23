@@ -2,7 +2,6 @@ import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { Scheduler } from "./scheduler";
 
@@ -43,7 +42,7 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Consensus.Service).toConstantValue(consensus);
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);

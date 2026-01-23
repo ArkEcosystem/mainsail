@@ -1,7 +1,7 @@
-import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
-import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
+import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
+import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consensus-bls12-381";
@@ -12,18 +12,16 @@ import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-si
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
+import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
-
-import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json";
 import { Deserializer } from "../../source/deserializer";
 import { Serializer } from "../../source/serializer";
 
 export const prepareSandbox = async (context) => {
-	context.app = new Application(new Container());
+	context.app = new Application();
 
 	context.app.bind(Identifiers.Cryptography.Commit.ProofSize).toConstantValue(
 		() =>

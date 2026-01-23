@@ -1,7 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa";
 import { describe } from "@mainsail/test-runner";
 import { Factories } from "@mainsail/test-factories";
@@ -28,7 +27,7 @@ describe<{
 		context.clients = [context.localClient];
 		context.clients = [context.localClient, new EthersClient(URL), new ViemClient(URL)];
 
-		const app = new Application(new Container());
+		const app = new Application();
 		context.app = app;
 		app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 

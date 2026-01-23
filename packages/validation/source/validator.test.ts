@@ -1,7 +1,6 @@
 import Ajv from "ajv/dist/2020";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { Validator } from "./validator";
 
@@ -9,7 +8,7 @@ describe<{
 	validator: Validator;
 }>("Validator", ({ beforeEach, it, assert }) => {
 	beforeEach((context) => {
-		const app = new Application(new Container());
+		const app = new Application();
 		context.validator = app.resolve(Validator);
 	});
 

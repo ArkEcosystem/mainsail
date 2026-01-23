@@ -3,7 +3,6 @@ import { Configuration } from "@mainsail/crypto-config";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-schnorr/source/pair";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { mnemonic, wif } from "../test/identity.json";
 import { devnet } from "../test/networks.json";
@@ -14,7 +13,7 @@ describe<{
 	factory: WIFFactory;
 }>("Identities - WIFFactory", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({

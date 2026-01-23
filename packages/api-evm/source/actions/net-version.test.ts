@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { NetVersion } from "./index.js";
 
@@ -13,7 +12,7 @@ describe<{
 	const version = "0.0.1";
 
 	beforeEach(async (context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
 			get: () => "nethash",

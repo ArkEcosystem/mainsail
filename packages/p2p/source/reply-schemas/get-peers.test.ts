@@ -2,7 +2,6 @@ import { Enums } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation/source/validator";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { headers } from "../../test/fixtures/responses/headers";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
@@ -23,7 +22,7 @@ describe<Context>("GetPeers Schema", ({ it, assert, beforeEach, each }) => {
 			peers: [{ ip: "127.0.0.1", port: 4000, protocol: Enums.Api.Protocol.Http }],
 		};
 
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.validator = context.app.resolve(Validator);
 

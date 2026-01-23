@@ -1,7 +1,6 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { headers as data } from "../../test/fixtures/responses/headers";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
@@ -14,7 +13,7 @@ type Context = {
 
 describe<Context>("Headers Schema", ({ it, assert, beforeEach, each }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.validator = context.app.resolve(Validator);
 

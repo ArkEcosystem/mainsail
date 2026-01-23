@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from "./service-provider";
 
@@ -12,7 +11,7 @@ type Context = {
 
 describe<Context>("ServiceProvider", ({ assert, it, beforeEach }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.serviceProvider = context.app.resolve(ServiceProvider);
 	});
 

@@ -1,5 +1,4 @@
 import { Identifiers } from "@mainsail/constants";
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
@@ -18,7 +17,7 @@ import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { typ
 import { ServiceProvider as CoreCryptoTransaction } from "../../source/service-provider.js";
 
 export const prepareSandbox = async (context: { app: Application }) => {
-	context.app = new Application(new Container());
+	context.app = new Application();
 
 	context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
 	context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => {} });

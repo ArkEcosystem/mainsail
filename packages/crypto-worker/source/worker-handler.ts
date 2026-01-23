@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/constants";
-import { Container, inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Application, Services } from "@mainsail/kernel";
 
@@ -109,7 +109,7 @@ export class WorkerScriptHandler implements Contracts.Crypto.WorkerScriptHandler
 	#impl!: WorkerImpl;
 
 	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
-		const app: Contracts.Kernel.Application = new Application(new Container());
+		const app: Contracts.Kernel.Application = new Application();
 
 		await app.bootstrap({
 			flags,

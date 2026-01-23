@@ -2,7 +2,6 @@ import { Identifiers } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { defaults } from "../defaults";
 import { isValidVersion } from "./is-valid-version";
@@ -20,7 +19,7 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)

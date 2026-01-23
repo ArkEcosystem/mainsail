@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel/source/application";
 import { dirSync, setGracefulCleanup } from "tmp";
@@ -11,7 +10,7 @@ describe<{
 	database: Database;
 }>("Database", ({ beforeEach, afterEach, it, assert }) => {
 	beforeEach((context) => {
-		const app = new Application(new Container());
+		const app = new Application();
 		app.bind("path.cache").toConstantValue(dirSync().name);
 
 		app.bind<Database>(Identifiers.Webhooks.Database).to(Database).inSingletonScope();

@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { Store } from "./store";
 
@@ -27,7 +26,7 @@ describe<{
 			setHeight: () => {},
 		};
 
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);

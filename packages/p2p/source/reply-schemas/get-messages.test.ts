@@ -1,7 +1,6 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { headers } from "../../test/fixtures/responses/headers";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
@@ -22,7 +21,7 @@ describe<Context>("GetMessages Schema", ({ it, assert, beforeEach, each }) => {
 			prevotes: [],
 		};
 
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.validator = context.app.resolve(Validator);
 

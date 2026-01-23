@@ -1,5 +1,4 @@
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { State } from "./state";
 
@@ -8,7 +7,7 @@ describe<{
 	state: State;
 }>("State", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.state = context.app.resolve(State);
 	});

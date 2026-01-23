@@ -1,7 +1,6 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { makeFormats } from "./formats";
 
@@ -10,7 +9,7 @@ describe<{
 	app: Application;
 }>("format", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.validator = context.app.resolve(Validator);
 
 		const formats = makeFormats();

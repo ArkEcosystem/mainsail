@@ -4,7 +4,6 @@ import * as Exceptions from "@mainsail/exceptions";
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { Configuration } from "../../crypto-config/distribution/index";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { RoundCalculator } from "./round-calculator";
 
@@ -15,7 +14,7 @@ type Context = {
 };
 
 const setup = (context: Context) => {
-	context.app = new Application(new Container());
+	context.app = new Application();
 	context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
 	context.configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
