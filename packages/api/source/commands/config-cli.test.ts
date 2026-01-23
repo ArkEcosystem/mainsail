@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import { Console } from "@mainsail/cli";
 import * as execa from "execa";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Command } from "./config-cli";
 
 describe<{

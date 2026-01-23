@@ -1,7 +1,7 @@
 import { Services } from "@mainsail/cli";
 import prompts from "prompts";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { CommandLineInterface } from "./cli";
 
 describe("CLI", ({ beforeEach, it, assert, stub }) => {
