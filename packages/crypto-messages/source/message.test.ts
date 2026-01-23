@@ -1,9 +1,10 @@
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { prevoteData, precommitData } from "../test/fixtures/index.js";
 import { Message } from "./message.js";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 }>("Message", ({ it, assert }) => {
 	const prevote = new Message({ ...prevoteData, serialized: Buffer.from("dead", "hex") });
 	const precommit = new Message({ ...precommitData, serialized: Buffer.from("dead", "hex") });
