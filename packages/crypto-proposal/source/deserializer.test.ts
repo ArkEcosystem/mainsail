@@ -1,4 +1,5 @@
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import {
 	proposalData,
 	proposalDataWithValidRound,
@@ -10,13 +11,13 @@ import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Deserializer } from "./deserializer";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	deserializer: Deserializer;
 }>("Deserializer", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.deserializer = context.sandbox.app.resolve(Deserializer);
+		context.deserializer = context.app.resolve(Deserializer);
 	});
 
 	it("#deserializeProposal - should correctly deserialize", async ({ deserializer }) => {

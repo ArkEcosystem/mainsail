@@ -1,7 +1,8 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import {
 	blockData,
 	blockHeader,
@@ -14,7 +15,7 @@ import { Proposal } from "./proposal";
 import { assertProposedData } from "../test/helpers/asserts";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	proposal: Proposal;
 }>("Proposal", ({ it, beforeEach, assert }) => {
 	const data: Contracts.Crypto.ProposedData = {
@@ -35,28 +36,28 @@ describe<{
 			getWorker: () => ({
 				// @ts-ignore
 				consensusSignature: (method, message, privateKey) =>
-					context.sandbox.app
+					context.app
 						.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
-						[method](message, privateKey),
+					[method](message, privateKey),
 				// @ts-ignore
 				transactionFactory: (method, message, privateKey) =>
-					context.sandbox.app.get(Identifiers.Cryptography.Transaction.Factory)![method](message, privateKey),
+					context.app.get(Identifiers.Cryptography.Transaction.Factory)![method](message, privateKey),
 			}),
 		};
 
-		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
+		context.app.bind(Identifiers.State.Store).toConstantValue({});
+		context.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
 		data.block.transactions = await Promise.all(
 			data.block.data.transactions.map(
 				async (txData) =>
-					await context.sandbox.app
+					await context.app
 						.get<Contracts.Crypto.TransactionFactory>(Identifiers.Cryptography.Transaction.Factory)
 						.fromData(txData),
 			),
 		);
 
-		context.proposal = context.sandbox.app.resolve(Proposal).initialize({
+		context.proposal = context.app.resolve(Proposal).initialize({
 			...proposalData,
 			dataSerialized: data.serialized,
 			blockHeader: data.block.header,
@@ -77,8 +78,8 @@ describe<{
 	});
 
 	// TODO: Fix test
-	it("#lockProof - should be defined", async ({ sandbox }) => {
-		const proposalWithValidRound = sandbox.app.resolve(Proposal).initialize({
+	it("#lockProof - should be defined", async ({ app }) => {
+		const proposalWithValidRound = app.resolve(Proposal).initialize({
 			...proposalDataWithValidRound,
 			dataSerialized: proposalDataWithValidRound.data.serialized,
 			blockHeader: proposalDataWithValidRound.blockHeader,
@@ -132,7 +133,7 @@ describe<{
 		assert.equal(data, proposalData);
 	});
 
-	it("#toSerializableData", ({ sandbox, proposal }) => {
+	it("#toSerializableData", ({ app, proposal }) => {
 		assert.equal(proposal.toSerializableData(), {
 			data: { serialized: data.serialized },
 			round: proposalData.round,
@@ -141,7 +142,7 @@ describe<{
 			validatorIndex: proposalData.validatorIndex,
 		});
 
-		const proposalWithValidRound = sandbox.app.resolve(Proposal).initialize({
+		const proposalWithValidRound = app.resolve(Proposal).initialize({
 			...proposalDataWithValidRound,
 			dataSerialized: data.serialized,
 			blockHeader: data.block.header,

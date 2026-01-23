@@ -1,6 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import {
 	proposalData,
 	proposalDataWithValidRound,
@@ -15,15 +16,15 @@ import { Deserializer } from "./deserializer";
 import { Serializer } from "./serializer";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	serializer: Serializer;
 	deserializer: Deserializer;
 }>("Serializer", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.serializer = context.sandbox.app.resolve(Serializer);
-		context.deserializer = context.sandbox.app.resolve(Deserializer);
+		context.serializer = context.app.resolve(Serializer);
+		context.deserializer = context.app.resolve(Deserializer);
 	});
 
 	it("#serializeProposal - should correctly serialize for signature", async ({ serializer }) => {
