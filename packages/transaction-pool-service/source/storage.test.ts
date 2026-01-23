@@ -4,7 +4,7 @@ import { Configuration } from "@mainsail/crypto-config";
 import { Application } from "@mainsail/kernel";
 import { fileSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Storage } from ".";
 
 describe<{
@@ -15,7 +15,7 @@ describe<{
 	beforeAll(() => setGracefulCleanup());
 
 	beforeEach(async (context) => {
-		context.configuration = { getRequired: () => {} };
+		context.configuration = { getRequired: () => { } };
 
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(context.configuration);

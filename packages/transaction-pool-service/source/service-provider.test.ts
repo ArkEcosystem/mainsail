@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import { Application, Services } from "@mainsail/kernel";
 import { AnySchema } from "joi";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from ".";
 
 const importFresh = (moduleName) => import(`${moduleName}?${Date.now()}`);
@@ -48,13 +48,13 @@ describe<{
 		await assert.resolves(() => context.serviceProvider.register());
 
 		context.app.rebind(Identifiers.TransactionPool.Storage).toConstantValue({
-			boot: () => {},
-			dispose: () => {},
+			boot: () => { },
+			dispose: () => { },
 		});
 
 		context.app.rebind(Identifiers.TransactionPool.Service).toConstantValue({
-			boot: () => {},
-			dispose: () => {},
+			boot: () => { },
+			dispose: () => { },
 		});
 
 		await assert.resolves(() => context.serviceProvider.boot());

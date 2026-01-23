@@ -5,7 +5,7 @@ import * as Exceptions from "@mainsail/exceptions";
 import { Configuration } from "@mainsail/crypto-config";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
-import { describeSkip } from "@mainsail/test-framework";
+import { describeSkip } from "@mainsail/test-runner";
 import { SenderState } from ".";
 
 describeSkip<{
@@ -24,22 +24,22 @@ describeSkip<{
 }>("SenderState", ({ it, assert, beforeEach, stub, spy, match }) => {
 	beforeEach(async (context) => {
 		context.configuration = {
-			get: () => {},
-			getOptional: () => {},
-			getRequired: () => {},
+			get: () => { },
+			getOptional: () => { },
+			getRequired: () => { },
 		};
 		context.handlerRegistry = {
-			getActivatedHandlerForData: () => {},
+			getActivatedHandlerForData: () => { },
 		};
 		context.expirationService = {
-			getExpirationHeight: () => {},
-			isExpired: () => {},
+			getExpirationHeight: () => { },
+			isExpired: () => { },
 		};
 		context.triggers = {
-			call: () => {},
+			call: () => { },
 		};
 		context.emitter = {
-			dispatch: () => {},
+			dispatch: () => { },
 		};
 
 		context.blockSerializer = {
@@ -210,7 +210,7 @@ describeSkip<{
 		handlerStub.resolvedValueNth(1, handler);
 		triggerStub.resolvedValueNth(1, true); // verifyTransaction
 
-		await senderState.revert(context.transaction).catch(() => {});
+		await senderState.revert(context.transaction).catch(() => { });
 		const promise = senderState.apply(context.transaction);
 
 		await assert.rejects(() => promise);

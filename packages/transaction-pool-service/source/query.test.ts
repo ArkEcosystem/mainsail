@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { BigNumber } from "@mainsail/utils";
 import { Query, QueryIterable } from ".";
 
@@ -15,9 +15,9 @@ describe<{
 }>("Query", ({ it, assert, beforeAll, beforeEach, stub }) => {
 	beforeAll((context) => {
 		context.mempool = {
-			getSenderMempool: () => {},
-			getSenderMempools: () => {},
-			hasSenderMempool: () => {},
+			getSenderMempool: () => { },
+			getSenderMempools: () => { },
+			hasSenderMempool: () => { },
 		};
 
 		context.container = new Container();
