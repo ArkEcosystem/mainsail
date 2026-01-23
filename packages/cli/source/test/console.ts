@@ -1,5 +1,4 @@
 import { Identifiers } from "@mainsail/constants";
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
 import { ApplicationFactory } from "../application-factory.js";
@@ -67,7 +66,7 @@ export class Console {
 	}
 
 	#createApplication(): Contracts.Cli.Application {
-		const app = ApplicationFactory.make(new Container(), this.pkg);
+		const app = ApplicationFactory.make(this.pkg);
 
 		this.flags = this.#useDefaultFlags ? { network: "devnet", token: "ark" } : {};
 

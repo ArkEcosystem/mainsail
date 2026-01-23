@@ -1,6 +1,6 @@
 import { ApplicationFactory, Commands, Flags, InputParser, Plugins } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
-import { Container, injectable } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { existsSync } from "fs";
 import { readJSONSync } from "fs-extra/esm";
@@ -25,7 +25,7 @@ export class CommandLineInterface {
 		const package_: Contracts.Types.PackageJson = readJSONSync(path.join(dirname, "..", "package.json"));
 
 		// Create the application we will work with
-		this.#app = ApplicationFactory.make(new Container(), package_);
+		this.#app = ApplicationFactory.make(package_);
 
 		// Check for updates
 		await this.#app.get<Contracts.Cli.Updater>(Identifiers.Cli.Service.Updater).check();
