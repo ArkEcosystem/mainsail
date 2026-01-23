@@ -2,11 +2,13 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers, Events, Enums } from "@mainsail/constants";
 import { Lock } from "@mainsail/utils";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { Consensus } from "./consensus";
 
 type Context = {
-	sandbox: Sandbox;
+	app: Application;
 	consensus: Consensus;
 	blockProcessor: any;
 	bootstrapper: any;
@@ -31,31 +33,31 @@ type Context = {
 describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each }) => {
 	beforeEach((context) => {
 		context.blockProcessor = {
-			commit: () => {},
-			process: () => {},
+			commit: () => { },
+			process: () => { },
 		};
 
 		context.state = {
-			getLastBlock: () => {},
+			getLastBlock: () => { },
 			getBlockNumber: () => 1,
 		};
 
 		context.cryptoConfiguration = {
 			getMilestoneDiff: () => ({}),
 			isNewMilestone: () => false,
-			setBlockNumber: () => {},
+			setBlockNumber: () => { },
 		};
 
 		context.proposalProcessor = {
-			process: () => {},
+			process: () => { },
 		};
 
 		context.messageProcessor = {
-			process: () => {},
+			process: () => { },
 		};
 
 		context.scheduler = {
-			clear: () => {},
+			clear: () => { },
 			getNextBlockTimestamp: (value) => value + 4000,
 			scheduleTimeoutBlockPrepare: () => true,
 			scheduleTimeoutPrecommit: () => true,
@@ -64,34 +66,34 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		context.bootstrapper = {
-			run: () => {},
+			run: () => { },
 		};
 
 		context.validatorsRepository = {
-			getValidator: () => {},
-			getValidators: () => {},
+			getValidator: () => { },
+			getValidators: () => { },
 		};
 
 		context.roundStateRepository = {
-			clear: () => {},
+			clear: () => { },
 			getRoundState: () => context.roundState,
 		};
 
 		context.validatorSet = {
-			getRoundValidators: () => {},
+			getRoundValidators: () => { },
 			getValidatorIndexByWalletAddress: () => "",
 		};
 
 		context.proposerCalculator = {
-			getValidatorIndex: () => {},
+			getValidatorIndex: () => { },
 		};
 
 		context.logger = {
-			info: () => {},
+			info: () => { },
 		};
 
 		context.eventDispatcher = {
-			dispatch: () => {},
+			dispatch: () => { },
 		};
 
 		const blockData = {
@@ -119,8 +121,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.proposer = {};
 
 		context.roundState = {
-			aggregatePrevotes: () => {},
-			getBlock: () => {},
+			aggregatePrevotes: () => { },
+			getBlock: () => { },
 			getProcessorResult: () => false,
 			getProposal: () => context.proposal,
 			hasPrecommit: () => false,
@@ -128,40 +130,40 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			hasProcessorResult: () => false,
 			hasProposal: () => false,
 			blockNumber: 1,
-			logPrecommits: () => {},
-			logPrevotes: () => {},
+			logPrecommits: () => { },
+			logPrevotes: () => { },
 			proposer: context.proposer,
 			round: 0,
-			setProcessorResult: () => {},
+			setProcessorResult: () => { },
 		} as unknown as Contracts.Consensus.RoundState;
 
 		context.peerStatistic = {
-			newRound: () => {},
+			newRound: () => { },
 		};
 
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
-		context.sandbox.app.bind(Identifiers.Processor.BlockProcessor).toConstantValue(context.blockProcessor);
-		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue(context.state);
-		context.sandbox.app.bind(Identifiers.Consensus.Processor.Message).toConstantValue(context.messageProcessor);
-		context.sandbox.app.bind(Identifiers.Consensus.Processor.Proposal).toConstantValue(context.proposalProcessor);
-		context.sandbox.app.bind(Identifiers.Consensus.Bootstrapper).toConstantValue(context.bootstrapper);
-		context.sandbox.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
-		context.sandbox.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Lock());
-		+context.sandbox.app.bind(Identifiers.Validator.Repository).toConstantValue(context.validatorsRepository);
-		context.sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
-		context.sandbox.app
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
+		context.app.bind(Identifiers.Processor.BlockProcessor).toConstantValue(context.blockProcessor);
+		context.app.bind(Identifiers.State.Store).toConstantValue(context.state);
+		context.app.bind(Identifiers.Consensus.Processor.Message).toConstantValue(context.messageProcessor);
+		context.app.bind(Identifiers.Consensus.Processor.Proposal).toConstantValue(context.proposalProcessor);
+		context.app.bind(Identifiers.Consensus.Bootstrapper).toConstantValue(context.bootstrapper);
+		context.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
+		context.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Lock());
+		+context.app.bind(Identifiers.Validator.Repository).toConstantValue(context.validatorsRepository);
+		context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
+		context.app
 			.bind(Identifiers.BlockchainUtils.ProposerCalculator)
 			.toConstantValue(context.proposerCalculator);
-		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
-		context.sandbox.app
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
+		context.app
 			.bind(Identifiers.Consensus.RoundStateRepository)
 			.toConstantValue(context.roundStateRepository);
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
-		context.sandbox.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue(context.peerStatistic);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
+		context.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue(context.peerStatistic);
 
-		context.consensus = context.sandbox.app.resolve(Consensus);
+		context.consensus = context.app.resolve(Consensus);
 	});
 
 	it("#getBlockNumber - should return initial value", async ({ consensus }) => {
@@ -250,8 +252,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		scheduler,
 	}) => {
 		const validator = {
-			prepareBlock: () => {},
-			propose: () => {},
+			prepareBlock: () => { },
+			propose: () => { },
 		};
 
 		const spyScheduleClear = spy(scheduler, "clear");
@@ -309,8 +311,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		scheduler,
 	}) => {
 		const validator = {
-			prepareBlock: () => {},
-			propose: () => {},
+			prepareBlock: () => { },
+			propose: () => { },
 		};
 
 		const spyScheduleClear = spy(scheduler, "clear");
@@ -405,7 +407,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
 	});
 
-	it("#startRound - local validator should locked value", async () => {});
+	it("#startRound - local validator should locked value", async () => { });
 
 	it("#onProposal - should return if step !== propose", async ({ consensus, blockProcessor, roundState }) => {
 		const spyBlockProcessorProcess = spy(blockProcessor, "process");
@@ -444,7 +446,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	it("#onProposal - should return if proposal is undefined", async ({ consensus, blockProcessor, roundState }) => {
 		const spyBlockProcessorProcess = spy(blockProcessor, "process");
 
-		roundState.getProposal = () => {};
+		roundState.getProposal = () => { };
 		await consensus.onProposal(roundState);
 
 		spyBlockProcessorProcess.neverCalled();
@@ -466,7 +468,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
 	});
 
-	it("#onProposal - should return if not from valid proposer", async ({ consensus }) => {});
+	it("#onProposal - should return if not from valid proposer", async ({ consensus }) => { });
 
 	it("#onProposal - broadcast prevote block hash, if block is valid & not locked", async ({
 		consensus,
@@ -487,7 +489,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const validator = {
-			prevote: () => {},
+			prevote: () => { },
 		};
 		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
 
@@ -543,7 +545,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const validator = {
-			prevote: () => {},
+			prevote: () => { },
 		};
 		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
 
@@ -599,7 +601,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const validator = {
-			prevote: () => {},
+			prevote: () => { },
 		};
 		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
 
@@ -636,9 +638,9 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	});
 
 	// TODO: Handle on processor
-	it("#onProposal - broadcast prevote null, if block processor throws", async ({ consensus }) => {});
+	it("#onProposal - broadcast prevote null, if block processor throws", async ({ consensus }) => { });
 
-	it("#onProposal - broadcast prevote null, if locked value exists", async ({ consensus }) => {});
+	it("#onProposal - broadcast prevote null, if locked value exists", async ({ consensus }) => { });
 
 	it("#onProposalLocked - broadcast prevote block hash, if block is valid and lockedRound is undefined", async ({
 		consensus,
@@ -660,7 +662,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const validator = {
-			prevote: () => {},
+			prevote: () => { },
 		};
 		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
 
@@ -702,7 +704,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
 	});
 
-	it("#onProposalLocked - broadcast prevote block hash, if block is valid and valid round is higher or equal than lockedRound ", async () => {});
+	it("#onProposalLocked - broadcast prevote block hash, if block is valid and valid round is higher or equal than lockedRound ", async () => { });
 
 	it("#onProposalLocked - broadcast prevote null, if block is valid and lockedRound is undefined", async ({
 		consensus,
@@ -724,7 +726,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const validator = {
-			prevote: () => {},
+			prevote: () => { },
 		};
 		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
 
@@ -766,7 +768,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
 	});
 
-	it("#onProposalLocked - broadcast prevote null, if block is valid and lockedRound is higher than validRound", async () => {});
+	it("#onProposalLocked - broadcast prevote null, if block is valid and lockedRound is higher than validRound", async () => { });
 
 	it("#onProposalLocked - should return if step === prevote", async ({ consensus, roundState, proposal }) => {
 		proposal.validRound = 0;
@@ -814,7 +816,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		proposal.validRound = 0;
 		roundState = { ...roundState, round: 1 };
 		consensus.setRound(1);
-		roundState.getProposal = () => {};
+		roundState.getProposal = () => { };
 		await consensus.onProposalLocked(roundState);
 
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
@@ -867,7 +869,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		eventDispatcher,
 	}) => {
 		const validator = {
-			precommit: () => {},
+			precommit: () => { },
 		};
 
 		const precommit = {
@@ -957,7 +959,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		proposer,
 	}) => {
 		const validator = {
-			precommit: () => {},
+			precommit: () => { },
 		};
 
 		const precommit = {
@@ -1019,7 +1021,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		proposer,
 	}) => {
 		const validator = {
-			precommit: () => {},
+			precommit: () => { },
 		};
 
 		const precommit = {
@@ -1076,7 +1078,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	});
 
 	it("#onMajorityPrevote - should return if proposal is undefined", async ({ consensus, roundState }) => {
-		roundState.getProposal = () => {};
+		roundState.getProposal = () => { };
 		consensus.setStep(Enums.Consensus.Step.Prevote);
 		await consensus.onMajorityPrevote(roundState);
 
@@ -1201,7 +1203,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		eventDispatcher,
 	}) => {
 		const validator = {
-			precommit: () => {},
+			precommit: () => { },
 		};
 
 		const precommit = {
@@ -1362,7 +1364,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.getData().block);
 		const spyRoundStateRepositoryClear = stub(roundStateRepository, "clear");
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
-		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => { });
 		const spyLoggerInfo = spy(logger, "info");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
@@ -1392,7 +1394,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	});
 
 	it("#onMajorityPrecommit - should terminate if processor throws", async ({
-		sandbox,
+		app,
 		consensus,
 		blockProcessor,
 		roundState,
@@ -1401,7 +1403,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const fakeTimers = clock();
 
 		const error = new Error("error");
-		const spyAppTerminate = stub(sandbox.app, "terminate").callsFake(() => {});
+		const spyAppTerminate = stub(app, "terminate").callsFake(() => { });
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.getData().block);
 		const spyBlockProcessorCommit = stub(blockProcessor, "commit").rejectedValue(error);
 
@@ -1433,7 +1435,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.getData().block);
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyRoundStateRepositoryClear = stub(roundStateRepository, "clear");
-		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => { });
 		const spyLoggerInfo = spy(logger, "info");
 
 		roundState.hasProcessorResult = () => true;
@@ -1464,7 +1466,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.getData().block);
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyRoundStateRepositoryClear = stub(roundStateRepository, "clear");
-		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => { });
 		const spyLoggerInfo = spy(logger, "info");
 
 		roundState.hasProcessorResult = () => false;
@@ -1502,7 +1504,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.getData().block);
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
-		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => { });
 
 		roundState.hasProcessorResult = () => true;
 		roundState.getProcessorResult = () => ({ success: true });
@@ -1529,7 +1531,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		roundState,
 	}) => {
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
-		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => { });
 
 		roundState.getProcessorResult = () => ({ success: true });
 
@@ -1560,7 +1562,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onMinorityWithHigherRound - should start new round", async ({ consensus, roundState }) => {
 		const fakeTimers = clock();
-		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => { });
 
 		roundState = { ...roundState, round: 1 };
 		void consensus.onMinorityWithHigherRound(roundState);
@@ -1571,7 +1573,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onMinorityWithHigherRound - should return if blockNumber doesn't match", async ({ consensus, roundState }) => {
 		const fakeTimers = clock();
-		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => { });
 
 		roundState = { ...roundState, blockNumber: 3 };
 		void consensus.onMinorityWithHigherRound(roundState);
@@ -1582,7 +1584,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onMinorityWithHigherRound - should return if round is not greater", async ({ consensus, roundState }) => {
 		const fakeTimers = clock();
-		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => { });
 
 		void consensus.onMinorityWithHigherRound(roundState);
 		await fakeTimers.nextAsync();
@@ -1604,7 +1606,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const validator = {
-			prevote: () => {},
+			prevote: () => { },
 		};
 		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
 
@@ -1674,7 +1676,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		proposer,
 	}) => {
 		const validator = {
-			precommit: () => {},
+			precommit: () => { },
 		};
 
 		const precommit = {
@@ -1750,7 +1752,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		"#onTimeoutPrecommit - should start next round",
 		async ({ context: { consensus }, dataset: step }: { context: Context; dataset: Contracts.Consensus.Step }) => {
 			const fakeTimers = clock();
-			const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+			const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => { });
 
 			consensus.setStep(step);
 			void consensus.onTimeoutPrecommit(1, 0);
@@ -1764,7 +1766,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onTimeoutPrecommit - should return if blockNumber doesn't match", async ({ consensus }) => {
 		const fakeTimers = clock();
-		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => { });
 
 		void consensus.onTimeoutPrecommit(3, 0);
 		await fakeTimers.nextAsync();
@@ -1774,7 +1776,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onTimeoutPrecommit - should return if round doesn't match", async ({ consensus }) => {
 		const fakeTimers = clock();
-		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => { });
 
 		void consensus.onTimeoutPrecommit(2, 1);
 		await fakeTimers.nextAsync();

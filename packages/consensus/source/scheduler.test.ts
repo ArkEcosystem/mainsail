@@ -1,7 +1,9 @@
 import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { Scheduler } from "./scheduler";
 
 let currentTimestamp: number;
@@ -11,7 +13,7 @@ const { Scheduler: SchedulerProxy } = await esmock("./scheduler", {
 });
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	scheduler: Scheduler;
 }>("Scheduler", ({ beforeEach, it, assert, spy, clock, stub }) => {
 	currentTimestamp = 0;
@@ -19,10 +21,10 @@ describe<{
 	const delays = [1000, 3000, 5000];
 
 	const consensus = {
-		onTimeoutPrecommit: () => {},
-		onTimeoutPrevote: () => {},
-		onTimeoutPropose: () => {},
-		onTimeoutStartRound: () => {},
+		onTimeoutPrecommit: () => { },
+		onTimeoutPrevote: () => { },
+		onTimeoutPropose: () => { },
+		onTimeoutStartRound: () => { },
 	};
 
 	const config = {
@@ -37,17 +39,17 @@ describe<{
 	};
 
 	const store = {
-		getLastBlock: () => {},
+		getLastBlock: () => { },
 	};
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Consensus.Service).toConstantValue(consensus);
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
-		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue(store);
+		context.app.bind(Identifiers.Consensus.Service).toConstantValue(consensus);
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
+		context.app.bind(Identifiers.State.Store).toConstantValue(store);
 
-		context.scheduler = context.sandbox.app.resolve(SchedulerProxy);
+		context.scheduler = context.app.resolve(SchedulerProxy);
 	});
 
 	it("should be instantiated", async ({ scheduler }) => {
