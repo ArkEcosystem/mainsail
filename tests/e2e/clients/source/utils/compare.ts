@@ -1,4 +1,4 @@
-import { assert } from "@mainsail/test-framework";
+import type { assert } from "@mainsail/test-runner";
 
 type Assert = typeof assert;
 
