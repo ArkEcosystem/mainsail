@@ -7,25 +7,27 @@ import { Validator } from "@mainsail/validation/source/validator";
 import { generateMnemonic } from "bip39";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { AddressFactory } from "./address.factory";
 import { schemas } from "./schemas";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	validator: Validator;
 }>("Schemas", ({ it, assert, beforeEach }) => {
 	const length = 42;
 
 	beforeEach(async (context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
-		await context.sandbox.app.resolve(CoreValidation).register();
+		await context.app.resolve(CoreValidation).register();
 
-		context.validator = context.sandbox.app.get(Identifiers.Cryptography.Validator);
+		context.validator = context.app.get(Identifiers.Cryptography.Validator);
 
 		for (const schema of Object.values({
 			...baseSchemas,
@@ -48,12 +50,12 @@ describe<{
 	});
 
 	it("address - should be ok for factory", async (context) => {
-		await context.sandbox.app.resolve<Schnorr>(Schnorr).register();
+		await context.app.resolve<Schnorr>(Schnorr).register();
 
 		assert.undefined(
 			context.validator.validate(
 				"address",
-				await context.sandbox.app.resolve(AddressFactory).fromMnemonic(generateMnemonic(256)),
+				await context.app.resolve(AddressFactory).fromMnemonic(generateMnemonic(256)),
 			).error,
 		);
 	});
