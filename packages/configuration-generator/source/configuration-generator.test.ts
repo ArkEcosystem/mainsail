@@ -4,7 +4,7 @@ import envPaths from "env-paths";
 import fs from "fs-extra/esm";
 import { join } from "path";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { makeApplication } from "./application-factory";
 import { ConfigurationGenerator } from "./configuration-generator";
 import { Identifiers as InternalIdentifiers } from "./identifiers";
@@ -98,7 +98,7 @@ describe<{
 	// TODO: fix stubs
 	it.skip("should log if logger is provided", async ({ generator, app }) => {
 		const logger = {
-			info: () => {},
+			info: () => { },
 		};
 
 		app.bind(InternalIdentifiers.LogService).toConstantValue(logger);

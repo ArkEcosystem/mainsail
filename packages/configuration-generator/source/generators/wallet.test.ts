@@ -1,4 +1,4 @@
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { makeApplication } from "../application-factory";
 import { Identifiers } from "../identifiers";
 import { WalletGenerator } from "./wallet";
