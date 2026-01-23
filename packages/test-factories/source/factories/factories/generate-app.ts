@@ -1,5 +1,4 @@
 import { Identifiers } from "@mainsail/constants";
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
@@ -21,7 +20,7 @@ import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 export const generateApp = async (
 	config: Contracts.Crypto.NetworkConfigPartial,
 ): Promise<Contracts.Kernel.Application> => {
-	const app = new Application(new Container());
+	const app = new Application();
 
 	app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 	app.bind(Identifiers.Services.Log.Service).toConstantValue({});

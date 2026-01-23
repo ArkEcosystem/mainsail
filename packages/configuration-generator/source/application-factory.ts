@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs";
 
 import { Enums, Identifiers } from "@mainsail/constants";
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
@@ -45,7 +44,7 @@ export const makeApplication = async (
 ): Promise<Application> => {
 	options = { address: "keccak256", name: "mainsail", ...options };
 
-	const app = new Application(new Container());
+	const app = new Application();
 	app.bind(Identifiers.Application.Name).toConstantValue(options.name);
 	app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({
 		dispatch: () => {},

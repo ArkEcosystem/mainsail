@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 
@@ -7,7 +6,7 @@ export const Builder = {
 		flags: Contracts.Types.JsonObject;
 		plugins: Contracts.Types.JsonObject;
 	}): Promise<Contracts.Kernel.Application> {
-		const app: Contracts.Kernel.Application = new Application(new Container());
+		const app: Contracts.Kernel.Application = new Application();
 
 		if (context) {
 			await app.bootstrap({

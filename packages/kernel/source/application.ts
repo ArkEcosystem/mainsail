@@ -1,6 +1,7 @@
 import { exit } from "node:process";
 
 import { Events, Identifiers } from "@mainsail/constants";
+import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { DirectoryCannotBeFound } from "@mainsail/exceptions";
 import { join } from "path";
@@ -15,8 +16,11 @@ import { ServiceProvider as EventServiceProvider } from "./services/events/servi
 export class Application implements Contracts.Kernel.Application {
 	#booted = false;
 	#terminating = false;
+	#container: Contracts.Kernel.Container.Container;
 
-	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
+	public constructor() {
+		this.#container = new Container();
+
 		this.bind<Contracts.Kernel.Application>(Identifiers.Application.Instance).toConstantValue(this);
 
 		this.bind<ConfigRepository>(Identifiers.Config.Repository).to(ConfigRepository).inSingletonScope();
@@ -214,25 +218,25 @@ export class Application implements Contracts.Kernel.Application {
 	public bind<T>(
 		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
 	): Contracts.Kernel.Container.BindToFluentSyntax<T> {
-		return this.container.bind(serviceIdentifier);
+		return this.#container.bind(serviceIdentifier);
 	}
 
 	public rebind<T>(
 		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
 	): Contracts.Kernel.Container.BindToFluentSyntax<T> {
-		if (this.container.isBound(serviceIdentifier)) {
-			this.container.unbindSync(serviceIdentifier);
+		if (this.#container.isBound(serviceIdentifier)) {
+			this.#container.unbindSync(serviceIdentifier);
 		}
 
-		return this.container.bind(serviceIdentifier);
+		return this.#container.bind(serviceIdentifier);
 	}
 
 	public unbind<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): void {
-		return this.container.unbindSync(serviceIdentifier);
+		return this.#container.unbindSync(serviceIdentifier);
 	}
 
 	public get<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): T {
-		return this.container.get(serviceIdentifier);
+		return this.#container.get(serviceIdentifier);
 	}
 
 	public getTagged<T>(
@@ -240,11 +244,11 @@ export class Application implements Contracts.Kernel.Application {
 		key: string | number | symbol,
 		value: string,
 	): T {
-		return this.container.get(serviceIdentifier, { tag: { key, value } });
+		return this.#container.get(serviceIdentifier, { tag: { key, value } });
 	}
 
 	public isBound<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): boolean {
-		return this.container.isBound(serviceIdentifier);
+		return this.#container.isBound(serviceIdentifier);
 	}
 
 	public isBoundTagged<T>(
@@ -252,11 +256,11 @@ export class Application implements Contracts.Kernel.Application {
 		key: string | number | symbol,
 		value: string,
 	): boolean {
-		return this.container.isBound(serviceIdentifier, { tag: { key, value } });
+		return this.#container.isBound(serviceIdentifier, { tag: { key, value } });
 	}
 
 	public resolve<T>(constructorFunction: Contracts.Kernel.Container.Newable<T>): T {
-		return this.container.get(constructorFunction, { autobind: true });
+		return this.#container.get(constructorFunction, { autobind: true });
 	}
 
 	async #bootstrapWith(type: string): Promise<void> {
