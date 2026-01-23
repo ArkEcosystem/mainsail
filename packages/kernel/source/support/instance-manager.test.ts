@@ -1,11 +1,12 @@
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { InstanceManager } from "./instance-manager";
-import { injectable } from "@mainsail/container";
+import { Container, injectable } from "@mainsail/container";
+import { Application } from "../application";
 
-interface MyDriver {}
+interface MyDriver { }
 
 @injectable()
-class MyMemoryDriver implements MyDriver {}
+class MyMemoryDriver implements MyDriver { }
 
 @injectable()
 class MyRemoteDriver implements MyDriver {
@@ -34,29 +35,29 @@ class MyInvalidManager extends InstanceManager<MyDriver> {
 }
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 }>("ClassManager", ({ beforeEach, assert, it }) => {
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 	});
 
-	it("should throw when default driver cannot be created", async ({ sandbox }) => {
-		const invalidManager = sandbox.app.resolve(MyInvalidManager);
+	it("should throw when default driver cannot be created", async ({ app }) => {
+		const invalidManager = app.resolve(MyInvalidManager);
 		const promise = invalidManager.boot();
 
 		await assert.rejects(() => promise);
 	});
 
-	it("should return default driver instance", async ({ sandbox }) => {
-		const manager = sandbox.app.resolve(MyManager);
+	it("should return default driver instance", async ({ app }) => {
+		const manager = app.resolve(MyManager);
 		await manager.boot();
 		const memoryDriver = manager.driver();
 
 		assert.instance(memoryDriver, MyMemoryDriver);
 	});
 
-	it("should return set driver instance", async ({ sandbox }) => {
-		const manager = sandbox.app.resolve(MyManager);
+	it("should return set driver instance", async ({ app }) => {
+		const manager = app.resolve(MyManager);
 		await manager.boot();
 		await manager.extend("remote", async () => new MyRemoteDriver());
 		manager.setDefaultDriver("remote");
@@ -65,8 +66,8 @@ describe<{
 		assert.instance(remoteDriver, MyRemoteDriver);
 	});
 
-	it("should return driver instance", async ({ sandbox }) => {
-		const manager = sandbox.app.resolve(MyManager);
+	it("should return driver instance", async ({ app }) => {
+		const manager = app.resolve(MyManager);
 		await manager.boot();
 		await manager.extend("remote", async () => new MyRemoteDriver());
 		const remoteDriver = manager.driver("remote");
@@ -74,16 +75,16 @@ describe<{
 		assert.instance(remoteDriver, MyRemoteDriver);
 	});
 
-	it("should throw when attempting to get unknown driver instance", async ({ sandbox }) => {
-		const manager = sandbox.app.resolve(MyManager);
+	it("should throw when attempting to get unknown driver instance", async ({ app }) => {
+		const manager = app.resolve(MyManager);
 
 		const check = () => manager.driver("some");
 
 		assert.rejects(check);
 	});
 
-	it("should return driver instances", async ({ sandbox }) => {
-		const manager = sandbox.app.resolve(MyManager);
+	it("should return driver instances", async ({ app }) => {
+		const manager = app.resolve(MyManager);
 		await manager.boot();
 		await manager.extend("remote", async () => new MyRemoteDriver());
 		const drivers = manager.getDrivers();

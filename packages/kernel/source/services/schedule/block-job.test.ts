@@ -2,15 +2,17 @@ import { Identifiers, Events } from "@mainsail/constants";
 
 import crypto from "../../../../core/bin/config/devnet/core/crypto.json";
 import { Configuration } from "../../../../crypto-config/distribution/index";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "../../application";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { MemoryEventDispatcher } from "../events";
 import { BlockJob } from "./block-job";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	job: BlockJob;
 	eventDispatcher: MemoryEventDispatcher;
-}>("BlockJob", ({ assert, beforeEach, it, spy, spyFn, match }) => {
+}>("BlockJob", ({ beforeEach, it, spy, spyFn, match }) => {
 	const expectFinishedEventData = () =>
 		match({
 			blockCount: match.number,
@@ -26,15 +28,15 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
-		context.eventDispatcher = context.sandbox.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher);
+		context.app = new Application(new Container());
+		context.eventDispatcher = context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher);
 
-		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
-		context.job = context.sandbox.app.resolve<BlockJob>(BlockJob);
+		context.job = context.app.resolve<BlockJob>(BlockJob);
 	});
 
 	it("should execute on cron", async (context) => {

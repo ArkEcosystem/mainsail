@@ -1,4 +1,4 @@
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { NullFilesystem } from "./null";
 
 describe("NullFilesystem", ({ assert, it }) => {

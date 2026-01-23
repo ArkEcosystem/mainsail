@@ -1,9 +1,9 @@
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { QueueJob } from "../../../contracts/kernel";
 import { NullQueue } from "./null";
 
 class MyQueueJob implements QueueJob {
-	public async handle(): Promise<void> {}
+	public async handle(): Promise<void> { }
 }
 
 describe("NullQueue", ({ assert, it }) => {

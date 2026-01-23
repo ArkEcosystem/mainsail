@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import {
 	InvalidConfigurationServiceProvider,
 	OptionalDependencyCannotBeFoundServiceProvider,
@@ -29,9 +29,9 @@ describe<{
 }>("RegisterServiceProviders", ({ assert, beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		context.logger = {
-			error: () => {},
-			notice: () => {},
-			warn: () => {},
+			error: () => { },
+			notice: () => { },
+			warn: () => { },
 		};
 
 		context.app = new Application(new Container());
@@ -100,10 +100,10 @@ describe<{
 			() => context.app.resolve<RegisterServiceProviders>(RegisterServiceProviders).bootstrap(),
 			Exceptions.ServiceProviderCannotBeRegistered,
 			'[stub] Failed to register: "[stub] Failed to validate the configuration: "{\n' +
-				'    "username": [\n' +
-				'        "\\"username\\" is required"\n' +
-				"    ]\n" +
-				'}".".',
+			'    "username": [\n' +
+			'        "\\"username\\" is required"\n' +
+			"    ]\n" +
+			'}".".',
 		);
 	});
 

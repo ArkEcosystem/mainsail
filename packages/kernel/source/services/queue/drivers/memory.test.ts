@@ -4,13 +4,15 @@ import { sleep } from "@mainsail/utils";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "../../../application";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { MemoryQueue } from "./memory";
 
 EventEmitter.prototype.constructor = Object.prototype.constructor;
 
 class DummyJob implements Contracts.Kernel.QueueJob {
-	public constructor(private readonly method) {}
+	public constructor(private readonly method) { }
 
 	public async handle(): Promise<void> {
 		return await this.method();
@@ -18,7 +20,7 @@ class DummyJob implements Contracts.Kernel.QueueJob {
 }
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	driver: MemoryQueue;
 	eventDispatcher: any;
 	logger: any;
@@ -26,18 +28,18 @@ describe<{
 }>("MemoryQueue", ({ assert, beforeEach, it, spy, spyFn, stubFn, match }) => {
 	beforeEach((context) => {
 		context.eventDispatcher = {
-			dispatch: () => {},
+			dispatch: () => { },
 		};
 		context.logger = {
-			warn: () => {},
+			warn: () => { },
 		};
-		context.jobMethod = () => {};
+		context.jobMethod = () => { };
 
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
-		context.driver = context.sandbox.app.resolve<MemoryQueue>(MemoryQueue);
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
+		context.driver = context.app.resolve<MemoryQueue>(MemoryQueue);
 	});
 
 	it("Start should process job", async (context) => {
@@ -114,7 +116,7 @@ describe<{
 	});
 
 	it("Clear should clear all jobs when stopped", async (context) => {
-		await context.driver.push(new DummyJob(() => {}));
+		await context.driver.push(new DummyJob(() => { }));
 
 		assert.is(context.driver.size(), 1);
 
@@ -147,7 +149,7 @@ describe<{
 	});
 
 	it("Stop should clear all jobs when stopped", async (context) => {
-		await context.driver.push(new DummyJob(() => {}));
+		await context.driver.push(new DummyJob(() => { }));
 
 		assert.is(context.driver.size(), 1);
 
@@ -274,7 +276,7 @@ describe<{
 	});
 
 	it("Pause should not process new jobs after pause", async (context) => {
-		await context.driver.push(new DummyJob(() => {}));
+		await context.driver.push(new DummyJob(() => { }));
 
 		assert.is(context.driver.size(), 1);
 
@@ -285,7 +287,7 @@ describe<{
 		assert.false(context.driver.isRunning());
 		assert.false(context.driver.isStarted());
 
-		await context.driver.push(new DummyJob(() => {}));
+		await context.driver.push(new DummyJob(() => { }));
 
 		assert.is(context.driver.size(), 1);
 		assert.false(context.driver.isRunning());
@@ -323,7 +325,7 @@ describe<{
 	it("Resume should resume processing after pause", async (context) => {
 		await context.driver.pause();
 
-		await context.driver.push(new DummyJob(() => {}));
+		await context.driver.push(new DummyJob(() => { }));
 
 		assert.is(context.driver.size(), 1);
 		assert.false(context.driver.isStarted());
@@ -339,7 +341,7 @@ describe<{
 	it("Resume should resume processing after stop", async (context) => {
 		await context.driver.stop();
 
-		await context.driver.push(new DummyJob(() => {}));
+		await context.driver.push(new DummyJob(() => { }));
 
 		assert.is(context.driver.size(), 1);
 		assert.false(context.driver.isStarted());
@@ -421,7 +423,7 @@ describe<{
 	});
 
 	it("Later should push job with delay", async (context) => {
-		await context.driver.later(50, new DummyJob(() => {}));
+		await context.driver.later(50, new DummyJob(() => { }));
 
 		assert.is(context.driver.size(), 0);
 
@@ -431,7 +433,7 @@ describe<{
 	});
 
 	it("Bulk should push multiple jobs", async (context) => {
-		await context.driver.bulk([new DummyJob(() => {}), new DummyJob(() => {})]);
+		await context.driver.bulk([new DummyJob(() => { }), new DummyJob(() => { })]);
 
 		assert.is(context.driver.size(), 2);
 	});

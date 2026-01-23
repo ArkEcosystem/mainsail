@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Identifiers, Events } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import {
 	DeferredBootServiceProvider,
 	DeferredDisposeServiceProvider,
@@ -22,9 +22,9 @@ describe<{
 }>("BootServiceProviders", ({ afterEach, assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.logger = {
-			error: () => {},
-			notice: () => {},
-			warn: () => {},
+			error: () => { },
+			notice: () => { },
+			warn: () => { },
 		};
 
 		context.app = new Application(new Container());

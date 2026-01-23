@@ -1,6 +1,6 @@
 import { dirSync, fileSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { LocalFilesystem } from "./local";
 
 describe<{

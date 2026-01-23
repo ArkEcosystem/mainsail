@@ -5,17 +5,17 @@ import { setMaxListeners } from "events";
 import { join } from "path";
 import { dirSync } from "tmp";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Application } from "./application";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
 import { ConfigRepository } from "./services/config";
 import { MemoryEventDispatcher } from "./services/events";
 
 @injectable()
-class StubClass {}
+class StubClass { }
 
 class StubServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
+	public async register(): Promise<void> { }
 
 	public name(): string {
 		return "name";
@@ -42,9 +42,9 @@ describe<{
 		context.app = new Application(context.container);
 
 		context.logger = {
-			debug: () => {},
-			error: () => {},
-			notice: () => {},
+			debug: () => { },
+			error: () => { },
+			notice: () => { },
 		};
 
 		context.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });

@@ -1,9 +1,9 @@
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { ClassManager } from "./class-manager";
 
-class MyMemoryDriver {}
+class MyMemoryDriver { }
 
-class MyRemoteDriver {}
+class MyRemoteDriver { }
 
 class MyManager extends ClassManager {
 	protected getDefaultDriver(): string {
