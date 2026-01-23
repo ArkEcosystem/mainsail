@@ -21,7 +21,7 @@ import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
 import { PublicKeySerializer } from "../../crypto-key-pair-schnorr/source/serializer";
 import { Signature } from "../../crypto-signature-schnorr/source/signature";
 import { ProposalCalculator } from "../../crypto.utils/source/proposal-calculator";
-import { Factories, Sandbox } from "@mainsail/test-framework";
+import { Factories } from "@mainsail/test-runner";
 import { Validator } from "../../validation/source/validator";
 import { AttributeRepository } from "../source/attributes";
 import { store } from "../source/state-store";
@@ -47,7 +47,6 @@ export interface Spies {
 
 export interface Setup {
 	app: Contracts.Kernel.Application;
-	sandbox: Sandbox;
 	walletRepo: WalletRepository;
 	walletRepoCopyOnWrite: WalletRepositoryBySender;
 	factory: Factories.FactoryBuilder;
@@ -168,13 +167,13 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.Cryptography.Hash.Factory).to(HashFactory);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Factory).to(TransactionFactory);
 	sandbox.app.bind(Identifiers.Database.Storage.Block).toConstantValue({
-		deleteBlocks: () => {},
-		deleteTopBlocks: () => {},
-		saveBlocks: () => {},
+		deleteBlocks: () => { },
+		deleteTopBlocks: () => { },
+		saveBlocks: () => { },
 	});
 	sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue({
-		getRoundValidators: () => {},
-		initialize: () => {},
+		getRoundValidators: () => { },
+		initialize: () => { },
 	});
 	sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});
 
@@ -254,7 +253,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Deserializer).to(TransactionDeserializer).inSingletonScope();
 	// sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer).inSingletonScope();
 	const blockFactory = {
-		fromData: () => {},
+		fromData: () => { },
 	};
 
 	sandbox.app.bind(Identifiers.Cryptography.Block.Factory).toConstantValue(blockFactory);

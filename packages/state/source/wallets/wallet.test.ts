@@ -1,31 +1,32 @@
 import { BigNumber } from "@mainsail/utils";
 import { Identifiers } from "@mainsail/constants";
-
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { Wallet } from ".";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 }>("Models - Wallet", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
-		context.sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue({
+		context.app = new Application(new Container());
+		context.app.bind(Identifiers.Evm.Instance).toConstantValue({
 			getAccountInfo: async () => ({ balance: 0n, nonce: 0n }),
 			getAccountInfoExtended: async () => ({ balance: 0n, nonce: 0n, legacyAttributes: {} }),
 		});
 	});
 
-	it("returns the address", async ({ sandbox }) => {
+	it("returns the address", async ({ app }) => {
 		const address = "Abcde";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 
 		assert.equal(wallet.getAddress(), address);
 	});
 
-	it("returns the legacy address", async ({ sandbox }) => {
+	it("returns the legacy address", async ({ app }) => {
 		const address = "Abcde";
 		const legacyAddress = "Fghij";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 		assert.equal(wallet.getAddress(), address);
 		assert.undefined(wallet.getLegacyAddress());
 
@@ -35,9 +36,9 @@ describe<{
 		assert.equal(wallet.getLegacyAddress(), legacyAddress);
 	});
 
-	it("should set and get balance", async ({ sandbox }) => {
+	it("should set and get balance", async ({ app }) => {
 		const address = "Abcde";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 
 		assert.equal(wallet.getBalance(), BigNumber.ZERO);
 
@@ -45,9 +46,9 @@ describe<{
 		assert.equal(wallet.getBalance(), BigNumber.ONE);
 	});
 
-	it("should set and get nonce", async ({ sandbox }) => {
+	it("should set and get nonce", async ({ app }) => {
 		const address = "Abcde";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 
 		assert.equal(wallet.getNonce(), BigNumber.ZERO);
 
@@ -55,9 +56,9 @@ describe<{
 		assert.equal(wallet.getNonce(), BigNumber.ONE);
 	});
 
-	it("should increase balance", async ({ sandbox }) => {
+	it("should increase balance", async ({ app }) => {
 		const address = "Abcde";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 
 		assert.equal(wallet.getBalance(), BigNumber.ZERO);
 
@@ -65,9 +66,9 @@ describe<{
 		assert.equal(wallet.getBalance(), BigNumber.ONE);
 	});
 
-	it("should decrease balance", async ({ sandbox }) => {
+	it("should decrease balance", async ({ app }) => {
 		const address = "Abcde";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 
 		assert.equal(wallet.getBalance(), BigNumber.ZERO);
 
@@ -75,9 +76,9 @@ describe<{
 		assert.equal(wallet.getBalance(), BigNumber.make("-1"));
 	});
 
-	it("should increase nonce", async ({ sandbox }) => {
+	it("should increase nonce", async ({ app }) => {
 		const address = "Abcde";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 
 		assert.equal(wallet.getNonce(), BigNumber.ZERO);
 
@@ -86,9 +87,9 @@ describe<{
 		assert.equal(wallet.getNonce(), BigNumber.ONE);
 	});
 
-	it("should decrease nonce", async ({ sandbox }) => {
+	it("should decrease nonce", async ({ app }) => {
 		const address = "Abcde";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 
 		assert.equal(wallet.getNonce(), BigNumber.ZERO);
 
