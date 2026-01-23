@@ -1,4 +1,4 @@
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { HashFactory } from "./hash.factory";
 
 describe("HashFactory", ({ assert, it }) => {
