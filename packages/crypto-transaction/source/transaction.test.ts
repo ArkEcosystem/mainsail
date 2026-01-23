@@ -4,11 +4,12 @@ import { Configuration } from "@mainsail/crypto-config";
 import { BigNumber } from "@mainsail/utils";
 import { zeroAddress } from "viem";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	validator: Contracts.Crypto.Validator;
 	factory: Contracts.Crypto.TransactionFactory;
 	serializer: Contracts.Crypto.TransactionSerializer;
@@ -17,14 +18,14 @@ describe<{
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.validator = context.sandbox.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
-		context.factory = context.sandbox.app.get<Contracts.Crypto.TransactionFactory>(
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
+		context.factory = context.app.get<Contracts.Crypto.TransactionFactory>(
 			Identifiers.Cryptography.Transaction.Factory,
 		);
-		context.serializer = context.sandbox.app.get<Contracts.Crypto.TransactionSerializer>(
+		context.serializer = context.app.get<Contracts.Crypto.TransactionSerializer>(
 			Identifiers.Cryptography.Transaction.Serializer,
 		);
-		context.deserializer = context.sandbox.app.get<Contracts.Crypto.TransactionDeserializer>(
+		context.deserializer = context.app.get<Contracts.Crypto.TransactionDeserializer>(
 			Identifiers.Cryptography.Transaction.Deserializer,
 		);
 	});
@@ -68,8 +69,8 @@ describe<{
 		}
 	});
 
-	it("#getSchema - gasPrice should be integer, min 5, max 1000 gwei", ({ sandbox, validator }) => {
-		const configuration = sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+	it("#getSchema - gasPrice should be integer, min 5, max 1000 gwei", ({ app, validator }) => {
+		const configuration = app.get<Configuration>(Identifiers.Cryptography.Configuration);
 		configuration.setHeight(1);
 
 		const validValues = [5, 6, 1000];

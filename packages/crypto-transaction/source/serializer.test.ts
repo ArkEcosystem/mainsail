@@ -1,6 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import {
 	serializedTransactionContractCall,
 	serializedTransactionContractCallWithSecondSignature,
@@ -10,17 +11,17 @@ import {
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	deserializer: Contracts.Crypto.TransactionDeserializer;
 	serializer: Contracts.Crypto.TransactionSerializer;
 }>("Serializer", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.serializer = context.sandbox.app.get<Contracts.Crypto.TransactionSerializer>(
+		context.serializer = context.app.get<Contracts.Crypto.TransactionSerializer>(
 			Identifiers.Cryptography.Transaction.Serializer,
 		);
-		context.deserializer = context.sandbox.app.get<Contracts.Crypto.TransactionDeserializer>(
+		context.deserializer = context.app.get<Contracts.Crypto.TransactionDeserializer>(
 			Identifiers.Cryptography.Transaction.Deserializer,
 		);
 	});

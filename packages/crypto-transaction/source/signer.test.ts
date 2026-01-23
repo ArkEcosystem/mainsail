@@ -3,11 +3,12 @@ import { Identifiers } from "@mainsail/constants";
 import { BigNumber } from "@mainsail/utils";
 
 import { TransactionBuilder } from "../source/builders.js";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	signer: Contracts.Crypto.TransactionSigner;
 	keyPair: Contracts.Crypto.KeyPair;
 	transaction: Contracts.Crypto.Transaction;
@@ -15,11 +16,11 @@ describe<{
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.signer = context.sandbox.app.get<Contracts.Crypto.TransactionSigner>(
+		context.signer = context.app.get<Contracts.Crypto.TransactionSigner>(
 			Identifiers.Cryptography.Transaction.Signer,
 		);
 
-		context.keyPair = await context.sandbox.app
+		context.keyPair = await context.app
 			.getTagged<Contracts.Crypto.KeyPairFactory>(
 				Identifiers.Cryptography.Identity.KeyPair.Factory,
 				"type",
@@ -27,7 +28,7 @@ describe<{
 			)
 			.fromMnemonic("secret");
 
-		const builder = context.sandbox.app.resolve(TransactionBuilder);
+		const builder = context.app.resolve(TransactionBuilder);
 		context.transaction = await (
 			await builder
 				.gasPrice(5 * 1e9)
