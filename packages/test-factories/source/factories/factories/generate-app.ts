@@ -14,34 +14,35 @@ import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-trans
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
-import { Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 export const generateApp = async (
 	config: Contracts.Crypto.NetworkConfigPartial,
 ): Promise<Contracts.Kernel.Application> => {
-	const sandbox = new Sandbox();
+	const app = new Application(new Container());
 
-	sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
-	sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
+	app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
+	app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
-	sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-	sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(config);
+	app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+	app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(config);
 
-	await sandbox.app.resolve(CoreValidation).register();
-	await sandbox.app.resolve(CoreCryptoValidation).register();
-	await sandbox.app.resolve(CoreCryptoAddressKeccak256).register();
-	await sandbox.app.resolve(CoreCryptoAddressBase58).register();
-	await sandbox.app.resolve(CoreCryptoKeyPairEcdsa).register();
-	await sandbox.app.resolve(CoreCryptoSignatureEcdsa).register();
-	await sandbox.app.resolve(CoreCryptoHashBcrypto).register();
-	await sandbox.app.resolve(CoreCryptoConsensus).register();
-	await sandbox.app.resolve(CoreCryptoTransaction).register();
-	await sandbox.app.resolve(CoreCryptoBlock).register();
-	await sandbox.app.resolve(CoreCryptoMessages).register();
-	await sandbox.app.resolve(CoreCryptoCommit).register();
-	await sandbox.app.resolve(CoreSerializer).register();
-	await sandbox.app.resolve(CoreCryptoWif).register();
+	await app.resolve(CoreValidation).register();
+	await app.resolve(CoreCryptoValidation).register();
+	await app.resolve(CoreCryptoAddressKeccak256).register();
+	await app.resolve(CoreCryptoAddressBase58).register();
+	await app.resolve(CoreCryptoKeyPairEcdsa).register();
+	await app.resolve(CoreCryptoSignatureEcdsa).register();
+	await app.resolve(CoreCryptoHashBcrypto).register();
+	await app.resolve(CoreCryptoConsensus).register();
+	await app.resolve(CoreCryptoTransaction).register();
+	await app.resolve(CoreCryptoBlock).register();
+	await app.resolve(CoreCryptoMessages).register();
+	await app.resolve(CoreCryptoCommit).register();
+	await app.resolve(CoreSerializer).register();
+	await app.resolve(CoreCryptoWif).register();
 
-	return sandbox.app;
+	return app;
 };
