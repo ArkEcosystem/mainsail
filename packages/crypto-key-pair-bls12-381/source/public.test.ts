@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 import { Configuration } from "@mainsail/crypto-config";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { KeyPairFactory } from "./pair";
 import { PublicKeyFactory } from "./public";
 
