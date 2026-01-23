@@ -7,7 +7,7 @@ import { BlockFactory } from "../../source/factory.js";
 
 // Function to generate test data
 export const prepareBlock = async (context) => {
-	const builder = context.sandbox.app.resolve(TransactionBuilder);
+	const builder = context.app.resolve(TransactionBuilder);
 
 	const tx1 = await (
 		await builder
@@ -58,13 +58,13 @@ export const prepareBlock = async (context) => {
 		payloadLength += serialized.length;
 	}
 
-	const block = await context.sandbox.app.resolve(BlockFactory).make(
+	const block = await context.app.resolve(BlockFactory).make(
 		{
 			generatorAddress: "0xB559F4FbB75c378CDd3Dd7CcbFeff9c5c2094E55",
 			height: 2,
 			numberOfTransactions: transactions.length,
 			payloadHash: (
-				await context.sandbox.app.get(Identifiers.Cryptography.Hash.Factory).sha256(payloadBuffers)
+				await context.app.get(Identifiers.Cryptography.Hash.Factory).sha256(payloadBuffers)
 			).toString("hex"),
 			payloadLength,
 			previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",

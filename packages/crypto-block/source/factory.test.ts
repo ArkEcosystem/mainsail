@@ -2,7 +2,8 @@ import type { Contracts, Utils } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import clone from "lodash.clonedeep";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import {
 	blockData,
 	blockDataJson,
@@ -19,7 +20,7 @@ import { Serializer } from "./serializer";
 
 describe<{
 	expectBlock: ({ data }: { data: Contracts.Crypto.BlockData }) => void;
-	sandbox: Sandbox;
+	app: Application;
 	factory: BlockFactory;
 	serializer: Serializer;
 }>("Factory", ({ it, assert, beforeEach }) => {
@@ -36,14 +37,14 @@ describe<{
 		await prepareSandbox(context);
 
 		for (const schema of Object.values(schemas)) {
-			context.sandbox.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
+			context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
 		}
 
-		context.factory = context.sandbox.app.resolve(BlockFactory);
-		context.serializer = context.sandbox.app.resolve(Serializer);
+		context.factory = context.app.resolve(BlockFactory);
+		context.serializer = context.app.resolve(Serializer);
 	});
 
-	it("#make - should make a block", async ({ factory, sandbox }) => {
+	it("#make - should make a block", async ({ factory }) => {
 		const block = await factory.make(blockData, []);
 
 		assertBlockData(assert, block.data, blockData);
