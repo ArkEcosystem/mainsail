@@ -3,12 +3,13 @@ import { Identifiers } from "@mainsail/constants";
 import { EvmInstance } from "@mainsail/evm-service/distribution/instances/index.js";
 
 import { DatabaseService } from "../source/database-service";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { setGracefulCleanup } from "tmp";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	evm: Contracts.Evm.Instance;
 	databaseService: Contracts.Database.DatabaseService;
 }>("DatabaseService", ({ it, afterAll, afterEach, beforeEach, assert }) => {
@@ -21,19 +22,19 @@ describe<{
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.sandbox.app
+		context.app
 			.bind(Identifiers.Evm.Instance)
 			.to(EvmInstance)
 			.inSingletonScope()
 			.whenTagged("instance", "evm");
 
-		context.evm = context.sandbox.app.getTagged<Contracts.Evm.Instance>(
+		context.evm = context.app.getTagged<Contracts.Evm.Instance>(
 			Identifiers.Evm.Instance,
 			"instance",
 			"evm",
 		);
 
-		context.databaseService = context.sandbox.app.resolve(DatabaseService);
+		context.databaseService = context.app.resolve(DatabaseService);
 		await context.databaseService.initialize();
 	});
 

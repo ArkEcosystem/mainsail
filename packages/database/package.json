@@ -42,7 +42,7 @@
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/evm-service": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
-		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/tmp": "0.2.6",
