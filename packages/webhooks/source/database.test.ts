@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel/source/application";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { dummyWebhook } from "../test/fixtures/assets";
 import { Database } from "./database";
 

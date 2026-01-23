@@ -34,7 +34,7 @@
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
-		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/test-runner": "workspace:*",
 		"@types/better-sqlite3": "7.6.13",
 		"@types/fs-extra": "11.0.4",
 		"tmp": "0.2.5",

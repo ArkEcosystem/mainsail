@@ -1,6 +1,6 @@
 import { Container, injectable } from "@mainsail/container";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { envPaths as environmentPaths } from "./env-paths";
 import { Application } from "./index";
 import { Identifiers } from "@mainsail/constants";

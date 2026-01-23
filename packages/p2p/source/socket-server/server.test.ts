@@ -2,7 +2,9 @@ import { Identifiers } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 import esmock from "esmock";
 
-import { describeSkip, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describeSkip } from "@mainsail/test-runner";
 import { defaults as transactionPoolDefaults } from "../../../transaction-pool-service/source/defaults";
 import { defaults } from "../defaults";
 
@@ -27,7 +29,7 @@ const { Server: ServerProxy } = await esmock("./server", {
 });
 
 // TODO: Fix this test
-describeSkip<{ sandbox: Sandbox; server: ServerProxy }>("Server", ({ it, assert, beforeEach, spy, stub, stubFn }) => {
+describeSkip<{ app: Application; server: ServerProxy }>("Server", ({ it, assert, beforeEach, spy, stub, stubFn }) => {
 	const name = "P2P server";
 	const options = { hostname: "127.0.0.1", port: 4000 };
 
@@ -40,35 +42,35 @@ describeSkip<{ sandbox: Sandbox; server: ServerProxy }>("Server", ({ it, assert,
 	};
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app
+		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
 			.whenTargetTagged("plugin", "p2p");
-		context.sandbox.app
+		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", transactionPoolDefaults))
 			.whenTargetTagged("plugin", "transaction-pool-service");
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
-		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.P2P.ApiNode.Repository).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
-		context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.TransactionPool.Processor).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Consensus.Processor.Proposal).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Consensus.Processor.Message).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Cryptography.Message.Serializer).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.P2P.Header.Service).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.P2P.Header.Factory).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.P2P.State).toConstantValue({});
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		context.app.bind(Identifiers.Database.Service).toConstantValue({});
+		context.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({});
+		context.app.bind(Identifiers.P2P.ApiNode.Repository).toConstantValue({});
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
+		context.app.bind(Identifiers.Cryptography.Block.Deserializer).toConstantValue({});
+		context.app.bind(Identifiers.TransactionPool.Processor).toConstantValue({});
+		context.app.bind(Identifiers.State.Service).toConstantValue({});
+		context.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue({});
+		context.app.bind(Identifiers.Consensus.Processor.Proposal).toConstantValue({});
+		context.app.bind(Identifiers.Consensus.Processor.Message).toConstantValue({});
+		context.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue({});
+		context.app.bind(Identifiers.Cryptography.Message.Serializer).toConstantValue({});
+		context.app.bind(Identifiers.P2P.Header.Service).toConstantValue({});
+		context.app.bind(Identifiers.P2P.Header.Factory).toConstantValue({});
+		context.app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue({});
+		context.app.bind(Identifiers.P2P.State).toConstantValue({});
 
-		context.server = context.sandbox.app.resolve(ServerProxy);
+		context.server = context.app.resolve(ServerProxy);
 	});
 
 	it.only("#initialize - should instantiate a new Hapi server", async ({ server }) => {
@@ -84,9 +86,9 @@ describeSkip<{ sandbox: Sandbox; server: ServerProxy }>("Server", ({ it, assert,
 		// });
 	});
 
-	it("#boot - should call server.start()", async ({ server, sandbox }) => {
+	it("#boot - should call server.start()", async ({ server, app }) => {
 		const spyHapiServerStart = spy(HapiServerMock.prototype, "start");
-		const spyAppTerminate = spy(sandbox.app, "terminate");
+		const spyAppTerminate = spy(app, "terminate");
 
 		await server.initialize(name, options);
 		await server.boot();
@@ -95,11 +97,11 @@ describeSkip<{ sandbox: Sandbox; server: ServerProxy }>("Server", ({ it, assert,
 		spyAppTerminate.neverCalled();
 	});
 
-	it("#boot - should terminate app if server.start() failed", async ({ server, sandbox }) => {
+	it("#boot - should terminate app if server.start() failed", async ({ server, app }) => {
 		const spyHapiServerStart = stub(HapiServerMock.prototype, "start").rejectedValue(
 			new Error("failed starting hapi server"),
 		);
-		const spyAppTerminate = stub(sandbox.app, "terminate").callsFake(() => {});
+		const spyAppTerminate = stub(app, "terminate").callsFake(() => {});
 
 		await server.initialize(name, options);
 		await server.boot();
@@ -108,9 +110,9 @@ describeSkip<{ sandbox: Sandbox; server: ServerProxy }>("Server", ({ it, assert,
 		spyAppTerminate.calledOnce();
 	});
 
-	it("#dispose - should call server.stop()", async ({ server, sandbox }) => {
+	it("#dispose - should call server.stop()", async ({ server, app }) => {
 		const spyHapiServerStop = spy(HapiServerMock.prototype, "stop");
-		const spyAppTerminate = spy(sandbox.app, "terminate");
+		const spyAppTerminate = spy(app, "terminate");
 
 		await server.initialize(name, options);
 		await server.dispose();
@@ -119,11 +121,11 @@ describeSkip<{ sandbox: Sandbox; server: ServerProxy }>("Server", ({ it, assert,
 		spyAppTerminate.neverCalled();
 	});
 
-	it("#dispose -should terminate app if server.stop() failed", async ({ server, sandbox }) => {
+	it("#dispose -should terminate app if server.stop() failed", async ({ server, app }) => {
 		const spyHapiServerStop = stub(HapiServerMock.prototype, "stop").rejectedValue(
 			new Error("failed stopping hapi server"),
 		);
-		const spyAppTerminate = stub(sandbox.app, "terminate").callsFake(() => {});
+		const spyAppTerminate = stub(app, "terminate").callsFake(() => {});
 
 		await server.initialize(name, options);
 		await server.dispose();

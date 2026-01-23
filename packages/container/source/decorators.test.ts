@@ -2,7 +2,7 @@ import { Container, inject } from "./ioc.js";
 import { injectable } from "./decorators.js";
 
 import { ServiceIdentifier, BindToFluentSyntax, Newable } from "inversify";
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 
 const Identifiers = {
 	App: Symbol.for("App"),

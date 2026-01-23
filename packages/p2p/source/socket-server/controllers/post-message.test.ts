@@ -1,10 +1,12 @@
 import { Identifiers } from "@mainsail/constants";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { PostMessageController } from "./post-message.js";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	controller: PostMessageController;
 }>("PostMessageController", ({ it, beforeEach, spy }) => {
 	const processor = {
@@ -20,15 +22,15 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue(factory);
-		context.sandbox.app.bind(Identifiers.Consensus.Processor.Message).toConstantValue(processor);
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.P2P.State).toConstantValue(state);
+		context.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue(factory);
+		context.app.bind(Identifiers.Consensus.Processor.Message).toConstantValue(processor);
+		context.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({});
+		context.app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue({});
+		context.app.bind(Identifiers.P2P.State).toConstantValue(state);
 
-		context.controller = context.sandbox.app.resolve(PostMessageController);
+		context.controller = context.app.resolve(PostMessageController);
 	});
 
 	it("#handle - should call processor", async ({ controller }) => {

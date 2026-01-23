@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { getBlockNotChainedErrorMessage, isBlockChained } from "./is-block-chained";
 
 describe("", ({ assert, it, stub }) => {

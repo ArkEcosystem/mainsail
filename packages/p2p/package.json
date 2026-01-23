@@ -55,7 +55,7 @@
 		"@mainsail/crypto-proposal": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
-		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/fs-extra": "11.0.4",
 		"@types/hapi__sntp": "3.1.4",

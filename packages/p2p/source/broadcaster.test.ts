@@ -2,12 +2,14 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { BigNumber, cloneDeep } from "@mainsail/utils";
 
-import { describeSkip, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describeSkip } from "@mainsail/test-runner";
 import { Broadcaster } from "./broadcaster";
 import { Peer } from "./peer";
 
 describeSkip<{
-	sandbox: Sandbox;
+	app: Application;
 	broadcaster: Broadcaster;
 	peers: Peer[];
 	block: any;
@@ -20,24 +22,24 @@ describeSkip<{
 	const blockchain = { getBlockPing: () => {}, getLastBlock: () => {} };
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
-		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(configuration);
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(repository);
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(communicator);
-		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Serializer).toConstantValue(serializer);
-		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
-		context.sandbox.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(configuration);
+		context.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(repository);
+		context.app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(communicator);
+		context.app.bind(Identifiers.Cryptography.Transaction.Serializer).toConstantValue(serializer);
+		context.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+		context.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
 
-		context.broadcaster = context.sandbox.app.resolve(Broadcaster);
+		context.broadcaster = context.app.resolve(Broadcaster);
 
 		context.peers = [
-			context.sandbox.app.resolve(Peer).init("180.177.54.4", 4000),
-			context.sandbox.app.resolve(Peer).init("181.177.54.4", 4000),
-			context.sandbox.app.resolve(Peer).init("182.177.54.4", 4000),
-			context.sandbox.app.resolve(Peer).init("183.177.54.4", 4000),
-			context.sandbox.app.resolve(Peer).init("184.177.54.4", 4000),
+			context.app.resolve(Peer).init("180.177.54.4", 4000),
+			context.app.resolve(Peer).init("181.177.54.4", 4000),
+			context.app.resolve(Peer).init("182.177.54.4", 4000),
+			context.app.resolve(Peer).init("183.177.54.4", 4000),
+			context.app.resolve(Peer).init("184.177.54.4", 4000),
 		];
 
 		context.block = {

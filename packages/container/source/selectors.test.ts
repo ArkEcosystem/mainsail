@@ -1,6 +1,6 @@
 import { Container, inject, injectable } from "inversify";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { anyAncestorOrTargetTagged } from "./selectors";
 
 const Identifiers = {

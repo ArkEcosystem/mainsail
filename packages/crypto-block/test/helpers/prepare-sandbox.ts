@@ -11,7 +11,8 @@ import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-trans
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
-import { Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
@@ -22,13 +23,11 @@ import { Serializer } from "../../source/serializer.js";
 // import { prepareBlock } from "./prepare-block.js";
 
 export const prepareSandbox = async (context) => {
-	context.sandbox = new Sandbox();
+	context.app = new Application(new Container());
 
-	context.sandbox.app.bind(Identifiers.Cryptography.Block.HeaderSize).toConstantValue(() => {
-		const hashByteLength = context.sandbox.app.get<number>(Identifiers.Cryptography.Hash.Size.SHA256);
-		const generatorAddressByteLength = context.sandbox.app.get<number>(
-			Identifiers.Cryptography.Identity.Address.Size,
-		);
+	context.app.bind(Identifiers.Cryptography.Block.HeaderSize).toConstantValue(() => {
+		const hashByteLength = context.app.get<number>(Identifiers.Cryptography.Hash.Size.SHA256);
+		const generatorAddressByteLength = context.app.get<number>(Identifiers.Cryptography.Identity.Address.Size);
 
 		return (
 			1 + // version
@@ -48,26 +47,26 @@ export const prepareSandbox = async (context) => {
 		);
 	});
 
-	context.sandbox.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
-	context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => {} });
-	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
+	context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
+	context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => {} });
+	context.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
-	await context.sandbox.app.resolve(CoreSerializer).register();
-	await context.sandbox.app.resolve(CoreValidation).register();
-	await context.sandbox.app.resolve(CoreCryptoConfig).register();
-	await context.sandbox.app.resolve(CoreCryptoValidation).register();
-	await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();
-	await context.sandbox.app.resolve(CoreCryptoSignatureEcdsa).register();
-	await context.sandbox.app.resolve(CoreCryptoConsensus).register();
-	await context.sandbox.app.resolve(CoreCryptoKeyPairEcdsa).register();
-	await context.sandbox.app.resolve(CoreCryptoAddressBase58).register();
-	await context.sandbox.app.resolve(CoreCryptoAddressKeccak256).register();
-	await context.sandbox.app.resolve(CoreCryptoWif).register();
-	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
-	context.sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer);
-	context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).to(Deserializer);
-	context.sandbox.app.bind(Identifiers.Cryptography.Block.HashFactory).to(HashFactory);
-	context.sandbox.app.bind(Identifiers.Cryptography.Block.Factory).to(BlockFactory);
+	await context.app.resolve(CoreSerializer).register();
+	await context.app.resolve(CoreValidation).register();
+	await context.app.resolve(CoreCryptoConfig).register();
+	await context.app.resolve(CoreCryptoValidation).register();
+	await context.app.resolve(CoreCryptoHashBcrypto).register();
+	await context.app.resolve(CoreCryptoSignatureEcdsa).register();
+	await context.app.resolve(CoreCryptoConsensus).register();
+	await context.app.resolve(CoreCryptoKeyPairEcdsa).register();
+	await context.app.resolve(CoreCryptoAddressBase58).register();
+	await context.app.resolve(CoreCryptoAddressKeccak256).register();
+	await context.app.resolve(CoreCryptoWif).register();
+	await context.app.resolve(CoreCryptoTransaction).register();
+	context.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer);
+	context.app.bind(Identifiers.Cryptography.Block.Deserializer).to(Deserializer);
+	context.app.bind(Identifiers.Cryptography.Block.HashFactory).to(HashFactory);
+	context.app.bind(Identifiers.Cryptography.Block.Factory).to(BlockFactory);
 
 	// await prepareBlock(context);
 };

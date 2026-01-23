@@ -1,4 +1,5 @@
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
+import { Application } from "@mainsail/kernel";
 import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
@@ -17,7 +18,7 @@ import walletTokensResponse from "../../test/fixtures/wallet_tokens.response.jso
 import walletTokenHoldersResponse from "../../test/fixtures/wallet_token_holders.response.json";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 }>("Wallets", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 

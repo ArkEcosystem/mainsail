@@ -1,4 +1,4 @@
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { IteratorMany } from ".";
 
 describe("IteratorMany", ({ it, assert }) => {

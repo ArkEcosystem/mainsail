@@ -1,5 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -12,7 +12,7 @@ import { addTransactionsToPool, getWallets, waitBlock, getAddressByPublicKey } f
 import { getCreateAddress, Hex, parseEther } from "viem";
 
 describe<{
-	sandbox: Sandbox;
+	app: Contracts.Kernel.Application;
 	snapshot: Snapshot;
 	wallets: Contracts.Crypto.KeyPair[];
 	legacyColdWallets: {
@@ -21,15 +21,15 @@ describe<{
 	}[];
 }>("Tokens", ({ beforeEach, afterEach, it, assert }) => {
 	beforeEach(async (context) => {
-		context.sandbox = await setup();
-		context.wallets = await getWallets(context.sandbox);
-		context.snapshot = await takeSnapshot(context.sandbox);
+		context.app = await setup();
+		context.wallets = await getWallets(context.app);
+		context.snapshot = await takeSnapshot(context.app);
 	});
 
-	afterEach(async ({ sandbox, snapshot }) => {
+	afterEach(async ({ app, snapshot }) => {
 		await snapshot.validate();
 
-		await shutdown(sandbox);
+		await shutdown(app);
 	});
 
 	it("should ingest tokens", async (context) => {
@@ -59,7 +59,7 @@ describe<{
 		assert.length(tokenHolders, 1);
 		assert.equal(
 			tokenHolders[0].address,
-			await getAddressByPublicKey(context.sandbox, context.wallets[0].publicKey),
+			await getAddressByPublicKey(context.app, context.wallets[0].publicKey),
 		);
 		assert.equal(tokenHolders[0].tokenAddress, erc20Address.toLowerCase());
 		assert.equal(tokenHolders[0].balance, parseEther("100000000").toString());
@@ -86,7 +86,7 @@ describe<{
 
 		assert.equal(
 			tokenHolders[0].address,
-			await getAddressByPublicKey(context.sandbox, context.wallets[0].publicKey),
+			await getAddressByPublicKey(context.app, context.wallets[0].publicKey),
 		);
 		assert.equal(tokenHolders[0].tokenAddress, erc20Address.toLowerCase());
 		assert.equal(tokenHolders[0].balance, (parseEther("100000000") - transferAmount).toString());
@@ -96,16 +96,16 @@ describe<{
 		assert.equal(tokenHolders[1].balance, transferAmount.toString());
 	});
 
-	const getAllTokens = async ({ sandbox }: { sandbox: Sandbox }): Promise<Models.Token[]> => {
-		const tokenRepositoryFactory = sandbox.app.get<ApiDatabaseContracts.TokenRepositoryFactory>(
+	const getAllTokens = async ({ app }: { app: Contracts.Kernel.Application }): Promise<Models.Token[]> => {
+		const tokenRepositoryFactory = app.get<ApiDatabaseContracts.TokenRepositoryFactory>(
 			ApiDatabaseIdentifiers.TokenRepositoryFactory,
 		);
 
 		return tokenRepositoryFactory().createQueryBuilder().getMany();
 	};
 
-	const getAllTokenHolders = async ({ sandbox }: { sandbox: Sandbox }): Promise<Models.TokenHolder[]> => {
-		const tokenHolderRepositoryFactory = sandbox.app.get<ApiDatabaseContracts.TokenHolderRepositoryFactory>(
+	const getAllTokenHolders = async ({ app }: { app: Contracts.Kernel.Application }): Promise<Models.TokenHolder[]> => {
+		const tokenHolderRepositoryFactory = app.get<ApiDatabaseContracts.TokenHolderRepositoryFactory>(
 			ApiDatabaseIdentifiers.TokenHolderRepositoryFactory,
 		);
 

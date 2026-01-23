@@ -2,7 +2,9 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { defaults } from "./defaults";
 import { Peer } from "./peer";
 import { ServiceProvider } from "./service-provider";
@@ -10,7 +12,7 @@ import { ServiceProvider } from "./service-provider";
 const importFresh = (moduleName) => import(`${moduleName}?${Date.now()}`);
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ it, assert, beforeEach, stub }) => {
 	const triggerService = { bind: () => {} };
@@ -22,28 +24,28 @@ describe<{
 	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
-		context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
-		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
+		context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
+		context.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
 
-		context.serviceProvider = context.sandbox.app.resolve(ServiceProvider);
+		context.serviceProvider = context.app.resolve(ServiceProvider);
 	});
 
 	it("#register - should register", async ({ serviceProvider }) => {
 		await assert.resolves(() => serviceProvider.register());
 	});
 
-	it("#boot - should call the server initialize", async ({ sandbox, serviceProvider }) => {
+	it("#boot - should call the server initialize", async ({ app, serviceProvider }) => {
 		const spyServerInitialize = stub(server, "initialize");
 		const spyServerBoot = stub(server, "boot");
 		const spyStatisticServiceBoot = stub(statisticService, "boot");
 
-		sandbox.app.bind(Identifiers.P2P.Server).toConstantValue(server);
-		sandbox.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue(statisticService);
+		app.bind(Identifiers.P2P.Server).toConstantValue(server);
+		app.bind(Identifiers.P2P.Statistic.Service).toConstantValue(statisticService);
 
-		const config = sandbox.app.resolve(Providers.PluginConfiguration).from("", defaults);
+		const config = app.resolve(Providers.PluginConfiguration).from("", defaults);
 		serviceProvider.setConfig(config);
 
 		await serviceProvider.boot();
@@ -53,13 +55,13 @@ describe<{
 		spyStatisticServiceBoot.calledOnce();
 	});
 
-	it("#dispose - should call the server dispose", async ({ sandbox, serviceProvider }) => {
+	it("#dispose - should call the server dispose", async ({ app, serviceProvider }) => {
 		const spyServerDispose = stub(server, "dispose");
 		const spyServiceDispose = stub(service, "dispose");
 		const spyPeerDispose = stub(peerDisposer, "disposePeers");
-		sandbox.app.bind(Identifiers.P2P.Server).toConstantValue(server);
-		sandbox.app.bind(Identifiers.P2P.Service).toConstantValue(service);
-		sandbox.app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue(peerDisposer);
+		app.bind(Identifiers.P2P.Server).toConstantValue(server);
+		app.bind(Identifiers.P2P.Service).toConstantValue(service);
+		app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue(peerDisposer);
 
 		await serviceProvider.dispose();
 
@@ -73,16 +75,16 @@ describe<{
 	});
 
 	it("#peerFactory - should create a peer with integer port number, when using string config", async ({
-		sandbox,
+		app,
 		serviceProvider,
 	}) => {
-		sandbox.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
-		const config = sandbox.app.resolve(Providers.PluginConfiguration).from("", defaults);
+		app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
+		const config = app.resolve(Providers.PluginConfiguration).from("", defaults);
 		serviceProvider.setConfig(config);
 		await serviceProvider.register();
 
 		const ip = "188.133.1.2";
-		const peer = sandbox.app.get<Contracts.P2P.PeerFactory>(Identifiers.P2P.Peer.Factory)(ip);
+		const peer = app.get<Contracts.P2P.PeerFactory>(Identifiers.P2P.Peer.Factory)(ip);
 
 		assert.instance(peer, Peer);
 		assert.number(peer.port);
@@ -91,7 +93,7 @@ describe<{
 });
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider.configSchema", ({ it, assert, beforeEach }) => {
 	const importDefaults = async () => (await importFresh<any>("../distribution/defaults.js")).defaults;
@@ -100,17 +102,17 @@ describe<{
 	const validator = { addFormat: () => {} };
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
+		context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
 			getMilestone: () => ({
 				roundValidators: 2,
 			}),
 		});
-		context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
+		context.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
 
-		context.serviceProvider = context.sandbox.app.resolve(ServiceProvider);
+		context.serviceProvider = context.app.resolve(ServiceProvider);
 
 		for (const key of Object.keys(process.env)) {
 			if (key.includes("MAINSAIL_P2P_")) {

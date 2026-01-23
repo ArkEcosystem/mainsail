@@ -1,6 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import {
 	serializedTransactionContractCall,
 	serializedTransactionContractCallWithSecondSignature,
@@ -11,13 +12,13 @@ import {
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	factory: Contracts.Crypto.TransactionFactory;
 }>("Factory", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.factory = context.sandbox.app.get<Contracts.Crypto.TransactionFactory>(
+		context.factory = context.app.get<Contracts.Crypto.TransactionFactory>(
 			Identifiers.Cryptography.Transaction.Factory,
 		);
 	});

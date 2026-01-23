@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { MemoryEventDispatcher } from "./memory";
 
 class DummyClass implements Contracts.Kernel.EventListener {

@@ -1,9 +1,10 @@
 import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
-import { Providers } from "@mainsail/kernel";
+import { Application, Providers } from "@mainsail/kernel";
 import esmock from "esmock";
 
-import { describeSkip, Sandbox } from "@mainsail/test-framework";
+import { Container } from "@mainsail/container";
+import { describeSkip } from "@mainsail/test-runner";
 import { defaults } from "./defaults";
 import { Routes } from "./enums";
 import { Peer } from "./peer";
@@ -25,7 +26,7 @@ const { PeerCommunicator: PeerCommunicatorProxy } = await esmock("./peer-communi
 });
 
 describeSkip<{
-	sandbox: Sandbox;
+	app: Application;
 	peerCommunicator: PeerCommunicator;
 }>("PeerCommunicator", ({ it, assert, beforeEach, stub, spy, match }) => {
 	const logger = { debug: () => {}, error: () => {}, info: () => {}, warn: () => {} };
@@ -44,24 +45,24 @@ describeSkip<{
 	const createQueue = () => queue;
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app
+		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
 			.whenTargetTagged("plugin", "p2p");
 
-		context.sandbox.app.bind(Identifiers.Application.Version).toConstantValue("0.0.1");
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
-		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Connector).toConstantValue(connector);
-		context.sandbox.app.bind(Identifiers.Services.Queue.Factory).toConstantValue(createQueue);
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(cryptoConfig);
-		context.sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).toConstantValue(serializer);
-		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Factory).toConstantValue(transactionFactory);
-		context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
+		context.app.bind(Identifiers.Application.Version).toConstantValue("0.0.1");
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
+		context.app.bind(Identifiers.P2P.Peer.Connector).toConstantValue(connector);
+		context.app.bind(Identifiers.Services.Queue.Factory).toConstantValue(createQueue);
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(cryptoConfig);
+		context.app.bind(Identifiers.Cryptography.Block.Serializer).toConstantValue(serializer);
+		context.app.bind(Identifiers.Cryptography.Transaction.Factory).toConstantValue(transactionFactory);
+		context.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
 
-		context.peerCommunicator = context.sandbox.app.resolve(PeerCommunicatorProxy);
+		context.peerCommunicator = context.app.resolve(PeerCommunicatorProxy);
 	});
 
 	it("#postBlock - should use connector to emit p2p.blocks.postBlock", async ({ peerCommunicator }) => {

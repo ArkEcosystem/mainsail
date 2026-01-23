@@ -1,9 +1,7 @@
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { normalizeUrl } from "./normalize-url";
 
-describe<{
-	sandbox: Sandbox;
-}>("normalizeUrl", ({ assert, each }) => {
+describe<{}>("normalizeUrl", ({ assert, each }) => {
 	each(
 		"normalizeUrl",
 		({ dataset: { given, normalized } }) => {

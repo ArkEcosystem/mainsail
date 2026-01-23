@@ -1,4 +1,4 @@
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Context, ServerHelper } from "../../../test/helpers/server";
 
 describe<Context>("Whitelist", ({ beforeEach, afterEach, afterAll, it, assert }) => {

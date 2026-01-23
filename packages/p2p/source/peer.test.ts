@@ -2,11 +2,13 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Enums } from "@mainsail/constants";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { Peer } from "./peer";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	peer: Peer;
 }>("Peer", ({ it, assert, beforeEach, each }) => {
 	const ip = "167.184.53.78";
@@ -14,11 +16,11 @@ describe<{
 	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
-		context.sandbox.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
+		context.app = new Application(new Container());
+		context.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
 
-		context.peer = context.sandbox.app.resolve(Peer).init(ip, port);
+		context.peer = context.app.resolve(Peer).init(ip, port);
 	});
 
 	it("#url - should return http url", ({ peer }) => {
@@ -28,10 +30,7 @@ describe<{
 	each(
 		"#url - should infer protocol when port is 80 or 443",
 		({ context, dataset }) => {
-			assert.equal(
-				context.sandbox.app.resolve(Peer).init(ip, dataset[0]).url,
-				`${dataset[1]}://${ip}:${dataset[0]}`,
-			);
+			assert.equal(context.app.resolve(Peer).init(ip, dataset[0]).url, `${dataset[1]}://${ip}:${dataset[0]}`);
 		},
 		[
 			[80, "http"],

@@ -1,25 +1,27 @@
 import { Identifiers } from "@mainsail/constants";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from "./service-provider";
 
 type Context = {
-	sandbox: Sandbox;
+	app: Application;
 	serviceProvider: ServiceProvider;
 };
 
 describe<Context>("ServiceProvider", ({ assert, it, beforeEach }) => {
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
-		context.serviceProvider = context.sandbox.app.resolve(ServiceProvider);
+		context.app = new Application(new Container());
+		context.serviceProvider = context.app.resolve(ServiceProvider);
 	});
 
-	it("should register all calculators", async ({ sandbox, serviceProvider }) => {
+	it("should register all calculators", async ({ app, serviceProvider }) => {
 		await serviceProvider.register();
 
-		assert.true(sandbox.app.isBound(Identifiers.BlockchainUtils.ProposerCalculator));
-		assert.true(sandbox.app.isBound(Identifiers.BlockchainUtils.FeeCalculator));
-		assert.true(sandbox.app.isBound(Identifiers.BlockchainUtils.RoundCalculator));
-		assert.true(sandbox.app.isBound(Identifiers.BlockchainUtils.TimestampCalculator));
+		assert.true(app.isBound(Identifiers.BlockchainUtils.ProposerCalculator));
+		assert.true(app.isBound(Identifiers.BlockchainUtils.FeeCalculator));
+		assert.true(app.isBound(Identifiers.BlockchainUtils.RoundCalculator));
+		assert.true(app.isBound(Identifiers.BlockchainUtils.TimestampCalculator));
 	});
 });

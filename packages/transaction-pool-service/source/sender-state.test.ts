@@ -5,7 +5,7 @@ import * as Exceptions from "@mainsail/exceptions";
 import { Configuration } from "@mainsail/crypto-config";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
-import { describeSkip } from "@mainsail/test-framework";
+import { describeSkip } from "@mainsail/test-runner";
 import { SenderState } from ".";
 
 describeSkip<{

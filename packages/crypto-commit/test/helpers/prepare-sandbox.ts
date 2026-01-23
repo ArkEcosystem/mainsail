@@ -15,42 +15,43 @@ import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
-import { Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json";
 import { Deserializer } from "../../source/deserializer";
 import { Serializer } from "../../source/serializer";
 
 export const prepareSandbox = async (context) => {
-	context.sandbox = new Sandbox();
+	context.app = new Application(new Container());
 
-	context.sandbox.app.bind(Identifiers.Cryptography.Commit.ProofSize).toConstantValue(
+	context.app.bind(Identifiers.Cryptography.Commit.ProofSize).toConstantValue(
 		() =>
 			4 + // round
-			context.sandbox.app.getTagged<number>(Identifiers.Cryptography.Signature.Size, "type", "consensus") + // signature
+			context.app.getTagged<number>(Identifiers.Cryptography.Signature.Size, "type", "consensus") + // signature
 			1 +
 			8, // validator set bitmap);
 	);
 
-	context.sandbox.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
-	context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => {} });
-	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
+	context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
+	context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => {} });
+	context.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
-	await context.sandbox.app.resolve(CoreSerializer).register();
-	await context.sandbox.app.resolve(CoreValidation).register();
-	await context.sandbox.app.resolve(CoreCryptoConfig).register();
-	await context.sandbox.app.resolve(CoreCryptoValidation).register();
-	await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();
-	await context.sandbox.app.resolve(CoreCryptoSignatureEcdsa).register();
-	await context.sandbox.app.resolve(CoreCryptoConsensus).register();
-	await context.sandbox.app.resolve(CoreCryptoKeyPairSchnorr).register();
-	await context.sandbox.app.resolve(CoreCryptoAddressKeccak256).register();
-	await context.sandbox.app.resolve(CoreCryptoAddressBase58).register();
-	await context.sandbox.app.resolve(CoreCryptoWif).register();
-	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
-	await context.sandbox.app.resolve(CoreCryptoBlock).register();
-	await context.sandbox.app.resolve(CoreCryptoMessages).register();
+	await context.app.resolve(CoreSerializer).register();
+	await context.app.resolve(CoreValidation).register();
+	await context.app.resolve(CoreCryptoConfig).register();
+	await context.app.resolve(CoreCryptoValidation).register();
+	await context.app.resolve(CoreCryptoHashBcrypto).register();
+	await context.app.resolve(CoreCryptoSignatureEcdsa).register();
+	await context.app.resolve(CoreCryptoConsensus).register();
+	await context.app.resolve(CoreCryptoKeyPairSchnorr).register();
+	await context.app.resolve(CoreCryptoAddressKeccak256).register();
+	await context.app.resolve(CoreCryptoAddressBase58).register();
+	await context.app.resolve(CoreCryptoWif).register();
+	await context.app.resolve(CoreCryptoTransaction).register();
+	await context.app.resolve(CoreCryptoBlock).register();
+	await context.app.resolve(CoreCryptoMessages).register();
 
-	context.sandbox.app.bind(Identifiers.Cryptography.Commit.Serializer).to(Serializer);
-	context.sandbox.app.bind(Identifiers.Cryptography.Commit.Deserializer).to(Deserializer);
+	context.app.bind(Identifiers.Cryptography.Commit.Serializer).to(Serializer);
+	context.app.bind(Identifiers.Cryptography.Commit.Deserializer).to(Deserializer);
 };

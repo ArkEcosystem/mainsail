@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import { Application, Services } from "@mainsail/kernel";
 import { AnySchema } from "joi";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from ".";
 
 const importFresh = (moduleName) => import(`${moduleName}?${Date.now()}`);

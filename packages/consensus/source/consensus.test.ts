@@ -2,11 +2,13 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers, Events, Enums } from "@mainsail/constants";
 import { Lock } from "@mainsail/utils";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { Consensus } from "./consensus";
 
 type Context = {
-	sandbox: Sandbox;
+	app: Application;
 	consensus: Consensus;
 	blockProcessor: any;
 	bootstrapper: any;
@@ -139,29 +141,25 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			newRound: () => {},
 		};
 
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
-		context.sandbox.app.bind(Identifiers.Processor.BlockProcessor).toConstantValue(context.blockProcessor);
-		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue(context.state);
-		context.sandbox.app.bind(Identifiers.Consensus.Processor.Message).toConstantValue(context.messageProcessor);
-		context.sandbox.app.bind(Identifiers.Consensus.Processor.Proposal).toConstantValue(context.proposalProcessor);
-		context.sandbox.app.bind(Identifiers.Consensus.Bootstrapper).toConstantValue(context.bootstrapper);
-		context.sandbox.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
-		context.sandbox.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Lock());
-		+context.sandbox.app.bind(Identifiers.Validator.Repository).toConstantValue(context.validatorsRepository);
-		context.sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
-		context.sandbox.app
-			.bind(Identifiers.BlockchainUtils.ProposerCalculator)
-			.toConstantValue(context.proposerCalculator);
-		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
-		context.sandbox.app
-			.bind(Identifiers.Consensus.RoundStateRepository)
-			.toConstantValue(context.roundStateRepository);
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
-		context.sandbox.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue(context.peerStatistic);
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
+		context.app.bind(Identifiers.Processor.BlockProcessor).toConstantValue(context.blockProcessor);
+		context.app.bind(Identifiers.State.Store).toConstantValue(context.state);
+		context.app.bind(Identifiers.Consensus.Processor.Message).toConstantValue(context.messageProcessor);
+		context.app.bind(Identifiers.Consensus.Processor.Proposal).toConstantValue(context.proposalProcessor);
+		context.app.bind(Identifiers.Consensus.Bootstrapper).toConstantValue(context.bootstrapper);
+		context.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
+		context.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Lock());
+		+context.app.bind(Identifiers.Validator.Repository).toConstantValue(context.validatorsRepository);
+		context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
+		context.app.bind(Identifiers.BlockchainUtils.ProposerCalculator).toConstantValue(context.proposerCalculator);
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
+		context.app.bind(Identifiers.Consensus.RoundStateRepository).toConstantValue(context.roundStateRepository);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
+		context.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue(context.peerStatistic);
 
-		context.consensus = context.sandbox.app.resolve(Consensus);
+		context.consensus = context.app.resolve(Consensus);
 	});
 
 	it("#getBlockNumber - should return initial value", async ({ consensus }) => {
@@ -1392,7 +1390,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	});
 
 	it("#onMajorityPrecommit - should terminate if processor throws", async ({
-		sandbox,
+		app,
 		consensus,
 		blockProcessor,
 		roundState,
@@ -1401,7 +1399,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const fakeTimers = clock();
 
 		const error = new Error("error");
-		const spyAppTerminate = stub(sandbox.app, "terminate").callsFake(() => {});
+		const spyAppTerminate = stub(app, "terminate").callsFake(() => {});
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.getData().block);
 		const spyBlockProcessorCommit = stub(blockProcessor, "commit").rejectedValue(error);
 

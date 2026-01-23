@@ -5,23 +5,25 @@ import { Validator } from "@mainsail/validation/source/validator";
 import { generateMnemonic } from "bip39";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { KeyPairFactory } from "./pair";
 import { schemas } from "./schemas";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	validator: Validator;
 }>("Schemas", ({ it, assert, beforeEach }) => {
 	const length = 66;
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.validator = context.app.resolve(Validator);
 
 		for (const schema of Object.values({
 			...baseSchemas,
@@ -42,7 +44,7 @@ describe<{
 	});
 
 	it("publicKey - should be ok from key pair factory", async (context) => {
-		const kayPair = await context.sandbox.app.resolve(KeyPairFactory).fromMnemonic(generateMnemonic(256));
+		const kayPair = await context.app.resolve(KeyPairFactory).fromMnemonic(generateMnemonic(256));
 
 		assert.undefined(context.validator.validate("publicKey", kayPair.publicKey).error);
 	});

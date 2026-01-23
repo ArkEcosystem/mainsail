@@ -1,13 +1,13 @@
 import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
-
+import { Application } from "@mainsail/kernel";
 import cryptoConfig from "../../../../core/bin/config/devnet/core/crypto.json";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { FactoryBuilder } from "../factory-builder";
 import { registerBlockFactory } from "./block";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	factoryBuilder: FactoryBuilder;
 }>("BlockFactory", ({ beforeEach, it, assert }) => {
 	beforeEach(async (context) => {

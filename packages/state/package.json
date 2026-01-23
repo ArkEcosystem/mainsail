@@ -29,7 +29,7 @@
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
-		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/test-runner": "workspace:*",
 		"@types/fs-extra": "11.0.4",
 		"@types/pumpify": "1.4.4",
 		"@types/sinon": "17.0.4",

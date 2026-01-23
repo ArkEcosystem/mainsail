@@ -2,7 +2,6 @@ import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { Proposal } from "@mainsail/crypto-proposal";
-import type { Sandbox } from "@mainsail/test-framework";
 import { assert, BigNumber } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 import dayjs from "dayjs";
@@ -22,21 +21,21 @@ import type { Validator } from "./contracts.js";
 // 1-3) replicates 'proposer.prepareBlock'
 // 4) replicates 'messageFactory.makeProposal'
 export const makeCustomProposal = async (
-	{ node, validators }: { node: Sandbox; validators: Validator[] },
+	{ app, validators }: { app: Contracts.Kernel.Application; validators: Validator[] },
 	transactions: Contracts.Crypto.Transaction[] = [],
 ): Promise<Contracts.Crypto.Proposal> => {
-	const previousBlock = node.app.get<Contracts.State.Store>(Identifiers.State.Store).getLastBlock();
+	const previousBlock = app.get<Contracts.State.Store>(Identifiers.State.Store).getLastBlock();
 
-	const cryptoConfiguration = node.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
+	const cryptoConfiguration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const milestone = cryptoConfiguration.getMilestone();
 
-	const transactionValidatorFactory = node.app.get<Contracts.Transactions.TransactionValidatorFactory>(
+	const transactionValidatorFactory = app.get<Contracts.Transactions.TransactionValidatorFactory>(
 		Identifiers.Transaction.Validator.Factory,
 	);
 	const transactionValidator = transactionValidatorFactory();
 
 	// 2)
-	const round = node.app.get<Consensus>(Identifiers.Consensus.Service).getRound();
+	const round = app.get<Consensus>(Identifiers.Consensus.Service).getRound();
 
 	// 3)
 	// update block buffer
@@ -100,8 +99,8 @@ export const makeCustomProposal = async (
 
 	await transactionValidator.getEvm().dispose();
 
-	const hashFactory = node.app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
-	const blockFactory = node.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
+	const hashFactory = app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
+	const blockFactory = app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
 	const block = await blockFactory.make(
 		{
 			fee: totals.fee,
@@ -123,7 +122,7 @@ export const makeCustomProposal = async (
 		transactions,
 	);
 
-	const messageSerializer = node.app.get<Contracts.Crypto.ProposalSerializer>(
+	const messageSerializer = app.get<Contracts.Crypto.ProposalSerializer>(
 		Identifiers.Cryptography.Proposal.Serializer,
 	);
 
@@ -142,13 +141,13 @@ export const makeCustomProposal = async (
 		{ includeSignature: false },
 	);
 
-	const proposalSignature = await node.app
+	const proposalSignature = await app
 		.getTagged<Contracts.Crypto.Signature>(Identifiers.Cryptography.Signature.Instance, "type", "consensus")
 		.sign(serializedProposal, Buffer.from(validators[0].consensusPrivateKey, "hex"));
 
 	const signedProposal = Buffer.concat([serializedProposal, Buffer.from(proposalSignature, "hex")]);
 
-	const proposal = node.app.resolve(Proposal).initialize({
+	const proposal = app.resolve(Proposal).initialize({
 		blockHeader: block.header,
 		dataSerialized: proposedBytes.toString("hex"),
 		round,
@@ -162,9 +161,9 @@ export const makeCustomProposal = async (
 	return proposal;
 };
 
-export const makeTransactionBuilderContext = (node: Sandbox, nodes: Sandbox[], validators: Validator[]) => {
+export const makeTransactionBuilderContext = (app: Contracts.Kernel.Application, apps: Contracts.Kernel.Application[], validators: Validator[]) => {
 	const context = {
-		sandbox: node,
+		app,
 		wallets: validators.map((v) => ({
 			compressed: false,
 			privateKey: v.privateKey,
@@ -175,12 +174,11 @@ export const makeTransactionBuilderContext = (node: Sandbox, nodes: Sandbox[], v
 	return {
 		...context,
 		fundedWalletProvider: async (
-			context: { sandbox: Sandbox; wallets: Contracts.Crypto.KeyPair[] },
+			context: { app: Contracts.Kernel.Application; wallets: Contracts.Crypto.KeyPair[] },
 			amount?: BigNumber,
 		): Promise<Contracts.Crypto.KeyPair> => {
 			// create a random wallet with funds (without sending a transaction)
-			const { sandbox } = context;
-			const { app } = sandbox;
+			const { app } = context;
 
 			const seed = randomBytes(32).toString("hex");
 
@@ -199,7 +197,7 @@ export const makeTransactionBuilderContext = (node: Sandbox, nodes: Sandbox[], v
 			// amount = amount ?? BigNumber.make("10000000000");
 
 			// for (const node of nodes) {
-			// 	const { walletRepository } = node.app
+			// 	const { walletRepository } = app
 			// 		.get<Contracts.State.Store>(Identifiers.State.Store)
 			// 		.getStore();
 			// 	const wallet = walletRepository.findByAddress(recipient);

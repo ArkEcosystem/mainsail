@@ -13,12 +13,14 @@
 		"uvu": "tsx --tsconfig tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"devDependencies": {
-		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/test-factories": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/container": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"uvu": "0.5.6",
 		"date-fns": "4.1.0",

@@ -1,4 +1,5 @@
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
+import { Application } from "@mainsail/kernel";
 import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
@@ -8,7 +9,7 @@ import wallets from "../../test/fixtures/wallets.json";
 import validatorRounds from "../../test/fixtures/validator-rounds.json";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 }>("Commits", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 

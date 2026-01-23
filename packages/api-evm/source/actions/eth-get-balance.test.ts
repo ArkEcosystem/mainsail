@@ -2,13 +2,14 @@ import { Identifiers } from "@mainsail/constants";
 import { schemas as keccak256Schemas } from "@mainsail/crypto-address-keccak256";
 import { schemas as validationSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation";
-
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
+import { Container } from "@mainsail/container";
 import { schemas } from "../validation/index.js";
 import { EthGetBalanceAction } from "./index.js";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	action: EthGetBalanceAction;
 	validator: Validator;
 	evm: any;
@@ -24,12 +25,11 @@ describe<{
 			}),
 		};
 
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
+		context.app.bind(Identifiers.Evm.Instance).toConstantValue(context.evm);
 
-		context.sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue(context.evm);
-
-		context.action = context.sandbox.app.resolve(EthGetBalanceAction);
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.action = context.app.resolve(EthGetBalanceAction);
+		context.validator = context.app.resolve(Validator);
 	});
 
 	it("should have a name", ({ action }) => {

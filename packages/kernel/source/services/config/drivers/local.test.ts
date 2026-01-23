@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 import { join } from "path";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Application } from "../../../application";
 import { MemoryEventDispatcher } from "../../events";
 import { JoiValidator } from "../../validation/drivers/joi";

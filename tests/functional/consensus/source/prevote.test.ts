@@ -1,6 +1,6 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import { Identifiers } from "@mainsail/constants";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { sleep } from "@mainsail/utils";
 
 import crypto from "../config/crypto.json" with { type: "json" };
@@ -17,9 +17,10 @@ import {
 	prepareNodeValidators,
 	snoozeForBlock,
 } from "./utilities.js";
+import type { Contracts } from "@mainsail/contracts";
 
 describe<{
-	nodes: Sandbox[];
+	nodes: Contracts.Kernel.Application[],
 	validators: Validator[];
 	p2p: P2PRegistry;
 }>("Propose", ({ beforeEach, afterEach, it, assert, stub }) => {
@@ -47,7 +48,7 @@ describe<{
 
 	it("should confirm block, if < minority does not prevote", async ({ nodes, p2p }) => {
 		const node0 = nodes[0];
-		const stubPrevote = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
+		const stubPrevote = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
 		stubPrevote.callsFake(async () => {
 			stubPrevote.restore();
@@ -74,13 +75,13 @@ describe<{
 
 	it("should not confirm block, if > minority does not prevote", async ({ nodes, p2p }) => {
 		const node0 = nodes[0];
-		const stubPrevote0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
+		const stubPrevote0 = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote0.callsFake(async () => {
 			stubPrevote0.restore();
 		});
 
 		const node1 = nodes[1];
-		const stubPrevote1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
+		const stubPrevote1 = stub(node1.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote1.callsFake(async () => {
 			stubPrevote1.restore();
 		});
@@ -93,7 +94,7 @@ describe<{
 
 	it("should confirm block, if < minority prevote null", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
-		const stubPrevote = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
+		const stubPrevote = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
 		const prevote = await makePrevote(node0, validators[0], 1, 0);
 
@@ -139,7 +140,7 @@ describe<{
 
 	it("should not confirm block, if > minority prevote null", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
-		const stubPrevote0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
+		const stubPrevote0 = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		const prevote0 = await makePrevote(node0, validators[0], 1, 0);
 
 		stubPrevote0.callsFake(async () => {
@@ -148,7 +149,7 @@ describe<{
 		});
 
 		const node1 = nodes[1];
-		const stubPrevote1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
+		const stubPrevote1 = stub(node1.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		const prevote1 = await makePrevote(node1, validators[1], 1, 0);
 
 		stubPrevote1.callsFake(async () => {
@@ -188,7 +189,7 @@ describe<{
 
 	it("should confirm block, if < minority prevote random block", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
-		const stubPrevote = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
+		const stubPrevote = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
 		const proposal = await makeProposal(node0, validators[0], 1, 0, Date.now());
 		const prevote = await makePrevote(node0, validators[0], 1, 0, proposal.getData().block.data.hash);
@@ -239,14 +240,14 @@ describe<{
 
 		const proposal = await makeProposal(node0, validators[0], 1, 0, Date.now());
 		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal.getData().block.data.hash);
-		const stubPrevote0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
+		const stubPrevote0 = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote0.callsFake(async () => {
 			stubPrevote0.restore();
 			await p2p.broadcastMessage(prevote0);
 		});
 
 		const prevote1 = await makePrevote(node1, validators[1], 1, 0, proposal.getData().block.data.hash);
-		const stubPrevote1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
+		const stubPrevote1 = stub(node1.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote1.callsFake(async () => {
 			stubPrevote1.restore();
 			await p2p.broadcastMessage(prevote1);
@@ -290,7 +291,7 @@ describe<{
 
 	it("should confirm block, if < minority prevote multiple random blocks", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
-		const stubPrevote = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
+		const stubPrevote = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
 		const proposal0 = await makeProposal(node0, validators[0], 1, 0, Date.now());
 		const proposal1 = await makeProposal(node0, validators[0], 1, 0, Date.now());

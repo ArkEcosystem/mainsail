@@ -1,15 +1,16 @@
 import Ajv from "ajv/dist/2020";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { Validator } from "./validator";
 
 describe<{
 	validator: Validator;
 }>("Validator", ({ beforeEach, it, assert }) => {
 	beforeEach((context) => {
-		const sandbox = new Sandbox();
-
-		context.validator = sandbox.app.resolve(Validator);
+		const app = new Application(new Container());
+		context.validator = app.resolve(Validator);
 	});
 
 	it("#validate - should pass", ({ validator }) => {

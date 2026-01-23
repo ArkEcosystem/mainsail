@@ -1,7 +1,9 @@
 import { Identifiers } from "@mainsail/constants";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { encodeFunctionData } from "viem";
 
 import { genesisBlock, network } from "../config/core/crypto.json";
@@ -21,10 +23,10 @@ describe<{
 		context.localClient = new LocalClient(URL);
 		context.clients = [new EthersClient(URL), new ViemClient(URL)];
 
-		const sandbox = new Sandbox();
-		sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
+		const app = new Application(new Container());
+		app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 
-		const keyPairFactory = sandbox.app.resolve(KeyPairFactory);
+		const keyPairFactory = app.resolve(KeyPairFactory);
 		const keyPair = await keyPairFactory.fromMnemonic("");
 		context.privateKey = `0x${keyPair.privateKey}`;
 	});

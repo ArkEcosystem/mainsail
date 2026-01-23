@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
-import { describeSkip } from "@mainsail/test-framework";
+import { describeSkip } from "@mainsail/test-runner";
 import { Application } from "../application";
 import { PluginConfiguration } from "./plugin-configuration";
 import { PluginManifest } from "./plugin-manifest";

@@ -1,4 +1,5 @@
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
+import { Application } from "@mainsail/kernel";
 import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
@@ -10,7 +11,7 @@ import tokenTransfers from "../../test/fixtures/token_transfers.json";
 import tokenTransfersResponse from "../../test/fixtures/token_transfers.response.json";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 }>("Tokens", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 

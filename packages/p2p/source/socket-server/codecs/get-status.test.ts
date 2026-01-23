@@ -1,4 +1,4 @@
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { request, response } from "../../../test/fixtures/get-status";
 import { getStatus } from "./get-status.js";
 import type * as types from "./proto/protos.d.ts";

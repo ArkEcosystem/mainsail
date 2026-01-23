@@ -2,39 +2,41 @@ import { Server } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { defaults as transactionPoolDefaults } from "../../../../transaction-pool-service/source/defaults";
 import { defaults } from "../../defaults";
 import { AcceptPeerPlugin } from "./accept-peer";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	acceptPeerPlugin: AcceptPeerPlugin;
 }>("AcceptPeerPlugin", ({ it, assert, beforeEach, spy, match }) => {
 	const logger = { debug: () => {}, warn: () => {} };
 	const peerProcessor = { validateAndAcceptPeer: () => {} };
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app
+		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
 			.whenTagged("plugin", "p2p");
-		context.sandbox.app
+		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", transactionPoolDefaults))
 			.whenTagged("plugin", "transaction-pool-service");
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue(peerProcessor);
-		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.TransactionPool.Processor).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue({});
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		context.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue(peerProcessor);
+		context.app.bind(Identifiers.Database.Service).toConstantValue({});
+		context.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({});
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
+		context.app.bind(Identifiers.Cryptography.Block.Deserializer).toConstantValue({});
+		context.app.bind(Identifiers.TransactionPool.Processor).toConstantValue({});
+		context.app.bind(Identifiers.State.Store).toConstantValue({});
 
-		context.acceptPeerPlugin = context.sandbox.app.resolve<AcceptPeerPlugin>(AcceptPeerPlugin);
+		context.acceptPeerPlugin = context.app.resolve<AcceptPeerPlugin>(AcceptPeerPlugin);
 	});
 
 	it("should register the validate plugin", async ({ acceptPeerPlugin }) => {

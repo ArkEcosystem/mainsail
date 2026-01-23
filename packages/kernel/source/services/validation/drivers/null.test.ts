@@ -1,4 +1,4 @@
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { NullValidator } from "./null";
 
 describe("NullValidator.validate", ({ assert, beforeEach, it }) => {

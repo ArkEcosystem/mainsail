@@ -4,7 +4,7 @@ import { Application, Providers, Services } from "@mainsail/kernel";
 import { AnySchema } from "joi";
 import { dirSync } from "tmp";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from "./service-provider";
 
 const importFresh = (moduleName) => import(`${moduleName}?${Date.now()}`);

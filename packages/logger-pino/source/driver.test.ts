@@ -7,7 +7,7 @@ import { readdirSync } from "fs";
 import { Writable } from "stream";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { PinoLogger } from "./driver";
 
 describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) => {

@@ -1,6 +1,6 @@
 import { Container } from "@mainsail/container";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Identifiers } from "@mainsail/constants";
 import { Application, ApplicationFactory, Utils } from "./index";
 

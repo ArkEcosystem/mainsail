@@ -1,33 +1,35 @@
 import { Identifiers } from "@mainsail/constants";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { Peer } from "../../peer";
 import { GetPeersController } from "./get-peers";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	controller: GetPeersController;
 }>("GetPeersController", ({ it, assert, beforeEach, stub }) => {
 	const peerRepository = { getPeers: () => {} };
 	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(peerRepository);
-		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
-		context.sandbox.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
+		context.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(peerRepository);
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
+		context.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
 
-		context.controller = context.sandbox.app.resolve(GetPeersController);
+		context.controller = context.app.resolve(GetPeersController);
 	});
 
-	it("should return the peers except connected peer sorted by latency", async ({ controller, sandbox }) => {
+	it("should return the peers except connected peer sorted by latency", async ({ controller, app }) => {
 		const peers = [
-			sandbox.app.resolve(Peer).init("180.177.54.4", 4000),
-			sandbox.app.resolve(Peer).init("181.177.54.4", 4000),
-			sandbox.app.resolve(Peer).init("182.177.54.4", 4000),
-			sandbox.app.resolve(Peer).init("183.177.54.4", 4000),
-			sandbox.app.resolve(Peer).init("184.177.54.4", 4000),
+			app.resolve(Peer).init("180.177.54.4", 4000),
+			app.resolve(Peer).init("181.177.54.4", 4000),
+			app.resolve(Peer).init("182.177.54.4", 4000),
+			app.resolve(Peer).init("183.177.54.4", 4000),
+			app.resolve(Peer).init("184.177.54.4", 4000),
 		];
 		peers[0].latency = 197_634;
 		peers[1].latency = 120_000;
@@ -49,13 +51,13 @@ describe<{
 		});
 	});
 
-	it("should return the peers except forwarded peer sorted by latency", async ({ controller, sandbox }) => {
+	it("should return the peers except forwarded peer sorted by latency", async ({ controller, app }) => {
 		const peers = [
-			sandbox.app.resolve(Peer).init("180.177.54.4", 4000),
-			sandbox.app.resolve(Peer).init("181.177.54.4", 4000),
-			sandbox.app.resolve(Peer).init("182.177.54.4", 4000),
-			sandbox.app.resolve(Peer).init("183.177.54.4", 4000),
-			sandbox.app.resolve(Peer).init("184.177.54.4", 4000),
+			app.resolve(Peer).init("180.177.54.4", 4000),
+			app.resolve(Peer).init("181.177.54.4", 4000),
+			app.resolve(Peer).init("182.177.54.4", 4000),
+			app.resolve(Peer).init("183.177.54.4", 4000),
+			app.resolve(Peer).init("184.177.54.4", 4000),
 		];
 		peers[0].latency = 197_634;
 		peers[1].latency = 120_000;

@@ -1,11 +1,12 @@
 import got from "got";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import blocks from "../../test/fixtures/blocks.json";
 import { ApiContext, prepareSandbox } from "../../test/helpers/prepare-sandbox";
+import { Application } from "@mainsail/kernel";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 }>("ResponseHeaders", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 

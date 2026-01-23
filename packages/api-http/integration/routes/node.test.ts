@@ -1,5 +1,6 @@
 import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
+import { Application } from "@mainsail/kernel";
 import nodeConfiguration from "../../test/fixtures/node_configuration.json";
 import nodeFees from "../../test/fixtures/node_fees.json";
 import transactions from "../../test/fixtures/transactions.json";
@@ -7,7 +8,7 @@ import { ApiContext, prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 }>("Node", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 

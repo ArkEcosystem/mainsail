@@ -6,7 +6,7 @@ import { ServiceProvider as Schnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { AddressFactory } from "./address.factory";
 
 const mnemonic =

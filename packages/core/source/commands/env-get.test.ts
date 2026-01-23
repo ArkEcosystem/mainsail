@@ -4,7 +4,7 @@ import { ensureDirSync, ensureFileSync } from "fs-extra/esm";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Console } from "@mainsail/cli";
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Command } from "./env-get";
 
 describe<{

@@ -1,5 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
@@ -17,51 +19,50 @@ import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreEvents } from "@mainsail/kernel/source/services/events";
 import { ServiceProvider as CoreTriggers } from "@mainsail/kernel/source/services/triggers";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
-import { Sandbox } from "@mainsail/test-framework";
 import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { dirSync } from "tmp";
 
-export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
-	context.sandbox = new Sandbox();
+export const prepareSandbox = async (context: { app?: Application }) => {
+	context.app = new Application(new Container());
 
-	await context.sandbox.app.resolve(CoreTriggers).register();
-	await context.sandbox.app.resolve(CoreEvents).register();
+	await context.app.resolve(CoreTriggers).register();
+	await context.app.resolve(CoreEvents).register();
 
-	await context.sandbox.app.resolve(CoreSerializer).register();
-	await context.sandbox.app.resolve(CoreValidation).register();
+	await context.app.resolve(CoreSerializer).register();
+	await context.app.resolve(CoreValidation).register();
 
 	try {
-		await context.sandbox.app.resolve(CoreCryptoConfig).register();
+		await context.app.resolve(CoreCryptoConfig).register();
 	} catch {}
 
-	await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();
+	await context.app.resolve(CoreCryptoHashBcrypto).register();
 
-	await context.sandbox.app.resolve(CoreCryptoSignatureEcdsa).register();
-	await context.sandbox.app.resolve(CoreCryptoKeyPairEcdsa).register();
+	await context.app.resolve(CoreCryptoSignatureEcdsa).register();
+	await context.app.resolve(CoreCryptoKeyPairEcdsa).register();
 
-	await context.sandbox.app.resolve(CoreCryptoAddressKeccak256).register();
-	await context.sandbox.app.resolve(CoreCryptoAddressBase58).register();
-	await context.sandbox.app.resolve(CoreCryptoConsensusBls12381).register();
+	await context.app.resolve(CoreCryptoAddressKeccak256).register();
+	await context.app.resolve(CoreCryptoAddressBase58).register();
+	await context.app.resolve(CoreCryptoConsensusBls12381).register();
 
-	await context.sandbox.app.resolve(CoreCryptoValidation).register();
-	await context.sandbox.app.resolve(CoreCryptoWif).register();
+	await context.app.resolve(CoreCryptoValidation).register();
+	await context.app.resolve(CoreCryptoWif).register();
 
-	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({
+	context.app.bind(Identifiers.Services.Log.Service).toConstantValue({
 		info: (msg) => console.log(msg),
 		debug: (msg) => console.log(msg),
 	});
-	context.sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
+	context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
-	context.sandbox.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
-	context.sandbox.app.useDataPath(dirSync().name);
+	context.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
+	context.app.useDataPath(dirSync().name);
 
-	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
-	await context.sandbox.app.resolve(CoreTransactions).register();
-	await context.sandbox.app.resolve(CoreCryptoBlock).register();
-	await context.sandbox.app.resolve(CoreCryptoCommit).register();
+	await context.app.resolve(CoreCryptoTransaction).register();
+	await context.app.resolve(CoreTransactions).register();
+	await context.app.resolve(CoreCryptoBlock).register();
+	await context.app.resolve(CoreCryptoCommit).register();
 
-	context.sandbox.app.bind(Identifiers.State.Store).toConstantValue({
+	context.app.bind(Identifiers.State.Store).toConstantValue({
 		getLastBlock: () => ({
 			data: {
 				number: 1,

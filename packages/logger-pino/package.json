@@ -37,7 +37,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/test-runner": "workspace:*",
 		"@types/capture-console": "1.0.5",
 		"@types/fs-extra": "11.0.4",
 		"@types/pump": "1.1.3",

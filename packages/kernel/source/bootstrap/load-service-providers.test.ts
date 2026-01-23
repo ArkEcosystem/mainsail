@@ -1,9 +1,9 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
+import { Container } from "@mainsail/container";
 import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
-import { describeSkip } from "@mainsail/test-framework";
+import { describeSkip } from "@mainsail/test-runner";
 import { Application } from "../application";
 import { ServiceProvider, ServiceProviderRepository } from "../providers";
 import { ConfigRepository } from "../services/config";

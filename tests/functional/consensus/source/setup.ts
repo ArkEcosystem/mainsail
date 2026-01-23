@@ -1,77 +1,77 @@
-import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
-import { Bootstrap, Providers, Services } from "@mainsail/kernel";
-import { Sandbox } from "@mainsail/test-framework";
+import { Container } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
+import { Application, Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { join } from "path";
 import { dirSync } from "tmp";
 
-import { ValidatorsJson } from "./contracts.js";
+import type { ValidatorsJson } from "./contracts.js";
 import { TestLogger } from "./logger.js";
-import { P2PRegistry } from "./p2p.js";
+import type { P2PRegistry } from "./p2p.js";
 import { ProposerCalculator } from "./proposer-calculator.js";
 import { Worker } from "./worker.js";
 
 type PluginOptions = Record<string, any>;
 
-const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validators: ValidatorsJson) => {
-	const sandbox = new Sandbox();
+const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validators: ValidatorsJson): Promise<Contracts.Kernel.Application> => {
+	const app = new Application(new Container());
 
 	// Basic binds and mocks
-	sandbox.app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
-	sandbox.app.bind(Identifiers.Config.Flags).toConstantValue({});
-	sandbox.app.bind(Identifiers.Config.Plugins).toConstantValue({});
-	sandbox.app
+	app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
+	app.bind(Identifiers.Config.Flags).toConstantValue({});
+	app.bind(Identifiers.Config.Plugins).toConstantValue({});
+	app
 		.bind(Identifiers.Services.EventDispatcher.Service)
 		.to(Services.Events.MemoryEventDispatcher)
 		.inSingletonScope();
 
-	p2pRegistry.registerNode(id, sandbox.app);
-	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue(p2pRegistry.makeBroadcaster(id));
-	sandbox.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => {} });
+	p2pRegistry.registerNode(id, app);
+	app.bind(Identifiers.P2P.Broadcaster).toConstantValue(p2pRegistry.makeBroadcaster(id));
+	app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => { } });
 
-	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
+	app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
 		getMessages: async () => [],
 		getProposals: async () => [],
-		getState: async () => {},
-		persist: async () => {},
+		getState: async () => { },
+		persist: async () => { },
 	});
 
-	sandbox.app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
+	app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
 		getTransactionBytes: async () => [],
-		onCommit: async () => {},
+		onCommit: async () => { },
 	});
-	sandbox.app.bind(Identifiers.Evm.Worker).toConstantValue({
-		onCommit: async () => {},
+	app.bind(Identifiers.Evm.Worker).toConstantValue({
+		onCommit: async () => { },
 	});
 
-	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
-	sandbox.app
+	app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
+	app
 		.bind(Identifiers.CryptoWorker.WorkerPool)
-		.toConstantValue({ getWorker: () => sandbox.app.get<Worker>(Identifiers.CryptoWorker.Worker.Instance) });
+		.toConstantValue({ getWorker: () => app.get<Worker>(Identifiers.CryptoWorker.Worker.Instance) });
 
 	// Bootstrap
-	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
-	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
+	await app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
+	await app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
-	sandbox.app.bind("path.data").toConstantValue(dirSync({ unsafeCleanup: true }).name);
-	sandbox.app.bind("path.config").toConstantValue(join(import.meta.dirname, `../config`));
-	sandbox.app.bind("path.cache").toConstantValue("");
-	sandbox.app.bind("path.log").toConstantValue("");
-	sandbox.app.bind("path.temp").toConstantValue("");
+	app.bind("path.data").toConstantValue(dirSync({ unsafeCleanup: true }).name);
+	app.bind("path.config").toConstantValue(join(import.meta.dirname, `../config`));
+	app.bind("path.cache").toConstantValue("");
+	app.bind("path.log").toConstantValue("");
+	app.bind("path.temp").toConstantValue("");
 
-	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadEnvironmentVariables).bootstrap();
+	await app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadEnvironmentVariables).bootstrap();
 
 	// Load configuration
-	const configRepository = sandbox.app.get<Services.Config.ConfigRepository>(Identifiers.Config.Repository);
+	const configRepository = app.get<Services.Config.ConfigRepository>(Identifiers.Config.Repository);
 	configRepository.set("validators", validators);
 	configRepository.set("crypto", crypto);
 
 	// Set logger
-	const logManager: Services.Log.LogManager = sandbox.app.get<Services.Log.LogManager>(
+	const logManager: Services.Log.LogManager = app.get<Services.Log.LogManager>(
 		Identifiers.Services.Log.Manager,
 	);
-	await logManager.extend("test", async () => sandbox.app.resolve<TestLogger>(TestLogger).make({ id }));
+	await logManager.extend("test", async () => app.resolve<TestLogger>(TestLogger).make({ id }));
 	logManager.setDefaultDriver("test");
 
 	// Load packages
@@ -111,26 +111,26 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	};
 
 	for (const packageId of packages) {
-		await loadPlugin(sandbox, packageId, options);
+		await loadPlugin(app, packageId, options);
 	}
 
 	// Rebinds
-	sandbox.app.rebind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
+	app.rebind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
 
-	return sandbox;
+	return app;
 };
 
-const loadPlugin = async (sandbox: Sandbox, packageId: string, options: PluginOptions) => {
-	const serviceProviderRepository = sandbox.app.get<Providers.ServiceProviderRepository>(
+const loadPlugin = async (app: Application, packageId: string, options: PluginOptions) => {
+	const serviceProviderRepository = app.get<Providers.ServiceProviderRepository>(
 		Identifiers.ServiceProvider.Repository,
 	);
 
 	const { ServiceProvider } = await import(packageId);
-	const pluginConfiguration = await getPluginConfiguration(sandbox, packageId, options);
+	const pluginConfiguration = await getPluginConfiguration(app, packageId, options);
 
-	const manifest = sandbox.app.resolve(Providers.PluginManifest).discover(packageId, import.meta.url);
+	const manifest = app.resolve(Providers.PluginManifest).discover(packageId, import.meta.url);
 
-	const serviceProvider = sandbox.app.resolve<Providers.ServiceProvider>(ServiceProvider);
+	const serviceProvider = app.resolve<Providers.ServiceProvider>(ServiceProvider);
 	serviceProvider.setManifest(manifest);
 	if (pluginConfiguration) {
 		serviceProvider.setConfig(pluginConfiguration);
@@ -141,23 +141,23 @@ const loadPlugin = async (sandbox: Sandbox, packageId: string, options: PluginOp
 };
 
 const getPluginConfiguration = async (
-	sandbox: Sandbox,
+	app: Application,
 	packageId: string,
 	options: PluginOptions,
 ): Promise<Providers.PluginConfiguration | undefined> => {
 	try {
 		const { defaults } = await import(`${packageId}/distribution/defaults.js`);
 
-		return sandbox.app
+		return app
 			.resolve(Providers.PluginConfiguration)
 			.from(packageId, defaults)
 			.merge(options[packageId] || {});
-	} catch {}
+	} catch { }
 	return undefined;
 };
 
-const boot = async (sandbox: Sandbox) => {
-	const serviceProviderRepository = sandbox.app.get<Providers.ServiceProviderRepository>(
+const boot = async (app: Contracts.Kernel.Application): Promise<void> => {
+	const serviceProviderRepository = app.get<Providers.ServiceProviderRepository>(
 		Identifiers.ServiceProvider.Repository,
 	);
 
@@ -166,30 +166,30 @@ const boot = async (sandbox: Sandbox) => {
 	}
 };
 
-const bootMany = async (sandboxes: Sandbox[]) => {
-	for (const sandbox of sandboxes) {
-		await boot(sandbox);
+const bootMany = async (apps: Contracts.Kernel.Application[]): Promise<void> => {
+	for (const app of apps) {
+		await boot(app);
 	}
 };
 
-const bootstrap = async (sandbox: Sandbox) => {
-	const configuration = sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
-	const commitFactory = sandbox.app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
+const bootstrap = async (app: Contracts.Kernel.Application) => {
+	const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
+	const commitFactory = app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
 	const genesisCommitJson = configuration.get<Contracts.Crypto.CommitJson>("genesisBlock");
 
 	const genesisCommit = await commitFactory.fromJson(genesisCommitJson);
-	const store = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
+	const store = app.get<Contracts.State.Store>(Identifiers.State.Store);
 	store.setGenesisCommit(genesisCommit);
 	// store.setLastBlock(genesisCommit.block);
 
-	// const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
+	// const validatorSet = app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
 	// await validatorSet.restore();
 
-	const commitState = sandbox.app.get<Contracts.Consensus.CommitStateFactory>(
+	const commitState = app.get<Contracts.Consensus.CommitStateFactory>(
 		Identifiers.Consensus.CommitState.Factory,
 	)(genesisCommit);
 
-	const blockProcessor = sandbox.app.get<Contracts.Processor.BlockProcessor>(Identifiers.Processor.BlockProcessor);
+	const blockProcessor = app.get<Contracts.Processor.BlockProcessor>(Identifiers.Processor.BlockProcessor);
 
 	const result = await blockProcessor.process(commitState);
 	if (!result.success) {
@@ -197,30 +197,30 @@ const bootstrap = async (sandbox: Sandbox) => {
 	}
 	await blockProcessor.commit(commitState);
 
-	sandbox.app.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository).printLoadedValidators();
+	app.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository).printLoadedValidators();
 
-	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
+	app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 };
 
-const bootstrapMany = async (sandboxes: Sandbox[]) => {
-	for (const sandbox of sandboxes) {
-		await bootstrap(sandbox);
+const bootstrapMany = async (apps: Contracts.Kernel.Application[]) => {
+	for (const app of apps) {
+		await bootstrap(app);
 	}
 };
 
-const run = async (sandbox: Sandbox) => {
-	const consensus = sandbox.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
+const run = async (app: Contracts.Kernel.Application) => {
+	const consensus = app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
 	await consensus.run();
 };
 
-const runMany = async (sandboxes: Sandbox[]) => {
-	for (const sandbox of sandboxes) {
-		await run(sandbox);
+const runMany = async (apps: Contracts.Kernel.Application[]) => {
+	for (const app of apps) {
+		await run(app);
 	}
 };
 
-const stop = async (sandbox: Sandbox) => {
-	const serviceProviderRepository = sandbox.app.get<Providers.ServiceProviderRepository>(
+const stop = async (app: Contracts.Kernel.Application) => {
+	const serviceProviderRepository = app.get<Providers.ServiceProviderRepository>(
 		Identifiers.ServiceProvider.Repository,
 	);
 
@@ -229,9 +229,9 @@ const stop = async (sandbox: Sandbox) => {
 	}
 };
 
-const stopMany = async (sandboxes: Sandbox[]) => {
-	for (const sandbox of sandboxes) {
-		await stop(sandbox);
+const stopMany = async (apps: Contracts.Kernel.Application[]) => {
+	for (const app of apps) {
+		await stop(app);
 	}
 };
 

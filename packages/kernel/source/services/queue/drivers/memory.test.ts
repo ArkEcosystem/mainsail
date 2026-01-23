@@ -4,7 +4,9 @@ import { sleep } from "@mainsail/utils";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "../../../application";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { MemoryQueue } from "./memory";
 
 EventEmitter.prototype.constructor = Object.prototype.constructor;
@@ -18,7 +20,7 @@ class DummyJob implements Contracts.Kernel.QueueJob {
 }
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	driver: MemoryQueue;
 	eventDispatcher: any;
 	logger: any;
@@ -33,11 +35,11 @@ describe<{
 		};
 		context.jobMethod = () => {};
 
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
-		context.driver = context.sandbox.app.resolve<MemoryQueue>(MemoryQueue);
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
+		context.driver = context.app.resolve<MemoryQueue>(MemoryQueue);
 	});
 
 	it("Start should process job", async (context) => {

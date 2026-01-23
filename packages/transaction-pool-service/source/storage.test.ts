@@ -4,7 +4,7 @@ import { Configuration } from "@mainsail/crypto-config";
 import { Application } from "@mainsail/kernel";
 import { fileSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Storage } from ".";
 
 describe<{

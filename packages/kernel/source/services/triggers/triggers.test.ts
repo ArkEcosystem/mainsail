@@ -1,7 +1,7 @@
 import * as Exceptions from "@mainsail/exceptions";
 import type { Contracts } from "@mainsail/contracts";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Action } from "./action";
 import { Triggers } from "./triggers";
 

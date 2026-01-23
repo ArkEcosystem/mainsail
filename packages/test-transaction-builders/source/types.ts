@@ -1,12 +1,11 @@
 import type { Contracts } from "@mainsail/contracts";
-import type { Sandbox } from "@mainsail/test-framework";
 import type { BigNumber } from "@mainsail/utils";
 
 export interface Context {
-	sandbox: Sandbox;
+	app: Contracts.Kernel.Application;
 	wallets: Contracts.Crypto.KeyPair[];
 	fundedWalletProvider?: (
-		context: { sandbox: Sandbox; wallets: Contracts.Crypto.KeyPair[] },
+		context: { app: Contracts.Kernel.Application; wallets: Contracts.Crypto.KeyPair[] },
 		amount?: BigNumber,
 	) => Promise<Contracts.Crypto.KeyPair>;
 }

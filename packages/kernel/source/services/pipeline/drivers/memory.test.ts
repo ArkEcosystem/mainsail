@@ -1,7 +1,7 @@
 import { Container, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Application } from "../../../application";
 import { MemoryPipeline } from "./memory";
 

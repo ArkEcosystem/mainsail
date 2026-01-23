@@ -222,8 +222,6 @@ jobs:
               run: cd packages/snapshot-legacy-importer && pnpm run test:coverage
             - name: Test state
               run: cd packages/state && pnpm run test:coverage
-            - name: Test test-framework
-              run: cd packages/test-framework && pnpm run test:coverage
             - name: Test test-runner
               run: cd packages/test-runner && pnpm run test:coverage
             - name: Test test-transaction-builders

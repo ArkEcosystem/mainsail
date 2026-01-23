@@ -1,24 +1,25 @@
 import { Identifiers } from "@mainsail/constants";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { assertCommitProofData } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Deserializer } from "./deserializer";
 import { Serializer } from "./serializer";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	serializer: Serializer;
 	deserializer: Deserializer;
 }>("Serializer", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.serializer = context.sandbox.app.get<Serializer>(Identifiers.Cryptography.Commit.Serializer);
-		context.deserializer = context.sandbox.app.get<Deserializer>(Identifiers.Cryptography.Commit.Deserializer);
+		context.serializer = context.app.get<Serializer>(Identifiers.Cryptography.Commit.Serializer);
+		context.deserializer = context.app.get<Deserializer>(Identifiers.Cryptography.Commit.Deserializer);
 	});
 
-	it("#size - should return proof size", async ({ serializer, sandbox }) => {
+	it("#size - should return proof size", async ({ serializer }) => {
 		assert.equal(serializer.proofSize(), 109);
 	});
 

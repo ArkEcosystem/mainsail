@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Identifiers, Events } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import {
 	DeferredBootServiceProvider,
 	DeferredDisposeServiceProvider,

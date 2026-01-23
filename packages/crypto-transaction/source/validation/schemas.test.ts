@@ -9,27 +9,29 @@ import { BigNumber } from "@mainsail/utils";
 import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { makeKeywords } from "./keywords";
 import { schemas } from "./schemas";
 import { extendSchema, signedSchema, strictSchema } from "./utilities";
 import { Transaction } from "../transaction";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	validator: Validator;
 }>("Schemas", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.validator = context.app.resolve(Validator);
 
 		for (const keyword of Object.values({
-			...makeBaseKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
-			...makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeBaseKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
 		})) {
 			context.validator.addKeyword(keyword);
 		}
@@ -167,8 +169,8 @@ describe<{
 		}
 	});
 
-	it("transactionBaseSchema - gasPrice should be number min 5 gwei", ({ sandbox, validator }) => {
-		sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
+	it("transactionBaseSchema - gasPrice should be number min 5 gwei", ({ app, validator }) => {
+		app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
 		validator.addSchema(schema);
 
 		const validValues = [5, 10, 100];
@@ -193,8 +195,8 @@ describe<{
 		}
 	});
 
-	it("transactionBaseSchema - gasPrice should accept 0 for genesis block", ({ sandbox, validator }) => {
-		const configuration = sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+	it("transactionBaseSchema - gasPrice should accept 0 for genesis block", ({ app, validator }) => {
+		const configuration = app.get<Configuration>(Identifiers.Cryptography.Configuration);
 		configuration.setHeight(1);
 
 		const genesisBlock: Contracts.Crypto.BlockData = configuration.get("genesisBlock.block");

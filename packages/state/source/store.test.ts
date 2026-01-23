@@ -1,10 +1,12 @@
 import { Identifiers } from "@mainsail/constants";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { Store } from "./store";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	store: Store;
 	logger: any;
 	eventDispatcher: any;
@@ -25,16 +27,16 @@ describe<{
 			setHeight: () => {},
 		};
 
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
-		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
-		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
+		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({
 			getRequired: () => false, //snapshots.skipUnknownAttributes
 		});
 
-		context.store = context.sandbox.app.resolve(Store);
+		context.store = context.app.resolve(Store);
 	});
 
 	it("#initialize - should set height and totalRound", ({ store }) => {

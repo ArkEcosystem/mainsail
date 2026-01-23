@@ -5,7 +5,7 @@ import { join } from "path";
 import prompts from "prompts";
 
 import { Console } from "@mainsail/cli";
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Command } from "./config-generate";
 
 describe<{

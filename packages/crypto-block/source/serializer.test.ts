@@ -1,4 +1,5 @@
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { blockData, blockDataWithTransactions } from "../test/fixtures/block";
 import { assertBlockData, assertTransactionData } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -6,15 +7,15 @@ import { Deserializer } from "./deserializer";
 import { Serializer } from "./serializer";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	serializer: Serializer;
 	deserializer: Deserializer;
 }>("Serializer", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.serializer = context.sandbox.app.resolve(Serializer);
-		context.deserializer = context.sandbox.app.resolve(Deserializer);
+		context.serializer = context.app.resolve(Serializer);
+		context.deserializer = context.app.resolve(Deserializer);
 	});
 
 	it("#size - should return size", ({ serializer }) => {
@@ -23,7 +24,7 @@ describe<{
 		assert.equal(serializer.totalSize(blockData), 461);
 	});
 
-	it("#size - should return size with transactions", async ({ serializer, sandbox }) => {
+	it("#size - should return size with transactions", async ({ serializer }) => {
 		assert.equal(serializer.totalSize(blockDataWithTransactions), 687);
 	});
 

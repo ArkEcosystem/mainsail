@@ -1,10 +1,12 @@
 import { Identifiers } from "@mainsail/constants";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { GetBlocksController } from "./get-blocks";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	controller: GetBlocksController;
 }>("GetBlocksController", ({ it, assert, beforeEach, stub }) => {
 	const logger = { debug: () => {}, info: () => {}, warn: () => {} };
@@ -15,13 +17,13 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
-		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue(database);
-		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue(store);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		context.app.bind(Identifiers.Database.Service).toConstantValue(database);
+		context.app.bind(Identifiers.State.Store).toConstantValue(store);
 
-		context.controller = context.sandbox.app.resolve(GetBlocksController);
+		context.controller = context.app.resolve(GetBlocksController);
 	});
 
 	it("should use database.findCommitBuffers to get the blocks according to the request params", async ({
