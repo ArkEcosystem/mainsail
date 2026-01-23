@@ -148,7 +148,7 @@ export type SystemRepositoryFactory = (customDataSource?: RepositoryDataSource) 
 export type WalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => WalletRepository;
 export type LegacyColdWalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => LegacyColdWalletRepository;
 
-export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
+export type { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
 
 export interface Migrations {
 	synchronizeEntities(): Promise<void>;

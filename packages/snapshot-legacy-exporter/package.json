@@ -36,6 +36,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/test-runner": "workspace:*",
 		"@types/fs-extra": "11.0.4",
 		"@types/pg": "8.15.5",
 		"@types/pumpify": "1.4.4",
