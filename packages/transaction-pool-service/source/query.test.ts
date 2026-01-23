@@ -15,9 +15,9 @@ describe<{
 }>("Query", ({ it, assert, beforeAll, beforeEach, stub }) => {
 	beforeAll((context) => {
 		context.mempool = {
-			getSenderMempool: () => { },
-			getSenderMempools: () => { },
-			hasSenderMempool: () => { },
+			getSenderMempool: () => {},
+			getSenderMempools: () => {},
+			hasSenderMempool: () => {},
 		};
 
 		context.container = new Container();

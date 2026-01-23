@@ -79,7 +79,7 @@ export class ApiContext {
 		private app: Application,
 		private readonly apiHttp: CoreApiHttp,
 		private readonly apiDatabase: CoreApiDatabase,
-	) { }
+	) {}
 
 	public get dataSource(): ApiDatabaseContracts.RepositoryDataSource {
 		return this.app.get<ApiDatabaseContracts.RepositoryDataSource>(ApiDatabaseIdentifiers.DataSource);
@@ -181,10 +181,7 @@ export const prepareSandbox = async (context: { app: Application }): Promise<Api
 
 	context.app.bind(Identifiers.Application.Name).toConstantValue("api-http-integration");
 
-	context.app
-		.bind(Identifiers.ServiceProvider.Configuration)
-		.to(Providers.PluginConfiguration)
-		.inSingletonScope();
+	context.app.bind(Identifiers.ServiceProvider.Configuration).to(Providers.PluginConfiguration).inSingletonScope();
 
 	context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 

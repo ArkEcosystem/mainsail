@@ -12,7 +12,7 @@ import { MemoryQueue } from "./memory";
 EventEmitter.prototype.constructor = Object.prototype.constructor;
 
 class DummyJob implements Contracts.Kernel.QueueJob {
-	public constructor(private readonly method) { }
+	public constructor(private readonly method) {}
 
 	public async handle(): Promise<void> {
 		return await this.method();
@@ -28,12 +28,12 @@ describe<{
 }>("MemoryQueue", ({ assert, beforeEach, it, spy, spyFn, stubFn, match }) => {
 	beforeEach((context) => {
 		context.eventDispatcher = {
-			dispatch: () => { },
+			dispatch: () => {},
 		};
 		context.logger = {
-			warn: () => { },
+			warn: () => {},
 		};
-		context.jobMethod = () => { };
+		context.jobMethod = () => {};
 
 		context.app = new Application(new Container());
 
@@ -116,7 +116,7 @@ describe<{
 	});
 
 	it("Clear should clear all jobs when stopped", async (context) => {
-		await context.driver.push(new DummyJob(() => { }));
+		await context.driver.push(new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 1);
 
@@ -149,7 +149,7 @@ describe<{
 	});
 
 	it("Stop should clear all jobs when stopped", async (context) => {
-		await context.driver.push(new DummyJob(() => { }));
+		await context.driver.push(new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 1);
 
@@ -276,7 +276,7 @@ describe<{
 	});
 
 	it("Pause should not process new jobs after pause", async (context) => {
-		await context.driver.push(new DummyJob(() => { }));
+		await context.driver.push(new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 1);
 
@@ -287,7 +287,7 @@ describe<{
 		assert.false(context.driver.isRunning());
 		assert.false(context.driver.isStarted());
 
-		await context.driver.push(new DummyJob(() => { }));
+		await context.driver.push(new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 1);
 		assert.false(context.driver.isRunning());
@@ -325,7 +325,7 @@ describe<{
 	it("Resume should resume processing after pause", async (context) => {
 		await context.driver.pause();
 
-		await context.driver.push(new DummyJob(() => { }));
+		await context.driver.push(new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 1);
 		assert.false(context.driver.isStarted());
@@ -341,7 +341,7 @@ describe<{
 	it("Resume should resume processing after stop", async (context) => {
 		await context.driver.stop();
 
-		await context.driver.push(new DummyJob(() => { }));
+		await context.driver.push(new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 1);
 		assert.false(context.driver.isStarted());
@@ -423,7 +423,7 @@ describe<{
 	});
 
 	it("Later should push job with delay", async (context) => {
-		await context.driver.later(50, new DummyJob(() => { }));
+		await context.driver.later(50, new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 0);
 
@@ -433,7 +433,7 @@ describe<{
 	});
 
 	it("Bulk should push multiple jobs", async (context) => {
-		await context.driver.bulk([new DummyJob(() => { }), new DummyJob(() => { })]);
+		await context.driver.bulk([new DummyJob(() => {}), new DummyJob(() => {})]);
 
 		assert.is(context.driver.size(), 2);
 	});

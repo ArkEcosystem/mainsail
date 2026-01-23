@@ -34,7 +34,7 @@ export const prepareSandbox = async (context) => {
 	);
 
 	context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
-	context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => { } });
+	context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => {} });
 	context.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
 	await context.app.resolve(CoreSerializer).register();

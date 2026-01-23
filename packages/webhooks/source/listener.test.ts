@@ -18,12 +18,12 @@ describe<{
 	let webhook: Contracts.Webhooks.Webhook;
 
 	const logger = {
-		debug: () => { },
-		error: () => { },
+		debug: () => {},
+		error: () => {},
 	};
 
 	const eventDispatcher = {
-		dispatch: () => { },
+		dispatch: () => {},
 	};
 
 	const expectFinishedEventData = ({ executionTime, webhook, payload }) => {

@@ -28,10 +28,7 @@ describe<{
 			network: devnet,
 		});
 
-		context.app
-			.bind(Identifiers.Cryptography.Identity.KeyPair.Factory)
-			.to(KeyPairFactory)
-			.inSingletonScope();
+		context.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
 
 		context.factory = context.app.resolve(WIFFactory);
 	});
@@ -43,9 +40,7 @@ describe<{
 	it("#fromKeys -  should be OK", async ({ factory, app }) => {
 		assert.equal(
 			await factory.fromKeys(
-				await app
-					.get<KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory)
-					.fromMnemonic(mnemonic),
+				await app.get<KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory).fromMnemonic(mnemonic),
 			),
 			wif,
 		);

@@ -4,7 +4,7 @@ import { describe } from "@mainsail/test-runner";
 import { container } from "./container";
 
 @injectable()
-class StubClass { }
+class StubClass {}
 
 describe<{
 	container: Container;

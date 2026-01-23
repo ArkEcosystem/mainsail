@@ -3,10 +3,10 @@ import { InstanceManager } from "./instance-manager";
 import { Container, injectable } from "@mainsail/container";
 import { Application } from "../application";
 
-interface MyDriver { }
+interface MyDriver {}
 
 @injectable()
-class MyMemoryDriver implements MyDriver { }
+class MyMemoryDriver implements MyDriver {}
 
 @injectable()
 class MyRemoteDriver implements MyDriver {

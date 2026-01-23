@@ -10,7 +10,7 @@ describe<{
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ beforeEach, it, assert, spy }) => {
 	const validator = {
-		addSchema: () => { },
+		addSchema: () => {},
 	};
 
 	beforeEach((context) => {

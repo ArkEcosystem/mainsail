@@ -27,9 +27,7 @@ export const prepareSandbox = async (context) => {
 
 	context.app.bind(Identifiers.Cryptography.Block.HeaderSize).toConstantValue(() => {
 		const hashByteLength = context.app.get<number>(Identifiers.Cryptography.Hash.Size.SHA256);
-		const generatorAddressByteLength = context.app.get<number>(
-			Identifiers.Cryptography.Identity.Address.Size,
-		);
+		const generatorAddressByteLength = context.app.get<number>(Identifiers.Cryptography.Identity.Address.Size);
 
 		return (
 			1 + // version
@@ -50,7 +48,7 @@ export const prepareSandbox = async (context) => {
 	});
 
 	context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
-	context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => { } });
+	context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => {} });
 	context.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
 	await context.app.resolve(CoreSerializer).register();

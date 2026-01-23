@@ -7,17 +7,17 @@ import { describeSkip } from "@mainsail/test-runner";
 import { Peer } from "./peer";
 import { PeerConnector } from "./peer-connector";
 
-let onDelay = (timeout: number) => { };
+let onDelay = (timeout: number) => {};
 
 class ClientMock {
-	static onConstructor = (...arguments_) => { };
+	static onConstructor = (...arguments_) => {};
 
 	constructor(...arguments_) {
 		ClientMock.onConstructor(...arguments_);
 	}
-	async connect() { }
-	async request() { }
-	async terminate() { }
+	async connect() {}
+	async request() {}
+	async terminate() {}
 }
 
 const { PeerConnector: PeerConnectorProxy } = await esmock("./peer-connector", {
@@ -33,10 +33,10 @@ describeSkip<{
 	app: Application;
 	peerConnector: PeerConnector;
 }>("PeerConnector", ({ it, assert, beforeEach, stub, spy, spyFn }) => {
-	const logger = { debug: () => { }, error: () => { }, info: () => { }, warn: () => { } };
+	const logger = { debug: () => {}, error: () => {}, info: () => {}, warn: () => {} };
 	beforeEach((context) => {
-		onDelay = () => { };
-		ClientMock.onConstructor = () => { };
+		onDelay = () => {};
+		ClientMock.onConstructor = () => {};
 
 		context.app = new Application(new Container());
 

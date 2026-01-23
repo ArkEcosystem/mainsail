@@ -48,13 +48,13 @@ describe<{
 		await assert.resolves(() => context.serviceProvider.register());
 
 		context.app.rebind(Identifiers.TransactionPool.Storage).toConstantValue({
-			boot: () => { },
-			dispose: () => { },
+			boot: () => {},
+			dispose: () => {},
 		});
 
 		context.app.rebind(Identifiers.TransactionPool.Service).toConstantValue({
-			boot: () => { },
-			dispose: () => { },
+			boot: () => {},
+			dispose: () => {},
 		});
 
 		await assert.resolves(() => context.serviceProvider.boot());

@@ -6,7 +6,7 @@ describe("ProcessBlockAction", ({ assert, it, stub, match }) => {
 		const roundState = {};
 
 		const blockProcessor = {
-			process: () => { },
+			process: () => {},
 		};
 
 		const spyOnProcess = stub(blockProcessor, "process");

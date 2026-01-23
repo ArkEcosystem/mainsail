@@ -29,19 +29,19 @@ describeSkip<{
 	app: Application;
 	peerCommunicator: PeerCommunicator;
 }>("PeerCommunicator", ({ it, assert, beforeEach, stub, spy, match }) => {
-	const logger = { debug: () => { }, error: () => { }, info: () => { }, warn: () => { } };
-	const eventDispatcher = { dispatch: () => { }, listen: () => { } };
-	const connector = { connect: () => { }, emit: () => { }, forgetError: () => { }, setError: () => { } };
+	const logger = { debug: () => {}, error: () => {}, info: () => {}, warn: () => {} };
+	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
+	const connector = { connect: () => {}, emit: () => {}, forgetError: () => {}, setError: () => {} };
 	const cryptoConfig = {};
-	const serializer = { serializeWithTransactions: () => { } };
+	const serializer = { serializeWithTransactions: () => {} };
 	const transactionFactory = {};
-	const validator = { validate: () => { } };
+	const validator = { validate: () => {} };
 
 	const version = "0.0.1";
 	const headers = { version };
 
 	const jobsQueued = [];
-	const queue = { push: (job) => jobsQueued.push(job), resolve: () => { }, resume: () => { } };
+	const queue = { push: (job) => jobsQueued.push(job), resolve: () => {}, resume: () => {} };
 	const createQueue = () => queue;
 
 	beforeEach((context) => {

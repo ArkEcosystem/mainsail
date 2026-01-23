@@ -16,7 +16,7 @@ describe<{
 
 		app.bind<Database>(Identifiers.Webhooks.Database).to(Database).inSingletonScope();
 		app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
-		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatch: () => { } });
+		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatch: () => {} });
 
 		const database = app.get<Database>(Identifiers.Webhooks.Database);
 		database.boot();

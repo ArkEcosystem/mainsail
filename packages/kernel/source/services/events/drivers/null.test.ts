@@ -4,7 +4,7 @@ import { describe } from "@mainsail/test-runner";
 import { NullEventDispatcher } from "./null";
 
 class MyEventListener implements Contracts.Kernel.EventListener {
-	public handle(payload: { name: string; data: any }): void { }
+	public handle(payload: { name: string; data: any }): void {}
 }
 
 describe("NullEventDispatcher", ({ assert, it }) => {

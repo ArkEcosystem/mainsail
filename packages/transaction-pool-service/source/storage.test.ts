@@ -15,7 +15,7 @@ describe<{
 	beforeAll(() => setGracefulCleanup());
 
 	beforeEach(async (context) => {
-		context.configuration = { getRequired: () => { } };
+		context.configuration = { getRequired: () => {} };
 
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(context.configuration);

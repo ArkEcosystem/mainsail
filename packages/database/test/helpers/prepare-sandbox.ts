@@ -34,7 +34,7 @@ export const prepareSandbox = async (context: { app?: Application }) => {
 
 	try {
 		await context.app.resolve(CoreCryptoConfig).register();
-	} catch { }
+	} catch {}
 
 	await context.app.resolve(CoreCryptoHashBcrypto).register();
 

@@ -14,7 +14,7 @@ describe<{
 	const processName = "ark-core";
 
 	const processManager: Partial<ProcessManager> = {
-		restart: (id: ProcessIdentifier): any => { },
+		restart: (id: ProcessIdentifier): any => {},
 	};
 
 	const ora: Partial<Ora> = {

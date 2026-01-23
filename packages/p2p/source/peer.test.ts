@@ -13,7 +13,7 @@ describe<{
 }>("Peer", ({ it, assert, beforeEach, each }) => {
 	const ip = "167.184.53.78";
 	const port = 4000;
-	const eventDispatcher = { dispatch: () => { }, listen: () => { } };
+	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 
 	beforeEach((context) => {
 		context.app = new Application(new Container());
@@ -30,10 +30,7 @@ describe<{
 	each(
 		"#url - should infer protocol when port is 80 or 443",
 		({ context, dataset }) => {
-			assert.equal(
-				context.app.resolve(Peer).init(ip, dataset[0]).url,
-				`${dataset[1]}://${ip}:${dataset[0]}`,
-			);
+			assert.equal(context.app.resolve(Peer).init(ip, dataset[0]).url, `${dataset[1]}://${ip}:${dataset[0]}`);
 		},
 		[
 			[80, "http"],

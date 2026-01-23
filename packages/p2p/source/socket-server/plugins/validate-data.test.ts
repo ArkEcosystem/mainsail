@@ -20,8 +20,8 @@ describe<{
 	app: Application;
 	validatePlugin: ValidateDataPlugin;
 }>("ValidatePlugin", ({ it, assert, beforeEach, spy, match, stub }) => {
-	const logger = { debug: () => { }, warn: () => { } };
-	const configuration = { getRequired: () => { } };
+	const logger = { debug: () => {}, warn: () => {} };
+	const configuration = { getRequired: () => {} };
 
 	const responsePayload = { status: "ok" };
 	const mockRouteByPath = {
@@ -45,9 +45,7 @@ describe<{
 
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(configuration);
-		context.app
-			.bind(Identifiers.P2P.Peer.Disposer)
-			.toConstantValue({ banPeer: () => { }, disposePeer: () => { } });
+		context.app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue({ banPeer: () => {}, disposePeer: () => {} });
 
 		context.validatePlugin = context.app.resolve(ValidateDataPluginProxy);
 	});

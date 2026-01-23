@@ -22,17 +22,9 @@ describe<{
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.app
-			.bind(Identifiers.Evm.Instance)
-			.to(EvmInstance)
-			.inSingletonScope()
-			.whenTagged("instance", "evm");
+		context.app.bind(Identifiers.Evm.Instance).to(EvmInstance).inSingletonScope().whenTagged("instance", "evm");
 
-		context.evm = context.app.getTagged<Contracts.Evm.Instance>(
-			Identifiers.Evm.Instance,
-			"instance",
-			"evm",
-		);
+		context.evm = context.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 
 		context.databaseService = context.app.resolve(DatabaseService);
 		await context.databaseService.initialize();

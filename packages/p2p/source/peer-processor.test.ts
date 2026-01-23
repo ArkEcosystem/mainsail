@@ -13,18 +13,18 @@ describeSkip<{
 	peerProcessor: PeerProcessor;
 	configuration: Providers.PluginConfiguration;
 }>("PeerProcessor", ({ it, assert, beforeEach, stub }) => {
-	const logger = { debug: () => { }, warn: () => { } };
-	const peerCommunicator = { ping: () => { } };
-	const peerConnector = { disconnect: () => { } };
+	const logger = { debug: () => {}, warn: () => {} };
+	const peerCommunicator = { ping: () => {} };
+	const peerConnector = { disconnect: () => {} };
 	const peerRepository = {
-		forgetPendingPeer: () => { },
-		getSameSubnetPeers: () => { },
-		hasPeer: () => { },
-		hasPendingPeer: () => { },
-		setPeer: () => { },
-		setPendingPeer: () => { },
+		forgetPendingPeer: () => {},
+		getSameSubnetPeers: () => {},
+		hasPeer: () => {},
+		hasPendingPeer: () => {},
+		setPeer: () => {},
+		setPendingPeer: () => {},
 	};
-	const eventDispatcher = { dispatch: () => { }, listen: () => { } };
+	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 
 	beforeEach((context) => {
 		context.app = new Application(new Container());
@@ -39,15 +39,9 @@ describeSkip<{
 		context.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(peerRepository);
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
-		context.app
-			.bind(Identifiers.P2P.Peer.Factory)
-			.toFactory<Peer>(() => (ip: string) => new Peer(ip, 4002));
+		context.app.bind(Identifiers.P2P.Peer.Factory).toFactory<Peer>(() => (ip: string) => new Peer(ip, 4002));
 
-		context.configuration = context.app.getTagged(
-			Identifiers.ServiceProvider.Configuration,
-			"plugin",
-			"p2p",
-		);
+		context.configuration = context.app.getTagged(Identifiers.ServiceProvider.Configuration, "plugin", "p2p");
 
 		context.peerProcessor = context.app.resolve(PeerProcessor);
 	});

@@ -15,13 +15,13 @@ describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ it, assert, beforeEach, stub }) => {
-	const triggerService = { bind: () => { } };
-	const validator = { addFormat: () => { }, addKeyword: () => { } };
-	const server = { boot: async () => { }, dispose: async () => { }, initialize: async () => { } };
-	const statisticService = { boot: async () => { } };
-	const service = { boot: async () => { }, dispose: async () => { } };
-	const peerDisposer = { disposePeers: async () => { } };
-	const eventDispatcher = { dispatch: () => { }, listen: () => { } };
+	const triggerService = { bind: () => {} };
+	const validator = { addFormat: () => {}, addKeyword: () => {} };
+	const server = { boot: async () => {}, dispose: async () => {}, initialize: async () => {} };
+	const statisticService = { boot: async () => {} };
+	const service = { boot: async () => {}, dispose: async () => {} };
+	const peerDisposer = { disposePeers: async () => {} };
+	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 
 	beforeEach((context) => {
 		context.app = new Application(new Container());
@@ -98,8 +98,8 @@ describe<{
 }>("ServiceProvider.configSchema", ({ it, assert, beforeEach }) => {
 	const importDefaults = async () => (await importFresh<any>("../distribution/defaults.js")).defaults;
 
-	const triggerService = { bind: () => { } };
-	const validator = { addFormat: () => { } };
+	const triggerService = { bind: () => {} };
+	const validator = { addFormat: () => {} };
 
 	beforeEach((context) => {
 		context.app = new Application(new Container());

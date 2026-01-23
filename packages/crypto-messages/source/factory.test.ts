@@ -42,12 +42,10 @@ describe<{
 					consensusSignature: (method, message, privateKey) =>
 						context.app
 							.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
-						[method](message, privateKey),
+							[method](message, privateKey),
 					// @ts-ignore
 					transactionFactory: (method, message, privateKey) =>
-						context.app
-							.get(Identifiers.Cryptography.Transaction.Factory)!
-						[method](message, privateKey),
+						context.app.get(Identifiers.Cryptography.Transaction.Factory)![method](message, privateKey),
 				};
 			},
 		};
@@ -56,9 +54,7 @@ describe<{
 		context.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
 		context.factory = context.app.resolve(Factory);
-		context.blockFactory = context.app.get<Contracts.Crypto.BlockFactory>(
-			Identifiers.Cryptography.Block.Factory,
-		);
+		context.blockFactory = context.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
 
 		const identityFactory = await Factories.factory<Factories.Types.Identity>("Identity", crypto);
 		const identity = await identityFactory

@@ -1,4 +1,5 @@
 import { Identifiers } from "@mainsail/constants";
+import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
@@ -13,9 +14,8 @@ import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-si
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
-import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
+import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 export const generateApp = async (

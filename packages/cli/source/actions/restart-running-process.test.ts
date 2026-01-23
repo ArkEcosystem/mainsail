@@ -17,7 +17,7 @@ describe<{
 	};
 
 	const restartProcess: Partial<RestartProcess> = {
-		execute: (processName: string) => { },
+		execute: (processName: string) => {},
 	};
 
 	beforeEach((context) => {

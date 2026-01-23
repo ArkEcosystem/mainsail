@@ -9,7 +9,7 @@ import { ServiceProvider } from "./service-provider";
 import { ServiceProviderRepository } from "./service-provider-repository";
 
 class StubListener implements Contracts.Kernel.EventListener {
-	public constructor(private readonly method?) { }
+	public constructor(private readonly method?) {}
 
 	public handle(): void {
 		this.method();
@@ -17,11 +17,11 @@ class StubListener implements Contracts.Kernel.EventListener {
 }
 
 class StubServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> { }
+	public async register(): Promise<void> {}
 
-	public async boot(): Promise<void> { }
+	public async boot(): Promise<void> {}
 
-	public async dispose(): Promise<void> { }
+	public async dispose(): Promise<void> {}
 }
 
 describe<{

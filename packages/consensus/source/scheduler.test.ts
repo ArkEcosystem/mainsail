@@ -21,10 +21,10 @@ describe<{
 	const delays = [1000, 3000, 5000];
 
 	const consensus = {
-		onTimeoutPrecommit: () => { },
-		onTimeoutPrevote: () => { },
-		onTimeoutPropose: () => { },
-		onTimeoutStartRound: () => { },
+		onTimeoutPrecommit: () => {},
+		onTimeoutPrevote: () => {},
+		onTimeoutPropose: () => {},
+		onTimeoutStartRound: () => {},
 	};
 
 	const config = {
@@ -39,7 +39,7 @@ describe<{
 	};
 
 	const store = {
-		getLastBlock: () => { },
+		getLastBlock: () => {},
 	};
 
 	beforeEach((context) => {

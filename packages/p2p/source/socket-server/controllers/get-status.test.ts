@@ -16,7 +16,7 @@ describe<{
 	app: Application;
 	controller: GetStatusController;
 }>("GetStatusController", ({ it, assert, beforeEach, stub }) => {
-	const store = { getLastBlock: () => { } };
+	const store = { getLastBlock: () => {} };
 
 	beforeEach((context) => {
 		context.app = new Application(new Container());

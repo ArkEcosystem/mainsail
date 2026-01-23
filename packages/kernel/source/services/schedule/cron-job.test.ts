@@ -84,14 +84,12 @@ describe<{
 
 	beforeEach((context) => {
 		context.mockEventDispatcher = {
-			dispatch: () => { },
+			dispatch: () => {},
 		};
 
 		context.app = new Application(new Container());
 
-		context.app
-			.bind(Identifiers.Services.EventDispatcher.Service)
-			.toConstantValue(context.mockEventDispatcher);
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.mockEventDispatcher);
 
 		context.job = context.app.resolve<CronJob>(CronJob);
 	});

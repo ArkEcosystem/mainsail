@@ -10,15 +10,15 @@ describe<{
 	controller: PostMessageController;
 }>("PostMessageController", ({ it, beforeEach, spy }) => {
 	const processor = {
-		process: () => { },
+		process: () => {},
 	};
 
 	const factory = {
-		makeMessageFromBytes: () => { },
+		makeMessageFromBytes: () => {},
 	};
 
 	const state = {
-		resetLastMessageTime: () => { },
+		resetLastMessageTime: () => {},
 	};
 
 	beforeEach((context) => {

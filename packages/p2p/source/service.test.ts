@@ -15,21 +15,21 @@ describeSkip<{
 	networkMonitor: Service;
 	configuration: Providers.PluginConfiguration;
 }>("NetworkMonitor", ({ it, assert, beforeEach, stub, spy, match, each }) => {
-	const logger = { debug: () => { }, error: () => { }, info: () => { }, notice: () => { }, warn: () => { } };
+	const logger = { debug: () => {}, error: () => {}, info: () => {}, notice: () => {}, warn: () => {} };
 
-	const emitter = { dispatch: () => { } };
+	const emitter = { dispatch: () => {} };
 	const communicator = {
-		getPeerBlocks: () => { },
-		getPeers: () => { },
-		ping: () => { },
-		pingPorts: () => { },
-		postBlock: () => { },
+		getPeerBlocks: () => {},
+		getPeers: () => {},
+		ping: () => {},
+		pingPorts: () => {},
+		postBlock: () => {},
 	};
-	const repository = { forgetPeer: () => { }, getPeers: () => [] };
+	const repository = { forgetPeer: () => {}, getPeers: () => [] };
 
-	const triggerService = { call: () => { } }; // validateAndAcceptPeer
-	const store = { getLastBlock: () => { } };
-	const blockchain = { getBlockPing: () => { }, getLastBlock: () => { } };
+	const triggerService = { call: () => {} }; // validateAndAcceptPeer
+	const store = { getLastBlock: () => {} };
+	const blockchain = { getBlockPing: () => {}, getLastBlock: () => {} };
 	const slots = { getSlotNumber: () => 0 };
 
 	beforeEach((context) => {
@@ -48,11 +48,7 @@ describeSkip<{
 		context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
 		context.app.bind(Identifiers.store).toConstantValue(store);
 
-		context.configuration = context.app.getTagged(
-			Identifiers.ServiceProvider.Configuration,
-			"plugin",
-			"p2p",
-		);
+		context.configuration = context.app.getTagged(Identifiers.ServiceProvider.Configuration, "plugin", "p2p");
 		context.networkMonitor = context.app.resolve(Service);
 	});
 

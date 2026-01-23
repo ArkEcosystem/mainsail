@@ -63,7 +63,7 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 			consensusSignature: (method, message, privateKey) =>
 				context
 					.app!.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
-				[method](message, privateKey),
+					[method](message, privateKey),
 		}),
 	};
 	context.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
@@ -74,20 +74,20 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 
 	const validator = {
 		getEvm: () => ({
-			dispose: async () => { },
-			initializeGenesis: async () => { },
+			dispose: async () => {},
+			initializeGenesis: async () => {},
 			logsBloom: async () => "0".repeat(512),
-			prepareNextCommit: async () => { },
-			rollback: async () => { },
-			snapshot: async () => { },
+			prepareNextCommit: async () => {},
+			rollback: async () => {},
+			snapshot: async () => {},
 			stateRoot: async () => "0000000000000000000000000000000000000000000000000000000000000000",
-			updateRewardsAndVotes: async () => { },
+			updateRewardsAndVotes: async () => {},
 		}),
 		validate: async () => true,
 	};
 	context.app.rebind(Identifiers.Transaction.Validator.Factory).toConstantValue(() => validator);
 
-	context.app.bind(Identifiers.Evm.Instance).toConstantValue(() => { });
+	context.app.bind(Identifiers.Evm.Instance).toConstantValue(() => {});
 	context.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue({});
 
 	context.app.bind(Identifiers.State.Store).toConstantValue({

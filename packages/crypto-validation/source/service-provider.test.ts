@@ -15,8 +15,8 @@ describe<{
 }>("ServiceProvider", ({ it, beforeEach, assert, spy }) => {
 	beforeEach((context) => {
 		context.validator = {
-			addKeyword: () => { },
-			addSchema: () => { },
+			addKeyword: () => {},
+			addSchema: () => {},
 		};
 
 		context.app = new Application(new Container());

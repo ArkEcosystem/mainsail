@@ -6,7 +6,7 @@ import { Application } from "./index";
 import { Identifiers } from "@mainsail/constants";
 
 @injectable()
-class StubClass { }
+class StubClass {}
 
 describe<{
 	app: Application;

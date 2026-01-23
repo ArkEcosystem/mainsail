@@ -33,7 +33,7 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	await context.app.resolve(CoreValidation).register();
 	await context.app.resolve(CoreCryptoConfig).register();
 
-	context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => { } });
+	context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => {} });
 	context.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
 	await context.app.resolve(CoreCryptoHashBcrypto).register();
@@ -65,9 +65,7 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 		);
 	});
 
-	for (const keyword of Object.values(
-		makeKeywords(context.app.get(Identifiers.Cryptography.Configuration)),
-	)) {
+	for (const keyword of Object.values(makeKeywords(context.app.get(Identifiers.Cryptography.Configuration)))) {
 		context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
 	}
 

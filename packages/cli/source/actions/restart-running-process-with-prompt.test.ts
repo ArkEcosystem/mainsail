@@ -18,7 +18,7 @@ describe<{
 	};
 
 	const restartProcess: Partial<RestartProcess> = {
-		execute: (processName: string) => { },
+		execute: (processName: string) => {},
 	};
 
 	const prompt: Partial<Prompt> = {

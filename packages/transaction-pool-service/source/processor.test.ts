@@ -20,10 +20,10 @@ describe<{
 }>("Processor", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll((context) => {
 		context.pool = {
-			addTransaction: () => { },
+			addTransaction: () => {},
 		};
 
-		context.extensions = [{ throwIfCannotBroadcast: () => { } }, { throwIfCannotBroadcast: () => { } }];
+		context.extensions = [{ throwIfCannotBroadcast: () => {} }, { throwIfCannotBroadcast: () => {} }];
 
 		context.broadcaster = {
 			broadcastTransactions: () => Promise.resolve(),
@@ -38,7 +38,7 @@ describe<{
 			headerSize: () => 152,
 		};
 		context.broadcaster = {
-			broadcastTransactions: async () => { },
+			broadcastTransactions: async () => {},
 		};
 
 		context.container = new Container();
@@ -53,7 +53,7 @@ describe<{
 		context.container.bind(Identifiers.Cryptography.Transaction.Deserializer).toConstantValue({});
 		context.container.bind(Identifiers.TransactionPool.Broadcaster).toConstantValue(context.broadcaster);
 		context.container.bind(Identifiers.Services.Log.Service).toConstantValue({
-			error: () => { },
+			error: () => {},
 		});
 
 		context.transaction1 = {
@@ -126,7 +126,7 @@ describe<{
 		const poolStub = stub(context.pool, "addTransaction");
 
 		poolStub
-			.callsFakeNth(0, async (transaction) => { })
+			.callsFakeNth(0, async (transaction) => {})
 			.callsFakeNth(1, async (transaction) => {
 				throw new Exceptions.TransactionFeeTooLowError(transaction);
 			});
@@ -158,7 +158,7 @@ describe<{
 		// const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
 
 		spiedExtension0
-			.callsFakeNth(0, async (transaction) => { })
+			.callsFakeNth(0, async (transaction) => {})
 			.callsFakeNth(1, async (transaction) => {
 				throw new Exceptions.TransactionFeeTooLowError(transaction);
 			});

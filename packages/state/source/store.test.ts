@@ -14,17 +14,17 @@ describe<{
 }>("Store", ({ it, beforeEach, assert, spy, stub }) => {
 	beforeEach(async (context) => {
 		context.logger = {
-			notice: () => { },
+			notice: () => {},
 		};
 
 		context.eventDispatcher = {
-			dispatch: () => { },
+			dispatch: () => {},
 		};
 
 		context.cryptoConfiguration = {
 			getMilestoneDiff: () => ({}),
 			isNewMilestone: () => false,
-			setHeight: () => { },
+			setHeight: () => {},
 		};
 
 		context.app = new Application(new Container());

@@ -13,8 +13,8 @@ describe<{
 	app: Application;
 	acceptPeerPlugin: AcceptPeerPlugin;
 }>("AcceptPeerPlugin", ({ it, assert, beforeEach, spy, match }) => {
-	const logger = { debug: () => { }, warn: () => { } };
-	const peerProcessor = { validateAndAcceptPeer: () => { } };
+	const logger = { debug: () => {}, warn: () => {} };
+	const peerProcessor = { validateAndAcceptPeer: () => {} };
 
 	beforeEach((context) => {
 		context.app = new Application(new Container());

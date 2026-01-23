@@ -10,8 +10,8 @@ describe<{
 	app: Application;
 	controller: GetPeersController;
 }>("GetPeersController", ({ it, assert, beforeEach, stub }) => {
-	const peerRepository = { getPeers: () => { } };
-	const eventDispatcher = { dispatch: () => { }, listen: () => { } };
+	const peerRepository = { getPeers: () => {} };
+	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 
 	beforeEach((context) => {
 		context.app = new Application(new Container());

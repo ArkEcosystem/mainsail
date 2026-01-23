@@ -9,11 +9,11 @@ describe<{
 	app: Application;
 	controller: GetBlocksController;
 }>("GetBlocksController", ({ it, assert, beforeEach, spy, match, stub }) => {
-	const logger = { debug: () => { }, info: () => { }, warn: () => { } };
-	const database = { findCommitBuffers: () => { } };
+	const logger = { debug: () => {}, info: () => {}, warn: () => {} };
+	const database = { findCommitBuffers: () => {} };
 	const store = {
-		getLastDownloadedBlock: () => { },
-		getBlockNumber: () => { },
+		getLastDownloadedBlock: () => {},
+		getBlockNumber: () => {},
 	};
 
 	beforeEach((context) => {

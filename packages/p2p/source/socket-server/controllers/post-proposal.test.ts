@@ -10,15 +10,15 @@ describe<{
 	controller: PostProposalController;
 }>("PostProposalController", ({ it, beforeEach, spy }) => {
 	const processor = {
-		process: () => { },
+		process: () => {},
 	};
 
 	const factory = {
-		makeProposalFromBytes: () => { },
+		makeProposalFromBytes: () => {},
 	};
 
 	const state = {
-		resetLastMessageTime: () => { },
+		resetLastMessageTime: () => {},
 	};
 
 	beforeEach((context) => {

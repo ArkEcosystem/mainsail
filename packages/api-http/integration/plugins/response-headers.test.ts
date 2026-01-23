@@ -6,7 +6,7 @@ import { ApiContext, prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { Application } from "@mainsail/kernel";
 
 describe<{
-	app: Application
+	app: Application;
 }>("ResponseHeaders", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 

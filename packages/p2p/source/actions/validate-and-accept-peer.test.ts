@@ -9,7 +9,7 @@ describe<{
 	app: Application;
 	action: ValidateAndAcceptPeerAction;
 }>("ValidateAndAcceptPeerAction", ({ it, spy, beforeEach }) => {
-	const peerProcessor = { validateAndAcceptPeer: () => { } };
+	const peerProcessor = { validateAndAcceptPeer: () => {} };
 
 	beforeEach((context) => {
 		context.app = new Application(new Container());

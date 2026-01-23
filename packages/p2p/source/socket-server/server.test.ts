@@ -11,13 +11,13 @@ import { defaults } from "../defaults";
 class HapiServerMock {
 	info = { uri: "127.0.0.1" };
 
-	register() { }
-	start() { }
-	stop() { }
-	bind() { }
-	route() { }
-	inject() { }
-	ext() { }
+	register() {}
+	start() {}
+	stop() {}
+	bind() {}
+	route() {}
+	inject() {}
+	ext() {}
 }
 
 const { Server: ServerProxy } = await esmock("./server", {
@@ -33,7 +33,7 @@ describeSkip<{ app: Application; server: ServerProxy }>("Server", ({ it, assert,
 	const name = "P2P server";
 	const options = { hostname: "127.0.0.1", port: 4000 };
 
-	const logger = { debug: () => { }, info: () => { }, warn: () => { } };
+	const logger = { debug: () => {}, info: () => {}, warn: () => {} };
 	const config = {
 		getRoundValidators: () => 51,
 		getMilestone: () => ({
@@ -101,7 +101,7 @@ describeSkip<{ app: Application; server: ServerProxy }>("Server", ({ it, assert,
 		const spyHapiServerStart = stub(HapiServerMock.prototype, "start").rejectedValue(
 			new Error("failed starting hapi server"),
 		);
-		const spyAppTerminate = stub(app, "terminate").callsFake(() => { });
+		const spyAppTerminate = stub(app, "terminate").callsFake(() => {});
 
 		await server.initialize(name, options);
 		await server.boot();
@@ -125,7 +125,7 @@ describeSkip<{ app: Application; server: ServerProxy }>("Server", ({ it, assert,
 		const spyHapiServerStop = stub(HapiServerMock.prototype, "stop").rejectedValue(
 			new Error("failed stopping hapi server"),
 		);
-		const spyAppTerminate = stub(app, "terminate").callsFake(() => { });
+		const spyAppTerminate = stub(app, "terminate").callsFake(() => {});
 
 		await server.initialize(name, options);
 		await server.dispose();

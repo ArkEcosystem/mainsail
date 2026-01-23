@@ -63,9 +63,9 @@ export const prepareBlock = async (context) => {
 			generatorAddress: "0xB559F4FbB75c378CDd3Dd7CcbFeff9c5c2094E55",
 			height: 2,
 			numberOfTransactions: transactions.length,
-			payloadHash: (
-				await context.app.get(Identifiers.Cryptography.Hash.Factory).sha256(payloadBuffers)
-			).toString("hex"),
+			payloadHash: (await context.app.get(Identifiers.Cryptography.Hash.Factory).sha256(payloadBuffers)).toString(
+				"hex",
+			),
 			payloadLength,
 			previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 			reward: BigNumber.ZERO,

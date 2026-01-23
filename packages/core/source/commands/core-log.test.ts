@@ -8,7 +8,7 @@ describe<{
 	cli: Console;
 }>("CoreLogCommnad", ({ beforeEach, it, stub }) => {
 	const process = {
-		log: () => { },
+		log: () => {},
 	};
 
 	beforeEach((context) => {

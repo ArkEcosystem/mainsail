@@ -10,8 +10,8 @@ describe<{
 	app: Application;
 	peerRepository: PeerRepository;
 }>("PeerRepository", ({ it, assert, beforeEach, spy }) => {
-	const eventDispatcher = { dispatch: () => { }, listen: () => { } };
-	const roundStatistic = { peerAdded: () => { }, peerRemoved: () => { } };
+	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
+	const roundStatistic = { peerAdded: () => {}, peerRemoved: () => {} };
 	const statisticService = { getCurrentRoundStatistic: () => roundStatistic };
 
 	beforeEach((context) => {
@@ -144,10 +144,7 @@ describe<{
 	});
 
 	it("#getPendingPeers - should return the pending peers", ({ peerRepository, app }) => {
-		const peers = [
-			app.resolve(Peer).init("176.165.66.55", 4000),
-			app.resolve(Peer).init("176.165.44.33", 4000),
-		];
+		const peers = [app.resolve(Peer).init("176.165.66.55", 4000), app.resolve(Peer).init("176.165.44.33", 4000)];
 
 		for (const peer of peers) {
 			peerRepository.setPendingPeer(peer);
@@ -160,10 +157,7 @@ describe<{
 		assert.false(peerRepository.hasPendingPeers());
 	});
 
-	it("#hasPendingPeers - should return true if there is more than zero pending peer", ({
-		peerRepository,
-		app,
-	}) => {
+	it("#hasPendingPeers - should return true if there is more than zero pending peer", ({ peerRepository, app }) => {
 		const peers = [
 			app.resolve(Peer).init("176.165.66.55", 4000),
 			app.resolve(Peer).init("176.165.44.33", 4000),
@@ -234,10 +228,7 @@ describe<{
 		assert.throws(() => peerRepository.getPendingPeer(peer.ip));
 	});
 
-	it("#hasPendingPeer - should return true if the pending peer exists", ({
-		peerRepository: peerRepository,
-		app,
-	}) => {
+	it("#hasPendingPeer - should return true if the pending peer exists", ({ peerRepository: peerRepository, app }) => {
 		const peer = app.resolve(Peer).init("176.165.66.55", 4000);
 
 		peerRepository.setPendingPeer(peer);

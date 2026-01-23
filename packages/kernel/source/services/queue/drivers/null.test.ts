@@ -3,7 +3,7 @@ import { QueueJob } from "../../../contracts/kernel";
 import { NullQueue } from "./null";
 
 class MyQueueJob implements QueueJob {
-	public async handle(): Promise<void> { }
+	public async handle(): Promise<void> {}
 }
 
 describe("NullQueue", ({ assert, it }) => {

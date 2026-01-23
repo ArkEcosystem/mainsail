@@ -8,13 +8,13 @@ describe<{
 	cli: Console;
 }>("UpdateCommand", ({ beforeEach, it, assert, stub, spy }) => {
 	const updater = {
-		check: () => { },
-		update: () => { },
+		check: () => {},
+		update: () => {},
 	};
 
 	const actionFactory = {
-		restartRunningProcess: () => { },
-		restartRunningProcessWithPrompt: () => { },
+		restartRunningProcess: () => {},
+		restartRunningProcessWithPrompt: () => {},
 	};
 
 	beforeEach((context) => {

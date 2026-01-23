@@ -22,9 +22,9 @@ describe<{
 }>("BootServiceProviders", ({ afterEach, assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.logger = {
-			error: () => { },
-			notice: () => { },
-			warn: () => { },
+			error: () => {},
+			notice: () => {},
+			warn: () => {},
 		};
 
 		context.app = new Application(new Container());

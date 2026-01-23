@@ -4,7 +4,7 @@ import { describe } from "@mainsail/test-runner";
 import { MemoryEventDispatcher } from "./memory";
 
 class DummyClass implements Contracts.Kernel.EventListener {
-	public constructor(private readonly method?) { }
+	public constructor(private readonly method?) {}
 
 	public handle(): void {
 		this.method();
@@ -19,7 +19,7 @@ describe<{
 }>("MemoryEventDispatcher", ({ assert, beforeEach, it, spy, spyFn }) => {
 	beforeEach((context) => {
 		context.emitter = new MemoryEventDispatcher();
-		context.dummyCaller = () => { };
+		context.dummyCaller = () => {};
 		context.dummyCallerSpy = spy(context, "dummyCaller");
 		context.dummyListener = new DummyClass(context.dummyCaller);
 	});

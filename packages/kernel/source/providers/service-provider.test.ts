@@ -10,7 +10,7 @@ import { PluginManifest } from "./plugin-manifest";
 import { ServiceProvider } from "./service-provider";
 
 class StubServiceProvider extends ServiceProvider {
-	async register() { }
+	async register() {}
 }
 
 describeSkip<{

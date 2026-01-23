@@ -156,7 +156,7 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 };
 
 export const addTransactionsToPool = async (
-	{ app }: { app: Contracts.Kernel.Application, },
+	{ app }: { app: Contracts.Kernel.Application },
 	transactions: Contracts.Crypto.Transaction[],
 ): Promise<Contracts.TransactionPool.ProcessorResult> => {
 	const processor = app.get<Contracts.TransactionPool.Processor>(Identifiers.TransactionPool.Processor);
@@ -256,6 +256,10 @@ export const getRandomColdWallet = async ({
 	};
 };
 
-export const getAddressByPublicKey = async ({ app }: { app: Contracts.Kernel.Application, }, publicKey: string): Promise<string> => app
-	.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-	.fromPublicKey(publicKey);
+export const getAddressByPublicKey = async (
+	{ app }: { app: Contracts.Kernel.Application },
+	publicKey: string,
+): Promise<string> =>
+	app
+		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
+		.fromPublicKey(publicKey);
