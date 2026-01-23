@@ -1,14 +1,15 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { validatorKeys } from "../test/fixtures/validator-keys";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { BIP39 } from "./keys/bip39";
 import { Validator } from "./validator";
+import { Application } from "@mainsail/kernel";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	validator: Contracts.Validator.Validator;
 	generatorAddress: string;
 }>("Validator", ({ it, assert, beforeEach }) => {
@@ -16,11 +17,11 @@ describe<{
 		await prepareSandbox(context);
 
 		const { consensusKeyPair, mnemonic } = validatorKeys[0];
-		context.validator = context.sandbox.app
+		context.validator = context.app
 			.resolve<Contracts.Validator.Validator>(Validator)
 			.configure(await new BIP39().configure(consensusKeyPair));
 
-		context.generatorAddress = await context.sandbox.app
+		context.generatorAddress = await context.app
 			.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 			.fromMnemonic(mnemonic);
 	});
