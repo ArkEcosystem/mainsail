@@ -1,5 +1,5 @@
 import { Console } from "@mainsail/cli";
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Identifiers } from "@mainsail/constants";
 
 import { Command } from "./core-log";
@@ -8,7 +8,7 @@ describe<{
 	cli: Console;
 }>("CoreLogCommnad", ({ beforeEach, it, stub }) => {
 	const process = {
-		log: () => {},
+		log: () => { },
 	};
 
 	beforeEach((context) => {

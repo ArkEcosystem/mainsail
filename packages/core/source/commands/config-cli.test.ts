@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { execa } from "execa";
 
 import { Console } from "@mainsail/cli";
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Command } from "./config-cli";
 
 describe<{

@@ -1,6 +1,6 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
 import { Console } from "@mainsail/cli";
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import envPaths, { Paths } from "env-paths";
 
 import { Command } from "./env-paths";

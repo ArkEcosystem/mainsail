@@ -2,7 +2,7 @@ import fs from "fs-extra";
 import prompts from "prompts";
 
 import { Console } from "@mainsail/cli";
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Command } from "./pool-clear";
 
 describe<{

@@ -1,5 +1,5 @@
 import { Console } from "@mainsail/cli";
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Identifiers } from "@mainsail/constants";
 
 import { Command } from "./update";
@@ -8,13 +8,13 @@ describe<{
 	cli: Console;
 }>("UpdateCommand", ({ beforeEach, it, assert, stub }) => {
 	const updater = {
-		check: () => {},
-		update: () => {},
+		check: () => { },
+		update: () => { },
 	};
 
 	const actionFactory = {
-		restartRunningProcess: () => {},
-		restartRunningProcessWithPrompt: () => {},
+		restartRunningProcess: () => { },
+		restartRunningProcessWithPrompt: () => { },
 	};
 
 	beforeEach((context) => {
