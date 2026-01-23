@@ -1,4 +1,3 @@
-import { Container, injectable } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 import { setMaxListeners } from "events";
@@ -10,9 +9,6 @@ import { Application } from "./application";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
 import { ConfigRepository } from "./services/config";
 import { MemoryEventDispatcher } from "./services/events";
-
-@injectable()
-class StubClass {}
 
 class StubServiceProvider extends ServiceProvider {
 	public async register(): Promise<void> {}
@@ -28,7 +24,6 @@ class StubServiceProvider extends ServiceProvider {
 
 describe<{
 	app: Application;
-	container: Container;
 	logger: Record<string, Function>;
 }>("Application", ({ afterEach, assert, beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
@@ -36,8 +31,6 @@ describe<{
 
 		// TODO
 		setMaxListeners(1000);
-
-		context.container = new Container();
 
 		context.app = new Application();
 
@@ -326,70 +319,5 @@ describe<{
 		errorLogSpy.calledWith(error.stack);
 		spyDispose.calledOnce();
 		assert.false(context.app.isBooted());
-	});
-
-	it("should bind a value to the IoC container", (context) => {
-		assert.false(context.app.isBound("key"));
-
-		context.app.bind("key").toConstantValue("value");
-
-		assert.true(context.app.isBound("key"));
-	});
-
-	it("should rebind a value to the IoC container", (context) => {
-		assert.false(context.app.isBound("key"));
-
-		context.app.bind("key").toConstantValue("value");
-
-		assert.is(context.app.get("key"), "value");
-		assert.true(context.app.isBound("key"));
-
-		context.app.rebind("key").toConstantValue("value-new");
-
-		assert.is(context.app.get("key"), "value-new");
-	});
-
-	it("should unbind a value from the IoC container", (context) => {
-		context.app.bind("key").toConstantValue("value");
-
-		assert.true(context.app.isBound("key"));
-
-		context.app.unbind("key");
-
-		assert.false(context.app.isBound("key"));
-	});
-
-	it("should return if bound tagged", (context) => {
-		assert.false(context.app.isBoundTagged("key", "a", "b"));
-		assert.false(context.app.isBoundTagged("key", "a", "c"));
-
-		context.app.bind("key").toConstantValue("value").whenTagged("a", "b");
-
-		assert.true(context.app.isBoundTagged("key", "a", "b"));
-		assert.false(context.app.isBoundTagged("key", "a", "c"));
-
-		context.app.unbind("key");
-
-		assert.false(context.app.isBoundTagged("key", "a", "b"));
-		assert.false(context.app.isBoundTagged("key", "a", "c"));
-	});
-
-	it("should get a value from the IoC container", (context) => {
-		context.app.bind("key").toConstantValue("value");
-
-		assert.is(context.app.get("key"), "value");
-	});
-
-	it("should get tagged value from the IoC container", async (context) => {
-		context.app.bind("animal").toConstantValue("bear").whenTagged("order", "carnivora");
-		context.app.bind("animal").toConstantValue("dolphin").whenTagged("order", "cetacea");
-
-		assert.throws(() => context.app.get("animal"));
-		assert.is(context.app.getTagged("animal", "order", "carnivora"), "bear");
-		assert.is(context.app.getTagged("animal", "order", "cetacea"), "dolphin");
-	});
-
-	it("should resolve a value from the IoC container", (context) => {
-		assert.instance(context.app.resolve(StubClass), StubClass);
 	});
 });

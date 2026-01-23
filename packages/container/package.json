@@ -25,6 +25,7 @@
 		"reflect-metadata": "0.2.2"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"uvu": "0.5.6"
 	},
