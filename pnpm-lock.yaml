@@ -3025,9 +3025,6 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/test-runner':
-        specifier: workspace:*
-        version: link:../test-runner
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -3047,6 +3044,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/chance':
         specifier: 1.1.7
         version: 1.1.7
@@ -3102,9 +3102,6 @@ importers:
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
-      '@mainsail/test-runner':
-        specifier: workspace:*
-        version: link:../test-runner
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
