@@ -5,7 +5,6 @@ import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 
 import { Application } from "../../../application";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { MemoryQueue } from "./memory";
 
@@ -35,7 +34,7 @@ describe<{
 		};
 		context.jobMethod = () => {};
 
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);

@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { PostProposalController } from "./post-proposal";
 
@@ -22,7 +21,7 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Cryptography.Proposal.Factory).toConstantValue(factory);
 		context.app.bind(Identifiers.Consensus.Processor.Proposal).toConstantValue(processor);

@@ -1,7 +1,6 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { makeKeywords } from "./keywords";
 
@@ -10,7 +9,7 @@ describe<{
 	validator: Validator;
 }>("Keywords", ({ it, beforeEach, assert }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		// context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		// context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);

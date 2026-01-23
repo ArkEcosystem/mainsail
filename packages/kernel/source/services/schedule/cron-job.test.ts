@@ -1,7 +1,6 @@
 import { Events, Identifiers } from "@mainsail/constants";
 import moment from "moment-timezone";
 
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { CronJob } from "./cron-job";
 import { Application } from "../../application";
@@ -87,7 +86,7 @@ describe<{
 			dispatch: () => {},
 		};
 
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.mockEventDispatcher);
 

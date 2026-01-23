@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Events, Identifiers } from "@mainsail/constants";
 
@@ -26,11 +25,10 @@ class StubServiceProvider extends ServiceProvider {
 
 describe<{
 	app: Application;
-	container: Container;
 	serviceProviderRepository: ServiceProviderRepository;
 }>("ServiceProviderRepository", ({ assert, beforeEach, it, spy, spyFn }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
 

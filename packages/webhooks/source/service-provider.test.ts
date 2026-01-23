@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { Application, Providers } from "@mainsail/kernel";
 import { NullEventDispatcher } from "@mainsail/kernel/source/services/events/drivers/null";
@@ -24,7 +23,7 @@ const init = (context: Context) => {
 		notice: () => {},
 	};
 
-	const app = new Application(new Container());
+	const app = new Application();
 	app.bind(Identifiers.ServiceProvider.Configuration).to(Providers.PluginConfiguration).inSingletonScope();
 	app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({});
 	app.bind(Identifiers.TransactionPool.Query).toConstantValue({});

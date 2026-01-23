@@ -5,7 +5,6 @@ import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { makeKeywords } from "./keywords";
 
@@ -14,7 +13,7 @@ describe<{
 	validator: Validator;
 }>("Keywords", ({ it, beforeEach, assert }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.validator = context.app.resolve(Validator);
 

@@ -4,7 +4,6 @@ import { schemas as validationSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { Container } from "@mainsail/container";
 import { schemas } from "../validation/index.js";
 import { EthGetBalanceAction } from "./index.js";
 
@@ -25,7 +24,7 @@ describe<{
 			}),
 		};
 
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Evm.Instance).toConstantValue(context.evm);
 
 		context.action = context.app.resolve(EthGetBalanceAction);

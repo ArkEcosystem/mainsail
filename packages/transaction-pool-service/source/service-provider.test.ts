@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { Application, Services } from "@mainsail/kernel";
 import { AnySchema } from "joi";
@@ -27,7 +26,7 @@ describe<{
 	maxTxPoolEnv: any;
 }>("ServiceProvider", ({ it, assert, beforeEach, afterEach, stub }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Services.Trigger.Service).to(Services.Triggers.Triggers).inSingletonScope();
 		context.app.bind(Identifiers.Evm.Instance).toConstantValue({
 			transact: () => ({}),

@@ -3,7 +3,6 @@ import { Providers } from "@mainsail/kernel";
 import esmock from "esmock";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describeSkip } from "@mainsail/test-runner";
 import { defaults as transactionPoolDefaults } from "../../../transaction-pool-service/source/defaults";
 import { defaults } from "../defaults";
@@ -42,7 +41,7 @@ describeSkip<{ app: Application; server: ServerProxy }>("Server", ({ it, assert,
 	};
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)

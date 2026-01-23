@@ -1,7 +1,6 @@
 import type { Contracts as ApiDatabaseContracts } from "@mainsail/api-database";
 import { Identifiers as ApiDatabaseIdentifiers, ServiceProvider as CoreApiDatabase } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
-import { Container } from "@mainsail/container";
 import { Application, Providers } from "@mainsail/kernel";
 
 import { ServiceProvider as CoreApiHttp } from "../../source/service-provider.js";
@@ -177,7 +176,7 @@ export class ApiContext {
 }
 
 export const prepareSandbox = async (context: { app: Application }): Promise<ApiContext> => {
-	context.app = new Application(new Container());
+	context.app = new Application();
 
 	context.app.bind(Identifiers.Application.Name).toConstantValue("api-http-integration");
 

@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { NetPeerCountAction } from "./index.js";
 
@@ -16,7 +15,7 @@ describe<{
 			peerCount: 0,
 		};
 
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Evm.State).toConstantValue(context.state);
 
 		context.action = context.app.resolve(NetPeerCountAction);

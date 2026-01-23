@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 import { Application } from "@mainsail/kernel";
@@ -17,7 +16,7 @@ describe<{
 	beforeEach(async (context) => {
 		context.configuration = { getRequired: () => {} };
 
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(context.configuration);
 	});
 

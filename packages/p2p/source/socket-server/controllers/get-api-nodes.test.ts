@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { GetBlocksController } from "./get-blocks";
 
@@ -17,7 +16,7 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 		context.app.bind(Identifiers.Database.Service).toConstantValue(database);

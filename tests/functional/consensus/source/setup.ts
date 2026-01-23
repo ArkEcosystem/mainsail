@@ -1,5 +1,4 @@
 import { Identifiers } from "@mainsail/constants";
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Application, Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { join } from "path";
@@ -14,7 +13,7 @@ import { Worker } from "./worker.js";
 type PluginOptions = Record<string, any>;
 
 const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validators: ValidatorsJson): Promise<Contracts.Kernel.Application> => {
-	const app = new Application(new Container());
+	const app = new Application();
 
 	// Basic binds and mocks
 	app.bind(Identifiers.Application.Name).toConstantValue("mainsail");

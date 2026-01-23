@@ -1,6 +1,5 @@
 import { ServiceProvider as BlockchainUtilities } from "@mainsail/blockchain-utils";
 import { Identifiers } from "@mainsail/constants";
-import { Container } from "@mainsail/container";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
@@ -25,7 +24,7 @@ import { ServiceProvider as CoreEvents } from "../../../kernel/source/services/e
 import { ServiceProvider as CoreTriggers } from "../../../kernel/source/services/triggers/index.js";
 
 export const prepareSandbox = async (context: { app?: Application }): Promise<void> => {
-	context.app = new Application(new Container());
+	context.app = new Application();
 
 	context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 	context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);

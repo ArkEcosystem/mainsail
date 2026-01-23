@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 
 import { describe } from "@mainsail/test-runner";
@@ -10,7 +9,7 @@ describe<{
 	app: Application;
 }>("ValidationServiceProvider", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 	});
 
 	it(".register", async (context) => {

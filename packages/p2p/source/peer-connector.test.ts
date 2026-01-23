@@ -2,7 +2,6 @@ import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describeSkip } from "@mainsail/test-runner";
 import { Peer } from "./peer";
 import { PeerConnector } from "./peer-connector";
@@ -38,7 +37,7 @@ describeSkip<{
 		onDelay = () => {};
 		ClientMock.onConstructor = () => {};
 
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 

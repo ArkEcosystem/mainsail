@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import capcon from "capture-console";
 
@@ -20,7 +19,7 @@ describe<{
 
 		// @ts-ignore
 		capcon.startCapture(console._stderr, (stderr) => (context.message = stderr.toString()));
-		const app = new Application(new Container());
+		const app = new Application();
 
 		context.logger = await app.resolve<Contracts.Kernel.Logger>(MemoryLogger).make();
 	});

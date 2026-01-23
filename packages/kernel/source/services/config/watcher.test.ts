@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { writeFileSync } from "fs";
 import { dirSync, setGracefulCleanup } from "tmp";
@@ -15,7 +14,7 @@ describe<{
 	watcher: Watcher;
 }>("Watcher", ({ afterAll, beforeEach, it, spy }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(new MemoryEventDispatcher());
 		context.app.bind("path.config").toConstantValue(configPath);

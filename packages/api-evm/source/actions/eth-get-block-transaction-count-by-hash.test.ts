@@ -3,7 +3,6 @@ import { schemas as cryptoBlockSchemas } from "@mainsail/crypto-block";
 import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { EthGetBlockTransactionCountByHash } from "./index.js";
 
@@ -18,7 +17,7 @@ describe<{
 			getBlockHeaderByHash: async () => undefined,
 		};
 
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Database.Service).toConstantValue(context.database);
 
 		context.action = context.app.resolve(EthGetBlockTransactionCountByHash);

@@ -3,7 +3,6 @@ import { Identifiers } from "@mainsail/constants";
 import { BigNumber, cloneDeep } from "@mainsail/utils";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describeSkip } from "@mainsail/test-runner";
 import { Broadcaster } from "./broadcaster";
 import { Peer } from "./peer";
@@ -22,7 +21,7 @@ describeSkip<{
 	const blockchain = { getBlockPing: () => {}, getLastBlock: () => {} };
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(configuration);

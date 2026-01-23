@@ -2,7 +2,6 @@ import { Identifiers } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation";
 import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { EthGetBlockTransactionCountByNumber } from "./index.js";
 
@@ -17,7 +16,7 @@ describe<{
 			getBlockHeader: async () => undefined,
 		};
 
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Database.Service).toConstantValue(context.database);
 
 		context.action = context.app.resolve(EthGetBlockTransactionCountByNumber);

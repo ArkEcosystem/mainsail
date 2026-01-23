@@ -4,7 +4,6 @@ import { BigNumber } from "@mainsail/utils";
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { Configuration } from "../../crypto-config/distribution/index";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { formatCurrency } from "./format.js";
 
@@ -13,7 +12,7 @@ describe<{
 	configuration: Configuration;
 }>("formatCurrency", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 

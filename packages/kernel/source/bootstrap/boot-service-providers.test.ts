@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import { Identifiers, Events } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 
@@ -27,7 +26,7 @@ describe<{
 			warn: () => {},
 		};
 
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 

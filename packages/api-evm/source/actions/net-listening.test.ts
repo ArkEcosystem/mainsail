@@ -1,7 +1,6 @@
 import { Validator } from "@mainsail/validation";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { NetListeningAction } from "./index.js";
 
@@ -11,7 +10,7 @@ describe<{
 	validator: Validator;
 }>("NetListeningAction", ({ beforeEach, it, assert }) => {
 	beforeEach(async (context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.action = context.app.resolve(NetListeningAction);
 		context.validator = context.app.resolve(Validator);

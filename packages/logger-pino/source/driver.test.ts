@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { sleep } from "@mainsail/utils";
@@ -26,7 +25,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 	afterAll(() => setGracefulCleanup());
 
 	beforeEach(async (context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
 		context.app.bind(Identifiers.Application.Thread).toConstantValue("main");
 		context.app.bind(Identifiers.Config.Flags).toConstantValue("core");
@@ -146,7 +145,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 	});
 
 	it("should rotate the log 3 times", async (context) => {
-		const app = new Application(new Container());
+		const app = new Application();
 		app.bind(Identifiers.Config.Flags).toConstantValue("core");
 		app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
 		app.bind(Identifiers.Application.Thread).toConstantValue("main");

@@ -3,7 +3,6 @@ import { Identifiers, Events } from "@mainsail/constants";
 import crypto from "../../../../core/bin/config/devnet/core/crypto.json";
 import { Configuration } from "../../../../crypto-config/distribution/index";
 import { Application } from "../../application";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { MemoryEventDispatcher } from "../events";
 import { BlockJob } from "./block-job";
@@ -28,7 +27,7 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.eventDispatcher = context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher);
 
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);

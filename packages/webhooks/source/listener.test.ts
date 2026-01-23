@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers, Events } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
@@ -40,7 +39,7 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		const app = new Application(new Container());
+		const app = new Application();
 		app.bind("path.cache").toConstantValue(dirSync().name);
 
 		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);

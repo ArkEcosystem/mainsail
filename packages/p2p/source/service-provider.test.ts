@@ -3,7 +3,6 @@ import { Identifiers } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { defaults } from "./defaults";
 import { Peer } from "./peer";
@@ -24,7 +23,7 @@ describe<{
 	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
 		context.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
@@ -102,7 +101,7 @@ describe<{
 	const validator = { addFormat: () => {} };
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({

@@ -2,7 +2,6 @@ import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { GetStatusController } from "./get-status";
 
@@ -19,7 +18,7 @@ describe<{
 	const store = { getLastBlock: () => {} };
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.State.Store).toConstantValue(store);
 

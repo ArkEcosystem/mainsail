@@ -1,4 +1,4 @@
-import { Container, injectable } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
 import { describe } from "@mainsail/test-runner";
@@ -10,7 +10,7 @@ describe<{
 	pipeline: Contracts.Kernel.Pipeline<string>;
 }>("Pipeline", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.pipeline = new MemoryPipeline<string>();
 	});
 

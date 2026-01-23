@@ -1,7 +1,6 @@
 import { BigNumber } from "@mainsail/utils";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { Wallet } from ".";
 
@@ -9,7 +8,7 @@ describe<{
 	app: Application;
 }>("Models - Wallet", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Evm.Instance).toConstantValue({
 			getAccountInfo: async () => ({ balance: 0n, nonce: 0n }),
 			getAccountInfoExtended: async () => ({ balance: 0n, nonce: 0n, legacyAttributes: {} }),

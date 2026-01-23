@@ -12,7 +12,6 @@ import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-valida
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
@@ -23,7 +22,7 @@ import { Serializer } from "../../source/serializer.js";
 // import { prepareBlock } from "./prepare-block.js";
 
 export const prepareSandbox = async (context) => {
-	context.app = new Application(new Container());
+	context.app = new Application();
 
 	context.app.bind(Identifiers.Cryptography.Block.HeaderSize).toConstantValue(() => {
 		const hashByteLength = context.app.get<number>(Identifiers.Cryptography.Hash.Size.SHA256);

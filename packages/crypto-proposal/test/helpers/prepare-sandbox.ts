@@ -1,5 +1,4 @@
 import { Identifiers } from "@mainsail/constants";
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
@@ -25,7 +24,7 @@ import { schemas } from "../../source/schemas.js";
 import { Serializer } from "../../source/serializer.js";
 
 export const prepareSandbox = async (context: { app?: Application }): Promise<void> => {
-	context.app = new Application(new Container());
+	context.app = new Application();
 
 	context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
 

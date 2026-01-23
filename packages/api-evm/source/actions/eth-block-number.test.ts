@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { EthBlockNumberAction } from "./index.js";
 
@@ -20,7 +19,7 @@ describe<{
 			},
 		};
 
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.State.Store).toConstantValue(context.store);
 
 		context.action = context.app.resolve(EthBlockNumberAction);

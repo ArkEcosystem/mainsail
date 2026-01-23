@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
@@ -17,7 +16,7 @@ describeSkip<{
 	app: Application;
 }>("ServiceProvider", ({ assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app
 			.bind(Identifiers.Services.Filesystem.Service)
 			.toConstantValue({ existsSync: () => true, readJSONSync: (path: string) => readJSONSync(path) });

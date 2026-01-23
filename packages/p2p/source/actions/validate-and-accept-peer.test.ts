@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { describe } from "@mainsail/test-runner";
 import { ValidateAndAcceptPeerAction } from "./validate-and-accept-peer";
 
@@ -12,7 +11,7 @@ describe<{
 	const peerProcessor = { validateAndAcceptPeer: () => {} };
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue(peerProcessor);
 

@@ -3,7 +3,6 @@ import * as Exceptions from "@mainsail/exceptions";
 import { Application, Providers } from "@mainsail/kernel";
 import esmock from "esmock";
 
-import { Container } from "@mainsail/container";
 import { describeSkip } from "@mainsail/test-runner";
 import { defaults } from "./defaults";
 import { Routes } from "./enums";
@@ -45,7 +44,7 @@ describeSkip<{
 	const createQueue = () => queue;
 
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)
