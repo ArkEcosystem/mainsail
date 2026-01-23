@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { FeeCalculator } from "./fee-calculator";
 
 describe("FeeCalculator", ({ assert, it }) => {

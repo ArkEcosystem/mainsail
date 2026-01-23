@@ -3,23 +3,25 @@ import * as Exceptions from "@mainsail/exceptions";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { Configuration } from "../../crypto-config/distribution/index";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { RoundCalculator } from "./round-calculator";
 
 type Context = {
+	app: Application;
 	configuration: Configuration;
 	roundCalculator: RoundCalculator;
 };
 
 const setup = (context: Context) => {
-	const sandbox = new Sandbox();
+	context.app = new Application(new Container());
+	context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-	sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-
-	context.configuration = sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+	context.configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
 	context.configuration.setConfig(crypto);
 
-	context.roundCalculator = sandbox.app.resolve<RoundCalculator>(RoundCalculator);
+	context.roundCalculator = context.app.resolve<RoundCalculator>(RoundCalculator);
 };
 
 describe<Context>("Round Calculator - calculateRoundInfoByRound", ({ assert, beforeEach, it, stub }) => {

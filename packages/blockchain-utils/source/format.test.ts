@@ -3,19 +3,21 @@ import { BigNumber } from "@mainsail/utils";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { Configuration } from "../../crypto-config/distribution/index";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { formatCurrency } from "./format.js";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	configuration: Configuration;
 }>("formatCurrency", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-		context.configuration = context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		context.configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
 		context.configuration.setConfig(crypto as any);
 	});
 

@@ -1,11 +1,12 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
-
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { TimestampCalculator } from "./timestamp-calculator";
 
 type Context = {
-	sandbox: Sandbox;
+	app: Application;
 	timestampCalculator: TimestampCalculator;
 	configuration: any;
 	timeouts: Partial<Contracts.Crypto.MilestoneTimeouts>;
@@ -13,7 +14,7 @@ type Context = {
 
 describe<Context>("TimestampCalculator", ({ assert, it, beforeEach }) => {
 	beforeEach((context: Context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
 		context.timeouts = {
 			blockTime: 0,
@@ -29,9 +30,9 @@ describe<Context>("TimestampCalculator", ({ assert, it, beforeEach }) => {
 			},
 		};
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 
-		context.timestampCalculator = context.sandbox.app.resolve(TimestampCalculator);
+		context.timestampCalculator = context.app.resolve(TimestampCalculator);
 	});
 
 	it("should throw if round is too high", async ({ timestampCalculator }) => {
