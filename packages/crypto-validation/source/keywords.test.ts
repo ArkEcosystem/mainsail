@@ -4,27 +4,24 @@ import { BigNumber } from "@mainsail/utils";
 import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { makeKeywords } from "./keywords";
 
-type Context = {
-	validator: Validator;
-	sandbox: Sandbox;
-};
-
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	validator: Validator;
 }>("Keywords", ({ it, beforeEach, assert }) => {
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.validator = context.app.resolve(Validator);
 
-		const keywords = makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration));
+		const keywords = makeKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration));
 		for (const keyword of Object.values(keywords)) {
 			context.validator.addKeyword(keyword);
 		}
