@@ -44,10 +44,35 @@ describe<{
 		assert.false(app.isBound("key"));
 	});
 
+	it("should return if bound tagged", (context) => {
+		assert.false(context.app.isBoundTagged("key", "a", "b"));
+		assert.false(context.app.isBoundTagged("key", "a", "c"));
+
+		context.app.bind("key").toConstantValue("value").whenTagged("a", "b");
+
+		assert.true(context.app.isBoundTagged("key", "a", "b"));
+		assert.false(context.app.isBoundTagged("key", "a", "c"));
+
+		context.app.unbind("key");
+
+		assert.false(context.app.isBoundTagged("key", "a", "b"));
+		assert.false(context.app.isBoundTagged("key", "a", "c"));
+	});
+
 	it("should get a value from the IoC container", ({ app }) => {
 		app.bind("key").toConstantValue("value");
 
 		assert.equal(app.get("key"), "value");
+	});
+
+
+	it("should get tagged value from the IoC container", async (context) => {
+		context.app.bind("animal").toConstantValue("bear").whenTagged("order", "carnivora");
+		context.app.bind("animal").toConstantValue("dolphin").whenTagged("order", "cetacea");
+
+		assert.throws(() => context.app.get("animal"));
+		assert.is(context.app.getTagged("animal", "order", "carnivora"), "bear");
+		assert.is(context.app.getTagged("animal", "order", "cetacea"), "dolphin");
 	});
 
 	it("should resolve a value from the IoC container", ({ app }) => {
