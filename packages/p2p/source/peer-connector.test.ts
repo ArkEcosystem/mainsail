@@ -1,21 +1,23 @@
 import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 
-import { describeSkip, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describeSkip } from "@mainsail/test-runner";
 import { Peer } from "./peer";
 import { PeerConnector } from "./peer-connector";
 
-let onDelay = (timeout: number) => {};
+let onDelay = (timeout: number) => { };
 
 class ClientMock {
-	static onConstructor = (...arguments_) => {};
+	static onConstructor = (...arguments_) => { };
 
 	constructor(...arguments_) {
 		ClientMock.onConstructor(...arguments_);
 	}
-	async connect() {}
-	async request() {}
-	async terminate() {}
+	async connect() { }
+	async request() { }
+	async terminate() { }
 }
 
 const { PeerConnector: PeerConnectorProxy } = await esmock("./peer-connector", {
@@ -28,19 +30,19 @@ const { PeerConnector: PeerConnectorProxy } = await esmock("./peer-connector", {
 });
 
 describeSkip<{
-	sandbox: Sandbox;
+	app: Application;
 	peerConnector: PeerConnector;
 }>("PeerConnector", ({ it, assert, beforeEach, stub, spy, spyFn }) => {
-	const logger = { debug: () => {}, error: () => {}, info: () => {}, warn: () => {} };
+	const logger = { debug: () => { }, error: () => { }, info: () => { }, warn: () => { } };
 	beforeEach((context) => {
-		onDelay = () => {};
-		ClientMock.onConstructor = () => {};
+		onDelay = () => { };
+		ClientMock.onConstructor = () => { };
 
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 
-		context.peerConnector = context.sandbox.app.resolve(PeerConnectorProxy);
+		context.peerConnector = context.app.resolve(PeerConnectorProxy);
 	});
 
 	it("#all - should return a empty array when there are no connections", ({ peerConnector }) => {

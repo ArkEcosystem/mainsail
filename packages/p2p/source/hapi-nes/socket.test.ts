@@ -1,4 +1,4 @@
-import { describeSkip } from "@mainsail/test-framework";
+import { describeSkip } from "@mainsail/test-runner";
 
 import * as Hapi from "@hapi/hapi";
 import * as Hoek from "@hapi/hoek";
@@ -84,7 +84,7 @@ describeSkip("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		server.plugins.nes._listener._sockets._forEach(async (socket) => {
 			try {
 				await socket._send(a, null, Hoek.ignore);
-			} catch {}
+			} catch { }
 		});
 
 		const [event] = await log;

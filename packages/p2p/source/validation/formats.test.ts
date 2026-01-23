@@ -1,15 +1,17 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { makeFormats } from "./formats";
 
 describe<{
 	validator: Validator;
-	sandbox: Sandbox;
+	app: Application;
 }>("format", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.app = new Application(new Container());
+		context.validator = context.app.resolve(Validator);
 
 		const formats = makeFormats();
 

@@ -1,4 +1,4 @@
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { mapAddr } from "./map-addr";
 
 describe("mapAddr", ({ it, assert }) => {

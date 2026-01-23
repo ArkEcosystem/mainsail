@@ -3,7 +3,9 @@ import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 import Joi from "joi";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { ValidateDataPlugin } from "./validate-data";
 
 const utils = {
@@ -15,11 +17,11 @@ const { ValidateDataPlugin: ValidateDataPluginProxy } = await esmock("./validate
 });
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	validatePlugin: ValidateDataPlugin;
 }>("ValidatePlugin", ({ it, assert, beforeEach, spy, match, stub }) => {
-	const logger = { debug: () => {}, warn: () => {} };
-	const configuration = { getRequired: () => {} };
+	const logger = { debug: () => { }, warn: () => { } };
+	const configuration = { getRequired: () => { } };
 
 	const responsePayload = { status: "ok" };
 	const mockRouteByPath = {
@@ -39,20 +41,20 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
-		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(configuration);
-		context.sandbox.app
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(configuration);
+		context.app
 			.bind(Identifiers.P2P.Peer.Disposer)
-			.toConstantValue({ banPeer: () => {}, disposePeer: () => {} });
+			.toConstantValue({ banPeer: () => { }, disposePeer: () => { } });
 
-		context.validatePlugin = context.sandbox.app.resolve(ValidateDataPluginProxy);
+		context.validatePlugin = context.app.resolve(ValidateDataPluginProxy);
 	});
 
 	// TODO: fix stub
-	it.skip("should register the validate plugin", async ({ validatePlugin, sandbox }) => {
-		stub(sandbox.app, "resolve").returnValue({ getRoutesConfigByPath: () => mockRouteByPath });
+	it.skip("should register the validate plugin", async ({ validatePlugin, app }) => {
+		stub(app, "resolve").returnValue({ getRoutesConfigByPath: () => mockRouteByPath });
 
 		const server = new Server({ port: 4100 });
 		server.route(mockRoute);
@@ -128,8 +130,8 @@ describe<{
 		assert.equal(responseValidAnotherRoute.statusCode, 200);
 	});
 
-	it("should not register the validate plugin if development mode is used", async ({ validatePlugin, sandbox }) => {
-		stub(sandbox.app, "resolve").returnValue({ getRoutesConfigByPath: () => mockRouteByPath });
+	it("should not register the validate plugin if development mode is used", async ({ validatePlugin, app }) => {
+		stub(app, "resolve").returnValue({ getRoutesConfigByPath: () => mockRouteByPath });
 
 		const server = new Server({ port: 4100 });
 		server.route(mockRoute);

@@ -1,5 +1,4 @@
-import { describeSkip, Sandbox } from "@mainsail/test-framework";
-
+import { describeSkip } from "@mainsail/test-runner";
 import * as Hapi from "@hapi/hapi";
 import * as Hoek from "@hapi/hoek";
 import * as Teamwork from "@hapi/teamwork";
@@ -7,7 +6,7 @@ import { Client } from "./client";
 import { plugin } from "./plugin";
 import { stringifyNesMessage } from "./utilities";
 
-describeSkip<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
+describeSkip<{}>("Client", ({ it, beforeEach, assert, nock, each }) => {
 	const createServerWithPlugin = async (pluginOptions = {}, serverOptions = {}, withPreResponseHandler = false) => {
 		const server = Hapi.server(serverOptions);
 		await server.register({ plugin: plugin, options: pluginOptions });

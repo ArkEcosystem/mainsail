@@ -4,59 +4,61 @@ import { Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import importFresh from "import-fresh";
 
-import { describeSkip, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describeSkip } from "@mainsail/test-runner";
 import { Peer } from "./peer";
 import { Service } from "./service";
 
 describeSkip<{
-	sandbox: Sandbox;
+	app: Application;
 	networkMonitor: Service;
 	configuration: Providers.PluginConfiguration;
 }>("NetworkMonitor", ({ it, assert, beforeEach, stub, spy, match, each }) => {
-	const logger = { debug: () => {}, error: () => {}, info: () => {}, notice: () => {}, warn: () => {} };
+	const logger = { debug: () => { }, error: () => { }, info: () => { }, notice: () => { }, warn: () => { } };
 
-	const emitter = { dispatch: () => {} };
+	const emitter = { dispatch: () => { } };
 	const communicator = {
-		getPeerBlocks: () => {},
-		getPeers: () => {},
-		ping: () => {},
-		pingPorts: () => {},
-		postBlock: () => {},
+		getPeerBlocks: () => { },
+		getPeers: () => { },
+		ping: () => { },
+		pingPorts: () => { },
+		postBlock: () => { },
 	};
-	const repository = { forgetPeer: () => {}, getPeers: () => [] };
+	const repository = { forgetPeer: () => { }, getPeers: () => [] };
 
-	const triggerService = { call: () => {} }; // validateAndAcceptPeer
-	const store = { getLastBlock: () => {} };
-	const blockchain = { getBlockPing: () => {}, getLastBlock: () => {} };
+	const triggerService = { call: () => { } }; // validateAndAcceptPeer
+	const store = { getLastBlock: () => { } };
+	const blockchain = { getBlockPing: () => { }, getLastBlock: () => { } };
 	const slots = { getSlotNumber: () => 0 };
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app
+		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", importFresh("./defaults").defaults))
 			.whenTargetTagged("plugin", "p2p");
-		context.sandbox.app.bind(Identifiers.Application.Version).toConstantValue("0.0.1");
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
-		context.sandbox.app.bind(Identifiers.PeerNetworkMonitor).to(Service);
-		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(emitter);
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(communicator);
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(repository);
-		context.sandbox.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
-		context.sandbox.app.bind(Identifiers.store).toConstantValue(store);
+		context.app.bind(Identifiers.Application.Version).toConstantValue("0.0.1");
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		context.app.bind(Identifiers.PeerNetworkMonitor).to(Service);
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(emitter);
+		context.app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(communicator);
+		context.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(repository);
+		context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
+		context.app.bind(Identifiers.store).toConstantValue(store);
 
-		context.configuration = context.sandbox.app.getTagged(
+		context.configuration = context.app.getTagged(
 			Identifiers.ServiceProvider.Configuration,
 			"plugin",
 			"p2p",
 		);
-		context.networkMonitor = context.sandbox.app.resolve(Service);
+		context.networkMonitor = context.app.resolve(Service);
 	});
 
 	// it("#boot - should populate peers from seed peers config by calling validateAndAcceptPeer, when peer discovery is disabled", async ({
 	// 	networkMonitor,
-	// 	sandbox,
+	// 	app,
 	// 	configuration,
 	// }) => {
 	// 	configuration.set("skipDiscovery", true);
@@ -69,7 +71,7 @@ describeSkip<{
 	// 		],
 	// 	};
 
-	// 	stub(sandbox.app, "config").returnValue(peers);
+	// 	stub(app, "config").returnValue(peers);
 	// 	const spyTriggerServiceCall = spy(triggerService, "call");
 
 	// 	await networkMonitor.boot();
@@ -84,7 +86,7 @@ describeSkip<{
 	// });
 
 	// it("#boot - should populate peers from URL config by calling validateAndAcceptPeer, when peer discovery is disabled", async ({
-	// 	sandbox,
+	// 	app,
 	// 	networkMonitor,
 	// 	configuration,
 	// }) => {
@@ -98,7 +100,7 @@ describeSkip<{
 	// 		{ ip: "191.177.54.44", port: 4000 },
 	// 	];
 
-	// 	stub(sandbox.app, "config").returnValue({
+	// 	stub(app, "config").returnValue({
 	// 		list: [],
 	// 		sources: ["http://peers.someurl.com"],
 	// 	});
@@ -117,7 +119,7 @@ describeSkip<{
 	// });
 
 	// it("#boot - should populate peers from URL config by calling validateAndAcceptPeer, when body is string, when peer discovery is disabled", async ({
-	// 	sandbox,
+	// 	app,
 	// 	networkMonitor,
 	// 	configuration,
 	// }) => {
@@ -131,7 +133,7 @@ describeSkip<{
 	// 		{ ip: "191.177.54.44", port: 4000 },
 	// 	];
 
-	// 	stub(sandbox.app, "config").returnValue({
+	// 	stub(app, "config").returnValue({
 	// 		list: [],
 	// 		sources: ["http://peers.someurl.com"],
 	// 	});
@@ -150,13 +152,13 @@ describeSkip<{
 	// });
 
 	// it("#boot -  should handle as empty array if appConfigPeers.sources is undefined, when peer discovery is disabled", async ({
-	// 	sandbox,
+	// 	app,
 	// 	networkMonitor,
 	// 	configuration,
 	// }) => {
 	// 	configuration.set("skipDiscovery", true);
 
-	// 	stub(sandbox.app, "config").returnValue({
+	// 	stub(app, "config").returnValue({
 	// 		list: [],
 	// 	});
 	// 	const spyTriggerServiceCall = spy(triggerService, "call");
@@ -167,13 +169,13 @@ describeSkip<{
 	// });
 
 	// it("#boot - should populate peers from file by calling validateAndAcceptPeer, when peer discovery is disabled", async ({
-	// 	sandbox,
+	// 	app,
 	// 	networkMonitor,
 	// 	configuration,
 	// }) => {
 	// 	configuration.set("skipDiscovery", true);
 
-	// 	stub(sandbox.app, "config").returnValue({
+	// 	stub(app, "config").returnValue({
 	// 		list: [],
 	// 		sources: [path.resolve(__dirname, "../test/fixtures/", "peers.json")],
 	// 	});
@@ -193,7 +195,7 @@ describeSkip<{
 	// // TODO: Stop test
 	// it.skip("#boot - should discover peers from seed peers (calling updateNetworkStatus) and log the peers discovered by version, when peer discovery is enabled", async ({
 	// 	networkMonitor,
-	// 	sandbox,
+	// 	app,
 	// 	configuration,
 	// }) => {
 	// 	const peers = [
@@ -204,7 +206,7 @@ describeSkip<{
 	// 		{ ip: "191.177.54.44", port: 4000, version: "3.0.2" },
 	// 	];
 	// 	stub(repository, "getPeers").returnValue(peers);
-	// 	stub(sandbox.app, "config").returnValue({
+	// 	stub(app, "config").returnValue({
 	// 		list: [],
 	// 	});
 	// 	const spyUpdateNetworkStatus = spy(networkMonitor, "updateNetworkStatus");
@@ -250,8 +252,8 @@ describeSkip<{
 		spyDiscoverPeers.neverCalled();
 	});
 
-	it.skip("#updateNetworkStatus - should discover new peers from existing", async ({ networkMonitor, sandbox }) => {
-		stub(sandbox.app, "config").returnValue({
+	it.skip("#updateNetworkStatus - should discover new peers from existing", async ({ networkMonitor, app }) => {
+		stub(app, "config").returnValue({
 			list: [],
 		});
 
@@ -264,9 +266,9 @@ describeSkip<{
 
 	it.skip("#updateNetworkStatus - should log an error when discovering new peers fails", async ({
 		networkMonitor,
-		sandbox,
+		app,
 	}) => {
-		stub(sandbox.app, "config").returnValue({
+		stub(app, "config").returnValue({
 			list: [],
 		});
 
@@ -283,9 +285,9 @@ describeSkip<{
 
 	it.skip("#updateNetworkStatus - should fall back to seed peers when after discovering we are below minimum peers", async ({
 		networkMonitor,
-		sandbox,
+		app,
 	}) => {
-		stub(sandbox.app, "config").returnValue({
+		stub(app, "config").returnValue({
 			list: [],
 		});
 
@@ -299,7 +301,7 @@ describeSkip<{
 	it.skip("#updateNetworkStatus - should not fall back to seed peers when config.ignoreMinimumNetworkReach, when we are below minimum peers", async ({
 		configuration,
 		networkMonitor,
-		sandbox,
+		app,
 	}) => {
 		configuration.set("ignoreMinimumNetworkReach", true);
 		const spyLoggerInfo = stub(logger, "info");
@@ -312,9 +314,9 @@ describeSkip<{
 	// TODO: Restore test
 	// it.only("#updateNetworkStatus - should schedule the next updateNetworkStatus only once", async ({
 	// 	networkMonitor,
-	// 	sandbox,
+	// 	app,
 	// }) => {
-	// 	stub(sandbox.app, "config").returnValue({
+	// 	stub(app, "config").returnValue({
 	// 		list: [],
 	// 	});
 

@@ -1,20 +1,22 @@
 import { Identifiers } from "@mainsail/constants";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { ValidateAndAcceptPeerAction } from "./validate-and-accept-peer";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	action: ValidateAndAcceptPeerAction;
 }>("ValidateAndAcceptPeerAction", ({ it, spy, beforeEach }) => {
-	const peerProcessor = { validateAndAcceptPeer: () => {} };
+	const peerProcessor = { validateAndAcceptPeer: () => { } };
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue(peerProcessor);
+		context.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue(peerProcessor);
 
-		context.action = new ValidateAndAcceptPeerAction(context.sandbox.app);
+		context.action = new ValidateAndAcceptPeerAction(context.app);
 	});
 
 	it("#execute - should call peerProcessor.validateAndAcceptPeer with arguments provided", async ({ action }) => {

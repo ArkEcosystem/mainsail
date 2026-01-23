@@ -1,12 +1,14 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { headers } from "../../test/fixtures/responses/headers";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
 import { getProposal } from "./get-proposal";
 
 type Context = {
-	sandbox: Sandbox;
+	app: Application;
 	validator: Validator;
 };
 
@@ -19,9 +21,9 @@ describe<Context>("GetProposal Schema", ({ it, assert, beforeEach, each }) => {
 			proposal: Buffer.alloc(0),
 		};
 
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.validator = context.app.resolve(Validator);
 
 		prepareValidatorContext(context);
 	});

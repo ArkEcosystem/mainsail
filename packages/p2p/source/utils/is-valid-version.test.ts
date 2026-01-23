@@ -1,12 +1,14 @@
 import { Identifiers } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { defaults } from "../defaults";
 import { isValidVersion } from "./is-valid-version";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 }>("isValidVersion", ({ it, assert, each, beforeEach }) => {
 	const configuration = {
 		get: () => "devnet",
@@ -18,19 +20,19 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app
+		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
 			.whenTagged("plugin", "p2p");
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(configuration);
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(configuration);
 	});
 
 	each(
 		"isValidVersion",
 		({ dataset: version, context }) => {
-			assert.true(isValidVersion(context.sandbox.app, version));
+			assert.true(isValidVersion(context.app, version));
 		},
 		["2.6.0", "2.6.666", "2.7.0", "2.8.0", "2.9.0", "2.9.934"],
 	);
@@ -38,7 +40,7 @@ describe<{
 	each(
 		"should be an invalid version",
 		({ dataset: version, context }) => {
-			assert.false(isValidVersion(context.sandbox.app, version));
+			assert.false(isValidVersion(context.app, version));
 		},
 		[undefined, "2.4.0", "2.5.0", "1.0.0", "---aaa", "2490", 2, -10.2, {}, true, () => 1, "2.0.0.0"],
 	);

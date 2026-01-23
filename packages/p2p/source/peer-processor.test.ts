@@ -1,53 +1,55 @@
 import { Identifiers, Events } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
 
-import { describeSkip, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describeSkip } from "@mainsail/test-runner";
 import { defaults } from "./defaults";
 import { Peer } from "./peer";
 import { PeerProcessor } from "./peer-processor";
 
 describeSkip<{
-	sandbox: Sandbox;
+	app: Application;
 	peerProcessor: PeerProcessor;
 	configuration: Providers.PluginConfiguration;
 }>("PeerProcessor", ({ it, assert, beforeEach, stub }) => {
-	const logger = { debug: () => {}, warn: () => {} };
-	const peerCommunicator = { ping: () => {} };
-	const peerConnector = { disconnect: () => {} };
+	const logger = { debug: () => { }, warn: () => { } };
+	const peerCommunicator = { ping: () => { } };
+	const peerConnector = { disconnect: () => { } };
 	const peerRepository = {
-		forgetPendingPeer: () => {},
-		getSameSubnetPeers: () => {},
-		hasPeer: () => {},
-		hasPendingPeer: () => {},
-		setPeer: () => {},
-		setPendingPeer: () => {},
+		forgetPendingPeer: () => { },
+		getSameSubnetPeers: () => { },
+		hasPeer: () => { },
+		hasPendingPeer: () => { },
+		setPeer: () => { },
+		setPendingPeer: () => { },
 	};
-	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
+	const eventDispatcher = { dispatch: () => { }, listen: () => { } };
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app
+		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
 			.whenTargetTagged("plugin", "p2p");
-		context.sandbox.app.resolve(Providers.PluginConfiguration).from("", defaults);
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(peerCommunicator);
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Connector).toConstantValue(peerConnector);
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(peerRepository);
-		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
-		context.sandbox.app
+		context.app.resolve(Providers.PluginConfiguration).from("", defaults);
+		context.app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(peerCommunicator);
+		context.app.bind(Identifiers.P2P.Peer.Connector).toConstantValue(peerConnector);
+		context.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(peerRepository);
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		context.app
 			.bind(Identifiers.P2P.Peer.Factory)
 			.toFactory<Peer>(() => (ip: string) => new Peer(ip, 4002));
 
-		context.configuration = context.sandbox.app.getTagged(
+		context.configuration = context.app.getTagged(
 			Identifiers.ServiceProvider.Configuration,
 			"plugin",
 			"p2p",
 		);
 
-		context.peerProcessor = context.sandbox.app.resolve(PeerProcessor);
+		context.peerProcessor = context.app.resolve(PeerProcessor);
 	});
 
 	it("#initialize - should add a listener to Events.CryptoEvent.MilestoneChanged", ({ peerProcessor }) => {
