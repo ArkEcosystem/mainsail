@@ -1,4 +1,5 @@
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
+import { Application } from "@mainsail/kernel";
 import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
@@ -9,7 +10,7 @@ import validatorBlocks from "../../test/fixtures/validator_blocks.json";
 import validatorBlocksResponse from "../../test/fixtures/validator_blocks.response.json";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 }>("Validators", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 

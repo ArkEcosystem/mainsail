@@ -1,4 +1,5 @@
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
+import { Application } from "@mainsail/kernel";
 import receiptTransactions from "../../test/fixtures/receipt_transactions.json";
 import receiptTransactionsResponse from "../../test/fixtures/receipt_transactions.response.json";
 import transactions from "../../test/fixtures/transactions.json";
@@ -8,7 +9,7 @@ import { ApiContext, prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 }>("Transactions", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 

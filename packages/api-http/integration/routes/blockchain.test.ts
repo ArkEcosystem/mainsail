@@ -1,11 +1,12 @@
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
 import blocks from "../../test/fixtures/blocks.json";
+import { Application } from "@mainsail/kernel";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 }>("Blockchain", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 

@@ -1,10 +1,9 @@
 import type { Contracts as ApiDatabaseContracts } from "@mainsail/api-database";
 import { Identifiers as ApiDatabaseIdentifiers, ServiceProvider as CoreApiDatabase } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
-import type { Application } from "@mainsail/kernel";
-import { Providers } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { Application, Providers } from "@mainsail/kernel";
 
-import { Sandbox } from "@mainsail/test-framework";
 import { ServiceProvider as CoreApiHttp } from "../../source/service-provider.js";
 
 const setupDatabase = async (app: Application): Promise<CoreApiDatabase> => {
@@ -80,7 +79,7 @@ export class ApiContext {
 		private app: Application,
 		private readonly apiHttp: CoreApiHttp,
 		private readonly apiDatabase: CoreApiDatabase,
-	) {}
+	) { }
 
 	public get dataSource(): ApiDatabaseContracts.RepositoryDataSource {
 		return this.app.get<ApiDatabaseContracts.RepositoryDataSource>(ApiDatabaseIdentifiers.DataSource);
@@ -177,33 +176,33 @@ export class ApiContext {
 	}
 }
 
-export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<ApiContext> => {
-	context.sandbox = new Sandbox();
+export const prepareSandbox = async (context: { app: Application }): Promise<ApiContext> => {
+	context.app = new Application(new Container());
 
-	context.sandbox.app.bind(Identifiers.Application.Name).toConstantValue("api-http-integration");
+	context.app.bind(Identifiers.Application.Name).toConstantValue("api-http-integration");
 
-	context.sandbox.app
+	context.app
 		.bind(Identifiers.ServiceProvider.Configuration)
 		.to(Providers.PluginConfiguration)
 		.inSingletonScope();
 
-	context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
+	context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 
-	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({
+	context.app.bind(Identifiers.Services.Log.Service).toConstantValue({
 		error: (message) => console.log(message),
 		info: (message) => console.log(message),
 		notice: (message) => console.log(message),
 		warning: (message) => console.log(message),
 	});
 
-	context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue({
+	context.app.bind(Identifiers.Cryptography.Validator).toConstantValue({
 		hasSchema: () => true,
 	});
 
-	context.sandbox.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
+	context.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 
-	const apiDatabase = await setupDatabase(context.sandbox.app);
-	const apiHttp = await setupHttp(context.sandbox.app);
+	const apiDatabase = await setupDatabase(context.app);
+	const apiHttp = await setupHttp(context.app);
 
-	return new ApiContext(context.sandbox.app, apiHttp, apiDatabase);
+	return new ApiContext(context.app, apiHttp, apiDatabase);
 };

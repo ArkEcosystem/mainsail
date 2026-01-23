@@ -1,10 +1,11 @@
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import apiNodes from "../../test/fixtures/api-nodes.json";
 import { ApiContext, prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
+import { Application } from "@mainsail/kernel";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 }>("ApiNodes", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 
