@@ -2,20 +2,22 @@ import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-schnorr/source/pair";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
+import { describe } from "@mainsail/test-runner";
 import { mnemonic, wif } from "../test/identity.json";
 import { devnet } from "../test/networks.json";
 import { WIFFactory } from "./wif.factory";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	factory: WIFFactory;
 }>("Identities - WIFFactory", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application(new Container());
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({
 			genesisBlock: {
 				block: {
 					height: 0,
@@ -26,22 +28,22 @@ describe<{
 			network: devnet,
 		});
 
-		context.sandbox.app
+		context.app
 			.bind(Identifiers.Cryptography.Identity.KeyPair.Factory)
 			.to(KeyPairFactory)
 			.inSingletonScope();
 
-		context.factory = context.sandbox.app.resolve(WIFFactory);
+		context.factory = context.app.resolve(WIFFactory);
 	});
 
 	it("#fromMnemonic - should be OK", async ({ factory }) => {
 		assert.equal(await factory.fromMnemonic(mnemonic), wif);
 	});
 
-	it("#fromKeys -  should be OK", async ({ factory, sandbox }) => {
+	it("#fromKeys -  should be OK", async ({ factory, app }) => {
 		assert.equal(
 			await factory.fromKeys(
-				await sandbox.app
+				await app
 					.get<KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory)
 					.fromMnemonic(mnemonic),
 			),
