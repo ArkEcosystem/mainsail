@@ -65,7 +65,6 @@ describe<{
 		assert.equal(app.get("key"), "value");
 	});
 
-
 	it("should get tagged value from the IoC container", async (context) => {
 		context.app.bind("animal").toConstantValue("bear").whenTagged("order", "carnivora");
 		context.app.bind("animal").toConstantValue("dolphin").whenTagged("order", "cetacea");

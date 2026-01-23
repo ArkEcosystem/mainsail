@@ -1,8 +1,6 @@
-
 import type { Contracts } from "@mainsail/contracts";
 
 import { Container } from "./ioc.js";
-
 
 export class Application {
 	#container: Contracts.Kernel.Container.Container;

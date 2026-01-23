@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/constants";
-import { Application as BaseApplication} from "@mainsail/container";
+import { Application as BaseApplication } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { resolve } from "path";
 

@@ -10,7 +10,6 @@ import { ServiceProvider, ServiceProviderRepository } from "./providers";
 import { ConfigRepository } from "./services/config";
 import { MemoryEventDispatcher } from "./services/events";
 
-
 class StubServiceProvider extends ServiceProvider {
 	public async register(): Promise<void> {}
 
