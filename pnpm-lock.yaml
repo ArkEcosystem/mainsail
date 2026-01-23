@@ -876,6 +876,9 @@ importers:
         specifier: 0.2.2
         version: 0.2.2
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner

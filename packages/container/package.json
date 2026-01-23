@@ -26,6 +26,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/test-runner": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
 		"uvu": "0.5.6"
 	},
 	"engines": {
