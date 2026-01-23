@@ -150,9 +150,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -226,9 +226,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@types/ip':
         specifier: 1.1.3
         version: 1.1.3
@@ -370,9 +370,9 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -422,9 +422,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@types/ip':
         specifier: 1.1.3
         version: 1.1.3
@@ -539,9 +539,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -649,9 +649,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
-        specifier: workspace:*
-        version: link:../test-framework
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -789,9 +786,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -829,9 +826,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       esmock:
         specifier: 2.7.1
         version: 2.7.1
@@ -879,9 +876,9 @@ importers:
         specifier: 0.2.2
         version: 0.2.2
     devDependencies:
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1127,9 +1124,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -1188,9 +1185,9 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1237,9 +1234,9 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1307,9 +1304,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1386,9 +1383,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1429,9 +1426,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@types/lodash.clone':
         specifier: 4.5.9
         version: 4.5.9
@@ -1466,9 +1463,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1491,9 +1488,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1540,9 +1537,9 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1586,9 +1583,9 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1638,9 +1635,9 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1684,9 +1681,9 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1760,9 +1757,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -1833,9 +1830,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -1870,9 +1867,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1901,9 +1898,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1932,9 +1929,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1996,9 +1993,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -2033,9 +2030,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -2067,9 +2064,9 @@ importers:
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2171,9 +2168,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -2261,9 +2258,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2325,9 +2322,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -2447,9 +2444,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@types/capture-console':
         specifier: 1.0.5
         version: 1.0.5
@@ -2536,9 +2533,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@types/capture-console':
         specifier: 1.0.5
         version: 1.0.5
@@ -2744,9 +2741,9 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -2805,9 +2802,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2956,9 +2953,9 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -2980,6 +2977,9 @@ importers:
       '@mainsail/constants':
         specifier: workspace:*
         version: link:../constants
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -3019,12 +3019,15 @@ importers:
       '@mainsail/crypto-wif':
         specifier: workspace:*
         version: link:../crypto-wif
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -3050,49 +3053,6 @@ importers:
       '@types/memoizee':
         specifier: 0.4.12
         version: 0.4.12
-      uvu:
-        specifier: 0.5.6
-        version: 0.5.6
-
-  packages/test-framework:
-    dependencies:
-      '@mainsail/configuration-generator':
-        specifier: workspace:*
-        version: link:../configuration-generator
-      '@mainsail/constants':
-        specifier: workspace:*
-        version: link:../constants
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/test-runner':
-        specifier: workspace:*
-        version: link:../test-runner
-      fs-extra:
-        specifier: 11.3.1
-        version: 11.3.1
-      tmp:
-        specifier: 0.2.5
-        version: 0.2.5
-    devDependencies:
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
-      '@types/chance':
-        specifier: 1.1.7
-        version: 1.1.7
-      '@types/fs-extra':
-        specifier: 11.0.4
-        version: 11.0.4
-      '@types/tmp':
-        specifier: 0.2.6
-        version: 0.2.6
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -3142,9 +3102,9 @@ importers:
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -3229,9 +3189,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@types/better-sqlite3':
         specifier: 7.6.13
         version: 7.6.13
@@ -3291,9 +3251,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -3386,9 +3346,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -3465,9 +3425,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -3514,9 +3474,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -3535,6 +3495,9 @@ importers:
       '@mainsail/constants':
         specifier: workspace:*
         version: link:../../../packages/constants
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../../../packages/container
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../../../packages/contracts
@@ -3544,12 +3507,15 @@ importers:
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../../../packages/evm-contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../../../packages/kernel
       '@mainsail/test-factories':
         specifier: workspace:*
         version: link:../../../packages/test-factories
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../../../packages/test-framework
+        version: link:../../../packages/test-runner
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../../../packages/utils
@@ -3703,9 +3669,6 @@ importers:
       '@mainsail/state':
         specifier: workspace:*
         version: link:../../../packages/state
-      '@mainsail/test-framework':
-        specifier: workspace:*
-        version: link:../../../packages/test-framework
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../../../packages/test-runner
@@ -3853,9 +3816,9 @@ importers:
       '@mainsail/state':
         specifier: workspace:*
         version: link:../../../packages/state
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../../../packages/test-framework
+        version: link:../../../packages/test-runner
       '@mainsail/test-transaction-builders':
         specifier: workspace:*
         version: link:../../../packages/test-transaction-builders
