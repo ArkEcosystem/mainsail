@@ -5,7 +5,7 @@
 // import { Actions } from "@mainsail/state";
 // import { BigNumber } from "@mainsail/utils";
 
-// import { describe, Sandbox } from "../../../test-framework";
+// import { describe } from "../../../test-runner";
 // import { BlockProcessor } from "./block-processor";
 // import {
 // 	AcceptBlockHandler,
@@ -19,7 +19,7 @@
 // } from "./handlers";
 
 // describe<{
-// 	sandbox: Sandbox;
+// 	app: Application;
 // 	blockProcessor: BlockProcessor;
 // 	baseBlock: any;
 // 	chainedBlock: any;
@@ -109,31 +109,31 @@
 
 // 		context.databaseInterceptor = {};
 
-// 		context.sandbox = new Sandbox();
+// 		context.app = new Application(new Container());
 
-// 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logService);
-// 		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
-// 		context.sandbox.app
+// 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logService);
+// 		context.app.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
+// 		context.app
 // 			.bind(Identifiers.Database.TransactionStorage)
 // 			.toConstantValue(context.transactionRepository);
-// 		context.sandbox.app.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
-// 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
-// 		context.sandbox.app.bind(Identifiers.DatabaseInteraction).toConstantValue(context.databaseInteractions);
-// 		context.sandbox.app.bind(Identifiers.DatabaseInterceptor).toConstantValue(context.databaseInterceptor);
-// 		context.sandbox.app.bind(Identifiers.RoundState).toConstantValue(context.roundState);
-// 		context.sandbox.app
+// 		context.app.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
+// 		context.app.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
+// 		context.app.bind(Identifiers.DatabaseInteraction).toConstantValue(context.databaseInteractions);
+// 		context.app.bind(Identifiers.DatabaseInterceptor).toConstantValue(context.databaseInterceptor);
+// 		context.app.bind(Identifiers.RoundState).toConstantValue(context.roundState);
+// 		context.app
 // 			.bind(Identifiers.Transaction.Handler.Registry)
 // 			.toConstantValue(context.transactionHandlerRegistry);
-// 		context.sandbox.app.bind(Identifiers.store).toConstantValue(context.store);
-// 		context.sandbox.app.bind(Identifiers.TransactionPool.Service).toConstantValue({});
-// 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-// 		context.sandbox.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue({});
-// 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Verifier).toConstantValue(context.blockVerifier);
+// 		context.app.bind(Identifiers.store).toConstantValue(context.store);
+// 		context.app.bind(Identifiers.TransactionPool.Service).toConstantValue({});
+// 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+// 		context.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue({});
+// 		context.app.bind(Identifiers.Cryptography.Block.Verifier).toConstantValue(context.blockVerifier);
 
-// 		context.sandbox.app.bind(Identifiers.Services.Trigger.Service).to(Services.Triggers.Triggers).inSingletonScope();
-// 		context.sandbox.app
+// 		context.app.bind(Identifiers.Services.Trigger.Service).to(Services.Triggers.Triggers).inSingletonScope();
+// 		context.app
 // 			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-// 			.bind("getActiveDelegates", new Actions.GetRoundValidatorsAction(context.sandbox.app));
+// 			.bind("getActiveDelegates", new Actions.GetRoundValidatorsAction(context.app));
 
 // 		context.baseBlock = {
 // 			data: {
@@ -189,7 +189,7 @@
 // 			verifySignature: () => {},
 // 		};
 
-// 		context.blockProcessor = context.sandbox.app.resolve<BlockProcessor>(BlockProcessor);
+// 		context.blockProcessor = context.app.resolve<BlockProcessor>(BlockProcessor);
 // 	});
 
 // 	it.only("should execute VerificationFailedHandler when !block.verification.verified", async (context) => {

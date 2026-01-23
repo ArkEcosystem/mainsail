@@ -1,4 +1,4 @@
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { ProcessBlockAction } from "./process-block";
 
 describe("ProcessBlockAction", ({ assert, it, stub, match }) => {
@@ -6,7 +6,7 @@ describe("ProcessBlockAction", ({ assert, it, stub, match }) => {
 		const roundState = {};
 
 		const blockProcessor = {
-			process: () => {},
+			process: () => { },
 		};
 
 		const spyOnProcess = stub(blockProcessor, "process");
