@@ -18,7 +18,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/constants": "workspace:*",
-		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/test-transaction-builders": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",

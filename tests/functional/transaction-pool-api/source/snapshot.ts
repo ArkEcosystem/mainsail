@@ -3,10 +3,10 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 } from "@mainsail/api-database";
+import { Events, Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
-import { Identifiers, Events } from "@mainsail/constants";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
-import { assert, Sandbox } from "@mainsail/test-framework";
+import { assert } from "@mainsail/test-runner";
 import { BigNumber } from "@mainsail/utils";
 import { parseAbi, parseEventLogs } from "viem";
 
@@ -17,16 +17,16 @@ interface WalletState {
 	nonce: BigNumber;
 }
 
-export const takeSnapshot = async (sandbox: Sandbox): Promise<Snapshot> => {
-	const snapshot = new Snapshot(sandbox);
-	const instance = sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+export const takeSnapshot = async (app: Contracts.Kernel.Application): Promise<Snapshot> => {
+	const snapshot = new Snapshot(app);
+	const instance = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 
 	const { accounts } = await instance.getAccounts(0n, 1000n);
 	for (const account of accounts) {
 		await snapshot.add(account);
 	}
 
-	const legacyColdWallets = await getLegacyColdWallets(sandbox);
+	const legacyColdWallets = await getLegacyColdWallets(app);
 	for (const { mainsailAddress, legacyColdWallet } of legacyColdWallets) {
 		await snapshot.addLegacyColdWallet(
 			mainsailAddress,
@@ -43,13 +43,13 @@ export class Snapshot {
 	private receipts: Record<string, { sender: string; receipt: Contracts.Evm.TransactionReceipt }> = {};
 	private manualDeltas: Record<string, WalletState> = {};
 
-	public constructor(public sandbox: Sandbox) {
+	public constructor(public app: Contracts.Kernel.Application) {
 		this.listenForEvmEvents();
 	}
 
 	private listenForEvmEvents() {
 		const event = Events.EvmEvent.TransactionReceipt;
-		const eventDispatcher = this.sandbox.app.get<
+		const eventDispatcher = this.app.get<
 			Contracts.Kernel.EventDispatcher<{
 				receipt: Contracts.Evm.TransactionReceipt;
 				sender: string;
@@ -88,7 +88,7 @@ export class Snapshot {
 	}
 
 	public async addManualDelta(addressOrPublicKey: string, delta: Partial<WalletState>): Promise<void> {
-		const account = await getAccountByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
+		const account = await getAccountByAddressOrPublicKey({ app: this.app }, addressOrPublicKey);
 		if (!this.manualDeltas[account.address]) {
 			this.manualDeltas[account.address] = { balance: BigNumber.ZERO, nonce: BigNumber.ZERO };
 		}
@@ -105,7 +105,7 @@ export class Snapshot {
 		// All account changes from block 0 onwards
 		const { accountDeltas, lastHeight } = await this.collectAccountDeltas();
 
-		const walletRepositoryFactory = this.sandbox.app.get<ApiDatabaseContracts.WalletRepositoryFactory>(
+		const walletRepositoryFactory = this.app.get<ApiDatabaseContracts.WalletRepositoryFactory>(
 			ApiDatabaseIdentifiers.WalletRepositoryFactory,
 		);
 
@@ -208,7 +208,7 @@ export class Snapshot {
 					// to race condition here. Hence it needs special treatment:
 					let nonceMismatch = true;
 					if (account.address === "0x0000000000000000000000000000000000000001") {
-						const dataSource = this.sandbox.app.get<ApiDatabaseContracts.RepositoryDataSource>(
+						const dataSource = this.app.get<ApiDatabaseContracts.RepositoryDataSource>(
 							ApiDatabaseIdentifiers.DataSource,
 						);
 
@@ -219,18 +219,18 @@ export class Snapshot {
 								.getOneOrFail();
 
 							const blockRepositoryFactory =
-								this.sandbox.app.get<ApiDatabaseContracts.BlockRepositoryFactory>(
+								this.app.get<ApiDatabaseContracts.BlockRepositoryFactory>(
 									ApiDatabaseIdentifiers.BlockRepositoryFactory,
 								);
 							const contractRepositoryFactory =
-								this.sandbox.app.get<ApiDatabaseContracts.ContractRepositoryFactory>(
+								this.app.get<ApiDatabaseContracts.ContractRepositoryFactory>(
 									ApiDatabaseIdentifiers.ContractRepositoryFactory,
 								);
 
 							const numberOfBlocks = await blockRepositoryFactory(entityManager)
 								.createQueryBuilder()
 								.getCount();
-							const roundCalculator = this.sandbox.app.get<Contracts.BlockchainUtils.RoundCalculator>(
+							const roundCalculator = this.app.get<Contracts.BlockchainUtils.RoundCalculator>(
 								Identifiers.BlockchainUtils.RoundCalculator,
 							);
 							const { round } = roundCalculator.calculateRound(numberOfBlocks - 1);
@@ -272,7 +272,7 @@ export class Snapshot {
 
 		let allValid = true;
 		let totalSupply = BigNumber.ZERO;
-		const evm = this.sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+		const evm = this.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 		const { accounts } = await evm.getAccounts(0n, 1000n);
 		for (let account of accounts) {
 			// Look up historical values for non contracts
@@ -293,7 +293,7 @@ export class Snapshot {
 		}
 
 		// Verify total supply
-		const stateRepositoryFactory = this.sandbox.app.get<ApiDatabaseContracts.StateRepositoryFactory>(
+		const stateRepositoryFactory = this.app.get<ApiDatabaseContracts.StateRepositoryFactory>(
 			ApiDatabaseIdentifiers.StateRepositoryFactory,
 		);
 
@@ -311,8 +311,8 @@ export class Snapshot {
 	}
 
 	private async collectAccountDeltas(): Promise<{ accountDeltas: Record<string, WalletState>; lastHeight: number }> {
-		const database = this.sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
-		const configuration = this.sandbox.app.get<Contracts.Crypto.Configuration>(
+		const database = this.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
+		const configuration = this.app.get<Contracts.Crypto.Configuration>(
 			Identifiers.Cryptography.Configuration,
 		);
 
@@ -323,7 +323,7 @@ export class Snapshot {
 
 		const blocks = await database.findBlocks(1, (await database.getLastCommit()).block.header.number);
 		const updateBalanceDelta = async (addressOrPublicKey: string, delta: BigNumber): Promise<void> => {
-			const account = await getAccountByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
+			const account = await getAccountByAddressOrPublicKey({ app: this.app }, addressOrPublicKey);
 
 			if (!accountDeltas[account.address]) {
 				accountDeltas[account.address] = { balance: BigNumber.ZERO, nonce: BigNumber.ZERO };
@@ -341,7 +341,7 @@ export class Snapshot {
 		};
 
 		const incrementNonce = async (height: number, addressOrPublicKey: string): Promise<void> => {
-			const account = await getAccountByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
+			const account = await getAccountByAddressOrPublicKey({ app: this.app }, addressOrPublicKey);
 
 			if (!accountDeltas[account.address]) {
 				accountDeltas[account.address] = {
@@ -359,7 +359,7 @@ export class Snapshot {
 			for (const transaction of block.transactions) {
 				const receipt = this.receipts[transaction.hash!];
 				if (receipt) {
-					const consumedGas = this.sandbox.app
+					const consumedGas = this.app
 						.get<Contracts.BlockchainUtils.FeeCalculator>(Identifiers.BlockchainUtils.FeeCalculator)
 						.calculateConsumed(transaction.data.gasPrice, Number(receipt.receipt.gasUsed));
 					console.log(
@@ -393,7 +393,7 @@ export class Snapshot {
 						await positiveBalanceChange(transaction.data.to, transaction.data.value);
 					}
 
-					const consensusContract = this.sandbox.app.get<string>(
+					const consensusContract = this.app.get<string>(
 						EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
 					);
 
@@ -420,7 +420,7 @@ export class Snapshot {
 					}
 
 					// multipayment forwards value to recipients
-					const multiPaymentContract = this.sandbox.app.get<string>(
+					const multiPaymentContract = this.app.get<string>(
 						EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
 					);
 					if (transaction.data.to === multiPaymentContract) {
@@ -450,7 +450,7 @@ export class Snapshot {
 			// each block increases nonce of internal address due to vote&reward updates
 			await incrementNonce(
 				block.header.number,
-				this.sandbox.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer),
+				this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer),
 			);
 
 			// Validator balance

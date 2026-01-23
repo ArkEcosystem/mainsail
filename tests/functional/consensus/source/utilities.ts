@@ -1,9 +1,8 @@
+import { Events, Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
-import { Identifiers, Events } from "@mainsail/constants";
-import { Sandbox } from "@mainsail/test-framework";
 import { sleep } from "@mainsail/utils";
 
-import { Validator, ValidatorsJson } from "./contracts.js";
+import type { Validator, ValidatorsJson } from "./contracts.js";
 
 export const prepareNodeValidators = (validators: ValidatorsJson, nodeIndex: number, totalNodes: number) => {
 	const secrets = validators.secrets;
@@ -15,19 +14,19 @@ export const prepareNodeValidators = (validators: ValidatorsJson, nodeIndex: num
 	};
 };
 
-export const getValidators = async (sandbox: Sandbox, validators: ValidatorsJson): Promise<Validator[]> => {
+export const getValidators = async (app: Contracts.Kernel.Application, validators: ValidatorsJson): Promise<Validator[]> => {
 	const result: Validator[] = [];
 
-	const addressFactory = sandbox.app.get<Contracts.Crypto.AddressFactory>(
+	const addressFactory = app.get<Contracts.Crypto.AddressFactory>(
 		Identifiers.Cryptography.Identity.Address.Factory,
 	);
-	const keyPairFactory = sandbox.app.getTagged<Contracts.Crypto.KeyPairFactory>(
+	const keyPairFactory = app.getTagged<Contracts.Crypto.KeyPairFactory>(
 		Identifiers.Cryptography.Identity.KeyPair.Factory,
 		"type",
 		"wallet",
 	);
 
-	const consensusKeyPairFactory = sandbox.app.getTagged<Contracts.Crypto.KeyPairFactory>(
+	const consensusKeyPairFactory = app.getTagged<Contracts.Crypto.KeyPairFactory>(
 		Identifiers.Cryptography.Identity.KeyPair.Factory,
 		"type",
 		"consensus",
@@ -51,13 +50,13 @@ export const getValidators = async (sandbox: Sandbox, validators: ValidatorsJson
 };
 
 export const makeProposal = async (
-	node: Sandbox,
+	app: Contracts.Kernel.Application,
 	validator: Validator,
 	blockNumber: number,
 	round: number,
 	timestamp: number,
 ): Promise<Contracts.Crypto.Proposal> => {
-	const proposer = node.app
+	const proposer = app
 		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
 		.getValidator(validator.consensusPublicKey);
 
@@ -75,13 +74,13 @@ export const makeProposal = async (
 };
 
 export const makePrevote = async (
-	node: Sandbox,
+	app: Contracts.Kernel.Application,
 	validator: Validator,
 	blockNumber: number,
 	round: number,
 	blockHash?: string,
 ): Promise<Contracts.Crypto.Message> => {
-	const proposer = node.app
+	const proposer = app
 		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
 		.getValidator(validator.consensusPublicKey);
 
@@ -90,7 +89,7 @@ export const makePrevote = async (
 	}
 
 	return await proposer.prevote(
-		node.app
+		app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
 			.getValidatorIndexByWalletAddress(validator.address),
 		blockNumber,
@@ -100,13 +99,13 @@ export const makePrevote = async (
 };
 
 export const makePrecommit = async (
-	node: Sandbox,
+	app: Contracts.Kernel.Application,
 	validator: Validator,
 	blockNumber: number,
 	round: number,
 	blockHash?: string,
 ): Promise<Contracts.Crypto.Message> => {
-	const proposer = node.app
+	const proposer = app
 		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
 		.getValidator(validator.consensusPublicKey);
 
@@ -115,7 +114,7 @@ export const makePrecommit = async (
 	}
 
 	return await proposer.precommit(
-		node.app
+		app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
 			.getValidatorIndexByWalletAddress(validator.address),
 		blockNumber,
@@ -124,11 +123,11 @@ export const makePrecommit = async (
 	);
 };
 
-export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], blockNumber?: number): Promise<void> => {
-	const function_ = async (sandbox: Sandbox): Promise<void> =>
+export const snoozeForBlock = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], blockNumber?: number): Promise<void> => {
+	const function_ = async (app: Contracts.Kernel.Application): Promise<void> =>
 		new Promise((resolve) => {
 			const event = Events.BlockEvent.Applied;
-			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher<Contracts.Crypto.BlockData>>(
+			const eventDispatcher = app.get<Contracts.Kernel.EventDispatcher<Contracts.Crypto.BlockData>>(
 				Identifiers.Services.EventDispatcher.Service,
 			);
 
@@ -144,18 +143,18 @@ export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], blockNumber?:
 			eventDispatcher.listen(event, listener);
 		});
 
-	if (Array.isArray(sandbox)) {
-		await Promise.all(sandbox.map((s) => function_(s)));
+	if (Array.isArray(app)) {
+		await Promise.all(app.map((s) => function_(s)));
 	} else {
-		await function_(sandbox);
+		await function_(app);
 	}
 };
 
-export const snoozeForRound = async (sandbox: Sandbox | Sandbox[], round?: number): Promise<void> => {
-	const function_ = async (sandbox: Sandbox): Promise<void> =>
+export const snoozeForRound = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], round?: number): Promise<void> => {
+	const function_ = async (app: Contracts.Kernel.Application): Promise<void> =>
 		new Promise((resolve) => {
 			const event = Events.ConsensusEvent.RoundStarted;
-			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher<Contracts.Consensus.State>>(
+			const eventDispatcher = app.get<Contracts.Kernel.EventDispatcher<Contracts.Consensus.State>>(
 				Identifiers.Services.EventDispatcher.Service,
 			);
 
@@ -171,10 +170,10 @@ export const snoozeForRound = async (sandbox: Sandbox | Sandbox[], round?: numbe
 			eventDispatcher.listen(event, listener);
 		});
 
-	if (Array.isArray(sandbox)) {
-		await Promise.all(sandbox.map((s) => function_(s)));
+	if (Array.isArray(app)) {
+		await Promise.all(app.map((s) => function_(s)));
 	} else {
-		await function_(sandbox);
+		await function_(app);
 	}
 };
 
@@ -182,16 +181,16 @@ export interface InvalidBlock {
 	block: Contracts.Crypto.BlockData;
 	error: Error;
 }
-export async function snoozeForInvalidBlock(sandbox: Sandbox, blockNumber?: number): Promise<InvalidBlock>;
-export async function snoozeForInvalidBlock(sandbox: Sandbox[], blockNumber?: number): Promise<InvalidBlock[]>;
+export async function snoozeForInvalidBlock(app: Contracts.Kernel.Application, blockNumber?: number): Promise<InvalidBlock>;
+export async function snoozeForInvalidBlock(app: Contracts.Kernel.Application[], blockNumber?: number): Promise<InvalidBlock[]>;
 export async function snoozeForInvalidBlock(
-	sandbox: Sandbox | Sandbox[],
+	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
 	blockNumber?: number,
 ): Promise<InvalidBlock | InvalidBlock[]> {
-	const function_ = async (sandbox: Sandbox): Promise<InvalidBlock> =>
+	const function_ = async (app: Contracts.Kernel.Application): Promise<InvalidBlock> =>
 		new Promise((resolve) => {
 			const event = Events.BlockEvent.Invalid;
-			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher<InvalidBlock>>(
+			const eventDispatcher = app.get<Contracts.Kernel.EventDispatcher<InvalidBlock>>(
 				Identifiers.Services.EventDispatcher.Service,
 			);
 
@@ -207,15 +206,15 @@ export async function snoozeForInvalidBlock(
 			eventDispatcher.listen(event, listener);
 		});
 
-	if (Array.isArray(sandbox)) {
-		return Promise.all(sandbox.map((s) => function_(s)));
+	if (Array.isArray(app)) {
+		return Promise.all(app.map((s) => function_(s)));
 	} else {
-		return function_(sandbox);
+		return function_(app);
 	}
 }
 
-export const getLastCommit = async (sandbox: Sandbox): Promise<Contracts.Crypto.Commit> => {
-	const databaseService = sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
+export const getLastCommit = async (app: Contracts.Kernel.Application): Promise<Contracts.Crypto.Commit> => {
+	const databaseService = app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
 
 	const lasCommit = await databaseService.getLastCommit();
 	const [serialized] = await databaseService.findCommitBuffers(
@@ -223,7 +222,7 @@ export const getLastCommit = async (sandbox: Sandbox): Promise<Contracts.Crypto.
 		lasCommit.block.header.number,
 	);
 
-	return sandbox.app
+	return app
 		.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory)
 		.fromBytes(serialized);
 };

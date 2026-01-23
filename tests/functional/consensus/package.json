@@ -18,7 +18,6 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/blockchain-utils": "workspace:*",
 		"@mainsail/evm-consensus": "workspace:*",
-		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/test-transaction-builders": "workspace:*",
 		"@mainsail/validation": "workspace:*",

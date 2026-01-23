@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
@@ -6,9 +6,10 @@ import { assertBlockHash, assertBlockNumber } from "./asserts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import { getLastCommit, prepareNodeValidators, snoozeForBlock } from "./utilities.js";
+import type { Contracts } from "@mainsail/contracts";
 
 describe<{
-	nodes: Sandbox[];
+	nodes: Contracts.Kernel.Application[];
 }>("Base", ({ beforeEach, afterEach, it }) => {
 	beforeEach(async (context) => {
 		const p2pRegistry = new P2PRegistry();
