@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { Options as OraOptions, Ora } from "ora";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { Spinner } from "../components";
 import { ProcessIdentifier } from "../contracts";
 import { ProcessManager } from "../services";
@@ -14,7 +14,7 @@ describe<{
 	const processName = "ark-core";
 
 	const processManager: Partial<ProcessManager> = {
-		restart: (id: ProcessIdentifier): any => {},
+		restart: (id: ProcessIdentifier): any => { },
 	};
 
 	const ora: Partial<Ora> = {

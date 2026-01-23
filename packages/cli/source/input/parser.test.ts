@@ -1,4 +1,4 @@
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { InputParser } from "./parser";
 
 describe("InputParser", ({ it, assert }) => {

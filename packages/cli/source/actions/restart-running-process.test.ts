@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 
-import { describe } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { ProcessIdentifier } from "../contracts";
 import { ProcessManager } from "../services";
 import { RestartProcess } from "./restart-process";
@@ -17,7 +17,7 @@ describe<{
 	};
 
 	const restartProcess: Partial<RestartProcess> = {
-		execute: (processName: string) => {},
+		execute: (processName: string) => { },
 	};
 
 	beforeEach((context) => {
