@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder, TransactionFactory, Verifier } from "@mainsail/crypto-transaction";
-import type { Sandbox } from "@mainsail/test-framework";
 import { BigNumber, sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
@@ -9,7 +8,7 @@ import type { Context, TransactionOptions } from "./types.js";
 import { AcceptAnyTransactionVerifier } from "./verifier.js";
 
 const applyCustomSignature = async (
-	sandbox: Sandbox,
+	app: Contracts.Kernel.Application,
 	transaction: Contracts.Crypto.Transaction,
 	signature?: string,
 ) => {
@@ -17,7 +16,6 @@ const applyCustomSignature = async (
 		return;
 	}
 
-	const { app } = sandbox;
 	const signatureSize = app.getTagged<number>(Identifiers.Cryptography.Signature.Size, "type", "wallet");
 
 	let serialized = transaction.serialized.subarray(0, transaction.serialized.byteLength - signatureSize);
@@ -30,7 +28,7 @@ const applyCustomSignature = async (
 };
 
 const applyCustomSignatures = async (
-	sandbox: Sandbox,
+	app: Contracts.Kernel.Application,
 	transaction: Contracts.Crypto.Transaction,
 	{ omitParticipantSignatures, participantSignatures }: TransactionOptions,
 ) => {
@@ -55,9 +53,7 @@ const applyCustomSignatures = async (
 	// transaction.serialized = Buffer.from(transactionHex, "hex");
 };
 
-export const getNonceByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<BigNumber> => {
-	const { app } = sandbox;
-
+export const getNonceByPublicKey = async (app: Contracts.Kernel.Application, publicKey: string): Promise<BigNumber> => {
 	const address = await app
 		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 		.fromPublicKey(publicKey);
@@ -69,21 +65,21 @@ export const getNonceByPublicKey = async (sandbox: Sandbox, publicKey: string): 
 };
 
 export const buildSignedTransaction = async <TBuilder extends TransactionBuilder>(
-	sandbox: Sandbox,
+	app: Contracts.Kernel.Application,
 	builder: TransactionBuilder,
 	keyPair: Contracts.Crypto.KeyPair,
 	options: TransactionOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
 	// !! Overwrite verifier to accept invalid schema data
-	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
-	(builder as unknown as { factory: TransactionFactory }).factory = sandbox.app.resolve(TransactionFactory);
+	app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
+	(builder as unknown as { factory: TransactionFactory }).factory = app.resolve(TransactionFactory);
 	(builder as unknown as { verifier: Contracts.Crypto.TransactionVerifier }).verifier =
-		sandbox.app.resolve(AcceptAnyTransactionVerifier);
+		app.resolve(AcceptAnyTransactionVerifier);
 
 	if (options.multiSigKeys) {
 		throw new Error("unsupported");
 		// const participants = options.multiSigKeys;
-		// const multiSigPublicKey = await sandbox.app
+		// const multiSigPublicKey = await app
 		// 	.getTagged<Contracts.Crypto.PublicKeyFactory>(
 		// 		Identifiers.Cryptography.Identity.PublicKey.Factory,
 		// 		"type",
@@ -94,7 +90,7 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 		// 		publicKeys: participants.map((p) => p.publicKey),
 		// 	});
 
-		// const nonce = await getNonceByPublicKey(sandbox, multiSigPublicKey);
+		// const nonce = await getNonceByPublicKey(app, multiSigPublicKey);
 
 		// const { multiSigKeys, nonceOffset = 0 } = options;
 		// builder = builder.nonce(nonce.plus(nonceOffset).toString()).senderPublicKey(multiSigPublicKey);
@@ -103,7 +99,7 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 		// 	builder = await builder.multiSignWithKeyPair(participant, index);
 		// }
 	} else {
-		const nonce = await getNonceByPublicKey(sandbox, keyPair.publicKey);
+		const nonce = await getNonceByPublicKey(app, keyPair.publicKey);
 		const { nonceOffset = 0 } = options;
 		builder = await builder.nonce(nonce.plus(nonceOffset).toString()).signWithKeyPair(keyPair);
 	}
@@ -111,11 +107,11 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 	const transaction = await builder.build();
 
 	if (options.signature) {
-		await applyCustomSignature(sandbox, transaction, options.signature);
+		await applyCustomSignature(app, transaction, options.signature);
 	}
 
 	if (options.omitParticipantSignatures) {
-		await applyCustomSignatures(sandbox, transaction, options);
+		await applyCustomSignatures(app, transaction, options);
 	}
 
 	if (options.callback) {
@@ -124,13 +120,13 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 		// manipulates the buffer, so signature has to be re-calculated
 		//		await options.callback(transaction);
 
-		// const signatureFactory = sandbox.app.getTagged<Contracts.Crypto.Signature>(
+		// const signatureFactory = app.getTagged<Contracts.Crypto.Signature>(
 		// 	Identifiers.Cryptography.Signature.Instance,
 		// 	"type",
 		// 	"wallet",
 		// );
 
-		// const hashFactory = sandbox.app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
+		// const hashFactory = app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
 		// const transactionHex = transaction.serialized.toString("hex");
 
 		// const signatureIndex = transactionHex.indexOf(transaction.data.signature!);
@@ -148,11 +144,11 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 	}
 
 	// !! Reset
-	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
-	(builder as unknown as { factory: TransactionFactory }).factory = sandbox.app.get(
+	app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
+	(builder as unknown as { factory: TransactionFactory }).factory = app.get(
 		Identifiers.Cryptography.Transaction.Factory,
 	);
-	(builder as unknown as { verifier: Contracts.Crypto.TransactionVerifier }).verifier = sandbox.app.get(
+	(builder as unknown as { verifier: Contracts.Crypto.TransactionVerifier }).verifier = app.get(
 		Identifiers.Cryptography.Transaction.Verifier,
 	);
 
@@ -160,16 +156,15 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 };
 
 export const addTransactionsToPool = async (
-	{ sandbox }: { sandbox: Sandbox },
+	{ app }: { app: Contracts.Kernel.Application, },
 	transactions: Contracts.Crypto.Transaction[],
 ): Promise<Contracts.TransactionPool.ProcessorResult> => {
-	const { app } = sandbox;
 	const processor = app.get<Contracts.TransactionPool.Processor>(Identifiers.TransactionPool.Processor);
 	return processor.process(transactions.map((t) => t.serialized));
 };
 
-export const waitBlock = async (sandbox: Sandbox, count: number = 1): Promise<void> => {
-	const state = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
+export const waitBlock = async (app: Contracts.Kernel.Application, count: number = 1): Promise<void> => {
+	const state = app.get<Contracts.State.Store>(Identifiers.State.Store);
 
 	let currentBlockNumber = state.getBlockNumber();
 	const targetBlockNumber = currentBlockNumber + count;
@@ -188,8 +183,7 @@ export const getRandomFundedWallet = async (
 		return context.fundedWalletProvider(context, amount);
 	}
 
-	const { sandbox, wallets } = context;
-	const { app } = sandbox;
+	const { app, wallets } = context;
 
 	//const seed = randomBytes(32).toString("hex");
 
@@ -202,7 +196,7 @@ export const getRandomFundedWallet = async (
 		.fromPublicKey(randomKeyPair.publicKey);
 	amount = amount ?? BigNumber.make("1000000000000000000");
 
-	const nonce = await getNonceByPublicKey(sandbox, wallets[0].publicKey);
+	const nonce = await getNonceByPublicKey(app, wallets[0].publicKey);
 
 	const fundTx = await (
 		await app
@@ -215,15 +209,13 @@ export const getRandomFundedWallet = async (
 	).build();
 
 	await addTransactionsToPool(context, [fundTx]);
-	await waitBlock(sandbox);
-	await waitBlock(sandbox); // Await 2 blocks to ensure the transaction is confirmed
+	await waitBlock(app);
+	await waitBlock(app); // Await 2 blocks to ensure the transaction is confirmed
 
 	return randomKeyPair;
 };
 
-export const getRandomConsensusKeyPair = async ({ sandbox }: Context): Promise<Contracts.Crypto.KeyPair> => {
-	const { app } = sandbox;
-
+export const getRandomConsensusKeyPair = async ({ app }: Context): Promise<Contracts.Crypto.KeyPair> => {
 	const seed = Array.from({ length: 12 }).fill(Date.now().toString()).join(" ");
 
 	return app
@@ -235,9 +227,7 @@ export const getRandomConsensusKeyPair = async ({ sandbox }: Context): Promise<C
 		.fromMnemonic(seed);
 };
 
-export const getRandomSignature = async ({ sandbox }: { sandbox: Sandbox }): Promise<string> => {
-	const { app } = sandbox;
-
+export const getRandomSignature = async ({ app }: { app: Contracts.Kernel.Application }): Promise<string> => {
 	const signatureSize = app.getTagged<number>(Identifiers.Cryptography.Signature.Size, "type", "wallet");
 
 	return randomBytes(signatureSize).toString("hex");
@@ -245,14 +235,13 @@ export const getRandomSignature = async ({ sandbox }: { sandbox: Sandbox }): Pro
 
 export const getRandomUsername = (): string => `validator_${Date.now().toString()}`.slice(0, 20);
 export const getRandomColdWallet = async ({
-	sandbox,
+	app,
 }: {
-	sandbox: Sandbox;
+	app: Contracts.Kernel.Application;
 }): Promise<{
 	keyPair: Contracts.Crypto.KeyPair;
 	address: string;
 }> => {
-	const { app } = sandbox;
 	const seed = Math.random().toString();
 
 	const randomKeyPair = await app
@@ -267,27 +256,6 @@ export const getRandomColdWallet = async ({
 	};
 };
 
-export const getAddressByPublicKey = async ({ sandbox }: { sandbox: Sandbox }, publicKey: string): Promise<string> => {
-	const { app } = sandbox;
-	return app
-		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-		.fromPublicKey(publicKey);
-};
-
-// export const getMultiSignatureWallet = async (
-// 	{ sandbox }: { sandbox: Sandbox },
-// 	asset: Contracts.Crypto.MultiSignatureAsset,
-// ): Promise<Contracts.State.Wallet> => {
-// 	const { app } = sandbox;
-
-// 	const multiSigPublicKey = await app
-// 		.getTagged<Contracts.Crypto.PublicKeyFactory>(
-// 			Identifiers.Cryptography.Identity.PublicKey.Factory,
-// 			"type",
-// 			"wallet",
-// 		)
-// 		.fromMultiSignatureAsset(asset);
-
-// 	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
-// 	return walletRepository.findByPublicKey(multiSigPublicKey);
-// };
+export const getAddressByPublicKey = async ({ app }: { app: Contracts.Kernel.Application, }, publicKey: string): Promise<string> => app
+	.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
+	.fromPublicKey(publicKey);
