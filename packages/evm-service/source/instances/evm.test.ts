@@ -1,5 +1,7 @@
 import { randomBytes } from "node:crypto";
 import type { Contracts } from "@mainsail/contracts";
+import { Application } from "@mainsail/kernel";
+import { Container } from "@mainsail/container";
 import { Enums } from "@mainsail/constants";
 import { Evm } from "@mainsail/evm";
 import {
@@ -19,7 +21,7 @@ import {
 	zeroHash,
 } from "viem";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import * as MainsailERC20 from "../../test/fixtures/MainsailERC20.json";
 import * as MainsailGlobals from "../../test/fixtures/MainsailGlobals.json";
 import { wallets } from "../../test/fixtures/wallets";
@@ -28,7 +30,7 @@ import { EvmInstance } from "./evm";
 import { setGracefulCleanup } from "tmp";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	instance: Contracts.Evm.Instance;
 }>("Instance", ({ it, assert, afterAll, afterEach, beforeEach }) => {
 	afterAll(() => setGracefulCleanup());
@@ -40,7 +42,7 @@ describe<{
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.instance = context.sandbox.app.resolve<Contracts.Evm.Instance>(EvmInstance);
+		context.instance = context.app.resolve<Contracts.Evm.Instance>(EvmInstance);
 	});
 
 	const deployConfig = {
@@ -80,11 +82,11 @@ describe<{
 		assert.equal(receipt.contractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
 	});
 
-	it("should call log hook", async ({ sandbox, instance }) => {
+	it("should call log hook", async ({ app, instance }) => {
 		let hookCalled = 0;
 
 		const evm = new Evm({
-			path: sandbox.app.dataPath("loghook"),
+			path: app.dataPath("loghook"),
 			logger: ({ level, message }) => {
 				//console.log("CALLED HOOK", { level, message, hookCalled });
 				hookCalled++;
@@ -132,7 +134,7 @@ describe<{
 			getBlock: () => ({
 				header: { number: BigInt(0), round: BigInt(0) },
 			}),
-			setAccountUpdates: () => {},
+			setAccountUpdates: () => { },
 		} as any);
 
 		const encodedCall = encodeFunctionData({
@@ -208,7 +210,7 @@ describe<{
 			getBlock: () => ({
 				header: { number: BigInt(0), round: BigInt(0) },
 			}),
-			setAccountUpdates: () => {},
+			setAccountUpdates: () => { },
 		} as any);
 
 		assert.equal(receipt.status, 1);
@@ -250,7 +252,7 @@ describe<{
 			getBlock: () => ({
 				header: { number: BigInt(1), round: BigInt(0) },
 			}),
-			setAccountUpdates: () => {},
+			setAccountUpdates: () => { },
 		} as any);
 
 		assert.equal(receipt.status, 1);
@@ -273,7 +275,7 @@ describe<{
 				getBlock: () => ({
 					header: { number: commitKey.blockNumber, round: commitKey.round },
 				}),
-				setAccountUpdates: () => {},
+				setAccountUpdates: () => { },
 			} as any);
 
 		// No legacy balance present yet
@@ -385,7 +387,7 @@ describe<{
 				getBlock: () => ({
 					header: { number: commitKey.blockNumber, round: commitKey.round },
 				}),
-				setAccountUpdates: () => {},
+				setAccountUpdates: () => { },
 			} as any);
 
 		await instance.prepareNextCommit({ commitKey });
@@ -471,7 +473,7 @@ describe<{
 			getBlock: () => ({
 				header: { number: commitKey.blockNumber, round: commitKey.round },
 			}),
-			setAccountUpdates: () => {},
+			setAccountUpdates: () => { },
 		} as any);
 
 		//
@@ -532,7 +534,7 @@ describe<{
 				getBlock: () => ({
 					header: { number: commitKey1.blockNumber, round: commitKey1.round },
 				}),
-				setAccountUpdates: () => {},
+				setAccountUpdates: () => { },
 			} as any),
 		);
 
@@ -543,7 +545,7 @@ describe<{
 				getBlock: () => ({
 					header: { number: commitKey2.blockNumber, round: commitKey2.round },
 				}),
-				setAccountUpdates: () => {},
+				setAccountUpdates: () => { },
 			} as any);
 		}, "assertion failed: self.pending_commits.contains_key(&commit_key)");
 
@@ -564,7 +566,7 @@ describe<{
 					getBlock: () => ({
 						header: { number: 0, round: 0 },
 					}),
-					setAccountUpdates: () => {},
+					setAccountUpdates: () => { },
 				} as any),
 		);
 	});
@@ -607,7 +609,7 @@ describe<{
 			getBlock: () => ({
 				header: { number: commitKey.blockNumber, round: commitKey.round },
 			}),
-			setAccountUpdates: () => {},
+			setAccountUpdates: () => { },
 		} as any);
 
 		const randomTxHash = getRandomTxHash();
@@ -647,7 +649,7 @@ describe<{
 			getBlock: () => ({
 				header: { number: BigInt(0), round: BigInt(0) },
 			}),
-			setAccountUpdates: () => {},
+			setAccountUpdates: () => { },
 		} as any);
 
 		assert.equal(receipt.status, 1);
@@ -711,7 +713,7 @@ describe<{
 			getBlock: () => ({
 				header: { number: BigInt(1), round: BigInt(0) },
 			}),
-			setAccountUpdates: () => {},
+			setAccountUpdates: () => { },
 		} as any);
 
 		// Balance updated correctly
@@ -809,7 +811,7 @@ describe<{
 			getBlock: () => ({
 				header: { number: BigInt(0), round: BigInt(0) },
 			}),
-			setAccountUpdates: () => {},
+			setAccountUpdates: () => { },
 		} as any);
 
 		code = await instance.codeAt(receipt.contractAddress!);
@@ -859,7 +861,7 @@ describe<{
 			getBlock: () => ({
 				header: { number: BigInt(0), round: BigInt(0) },
 			}),
-			setAccountUpdates: () => {},
+			setAccountUpdates: () => { },
 		} as any);
 
 		await assert.rejects(
@@ -904,7 +906,7 @@ describe<{
 			getBlock: () => ({
 				header: { number: BigInt(0), round: BigInt(0) },
 			}),
-			setAccountUpdates: () => {},
+			setAccountUpdates: () => { },
 		} as any);
 
 		// look up slot containing user balance
@@ -1010,7 +1012,7 @@ describe<{
 			getBlock: () => ({
 				header: { number: BigInt(1), round: BigInt(0) },
 			}),
-			setAccountUpdates: () => {},
+			setAccountUpdates: () => { },
 		} as any);
 
 		const contractAddress = receipt.contractAddress;
@@ -1076,7 +1078,7 @@ describe<{
 			getBlock: () => ({
 				header: { number: BigInt(1), round: BigInt(0) },
 			}),
-			setAccountUpdates: () => {},
+			setAccountUpdates: () => { },
 		} as any);
 
 		//
