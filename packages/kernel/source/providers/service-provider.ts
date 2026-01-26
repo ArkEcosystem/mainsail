@@ -45,14 +45,6 @@ export class ServiceProvider {
 		return undefined;
 	}
 
-	public alias(): string | undefined {
-		if (this.#packageManifest) {
-			return this.#packageManifest.get("arkecosystem.core.alias");
-		}
-
-		return undefined;
-	}
-
 	public config(): Contracts.Kernel.PluginConfiguration {
 		return this.#packageConfiguration;
 	}
