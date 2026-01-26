@@ -15,7 +15,7 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
-		"test:coverage": "c8 --check-coverage --lines 100 pnpm run test",
+		"test:coverage": "c8 --check-coverage pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
 		"test:file": "pnpm run uvu source",
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"

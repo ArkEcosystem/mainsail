@@ -34,6 +34,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/test-runner": "workspace:*",
 		"@types/semver": "7.7.0",
 		"uvu": "0.5.6"
 	},
