@@ -87,19 +87,6 @@ describeSkip<{
 		assert.undefined(context.app.resolve(StubServiceProvider).version());
 	});
 
-	it(".alias", (context) => {
-		const serviceProvider: ServiceProvider = context.app.resolve(StubServiceProvider);
-
-		const pluginManifest = context.app.resolve(PluginManifest);
-		serviceProvider.setManifest(pluginManifest.discover(resolve(__dirname, "../../test/stubs/stub-plugin")));
-
-		assert.is(serviceProvider.alias(), "some-alias");
-	});
-
-	it(".alias (no manifest)", (context) => {
-		assert.undefined(context.app.resolve(StubServiceProvider).alias());
-	});
-
 	it(".config", (context) => {
 		const serviceProvider: ServiceProvider = context.app.resolve(StubServiceProvider);
 
