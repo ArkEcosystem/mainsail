@@ -65,34 +65,6 @@ describe<{
 		assert.true(context.serviceProviderRepository.has("stub"));
 	});
 
-	it(".alias should throw if a service provider does not exist", (context) => {
-		assert.rejects(
-			() => context.serviceProviderRepository.alias("name", "alias"),
-			"The service provider [name] is unknown.",
-		);
-	});
-
-	it(".alias should throw if an alias is already in use", (context) => {
-		context.serviceProviderRepository.set("name", new StubServiceProvider());
-
-		context.serviceProviderRepository.alias("name", "alias");
-
-		assert.rejects(
-			() => context.serviceProviderRepository.alias("name", "alias"),
-			"The alias [alias] is already in use.",
-		);
-	});
-
-	it(".alias should create an alias", (context) => {
-		context.serviceProviderRepository.set("name", new StubServiceProvider());
-
-		assert.rejects(() => context.serviceProviderRepository.get("alias"));
-
-		context.serviceProviderRepository.alias("name", "alias");
-
-		assert.defined(context.serviceProviderRepository.get("alias"));
-	});
-
 	it(".loaded", (context) => {
 		assert.false(context.serviceProviderRepository.loaded("stub"));
 

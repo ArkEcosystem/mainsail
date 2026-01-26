@@ -91,12 +91,6 @@ export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 			);
 
 			this.serviceProviderRepository.set(plugin.package, serviceProvider);
-
-			const alias: string | undefined = serviceProvider.alias();
-
-			if (alias) {
-				this.serviceProviderRepository.alias(plugin.package, alias);
-			}
 		}
 	}
 

@@ -40,15 +40,5 @@
 	},
 	"engines": {
 		"node": ">=20.x"
-	},
-	"arkecosystem": {
-		"core": {
-			"dependencies": [
-				{
-					"name": "@mainsail/api-database",
-					"required": true
-				}
-			]
-		}
 	}
 }
