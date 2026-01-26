@@ -11,8 +11,6 @@ import { ConfigRepository } from "./services/config";
 import { MemoryEventDispatcher } from "./services/events";
 
 class StubServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "name";
 	}

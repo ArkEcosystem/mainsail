@@ -93,5 +93,5 @@ export abstract class ServiceProvider {
 		return false;
 	}
 
-	public abstract register(): Promise<void>;
+	public async register(): Promise<void> {};
 }
