@@ -69,10 +69,5 @@
 	},
 	"engines": {
 		"node": ">=20.x"
-	},
-	"arkecosystem": {
-		"core": {
-			"alias": "p2p"
-		}
 	}
 }
