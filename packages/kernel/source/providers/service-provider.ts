@@ -93,5 +93,5 @@ export class ServiceProvider {
 		return false;
 	}
 
-	public async register(): Promise<void> {};
+	public async register(): Promise<void> {}
 }

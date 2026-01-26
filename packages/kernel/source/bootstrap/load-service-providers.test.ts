@@ -9,8 +9,7 @@ import { ConfigRepository } from "../services/config";
 import { MemoryEventDispatcher } from "../services/events";
 import { LoadServiceProviders } from "./load-service-providers";
 
-class StubServiceProvider extends ServiceProvider {
-}
+class StubServiceProvider extends ServiceProvider {}
 
 describeSkip<{
 	app: Application;
