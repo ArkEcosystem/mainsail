@@ -238,13 +238,8 @@ export class WalletsController extends Controller {
 
 	public async tokensShow(request: Hapi.Request): Promise<object> {
 		const walletId = request.params.id as string;
-
 		const wallet = await this.getWallet(walletId);
-		if (!wallet) {
-			return Boom.notFound("Wallet not found");
-		}
-
-		return this.getTokens(request, wallet);
+		return this.getTokens(request, wallet?.address ?? walletId);
 	}
 
 	private async getTransactions(request: Hapi.Request, criteria: Search.Criteria.TransactionCriteria) {
@@ -269,12 +264,12 @@ export class WalletsController extends Controller {
 		);
 	}
 
-	private async getTokens(request: Hapi.Request, wallet: Models.Wallet) {
+	private async getTokens(request: Hapi.Request, walletAddress: string) {
 		const pagination = this.getListingPage(request);
 
 		const tokenHoldersQuery = this.tokenHolderRepositoryFactory()
 			.createQueryBuilder("th")
-			.where("th.address = :address", { address: wallet.address })
+			.where("th.address = :address", { address: walletAddress })
 			.andWhere("th.balance > 0");
 
 		const [pageTokenHolderRows, totalCountRow] = await Promise.all([
