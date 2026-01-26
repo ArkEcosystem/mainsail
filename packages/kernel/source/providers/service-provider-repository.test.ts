@@ -16,8 +16,6 @@ class StubListener implements Contracts.Kernel.EventListener {
 }
 
 class StubServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public async boot(): Promise<void> {}
 
 	public async dispose(): Promise<void> {}
