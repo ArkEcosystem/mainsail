@@ -1,9 +1,9 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
 export class CreateIndexes1697617471901 implements MigrationInterface {
-	public async up(queryRunner: QueryRunner): Promise<void> {
-		// language=postgresql
-		await queryRunner.query(`
+      public async up(queryRunner: QueryRunner): Promise<void> {
+            // language=postgresql
+            await queryRunner.query(`
             CREATE UNIQUE INDEX transactions_sender_nonce ON transactions(sender_public_key, nonce);
             CREATE INDEX transactions_to_timestamp_tx_index ON transactions("to", timestamp DESC, transaction_index DESC);
             CREATE INDEX transactions_from_timestamp_tx_index ON transactions("from", timestamp DESC, transaction_index DESC);
@@ -62,12 +62,20 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX token_transfers_address ON token_transfers ("address", "block_number" DESC, "index" DESC);
             CREATE INDEX token_transfers_address_from ON token_transfers ("address", "from", "block_number" DESC, "index" DESC);
             CREATE INDEX token_transfers_address_to ON token_transfers ("address", "to", "block_number" DESC, "index" DESC );
-        `);
-	}
 
-	public async down(queryRunner: QueryRunner): Promise<void> {
-		// language=postgresql
-		await queryRunner.query(`
+            -- when >= 3 chars
+            CREATE INDEX tokens_symbol_trgm ON tokens USING gin (symbol gin_trgm_ops);
+            CREATE INDEX tokens_name_trgm ON tokens USING gin (name gin_trgm_ops);
+
+            -- when <= 2 chars
+            CREATE INDEX tokens_symbol_prefix ON tokens ((casefold(symbol)) text_pattern_ops);
+            CREATE INDEX tokens_name_prefix ON tokens ((casefold(name)) text_pattern_ops);
+            `);
+      }
+
+      public async down(queryRunner: QueryRunner): Promise<void> {
+            // language=postgresql
+            await queryRunner.query(`
             DROP INDEX transactions_sender_nonce;
             DROP INDEX transactions_to_timestamp_tx_index;
             DROP INDEX transactions_sender_timestamp_tx_index;
@@ -111,6 +119,11 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 
             DROP INDEX legacy_cold_wallets_unique_merge_address;
 
+            DROP INDEX tokens_symbol_trgm;
+            DROP INDEX tokens_name_trgm;
+            DROP INDEX tokens_symbol_prefix;
+            DROP INDEX tokens_name_prefix;
+
             DROP INDEX token_holders_address;
             DROP INDEX token_holders_address_token;
 
@@ -121,5 +134,5 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX token_transfers_address_from;
             DROP INDEX token_transfers_address_to;
         `);
-	}
+      }
 }
