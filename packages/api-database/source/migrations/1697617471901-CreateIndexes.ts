@@ -62,7 +62,15 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX token_transfers_address ON token_transfers ("address", "block_number" DESC, "index" DESC);
             CREATE INDEX token_transfers_address_from ON token_transfers ("address", "from", "block_number" DESC, "index" DESC);
             CREATE INDEX token_transfers_address_to ON token_transfers ("address", "to", "block_number" DESC, "index" DESC );
-        `);
+
+            -- when >= 3 chars
+            CREATE INDEX tokens_symbol_trgm ON tokens USING gin (symbol gin_trgm_ops);
+            CREATE INDEX tokens_name_trgm ON tokens USING gin (name gin_trgm_ops);
+
+            -- when <= 2 chars
+            CREATE INDEX tokens_symbol_prefix ON tokens ((casefold(symbol)) text_pattern_ops);
+            CREATE INDEX tokens_name_prefix ON tokens ((casefold(name)) text_pattern_ops);
+            `);
 	}
 
 	public async down(queryRunner: QueryRunner): Promise<void> {
@@ -110,6 +118,11 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX wallets_unique_public_key;
 
             DROP INDEX legacy_cold_wallets_unique_merge_address;
+
+            DROP INDEX tokens_symbol_trgm;
+            DROP INDEX tokens_name_trgm;
+            DROP INDEX tokens_symbol_prefix;
+            DROP INDEX tokens_name_prefix;
 
             DROP INDEX token_holders_address;
             DROP INDEX token_holders_address_token;

@@ -658,6 +658,9 @@ export class Sync implements Contracts.ApiSync.Service {
 			await (this.dataSource as TypeOrm.DataSource)
 				.createQueryRunner()
 				.query("CREATE EXTENSION IF NOT EXISTS citext;");
+			await (this.dataSource as TypeOrm.DataSource)
+				.createQueryRunner()
+				.query("CREATE EXTENSION IF NOT EXISTS pg_trgm;");
 		} catch (error) {
 			await this.app.terminate("failed to reset database", error);
 		}

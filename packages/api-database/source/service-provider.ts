@@ -123,6 +123,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			// Migrations are handled during bootstrap elsewhere in the main process (see sync.ts)
 			await dataSource.initialize();
 			await dataSource.createQueryRunner().query("CREATE EXTENSION IF NOT EXISTS citext;");
+			await dataSource.createQueryRunner().query("CREATE EXTENSION IF NOT EXISTS pg_trgm;");
 
 			this.app.bind(Identifiers.DataSource).toConstantValue(dataSource);
 			this.app.bind(Identifiers.Migrations).to(Migrations).inSingletonScope();

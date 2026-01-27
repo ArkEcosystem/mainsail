@@ -38,9 +38,75 @@ describe<{
 	it("/tokens", async () => {
 		await apiContext.tokenRepository.save(tokens);
 
-		const { statusCode, data } = await request("/tokens", options);
-		assert.equal(statusCode, 200);
-		assert.equal(data.data, tokens);
+		const testCases = [
+			{
+				query: "",
+				result: {
+					data: [...tokens].sort((a, b) => a.address.localeCompare(b.address)),
+					statusCode: 200,
+				},
+			},
+			{
+				query: "?name=DARK20",
+				result: {
+					data: [tokens[0]],
+					statusCode: 200,
+				},
+			},
+			{
+				query: "?name=DARK21",
+				result: {
+					data: [tokens[1]],
+					statusCode: 200,
+				},
+			},
+			{
+				query: "?name=DARK",
+				result: {
+					data: [tokens[0], tokens[1], tokens[2]],
+					statusCode: 200,
+				},
+			},
+			{
+				query: "?name=ark22",
+				result: {
+					data: [tokens[2]],
+					statusCode: 200,
+				},
+			},
+			{
+				query: "?name=!!",
+				result: {
+					data: [tokens[2]],
+					statusCode: 200,
+				},
+			},
+			{
+				query: "?name=K20",
+				result: {
+					data: [tokens[0]],
+					statusCode: 200,
+				},
+			},
+			{
+				query: "?name=asdf",
+				result: {
+					data: [],
+					statusCode: 200,
+				},
+			},
+		];
+
+		for (const { query, result } of testCases) {
+			const endpoint = `/tokens${query}`;
+			if (result.statusCode === 404) {
+				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
+			} else {
+				const { statusCode, data } = await request(endpoint, options);
+				assert.equal(statusCode, result.statusCode);
+				assert.equal(data.data, result.data);
+			}
+		}
 	});
 
 	it("/tokens/{}", async () => {
