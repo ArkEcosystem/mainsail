@@ -18,6 +18,7 @@ describe<{
 	commitState: any,
 	blockProcessor: any,
 	validatorSet: any
+	validatorRepository: any
 }>("Bootstrapper", ({ beforeEach, it, assert, spy, stub }) => {
 	const genesisCommitJson = {}
 	const genesisCommit = {
@@ -76,13 +77,17 @@ describe<{
 			restore: () => {}
 		}
 
+		context.validatorRepository = {
+			printLoadedValidators: () => {}
+		}
+
 		const app = new Application();
 
 		app.bind(Identifiers.Consensus.Service).toConstantValue({});
 		app.bind(Identifiers.State.Store).toConstantValue(context.stateStore);
 		app.bind(Identifiers.State.State).toConstantValue(context.state);
 		app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
-		app.bind(Identifiers.Validator.Repository).toConstantValue({});
+		app.bind(Identifiers.Validator.Repository).toConstantValue(context.validatorRepository);
 		app.bind(Identifiers.P2P.Server).toConstantValue({});
 		app.bind(Identifiers.P2P.Service).toConstantValue({});
 		app.bind(Identifiers.Cryptography.Commit.Factory).toConstantValue(context.commitFactory);
@@ -101,7 +106,7 @@ describe<{
 
 	});
 
-	it("should store genesis commit form configuration, database is empty, skip import, process block", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state }) => {
+	it("should store genesis commit form configuration, database is empty, skip import, process block", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository }) => {
 		// Snapshot exists
 		const milestone = {}
 
@@ -118,6 +123,7 @@ describe<{
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyValidatorSetRestore = spy(validatorSet, "restore");
 		const spyStateSetBootstrap = spy(state, "setBootstrap");
+		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
 
 		await bootstrapper.bootstrap();
 
@@ -141,9 +147,10 @@ describe<{
 		// bootstrap
 		spyStateSetBootstrap.calledOnce();
 		spyStateSetBootstrap.calledWith(false);
+		spyPrintLoadedValidators.calledOnce();
 	})
 
-	it("should store genesis commit form configuration, database is empty, run import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state }) => {
+	it("should store genesis commit form configuration, database is empty, run import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository }) => {
 		// Snapshot exists
 		const genesisCommit = {
 			block: {
@@ -173,6 +180,7 @@ describe<{
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyValidatorSetRestore = spy(validatorSet, "restore");
 		const spyStateSetBootstrap = spy(state, "setBootstrap");
+		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
 
 		await bootstrapper.bootstrap();
 
@@ -196,7 +204,8 @@ describe<{
 		// bootstrap
 		spyStateSetBootstrap.calledOnce();
 		spyStateSetBootstrap.calledWith(false);
-	})
+		spyPrintLoadedValidators.calledOnce();
+	});
 
 
 	it("should throw if stored genesis block doesn't match genesis block from config", async ({ bootstrapper, stateStore, databaseService }) => {
