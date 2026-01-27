@@ -117,7 +117,7 @@ export class Bootstrapper {
 	async #initGenesisState(): Promise<void> {
 		await this.#tryImportSnapshot();
 		await this.#processGenesisBlock();
-		// await this.validatorSet.restore();
+		await this.validatorSet.restore();
 
 		// // After genesis commit to restore all data
 		// await this.#initApiSync();
