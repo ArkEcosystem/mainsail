@@ -85,7 +85,7 @@ describe<{
 		app.bind(Identifiers.State.Store).toConstantValue(context.stateStore);
 		app.bind(Identifiers.Processor.BlockProcessor).toConstantValue(context.blockProcessor);
 		app.bind(Identifiers.Consensus.CommitState.Factory).toConstantValue(context.commitStateFactory);
-		app.bind(Identifiers.ApiSync.Service).toConstantValue({}); // Optional
+		// app.bind(Identifiers.ApiSync.Service).toConstantValue({}); // Optional
 		app.bind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(context.snapshotImporter); // Optional
 		app.bind(Identifiers.TransactionPool.Worker).toConstantValue({}); // Optional
 		app.bind(Identifiers.Evm.Worker).toConstantValue({}); // Optional

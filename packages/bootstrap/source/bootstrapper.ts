@@ -109,9 +109,10 @@ export class Bootstrapper {
 	async #initApiSync(): Promise<void> {
 		if (this.apiSync) {
 			await this.apiSync.bootstrap();
-		} else if (this.snapshotImporter) {
-			this.snapshotImporter.dispose();
 		}
+
+		// TODO: Check if can be removed
+		// this.snapshotImporter.dispose();
 	}
 
 	async #initGenesisState(): Promise<void> {
@@ -120,7 +121,7 @@ export class Bootstrapper {
 		await this.validatorSet.restore();
 
 		// // After genesis commit to restore all data
-		// await this.#initApiSync();
+		await this.#initApiSync();
 	}
 
 	async #initPostGenesisState(): Promise<void> {
@@ -164,6 +165,7 @@ export class Bootstrapper {
 	}
 
 	async #tryImportSnapshot(): Promise<void> {
+		// TODO: Move this check to snapshot importer
 		const genesisBlock = this.stateStore.getGenesisCommit();
 		const milestone = this.configuration.getMilestone();
 
