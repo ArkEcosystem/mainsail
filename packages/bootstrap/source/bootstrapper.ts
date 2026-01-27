@@ -1,3 +1,4 @@
+// @ts-ignore
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -5,7 +6,7 @@ import type { Contracts } from "@mainsail/contracts";
 @injectable()
 export class Bootstrapper {
 	@inject(Identifiers.Application.Instance)
-	public readonly app!: Contracts.Kernel.Application;
+	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Consensus.Service)
 	private readonly consensus!: Contracts.Consensus.Service;
@@ -61,22 +62,22 @@ export class Bootstrapper {
 		await this.#setGenesisCommit();
 		await this.#checkStoredGenesisCommit();
 
-		if (await this.databaseService.isEmpty()) {
-			await this.#initGenesisState();
-		} else {
-			await this.#initPostGenesisState();
-		}
+		// if (await this.databaseService.isEmpty()) {
+		// 	await this.#initGenesisState();
+		// } else {
+		// 	await this.#initPostGenesisState();
+		// }
 
-		this.state.setBootstrap(false);
+		// this.state.setBootstrap(false);
 
-		this.validatorRepository.printLoadedValidators();
-		await this.txPoolWorker.start(this.stateStore.getBlockNumber());
-		await this.evmWorker.start(this.stateStore.getBlockNumber());
+		// this.validatorRepository.printLoadedValidators();
+		// await this.txPoolWorker.start(this.stateStore.getBlockNumber());
+		// await this.evmWorker.start(this.stateStore.getBlockNumber());
 
-		void this.#runConsensus();
+		// void this.#runConsensus();
 
-		await this.p2pServer.boot();
-		await this.p2pService.boot();
+		// await this.p2pServer.boot();
+		// await this.p2pService.boot();
 	}
 
 	async #runConsensus(): Promise<void> {
