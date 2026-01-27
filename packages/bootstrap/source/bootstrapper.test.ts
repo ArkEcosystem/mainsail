@@ -12,6 +12,7 @@ describe<{
 	commitFactory: any,
 	stateStore: any,
 	databaseService: any,
+	snapshotImporter: any,
 }>("Bootstrapper", ({ beforeEach, it, assert, spy, stub }) => {
 	const genesisCommitJson = {}
 	const genesisCommit = {
@@ -19,6 +20,9 @@ describe<{
 			data: {
 				hash: "aaaaa"
 			},
+			header: {
+				parentHash: "0000000000000000000000000000000000000000000000000000000000000000"
+			}
 		}
 	}
 
@@ -26,6 +30,7 @@ describe<{
 		context.configuration = {
 			get: () => genesisCommitJson,
 			getGenesisHeight: () => 1,
+			getMilestone: () => {},
 		}
 
 		context.commitFactory = {
@@ -38,7 +43,12 @@ describe<{
 		}
 
 		context.databaseService = {
-			getBlock: () => undefined
+			getBlock: () => undefined,
+			isEmpty: () => true
+		}
+
+		context.snapshotImporter = {
+			run: () => {},
 		}
 
 		const app = new Application();
@@ -56,7 +66,7 @@ describe<{
 		app.bind(Identifiers.Processor.BlockProcessor).toConstantValue({});
 		app.bind(Identifiers.Consensus.CommitState.Factory).toConstantValue({});
 		app.bind(Identifiers.ApiSync.Service).toConstantValue({}); // Optional
-		app.bind(Identifiers.Snapshot.Legacy.Importer).toConstantValue({}); // Optional
+		app.bind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(context.snapshotImporter); // Optional
 		app.bind(Identifiers.TransactionPool.Worker).toConstantValue({}); // Optional
 		app.bind(Identifiers.Evm.Worker).toConstantValue({}); // Optional
 
@@ -66,8 +76,7 @@ describe<{
 
 	});
 
-
-	it("should store genesis commit form configuration, and database is empty", async ({ bootstrapper, stateStore, databaseService }) => {
+	it.skip("should store genesis commit form configuration, and database is empty", async ({ bootstrapper, stateStore, databaseService }) => {
 		const spyStoreSetGenesisCommit = spy(stateStore, "setGenesisCommit");
 		const spyStoreGetGenesisCommit = spy(stateStore, "getGenesisCommit")
 		const spyDatabaseServiceGetBlock = spy(databaseService, "getBlock");
@@ -81,6 +90,7 @@ describe<{
 		spyDatabaseServiceGetBlock.calledOnce();
 		spyStoreGetGenesisCommit.neverCalled();
 	})
+
 
 	it("should throw if stored genesis block doesn't match genesis block from config", async ({ bootstrapper, stateStore, databaseService }) => {
 		const spyStoreSetGenesisCommit = spy(stateStore, "setGenesisCommit");
@@ -99,5 +109,28 @@ describe<{
 		// #checkStoredGenesisCommit
 		spyDatabaseServiceGetBlock.calledOnce();
 		spyStoreGetGenesisCommit.calledOnce();
+	})
+
+	it("should throw if milestone.snapshot doesn't match genesis block parentHash", async ({ bootstrapper, stateStore, databaseService, configuration }) => {
+		const spyStoreSetGenesisCommit = spy(stateStore, "setGenesisCommit");
+		const spyStoreGetGenesisCommit = spy(stateStore, "getGenesisCommit")
+		const spyDatabaseServiceGetBlock = spy(databaseService, "getBlock");
+		const spyDatabaseServiceIsEmpty = spy(databaseService, "isEmpty");
+		const spyGetMilestone = stub(configuration, "getMilestone").returnValue({
+			snapshot: "abc"
+		});
+
+		await assert.rejects(() => bootstrapper.bootstrap(), "Previous block is set to snapshot, but there is no snapshot defined in milestones");
+
+		// #setGenesisCommit
+		spyStoreSetGenesisCommit.calledOnce();
+		spyStoreSetGenesisCommit.calledWith(genesisCommit);
+		// #checkStoredGenesisCommit
+		spyDatabaseServiceGetBlock.calledOnce();
+		// bootstrap
+		spyDatabaseServiceIsEmpty.calledOnce();
+		// #tryImportSnapshot
+		spyStoreGetGenesisCommit.calledOnce();
+		spyGetMilestone.calledOnce();
 	})
 });

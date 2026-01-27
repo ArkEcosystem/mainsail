@@ -49,8 +49,7 @@ export class Bootstrapper {
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
 	@inject(Identifiers.Snapshot.Legacy.Importer)
-	@optional()
-	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
+	private readonly snapshotImporter!: Contracts.Snapshot.LegacyImporter;
 
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
@@ -62,11 +61,11 @@ export class Bootstrapper {
 		await this.#setGenesisCommit();
 		await this.#checkStoredGenesisCommit();
 
-		// if (await this.databaseService.isEmpty()) {
-		// 	await this.#initGenesisState();
-		// } else {
-		// 	await this.#initPostGenesisState();
-		// }
+		if (await this.databaseService.isEmpty()) {
+			await this.#initGenesisState();
+		} else {
+			// await this.#initPostGenesisState();
+		}
 
 		// this.state.setBootstrap(false);
 
@@ -116,16 +115,12 @@ export class Bootstrapper {
 	}
 
 	async #initGenesisState(): Promise<void> {
-		if (!(await this.databaseService.isEmpty())) {
-			throw new Error("initGenesisState must be called on empty database");
-		}
-
 		await this.#tryImportSnapshot();
-		await this.#processGenesisBlock();
-		await this.validatorSet.restore();
+		// await this.#processGenesisBlock();
+		// await this.validatorSet.restore();
 
-		// After genesis commit to restore all data
-		await this.#initApiSync();
+		// // After genesis commit to restore all data
+		// await this.#initApiSync();
 	}
 
 	async #initPostGenesisState(): Promise<void> {
@@ -168,14 +163,10 @@ export class Bootstrapper {
 			genesisBlock.block.header.parentHash === "0000000000000000000000000000000000000000000000000000000000000000"
 		) {
 			if (milestone.snapshot) {
-				throw new Error("previous block set to snapshot but no hash in milestone");
+				throw new Error("Previous block is set to snapshot, but there is no snapshot defined in milestones");
 			}
 
 			return;
-		}
-
-		if (!this.snapshotImporter) {
-			throw new Error("snapshot importer not loaded");
 		}
 
 		await this.snapshotImporter.run(genesisBlock);
