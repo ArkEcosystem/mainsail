@@ -21,6 +21,7 @@ describe<{
 	validatorRepository: any
 	txPoolWorker: any
 	evmWorker: any
+	consensus: any
 }>("Bootstrapper", ({ beforeEach, it, assert, spy, stub }) => {
 	const genesisCommitJson = {}
 	const genesisCommit = {
@@ -92,9 +93,13 @@ describe<{
 			start: () => {}
 		}
 
+		context.consensus = {
+			run: () => {}
+		}
+
 		const app = new Application();
 
-		app.bind(Identifiers.Consensus.Service).toConstantValue({});
+		app.bind(Identifiers.Consensus.Service).toConstantValue(context.consensus);
 		app.bind(Identifiers.State.Store).toConstantValue(context.stateStore);
 		app.bind(Identifiers.State.State).toConstantValue(context.state);
 		app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
@@ -117,7 +122,7 @@ describe<{
 
 	});
 
-	it("should store genesis commit form configuration, database is empty, skip import, process block", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker }) => {
+	it("should store genesis commit form configuration, database is empty, skip import, process block", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus }) => {
 		// Snapshot exists
 		const milestone = {}
 
@@ -137,6 +142,7 @@ describe<{
 		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
 		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
 		const spyEvmWorkerStart = spy(evmWorker, "start");
+		const spyConsensusRun = spy(consensus, "run");
 
 		await bootstrapper.bootstrap();
 
@@ -163,9 +169,10 @@ describe<{
 		spyPrintLoadedValidators.calledOnce();
 		spyTxPoolWorkerStart.calledOnce();
 		spyEvmWorkerStart.calledOnce();
+		spyConsensusRun.calledOnce();
 	})
 
-	it("should store genesis commit form configuration, database is empty, run import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker }) => {
+	it("should store genesis commit form configuration, database is empty, run import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus }) => {
 		// Snapshot exists
 		const genesisCommit = {
 			block: {
@@ -198,6 +205,8 @@ describe<{
 		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
 		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
 		const spyEvmWorkerStart = spy(evmWorker, "start");
+		const spyConsensusRun = spy(consensus, "run");
+
 
 		await bootstrapper.bootstrap();
 
@@ -224,6 +233,7 @@ describe<{
 		spyPrintLoadedValidators.calledOnce();
 		spyTxPoolWorkerStart.calledOnce();
 		spyEvmWorkerStart.calledOnce();
+		spyConsensusRun.calledOnce();
 	});
 
 
