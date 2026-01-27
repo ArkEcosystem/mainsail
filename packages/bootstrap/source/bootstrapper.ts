@@ -73,13 +73,13 @@ export class Bootstrapper {
 		await this.txPoolWorker.start(this.stateStore.getBlockNumber());
 		await this.evmWorker.start(this.stateStore.getBlockNumber());
 
-		void this.runConsensus();
+		void this.#runConsensus();
 
 		await this.p2pServer.boot();
 		await this.p2pService.boot();
 	}
 
-	async runConsensus(): Promise<void> {
+	async #runConsensus(): Promise<void> {
 		try {
 			await this.consensus.run();
 		} catch (error) {
