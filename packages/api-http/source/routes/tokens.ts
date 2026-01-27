@@ -5,6 +5,7 @@ import Joi from "joi";
 
 import { TokensController } from "../controllers/tokens.js";
 import { address } from "../schemas/schemas.js";
+import { tokenNameSchema } from "../schemas/tokens.js";
 import { walletAddressSchema } from "../schemas/wallets.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
@@ -21,7 +22,9 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				},
 			},
 			validate: {
-				query: Joi.object({}).concat(Schemas.pagination),
+				query: Joi.object({
+					name: Schemas.orEqualCriteria(tokenNameSchema),
+				}).concat(Schemas.pagination),
 			},
 		},
 		path: "/tokens",

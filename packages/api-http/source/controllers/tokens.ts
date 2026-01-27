@@ -4,6 +4,7 @@ import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
+	TypeOrm,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
@@ -41,11 +42,16 @@ export class TokensController extends Controller {
 	public async index(request: Hapi.Request): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 
-		const [tokens, totalCount] = await this.tokenRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.offset(pagination.offset)
-			.limit(pagination.limit)
+		const tokensQuery = this.tokenRepositoryFactory()
+			.createQueryBuilder("tok").select();
+
+		TokensController.andWhereNameSearch(tokensQuery, request.query.name);
+
+		const [tokens, totalCount] = await TokensController.optionallyOrderedByName(
+			tokensQuery
+				.offset(pagination.offset)
+				.limit(pagination.limit), request.query.name)
+			.addOrderBy("tok.address", "ASC")
 			.getManyAndCount();
 
 		return this.toPagination(
@@ -186,5 +192,46 @@ export class TokensController extends Controller {
 			.select()
 			.where("address = :address", { address })
 			.getOne();
+	}
+
+	public static andWhereNameSearch(queryBuilder: TypeOrm.SelectQueryBuilder<Models.TokenHolder | Models.Token>, nameQuery?: string): void {
+		const nameSearch = (nameQuery as string ?? "").trim();
+		if (!nameSearch) {
+			return;
+		}
+
+		const nameSearchLower = nameSearch.toLowerCase();
+		const isShort = nameSearch.length > 0 && nameSearch.length <= 2;
+
+		queryBuilder.andWhere(new TypeOrm.Brackets(b => {
+			if (isShort) {
+				// For short queries, use the faster prefix index
+				b.where("lower(tok.symbol) LIKE :prefix", { prefix: `${nameSearchLower}%` })
+					.orWhere("lower(tok.name) LIKE :prefix", { prefix: `${nameSearchLower}%` });
+			} else {
+				// Otherwise trigram index
+				b.where("tok.symbol ILIKE :like", { like: `%${nameSearchLower}%` })
+					.orWhere("tok.name ILIKE :like", { like: `%${nameSearchLower}%` });
+			}
+		}));
+	}
+
+
+	public static optionallyOrderedByName(queryBuilder: TypeOrm.SelectQueryBuilder<Models.TokenHolder | Models.Token>, nameQuery?: string): TypeOrm.SelectQueryBuilder<Models.TokenHolder | Models.Token> {
+		const nameSearch = (nameQuery as string ?? "").trim();
+		if (!nameSearch) {
+			return queryBuilder;
+		}
+
+		queryBuilder.addOrderBy(
+			`CASE WHEN lower(tok.symbol) LIKE :orderByPrefix THEN 0
+	   			WHEN lower(tok.name) LIKE :orderByPrefix THEN 1
+	   			ELSE 2
+	 		END`,
+			"ASC"
+		).setParameter("orderByPrefix", `${nameSearch.toLowerCase()}%`);
+
+		return queryBuilder;
+
 	}
 }
