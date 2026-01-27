@@ -91,7 +91,7 @@ describe<{
 
 	});
 
-	it.skip("should store genesis commit form configuration, database is empty, skip import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory }) => {
+	it("should store genesis commit form configuration, database is empty, skip import, process block", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor }) => {
 		// Snapshot exists
 		const milestone = {}
 
@@ -102,6 +102,10 @@ describe<{
 		const spyDatabaseServiceIsEmpty = stub(databaseService, "isEmpty").returnValue(true);
 		const spyGetMilestone = stub(configuration, "getMilestone").returnValue(milestone);
 		const spySnapshotImporterRun = spy(snapshotImporter, "run");
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue({
+			success: true
+		});
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 
 		await bootstrapper.bootstrap();
 
@@ -114,12 +118,16 @@ describe<{
 		// bootstrap
 		spyDatabaseServiceIsEmpty.calledOnce();
 		// #tryImportSnapshot
-		spyStoreGetGenesisCommit.calledOnce();
 		spyGetMilestone.calledOnce();
 		spySnapshotImporterRun.neverCalled();
+		// #processGenesisBlock
+		spyStoreGetGenesisCommit.calledTimes(2); // #checkStoredGenesisCommit, #processGenesisBlock
+		// #processCommit
+		spyBlockProcessorProcess.calledOnce();
+		spyBlockProcessorCommit.calledOnce();
 	})
 
-	it.skip("should store genesis commit form configuration, database is empty, run import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory }) => {
+	it("should store genesis commit form configuration, database is empty, run import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor }) => {
 		// Snapshot exists
 		const genesisCommit = {
 			block: {
@@ -143,6 +151,10 @@ describe<{
 		const spyDatabaseServiceIsEmpty = stub(databaseService, "isEmpty").returnValue(true);
 		const spyGetMilestone = stub(configuration, "getMilestone").returnValue(milestone);
 		const spySnapshotImporterRun = spy(snapshotImporter, "run");
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue({
+			success: true
+		});
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 
 		await bootstrapper.bootstrap();
 
@@ -155,9 +167,13 @@ describe<{
 		// bootstrap
 		spyDatabaseServiceIsEmpty.calledOnce();
 		// #tryImportSnapshot
-		spyStoreGetGenesisCommit.calledOnce();
 		spyGetMilestone.calledOnce();
 		spySnapshotImporterRun.calledOnce();
+		// #processGenesisBlock
+		spyStoreGetGenesisCommit.calledTimes(2); // #checkStoredGenesisCommit, #processGenesisBlock
+		// #processCommit
+		spyBlockProcessorProcess.calledOnce();
+		spyBlockProcessorCommit.calledOnce();
 	})
 
 
