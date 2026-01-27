@@ -76,19 +76,73 @@ describe<{
 
 	});
 
-	it.skip("should store genesis commit form configuration, and database is empty", async ({ bootstrapper, stateStore, databaseService }) => {
-		const spyStoreSetGenesisCommit = spy(stateStore, "setGenesisCommit");
-		const spyStoreGetGenesisCommit = spy(stateStore, "getGenesisCommit")
-		const spyDatabaseServiceGetBlock = spy(databaseService, "getBlock");
+	it("should store genesis commit form configuration, database is empty, skip import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory }) => {
+		// Snapshot exists
+		const milestone = {}
+
+		const spyCommitFactoryFromJson = stub(commitFactory, "fromJson").returnValue(genesisCommit);
+		const spyStoreSetGenesisCommit = stub(stateStore, "setGenesisCommit").returnValue(genesisCommit);
+		const spyStoreGetGenesisCommit = stub(stateStore, "getGenesisCommit").returnValue(genesisCommit)
+		const spyDatabaseServiceGetBlock = stub(databaseService, "getBlock").returnValue(undefined)
+		const spyDatabaseServiceIsEmpty = stub(databaseService, "isEmpty").returnValue(true);
+		const spyGetMilestone = stub(configuration, "getMilestone").returnValue(milestone);
+		const spySnapshotImporterRun = spy(snapshotImporter, "run");
 
 		await bootstrapper.bootstrap();
 
 		// #setGenesisCommit
+		spyCommitFactoryFromJson.calledOnce();
 		spyStoreSetGenesisCommit.calledOnce();
 		spyStoreSetGenesisCommit.calledWith(genesisCommit);
 		// #checkStoredGenesisCommit
 		spyDatabaseServiceGetBlock.calledOnce();
-		spyStoreGetGenesisCommit.neverCalled();
+		// bootstrap
+		spyDatabaseServiceIsEmpty.calledOnce();
+		// #tryImportSnapshot
+		spyStoreGetGenesisCommit.calledOnce();
+		spyGetMilestone.calledOnce();
+		spySnapshotImporterRun.neverCalled();
+	})
+
+	it("should store genesis commit form configuration, database is empty, run import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory }) => {
+		// Snapshot exists
+		const genesisCommit = {
+			block: {
+				data: {
+					hash: "aaaaa"
+				},
+				header: {
+					parentHash: "1111111111111111111111111111111111111111111111111111111111111111"
+				}
+			}
+		}
+
+		const milestone = {
+			snapshot: "abc"
+		}
+
+		const spyCommitFactoryFromJson = stub(commitFactory, "fromJson").returnValue(genesisCommit);
+		const spyStoreSetGenesisCommit = stub(stateStore, "setGenesisCommit").returnValue(genesisCommit);
+		const spyStoreGetGenesisCommit = stub(stateStore, "getGenesisCommit").returnValue(genesisCommit)
+		const spyDatabaseServiceGetBlock = stub(databaseService, "getBlock").returnValue(undefined)
+		const spyDatabaseServiceIsEmpty = stub(databaseService, "isEmpty").returnValue(true);
+		const spyGetMilestone = stub(configuration, "getMilestone").returnValue(milestone);
+		const spySnapshotImporterRun = spy(snapshotImporter, "run");
+
+		await bootstrapper.bootstrap();
+
+		// #setGenesisCommit
+		spyCommitFactoryFromJson.calledOnce();
+		spyStoreSetGenesisCommit.calledOnce();
+		spyStoreSetGenesisCommit.calledWith(genesisCommit);
+		// #checkStoredGenesisCommit
+		spyDatabaseServiceGetBlock.calledOnce();
+		// bootstrap
+		spyDatabaseServiceIsEmpty.calledOnce();
+		// #tryImportSnapshot
+		spyStoreGetGenesisCommit.calledOnce();
+		spyGetMilestone.calledOnce();
+		spySnapshotImporterRun.calledOnce();
 	})
 
 
