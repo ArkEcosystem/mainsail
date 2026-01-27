@@ -13,6 +13,7 @@ import { TransactionResource } from "../resources/index.js";
 import { TokenHolderResource } from "../resources/token-holder.js";
 import { WalletResource } from "../resources/wallet.js";
 import { Controller } from "./controller.js";
+import { TokensController } from "./tokens.js";
 
 type TokenHolderRaw = {
 	token: string;
@@ -125,6 +126,10 @@ export class WalletsController extends Controller {
 	}
 
 	public async tokens(request: Hapi.Request): Promise<object> {
+		if (!request.query.addresses) {
+			return this.getEmptyPage();
+		}
+
 		const walletAddresses = Array.isArray(request.query.addresses)
 			? request.query.addresses
 			: [request.query.addresses];
@@ -132,12 +137,12 @@ export class WalletsController extends Controller {
 		const pagination = this.getListingPage(request);
 
 		const tokenPaginatedQuery = this.tokenRepositoryFactory()
-			.createQueryBuilder("t")
+			.createQueryBuilder("tok")
 			.where(
 				`EXISTS (
 					SELECT 1
 					FROM token_holders th
-					WHERE th.token_address = t.address
+					WHERE th.token_address = tok.address
 						AND th.address IN (:...addresses)
 						AND th.balance > 0
 					LIMIT 1
@@ -145,22 +150,27 @@ export class WalletsController extends Controller {
 				{ addresses: walletAddresses },
 			);
 
+		TokensController.andWhereNameSearch(tokenPaginatedQuery, request.query.name);
+
 		const [pageTokensRows, totalCountRow] = await Promise.all([
-			tokenPaginatedQuery
-				.clone()
-				.select([
-					"t.address AS token",
-					"t.symbol AS symbol",
-					"t.name AS name",
-					"t.decimals AS decimals",
-					"t.total_supply AS supply",
-				])
-				.offset(pagination.offset)
-				.limit(pagination.limit)
-				.orderBy("t.address", "ASC")
+			TokensController.optionallyOrderedByName(
+				tokenPaginatedQuery
+					.clone()
+					.select([
+						"tok.address AS token",
+						"tok.symbol AS symbol",
+						"tok.name AS name",
+						"tok.decimals AS decimals",
+						"tok.total_supply AS supply",
+					])
+					.offset(pagination.offset)
+					.limit(pagination.limit),
+				request.query.name,
+			)
+				.addOrderBy("tok.address", "ASC")
 				.getRawMany<TokenMetadata>(),
 
-			tokenPaginatedQuery.clone().select("COUNT(DISTINCT t.address)", "cnt").getRawOne<{ cnt: string }>(),
+			tokenPaginatedQuery.clone().select("COUNT(DISTINCT tok.address)", "cnt").getRawOne<{ cnt: string }>(),
 		]);
 
 		const tokenMetadata = pageTokensRows.reduce<Record<string, TokenMetadata>>(
@@ -269,25 +279,30 @@ export class WalletsController extends Controller {
 
 		const tokenHoldersQuery = this.tokenHolderRepositoryFactory()
 			.createQueryBuilder("th")
+			.innerJoin(Models.Token, "tok", "tok.address = th.token_address")
 			.where("th.address = :address", { address: walletAddress })
 			.andWhere("th.balance > 0");
 
+		TokensController.andWhereNameSearch(tokenHoldersQuery, request.query.name);
+
 		const [pageTokenHolderRows, totalCountRow] = await Promise.all([
-			tokenHoldersQuery
-				.clone()
-				.select([
-					`th.token_address AS "tokenAddress"`,
-					"th.address AS address",
-					"th.balance AS balance",
-					"tok.name AS name",
-					"tok.symbol AS symbol",
-					"tok.decimals AS decimals",
-					"tok.total_supply AS supply",
-				])
-				.innerJoin(Models.Token, "tok", "tok.address = th.token_address")
-				.offset(pagination.offset)
-				.limit(pagination.limit)
-				.orderBy("th.token_address", "ASC")
+			TokensController.optionallyOrderedByName(
+				tokenHoldersQuery
+					.clone()
+					.select([
+						`th.token_address AS "tokenAddress"`,
+						"th.address AS address",
+						"th.balance AS balance",
+						"tok.name AS name",
+						"tok.symbol AS symbol",
+						"tok.decimals AS decimals",
+						"tok.total_supply AS supply",
+					])
+					.offset(pagination.offset)
+					.limit(pagination.limit),
+				request.query.name,
+			)
+				.addOrderBy("th.token_address", "ASC")
 				.addOrderBy("th.balance", "DESC")
 				.addOrderBy("th.address", "ASC")
 				.getRawMany(),
