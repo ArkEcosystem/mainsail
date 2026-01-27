@@ -132,7 +132,7 @@ describe<{
 
 	});
 
-	it("should store genesis commit form configuration, database is empty, skip import, process block", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus, p2pServer, p2pService }) => {
+	it("should be ok with empty database and without snapshot", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus, p2pServer, p2pService }) => {
 		// Snapshot exists
 		const milestone = {}
 
@@ -186,7 +186,7 @@ describe<{
 		spyP2PServiceBoot.calledOnce();
 	})
 
-	it("should store genesis commit form configuration, database is empty, run import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus, p2pServer, p2pService }) => {
+	it("should be ok with empty database and with snapshot", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus, p2pServer, p2pService }) => {
 		// Snapshot exists
 		const genesisCommit = {
 			block: {

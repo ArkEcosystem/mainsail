@@ -64,7 +64,7 @@ export class Bootstrapper {
 		if (await this.databaseService.isEmpty()) {
 			await this.#initGenesisState();
 		} else {
-			// await this.#initPostGenesisState();
+			await this.#initPostGenesisState();
 		}
 
 		this.state.setBootstrap(false);
@@ -75,6 +75,7 @@ export class Bootstrapper {
 
 		void this.#runConsensus();
 
+		// TODO: Check if we need booth
 		await this.p2pServer.boot();
 		await this.p2pService.boot();
 	}
