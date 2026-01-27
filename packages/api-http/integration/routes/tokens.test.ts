@@ -40,56 +40,56 @@ describe<{
 
 		const testCases = [
 			{
-				query: '',
+				query: "",
 				result: {
 					data: [...tokens].sort((a, b) => a.address.localeCompare(b.address)),
 					statusCode: 200,
 				},
 			},
 			{
-				query: '?name=DARK20',
+				query: "?name=DARK20",
 				result: {
 					data: [tokens[0]],
 					statusCode: 200,
 				},
 			},
 			{
-				query: '?name=DARK21',
+				query: "?name=DARK21",
 				result: {
 					data: [tokens[1]],
 					statusCode: 200,
 				},
 			},
 			{
-				query: '?name=DARK',
+				query: "?name=DARK",
 				result: {
 					data: [tokens[0], tokens[1], tokens[2]],
 					statusCode: 200,
 				},
 			},
 			{
-				query: '?name=ark22',
+				query: "?name=ark22",
 				result: {
 					data: [tokens[2]],
 					statusCode: 200,
 				},
 			},
 			{
-				query: '?name=!!',
+				query: "?name=!!",
 				result: {
 					data: [tokens[2]],
 					statusCode: 200,
 				},
 			},
 			{
-				query: '?name=K20',
+				query: "?name=K20",
 				result: {
 					data: [tokens[0]],
 					statusCode: 200,
 				},
 			},
 			{
-				query: '?name=asdf',
+				query: "?name=asdf",
 				result: {
 					data: [],
 					statusCode: 200,

@@ -304,7 +304,8 @@ describe<{
 		await apiContext.tokenRepository.save(tokens);
 		await apiContext.tokenHolderRepository.save(tokenHolders);
 
-		const path = "/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7";
+		const path =
+			"/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7";
 
 		const testCases = [
 			{

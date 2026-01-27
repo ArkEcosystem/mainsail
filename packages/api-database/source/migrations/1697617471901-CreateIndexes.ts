@@ -1,9 +1,9 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
 export class CreateIndexes1697617471901 implements MigrationInterface {
-      public async up(queryRunner: QueryRunner): Promise<void> {
-            // language=postgresql
-            await queryRunner.query(`
+	public async up(queryRunner: QueryRunner): Promise<void> {
+		// language=postgresql
+		await queryRunner.query(`
             CREATE UNIQUE INDEX transactions_sender_nonce ON transactions(sender_public_key, nonce);
             CREATE INDEX transactions_to_timestamp_tx_index ON transactions("to", timestamp DESC, transaction_index DESC);
             CREATE INDEX transactions_from_timestamp_tx_index ON transactions("from", timestamp DESC, transaction_index DESC);
@@ -71,11 +71,11 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX tokens_symbol_prefix ON tokens ((casefold(symbol)) text_pattern_ops);
             CREATE INDEX tokens_name_prefix ON tokens ((casefold(name)) text_pattern_ops);
             `);
-      }
+	}
 
-      public async down(queryRunner: QueryRunner): Promise<void> {
-            // language=postgresql
-            await queryRunner.query(`
+	public async down(queryRunner: QueryRunner): Promise<void> {
+		// language=postgresql
+		await queryRunner.query(`
             DROP INDEX transactions_sender_nonce;
             DROP INDEX transactions_to_timestamp_tx_index;
             DROP INDEX transactions_sender_timestamp_tx_index;
@@ -134,5 +134,5 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX token_transfers_address_from;
             DROP INDEX token_transfers_address_to;
         `);
-      }
+	}
 }

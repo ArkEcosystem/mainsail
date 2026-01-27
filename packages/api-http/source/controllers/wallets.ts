@@ -165,7 +165,8 @@ export class WalletsController extends Controller {
 					])
 					.offset(pagination.offset)
 					.limit(pagination.limit),
-				request.query.name)
+				request.query.name,
+			)
 				.addOrderBy("tok.address", "ASC")
 				.getRawMany<TokenMetadata>(),
 
@@ -299,7 +300,8 @@ export class WalletsController extends Controller {
 					])
 					.offset(pagination.offset)
 					.limit(pagination.limit),
-				request.query.name)
+				request.query.name,
+			)
 				.addOrderBy("th.token_address", "ASC")
 				.addOrderBy("th.balance", "DESC")
 				.addOrderBy("th.address", "ASC")
