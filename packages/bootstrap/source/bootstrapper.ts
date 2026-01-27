@@ -116,7 +116,7 @@ export class Bootstrapper {
 
 	async #initGenesisState(): Promise<void> {
 		await this.#tryImportSnapshot();
-		// await this.#processGenesisBlock();
+		await this.#processGenesisBlock();
 		// await this.validatorSet.restore();
 
 		// // After genesis commit to restore all data
@@ -139,19 +139,28 @@ export class Bootstrapper {
 	}
 
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {
-		try {
-			const commitState = this.commitStateFactory(commit);
-			const result = await this.blockProcessor.process(commitState);
-			if (!result.success) {
-				throw new Error(`Block is not processed.`);
-			}
-
-			commitState.setProcessorResult(result);
-
-			await this.blockProcessor.commit(commitState);
-		} catch (error) {
-			await this.app.terminate(`Failed to process block at height ${commit.block.data.number}`, error);
+		const commitState = this.commitStateFactory(commit);
+		const result = await this.blockProcessor.process(commitState);
+		if (!result.success) {
+			throw new Error(`Block is not processed.`);
 		}
+
+		commitState.setProcessorResult(result);
+		await this.blockProcessor.commit(commitState);
+
+		// try {
+		// 	const commitState = this.commitStateFactory(commit);
+		// 	const result = await this.blockProcessor.process(commitState);
+		// 	if (!result.success) {
+		// 		throw new Error(`Block is not processed.`);
+		// 	}
+
+		// 	commitState.setProcessorResult(result);
+
+		// 	await this.blockProcessor.commit(commitState);
+		// } catch (error) {
+		// 	await this.app.terminate(`Failed to process block at height ${commit.block.data.number}`, error);
+		// }
 	}
 
 	async #tryImportSnapshot(): Promise<void> {

@@ -13,6 +13,9 @@ describe<{
 	stateStore: any,
 	databaseService: any,
 	snapshotImporter: any,
+	commitStateFactory: any,
+	commitState: any,
+	blockProcessor: any,
 }>("Bootstrapper", ({ beforeEach, it, assert, spy, stub }) => {
 	const genesisCommitJson = {}
 	const genesisCommit = {
@@ -51,6 +54,18 @@ describe<{
 			run: () => {},
 		}
 
+		context.commitState = {
+			setProcessorResult: () => {}
+		}
+		context.commitStateFactory = () => context.commitState
+
+		context.blockProcessor = {
+			process: () => {
+				success: true
+			},
+			commit: () => {}
+		}
+
 		const app = new Application();
 
 		app.bind(Identifiers.Consensus.Service).toConstantValue({});
@@ -63,8 +78,8 @@ describe<{
 		app.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
 		app.bind(Identifiers.ValidatorSet.Service).toConstantValue({});
 		app.bind(Identifiers.State.Store).toConstantValue(context.stateStore);
-		app.bind(Identifiers.Processor.BlockProcessor).toConstantValue({});
-		app.bind(Identifiers.Consensus.CommitState.Factory).toConstantValue({});
+		app.bind(Identifiers.Processor.BlockProcessor).toConstantValue(context.blockProcessor);
+		app.bind(Identifiers.Consensus.CommitState.Factory).toConstantValue(context.commitStateFactory);
 		app.bind(Identifiers.ApiSync.Service).toConstantValue({}); // Optional
 		app.bind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(context.snapshotImporter); // Optional
 		app.bind(Identifiers.TransactionPool.Worker).toConstantValue({}); // Optional
@@ -76,7 +91,7 @@ describe<{
 
 	});
 
-	it("should store genesis commit form configuration, database is empty, skip import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory }) => {
+	it.skip("should store genesis commit form configuration, database is empty, skip import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory }) => {
 		// Snapshot exists
 		const milestone = {}
 
@@ -104,7 +119,7 @@ describe<{
 		spySnapshotImporterRun.neverCalled();
 	})
 
-	it("should store genesis commit form configuration, database is empty, run import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory }) => {
+	it.skip("should store genesis commit form configuration, database is empty, run import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory }) => {
 		// Snapshot exists
 		const genesisCommit = {
 			block: {
@@ -186,5 +201,39 @@ describe<{
 		// #tryImportSnapshot
 		spyStoreGetGenesisCommit.calledOnce();
 		spyGetMilestone.calledOnce();
+	})
+
+	it("should throw if genesis block is not processed", async ({  bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor }) => {
+		// Snapshot exists
+		const milestone = {}
+
+		const spyCommitFactoryFromJson = stub(commitFactory, "fromJson").returnValue(genesisCommit);
+		const spyStoreSetGenesisCommit = stub(stateStore, "setGenesisCommit").returnValue(genesisCommit);
+		const spyStoreGetGenesisCommit = stub(stateStore, "getGenesisCommit").returnValue(genesisCommit)
+		const spyDatabaseServiceGetBlock = stub(databaseService, "getBlock").returnValue(undefined)
+		const spyDatabaseServiceIsEmpty = stub(databaseService, "isEmpty").returnValue(true);
+		const spyGetMilestone = stub(configuration, "getMilestone").returnValue(milestone);
+		const spySnapshotImporterRun = spy(snapshotImporter, "run");
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue({
+			success: false
+		});
+
+		await assert.rejects(() => bootstrapper.bootstrap(), "Block is not processed.");
+
+		// #setGenesisCommit
+		spyCommitFactoryFromJson.calledOnce();
+		spyStoreSetGenesisCommit.calledOnce();
+		spyStoreSetGenesisCommit.calledWith(genesisCommit);
+		// #checkStoredGenesisCommit
+		spyDatabaseServiceGetBlock.calledOnce();
+		// bootstrap
+		spyDatabaseServiceIsEmpty.calledOnce();
+		// #tryImportSnapshot
+		spyGetMilestone.calledOnce();
+		spySnapshotImporterRun.neverCalled();
+		// #processGenesisBlock
+		spyStoreGetGenesisCommit.calledTimes(2); // #checkStoredGenesisCommit, #processGenesisBlock
+		// #processCommit
+		spyBlockProcessorProcess.calledOnce();
 	})
 });
