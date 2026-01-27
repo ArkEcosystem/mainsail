@@ -300,6 +300,38 @@ describe<{
 		}
 	});
 
+	it("/wallets/tokens?addresses&names", async () => {
+		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenHolderRepository.save(tokenHolders);
+
+		const path = "/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7";
+
+		const testCases = [
+			{
+				path: `${path}&name=DARK20`,
+				result: [walletTokenHoldersResponse[0]],
+			},
+			{
+				path: `${path}&name=ARK`,
+				result: walletTokenHoldersResponse,
+			},
+			{
+				path: `${path}&name=!!`,
+				result: [walletTokenHoldersResponse[1]],
+			},
+			{
+				path: `${path}&name=ETH`,
+				result: [],
+			},
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
+	});
+
 	it("/wallets/tokens pagination", async () => {
 		await apiContext.tokenRepository.save(tokens);
 		await apiContext.tokenHolderRepository.save(tokenHolders);
