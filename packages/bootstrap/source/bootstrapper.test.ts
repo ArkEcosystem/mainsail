@@ -17,11 +17,13 @@ describe<{
 	commitStateFactory: any,
 	commitState: any,
 	blockProcessor: any,
-	validatorSet: any
-	validatorRepository: any
-	txPoolWorker: any
-	evmWorker: any
-	consensus: any
+	validatorSet: any,
+	validatorRepository: any,
+	txPoolWorker: any,
+	evmWorker: any,
+	consensus: any,
+	p2pServer: any,
+	p2pService: any,
 }>("Bootstrapper", ({ beforeEach, it, assert, spy, stub }) => {
 	const genesisCommitJson = {}
 	const genesisCommit = {
@@ -97,6 +99,14 @@ describe<{
 			run: () => {}
 		}
 
+		context.p2pServer = {
+			boot: () => {}
+		}
+
+		context.p2pService = {
+			boot: () => {}
+		}
+
 		const app = new Application();
 
 		app.bind(Identifiers.Consensus.Service).toConstantValue(context.consensus);
@@ -104,8 +114,8 @@ describe<{
 		app.bind(Identifiers.State.State).toConstantValue(context.state);
 		app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 		app.bind(Identifiers.Validator.Repository).toConstantValue(context.validatorRepository);
-		app.bind(Identifiers.P2P.Server).toConstantValue({});
-		app.bind(Identifiers.P2P.Service).toConstantValue({});
+		app.bind(Identifiers.P2P.Server).toConstantValue(context.p2pServer);
+		app.bind(Identifiers.P2P.Service).toConstantValue(context.p2pService);
 		app.bind(Identifiers.Cryptography.Commit.Factory).toConstantValue(context.commitFactory);
 		app.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
 		app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
@@ -122,7 +132,7 @@ describe<{
 
 	});
 
-	it("should store genesis commit form configuration, database is empty, skip import, process block", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus }) => {
+	it("should store genesis commit form configuration, database is empty, skip import, process block", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus, p2pServer, p2pService }) => {
 		// Snapshot exists
 		const milestone = {}
 
@@ -143,6 +153,8 @@ describe<{
 		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
 		const spyEvmWorkerStart = spy(evmWorker, "start");
 		const spyConsensusRun = spy(consensus, "run");
+		const spyP2PServerBoot = spy(p2pServer, "boot");
+		const spyP2PServiceBoot = spy(p2pService, "boot");
 
 		await bootstrapper.bootstrap();
 
@@ -170,9 +182,11 @@ describe<{
 		spyTxPoolWorkerStart.calledOnce();
 		spyEvmWorkerStart.calledOnce();
 		spyConsensusRun.calledOnce();
+		spyP2PServerBoot.calledOnce();
+		spyP2PServiceBoot.calledOnce();
 	})
 
-	it("should store genesis commit form configuration, database is empty, run import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus }) => {
+	it("should store genesis commit form configuration, database is empty, run import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus, p2pServer, p2pService }) => {
 		// Snapshot exists
 		const genesisCommit = {
 			block: {
@@ -206,6 +220,8 @@ describe<{
 		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
 		const spyEvmWorkerStart = spy(evmWorker, "start");
 		const spyConsensusRun = spy(consensus, "run");
+		const spyP2PServerBoot = spy(p2pServer, "boot");
+		const spyP2PServiceBoot = spy(p2pService, "boot");
 
 
 		await bootstrapper.bootstrap();
@@ -234,6 +250,8 @@ describe<{
 		spyTxPoolWorkerStart.calledOnce();
 		spyEvmWorkerStart.calledOnce();
 		spyConsensusRun.calledOnce();
+		spyP2PServerBoot.calledOnce();
+		spyP2PServiceBoot.calledOnce();
 	});
 
 

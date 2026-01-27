@@ -75,8 +75,8 @@ export class Bootstrapper {
 
 		void this.#runConsensus();
 
-		// await this.p2pServer.boot();
-		// await this.p2pService.boot();
+		await this.p2pServer.boot();
+		await this.p2pService.boot();
 	}
 
 	async #runConsensus(): Promise<void> {
