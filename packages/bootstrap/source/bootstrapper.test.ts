@@ -19,6 +19,8 @@ describe<{
 	blockProcessor: any,
 	validatorSet: any
 	validatorRepository: any
+	txPoolWorker: any
+	evmWorker: any
 }>("Bootstrapper", ({ beforeEach, it, assert, spy, stub }) => {
 	const genesisCommitJson = {}
 	const genesisCommit = {
@@ -45,7 +47,8 @@ describe<{
 
 		context.stateStore = {
 			setGenesisCommit: () => {},
-			getGenesisCommit: () => genesisCommit
+			getGenesisCommit: () => genesisCommit,
+			getBlockNumber: () => 1
 		}
 
 		context.state = {
@@ -81,6 +84,14 @@ describe<{
 			printLoadedValidators: () => {}
 		}
 
+		context.txPoolWorker = {
+			start: () => {}
+		}
+
+		context.evmWorker = {
+			start: () => {}
+		}
+
 		const app = new Application();
 
 		app.bind(Identifiers.Consensus.Service).toConstantValue({});
@@ -96,9 +107,9 @@ describe<{
 		app.bind(Identifiers.Processor.BlockProcessor).toConstantValue(context.blockProcessor);
 		app.bind(Identifiers.Consensus.CommitState.Factory).toConstantValue(context.commitStateFactory);
 		// app.bind(Identifiers.ApiSync.Service).toConstantValue({}); // Optional
-		app.bind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(context.snapshotImporter); // Optional
-		app.bind(Identifiers.TransactionPool.Worker).toConstantValue({}); // Optional
-		app.bind(Identifiers.Evm.Worker).toConstantValue({}); // Optional
+		app.bind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(context.snapshotImporter);
+		app.bind(Identifiers.TransactionPool.Worker).toConstantValue(context.txPoolWorker);
+		app.bind(Identifiers.Evm.Worker).toConstantValue(context.evmWorker);
 
 		context.bootstrapper = app.resolve(Bootstrapper);
 		context.app = app;
@@ -106,7 +117,7 @@ describe<{
 
 	});
 
-	it("should store genesis commit form configuration, database is empty, skip import, process block", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository }) => {
+	it("should store genesis commit form configuration, database is empty, skip import, process block", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker }) => {
 		// Snapshot exists
 		const milestone = {}
 
@@ -124,6 +135,8 @@ describe<{
 		const spyValidatorSetRestore = spy(validatorSet, "restore");
 		const spyStateSetBootstrap = spy(state, "setBootstrap");
 		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
+		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
+		const spyEvmWorkerStart = spy(evmWorker, "start");
 
 		await bootstrapper.bootstrap();
 
@@ -148,9 +161,11 @@ describe<{
 		spyStateSetBootstrap.calledOnce();
 		spyStateSetBootstrap.calledWith(false);
 		spyPrintLoadedValidators.calledOnce();
+		spyTxPoolWorkerStart.calledOnce();
+		spyEvmWorkerStart.calledOnce();
 	})
 
-	it("should store genesis commit form configuration, database is empty, run import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository }) => {
+	it("should store genesis commit form configuration, database is empty, run import", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker }) => {
 		// Snapshot exists
 		const genesisCommit = {
 			block: {
@@ -181,6 +196,8 @@ describe<{
 		const spyValidatorSetRestore = spy(validatorSet, "restore");
 		const spyStateSetBootstrap = spy(state, "setBootstrap");
 		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
+		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
+		const spyEvmWorkerStart = spy(evmWorker, "start");
 
 		await bootstrapper.bootstrap();
 
@@ -205,6 +222,8 @@ describe<{
 		spyStateSetBootstrap.calledOnce();
 		spyStateSetBootstrap.calledWith(false);
 		spyPrintLoadedValidators.calledOnce();
+		spyTxPoolWorkerStart.calledOnce();
+		spyEvmWorkerStart.calledOnce();
 	});
 
 
