@@ -1,12 +1,11 @@
-// @ts-ignore
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Bootstrapper {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
+	// @inject(Identifiers.Application.Instance)
+	// private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Consensus.Service)
 	private readonly consensus!: Contracts.Consensus.Service;
@@ -121,17 +120,19 @@ export class Bootstrapper {
 		await this.#processGenesisBlock();
 		await this.validatorSet.restore();
 
-		// // After genesis commit to restore all data
+		// After genesis commit to restore all data
 		await this.#initApiSync();
 	}
 
 	async #initPostGenesisState(): Promise<void> {
+		// TODO: Check if we can move to bootstrap
 		await this.#initApiSync();
 
 		const commit = await this.databaseService.getLastCommit();
-		this.stateStore.setLastBlock(commit.block);
+		this.stateStore.setLastBlock(commit.block); // TODO: Check if we call it on genesis state
 		this.stateStore.setTotalRound(this.databaseService.getState().totalRound);
 
+		// TODO: Check if we can move to bootstrap
 		await this.validatorSet.restore();
 	}
 
