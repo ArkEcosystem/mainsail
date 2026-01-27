@@ -11,6 +11,9 @@ export class Bootstrapper {
 	@inject(Identifiers.Consensus.Service)
 	private readonly consensus!: Contracts.Consensus.Service;
 
+	@inject(Identifiers.State.Store)
+	private stateStore!: Contracts.State.Store;
+
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
 
@@ -34,9 +37,6 @@ export class Bootstrapper {
 
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
-
-	@inject(Identifiers.State.Store)
-	private stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly blockProcessor!: Contracts.Processor.BlockProcessor;
@@ -67,7 +67,7 @@ export class Bootstrapper {
 			// await this.#initPostGenesisState();
 		}
 
-		// this.state.setBootstrap(false);
+		this.state.setBootstrap(false);
 
 		// this.validatorRepository.printLoadedValidators();
 		// await this.txPoolWorker.start(this.stateStore.getBlockNumber());
