@@ -1,0 +1,553 @@
+import { Identifiers } from "@mainsail/constants";
+import { Application } from "@mainsail/kernel";
+
+import { describe } from "@mainsail/test-runner";
+import { Bootstrapper } from "./bootstrapper";
+
+describe<{
+	app: Application;
+	bootstrapper: Bootstrapper;
+	configuration: any;
+	commitFactory: any;
+	stateStore: any;
+	state: any;
+	databaseService: any;
+	snapshotImporter: any;
+	commitStateFactory: any;
+	commitState: any;
+	blockProcessor: any;
+	validatorSet: any;
+	validatorRepository: any;
+	txPoolWorker: any;
+	evmWorker: any;
+	consensus: any;
+	p2pServer: any;
+	p2pService: any;
+	apiSync: any;
+}>("Bootstrapper", ({ beforeEach, it, assert, spy, stub }) => {
+	const genesisCommitJson = {};
+	const genesisCommit = {
+		block: {
+			data: {
+				hash: "aaaaa",
+			},
+			header: {
+				parentHash: "0000000000000000000000000000000000000000000000000000000000000000",
+			},
+		},
+	};
+
+	beforeEach((context) => {
+		context.configuration = {
+			get: () => genesisCommitJson,
+			getGenesisHeight: () => 1,
+			getMilestone: () => {},
+		};
+
+		context.commitFactory = {
+			fromJson: () => genesisCommit,
+		};
+
+		context.stateStore = {
+			setGenesisCommit: () => {},
+			getGenesisCommit: () => genesisCommit,
+			getBlockNumber: () => 1,
+			setLastBlock: () => {},
+			setTotalRound: () => {},
+		};
+
+		context.state = {
+			setBootstrap: () => {},
+		};
+
+		context.databaseService = {
+			getBlock: () => undefined,
+			isEmpty: () => true,
+			getLastCommit: () => {},
+			getState: () => {},
+		};
+
+		context.snapshotImporter = {
+			run: () => {},
+			dispose: () => {},
+		};
+
+		context.commitState = {
+			setProcessorResult: () => {},
+		};
+		context.commitStateFactory = () => context.commitState;
+
+		context.blockProcessor = {
+			process: () => {
+				success: true;
+			},
+			commit: () => {},
+		};
+
+		context.validatorSet = {
+			restore: () => {},
+		};
+
+		context.validatorRepository = {
+			printLoadedValidators: () => {},
+		};
+
+		context.txPoolWorker = {
+			start: () => {},
+		};
+
+		context.evmWorker = {
+			start: () => {},
+		};
+
+		context.consensus = {
+			run: () => {},
+		};
+
+		context.p2pServer = {
+			boot: () => {},
+		};
+
+		context.p2pService = {
+			boot: () => {},
+		};
+
+		context.apiSync = {
+			bootstrap: () => {},
+		};
+
+		const app = new Application();
+
+		app.bind(Identifiers.Consensus.Service).toConstantValue(context.consensus);
+		app.bind(Identifiers.State.Store).toConstantValue(context.stateStore);
+		app.bind(Identifiers.State.State).toConstantValue(context.state);
+		app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
+		app.bind(Identifiers.Validator.Repository).toConstantValue(context.validatorRepository);
+		app.bind(Identifiers.P2P.Server).toConstantValue(context.p2pServer);
+		app.bind(Identifiers.P2P.Service).toConstantValue(context.p2pService);
+		app.bind(Identifiers.Cryptography.Commit.Factory).toConstantValue(context.commitFactory);
+		app.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
+		app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
+		app.bind(Identifiers.Processor.BlockProcessor).toConstantValue(context.blockProcessor);
+		app.bind(Identifiers.Consensus.CommitState.Factory).toConstantValue(context.commitStateFactory);
+		app.bind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(context.snapshotImporter);
+		app.bind(Identifiers.TransactionPool.Worker).toConstantValue(context.txPoolWorker);
+		app.bind(Identifiers.Evm.Worker).toConstantValue(context.evmWorker);
+
+		context.bootstrapper = app.resolve(Bootstrapper);
+		context.app = app;
+	});
+
+	it("should be ok with full database, with api sync", async ({
+		app,
+		stateStore,
+		databaseService,
+		commitFactory,
+		validatorSet,
+		state,
+		validatorRepository,
+		txPoolWorker,
+		evmWorker,
+		consensus,
+		p2pServer,
+		p2pService,
+		apiSync,
+	}) => {
+		app.bind(Identifiers.ApiSync.Service).toConstantValue(apiSync);
+		const bootstrapper = app.resolve(Bootstrapper);
+
+		const genesisCommit = {
+			block: {
+				data: {
+					hash: "bbbbbb",
+				},
+				header: {
+					parentHash: "0000000000000000000000000000000000000000000000000000000000000000",
+				},
+			},
+		};
+
+		const databaseState = {
+			totalRound: 13,
+		};
+
+		const spyCommitFactoryFromJson = stub(commitFactory, "fromJson").returnValue(genesisCommit);
+		const spyStoreSetGenesisCommit = stub(stateStore, "setGenesisCommit").returnValue(genesisCommit);
+		const spyStoreSetLastBlock = spy(stateStore, "setLastBlock");
+		const spyStoreSetTotalRound = spy(stateStore, "setTotalRound");
+		const spyDatabaseServiceGetBlock = stub(databaseService, "getBlock").returnValue(undefined);
+		const spyDatabaseServiceIsEmpty = stub(databaseService, "isEmpty").returnValue(false);
+		const spyDatabaseServiceGetLastCommit = stub(databaseService, "getLastCommit").returnValue(genesisCommit);
+		const spyDatabaseServiceGetState = stub(databaseService, "getState").returnValue(databaseState);
+		const spyValidatorSetRestore = spy(validatorSet, "restore");
+		const spyStateSetBootstrap = spy(state, "setBootstrap");
+		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
+		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
+		const spyEvmWorkerStart = spy(evmWorker, "start");
+		const spyConsensusRun = spy(consensus, "run");
+		const spyP2PServerBoot = spy(p2pServer, "boot");
+		const spyP2PServiceBoot = spy(p2pService, "boot");
+		const spyApiSyncBootstrap = spy(apiSync, "bootstrap");
+
+		await bootstrapper.bootstrap();
+
+		// #setGenesisCommit
+		spyCommitFactoryFromJson.calledOnce();
+		spyStoreSetGenesisCommit.calledOnce();
+		spyStoreSetGenesisCommit.calledWith(genesisCommit);
+		// #checkStoredGenesisCommit
+		spyDatabaseServiceGetBlock.calledOnce();
+		// bootstrap
+		spyDatabaseServiceIsEmpty.calledOnce();
+
+		// #initPostGenesisState
+		spyDatabaseServiceGetLastCommit.calledOnce();
+		spyStoreSetLastBlock.calledOnce();
+		spyStoreSetLastBlock.calledWith(genesisCommit.block);
+		spyDatabaseServiceGetState.calledOnce();
+		spyStoreSetTotalRound.calledWith(databaseState.totalRound);
+		spyValidatorSetRestore.calledOnce();
+
+		// bootstrap
+		spyApiSyncBootstrap.calledOnce();
+		spyStateSetBootstrap.calledOnce();
+		spyStateSetBootstrap.calledWith(false);
+		spyPrintLoadedValidators.calledOnce();
+		spyTxPoolWorkerStart.calledOnce();
+		spyEvmWorkerStart.calledOnce();
+		spyConsensusRun.calledOnce();
+		spyP2PServerBoot.calledOnce();
+		spyP2PServiceBoot.calledOnce();
+	});
+
+	it("should be ok with full database, without api sync", async ({
+		bootstrapper,
+		stateStore,
+		databaseService,
+		commitFactory,
+		validatorSet,
+		state,
+		validatorRepository,
+		txPoolWorker,
+		evmWorker,
+		consensus,
+		p2pServer,
+		p2pService,
+		apiSync,
+	}) => {
+		const genesisCommit = {
+			block: {
+				data: {
+					hash: "bbbbbb",
+				},
+				header: {
+					parentHash: "0000000000000000000000000000000000000000000000000000000000000000",
+				},
+			},
+		};
+
+		const databaseState = {
+			totalRound: 13,
+		};
+
+		const spyCommitFactoryFromJson = stub(commitFactory, "fromJson").returnValue(genesisCommit);
+		const spyStoreSetGenesisCommit = stub(stateStore, "setGenesisCommit").returnValue(genesisCommit);
+		const spyStoreSetLastBlock = spy(stateStore, "setLastBlock");
+		const spyStoreSetTotalRound = spy(stateStore, "setTotalRound");
+		const spyDatabaseServiceGetBlock = stub(databaseService, "getBlock").returnValue(undefined);
+		const spyDatabaseServiceIsEmpty = stub(databaseService, "isEmpty").returnValue(false);
+		const spyDatabaseServiceGetLastCommit = stub(databaseService, "getLastCommit").returnValue(genesisCommit);
+		const spyDatabaseServiceGetState = stub(databaseService, "getState").returnValue(databaseState);
+		const spyValidatorSetRestore = spy(validatorSet, "restore");
+		const spyStateSetBootstrap = spy(state, "setBootstrap");
+		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
+		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
+		const spyEvmWorkerStart = spy(evmWorker, "start");
+		const spyConsensusRun = spy(consensus, "run");
+		const spyP2PServerBoot = spy(p2pServer, "boot");
+		const spyP2PServiceBoot = spy(p2pService, "boot");
+		const spyApiSyncBootstrap = spy(apiSync, "bootstrap");
+
+		await bootstrapper.bootstrap();
+
+		// #setGenesisCommit
+		spyCommitFactoryFromJson.calledOnce();
+		spyStoreSetGenesisCommit.calledOnce();
+		spyStoreSetGenesisCommit.calledWith(genesisCommit);
+		// #checkStoredGenesisCommit
+		spyDatabaseServiceGetBlock.calledOnce();
+		// bootstrap
+		spyDatabaseServiceIsEmpty.calledOnce();
+
+		// #initPostGenesisState
+		spyDatabaseServiceGetLastCommit.calledOnce();
+		spyStoreSetLastBlock.calledOnce();
+		spyStoreSetLastBlock.calledWith(genesisCommit.block);
+		spyDatabaseServiceGetState.calledOnce();
+		spyStoreSetTotalRound.calledWith(databaseState.totalRound);
+		spyValidatorSetRestore.calledOnce();
+
+		// bootstrap
+		spyApiSyncBootstrap.neverCalled();
+		spyStateSetBootstrap.calledOnce();
+		spyStateSetBootstrap.calledWith(false);
+		spyPrintLoadedValidators.calledOnce();
+		spyTxPoolWorkerStart.calledOnce();
+		spyEvmWorkerStart.calledOnce();
+		spyConsensusRun.calledOnce();
+		spyP2PServerBoot.calledOnce();
+		spyP2PServiceBoot.calledOnce();
+	});
+
+	it("should be ok with empty database and without snapshot", async ({
+		bootstrapper,
+		stateStore,
+		databaseService,
+		configuration,
+		snapshotImporter,
+		commitFactory,
+		blockProcessor,
+		validatorSet,
+		state,
+		validatorRepository,
+		txPoolWorker,
+		evmWorker,
+		consensus,
+		p2pServer,
+		p2pService,
+	}) => {
+		const milestone = {};
+
+		const spyCommitFactoryFromJson = stub(commitFactory, "fromJson").returnValue(genesisCommit);
+		const spyStoreSetGenesisCommit = stub(stateStore, "setGenesisCommit").returnValue(genesisCommit);
+		const spyStoreGetGenesisCommit = stub(stateStore, "getGenesisCommit").returnValue(genesisCommit);
+		const spyDatabaseServiceGetBlock = stub(databaseService, "getBlock").returnValue(undefined);
+		const spyDatabaseServiceIsEmpty = stub(databaseService, "isEmpty").returnValue(true);
+		const spyGetMilestone = stub(configuration, "getMilestone").returnValue(milestone);
+		const spySnapshotImporterRun = spy(snapshotImporter, "run");
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue({
+			success: true,
+		});
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyValidatorSetRestore = spy(validatorSet, "restore");
+		const spyStateSetBootstrap = spy(state, "setBootstrap");
+		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
+		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
+		const spyEvmWorkerStart = spy(evmWorker, "start");
+		const spyConsensusRun = spy(consensus, "run");
+		const spyP2PServerBoot = spy(p2pServer, "boot");
+		const spyP2PServiceBoot = spy(p2pService, "boot");
+
+		await bootstrapper.bootstrap();
+
+		// #setGenesisCommit
+		spyCommitFactoryFromJson.calledOnce();
+		spyStoreSetGenesisCommit.calledOnce();
+		spyStoreSetGenesisCommit.calledWith(genesisCommit);
+		// #checkStoredGenesisCommit
+		spyDatabaseServiceGetBlock.calledOnce();
+		// bootstrap
+		spyDatabaseServiceIsEmpty.calledOnce();
+		// #tryImportSnapshot
+		spyGetMilestone.calledOnce();
+		spySnapshotImporterRun.neverCalled();
+		// #processGenesisBlock
+		spyStoreGetGenesisCommit.calledTimes(2); // #checkStoredGenesisCommit, #processGenesisBlock
+		// #processCommit
+		spyBlockProcessorProcess.calledOnce();
+		spyBlockProcessorCommit.calledOnce();
+		spyValidatorSetRestore.calledOnce();
+		// bootstrap
+		spyStateSetBootstrap.calledOnce();
+		spyStateSetBootstrap.calledWith(false);
+		spyPrintLoadedValidators.calledOnce();
+		spyTxPoolWorkerStart.calledOnce();
+		spyEvmWorkerStart.calledOnce();
+		spyConsensusRun.calledOnce();
+		spyP2PServerBoot.calledOnce();
+		spyP2PServiceBoot.calledOnce();
+	});
+
+	it("should be ok with empty database and with snapshot", async ({
+		bootstrapper,
+		stateStore,
+		databaseService,
+		configuration,
+		snapshotImporter,
+		commitFactory,
+		blockProcessor,
+		validatorSet,
+		state,
+		validatorRepository,
+		txPoolWorker,
+		evmWorker,
+		consensus,
+		p2pServer,
+		p2pService,
+	}) => {
+		const genesisCommit = {
+			block: {
+				data: {
+					hash: "aaaaa",
+				},
+				header: {
+					parentHash: "1111111111111111111111111111111111111111111111111111111111111111",
+				},
+			},
+		};
+
+		const milestone = {
+			snapshot: "abc",
+		};
+
+		const spyCommitFactoryFromJson = stub(commitFactory, "fromJson").returnValue(genesisCommit);
+		const spyStoreSetGenesisCommit = stub(stateStore, "setGenesisCommit").returnValue(genesisCommit);
+		const spyStoreGetGenesisCommit = stub(stateStore, "getGenesisCommit").returnValue(genesisCommit);
+		const spyDatabaseServiceGetBlock = stub(databaseService, "getBlock").returnValue(undefined);
+		const spyDatabaseServiceIsEmpty = stub(databaseService, "isEmpty").returnValue(true);
+		const spyGetMilestone = stub(configuration, "getMilestone").returnValue(milestone);
+		const spySnapshotImporterRun = spy(snapshotImporter, "run");
+		const spySnapshotImporterDispose = spy(snapshotImporter, "dispose");
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue({
+			success: true,
+		});
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyValidatorSetRestore = spy(validatorSet, "restore");
+		const spyStateSetBootstrap = spy(state, "setBootstrap");
+		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
+		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
+		const spyEvmWorkerStart = spy(evmWorker, "start");
+		const spyConsensusRun = spy(consensus, "run");
+		const spyP2PServerBoot = spy(p2pServer, "boot");
+		const spyP2PServiceBoot = spy(p2pService, "boot");
+
+		await bootstrapper.bootstrap();
+
+		// #setGenesisCommit
+		spyCommitFactoryFromJson.calledOnce();
+		spyStoreSetGenesisCommit.calledOnce();
+		spyStoreSetGenesisCommit.calledWith(genesisCommit);
+		// #checkStoredGenesisCommit
+		spyDatabaseServiceGetBlock.calledOnce();
+		// bootstrap
+		spyDatabaseServiceIsEmpty.calledOnce();
+		// #tryImportSnapshot
+		spyGetMilestone.calledOnce();
+		spySnapshotImporterRun.calledOnce();
+		spySnapshotImporterDispose.calledOnce();
+		// #processGenesisBlock
+		spyStoreGetGenesisCommit.calledTimes(2); // #checkStoredGenesisCommit, #processGenesisBlock
+		// #processCommit
+		spyBlockProcessorProcess.calledOnce();
+		spyBlockProcessorCommit.calledOnce();
+		spyValidatorSetRestore.calledOnce();
+		// bootstrap
+		spyStateSetBootstrap.calledOnce();
+		spyStateSetBootstrap.calledWith(false);
+		spyPrintLoadedValidators.calledOnce();
+		spyTxPoolWorkerStart.calledOnce();
+		spyEvmWorkerStart.calledOnce();
+		spyConsensusRun.calledOnce();
+		spyP2PServerBoot.calledOnce();
+		spyP2PServiceBoot.calledOnce();
+	});
+
+	it("should throw if stored genesis block doesn't match genesis block from config", async ({
+		bootstrapper,
+		stateStore,
+		databaseService,
+	}) => {
+		const spyStoreSetGenesisCommit = spy(stateStore, "setGenesisCommit");
+		const spyStoreGetGenesisCommit = spy(stateStore, "getGenesisCommit");
+		const spyDatabaseServiceGetBlock = stub(databaseService, "getBlock").returnValue({
+			data: {
+				hash: "bbbbb",
+			},
+		});
+
+		await assert.rejects(
+			() => bootstrapper.bootstrap(),
+			"Block from crypto.json doesn't match stored genesis block",
+		);
+
+		// #setGenesisCommit
+		spyStoreSetGenesisCommit.calledOnce();
+		spyStoreSetGenesisCommit.calledWith(genesisCommit);
+		// #checkStoredGenesisCommit
+		spyDatabaseServiceGetBlock.calledOnce();
+		spyStoreGetGenesisCommit.calledOnce();
+	});
+
+	it("should throw if milestone.snapshot doesn't match genesis block parentHash", async ({
+		bootstrapper,
+		stateStore,
+		databaseService,
+		configuration,
+	}) => {
+		const spyStoreSetGenesisCommit = spy(stateStore, "setGenesisCommit");
+		const spyStoreGetGenesisCommit = spy(stateStore, "getGenesisCommit");
+		const spyDatabaseServiceGetBlock = spy(databaseService, "getBlock");
+		const spyDatabaseServiceIsEmpty = spy(databaseService, "isEmpty");
+		const spyGetMilestone = stub(configuration, "getMilestone").returnValue({
+			snapshot: "abc",
+		});
+
+		await assert.rejects(
+			() => bootstrapper.bootstrap(),
+			"Previous block is set to snapshot, but there is no snapshot defined in milestones",
+		);
+
+		// #setGenesisCommit
+		spyStoreSetGenesisCommit.calledOnce();
+		spyStoreSetGenesisCommit.calledWith(genesisCommit);
+		// #checkStoredGenesisCommit
+		spyDatabaseServiceGetBlock.calledOnce();
+		// bootstrap
+		spyDatabaseServiceIsEmpty.calledOnce();
+		// #tryImportSnapshot
+		spyStoreGetGenesisCommit.calledOnce();
+		spyGetMilestone.calledOnce();
+	});
+
+	it("should throw if genesis block is not processed", async ({
+		bootstrapper,
+		stateStore,
+		databaseService,
+		configuration,
+		snapshotImporter,
+		commitFactory,
+		blockProcessor,
+	}) => {
+		// Snapshot exists
+		const milestone = {};
+
+		const spyCommitFactoryFromJson = stub(commitFactory, "fromJson").returnValue(genesisCommit);
+		const spyStoreSetGenesisCommit = stub(stateStore, "setGenesisCommit").returnValue(genesisCommit);
+		const spyStoreGetGenesisCommit = stub(stateStore, "getGenesisCommit").returnValue(genesisCommit);
+		const spyDatabaseServiceGetBlock = stub(databaseService, "getBlock").returnValue(undefined);
+		const spyDatabaseServiceIsEmpty = stub(databaseService, "isEmpty").returnValue(true);
+		const spyGetMilestone = stub(configuration, "getMilestone").returnValue(milestone);
+		const spySnapshotImporterRun = spy(snapshotImporter, "run");
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue({
+			success: false,
+		});
+
+		await assert.rejects(() => bootstrapper.bootstrap(), "Block is not processed.");
+
+		// #setGenesisCommit
+		spyCommitFactoryFromJson.calledOnce();
+		spyStoreSetGenesisCommit.calledOnce();
+		spyStoreSetGenesisCommit.calledWith(genesisCommit);
+		// #checkStoredGenesisCommit
+		spyDatabaseServiceGetBlock.calledOnce();
+		// bootstrap
+		spyDatabaseServiceIsEmpty.calledOnce();
+		// #tryImportSnapshot
+		spyGetMilestone.calledOnce();
+		spySnapshotImporterRun.neverCalled();
+		// #processGenesisBlock
+		spyStoreGetGenesisCommit.calledTimes(2); // #checkStoredGenesisCommit, #processGenesisBlock
+		// #processCommit
+		spyBlockProcessorProcess.calledOnce();
+	});
+});

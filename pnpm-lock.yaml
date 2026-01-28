@@ -576,6 +576,9 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
+      esmock:
+        specifier: 2.7.3
+        version: 2.7.3
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -7194,6 +7197,10 @@ packages:
 
   esmock@2.7.1:
     resolution: {integrity: sha512-YgtZ6TSwRbdqFLkJwxVCYkt0rzKpjHb0tbDqSjWvbkm8Uy5Tm5W6ixICb3FVRkAd1uQlLOXiIn7OPY4F4f18cw==}
+    engines: {node: '>=14.16.0'}
+
+  esmock@2.7.3:
+    resolution: {integrity: sha512-/M/YZOjgyLaVoY6K83pwCsGE1AJQnj4S4GyXLYgi/Y79KL8EeW6WU7Rmjc89UO7jv6ec8+j34rKeWOfiLeEu0A==}
     engines: {node: '>=14.16.0'}
 
   esniff@2.0.1:
@@ -14799,6 +14806,8 @@ snapshots:
       - supports-color
 
   esmock@2.7.1: {}
+
+  esmock@2.7.3: {}
 
   esniff@2.0.1:
     dependencies:

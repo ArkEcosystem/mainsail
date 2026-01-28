@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/constants";
 import { Application, Services } from "@mainsail/kernel";
 
 import { describe } from "@mainsail/test-runner";
-import { ServiceProvider } from ".";
+import { ServiceProvider } from "./service-provider.js";
 
 describe<{
 	app: Application;

@@ -100,12 +100,12 @@ export class Consensus implements Contracts.Consensus.Service {
 		return this.#validValue ? this.#validValue.round : undefined;
 	}
 
-	// TODO: Only for tests
+	// Only for tests
 	public setValidRound(round: Contracts.Consensus.RoundState): void {
 		this.#validValue = round;
 	}
 
-	// TODO: Only for tests
+	// Only for tests
 	public setProposal(proposalPromise: Promise<Contracts.Crypto.Proposal>, block: Contracts.Crypto.Block): void {
 		this.#proposalPromise = proposalPromise;
 		this.#proposedBlock = block;
@@ -122,14 +122,18 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	public async run(): Promise<void> {
-		await this.#bootstrap();
-		await this.startRound(this.#round);
+		try {
+			await this.#bootstrap();
+			await this.startRound(this.#round);
 
-		await this.handle(this.roundStateRepository.getRoundState(this.#blockNumber, this.#round));
+			await this.handle(this.roundStateRepository.getRoundState(this.#blockNumber, this.#round));
 
-		// Rerun previous rounds, in case proposal & +2/3 precommits were received
-		for (let index = 0; index < this.#round; index++) {
-			await this.handle(this.roundStateRepository.getRoundState(this.#blockNumber, index));
+			// Rerun previous rounds, in case proposal & +2/3 precommits were received
+			for (let index = 0; index < this.#round; index++) {
+				await this.handle(this.roundStateRepository.getRoundState(this.#blockNumber, index));
+			}
+		} catch (error) {
+			await this.app.terminate("Consensus bootstrap error", error);
 		}
 	}
 

@@ -4,11 +4,11 @@ import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Bootstrapper {
-	@inject(Identifiers.Application.Instance)
-	public readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.Consensus.Service)
 	private readonly consensus!: Contracts.Consensus.Service;
+
+	@inject(Identifiers.State.Store)
+	private stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
@@ -34,9 +34,6 @@ export class Bootstrapper {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	@inject(Identifiers.State.Store)
-	private stateStore!: Contracts.State.Store;
-
 	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly blockProcessor!: Contracts.Processor.BlockProcessor;
 
@@ -48,8 +45,7 @@ export class Bootstrapper {
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
 	@inject(Identifiers.Snapshot.Legacy.Importer)
-	@optional()
-	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
+	private readonly snapshotImporter!: Contracts.Snapshot.LegacyImporter;
 
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
@@ -67,24 +63,23 @@ export class Bootstrapper {
 			await this.#initPostGenesisState();
 		}
 
+		await this.validatorSet.restore();
+
+		// After genesis commit to restore all data
+		await this.#initApiSync();
+		this.snapshotImporter.dispose();
+
 		this.state.setBootstrap(false);
 
 		this.validatorRepository.printLoadedValidators();
 		await this.txPoolWorker.start(this.stateStore.getBlockNumber());
 		await this.evmWorker.start(this.stateStore.getBlockNumber());
 
-		void this.runConsensus();
+		// TODO: Check if we can extract bootstrap
+		void this.consensus.run();
 
 		await this.p2pServer.boot();
 		await this.p2pService.boot();
-	}
-
-	async runConsensus(): Promise<void> {
-		try {
-			await this.consensus.run();
-		} catch (error) {
-			console.log(error);
-		}
 	}
 
 	async #setGenesisCommit(): Promise<void> {
@@ -109,32 +104,18 @@ export class Bootstrapper {
 	async #initApiSync(): Promise<void> {
 		if (this.apiSync) {
 			await this.apiSync.bootstrap();
-		} else if (this.snapshotImporter) {
-			this.snapshotImporter.dispose();
 		}
 	}
 
 	async #initGenesisState(): Promise<void> {
-		if (!(await this.databaseService.isEmpty())) {
-			throw new Error("initGenesisState must be called on empty database");
-		}
-
 		await this.#tryImportSnapshot();
 		await this.#processGenesisBlock();
-		await this.validatorSet.restore();
-
-		// After genesis commit to restore all data
-		await this.#initApiSync();
 	}
 
 	async #initPostGenesisState(): Promise<void> {
-		await this.#initApiSync();
-
 		const commit = await this.databaseService.getLastCommit();
 		this.stateStore.setLastBlock(commit.block);
 		this.stateStore.setTotalRound(this.databaseService.getState().totalRound);
-
-		await this.validatorSet.restore();
 	}
 
 	async #processGenesisBlock(): Promise<void> {
@@ -143,22 +124,18 @@ export class Bootstrapper {
 	}
 
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {
-		try {
-			const commitState = this.commitStateFactory(commit);
-			const result = await this.blockProcessor.process(commitState);
-			if (!result.success) {
-				throw new Error(`Block is not processed.`);
-			}
-
-			commitState.setProcessorResult(result);
-
-			await this.blockProcessor.commit(commitState);
-		} catch (error) {
-			await this.app.terminate(`Failed to process block at height ${commit.block.data.number}`, error);
+		const commitState = this.commitStateFactory(commit);
+		const result = await this.blockProcessor.process(commitState);
+		if (!result.success) {
+			throw new Error(`Block is not processed.`);
 		}
+
+		commitState.setProcessorResult(result);
+		await this.blockProcessor.commit(commitState);
 	}
 
 	async #tryImportSnapshot(): Promise<void> {
+		// TODO: Move this check to snapshot importer
 		const genesisBlock = this.stateStore.getGenesisCommit();
 		const milestone = this.configuration.getMilestone();
 
@@ -167,14 +144,10 @@ export class Bootstrapper {
 			genesisBlock.block.header.parentHash === "0000000000000000000000000000000000000000000000000000000000000000"
 		) {
 			if (milestone.snapshot) {
-				throw new Error("previous block set to snapshot but no hash in milestone");
+				throw new Error("Previous block is set to snapshot, but there is no snapshot defined in milestones");
 			}
 
 			return;
-		}
-
-		if (!this.snapshotImporter) {
-			throw new Error("snapshot importer not loaded");
 		}
 
 		await this.snapshotImporter.run(genesisBlock);
