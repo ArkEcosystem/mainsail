@@ -30,7 +30,9 @@
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
-		"uvu": "0.5.6"
+		"@types/tmp": "0.2.6",
+		"uvu": "0.5.6",
+		"tmp": "0.2.5"
 	},
 	"engines": {
 		"node": ">=20.x"
