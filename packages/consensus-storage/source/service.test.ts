@@ -75,6 +75,8 @@ describe<{
 			messages: [],
 		});
 		assert.equal(await service.getState(), state0);
+		assert.equal(await service.getProposals(), []);
+		assert.equal(await service.getMessages(), []);
 
 		await service.persist({
 			state: state1,
@@ -82,6 +84,8 @@ describe<{
 			messages: [],
 		});
 		assert.equal(await service.getState(), state1);
+		assert.equal(await service.getProposals(), []);
+		assert.equal(await service.getMessages(), []);
 	});
 
 	it("#getProposals - should return empty array", async ({ service }) => {
@@ -119,16 +123,22 @@ describe<{
 			messages: [],
 		});
 
+
+		assert.equal(await service.getState(), state0);
 		assert.equal(await service.getProposals(), [proposalSerialized1, proposalSerialized2]);
+		assert.equal(await service.getMessages(), []);
+
 
 		// Clear
 		await service.persist({
-			state: state0,
+			state: state1,
 			proposals: [proposal3],
 			messages: [],
 		});
 
+		assert.equal(await service.getState(), state1);
 		assert.equal(await service.getProposals(), [proposalSerialized3]);
+		assert.equal(await service.getMessages(), []);
 	});
 
 	it("#getMessages - should return empty array", async ({ service }) => {
@@ -166,14 +176,18 @@ describe<{
 			messages: [message1, message2],
 		});
 
+		assert.equal(await service.getState(), state0);
+		assert.equal(await service.getProposals(), []);
 		assert.equal(await service.getMessages(), [messageSerialized1, messageSerialized2]);
 
 		await service.persist({
-			state: state0,
+			state: state1,
 			proposals: [],
 			messages: [message3],
 		});
 
+		assert.equal(await service.getState(), state1);
+		assert.equal(await service.getProposals(), []);
 		assert.equal(await service.getMessages(), [messageSerialized3]);
 	});
 });
