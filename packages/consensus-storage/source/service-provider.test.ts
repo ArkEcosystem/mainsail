@@ -10,7 +10,7 @@ import { ServiceProvider } from "./service-provider";
 describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
-}>("ServiceProvider", ({ beforeEach, afterEach, it, assert, stubFn }) => {
+}>("ServiceProvider", ({ beforeEach, afterEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		const app = new Application();
 
@@ -25,7 +25,7 @@ describe<{
 		context.app = app;
 	});
 
-	it("should register", async ({serviceProvider, app}) => {
+	it("#register - should be ok", async ({serviceProvider, app}) => {
 		await serviceProvider.register();
 
 		assert.true(app.isBound(Identifiers.ConsensusStorage.Root));
@@ -35,4 +35,73 @@ describe<{
 		assert.true(app.isBound(Identifiers.ConsensusStorage.Service));
 	});
 
+
+	it("#dispose - should call persist with round and consensus state data", async ({serviceProvider, app}) => {
+		await serviceProvider.register();
+
+		const message1 = {
+			msg: 1
+		}
+
+		const message2 = {
+			msg: 2
+		}
+
+		const message3 = {
+			msg: 3
+		}
+
+		const message4 = {
+			msg: 4
+		}
+
+		const proposal1 = {
+			proposal: 1
+		}
+
+		const proposal2 = {
+			proposal: 2
+		}
+
+		app.bind(Identifiers.Consensus.RoundStateRepository).toConstantValue({
+			getRoundStates: () => [
+				{
+					getMessages: () => [message1],
+					getProposal: () => proposal1,
+				},
+				{
+					getMessages: () => [message2, message3],
+					getProposal: () => proposal2,
+				},
+				{
+					getMessages: () => [message4],
+					getProposal: () => undefined,
+				}
+			]
+		});
+
+		const state = {
+			state: 1
+		}
+
+		app.bind(Identifiers.Consensus.Service).toConstantValue({
+			getState: () => state
+		});
+
+		const consensusStorageService = {
+			persist: () => {}
+		}
+		app.rebind(Identifiers.ConsensusStorage.Service).toConstantValue(consensusStorageService);
+
+		const spyPersist = spy(consensusStorageService, "persist")
+
+		await serviceProvider.dispose();
+
+		spyPersist.calledOnce();
+		spyPersist.calledWith({
+			messages: [message1, message2, message3, message4],
+			proposals: [proposal1, proposal2],
+			state: state
+		});
+	});
 });
