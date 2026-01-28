@@ -78,7 +78,6 @@ export class Bootstrapper {
 		// TODO: Check if we can extract bootstrap
 		void this.consensus.run();
 
-		// TODO: Check if we need booth
 		await this.p2pServer.boot();
 		await this.p2pService.boot();
 	}
