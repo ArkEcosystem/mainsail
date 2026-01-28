@@ -138,33 +138,6 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 		return !isMainThread;
 	}
 
-	public enableMaintenance(): void {
-		// writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: Date.now() }));
-		// this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice(
-		// 	"Application is now in maintenance mode.",
-		// );
-		// // eslint-disable-next-line @typescript-eslint/no-floating-promises
-		// this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service).dispatch(
-		// 	"kernel.maintenance",
-		// 	true,
-		// );
-	}
-
-	public disableMaintenance(): void {
-		// removeSync(this.tempPath("maintenance"));
-		// this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice("Application is now live.");
-		// // eslint-disable-next-line @typescript-eslint/no-floating-promises
-		// this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service).dispatch(
-		// 	"kernel.maintenance",
-		// 	false,
-		// );
-	}
-
-	public isDownForMaintenance(): boolean {
-		// existsSync(this.tempPath("maintenance"));
-		return false;
-	}
-
 	public async terminate(reason?: string, error?: Error): Promise<never> {
 		this.#booted = false;
 
