@@ -107,9 +107,6 @@ export class Bootstrapper {
 		if (this.apiSync) {
 			await this.apiSync.bootstrap();
 		}
-
-		// TODO: Check if can be removed
-		// this.snapshotImporter.dispose();
 	}
 
 	async #initGenesisState(): Promise<void> {
@@ -119,6 +116,7 @@ export class Bootstrapper {
 
 		// After genesis commit to restore all data
 		await this.#initApiSync();
+		this.snapshotImporter.dispose();
 	}
 
 	async #initPostGenesisState(): Promise<void> {

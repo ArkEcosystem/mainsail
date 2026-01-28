@@ -69,6 +69,7 @@ describe<{
 
 		context.snapshotImporter = {
 			run: () => {},
+			dispose: () => {},
 		}
 
 		context.commitState = {
@@ -278,6 +279,7 @@ describe<{
 		const spyDatabaseServiceIsEmpty = stub(databaseService, "isEmpty").returnValue(true);
 		const spyGetMilestone = stub(configuration, "getMilestone").returnValue(milestone);
 		const spySnapshotImporterRun = spy(snapshotImporter, "run");
+		const spySnapshotImporterDispose = spy(snapshotImporter, "dispose");
 		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue({
 			success: true
 		});
@@ -305,6 +307,7 @@ describe<{
 		// #tryImportSnapshot
 		spyGetMilestone.calledOnce();
 		spySnapshotImporterRun.calledOnce();
+		spySnapshotImporterDispose.calledOnce();
 		// #processGenesisBlock
 		spyStoreGetGenesisCommit.calledTimes(2); // #checkStoredGenesisCommit, #processGenesisBlock
 		// #processCommit
