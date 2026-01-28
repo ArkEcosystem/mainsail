@@ -75,19 +75,12 @@ export class Bootstrapper {
 		await this.txPoolWorker.start(this.stateStore.getBlockNumber());
 		await this.evmWorker.start(this.stateStore.getBlockNumber());
 
-		void this.#runConsensus();
+		// TODO: Check if we can extract bootstrap
+		void this.consensus.run();
 
 		// TODO: Check if we need booth
 		await this.p2pServer.boot();
 		await this.p2pService.boot();
-	}
-
-	async #runConsensus(): Promise<void> {
-		try {
-			await this.consensus.run();
-		} catch (error) { // TODO: Check if it makes sense
-			console.log(error);
-		}
 	}
 
 	async #setGenesisCommit(): Promise<void> {
