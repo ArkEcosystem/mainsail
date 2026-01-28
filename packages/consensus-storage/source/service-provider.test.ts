@@ -10,7 +10,7 @@ import { ServiceProvider } from "./service-provider";
 describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
-}>("ServiceProvider", ({ beforeEach, afterEach, it, assert, spy }) => {
+}>("ServiceProvider", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		const app = new Application();
 
