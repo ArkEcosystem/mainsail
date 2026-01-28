@@ -4,9 +4,6 @@ import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Bootstrapper {
-	// @inject(Identifiers.Application.Instance)
-	// private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.Consensus.Service)
 	private readonly consensus!: Contracts.Consensus.Service;
 
@@ -150,20 +147,6 @@ export class Bootstrapper {
 
 		commitState.setProcessorResult(result);
 		await this.blockProcessor.commit(commitState);
-
-		// try {
-		// 	const commitState = this.commitStateFactory(commit);
-		// 	const result = await this.blockProcessor.process(commitState);
-		// 	if (!result.success) {
-		// 		throw new Error(`Block is not processed.`);
-		// 	}
-
-		// 	commitState.setProcessorResult(result);
-
-		// 	await this.blockProcessor.commit(commitState);
-		// } catch (error) {
-		// 	await this.app.terminate(`Failed to process block at height ${commit.block.data.number}`, error);
-		// }
 	}
 
 	async #tryImportSnapshot(): Promise<void> {
