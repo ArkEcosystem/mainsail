@@ -55,6 +55,9 @@
 			"package": "@mainsail/networking-ntp"
 		},
 		{
+			"package": "@mainsail/snapshot-legacy-importer"
+		},
+		{
 			"package": "@mainsail/state"
 		},
 		{
