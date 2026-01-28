@@ -24,6 +24,7 @@ describe<{
 	consensus: any,
 	p2pServer: any,
 	p2pService: any,
+	apiSync: any,
 }>("Bootstrapper", ({ beforeEach, it, assert, spy, stub }) => {
 	const genesisCommitJson = {}
 	const genesisCommit = {
@@ -112,6 +113,10 @@ describe<{
 			boot: () => {}
 		}
 
+		context.apiSync = {
+			bootstrap: () => {}
+		}
+
 		const app = new Application();
 
 		app.bind(Identifiers.Consensus.Service).toConstantValue(context.consensus);
@@ -126,7 +131,6 @@ describe<{
 		app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
 		app.bind(Identifiers.Processor.BlockProcessor).toConstantValue(context.blockProcessor);
 		app.bind(Identifiers.Consensus.CommitState.Factory).toConstantValue(context.commitStateFactory);
-		// app.bind(Identifiers.ApiSync.Service).toConstantValue({}); // Optional
 		app.bind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(context.snapshotImporter);
 		app.bind(Identifiers.TransactionPool.Worker).toConstantValue(context.txPoolWorker);
 		app.bind(Identifiers.Evm.Worker).toConstantValue(context.evmWorker);
@@ -137,8 +141,76 @@ describe<{
 
 	});
 
-	it("should be ok with full database", async ({ bootstrapper, stateStore, databaseService, commitFactory, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus, p2pServer, p2pService }) => {
-		// Snapshot exists
+	it("should be ok with full database, with api sync", async ({ app, stateStore, databaseService, commitFactory, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus, p2pServer, p2pService, apiSync }) => {
+		app.bind(Identifiers.ApiSync.Service).toConstantValue(apiSync);
+		const bootstrapper = app.resolve(Bootstrapper);
+
+		const genesisCommit = {
+			block: {
+				data: {
+					hash: "bbbbbb"
+				},
+				header: {
+					parentHash: "0000000000000000000000000000000000000000000000000000000000000000"
+				}
+			}
+		}
+
+		const databaseState = {
+			totalRound: 13
+		}
+
+
+		const spyCommitFactoryFromJson = stub(commitFactory, "fromJson").returnValue(genesisCommit);
+		const spyStoreSetGenesisCommit = stub(stateStore, "setGenesisCommit").returnValue(genesisCommit);
+		const spyStoreSetLastBlock = spy(stateStore, "setLastBlock");
+		const spyStoreSetTotalRound = spy(stateStore, "setTotalRound");
+		const spyDatabaseServiceGetBlock = stub(databaseService, "getBlock").returnValue(undefined)
+		const spyDatabaseServiceIsEmpty = stub(databaseService, "isEmpty").returnValue(false);
+		const spyDatabaseServiceGetLastCommit = stub(databaseService, "getLastCommit").returnValue(genesisCommit);
+		const spyDatabaseServiceGetState = stub(databaseService, "getState").returnValue(databaseState);
+		const spyValidatorSetRestore = spy(validatorSet, "restore");
+		const spyStateSetBootstrap = spy(state, "setBootstrap");
+		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
+		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
+		const spyEvmWorkerStart = spy(evmWorker, "start");
+		const spyConsensusRun = spy(consensus, "run");
+		const spyP2PServerBoot = spy(p2pServer, "boot");
+		const spyP2PServiceBoot = spy(p2pService, "boot");
+		const spyApiSyncBootstrap = spy(apiSync, "bootstrap");
+
+		await bootstrapper.bootstrap();
+
+		// #setGenesisCommit
+		spyCommitFactoryFromJson.calledOnce();
+		spyStoreSetGenesisCommit.calledOnce();
+		spyStoreSetGenesisCommit.calledWith(genesisCommit);
+		// #checkStoredGenesisCommit
+		spyDatabaseServiceGetBlock.calledOnce();
+		// bootstrap
+		spyDatabaseServiceIsEmpty.calledOnce();
+
+		// #initPostGenesisState
+		spyDatabaseServiceGetLastCommit.calledOnce();
+		spyStoreSetLastBlock.calledOnce();
+		spyStoreSetLastBlock.calledWith(genesisCommit.block);
+		spyDatabaseServiceGetState.calledOnce();
+		spyStoreSetTotalRound.calledWith(databaseState.totalRound);
+		spyValidatorSetRestore.calledOnce();
+
+		// bootstrap
+		spyApiSyncBootstrap.calledOnce();
+		spyStateSetBootstrap.calledOnce();
+		spyStateSetBootstrap.calledWith(false);
+		spyPrintLoadedValidators.calledOnce();
+		spyTxPoolWorkerStart.calledOnce();
+		spyEvmWorkerStart.calledOnce();
+		spyConsensusRun.calledOnce();
+		spyP2PServerBoot.calledOnce();
+		spyP2PServiceBoot.calledOnce();
+	})
+
+	it("should be ok with full database, without api sync", async ({ bootstrapper, stateStore, databaseService, commitFactory, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus, p2pServer, p2pService, apiSync }) => {
 		const genesisCommit = {
 			block: {
 				data: {
@@ -170,6 +242,7 @@ describe<{
 		const spyConsensusRun = spy(consensus, "run");
 		const spyP2PServerBoot = spy(p2pServer, "boot");
 		const spyP2PServiceBoot = spy(p2pService, "boot");
+		const spyApiSyncBootstrap = spy(apiSync, "bootstrap");
 
 		await bootstrapper.bootstrap();
 
@@ -191,6 +264,7 @@ describe<{
 		spyValidatorSetRestore.calledOnce();
 
 		// bootstrap
+		spyApiSyncBootstrap.neverCalled();
 		spyStateSetBootstrap.calledOnce();
 		spyStateSetBootstrap.calledWith(false);
 		spyPrintLoadedValidators.calledOnce();
@@ -202,7 +276,6 @@ describe<{
 	})
 
 	it("should be ok with empty database and without snapshot", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus, p2pServer, p2pService }) => {
-		// Snapshot exists
 		const milestone = {}
 
 		const spyCommitFactoryFromJson = stub(commitFactory, "fromJson").returnValue(genesisCommit);
@@ -256,7 +329,6 @@ describe<{
 	})
 
 	it("should be ok with empty database and with snapshot", async ({ bootstrapper, stateStore, databaseService, configuration, snapshotImporter, commitFactory, blockProcessor, validatorSet, state, validatorRepository, txPoolWorker, evmWorker, consensus, p2pServer, p2pService }) => {
-		// Snapshot exists
 		const genesisCommit = {
 			block: {
 				data: {
