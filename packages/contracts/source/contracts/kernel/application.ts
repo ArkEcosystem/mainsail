@@ -46,12 +46,6 @@ export interface Application {
 
 	isWorker(): boolean;
 
-	enableMaintenance(): void;
-
-	disableMaintenance(): void;
-
-	isDownForMaintenance(): boolean;
-
 	terminate(reason?: string, error?: Error): Promise<never>;
 
 	bind<T>(serviceIdentifier: ServiceIdentifier<T>): BindToFluentSyntax<T>;
