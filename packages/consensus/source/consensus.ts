@@ -135,7 +135,6 @@ export class Consensus implements Contracts.Consensus.Service {
 		} catch (error) {
 			await this.app.terminate("Consensus bootstrap error", error);
 		}
-
 	}
 
 	public async dispose(): Promise<void> {

@@ -15,7 +15,7 @@ class Bootstrapper {
 
 const { ServiceProvider: ServiceProviderProxy } = await esmock("./service-provider", {
 	"./bootstrapper": {
-		Bootstrapper
+		Bootstrapper,
 	},
 });
 
