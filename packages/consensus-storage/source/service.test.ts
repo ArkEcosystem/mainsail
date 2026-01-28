@@ -20,7 +20,7 @@ describe<{
 		step: Enums.Consensus.Step.Precommit,
 		validRound: undefined,
 		lockedRound: undefined,
-	}
+	};
 
 	const state1: Contracts.Consensus.StateData = {
 		blockNumber: 1,
@@ -28,7 +28,7 @@ describe<{
 		step: Enums.Consensus.Step.Prevote,
 		validRound: 0,
 		lockedRound: 0,
-	}
+	};
 
 	beforeEach((context) => {
 		const app = new Application();
@@ -41,15 +41,11 @@ describe<{
 		});
 
 		app.bind(Identifiers.ConsensusStorage.Root).toConstantValue(storage);
-		app
-			.bind(Identifiers.ConsensusStorage.Storage.Proposal)
-			.toConstantValue(storage.openDB({ name: "proposals" }));
-		app
-			.bind(Identifiers.ConsensusStorage.Storage.Message)
-			.toConstantValue(storage.openDB({ name: "message" }));
-		app
-			.bind(Identifiers.ConsensusStorage.Storage.ConsensusState)
-			.toConstantValue(storage.openDB({ name: "consensus" }));
+		app.bind(Identifiers.ConsensusStorage.Storage.Proposal).toConstantValue(storage.openDB({ name: "proposals" }));
+		app.bind(Identifiers.ConsensusStorage.Storage.Message).toConstantValue(storage.openDB({ name: "message" }));
+		app.bind(Identifiers.ConsensusStorage.Storage.ConsensusState).toConstantValue(
+			storage.openDB({ name: "consensus" }),
+		);
 
 		app.bind(Identifiers.Cryptography.Proposal.Factory).toConstantValue({
 			makeProposalFromBytes: (a: any) => a,
@@ -95,26 +91,26 @@ describe<{
 	it("#getProposals - should return latest stored proposals", async ({ service }) => {
 		assert.equal(await service.getProposals(), []);
 
-		const proposalSerialized1 = Buffer.from("1_1")
-		const proposalSerialized2 = Buffer.from("1_2")
-		const proposalSerialized3 = Buffer.from("1_3")
+		const proposalSerialized1 = Buffer.from("1_1");
+		const proposalSerialized2 = Buffer.from("1_2");
+		const proposalSerialized3 = Buffer.from("1_3");
 
 		const proposal1 = {
 			round: 1,
 			validatorIndex: 1,
-			serialized: proposalSerialized1
+			serialized: proposalSerialized1,
 		} as Contracts.Crypto.Proposal;
 
 		const proposal2 = {
 			round: 2,
 			validatorIndex: 2,
-			serialized: proposalSerialized2
+			serialized: proposalSerialized2,
 		} as Contracts.Crypto.Proposal;
 
 		const proposal3 = {
 			round: 3,
 			validatorIndex: 3,
-			serialized: proposalSerialized3
+			serialized: proposalSerialized3,
 		} as Contracts.Crypto.Proposal;
 
 		await service.persist({
@@ -123,11 +119,9 @@ describe<{
 			messages: [],
 		});
 
-
 		assert.equal(await service.getState(), state0);
 		assert.equal(await service.getProposals(), [proposalSerialized1, proposalSerialized2]);
 		assert.equal(await service.getMessages(), []);
-
 
 		// Clear
 		await service.persist({
@@ -148,26 +142,26 @@ describe<{
 	it("#getMessages - should return latest stored messages", async ({ service }) => {
 		assert.equal(await service.getMessages(), []);
 
-		const messageSerialized1 = Buffer.from("1_1")
-		const messageSerialized2 = Buffer.from("1_2")
-		const messageSerialized3 = Buffer.from("1_3")
+		const messageSerialized1 = Buffer.from("1_1");
+		const messageSerialized2 = Buffer.from("1_2");
+		const messageSerialized3 = Buffer.from("1_3");
 
 		const message1 = {
 			round: 1,
 			validatorIndex: 1,
-			serialized: messageSerialized1
+			serialized: messageSerialized1,
 		} as Contracts.Crypto.Message;
 
 		const message2 = {
 			round: 2,
 			validatorIndex: 2,
-			serialized: messageSerialized2
+			serialized: messageSerialized2,
 		} as Contracts.Crypto.Message;
 
 		const message3 = {
 			round: 3,
 			validatorIndex: 3,
-			serialized: messageSerialized3
+			serialized: messageSerialized3,
 		} as Contracts.Crypto.Message;
 
 		await service.persist({
