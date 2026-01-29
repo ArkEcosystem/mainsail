@@ -6,13 +6,16 @@ import { Wallet } from ".";
 
 describe<{
 	app: Application;
-}>("Models - Wallet", ({ it, assert, beforeEach }) => {
+	evm: any;
+}>("Models - Wallet", ({ it, assert, beforeEach, stub }) => {
 	beforeEach((context) => {
-		context.app = new Application();
-		context.app.bind(Identifiers.Evm.Instance).toConstantValue({
+		context.evm = {
 			getAccountInfo: async () => ({ balance: 0n, nonce: 0n }),
 			getAccountInfoExtended: async () => ({ balance: 0n, nonce: 0n, legacyAttributes: {} }),
-		});
+		}
+
+		context.app = new Application();
+		context.app.bind(Identifiers.Evm.Instance).toConstantValue(context.evm);
 	});
 
 	it("returns the address", async ({ app }) => {
@@ -34,6 +37,19 @@ describe<{
 		assert.equal(wallet.getAddress(), address);
 		assert.equal(wallet.getLegacyAddress(), legacyAddress);
 	});
+
+	it("should take balance and nonce from emv", async ({evm, app}) => {
+		stub(evm, "getAccountInfoExtended").returnValue({
+			balance: 2n,
+			nonce: 3n,
+			legacyAttributes: {}
+		})
+
+		const wallet = await app.resolve(Wallet).init("Abcde");
+
+		assert.equal(wallet.getBalance(), BigNumber.make(2));
+		assert.equal(wallet.getNonce(), BigNumber.make(3));
+	})
 
 	it("should set and get balance", async ({ app }) => {
 		const address = "Abcde";
@@ -94,5 +110,47 @@ describe<{
 
 		wallet.decreaseNonce();
 		assert.equal(wallet.getNonce(), BigNumber.make("-1"));
+	});
+
+
+	it("#getLegacyAddress - should get address", async ({ app }) => {
+		const legacyAddress = "legacyAddress";
+		const wallet = await app.resolve(Wallet).init("Abcde", legacyAddress);
+
+		assert.equal(wallet.getLegacyAddress(), legacyAddress);
+	});
+
+	it("#hasLegacySecondPublicKey - should return false", async ({ app }) => {
+		const wallet = await app.resolve(Wallet).init("Abcde");
+
+		assert.false(wallet.hasLegacySecondPublicKey());
+	});
+
+	it("#hasLegacySecondPublicKey - should return true", async ({ app, evm }) => {
+		stub(evm, "getAccountInfoExtended").returnValue({
+			balance: 0n,
+			nonce: 0n,
+			legacyAttributes: {
+				secondPublicKey: "secondPublicKey"
+			}
+		})
+
+		const wallet = await app.resolve(Wallet).init("Abcde");
+
+		assert.true(wallet.hasLegacySecondPublicKey());
+	});
+
+	it("#legacySecondPublicKey - should return string", async ({ app, evm }) => {
+		stub(evm, "getAccountInfoExtended").returnValue({
+			balance: 0n,
+			nonce: 0n,
+			legacyAttributes: {
+				secondPublicKey: "secondPublicKey"
+			}
+		})
+
+		const wallet = await app.resolve(Wallet).init("Abcde");
+
+		assert.equal(wallet.legacySecondPublicKey(), "secondPublicKey");
 	});
 });
