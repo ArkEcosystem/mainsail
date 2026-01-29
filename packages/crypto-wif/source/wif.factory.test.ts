@@ -19,7 +19,7 @@ describe<{
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({
 			genesisBlock: {
 				block: {
-					height: 0,
+					number: 0,
 				},
 			},
 			milestones: [],
