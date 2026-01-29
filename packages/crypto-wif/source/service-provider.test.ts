@@ -21,5 +21,4 @@ describe<{
 
 		assert.true(app.isBound(Identifiers.Cryptography.Identity.Wif.Factory));
 	});
-
 });
