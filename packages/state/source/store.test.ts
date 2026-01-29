@@ -42,8 +42,7 @@ describe<{
 
 	it("#getGenesisCommit  should throw if genesis commit is not set", ({ store }) => {
 		assert.throws(() => store.getGenesisCommit());
-	})
-
+	});
 
 	it("#setGenesisCommit  should set genesis commit", ({ store }) => {
 		const genesisCommit: any = {
@@ -51,15 +50,21 @@ describe<{
 				data: {
 					height: 0,
 				},
-			}
-		}
+			},
+		};
 
 		store.setGenesisCommit(genesisCommit);
 
 		assert.equal(store.getGenesisCommit(), genesisCommit);
-	})
+	});
 
-	it("#setBlockNumber - should not log and dispatch milestone change if it is worker", ({ app, store, cryptoConfiguration, logger, eventDispatcher }) => {
+	it("#setBlockNumber - should not log and dispatch milestone change if it is worker", ({
+		app,
+		store,
+		cryptoConfiguration,
+		logger,
+		eventDispatcher,
+	}) => {
 		const spyConfigurationSetHeight = spy(cryptoConfiguration, "setHeight");
 		const spyConfigurationIsNewMilestone = stub(cryptoConfiguration, "isNewMilestone").returnValue(true);
 		const spyAppIsWorker = stub(app, "isWorker").returnValue(true);
@@ -76,9 +81,15 @@ describe<{
 
 		spyLoggerNotice.neverCalled();
 		spyDispatch.neverCalled();
-	})
+	});
 
-	it("#setBlockNumber - should log and dispatch milestone change if it is not worker", ({ app, store, cryptoConfiguration, logger, eventDispatcher }) => {
+	it("#setBlockNumber - should log and dispatch milestone change if it is not worker", ({
+		app,
+		store,
+		cryptoConfiguration,
+		logger,
+		eventDispatcher,
+	}) => {
 		const spyConfigurationSetHeight = spy(cryptoConfiguration, "setHeight");
 		const spyConfigurationIsNewMilestone = stub(cryptoConfiguration, "isNewMilestone").returnValue(true);
 		const spyAppIsWorker = stub(app, "isWorker").returnValue(false);
@@ -96,14 +107,14 @@ describe<{
 		spyLoggerNotice.calledOnce();
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Events.CryptoEvent.MilestoneChanged);
-	})
+	});
 
 	it("#getLastBlock - should throw if not set", ({ store }) => {
 		assert.throws(() => store.getLastBlock());
 	});
 
 	it("#setLastBlock - should be ok", ({ store, cryptoConfiguration }) => {
-		const spyConfigurationSetHeight = spy(cryptoConfiguration, "setHeight")
+		const spyConfigurationSetHeight = spy(cryptoConfiguration, "setHeight");
 
 		const block: any = {
 			data: {
@@ -112,36 +123,36 @@ describe<{
 		};
 		store.setLastBlock(block);
 
-		assert.equal(store.getLastBlock(), block)
-		assert.equal(store.getBlockNumber(), 1)
+		assert.equal(store.getLastBlock(), block);
+		assert.equal(store.getBlockNumber(), 1);
 
 		spyConfigurationSetHeight.calledOnce();
 		spyConfigurationSetHeight.calledWith(2);
 	});
 
 	it("#setTotalRound - should set total round", ({ store }) => {
-		assert.equal(store.getTotalRound(), 0)
+		assert.equal(store.getTotalRound(), 0);
 
 		store.setTotalRound(2);
 
-		assert.equal(store.getTotalRound(), 2)
+		assert.equal(store.getTotalRound(), 2);
 	});
 
 	it("#onCommit - should set total round and last block", ({ store }) => {
 		const block = {
 			data: {
-				number: 0
-			}
-		}
+				number: 0,
+			},
+		};
 
 		const unit: any = {
 			getBlock: () => block,
-			round: 0
-		}
+			round: 0,
+		};
 
 		store.onCommit(unit);
 
-		assert.equal(store.getLastBlock(), block)
-		assert.equal(store.getTotalRound(), 1)
+		assert.equal(store.getLastBlock(), block);
+		assert.equal(store.getTotalRound(), 1);
 	});
 });
