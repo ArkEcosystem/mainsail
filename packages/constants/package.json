@@ -21,6 +21,7 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"devDependencies": {
+		"@mainsail/test-runner": "workspace:*",
 		"uvu": "0.5.6"
 	},
 	"engines": {
