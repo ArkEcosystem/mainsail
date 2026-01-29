@@ -22,8 +22,8 @@ export class Store implements Contracts.State.Store {
 	#blockNumber = 0;
 	#totalRound = 0;
 
-	public setGenesisCommit(block: Contracts.Crypto.Commit): void {
-		this.#genesisCommit = block;
+	public setGenesisCommit(genesisCommit: Contracts.Crypto.Commit): void {
+		this.#genesisCommit = genesisCommit;
 	}
 
 	public getGenesisCommit(): Contracts.Crypto.Commit {
