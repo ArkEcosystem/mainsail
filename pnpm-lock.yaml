@@ -2201,6 +2201,9 @@ importers:
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../evm-service
+      '@mainsail/processor':
+        specifier: workspace:*
+        version: link:../processor
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer

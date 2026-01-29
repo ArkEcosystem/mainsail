@@ -12,6 +12,7 @@ import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-si
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
+import { ServiceProvider as Processor } from "@mainsail/processor";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
@@ -55,6 +56,11 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	await context.app.resolve(CoreTransactions).register();
 	await context.app.resolve(CoreCryptoBlock).register();
 	await context.app.resolve(CoreCryptoCommit).register();
+
+	context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue({});
+	await context.app.resolve(Processor).register();
+
+
 
 	context.app.bind(Identifiers.State.Store).toConstantValue({
 		getLastBlock: () => ({
