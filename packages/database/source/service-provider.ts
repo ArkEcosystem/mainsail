@@ -18,6 +18,4 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async boot(): Promise<void> {
 		await this.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service).initialize();
 	}
-
-	public async dispose(): Promise<void> {}
 }
