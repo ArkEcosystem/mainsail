@@ -1,3 +1,4 @@
+import { ServiceProvider as Consensus } from "@mainsail/consensus";
 import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
@@ -12,8 +13,8 @@ import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-si
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
-import { ServiceProvider as Processor } from "@mainsail/processor";
 import { Application } from "@mainsail/kernel";
+import { ServiceProvider as Processor } from "@mainsail/processor";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
@@ -56,11 +57,21 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	await context.app.resolve(CoreTransactions).register();
 	await context.app.resolve(CoreCryptoBlock).register();
 	await context.app.resolve(CoreCryptoCommit).register();
-
-	context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue({});
 	await context.app.resolve(Processor).register();
+	await context.app.resolve(Consensus).register();
 
-
+	context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue({
+		getRoundValidators: () => []
+	})
+	context.app.bind(Identifiers.State.State).toConstantValue({
+		isBootstrap: () => true
+	})
+	context.app.bind(Identifiers.BlockchainUtils.RoundCalculator).toConstantValue({
+		isNewRound: () => false
+	})
+	context.app.bind(Identifiers.Database.Service).toConstantValue({
+		onCommit: () => {}
+	})
 
 	context.app.bind(Identifiers.State.Store).toConstantValue({
 		getLastBlock: () => ({

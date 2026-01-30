@@ -2159,6 +2159,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/consensus':
+        specifier: workspace:*
+        version: link:../consensus
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts

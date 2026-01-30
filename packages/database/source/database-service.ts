@@ -21,6 +21,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
+	// TODO: Check totalRound
 	#state = { blockNumber: 0, totalRound: 0 };
 
 	public async initialize(): Promise<void> {
@@ -174,6 +175,8 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	async #getBlockNumberByHash(blockHash: string): Promise<number | undefined> {
+		console.log("TEST: ", blockHash, await this.storage.getBlockNumberByHash(blockHash))
+
 		return (await this.storage.getBlockNumberByHash(blockHash)) ?? undefined;
 	}
 

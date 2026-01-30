@@ -46,6 +46,7 @@
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@mainsail/processor": "workspace:*",
+		"@mainsail/consensus": "workspace:*",
 		"@types/tmp": "0.2.6",
 		"tmp": "0.2.5",
 		"uvu": "0.5.6"
