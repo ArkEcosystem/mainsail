@@ -123,7 +123,7 @@ describe<{
 			}
 		}
 
-		const unit = {
+		const unit: any = {
 			getCommit: () => commit
 		}
 
