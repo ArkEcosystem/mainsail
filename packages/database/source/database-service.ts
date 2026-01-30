@@ -175,8 +175,6 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	async #getBlockNumberByHash(blockHash: string): Promise<number | undefined> {
-		console.log("TEST: ", blockHash, await this.storage.getBlockNumberByHash(blockHash))
-
 		return (await this.storage.getBlockNumberByHash(blockHash)) ?? undefined;
 	}
 

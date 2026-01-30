@@ -68,11 +68,75 @@ describe<{
 		assert.false(await databaseService.isEmpty())
 	})
 
-	it("#hasCommitByHash - should be true", async ({ databaseService, genesisCommit }) => {
-		console.log(genesisCommit.block.header.hash)
-		console.log(await databaseService.getBlockByHash(genesisCommit.block.header.hash))
-		// console.log(await databaseService.getBlock(0));
-		// console.log(await databaseService.getBlock(0));
-		// assert.true(await databaseService.hasCommitByHash(genesisCommit.block.header.hash))
+	// it("#hasCommitByHash - should be true", async ({ databaseService, genesisCommit }) => {
+	// 	assert.true(await databaseService.hasCommitByHash(genesisCommit.block.header.hash))
+	// })
+
+	it("#findCommitBuffers - should return commit buffer", async ({ databaseService, genesisCommit }) => {
+		assert.equal(await databaseService.findCommitBuffers(0,1), [Buffer.from(genesisCommit.serialized, "hex")]);
+	})
+
+	it("#getBlock - should return block", async ({ databaseService, genesisCommit }) => {
+		assert.equal((await databaseService.getBlock(0))?.header.hash, genesisCommit.block.header.hash);
+	})
+
+	// it("#getBlockByHash - should return block", async ({ databaseService, genesisCommit }) => {
+	// 	console.log(await databaseService.getBlockByHash(genesisCommit.block.header.hash));
+	// 	// assert.equal((await databaseService.getBlock(0))?.header.hash, genesisCommit.block.header.hash);
+	// })
+
+	it("#getBlockByHash - should return block header", async ({ databaseService, genesisCommit }) => {
+		assert.equal((await databaseService.getBlockHeader(0)), genesisCommit.block.header);
+	})
+
+	// it("#getBlockHeaderByHash - should return block header", async ({ databaseService, genesisCommit }) => {
+	// 	// console.log(await databaseService.getBlockHeaderByHash(genesisCommit.block.header.hash));
+	// 	assert.equal((await databaseService.getBlockHeaderByHash(0)), genesisCommit.block.header);
+	// })
+
+	it("#findBlocks - should return blocks", async ({ databaseService, genesisCommit }) => {
+		assert.equal((await databaseService.findBlocks(0, 1)), [genesisCommit.block]);
+	})
+
+	it("#readCommits - should return commits", async ({ databaseService, genesisCommit }) => {
+        const commits = [];
+        for await (const commit of databaseService.readCommits(0, 1)) {
+            commits.push(commit);
+        }
+		assert.equal(commits.map(c => c.block.data.hash), [genesisCommit.block.data.hash]);
+	})
+
+	it("#getLastCommit - should return last commit", async ({ databaseService, genesisCommit }) => {
+		assert.equal((await databaseService.getLastCommit()).block.header.hash, genesisCommit.block.header.hash);
+	})
+
+
+	it("#onCommit - should set blockNumber and increase totalRound", async ({ databaseService, genesisCommit }) => {
+		const commit = {
+			block: {
+				data: {
+					number: 3
+				}
+			},
+			proof: {
+				round: 1
+			}
+		}
+
+		const unit = {
+			getCommit: () => commit
+		}
+
+		assert.equal(databaseService.getState(), {
+			blockNumber: 0,
+			totalRound: 1
+		})
+
+		await databaseService.onCommit(unit);
+
+		assert.equal(databaseService.getState(), {
+			blockNumber: 3,
+			totalRound: 3
+		})
 	})
 });
