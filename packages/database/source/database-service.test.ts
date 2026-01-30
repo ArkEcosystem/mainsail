@@ -1,5 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
-import { Identifiers } from "@mainsail/constants";
+import { Identifiers, Enums } from "@mainsail/constants";
 import { EvmInstance } from "@mainsail/evm-service/distribution/instances/index.js";
 
 import { DatabaseService } from "../source/database-service";
@@ -30,15 +30,12 @@ describe<{
 		const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 		const commitFactory = app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
 		const commitStateFactory = app.get<Contracts.Consensus.CommitStateFactory>(Identifiers.Consensus.CommitState.Factory);
-		// const blockProcessor = app.get<Contracts.Processor.BlockProcessor>(Identifiers.Processor.BlockProcessor);
 		const evm = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
-		// const transactionHandler = app.get<Contracts.Transactions.TransactionHandler>(Identifiers.Transaction.Handler);
 
 		const genesisCommitJson = configuration.get<Contracts.Crypto.CommitJson>("genesisBlock");
 		const genesisCommit = await commitFactory.fromJson(genesisCommitJson);
 
 		const commitState = commitStateFactory(genesisCommit);
-		// const result = blockProcessor.process(commitState);
 
 		const commitKey = {
 			blockHash: genesisCommit.block.header.hash,
@@ -46,7 +43,43 @@ describe<{
 			round: BigInt(genesisCommit.block.header.round),
 		}
 
+		await evm.initializeGenesis({
+			deployerAccount: "0x0000000000000000000000000000000000000001",
+			initialBlockNumber: 0n,
+			initialSupply: 10000000000000000000000000000n,
+			account: genesisCommit.block.data.proposer,
+			validatorContract: "0x0000000000000000000000000000000000000001",
+			usernameContract: "0x0000000000000000000000000000000000000001",
+		})
+
 		await evm.prepareNextCommit({ commitKey });
+
+		for (const transaction of genesisCommit.block.transactions) {
+			const { receipt } = await evm.process({
+				blockContext: {
+					commitKey,
+					gasLimit: BigInt("10000000"),
+					timestamp: BigInt(genesisCommit.block.header.timestamp),
+					validatorAddress: genesisCommit.block.header.proposer,
+				},
+				data: Buffer.from(transaction.data.data, "hex"),
+				from: transaction.data.from,
+				gasLimit: BigInt(transaction.data.gasLimit),
+				gasPrice: BigInt(transaction.data.gasPrice),
+				index: transaction.data.transactionIndex,
+				nonce: transaction.data.nonce.toBigInt(),
+				specId: Enums.Evm.SpecId.LATEST,
+				to: transaction.data.to,
+				txHash: transaction.hash,
+				value: transaction.data.value.toBigInt(),
+			});
+
+
+			if (receipt.status !== 1) {
+				throw new Error("Can't process transaction")
+			}
+		}
+
 		await evm.onCommit(commitState);
 
 		await context.databaseService.initialize();
