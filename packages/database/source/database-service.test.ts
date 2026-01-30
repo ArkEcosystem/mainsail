@@ -172,4 +172,17 @@ describe<{
 			totalRound: 3
 		})
 	})
+
+	// TODO: Check all fields are matching
+	it("#getTransactionByHash - should return transaction", async ({ databaseService, genesisCommit }) => {
+		assert.equal(((await databaseService.getTransactionByHash(genesisCommit.block.data.transactions[0].hash))?.data.hash), genesisCommit.block.data.transactions[0].hash);
+	})
+
+	// it("#getTransactionByBlockHashAndIndex - should return transaction", async ({ databaseService, genesisCommit }) => {
+	// 	assert.equal(((await databaseService.getTransactionByBlockHashAndIndex(genesisCommit.block.data.hash, 0))?.data.hash), genesisCommit.block.data.transactions[0].hash);
+	// })
+
+	it("#getTransactionByBlockNumberAndIndex - should return transaction", async ({ databaseService, genesisCommit }) => {
+		assert.equal(((await databaseService.getTransactionByBlockNumberAndIndex(0, 0))?.data.hash), genesisCommit.block.data.transactions[0].hash);
+	})
 });
