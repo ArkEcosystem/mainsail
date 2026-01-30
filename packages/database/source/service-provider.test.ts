@@ -26,11 +26,10 @@ describe<{
 		assert.true(await serviceProvider.required());
 	});
 
-
 	it("#boot - should initialize database service", async ({ app, serviceProvider }) => {
 		const databaseService = {
-			initialize: () => {}
-		}
+			initialize: () => {},
+		};
 		app.bind(Identifiers.Database.Service).toConstantValue(databaseService);
 
 		const spyInitialize = spy(databaseService, "initialize");

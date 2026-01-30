@@ -20,7 +20,7 @@ import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { dirSync } from "tmp";
 
-import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json"};
+import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
 
 export const prepareSandbox = async (context: { app?: Application }): Promise<void> => {
 	context.app = new Application();
@@ -61,17 +61,17 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	await context.app.resolve(Consensus).register();
 
 	context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue({
-		getRoundValidators: () => []
-	})
+		getRoundValidators: () => [],
+	});
 	context.app.bind(Identifiers.State.State).toConstantValue({
-		isBootstrap: () => true
-	})
+		isBootstrap: () => true,
+	});
 	context.app.bind(Identifiers.BlockchainUtils.RoundCalculator).toConstantValue({
-		isNewRound: () => false
-	})
+		isNewRound: () => false,
+	});
 	context.app.bind(Identifiers.Database.Service).toConstantValue({
-		onCommit: () => {}
-	})
+		onCommit: () => {},
+	});
 
 	context.app.bind(Identifiers.State.Store).toConstantValue({
 		getLastBlock: () => ({
