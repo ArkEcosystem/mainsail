@@ -4,7 +4,6 @@ import { Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from "./service-provider";
 
-
 describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
@@ -19,7 +18,6 @@ describe<{
 	it("should register", async (context) => {
 		await assert.resolves(() => context.serviceProvider.register());
 
-		assert.true(context.app.isBound(Identifiers.Cryptography.Validator))
+		assert.true(context.app.isBound(Identifiers.Cryptography.Validator));
 	});
-
 });
