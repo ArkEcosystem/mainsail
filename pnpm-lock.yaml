@@ -1984,6 +1984,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/crypto-key-pair-ecdsa':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-ecdsa
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner

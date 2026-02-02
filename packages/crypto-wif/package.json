@@ -30,6 +30,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
+		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"uvu": "0.5.6"
 	},
 	"engines": {
