@@ -7,7 +7,6 @@ import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { Validator } from "@mainsail/validation/source/validator";
 import { generateMnemonic } from "bip39";
 
-
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
