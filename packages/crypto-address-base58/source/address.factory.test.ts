@@ -116,7 +116,10 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.set("network.pubKeyHash", 44);
 
-		 await assert.rejects(() => addressFactory.toBuffer("D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"), "Expected address network byte 44, but got 30.");
+		await assert.rejects(
+			() => addressFactory.toBuffer("D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"),
+			"Expected address network byte 44, but got 30.",
+		);
 	});
 
 	it("should throw invalid checksum", async (context) => {
@@ -124,6 +127,9 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 
 		const addressFactory = context.app.resolve(AddressFactory);
 
-		 await assert.rejects(() => addressFactory.toBuffer("E61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"), "Invalid checksum for base58 string.");
+		await assert.rejects(
+			() => addressFactory.toBuffer("E61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"),
+			"Invalid checksum for base58 string.",
+		);
 	});
 });
