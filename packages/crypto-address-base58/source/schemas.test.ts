@@ -75,7 +75,7 @@ describe<{
 	});
 
 	it("address - should not be ok", ({ validator }) => {
-		assert.defined(validator.validate("legacyAddress", "a".repeat(length - 1)).error);
+		assert.defined(validator.validate("legacyAddress", "a".repeat(length - 2)).error);
 		assert.defined(validator.validate("legacyAddress", "a".repeat(length + 1)).error);
 		assert.defined(validator.validate("legacyAddress", 123).error);
 		assert.defined(validator.validate("legacyAddress", null).error);

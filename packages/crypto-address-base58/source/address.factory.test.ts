@@ -41,6 +41,22 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		);
 	});
 
+	it("should derive an address from multi signature address", async (context) => {
+		await context.app.resolve<ECDSA>(ECDSA).register();
+
+		assert.is(
+			await context.app.resolve(AddressFactory).fromMultiSignatureAsset({
+				min: 3,
+				publicKeys: [
+					"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
+					"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
+					"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
+				],
+			}),
+			"D8UtPGvjKzjn1fN5GfESoTrTrkQv6XjALS",
+		);
+	});
+
 	it("should derive an address from a public key (schnorr)", async (context) => {
 		await context.app.resolve<Schnorr>(Schnorr).register();
 
@@ -88,6 +104,32 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		assert.equal(
 			await addressFactory.fromBuffer(await addressFactory.toBuffer("D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib")),
 			"D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib",
+		);
+	});
+
+	it("should throw if pubKeyHash doesn't match", async (context) => {
+		await context.app.resolve<ECDSA>(ECDSA).register();
+
+		const addressFactory = context.app.resolve(AddressFactory);
+
+		context.app
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.set("network.pubKeyHash", 44);
+
+		await assert.rejects(
+			() => addressFactory.toBuffer("D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"),
+			"Expected address network byte 44, but got 30.",
+		);
+	});
+
+	it("should throw invalid checksum", async (context) => {
+		await context.app.resolve<ECDSA>(ECDSA).register();
+
+		const addressFactory = context.app.resolve(AddressFactory);
+
+		await assert.rejects(
+			() => addressFactory.toBuffer("E61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"),
+			"Invalid checksum for base58 string.",
 		);
 	});
 });

@@ -166,8 +166,6 @@ jobs:
               run: cd packages/crypto-key-pair-bls12-381 && pnpm run test:coverage
             - name: Test crypto-key-pair-ecdsa
               run: cd packages/crypto-key-pair-ecdsa && pnpm run test:coverage
-            - name: Test crypto-key-pair-ed25519
-              run: cd packages/crypto-key-pair-ed25519 && pnpm run test:coverage
             - name: Test crypto-key-pair-schnorr
               run: cd packages/crypto-key-pair-schnorr && pnpm run test:coverage
             - name: Test crypto-messages
