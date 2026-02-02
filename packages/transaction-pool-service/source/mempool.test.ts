@@ -4,8 +4,8 @@ import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
-import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
-import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
+import { KeyPairFactory } from "../../crypto-key-pair-ecdsa/source/pair";
+import { PublicKeyFactory } from "../../crypto-key-pair-ecdsa/source/public";
 import { describeSkip } from "@mainsail/test-runner";
 import { Stub } from "../../test-runner/distribution/stub";
 import { Mempool } from ".";

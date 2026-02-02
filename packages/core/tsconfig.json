@@ -76,9 +76,6 @@
 			"path": "../crypto-key-pair-bls12-381"
 		},
 		{
-			"path": "../crypto-key-pair-schnorr"
-		},
-		{
 			"path": "../crypto-messages"
 		},
 		{

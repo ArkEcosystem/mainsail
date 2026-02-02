@@ -2,7 +2,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
-import { ServiceProvider as Schnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
@@ -21,20 +20,10 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 			.set("network.pubKeyHash", 30);
 
 		await context.app.resolve(CoreValidation).register();
-	});
-
-	it("should derive an address from an mnemonic (schnorr)", async (context) => {
-		await context.app.resolve<Schnorr>(Schnorr).register();
-
-		assert.is(
-			await context.app.resolve(AddressFactory).fromMnemonic(mnemonic),
-			"D5jdQXLMgL2TumzdJ8B1zVAGtYWc43VQSx",
-		);
-	});
-
-	it("should derive an address from an mnemonic (secp256k1)", async (context) => {
 		await context.app.resolve<ECDSA>(ECDSA).register();
+	});
 
+	it("should derive an address from an mnemonic", async (context) => {
 		assert.is(
 			await context.app.resolve(AddressFactory).fromMnemonic(mnemonic),
 			"D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib",
@@ -42,8 +31,6 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should derive an address from multi signature address", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		assert.is(
 			await context.app.resolve(AddressFactory).fromMultiSignatureAsset({
 				min: 3,
@@ -57,20 +44,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		);
 	});
 
-	it("should derive an address from a public key (schnorr)", async (context) => {
-		await context.app.resolve<Schnorr>(Schnorr).register();
-
-		assert.is(
-			await context.app
-				.resolve(AddressFactory)
-				.fromPublicKey("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
-			"DRuQRMywxznq9pMQUAXLcwt7C8ZLs8NDBv",
-		);
-	});
-
-	it("should derive an address from a public key (secp256k1)", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
+	it("should derive an address from a public key", async (context) => {
 		assert.is(
 			await context.app
 				.resolve(AddressFactory)
@@ -80,14 +54,10 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should derive an address from wif", async (context) => {
-		await context.app.resolve<Schnorr>(Schnorr).register();
-
-		assert.is(await context.app.resolve(AddressFactory).fromWIF(wif), "D5jdQXLMgL2TumzdJ8B1zVAGtYWc43VQSx");
+		assert.is(await context.app.resolve(AddressFactory).fromWIF(wif), "D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib");
 	});
 
 	it("should validate addresses", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		assert.true(await context.app.resolve(AddressFactory).validate("D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"));
 		assert.false(
 			await context.app
@@ -97,8 +67,6 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should convert between buffer", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		const addressFactory = context.app.resolve(AddressFactory);
 
 		assert.equal(
@@ -108,8 +76,6 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should throw if pubKeyHash doesn't match", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		const addressFactory = context.app.resolve(AddressFactory);
 
 		context.app
@@ -123,8 +89,6 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should throw invalid checksum", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		const addressFactory = context.app.resolve(AddressFactory);
 
 		await assert.rejects(

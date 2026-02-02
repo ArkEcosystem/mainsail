@@ -1030,9 +1030,6 @@ importers:
       '@mainsail/crypto-key-pair-bls12-381':
         specifier: workspace:*
         version: link:../crypto-key-pair-bls12-381
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
@@ -1209,9 +1206,6 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -1258,9 +1252,6 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -1392,9 +1383,9 @@ importers:
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
-      '@mainsail/crypto-key-pair-schnorr':
+      '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
+        version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
@@ -1581,52 +1572,6 @@ importers:
         version: 0.5.6
 
   packages/crypto-key-pair-ecdsa:
-    dependencies:
-      '@mainsail/constants':
-        specifier: workspace:*
-        version: link:../constants
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/exceptions':
-        specifier: workspace:*
-        version: link:../exceptions
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      bcrypto:
-        specifier: 5.5.2
-        version: 5.5.2
-      wif:
-        specifier: 5.0.0
-        version: 5.0.0
-    devDependencies:
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/test-runner':
-        specifier: workspace:*
-        version: link:../test-runner
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
-      bip39:
-        specifier: 3.1.0
-        version: 3.1.0
-      uvu:
-        specifier: 0.5.6
-        version: 0.5.6
-
-  packages/crypto-key-pair-schnorr:
     dependencies:
       '@mainsail/constants':
         specifier: workspace:*
@@ -2039,9 +1984,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-key-pair-schnorr':
+      '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
+        version: link:../crypto-key-pair-ecdsa
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -2958,9 +2903,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -2973,9 +2915,6 @@ importers:
       '@types/sinon':
         specifier: 17.0.4
         version: 17.0.4
-      sinon:
-        specifier: 21.0.0
-        version: 21.0.0
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -3412,9 +3351,9 @@ importers:
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
-      '@mainsail/crypto-key-pair-schnorr':
+      '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
+        version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
@@ -3773,9 +3712,6 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../../../packages/crypto-key-pair-ecdsa
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-key-pair-schnorr
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../../../packages/crypto-messages
