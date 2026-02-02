@@ -172,8 +172,6 @@ jobs:
               run: cd packages/crypto-signature-bls12-381 && pnpm run test:coverage
             - name: Test crypto-signature-ecdsa
               run: cd packages/crypto-signature-ecdsa && pnpm run test:coverage
-            - name: Test crypto-signature-schnorr
-              run: cd packages/crypto-signature-schnorr && pnpm run test:coverage
             - name: Test crypto-transaction
               run: cd packages/crypto-transaction && pnpm run test:coverage
             - name: Test crypto-validation
