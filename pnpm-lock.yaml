@@ -1193,9 +1193,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
       bcrypto:
         specifier: 5.5.2
         version: 5.5.2
