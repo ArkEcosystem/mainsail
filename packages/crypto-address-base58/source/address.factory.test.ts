@@ -20,11 +20,10 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 			.set("network.pubKeyHash", 30);
 
 		await context.app.resolve(CoreValidation).register();
+		await context.app.resolve<ECDSA>(ECDSA).register();
 	});
 
 	it("should derive an address from an mnemonic", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		assert.is(
 			await context.app.resolve(AddressFactory).fromMnemonic(mnemonic),
 			"D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib",
@@ -32,8 +31,6 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should derive an address from multi signature address", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		assert.is(
 			await context.app.resolve(AddressFactory).fromMultiSignatureAsset({
 				min: 3,
@@ -48,8 +45,6 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should derive an address from a public key", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		assert.is(
 			await context.app
 				.resolve(AddressFactory)
@@ -59,14 +54,10 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should derive an address from wif", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		assert.is(await context.app.resolve(AddressFactory).fromWIF(wif), "D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib");
 	});
 
 	it("should validate addresses", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		assert.true(await context.app.resolve(AddressFactory).validate("D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"));
 		assert.false(
 			await context.app
@@ -76,8 +67,6 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should convert between buffer", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		const addressFactory = context.app.resolve(AddressFactory);
 
 		assert.equal(
@@ -87,8 +76,6 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should throw if pubKeyHash doesn't match", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		const addressFactory = context.app.resolve(AddressFactory);
 
 		context.app
@@ -102,8 +89,6 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should throw invalid checksum", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		const addressFactory = context.app.resolve(AddressFactory);
 
 		await assert.rejects(
