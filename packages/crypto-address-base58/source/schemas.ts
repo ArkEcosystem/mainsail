@@ -4,7 +4,7 @@ export const schemas = {
 		allOf: [
 			{
 				maxLength: 34,
-				minLength: 34,
+				minLength: 33,
 				pattern: "^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$",
 			},
 		],
