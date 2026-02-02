@@ -61,7 +61,6 @@
 		{ "path": "packages/crypto-proposal" },
 		{ "path": "packages/crypto-signature-bls12-381" },
 		{ "path": "packages/crypto-signature-ecdsa" },
-		{ "path": "packages/crypto-signature-schnorr" },
 		{ "path": "packages/crypto-transaction" },
 		{ "path": "packages/crypto-validation" },
 		{ "path": "packages/crypto-wif" },
