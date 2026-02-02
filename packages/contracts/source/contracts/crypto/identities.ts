@@ -17,8 +17,6 @@ export interface AddressFactory {
 
 	fromMultiSignatureAsset(asset: MultiSignatureAsset): Promise<string>;
 
-	fromPrivateKey(privateKey: KeyPair): Promise<string>;
-
 	fromBuffer(buffer: Buffer): Promise<string>;
 
 	toBuffer(address: string): Promise<Buffer>;
