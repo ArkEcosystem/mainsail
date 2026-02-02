@@ -36,6 +36,7 @@
 		"@mainsail/crypto-hash-bcrypto": "workspace:*",
 		"@mainsail/crypto-messages": "workspace:*",
 		"@mainsail/crypto-signature-ecdsa": "workspace:*",
+		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
