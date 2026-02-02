@@ -57,7 +57,6 @@
 		{ "path": "packages/crypto-hash-bcrypto" },
 		{ "path": "packages/crypto-key-pair-bls12-381" },
 		{ "path": "packages/crypto-key-pair-ecdsa" },
-		{ "path": "packages/crypto-key-pair-schnorr" },
 		{ "path": "packages/crypto-messages" },
 		{ "path": "packages/crypto-proposal" },
 		{ "path": "packages/crypto-signature-bls12-381" },
