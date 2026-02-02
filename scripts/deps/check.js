@@ -65,7 +65,6 @@ const EXCEPTIONS = {
 			"@mainsail/crypto-hash-wasm",
 			"@mainsail/crypto-key-pair-bls12-381",
 			"@mainsail/crypto-key-pair-ecdsa",
-			"@mainsail/crypto-key-pair-ed25519",
 			"@mainsail/crypto-key-pair-schnorr",
 			"@mainsail/crypto-messages",
 			"@mainsail/crypto-proposal",
@@ -114,7 +113,7 @@ const EXCEPTIONS = {
 			"@mainsail/configuration-generator",
 		],
 		devDependencies: [],
-	},	
+	},
 };
 
 class Package {
