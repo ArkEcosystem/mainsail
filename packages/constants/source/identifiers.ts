@@ -110,7 +110,6 @@ export const Identifiers = {
 		Legacy: {
 			Identity: {
 				AddressFactory: Symbol("Crypto<Legacy.Identity.Address.Factory>"),
-				AddressSerializer: Symbol("Crypto<Legacy.Identity.Address.Serializer>"),
 			},
 		},
 		Message: {

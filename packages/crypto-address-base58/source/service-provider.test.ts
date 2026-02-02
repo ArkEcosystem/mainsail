@@ -25,7 +25,6 @@ describe<{
 		await serviceProvider.register();
 
 		assert.true(app.isBound(Identifiers.Cryptography.Legacy.Identity.AddressFactory));
-		assert.true(app.isBound(Identifiers.Cryptography.Legacy.Identity.AddressSerializer));
 
 		assert.true(validator.hasSchema("legacyAddress"));
 	});
