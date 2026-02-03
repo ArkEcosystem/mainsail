@@ -1,12 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { injectable, Selectors } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import {
-	KeyPairFactory,
-	PrivateKeyFactory,
-	PublicKeyFactory,
-	PublicKeySerializer,
-} from "@mainsail/crypto-key-pair-bls12-381";
 import { Serializer, Signature } from "@mainsail/crypto-signature-bls12-381";
 import { Providers } from "@mainsail/kernel";
 
@@ -23,30 +17,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind(Identifiers.Cryptography.Signature.Size)
 			.toConstantValue(96)
-			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
-
-		this.app
-			.bind(Identifiers.Cryptography.Identity.KeyPair.Factory)
-			.to(KeyPairFactory)
-			.inSingletonScope()
-			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
-
-		this.app
-			.bind(Identifiers.Cryptography.Identity.PrivateKey.Factory)
-			.to(PrivateKeyFactory)
-			.inSingletonScope()
-			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
-
-		this.app
-			.bind(Identifiers.Cryptography.Identity.PublicKey.Factory)
-			.to(PublicKeyFactory)
-			.inSingletonScope()
-			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
-
-		this.app
-			.bind(Identifiers.Cryptography.Identity.PublicKey.Serializer)
-			.to(PublicKeySerializer)
-			.inSingletonScope()
 			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
 
 		this.app
