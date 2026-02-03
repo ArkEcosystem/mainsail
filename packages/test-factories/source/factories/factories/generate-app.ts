@@ -5,7 +5,8 @@ import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CoreCryptoCommit } from "@mainsail/crypto-commit";
 import { Configuration } from "@mainsail/crypto-config";
-import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consensus-bls12-381";
+import { ServiceProvider as CoreCryptoSignatureBls} from "@mainsail/crypto-signature-bls12-381";
+import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CoreCryptoMessages } from "@mainsail/crypto-messages";
@@ -35,7 +36,8 @@ export const generateApp = async (
 	await app.resolve(CoreCryptoKeyPairEcdsa).register();
 	await app.resolve(CoreCryptoSignatureEcdsa).register();
 	await app.resolve(CoreCryptoHashBcrypto).register();
-	await app.resolve(CoreCryptoConsensus).register();
+	await app.resolve(CoreCryptoSignatureBls).register();
+	await app.resolve(CoreCryptoKeyPairBls).register();
 	await app.resolve(CoreCryptoTransaction).register();
 	await app.resolve(CoreCryptoBlock).register();
 	await app.resolve(CoreCryptoMessages).register();

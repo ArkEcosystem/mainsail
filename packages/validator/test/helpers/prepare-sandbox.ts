@@ -4,7 +4,8 @@ import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-add
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { Configuration } from "@mainsail/crypto-config";
-import { ServiceProvider as CoreConsensusBls12381 } from "@mainsail/crypto-consensus-bls12-381";
+import { ServiceProvider as CoreCryptoSignatureBls} from "@mainsail/crypto-signature-bls12-381";
+import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CoreCryptoMessages } from "@mainsail/crypto-messages";
@@ -45,7 +46,8 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	await context.app.resolve(CoreCryptoAddressBase58).register();
 	await context.app.resolve(CoreCryptoValidation).register();
 	await context.app.resolve(CoreCryptoWif).register();
-	await context.app.resolve(CoreConsensusBls12381).register();
+	await context.app.resolve(CoreCryptoSignatureBls).register();
+	await context.app.resolve(CoreCryptoKeyPairBls).register();
 
 	context.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 	context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({ getRequired: () => 0.75 }); // txCollatorFactor
