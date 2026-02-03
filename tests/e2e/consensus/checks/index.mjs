@@ -1,10 +1,10 @@
 import got from "got";
 import express from "express";
+import { sleep } from "/mainsail/packages/utils/distribution/index.js";
 
-import { ConsensusAbi } from "/mainsail/packages/evm-contracts/distribution/index.js";
-import { makeEvmCall, makeEvmDeploy } from "./tx.mjs";
-import { getApiHttp, postTransactions } from "./client.mjs";
+import { getApiHttp } from "./client.mjs";
 import { config } from "./config.mjs";
+import { broadcastedTransactions, broadcastTransactions } from "./transactions.mjs";
 
 const app = express();
 app.use(express.json());
@@ -15,8 +15,6 @@ const EXPECTED_NUMBER_OF_PEERS = 6;
 
 let webhookTarget;
 let peers = [];
-
-let broadcastedTransactions = [];
 
 // Results
 let allPeersReachedTargetBlockNumber = false;
@@ -78,17 +76,6 @@ async function waitForResults() {
 	process.exit(allTransactionsSuccessful ? 0 : 1);
 }
 
-async function broadcastTransactions() {
-	const tx = await makeEvmCall(`${config.to}`, "100000000");
-	const txDeploy = await makeEvmDeploy(ConsensusAbi, 1);
-	const response = await postTransactions(config.peer, [
-		tx.serialized.toString("hex"),
-		txDeploy.serialized.toString("hex"),
-	]);
-
-	console.log("broadcastTransactions", { txs: [tx.hash, txDeploy.hash], response: JSON.stringify(response) });
-	broadcastedTransactions.push(tx.hash, txDeploy.hash);
-}
 
 async function discoverPeers() {
 	do {
@@ -164,5 +151,3 @@ async function setupWebhook() {
 		}
 	}
 }
-
-const sleep = async (ms) => await new Promise((resolve) => setTimeout(resolve, ms));
