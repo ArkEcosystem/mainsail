@@ -10,7 +10,7 @@ import { PublicKeyFactory } from "./public";
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
-describe<{ app: Application, factory: PublicKeyFactory }>("PublicKeyFactory", ({ assert, beforeEach, each, it }) => {
+describe<{ app: Application; factory: PublicKeyFactory }>("PublicKeyFactory", ({ assert, beforeEach, each, it }) => {
 	beforeEach((context) => {
 		context.app = new Application();
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
@@ -34,10 +34,7 @@ describe<{ app: Application, factory: PublicKeyFactory }>("PublicKeyFactory", ({
 	});
 
 	it("should throw not implemented exception when deriving from a musig", async ({ factory }) => {
-		await assert.rejects(
-			async () => factory.fromMultiSignatureAsset({} as any),
-			Exceptions.NotImplemented,
-		);
+		await assert.rejects(async () => factory.fromMultiSignatureAsset({} as any), Exceptions.NotImplemented);
 	});
 
 	each(
@@ -71,9 +68,18 @@ describe<{ app: Application, factory: PublicKeyFactory }>("PublicKeyFactory", ({
 	);
 
 	it("should aggregate public keys", async ({ factory }) => {
-		assert.equal(await factory.aggregate([
-			Buffer.from("95af988701a6fb60e09da41d2ca1a9e0b49e43501bda4255b3ca01073f490c34102b6bbcafde6333185e9980745d72cb", "hex"),
-			Buffer.from("97f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb", "hex")
-		]), "ac58473340898df1df2c37109e974cdcacd53ec916b4c38ce643cc96e2a6ae689369a96dd6385351510cfb09a2ecfa57");
+		assert.equal(
+			await factory.aggregate([
+				Buffer.from(
+					"95af988701a6fb60e09da41d2ca1a9e0b49e43501bda4255b3ca01073f490c34102b6bbcafde6333185e9980745d72cb",
+					"hex",
+				),
+				Buffer.from(
+					"97f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb",
+					"hex",
+				),
+			]),
+			"ac58473340898df1df2c37109e974cdcacd53ec916b4c38ce643cc96e2a6ae689369a96dd6385351510cfb09a2ecfa57",
+		);
 	});
 });

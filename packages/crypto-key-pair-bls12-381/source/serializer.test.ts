@@ -20,7 +20,8 @@ describe<{
 	});
 
 	it("should serialize and deserialize address", async ({ serializer }) => {
-		const publicKey = "95af988701a6fb60e09da41d2ca1a9e0b49e43501bda4255b3ca01073f490c34102b6bbcafde6333185e9980745d72cb";
+		const publicKey =
+			"95af988701a6fb60e09da41d2ca1a9e0b49e43501bda4255b3ca01073f490c34102b6bbcafde6333185e9980745d72cb";
 
 		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(100));
 

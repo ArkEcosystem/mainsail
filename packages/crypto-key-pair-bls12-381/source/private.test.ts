@@ -9,7 +9,7 @@ import { PrivateKeyFactory } from "./private";
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
-describe<{ app: Application, factory: PrivateKeyFactory }>("PrivateKeyFactory", ({ assert, beforeEach, it }) => {
+describe<{ app: Application; factory: PrivateKeyFactory }>("PrivateKeyFactory", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.app = new Application();
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
@@ -27,8 +27,7 @@ describe<{ app: Application, factory: PrivateKeyFactory }>("PrivateKeyFactory", 
 
 	it("should derive from a WIF", async ({ factory }) => {
 		assert.is(
-			await factory
-				.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"),
+			await factory.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"),
 			"0000000000000000000000000000000000000000000000000000000000000001",
 		);
 	});
