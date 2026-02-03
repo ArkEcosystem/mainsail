@@ -11,7 +11,7 @@ import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, BigNumber, chunk } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
 import path from "path";
-import { encodeFunctionData, sha256 } from "viem";
+import { encodeFunctionData } from "viem";
 
 @injectable()
 export class Importer implements Contracts.Snapshot.LegacyImporter {
@@ -45,6 +45,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
 	private readonly deployerAddress!: string;
+
+	@inject(Identifiers.Cryptography.Hash.Factory)
+	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	#prepared = false;
 
@@ -406,8 +409,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 					);
 					stats.importedValidatorsWithoutBlsKey++;
 				} else {
-					const entropy = sha256(Buffer.from(validator.username, "utf8")).slice(2, 34);
-					const mnemonic = entropyToMnemonic(Buffer.from(entropy, "hex"));
+					const entropy = this.hashFactory.sha256(Buffer.from(validator.username, "utf8"));
+					const mnemonic = entropyToMnemonic(entropy);
 
 					const consensusKeyPair = await this.consensusKeyPairFactory.fromMnemonic(mnemonic);
 					validator.blsPublicKey = consensusKeyPair.publicKey;
@@ -557,7 +560,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		} as Contracts.Evm.TransactionContext;
 	}
 
-	#generateTxHash = () => sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
+	#generateTxHash = () => this.hashFactory.sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).toString("hex");
 
 	async #readSnapshot(snapshotPath: string): Promise<Interfaces.LegacySnapshot> {
 		if (snapshotPath.endsWith(".compressed")) {
