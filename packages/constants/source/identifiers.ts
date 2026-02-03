@@ -130,9 +130,6 @@ export const Identifiers = {
 			Serializer: Symbol("Crypto<Signature.Serializer>"),
 			Size: Symbol("Crypto<Signature.Size>"),
 		},
-		Size: {
-			Signature: Symbol("Crypto<Size.Signature>"),
-		},
 		Transaction: {
 			Deserializer: Symbol("Crypto<Transaction.Deserializer>"),
 			Factory: Symbol("Crypto<Transaction.Factory>"),
