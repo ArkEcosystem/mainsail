@@ -1,15 +1,10 @@
-import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { NotImplemented } from "@mainsail/exceptions";
-import { ByteBuffer } from "@mainsail/utils";
 import { secp256k1 } from "bcrypto";
 
 @injectable()
 export class Signature implements Contracts.Crypto.Signature {
-	@inject(Identifiers.Cryptography.Signature.Size)
-	private readonly signatureSize!: number;
-
 	public async sign(message: Buffer, privateKey: Buffer): Promise<string> {
 		return secp256k1.signatureExport(secp256k1.sign(message, privateKey)).toString("hex");
 	}
@@ -50,14 +45,6 @@ export class Signature implements Contracts.Crypto.Signature {
 		}
 
 		return secp256k1.verify(message, signatureRS, publicKey);
-	}
-
-	public serialize(buffer: ByteBuffer, signature: string): void {
-		buffer.writeBytes(Buffer.from(signature, "hex"));
-	}
-
-	public deserialize(buffer: ByteBuffer): Buffer {
-		return buffer.readBytes(this.signatureSize);
 	}
 
 	public async aggregate(signatures: Buffer[]): Promise<string> {

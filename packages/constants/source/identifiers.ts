@@ -97,6 +97,7 @@ export const Identifiers = {
 			},
 			PrivateKey: {
 				Factory: Symbol("Crypto<Identity.PrivateKey.Factory>"),
+
 			},
 			PublicKey: {
 				Factory: Symbol("Crypto<Identity.PublicKey.Factory>"),
@@ -126,6 +127,7 @@ export const Identifiers = {
 		Serializer: Symbol("Crypto<Serializer>"),
 		Signature: {
 			Instance: Symbol("Crypto<Signature.Instance>"),
+			Serializer: Symbol("Crypto<Signature.Serializer>"),
 			Size: Symbol("Crypto<Signature.Size>"),
 		},
 		Size: {

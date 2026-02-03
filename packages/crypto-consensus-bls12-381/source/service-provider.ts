@@ -7,7 +7,7 @@ import {
 	PublicKeyFactory,
 	PublicKeySerializer,
 } from "@mainsail/crypto-key-pair-bls12-381";
-import { Signature } from "@mainsail/crypto-signature-bls12-381";
+import { Serializer,Signature } from "@mainsail/crypto-signature-bls12-381";
 import { Providers } from "@mainsail/kernel";
 
 import { schemas } from "./schemas.js";
@@ -52,6 +52,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind(Identifiers.Cryptography.Signature.Instance)
 			.to(Signature)
+			.inSingletonScope()
+			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
+
+		this.app
+			.bind(Identifiers.Cryptography.Signature.Serializer)
+			.to(Serializer)
 			.inSingletonScope()
 			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
 
