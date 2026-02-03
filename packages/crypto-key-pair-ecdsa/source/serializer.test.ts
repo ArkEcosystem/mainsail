@@ -16,7 +16,6 @@ describe<{
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-
 		context.serializer = context.app.resolve(PublicKeySerializer);
 	});
 

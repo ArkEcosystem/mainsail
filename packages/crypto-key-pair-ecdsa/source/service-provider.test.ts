@@ -4,7 +4,6 @@ import { Application } from "@mainsail/kernel";
 import { Validator } from "@mainsail/validation";
 import { schemas as baseSchemas } from "@mainsail/crypto-validation";
 
-
 import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from "./service-provider";
 

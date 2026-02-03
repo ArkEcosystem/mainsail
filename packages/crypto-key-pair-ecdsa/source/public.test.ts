@@ -3,7 +3,6 @@ import { Configuration } from "@mainsail/crypto-config";
 import { Application } from "@mainsail/kernel";
 import * as Exceptions from "@mainsail/exceptions";
 
-
 import { describe } from "@mainsail/test-runner";
 import { KeyPairFactory } from "./pair";
 import { PublicKeyFactory } from "./public";
@@ -11,7 +10,7 @@ import { PublicKeyFactory } from "./public";
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
-describe<{ app: Application, factory: PublicKeyFactory }>("PrivateKeyFactory", ({ assert, beforeEach, each, it }) => {
+describe<{ app: Application; factory: PublicKeyFactory }>("PrivateKeyFactory", ({ assert, beforeEach, each, it }) => {
 	beforeEach((context) => {
 		context.app = new Application();
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
@@ -27,10 +26,9 @@ describe<{ app: Application, factory: PublicKeyFactory }>("PrivateKeyFactory", (
 		);
 	});
 
-	it("should derive from a WIF", async ({factory}) => {
+	it("should derive from a WIF", async ({ factory }) => {
 		assert.is(
-			await factory
-				.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"),
+			await factory.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"),
 			"0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
 		);
 	});
@@ -50,36 +48,48 @@ describe<{ app: Application, factory: PublicKeyFactory }>("PrivateKeyFactory", (
 	});
 
 	it("should throw if min < 1", async ({ factory }) => {
-		await assert.rejects(() => factory.fromMultiSignatureAsset({
-			min: 0,
-			publicKeys: [
-				"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
-				"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
-				"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
-			],
-		}), "The multi signature asset is invalid.")
+		await assert.rejects(
+			() =>
+				factory.fromMultiSignatureAsset({
+					min: 0,
+					publicKeys: [
+						"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
+						"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
+						"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
+					],
+				}),
+			"The multi signature asset is invalid.",
+		);
 	});
 
 	it("should throw if min > publicKeys.length", async ({ factory }) => {
-		await assert.rejects(() => factory.fromMultiSignatureAsset({
-			min: 4,
-			publicKeys: [
-				"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
-				"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
-				"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
-			],
-		}), "The multi signature asset is invalid.")
+		await assert.rejects(
+			() =>
+				factory.fromMultiSignatureAsset({
+					min: 4,
+					publicKeys: [
+						"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
+						"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
+						"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
+					],
+				}),
+			"The multi signature asset is invalid.",
+		);
 	});
 
 	it("should throw if publicKey is invalid", async ({ factory }) => {
-		await assert.rejects(() => factory.fromMultiSignatureAsset({
-			min: 1,
-			publicKeys: [
-				"0",
-				"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
-				"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
-			],
-		}), "Expected 0 to be a valid public key");
+		await assert.rejects(
+			() =>
+				factory.fromMultiSignatureAsset({
+					min: 1,
+					publicKeys: [
+						"0",
+						"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
+						"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
+					],
+				}),
+			"Expected 0 to be a valid public key",
+		);
 	});
 
 	each(
