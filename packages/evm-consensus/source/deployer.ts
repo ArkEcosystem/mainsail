@@ -43,7 +43,8 @@ export class Deployer {
 	#nonce = 0;
 	#needsCommit = false;
 
-	#generateTxHash = () => this.hashFactory.sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).toString("hex");
+	#generateTxHash = () =>
+		this.hashFactory.sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).toString("hex");
 
 	public async deploy(genesisBlockInfo: GenesisBlockInfo): Promise<void> {
 		this.#genesisBlockInfo = genesisBlockInfo;

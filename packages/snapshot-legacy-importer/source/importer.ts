@@ -560,7 +560,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		} as Contracts.Evm.TransactionContext;
 	}
 
-	#generateTxHash = () => this.hashFactory.sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).toString("hex");
+	#generateTxHash = () =>
+		this.hashFactory.sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).toString("hex");
 
 	async #readSnapshot(snapshotPath: string): Promise<Interfaces.LegacySnapshot> {
 		if (snapshotPath.endsWith(".compressed")) {
