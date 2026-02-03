@@ -29,9 +29,6 @@
 			"path": "../crypto-config"
 		},
 		{
-			"path": "../crypto-consensus-bls12-381"
-		},
-		{
 			"path": "../crypto-hash-bcrypto"
 		},
 		{
