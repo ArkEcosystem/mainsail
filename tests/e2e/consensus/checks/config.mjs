@@ -3,6 +3,7 @@ import validatorSecrets from "/mainsail/tests/e2e/consensus/nodes/node0/core/val
 
 export const config = {
     to: "0x1000000000000000000000000000000000000000",
+    tokenBeneficiary: "0x9000000000000000000000000000000000000009",
     senderPassphrase: validatorSecrets.secrets[0],
     peer: {
         apiEvmUrl: "http://api-node:4008",
