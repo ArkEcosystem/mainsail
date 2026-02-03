@@ -2,7 +2,6 @@ import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { getBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { NotImplemented } from "@mainsail/exceptions";
-import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class Signature implements Contracts.Crypto.Signature {
@@ -18,14 +17,6 @@ export class Signature implements Contracts.Crypto.Signature {
 			message,
 			bls.Signature.fromBytes(signature).toBytes(),
 		);
-	}
-
-	public serialize(buffer: ByteBuffer, signature: string): void {
-		buffer.writeBytes(Buffer.from(signature, "hex"));
-	}
-
-	public deserialize(buffer: ByteBuffer): Buffer {
-		return buffer.readBytes(96);
 	}
 
 	public async aggregate(signatures: Buffer[]): Promise<string> {

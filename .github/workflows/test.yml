@@ -166,18 +166,12 @@ jobs:
               run: cd packages/crypto-key-pair-bls12-381 && pnpm run test:coverage
             - name: Test crypto-key-pair-ecdsa
               run: cd packages/crypto-key-pair-ecdsa && pnpm run test:coverage
-            - name: Test crypto-key-pair-ed25519
-              run: cd packages/crypto-key-pair-ed25519 && pnpm run test:coverage
-            - name: Test crypto-key-pair-schnorr
-              run: cd packages/crypto-key-pair-schnorr && pnpm run test:coverage
             - name: Test crypto-messages
               run: cd packages/crypto-messages && pnpm run test:coverage
             - name: Test crypto-signature-bls12-381
               run: cd packages/crypto-signature-bls12-381 && pnpm run test:coverage
             - name: Test crypto-signature-ecdsa
               run: cd packages/crypto-signature-ecdsa && pnpm run test:coverage
-            - name: Test crypto-signature-schnorr
-              run: cd packages/crypto-signature-schnorr && pnpm run test:coverage
             - name: Test crypto-transaction
               run: cd packages/crypto-transaction && pnpm run test:coverage
             - name: Test crypto-validation

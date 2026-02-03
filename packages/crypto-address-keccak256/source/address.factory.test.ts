@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
-import { ServiceProvider as Schnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
@@ -19,40 +18,31 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
 		await context.app.resolve(CoreValidation).register();
-	});
-
-	it("should derive an address from an mnemonic (schnorr)", async (context) => {
-		await context.app.resolve<Schnorr>(Schnorr).register();
-
-		assert.is(
-			await context.app.resolve(AddressFactory).fromMnemonic(mnemonic),
-			"0x4D9AED240463043cFcf5B5Df16b9ad523930A181",
-		);
-	});
-
-	it("should derive an address from an mnemonic (secp256k1)", async (context) => {
 		await context.app.resolve<ECDSA>(ECDSA).register();
+	});
 
+	it("should derive an address from an mnemonic", async (context) => {
 		assert.is(
 			await context.app.resolve(AddressFactory).fromMnemonic(mnemonic),
 			"0xC7C50f33278bDe272ffe23865fF9fBd0155a5175",
 		);
 	});
 
-	it("should derive an address from a public key (schnorr)", async (context) => {
-		await context.app.resolve<Schnorr>(Schnorr).register();
-
+	it("should derive an address from multi signature address", async (context) => {
 		assert.is(
-			await context.app
-				.resolve(AddressFactory)
-				.fromPublicKey("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
-			"0x4D9AED240463043cFcf5B5Df16b9ad523930A181",
+			await context.app.resolve(AddressFactory).fromMultiSignatureAsset({
+				min: 3,
+				publicKeys: [
+					"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
+					"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
+					"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
+				],
+			}),
+			"0x970996B998f3C854D9a4D2C327Cc049ae6241C40",
 		);
 	});
 
-	it("should derive an address from a public key (secp256k1)", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
+	it("should derive an address from a public key", async (context) => {
 		assert.is(
 			await context.app
 				.resolve(AddressFactory)
@@ -61,15 +51,25 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		);
 	});
 
-	it("should derive an address from wif", async (context) => {
-		await context.app.resolve<Schnorr>(Schnorr).register();
+	it("should throw if public key doesn't have 65 chars", async (context) => {
+		await assert.rejects(
+			() => context.app.resolve(AddressFactory).fromPublicKey("0".repeat(66 * 2)),
+			"Invalid uncompressed public key",
+		);
+	});
 
-		assert.is(await context.app.resolve(AddressFactory).fromWIF(wif), "0x4D9AED240463043cFcf5B5Df16b9ad523930A181");
+	it("should throw if public key doesn't start with 0x04", async (context) => {
+		await assert.rejects(
+			() => context.app.resolve(AddressFactory).fromPublicKey("0".repeat(65 * 2)),
+			"Invalid uncompressed public key",
+		);
+	});
+
+	it("should derive an address from wif", async (context) => {
+		assert.is(await context.app.resolve(AddressFactory).fromWIF(wif), "0xC7C50f33278bDe272ffe23865fF9fBd0155a5175");
 	});
 
 	it("should validate addresses", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		assert.true(await context.app.resolve(AddressFactory).validate("0xC7C50f33278bDe272ffe23865fF9fBd0155a5175"));
 		assert.true(await context.app.resolve(AddressFactory).validate("0xC7C50f33278bDe272ffe23865fF9fBd0155a5175"));
 		assert.false(await context.app.resolve(AddressFactory).validate("0xC7C50f33278bde272ffe23865ff9fbd0155a5175"));
@@ -81,8 +81,6 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should convert from and to buffer", async (context) => {
-		await context.app.resolve<ECDSA>(ECDSA).register();
-
 		const buffer = await context.app.resolve(AddressFactory).toBuffer("0xC7C50f33278bDe272ffe23865fF9fBd0155a5175");
 		assert.equal(buffer.byteLength, 20);
 

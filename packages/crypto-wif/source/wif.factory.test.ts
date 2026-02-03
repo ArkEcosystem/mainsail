@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
-import { KeyPairFactory } from "@mainsail/crypto-key-pair-schnorr/source/pair";
+import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa/source/pair";
 
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
@@ -19,7 +19,7 @@ describe<{
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({
 			genesisBlock: {
 				block: {
-					height: 0,
+					number: 0,
 				},
 			},
 			milestones: [],

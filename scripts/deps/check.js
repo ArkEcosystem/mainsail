@@ -34,7 +34,6 @@ const EXCEPTIONS = {
 	"@mainsail/configuration-generator": {
 		dependencies: [
 			"@mainsail/crypto-key-pair-ecdsa",
-			"@mainsail/crypto-signature-schnorr-secp256k1",
 			"@mainsail/snapshot-legacy-exporter",
 		],
 		devDependencies: [],
@@ -65,12 +64,8 @@ const EXCEPTIONS = {
 			"@mainsail/crypto-hash-wasm",
 			"@mainsail/crypto-key-pair-bls12-381",
 			"@mainsail/crypto-key-pair-ecdsa",
-			"@mainsail/crypto-key-pair-ed25519",
-			"@mainsail/crypto-key-pair-schnorr",
 			"@mainsail/crypto-messages",
 			"@mainsail/crypto-proposal",
-			"@mainsail/crypto-signature-schnorr-secp256k1",
-			"@mainsail/crypto-signature-schnorr",
 			"@mainsail/crypto-transaction",
 			"@mainsail/crypto-validation",
 			"@mainsail/crypto-wif",
@@ -114,7 +109,7 @@ const EXCEPTIONS = {
 			"@mainsail/configuration-generator",
 		],
 		devDependencies: [],
-	},	
+	},
 };
 
 class Package {

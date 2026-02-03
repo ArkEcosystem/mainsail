@@ -110,8 +110,6 @@ export const Identifiers = {
 		Legacy: {
 			Identity: {
 				AddressFactory: Symbol("Crypto<Legacy.Identity.Address.Factory>"),
-				AddressSerializer: Symbol("Crypto<Legacy.Identity.Address.Serializer>"),
-				AddressSize: Symbol("Crypto<Legacy.Identity.Address.Size>"),
 			},
 		},
 		Message: {
@@ -128,10 +126,8 @@ export const Identifiers = {
 		Serializer: Symbol("Crypto<Serializer>"),
 		Signature: {
 			Instance: Symbol("Crypto<Signature.Instance>"),
+			Serializer: Symbol("Crypto<Signature.Serializer>"),
 			Size: Symbol("Crypto<Signature.Size>"),
-		},
-		Size: {
-			Signature: Symbol("Crypto<Size.Signature>"),
 		},
 		Transaction: {
 			Deserializer: Symbol("Crypto<Transaction.Deserializer>"),

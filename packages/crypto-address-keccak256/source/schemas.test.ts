@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
-import { ServiceProvider as Schnorr } from "@mainsail/crypto-key-pair-schnorr";
+import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
 import { schemas as baseSchemas } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { Validator } from "@mainsail/validation/source/validator";
@@ -49,7 +49,7 @@ describe<{
 	});
 
 	it("address - should be ok for factory", async (context) => {
-		await context.app.resolve<Schnorr>(Schnorr).register();
+		await context.app.resolve<ECDSA>(ECDSA).register();
 
 		assert.undefined(
 			context.validator.validate(
