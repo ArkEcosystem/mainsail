@@ -19,6 +19,9 @@
 			"package": "@mainsail/crypto-key-pair-ecdsa"
 		},
 		{
+			"package": "@mainsail/crypto-signature-bls12-381"
+		},
+		{
 			"package": "@mainsail/crypto-key-pair-bls12-381"
 		},
 		{
@@ -138,6 +141,9 @@
 			"package": "@mainsail/crypto-key-pair-ecdsa"
 		},
 		{
+			"package": "@mainsail/crypto-signature-bls12-381"
+		},
+		{
 			"package": "@mainsail/crypto-key-pair-bls12-381"
 		},
 		{
@@ -180,6 +186,9 @@
 		},
 		{
 			"package": "@mainsail/crypto-key-pair-ecdsa"
+		},
+		{
+			"package": "@mainsail/crypto-signature-bls12-381"
 		},
 		{
 			"package": "@mainsail/crypto-key-pair-bls12-381"
@@ -251,6 +260,9 @@
 		},
 		{
 			"package": "@mainsail/crypto-key-pair-ecdsa"
+		},
+		{
+			"package": "@mainsail/crypto-signature-bls12-381"
 		},
 		{
 			"package": "@mainsail/crypto-key-pair-bls12-381"

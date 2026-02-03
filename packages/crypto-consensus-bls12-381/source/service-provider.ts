@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { injectable, Selectors } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Serializer, Signature } from "@mainsail/crypto-signature-bls12-381";
 import { Providers } from "@mainsail/kernel";
 
 import { schemas } from "./schemas.js";
@@ -12,23 +11,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind(Identifiers.Cryptography.Identity.PublicKey.Size)
 			.toConstantValue(48)
-			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
-
-		this.app
-			.bind(Identifiers.Cryptography.Signature.Size)
-			.toConstantValue(96)
-			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
-
-		this.app
-			.bind(Identifiers.Cryptography.Signature.Instance)
-			.to(Signature)
-			.inSingletonScope()
-			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
-
-		this.app
-			.bind(Identifiers.Cryptography.Signature.Serializer)
-			.to(Serializer)
-			.inSingletonScope()
 			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
 
 		for (const schema of Object.values(schemas)) {
