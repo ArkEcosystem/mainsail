@@ -1,4 +1,4 @@
-import { Container } from "@mainsail/container";
+import { Application } from "@mainsail/kernel";
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 
@@ -9,25 +9,26 @@ import { PrivateKeyFactory } from "./private";
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
-describe<{ container: Container }>("PrivateKeyFactory", ({ assert, beforeEach, it }) => {
+describe<{ app: Application, factory: PrivateKeyFactory }>("PrivateKeyFactory", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.container = new Container();
-		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.container.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
+		context.app = new Application();
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
+
+		context.factory = context.app.resolve(PrivateKeyFactory);
 	});
 
-	it("should derive from an mnemonic", async (context) => {
+	it("should derive from an mnemonic", async ({ factory }) => {
 		assert.is(
-			await context.container.get(PrivateKeyFactory, { autobind: true }).fromMnemonic(mnemonic),
+			await factory.fromMnemonic(mnemonic),
 			"6a0f42158b2412bc038076a9006acca5fd28f5a495479cdbe4117da0c2e18faf",
 		);
 	});
 
-	it("should derive from a WIF", async (context) => {
+	it("should derive from a WIF", async ({ factory }) => {
 		assert.is(
-			await context.container
-				.get(PrivateKeyFactory, { autobind: true })
-				.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn", 128),
+			await factory
+				.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"),
 			"0000000000000000000000000000000000000000000000000000000000000001",
 		);
 	});
