@@ -1021,9 +1021,6 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
@@ -1036,6 +1033,9 @@ importers:
       '@mainsail/crypto-proposal':
         specifier: workspace:*
         version: link:../crypto-proposal
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
