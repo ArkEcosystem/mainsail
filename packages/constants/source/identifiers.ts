@@ -97,7 +97,6 @@ export const Identifiers = {
 			},
 			PrivateKey: {
 				Factory: Symbol("Crypto<Identity.PrivateKey.Factory>"),
-
 			},
 			PublicKey: {
 				Factory: Symbol("Crypto<Identity.PublicKey.Factory>"),

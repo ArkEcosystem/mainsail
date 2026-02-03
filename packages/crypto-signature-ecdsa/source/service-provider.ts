@@ -19,7 +19,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.inSingletonScope()
 			.when(Selectors.anyAncestorOrTargetTagged("type", "wallet"));
 
-
 		this.app
 			.bind(Identifiers.Cryptography.Signature.Serializer)
 			.to(Serializer)

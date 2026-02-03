@@ -7,7 +7,7 @@ import {
 	PublicKeyFactory,
 	PublicKeySerializer,
 } from "@mainsail/crypto-key-pair-bls12-381";
-import { Serializer,Signature } from "@mainsail/crypto-signature-bls12-381";
+import { Serializer, Signature } from "@mainsail/crypto-signature-bls12-381";
 import { Providers } from "@mainsail/kernel";
 
 import { schemas } from "./schemas.js";
