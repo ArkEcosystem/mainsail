@@ -7,7 +7,6 @@ import { schemas } from "./schemas.js";
 import { Serializer } from "./serializer.js";
 import { Signature } from "./signature.js";
 
-
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -31,5 +30,4 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
 		}
 	}
-
 }

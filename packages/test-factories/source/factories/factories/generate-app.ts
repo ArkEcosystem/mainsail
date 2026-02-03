@@ -5,11 +5,11 @@ import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CoreCryptoCommit } from "@mainsail/crypto-commit";
 import { Configuration } from "@mainsail/crypto-config";
-import { ServiceProvider as CoreCryptoSignatureBls} from "@mainsail/crypto-signature-bls12-381";
-import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
+import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CoreCryptoMessages } from "@mainsail/crypto-messages";
+import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-signature-bls12-381";
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";

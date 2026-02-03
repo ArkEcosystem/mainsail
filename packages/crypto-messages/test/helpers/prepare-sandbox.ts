@@ -8,7 +8,7 @@ import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-
 import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { makeKeywords } from "@mainsail/crypto-proposal/source/keywords.js";
-import { ServiceProvider as CoreCryptoSignatureBls} from "@mainsail/crypto-signature-bls12-381";
+import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-signature-bls12-381";
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";

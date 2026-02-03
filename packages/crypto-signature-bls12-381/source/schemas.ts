@@ -1,4 +1,3 @@
-
 export const schemas = {
 	consensusSignature: {
 		$id: "consensusSignature",
