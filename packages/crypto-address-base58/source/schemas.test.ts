@@ -3,7 +3,8 @@ import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 import { schemas as baseSchemas } from "@mainsail/crypto-validation";
 import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
-import { ServiceProvider as CoreValidation } from "@mainsail/validation";
+import { ServiceProvider as Validation } from "@mainsail/validation";
+import { ServiceProvider as CryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { Validator } from "@mainsail/validation/source/validator";
 import { generateMnemonic } from "bip39";
 
@@ -41,7 +42,8 @@ describe<{
 			],
 		});
 
-		await context.app.resolve(CoreValidation).register();
+		await context.app.resolve(Validation).register();
+		await context.app.resolve(CryptoHashBcrypto).register();
 
 		context.validator = context.app.get(Identifiers.Cryptography.Validator);
 
