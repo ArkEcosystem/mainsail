@@ -33,33 +33,33 @@ describe<{
 	});
 
 	it("publicKey - should be ok", ({ validator }) => {
-		assert.undefined(validator.validate("publicKey", "0".repeat(length)).error);
+		assert.undefined(validator.validate("consensusPublicKey", "0".repeat(length)).error);
 
 		const validChars = "0123456789abcdef";
 
 		for (const char of validChars) {
-			assert.undefined(validator.validate("publicKey", char.repeat(length)).error);
+			assert.undefined(validator.validate("consensusPublicKey", char.repeat(length)).error);
 		}
 	});
 
 	it("publicKey - should be ok from key pair factory", async (context) => {
 		const kayPair = await context.app.resolve(KeyPairFactory).fromMnemonic(generateMnemonic(256));
 
-		assert.undefined(context.validator.validate("publicKey", kayPair.publicKey).error);
+		assert.undefined(context.validator.validate("consensusPublicKey", kayPair.publicKey).error);
 	});
 
 	it("publicKey - should not be ok", ({ validator }) => {
-		assert.defined(validator.validate("publicKey", "0".repeat(length - 1)).error);
-		assert.defined(validator.validate("publicKey", "0".repeat(length + 1)).error);
-		assert.defined(validator.validate("publicKey", 123).error);
-		assert.defined(validator.validate("publicKey", null).error);
-		assert.defined(validator.validate("publicKey").error);
-		assert.defined(validator.validate("publicKey", {}).error);
+		assert.defined(validator.validate("consensusPublicKey", "0".repeat(length - 1)).error);
+		assert.defined(validator.validate("consensusPublicKey", "0".repeat(length + 1)).error);
+		assert.defined(validator.validate("consensusPublicKey", 123).error);
+		assert.defined(validator.validate("consensusPublicKey", null).error);
+		assert.defined(validator.validate("consensusPublicKey").error);
+		assert.defined(validator.validate("consensusPublicKey", {}).error);
 
 		const invalidChars = "ABCDEFGHIJKLghijkl!#$%&'|+/";
 
 		for (const char of invalidChars) {
-			assert.defined(validator.validate("publicKey", char.repeat(64)).error);
+			assert.defined(validator.validate("consensusPublicKey", char.repeat(64)).error);
 		}
 	});
 });
