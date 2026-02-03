@@ -28,7 +28,7 @@ describe<{
 	});
 
 	it("should serialize and deserialize address", async ({ factory, serializer }) => {
-		const address = "0xC7C50f33278bDe272ffe23865fF9fBd0155a5175"
+		const address = "0xC7C50f33278bDe272ffe23865fF9fBd0155a5175";
 		const buffer = await factory.toBuffer(address);
 
 		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(100));

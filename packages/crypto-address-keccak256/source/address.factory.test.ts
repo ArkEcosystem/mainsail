@@ -52,15 +52,17 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should throw if public key doesn't have 65 chars", async (context) => {
-			await assert.rejects(() => context.app
-				.resolve(AddressFactory)
-				.fromPublicKey("0".repeat(66 * 2)), "Invalid uncompressed public key");
+		await assert.rejects(
+			() => context.app.resolve(AddressFactory).fromPublicKey("0".repeat(66 * 2)),
+			"Invalid uncompressed public key",
+		);
 	});
 
 	it("should throw if public key doesn't start with 0x04", async (context) => {
-			await assert.rejects(() => context.app
-				.resolve(AddressFactory)
-				.fromPublicKey("0".repeat(65 * 2)), "Invalid uncompressed public key");
+		await assert.rejects(
+			() => context.app.resolve(AddressFactory).fromPublicKey("0".repeat(65 * 2)),
+			"Invalid uncompressed public key",
+		);
 	});
 
 	it("should derive an address from wif", async (context) => {
