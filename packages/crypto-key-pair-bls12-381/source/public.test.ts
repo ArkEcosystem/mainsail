@@ -1,4 +1,4 @@
-import { Container } from "@mainsail/container";
+import { Application } from "@mainsail/kernel";
 import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 import { Configuration } from "@mainsail/crypto-config";
@@ -10,40 +10,37 @@ import { PublicKeyFactory } from "./public";
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
-describe<{ container: Container }>("PublicKeyFactory", ({ assert, beforeEach, each, it }) => {
+describe<{ app: Application; factory: PublicKeyFactory }>("PublicKeyFactory", ({ assert, beforeEach, each, it }) => {
 	beforeEach((context) => {
-		context.container = new Container();
-		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.container.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
+		context.app = new Application();
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
+
+		context.factory = context.app.resolve(PublicKeyFactory);
 	});
 
-	it("should derive a key pair from an mnemonic", async (context) => {
+	it("should derive a key pair from an mnemonic", async ({ factory }) => {
 		assert.is(
-			await context.container.get(PublicKeyFactory, { autobind: true }).fromMnemonic(mnemonic),
+			await factory.fromMnemonic(mnemonic),
 			"95af988701a6fb60e09da41d2ca1a9e0b49e43501bda4255b3ca01073f490c34102b6bbcafde6333185e9980745d72cb",
 		);
 	});
 
-	it("should derive from a WIF", async (context) => {
+	it("should derive from a WIF", async ({ factory }) => {
 		assert.is(
-			await context.container
-				.get(PublicKeyFactory, { autobind: true })
-				.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn", 128),
+			await factory.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"),
 			"97f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb",
 		);
 	});
 
-	it("should throw not implemented exception when deriving from a musig", async (context) => {
-		await assert.rejects(
-			async () => context.container.get(PublicKeyFactory, { autobind: true }).fromMultiSignatureAsset({} as any),
-			Exceptions.NotImplemented,
-		);
+	it("should throw not implemented exception when deriving from a musig", async ({ factory }) => {
+		await assert.rejects(async () => factory.fromMultiSignatureAsset({} as any), Exceptions.NotImplemented);
 	});
 
 	each(
 		"should pass with valid public keys",
 		async ({ context, dataset }) => {
-			assert.true(await context.container.get(PublicKeyFactory, { autobind: true }).verify(dataset));
+			assert.true(await context.factory.verify(dataset));
 		},
 		[
 			"95af988701a6fb60e09da41d2ca1a9e0b49e43501bda4255b3ca01073f490c34102b6bbcafde6333185e9980745d72cb",
@@ -54,7 +51,7 @@ describe<{ container: Container }>("PublicKeyFactory", ({ assert, beforeEach, ea
 	each(
 		"should fail with invalid public keys",
 		async ({ context, dataset }) => {
-			assert.false(await context.container.get(PublicKeyFactory, { autobind: true }).verify(dataset));
+			assert.false(await context.factory.verify(dataset));
 		},
 		[
 			"0",
@@ -69,4 +66,20 @@ describe<{ container: Container }>("PublicKeyFactory", ({ assert, beforeEach, ea
 			"22337416a26d8d49ec27059bd0589c49bb474029c3627715380f4df83fb431aece",
 		],
 	);
+
+	it("should aggregate public keys", async ({ factory }) => {
+		assert.equal(
+			await factory.aggregate([
+				Buffer.from(
+					"95af988701a6fb60e09da41d2ca1a9e0b49e43501bda4255b3ca01073f490c34102b6bbcafde6333185e9980745d72cb",
+					"hex",
+				),
+				Buffer.from(
+					"97f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb",
+					"hex",
+				),
+			]),
+			"ac58473340898df1df2c37109e974cdcacd53ec916b4c38ce643cc96e2a6ae689369a96dd6385351510cfb09a2ecfa57",
+		);
+	});
 });
