@@ -1,12 +1,18 @@
 import { describe } from "@mainsail/test-runner";
+import { Application } from "@mainsail/kernel";
+import { ServiceProvider as CryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { NetworkGenerator } from "./network";
 
 describe<{
 	dataPath: string;
+	app: Application;
 	generator: NetworkGenerator;
 }>("NetworkGenerator", ({ it, assert, beforeEach }) => {
-	beforeEach((context) => {
-		context.generator = new NetworkGenerator();
+	beforeEach(async (context) => {
+		context.app = new Application();
+		await context.app.resolve(CryptoHashBcrypto).register();
+
+		context.generator = context.app.resolve(NetworkGenerator);
 	});
 
 	it("#generate - should generate network", ({ generator }) => {

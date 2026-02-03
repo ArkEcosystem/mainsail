@@ -23,6 +23,9 @@ export class GenesisBlockGenerator extends Generator {
 	@optional()
 	private readonly snapshotLegacyImporter?: Contracts.Snapshot.LegacyImporter;
 
+	@inject(Identifiers.Cryptography.Hash.Factory)
+	private readonly hashFactory!: Contracts.Crypto.HashFactory;
+
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
@@ -340,11 +343,7 @@ export class GenesisBlockGenerator extends Generator {
 					timestamp: dayjs(options.epoch).valueOf(),
 					transactions: transactionData,
 					transactionsCount: transactions.length,
-					transactionsRoot: (
-						this.app
-							.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
-							.sha256(payloadBuffers)
-					).toString("hex"),
+					transactionsRoot: this.hashFactory.sha256(payloadBuffers).toString("hex"),
 					version: 1,
 				},
 				transactions,
