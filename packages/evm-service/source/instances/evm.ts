@@ -184,7 +184,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 
 	public async getBlockNumberByHash(blockHash: string): Promise<number | undefined | null> {
 		const result = await this.#evm.getBlockNumberByHash(blockHash);
-		if (!result) {
+		if (result === null || result === undefined) {
 			return undefined;
 		}
 

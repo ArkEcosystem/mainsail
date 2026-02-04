@@ -49,16 +49,12 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 		const buffers = await Promise.all(
 			blockNumbers.map(async (blockNumber: number) => {
-				try {
-					const commitStorage = await this.#readCommitStorage(blockNumber);
-					if (!commitStorage) {
-						return;
-					}
-
-					return this.commitSerializer.serializeCommit(await this.commitFactory.fromStorage(commitStorage));
-				} catch {
+				const commitStorage = await this.#readCommitStorage(blockNumber);
+				if (!commitStorage) {
 					return;
 				}
+
+				return this.commitSerializer.serializeCommit(await this.commitFactory.fromStorage(commitStorage));
 			}),
 		);
 
