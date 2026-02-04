@@ -2002,6 +2002,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/consensus':
+        specifier: workspace:*
+        version: link:../consensus
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
@@ -2047,6 +2050,9 @@ importers:
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../evm-service
+      '@mainsail/processor':
+        specifier: workspace:*
+        version: link:../processor
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer

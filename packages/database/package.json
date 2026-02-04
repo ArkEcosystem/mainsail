@@ -27,6 +27,7 @@
 		"@mainsail/utils": "workspace:*"
 	},
 	"devDependencies": {
+		"@mainsail/consensus": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-address-base58": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
@@ -42,6 +43,7 @@
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/evm-service": "workspace:*",
+		"@mainsail/processor": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
