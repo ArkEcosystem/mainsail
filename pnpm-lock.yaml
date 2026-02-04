@@ -731,18 +731,21 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -1021,9 +1024,6 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
@@ -1036,6 +1036,9 @@ importers:
       '@mainsail/crypto-proposal':
         specifier: workspace:*
         version: link:../crypto-proposal
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -1298,15 +1301,18 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -1374,18 +1380,21 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -1456,34 +1465,6 @@ importers:
       '@types/lodash.set':
         specifier: 4.3.9
         version: 4.3.9
-      uvu:
-        specifier: 0.5.6
-        version: 0.5.6
-
-  packages/crypto-consensus-bls12-381:
-    dependencies:
-      '@mainsail/constants':
-        specifier: workspace:*
-        version: link:../constants
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/crypto-key-pair-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-bls12-381
-      '@mainsail/crypto-signature-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-signature-bls12-381
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-    devDependencies:
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/test-runner':
-        specifier: workspace:*
-        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1650,18 +1631,21 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-proposal':
         specifier: workspace:*
         version: link:../crypto-proposal
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -1726,15 +1710,18 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -2036,15 +2023,18 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -2914,18 +2904,21 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -3317,12 +3310,12 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
@@ -3332,6 +3325,9 @@ importers:
       '@mainsail/crypto-proposal':
         specifier: workspace:*
         version: link:../crypto-proposal
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -3531,12 +3527,12 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../../../packages/crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../../../packages/crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../../../packages/crypto-key-pair-ecdsa
@@ -3546,6 +3542,9 @@ importers:
       '@mainsail/crypto-proposal':
         specifier: workspace:*
         version: link:../../../packages/crypto-proposal
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../../../packages/crypto-signature-ecdsa
@@ -3675,12 +3674,12 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../../../packages/crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../../../packages/crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../../../packages/crypto-key-pair-ecdsa
@@ -3690,6 +3689,9 @@ importers:
       '@mainsail/crypto-proposal':
         specifier: workspace:*
         version: link:../../../packages/crypto-proposal
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../../../packages/crypto-signature-ecdsa

@@ -6,9 +6,10 @@ import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CoreCryptoCommit } from "@mainsail/crypto-commit";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
-import { ServiceProvider as CoreCryptoConsensusBls12381 } from "@mainsail/crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
+import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
+import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-signature-bls12-381";
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
@@ -20,7 +21,7 @@ import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { dirSync } from "tmp";
 
-import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
+import crypto from "../../../core/bin/config/devnet/core/crypto.json";
 
 export const prepareSandbox = async (context: { app?: Application }): Promise<void> => {
 	context.app = new Application();
@@ -39,7 +40,8 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 
 	await context.app.resolve(CoreCryptoAddressKeccak256).register();
 	await context.app.resolve(CoreCryptoAddressBase58).register();
-	await context.app.resolve(CoreCryptoConsensusBls12381).register();
+	await context.app.resolve(CoreCryptoSignatureBls).register();
+	await context.app.resolve(CoreCryptoKeyPairBls).register();
 
 	await context.app.resolve(CoreCryptoValidation).register();
 	await context.app.resolve(CoreCryptoWif).register();

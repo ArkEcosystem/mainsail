@@ -1,7 +1,8 @@
 import { Identifiers } from "@mainsail/constants";
 import { schemas as blockSchemas } from "@mainsail/crypto-block";
 import { Configuration } from "@mainsail/crypto-config";
-import { schemas as consensusSchemas } from "@mainsail/crypto-consensus-bls12-381";
+import { schemas as keyPairBlsSchemas } from "@mainsail/crypto-key-pair-bls12-381";
+import { schemas as signatureBlsSchemas } from "@mainsail/crypto-signature-bls12-381";
 import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation/source/validator";
 
@@ -34,7 +35,8 @@ describe<{
 		for (const schema of Object.values({
 			...baseSchemas,
 			...blockSchemas,
-			...consensusSchemas,
+			...keyPairBlsSchemas,
+			...signatureBlsSchemas,
 			...schemas,
 		})) {
 			context.validator.addSchema(schema);

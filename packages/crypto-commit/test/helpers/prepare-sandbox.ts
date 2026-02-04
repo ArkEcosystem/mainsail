@@ -4,7 +4,8 @@ import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-add
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
-import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consensus-bls12-381";
+import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-signature-bls12-381";
+import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CoreCryptoMessages } from "@mainsail/crypto-messages";
@@ -41,7 +42,8 @@ export const prepareSandbox = async (context) => {
 	await context.app.resolve(CoreCryptoValidation).register();
 	await context.app.resolve(CoreCryptoHashBcrypto).register();
 	await context.app.resolve(CoreCryptoSignatureEcdsa).register();
-	await context.app.resolve(CoreCryptoConsensus).register();
+	await context.app.resolve(CoreCryptoSignatureBls).register();
+	await context.app.resolve(CoreCryptoKeyPairBls).register();
 	await context.app.resolve(CoreCryptoKeyPairEcdsa).register();
 	await context.app.resolve(CoreCryptoAddressKeccak256).register();
 	await context.app.resolve(CoreCryptoAddressBase58).register();

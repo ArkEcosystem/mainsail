@@ -85,9 +85,6 @@ const getApplication = async (config) => {
             package: "@mainsail/crypto-address-keccak256",
         },
         {
-            package: "@mainsail/crypto-consensus-bls12-381",
-        },
-        {
             package: "@mainsail/crypto-wif",
         },
         {
