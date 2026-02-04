@@ -1,6 +1,8 @@
 import { describe } from "@mainsail/test-runner";
 import { Application } from "@mainsail/kernel";
 import { Signature } from "./signature";
+import { NotImplemented } from "@mainsail/exceptions";
+
 
 describe<{
 	app: Application;
@@ -29,5 +31,17 @@ describe<{
 				),
 			),
 		);
+	});
+
+	it("#signRecoverable - should throw not implemented", async ({ signature }) => {
+		await assert.rejects(() => signature.signRecoverable(Buffer.from(""), Buffer.from("")), NotImplemented);
+	});
+
+	it("#verifyRecoverable - should throw not implemented", async ({ signature }) => {
+		await assert.rejects(() => signature.verifyRecoverable({ r: "", s: "", v: 0 }, Buffer.from(""), Buffer.from("")), NotImplemented);
+	});
+
+	it("#recoverPublicKey - should throw not implemented", async ({ signature }) => {
+		await assert.rejects(() => signature.recoverPublicKey(Buffer.from(""), { r: "", s: "", v: 0 }), NotImplemented);
 	});
 });
