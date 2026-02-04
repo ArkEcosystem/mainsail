@@ -26,9 +26,11 @@ const peerBlockNumberMap = new Map();
 
 (async () => {
 	await discoverPeers();
+	console.log("1")
 	await setupWebhook();
+	console.log("2")
 	await broadcastTransactions();
-	
+	console.log("3")
 	app.listen(3001, function () {
 		console.log("Block listener port 3001!");
 	});
@@ -115,9 +117,13 @@ async function setupWebhook() {
 		}
 
 		console.log(`got block ${number} from ${req.ip}`);
-		peerBlockNumberMap.set(req.ip, number);
+		const seen = [...peerBlockNumberMap.values()].some(b => b === number);
+		if (!seen) {
+			console.log("emitting block.applied", { number});
+			eventEmitter.emit("block.applied", number);
+		}
 
-        eventEmitter.emit("block.applied", number);
+		peerBlockNumberMap.set(req.ip, number);
 
 		if (number >= TARGET_BLOCK_NUMBER && peerBlockNumberMap.has(req.ip)) {
 			console.log(`received target ${TARGET_BLOCK_NUMBER} from ${req.ip}`);

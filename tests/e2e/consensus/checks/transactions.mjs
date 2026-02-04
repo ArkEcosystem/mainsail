@@ -11,31 +11,29 @@ import { encodeFunctionData, getCreateAddress, parseEther } from "viem";
 export const broadcastedTransactions = [];
 
 export async function broadcastTransactions() {
-    const broadcastedTransactions = []
-    
     // 1. Native transfer and 2 deploys in same block.
     const nativeTransfer = await makeEvmCall(`${config.to}`, "100000000", 0);
     const { tx: tokenDeploy, contractAddress: tokenAddress }  = await makeEvmDeploy(DARK20Abi, 1);
     const { tx: batchTransferDeploy, contractAddress: batchTransferAddress } = await makeEvmDeploy(ERC20BatchTransferAbi, 2);
-    const batch1 = [nativeTransfer, tokenDeploy, batchTransferDeploy, tokenTransfer];
+    const batch1 = [nativeTransfer, tokenDeploy, batchTransferDeploy];
     let response = await postTransactions(config.peer, batch1.map(tx => tx.serialized.toString("hex")));
     console.log("Batch 1", { txs: batch1.map(tx => tx.hash), response: JSON.stringify(response) });
     broadcastedTransactions.push(...batch1.map(tx => tx.hash));
-    await waitBlock();
+   // await waitBlock();
 
     // 2. Single token transfer with approval
     const tokenTransfer = await makeTokenTransfer(tokenAddress, config.tokenBeneficiary, parseEther("1"), 3);
 
-    const allowanceGiver = await addressFactory.fromMnemonic(config.validatorSecrets[0]);
-    const allowanceRecipient = await addressFactory.fromMnemonic(config.validatorSecrets[1]);
+    const allowanceGiver = await getAddressFromPassphrase(config.validatorSecrets[0]);
+    const allowanceRecipient = await getAddressFromPassphrase(config.validatorSecrets[1]);
     const tokenApproval = await makeTokenApproval(tokenAddress, allowanceRecipient, parseEther("100", 4));
-    const tokenTransferFrom = await makeTokenTransferFrom(tokenAddress, allowanceGiver, config.tokenBeneficiary, parseEther("100", 4), config.validatorSecrets[1]);
+    const tokenTransferFrom = await makeTokenTransferFrom(tokenAddress, allowanceGiver, config.tokenBeneficiary, parseEther("100", 4), 5, config.validatorSecrets[1]);
 
     const batch2 = [tokenTransfer, tokenApproval, tokenTransferFrom];
     response = await postTransactions(config.peer, batch2.map(tx => tx.serialized.toString("hex")));
     console.log("Batch 2", { txs: batch2.map(tx => tx.hash), response: JSON.stringify(response) });
     broadcastedTransactions.push(...batch2.map(tx => tx.hash));    
-    await waitBlock();
+//await waitBlock();
 }
 
 const makeEvmCall = async (to, amount, nonceOffset = 0, senderPassphrase = config.senderPassphrase) => {
@@ -174,11 +172,11 @@ const getAddressFromPassphrase = async (passphrase) => {
     return addressFactory.fromMnemonic(passphrase);
 }
 
-const waitBlock = async (timeoutMs = 10000) => {
+const waitBlock = (timeoutMs = 1000 * 60) => {
     return new Promise((resolve, reject) => {
         const timer = setTimeout(() => {
-            eventEmitter.removeListener('block.applied', handler);
-            reject(new Error('Timed out waiting for webhook'));
+            eventEmitter.removeListener("block.applied", handler);
+            reject(new Error("Timed out waiting for webhook"));
         }, timeoutMs);
 
         const handler = (payload) => {
@@ -186,6 +184,6 @@ const waitBlock = async (timeoutMs = 10000) => {
             resolve(payload);
         };
 
-        eventEmitter.once('block.applied', handler);
+        eventEmitter.once("block.applied", handler);
     });
 }
