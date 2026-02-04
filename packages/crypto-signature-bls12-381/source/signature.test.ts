@@ -14,6 +14,12 @@ describe<{
 		context.signature = context.app.resolve(Signature);
 	});
 
+	it("should sign", async ({ signature }) => {
+		const result = await signature.sign(Buffer.from("64726e3da8", "hex"), Buffer.from("67d53f170b908cabb9eb326c3c337762d59289a8fec79f7bc9254b584b73265c", "hex"));
+
+		assert.equal(result, "9529fb1b3001aa735a2d3a70ac8568c9e5757c7112d43de6a0463b3d4354b54a706dc3ab9ca49d32f2307059fe93c5b017949f54427e257af38f72cff36b041ce30fb5ebbac636b2f84ced80a16e0150b059771dae40a5baf86f5805baf061b0");
+	});
+
 	it("should sign and verify", async ({ signature }) => {
 		assert.true(
 			await signature.verify(
