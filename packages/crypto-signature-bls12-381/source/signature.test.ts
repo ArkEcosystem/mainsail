@@ -1,12 +1,22 @@
 import { describe } from "@mainsail/test-runner";
+import { Application } from "@mainsail/kernel";
 import { Signature } from "./signature";
 
-describe("Signature", ({ assert, it }) => {
-	it("should sign and verify", async () => {
+describe<{
+	app: Application;
+	signature: Signature;
+}>("Signature", ({ beforeEach, assert, it }) => {
+	beforeEach((context) => {
+		context.app = new Application();
+
+		context.signature = context.app.resolve(Signature);
+	});
+
+	it("should sign and verify", async ({ signature }) => {
 		assert.true(
-			await new Signature().verify(
+			await signature.verify(
 				Buffer.from(
-					await new Signature().sign(
+					await signature.sign(
 						Buffer.from("64726e3da8", "hex"),
 						Buffer.from("67d53f170b908cabb9eb326c3c337762d59289a8fec79f7bc9254b584b73265c", "hex"),
 					),
