@@ -325,9 +325,6 @@ describe<{
 		databaseService,
 		genesisCommit,
 	}) => {
-		console.log((await databaseService.getTransactionByBlockNumberAndIndex(0, 0))?.data);
-		console.log(genesisCommit.block.data.transactions[0]);
-
 		assert.equal(
 			(await databaseService.getTransactionByBlockNumberAndIndex(0, 0))?.data.hash,
 			genesisCommit.block.data.transactions[0].hash,
