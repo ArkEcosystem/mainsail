@@ -27,13 +27,13 @@ export class Serializer implements Contracts.Serializer.Serializer {
 	@tagged("type", "wallet")
 	private readonly publicKeySerializer!: Contracts.Crypto.PublicKeySerializer;
 
-	@inject(Identifiers.Cryptography.Signature.Instance)
+	@inject(Identifiers.Cryptography.Signature.Serializer)
 	@tagged("type", "wallet")
-	private readonly signatureSerializer!: Contracts.Crypto.Signature;
+	private readonly signatureSerializer!: Contracts.Crypto.SignatureSerializer;
 
-	@inject(Identifiers.Cryptography.Signature.Instance)
+	@inject(Identifiers.Cryptography.Signature.Serializer)
 	@tagged("type", "consensus")
-	private readonly consensusSignatureSerializer!: Contracts.Crypto.Signature;
+	private readonly consensusSignatureSerializer!: Contracts.Crypto.SignatureSerializer;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
 	private readonly transactionUtils!: Contracts.Crypto.TransactionUtilities;

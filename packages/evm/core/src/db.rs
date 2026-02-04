@@ -1054,19 +1054,8 @@ impl PersistentDB {
 
             // Finalize commit
             let mut tx_receipts = HashMap::default();
-            let mut calculated_cumulative_gas_used = 0;
             for (k, (result, cumulative_gas_used)) in results {
                 let receipt = map_execution_result(result.clone(), *cumulative_gas_used);
-                self.logger.log(
-                    LogLevel::Info,
-                    format!(
-                        "cum: {} ccum: {} gas_used: {}",
-                        *cumulative_gas_used, calculated_cumulative_gas_used, receipt.gas_used
-                    ),
-                );
-
-                calculated_cumulative_gas_used += receipt.gas_used;
-
                 tx_receipts.insert(k.clone(), receipt);
             }
 
