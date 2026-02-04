@@ -15,31 +15,31 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind(Identifiers.Cryptography.Identity.PublicKey.Size)
 			.toConstantValue(48)
-			.when(Selectors.anyAncestorOrTargetTagged("type", "wallet"));
+			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
 
 		this.app
 			.bind(Identifiers.Cryptography.Identity.KeyPair.Factory)
 			.to(KeyPairFactory)
 			.inSingletonScope()
-			.when(Selectors.anyAncestorOrTargetTagged("type", "wallet"));
+			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
 
 		this.app
 			.bind(Identifiers.Cryptography.Identity.PrivateKey.Factory)
 			.to(PrivateKeyFactory)
 			.inSingletonScope()
-			.when(Selectors.anyAncestorOrTargetTagged("type", "wallet"));
+			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
 
 		this.app
 			.bind(Identifiers.Cryptography.Identity.PublicKey.Factory)
 			.to(PublicKeyFactory)
 			.inSingletonScope()
-			.when(Selectors.anyAncestorOrTargetTagged("type", "wallet"));
+			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
 
 		this.app
 			.bind(Identifiers.Cryptography.Identity.PublicKey.Serializer)
 			.to(PublicKeySerializer)
 			.inSingletonScope()
-			.when(Selectors.anyAncestorOrTargetTagged("type", "wallet"));
+			.when(Selectors.anyAncestorOrTargetTagged("type", "consensus"));
 
 		this.#registerSchemas();
 	}

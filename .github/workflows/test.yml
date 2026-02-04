@@ -158,8 +158,6 @@ jobs:
               run: cd packages/crypto-commit && pnpm run test:coverage
             - name: Test crypto-config
               run: cd packages/crypto-config && pnpm run test:coverage
-            - name: Test crypto-consensus-bls12-381
-              run: cd packages/crypto-consensus-bls12-381 && pnpm run test:coverage
             - name: Test crypto-hash-bcrypto
               run: cd packages/crypto-hash-bcrypto && pnpm run test:coverage
             - name: Test crypto-key-pair-bls12-381
