@@ -53,7 +53,6 @@
 		{ "path": "packages/crypto-block" },
 		{ "path": "packages/crypto-commit" },
 		{ "path": "packages/crypto-config" },
-		{ "path": "packages/crypto-consensus-bls12-381" },
 		{ "path": "packages/crypto-hash-bcrypto" },
 		{ "path": "packages/crypto-key-pair-bls12-381" },
 		{ "path": "packages/crypto-key-pair-ecdsa" },

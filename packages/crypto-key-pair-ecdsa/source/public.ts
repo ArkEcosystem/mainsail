@@ -22,7 +22,7 @@ export class PublicKeyFactory implements Contracts.Crypto.PublicKeyFactory {
 		const { min, publicKeys }: Contracts.Crypto.MultiSignatureAsset = asset;
 
 		for (const publicKey of publicKeys) {
-			if (!this.verify(publicKey)) {
+			if (!(await this.verify(publicKey))) {
 				throw new PublicKeyError(publicKey);
 			}
 		}

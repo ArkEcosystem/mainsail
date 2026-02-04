@@ -64,7 +64,6 @@ export interface AddressSerializer {
 
 export interface PublicKeySerializer {
 	serialize(buffer: ByteBuffer, publicKey: string): void;
-
 	deserialize(buffer: ByteBuffer): Buffer;
 }
 
@@ -79,10 +78,6 @@ export interface Signature {
 
 	verify(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean>;
 
-	serialize(buffer: ByteBuffer, signature: string): void;
-
-	deserialize(buffer: ByteBuffer): Buffer;
-
 	aggregate(signatures: Buffer[]): Promise<string>;
 
 	signRecoverable(message: Buffer, privateKey: Buffer): Promise<EcdsaSignature>;
@@ -90,4 +85,10 @@ export interface Signature {
 	verifyRecoverable(signature: EcdsaSignature, message: Buffer, publicKey: Buffer): Promise<boolean>;
 
 	recoverPublicKey(message: Buffer, signature: EcdsaSignature): string;
+}
+
+export interface SignatureSerializer {
+	serialize(buffer: ByteBuffer, signature: string): void;
+
+	deserialize(buffer: ByteBuffer): Buffer;
 }
