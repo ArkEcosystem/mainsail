@@ -4,6 +4,7 @@ import { sleep } from "/mainsail/packages/utils/distribution/index.js";
 
 import { getApiHttp } from "./client.mjs";
 import { config } from "./config.mjs";
+import { eventEmitter } from "./events.mjs";
 import { broadcastedTransactions, broadcastTransactions } from "./transactions.mjs";
 
 const app = express();
@@ -115,6 +116,8 @@ async function setupWebhook() {
 
 		console.log(`got block ${number} from ${req.ip}`);
 		peerBlockNumberMap.set(req.ip, number);
+
+        eventEmitter.emit("block.applied", number);
 
 		if (number >= TARGET_BLOCK_NUMBER && peerBlockNumberMap.has(req.ip)) {
 			console.log(`received target ${TARGET_BLOCK_NUMBER} from ${req.ip}`);
