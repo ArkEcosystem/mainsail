@@ -104,8 +104,8 @@ describe<{
 	});
 
 	it("#hasCommitByHash - should be true", async ({ databaseService, genesisCommit }) => {
-		assert.true(await databaseService.hasCommitByHash(genesisCommit.block.header.hash))
-	})
+		assert.true(await databaseService.hasCommitByHash(genesisCommit.block.header.hash));
+	});
 
 	it("#findCommitBuffers - should return commit buffer", async ({ databaseService, genesisCommit }) => {
 		assert.equal(await databaseService.findCommitBuffers(0, 1), [Buffer.from(genesisCommit.serialized, "hex")]);
@@ -117,15 +117,18 @@ describe<{
 
 	it("#getBlockByHash - should return block", async ({ databaseService, genesisCommit }) => {
 		assert.equal((await databaseService.getBlock(0))?.header.hash, genesisCommit.block.header.hash);
-	})
+	});
 
 	it("#getBlockByHash - should return block header", async ({ databaseService, genesisCommit }) => {
 		assert.equal(await databaseService.getBlockHeader(0), genesisCommit.block.header);
 	});
 
 	it("#getBlockHeaderByHash - should return block header", async ({ databaseService, genesisCommit }) => {
-		assert.equal((await databaseService.getBlockHeaderByHash(genesisCommit.block.header.hash)), genesisCommit.block.header);
-	})
+		assert.equal(
+			await databaseService.getBlockHeaderByHash(genesisCommit.block.header.hash),
+			genesisCommit.block.header,
+		);
+	});
 
 	it("#findBlocks - should return blocks", async ({ databaseService, genesisCommit }) => {
 		assert.equal(await databaseService.findBlocks(0, 1), [genesisCommit.block]);
