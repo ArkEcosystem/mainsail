@@ -1,10 +1,11 @@
 import got from "got";
 import express from "express";
+import { sleep } from "/mainsail/packages/utils/distribution/index.js";
 
-import { ConsensusAbi } from "/mainsail/packages/evm-contracts/distribution/index.js";
-import { makeEvmCall, makeEvmDeploy } from "./tx.mjs";
-import { getApiHttp, postTransactions } from "./client.mjs";
+import { getApiHttp } from "./client.mjs";
 import { config } from "./config.mjs";
+import { eventEmitter } from "./events.mjs";
+import { broadcastedTransactions, broadcastTransactions, tokenContractValidations } from "./transactions.mjs";
 
 const app = express();
 app.use(express.json());
@@ -16,23 +17,22 @@ const EXPECTED_NUMBER_OF_PEERS = 6;
 let webhookTarget;
 let peers = [];
 
-let broadcastedTransactions = [];
-
 // Results
 let allPeersReachedTargetBlockNumber = false;
 let allTransactionsReportedByApi = false;
 let allTransactionsSuccessful = false;
+let allTokenChecksSuccessful = false;
 
 const peerBlockNumberMap = new Map();
 
 (async () => {
 	await discoverPeers();
 	await setupWebhook();
-	await broadcastTransactions();
-	
 	app.listen(3001, function () {
 		console.log("Block listener port 3001!");
 	});
+
+	await broadcastTransactions();
 
 	await waitForResults();
 })();
@@ -40,55 +40,72 @@ const peerBlockNumberMap = new Map();
 async function waitForResults() {
 	do {
 		await sleep(1000);
-		console.log("waiting for results...", { allPeersReachedTargetBlockNumber, allTransactionsReportedByApi, allTransactionsSuccessful });
+		console.log("waiting for results...", { allPeersReachedTargetBlockNumber, allTransactionsReportedByApi, allTokenChecksSuccessful, allTransactionsSuccessful });
 
 		if (!allTransactionsReportedByApi) {
-			try { 
-			   let allFound = true;
-			   let allSuccessful = true;
-			   for (const hash of broadcastedTransactions) {
-				   const transaction = await getApiHttp(config.peer, `/transactions/${hash}`);
-				   if (!transaction) {
-						allFound = false;
+			try {
+				let transactionsFound = true;
+				let receiptsSuccessful = true;
+				for (const hash of broadcastedTransactions) {
+					const response = await getApiHttp(config.peer, `/transactions/${hash}`);
+					if (!response) {
+						transactionsFound = false;
 						break;
-				   }
+					}
 
-				   if (transaction.receipt.status !== 1) {
+					const { data: transaction } = response;
+					if (!transaction) {
+						transactionsFound = false;
+						break;
+					}
+
+					if (transaction.receipt.status !== 1) {
 						console.log("transaction failed!!", transaction);
-						allSuccessful = false;
-				   }
-			   }
-   
-			   if (allFound) {
-				   allTransactionsReportedByApi = true;
-			   }
+						receiptsSuccessful = false;
+					}
+				}
 
-			   if (allSuccessful) {
-				   allTransactionsSuccessful = true;
-			   }
-		   } catch (ex) {
+				if (transactionsFound) {
+					allTransactionsReportedByApi = true;
+				}
+
+				if (receiptsSuccessful) {
+					allTransactionsSuccessful = true;
+				}
+
+			} catch (ex) {
 				console.log(ex);
-		   }
+			}
 		}
 
-	} while (!allPeersReachedTargetBlockNumber || !allTransactionsReportedByApi);
+		if (!allTokenChecksSuccessful) {
+			try {
+				let tokensOk = true;
+				for (const validation of tokenContractValidations) {
+					const { results: holders } = await getApiHttp(config.peer, `/tokens/${validation.address}/holders`);
+					const hasTokenHolder = holders.some(h => h.address === config.tokenBeneficiary && h.balance === validation.tokenBeneficiaryBalance);
+					if (!hasTokenHolder) {
+						tokensOk = false;
+					} else {
+						console.log(`OK: ${JSON.stringify(validation)}`)
+					}
+				}
+
+				if (tokensOk) {
+					allTokenChecksSuccessful = true;
+				}
+			} catch (ex) {
+				console.log(ex);
+			}
+		}
+
+	} while (!allPeersReachedTargetBlockNumber || !allTransactionsSuccessful || !allTransactionsReportedByApi || !allTokenChecksSuccessful);
 
 	console.log(`checks successful. exiting`);
 
-	process.exit(allTransactionsSuccessful ? 0 : 1);
+	process.exit(0);
 }
 
-async function broadcastTransactions() {
-	const tx = await makeEvmCall(`${config.to}`, "100000000");
-	const txDeploy = await makeEvmDeploy(ConsensusAbi, 1);
-	const response = await postTransactions(config.peer, [
-		tx.serialized.toString("hex"),
-		txDeploy.serialized.toString("hex"),
-	]);
-
-	console.log("broadcastTransactions", { txs: [tx.hash, txDeploy.hash], response: JSON.stringify(response) });
-	broadcastedTransactions.push(tx.hash, txDeploy.hash);
-}
 
 async function discoverPeers() {
 	do {
@@ -119,17 +136,23 @@ async function setupWebhook() {
 	app.post("/callback", function (req, res) {
 		res.status(200).end();
 
-		const { number } = req.body.data;
+		const blockData = req.body.data;
 
 		if (!peerBlockNumberMap.has(req.ip)) {
 			console.log("ignoring peer callback", req.ip);
 			return;
 		}
 
-		console.log(`got block ${number} from ${req.ip}`);
-		peerBlockNumberMap.set(req.ip, number);
+		console.log(`got block ${blockData.number} from ${req.ip}`);
+		const seen = [...peerBlockNumberMap.values()].some(b => b === blockData.number);
+		if (!seen) {
+			console.log("emitting block.applied", { number: blockData.number });
+			eventEmitter.emit("block.applied", blockData);
+		}
 
-		if (number >= TARGET_BLOCK_NUMBER && peerBlockNumberMap.has(req.ip)) {
+		peerBlockNumberMap.set(req.ip, blockData.number);
+
+		if (blockData.number >= TARGET_BLOCK_NUMBER && peerBlockNumberMap.has(req.ip)) {
 			console.log(`received target ${TARGET_BLOCK_NUMBER} from ${req.ip}`);
 			peerBlockNumberMap.delete(req.ip);
 
@@ -142,7 +165,7 @@ async function setupWebhook() {
 
 	// register webhook on all peers
 	for (const peer of peers) {
-		for (;;) {
+		for (; ;) {
 			peer.ip = peer.ip.replace("::ffff:", "");
 			const peerWebhookEndpoint = `http://${peer.ip}:4004/api/webhooks`;
 
@@ -164,5 +187,3 @@ async function setupWebhook() {
 		}
 	}
 }
-
-const sleep = async (ms) => await new Promise((resolve) => setTimeout(resolve, ms));
