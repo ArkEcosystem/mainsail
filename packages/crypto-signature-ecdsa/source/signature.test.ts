@@ -3,6 +3,15 @@ import { Signature } from "./signature";
 import { secp256k1 } from "bcrypto";
 
 describe("Signature", ({ assert, it }) => {
+	it("should sign", async () => {
+		const result = await new Signature().sign(
+			Buffer.from("64726e3da8", "hex"),
+			Buffer.from("814857ce48e291893feab95df02e1dbf7ad3994ba46f247f77e4eefd5d8734a2", "hex"),
+		);
+
+		assert.equal(result, "3044022066f1c6d9fe13834f6e348aae40426060339ed8cba7d9b2f105c8220be095877c02201368fffd8294f1e22086703d33511fc8bb25231d6e9dc64d6449035003184bdd");
+	});
+
 	it("should sign and verify", async () => {
 		assert.true(
 			await new Signature().verify(
