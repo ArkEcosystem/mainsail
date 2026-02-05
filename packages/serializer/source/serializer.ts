@@ -28,10 +28,6 @@ export class Serializer implements Contracts.Serializer.Serializer {
 	private readonly publicKeySerializer!: Contracts.Crypto.PublicKeySerializer;
 
 	@inject(Identifiers.Cryptography.Signature.Serializer)
-	@tagged("type", "wallet")
-	private readonly signatureSerializer!: Contracts.Crypto.SignatureSerializer;
-
-	@inject(Identifiers.Cryptography.Signature.Serializer)
 	@tagged("type", "consensus")
 	private readonly consensusSignatureSerializer!: Contracts.Crypto.SignatureSerializer;
 
@@ -106,11 +102,6 @@ export class Serializer implements Contracts.Serializer.Serializer {
 
 			if (schema.type === "publicKey") {
 				this.publicKeySerializer.serialize(result, data[property]);
-				continue;
-			}
-
-			if (schema.type === "signature") {
-				this.signatureSerializer.serialize(result, data[property]);
 				continue;
 			}
 
@@ -222,11 +213,6 @@ export class Serializer implements Contracts.Serializer.Serializer {
 
 			if (schema.type === "publicKey") {
 				target[property] = this.publicKeySerializer.deserialize(source).toString("hex");
-				continue;
-			}
-
-			if (schema.type === "signature") {
-				target[property] = this.signatureSerializer.deserialize(source).toString("hex");
 				continue;
 			}
 
