@@ -9,7 +9,7 @@ import { schemas } from "./validation/schemas.js";
 export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "wallet")
-	private readonly signatureFactory!: Contracts.Crypto.Signature;
+	private readonly signatureFactory!: Contracts.Crypto.SignatureEcdsa;
 
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.Validator;

@@ -4,7 +4,6 @@ export type MandatoryPropertyType =
 	| "hash"
 	| "publicKey"
 	| "hex"
-	| "signature"
 	| "transactions"
 	| "consensusSignature"
 	| "validatorSet";

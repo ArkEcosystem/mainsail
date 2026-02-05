@@ -1,7 +1,6 @@
 import { describe } from "@mainsail/test-runner";
 import { Application } from "@mainsail/kernel";
 import { Signature } from "./signature";
-import { NotImplemented } from "@mainsail/exceptions";
 
 const privateKeys = [
 	"3325023a5e4e0069558c5bd9eb7eca78b4f4c7711b9b231d9263a8edc33bc510",
@@ -104,20 +103,5 @@ describe<{
 
 		const result13 = await signature.aggregate([signatures[1], signatures[3]]);
 		assert.equal(result13, aggregated13);
-	});
-
-	it("#signRecoverable - should throw not implemented", async ({ signature }) => {
-		await assert.rejects(() => signature.signRecoverable(Buffer.from(""), Buffer.from("")), NotImplemented);
-	});
-
-	it("#verifyRecoverable - should throw not implemented", async ({ signature }) => {
-		await assert.rejects(
-			() => signature.verifyRecoverable({ r: "", s: "", v: 0 }, Buffer.from(""), Buffer.from("")),
-			NotImplemented,
-		);
-	});
-
-	it("#recoverPublicKey - should throw not implemented", async ({ signature }) => {
-		await assert.rejects(() => signature.recoverPublicKey(Buffer.from(""), { r: "", s: "", v: 0 }), NotImplemented);
 	});
 });
