@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
+import { ServiceProvider as CryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
@@ -21,6 +22,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 
 		await context.app.resolve(CoreValidation).register();
 		await context.app.resolve<ECDSA>(ECDSA).register();
+		await context.app.resolve<CryptoHashBcrypto>(CryptoHashBcrypto).register();
 	});
 
 	it("should derive an address from an mnemonic", async (context) => {
