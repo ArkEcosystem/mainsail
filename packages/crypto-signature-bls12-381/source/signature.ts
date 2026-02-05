@@ -4,7 +4,7 @@ import { getBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { NotImplemented } from "@mainsail/exceptions";
 
 @injectable()
-export class Signature implements Contracts.Crypto.Signature {
+export class Signature implements Contracts.Crypto.SignatureBls {
 	public async sign(message: Buffer, privateKey: Buffer): Promise<string> {
 		const bls = await getBls();
 		return Buffer.from(bls.SecretKey.fromBytes(privateKey).sign(message).toBytes()).toString("hex");

@@ -14,7 +14,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 
 	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "consensus")
-	private readonly consensusSignature!: Contracts.Crypto.Signature;
+	private readonly consensusSignature!: Contracts.Crypto.SignatureBls;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;

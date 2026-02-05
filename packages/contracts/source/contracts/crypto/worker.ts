@@ -1,5 +1,5 @@
 import type { BlockFactory } from "../crypto/block.js";
-import type { PublicKeyFactory, Signature, SignatureEcdsa } from "../crypto/identities.js";
+import type { PublicKeyFactory, SignatureBls, SignatureEcdsa } from "../crypto/identities.js";
 import type { TransactionFactory } from "../crypto/transactions.js";
 import type { Requests, Subprocess } from "../kernel/ipc.js";
 import type { JsonObject } from "../types/index.js";
@@ -10,10 +10,10 @@ export interface WorkerFlags extends JsonObject {
 
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
-	consensusSignature<K extends Requests<Signature>>(
+	consensusSignature<K extends Requests<SignatureBls>>(
 		method: K,
-		...arguments_: Parameters<Signature[K]>
-	): Promise<ReturnType<Signature[K]>>;
+		...arguments_: Parameters<SignatureBls[K]>
+	): Promise<ReturnType<SignatureBls[K]>>;
 	walletSignature<K extends Requests<SignatureEcdsa>>(
 		method: K,
 		...arguments_: Parameters<SignatureEcdsa[K]>

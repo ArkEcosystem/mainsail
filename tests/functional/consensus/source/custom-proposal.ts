@@ -142,7 +142,7 @@ export const makeCustomProposal = async (
 	);
 
 	const proposalSignature = await app
-		.getTagged<Contracts.Crypto.Signature>(Identifiers.Cryptography.Signature.Instance, "type", "consensus")
+		.getTagged<Contracts.Crypto.SignatureBls>(Identifiers.Cryptography.Signature.Instance, "type", "consensus")
 		.sign(serializedProposal, Buffer.from(validators[0].consensusPrivateKey, "hex"));
 
 	const signedProposal = Buffer.concat([serializedProposal, Buffer.from(proposalSignature, "hex")]);

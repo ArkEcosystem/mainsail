@@ -54,7 +54,7 @@ export interface PublicKeySerializer {
 
 
 
-export interface Signature {
+export interface SignatureBls {
 	sign(message: Buffer, privateKey: Buffer): Promise<string>;
 	verify(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean>;
 	aggregate(signatures: Buffer[]): Promise<string>;

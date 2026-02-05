@@ -40,12 +40,12 @@ export class Worker implements Contracts.Crypto.Worker {
 		return this.ipcSubprocess.getQueueSize();
 	}
 
-	public async consensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
+	public async consensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureBls>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.Signature[K]>
-	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
+		...arguments_: Parameters<Contracts.Crypto.SignatureBls[K]>
+	): Promise<ReturnType<Contracts.Crypto.SignatureBls[K]>> {
 		return this.ipcSubprocess.sendRequest("consensusSignature", method, arguments_) as Promise<
-			ReturnType<Contracts.Crypto.Signature[K]>
+			ReturnType<Contracts.Crypto.SignatureBls[K]>
 		>;
 	}
 
