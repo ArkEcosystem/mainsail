@@ -52,15 +52,10 @@ export interface PublicKeySerializer {
 	deserialize(buffer: ByteBuffer): Buffer;
 }
 
-
-
 export interface SignatureBls {
 	sign(message: Buffer, privateKey: Buffer): Promise<string>;
 	verify(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean>;
 	aggregate(signatures: Buffer[]): Promise<string>;
-	signRecoverable(message: Buffer, privateKey: Buffer): Promise<EcdsaSignature>;
-	verifyRecoverable(signature: EcdsaSignature, message: Buffer, publicKey: Buffer): Promise<boolean>;
-	recoverPublicKey(message: Buffer, signature: EcdsaSignature): string;
 }
 
 export interface SignatureSerializer {

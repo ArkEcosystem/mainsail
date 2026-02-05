@@ -1,7 +1,6 @@
 import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { getBls } from "@mainsail/crypto-key-pair-bls12-381";
-import { NotImplemented } from "@mainsail/exceptions";
 
 @injectable()
 export class Signature implements Contracts.Crypto.SignatureBls {
@@ -24,21 +23,5 @@ export class Signature implements Contracts.Crypto.SignatureBls {
 		return Buffer.from(
 			bls.aggregateSignatures(signatures.map((s) => bls.Signature.fromBytes(s).toBytes())),
 		).toString("hex");
-	}
-
-	public async signRecoverable(message: Buffer, privateKey: Buffer): Promise<Contracts.Crypto.EcdsaSignature> {
-		throw new NotImplemented(this.constructor.name, "signRecoverable");
-	}
-
-	public async verifyRecoverable(
-		signature: Contracts.Crypto.EcdsaSignature,
-		message: Buffer,
-		publicKey: Buffer,
-	): Promise<boolean> {
-		throw new NotImplemented(this.constructor.name, "verifyRecoverable");
-	}
-
-	public recoverPublicKey(message: Buffer, signature: Contracts.Crypto.EcdsaSignature): string {
-		throw new NotImplemented(this.constructor.name, "recoverPublicKey");
 	}
 }
