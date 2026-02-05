@@ -409,7 +409,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 					);
 					stats.importedValidatorsWithoutBlsKey++;
 				} else {
-					const entropy = this.hashFactory.sha256(Buffer.from(validator.username, "utf8"));
+					const entropy = this.hashFactory.sha256(Buffer.from(validator.username, "utf8")).toString("hex").slice(0, 32);;
 					const mnemonic = entropyToMnemonic(entropy);
 
 					const consensusKeyPair = await this.consensusKeyPairFactory.fromMnemonic(mnemonic);
