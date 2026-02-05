@@ -63,7 +63,6 @@ export interface SignatureSerializer {
 	deserialize(buffer: ByteBuffer): Buffer;
 }
 
-
 export interface EcdsaSignature {
 	r: string;
 	s: string;
