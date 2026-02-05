@@ -25,7 +25,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 
 	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "wallet")
-	private readonly signatureSerializer!: Contracts.Crypto.Signature;
+	private readonly signatureSerializer!: Contracts.Crypto.SignatureEcdsa;
 
 	@inject(Identifiers.Cryptography.Transaction.Deserializer)
 	private readonly deserializer!: Contracts.Crypto.TransactionDeserializer;

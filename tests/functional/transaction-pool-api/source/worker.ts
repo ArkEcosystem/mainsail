@@ -33,10 +33,10 @@ export class Worker implements Contracts.Crypto.WorkerScriptHandler {
 		return this.#callConsensusSignature(method, arguments_);
 	}
 
-	public async walletSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
+	public async walletSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureEcdsa>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.Signature[K]>
-	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
+		...arguments_: Parameters<Contracts.Crypto.SignatureEcdsa[K]>
+	): Promise<ReturnType<Contracts.Crypto.SignatureEcdsa[K]>> {
 		throw new Error("Method walletSignature not implemented.");
 	}
 

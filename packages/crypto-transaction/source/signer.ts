@@ -7,7 +7,7 @@ import { formatEcdsaSignature } from "@mainsail/utils";
 export class Signer implements Contracts.Crypto.TransactionSigner {
 	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "wallet")
-	private readonly signatureFactory!: Contracts.Crypto.Signature;
+	private readonly signatureFactory!: Contracts.Crypto.SignatureEcdsa;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
 	private readonly utils!: Contracts.Crypto.TransactionUtilities;

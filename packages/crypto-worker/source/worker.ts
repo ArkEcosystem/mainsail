@@ -49,12 +49,12 @@ export class Worker implements Contracts.Crypto.Worker {
 		>;
 	}
 
-	public async walletSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
+	public async walletSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureEcdsa>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.Signature[K]>
-	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
+		...arguments_: Parameters<Contracts.Crypto.SignatureEcdsa[K]>
+	): Promise<ReturnType<Contracts.Crypto.SignatureEcdsa[K]>> {
 		return this.ipcSubprocess.sendRequest("walletSignature", method, arguments_) as Promise<
-			ReturnType<Contracts.Crypto.Signature[K]>
+			ReturnType<Contracts.Crypto.SignatureEcdsa[K]>
 		>;
 	}
 

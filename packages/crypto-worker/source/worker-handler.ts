@@ -21,7 +21,7 @@ class WorkerImpl {
 
 	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "wallet")
-	private readonly walletSignature!: Contracts.Crypto.Signature;
+	private readonly walletSignature!: Contracts.Crypto.SignatureEcdsa;
 
 	public async callConsensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
 		method: K,
@@ -30,7 +30,7 @@ class WorkerImpl {
 		return this.#call(this.consensusSignature, method, arguments_);
 	}
 
-	public async callWalletSignawture<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
+	public async callWalletSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureEcdsa>>(
 		method: K,
 		arguments_: Contracts.Kernel.IPC.MethodArguments<Contracts.Crypto.Signature, K>,
 	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
@@ -136,7 +136,7 @@ export class WorkerScriptHandler implements Contracts.Crypto.WorkerScriptHandler
 		...arguments_: Parameters<Contracts.Crypto.Signature[K]>
 	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
 		// @ts-ignore
-		return this.#impl.callWalletSignawture(method, arguments_[0]);
+		return this.#impl.callWalletSignature(method, arguments_[0]);
 	}
 
 	public async blockFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.BlockFactory>>(
