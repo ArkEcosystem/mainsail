@@ -116,7 +116,7 @@ export const makeCustomProposal = async (
 			timestamp: dayjs().valueOf(),
 			transactions: transactionData,
 			transactionsCount: transactionData.length,
-			transactionsRoot: (await hashFactory.sha256(payloadBuffers)).toString("hex"),
+			transactionsRoot: hashFactory.sha256(payloadBuffers).toString("hex"),
 			version: 1,
 		},
 		transactions,

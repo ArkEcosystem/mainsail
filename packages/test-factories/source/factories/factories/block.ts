@@ -106,11 +106,10 @@ export const registerBlockFactory = async (
 					timestamp: options.timestamp || dayjs().valueOf(),
 					transactions: transactionData,
 					transactionsCount: transactions.length,
-					transactionsRoot: (
-						await app
-							.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
-							.sha256(payloadBuffers)
-					).toString("hex"),
+					transactionsRoot: app
+						.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
+						.sha256(payloadBuffers)
+						.toString("hex"),
 					version: 1,
 				},
 				transactions,
