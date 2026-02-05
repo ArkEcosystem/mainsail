@@ -22,4 +22,17 @@ describe("Signature", ({ assert, it }) => {
 		assert.equal(recoveredPublicKey, publicKey);
 		assert.true(await new Signature().verifyRecoverable(signature, message, Buffer.from(publicKey, "hex")));
 	});
+
+	it("#verifyRecoverable should return false if s is not low", async () => {
+		const signature = {
+			r: "66f1c6d9fe13834f6e348aae40426060339ed8cba7d9b2f105c8220be095877c",
+			s: "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141bd",
+			v: 1,
+		};
+
+		const message = Buffer.from("64726e3da8", "hex");
+		const publicKey = Buffer.from("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex");
+
+		assert.false(await new Signature().verifyRecoverable(signature, message, publicKey));
+	});
 });
