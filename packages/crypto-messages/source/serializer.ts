@@ -23,7 +23,7 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 				4 + // blockNumber
 				4 + // round
 				1 + // validatorIndex
-				1 +
+				1 + // blockHash presence flag
 				(message.blockHash ? this.hashSize : 0) + // blockHash
 				this.signatureSize, // signature
 			schema,
@@ -37,7 +37,7 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 				1 + // type
 				4 + // blockNumber
 				4 + // round
-				1 +
+				1 + // blockHash presence flag
 				(message.blockHash ? this.hashSize : 0), // blockHash
 			schema: schemaForSignature,
 			skip: 0,

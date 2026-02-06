@@ -10,18 +10,14 @@ export interface SignatureMessageData {
 	readonly blockHash?: string;
 }
 
-export type HasBlockHash = { blockHash: string };
-export type WithoutBlockHash<T> = Omit<T, "blockHash">;
-export type WithOptionalBlockHash<T extends HasBlockHash> = WithoutBlockHash<T> & Partial<Pick<T, "blockHash">>;
-
-export interface MessageData {
-	readonly type: MessageType;
-	readonly blockNumber: number;
-	readonly round: number;
-	readonly blockHash?: string;
+export interface MessageData extends SignatureMessageData {
 	readonly validatorIndex: number;
 	readonly signature: string;
 }
+
+export type HasBlockHash = { blockHash: string };
+export type WithoutBlockHash<T> = Omit<T, "blockHash">;
+export type WithOptionalBlockHash<T extends HasBlockHash> = WithoutBlockHash<T> & Partial<Pick<T, "blockHash">>;
 
 export interface Message extends MessageData {
 	readonly serialized: Buffer;
