@@ -45,10 +45,16 @@ describe<{
 	});
 
 	it("#deserializeMessage - should throw with extra bytes", async ({ deserializer }) => {
-		await assert.rejects(() => deserializer.deserializeMessage(Buffer.from(serializedPrecommitNoBlock + "00", "hex")), "Message deserialization failed: 1 bytes remaining");
+		await assert.rejects(
+			() => deserializer.deserializeMessage(Buffer.from(serializedPrecommitNoBlock + "00", "hex")),
+			"Message deserialization failed: 1 bytes remaining",
+		);
 	});
 
 	it("#deserializeMessage - should throw with missing bytes", async ({ deserializer }) => {
-		await assert.rejects(() => deserializer.deserializeMessage(Buffer.from(serializedPrecommitNoBlock.slice(0, -2), "hex")), "Message deserialization failed: Read over buffer boundary.");
+		await assert.rejects(
+			() => deserializer.deserializeMessage(Buffer.from(serializedPrecommitNoBlock.slice(0, -2), "hex")),
+			"Message deserialization failed: Read over buffer boundary.",
+		);
 	});
 });

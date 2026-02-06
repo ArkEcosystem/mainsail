@@ -15,7 +15,7 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
 		try {
-			const result =  await this.serializer.deserialize<Contracts.Crypto.MessageData>(
+			const result = await this.serializer.deserialize<Contracts.Crypto.MessageData>(
 				buffer,
 				{},
 				{
@@ -23,7 +23,7 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 				},
 			);
 
-			if(buffer.getRemainderLength() === 0) {
+			if (buffer.getRemainderLength() === 0) {
 				return result;
 			}
 		} catch (error) {
