@@ -12,7 +12,7 @@ export class Worker implements Contracts.Crypto.WorkerScriptHandler {
 
 	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "consensus")
-	private readonly consensusSignatureImp!: Contracts.Crypto.Signature;
+	private readonly consensusSignatureImp!: Contracts.Crypto.SignatureBls;
 
 	// @inject(Identifiers.Cryptography.Identity.PublicKey.Factory)
 	// @tagged("type", "consensus")
@@ -26,17 +26,17 @@ export class Worker implements Contracts.Crypto.WorkerScriptHandler {
 		//
 	}
 
-	public async consensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
+	public async consensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureBls>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.Signature[K]>
-	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
+		...arguments_: Parameters<Contracts.Crypto.SignatureBls[K]>
+	): Promise<ReturnType<Contracts.Crypto.SignatureBls[K]>> {
 		return this.#callConsensusSignature(method, arguments_);
 	}
 
-	public async walletSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
+	public async walletSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureEcdsa>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.Signature[K]>
-	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
+		...arguments_: Parameters<Contracts.Crypto.SignatureEcdsa[K]>
+	): Promise<ReturnType<Contracts.Crypto.SignatureEcdsa[K]>> {
 		throw new Error("Method walletSignature not implemented.");
 	}
 
@@ -69,10 +69,10 @@ export class Worker implements Contracts.Crypto.WorkerScriptHandler {
 		return true;
 	}
 
-	async #callConsensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
+	async #callConsensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureBls>>(
 		method: K,
-		arguments_: Parameters<Contracts.Crypto.Signature[K]>,
-	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
+		arguments_: Parameters<Contracts.Crypto.SignatureBls[K]>,
+	): Promise<ReturnType<Contracts.Crypto.SignatureBls[K]>> {
 		return this.#call(this.consensusSignatureImp, method, arguments_);
 	}
 

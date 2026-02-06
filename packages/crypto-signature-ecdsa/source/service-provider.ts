@@ -2,7 +2,6 @@ import { Identifiers } from "@mainsail/constants";
 import { injectable, Selectors } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 
-import { Serializer } from "./serializer.js";
 import { Signature } from "./signature.js";
 
 @injectable()
@@ -16,12 +15,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind(Identifiers.Cryptography.Signature.Instance)
 			.to(Signature)
-			.inSingletonScope()
-			.when(Selectors.anyAncestorOrTargetTagged("type", "wallet"));
-
-		this.app
-			.bind(Identifiers.Cryptography.Signature.Serializer)
-			.to(Serializer)
 			.inSingletonScope()
 			.when(Selectors.anyAncestorOrTargetTagged("type", "wallet"));
 	}
