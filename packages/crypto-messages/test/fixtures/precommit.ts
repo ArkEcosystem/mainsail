@@ -1,10 +1,8 @@
 import { Enums } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 
-import { blockData } from "./block.js";
-
 export const precommitData: Contracts.Crypto.MessageData = {
-	blockHash: blockData.hash,
+	blockHash: "82139a7708157c8e2b78f0db38216924c8a17f82e77d5997fb280b1435a6cc97",
 	blockNumber: 1,
 	round: 1,
 	signature:
