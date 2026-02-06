@@ -149,4 +149,12 @@ describe<{
 
 		assert.equal(toData(precommit), precommitDataNoBlock);
 	});
+
+	it("#makeMessageFromBytes - should throw if extra bytes are present", async ({ factory }) => {
+		await assert.rejects(() => factory.makeMessageFromBytes(Buffer.from(serializedPrecommitNoBlock + "00", "hex")), "Message deserialization failed: 1 bytes remaining");
+	});
+
+	it("#makeMessageFromBytes - should throw if missing bytes are present", async ({ factory }) => {
+		await assert.rejects(() => factory.makeMessageFromBytes(Buffer.from(serializedPrecommitNoBlock.slice(0, -2), "hex")), "Message deserialization failed: Read over buffer boundary.");
+	});
 });

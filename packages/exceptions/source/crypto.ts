@@ -57,6 +57,12 @@ export class MessageSchemaError extends Exception {
 	}
 }
 
+export class MessageDeserializationError extends Exception {
+	public constructor(message: string) {
+		super(`Message deserialization failed: ${message}`);
+	}
+}
+
 export class InvalidTransactionBytesError extends Exception {
 	public constructor(message: string) {
 		super(`Failed to deserialize transaction, encountered invalid bytes: ${message}`);

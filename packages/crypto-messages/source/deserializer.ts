@@ -1,6 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+import { MessageDeserializationError } from "@mainsail/exceptions";
 import { ByteBuffer } from "@mainsail/utils";
 
 import { schema } from "./serializer-schemas.js";
@@ -26,9 +27,9 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 				return result;
 			}
 		} catch (error) {
-			throw new Error(`Message deserialization failed: ${error instanceof Error ? error.message : ""}`);
+			throw new MessageDeserializationError(error instanceof Error ? error.message : "");
 		}
 
-		throw new Error(`Message deserialization failed: ${buffer.getRemainderLength()} bytes remaining`);
+		throw new MessageDeserializationError(`${buffer.getRemainderLength()} bytes remaining`);
 	}
 }
