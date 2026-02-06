@@ -10,8 +10,11 @@ export interface SignatureMessageData {
 	readonly blockHash?: string;
 }
 
-export interface MessageData extends SignatureMessageData {
+export interface MakeMessageData extends SignatureMessageData {
 	readonly validatorIndex: number;
+}
+
+export interface MessageData extends MakeMessageData {
 	readonly signature: string;
 }
 
@@ -19,11 +22,6 @@ export interface Message extends MessageData {
 	readonly serialized: Buffer;
 	toString(): string;
 }
-
-export type HasSignature = { signature: string };
-export type WithoutSignature<T> = Omit<T, "signature">;
-export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
-export type MakeMessageData = WithoutSignature<MessageData>;
 
 export interface MessageFactory {
 	makeMessage(data: MakeMessageData, keyPair: KeyPair): Promise<Message>;
