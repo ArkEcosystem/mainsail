@@ -38,10 +38,10 @@ export class Factory implements Contracts.Crypto.MessageFactory {
 
 	public async makeMessageFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Message> {
 		const data = await this.deserializer.deserializeMessage(bytes);
-		return this.makeMessageFromData(data, bytes);
+		return this.#makeMessageFromData(data, bytes);
 	}
 
-	public async makeMessageFromData(
+ 	async #makeMessageFromData(
 		data: Contracts.Crypto.MessageData,
 		serialized?: Buffer,
 	): Promise<Contracts.Crypto.Message> {
