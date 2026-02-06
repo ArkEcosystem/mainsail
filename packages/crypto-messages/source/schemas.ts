@@ -4,6 +4,7 @@ import type { AnySchemaObject } from "ajv";
 export const schemas: Record<"message", AnySchemaObject> = {
 	message: {
 		$id: "message",
+		additionalProperties: false,
 		properties: {
 			blockHash: { $ref: "blockHash" },
 			blockNumber: { minimum: 1, type: "integer" },
@@ -13,6 +14,6 @@ export const schemas: Record<"message", AnySchemaObject> = {
 			validatorIndex: { isValidatorIndex: {} },
 		},
 		required: ["type", "blockNumber", "round", "validatorIndex", "signature"],
-		type: "object",
+		type: "object"
 	},
 };
