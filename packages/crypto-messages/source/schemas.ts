@@ -14,6 +14,6 @@ export const schemas: Record<"message", AnySchemaObject> = {
 			validatorIndex: { isValidatorIndex: {} },
 		},
 		required: ["type", "blockNumber", "round", "validatorIndex", "signature"],
-		type: "object"
+		type: "object",
 	},
 };

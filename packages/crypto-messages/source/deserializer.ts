@@ -13,8 +13,12 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 	public async deserializeMessage(serialized: Buffer): Promise<Contracts.Crypto.MessageData> {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		return await this.serializer.deserialize<Contracts.Crypto.MessageData>(buffer, {}, {
-			schema,
-		});
+		return await this.serializer.deserialize<Contracts.Crypto.MessageData>(
+			buffer,
+			{},
+			{
+				schema,
+			},
+		);
 	}
 }

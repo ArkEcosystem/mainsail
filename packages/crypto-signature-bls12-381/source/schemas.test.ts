@@ -14,7 +14,6 @@ describe<{
 
 		context.validator = context.app.resolve(Validator);
 
-
 		for (const schema of Object.values({
 			...baseSchemas,
 			...schemas,
@@ -47,5 +46,3 @@ describe<{
 		}
 	});
 });
-
-

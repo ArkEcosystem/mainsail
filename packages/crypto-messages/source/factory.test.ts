@@ -121,7 +121,7 @@ describe<{
 		const invalidPrecommitData = {
 			...precommitData,
 			blockNumber: 0, // invalid block number
-		}
+		};
 
 		await assert.rejects(() => factory.makeMessage(invalidPrecommitData, identity.keys), MessageSchemaError);
 	});

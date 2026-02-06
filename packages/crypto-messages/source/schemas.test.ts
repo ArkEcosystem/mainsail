@@ -87,7 +87,19 @@ describe<{
 	});
 
 	it("message - should throw for invalid signature", async ({ validator }) => {
-		const values = [-1, "0", "1", "invalidSignature", [], {}, null, undefined, "a".repeat(191), "a".repeat(193), "g".repeat(192)];
+		const values = [
+			-1,
+			"0",
+			"1",
+			"invalidSignature",
+			[],
+			{},
+			null,
+			undefined,
+			"a".repeat(191),
+			"a".repeat(193),
+			"g".repeat(192),
+		];
 
 		for (const value of values) {
 			const result = validator.validate("message", { ...prevoteData, signature: value });
@@ -109,7 +121,7 @@ describe<{
 	});
 
 	it("message - should throw for invalid validatorIndex", async ({ validator }) => {
-		const values = [-1, 53,  "0", "1", "invalidValidatorIndex", [], {}, null, undefined];
+		const values = [-1, 53, "0", "1", "invalidValidatorIndex", [], {}, null, undefined];
 
 		for (const value of values) {
 			const result = validator.validate("message", { ...prevoteData, validatorIndex: value });
@@ -120,7 +132,7 @@ describe<{
 	});
 
 	it("message - should throw for invalid type", async ({ validator }) => {
-		const values = [-1,  "0", "invalidValidatorIndex", [], {}, null, undefined];
+		const values = [-1, "0", "invalidValidatorIndex", [], {}, null, undefined];
 
 		for (const value of values) {
 			const result = validator.validate("message", value);
@@ -134,5 +146,3 @@ describe<{
 		assert.defined(result.error);
 	});
 });
-
-
