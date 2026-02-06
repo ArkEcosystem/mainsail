@@ -25,8 +25,6 @@ export interface MessageData {
 
 export interface Message extends MessageData {
 	readonly serialized: Buffer;
-
-	toSignatureData(): SignatureMessageData;
 	toString(): string;
 }
 

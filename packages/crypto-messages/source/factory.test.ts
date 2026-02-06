@@ -1,6 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers, Enums } from "@mainsail/constants";
 
+import { MessageSchemaError } from "@mainsail/exceptions";
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
@@ -114,6 +115,15 @@ describe<{
 			message.signature,
 			"904c8055242bd7736a1cf7ce20c8fedeee5f2f8fe3f6cab6a166c36c1be0f616c2b7a333912becfa3ecb799c8cd420a012bf41018f5c52f67a2858a6d5bd016e8ef6f56a84d8a734ba6ce5f9a5260201fd9d73ce8688ff0019df2c07a1c33c4d",
 		);
+	});
+
+	it("#makeMessage - should throw if schema is invalid", async ({ factory, identity }) => {
+		const invalidPrecommitData = {
+			...precommitData,
+			blockNumber: 0, // invalid block number
+		}
+
+		await assert.rejects(() => factory.makeMessage(invalidPrecommitData, identity.keys), MessageSchemaError);
 	});
 
 	it("#makeMessageFromBytes - should be ok for prevote", async ({ factory }) => {
