@@ -38,20 +38,9 @@ export class Factory implements Contracts.Crypto.MessageFactory {
 
 	public async makeMessageFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Message> {
 		const data = await this.deserializer.deserializeMessage(bytes);
-		return this.#makeMessageFromData(data, bytes);
-	}
-
- 	async #makeMessageFromData(
-		data: Contracts.Crypto.MessageData,
-		serialized?: Buffer,
-	): Promise<Contracts.Crypto.Message> {
 		this.#applySchema("message", data);
 
-		if (!serialized) {
-			serialized = await this.serializer.serializeMessage(data);
-		}
-
-		return new Message({ ...data, serialized });
+		return new Message({ ...data, serialized: bytes });
 	}
 
 	#applySchema<T>(schema: string, data: T): T {
