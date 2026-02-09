@@ -13,7 +13,7 @@ export class BlockResource {
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	public async transform(block: Contracts.Crypto.Block, transactionObject: boolean): Promise<object> {
-		const blockData: Contracts.Crypto.BlockData = block.data;
+		const blockData = block.data;
 
 		const milestone = this.configuration.getMilestone(blockData.number);
 
@@ -25,7 +25,7 @@ export class BlockResource {
 			nonce: "0x0000000000000000",
 			sha3Uncles: "0x1dcc4de8dec75d7aab85b567b6ccd41ad4e2a311b82e5872087ed76f0f1ccf8f", // No uncles in ARK, this is hash of empty list
 			logsBloom: `0x${blockData.logsBloom}`,
-			transactionsRoot: `0x${blockData.stateRoot}`,
+			transactionsRoot: `0x${blockData.transactionsRoot}`,
 			stateRoot: `0x${blockData.stateRoot}`,
 			receiptsRoot: `0x${blockData.stateRoot}`,
 			miner: blockData.proposer.toLowerCase(),

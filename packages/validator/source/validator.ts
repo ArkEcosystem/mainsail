@@ -315,7 +315,6 @@ export class Validator implements Contracts.Validator.Validator {
 				round,
 				stateRoot,
 				timestamp,
-				transactions: transactionData,
 				transactionsCount: transactionData.length,
 				transactionsRoot: this.hashFactory.sha256(payloadBuffers).toString("hex"),
 				version: 1,

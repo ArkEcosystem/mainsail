@@ -104,7 +104,6 @@ export const registerBlockFactory = async (
 					round: 0,
 					stateRoot: "0".repeat(64),
 					timestamp: options.timestamp || dayjs().valueOf(),
-					transactions: transactionData,
 					transactionsCount: transactions.length,
 					transactionsRoot: app
 						.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
