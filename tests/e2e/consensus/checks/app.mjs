@@ -1,61 +1,11 @@
 import { Container } from "/mainsail/packages/container/distribution/index.js";
 import { Identifiers } from "/mainsail/packages/constants/distribution/index.js";
 import { Application } from "/mainsail/packages/kernel/distribution/index.js";
-import { TransactionBuilder } from "/mainsail/packages/crypto-transaction/distribution/index.js";
-
-import { getWalletNonce } from "./client.mjs";
 import { config } from "./config.mjs"
 
 let app = undefined;
 
-
-export const makeEvmCall = async (
-    to,
-    amount,
-) => {
-    const app = await getApplication(config);
-
-    const addressFactory = app.getTagged(Identifiers.Cryptography.Identity.Address.Factory, "type", "wallet");
-    const senderAddress = await addressFactory.fromMnemonic(config.senderPassphrase);
-    const walletNonce = await getWalletNonce(config.peer, senderAddress);
-
-    let builder = app
-        .resolve(TransactionBuilder)
-        .gasPrice(5000000000)
-        .gasLimit(21000)
-        .payload("")
-        .recipientAddress(to)
-        .value(amount)
-        .nonce(walletNonce.toString());
-
-    const signed = await builder.sign(config.senderPassphrase);
-
-    return signed.build();
-};
-
-export const makeEvmDeploy = async (
-    abi,
-    nonceOffset = 0,
-) => {
-    const app = await getApplication(config);
-
-    const addressFactory = app.getTagged(Identifiers.Cryptography.Identity.Address.Factory, "type", "wallet");
-    const senderAddress = await addressFactory.fromMnemonic(config.senderPassphrase);
-    const walletNonce = await getWalletNonce(config.peer, senderAddress);
-
-    let builder = app
-        .resolve(TransactionBuilder)
-        .gasPrice(5000000000)
-        .gasLimit(4_000_000)
-        .payload(abi.bytecode.object.slice(2))
-        .nonce((walletNonce + nonceOffset).toString());
-
-    const signed = await builder.sign(config.senderPassphrase);
-
-    return signed.build();
-};
-
-const getApplication = async (config) => {
+export const getApplication = async () => {
     if (app) {
         return app;
     }
