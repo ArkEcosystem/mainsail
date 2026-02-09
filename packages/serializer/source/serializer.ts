@@ -4,7 +4,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { NotImplemented } from "@mainsail/exceptions";
 import { assert, BigNumber, ByteBuffer, validatorSetPack, validatorSetUnpack } from "@mainsail/utils";
 
-type TransactionCount = Pick<Contracts.Crypto.BlockData, "transactionsCount">;
+type TransactionCount = Pick<Contracts.Crypto.BlockHeaderRaw, "transactionsCount">;
 
 const assertTransactionCount: (data: unknown) => asserts data is TransactionCount = (
 	data: unknown,

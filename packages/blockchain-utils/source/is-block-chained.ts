@@ -8,8 +8,8 @@ type BlockChainedDetails = {
 };
 
 const getBlockChainedDetails = (
-	previousBlock: Contracts.Crypto.BlockData,
-	nextBlock: Contracts.Crypto.BlockData,
+	previousBlock: Contracts.Crypto.BlockHeader,
+	nextBlock: Contracts.Crypto.BlockHeader,
 ): BlockChainedDetails => {
 	const followsPrevious: boolean = nextBlock.parentHash === previousBlock.hash;
 	const isPlusOne: boolean = nextBlock.number === previousBlock.number + 1;
@@ -22,13 +22,13 @@ const getBlockChainedDetails = (
 };
 
 export const isBlockChained = (
-	previousBlock: Contracts.Crypto.BlockData,
-	nextBlock: Contracts.Crypto.BlockData,
+	previousBlock: Contracts.Crypto.BlockHeader,
+	nextBlock: Contracts.Crypto.BlockHeader,
 ): boolean => getBlockChainedDetails(previousBlock, nextBlock).isChained;
 
 export const getBlockNotChainedErrorMessage = (
-	previousBlock: Contracts.Crypto.BlockData,
-	nextBlock: Contracts.Crypto.BlockData,
+	previousBlock: Contracts.Crypto.BlockHeader,
+	nextBlock: Contracts.Crypto.BlockHeader,
 ): string => {
 	const details: BlockChainedDetails = getBlockChainedDetails(previousBlock, nextBlock);
 

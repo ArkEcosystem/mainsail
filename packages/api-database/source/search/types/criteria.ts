@@ -31,7 +31,7 @@ export type BlockCriteria = {
 export type OrBlockCriteria = OrCriteria<BlockCriteria>;
 
 export type BlockDataWithTransactionData = {
-	data: Contracts.Crypto.BlockData;
+	data: Contracts.Crypto.BlockHeader;
 	transactions: Contracts.Crypto.TransactionData[];
 };
 

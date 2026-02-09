@@ -8,7 +8,7 @@ export class BlockResource implements Contracts.Api.Resource {
 	}
 
 	public async transform(block: Contracts.Crypto.Block): Promise<object> {
-		const blockData: Contracts.Crypto.BlockData = block.data;
+		const blockData: Contracts.Crypto.BlockHeader = block.data;
 
 		return {
 			forged: {
