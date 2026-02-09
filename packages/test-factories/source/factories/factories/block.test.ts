@@ -18,17 +18,17 @@ describe<{
 	it("should create a single block", async ({ factoryBuilder }) => {
 		const entity = await factoryBuilder.get("Block").make<Contracts.Crypto.Commit>();
 
-		assert.string(entity.block.data.proposer);
-		assert.number(entity.block.data.number);
-		assert.string(entity.block.data.hash);
-		assert.number(entity.block.data.transactionsCount);
-		assert.string(entity.block.data.stateRoot);
-		assert.number(entity.block.data.payloadSize);
-		assert.string(entity.block.data.parentHash);
-		assert.instance(entity.block.data.reward, BigNumber);
-		assert.number(entity.block.data.timestamp);
-		assert.instance(entity.block.data.fee, BigNumber);
-		assert.number(entity.block.data.version);
+		assert.string(entity.block.proposer);
+		assert.number(entity.block.number);
+		assert.string(entity.block.hash);
+		assert.number(entity.block.transactionsCount);
+		assert.string(entity.block.stateRoot);
+		assert.number(entity.block.payloadSize);
+		assert.string(entity.block.parentHash);
+		assert.instance(entity.block.reward, BigNumber);
+		assert.number(entity.block.timestamp);
+		assert.instance(entity.block.fee, BigNumber);
+		assert.number(entity.block.version);
 		assert.string(entity.block.serialized);
 		assert.array(entity.block.transactions);
 	});
@@ -38,23 +38,23 @@ describe<{
 
 		const options = {
 			getPreviousBlock(): Contracts.Crypto.BlockData {
-				return previousBlock.block.data;
+				return previousBlock.block;
 			},
 		};
 
 		const entity = await factoryBuilder.get("Block").withOptions(options).make<Contracts.Crypto.Commit>();
 
-		assert.string(entity.block.data.proposer);
-		assert.number(entity.block.data.number);
-		assert.string(entity.block.data.hash);
-		assert.number(entity.block.data.transactionsCount);
-		assert.string(entity.block.data.stateRoot);
-		assert.number(entity.block.data.payloadSize);
-		assert.string(entity.block.data.parentHash);
-		assert.instance(entity.block.data.reward, BigNumber);
-		assert.number(entity.block.data.timestamp);
-		assert.instance(entity.block.data.fee, BigNumber);
-		assert.number(entity.block.data.version);
+		assert.string(entity.block.proposer);
+		assert.number(entity.block.number);
+		assert.string(entity.block.hash);
+		assert.number(entity.block.transactionsCount);
+		assert.string(entity.block.stateRoot);
+		assert.number(entity.block.payloadSize);
+		assert.string(entity.block.parentHash);
+		assert.instance(entity.block.reward, BigNumber);
+		assert.number(entity.block.timestamp);
+		assert.instance(entity.block.fee, BigNumber);
+		assert.number(entity.block.version);
 		assert.string(entity.block.serialized);
 		assert.array(entity.block.transactions);
 	});
@@ -66,17 +66,17 @@ describe<{
 
 		const entity = await factoryBuilder.get("Block").withOptions(options).make<Contracts.Crypto.Commit>();
 
-		assert.string(entity.block.data.proposer);
-		assert.number(entity.block.data.number);
-		assert.string(entity.block.data.hash);
-		assert.number(entity.block.data.transactionsCount);
-		assert.string(entity.block.data.stateRoot);
-		assert.number(entity.block.data.payloadSize);
-		assert.string(entity.block.data.parentHash);
-		assert.instance(entity.block.data.reward, BigNumber);
-		assert.number(entity.block.data.timestamp);
-		assert.instance(entity.block.data.fee, BigNumber);
-		assert.number(entity.block.data.version);
+		assert.string(entity.block.proposer);
+		assert.number(entity.block.number);
+		assert.string(entity.block.hash);
+		assert.number(entity.block.transactionsCount);
+		assert.string(entity.block.stateRoot);
+		assert.number(entity.block.payloadSize);
+		assert.string(entity.block.parentHash);
+		assert.instance(entity.block.reward, BigNumber);
+		assert.number(entity.block.timestamp);
+		assert.instance(entity.block.fee, BigNumber);
+		assert.number(entity.block.version);
 		assert.string(entity.block.serialized);
 		assert.array(entity.block.transactions);
 	});
