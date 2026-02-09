@@ -41,10 +41,14 @@ describe<{
 		deserializer,
 		app,
 	}) => {
-
-		const transactions = await Promise.all(blockDataWithTransactions.transactions.map(async (transaction) =>
-			await app.get<Contracts.Crypto.TransactionFactory>(Identifiers.Cryptography.Transaction.Factory).fromData(transaction),
-		));
+		const transactions = await Promise.all(
+			blockDataWithTransactions.transactions.map(
+				async (transaction) =>
+					await app
+						.get<Contracts.Crypto.TransactionFactory>(Identifiers.Cryptography.Transaction.Factory)
+						.fromData(transaction),
+			),
+		);
 
 		const serialized = await serializer.serializeWithTransactions({
 			...blockDataWithTransactions,

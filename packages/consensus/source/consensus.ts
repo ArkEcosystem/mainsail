@@ -521,10 +521,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#round,
 			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
 		);
-		this.logger.info(
-			`Created proposal with new block ${this.#getBlockString(this.#proposedBlock)}`,
-			"consensus",
-		);
+		this.logger.info(`Created proposal with new block ${this.#getBlockString(this.#proposedBlock)}`, "consensus");
 
 		void this.eventDispatcher.dispatch(Events.BlockEvent.Forged, this.#proposedBlock);
 

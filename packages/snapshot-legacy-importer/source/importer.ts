@@ -103,9 +103,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	public async run(genesisCommit: Contracts.Crypto.Commit): Promise<Contracts.Snapshot.LegacyImportResult> {
 		await this.prepareRestore();
 
-		const {
-			block
-		} = genesisCommit;
+		const { block } = genesisCommit;
 
 		const milestone = this.configuration.getMilestone(this.configuration.getGenesisHeight());
 		assert.defined(milestone.snapshot);

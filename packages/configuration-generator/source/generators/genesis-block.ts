@@ -89,7 +89,7 @@ export class GenesisBlockGenerator extends Generator {
 		const genesis = await this.#createGenesisCommit(genesisWallet.keys, transactions, options);
 
 		return {
-			block:{...genesis.block, transactions: genesis.block.transactions.map((tx) => tx.data) },
+			block: { ...genesis.block, transactions: genesis.block.transactions.map((tx) => tx.data) },
 			proof: genesis.proof,
 			serialized: genesis.serialized,
 		};

@@ -43,7 +43,9 @@ describe<{
 
 		context.factory = context.app.resolve(BlockFactory);
 		context.serializer = context.app.resolve(Serializer);
-		context.txFactory = context.app.get<Contracts.Crypto.TransactionFactory>(Identifiers.Cryptography.Transaction.Factory);
+		context.txFactory = context.app.get<Contracts.Crypto.TransactionFactory>(
+			Identifiers.Cryptography.Transaction.Factory,
+		);
 	});
 
 	it("#make - should make a block", async ({ factory }) => {
@@ -55,9 +57,11 @@ describe<{
 	});
 
 	it("#make - should make a block with transactions", async ({ factory, txFactory }) => {
-		const transactions = await Promise.all(blockDataWithTransactionsOriginal.transactions.map(async (transaction) =>
-			await txFactory.fromData(transaction),
-		));
+		const transactions = await Promise.all(
+			blockDataWithTransactionsOriginal.transactions.map(
+				async (transaction) => await txFactory.fromData(transaction),
+			),
+		);
 
 		const block = await factory.make(blockDataWithTransactionsOriginal, transactions);
 
@@ -66,11 +70,7 @@ describe<{
 		assert.equal(block.serialized, serializedWithTransactions);
 
 		for (let index = 0; index < transactions.length; index++) {
-			assertTransactionData(
-				assert,
-				block.transactions[index].data,
-				transactions[index].data,
-			);
+			assertTransactionData(assert, block.transactions[index].data, transactions[index].data);
 		}
 	});
 

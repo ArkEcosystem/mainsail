@@ -68,7 +68,7 @@ export interface BlockFactory {
 
 export type BlockSerializable = BlockHeaderRaw & {
 	readonly transactions: { serialized: Buffer }[];
-}
+};
 
 export interface BlockSerializer {
 	totalSize(block: BlockHeaderRaw): number;

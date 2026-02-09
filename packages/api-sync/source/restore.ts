@@ -399,9 +399,7 @@ export class Restore {
 				} else {
 					validatorAttributes.producedBlocks += 1;
 					validatorAttributes.totalForgedFees = validatorAttributes.totalForgedFees.plus(block.fee);
-					validatorAttributes.totalForgedRewards = validatorAttributes.totalForgedFees.plus(
-						block.reward,
-					);
+					validatorAttributes.totalForgedRewards = validatorAttributes.totalForgedFees.plus(block.reward);
 					validatorAttributes.lastBlock = block;
 				}
 

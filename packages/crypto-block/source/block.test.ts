@@ -23,7 +23,6 @@ describe<{}>("Block", ({ it, assert }) => {
 		const indexedTransaction2 = clone(transaction2);
 		indexedTransaction2.data.transactionIndex = 1;
 
-
 		const block = sealBlock({
 			data: blockData,
 			serialized: "serialized_content",

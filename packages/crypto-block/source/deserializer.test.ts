@@ -24,7 +24,9 @@ describe<{
 	});
 
 	it.only("#deserialize - should correctly deserialize a block with transactions", async ({ deserializer }) => {
-		const deserialized = await deserializer.deserializeWithTransactions(Buffer.from(serializedWithTransactions, "hex"))
+		const deserialized = await deserializer.deserializeWithTransactions(
+			Buffer.from(serializedWithTransactions, "hex"),
+		);
 
 		assertBlockData(assert, deserialized.data, blockDataWithTransactions);
 

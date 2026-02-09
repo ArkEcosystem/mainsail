@@ -24,9 +24,7 @@ export class InvalidTimestamp extends ValidatorException {
 
 export class InvalidReward extends ValidatorException {
 	public constructor(block: Contracts.Crypto.Block, expectedReward: string) {
-		super(
-			`Block ${block.hash} has invalid reward. Block reward is ${block.reward} instead ${expectedReward}.`,
-		);
+		super(`Block ${block.hash} has invalid reward. Block reward is ${block.reward} instead ${expectedReward}.`);
 	}
 }
 
@@ -78,9 +76,7 @@ export class FutureBlock extends ValidatorException {
 
 export class InvalidGenerator extends ValidatorException {
 	public constructor(block: Contracts.Crypto.Block, expectedValidator: string) {
-		super(
-			`Block ${block.hash} has invalid generator. Proposer is ${block.proposer} instead ${expectedValidator}.`,
-		);
+		super(`Block ${block.hash} has invalid generator. Proposer is ${block.proposer} instead ${expectedValidator}.`);
 	}
 }
 

@@ -116,7 +116,7 @@ describe<{
 	// User assert block data
 	it("#getData - should be ok", async ({ proposal }) => {
 		await proposal.deserializeData();
-		assertProposedData(assert, { ...proposal.getData().block , transactions: []}, data.block);
+		assertProposedData(assert, { ...proposal.getData().block, transactions: [] }, data.block);
 		assert.equal(proposal.getData().block.transactions.length, 2);
 	});
 

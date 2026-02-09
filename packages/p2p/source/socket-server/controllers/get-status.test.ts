@@ -29,7 +29,8 @@ describe<{
 		const number = 1987;
 		const hash = "984003423092345907";
 		const lastBlock = {
-			number, hash,
+			number,
+			hash,
 		};
 
 		stub(store, "getLastBlock").returnValue(lastBlock);
