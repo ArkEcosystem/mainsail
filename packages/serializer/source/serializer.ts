@@ -31,9 +31,6 @@ export class Serializer implements Contracts.Serializer.Serializer {
 	@tagged("type", "consensus")
 	private readonly consensusSignatureSerializer!: Contracts.Crypto.SignatureSerializer;
 
-	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly transactionUtils!: Contracts.Crypto.TransactionUtilities;
-
 	@inject(Identifiers.Cryptography.Hash.Size.HASH256)
 	private readonly hashSize!: number;
 
@@ -133,7 +130,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 
 			if (schema.type === "transactions") {
 				for (const transaction of value) {
-					const serialized: Buffer = await this.transactionUtils.toBytes(transaction);
+					const serialized: Buffer = transaction.serialized;
 
 					result.writeUint32(serialized.length);
 					result.writeBytes(serialized);
