@@ -132,7 +132,8 @@ describe<{
 			blockNumber: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				header: { number: BigInt(0), round: BigInt(0) },
+				number: BigInt(0),
+				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -208,7 +209,8 @@ describe<{
 			blockNumber: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				header: { number: BigInt(0), round: BigInt(0) },
+				number: BigInt(0),
+				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -250,7 +252,8 @@ describe<{
 			blockNumber: BigInt(1),
 			round: BigInt(0),
 			getBlock: () => ({
-				header: { number: BigInt(1), round: BigInt(0) },
+				number: BigInt(1),
+				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -273,7 +276,8 @@ describe<{
 				blockNumber: commitKey.blockNumber,
 				round: commitKey.round,
 				getBlock: () => ({
-					header: { number: commitKey.blockNumber, round: commitKey.round },
+					number: commitKey.blockNumber,
+					round: commitKey.round,
 				}),
 				setAccountUpdates: () => {},
 			} as any);
@@ -385,7 +389,8 @@ describe<{
 				blockNumber: commitKey.blockNumber,
 				round: commitKey.round,
 				getBlock: () => ({
-					header: { number: commitKey.blockNumber, round: commitKey.round },
+					number: commitKey.blockNumber,
+					round: commitKey.round,
 				}),
 				setAccountUpdates: () => {},
 			} as any);
@@ -471,7 +476,8 @@ describe<{
 		await instance.onCommit({
 			...commitKey,
 			getBlock: () => ({
-				header: { number: commitKey.blockNumber, round: commitKey.round },
+				number: commitKey.blockNumber,
+				round: commitKey.round,
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -532,7 +538,8 @@ describe<{
 			instance.onCommit({
 				...commitKey1,
 				getBlock: () => ({
-					header: { number: commitKey1.blockNumber, round: commitKey1.round },
+					number: commitKey1.blockNumber,
+					round: commitKey1.round,
 				}),
 				setAccountUpdates: () => {},
 			} as any),
@@ -543,7 +550,8 @@ describe<{
 			await instance.onCommit({
 				...commitKey2,
 				getBlock: () => ({
-					header: { number: commitKey2.blockNumber, round: commitKey2.round },
+					number: commitKey2.blockNumber,
+					round: commitKey2.round,
 				}),
 				setAccountUpdates: () => {},
 			} as any);
@@ -564,7 +572,8 @@ describe<{
 					blockNumber: 0,
 					round: 0,
 					getBlock: () => ({
-						header: { number: 0, round: 0 },
+						number: 0,
+						round: 0,
 					}),
 					setAccountUpdates: () => {},
 				} as any),
@@ -607,7 +616,8 @@ describe<{
 		await instance.onCommit({
 			...commitKey,
 			getBlock: () => ({
-				header: { number: commitKey.blockNumber, round: commitKey.round },
+				number: commitKey.blockNumber,
+				round: commitKey.round,
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -647,7 +657,8 @@ describe<{
 			blockNumber: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				header: { number: BigInt(0), round: BigInt(0) },
+				number: BigInt(0),
+				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -711,7 +722,8 @@ describe<{
 			blockNumber: BigInt(1),
 			round: BigInt(0),
 			getBlock: () => ({
-				header: { number: BigInt(1), round: BigInt(0) },
+				number: BigInt(1),
+				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -809,7 +821,8 @@ describe<{
 			blockNumber: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				header: { number: BigInt(0), round: BigInt(0) },
+				number: BigInt(0),
+				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -859,7 +872,8 @@ describe<{
 			blockNumber: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				header: { number: BigInt(0), round: BigInt(0) },
+				number: BigInt(0),
+				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -904,7 +918,8 @@ describe<{
 			blockNumber: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				header: { number: BigInt(0), round: BigInt(0) },
+				number: BigInt(0),
+				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -1010,7 +1025,8 @@ describe<{
 			blockNumber: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				header: { number: BigInt(1), round: BigInt(0) },
+				number: BigInt(1),
+				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
 		} as any);
@@ -1076,7 +1092,8 @@ describe<{
 			blockNumber: BigInt(0),
 			round: BigInt(0),
 			getBlock: () => ({
-				header: { number: BigInt(1), round: BigInt(0) },
+				number: BigInt(1),
+				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
 		} as any);
