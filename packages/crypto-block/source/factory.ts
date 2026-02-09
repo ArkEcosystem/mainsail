@@ -89,10 +89,10 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 			}
 		}
 
-		return this.#fromData(data);
+		return this.fromData(data);
 	}
 
-	async #fromData(data: Contracts.Crypto.BlockData): Promise<Contracts.Crypto.Block> {
+	public async fromData(data: Contracts.Crypto.BlockData): Promise<Contracts.Crypto.Block> {
 		await this.#applySchema(data);
 
 		const transactions = await Promise.all(

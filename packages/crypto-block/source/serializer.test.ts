@@ -5,6 +5,8 @@ import { assertBlockData, assertTransactionData } from "../test/helpers/asserts"
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Deserializer } from "./deserializer";
 import { Serializer } from "./serializer";
+import { Identifiers } from "@mainsail/constants";
+import { Contracts } from "@mainsail/contracts";
 
 describe<{
 	app: Application;
@@ -19,8 +21,6 @@ describe<{
 	});
 
 	it("#size - should return size", ({ serializer }) => {
-		assert.equal(serializer.headerSize(), 461);
-
 		assert.equal(serializer.totalSize(blockData), 461);
 	});
 
@@ -39,19 +39,28 @@ describe<{
 	it("#serialize - should serialize and deserialize block with transactions", async ({
 		serializer,
 		deserializer,
+		app,
 	}) => {
-		const serialized = await serializer.serializeWithTransactions(blockDataWithTransactions);
+
+		const transactions = await Promise.all(blockDataWithTransactions.transactions.map(async (transaction) =>
+			await app.get<Contracts.Crypto.TransactionFactory>(Identifiers.Cryptography.Transaction.Factory).fromData(transaction),
+		));
+
+		const serialized = await serializer.serializeWithTransactions({
+			...blockDataWithTransactions,
+			transactions,
+		});
 
 		const deserialized = await deserializer.deserializeWithTransactions(serialized);
 
 		assertBlockData(assert, deserialized.data, blockDataWithTransactions);
 
-		assert.length(deserialized.data.transactions, blockDataWithTransactions.transactions.length);
+		assert.length(deserialized.transactions, blockDataWithTransactions.transactions.length);
 
 		for (let index = 0; index < blockDataWithTransactions.transactions.length; index++) {
 			assertTransactionData(
 				assert,
-				deserialized.data.transactions[index],
+				deserialized.transactions[index].data,
 				blockDataWithTransactions.transactions[index],
 			);
 		}
