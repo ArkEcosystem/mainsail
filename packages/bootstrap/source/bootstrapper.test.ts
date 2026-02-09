@@ -28,12 +28,8 @@ describe<{
 	const genesisCommitJson = {};
 	const genesisCommit = {
 		block: {
-			data: {
-				hash: "aaaaa",
-			},
-			header: {
-				parentHash: "0000000000000000000000000000000000000000000000000000000000000000",
-			},
+			hash: "aaaaa",
+			parentHash: "0000000000000000000000000000000000000000000000000000000000000000",
 		},
 	};
 
