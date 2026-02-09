@@ -47,37 +47,6 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		return this.#fromSerialized(buff);
 	}
 
-	public async fromJson(json: Contracts.Crypto.BlockJson): Promise<Contracts.Crypto.Block> {
-		// @ts-ignore
-		const data: Utils.Mutable<Contracts.Crypto.BlockData> = { ...json };
-		data.fee = BigNumber.make(data.fee);
-		data.reward = BigNumber.make(data.reward);
-
-		if (data.transactions) {
-			for (const transaction of data.transactions) {
-				transaction.value = BigNumber.make(transaction.value);
-				transaction.nonce = BigNumber.make(transaction.nonce);
-			}
-		}
-
-		return this.fromData(data);
-	}
-
-	public async fromData(data: Contracts.Crypto.BlockData): Promise<Contracts.Crypto.Block> {
-		await this.#applySchema(data);
-
-		const transactions = await Promise.all(
-			data.transactions.map((tx) => this.transactionFactory.fromData(tx, false)),
-		);
-
-		const serialized: Buffer = await this.serializer.serializeWithTransactions({ ...data, transactions });
-
-		return sealBlock({
-			...(await this.deserializer.deserializeWithTransactions(serialized)),
-			serialized: serialized.toString("hex"),
-		});
-	}
-
 	public async fromStorage(
 		header: Contracts.Evm.BlockHeaderStorageData,
 		transactions: Contracts.Evm.TransactionStorageData[],
@@ -98,13 +67,43 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 				round: header.round,
 				stateRoot: header.stateRoot,
 				timestamp: Number(header.timestamp),
-				// transactions: parsedTransactions.map((tx) => tx.data),
 				transactionsCount: header.transactionsCount,
 				transactionsRoot: header.transactionsRoot,
 				version: header.version,
 			},
 			serialized: "",
 			transactions: parsedTransactions,
+		});
+	}
+
+	public async fromJson(json: Contracts.Crypto.BlockJson): Promise<Contracts.Crypto.Block> {
+		// @ts-ignore
+		const data: Utils.Mutable<Contracts.Crypto.BlockData> = { ...json };
+		data.fee = BigNumber.make(data.fee);
+		data.reward = BigNumber.make(data.reward);
+
+		if (data.transactions) {
+			for (const transaction of data.transactions) {
+				transaction.value = BigNumber.make(transaction.value);
+				transaction.nonce = BigNumber.make(transaction.nonce);
+			}
+		}
+
+		return this.#fromData(data);
+	}
+
+	async #fromData(data: Contracts.Crypto.BlockData): Promise<Contracts.Crypto.Block> {
+		await this.#applySchema(data);
+
+		const transactions = await Promise.all(
+			data.transactions.map((tx) => this.transactionFactory.fromData(tx, false)),
+		);
+
+		const serialized: Buffer = await this.serializer.serializeWithTransactions({ ...data, transactions });
+
+		return sealBlock({
+			...(await this.deserializer.deserializeWithTransactions(serialized)),
+			serialized: serialized.toString("hex"),
 		});
 	}
 
