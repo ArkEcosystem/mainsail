@@ -30,9 +30,7 @@ export type BlockData = BlockHeader & {
 	readonly transactions: TransactionData[];
 };
 
-export interface Block {
-	readonly data: BlockHeader;
-	readonly header: BlockHeader;
+export interface Block extends BlockHeader {
 	readonly serialized: string;
 	readonly transactions: Transaction[];
 }

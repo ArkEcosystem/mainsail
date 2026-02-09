@@ -20,15 +20,15 @@ export class BlocksController extends Controller {
 		const pagination = this.getQueryPagination(request.query);
 
 		const blocks = await this.database.findBlocks(
-			lastBlock.data.number - pagination.offset - pagination.limit + 1,
-			lastBlock.data.number - pagination.offset,
+			lastBlock.number - pagination.offset - pagination.limit + 1,
+			lastBlock.number - pagination.offset,
 		);
 		blocks.reverse();
 
 		return this.toPagination(
 			{
 				results: blocks,
-				totalCount: lastBlock.data.number,
+				totalCount: lastBlock.number,
 			},
 			BlockResource,
 		);

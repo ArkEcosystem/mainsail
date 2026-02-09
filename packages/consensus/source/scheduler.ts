@@ -22,7 +22,7 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 	public getNextBlockTimestamp(commitTime: number): number {
 		return Math.max(
 			commitTime + this.cryptoConfiguration.getMilestone().timeouts.blockPrepareTime,
-			this.stateStore.getLastBlock().data.timestamp + this.cryptoConfiguration.getMilestone().timeouts.blockTime,
+			this.stateStore.getLastBlock().timestamp + this.cryptoConfiguration.getMilestone().timeouts.blockTime,
 		);
 	}
 

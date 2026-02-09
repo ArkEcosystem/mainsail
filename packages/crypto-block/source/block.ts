@@ -6,16 +6,11 @@ interface BlockArguments {
 	transactions: Contracts.Crypto.Transaction[];
 }
 
-export const sealBlock = ({ data, serialized, transactions }: BlockArguments): Contracts.Crypto.Block => {
-	const { ...blockHeader } = data;
-
-	return Object.seal({
-		data,
-		header: blockHeader,
+export const sealBlock = ({ data, serialized, transactions }: BlockArguments): Contracts.Crypto.Block => Object.seal({
+		...data,
 		serialized,
 		transactions: transactions.map((transaction, index) => {
 			transaction.data.transactionIndex = index;
 			return transaction;
 		}),
 	});
-};

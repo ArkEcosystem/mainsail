@@ -49,14 +49,14 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 			publicKeys.push(Buffer.from(validatorPublicKey, "hex"));
 		}
 
-		const { roundValidators } = this.configuration.getMilestone(block.header.number);
+		const { roundValidators } = this.configuration.getMilestone(block.number);
 		if (!isMajority(publicKeys.length, roundValidators)) {
 			return false;
 		}
 
 		const precommit = await this.serializer.serializeMessageForSignature({
-			blockHash: block.data.hash,
-			blockNumber: block.data.number,
+			blockHash: block.hash,
+			blockNumber: block.number,
 			round: proof.round,
 			type: Enums.Crypto.MessageType.Precommit,
 		});
@@ -65,6 +65,6 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 	}
 
 	#hasValidBlockNumber(commit: Contracts.Crypto.Commit): boolean {
-		return commit.block.data.number === this.getConsensus().getBlockNumber();
+		return commit.block.number === this.getConsensus().getBlockNumber();
 	}
 }

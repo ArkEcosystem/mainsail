@@ -18,14 +18,14 @@ export class GeneratorVerifier implements Contracts.Processor.Handler {
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (unit.getBlock().data.number === this.configuration.getGenesisHeight()) {
+		if (unit.getBlock().number === this.configuration.getGenesisHeight()) {
 			return;
 		}
 
-		const validatorIndex = this.proposerCalculator.getValidatorIndex(unit.getBlock().data.round);
+		const validatorIndex = this.proposerCalculator.getValidatorIndex(unit.getBlock().round);
 		const validator = this.validatorSet.getValidator(validatorIndex);
 
-		if (unit.getBlock().data.proposer !== validator.address) {
+		if (unit.getBlock().proposer !== validator.address) {
 			throw new InvalidGenerator(unit.getBlock(), validator.address);
 		}
 	}

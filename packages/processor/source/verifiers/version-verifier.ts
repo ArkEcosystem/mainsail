@@ -14,7 +14,7 @@ export class VersionVerifier implements Contracts.Processor.Handler {
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const version = this.configuration.getMilestone().block.version;
 
-		if (unit.getBlock().data.version !== version) {
+		if (unit.getBlock().version !== version) {
 			throw new InvalidBlockVersion(unit.getBlock());
 		}
 	}

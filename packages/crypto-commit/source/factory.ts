@@ -35,7 +35,7 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 	public async fromStorage(data: Contracts.Evm.CommitStorageData): Promise<Contracts.Crypto.Commit> {
 		const block = await this.blockFactory.fromStorage(data.header, data.transactions);
 
-		const { roundValidators } = this.configuration.getMilestone(block.header.number);
+		const { roundValidators } = this.configuration.getMilestone(block.number);
 
 		return {
 			block,

@@ -85,8 +85,8 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		const data = await this.#readBlockHeaderData(blockNumber);
 
 		if (data) {
-			const { header } = await this.blockFactory.fromStorage(data, []);
-			return header;
+			const block = await this.blockFactory.fromStorage(data, []);
+			return block;
 		}
 
 		return undefined;
@@ -101,8 +101,8 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 		const data = await this.#readBlockHeaderData(blockNumber);
 		if (data) {
-			const { header } = await this.blockFactory.fromStorage(data, []);
-			return header;
+			const block = await this.blockFactory.fromStorage(data, []);
+			return block;
 		}
 
 		return undefined;
@@ -169,7 +169,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const commit = await unit.getCommit();
-		this.#state.blockNumber = commit.block.data.number;
+		this.#state.blockNumber = commit.block.number;
 		this.#state.totalRound += commit.proof.round + 1;
 	}
 

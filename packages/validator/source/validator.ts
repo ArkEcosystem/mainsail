@@ -71,7 +71,7 @@ export class Validator implements Contracts.Validator.Validator {
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
 		const previousBlock = this.stateStore.getLastBlock();
-		const blockNumber = previousBlock.header.number + 1;
+		const blockNumber = previousBlock.number + 1;
 
 		const { logsBloom, stateRoot, transactions } = await this.#getTransactionsForForging(
 			generatorAddress,
@@ -240,8 +240,8 @@ export class Validator implements Contracts.Validator.Validator {
 				validatorAddress: generatorAddress,
 			});
 
-			if (this.roundCalculator.isNewRound(previousBlock.header.number + 2)) {
-				const { roundValidators } = this.cryptoConfiguration.getMilestone(previousBlock.header.number + 2);
+			if (this.roundCalculator.isNewRound(previousBlock.number + 2)) {
+				const { roundValidators } = this.cryptoConfiguration.getMilestone(previousBlock.number + 2);
 
 				await evm.calculateRoundValidators({
 					commitKey,
@@ -253,7 +253,7 @@ export class Validator implements Contracts.Validator.Validator {
 			}
 
 			const logsBloom = await evm.logsBloom(commitKey);
-			const stateRoot = await evm.stateRoot(commitKey, previousBlock.header.stateRoot);
+			const stateRoot = await evm.stateRoot(commitKey, previousBlock.stateRoot);
 
 			return {
 				logsBloom,
@@ -274,7 +274,7 @@ export class Validator implements Contracts.Validator.Validator {
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
 		const previousBlock = this.stateStore.getLastBlock();
-		const number = previousBlock.header.number + 1;
+		const number = previousBlock.number + 1;
 		const milestone = this.cryptoConfiguration.getMilestone(number);
 
 		const totals: { fee: BigNumber; gasUsed: number } = {
@@ -308,7 +308,7 @@ export class Validator implements Contracts.Validator.Validator {
 				gasUsed: totals.gasUsed,
 				logsBloom,
 				number,
-				parentHash: previousBlock.header.hash,
+				parentHash: previousBlock.hash,
 				payloadSize,
 				proposer,
 				reward: BigNumber.make(milestone.reward),

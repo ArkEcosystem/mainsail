@@ -96,7 +96,7 @@ export class Bootstrapper {
 			return;
 		}
 
-		if (this.stateStore.getGenesisCommit().block.data.hash !== genesisBlock.data.hash) {
+		if (this.stateStore.getGenesisCommit().block.hash !== genesisBlock.hash) {
 			throw new Error("Block from crypto.json doesn't match stored genesis block");
 		}
 	}
@@ -141,7 +141,7 @@ export class Bootstrapper {
 
 		// assume snapshot is present if the previous block points to a non-zero hash
 		if (
-			genesisBlock.block.header.parentHash === "0000000000000000000000000000000000000000000000000000000000000000"
+			genesisBlock.block.parentHash === "0000000000000000000000000000000000000000000000000000000000000000"
 		) {
 			if (milestone.snapshot) {
 				throw new Error("Previous block is set to snapshot, but there is no snapshot defined in milestones");

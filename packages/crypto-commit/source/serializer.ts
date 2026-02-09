@@ -36,7 +36,7 @@ export class Serializer implements Contracts.Crypto.CommitSerializer {
 
 		let serializedBlock: Buffer = Buffer.from(commit.block.serialized, "hex");
 		if (serializedBlock.byteLength === 0) {
-			serializedBlock = await this.blockSerializer.serializeWithTransactions({ ...commit.block.data, transactions: commit.block.transactions });
+			serializedBlock = await this.blockSerializer.serializeWithTransactions(commit.block);
 		}
 
 		return Buffer.concat([serializedProof, serializedBlock]);

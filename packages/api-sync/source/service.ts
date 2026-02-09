@@ -144,8 +144,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const commit = await unit.getCommit();
 
+		const header = commit.block;
 		const {
-			block: { header, transactions: blockTransactions },
+			block: { transactions: blockTransactions },
 			proof,
 		} = commit;
 
@@ -631,7 +632,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		const genesisHeight = this.configuration.getGenesisHeight();
 		const lastHeight = (await this.databaseService.isEmpty())
 			? genesisHeight
-			: (await this.databaseService.getLastCommit()).block.header.number;
+			: (await this.databaseService.getLastCommit()).block.number;
 
 		const inMaintenance = await this.systemRepositoryFactory().inMaintenance();
 		const [blocks] = await this.dataSource.query(

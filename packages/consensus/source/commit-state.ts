@@ -13,7 +13,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 	#accountUpdates: Array<Contracts.Evm.AccountUpdate> = [];
 
 	public get blockNumber(): number {
-		return this.#commit.block.data.number;
+		return this.#commit.block.number;
 	}
 
 	public get round(): number {

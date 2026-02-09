@@ -147,9 +147,9 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 				// Check blocks
 				for (const [index, commit] of commits.entries()) {
-					if (commit.block.data.number !== number + index) {
+					if (commit.block.number !== number + index) {
 						throw new Error(
-							`Received block number ${commit.block.data.number} does not match expected number ${
+							`Received block number ${commit.block.number} does not match expected number ${
 								number + index
 							}`,
 						);
