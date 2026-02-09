@@ -47,9 +47,7 @@ describe<{
 	it("#setGenesisCommit  should set genesis commit", ({ store }) => {
 		const genesisCommit: any = {
 			block: {
-				data: {
-					height: 0,
-				},
+				height: 0,
 			},
 		};
 
@@ -117,9 +115,7 @@ describe<{
 		const spyConfigurationSetHeight = spy(cryptoConfiguration, "setHeight");
 
 		const block: any = {
-			data: {
-				number: 1,
-			},
+			number: 1,
 		};
 		store.setLastBlock(block);
 
@@ -140,9 +136,7 @@ describe<{
 
 	it("#onCommit - should set total round and last block", ({ store }) => {
 		const block = {
-			data: {
-				number: 0,
-			},
+			number: 0,
 		};
 
 		const unit: any = {
