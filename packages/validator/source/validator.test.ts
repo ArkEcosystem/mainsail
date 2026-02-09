@@ -33,7 +33,7 @@ describe<{
 	it("#prepareBlock - should prepare block", async ({ validator, generatorAddress }) => {
 		const block = await validator.prepareBlock(generatorAddress, 1, 0);
 		assert.defined(block);
-		assert.equal(block.data.number, 2);
+		assert.equal(block.number, 2);
 	});
 
 	it("#propose - should create signed proposal", async ({ validator, generatorAddress }) => {
@@ -45,14 +45,14 @@ describe<{
 
 	it("#prevote - should create signed prevote", async ({ validator, generatorAddress }) => {
 		const block = await validator.prepareBlock(generatorAddress, 1, 0);
-		const prevote = await validator.prevote(0, 1, 1, block.header.hash);
+		const prevote = await validator.prevote(0, 1, 1, block.hash);
 		assert.defined(prevote);
 		assert.defined(prevote.signature);
 	});
 
 	it("#precommit - should create signed precommit", async ({ validator, generatorAddress }) => {
 		const block = await validator.prepareBlock(generatorAddress, 1, 0);
-		const precommit = await validator.precommit(0, 1, 1, block.header.hash);
+		const precommit = await validator.precommit(0, 1, 1, block.hash);
 		assert.defined(precommit);
 		assert.defined(precommit.signature);
 	});
