@@ -5,7 +5,7 @@ import { TransactionSchemaError } from "@mainsail/exceptions";
 import { ByteBuffer, sleep } from "@mainsail/utils";
 
 import { HashFactory } from "./hash.factory.js";
-import { schema, transactionsSchema } from "./serializer-schemas.js";
+import { blockHeaderSchema, transactionsSchema } from "./serializer-schemas.js";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.BlockDeserializer {
@@ -66,7 +66,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 			{},
 			{
 				length: this.headerSize(),
-				schema,
+				schema: blockHeaderSchema,
 			},
 		);
 	}
