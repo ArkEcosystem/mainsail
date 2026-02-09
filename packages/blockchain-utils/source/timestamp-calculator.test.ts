@@ -36,9 +36,7 @@ describe<Context>("TimestampCalculator", ({ assert, it, beforeEach }) => {
 
 	it("should throw if round is too high", async ({ timestampCalculator }) => {
 		const block = {
-			data: {
-				timestamp: 0,
-			},
+			timestamp: 0,
 		} as Contracts.Crypto.Block;
 
 		const round = 100_001;
@@ -51,9 +49,7 @@ describe<Context>("TimestampCalculator", ({ assert, it, beforeEach }) => {
 
 	it("should throw if round is too high", async ({ timestampCalculator }) => {
 		const block = {
-			data: {
-				timestamp: 0,
-			},
+			timestamp: 0,
 		} as Contracts.Crypto.Block;
 
 		const round = 100_001;
@@ -66,26 +62,20 @@ describe<Context>("TimestampCalculator", ({ assert, it, beforeEach }) => {
 
 	it("should return block timestamp if all milestones values are 0", async ({ timestampCalculator }) => {
 		const block = {
-			data: {
-				timestamp: 0,
-			},
+			timestamp: 0,
 		} as Contracts.Crypto.Block;
 
 		assert.equal(timestampCalculator.calculateMinimalTimestamp(block, 0), 0);
 
 		const block2 = {
-			data: {
-				timestamp: 1000,
-			},
+			timestamp: 1000,
 		} as Contracts.Crypto.Block;
 		assert.equal(timestampCalculator.calculateMinimalTimestamp(block2, 0), 1000);
 	});
 
 	it("should read blockTime from milestones and use it only once", async ({ timestampCalculator, timeouts }) => {
 		const block = {
-			data: {
-				timestamp: 0,
-			},
+			timestamp: 0,
 		} as Contracts.Crypto.Block;
 
 		timeouts.blockTime = 1000;
@@ -100,9 +90,7 @@ describe<Context>("TimestampCalculator", ({ assert, it, beforeEach }) => {
 		timeouts,
 	}) => {
 		const block = {
-			data: {
-				timestamp: 0,
-			},
+			timestamp: 0,
 		} as Contracts.Crypto.Block;
 
 		timeouts.stageTimeout = 1000;
@@ -117,9 +105,7 @@ describe<Context>("TimestampCalculator", ({ assert, it, beforeEach }) => {
 		timeouts,
 	}) => {
 		const block = {
-			data: {
-				timestamp: 0,
-			},
+			timestamp: 0,
 		} as Contracts.Crypto.Block;
 
 		timeouts.stageTimeoutIncrease = 1000;
@@ -137,9 +123,7 @@ describe<Context>("TimestampCalculator", ({ assert, it, beforeEach }) => {
 		timeouts,
 	}) => {
 		const block = {
-			data: {
-				timestamp: 0,
-			},
+			timestamp: 0,
 		} as Contracts.Crypto.Block;
 
 		timeouts.blockTime = 1000;
