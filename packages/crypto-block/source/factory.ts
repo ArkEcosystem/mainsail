@@ -25,12 +25,12 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	private readonly validator!: Contracts.Crypto.Validator;
 
 	public async make(
-		data: Contracts.Crypto.BlockDataSerializable,
+		data: Contracts.Crypto.BlockHeaderRaw,
 		transactions: Contracts.Crypto.Transaction[],
 	): Promise<Contracts.Crypto.Block> {
-		const block: Contracts.Crypto.BlockData = { ...data, hash: await this.hashFactory.make(data) };
+		const block: Contracts.Crypto.BlockHeader = { ...data, hash: await this.hashFactory.make(data) };
 
-		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
+		const serialized: Buffer = await this.serializer.serializeWithTransactions({ ...data, transactions });
 
 		return sealBlock({
 			data: block,
@@ -66,7 +66,11 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	public async fromData(data: Contracts.Crypto.BlockData): Promise<Contracts.Crypto.Block> {
 		await this.#applySchema(data);
 
-		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
+		const transactions = await Promise.all(
+			data.transactions.map((tx) => this.transactionFactory.fromData(tx, false)),
+		);
+
+		const serialized: Buffer = await this.serializer.serializeWithTransactions({ ...data, transactions });
 
 		return sealBlock({
 			...(await this.deserializer.deserializeWithTransactions(serialized)),
@@ -94,7 +98,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 				round: header.round,
 				stateRoot: header.stateRoot,
 				timestamp: Number(header.timestamp),
-				transactions: parsedTransactions.map((tx) => tx.data),
+				// transactions: parsedTransactions.map((tx) => tx.data),
 				transactionsCount: header.transactionsCount,
 				transactionsRoot: header.transactionsRoot,
 				version: header.version,
@@ -107,11 +111,13 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	async #fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.Block> {
 		const deserialized = await this.deserializer.deserializeWithTransactions(serialized);
 
-		const validated: Contracts.Crypto.BlockData | undefined = await this.#applySchema(deserialized.data);
+		await this.#applySchema(deserialized.data);
 
-		if (validated) {
-			deserialized.data = validated;
-		}
+		// TODO: Validate transactions and block header related to transactions ()
+
+		// if (validated) {
+		// 	deserialized.data = validated;
+		// }
 
 		return sealBlock({
 			...deserialized,
@@ -119,39 +125,43 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		});
 	}
 
-	async #applySchema(data: Contracts.Crypto.BlockData): Promise<Contracts.Crypto.BlockData> {
-		const result = this.validator.validate("block", data);
+	async #applySchema(data: Contracts.Crypto.BlockHeader): Promise<void> {
+		const result = this.validator.validate("blockHeader", data);
 
 		if (!result.error) {
-			return result.value;
+			return;
 		}
 
 		for (const error of result.errors ?? []) {
-			let fatal = false;
+			throw new BlockSchemaError(
+				data.number,
+				`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
+					`${error.message}: ${JSON.stringify(error.data)}`,
+			);
 
-			const match = error.instancePath.match(/\.transactions\[(\d+)]/);
-			if (match === null) {
-				fatal = true;
-			} else {
-				if (data.transactions) {
-					const txIndex = Number(match[1]);
-					const tx = data.transactions[txIndex];
+			// let fatal = false;
 
-					if (tx.hash === undefined) {
-						fatal = true;
-					}
-				}
-			}
+			// const match = error.instancePath.match(/\.transactions\[(\d+)]/);
+			// if (match === null) {
+			// 	fatal = true;
+			// } else {
+			// 	if (data.transactions) {
+			// 		const txIndex = Number(match[1]);
+			// 		const tx = data.transactions[txIndex];
 
-			if (fatal) {
-				throw new BlockSchemaError(
-					data.number,
-					`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
-						`${error.message}: ${JSON.stringify(error.data)}`,
-				);
-			}
+			// 		if (tx.hash === undefined) {
+			// 			fatal = true;
+			// 		}
+			// 	}
+			// }
+
+			// if (fatal) {
+			// 	throw new BlockSchemaError(
+			// 		data.number,
+			// 		`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
+			// 			`${error.message}: ${JSON.stringify(error.data)}`,
+			// 	);
+			// }
 		}
-
-		return result.value;
 	}
 }
