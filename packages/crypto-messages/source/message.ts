@@ -65,13 +65,4 @@ export class Message implements Contracts.Crypto.Message {
 			validatorIndex: this.#validatorIndex,
 		});
 	}
-
-	toSignatureData(): Contracts.Crypto.SignatureMessageData {
-		return {
-			blockHash: this.#blockHash,
-			blockNumber: this.#blockNumber,
-			round: this.#round,
-			type: this.type,
-		};
-	}
 }
