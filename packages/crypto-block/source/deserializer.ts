@@ -1,8 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable, optional } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { TransactionSchemaError } from "@mainsail/exceptions";
-import { ByteBuffer, sleep } from "@mainsail/utils";
+import { ByteBuffer } from "@mainsail/utils";
 
 import { HashFactory } from "./hash.factory.js";
 import { blockHeaderSchema, transactionsSchema } from "./serializer-schemas.js";
@@ -15,18 +14,11 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
-	@inject(Identifiers.Cryptography.Transaction.Deserializer)
-	private readonly transactionDeserializer!: Contracts.Crypto.TransactionDeserializer;
-
 	@inject(Identifiers.Cryptography.Serializer)
 	private readonly serializer!: Contracts.Serializer.Serializer;
 
 	@inject(Identifiers.Cryptography.Block.HeaderSize)
 	private readonly headerSize!: () => number;
-
-	@inject(Identifiers.CryptoWorker.WorkerPool)
-	@optional()
-	private readonly workerPool: Contracts.Crypto.WorkerPool | undefined;
 
 	public async deserializeHeader(serialized: Buffer): Promise<Contracts.Crypto.BlockHeader> {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
@@ -83,50 +75,8 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 			},
 		);
 
-		/**
-		 * After unpacking we need to turn the transactions into DTOs!
-		 *
-		 * We keep this behavior out of the (de)serializer because it
-		 * is very specific to this bit of code in this specific class.
-		 */
-		const transactions: Contracts.Crypto.Transaction[] = Array.from({ length: block.transactionsCount });
-
-		await Promise.all(
-			block.transactions.map(async (serialized, index) => {
-				const transaction = await this.transactionDeserializer.deserialize(serialized as unknown as Buffer);
-
-				if (index % 20 === 0) {
-					await sleep(0);
-				}
-
-				const computed = await this.#computeCryptoData(transaction);
-				if (computed.schemaError) {
-					throw new TransactionSchemaError(computed.schemaError);
-				}
-
-				transaction.data = transaction.data.startsWith("0x")
-					? transaction.data.slice(2)
-					: transaction.data;
-				transaction.hash = computed.hash;
-				transaction.from = computed.address;
-				transaction.senderPublicKey = computed.publicKey;
-				transaction.senderLegacyAddress = computed.legacyAddress;
-
-				transactions[index] = transaction;
-			}),
+		return Promise.all(
+			block.transactions.map(async (serialized) => this.transactionFactory.fromBytes(serialized as unknown as Buffer)),
 		);
-
-		return transactions;
-	}
-
-	async #computeCryptoData(
-		transaction: Contracts.Crypto.TransactionData,
-	): Promise<Contracts.Crypto.TransactionCryptoData> {
-		if (this.workerPool) {
-			const worker = await this.workerPool.getWorker();
-			return worker.transactionFactory("computeCryptoData", transaction);
-		}
-
-		return this.transactionFactory.computeCryptoData(transaction);
 	}
 }
