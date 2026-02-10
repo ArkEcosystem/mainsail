@@ -43,7 +43,7 @@ export interface TransactionData {
 }
 
 export interface TransactionJson {
-	network?: number;
+	network: number;
 
 	from: string;
 	senderPublicKey: string;
@@ -57,11 +57,11 @@ export interface TransactionJson {
 	nonce: string;
 	data: string;
 
-	hash?: string;
+	hash: string;
 
-	v?: number;
-	r?: string;
-	s?: string;
+	v: number;
+	r: string;
+	s: string;
 
 	transactionIndex?: number;
 	gasUsed?: number;

@@ -1,20 +1,17 @@
 import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class Transaction implements Contracts.Crypto.Transaction {
-	public data!: Contracts.Crypto.TransactionData;
-	public serialized!: Buffer;
+	public data: Contracts.Crypto.TransactionData;
+	public serialized: Buffer;
+
+	constructor(data: Contracts.Crypto.TransactionData, serialized: Buffer) {
+		this.data = data;
+		this.serialized = serialized;
+	}
 
 	public get hash(): string {
 		return this.data.hash;
-	}
-
-	public static getData(json: Contracts.Crypto.TransactionJson): Contracts.Crypto.TransactionData {
-		const data: Contracts.Crypto.TransactionData = { ...json } as unknown as Contracts.Crypto.TransactionData;
-		data.value = BigNumber.make(data.value);
-		data.nonce = BigNumber.make(data.nonce);
-		return data;
 	}
 }

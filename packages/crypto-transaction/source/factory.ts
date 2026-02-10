@@ -9,8 +9,6 @@ import {
 } from "@mainsail/exceptions";
 import { assert, BigNumber } from "@mainsail/utils";
 
-import { Transaction } from "./transaction.js";
-
 @injectable()
 export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	@inject(Identifiers.Cryptography.Configuration)
@@ -48,7 +46,13 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	}
 
 	public async fromJson(json: Contracts.Crypto.TransactionJson): Promise<Contracts.Crypto.Transaction> {
-		return this.fromData(Transaction.getData(json));
+		const tx: Contracts.Crypto.TransactionData = {
+			...json,
+			value: BigNumber.make(json.value),
+			nonce: BigNumber.make(json.nonce),
+		};
+
+		return this.fromData(tx, true);
 	}
 
 	public async fromStorage(data: Contracts.Evm.TransactionStorageData): Promise<Contracts.Crypto.Transaction> {

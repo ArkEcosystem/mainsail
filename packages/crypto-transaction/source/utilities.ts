@@ -17,9 +17,7 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 	private readonly serializer!: Contracts.Crypto.TransactionSerializer;
 
 	public resolve(data: Contracts.Crypto.TransactionData): Contracts.Crypto.Transaction {
-		const transaction: Contracts.Crypto.Transaction = this.app.resolve(Transaction);
-		transaction.data = data;
-		return transaction;
+		return new Transaction(data, Buffer.alloc(0)); // TODO: Fix
 	}
 
 	public async toBytes(data: Contracts.Crypto.TransactionData): Promise<Buffer> {
