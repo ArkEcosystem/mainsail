@@ -5,7 +5,7 @@ import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "@mainsail/test-runner";
 import { Factories } from "../../test-factories/source/index.js";
 import { blockData } from "../test/fixtures/block";
-import { sealBlock } from "./block";
+import { Block } from "./block";
 import { assertBlockData } from "../test/helpers/asserts.js";
 
 describe<{}>("Block", ({ it, assert }) => {
@@ -23,13 +23,12 @@ describe<{}>("Block", ({ it, assert }) => {
 		const indexedTransaction2 = clone(transaction2);
 		indexedTransaction2.data.transactionIndex = 1;
 
-		const block = sealBlock({
+		const block = new Block({
 			data: blockData,
 			serialized: "serialized_content",
 			transactions: [transaction1, transaction2],
 		});
 
-		assert.true(Object.isSealed(block));
 		assertBlockData(assert, block, blockData);
 		assert.equal(block.serialized, "serialized_content");
 		assert.equal(block.transactions, [indexedTransaction1, indexedTransaction2]);
