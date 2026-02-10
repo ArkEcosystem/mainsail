@@ -70,8 +70,7 @@ export interface TransactionJson {
 }
 
 export interface SerializeOptions {
-	excludeSignature?: boolean;
-	// TODO: consider passing pre-allocated buffer
+	excludeSignature: boolean;
 }
 
 export interface TransactionCryptoData {
@@ -126,8 +125,6 @@ export interface TransactionFactory {
 
 export interface TransactionUtilities {
 	resolve(data: TransactionData): Transaction;
-
-	toBytes(data: TransactionData): Promise<Buffer>;
 
 	toHash(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;
 

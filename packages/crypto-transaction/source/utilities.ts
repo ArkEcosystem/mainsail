@@ -13,15 +13,8 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Cryptography.Transaction.Serializer)
-	private readonly serializer!: Contracts.Crypto.TransactionSerializer;
-
 	public resolve(data: Contracts.Crypto.TransactionData): Contracts.Crypto.Transaction {
 		return new Transaction(data, Buffer.alloc(0)); // TODO: Fix
-	}
-
-	public async toBytes(data: Contracts.Crypto.TransactionData): Promise<Buffer> {
-		return this.serializer.serialize(this.resolve(data));
 	}
 
 	public async toHash(
