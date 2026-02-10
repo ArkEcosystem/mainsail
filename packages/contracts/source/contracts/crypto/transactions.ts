@@ -132,7 +132,7 @@ export interface TransactionSerializer {
 }
 
 export interface TransactionDeserializer {
-	deserialize(serialized: Buffer): Promise<Transaction>;
+	deserialize(serialized: Buffer): Promise<{ data: TransactionData; serialized: Buffer }>;
 }
 
 export interface TransactionFactory {

@@ -3,8 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 import { bytesToHex, getAddress, Hex, hexToBigInt } from "viem";
 
-import { Transaction } from "./transaction.js";
-
 function decodeListBounds(buffer: Uint8Array): { start: number; end: number } {
 	if (buffer.byteLength === 0) {
 		throw new Error("decode RLP empty buffer");
@@ -125,7 +123,7 @@ function readLength(buffer: Uint8Array, offset: number, lengthOfLength: number) 
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
-	public async deserialize(serialized: Buffer): Promise<Contracts.Crypto.Transaction> {
+	public async deserialize(serialized: Buffer): Promise<{ data: Contracts.Crypto.TransactionData; serialized: Buffer }> {
 		const data = {} as Contracts.Crypto.TransactionData;
 
 		const { start, end } = decodeListBounds(serialized);
@@ -180,7 +178,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 			data.legacySecondSignature = fields[9].slice(2);
 		}
 
-		return new Transaction(data, serialized);
+		return { data, serialized };
 	}
 
 	#parseNumber(value: Hex): number {
