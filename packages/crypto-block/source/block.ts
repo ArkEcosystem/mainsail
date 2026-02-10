@@ -46,7 +46,7 @@ export class Block implements Contracts.Crypto.Block {
 		this.serialized = serialized;
 
 		this.transactions = transactions.map((transaction, index) => {
-			transaction.data.transactionIndex = index;
+			transaction.transactionIndex = index;
 			return transaction;
 		});
 	}
@@ -69,8 +69,8 @@ export class Block implements Contracts.Crypto.Block {
 			transactionsRoot: this.transactionsRoot,
 			proposer: this.proposer,
 			hash: this.hash,
-			transactions: this.transactions.map((transaction) => transaction.data),
-			/* eslint- sort-keys-fix/sort-keys-fix */
+			transactions: this.transactions.map((transaction) => transaction.toData()),
+			/* eslint-enable sort-keys-fix/sort-keys-fix */
 		};
 	}
 }

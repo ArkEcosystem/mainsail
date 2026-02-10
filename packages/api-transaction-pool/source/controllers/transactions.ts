@@ -66,9 +66,8 @@ export class TransactionsController extends AbstractController {
 			pagination.offset,
 			pagination.offset + pagination.limit,
 		);
-		const results = transactions.map((t) => t.data);
 		const resultsPage = {
-			results,
+			results: transactions,
 			totalCount: all.length,
 		};
 
@@ -86,6 +85,6 @@ export class TransactionsController extends AbstractController {
 
 		const transaction: Contracts.Crypto.Transaction = await transactionQuery.first();
 
-		return super.respondWithResource(transaction.data, TransactionResource);
+		return super.respondWithResource(transaction, TransactionResource);
 	}
 }

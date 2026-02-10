@@ -195,11 +195,11 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 		const transaction = await this.transactionFactory.fromStorage(transactionStorageData);
 
-		assert.defined<number>(transaction.data.blockNumber);
-		const blockHeaderData = await this.#readBlockHeaderData(transaction.data.blockNumber);
+		assert.defined<number>(transaction.blockNumber);
+		const blockHeaderData = await this.#readBlockHeaderData(transaction.blockNumber);
 		assert.defined(blockHeaderData);
 
-		transaction.data.blockHash = blockHeaderData.hash;
+		transaction.blockHash = blockHeaderData.hash;
 
 		return transaction;
 	}

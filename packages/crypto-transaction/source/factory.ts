@@ -157,7 +157,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		try {
 			const transaction = await this.deserializer.deserialize(serialized);
 
-			const { schemaError } = await this.computeCryptoData(transaction.data, strict);
+			const { schemaError } = await this.computeCryptoData(transaction, strict);
 			if (schemaError) {
 				throw new TransactionSchemaError(schemaError);
 			}

@@ -47,9 +47,9 @@ export class BlockResource {
 		const transactionResource = this.app.resolve(TransactionResource);
 		return Promise.all(
 			block.transactions.map(async (transaction) => {
-				transaction.data.blockHash = block.hash;
-				transaction.data.blockNumber = block.number;
-				return await transactionResource.transform(transaction.data);
+				transaction.blockHash = block.hash;
+				transaction.blockNumber = block.number;
+				return await transactionResource.transform(transaction);
 			}),
 		);
 	}

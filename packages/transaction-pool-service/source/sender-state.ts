@@ -59,7 +59,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		await this.#validateTransaction(transaction);
 
 		this.#wallet.increaseNonce();
-		this.#wallet.decreaseBalance(transaction.data.value.plus(this.feeCalculator.calculate(transaction)));
+		this.#wallet.decreaseBalance(transaction.value.plus(this.feeCalculator.calculate(transaction)));
 	}
 
 	public async replace(
@@ -67,19 +67,19 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		newTransaction: Contracts.Crypto.Transaction,
 		currentNonce: BigNumber,
 	): Promise<boolean> {
-		if (!oldTransaction.data.nonce.isEqualTo(newTransaction.data.nonce)) {
+		if (!oldTransaction.nonce.isEqualTo(newTransaction.nonce)) {
 			throw new Error("cannot replace transaction with mismatching nonce");
 		}
 
-		const oldTransactionCost = oldTransaction.data.value.plus(this.feeCalculator.calculate(oldTransaction));
-		const newTransactionCost = newTransaction.data.value.plus(this.feeCalculator.calculate(newTransaction));
+		const oldTransactionCost = oldTransaction.value.plus(this.feeCalculator.calculate(oldTransaction));
+		const newTransactionCost = newTransaction.value.plus(this.feeCalculator.calculate(newTransaction));
 
 		const availableBalance = this.#wallet.getBalance().plus(oldTransactionCost);
 		if (availableBalance.isLessThan(newTransactionCost)) {
 			return false;
 		}
 
-		const nonceOffset = currentNonce.minus(newTransaction.data.nonce).times(-1);
+		const nonceOffset = currentNonce.minus(newTransaction.nonce).times(-1);
 		await this.#validateTransaction(newTransaction, nonceOffset, oldTransactionCost);
 
 		// Nonce stays the same
@@ -92,7 +92,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	public revert(transaction: Contracts.Crypto.Transaction): void {
 		this.#wallet.decreaseNonce();
-		this.#wallet.increaseBalance(transaction.data.value.plus(this.feeCalculator.calculate(transaction)));
+		this.#wallet.increaseBalance(transaction.value.plus(this.feeCalculator.calculate(transaction)));
 	}
 
 	async #validateTransaction(
@@ -106,19 +106,19 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		}
 
 		const chainId: number = this.cryptoConfiguration.get("network.chainId");
-		if (transaction.data.network && transaction.data.network !== chainId) {
+		if (transaction.network && transaction.network !== chainId) {
 			throw new TransactionFromWrongNetworkError(transaction, chainId);
 		}
 
-		if (!this.#wallet.getNonce().plus(nonceOffset).isEqualTo(transaction.data.nonce)) {
-			throw new UnexpectedNonceError(transaction.data.nonce, this.#wallet);
+		if (!this.#wallet.getNonce().plus(nonceOffset).isEqualTo(transaction.nonce)) {
+			throw new UnexpectedNonceError(transaction.nonce, this.#wallet);
 		}
 
 		if (
 			this.#wallet
 				.getBalance()
 				.plus(refund)
-				.minus(transaction.data.value)
+				.minus(transaction.value)
 				.minus(this.feeCalculator.calculate(transaction))
 				.isNegative()
 		) {

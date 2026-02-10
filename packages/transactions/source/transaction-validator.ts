@@ -46,7 +46,7 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 			transaction,
 		);
 
-		assert.string(transaction.data.from);
+		assert.string(transaction.from);
 
 		return receipt;
 	}

@@ -99,18 +99,18 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 					await sleep(0);
 				}
 
-				const computed = await this.#computeCryptoData(transaction.data);
+				const computed = await this.#computeCryptoData(transaction);
 				if (computed.schemaError) {
 					throw new TransactionSchemaError(computed.schemaError);
 				}
 
-				transaction.data.data = transaction.data.data.startsWith("0x")
-					? transaction.data.data.slice(2)
-					: transaction.data.data;
-				transaction.data.hash = computed.hash;
-				transaction.data.from = computed.address;
-				transaction.data.senderPublicKey = computed.publicKey;
-				transaction.data.senderLegacyAddress = computed.legacyAddress;
+				transaction.data = transaction.data.startsWith("0x")
+					? transaction.data.slice(2)
+					: transaction.data;
+				transaction.hash = computed.hash;
+				transaction.from = computed.address;
+				transaction.senderPublicKey = computed.publicKey;
+				transaction.senderLegacyAddress = computed.legacyAddress;
 
 				transactions[index] = transaction;
 			}),

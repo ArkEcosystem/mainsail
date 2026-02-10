@@ -80,7 +80,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 				const receipt = await this.transactionProcessor.process(unit, transaction);
 				processResult.receipts.set(transaction.hash, receipt);
 
-				transaction.data.gasUsed = Number(receipt.gasUsed);
+				transaction.gasUsed = Number(receipt.gasUsed);
 				this.#consumeGas(block, processResult, Number(receipt.gasUsed));
 			}
 
@@ -190,10 +190,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	#verifyTotalFee(block: Contracts.Crypto.Block): void {
 		let totalGas = BigNumber.ZERO;
 		for (const transaction of block.transactions) {
-			assert.defined(transaction.data.gasUsed);
+			assert.defined(transaction.gasUsed);
 
 			totalGas = totalGas.plus(
-				this.feeCalculator.calculateConsumed(transaction.data.gasUsed, transaction.data.gasPrice),
+				this.feeCalculator.calculateConsumed(transaction.gasUsed, transaction.gasPrice),
 			);
 		}
 
@@ -249,7 +249,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			return;
 		}
 
-		void this.#emit(Events.TransactionEvent.Applied, transaction.data);
+		void this.#emit(Events.TransactionEvent.Applied, transaction);
 	}
 
 	async #updateRewardsAndVotes(unit: Contracts.Processor.ProcessableUnit) {

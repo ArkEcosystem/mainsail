@@ -57,7 +57,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 
 		const block = unit.getBlock();
 		for (const transaction of block.transactions) {
-			sendersAddresses.add(transaction.data.from);
+			sendersAddresses.add(transaction.from);
 		}
 
 		// TODO: get syncing status from p2p service

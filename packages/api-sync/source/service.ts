@@ -167,8 +167,7 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		for (const transaction of blockTransactions) {
 			const {
-				data,
-				data: { senderPublicKey },
+				senderPublicKey,
 			} = transaction;
 			if (!publicKeyToAddress[senderPublicKey]) {
 				const address = await this.addressFactory.fromPublicKey(senderPublicKey);
@@ -191,26 +190,26 @@ export class Sync implements Contracts.ApiSync.Service {
 				blockNumber: header.number.toFixed(),
 				cumulativeGasUsed: Number(receipt.cumulativeGasUsed),
 
-				data: data.data,
+				data: transaction.data,
 
 				decodedError: parseTransactionError(transaction, receipt),
 
 				// Receipt data
 				deployedContractAddress: receipt.contractAddress,
 
-				from: data.from,
+				from: transaction.from,
 
-				gas: data.gasLimit,
+				gas: transaction.gasLimit,
 
-				gasPrice: data.gasPrice,
+				gasPrice: transaction.gasPrice,
 
 				gasRefunded: Number(receipt.gasRefunded),
 
 				gasUsed: Number(receipt.gasUsed),
 
-				hash: data.hash,
+				hash: transaction.hash,
 
-				legacySecondSignature: data.legacySecondSignature,
+				legacySecondSignature: transaction.legacySecondSignature,
 
 				// is converted into JSONB column
 				logs: receipt.logs as unknown as string,
@@ -218,16 +217,16 @@ export class Sync implements Contracts.ApiSync.Service {
 				multiPaymentRecipients:
 					parsedMultiPayments.length > 0 ? [...new Set(parsedMultiPayments.map((mp) => mp.to))] : undefined,
 
-				nonce: data.nonce.toFixed(),
+				nonce: transaction.nonce.toFixed(),
 
 				output: receipt.output,
-				senderPublicKey: data.senderPublicKey,
-				signature: formatEcdsaSignature(data.r!, data.s!, data.v!),
+				senderPublicKey: transaction.senderPublicKey,
+				signature: formatEcdsaSignature(transaction.r!, transaction.s!, transaction.v!),
 				status: receipt.status,
 				timestamp: header.timestamp.toFixed(),
-				to: data.to,
-				transactionIndex: data.transactionIndex!,
-				value: data.value.toFixed(),
+				to: transaction.to,
+				transactionIndex: transaction.transactionIndex!,
+				value: transaction.value.toFixed(),
 			});
 
 			multiPayments.push(...parsedMultiPayments);

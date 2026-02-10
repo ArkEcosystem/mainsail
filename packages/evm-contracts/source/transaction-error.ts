@@ -72,7 +72,7 @@ export function parseTransactionError(
 	}
 
 	if (!receipt.output || receipt.output.byteLength === 0) {
-		if (receipt.gasUsed >= transaction.data.gasLimit) {
+		if (receipt.gasUsed >= transaction.gasLimit) {
 			return "out of gas";
 		}
 

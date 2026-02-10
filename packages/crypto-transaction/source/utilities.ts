@@ -40,6 +40,6 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 	}
 
 	public async getHash(transaction: Contracts.Crypto.Transaction): Promise<string> {
-		return (await this.toHash(transaction.data, { excludeSignature: false })).toString("hex");
+		return (await this.toHash(transaction, { excludeSignature: false })).toString("hex");
 	}
 }

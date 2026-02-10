@@ -171,9 +171,9 @@ export class Validator implements Contracts.Validator.Validator {
 				}
 
 				const transaction = await this.transactionFactory.fromBytes(bytes);
-				transaction.data.transactionIndex = candidateTransactions.length;
+				transaction.transactionIndex = candidateTransactions.length;
 
-				if (failedSenders.has(transaction.data.senderPublicKey)) {
+				if (failedSenders.has(transaction.senderPublicKey)) {
 					continue;
 				}
 
@@ -184,7 +184,7 @@ export class Validator implements Contracts.Validator.Validator {
 
 					let optimisticExecution = false;
 
-					const gasLimit = transaction.data.gasLimit;
+					const gasLimit = transaction.gasLimit;
 					if (gasLeft - gasLimit < 0) {
 						// Optimistically execute transaction even if the gas limit exceeds the remaining
 						// block space since there's possibly still space to fit the actual gas consumed.
@@ -219,16 +219,16 @@ export class Validator implements Contracts.Validator.Validator {
 						break;
 					}
 
-					transaction.data.gasUsed = Number(result.gasUsed);
+					transaction.gasUsed = Number(result.gasUsed);
 					candidateTransactions.push(transaction);
 				} catch (error) {
 					this.logger.warn(
-						`tx ${transaction.hash} from ${transaction.data.from} failed to collate: ${error.message}`,
+						`tx ${transaction.hash} from ${transaction.from} failed to collate: ${error.message}`,
 					);
 
-					await this.txPoolWorker.removeTransaction(transaction.data.from, transaction.hash);
+					await this.txPoolWorker.removeTransaction(transaction.from, transaction.hash);
 
-					failedSenders.add(transaction.data.senderPublicKey);
+					failedSenders.add(transaction.senderPublicKey);
 				}
 			}
 
@@ -289,17 +289,16 @@ export class Validator implements Contracts.Validator.Validator {
 		let payloadSize = transactions.length * 4;
 
 		for (const transaction of transactions) {
-			const { data, serialized } = transaction;
-			assert.string(data.hash);
-			assert.number(data.gasUsed);
+			assert.string(transaction.hash);
+			assert.number(transaction.gasUsed);
 
-			assert.number(data.gasUsed);
-			totals.fee = totals.fee.plus(this.gasFeeCalculator.calculateConsumed(data.gasPrice, data.gasUsed));
-			totals.gasUsed += data.gasUsed;
+			assert.number(transaction.gasUsed);
+			totals.fee = totals.fee.plus(this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, transaction.gasUsed));
+			totals.gasUsed += transaction.gasUsed;
 
-			payloadBuffers.push(Buffer.from(data.hash, "hex"));
-			transactionData.push(data);
-			payloadSize += serialized.length;
+			payloadBuffers.push(Buffer.from(transaction.hash, "hex"));
+			transactionData.push(transaction.toData());
+			payloadSize += transaction.serialized.length;
 		}
 
 		return this.blockFactory.make(
