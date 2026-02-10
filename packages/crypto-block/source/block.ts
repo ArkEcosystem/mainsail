@@ -12,13 +12,13 @@ export class Block implements Contracts.Crypto.Block {
 	public readonly version: number;
 	public readonly number: number;
 	public readonly round: number;
-	public readonly parentHash: string
+	public readonly parentHash: string;
 	public readonly stateRoot: string;
-	public readonly logsBloom: string
+	public readonly logsBloom: string;
 	public readonly transactionsCount: number;
-	public readonly gasUsed: number
+	public readonly gasUsed: number;
 	public readonly fee: BigNumber;
-	public readonly reward: BigNumber
+	public readonly reward: BigNumber;
 	public readonly payloadSize: number;
 	public readonly transactionsRoot: string;
 	public readonly proposer: string;
