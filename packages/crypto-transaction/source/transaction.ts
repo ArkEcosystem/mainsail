@@ -1,16 +1,9 @@
-import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class Transaction implements Contracts.Crypto.Transaction {
-	@inject(Identifiers.Cryptography.Identity.Address.Factory)
-	protected readonly addressFactory!: Contracts.Crypto.AddressFactory;
-
-	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration!: Contracts.Crypto.Configuration;
-
 	public data!: Contracts.Crypto.TransactionData;
 	public serialized!: Buffer;
 
