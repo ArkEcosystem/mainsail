@@ -63,6 +63,11 @@ const setup = async (): Promise<Contracts.Kernel.Application> => {
 	await app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadConfiguration).bootstrap();
 
 	const options = {
+		"@mainsail/api-sync": {
+			maxSyncAttempts: 1,
+			syncInterval: 250,
+			truncateDatabase: "1",
+		},
 		"@mainsail/state": {
 			snapshots: {
 				enabled: false,
@@ -73,11 +78,6 @@ const setup = async (): Promise<Contracts.Kernel.Application> => {
 			maxTransactionBytes: 50_000,
 
 			storage: ":memory:",
-		},
-		"@mainsail/api-sync": {
-			syncInterval: 250,
-			maxSyncAttempts: 1,
-			truncateDatabase: "1",
 		},
 	};
 
@@ -190,9 +190,9 @@ const bootstrap = async (app: Application) => {
 
 	await evm.prepareNextCommit({
 		commitKey: {
+			blockHash: commitState.getBlock().hash,
 			blockNumber: BigInt(commitState.blockNumber),
 			round: BigInt(commitState.round),
-			blockHash: commitState.getBlock().header.hash,
 		},
 	});
 
