@@ -124,8 +124,6 @@ export interface TransactionFactory {
 }
 
 export interface TransactionUtilities {
-	resolve(data: TransactionData): Transaction;
-
 	toHash(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;
 
 	getHash(transaction: Transaction): Promise<string>;

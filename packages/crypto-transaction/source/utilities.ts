@@ -1,22 +1,13 @@
-import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 import { Keccak256 } from "bcrypto";
 import { toBytes, toRlp } from "viem";
 
 import { toBytesCompat } from "./serializer.js";
-import { Transaction } from "./transaction.js";
 
 @injectable()
 export class Utils implements Contracts.Crypto.TransactionUtilities {
-	@inject(Identifiers.Application.Instance)
-	public readonly app!: Contracts.Kernel.Application;
-
-	public resolve(data: Contracts.Crypto.TransactionData): Contracts.Crypto.Transaction {
-		return new Transaction(data, Buffer.alloc(0)); // TODO: Fix
-	}
-
 	public async toHash(
 		transaction: Contracts.Crypto.TransactionData,
 		options?: Contracts.Crypto.SerializeOptions,
