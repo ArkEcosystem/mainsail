@@ -65,7 +65,7 @@ export class Deployer {
 		if (this.#needsCommit) {
 			await this.evm.onCommit({
 				commitKey,
-				getBlock: () => ({ header: { ...commitKey, number: commitKey.blockNumber } }),
+				getBlock: () => ({ ...commitKey, number: commitKey.blockNumber }),
 				setAccountUpdates: () => ({}),
 			} as unknown as Contracts.Processor.ProcessableUnit);
 		}

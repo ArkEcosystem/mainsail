@@ -30,11 +30,11 @@ export type BlockData = BlockHeader & {
 	readonly transactions: TransactionData[];
 };
 
-export interface Block {
-	readonly data: BlockData;
-	readonly header: BlockHeader;
+export interface Block extends BlockHeader {
 	readonly serialized: string;
 	readonly transactions: Transaction[];
+
+	toData(): BlockData;
 }
 
 export interface BlockJson {
@@ -59,28 +59,30 @@ export interface BlockJson {
 	readonly transactions: TransactionJson[];
 }
 
-export type BlockDataSerializable = Omit<BlockData, "hash">;
-
 export interface BlockFactory {
-	make(data: BlockDataSerializable, transactions: Transaction[]): Promise<Block>;
+	make(data: BlockHeaderRaw, transactions: Transaction[]): Promise<Block>;
 
 	fromHex(hex: string): Promise<Block>;
 	fromBytes(buff: Buffer): Promise<Block>;
 	fromJson(json: BlockJson): Promise<Block>;
-	fromData(data: BlockData): Promise<Block>;
 	fromStorage(header: BlockHeaderStorageData, transactions: TransactionStorageData[]): Promise<Block>;
+	headerFromStorage(header: BlockHeaderStorageData): Promise<BlockHeader>;
 }
 
+export type BlockSerializable = BlockHeaderRaw & {
+	readonly transactions: { serialized: Buffer }[];
+};
+
 export interface BlockSerializer {
-	totalSize(block: BlockDataSerializable): number;
+	totalSize(block: BlockHeaderRaw): number;
 
 	serializeHeader(block: BlockHeaderRaw): Promise<Buffer>;
 
-	serializeWithTransactions(block: BlockDataSerializable): Promise<Buffer>;
+	serializeWithTransactions(block: BlockSerializable): Promise<Buffer>;
 }
 
 export interface BlockWithTransactions {
-	data: BlockData;
+	data: BlockHeader;
 	transactions: Transaction[];
 }
 

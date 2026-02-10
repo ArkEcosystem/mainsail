@@ -77,10 +77,8 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 
 	context.app.bind(Identifiers.State.Store).toConstantValue({
 		getLastBlock: () => ({
-			data: {
-				id: "0000000000000000000000000000000000000000000000000000000000000000",
-				number: 1,
-			},
+			id: "0000000000000000000000000000000000000000000000000000000000000000",
+			number: 1,
 		}),
 	});
 };

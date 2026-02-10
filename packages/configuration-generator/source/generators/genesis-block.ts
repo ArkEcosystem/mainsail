@@ -89,7 +89,7 @@ export class GenesisBlockGenerator extends Generator {
 		const genesis = await this.#createGenesisCommit(genesisWallet.keys, transactions, options);
 
 		return {
-			block: genesis.block.data,
+			block: { ...genesis.block, transactions: genesis.block.transactions.map((tx) => tx.data) },
 			proof: genesis.proof,
 			serialized: genesis.serialized,
 		};
@@ -341,7 +341,6 @@ export class GenesisBlockGenerator extends Generator {
 							"0000000000000000000000000000000000000000000000000000000000000000",
 					),
 					timestamp: dayjs(options.epoch).valueOf(),
-					transactions: transactionData,
 					transactionsCount: transactions.length,
 					transactionsRoot: this.hashFactory.sha256(payloadBuffers).toString("hex"),
 					version: 1,

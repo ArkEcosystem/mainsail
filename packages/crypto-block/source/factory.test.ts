@@ -22,6 +22,7 @@ describe<{
 	expectBlock: ({ data }: { data: Contracts.Crypto.BlockData }) => void;
 	app: Application;
 	factory: BlockFactory;
+	txFactory: Contracts.Crypto.TransactionFactory;
 	serializer: Serializer;
 }>("Factory", ({ it, assert, beforeEach }) => {
 	const blockDataOriginal = clone(blockData);
@@ -42,44 +43,41 @@ describe<{
 
 		context.factory = context.app.resolve(BlockFactory);
 		context.serializer = context.app.resolve(Serializer);
+		context.txFactory = context.app.get<Contracts.Crypto.TransactionFactory>(
+			Identifiers.Cryptography.Transaction.Factory,
+		);
 	});
 
 	it("#make - should make a block", async ({ factory }) => {
 		const block = await factory.make(blockData, []);
 
-		assertBlockData(assert, block.data, blockData);
-		assertBlockData(assert, block.header, blockData);
+		assertBlockData(assert, block, blockData);
 		assert.equal(block.transactions, []);
 		assert.equal(block.serialized, serialized);
 	});
 
-	it("#make - should make a block with transactions", async ({ factory }) => {
-		const block = await factory.make(blockDataWithTransactionsOriginal, [
-			// @ts-ignore
-			{ data: blockDataWithTransactionsOriginal.transactions[0] },
-			// @ts-ignore
-			{ data: blockDataWithTransactionsOriginal.transactions[1] },
-		]);
+	it("#make - should make a block with transactions", async ({ factory, txFactory }) => {
+		const transactions = await Promise.all(
+			blockDataWithTransactionsOriginal.transactions.map(
+				async (transaction) => await txFactory.fromData(transaction),
+			),
+		);
 
-		assertBlockData(assert, block.data, blockDataWithTransactionsOriginal);
-		assertBlockData(assert, block.header, blockDataWithTransactionsOriginal);
-		assert.length(block.transactions, blockDataWithTransactionsOriginal.transactions.length);
+		const block = await factory.make(blockDataWithTransactionsOriginal, transactions);
+
+		assertBlockData(assert, block, blockDataWithTransactionsOriginal);
+		assert.length(block.transactions, transactions.length);
 		assert.equal(block.serialized, serializedWithTransactions);
 
-		for (let index = 0; index < blockDataWithTransactionsOriginal.transactions.length; index++) {
-			assertTransactionData(
-				assert,
-				block.transactions[index].data,
-				blockDataWithTransactionsOriginal.transactions[index],
-			);
+		for (let index = 0; index < transactions.length; index++) {
+			assertTransactionData(assert, block.transactions[index].data, transactions[index].data);
 		}
 	});
 
 	it("#fromHex - should create a block instance from hex", async ({ factory }) => {
 		const block = await factory.fromHex(serialized);
 
-		assertBlockData(assert, block.data, blockDataClone);
-		assertBlockData(assert, block.header, blockDataClone);
+		assertBlockData(assert, block, blockDataClone);
 		assert.equal(block.transactions, []);
 		assert.equal(block.serialized, serialized);
 	});
@@ -87,8 +85,7 @@ describe<{
 	it("#fromHex - should create a block instance with transactions from hex", async ({ factory }) => {
 		const block = await factory.fromHex(serializedWithTransactions);
 
-		assertBlockData(assert, block.data, blockDataWithTransactionsClone);
-		assertBlockData(assert, block.header, blockDataWithTransactionsClone);
+		assertBlockData(assert, block, blockDataWithTransactionsClone);
 		assert.equal(block.serialized, serializedWithTransactions);
 
 		assert.length(block.transactions, blockDataWithTransactionsClone.transactions.length);
@@ -97,8 +94,7 @@ describe<{
 	it("#fromBytes - should create a block instance from a buffer", async ({ factory }) => {
 		const block = await factory.fromBytes(Buffer.from(serialized, "hex"));
 
-		assertBlockData(assert, block.data, blockDataClone);
-		assertBlockData(assert, block.header, blockDataClone);
+		assertBlockData(assert, block, blockDataClone);
 		assert.equal(block.transactions, []);
 		assert.equal(block.serialized, serialized);
 	});
@@ -106,8 +102,7 @@ describe<{
 	it("#fromBytes - should create a block with transactions instance from a buffer", async ({ factory }) => {
 		const block = await factory.fromBytes(Buffer.from(serializedWithTransactions, "hex"));
 
-		assertBlockData(assert, block.data, blockDataWithTransactionsClone);
-		assertBlockData(assert, block.header, blockDataWithTransactionsClone);
+		assertBlockData(assert, block, blockDataWithTransactionsClone);
 		assert.equal(block.serialized, serializedWithTransactions);
 
 		assert.length(block.transactions, blockDataWithTransactionsClone.transactions.length);
@@ -116,8 +111,7 @@ describe<{
 	it("#fromData - should create a block instance from an object", async (context) => {
 		const block = await context.factory.fromData(blockData);
 
-		assertBlockData(assert, block.data, blockData);
-		assertBlockData(assert, block.header, blockData);
+		assertBlockData(assert, block, blockData);
 		assert.equal(block.transactions, []);
 		assert.string(block.serialized);
 	});
@@ -125,8 +119,7 @@ describe<{
 	it("#fromData - should create a block with transactions instance from an object", async (context) => {
 		const block = await context.factory.fromData(blockDataWithTransactionsOriginal);
 
-		assertBlockData(assert, block.data, blockDataWithTransactionsOriginal);
-		assertBlockData(assert, block.header, blockDataWithTransactionsOriginal);
+		assertBlockData(assert, block, blockDataWithTransactionsOriginal);
 		assert.string(block.serialized);
 
 		for (let index = 0; index < blockDataWithTransactionsOriginal.transactions.length; index++) {
@@ -160,24 +153,13 @@ describe<{
 		);
 	});
 
-	it("#fromData - should throw on invalid transaction data", async ({ factory }) => {
-		// @ts-ignore
-		delete blockDataWithTransactionsClone.transactions[0].hash;
-
-		await assert.rejects(
-			() => factory.fromData(blockDataWithTransactionsClone),
-			"Invalid data at /transactions/0: must have required property 'hash': undefined",
-		);
-	});
-
 	it("#fromJson - should create a block instance from JSON", async ({ factory }) => {
 		const block = await factory.fromJson(blockDataJson);
 
 		// Recalculated id
 		blockDataClone.hash = blockDataJson.hash;
 
-		assertBlockData(assert, block.data, blockDataClone);
-		assertBlockData(assert, block.header, blockDataClone);
+		assertBlockData(assert, block, blockDataClone);
 		assert.equal(block.transactions, []);
 		assert.string(block.serialized);
 	});
@@ -188,8 +170,7 @@ describe<{
 		// Recalculated id
 		blockDataWithTransactionsClone.hash = blockDataWithTransactionsJson.hash;
 
-		assertBlockData(assert, block.data, blockDataWithTransactionsClone);
-		assertBlockData(assert, block.header, blockDataWithTransactionsClone);
+		assertBlockData(assert, block, blockDataWithTransactionsClone);
 		assert.string(block.serialized);
 		assert.length(block.transactions, blockDataWithTransactionsClone.transactions.length);
 

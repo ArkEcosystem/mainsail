@@ -100,12 +100,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 	#nonce = 0n;
 
-	public async run(genesisBlock: Contracts.Crypto.Commit): Promise<Contracts.Snapshot.LegacyImportResult> {
+	public async run(genesisCommit: Contracts.Crypto.Commit): Promise<Contracts.Snapshot.LegacyImportResult> {
 		await this.prepareRestore();
 
-		const {
-			block: { header },
-		} = genesisBlock;
+		const { block } = genesisCommit;
 
 		const milestone = this.configuration.getMilestone(this.configuration.getGenesisHeight());
 		assert.defined(milestone.snapshot);
@@ -114,13 +112,13 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			throw new Error("imported snapshot hash mismatch");
 		}
 
-		if (this.previousGenesisBlockHash !== header.parentHash) {
+		if (this.previousGenesisBlockHash !== block.parentHash) {
 			throw new Error("genesis block previous block hash mismatch ");
 		}
 
 		const result = await this.import({
-			commitKey: { blockHash: header.hash, blockNumber: BigInt(header.number), round: BigInt(header.round) },
-			timestamp: header.timestamp,
+			commitKey: { blockHash: block.hash, blockNumber: BigInt(block.number), round: BigInt(block.round) },
+			timestamp: block.timestamp,
 		});
 
 		this.#data.result = result;

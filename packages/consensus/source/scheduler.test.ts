@@ -57,9 +57,7 @@ describe<{
 
 	it("#getNextBlockTimestamp - should return previous block timestamp + blockTime", async ({ scheduler }) => {
 		const spyOnGetLatBlock = stub(store, "getLastBlock").returnValue({
-			data: {
-				timestamp: 0,
-			},
+			timestamp: 0,
 		});
 
 		assert.equal(scheduler.getNextBlockTimestamp(0), 8000);
@@ -68,9 +66,7 @@ describe<{
 
 	it("#getNextBlockTimestamp - should return previous block commitTime + blockPrepareTime", async ({ scheduler }) => {
 		const spyOnGetLatBlock = stub(store, "getLastBlock").returnValue({
-			data: {
-				timestamp: 0,
-			},
+			timestamp: 0,
 		});
 
 		assert.equal(scheduler.getNextBlockTimestamp(6000), 10_000);

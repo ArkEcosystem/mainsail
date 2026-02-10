@@ -83,13 +83,9 @@ describe<{
 		);
 	});
 
-	it("#makeProposal - should correctly make signed proposal, with validRound", async ({
-		blockFactory,
-		factory,
-		identity,
-	}) => {
+	it("#makeProposal - should correctly make signed proposal, with validRound", async ({ factory, identity }) => {
 		const data: Contracts.Crypto.ProposedData = {
-			block: await blockFactory.fromData(blockData),
+			block: blockData,
 			serialized: serializedBlock,
 		};
 

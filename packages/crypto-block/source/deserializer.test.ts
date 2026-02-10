@@ -23,19 +23,19 @@ describe<{
 		assert.undefined(deserialized.transactions);
 	});
 
-	it("#deserialize - should correctly deserialize a block with transactions", async ({ deserializer }) => {
-		const deserialized = (
-			await deserializer.deserializeWithTransactions(Buffer.from(serializedWithTransactions, "hex"))
-		).data;
+	it.only("#deserialize - should correctly deserialize a block with transactions", async ({ deserializer }) => {
+		const deserialized = await deserializer.deserializeWithTransactions(
+			Buffer.from(serializedWithTransactions, "hex"),
+		);
 
-		assertBlockData(assert, deserialized, blockDataWithTransactions);
+		assertBlockData(assert, deserialized.data, blockDataWithTransactions);
 
 		assert.length(deserialized.transactions, blockDataWithTransactions.transactions.length);
 
 		for (let index = 0; index < blockDataWithTransactions.transactions.length; index++) {
 			assertTransactionData(
 				assert,
-				deserialized.transactions[index],
+				deserialized.transactions[index].data,
 				blockDataWithTransactions.transactions[index],
 			);
 		}

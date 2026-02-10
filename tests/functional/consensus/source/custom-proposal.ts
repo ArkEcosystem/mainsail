@@ -54,7 +54,7 @@ export const makeCustomProposal = async (
 	const transactionBuffers: Buffer[] = [];
 
 	const commitKey = {
-		blockNumber: BigInt(previousBlock.header.number + 1),
+		blockNumber: BigInt(previousBlock.number + 1),
 		round: BigInt(round),
 	};
 
@@ -107,14 +107,13 @@ export const makeCustomProposal = async (
 			gasUsed: totals.gasUsed,
 			logsBloom: "0".repeat(64),
 			number: Number(commitKey.blockNumber),
-			parentHash: previousBlock.header.hash,
+			parentHash: previousBlock.hash,
 			payloadSize,
 			proposer: validators[0].address,
 			reward: BigNumber.make(milestone.reward),
 			round,
 			stateRoot: "0".repeat(64),
 			timestamp: dayjs().valueOf(),
-			transactions: transactionData,
 			transactionsCount: transactionData.length,
 			transactionsRoot: hashFactory.sha256(payloadBuffers).toString("hex"),
 			version: 1,
@@ -148,7 +147,7 @@ export const makeCustomProposal = async (
 	const signedProposal = Buffer.concat([serializedProposal, Buffer.from(proposalSignature, "hex")]);
 
 	const proposal = app.resolve(Proposal).initialize({
-		blockHeader: block.header,
+		blockHeader: block,
 		dataSerialized: proposedBytes.toString("hex"),
 		round,
 		serialized: signedProposal,

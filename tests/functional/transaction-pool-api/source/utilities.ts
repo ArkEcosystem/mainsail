@@ -173,7 +173,7 @@ export const getTransactionReceipt = async (
 		}
 
 		const evm = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
-		const { receipt } = await evm.getReceipt(BigInt(block.header.number), hash);
+		const { receipt } = await evm.getReceipt(BigInt(block.number), hash);
 		return receipt;
 	}
 

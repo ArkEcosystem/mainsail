@@ -4,7 +4,7 @@ import type { Contracts, Utils } from "@mainsail/contracts";
 import { BlockSchemaError } from "@mainsail/exceptions";
 import { BigNumber } from "@mainsail/utils";
 
-import { sealBlock } from "./block.js";
+import { Block } from "./block.js";
 import { HashFactory } from "./hash.factory.js";
 
 @injectable()
@@ -25,14 +25,14 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	private readonly validator!: Contracts.Crypto.Validator;
 
 	public async make(
-		data: Contracts.Crypto.BlockDataSerializable,
+		data: Contracts.Crypto.BlockHeaderRaw,
 		transactions: Contracts.Crypto.Transaction[],
 	): Promise<Contracts.Crypto.Block> {
-		const block: Contracts.Crypto.BlockData = { ...data, hash: await this.hashFactory.make(data) };
+		const block: Contracts.Crypto.BlockHeader = { ...data, hash: await this.hashFactory.make(data) };
 
-		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
+		const serialized: Buffer = await this.serializer.serializeWithTransactions({ ...data, transactions });
 
-		return sealBlock({
+		return new Block({
 			data: block,
 			serialized: serialized.toString("hex"),
 			transactions,
@@ -45,6 +45,43 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 
 	public async fromBytes(buff: Buffer): Promise<Contracts.Crypto.Block> {
 		return this.#fromSerialized(buff);
+	}
+
+	public async fromStorage(
+		header: Contracts.Evm.BlockHeaderStorageData,
+		transactions: Contracts.Evm.TransactionStorageData[],
+	): Promise<Contracts.Crypto.Block> {
+		const parsedTransactions = await Promise.all(transactions.map((tx) => this.transactionFactory.fromStorage(tx)));
+
+		return new Block({
+			data: {
+				...(await this.headerFromStorage(header)),
+			},
+			serialized: "",
+			transactions: parsedTransactions,
+		});
+	}
+
+	public async headerFromStorage(
+		header: Contracts.Evm.BlockHeaderStorageData,
+	): Promise<Contracts.Crypto.BlockHeader> {
+		return {
+			fee: BigNumber.make(header.fee),
+			gasUsed: header.gasUsed,
+			hash: header.hash,
+			logsBloom: header.logsBloom,
+			number: header.number,
+			parentHash: header.parentHash,
+			payloadSize: header.payloadSize,
+			proposer: header.proposer,
+			reward: BigNumber.make(header.reward),
+			round: header.round,
+			stateRoot: header.stateRoot,
+			timestamp: Number(header.timestamp),
+			transactionsCount: header.transactionsCount,
+			transactionsRoot: header.transactionsRoot,
+			version: header.version,
+		};
 	}
 
 	public async fromJson(json: Contracts.Crypto.BlockJson): Promise<Contracts.Crypto.Block> {
@@ -66,92 +103,72 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	public async fromData(data: Contracts.Crypto.BlockData): Promise<Contracts.Crypto.Block> {
 		await this.#applySchema(data);
 
-		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
+		const transactions = await Promise.all(
+			data.transactions.map((tx) => this.transactionFactory.fromData(tx, false)),
+		);
 
-		return sealBlock({
+		const serialized: Buffer = await this.serializer.serializeWithTransactions({ ...data, transactions });
+
+		return new Block({
 			...(await this.deserializer.deserializeWithTransactions(serialized)),
 			serialized: serialized.toString("hex"),
-		});
-	}
-
-	public async fromStorage(
-		header: Contracts.Evm.BlockHeaderStorageData,
-		transactions: Contracts.Evm.TransactionStorageData[],
-	): Promise<Contracts.Crypto.Block> {
-		const parsedTransactions = await Promise.all(transactions.map((tx) => this.transactionFactory.fromStorage(tx)));
-
-		return sealBlock({
-			data: {
-				fee: BigNumber.make(header.fee),
-				gasUsed: header.gasUsed,
-				hash: header.hash,
-				logsBloom: header.logsBloom,
-				number: header.number,
-				parentHash: header.parentHash,
-				payloadSize: header.payloadSize,
-				proposer: header.proposer,
-				reward: BigNumber.make(header.reward),
-				round: header.round,
-				stateRoot: header.stateRoot,
-				timestamp: Number(header.timestamp),
-				transactions: parsedTransactions.map((tx) => tx.data),
-				transactionsCount: header.transactionsCount,
-				transactionsRoot: header.transactionsRoot,
-				version: header.version,
-			},
-			serialized: "",
-			transactions: parsedTransactions,
 		});
 	}
 
 	async #fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.Block> {
 		const deserialized = await this.deserializer.deserializeWithTransactions(serialized);
 
-		const validated: Contracts.Crypto.BlockData | undefined = await this.#applySchema(deserialized.data);
+		await this.#applySchema(deserialized.data);
 
-		if (validated) {
-			deserialized.data = validated;
-		}
+		// TODO: Validate transactions and block header related to transactions ()
 
-		return sealBlock({
+		// if (validated) {
+		// 	deserialized.data = validated;
+		// }
+
+		return new Block({
 			...deserialized,
 			serialized: serialized.toString("hex"),
 		});
 	}
 
-	async #applySchema(data: Contracts.Crypto.BlockData): Promise<Contracts.Crypto.BlockData> {
-		const result = this.validator.validate("block", data);
+	async #applySchema(data: Contracts.Crypto.BlockHeader): Promise<void> {
+		const result = this.validator.validate("blockHeader", data);
 
 		if (!result.error) {
-			return result.value;
+			return;
 		}
 
 		for (const error of result.errors ?? []) {
-			let fatal = false;
+			throw new BlockSchemaError(
+				data.number,
+				`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
+					`${error.message}: ${JSON.stringify(error.data)}`,
+			);
 
-			const match = error.instancePath.match(/\.transactions\[(\d+)]/);
-			if (match === null) {
-				fatal = true;
-			} else {
-				if (data.transactions) {
-					const txIndex = Number(match[1]);
-					const tx = data.transactions[txIndex];
+			// let fatal = false;
 
-					if (tx.hash === undefined) {
-						fatal = true;
-					}
-				}
-			}
+			// const match = error.instancePath.match(/\.transactions\[(\d+)]/);
+			// if (match === null) {
+			// 	fatal = true;
+			// } else {
+			// 	if (data.transactions) {
+			// 		const txIndex = Number(match[1]);
+			// 		const tx = data.transactions[txIndex];
 
-			if (fatal) {
-				throw new BlockSchemaError(
-					data.number,
-					`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
-						`${error.message}: ${JSON.stringify(error.data)}`,
-				);
-			}
+			// 		if (tx.hash === undefined) {
+			// 			fatal = true;
+			// 		}
+			// 	}
+			// }
+
+			// if (fatal) {
+			// 	throw new BlockSchemaError(
+			// 		data.number,
+			// 		`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
+			// 			`${error.message}: ${JSON.stringify(error.data)}`,
+			// 	);
+			// }
 		}
-
-		return result.value;
 	}
 }

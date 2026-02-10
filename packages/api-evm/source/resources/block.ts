@@ -13,30 +13,28 @@ export class BlockResource {
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	public async transform(block: Contracts.Crypto.Block, transactionObject: boolean): Promise<object> {
-		const blockData: Contracts.Crypto.BlockData = block.data;
-
-		const milestone = this.configuration.getMilestone(blockData.number);
+		const milestone = this.configuration.getMilestone(block.number);
 
 		/* eslint-disable sort-keys-fix/sort-keys-fix */
 		return {
-			number: `0x${blockData.number.toString(16)}`,
-			hash: `0x${blockData.hash}`,
-			parentHash: `0x${blockData.parentHash}`,
+			number: `0x${block.number.toString(16)}`,
+			hash: `0x${block.hash}`,
+			parentHash: `0x${block.parentHash}`,
 			nonce: "0x0000000000000000",
 			sha3Uncles: "0x1dcc4de8dec75d7aab85b567b6ccd41ad4e2a311b82e5872087ed76f0f1ccf8f", // No uncles in ARK, this is hash of empty list
-			logsBloom: `0x${blockData.logsBloom}`,
-			transactionsRoot: `0x${blockData.stateRoot}`,
-			stateRoot: `0x${blockData.stateRoot}`,
-			receiptsRoot: `0x${blockData.stateRoot}`,
-			miner: blockData.proposer.toLowerCase(),
+			logsBloom: `0x${block.logsBloom}`,
+			transactionsRoot: `0x${block.transactionsRoot}`,
+			stateRoot: `0x${block.stateRoot}`,
+			receiptsRoot: `0x${block.stateRoot}`,
+			miner: block.proposer.toLowerCase(),
 			difficulty: "0x0",
 			totalDifficulty: "0x0",
 			// baseFeePerGas: "0x0",
 			extraData: "0x",
-			size: `0x${blockData.payloadSize.toString(16)}`, // TODO: Add block header size
+			size: `0x${block.payloadSize.toString(16)}`, // TODO: Add block header size
 			gasLimit: `0x${milestone.block.maxGasLimit.toString(16)}`,
-			gasUsed: `0x${blockData.gasUsed.toString(16)}`,
-			timestamp: `0x${blockData.timestamp.toString(16)}`,
+			gasUsed: `0x${block.gasUsed.toString(16)}`,
+			timestamp: `0x${block.timestamp.toString(16)}`,
 			transactions: transactionObject
 				? await this.#transformTransactions(block)
 				: block.transactions.map((transaction) => transaction.hash),
@@ -49,8 +47,8 @@ export class BlockResource {
 		const transactionResource = this.app.resolve(TransactionResource);
 		return Promise.all(
 			block.transactions.map(async (transaction) => {
-				transaction.data.blockHash = block.data.hash;
-				transaction.data.blockNumber = block.data.number;
+				transaction.data.blockHash = block.hash;
+				transaction.data.blockNumber = block.number;
 				return await transactionResource.transform(transaction.data);
 			}),
 		);

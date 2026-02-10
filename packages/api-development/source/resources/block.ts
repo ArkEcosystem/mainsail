@@ -8,13 +8,11 @@ export class BlockResource implements Contracts.Api.Resource {
 	}
 
 	public async transform(block: Contracts.Crypto.Block): Promise<object> {
-		const blockData: Contracts.Crypto.BlockData = block.data;
-
 		return {
 			forged: {
-				fee: blockData.fee.toFixed(),
-				reward: blockData.reward.toFixed(),
-				total: blockData.reward.plus(blockData.fee).toFixed(),
+				fee: block.fee.toFixed(),
+				reward: block.reward.toFixed(),
+				total: block.reward.plus(block.fee).toFixed(),
 			},
 			// TODO: Fix
 			// generator: {
@@ -22,16 +20,16 @@ export class BlockResource implements Contracts.Api.Resource {
 			// 	publicKey: generator.getPublicKey(),
 			// 	username: generator.hasAttribute("username") ? generator.getAttribute("username") : undefined,
 			// },
-			height: +blockData.number,
-			id: blockData.hash,
+			height: +block.number,
+			id: block.hash,
 			payload: {
-				hash: blockData.transactionsRoot,
-				length: blockData.payloadSize,
+				hash: block.transactionsRoot,
+				length: block.payloadSize,
 			},
-			previous: blockData.parentHash,
-			timestamp: blockData.timestamp,
-			transactions: blockData.transactionsCount,
-			version: blockData.version,
+			previous: block.parentHash,
+			timestamp: block.timestamp,
+			transactions: block.transactionsCount,
+			version: block.version,
 		};
 	}
 }

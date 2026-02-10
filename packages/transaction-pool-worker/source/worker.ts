@@ -63,13 +63,13 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		// TODO: get syncing status from p2p service
 		const nowMs = dayjs().valueOf();
 		const { blockTime } = this.configuration.getMilestone().timeouts;
-		const isSyncing = block.header.timestamp < nowMs - blockTime * 3;
+		const isSyncing = block.timestamp < nowMs - blockTime * 3;
 
 		await this.ipcSubprocess.sendRequest(
 			"commit",
 			unit.blockNumber,
 			[...sendersAddresses.keys()],
-			block.header.gasUsed,
+			block.gasUsed,
 			isSyncing,
 		);
 	}

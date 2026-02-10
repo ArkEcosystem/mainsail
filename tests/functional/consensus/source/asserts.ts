@@ -10,7 +10,7 @@ export const assertBlockNumber = async (app: Contracts.Kernel.Application | Cont
 	for (const node of nodes) {
 		const commit = await getLastCommit(node);
 		assert.defined(commit);
-		assert.equal(commit.block.data.number, blockNumber);
+		assert.equal(commit.block.number, blockNumber);
 	}
 };
 
@@ -20,7 +20,7 @@ export const assertBlockRound = async (app: Contracts.Kernel.Application | Contr
 	for (const node of nodes) {
 		const commit = await getLastCommit(node);
 		assert.defined(commit);
-		assert.equal(commit.block.data.round, round);
+		assert.equal(commit.block.round, round);
 	}
 };
 
@@ -39,13 +39,13 @@ export const assertBlockHash = async (app: Contracts.Kernel.Application | Contra
 
 	if (id === undefined) {
 		const commit = await getLastCommit(nodes[0]);
-		id = commit.block.data.hash;
+		id = commit.block.hash;
 	}
 
 	for (const node of nodes) {
 		const commit = await getLastCommit(node);
 		assert.defined(commit);
-		assert.equal(commit.block!.data.hash, id);
+		assert.equal(commit.block!.hash, id);
 	}
 };
 

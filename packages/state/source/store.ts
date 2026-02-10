@@ -34,7 +34,7 @@ export class Store implements Contracts.State.Store {
 
 	public setLastBlock(block: Contracts.Crypto.Block): void {
 		this.#lastBlock = block;
-		this.setBlockNumber(block.data.number);
+		this.setBlockNumber(block.number);
 	}
 
 	public getLastBlock(): Contracts.Crypto.Block {

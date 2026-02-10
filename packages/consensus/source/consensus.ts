@@ -234,7 +234,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			const proposal = await this.#proposalPromise;
 			assert.defined(this.#proposedBlock);
 
-			this.logger.info(`Proposing block ${this.#getBlockString(this.#proposedBlock.header)}`, "consensus");
+			this.logger.info(`Proposing block ${this.#getBlockString(this.#proposedBlock)}`, "consensus");
 
 			this.#proposalPromise = undefined;
 			this.#proposedBlock = undefined;
@@ -383,10 +383,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		const block = processState.getBlock();
 
-		this.logger.info(`Received +2/3 precommits for ${this.#getBlockString(block.header)}`, "consensus");
+		this.logger.info(`Received +2/3 precommits for ${this.#getBlockString(block)}`, "consensus");
 
 		if (!processState.getProcessorResult().success) {
-			this.logger.info(`Block ${this.#getBlockString(block.header)} is invalid`, "consensus");
+			this.logger.info(`Block ${this.#getBlockString(block)} is invalid`, "consensus");
 			return;
 		}
 
@@ -503,7 +503,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			const lockProof = await this.#validValue.aggregatePrevotes();
 
 			this.logger.info(
-				`Created proposal with existing block ${this.#getBlockString(this.#proposedBlock.header)}`,
+				`Created proposal with existing block ${this.#getBlockString(this.#proposedBlock)}`,
 				"consensus",
 			);
 
@@ -521,12 +521,9 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#round,
 			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
 		);
-		this.logger.info(
-			`Created proposal with new block ${this.#getBlockString(this.#proposedBlock.header)}`,
-			"consensus",
-		);
+		this.logger.info(`Created proposal with new block ${this.#getBlockString(this.#proposedBlock)}`, "consensus");
 
-		void this.eventDispatcher.dispatch(Events.BlockEvent.Forged, this.#proposedBlock.data);
+		void this.eventDispatcher.dispatch(Events.BlockEvent.Forged, this.#proposedBlock);
 
 		return registeredProposer.propose(
 			this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.address),
@@ -575,7 +572,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	async #bootstrap(): Promise<void> {
-		this.#blockNumber = this.stateStore.getLastBlock().data.number + 1;
+		this.#blockNumber = this.stateStore.getLastBlock().number + 1;
 
 		const state = await this.bootstrapper.run();
 

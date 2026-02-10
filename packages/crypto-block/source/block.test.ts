@@ -5,10 +5,11 @@ import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "@mainsail/test-runner";
 import { Factories } from "../../test-factories/source/index.js";
 import { blockData } from "../test/fixtures/block";
-import { sealBlock } from "./block";
+import { Block } from "./block";
+import { assertBlockData } from "../test/helpers/asserts.js";
 
 describe<{}>("Block", ({ it, assert }) => {
-	it("#sealBlock - should seal block", async () => {
+	it("#should create new block", async () => {
 		const transactionFactory = await Factories.factory<TransactionBuilder>("Transfer", crypto);
 
 		const transactionBuilder1 = await transactionFactory.withStates("sign").make();
@@ -22,19 +23,13 @@ describe<{}>("Block", ({ it, assert }) => {
 		const indexedTransaction2 = clone(transaction2);
 		indexedTransaction2.data.transactionIndex = 1;
 
-		const { transactions: _, ...blockHeader } = blockData;
-
-		const block = sealBlock({
+		const block = new Block({
 			data: blockData,
 			serialized: "serialized_content",
 			transactions: [transaction1, transaction2],
 		});
 
-		assert.true(Object.isSealed(block));
-		assert.equal(block.data, blockData);
-		assert.equal(block.header, blockHeader);
-		assert.defined(block.data.transactions);
-		assert.undefined(block.header.transactions);
+		assertBlockData(assert, block, blockData);
 		assert.equal(block.serialized, "serialized_content");
 		assert.equal(block.transactions, [indexedTransaction1, indexedTransaction2]);
 	});
