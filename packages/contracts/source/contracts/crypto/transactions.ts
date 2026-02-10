@@ -102,7 +102,7 @@ export interface TransactionSigner {
 }
 
 export interface TransactionSerializer {
-	serialize(transaction: Transaction, options?: SerializeOptions): Promise<Buffer>;
+	serialize(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;
 }
 
 export interface TransactionDeserializer {

@@ -9,6 +9,8 @@ import {
 } from "@mainsail/exceptions";
 import { assert, BigNumber } from "@mainsail/utils";
 
+import { Transaction } from "./transaction.js";
+
 @injectable()
 export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	@inject(Identifiers.Cryptography.Configuration)
@@ -46,17 +48,17 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	}
 
 	public async fromJson(json: Contracts.Crypto.TransactionJson): Promise<Contracts.Crypto.Transaction> {
-		const tx: Contracts.Crypto.TransactionData = {
+		const transactionData: Contracts.Crypto.TransactionData = {
 			...json,
-			value: BigNumber.make(json.value),
 			nonce: BigNumber.make(json.nonce),
+			value: BigNumber.make(json.value),
 		};
 
-		return this.fromData(tx, true);
+		return this.fromData(transactionData, true);
 	}
 
 	public async fromStorage(data: Contracts.Evm.TransactionStorageData): Promise<Contracts.Crypto.Transaction> {
-		const transaction = this.utils.resolve({
+		const transaction: Contracts.Crypto.TransactionData = {
 			blockNumber: data.blockNumber,
 			data: data.data.toString("hex"),
 			from: data.from,
@@ -74,28 +76,26 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			transactionIndex: data.index,
 			v: data.v,
 			value: BigNumber.make(data.value),
-		});
+		};
 
-		transaction.serialized = await this.serializer.serialize(transaction);
+		const serialized = await this.serializer.serialize(transaction);
 
-		return transaction;
+		return new Transaction(transaction, serialized);
 	}
 
 	public async fromData(
 		data: Contracts.Crypto.TransactionData,
 		strict?: boolean,
 	): Promise<Contracts.Crypto.Transaction> {
-		const { value, error } = await this.verifier.verifySchema(data, strict);
+		const { error } = await this.verifier.verifySchema(data, strict);
 
 		if (error) {
 			throw new TransactionSchemaError(error);
 		}
 
-		const transaction = this.utils.resolve(value);
+		const serialized = await this.serializer.serialize(data);
 
-		await this.serializer.serialize(transaction);
-
-		return this.fromBytes(transaction.serialized, strict);
+		return this.fromBytes(serialized, strict);
 	}
 
 	public async computeCryptoData(

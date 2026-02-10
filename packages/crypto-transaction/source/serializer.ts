@@ -5,41 +5,39 @@ import { ByteArray, Hex, toBytes, toRlp } from "viem";
 @injectable()
 export class Serializer implements Contracts.Crypto.TransactionSerializer {
 	public async serialize(
-		transaction: Contracts.Crypto.Transaction,
-		options: Contracts.Crypto.SerializeOptions = {},
+		transaction: Contracts.Crypto.TransactionData,
+		options: Contracts.Crypto.SerializeOptions = { excludeSignature: false },
 	): Promise<Buffer> {
 		const fields = [
-			toBytesCompat(transaction.data.nonce.toBigInt()), // nonce - 0
-			toBytesCompat(transaction.data.gasPrice), // gasPrice - 1
-			toBytesCompat(transaction.data.gasLimit), // gasLimit - 2
-			toBytes(transaction.data.to || "0x"), // to - 3
-			toBytesCompat(transaction.data.value.toBigInt()), // value - 4
-			toBytes(transaction.data.data.startsWith("0x") ? transaction.data.data : `0x${transaction.data.data}`), // data - 5
-			toBytesCompat(transaction.data.network), // v - 6
+			toBytesCompat(transaction.nonce.toBigInt()), // nonce - 0
+			toBytesCompat(transaction.gasPrice), // gasPrice - 1
+			toBytesCompat(transaction.gasLimit), // gasLimit - 2
+			toBytes(transaction.to || "0x"), // to - 3
+			toBytesCompat(transaction.value.toBigInt()), // value - 4
+			toBytes(transaction.data.startsWith("0x") ? transaction.data : `0x${transaction.data}`), // data - 5
+			toBytesCompat(transaction.network), // v - 6
 			toBytesCompat(0), // r - 7
 			toBytesCompat(0), // s - 8
 		];
 
-		if (transaction.data.v !== undefined && transaction.data.r && transaction.data.s && !options.excludeSignature) {
+		if (transaction.v !== undefined && transaction.r && transaction.s && !options.excludeSignature) {
 			// Legacy with EIP-155
-			const normalizedV = transaction.data.v;
-			const v = transaction.data.network * 2 + 35 + normalizedV;
+			const normalizedV = transaction.v;
+			const v = transaction.network * 2 + 35 + normalizedV;
 
 			// 6, 7, 8
 			fields[6] = toBytesCompat(v);
-			fields[7] = toBytesCompat(`0x${transaction.data.r}`);
-			fields[8] = toBytesCompat(`0x${transaction.data.s}`);
+			fields[7] = toBytesCompat(`0x${transaction.r}`);
+			fields[8] = toBytesCompat(`0x${transaction.s}`);
 
-			if (transaction.data.legacySecondSignature) {
+			if (transaction.legacySecondSignature) {
 				// 9
-				fields.push(toBytes(`0x${transaction.data.legacySecondSignature}`));
+				fields.push(toBytes(`0x${transaction.legacySecondSignature}`));
 			}
 		}
 
 		const rlpEncoded = toRlp(fields);
-		transaction.serialized = Buffer.from(`${rlpEncoded.slice(2)}`, "hex");
-
-		return transaction.serialized;
+		return Buffer.from(`${rlpEncoded.slice(2)}`, "hex");
 	}
 }
 
