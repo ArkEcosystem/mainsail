@@ -93,7 +93,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			processResult.success = true;
 		} catch (error) {
-			void this.#emit(Events.BlockEvent.Invalid, { block: unit.getBlock(), error });
+			void this.#emit(Events.BlockEvent.Invalid, { block: unit.getBlock().toData(), error });
 			this.logger.error(`Cannot process block because: ${error.message}`, "consensus");
 		}
 
@@ -125,7 +125,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		this.#logBlockCommitted(unit);
 		this.#logNewRound(unit);
 
-		void this.#emit(Events.BlockEvent.Applied, commit.block);
+		void this.#emit(Events.BlockEvent.Applied, commit.block.toData());
 	}
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {
