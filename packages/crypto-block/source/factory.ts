@@ -4,7 +4,7 @@ import type { Contracts, Utils } from "@mainsail/contracts";
 import { BlockSchemaError } from "@mainsail/exceptions";
 import { BigNumber } from "@mainsail/utils";
 
-import { sealBlock } from "./block.js";
+import { Block } from "./block.js";
 import { HashFactory } from "./hash.factory.js";
 
 @injectable()
@@ -32,7 +32,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 
 		const serialized: Buffer = await this.serializer.serializeWithTransactions({ ...data, transactions });
 
-		return sealBlock({
+		return new Block({
 			data: block,
 			serialized: serialized.toString("hex"),
 			transactions,
@@ -53,7 +53,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	): Promise<Contracts.Crypto.Block> {
 		const parsedTransactions = await Promise.all(transactions.map((tx) => this.transactionFactory.fromStorage(tx)));
 
-		return sealBlock({
+		return new Block({
 			data: {
 				...(await this.headerFromStorage(header)),
 			},
@@ -109,7 +109,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 
 		const serialized: Buffer = await this.serializer.serializeWithTransactions({ ...data, transactions });
 
-		return sealBlock({
+		return new Block({
 			...(await this.deserializer.deserializeWithTransactions(serialized)),
 			serialized: serialized.toString("hex"),
 		});
@@ -126,7 +126,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		// 	deserialized.data = validated;
 		// }
 
-		return sealBlock({
+		return new Block({
 			...deserialized,
 			serialized: serialized.toString("hex"),
 		});

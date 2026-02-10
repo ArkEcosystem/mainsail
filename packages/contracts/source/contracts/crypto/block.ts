@@ -33,6 +33,8 @@ export type BlockData = BlockHeader & {
 export interface Block extends BlockHeader {
 	readonly serialized: string;
 	readonly transactions: Transaction[];
+
+	toData(): BlockData;
 }
 
 export interface BlockJson {
