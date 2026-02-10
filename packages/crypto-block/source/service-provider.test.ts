@@ -7,9 +7,9 @@ import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from "./service-provider";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/crypto-validation";
 import { ServiceProvider as TransactionServiceProvider } from "@mainsail/crypto-transaction";
-import { ServiceProvider as AddressServiceProvider } from "@mainsail/crypto-address-keccak256"
-import { ServiceProvider as KeyPairServiceProvider } from "@mainsail/crypto-key-pair-ecdsa"
-import { ServiceProvider as HashBcryptoServiceProvider } from "@mainsail/crypto-hash-bcrypto"
+import { ServiceProvider as AddressServiceProvider } from "@mainsail/crypto-address-keccak256";
+import { ServiceProvider as KeyPairServiceProvider } from "@mainsail/crypto-key-pair-ecdsa";
+import { ServiceProvider as HashBcryptoServiceProvider } from "@mainsail/crypto-hash-bcrypto";
 
 describe<{
 	app: Application;
