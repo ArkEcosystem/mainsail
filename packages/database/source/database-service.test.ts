@@ -104,7 +104,7 @@ describe<{
 
 		await databaseService.onCommit({
 			getCommit: async () => ({
-				block: { data: { number: 2 } },
+				block: { number: 2 },
 				proof: { round: 0 },
 			}),
 		} as Contracts.Processor.ProcessableUnit);
@@ -168,16 +168,16 @@ describe<{
 		const commitState = commitStateFactory(genesisCommit);
 
 		const commitKey = {
-			blockHash: genesisCommit.block.header.hash,
-			blockNumber: BigInt(genesisCommit.block.header.number),
-			round: BigInt(genesisCommit.block.header.round),
+			blockHash: genesisCommit.block.hash,
+			blockNumber: BigInt(genesisCommit.block.number),
+			round: BigInt(genesisCommit.block.round),
 		};
 
 		await evm.initializeGenesis({
 			deployerAccount: "0x0000000000000000000000000000000000000001",
 			initialBlockNumber: 0n,
 			initialSupply: 10000000000000000000000000000n,
-			account: genesisCommit.block.data.proposer,
+			account: genesisCommit.block.proposer,
 			validatorContract: "0x0000000000000000000000000000000000000001",
 			usernameContract: "0x0000000000000000000000000000000000000001",
 		});
@@ -189,8 +189,8 @@ describe<{
 				blockContext: {
 					commitKey,
 					gasLimit: BigInt("10000000"),
-					timestamp: BigInt(genesisCommit.block.header.timestamp),
-					validatorAddress: genesisCommit.block.header.proposer,
+					timestamp: BigInt(genesisCommit.block.timestamp),
+					validatorAddress: genesisCommit.block.proposer,
 				},
 				data: Buffer.from(transaction.data.data, "hex"),
 				from: transaction.data.from,
@@ -232,7 +232,7 @@ describe<{
 	});
 
 	it("#hasCommitByHash - should be true", async ({ databaseService, genesisCommit }) => {
-		assert.true(await databaseService.hasCommitByHash(genesisCommit.block.header.hash));
+		assert.true(await databaseService.hasCommitByHash(genesisCommit.block.hash));
 	});
 
 	it("#findCommitBuffers - should return commit buffer", async ({ databaseService, genesisCommit }) => {
@@ -240,21 +240,23 @@ describe<{
 	});
 
 	it("#getBlock - should return block", async ({ databaseService, genesisCommit }) => {
-		assert.equal((await databaseService.getBlock(0))?.header.hash, genesisCommit.block.header.hash);
+		assert.equal((await databaseService.getBlock(0))?.hash, genesisCommit.block.hash);
 	});
 
 	it("#getBlockByHash - should return block", async ({ databaseService, genesisCommit }) => {
-		assert.equal((await databaseService.getBlock(0))?.header.hash, genesisCommit.block.header.hash);
+		assert.equal((await databaseService.getBlock(0))?.hash, genesisCommit.block.hash);
 	});
 
-	it("#getBlockByHash - should return block header", async ({ databaseService, genesisCommit }) => {
-		assert.equal(await databaseService.getBlockHeader(0), genesisCommit.block.header);
+	it("#getBlockHeader - should return block header", async ({ databaseService, genesisCommit }) => {
+		const { transactions: _, serialized: __, ...header } = genesisCommit.block;
+		assert.equal(await databaseService.getBlockHeader(0), header);
 	});
 
 	it("#getBlockHeaderByHash - should return block header", async ({ databaseService, genesisCommit }) => {
+		const { transactions: _, serialized: __, ...header } = genesisCommit.block;
 		assert.equal(
-			await databaseService.getBlockHeaderByHash(genesisCommit.block.header.hash),
-			genesisCommit.block.header,
+			await databaseService.getBlockHeaderByHash(genesisCommit.block.hash),
+			header,
 		);
 	});
 
@@ -268,21 +270,19 @@ describe<{
 			commits.push(commit);
 		}
 		assert.equal(
-			commits.map((c) => c.block.data.hash),
-			[genesisCommit.block.data.hash],
+			commits.map((c) => c.block.hash),
+			[genesisCommit.block.hash],
 		);
 	});
 
 	it("#getLastCommit - should return last commit", async ({ databaseService, genesisCommit }) => {
-		assert.equal((await databaseService.getLastCommit()).block.header.hash, genesisCommit.block.header.hash);
+		assert.equal((await databaseService.getLastCommit()).block.hash, genesisCommit.block.hash);
 	});
 
 	it("#onCommit - should set blockNumber and increase totalRound", async ({ databaseService, genesisCommit }) => {
 		const commit = {
 			block: {
-				data: {
-					number: 3,
-				},
+				number: 3,
 			},
 			proof: {
 				round: 1,
@@ -309,15 +309,15 @@ describe<{
 	// TODO: Check all fields are matching
 	it("#getTransactionByHash - should return transaction", async ({ databaseService, genesisCommit }) => {
 		assert.equal(
-			(await databaseService.getTransactionByHash(genesisCommit.block.data.transactions[0].hash))?.data.hash,
-			genesisCommit.block.data.transactions[0].hash,
+			(await databaseService.getTransactionByHash(genesisCommit.block.transactions[0].hash))?.data.hash,
+			genesisCommit.block.transactions[0].hash,
 		);
 	});
 
 	it("#getTransactionByBlockHashAndIndex - should return transaction", async ({ databaseService, genesisCommit }) => {
 		assert.equal(
-			(await databaseService.getTransactionByBlockHashAndIndex(genesisCommit.block.data.hash, 0))?.data.hash,
-			genesisCommit.block.data.transactions[0].hash,
+			(await databaseService.getTransactionByBlockHashAndIndex(genesisCommit.block.hash, 0))?.data.hash,
+			genesisCommit.block.transactions[0].hash,
 		);
 	});
 
@@ -327,7 +327,7 @@ describe<{
 	}) => {
 		assert.equal(
 			(await databaseService.getTransactionByBlockNumberAndIndex(0, 0))?.data.hash,
-			genesisCommit.block.data.transactions[0].hash,
+			genesisCommit.block.transactions[0].hash,
 		);
 	});
 });

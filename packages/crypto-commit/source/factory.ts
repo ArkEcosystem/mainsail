@@ -11,6 +11,9 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 	@inject(Identifiers.Cryptography.Commit.Deserializer)
 	private readonly commitDeserializer!: Contracts.Crypto.CommitDeserializer;
 
+	@inject(Identifiers.Cryptography.Commit.Serializer)
+	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -37,15 +40,21 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 
 		const { roundValidators } = this.configuration.getMilestone(block.number);
 
-		return {
+		const commit = {
 			block,
 			proof: {
 				round: data.proof.round,
 				signature: data.proof.signature,
 				validators: validatorSetUnpack(data.proof.validatorSet, roundValidators),
-			},
-			serialized: "",
+			}
 		};
+
+		const serialized = await  this.commitSerializer.serializeCommit(commit);
+
+		return {
+			...commit,
+			serialized: serialized.toString("hex"),
+		}
 	}
 
 	public async fromJson(json: Contracts.Crypto.CommitJson): Promise<Contracts.Crypto.Commit> {

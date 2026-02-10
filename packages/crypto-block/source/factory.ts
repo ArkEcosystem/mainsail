@@ -55,25 +55,33 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 
 		return sealBlock({
 			data: {
-				fee: BigNumber.make(header.fee),
-				gasUsed: header.gasUsed,
-				hash: header.hash,
-				logsBloom: header.logsBloom,
-				number: header.number,
-				parentHash: header.parentHash,
-				payloadSize: header.payloadSize,
-				proposer: header.proposer,
-				reward: BigNumber.make(header.reward),
-				round: header.round,
-				stateRoot: header.stateRoot,
-				timestamp: Number(header.timestamp),
-				transactionsCount: header.transactionsCount,
-				transactionsRoot: header.transactionsRoot,
-				version: header.version,
+				...await this.headerFromStorage(header),
 			},
 			serialized: "",
 			transactions: parsedTransactions,
 		});
+	}
+
+	public async headerFromStorage(
+		header: Contracts.Evm.BlockHeaderStorageData,
+	): Promise<Contracts.Crypto.BlockHeader> {
+		return {
+			fee: BigNumber.make(header.fee),
+			gasUsed: header.gasUsed,
+			hash: header.hash,
+			logsBloom: header.logsBloom,
+			number: header.number,
+			parentHash: header.parentHash,
+			payloadSize: header.payloadSize,
+			proposer: header.proposer,
+			reward: BigNumber.make(header.reward),
+			round: header.round,
+			stateRoot: header.stateRoot,
+			timestamp: Number(header.timestamp),
+			transactionsCount: header.transactionsCount,
+			transactionsRoot: header.transactionsRoot,
+			version: header.version,
+		}
 	}
 
 	public async fromJson(json: Contracts.Crypto.BlockJson): Promise<Contracts.Crypto.Block> {

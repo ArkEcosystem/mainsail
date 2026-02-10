@@ -72,6 +72,8 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			value: BigNumber.make(data.value),
 		});
 
+		transaction.serialized = await this.serializer.serialize(transaction);
+
 		return transaction;
 	}
 
