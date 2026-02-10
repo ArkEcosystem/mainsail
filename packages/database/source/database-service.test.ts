@@ -254,10 +254,7 @@ describe<{
 
 	it("#getBlockHeaderByHash - should return block header", async ({ databaseService, genesisCommit }) => {
 		const { transactions: _, serialized: __, ...header } = genesisCommit.block;
-		assert.equal(
-			await databaseService.getBlockHeaderByHash(genesisCommit.block.hash),
-			header,
-		);
+		assert.equal(await databaseService.getBlockHeaderByHash(genesisCommit.block.hash), header);
 	});
 
 	it("#findBlocks - should return blocks", async ({ databaseService, genesisCommit }) => {

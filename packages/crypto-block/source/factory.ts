@@ -55,7 +55,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 
 		return sealBlock({
 			data: {
-				...await this.headerFromStorage(header),
+				...(await this.headerFromStorage(header)),
 			},
 			serialized: "",
 			transactions: parsedTransactions,
@@ -81,7 +81,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 			transactionsCount: header.transactionsCount,
 			transactionsRoot: header.transactionsRoot,
 			version: header.version,
-		}
+		};
 	}
 
 	public async fromJson(json: Contracts.Crypto.BlockJson): Promise<Contracts.Crypto.Block> {

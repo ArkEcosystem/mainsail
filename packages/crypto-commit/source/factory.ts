@@ -46,15 +46,15 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 				round: data.proof.round,
 				signature: data.proof.signature,
 				validators: validatorSetUnpack(data.proof.validatorSet, roundValidators),
-			}
+			},
 		};
 
-		const serialized = await  this.commitSerializer.serializeCommit(commit);
+		const serialized = await this.commitSerializer.serializeCommit(commit);
 
 		return {
 			...commit,
 			serialized: serialized.toString("hex"),
-		}
+		};
 	}
 
 	public async fromJson(json: Contracts.Crypto.CommitJson): Promise<Contracts.Crypto.Commit> {
