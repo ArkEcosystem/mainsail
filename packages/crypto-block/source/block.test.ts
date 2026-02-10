@@ -9,7 +9,7 @@ import { Block } from "./block";
 import { assertBlockData } from "../test/helpers/asserts.js";
 
 describe<{}>("Block", ({ it, assert }) => {
-	it("#sealBlock - should seal block", async () => {
+	it("#should create new block", async () => {
 		const transactionFactory = await Factories.factory<TransactionBuilder>("Transfer", crypto);
 
 		const transactionBuilder1 = await transactionFactory.withStates("sign").make();
