@@ -39,7 +39,7 @@ describe<{
 		const commit = await getLastCommit(nodes[0]);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockHash(nodes, commit.block.data.hash);
+		await assertBlockHash(nodes, commit.block.hash);
 	});
 
 	it("should create 3 new block", async ({ nodes }) => {
@@ -48,6 +48,6 @@ describe<{
 		const commit = await getLastCommit(nodes[0]);
 
 		await assertBlockNumber(nodes, 3);
-		await assertBlockHash(nodes, commit.block.data.hash);
+		await assertBlockHash(nodes, commit.block.hash);
 	});
 });

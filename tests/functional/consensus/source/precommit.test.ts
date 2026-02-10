@@ -122,10 +122,10 @@ describe<{
 				.sort(),
 			[
 				undefined,
-				commit.block.data.hash,
-				commit.block.data.hash,
-				commit.block.data.hash,
-				commit.block.data.hash,
+				commit.block.hash,
+				commit.block.hash,
+				commit.block.hash,
+				commit.block.hash,
 			].sort(),
 		);
 
@@ -171,7 +171,7 @@ describe<{
 				.getMessages(1, 0)
 				.map((prevote) => prevote.blockHash)
 				.sort(),
-			[undefined, commit.block.data.hash, commit.block.data.hash, commit.block.data.hash].sort(),
+			[undefined, commit.block.hash, commit.block.hash, commit.block.hash].sort(),
 		);
 
 		// Next block
@@ -197,7 +197,7 @@ describe<{
 
 		const node1 = nodes[1];
 		const stubPrecommit1 = stub(node1.get<Consensus>(Identifiers.Consensus.Service), "precommit");
-		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal.getData().block.data.hash);
+		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal.getData().block.hash);
 		stubPrecommit1.callsFake(async () => {
 			stubPrecommit1.restore();
 			await p2p.broadcastMessage(precommit1);
@@ -223,10 +223,10 @@ describe<{
 				.map((prevote) => prevote.blockHash)
 				.sort(),
 			[
-				proposal.getData().block.data.hash,
-				commit.block.data.hash,
-				commit.block.data.hash,
-				commit.block.data.hash,
+				proposal.getData().block.hash,
+				commit.block.hash,
+				commit.block.hash,
+				commit.block.hash,
 			].sort(),
 		);
 
@@ -257,11 +257,11 @@ describe<{
 
 		const node1 = nodes[1];
 		const stubPrecommit1 = stub(node1.get<Consensus>(Identifiers.Consensus.Service), "precommit");
-		const precommit0 = await makePrecommit(node1, validators[1], 1, 0, proposal0.getData().block.data.hash);
-		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal1.getData().block.data.hash);
-		const precommit2 = await makePrecommit(node1, validators[1], 1, 0, proposal2.getData().block.data.hash);
-		const precommit3 = await makePrecommit(node1, validators[1], 1, 0, proposal3.getData().block.data.hash);
-		const precommit4 = await makePrecommit(node1, validators[1], 1, 0, proposal4.getData().block.data.hash);
+		const precommit0 = await makePrecommit(node1, validators[1], 1, 0, proposal0.getData().block.hash);
+		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal1.getData().block.hash);
+		const precommit2 = await makePrecommit(node1, validators[1], 1, 0, proposal2.getData().block.hash);
+		const precommit3 = await makePrecommit(node1, validators[1], 1, 0, proposal3.getData().block.hash);
+		const precommit4 = await makePrecommit(node1, validators[1], 1, 0, proposal4.getData().block.hash);
 		stubPrecommit1.callsFake(async () => {
 			stubPrecommit1.restore();
 			await p2p.broadcastMessage(precommit0);
@@ -291,14 +291,14 @@ describe<{
 				.map((prevote) => prevote.blockHash)
 				.sort(),
 			[
-				proposal0.getData().block.data.hash,
-				proposal1.getData().block.data.hash,
-				proposal2.getData().block.data.hash,
-				proposal3.getData().block.data.hash,
-				proposal4.getData().block.data.hash,
-				commit.block.data.hash,
-				commit.block.data.hash,
-				commit.block.data.hash,
+				proposal0.getData().block.hash,
+				proposal1.getData().block.hash,
+				proposal2.getData().block.hash,
+				proposal3.getData().block.hash,
+				proposal4.getData().block.hash,
+				commit.block.hash,
+				commit.block.hash,
+				commit.block.hash,
 			].sort(),
 		);
 
