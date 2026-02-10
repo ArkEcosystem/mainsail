@@ -1,8 +1,9 @@
-import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
+import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 import { bytesToHex, getAddress, Hex, hexToBigInt } from "viem";
+
+import { Transaction } from "./transaction.js";
 
 function decodeListBounds(buffer: Uint8Array): { start: number; end: number } {
 	if (buffer.byteLength === 0) {
@@ -124,9 +125,6 @@ function readLength(buffer: Uint8Array, offset: number, lengthOfLength: number) 
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
-	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils!: Contracts.Crypto.TransactionUtilities;
-
 	public async deserialize(serialized: Buffer): Promise<Contracts.Crypto.Transaction> {
 		const data = {} as Contracts.Crypto.TransactionData;
 
@@ -182,11 +180,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 			data.legacySecondSignature = fields[9].slice(2);
 		}
 
-		const instance = this.utils.resolve(data);
-
-		instance.serialized = serialized;
-
-		return instance;
+		return new Transaction(data, serialized);
 	}
 
 	#parseNumber(value: Hex): number {
