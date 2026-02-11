@@ -6,7 +6,7 @@ import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction extends TransactionData {
 	serialized: Buffer;
-	toData() : TransactionData;
+	toData(): TransactionData;
 }
 
 export interface BlockTransaction extends Transaction {
@@ -14,7 +14,6 @@ export interface BlockTransaction extends Transaction {
 	blockHash: string;
 	blockNumber: number;
 }
-
 
 export interface TransactionUnsignedSerializable {
 	network: number;
@@ -141,4 +140,3 @@ export interface TransactionUtilities {
 }
 
 export type TransactionSchema = Record<string, unknown>;
-

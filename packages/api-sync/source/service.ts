@@ -166,9 +166,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		);
 
 		for (const transaction of blockTransactions) {
-			const {
-				senderPublicKey,
-			} = transaction;
+			const { senderPublicKey } = transaction;
 			if (!publicKeyToAddress[senderPublicKey]) {
 				const address = await this.addressFactory.fromPublicKey(senderPublicKey);
 				publicKeyToAddress[senderPublicKey] = address;

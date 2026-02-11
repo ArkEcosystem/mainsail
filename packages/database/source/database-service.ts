@@ -193,11 +193,10 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return undefined;
 		}
 
-
 		const blockHeaderData = await this.#readBlockHeaderData(transactionStorageData.blockNumber);
 		assert.defined(blockHeaderData);
 
-		return this.transactionFactory.fromStorage({...transactionStorageData, blockHash: blockHeaderData.hash});
+		return this.transactionFactory.fromStorage({ ...transactionStorageData, blockHash: blockHeaderData.hash });
 	}
 
 	async #map<T, U>(data: U[], callback: (...arguments_: U[]) => Promise<T>): Promise<T[]> {

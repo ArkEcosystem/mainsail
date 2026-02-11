@@ -31,10 +31,7 @@ export class LegacyAttributeVerifier implements Contracts.Processor.Handler {
 				continue;
 			}
 
-			await this.transactionVerifier.verifyLegacySecondSignature(
-				transaction,
-				legacyAttributes.secondPublicKey,
-			);
+			await this.transactionVerifier.verifyLegacySecondSignature(transaction, legacyAttributes.secondPublicKey);
 		}
 	}
 }

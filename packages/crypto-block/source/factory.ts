@@ -51,7 +51,9 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		header: Contracts.Evm.BlockHeaderStorageData,
 		transactions: Contracts.Evm.TransactionStorageData[],
 	): Promise<Contracts.Crypto.Block> {
-		const parsedTransactions = await Promise.all(transactions.map((tx) => this.transactionFactory.fromStorage({...tx, blockHash: header.hash})));
+		const parsedTransactions = await Promise.all(
+			transactions.map((tx) => this.transactionFactory.fromStorage({ ...tx, blockHash: header.hash })),
+		);
 
 		return new Block({
 			data: {

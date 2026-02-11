@@ -123,7 +123,9 @@ function readLength(buffer: Uint8Array, offset: number, lengthOfLength: number) 
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
-	public async deserialize(serialized: Buffer): Promise<{ data: Contracts.Crypto.TransactionDeserialized; serialized: Buffer }> {
+	public async deserialize(
+		serialized: Buffer,
+	): Promise<{ data: Contracts.Crypto.TransactionDeserialized; serialized: Buffer }> {
 		const { start, end } = decodeListBounds(serialized);
 
 		if (end !== serialized.byteLength) {
@@ -169,7 +171,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		const r = fields[7].slice(2);
 		const s = fields[8].slice(2);
 
-		let legacySecondSignature: string | undefined  =  undefined;
+		let legacySecondSignature: string | undefined = undefined;
 
 		// Legacy second signature
 		if (fields.length === 10) {
@@ -191,7 +193,6 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 			legacySecondSignature,
 		};
 		/* eslint-enable sort-keys-fix/sort-keys-fix */
-
 
 		return { data: transaction, serialized };
 	}

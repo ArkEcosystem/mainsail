@@ -76,7 +76,9 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 		);
 
 		return Promise.all(
-			block.transactions.map(async (serialized) => this.transactionFactory.fromBytes(serialized as unknown as Buffer)),
+			block.transactions.map(async (serialized) =>
+				this.transactionFactory.fromBytes(serialized as unknown as Buffer),
+			),
 		);
 	}
 }

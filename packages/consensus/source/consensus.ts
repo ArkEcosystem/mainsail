@@ -8,7 +8,7 @@ const FAILED_PROCESSOR_RESULT: Contracts.Processor.BlockProcessorResult = {
 	feeUsed: BigNumber.ZERO,
 	gasUsed: 0,
 	receipts: new Map(),
-	success: false
+	success: false,
 };
 
 @injectable()

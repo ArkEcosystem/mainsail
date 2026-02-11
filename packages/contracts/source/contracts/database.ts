@@ -1,4 +1,4 @@
-import type { Block, BlockHeader, BlockTransaction,Commit, CommitHandler } from "./crypto/index.js";
+import type { Block, BlockHeader, BlockTransaction, Commit, CommitHandler } from "./crypto/index.js";
 import type { ProcessableUnit } from "./processor/index.js";
 
 export interface State {

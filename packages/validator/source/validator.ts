@@ -143,7 +143,13 @@ export class Validator implements Contracts.Validator.Validator {
 		generatorAddress: string,
 		timestamp: number,
 		commitKey: Contracts.Evm.CommitKey,
-	): Promise<{ logsBloom: string; stateRoot: string; transactions: Contracts.Crypto.Transaction[], gasUsed: number, fee: BigNumber }> {
+	): Promise<{
+		logsBloom: string;
+		stateRoot: string;
+		transactions: Contracts.Crypto.Transaction[];
+		gasUsed: number;
+		fee: BigNumber;
+	}> {
 		const transactionBytes = await this.txPoolWorker.getTransactionBytes();
 
 		const validator = this.createTransactionValidator();
@@ -221,7 +227,9 @@ export class Validator implements Contracts.Validator.Validator {
 					}
 
 					gasUsed += Number(result.gasUsed);
-					fee = fee.plus(this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, Number(result.gasUsed)));
+					fee = fee.plus(
+						this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, Number(result.gasUsed)),
+					);
 					candidateTransactions.push(transaction);
 				} catch (error) {
 					this.logger.warn(
@@ -278,7 +286,6 @@ export class Validator implements Contracts.Validator.Validator {
 		timestamp: number,
 		gasUsed: number,
 		fee: BigNumber,
-
 	): Promise<Contracts.Crypto.Block> {
 		const previousBlock = this.stateStore.getLastBlock();
 		const number = previousBlock.number + 1;

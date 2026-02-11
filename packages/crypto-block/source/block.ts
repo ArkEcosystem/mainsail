@@ -46,11 +46,14 @@ export class Block implements Contracts.Crypto.Block {
 		this.hash = data.hash;
 		this.serialized = serialized;
 
-		this.transactions = transactions.map((transaction, index) => new BlockTransaction(transaction, transaction.serialized, {
-			blockHash: this.hash,
-			blockNumber: this.number,
-			transactionIndex: index,
-		}));
+		this.transactions = transactions.map(
+			(transaction, index) =>
+				new BlockTransaction(transaction, transaction.serialized, {
+					blockHash: this.hash,
+					blockNumber: this.number,
+					transactionIndex: index,
+				}),
+		);
 	}
 
 	toData(): Contracts.Crypto.BlockData {
