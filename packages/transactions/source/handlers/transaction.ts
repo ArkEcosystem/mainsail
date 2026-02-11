@@ -70,6 +70,7 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 	public async apply(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
+		index: number,
 	): Promise<Contracts.Evm.TransactionReceipt> {
 		assert.string(transaction.hash);
 
@@ -85,7 +86,7 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 				from,
 				gasLimit: BigInt(transaction.gasLimit),
 				gasPrice: BigInt(transaction.gasPrice),
-				// index: transaction.transactionIndex,
+				index,
 				legacyAddress: senderLegacyAddress,
 				nonce: transaction.nonce.toBigInt(),
 				specId: evmSpec,

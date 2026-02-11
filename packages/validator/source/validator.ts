@@ -173,7 +173,7 @@ export class Validator implements Contracts.Validator.Validator {
 				performance.now() +
 				milestone.timeouts.blockPrepareTime * this.configuration.getRequired<number>("txCollatorFactor");
 
-			for (const bytes of transactionBytes) {
+			for (const [index, bytes] of transactionBytes.entries()) {
 				if (performance.now() > timeLimit) {
 					break;
 				}
@@ -209,6 +209,7 @@ export class Validator implements Contracts.Validator.Validator {
 					const result = await validator.validate(
 						{ commitKey, gasLimit: milestone.block.maxGasLimit, generatorAddress, timestamp },
 						transaction,
+						index,
 					);
 
 					gasLeft -= Number(result.gasUsed);
