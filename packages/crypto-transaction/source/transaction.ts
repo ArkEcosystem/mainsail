@@ -44,10 +44,10 @@ export class Transaction implements Contracts.Crypto.Transaction {
 		this.s = data.s;
 		this.legacySecondSignature = data.legacySecondSignature;
 
-		this.transactionIndex = data.transactionIndex;
-		this.gasUsed = data.gasUsed;
-		this.blockHash = data.blockHash;
-		this.blockNumber = data.blockNumber;
+		// this.transactionIndex = data.transactionIndex;
+		// this.gasUsed = data.gasUsed;
+		// this.blockHash = data.blockHash;
+		// this.blockNumber = data.blockNumber;
 
 		this.serialized = serialized;
 	}
@@ -71,10 +71,10 @@ export class Transaction implements Contracts.Crypto.Transaction {
 			s: this.s,
 			legacySecondSignature: this.legacySecondSignature,
 
-			transactionIndex: this.transactionIndex,
-			gasUsed: this.gasUsed,
-			blockHash: this.blockHash,
-			blockNumber: this.blockNumber,
+			// transactionIndex: this.transactionIndex,
+			// gasUsed: this.gasUsed,
+			// blockHash: this.blockHash,
+			// blockNumber: this.blockNumber,
 			/* eslint-enable sort-keys-fix/sort-keys-fix */
 		};
 	}

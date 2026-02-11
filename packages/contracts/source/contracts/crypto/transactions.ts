@@ -5,28 +5,6 @@ import type { EcdsaSignature, KeyPair } from "./identities.js";
 import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction extends TransactionData {
-	network: number;
-
-	from: string;
-	senderLegacyAddress?: string;
-	senderPublicKey: string;
-	to?: string;
-
-	value: BigNumber;
-
-	gasPrice: number;
-	gasLimit: number;
-
-	nonce: BigNumber;
-	data: string;
-
-	hash: string;
-
-	v: number;
-	r: string;
-	s: string;
-	legacySecondSignature?: string;
-
 	transactionIndex?: number;
 	gasUsed?: number;
 	blockHash?: string;
@@ -37,7 +15,6 @@ export interface Transaction extends TransactionData {
 	toData() : TransactionData;
 }
 
-export type TransactionSchema = Record<string, unknown>;
 
 export interface TransactionUnsignedSerializable {
 	network: number;
@@ -66,10 +43,10 @@ export interface TransactionSerializable extends TransactionUnsignedSerializable
 export interface TransactionData extends TransactionSerializable {
 	hash: string;
 
-	transactionIndex?: number;
-	gasUsed?: number;
-	blockHash?: string;
-	blockNumber?: number;
+	// transactionIndex?: number;
+	// gasUsed?: number;
+	// blockHash?: string;
+	// blockNumber?: number;
 }
 
 export interface TransactionJson {
@@ -146,3 +123,6 @@ export interface TransactionUtilities {
 	toHash(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;
 	getHash(transaction: Transaction): Promise<string>;
 }
+
+export type TransactionSchema = Record<string, unknown>;
+

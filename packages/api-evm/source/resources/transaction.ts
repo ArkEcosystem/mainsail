@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class TransactionResource {
-	public async transform(transaction: Contracts.Crypto.TransactionData): Promise<object> {
+	public async transform(transaction: Contracts.Crypto.Transaction): Promise<object> {
 		/* eslint-disable sort-keys-fix/sort-keys-fix */
 		return {
 			blockHash: `0x${transaction.blockHash}`,
