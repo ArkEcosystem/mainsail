@@ -1,4 +1,4 @@
-import type { Block, BlockHeader, Commit, CommitHandler, Transaction } from "./crypto/index.js";
+import type { Block, BlockHeader, BlockTransaction,Commit, CommitHandler } from "./crypto/index.js";
 import type { ProcessableUnit } from "./processor/index.js";
 
 export interface State {
@@ -24,9 +24,9 @@ export interface DatabaseService extends CommitHandler {
 	getBlockHeader(blockNumber: number): Promise<BlockHeader | undefined>;
 	getBlockHeaderByHash(blockHash: string): Promise<BlockHeader | undefined>;
 
-	getTransactionByHash(transactionHash: string): Promise<Transaction | undefined>;
-	getTransactionByBlockHashAndIndex(blockHash: string, index: number): Promise<Transaction | undefined>;
-	getTransactionByBlockNumberAndIndex(blockNumber: number, index: number): Promise<Transaction | undefined>;
+	getTransactionByHash(transactionHash: string): Promise<BlockTransaction | undefined>;
+	getTransactionByBlockHashAndIndex(blockHash: string, index: number): Promise<BlockTransaction | undefined>;
+	getTransactionByBlockNumberAndIndex(blockNumber: number, index: number): Promise<BlockTransaction | undefined>;
 
 	onCommit(unit: ProcessableUnit): Promise<void>;
 }

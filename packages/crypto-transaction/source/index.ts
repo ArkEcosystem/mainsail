@@ -1,3 +1,4 @@
+export * from "./block-transaction.js";
 export * from "./builders.js";
 export * from "./deserializer.js";
 export * from "./factory.js";

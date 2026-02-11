@@ -1,7 +1,7 @@
 import type { BigNumber } from "@mainsail/utils";
 
 import type { BlockHeaderStorageData, TransactionStorageData } from "../evm/storage.js";
-import type { Transaction, TransactionData, TransactionJson } from "./transactions.js";
+import type { BlockTransaction, Transaction, TransactionData, TransactionJson } from "./transactions.js";
 
 export type BlockTag = "latest" | "finalized" | "safe";
 
@@ -32,7 +32,7 @@ export type BlockData = BlockHeader & {
 
 export interface Block extends BlockHeader {
 	readonly serialized: string;
-	readonly transactions: Transaction[];
+	readonly transactions: BlockTransaction[];
 
 	toData(): BlockData;
 }

@@ -4,7 +4,7 @@ import type { Contracts } from "@mainsail/contracts";
 @injectable()
 export class ReceiptResource {
 	public async transform(
-		transaction: Contracts.Crypto.Transaction,
+		transaction: Contracts.Crypto.BlockTransaction,
 		header: Contracts.Crypto.BlockHeader,
 		receipt: Contracts.Evm.TransactionReceipt,
 	): Promise<object> {

@@ -58,7 +58,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		return this.fromData(transactionData, true);
 	}
 
-	public async fromStorage(data: Contracts.Evm.TransactionStorageData): Promise<Contracts.Crypto.BlockTransaction> {
+	public async fromStorage(data: Contracts.Crypto.TransactionStorageDataExtended): Promise<Contracts.Crypto.BlockTransaction> {
 		const transaction: Contracts.Crypto.TransactionData = {
 			data: data.data.toString("hex"),
 			from: data.from,
@@ -80,6 +80,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		const serialized = await this.serializer.serialize(transaction);
 
 		return new BlockTransaction(transaction, serialized, {
+			blockHash: data.blockHash,
 			blockNumber: data.blockNumber,
 			transactionIndex: data.index,
 		});

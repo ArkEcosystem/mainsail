@@ -85,7 +85,7 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 				from,
 				gasLimit: BigInt(transaction.gasLimit),
 				gasPrice: BigInt(transaction.gasPrice),
-				index: transaction.transactionIndex,
+				// index: transaction.transactionIndex,
 				legacyAddress: senderLegacyAddress,
 				nonce: transaction.nonce.toBigInt(),
 				specId: evmSpec,

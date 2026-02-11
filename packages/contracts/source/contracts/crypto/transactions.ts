@@ -16,10 +16,10 @@ export interface Transaction extends TransactionData {
 
 export interface BlockTransaction extends Transaction {
 	transactionIndex: number;
+	blockHash: string;
 	blockNumber: number;
 
 	// gasUsed?: number;
-	// blockHash?: string;
 }
 
 
@@ -49,11 +49,10 @@ export interface TransactionSerializable extends TransactionUnsignedSerializable
 
 export interface TransactionData extends TransactionSerializable {
 	hash: string;
+}
 
-	// transactionIndex?: number;
-	// gasUsed?: number;
-	// blockHash?: string;
-	// blockNumber?: number;
+export interface TransactionStorageDataExtended extends TransactionStorageData {
+	blockHash: string;
 }
 
 export interface TransactionJson {
@@ -122,7 +121,7 @@ export interface TransactionFactory {
 	fromBytes(buff: Buffer, strict?: boolean): Promise<Transaction>;
 	fromJson(json: TransactionJson): Promise<Transaction>;
 	fromData(data: TransactionData, strict?: boolean): Promise<Transaction>;
-	fromStorage(data: TransactionStorageData): Promise<BlockTransaction>;
+	fromStorage(data: TransactionStorageDataExtended): Promise<BlockTransaction>;
 	computeCryptoData(data: TransactionData): Promise<TransactionCryptoData>;
 }
 

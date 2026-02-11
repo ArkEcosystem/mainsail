@@ -1,8 +1,6 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import type { BigNumber } from "@mainsail/utils";
 
-@injectable()
 export class Transaction implements Contracts.Crypto.Transaction {
 	public readonly hash: string;
 	public readonly network: number;
