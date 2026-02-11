@@ -73,7 +73,7 @@ export class Validator implements Contracts.Validator.Validator {
 		const previousBlock = this.stateStore.getLastBlock();
 		const blockNumber = previousBlock.number + 1;
 
-		const { logsBloom, stateRoot, transactions } = await this.#getTransactionsForForging(
+		const { logsBloom, stateRoot, transactions, gasUsed, fee } = await this.#getTransactionsForForging(
 			generatorAddress,
 			timestamp,
 			{
@@ -81,7 +81,7 @@ export class Validator implements Contracts.Validator.Validator {
 				round: BigInt(round),
 			},
 		);
-		return this.#makeBlock(round, generatorAddress, logsBloom, stateRoot, transactions, timestamp);
+		return this.#makeBlock(round, generatorAddress, logsBloom, stateRoot, transactions, timestamp, gasUsed, fee);
 	}
 
 	public async propose(
@@ -143,7 +143,7 @@ export class Validator implements Contracts.Validator.Validator {
 		generatorAddress: string,
 		timestamp: number,
 		commitKey: Contracts.Evm.CommitKey,
-	): Promise<{ logsBloom: string; stateRoot: string; transactions: Contracts.Crypto.Transaction[] }> {
+	): Promise<{ logsBloom: string; stateRoot: string; transactions: Contracts.Crypto.Transaction[], gasUsed: number, fee: BigNumber }> {
 		const transactionBytes = await this.txPoolWorker.getTransactionBytes();
 
 		const validator = this.createTransactionValidator();
@@ -159,6 +159,8 @@ export class Validator implements Contracts.Validator.Validator {
 			const previousBlock = this.stateStore.getLastBlock();
 			const milestone = this.cryptoConfiguration.getMilestone();
 			let gasLeft = milestone.block.maxGasLimit;
+			let gasUsed = 0;
+			let fee = BigNumber.ZERO;
 
 			// txCollatorFactor% of the time for block preparation, the rest is for  block and proposal serialization and signing
 			const timeLimit =
@@ -171,7 +173,6 @@ export class Validator implements Contracts.Validator.Validator {
 				}
 
 				const transaction = await this.transactionFactory.fromBytes(bytes);
-				transaction.transactionIndex = candidateTransactions.length;
 
 				if (failedSenders.has(transaction.senderPublicKey)) {
 					continue;
@@ -219,7 +220,8 @@ export class Validator implements Contracts.Validator.Validator {
 						break;
 					}
 
-					transaction.gasUsed = Number(result.gasUsed);
+					gasUsed += Number(result.gasUsed);
+					fee = fee.plus(this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, Number(result.gasUsed)));
 					candidateTransactions.push(transaction);
 				} catch (error) {
 					this.logger.warn(
@@ -256,6 +258,8 @@ export class Validator implements Contracts.Validator.Validator {
 			const stateRoot = await evm.stateRoot(commitKey, previousBlock.stateRoot);
 
 			return {
+				fee,
+				gasUsed,
 				logsBloom,
 				stateRoot,
 				transactions: candidateTransactions,
@@ -272,15 +276,14 @@ export class Validator implements Contracts.Validator.Validator {
 		stateRoot: string,
 		transactions: Contracts.Crypto.Transaction[],
 		timestamp: number,
+		gasUsed: number,
+		fee: BigNumber,
+
 	): Promise<Contracts.Crypto.Block> {
 		const previousBlock = this.stateStore.getLastBlock();
 		const number = previousBlock.number + 1;
 		const milestone = this.cryptoConfiguration.getMilestone(number);
 
-		const totals: { fee: BigNumber; gasUsed: number } = {
-			fee: BigNumber.ZERO,
-			gasUsed: 0,
-		};
 		const payloadBuffers: Buffer[] = [];
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
 
@@ -290,11 +293,6 @@ export class Validator implements Contracts.Validator.Validator {
 
 		for (const transaction of transactions) {
 			assert.string(transaction.hash);
-			assert.number(transaction.gasUsed);
-
-			assert.number(transaction.gasUsed);
-			totals.fee = totals.fee.plus(this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, transaction.gasUsed));
-			totals.gasUsed += transaction.gasUsed;
 
 			payloadBuffers.push(Buffer.from(transaction.hash, "hex"));
 			transactionData.push(transaction.toData());
@@ -303,8 +301,8 @@ export class Validator implements Contracts.Validator.Validator {
 
 		return this.blockFactory.make(
 			{
-				fee: totals.fee,
-				gasUsed: totals.gasUsed,
+				fee,
+				gasUsed,
 				logsBloom,
 				number,
 				parentHash: previousBlock.hash,

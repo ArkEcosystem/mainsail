@@ -18,12 +18,7 @@ export class Transaction implements Contracts.Crypto.Transaction {
 	public readonly s: string;
 	public readonly legacySecondSignature?: string;
 
-	public readonly transactionIndex?: number;
-	public readonly gasUsed?: number;
-	public readonly blockHash?: string;
-	public readonly blockNumber?: number;
-
-	public serialized: Buffer;
+	public readonly serialized: Buffer;
 
 	constructor(data: Contracts.Crypto.TransactionData, serialized: Buffer) {
 		this.hash = data.hash;
@@ -41,11 +36,6 @@ export class Transaction implements Contracts.Crypto.Transaction {
 		this.r = data.r;
 		this.s = data.s;
 		this.legacySecondSignature = data.legacySecondSignature;
-
-		// this.transactionIndex = data.transactionIndex;
-		// this.gasUsed = data.gasUsed;
-		// this.blockHash = data.blockHash;
-		// this.blockNumber = data.blockNumber;
 
 		this.serialized = serialized;
 	}
@@ -68,11 +58,6 @@ export class Transaction implements Contracts.Crypto.Transaction {
 			r: this.r,
 			s: this.s,
 			legacySecondSignature: this.legacySecondSignature,
-
-			// transactionIndex: this.transactionIndex,
-			// gasUsed: this.gasUsed,
-			// blockHash: this.blockHash,
-			// blockNumber: this.blockNumber,
 			/* eslint-enable sort-keys-fix/sort-keys-fix */
 		};
 	}

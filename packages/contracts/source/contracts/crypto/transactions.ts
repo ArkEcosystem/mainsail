@@ -5,11 +5,6 @@ import type { EcdsaSignature, KeyPair } from "./identities.js";
 import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction extends TransactionData {
-	transactionIndex?: number;
-	gasUsed?: number;
-	blockHash?: string;
-	blockNumber?: number;
-
 	serialized: Buffer;
 	toData() : TransactionData;
 }
@@ -18,8 +13,6 @@ export interface BlockTransaction extends Transaction {
 	transactionIndex: number;
 	blockHash: string;
 	blockNumber: number;
-
-	// gasUsed?: number;
 }
 
 
