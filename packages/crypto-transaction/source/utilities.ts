@@ -9,7 +9,7 @@ import { toBytesCompat } from "./serializer.js";
 @injectable()
 export class Utils implements Contracts.Crypto.TransactionUtilities {
 	public async toHash(
-		transaction: Contracts.Crypto.TransactionData,
+		transaction: Contracts.Crypto.TransactionDeserialized,
 		options?: Contracts.Crypto.SerializeOptions,
 	): Promise<Buffer> {
 		const fields = [
@@ -39,7 +39,7 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 		return Buffer.from(Keccak256.digest(Buffer.from(`${encoded.slice(2)}`, "hex")));
 	}
 
-	public async getHash(transaction: Contracts.Crypto.Transaction): Promise<string> {
+	public async getHash(transaction: Contracts.Crypto.TransactionDeserialized): Promise<string> {
 		return (await this.toHash(transaction, { excludeSignature: false })).toString("hex");
 	}
 }

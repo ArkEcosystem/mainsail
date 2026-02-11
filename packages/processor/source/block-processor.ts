@@ -183,7 +183,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	): void {
 		const fee = this.feeCalculator.calculateConsumed(gasUsed, transaction.gasPrice);
 
-
 		if (processorResult.feeUsed.plus(fee).isGreaterThan(block.fee)) {
 			throw new Error("Cannot consume more fee");
 		}
@@ -195,9 +194,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		block: Contracts.Crypto.Block,
 		processorResult: Contracts.Processor.BlockProcessorResult,
 	): void {
-		const totalGas = block.gasUsed;
-		if (totalGas !== processorResult.gasUsed) {
-			throw new Error(`Block gas ${totalGas} does not match consumed gas ${processorResult.gasUsed}`);
+		if (block.gasUsed !== processorResult.gasUsed) {
+			throw new Error(`Block gas ${block.gasUsed} does not match consumed gas ${processorResult.gasUsed}`);
 		}
 	}
 

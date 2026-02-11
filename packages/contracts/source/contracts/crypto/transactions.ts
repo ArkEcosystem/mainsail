@@ -40,6 +40,25 @@ export interface TransactionSerializable extends TransactionUnsignedSerializable
 	legacySecondSignature?: string;
 }
 
+export interface TransactionDeserialized {
+	network: number;
+	to?: string;
+
+	value: BigNumber;
+
+	gasPrice: number;
+	gasLimit: number;
+
+	nonce: BigNumber;
+	data: string;
+
+	v: number;
+	r: string;
+	s: string;
+
+	legacySecondSignature?: string;
+}
+
 export interface TransactionData extends TransactionSerializable {
 	hash: string;
 }
@@ -81,10 +100,9 @@ export interface SerializeOptions {
 
 export interface TransactionCryptoData {
 	readonly hash: string;
-	readonly publicKey: string;
-	readonly address: string;
-	readonly legacyAddress?: string;
-	readonly schemaError?: string;
+	readonly from: string;
+	readonly senderPublicKey: string;
+	readonly senderLegacyAddress?: string;
 }
 
 export interface TransactionVerifier {
@@ -106,7 +124,7 @@ export interface TransactionSerializer {
 }
 
 export interface TransactionDeserializer {
-	deserialize(serialized: Buffer): Promise<{ data: TransactionData; serialized: Buffer }>;
+	deserialize(serialized: Buffer): Promise<{ data: TransactionDeserialized; serialized: Buffer }>;
 }
 
 export interface TransactionFactory {
@@ -115,12 +133,11 @@ export interface TransactionFactory {
 	fromJson(json: TransactionJson): Promise<Transaction>;
 	fromData(data: TransactionData, strict?: boolean): Promise<Transaction>;
 	fromStorage(data: TransactionStorageDataExtended): Promise<BlockTransaction>;
-	computeCryptoData(data: TransactionData): Promise<TransactionCryptoData>;
 }
 
 export interface TransactionUtilities {
-	toHash(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;
-	getHash(transaction: Transaction): Promise<string>;
+	toHash(transaction: TransactionDeserialized, options?: SerializeOptions): Promise<Buffer>;
+	getHash(transaction: TransactionDeserialized): Promise<string>;
 }
 
 export type TransactionSchema = Record<string, unknown>;

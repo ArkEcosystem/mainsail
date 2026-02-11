@@ -123,9 +123,7 @@ function readLength(buffer: Uint8Array, offset: number, lengthOfLength: number) 
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
-	public async deserialize(serialized: Buffer): Promise<{ data: Contracts.Crypto.TransactionData; serialized: Buffer }> {
-		const data = {} as Contracts.Crypto.TransactionData;
-
+	public async deserialize(serialized: Buffer): Promise<{ data: Contracts.Crypto.TransactionDeserialized; serialized: Buffer }> {
 		const { start, end } = decodeListBounds(serialized);
 
 		if (end !== serialized.byteLength) {
@@ -152,33 +150,50 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 			throw new Error("decoded RLP contains too few fields");
 		}
 
-		data.nonce = BigNumber.make(this.#parseNumber(fields[0]));
-		data.gasPrice = this.#parseNumber(fields[1]);
-		data.gasLimit = this.#parseNumber(fields[2]);
+		const nonce = BigNumber.make(this.#parseNumber(fields[0]));
+		const gasPrice = this.#parseNumber(fields[1]);
+		const gasLimit = this.#parseNumber(fields[2]);
 
 		const recipientAddressRaw = this.#parseAddress(fields[3]);
-		data.to = recipientAddressRaw ? getAddress(recipientAddressRaw) : undefined;
+		const to = recipientAddressRaw ? getAddress(recipientAddressRaw) : undefined;
 
-		data.value = this.#parseBigNumber(fields[4]);
-		data.data = this.#parseData(fields[5]);
+		const value = this.#parseBigNumber(fields[4]);
+		const data = this.#parseData(fields[5]);
 
 		// Signature
 		const v = this.#parseNumber(fields[6]);
 		const chainId = Math.floor((v - 35) / 2);
-		data.network = chainId;
+		const network = chainId;
 
 		const normalizedV = v - (chainId * 2 + 35);
+		const r = fields[7].slice(2);
+		const s = fields[8].slice(2);
 
-		data.v = normalizedV;
-		data.r = fields[7].slice(2);
-		data.s = fields[8].slice(2);
+		let legacySecondSignature: string | undefined  =  undefined;
 
 		// Legacy second signature
 		if (fields.length === 10) {
-			data.legacySecondSignature = fields[9].slice(2);
+			legacySecondSignature = fields[9].slice(2);
 		}
 
-		return { data, serialized };
+		/* eslint-disable sort-keys-fix/sort-keys-fix */
+		const transaction: Contracts.Crypto.TransactionDeserialized = {
+			network,
+			to,
+			value,
+			gasPrice,
+			gasLimit,
+			nonce,
+			data,
+			v: normalizedV,
+			r,
+			s,
+			legacySecondSignature,
+		};
+		/* eslint-enable sort-keys-fix/sort-keys-fix */
+
+
+		return { data: transaction, serialized };
 	}
 
 	#parseNumber(value: Hex): number {

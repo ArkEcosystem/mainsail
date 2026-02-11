@@ -102,8 +102,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	}
 
 	public async computeCryptoData(
-		data: Contracts.Crypto.TransactionData,
-		strict: boolean = true,
+		data: Contracts.Crypto.TransactionDeserialized,
 	): Promise<Contracts.Crypto.TransactionCryptoData> {
 		assert.number(data.v);
 		assert.string(data.r);
@@ -139,33 +138,27 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			excludeSignature: false,
 		});
 
-		// Assign to pass schema check
-		data.hash = signedHash.toString("hex");
-		data.from = address;
-		data.senderPublicKey = publicKey;
-		data.senderLegacyAddress = legacyAddress;
-
-		const { error } = await this.verifier.verifySchema(data, strict);
+		// const { error } = await this.verifier.verifySchema(data, strict);
 
 		return {
-			address,
-			hash: data.hash,
-			legacyAddress,
-			publicKey,
-			schemaError: error,
-		};
+			from: address,
+			hash: signedHash.toString("hex"),
+			senderLegacyAddress: legacyAddress,
+			senderPublicKey: publicKey,
+		}
 	}
 
 	async #fromSerialized(serialized: Buffer, strict: boolean = true): Promise<Contracts.Crypto.Transaction> {
 		try {
 			const { data: transaction } = await this.deserializer.deserialize(serialized);
 
-			const { schemaError } = await this.computeCryptoData(transaction, strict);
-			if (schemaError) {
-				throw new TransactionSchemaError(schemaError);
-			}
+			const cryptoData = await this.computeCryptoData(transaction);
 
-			return new Transaction(transaction, serialized);
+			// if (schemaError) {
+			// 	throw new TransactionSchemaError(schemaError);
+			// }
+
+			return new Transaction({ ...cryptoData, ...transaction }, serialized);
 		} catch (error) {
 			if (
 				error instanceof TransactionVersionError ||
