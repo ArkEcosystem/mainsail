@@ -11,8 +11,15 @@ export interface Transaction extends TransactionData {
 	blockNumber?: number;
 
 	serialized: Buffer;
-
 	toData() : TransactionData;
+}
+
+export interface BlockTransaction extends Transaction {
+	transactionIndex: number;
+	blockNumber: number;
+
+	// gasUsed?: number;
+	// blockHash?: string;
 }
 
 
@@ -115,7 +122,7 @@ export interface TransactionFactory {
 	fromBytes(buff: Buffer, strict?: boolean): Promise<Transaction>;
 	fromJson(json: TransactionJson): Promise<Transaction>;
 	fromData(data: TransactionData, strict?: boolean): Promise<Transaction>;
-	fromStorage(data: TransactionStorageData): Promise<Transaction>;
+	fromStorage(data: TransactionStorageData): Promise<BlockTransaction>;
 	computeCryptoData(data: TransactionData): Promise<TransactionCryptoData>;
 }
 

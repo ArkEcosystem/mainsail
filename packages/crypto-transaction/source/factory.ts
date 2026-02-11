@@ -9,6 +9,7 @@ import {
 } from "@mainsail/exceptions";
 import { assert, BigNumber } from "@mainsail/utils";
 
+import { BlockTransaction } from "./block-transaction.js";
 import { Transaction } from "./transaction.js";
 
 @injectable()
@@ -57,9 +58,8 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		return this.fromData(transactionData, true);
 	}
 
-	public async fromStorage(data: Contracts.Evm.TransactionStorageData): Promise<Contracts.Crypto.Transaction> {
+	public async fromStorage(data: Contracts.Evm.TransactionStorageData): Promise<Contracts.Crypto.BlockTransaction> {
 		const transaction: Contracts.Crypto.TransactionData = {
-			// blockNumber: data.blockNumber,
 			data: data.data.toString("hex"),
 			from: data.from,
 			gasLimit: Number(data.gasLimit),
@@ -73,14 +73,16 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			senderLegacyAddress: data.legacyAddress,
 			senderPublicKey: data.senderPublicKey,
 			to: data.to,
-			// transactionIndex: data.index,
 			v: data.v,
 			value: BigNumber.make(data.value),
 		};
 
 		const serialized = await this.serializer.serialize(transaction);
 
-		return new Transaction(transaction, serialized);
+		return new BlockTransaction(transaction, serialized, {
+			blockNumber: data.blockNumber,
+			transactionIndex: data.index,
+		});
 	}
 
 	public async fromData(
