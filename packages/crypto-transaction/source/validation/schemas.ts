@@ -38,8 +38,14 @@ const transaction: SchemaObject = {
 
 		nonce: { bignumber: { minimum: 0 } },
 
-		r: { $ref: "hex" },
-		s: { $ref: "hex" },
+		r: {
+			allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
+			type: "string",
+		},
+		s: {
+			allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
+			type: "string",
+		},
 
 		senderLegacyAddress: { type: "string" },
 

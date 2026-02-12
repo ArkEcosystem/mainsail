@@ -317,6 +317,75 @@ describe<{
 		}
 	});
 
+	it("signedSchema - should be ok for v value", ({ validator }) => {
+		const validValues = [0, 1];
+
+		for(const v of validValues) {
+			const transaction = {
+				...transactionSigned,
+				v,
+			};
+
+			assert.undefined(validator.validate("transactionSigned", transaction).error);
+		}
+
+		const invalidValues = [-1, 2, "0", null, undefined, {}, "test"];
+		for(const v of invalidValues) {
+			const transaction = {
+				...transactionSigned,
+				v,
+			};
+
+			assert.true(validator.validate("transactionSigned", transaction).error.includes("v"));
+		}
+	});
+
+	it("signedSchema - should be ok for r value", ({ validator }) => {
+		const validValues = "0123456789abcdef".split("").map((char) => char.repeat(64));
+
+		for(const r of validValues) {
+			const transaction = {
+				...transactionSigned,
+				r,
+			};
+
+			assert.undefined(validator.validate("transactionSigned", transaction).error);
+		}
+
+		const invalidValues = [-1, 2, "0", null, undefined, {}, "test", "0".repeat(63), "0".repeat(65), "A".repeat(64), "g".repeat(64)];
+		for(const r of invalidValues) {
+			const transaction = {
+				...transactionSigned,
+				r,
+			};
+
+			assert.true(validator.validate("transactionSigned", transaction).error.includes("r"));
+		}
+	});
+
+	it("signedSchema - should be ok for s value", ({ validator }) => {
+		const validValues = "0123456789abcdef".split("").map((char) => char.repeat(64));
+
+		for(const s of validValues) {
+			const transaction = {
+				...transactionSigned,
+				s,
+			};
+
+			assert.undefined(validator.validate("transactionSigned", transaction).error);
+		}
+
+		const invalidValues = [-1, 2, "0", null, undefined, {}, "test", "0".repeat(63), "0".repeat(65), "A".repeat(64), "g".repeat(64)];
+		for(const s of invalidValues) {
+			const transaction = {
+				...transactionSigned,
+				s,
+			};
+
+			assert.true(validator.validate("transactionSigned", transaction).error.includes("s"));
+		}
+	});
+
 	it("strictSchema - should be ok", ({ validator }) => {
 		const transaction = {
 			...transactionSigned,
