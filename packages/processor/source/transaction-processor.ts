@@ -56,6 +56,8 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			throw new InvalidSignatureError();
 		}
 
+		console.log(transaction);
+
 		const receipt = await this.transactionHandler.apply(transactionHandlerContext, transaction, index);
 
 		const feeConsumed = this.feeCalculator.calculateConsumed(transaction.gasPrice, Number(receipt.gasUsed));
