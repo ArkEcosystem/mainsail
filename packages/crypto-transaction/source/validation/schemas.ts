@@ -1,7 +1,5 @@
 import type { SchemaObject } from "ajv";
 
-import { signedSchema, strictSchema } from "./utilities.js";
-
 const transactionHash: SchemaObject = {
 	$id: "transactionHash",
 	allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
@@ -55,6 +53,18 @@ const transaction: SchemaObject = {
 	type: "object",
 };
 
+const transactionSigned: SchemaObject = {
+	...transaction,
+	$id: "transactionSigned",
+	required: [...transaction.required, "hash", "v", "r", "s"],
+};
+
+const transactionStrict: SchemaObject = {
+	...transactionSigned,
+	$id: "transactionStrict",
+	unevaluatedProperties: false
+};
+
 const transactions = {
 	$id: "transactions",
 	items: { $ref: "transactionSigned" },
@@ -66,7 +76,7 @@ export const schemas = {
 	prefixedTransactionHash,
 	transaction,
 	transactionHash,
-	transactionSigned: signedSchema(transaction),
-	transactionStrict: strictSchema(transaction),
+	transactionSigned,
+	transactionStrict,
 	transactions,
 };
