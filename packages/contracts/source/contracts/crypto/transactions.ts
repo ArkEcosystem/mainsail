@@ -5,23 +5,23 @@ import type { EcdsaSignature, KeyPair } from "./identities.js";
 import type { SchemaValidationResult } from "./validator.js";
 
 export interface TransactionUnsignedSerializable {
-	network: number;
+	readonly network: number;
 
-	to?: string;
-	value: BigNumber;
+	readonly to?: string;
+	readonly value: BigNumber;
 
-	gasPrice: number;
-	gasLimit: number;
-	nonce: BigNumber;
-	data: string;
+	readonly gasPrice: number;
+	readonly gasLimit: number;
+	readonly nonce: BigNumber;
+	readonly data: string;
 }
 
 export interface TransactionSerializable extends TransactionUnsignedSerializable {
-	v: number;
-	r: string;
-	s: string;
+	readonly v: number;
+	readonly r: string;
+	readonly s: string;
 
-	legacySecondSignature?: string;
+	readonly legacySecondSignature?: string;
 }
 
 export interface TransactionCryptoData {
@@ -34,42 +34,42 @@ export interface TransactionCryptoData {
 export interface TransactionData extends TransactionSerializable, TransactionCryptoData {}
 
 export interface Transaction extends TransactionData {
-	serialized: Buffer;
+	readonly serialized: Buffer;
 	toData(): TransactionData;
 }
 
 export interface BlockTransaction extends Transaction {
-	transactionIndex: number;
-	blockHash: string;
-	blockNumber: number;
+	readonly transactionIndex: number;
+	readonly blockHash: string;
+	readonly blockNumber: number;
 }
 
 export interface TransactionStorageDataExtended extends TransactionStorageData {
-	blockHash: string;
+	readonly blockHash: string;
 }
 
 export interface TransactionJson {
-	hash: string;
-	network: number;
+	readonly hash: string;
+	readonly network: number;
 
-	from: string;
-	senderPublicKey: string;
-	to?: string;
+	readonly from: string;
+	readonly senderPublicKey: string;
+	readonly to?: string;
 
-	value: string;
+	readonly value: string;
 
-	gasLimit: number;
-	gasPrice: number;
-	nonce: string;
-	data: string;
+	readonly gasLimit: number;
+	readonly gasPrice: number;
+	readonly nonce: string;
+	readonly data: string;
 
-	v: number;
-	r: string;
-	s: string;
+	readonly v: number;
+	readonly r: string;
+	readonly s: string;
 
-	transactionIndex?: number;
-	blockHash?: string;
-	blockNumber?: number;
+	readonly transactionIndex?: number;
+	readonly blockHash?: string;
+	readonly blockNumber?: number;
 }
 
 export interface SerializeOptions {

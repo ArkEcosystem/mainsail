@@ -24,9 +24,9 @@ export class Signer implements Contracts.Crypto.TransactionSigner {
 		const hash: Buffer = await this.utils.toHash(transaction, options);
 		const signature = await this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));
 
-		transaction.v = signature.v;
-		transaction.r = signature.r;
-		transaction.s = signature.s;
+		// transaction.v = signature.v;
+		// transaction.r = signature.r;
+		// transaction.s = signature.s;
 
 		return signature;
 	}
@@ -45,7 +45,7 @@ export class Signer implements Contracts.Crypto.TransactionSigner {
 
 		const legacySecondSignature = formatEcdsaSignature(r, s, v);
 
-		transaction.legacySecondSignature = legacySecondSignature;
+		// transaction.legacySecondSignature = legacySecondSignature;
 
 		return legacySecondSignature;
 	}
