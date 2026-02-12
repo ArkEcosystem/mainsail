@@ -613,7 +613,7 @@ jobs:
         strategy:
             matrix:
                 node-version: [22.x]
-                name: ["transaction-pool-api", "consensus"]
+                name: ["transaction-pool-api", "consensus", "resync"]
 
         services:
             postgres:
