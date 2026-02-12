@@ -76,18 +76,16 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 
 		const { evmSpec } = this.configuration.getMilestone();
 
-		const { from, senderLegacyAddress } = transaction;
-
 		try {
 			const { instance, blockContext } = context.evm;
 			const data = {
 				blockContext,
 				data: Buffer.from(transaction.data, "hex"),
-				from,
+				from: transaction.from,
 				gasLimit: BigInt(transaction.gasLimit),
 				gasPrice: BigInt(transaction.gasPrice),
 				index,
-				legacyAddress: senderLegacyAddress,
+				legacyAddress: transaction.senderLegacyAddress,
 				nonce: transaction.nonce.toBigInt(),
 				specId: evmSpec,
 				to: transaction.to,
@@ -95,14 +93,11 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 				value: transaction.value.toBigInt(),
 			}
 
-			console.log(data);
-			console.log("DATA: " + data.data.toString("hex"));
-
 			const { receipt } = await instance.process(data);
 
 			void this.#emit(Events.EvmEvent.TransactionReceipt, {
 				receipt,
-				sender: from,
+				sender: transaction.from,
 				transactionId: transaction.hash,
 			});
 

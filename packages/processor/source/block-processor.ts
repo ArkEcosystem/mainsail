@@ -80,11 +80,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 				const receipt = await this.transactionProcessor.process(unit, transaction, index);
 				processResult.receipts.set(transaction.hash, receipt);
 
-				const pad = (string_: string | number): string => string_.toString().padStart(3, " ");
-				console.log(
-					`Processed transaction (${pad(index)}) ${transaction.hash} with status ${receipt.status} and gas used ${receipt.gasUsed}`,
-				);
-
 				this.#consumeGas(block, processResult, Number(receipt.gasUsed));
 				this.#consumeFee(block, processResult, transaction, Number(receipt.gasUsed));
 			}
