@@ -136,7 +136,6 @@ export interface TransactionFactory {
 
 export interface TransactionUtilities {
 	toHash(transaction: TransactionDeserialized, options?: SerializeOptions): Promise<Buffer>;
-	getHash(transaction: TransactionDeserialized): Promise<string>;
 }
 
 export type TransactionSchema = Record<string, unknown>;

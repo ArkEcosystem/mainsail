@@ -38,8 +38,4 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 		const encoded = toRlp(fields); // remove 0x prefix
 		return Buffer.from(Keccak256.digest(Buffer.from(`${encoded.slice(2)}`, "hex")));
 	}
-
-	public async getHash(transaction: Contracts.Crypto.TransactionDeserialized): Promise<string> {
-		return (await this.toHash(transaction, { excludeSignature: false })).toString("hex");
-	}
 }

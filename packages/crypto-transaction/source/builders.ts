@@ -141,7 +141,7 @@ export class TransactionBuilder {
 		const struct: Contracts.Crypto.TransactionData = {
 			from: this.data.from,
 			gasPrice: this.data.gasPrice,
-			hash: await this.utils.getHash(await this.build()),
+			hash: await this.#getHash(),
 			legacySecondSignature: this.data.legacySecondSignature,
 			network: this.data.network,
 			nonce: this.data.nonce,
@@ -154,6 +154,10 @@ export class TransactionBuilder {
 		} as Contracts.Crypto.TransactionData;
 
 		return struct;
+	}
+
+	async #getHash(): Promise<string> {
+		return (await this.utils.toHash(this.data, { excludeSignature: false })).toString("hex");
 	}
 
 	async #signWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TransactionBuilder> {
