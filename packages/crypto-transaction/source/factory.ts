@@ -58,32 +58,26 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	}
 
 	public async fromStorage(
-		data: Contracts.Crypto.TransactionStorageDataExtended,
+		transaction: Contracts.Crypto.TransactionStorageDataExtended,
 	): Promise<Contracts.Crypto.BlockTransaction> {
-		const transaction: Contracts.Crypto.TransactionData = {
-			data: data.data.toString("hex"),
-			from: data.from,
-			gasLimit: Number(data.gasLimit),
-			gasPrice: Number(data.gasPrice),
-			hash: data.txHash,
-			legacySecondSignature: data.legacySecondSignature,
+		const transactionData: Contracts.Crypto.TransactionData = {
+			...transaction,
+			data: transaction.data.toString("hex"),
+			gasLimit: Number(transaction.gasLimit),
+			gasPrice: Number(transaction.gasPrice),
+			hash: transaction.txHash,
 			network: this.configuration.get<number>("network.chainId"),
-			nonce: BigNumber.make(data.nonce),
-			r: data.r,
-			s: data.s,
-			senderLegacyAddress: data.legacyAddress!,
-			senderPublicKey: data.senderPublicKey,
-			to: data.to,
-			v: data.v,
-			value: BigNumber.make(data.value),
+			nonce: BigNumber.make(transaction.nonce),
+			senderLegacyAddress: transaction.legacyAddress || (await this.legacyAddressFactory.fromPublicKey(transaction.senderPublicKey)), // TODO: Make legacy address mandatory
+			value: BigNumber.make(transaction.value),
 		};
 
-		const serialized = await this.serializer.serialize(transaction);
+		const serialized = await this.serializer.serialize(transactionData);
 
-		return new BlockTransaction(transaction, serialized, {
-			blockHash: data.blockHash,
-			blockNumber: data.blockNumber,
-			transactionIndex: data.index,
+		return new BlockTransaction(transactionData, serialized, {
+			blockHash: transaction.blockHash,
+			blockNumber: transaction.blockNumber,
+			transactionIndex: transaction.index,
 		});
 	}
 
