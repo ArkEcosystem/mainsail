@@ -13,7 +13,7 @@ export const makeKeywords = (
 	const network: FuncKeywordDefinition = {
 		compile() {
 			return (data) => {
-				const chainId = configuration.get("network.chainId");
+				const chainId = configuration.get<number | undefined>("network.chainId");
 				if (!chainId) {
 					return true;
 				}
@@ -39,10 +39,10 @@ export const makeKeywords = (
 				} = configuration.getMilestone();
 
 				try {
-					const bignum = BigNumber.make(data);
-					if (bignum.isLessThan(minimumGasPrice)) {
+					const value = BigNumber.make(data);
+					if (value.isLessThan(minimumGasPrice)) {
 						// Accept 0 gasFee when processing genesis block only
-						if (!bignum.isZero()) {
+						if (!value.isZero()) {
 							return false;
 						}
 
@@ -53,7 +53,7 @@ export const makeKeywords = (
 						// Otherwise lookup by transaction hash
 						if (!valid && parentSchema && parentSchema.parentData && parentSchema.parentData.hash) {
 							if (genesisTransactionsLookup.size === 0) {
-								const genesisBlock = configuration.get<Contracts.Crypto.BlockJson | undefined>(
+								const genesisBlock = configuration.get<Contracts.Crypto.BlockJson>(
 									"genesisBlock.block",
 								);
 								for (const transaction of genesisBlock?.transactions || []) {
@@ -69,7 +69,7 @@ export const makeKeywords = (
 
 					// The upper limit technically isn't needed and solely acts as a safeguard
 					// as there's no legit reason to go beyond it.
-					if (bignum.isGreaterThan(maximumGasPrice)) {
+					if (value.isGreaterThan(maximumGasPrice)) {
 						return false;
 					}
 				} catch {
