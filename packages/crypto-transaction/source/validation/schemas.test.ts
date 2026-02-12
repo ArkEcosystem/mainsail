@@ -21,12 +21,19 @@ describe<{
 	const transactionOriginal = {
 		gasLimit: 21_000,
 		gasPrice: 5 * 1e9,
-		hash: "1".repeat(64),
 		network: 10_000,
 		nonce: 1,
 		from: "0x" + "a".repeat(40),
 		senderPublicKey: "a".repeat(66),
 		value: 0,
+	};
+
+	const transactionSigned = {
+		...transactionOriginal,
+		hash: "0".repeat(64),
+		v: 0,
+		r: "1".repeat(64),
+		s: "2".repeat(64),
 	};
 
 	beforeEach((context) => {
@@ -207,6 +214,7 @@ describe<{
 
 		const transaction = {
 			...transactionOriginal,
+			hash: "1".repeat(64),
 			gasPrice: 0,
 		};
 
@@ -284,170 +292,57 @@ describe<{
 		}
 	});
 
-	it.skip("transactionBaseSchema - signature should be alphanumeric", ({ validator }) => {
-		const validChars = "0123456789abcdefghijklmnopqrstuvwxyz";
-
-		for (const char of validChars) {
-			const transaction = {
-				...transactionOriginal,
-				signature: char.repeat(130),
-			};
-
-			assert.undefined(validator.validate("transaction", transaction).error);
-		}
-
-		const invalidValues = [..."ABCDEFGHJKLMNPQRSTUVWXYZ", "/", "!", "&", {}];
-
-		for (const value of invalidValues) {
-			const transaction = {
-				...transactionOriginal,
-				signature: value,
-			};
-
-			assert.true(validator.validate("transaction", transaction).error.includes("signature"));
-		}
-	});
-
-	it.skip("transactionBaseSchema - signatures should be alphanumeric, 130 length, min 1 and max 16, unique items", ({
-		validator,
-	}) => {
-		const validChars = "0123456789abcdefghijklmnopqrstuvwxyz";
-
-		for (const char of validChars) {
-			const transaction = {
-				...transactionOriginal,
-				signatures: [char.repeat(130)],
-			};
-
-			assert.undefined(validator.validate("transaction", transaction).error);
-		}
-
-		const invalidValues = [
-			"a".repeat(129),
-			"a".repeat(131),
-			"A".repeat(130),
-			"/".repeat(130),
-			"!".repeat(130),
-			"&".repeat(130),
-			null,
-			undefined,
-			{},
-		];
-		for (const value of invalidValues) {
-			const transaction = {
-				...transactionOriginal,
-				signatures: [value],
-			};
-
-			assert.true(validator.validate("transaction", transaction).error.includes("signatures"));
-		}
-
-		// Len 0
-		assert.true(
-			validator
-				.validate("transaction", {
-					...transactionOriginal,
-					signatures: [],
-				})
-				.error.includes("signatures"),
-		);
-
-		// Len > 16
-		assert.true(
-			validator
-				.validate("transaction", {
-					...transactionOriginal,
-					signatures: [
-						"a".repeat(130),
-						"b".repeat(130),
-						"c".repeat(130),
-						"d".repeat(130),
-						"e".repeat(130),
-						"f".repeat(130),
-						"g".repeat(130),
-						"h".repeat(130),
-						"i".repeat(130),
-						"j".repeat(130),
-						"k".repeat(130),
-						"l".repeat(130),
-						"m".repeat(130),
-						"n".repeat(130),
-						"o".repeat(130),
-						"p".repeat(130),
-						"r".repeat(130),
-					],
-				})
-				.error.includes("signatures"),
-		);
-
-		// Unique
-		assert.true(
-			validator
-				.validate("transaction", {
-					...transactionOriginal,
-					signatures: ["a".repeat(130), "a".repeat(130)],
-				})
-				.error.includes("signatures"),
-		);
-	});
-
-	it.skip("signedSchema - should be ok with signature", ({ validator }) => {
+	it("signedSchema - should be ok", ({ validator }) => {
 		const transaction = {
-			...transactionOriginal,
+			...transactionSigned,
 		};
 
 		assert.undefined(validator.validate("transactionSigned", transaction).error);
 	});
 
-	it.skip("signedSchema - should be ok with signatures", ({ validator }) => {
+	it("signedSchema - should not be ok if v,r,s or hash are missing", ({ validator }) => {
 		const transaction = {
-			...transactionOriginal,
-			signatures: ["a".repeat(130)],
+			...transactionSigned,
 		};
 
-		delete transaction.signature;
+		const props = ["v", "r", "s", "hash"] as const;
+		for (const prop of props) {
+			const transactionCopy = {
+				...transaction,
+			};
 
-		assert.undefined(validator.validate("transactionSigned", transaction).error);
+			delete transactionCopy[prop];
+
+			assert.true(validator.validate("transactionSigned", transactionCopy).error.includes(prop));
+		}
 	});
 
-	it.skip("signedSchema - should be ok with signature & signatures", ({ validator }) => {
+	it("strictSchema - should be ok", ({ validator }) => {
 		const transaction = {
-			...transactionOriginal,
-			signatures: ["a".repeat(130)],
+			...transactionSigned,
 		};
 
-		assert.undefined(validator.validate("transactionSigned", transaction).error);
+		assert.undefined(validator.validate("transactionStrict", transaction).error);
 	});
 
-	it.skip("signedSchema - should not be ok without signature and signatures", ({ validator }) => {
+	it("strictSchema - should not be ok with any missing property", ({ validator }) => {
+		const props = Object.keys(transactionSigned);
+		for (const prop of props) {
+			const transaction = {
+				...transactionSigned,
+				[prop]: undefined,
+			};
+
+			assert.true(validator.validate("transactionStrict", transaction).error.includes(prop));
+		}
+	});
+
+
+	it("strictSchema - should not be ok with any additional property", ({ validator }) => {
 		const transaction = {
-			...transactionOriginal,
+			...transactionSigned,
+			test: "test",
 		};
-		delete transaction.signature;
-
-		assert.defined(validator.validate("transactionSigned", transaction).error);
-	});
-
-	it.skip("strictSchema - should not have any additional properties", ({ validator }) => {
-		assert.undefined(
-			validator.validate("transactionStrict", {
-				...transactionOriginal,
-			}).error,
-		);
-
-		assert.defined(
-			validator.validate("transactionStrict", {
-				...transactionOriginal,
-				test: "test",
-			}).error,
-		);
-	});
-
-	it.skip("strictSchema - should not be ok without signature and signatures", ({ validator }) => {
-		const transaction = {
-			...transactionOriginal,
-		};
-		delete transaction.signature;
 
 		assert.defined(validator.validate("transactionStrict", transaction).error);
 	});
