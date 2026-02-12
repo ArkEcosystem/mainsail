@@ -9,7 +9,7 @@ import { toBytesCompat } from "./serializer.js";
 @injectable()
 export class Utils implements Contracts.Crypto.TransactionUtilities {
 	public async toHash(
-		transaction: Contracts.Crypto.TransactionDeserialized,
+		transaction: Contracts.Crypto.TransactionSerializable,
 		options?: Contracts.Crypto.SerializeOptions,
 	): Promise<Buffer> {
 		const fields = [

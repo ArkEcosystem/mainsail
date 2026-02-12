@@ -125,7 +125,7 @@ function readLength(buffer: Uint8Array, offset: number, lengthOfLength: number) 
 export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 	public async deserialize(
 		serialized: Buffer,
-	): Promise<{ data: Contracts.Crypto.TransactionDeserialized; serialized: Buffer }> {
+	): Promise<{ data: Contracts.Crypto.TransactionSerializable; serialized: Buffer }> {
 		const { start, end } = decodeListBounds(serialized);
 
 		if (end !== serialized.byteLength) {
@@ -179,7 +179,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		}
 
 		/* eslint-disable sort-keys-fix/sort-keys-fix */
-		const transaction: Contracts.Crypto.TransactionDeserialized = {
+		const transaction: Contracts.Crypto.TransactionSerializable = {
 			network,
 			to,
 			value,

@@ -4,7 +4,6 @@ import { Transaction } from "./transaction.js";
 
 export class BlockTransaction extends Transaction {
 	public readonly transactionIndex: number;
-	// public readonly gasUsed?: number;
 	public readonly blockHash: string;
 	public readonly blockNumber: number;
 

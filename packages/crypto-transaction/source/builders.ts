@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
+import type { Contracts, Utils } from "@mainsail/contracts";
 import { MissingTransactionSignatureError, ValidationFailed } from "@mainsail/exceptions";
 import { BigNumber } from "@mainsail/utils";
 
@@ -30,7 +30,7 @@ export class TransactionBuilder {
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
-	public data!: Contracts.Crypto.TransactionData;
+	public data!: Utils.Mutable<Contracts.Crypto.TransactionData>;
 
 	protected signWithSenderAsRecipient = false;
 

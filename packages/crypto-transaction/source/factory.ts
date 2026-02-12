@@ -104,7 +104,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	}
 
 	public async computeCryptoData(
-		data: Contracts.Crypto.TransactionDeserialized,
+		data: Contracts.Crypto.TransactionSerializable,
 	): Promise<Contracts.Crypto.TransactionCryptoData> {
 		assert.number(data.v);
 		assert.string(data.r);
