@@ -68,7 +68,9 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			hash: transaction.txHash,
 			network: this.configuration.get<number>("network.chainId"),
 			nonce: BigNumber.make(transaction.nonce),
-			senderLegacyAddress: transaction.legacyAddress || (await this.legacyAddressFactory.fromPublicKey(transaction.senderPublicKey)), // TODO: Make legacy address mandatory
+			senderLegacyAddress:
+				transaction.legacyAddress ||
+				(await this.legacyAddressFactory.fromPublicKey(transaction.senderPublicKey)), // TODO: Make legacy address mandatory
 			value: BigNumber.make(transaction.value),
 		};
 

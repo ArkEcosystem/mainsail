@@ -68,7 +68,7 @@ const transactionSigned: SchemaObject = {
 const transactionStrict: SchemaObject = {
 	...transactionSigned,
 	$id: "transactionStrict",
-	unevaluatedProperties: false
+	unevaluatedProperties: false,
 };
 
 const transactions = {

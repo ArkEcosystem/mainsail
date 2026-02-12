@@ -320,7 +320,7 @@ describe<{
 	it("signedSchema - should be ok for v value", ({ validator }) => {
 		const validValues = [0, 1];
 
-		for(const v of validValues) {
+		for (const v of validValues) {
 			const transaction = {
 				...transactionSigned,
 				v,
@@ -330,7 +330,7 @@ describe<{
 		}
 
 		const invalidValues = [-1, 2, "0", null, undefined, {}, "test"];
-		for(const v of invalidValues) {
+		for (const v of invalidValues) {
 			const transaction = {
 				...transactionSigned,
 				v,
@@ -343,7 +343,7 @@ describe<{
 	it("signedSchema - should be ok for r value", ({ validator }) => {
 		const validValues = "0123456789abcdef".split("").map((char) => char.repeat(64));
 
-		for(const r of validValues) {
+		for (const r of validValues) {
 			const transaction = {
 				...transactionSigned,
 				r,
@@ -352,8 +352,20 @@ describe<{
 			assert.undefined(validator.validate("transactionSigned", transaction).error);
 		}
 
-		const invalidValues = [-1, 2, "0", null, undefined, {}, "test", "0".repeat(63), "0".repeat(65), "A".repeat(64), "g".repeat(64)];
-		for(const r of invalidValues) {
+		const invalidValues = [
+			-1,
+			2,
+			"0",
+			null,
+			undefined,
+			{},
+			"test",
+			"0".repeat(63),
+			"0".repeat(65),
+			"A".repeat(64),
+			"g".repeat(64),
+		];
+		for (const r of invalidValues) {
 			const transaction = {
 				...transactionSigned,
 				r,
@@ -366,7 +378,7 @@ describe<{
 	it("signedSchema - should be ok for s value", ({ validator }) => {
 		const validValues = "0123456789abcdef".split("").map((char) => char.repeat(64));
 
-		for(const s of validValues) {
+		for (const s of validValues) {
 			const transaction = {
 				...transactionSigned,
 				s,
@@ -375,8 +387,20 @@ describe<{
 			assert.undefined(validator.validate("transactionSigned", transaction).error);
 		}
 
-		const invalidValues = [-1, 2, "0", null, undefined, {}, "test", "0".repeat(63), "0".repeat(65), "A".repeat(64), "g".repeat(64)];
-		for(const s of invalidValues) {
+		const invalidValues = [
+			-1,
+			2,
+			"0",
+			null,
+			undefined,
+			{},
+			"test",
+			"0".repeat(63),
+			"0".repeat(65),
+			"A".repeat(64),
+			"g".repeat(64),
+		];
+		for (const s of invalidValues) {
 			const transaction = {
 				...transactionSigned,
 				s,
@@ -405,7 +429,6 @@ describe<{
 			assert.true(validator.validate("transactionStrict", transaction).error.includes(prop));
 		}
 	});
-
 
 	it("strictSchema - should not be ok with any additional property", ({ validator }) => {
 		const transaction = {
