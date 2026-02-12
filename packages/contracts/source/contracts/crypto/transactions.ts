@@ -66,10 +66,6 @@ export interface TransactionJson {
 	readonly v: number;
 	readonly r: string;
 	readonly s: string;
-
-	readonly transactionIndex?: number;
-	readonly blockHash?: string;
-	readonly blockNumber?: number;
 }
 
 export interface SerializeOptions {
