@@ -24,9 +24,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 			return false;
 		}
 
-		const hash: Buffer = await this.utils.toHash(data, {
-			excludeSignature: true,
-		});
+		const hash: Buffer = await this.utils.toHashUnsigned(data);
 
 		return this.signatureFactory.verifyRecoverable({ r, s, v }, hash, Buffer.from(senderPublicKey, "hex"));
 	}
@@ -53,9 +51,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 		const s = legacySecondSignature.slice(64, 128);
 		const v = Number.parseInt(legacySecondSignature.slice(128, 130), 16);
 
-		const hash: Buffer = await this.utils.toHash(data, {
-			excludeSignature: true,
-		});
+		const hash: Buffer = await this.utils.toHashUnsigned(data);
 
 		const verified = await this.signatureFactory.verifyRecoverable(
 			{ r, s, v },

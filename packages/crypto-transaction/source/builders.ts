@@ -157,7 +157,7 @@ export class TransactionBuilder {
 	}
 
 	async #getHash(): Promise<string> {
-		return (await this.utils.toHash(this.data, { excludeSignature: false })).toString("hex");
+		return (await this.utils.toHash(this.data)).toString("hex");
 	}
 
 	async #signWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TransactionBuilder> {

@@ -119,9 +119,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		// 	data.nonce = BigNumber.make(data.nonce["value"]);
 		// }
 
-		const hash = await this.utils.toHash(data, {
-			excludeSignature: true,
-		});
+		const hash = await this.utils.toHashUnsigned(data);
 
 		const senderPublicKey = this.signatureSerializer.recoverPublicKey(hash, {
 			r: data.r,
@@ -136,9 +134,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			senderLegacyAddress = await this.legacyAddressFactory.fromPublicKey(senderPublicKey);
 		}
 
-		const signedHash = await this.utils.toHash(data, {
-			excludeSignature: false,
-		});
+		const signedHash = await this.utils.toHash(data);
 
 		// const { error } = await this.verifier.verifySchema(data, strict);
 
@@ -163,7 +159,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 				throw new TransactionSchemaError(error);
 			}
 
-			return new Transaction(tx, serialized);;
+			return new Transaction(tx, serialized);
 		} catch (error) {
 			if (
 				error instanceof TransactionVersionError ||

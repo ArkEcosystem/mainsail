@@ -13,15 +13,10 @@ export class Signer implements Contracts.Crypto.TransactionSigner {
 	private readonly utils!: Contracts.Crypto.TransactionUtilities;
 
 	public async sign(
-		transaction: Contracts.Crypto.TransactionData,
+		transaction: Contracts.Crypto.TransactionUnsignedSerializable,
 		keys: Contracts.Crypto.KeyPair,
-		options?: Contracts.Crypto.SerializeOptions,
 	): Promise<Contracts.Crypto.EcdsaSignature> {
-		if (!options || options.excludeSignature === undefined) {
-			options = { excludeSignature: true, ...options };
-		}
-
-		const hash: Buffer = await this.utils.toHash(transaction, options);
+		const hash: Buffer = await this.utils.toHashUnsigned(transaction);
 		const signature = await this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));
 
 		// transaction.v = signature.v;
@@ -32,15 +27,10 @@ export class Signer implements Contracts.Crypto.TransactionSigner {
 	}
 
 	public async legacySecondSign(
-		transaction: Contracts.Crypto.TransactionData,
+		transaction: Contracts.Crypto.TransactionUnsignedSerializable,
 		keys: Contracts.Crypto.KeyPair,
-		options?: Contracts.Crypto.SerializeOptions,
 	): Promise<string> {
-		if (!options || options.excludeSignature === undefined) {
-			options = { excludeSignature: true, ...options };
-		}
-
-		const hash: Buffer = await this.utils.toHash(transaction, options);
+		const hash: Buffer = await this.utils.toHashUnsigned(transaction);
 		const { r, s, v } = await this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));
 
 		const legacySecondSignature = formatEcdsaSignature(r, s, v);
