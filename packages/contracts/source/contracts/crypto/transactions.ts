@@ -82,8 +82,16 @@ export interface TransactionVerifier {
 }
 
 export interface TransactionSigner {
-	sign(transaction: TransactionUnsignedSerializable, keys: KeyPair, options?: SerializeOptions): Promise<EcdsaSignature>;
-	legacySecondSign(transaction: TransactionUnsignedSerializable, keys: KeyPair, options?: SerializeOptions): Promise<string>;
+	sign(
+		transaction: TransactionUnsignedSerializable,
+		keys: KeyPair,
+		options?: SerializeOptions,
+	): Promise<EcdsaSignature>;
+	legacySecondSign(
+		transaction: TransactionUnsignedSerializable,
+		keys: KeyPair,
+		options?: SerializeOptions,
+	): Promise<string>;
 }
 
 export interface TransactionSerializer {

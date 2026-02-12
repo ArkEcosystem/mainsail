@@ -13,7 +13,7 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 			...this.#getBaseFields(transaction),
 			toBytesCompat(transaction.network),
 			toBytesCompat(0),
-			toBytesCompat(0)
+			toBytesCompat(0),
 		];
 
 		const encoded = toRlp(fields); // remove 0x prefix
@@ -30,7 +30,7 @@ export class Utils implements Contracts.Crypto.TransactionUtilities {
 			toBytesCompat(transaction.v + transaction.network * 2 + 35),
 			toBytesCompat(`0x${transaction.r}`),
 			toBytesCompat(`0x${transaction.s}`),
-		]
+		];
 
 		const encoded = toRlp(fields); // remove 0x prefix
 		return Buffer.from(Keccak256.digest(Buffer.from(`${encoded.slice(2)}`, "hex")));

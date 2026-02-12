@@ -91,7 +91,7 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 				to: transaction.to,
 				txHash: transaction.hash,
 				value: transaction.value.toBigInt(),
-			}
+			};
 
 			const { receipt } = await instance.process(data);
 

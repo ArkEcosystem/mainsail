@@ -119,7 +119,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		// }
 
 		const unsignedHash = await this.utils.toHashUnsigned(data);
-		const hash = await this.utils.toHash(data)
+		const hash = await this.utils.toHash(data);
 
 		const senderPublicKey = this.signatureSerializer.recoverPublicKey(unsignedHash, {
 			r: data.r,

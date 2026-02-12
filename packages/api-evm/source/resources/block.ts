@@ -46,11 +46,14 @@ export class BlockResource {
 	async #transformTransactions(block: Contracts.Crypto.Block): Promise<object[]> {
 		const transactionResource = this.app.resolve(TransactionResource);
 		return Promise.all(
-			block.transactions.map(async (transaction) => await transactionResource.transform({
-					...transaction,
-					blockHash: block.hash,
-					blockNumber: block.number
-				})),
+			block.transactions.map(
+				async (transaction) =>
+					await transactionResource.transform({
+						...transaction,
+						blockHash: block.hash,
+						blockNumber: block.number,
+					}),
+			),
 		);
 	}
 }

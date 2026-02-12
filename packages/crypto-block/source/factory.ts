@@ -87,15 +87,16 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	}
 
 	public async fromJson(json: Contracts.Crypto.BlockJson): Promise<Contracts.Crypto.Block> {
-		const data: Contracts.Crypto.BlockData = { ...json,
+		const data: Contracts.Crypto.BlockData = {
+			...json,
 			fee: BigNumber.make(json.fee),
 			reward: BigNumber.make(json.reward),
 			transactions: json.transactions.map((tx) => ({
 				...tx,
 				nonce: BigNumber.make(tx.nonce),
 				value: BigNumber.make(tx.value),
-			}))
-		 };
+			})),
+		};
 
 		return this.fromData(data);
 	}
