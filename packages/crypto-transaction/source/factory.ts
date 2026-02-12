@@ -111,29 +111,29 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		assert.string(data.s);
 
 		// Passing via IPC converts BigNumber to '{ value: bigint }'
-		if ("value" in data.value) {
-			data.value = BigNumber.make(data.value["value"]);
-		}
+		// if ("value" in data.value) {
+		// 	data.value = BigNumber.make(data.value["value"]);
+		// }
 
-		if ("value" in data.nonce) {
-			data.nonce = BigNumber.make(data.nonce["value"]);
-		}
+		// if ("value" in data.nonce) {
+		// 	data.nonce = BigNumber.make(data.nonce["value"]);
+		// }
 
 		const hash = await this.utils.toHash(data, {
 			excludeSignature: true,
 		});
 
-		const publicKey = this.signatureSerializer.recoverPublicKey(hash, {
+		const senderPublicKey = this.signatureSerializer.recoverPublicKey(hash, {
 			r: data.r,
 			s: data.s,
 			v: data.v,
 		});
 
-		const address = await this.addressFactory.fromPublicKey(publicKey);
+		const from = await this.addressFactory.fromPublicKey(senderPublicKey);
 
-		let legacyAddress: string | undefined;
+		let senderLegacyAddress: string | undefined;
 		if (this.legacyAddressFactory) {
-			legacyAddress = await this.legacyAddressFactory.fromPublicKey(publicKey);
+			senderLegacyAddress = await this.legacyAddressFactory.fromPublicKey(senderPublicKey);
 		}
 
 		const signedHash = await this.utils.toHash(data, {
@@ -143,10 +143,10 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		// const { error } = await this.verifier.verifySchema(data, strict);
 
 		return {
-			from: address,
+			from,
 			hash: signedHash.toString("hex"),
-			senderLegacyAddress: legacyAddress,
-			senderPublicKey: publicKey,
+			senderLegacyAddress,
+			senderPublicKey,
 		};
 	}
 
