@@ -28,7 +28,7 @@ export interface TransactionCryptoData {
 	readonly hash: string;
 	readonly from: string;
 	readonly senderPublicKey: string;
-	readonly senderLegacyAddress?: string;
+	readonly senderLegacyAddress: string;
 }
 
 export interface TransactionData extends TransactionSerializable, TransactionCryptoData {}
@@ -75,10 +75,10 @@ export interface SerializeOptions {
 export interface TransactionVerifier {
 	verifyHash(data: TransactionData): Promise<boolean>;
 	verifySchema(
-		data: Omit<TransactionData, "hash">,
+		data: Omit<TransactionSerializable, "hash">,
 		strict?: boolean,
-	): Promise<SchemaValidationResult<TransactionData>>;
-	verifyLegacySecondSignature(data: TransactionData, legacySecondPublicKey: string): Promise<boolean>;
+	): Promise<SchemaValidationResult<TransactionSerializable>>;
+	verifyLegacySecondSignature(data: TransactionSerializable, legacySecondPublicKey: string): Promise<boolean>;
 }
 
 export interface TransactionSigner {
@@ -87,7 +87,7 @@ export interface TransactionSigner {
 }
 
 export interface TransactionSerializer {
-	serialize(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;
+	serialize(transaction: TransactionSerializable, options?: SerializeOptions): Promise<Buffer>;
 }
 
 export interface TransactionDeserializer {
@@ -98,7 +98,7 @@ export interface TransactionFactory {
 	fromHex(hex: string): Promise<Transaction>;
 	fromBytes(buff: Buffer, strict?: boolean): Promise<Transaction>;
 	fromJson(json: TransactionJson): Promise<Transaction>;
-	fromData(data: TransactionData, strict?: boolean): Promise<Transaction>;
+	fromData(data: TransactionSerializable, strict?: boolean): Promise<Transaction>;
 	fromStorage(data: TransactionStorageDataExtended): Promise<BlockTransaction>;
 }
 

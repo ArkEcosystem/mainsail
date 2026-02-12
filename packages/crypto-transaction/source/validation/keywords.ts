@@ -53,7 +53,7 @@ export const makeKeywords = (
 						// Otherwise lookup by transaction hash
 						if (!valid && parentSchema && parentSchema.parentData && parentSchema.parentData.hash) {
 							if (genesisTransactionsLookup.size === 0) {
-								const genesisBlock = configuration.get<Contracts.Crypto.BlockData | undefined>(
+								const genesisBlock = configuration.get<Contracts.Crypto.BlockJson | undefined>(
 									"genesisBlock.block",
 								);
 								for (const transaction of genesisBlock?.transactions || []) {

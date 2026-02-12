@@ -5,7 +5,7 @@ import { ByteArray, Hex, toBytes, toRlp } from "viem";
 @injectable()
 export class Serializer implements Contracts.Crypto.TransactionSerializer {
 	public async serialize(
-		transaction: Contracts.Crypto.TransactionData,
+		transaction: Contracts.Crypto.TransactionSerializable,
 		options: Contracts.Crypto.SerializeOptions = { excludeSignature: false },
 	): Promise<Buffer> {
 		const fields = [

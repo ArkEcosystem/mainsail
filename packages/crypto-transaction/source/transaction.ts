@@ -6,7 +6,7 @@ export class Transaction implements Contracts.Crypto.Transaction {
 	public readonly network: number;
 	public readonly from: string;
 	public readonly senderPublicKey: string;
-	public readonly senderLegacyAddress?: string;
+	public readonly senderLegacyAddress: string;
 	public readonly to?: string;
 	public readonly value: BigNumber;
 	public readonly gasPrice: number;
@@ -49,6 +49,7 @@ export class Transaction implements Contracts.Crypto.Transaction {
 			network: this.network,
 			from: this.from,
 			senderPublicKey: this.senderPublicKey,
+			senderLegacyAddress: this.senderLegacyAddress,
 			to: this.to,
 			value: this.value,
 			gasPrice: this.gasPrice,

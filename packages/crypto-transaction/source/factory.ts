@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable, optional, tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import {
 	DuplicateParticipantInMultiSignatureError,
@@ -21,7 +21,6 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	@inject(Identifiers.Cryptography.Legacy.Identity.AddressFactory)
-	@optional()
 	private readonly legacyAddressFactory!: Contracts.Crypto.AddressFactory;
 
 	@inject(Identifiers.Cryptography.Signature.Instance)
@@ -49,7 +48,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	}
 
 	public async fromJson(json: Contracts.Crypto.TransactionJson): Promise<Contracts.Crypto.Transaction> {
-		const transactionData: Contracts.Crypto.TransactionData = {
+		const transactionData: Contracts.Crypto.TransactionSerializable = {
 			...json,
 			nonce: BigNumber.make(json.nonce),
 			value: BigNumber.make(json.value),
@@ -72,7 +71,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			nonce: BigNumber.make(data.nonce),
 			r: data.r,
 			s: data.s,
-			senderLegacyAddress: data.legacyAddress,
+			senderLegacyAddress: data.legacyAddress!,
 			senderPublicKey: data.senderPublicKey,
 			to: data.to,
 			v: data.v,
@@ -89,7 +88,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	}
 
 	public async fromData(
-		data: Contracts.Crypto.TransactionData,
+		data: Contracts.Crypto.TransactionSerializable,
 		strict?: boolean,
 	): Promise<Contracts.Crypto.Transaction> {
 		const { error } = await this.verifier.verifySchema(data, strict);
@@ -119,29 +118,21 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		// 	data.nonce = BigNumber.make(data.nonce["value"]);
 		// }
 
-		const hash = await this.utils.toHashUnsigned(data);
+		const unsignedHash = await this.utils.toHashUnsigned(data);
+		const hash = await this.utils.toHash(data)
 
-		const senderPublicKey = this.signatureSerializer.recoverPublicKey(hash, {
+		const senderPublicKey = this.signatureSerializer.recoverPublicKey(unsignedHash, {
 			r: data.r,
 			s: data.s,
 			v: data.v,
 		});
 
-		const from = await this.addressFactory.fromPublicKey(senderPublicKey);
-
-		let senderLegacyAddress: string | undefined;
-		if (this.legacyAddressFactory) {
-			senderLegacyAddress = await this.legacyAddressFactory.fromPublicKey(senderPublicKey);
-		}
-
-		const signedHash = await this.utils.toHash(data);
-
 		// const { error } = await this.verifier.verifySchema(data, strict);
 
 		return {
-			from,
-			hash: signedHash.toString("hex"),
-			senderLegacyAddress,
+			from: await this.addressFactory.fromPublicKey(senderPublicKey),
+			hash: hash.toString("hex"),
+			senderLegacyAddress: await this.legacyAddressFactory.fromPublicKey(senderPublicKey),
 			senderPublicKey,
 		};
 	}
@@ -150,7 +141,6 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		try {
 			const { data: transaction } = await this.deserializer.deserialize(serialized);
 			const cryptoData = await this.computeCryptoData(transaction);
-
 
 			const tx = { ...cryptoData, ...transaction };
 

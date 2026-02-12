@@ -30,15 +30,15 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	}
 
 	public async verifySchema(
-		data: Contracts.Crypto.TransactionData,
+		data: Contracts.Crypto.TransactionSerializable,
 		strict: boolean,
-	): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionData>> {
+	): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionSerializable>> {
 		const { $id } = schemas.transaction;
 		return this.validator.validate(strict ? `${$id}Strict` : `${$id}`, data);
 	}
 
 	public async verifyLegacySecondSignature(
-		data: Contracts.Crypto.TransactionData,
+		data: Contracts.Crypto.TransactionSerializable,
 		legacySecondPublicKey: string,
 	): Promise<boolean> {
 		const { legacySecondSignature } = data;
