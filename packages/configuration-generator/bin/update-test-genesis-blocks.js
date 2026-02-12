@@ -89,6 +89,46 @@ const configurations = [
 			}
 		},
 	},
+	// tests/functional/resync/paths/config/
+	{
+		network: "devnet",
+		symbol: "TѦ",
+		token: "ARK",
+		distribute: true,
+		premine: "125000000000000000000000000",
+		chainId: 10000,
+		validators: 53,
+		initialHeight: 0,
+		overwriteConfig: true,
+		timeouts: {
+			blockPrepareTime: 100,
+			blockTime: 100,
+			stageTimeout: 100,
+			stageTimeoutIncrease: 100,
+			tolerance: 100,
+		},
+		postGenerate: (location) => {
+			// Functional tests run on single node
+			const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+			for (const file of ["crypto.json", "validators.json", "genesis-wallet.json"]) {
+				const source = path.join(location, file);
+				const target = path.join(
+					__dirname,
+					"..",
+					"..",
+					"..",
+					"tests",
+					"functional",
+					"resync",
+					"paths",
+					"config",
+					file,
+				);
+				copyFileSync(source, target);
+			}
+		},
+	},
 
 	// E2E Consensus
 	// tests/e2e/consensus
