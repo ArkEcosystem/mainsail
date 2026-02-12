@@ -80,7 +80,7 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 
 		try {
 			const { instance, blockContext } = context.evm;
-			const { receipt } = await instance.process({
+			const data = {
 				blockContext,
 				data: Buffer.from(transaction.data, "hex"),
 				from,
@@ -93,7 +93,12 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 				to: transaction.to,
 				txHash: transaction.hash,
 				value: transaction.value.toBigInt(),
-			});
+			}
+
+			console.log(data);
+			console.log("DATA: " + data.data.toString("hex"));
+
+			const { receipt } = await instance.process(data);
 
 			void this.#emit(Events.EvmEvent.TransactionReceipt, {
 				receipt,
