@@ -103,6 +103,9 @@ export class Snapshot {
 	}
 
 	public async validate(): Promise<void> {
+		await this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service).dispose();
+		await this.app.get<Contracts.ApiSync.Service>(Identifiers.ApiSync.Service).beforeCommit();
+
 		// All account changes from block 0 onwards
 		const { accountDeltas, lastHeight } = await this.collectAccountDeltas();
 
