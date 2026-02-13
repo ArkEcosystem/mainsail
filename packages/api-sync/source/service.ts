@@ -29,8 +29,6 @@ interface DeferredSync {
 	newMilestones?: Contracts.Crypto.Milestone;
 }
 
-const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve) => queue.once("drain", resolve));
-
 @injectable()
 export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.Application.Instance)
@@ -136,9 +134,7 @@ export class Sync implements Contracts.ApiSync.Service {
 	}
 
 	public async beforeCommit(): Promise<void> {
-		while (this.#queue.size() > 0) {
-			await drainQueue(this.#queue);
-		}
+		await this.#queue.drain();
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {

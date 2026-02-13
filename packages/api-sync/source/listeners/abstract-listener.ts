@@ -52,9 +52,9 @@ export abstract class AbstractListener<TEventData, TEntity extends object> imple
 
 		this.#syncInterval = setInterval(async () => {
 			try {
-				await this.#syncToDatabase();
+				await this.#syncToDatabaseTransaction();
 			} catch (ex) {
-				this.logger.error(`#syncToDatabase failed: ${ex}`);
+				this.logger.error(`#syncToDatabaseTransaction failed: ${ex}`);
 			}
 		}, syncInterval);
 	}
@@ -67,6 +67,16 @@ export abstract class AbstractListener<TEventData, TEntity extends object> imple
 		if (this.#syncInterval) {
 			clearInterval(this.#syncInterval);
 		}
+	}
+
+	public async flush(entityManager: TypeOrm.EntityManager): Promise<void> {
+		const { added, removed } = this.#collectedEvents();
+
+		if (removed.length === 0 && added.length === 0) {
+			return;
+		}
+
+		await this.#syncToDatabase(entityManager, added, removed);
 	}
 
 	protected getSyncIntervalMs(): number {
@@ -116,43 +126,56 @@ export abstract class AbstractListener<TEventData, TEntity extends object> imple
 		this.#removedEvents.set(id, event);
 	}
 
-	async #syncToDatabase(): Promise<void> {
-		const addedEvents = [...this.#addedEvents.values()];
-		const removedEvents = [...this.#removedEvents.values()];
+	async #syncToDatabaseTransaction(): Promise<void> {
+		const { added, removed } = this.#collectedEvents();
 
-		if (removedEvents.length === 0 && addedEvents.length === 0) {
+		if (removed.length === 0 && added.length === 0) {
 			return;
 		}
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
-			const entityRepository = this.makeEntityRepository(entityManager);
+			await this.#syncToDatabase(entityManager, added, removed);
+		});
+	}
 
-			this.logger.debug(
-				`syncing ${entityRepository.metadata.tableNameWithoutPrefix} to database (added: ${this.#addedEvents.size} removed: ${this.#removedEvents.size}))`,
+	async #syncToDatabase(
+		entityManager: TypeOrm.EntityManager,
+		added: TEventData[],
+		removed: TEventData[],
+	): Promise<void> {
+		const entityRepository = this.makeEntityRepository(entityManager);
+
+		this.logger.debug(
+			`syncing ${entityRepository.metadata.tableNameWithoutPrefix} to database (added: ${added.length} removed: ${removed.length}))`,
+		);
+
+		if (removed.length > 0) {
+			const eventIds = removed.map((event) => this.getEventId(event));
+			await entityRepository.delete(eventIds);
+			for (const eventId of eventIds) {
+				this.#removedEvents.delete(eventId);
+			}
+		}
+
+		if (added.length > 0) {
+			await entityRepository.upsert(
+				added.map((event) => this.mapEventToEntity(event) as unknown as object),
+				entityRepository.metadata.primaryColumns.map((c) => c.propertyName),
 			);
 
-			if (removedEvents.length > 0) {
-				const eventIds = removedEvents.map((event) => this.getEventId(event));
-				await entityRepository.delete(eventIds);
-				for (const eventId of eventIds) {
-					this.#removedEvents.delete(eventId);
-				}
+			for (const event of added) {
+				this.#addedEvents.delete(this.getEventId(event));
 			}
-
-			if (addedEvents.length > 0) {
-				await entityRepository.upsert(
-					[...this.#addedEvents.values()].map((event) => this.mapEventToEntity(event) as unknown as object),
-					entityRepository.metadata.primaryColumns.map((c) => c.propertyName),
-				);
-
-				for (const event of addedEvents) {
-					this.#addedEvents.delete(this.getEventId(event));
-				}
-			}
-		});
+		}
 	}
 
 	async #truncate(): Promise<void> {
 		await this.makeEntityRepository(this.dataSource).clear();
+	}
+
+	#collectedEvents(): { added: TEventData[]; removed: TEventData[] } {
+		const added = [...this.#addedEvents.values()];
+		const removed = [...this.#removedEvents.values()];
+		return { added, removed };
 	}
 }
