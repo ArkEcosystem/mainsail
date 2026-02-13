@@ -13,6 +13,7 @@ import { performance } from "perf_hooks";
 
 import { TokenParser } from "./contracts.js";
 import { parseMultiPayments, parseUsernames } from "./parsers/index.js";
+import { Listeners } from "./listeners.js";
 
 interface RepositoryContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;
@@ -145,6 +146,9 @@ export class Restore {
 	@inject(Identifiers.ApiSync.TokenParser)
 	private readonly tokenParser!: TokenParser;
 
+	@inject(Identifiers.ApiSync.Listener)
+	private readonly listeners!: Listeners;
+
 	@inject(Identifiers.Snapshot.Legacy.Importer)
 	@optional()
 	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
@@ -231,6 +235,9 @@ export class Restore {
 
 			// 8) Write `contracts` table
 			await this.#ingestContracts(context);
+
+			// 9) Write captured data from plugins, configuration, etc.
+			await this.listeners.flush(entityManager);
 
 			restoredHeight = context.lastBlockNumber;
 		});
