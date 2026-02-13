@@ -12,8 +12,8 @@ import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from
 import { performance } from "perf_hooks";
 
 import { TokenParser } from "./contracts.js";
-import { parseMultiPayments, parseUsernames } from "./parsers/index.js";
 import { Listeners } from "./listeners.js";
+import { parseMultiPayments, parseUsernames } from "./parsers/index.js";
 
 interface RepositoryContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;
@@ -633,34 +633,40 @@ export class Restore {
 					attributes: {
 						...(validatorAttributes
 							? {
-								validatorFee: validatorAttributes.fee,
-								validatorPublicKey: validatorAttributes.blsPublicKey,
-								validatorResigned: validatorAttributes.isResigned,
-								validatorVoteBalance: validatorAttributes.voteBalance,
-								validatorVotersCount: validatorAttributes.votersCount,
+									validatorFee: validatorAttributes.fee,
+									validatorPublicKey: validatorAttributes.blsPublicKey,
+									validatorResigned: validatorAttributes.isResigned,
+									validatorVoteBalance: validatorAttributes.voteBalance,
+									validatorVotersCount: validatorAttributes.votersCount,
 
-								...(validatorAttributes.totalForgedFees.isGreaterThan(0) ? { validatorForgedFees: validatorAttributes.totalForgedFees.toFixed() } : {}),
-								...(validatorAttributes.totalForgedRewards.isGreaterThan(0) ? { validatorForgedRewards: validatorAttributes.totalForgedRewards.toFixed() } : {}),
-								...(validatorAttributes.totalForgedFees
-									.plus(validatorAttributes.totalForgedRewards).isGreaterThan(0) ?
-									{
-										validatorForgedTotal: validatorAttributes.totalForgedFees
-											.plus(validatorAttributes.totalForgedRewards)
-											.toFixed()
-									} : {}),
-								validatorLastBlock: validatorAttributes.lastBlock
-									? {
-										hash: validatorAttributes.lastBlock.hash,
-										number: validatorAttributes.lastBlock.number,
-										timestamp: validatorAttributes.lastBlock.timestamp,
-									}
-									: {},
-								validatorProducedBlocks: validatorAttributes.producedBlocks,
+									...(validatorAttributes.totalForgedFees.isGreaterThan(0)
+										? { validatorForgedFees: validatorAttributes.totalForgedFees.toFixed() }
+										: {}),
+									...(validatorAttributes.totalForgedRewards.isGreaterThan(0)
+										? { validatorForgedRewards: validatorAttributes.totalForgedRewards.toFixed() }
+										: {}),
+									...(validatorAttributes.totalForgedFees
+										.plus(validatorAttributes.totalForgedRewards)
+										.isGreaterThan(0)
+										? {
+												validatorForgedTotal: validatorAttributes.totalForgedFees
+													.plus(validatorAttributes.totalForgedRewards)
+													.toFixed(),
+											}
+										: {}),
+									validatorLastBlock: validatorAttributes.lastBlock
+										? {
+												hash: validatorAttributes.lastBlock.hash,
+												number: validatorAttributes.lastBlock.number,
+												timestamp: validatorAttributes.lastBlock.timestamp,
+											}
+										: {},
+									validatorProducedBlocks: validatorAttributes.producedBlocks,
 
-								// updated at end of db transaction
-								// - validatorRank
-								// - validatorApproval
-							}
+									// updated at end of db transaction
+									// - validatorRank
+									// - validatorApproval
+								}
 							: {}),
 						...(userAttributes
 							? {

@@ -458,7 +458,7 @@ describe<{
 	});
 
 	it("Later should push job with delay", async (context) => {
-		await context.driver.later(50, new DummyJob(() => { }));
+		await context.driver.later(50, new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 0);
 

@@ -138,8 +138,11 @@ export abstract class AbstractListener<TEventData, TEntity extends object> imple
 		});
 	}
 
-
-	async #syncToDatabase(entityManager: TypeOrm.EntityManager, added: TEventData[], removed: TEventData[]): Promise<void> {
+	async #syncToDatabase(
+		entityManager: TypeOrm.EntityManager,
+		added: TEventData[],
+		removed: TEventData[],
+	): Promise<void> {
 		const entityRepository = this.makeEntityRepository(entityManager);
 
 		this.logger.debug(
@@ -170,9 +173,9 @@ export abstract class AbstractListener<TEventData, TEntity extends object> imple
 		await this.makeEntityRepository(this.dataSource).clear();
 	}
 
-	#collectedEvents(): { added: TEventData[], removed: TEventData[] } {
+	#collectedEvents(): { added: TEventData[]; removed: TEventData[] } {
 		const added = [...this.#addedEvents.values()];
 		const removed = [...this.#removedEvents.values()];
-		return { added, removed }
+		return { added, removed };
 	}
 }

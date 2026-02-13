@@ -1,3 +1,4 @@
+import { TypeOrm } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -7,7 +8,6 @@ import { ApiNodes } from "./listeners/api-nodes.js";
 import { DeployerContracts } from "./listeners/contracts.js";
 import { Peers } from "./listeners/peers.js";
 import { Plugins } from "./listeners/plugins.js";
-import { TypeOrm } from "@mainsail/api-database";
 
 @injectable()
 export class Listeners implements IListeners {

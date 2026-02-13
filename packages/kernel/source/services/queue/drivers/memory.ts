@@ -64,7 +64,6 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 				await this.start();
 			}
 
-
 			await this.#waitUntilProcessed();
 		}
 
