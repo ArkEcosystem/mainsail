@@ -842,7 +842,7 @@ export class Restore {
 			.createQueryBuilder()
 			.insert()
 			.values({
-				activeMilestones: this.configuration.getMilestone(context.lastBlockNumber),
+				activeMilestones: this.configuration.getMilestone(context.lastBlockNumber + 1),
 				cryptoConfiguration: this.configuration.all() ?? {},
 				id: 1,
 				version: this.app.version(),
