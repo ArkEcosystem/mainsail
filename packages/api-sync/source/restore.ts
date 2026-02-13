@@ -633,29 +633,34 @@ export class Restore {
 					attributes: {
 						...(validatorAttributes
 							? {
-									validatorFee: validatorAttributes.fee,
-									validatorForgedFees: validatorAttributes.totalForgedFees.toFixed(),
-									validatorForgedRewards: validatorAttributes.totalForgedRewards.toFixed(),
-									validatorForgedTotal: validatorAttributes.totalForgedFees
-										.plus(validatorAttributes.totalForgedRewards)
-										.toFixed(),
-									validatorLastBlock: validatorAttributes.lastBlock
-										? {
-												hash: validatorAttributes.lastBlock.hash,
-												number: validatorAttributes.lastBlock.number,
-												timestamp: validatorAttributes.lastBlock.timestamp,
-											}
-										: {},
-									validatorProducedBlocks: validatorAttributes.producedBlocks,
-									validatorPublicKey: validatorAttributes.blsPublicKey,
-									validatorResigned: validatorAttributes.isResigned,
-									validatorVoteBalance: validatorAttributes.voteBalance,
-									validatorVotersCount: validatorAttributes.votersCount,
+								validatorFee: validatorAttributes.fee,
+								validatorPublicKey: validatorAttributes.blsPublicKey,
+								validatorResigned: validatorAttributes.isResigned,
+								validatorVoteBalance: validatorAttributes.voteBalance,
+								validatorVotersCount: validatorAttributes.votersCount,
 
-									// updated at end of db transaction
-									// - validatorRank
-									// - validatorApproval
-								}
+								...(validatorAttributes.totalForgedFees.isGreaterThan(0) ? { validatorForgedFees: validatorAttributes.totalForgedFees.toFixed() } : {}),
+								...(validatorAttributes.totalForgedRewards.isGreaterThan(0) ? { validatorForgedRewards: validatorAttributes.totalForgedRewards.toFixed() } : {}),
+								...(validatorAttributes.totalForgedFees
+									.plus(validatorAttributes.totalForgedRewards).isGreaterThan(0) ?
+									{
+										validatorForgedTotal: validatorAttributes.totalForgedFees
+											.plus(validatorAttributes.totalForgedRewards)
+											.toFixed()
+									} : {}),
+								validatorLastBlock: validatorAttributes.lastBlock
+									? {
+										hash: validatorAttributes.lastBlock.hash,
+										number: validatorAttributes.lastBlock.number,
+										timestamp: validatorAttributes.lastBlock.timestamp,
+									}
+									: {},
+								validatorProducedBlocks: validatorAttributes.producedBlocks,
+
+								// updated at end of db transaction
+								// - validatorRank
+								// - validatorApproval
+							}
 							: {}),
 						...(userAttributes
 							? {
