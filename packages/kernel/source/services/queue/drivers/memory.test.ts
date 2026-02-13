@@ -421,8 +421,44 @@ describe<{
 		onDrain.calledOnce();
 	});
 
+	it("Drain should process all queued jobs", async (context) => {
+		const jobMethod1 = stubFn().callsFake(async () => {
+			await sleep(50);
+		});
+
+		const jobMethod2 = stubFn().callsFake(async () => {
+			await sleep(50);
+		});
+
+		await context.driver.push(new DummyJob(async () => await jobMethod1.call()));
+		await context.driver.push(new DummyJob(async () => await jobMethod2.call()));
+
+		assert.is(context.driver.size(), 2);
+
+		await context.driver.drain();
+
+		assert.is(context.driver.size(), 0);
+
+		jobMethod1.calledOnce();
+		jobMethod2.calledOnce();
+
+		assert.false(context.driver.isStarted());
+		assert.false(context.driver.isRunning());
+	});
+
+	it("Drain should process empty queue", async (context) => {
+		assert.is(context.driver.size(), 0);
+
+		await context.driver.drain();
+
+		assert.is(context.driver.size(), 0);
+
+		assert.false(context.driver.isStarted());
+		assert.false(context.driver.isRunning());
+	});
+
 	it("Later should push job with delay", async (context) => {
-		await context.driver.later(50, new DummyJob(() => {}));
+		await context.driver.later(50, new DummyJob(() => { }));
 
 		assert.is(context.driver.size(), 0);
 

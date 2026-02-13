@@ -58,6 +58,19 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 		this.#jobs = [];
 	}
 
+	public async drain(): Promise<void> {
+		while (this.#running || this.#jobs.length > 0) {
+			if (!this.#started) {
+				await this.start();
+			}
+
+
+			await this.#waitUntilProcessed();
+		}
+
+		this.#started = false;
+	}
+
 	public async push(job: Contracts.Kernel.QueueJob): Promise<void> {
 		this.#jobs.push(job);
 
