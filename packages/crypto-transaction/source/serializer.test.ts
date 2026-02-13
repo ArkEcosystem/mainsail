@@ -52,7 +52,6 @@ describe<{
 	// 		const reserialized = await serializer.serialize(deserializedFull.data, { excludeSignature: true });
 	// 		const deserializedWithoutSignature = await deserializer.deserialize(reserialized);
 
-
 	// 		// Remove v,r, s
 	// 		const deserializedFullData = (({ v, r, s, ...rest }) => rest)(deserializedFull.data);
 	// 		const deserializedWithoutSignatureData = (({ v, r, s, ...rest }) => rest)(deserializedWithoutSignature.data);

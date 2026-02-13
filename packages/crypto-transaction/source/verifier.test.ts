@@ -17,21 +17,21 @@ describe<{
 	factory: Contracts.Crypto.TransactionFactory;
 }>("Verifier", ({ it, beforeEach, assert }) => {
 	const txData = {
-		hash: '3a5823fe8f498b2e509974b3939584bd1200ad32fa32bc8a1a778b608f79f780',
+		hash: "3a5823fe8f498b2e509974b3939584bd1200ad32fa32bc8a1a778b608f79f780",
 		network: 10000,
-		from: '0x75545540230d5c3BEf023202d23CB74cFA723376',
-		senderPublicKey: '03e0812731df97edc9990d55d919b33294f131b5fd44996266859cfd2514514121',
-		senderLegacyAddress: 'DH8WhBj6ron2tQhdFPQzjDcrk2CCY997MP',
-		to: '0xBe89811e15f611C1db12e59679b6F3DC1F430155',
+		from: "0x75545540230d5c3BEf023202d23CB74cFA723376",
+		senderPublicKey: "03e0812731df97edc9990d55d919b33294f131b5fd44996266859cfd2514514121",
+		senderLegacyAddress: "DH8WhBj6ron2tQhdFPQzjDcrk2CCY997MP",
+		to: "0xBe89811e15f611C1db12e59679b6F3DC1F430155",
 		value: BigNumber.ONE,
 		gasPrice: 5000000000,
 		gasLimit: 1000000,
 		nonce: BigNumber.ZERO,
-		data: '',
+		data: "",
 		v: 0,
-		r: '921101a4583fb153ec00e501f3c2e2636114e1c8c58d2df8a19426cc066a6768',
-		s: '22db4bce1e0ace485ce0838d178b4d5bcfa9f69b315a14c580d9b01e5c980bdd',
-	}
+		r: "921101a4583fb153ec00e501f3c2e2636114e1c8c58d2df8a19426cc066a6768",
+		s: "22db4bce1e0ace485ce0838d178b4d5bcfa9f69b315a14c580d9b01e5c980bdd",
+	};
 
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
@@ -65,7 +65,7 @@ describe<{
 			const txData = {
 				...transaction,
 				[field]: undefined,
-			}
+			};
 
 			const verified = await verifier.verifyHash(txData);
 			assert.false(verified);
@@ -82,20 +82,26 @@ describe<{
 		// }));
 
 		// Changed last character
-		assert.false(await verifier.verifyHash({
-			...txData,
-			r: "921101a4583fb153ec00e501f3c2e2636114e1c8c58d2df8a19426cc066a6769",
-		}));
+		assert.false(
+			await verifier.verifyHash({
+				...txData,
+				r: "921101a4583fb153ec00e501f3c2e2636114e1c8c58d2df8a19426cc066a6769",
+			}),
+		);
 
-		assert.false(await verifier.verifyHash({
-			...txData,
-			s: "22db4bce1e0ace485ce0838d178b4d5bcfa9f69b315a14c580d9b01e5c980bdc",
-		}));
+		assert.false(
+			await verifier.verifyHash({
+				...txData,
+				s: "22db4bce1e0ace485ce0838d178b4d5bcfa9f69b315a14c580d9b01e5c980bdc",
+			}),
+		);
 
-		assert.false(await verifier.verifyHash({
-			...txData,
-			senderPublicKey: "03e0812731df97edc9990d55d919b33294f131b5fd44996266859cfd2514514122",
-		}));
+		assert.false(
+			await verifier.verifyHash({
+				...txData,
+				senderPublicKey: "03e0812731df97edc9990d55d919b33294f131b5fd44996266859cfd2514514122",
+			}),
+		);
 	});
 
 	it("verifySchema - should be ok", async ({ factory, verifier }) => {
@@ -120,8 +126,8 @@ describe<{
 		]) {
 			const transaction = (await factory.fromHex(serialized)).toData();
 
-			assert.defined((await verifier.verifySchema({...transaction, v: 2 }, false)).error); // Invalid v
-			assert.defined((await verifier.verifySchema({...transaction, test: "test"}, true)).error); // Extra property in strict mode
+			assert.defined((await verifier.verifySchema({ ...transaction, v: 2 }, false)).error); // Invalid v
+			assert.defined((await verifier.verifySchema({ ...transaction, test: "test" }, true)).error); // Extra property in strict mode
 		}
 	});
 

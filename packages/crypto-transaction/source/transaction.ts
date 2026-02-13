@@ -61,7 +61,7 @@ export class Transaction implements Contracts.Crypto.Transaction {
 			r: this.r,
 			s: this.s,
 			/* eslint-enable sort-keys-fix/sort-keys-fix */
-		}
+		};
 
 		if (data.legacySecondSignature) {
 			data = {

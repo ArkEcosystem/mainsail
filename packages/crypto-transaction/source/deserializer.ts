@@ -196,7 +196,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 			transaction = {
 				...transaction,
 				legacySecondSignature,
-			}
+			};
 		}
 		/* eslint-enable sort-keys-fix/sort-keys-fix */
 
