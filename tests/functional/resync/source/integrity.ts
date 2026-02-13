@@ -90,6 +90,7 @@ const computeNodeTableHashes = async (node: Contracts.Kernel.Application): Promi
 }
 
 const verifyIntegrity = async (t: typeof assert, syncNode: Contracts.Kernel.Application, restoreNode: Contracts.Kernel.Application): Promise<void> => {
+    await patchDatabase(syncNode);
     const tableHashesSyncNode = await computeNodeTableHashes(syncNode);
     const tableHashesRestoreNode = await computeNodeTableHashes(restoreNode);
 
@@ -98,12 +99,38 @@ const verifyIntegrity = async (t: typeof assert, syncNode: Contracts.Kernel.Appl
     // - plugins stores the node's database name which differs (IGNORE)
     // - configuration (investigate)
     // - contracts (investigate)
-    const brokenTables = ["public.wallets", "public.contracts", "public.configuration", "public.plugins"];
+    const brokenTables = ["public.contracts", "public.configuration", "public.plugins"];
 
     t.equal(
         tableHashesSyncNode.filter(t => !brokenTables.includes(t.table_name)),
         tableHashesRestoreNode.filter(t => !brokenTables.includes(t.table_name)),
     );
+}
+
+const patchDatabase = async (syncNode: Contracts.Kernel.Application, restoreNode: Contracts.Kernel.Application): Promise<void> => {
+    const syncNodeName = syncNode.get<string>(Identifiers.Application.Name);
+    const restoreNodeName = restoreNode.get<string>(Identifiers.Application.Name);
+
+    await runDatabaseQuery(syncNodeName, async (dataSource: TypeOrm.DataSource) => {
+        await dataSource.query(`UPDATE wallets SET updated_at = 0;`);
+
+        await dataSource.query(`
+            UPDATE plugins
+            SET configuration = 
+            jsonb_set(
+                jsonb_set(
+                    configuration,
+                    '{database,database}',
+                    to_jsonb('${restoreNodeName}'::text),
+                    false
+                ),
+                '{database,applicationName}',
+                to_jsonb('mainsail/${restoreNodeName}'::text),
+                false
+            )
+            WHERE name = '@mainsail/api-database';
+        `);
+    });
 }
 
 export const verifyNodeIntegrity = async (t: typeof assert, syncNode: Contracts.Kernel.Application, dataDirectory: string): Promise<void> => {
