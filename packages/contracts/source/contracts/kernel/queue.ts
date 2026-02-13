@@ -17,6 +17,8 @@ export interface Queue extends EventEmitter {
 
 	clear(): Promise<void>;
 
+	drain(): Promise<void>;
+
 	push(job: QueueJob): Promise<void>;
 
 	later(delay: number, job: QueueJob): Promise<void>;
