@@ -14,34 +14,78 @@ interface TableHash {
 }
 
 const QUERY_COMPUTE_TABLE_HASHES = `
-SELECT
-    n.nspname || '.' || c.relname AS table_name,
-    md5(
-        query_to_xml(
-            format(
-                'SELECT * FROM %I.%I ORDER BY ctid',
-                n.nspname,
-                c.relname
-            ),
-            true,
-            false,
-            ''
-        ) :: text
-    ) AS hash
-FROM
-    pg_class c
-    JOIN pg_namespace n ON n.oid = c.relnamespace
-WHERE
-    c.relkind = 'r'
-    AND n.nspname NOT IN ('pg_catalog', 'information_schema')
-ORDER BY
-    n.nspname ASC,
-    c.relname ASC;
+CREATE OR REPLACE FUNCTION public.compute_table_hashes(
+    p_exclude_schemas text[] DEFAULT ARRAY['pg_catalog','information_schema']
+)
+RETURNS TABLE(table_name text, hash text)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    r record;
+    pk_cols text;
+    sql text;
+BEGIN
+    FOR r IN
+        SELECT n.nspname, c.relname, c.oid AS relid
+        FROM pg_class c
+        JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE c.relkind = 'r'
+          AND n.nspname <> ALL (p_exclude_schemas)
+        ORDER BY n.nspname, c.relname
+    LOOP
+        -- Find primary key columns in ordinal order
+        SELECT string_agg(quote_ident(a.attname), ', ' ORDER BY k.ord)
+        INTO pk_cols
+        FROM pg_index i
+        JOIN LATERAL unnest(i.indkey) WITH ORDINALITY AS k(attnum, ord) ON true
+        JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = k.attnum
+        WHERE i.indrelid = r.relid
+          AND i.indisprimary;
+
+        IF pk_cols IS NOT NULL THEN
+            -- Option A: stable ordering by PK
+            sql := format($f$
+                SELECT md5(
+                    coalesce(
+                        string_agg(
+                            encode(digest(to_jsonb(t)::text, 'sha256'), 'hex'),
+                            '' ORDER BY %s
+                        ),
+                        ''
+                    )
+                )
+                FROM %I.%I AS t
+            $f$, pk_cols, r.nspname, r.relname);
+        ELSE
+            -- No PK: deterministic fallback (order by row-hash)
+            sql := format($f$
+                SELECT md5(
+                    coalesce(
+                        string_agg(h, '' ORDER BY h),
+                        ''
+                    )
+                )
+                FROM (
+                    SELECT encode(digest(to_jsonb(t)::text, 'sha256'), 'hex') AS h
+                    FROM %I.%I AS t
+                ) s
+            $f$, r.nspname, r.relname);
+        END IF;
+
+        table_name := format('%I.%I', r.nspname, r.relname);
+        EXECUTE sql INTO hash;
+        RETURN NEXT;
+    END LOOP;
+END;
+$$;
 `;
 
-
 const computeNodeTableHashes = async (node: Contracts.Kernel.Application): Promise<TableHashes> => {
-    const tableHashes = await runDatabaseQuery(node.get<string>(Identifiers.Application.Name), async (dataSource: TypeOrm.DataSource) => dataSource.query<TableHashes>(QUERY_COMPUTE_TABLE_HASHES));
+    const tableHashes = await runDatabaseQuery(node.get<string>(Identifiers.Application.Name), async (dataSource: TypeOrm.DataSource) => {
+        await dataSource.query(`CREATE EXTENSION IF NOT EXISTS pgcrypto;`);
+        await dataSource.query(QUERY_COMPUTE_TABLE_HASHES);
+        return dataSource.query<TableHashes>(`SELECT * FROM public.compute_table_hashes();`);
+    });
     return tableHashes;
 }
 
