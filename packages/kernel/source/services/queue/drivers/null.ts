@@ -28,6 +28,10 @@ export class NullQueue extends EventEmitter implements Contracts.Kernel.Queue {
 		return;
 	}
 
+	public async drain(): Promise<void> {
+		return;
+	}
+
 	public async push(job: Contracts.Kernel.QueueJob): Promise<void> {
 		return;
 	}

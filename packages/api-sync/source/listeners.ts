@@ -1,3 +1,4 @@
+import { TypeOrm } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -36,5 +37,11 @@ export class Listeners implements IListeners {
 		}
 
 		this.#listeners = [];
+	}
+
+	public async flush(entityManager: TypeOrm.EntityManager): Promise<void> {
+		for (const listener of this.#listeners) {
+			await listener.flush(entityManager);
+		}
 	}
 }

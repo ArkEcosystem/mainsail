@@ -12,6 +12,7 @@ import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from
 import { performance } from "perf_hooks";
 
 import { TokenParser } from "./contracts.js";
+import { Listeners } from "./listeners.js";
 import { parseMultiPayments, parseUsernames } from "./parsers/index.js";
 
 interface RepositoryContext {
@@ -145,6 +146,9 @@ export class Restore {
 	@inject(Identifiers.ApiSync.TokenParser)
 	private readonly tokenParser!: TokenParser;
 
+	@inject(Identifiers.ApiSync.Listener)
+	private readonly listeners!: Listeners;
+
 	@inject(Identifiers.Snapshot.Legacy.Importer)
 	@optional()
 	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
@@ -231,6 +235,9 @@ export class Restore {
 
 			// 8) Write `contracts` table
 			await this.#ingestContracts(context);
+
+			// 9) Write captured data from plugins, configuration, etc.
+			await this.listeners.flush(entityManager);
 
 			restoredHeight = context.lastBlockNumber;
 		});
@@ -626,11 +633,26 @@ export class Restore {
 						...(validatorAttributes
 							? {
 									validatorFee: validatorAttributes.fee,
-									validatorForgedFees: validatorAttributes.totalForgedFees.toFixed(),
-									validatorForgedRewards: validatorAttributes.totalForgedRewards.toFixed(),
-									validatorForgedTotal: validatorAttributes.totalForgedFees
+									validatorPublicKey: validatorAttributes.blsPublicKey,
+									validatorResigned: validatorAttributes.isResigned,
+									validatorVoteBalance: validatorAttributes.voteBalance,
+									validatorVotersCount: validatorAttributes.votersCount,
+
+									...(validatorAttributes.totalForgedFees.isGreaterThan(0)
+										? { validatorForgedFees: validatorAttributes.totalForgedFees.toFixed() }
+										: {}),
+									...(validatorAttributes.totalForgedRewards.isGreaterThan(0)
+										? { validatorForgedRewards: validatorAttributes.totalForgedRewards.toFixed() }
+										: {}),
+									...(validatorAttributes.totalForgedFees
 										.plus(validatorAttributes.totalForgedRewards)
-										.toFixed(),
+										.isGreaterThan(0)
+										? {
+												validatorForgedTotal: validatorAttributes.totalForgedFees
+													.plus(validatorAttributes.totalForgedRewards)
+													.toFixed(),
+											}
+										: {}),
 									validatorLastBlock: validatorAttributes.lastBlock
 										? {
 												hash: validatorAttributes.lastBlock.hash,
@@ -639,10 +661,6 @@ export class Restore {
 											}
 										: {},
 									validatorProducedBlocks: validatorAttributes.producedBlocks,
-									validatorPublicKey: validatorAttributes.blsPublicKey,
-									validatorResigned: validatorAttributes.isResigned,
-									validatorVoteBalance: validatorAttributes.voteBalance,
-									validatorVotersCount: validatorAttributes.votersCount,
 
 									// updated at end of db transaction
 									// - validatorRank
@@ -829,7 +847,7 @@ export class Restore {
 			.createQueryBuilder()
 			.insert()
 			.values({
-				activeMilestones: this.configuration.getMilestone(context.lastBlockNumber),
+				activeMilestones: this.configuration.getMilestone(context.lastBlockNumber + 1),
 				cryptoConfiguration: this.configuration.all() ?? {},
 				id: 1,
 				version: this.app.version(),
