@@ -90,21 +90,55 @@ const computeNodeTableHashes = async (node: Contracts.Kernel.Application): Promi
 }
 
 const verifyIntegrity = async (t: typeof assert, syncNode: Contracts.Kernel.Application, restoreNode: Contracts.Kernel.Application): Promise<void> => {
-    await patchDatabase(syncNode);
+    await patchDatabase(syncNode, restoreNode);
+
     const tableHashesSyncNode = await computeNodeTableHashes(syncNode);
     const tableHashesRestoreNode = await computeNodeTableHashes(restoreNode);
 
-    // TODO:
-    // - wallets differ by the `updated_at` column (IGNORE)
-    // - plugins stores the node's database name which differs (IGNORE)
-    // - configuration (investigate)
-    // - contracts (investigate)
-    const brokenTables = ["public.contracts", "public.configuration", "public.plugins"];
-
-    t.equal(
-        tableHashesSyncNode.filter(t => !brokenTables.includes(t.table_name)),
-        tableHashesRestoreNode.filter(t => !brokenTables.includes(t.table_name)),
+    const result = compareTableHashes(
+        tableHashesSyncNode,
+        tableHashesRestoreNode
     );
+
+    if (!result.equal) {
+        console.error("Mismatching tables:");
+        for (const difference of result.differences) {
+            console.error(difference);
+        };
+    }
+
+    t.true(result.equal);
+}
+
+const compareTableHashes = (
+    a: TableHashes,
+    b: TableHashes
+): { equal: boolean; differences: string[] } => {
+    const mapA = new Map(a.map(t => [t.table_name, t.hash]));
+    const mapB = new Map(b.map(t => [t.table_name, t.hash]));
+
+    const allTables = new Set([
+        ...mapA.keys(),
+        ...mapB.keys(),
+    ]);
+
+    const differences: string[] = [];
+
+    for (const table of allTables) {
+        const hashA = mapA.get(table);
+        const hashB = mapB.get(table);
+
+        if (hashA !== hashB) {
+            differences.push(
+                `${table} => A: ${hashA ?? "missing"} | B: ${hashB ?? "missing"}`
+            );
+        }
+    }
+
+    return {
+        differences,
+        equal: differences.length === 0,
+    };
 }
 
 const patchDatabase = async (syncNode: Contracts.Kernel.Application, restoreNode: Contracts.Kernel.Application): Promise<void> => {
@@ -153,81 +187,3 @@ export const verifyNodeIntegrity = async (t: typeof assert, syncNode: Contracts.
     }
 }
 
-/*
-
-[
-  {
-    table_name: 'public.api_nodes',
-    hash: 'c3749de3b83987b4f1ff0a2911681a16'
-  },
-  {
-    table_name: 'public.blocks',
-    hash: '287dbc07f35ecce596068be6a143408a'
-  },
-  {
-    table_name: 'public.configuration',
-    hash: '98bd99a1bc9302e794e317d00792c607'
-  },
-  {
-    table_name: 'public.contracts',
-    hash: 'cdf145ca95bce1eb9842834c6c768a1f'
-  },
-  {
-    table_name: 'public.legacy_cold_wallets',
-    hash: 'c3749de3b83987b4f1ff0a2911681a16'
-  },
-  {
-    table_name: 'public.migrations',
-    hash: 'e3ce7066d80b6b73c7b0aedd190731c2'
-  },
-  {
-    table_name: 'public.multi_payments',
-    hash: 'c3749de3b83987b4f1ff0a2911681a16'
-  },
-  {
-    table_name: 'public.peers',
-    hash: 'c3749de3b83987b4f1ff0a2911681a16'
-  },
-  {
-    table_name: 'public.plugins',
-    hash: '128e7aa899150cc64ad47481262963fe'
-  },
-  {
-    table_name: 'public.state',
-    hash: '3fecd1f8de67f3a4b3d4930a8ae9079c'
-  },
-  {
-    table_name: 'public.system',
-    hash: 'c3749de3b83987b4f1ff0a2911681a16'
-  },
-  {
-    table_name: 'public.token_holders',
-    hash: 'c3749de3b83987b4f1ff0a2911681a16'
-  },
-  {
-    table_name: 'public.token_transfers',
-    hash: 'c3749de3b83987b4f1ff0a2911681a16'
-  },
-  {
-    table_name: 'public.tokens',
-    hash: 'c3749de3b83987b4f1ff0a2911681a16'
-  },
-  {
-    table_name: 'public.transactions',
-    hash: '7cac674efc8c13b3558bb1491e331f96'
-  },
-  {
-    table_name: 'public.validator_rounds',
-    hash: '350e2307635f5c8bad0d4a83aae7cc1c'
-  },
-  {
-    table_name: 'public.wallet_token_counts',
-    hash: 'c3749de3b83987b4f1ff0a2911681a16'
-  },
-  {
-    table_name: 'public.wallets',
-    hash: '19cfc5cff67b48f612167e8d1d1295b2'
-  }
-]
-
-*/
