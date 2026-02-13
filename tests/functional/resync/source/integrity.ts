@@ -105,6 +105,8 @@ const verifyIntegrity = async (t: typeof assert, syncNode: Contracts.Kernel.Appl
         for (const difference of result.differences) {
             console.error(difference);
         };
+
+        process.exit(1);
     }
 
     t.true(result.equal);
