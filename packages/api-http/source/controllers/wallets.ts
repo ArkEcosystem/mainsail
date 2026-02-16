@@ -269,7 +269,7 @@ export class WalletsController extends Controller {
 		);
 
 		return this.toPagination(
-			await this.enrichTransactionResult(transactions, { fullReceipt: request.query.fullReceipt }),
+			await this.enrichTransactionResult(transactions, { fullReceipt: request.query.fullReceipt, includeTokens: request.query.includeTokens }),
 			TransactionResource,
 		);
 	}
