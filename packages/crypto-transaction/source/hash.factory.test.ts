@@ -1,19 +1,20 @@
 import { Application } from "@mainsail/kernel";
+import { Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
 import { HashFactory } from "./hash.factory.js";
+import { Serializer } from "./serializer.js";
 import {
 	Deserialized,
 } from "../test/fixtures/index.js";
-import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
-	app: Application;
 	hasher: HashFactory;
 }>("HashFactory", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
-		await prepareSandbox(context);
+		const app = new Application();
 
-		context.hasher = context.app.resolve(HashFactory)
+		app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer);
+		context.hasher = app.resolve(HashFactory)
 	});
 
 	it("#toHash - should be ok", async ({ hasher }) => {
