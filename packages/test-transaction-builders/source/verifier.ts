@@ -9,10 +9,24 @@ export class AcceptAnyTransactionVerifier implements Contracts.Crypto.Transactio
 		return true;
 	}
 
-	public async verifySchema(
-		data: Contracts.Crypto.TransactionData,
-		_: boolean,
-	): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionData>> {
+	public async verifySchemaUnsigned(
+		data: Contracts.Crypto.TransactionUnsignedSerializable): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionUnsignedSerializable>> {
+		return {
+			error: undefined,
+			errors: undefined,
+			value: data,
+		};
+	}
+
+	public async verifySchemaSigned(data: Contracts.Crypto.TransactionSerializable): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionSerializable>> {
+		return {
+			error: undefined,
+			errors: undefined,
+			value: data,
+		};
+	}
+
+	public async verifySchemaStrict(data: Contracts.Crypto.TransactionData): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionData>> {
 		return {
 			error: undefined,
 			errors: undefined,
