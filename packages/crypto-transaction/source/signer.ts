@@ -17,13 +17,7 @@ export class Signer implements Contracts.Crypto.TransactionSigner {
 		keys: Contracts.Crypto.KeyPair,
 	): Promise<Contracts.Crypto.EcdsaSignature> {
 		const hash: Buffer = await this.utils.toHashUnsigned(transaction);
-		const signature = await this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));
-
-		// transaction.v = signature.v;
-		// transaction.r = signature.r;
-		// transaction.s = signature.s;
-
-		return signature;
+		return this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));;
 	}
 
 	public async legacySecondSign(
@@ -33,10 +27,6 @@ export class Signer implements Contracts.Crypto.TransactionSigner {
 		const hash: Buffer = await this.utils.toHashUnsigned(transaction);
 		const { r, s, v } = await this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));
 
-		const legacySecondSignature = formatEcdsaSignature(r, s, v);
-
-		// transaction.legacySecondSignature = legacySecondSignature;
-
-		return legacySecondSignature;
+		return formatEcdsaSignature(r, s, v);;
 	}
 }
