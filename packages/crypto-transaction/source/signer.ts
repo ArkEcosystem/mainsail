@@ -9,14 +9,14 @@ export class Signer implements Contracts.Crypto.TransactionSigner {
 	@tagged("type", "wallet")
 	private readonly signatureFactory!: Contracts.Crypto.SignatureEcdsa;
 
-	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils!: Contracts.Crypto.TransactionHashFactory;
+	@inject(Identifiers.Cryptography.Transaction.HashFactory)
+	private readonly hashFactory!: Contracts.Crypto.TransactionHashFactory;
 
 	public async sign(
 		transaction: Contracts.Crypto.TransactionUnsignedSerializable,
 		keys: Contracts.Crypto.KeyPair,
 	): Promise<Contracts.Crypto.EcdsaSignature> {
-		const hash: Buffer = await this.utils.toHashUnsigned(transaction);
+		const hash: Buffer = await this.hashFactory.toHashUnsigned(transaction);
 		return this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));;
 	}
 
@@ -24,7 +24,7 @@ export class Signer implements Contracts.Crypto.TransactionSigner {
 		transaction: Contracts.Crypto.TransactionUnsignedSerializable,
 		keys: Contracts.Crypto.KeyPair,
 	): Promise<string> {
-		const hash: Buffer = await this.utils.toHashUnsigned(transaction);
+		const hash: Buffer = await this.hashFactory.toHashUnsigned(transaction);
 		const { r, s, v } = await this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));
 
 		return formatEcdsaSignature(r, s, v);;

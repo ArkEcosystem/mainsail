@@ -33,8 +33,8 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	@inject(Identifiers.Cryptography.Transaction.Serializer)
 	private readonly serializer!: Contracts.Crypto.TransactionSerializer;
 
-	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils!: Contracts.Crypto.TransactionHashFactory;
+	@inject(Identifiers.Cryptography.Transaction.HashFactory)
+	private readonly hashFactory!: Contracts.Crypto.TransactionHashFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly verifier!: Contracts.Crypto.TransactionVerifier;
@@ -114,8 +114,8 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		// 	data.nonce = BigNumber.make(data.nonce["value"]);
 		// }
 
-		const unsignedHash = await this.utils.toHashUnsigned(data);
-		const hash = await this.utils.toHash(data);
+		const unsignedHash = await this.hashFactory.toHashUnsigned(data);
+		const hash = await this.hashFactory.toHash(data);
 
 		const senderPublicKey = this.signatureSerializer.recoverPublicKey(unsignedHash, {
 			r: data.r,

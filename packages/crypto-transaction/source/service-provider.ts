@@ -15,7 +15,7 @@ import { Verifier } from "./verifier.js";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utilities).inSingletonScope();
+		this.app.bind(Identifiers.Cryptography.Transaction.HashFactory).to(Utilities).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Deserializer).to(Deserializer).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Factory).to(TransactionFactory).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Signer).to(Signer).inSingletonScope();

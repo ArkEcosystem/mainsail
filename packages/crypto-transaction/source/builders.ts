@@ -24,8 +24,8 @@ export class TransactionBuilder {
 	@inject(Identifiers.Cryptography.Transaction.Signer)
 	protected readonly signer!: Contracts.Crypto.TransactionSigner;
 
-	@inject(Identifiers.Cryptography.Transaction.Utils)
-	protected readonly utils!: Contracts.Crypto.TransactionHashFactory;
+	@inject(Identifiers.Cryptography.Transaction.HashFactory)
+	protected readonly hashFactory!: Contracts.Crypto.TransactionHashFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
@@ -157,7 +157,7 @@ export class TransactionBuilder {
 	}
 
 	async #getHash(): Promise<string> {
-		return (await this.utils.toHash(this.data)).toString("hex");
+		return (await this.hashFactory.toHash(this.data)).toString("hex");
 	}
 
 	async #signWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TransactionBuilder> {
