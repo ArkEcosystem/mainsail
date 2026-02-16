@@ -43,8 +43,8 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		return this.#fromSerialized(Buffer.from(hex, "hex"));
 	}
 
-	public async fromBytes(buff: Buffer, strict: boolean = true): Promise<Contracts.Crypto.Transaction> {
-		return this.#fromSerialized(buff, strict);
+	public async fromBytes(buff: Buffer): Promise<Contracts.Crypto.Transaction> {
+		return this.#fromSerialized(buff);
 	}
 
 	public async fromJson(json: Contracts.Crypto.TransactionJson): Promise<Contracts.Crypto.Transaction> {
@@ -54,7 +54,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			value: BigNumber.make(json.value),
 		};
 
-		return this.fromData(transactionData, true);
+		return this.fromData(transactionData);
 	}
 
 	public async fromStorage(
@@ -85,17 +85,15 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 
 	public async fromData(
 		data: Contracts.Crypto.TransactionSerializable,
-		strict?: boolean,
 	): Promise<Contracts.Crypto.Transaction> {
-		const { error } = await this.verifier.verifySchema(data, strict);
+		const { error } = await this.verifier.verifySchemaSigned(data);
 
 		if (error) {
 			throw new TransactionSchemaError(error);
 		}
 
 		const serialized = await this.serializer.serialize(data);
-
-		return this.fromBytes(serialized, strict);
+		return this.fromBytes(serialized);
 	}
 
 	public async computeCryptoData(
@@ -133,14 +131,14 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		};
 	}
 
-	async #fromSerialized(serialized: Buffer, strict: boolean = true): Promise<Contracts.Crypto.Transaction> {
+	async #fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.Transaction> {
 		try {
 			const { data: transaction } = await this.deserializer.deserialize(serialized);
 			const cryptoData = await this.computeCryptoData(transaction);
 
 			const tx = { ...cryptoData, ...transaction };
 
-			const { error } = await this.verifier.verifySchema(tx, strict);
+			const { error } = await this.verifier.verifySchemaStrict(tx);
 			if (error) {
 				throw new TransactionSchemaError(error);
 			}

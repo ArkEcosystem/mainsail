@@ -74,10 +74,9 @@ export interface SerializeOptions {
 
 export interface TransactionVerifier {
 	verifyHash(data: TransactionData): Promise<boolean>;
-	verifySchema(
-		data: Omit<TransactionSerializable, "hash">,
-		strict?: boolean,
-	): Promise<SchemaValidationResult<TransactionSerializable>>;
+	verifySchemaUnsigned(data: TransactionUnsignedSerializable): Promise<SchemaValidationResult<TransactionUnsignedSerializable>>;
+	verifySchemaSigned(data: TransactionSerializable): Promise<SchemaValidationResult<TransactionSerializable>>;
+	verifySchemaStrict(data: TransactionData): Promise<SchemaValidationResult<TransactionData>>;
 	verifyLegacySecondSignature(data: TransactionSerializable, legacySecondPublicKey: string): Promise<boolean>;
 }
 

@@ -9,6 +9,9 @@ import {
 	serializedTransactionDeploy,
 	serializedTransactionTransfer,
 } from "../test/fixtures/transaction";
+import {
+	Transactions
+} from "../test/fixtures/index";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
@@ -45,15 +48,13 @@ describe<{
 	});
 
 	it("verifyHash - should be ok", async ({ factory, verifier }) => {
-		for (const serialized of [
-			serializedTransactionContractCall,
-			serializedTransactionContractCallWithSecondSignature,
-			serializedTransactionDeploy,
-			serializedTransactionTransfer,
+		for (const transaction of [
+			Transactions.transactionTransfer,
+			Transactions.transactionContractCall,
+			Transactions.transactionContractCallWithSecondSignature,
+			Transactions.transactionDeploy,
 		]) {
-			const transaction = await factory.fromHex(serialized);
-			const verified = await verifier.verifyHash(transaction);
-			assert.true(verified);
+			assert.true(await verifier.verifyHash(transaction));
 		}
 	});
 

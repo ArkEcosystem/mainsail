@@ -20,24 +20,23 @@ const networkByte: SchemaObject = {
 const transaction: SchemaObject = {
 	$id: "transaction",
 	properties: {
-		data: { bytecode: {} },
-		from: { $ref: "address" },
-
-		gasLimit: { transactionGasLimit: {} },
-		gasPrice: { transactionGasPrice: {} },
-
-		hash: { $ref: "transactionHash" },
-
-		// Legacy
-		legacySecondSignature: {
-			allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }],
-			type: "string",
-		},
+		/* eslint-disable sort-keys-fix/sort-keys-fix */
+		hash: { $ref: "transactionHash" }, // Signed
 
 		network: { $ref: "networkByte" },
-
+		to: { $ref: "address" },
+		value: { bignumber: { maximum: undefined, minimum: 0 } },
+		gasLimit: { transactionGasLimit: {} },
+		gasPrice: { transactionGasPrice: {} },
 		nonce: { bignumber: { minimum: 0 } },
+		data: { bytecode: {} },
 
+		from: { $ref: "address" },
+		senderPublicKey: { $ref: "publicKey" },
+		senderLegacyAddress: { type: "string" },
+
+		// Signed
+		v: { maximum: 1, minimum: 0, type: "number" },
 		r: {
 			allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
 			type: "string",
@@ -47,13 +46,11 @@ const transaction: SchemaObject = {
 			type: "string",
 		},
 
-		senderLegacyAddress: { type: "string" },
-
-		senderPublicKey: { $ref: "publicKey" },
-
-		to: { $ref: "address" },
-		v: { maximum: 1, minimum: 0, type: "number" },
-		value: { bignumber: { maximum: undefined, minimum: 0 } },
+		legacySecondSignature: {
+			allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }],
+			type: "string",
+		},
+		/* eslint-enable sort-keys-fix/sort-keys-fix */
 	},
 	required: ["network", "from", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
 	type: "object",

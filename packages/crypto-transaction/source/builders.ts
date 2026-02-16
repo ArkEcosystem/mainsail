@@ -46,7 +46,7 @@ export class TransactionBuilder {
 	}
 
 	public async build(data: Partial<Contracts.Crypto.TransactionData> = {}): Promise<Contracts.Crypto.Transaction> {
-		return this.factory.fromData({ ...this.data, ...data }, false);
+		return this.factory.fromData({ ...this.data, ...data });
 	}
 
 	public nonce(nonce: string): TransactionBuilder {
@@ -169,7 +169,7 @@ export class TransactionBuilder {
 		}
 
 		const data = this.#getSigningObject();
-		const { error } = await this.verifier.verifySchema(data, false);
+		const { error } = await this.verifier.verifySchemaUnsigned(data);
 		if (error) {
 			throw new ValidationFailed(error);
 		}
@@ -185,7 +185,7 @@ export class TransactionBuilder {
 
 	async #legacySecondSignWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TransactionBuilder> {
 		const data = this.#getSigningObject();
-		const { error } = await this.verifier.verifySchema(data, false);
+		const { error } = await this.verifier.verifySchemaUnsigned(data);
 		if (error) {
 			throw new ValidationFailed(error);
 		}
