@@ -22,6 +22,7 @@ describe<{
 		assert.true(app.isBound(Identifiers.Cryptography.Hash.Size.HASH256));
 		assert.true(app.isBound(Identifiers.Cryptography.Hash.Size.RIPEMD160));
 		assert.true(app.isBound(Identifiers.Cryptography.Hash.Size.SHA256));
+		assert.true(app.isBound(Identifiers.Cryptography.Hash.Size.KECCAK256));
 		assert.true(app.isBound(Identifiers.Cryptography.Hash.Factory));
 	});
 });

@@ -82,6 +82,7 @@ export const Identifiers = {
 			Factory: Symbol("Crypto<Hash.Factory>"),
 			Size: {
 				HASH256: Symbol("Crypto<Hash.Size.HASH256>"),
+				KECCAK256: Symbol("Crypto<Hash.Size.KECCAK256>"),
 				RIPEMD160: Symbol("Crypto<Hash.Size.RIPEMD160>"),
 				SHA256: Symbol("Crypto<Hash.Size.SHA256>"),
 			},

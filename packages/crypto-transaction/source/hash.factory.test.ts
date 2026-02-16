@@ -1,5 +1,6 @@
 import { Application } from "@mainsail/kernel";
 import { Identifiers } from "@mainsail/constants";
+import { ServiceProvider as HashBcryptoServiceProvider } from "@mainsail/crypto-hash-bcrypto";
 import { describe } from "@mainsail/test-runner";
 import { HashFactory } from "./hash.factory.js";
 import { Serializer } from "./serializer.js";
@@ -12,6 +13,8 @@ describe<{
 }>("HashFactory", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
 		const app = new Application();
+
+		await app.resolve(HashBcryptoServiceProvider).register();
 
 		app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer);
 		context.hasher = app.resolve(HashFactory)
