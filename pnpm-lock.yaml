@@ -1829,9 +1829,6 @@ importers:
       ajv:
         specifier: 8.17.1
         version: 8.17.1
-      bcrypto:
-        specifier: 5.5.2
-        version: 5.5.2
       viem:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
