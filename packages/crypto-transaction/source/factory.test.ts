@@ -9,6 +9,10 @@ import {
 	serializedTransactionTransfer,
 	transactionTransfer,
 } from "../test/fixtures/transaction.js";
+import {
+	Serialized,
+	Transactions
+} from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
@@ -24,24 +28,21 @@ describe<{
 	});
 
 	it("fromJson - should deserialize well-formed transaction", async ({ factory }) => {
-		try {
-			const tx = await factory.fromJson(transactionTransfer);
-			//console.log(tx.serialized.toString("hex"));
-			assert.equal(tx.serialized, Buffer.from(serializedTransactionTransfer, "hex"));
-		} catch (ex: any) {
-			console.log(ex.message);
-			assert.false(true);
-		}
+		const tx = await factory.fromJson(transactionTransfer);
+		assert.equal(tx.serialized, Buffer.from(serializedTransactionTransfer, "hex"));
 	});
 
-	it("fromHex - should deserialize well-formed transactions", async ({ factory }) => {
-		for (const serialized of [
-			serializedTransactionTransfer,
-			serializedTransactionContractCall,
-			serializedTransactionContractCallWithSecondSignature,
-			serializedTransactionDeploy,
+	it.only("fromHex - should deserialize well-formed transactions", async ({ factory }) => {
+		for (const [serialized, transaction] of [
+			[Serialized.transactionTransfer, Transactions.transactionTransfer],
+			// [Serialized.transactionContractCall, Transactions.transactionContractCall],
+			// [Serialized.transactionContractCallWithSecondSignature, Transactions.transactionContractCallWithSecondSignature],
+			// [Serialized.transactionDeploy, Transactions.transactionDeploy],
 		]) {
-			await assert.resolves(async () => factory.fromHex(serialized));
+			const tx = await factory.fromHex(serialized);
+
+			assert.equal(tx.serialized, transaction.serialized);
+			assert.equal({...tx, serialized: undefined}, {...transaction, serialized: undefined});
 		}
 	});
 
