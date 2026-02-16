@@ -91,6 +91,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				query: Joi.object({
 					...transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
+					includeTokens: Joi.bool().default(false),
 					orderBy: transactionsOrderBy,
 				})
 					.concat(transactionSortingSchema)
