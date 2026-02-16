@@ -95,7 +95,8 @@ export interface TransactionSigner {
 }
 
 export interface TransactionSerializer {
-	serialize(transaction: TransactionSerializable, options?: SerializeOptions): Promise<Buffer>;
+	serialize(transaction: TransactionSerializable): Promise<Buffer>;
+	serializeUnsigned(transaction: TransactionUnsignedSerializable): Promise<Buffer>;
 }
 
 export interface TransactionDeserializer {

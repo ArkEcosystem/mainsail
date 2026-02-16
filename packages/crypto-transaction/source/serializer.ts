@@ -6,7 +6,32 @@ import { ByteArray, Hex, toBytes, toRlp } from "viem";
 export class Serializer implements Contracts.Crypto.TransactionSerializer {
 	public async serialize(
 		transaction: Contracts.Crypto.TransactionSerializable,
-		options: Contracts.Crypto.SerializeOptions = { excludeSignature: false },
+	): Promise<Buffer> {
+		// Legacy with EIP-155
+		const normalizedV = transaction.v;
+		const v = transaction.network * 2 + 35 + normalizedV;
+
+		const fields = [
+			toBytesCompat(transaction.nonce.toBigInt()), // nonce - 0
+			toBytesCompat(transaction.gasPrice), // gasPrice - 1
+			toBytesCompat(transaction.gasLimit), // gasLimit - 2
+			toBytes(transaction.to || "0x"), // to - 3
+			toBytesCompat(transaction.value.toBigInt()), // value - 4
+			toBytes(transaction.data.startsWith("0x") ? transaction.data : `0x${transaction.data}`), // data - 5
+			toBytesCompat(v), // v - 6
+			toBytesCompat(`0x${transaction.r}`), // r - 7
+			toBytesCompat(`0x${transaction.s}`), // s - 8
+		];
+
+		if (transaction.legacySecondSignature) {
+			fields.push(toBytes(`0x${transaction.legacySecondSignature}`)); // legacy second signature - 9
+		}
+
+		return Buffer.from(`${toRlp(fields).slice(2)}`, "hex");
+	}
+
+	public async serializeUnsigned(
+		transaction: Contracts.Crypto.TransactionUnsignedSerializable,
 	): Promise<Buffer> {
 		const fields = [
 			toBytesCompat(transaction.nonce.toBigInt()), // nonce - 0
@@ -20,24 +45,7 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 			toBytesCompat(0), // s - 8
 		];
 
-		if (transaction.v !== undefined && transaction.r && transaction.s && !options.excludeSignature) {
-			// Legacy with EIP-155
-			const normalizedV = transaction.v;
-			const v = transaction.network * 2 + 35 + normalizedV;
-
-			// 6, 7, 8
-			fields[6] = toBytesCompat(v);
-			fields[7] = toBytesCompat(`0x${transaction.r}`);
-			fields[8] = toBytesCompat(`0x${transaction.s}`);
-
-			if (transaction.legacySecondSignature) {
-				// 9
-				fields.push(toBytes(`0x${transaction.legacySecondSignature}`));
-			}
-		}
-
-		const rlpEncoded = toRlp(fields);
-		return Buffer.from(`${rlpEncoded.slice(2)}`, "hex");
+		return Buffer.from(`${toRlp(fields).slice(2)}`, "hex");
 	}
 }
 
