@@ -10,7 +10,7 @@ export class Signer implements Contracts.Crypto.TransactionSigner {
 	private readonly signatureFactory!: Contracts.Crypto.SignatureEcdsa;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils!: Contracts.Crypto.TransactionUtilities;
+	private readonly utils!: Contracts.Crypto.TransactionHashFactory;
 
 	public async sign(
 		transaction: Contracts.Crypto.TransactionUnsignedSerializable,

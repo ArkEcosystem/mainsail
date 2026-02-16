@@ -25,7 +25,7 @@ export class TransactionBuilder {
 	protected readonly signer!: Contracts.Crypto.TransactionSigner;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	protected readonly utils!: Contracts.Crypto.TransactionUtilities;
+	protected readonly utils!: Contracts.Crypto.TransactionHashFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;

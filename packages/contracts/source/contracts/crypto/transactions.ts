@@ -111,7 +111,7 @@ export interface TransactionFactory {
 	fromStorage(data: TransactionStorageDataExtended): Promise<BlockTransaction>;
 }
 
-export interface TransactionUtilities {
+export interface TransactionHashFactory {
 	toHashUnsigned(transaction: TransactionUnsignedSerializable): Promise<Buffer>;
 	toHash(transaction: TransactionSerializable): Promise<Buffer>;
 }

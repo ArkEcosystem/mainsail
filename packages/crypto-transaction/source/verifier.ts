@@ -15,7 +15,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	private readonly validator!: Contracts.Crypto.Validator;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils!: Contracts.Crypto.TransactionUtilities;
+	private readonly utils!: Contracts.Crypto.TransactionHashFactory;
 
 	public async verifyHash(data: Contracts.Crypto.TransactionData): Promise<boolean> {
 		const { v, r, s, senderPublicKey } = data;
