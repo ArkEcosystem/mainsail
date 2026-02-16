@@ -83,9 +83,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		});
 	}
 
-	public async fromData(
-		data: Contracts.Crypto.TransactionSerializable,
-	): Promise<Contracts.Crypto.Transaction> {
+	public async fromData(data: Contracts.Crypto.TransactionSerializable): Promise<Contracts.Crypto.Transaction> {
 		const { error } = await this.verifier.verifySchemaSigned(data);
 
 		if (error) {

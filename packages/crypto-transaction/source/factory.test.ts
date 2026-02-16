@@ -9,10 +9,7 @@ import {
 	serializedTransactionTransfer,
 	transactionTransfer,
 } from "../test/fixtures/transaction.js";
-import {
-	Serialized,
-	Transactions
-} from "../test/fixtures/index.js";
+import { Serialized, Transactions } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
@@ -42,7 +39,7 @@ describe<{
 			const tx = await factory.fromHex(serialized);
 
 			assert.equal(tx.serialized, transaction.serialized);
-			assert.equal({...tx, serialized: undefined}, {...transaction, serialized: undefined});
+			assert.equal({ ...tx, serialized: undefined }, { ...transaction, serialized: undefined });
 		}
 	});
 

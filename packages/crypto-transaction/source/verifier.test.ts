@@ -3,10 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { describe } from "@mainsail/test-runner";
-import {
-	Transactions,
-	Serialized
-} from "../test/fixtures/index";
+import { Transactions, Serialized } from "../test/fixtures/index";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{

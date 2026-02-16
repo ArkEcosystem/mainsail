@@ -1,6 +1,6 @@
 import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Hash256, Keccak256,RIPEMD160, SHA256 } from "bcrypto";
+import { Hash256, Keccak256, RIPEMD160, SHA256 } from "bcrypto";
 
 @injectable()
 export class HashFactory implements Contracts.Crypto.HashFactory {

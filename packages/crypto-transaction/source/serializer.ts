@@ -4,9 +4,7 @@ import { ByteArray, Hex, toBytes, toRlp } from "viem";
 
 @injectable()
 export class Serializer implements Contracts.Crypto.TransactionSerializer {
-	public async serialize(
-		transaction: Contracts.Crypto.TransactionSerializable,
-	): Promise<Buffer> {
+	public async serialize(transaction: Contracts.Crypto.TransactionSerializable): Promise<Buffer> {
 		// Legacy with EIP-155
 		const normalizedV = transaction.v;
 		const v = transaction.network * 2 + 35 + normalizedV;
@@ -30,9 +28,7 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 		return Buffer.from(`${toRlp(fields).slice(2)}`, "hex");
 	}
 
-	public async serializeUnsigned(
-		transaction: Contracts.Crypto.TransactionUnsignedSerializable,
-	): Promise<Buffer> {
+	public async serializeUnsigned(transaction: Contracts.Crypto.TransactionUnsignedSerializable): Promise<Buffer> {
 		const fields = [
 			toBytesCompat(transaction.nonce.toBigInt()), // nonce - 0
 			toBytesCompat(transaction.gasPrice), // gasPrice - 1

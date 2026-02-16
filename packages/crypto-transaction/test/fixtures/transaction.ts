@@ -1,4 +1,4 @@
-import { BigNumber } from "@mainsail/utils"
+import { BigNumber } from "@mainsail/utils";
 
 export const transactionTransfer = {
 	data: "",
