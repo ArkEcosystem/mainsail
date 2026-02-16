@@ -4,13 +4,8 @@ import { Application } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { describe } from "@mainsail/test-runner";
 import {
-	serializedTransactionContractCall,
-	serializedTransactionContractCallWithSecondSignature,
-	serializedTransactionDeploy,
-	serializedTransactionTransfer,
-} from "../test/fixtures/transaction";
-import {
-	Transactions
+	Transactions,
+	Serialized
 } from "../test/fixtures/index";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
@@ -61,7 +56,7 @@ describe<{
 	it("verifyHash - should be false if v, r, s or senderPublicKey are missing", async ({ factory, verifier }) => {
 		const fields = ["v", "r", "s", "senderPublicKey"] as const;
 		for (const field of fields) {
-			const transaction = await factory.fromHex(serializedTransactionTransfer);
+			const transaction = await factory.fromHex(Serialized.transactionTransfer);
 
 			const txData = {
 				...transaction,
@@ -107,28 +102,30 @@ describe<{
 
 	it("verifySchema - should be ok", async ({ factory, verifier }) => {
 		for (const serialized of [
-			serializedTransactionContractCall,
-			serializedTransactionContractCallWithSecondSignature,
-			serializedTransactionDeploy,
-			serializedTransactionTransfer,
+			Serialized.transactionContractCall,
+			Serialized.transactionContractCallWithSecondSignature,
+			Serialized.transactionDeploy,
+			Serialized.transactionTransfer,
 		]) {
 			const transaction = await factory.fromHex(serialized);
-			assert.undefined((await verifier.verifySchema(transaction.toData(), false)).error);
-			assert.undefined((await verifier.verifySchema(transaction.toData(), true)).error);
+			assert.undefined((await verifier.verifySchemaUnsigned(transaction.toData())).error);
+			assert.undefined((await verifier.verifySchemaSigned(transaction.toData())).error);
+			assert.undefined((await verifier.verifySchemaStrict(transaction.toData())).error);
 		}
 	});
 
 	it("verifySchema - should be false", async ({ factory, verifier }) => {
 		for (const serialized of [
-			serializedTransactionContractCall,
-			serializedTransactionContractCallWithSecondSignature,
-			serializedTransactionDeploy,
-			serializedTransactionTransfer,
+			Serialized.transactionContractCall,
+			Serialized.transactionContractCallWithSecondSignature,
+			Serialized.transactionDeploy,
+			Serialized.transactionTransfer,
 		]) {
 			const transaction = (await factory.fromHex(serialized)).toData();
 
-			assert.defined((await verifier.verifySchema({ ...transaction, v: 2 }, false)).error); // Invalid v
-			assert.defined((await verifier.verifySchema({ ...transaction, test: "test" }, true)).error); // Extra property in strict mode
+			assert.defined((await verifier.verifySchemaUnsigned({ ...transaction, v: 2 })).error); // Invalid v
+			assert.defined((await verifier.verifySchemaSigned({ ...transaction, v: 2 })).error); // Invalid v
+			assert.defined((await verifier.verifySchemaStrict({ ...transaction, test: "test" })).error); // Extra property in strict mode
 		}
 	});
 
