@@ -11,13 +11,16 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
-import { EnrichedBlock, EnrichedTransaction } from "../resources/index.js";
+import { EnrichedBlock, EnrichedTransaction, TransactionTokenTransfer, TransactionTokenTransferRaw } from "../resources/index.js";
 
 @injectable()
 export class Controller extends AbstractController {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-http")
 	protected readonly apiConfiguration!: Contracts.Kernel.PluginConfiguration;
+
+	@inject(ApiDatabaseIdentifiers.DataSource)
+	protected readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
 
 	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
 	protected readonly stateRepositoryFactory!: ApiDatabaseContracts.StateRepositoryFactory;
@@ -117,31 +120,93 @@ export class Controller extends AbstractController {
 
 	protected async enrichTransactionResult(
 		resultPage: Search.ResultsPage<Models.Transaction>,
-		context?: { state?: Models.State; fullReceipt?: boolean },
+		context?: { state?: Models.State; fullReceipt?: boolean; includeTokens?: boolean },
 	): Promise<Search.ResultsPage<EnrichedTransaction>> {
 		const state = context?.state ?? (await this.getState());
+
+		let transferredTokens: Record<string, TransactionTokenTransfer[]> = {};
+		if (context?.includeTokens) {
+			transferredTokens = await this.fetchTransactionTransferredTokens(resultPage.results.map(t => t.hash));
+		}
 
 		return {
 			...resultPage,
 			results: await Promise.all(
-				resultPage.results.map((tx) => this.enrichTransaction(tx, state, context?.fullReceipt)),
+				resultPage.results.map((tx) => this.enrichTransaction(tx, { ...context, state, tokens: transferredTokens[tx.hash] })),
 			),
 		};
 	}
 
 	protected async enrichTransaction(
 		transaction: Models.Transaction,
-		state?: Models.State,
-		fullReceipt?: boolean,
+		context?: { state?: Models.State; fullReceipt?: boolean; tokens?: TransactionTokenTransfer[] },
 	): Promise<EnrichedTransaction> {
-		const [_state] = await Promise.all([state ? state : this.getState()]);
+		const [state] = await Promise.all([
+			context?.state ? context.state : this.getState()
+		]);
 
-		return { ...transaction, fullReceipt: fullReceipt ?? false, state: _state };
+		return { ...transaction, fullReceipt: context?.fullReceipt ?? false, state, tokens: context?.tokens };
+	}
+
+	protected async fetchTransactionTransferredTokens(transactionHashes: string[]): Promise<Record<string, TransactionTokenTransfer[]>> {
+		const maxTokensPerTx = 10
+
+		const sql = `
+SELECT
+  h.transaction_hash AS "transactionHash",
+  tt.from AS "from",
+  tt.to AS "to",
+  tt.value AS "value",
+  tt.index AS "index",
+  tok.address AS "tokenAddress",
+  tok.symbol AS "tokenSymbol",
+  tok.decimals AS "tokenDecimals",
+  tok.name AS "tokenName"
+FROM
+  unnest($1::text[]) AS h(transaction_hash)
+  JOIN LATERAL (
+    SELECT
+      *
+    FROM
+      token_transfers tt
+    WHERE
+      tt.transaction_hash = h.transaction_hash
+    ORDER BY
+      tt.index ASC
+    LIMIT
+      $2
+  ) tt ON true
+  JOIN tokens tok ON tok.address = tt.address
+ORDER BY
+  h.transaction_hash ASC,
+  tt.index ASC
+`;
+		const rows = await this.dataSource.query<TransactionTokenTransferRaw[]>(sql, [transactionHashes, maxTokensPerTx]);
+
+		return rows.reduce<Record<string, TransactionTokenTransfer[]>>((accumulator, current) => {
+			if (!accumulator[current.transactionHash]) {
+				accumulator[current.transactionHash] = [];
+			}
+
+			accumulator[current.transactionHash].push({
+				from: current.from,
+				index: current.index,
+				metadata: {
+					tokenAddress: current.tokenAddress,
+					tokenDecimals: current.tokenDecimals,
+					tokenName: current.tokenName,
+					tokenSymbol: current.tokenSymbol,
+				},
+				to: current.to,
+				value: current.value,
+			});
+			return accumulator;
+		}, {});
 	}
 
 	protected getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {
 		const asHeight = Number(idOrHeight);
 		// NOTE: This assumes all block ids are sha256 and never a valid number below this threshold.
-		return !isNaN(asHeight) && asHeight <= Number.MAX_SAFE_INTEGER ? { number: asHeight } : { hash: idOrHeight };
+		return !Number.isNaN(asHeight) && asHeight <= Number.MAX_SAFE_INTEGER ? { number: asHeight } : { hash: idOrHeight };
 	}
 }
