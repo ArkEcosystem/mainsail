@@ -52,19 +52,20 @@ const transaction: SchemaObject = {
 		},
 		/* eslint-enable sort-keys-fix/sort-keys-fix */
 	},
-	required: ["network", "from", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
+	required: ["network", "gasPrice", "gasLimit", "value", "nonce", "data"],
 	type: "object",
 };
 
 const transactionSigned: SchemaObject = {
 	...transaction,
 	$id: "transactionSigned",
-	required: [...transaction.required, "hash", "v", "r", "s"],
+	required: [...transaction.required, "v", "r", "s"],
 };
 
 const transactionStrict: SchemaObject = {
 	...transactionSigned,
 	$id: "transactionStrict",
+	required: [...transactionSigned.required, "hash", "from", "senderPublicKey", "senderLegacyAddress"],
 	unevaluatedProperties: false,
 };
 

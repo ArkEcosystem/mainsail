@@ -23,14 +23,16 @@ describe<{
 		gasPrice: 5 * 1e9,
 		network: 10_000,
 		nonce: 1,
-		from: "0x" + "a".repeat(40),
-		senderPublicKey: "a".repeat(66),
+		data: "",
 		value: 0,
 	};
 
 	const transactionSigned = {
 		...transactionOriginal,
 		hash: "0".repeat(64),
+		from: "0x" + "a".repeat(40),
+		senderPublicKey: "a".repeat(66),
+		senderLegacyAddress: "a".repeat(33),
 		v: 0,
 		r: "1".repeat(64),
 		s: "2".repeat(64),
@@ -135,7 +137,7 @@ describe<{
 	});
 
 	it("transactionBaseSchema - should have required fields", ({ validator }) => {
-		const requiredFields = ["network", "value", "gasPrice", "nonce", "senderPublicKey"];
+		const requiredFields = ["network", "value", "gasPrice", "nonce", "data"];
 		for (const field of requiredFields) {
 			const transaction = {
 				...transactionOriginal,
@@ -305,7 +307,7 @@ describe<{
 			...transactionSigned,
 		};
 
-		const props = ["v", "r", "s", "hash"] as const;
+		const props = ["v", "r", "s"] as const;
 		for (const prop of props) {
 			const transactionCopy = {
 				...transaction,
