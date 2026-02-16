@@ -19,7 +19,6 @@ services:
 
     node0: &nodeDefinition
         build: ./nodes
-        image: mainsail
         volumes:
             - ./../../../:/mainsail
         working_dir: /mainsail

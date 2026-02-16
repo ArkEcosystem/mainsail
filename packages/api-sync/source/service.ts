@@ -133,7 +133,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		await this.#queue.start();
 	}
 
-	public async beforeCommit(): Promise<void> {
+	public async flush(): Promise<void> {
 		await this.#queue.drain();
 	}
 

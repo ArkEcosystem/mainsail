@@ -102,7 +102,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	public async commit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (this.apiSync && unit.blockNumber > this.configuration.getGenesisHeight()) {
-			await this.apiSync.beforeCommit();
+			await this.apiSync.flush();
 		}
 
 		const commit = await unit.getCommit();
