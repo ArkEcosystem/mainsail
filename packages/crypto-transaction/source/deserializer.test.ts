@@ -10,6 +10,9 @@ import {
 	serializedTransactionTransferEqualGreater11Fields,
 	serializedTransactionTransferLessThan9Fields,
 } from "../test/fixtures/transaction";
+import {
+	Deserialized
+} from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
@@ -24,14 +27,15 @@ describe<{
 		);
 	});
 
+
 	it("should be ok", async ({ deserializer }) => {
-		for (const serialized of [
-			serializedTransactionContractCall,
-			serializedTransactionContractCallWithSecondSignature,
-			serializedTransactionDeploy,
-			serializedTransactionTransfer,
+		for (const [serialized, deserialized] of [
+			[serializedTransactionContractCall, Deserialized.transactionContractCall],
+			[serializedTransactionContractCallWithSecondSignature, Deserialized.transactionContractCallWithSecondSignature],
+			[serializedTransactionDeploy, Deserialized.transactionDeploy],
+			[serializedTransactionTransfer, Deserialized.transactionTransfer],
 		]) {
-			await assert.resolves(async () => deserializer.deserialize(Buffer.from(serialized, "hex")));
+			await assert.equal((await deserializer.deserialize(Buffer.from(serialized, "hex"))).data, deserialized);
 		}
 	});
 
