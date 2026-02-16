@@ -46,7 +46,6 @@ services:
 
     node0: &nodeDefinition
         build: ./nodes
-        image: mainsail
         volumes:
             - ./../../../:/mainsail
         depends_on:
