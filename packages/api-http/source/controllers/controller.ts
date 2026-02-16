@@ -11,7 +11,12 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
-import { EnrichedBlock, EnrichedTransaction, TransactionTokenTransfer, TransactionTokenTransferRaw } from "../resources/index.js";
+import {
+	EnrichedBlock,
+	EnrichedTransaction,
+	TransactionTokenTransfer,
+	TransactionTokenTransferRaw,
+} from "../resources/index.js";
 
 @injectable()
 export class Controller extends AbstractController {
@@ -126,13 +131,15 @@ export class Controller extends AbstractController {
 
 		let transferredTokens: Record<string, TransactionTokenTransfer[]> = {};
 		if (context?.includeTokens) {
-			transferredTokens = await this.fetchTransactionTransferredTokens(resultPage.results.map(t => t.hash));
+			transferredTokens = await this.fetchTransactionTransferredTokens(resultPage.results.map((t) => t.hash));
 		}
 
 		return {
 			...resultPage,
 			results: await Promise.all(
-				resultPage.results.map((tx) => this.enrichTransaction(tx, { ...context, state, tokens: transferredTokens[tx.hash] })),
+				resultPage.results.map((tx) =>
+					this.enrichTransaction(tx, { ...context, state, tokens: transferredTokens[tx.hash] }),
+				),
 			),
 		};
 	}
@@ -141,15 +148,15 @@ export class Controller extends AbstractController {
 		transaction: Models.Transaction,
 		context?: { state?: Models.State; fullReceipt?: boolean; tokens?: TransactionTokenTransfer[] },
 	): Promise<EnrichedTransaction> {
-		const [state] = await Promise.all([
-			context?.state ? context.state : this.getState()
-		]);
+		const [state] = await Promise.all([context?.state ? context.state : this.getState()]);
 
 		return { ...transaction, fullReceipt: context?.fullReceipt ?? false, state, tokens: context?.tokens };
 	}
 
-	protected async fetchTransactionTransferredTokens(transactionHashes: string[]): Promise<Record<string, TransactionTokenTransfer[]>> {
-		const maxTokensPerTx = 10
+	protected async fetchTransactionTransferredTokens(
+		transactionHashes: string[],
+	): Promise<Record<string, TransactionTokenTransfer[]>> {
+		const maxTokensPerTx = 10;
 
 		const sql = `
 SELECT
@@ -181,7 +188,10 @@ ORDER BY
   h.transaction_hash ASC,
   tt.index ASC
 `;
-		const rows = await this.dataSource.query<TransactionTokenTransferRaw[]>(sql, [transactionHashes, maxTokensPerTx]);
+		const rows = await this.dataSource.query<TransactionTokenTransferRaw[]>(sql, [
+			transactionHashes,
+			maxTokensPerTx,
+		]);
 
 		return rows.reduce<Record<string, TransactionTokenTransfer[]>>((accumulator, current) => {
 			if (!accumulator[current.transactionHash]) {
@@ -207,6 +217,8 @@ ORDER BY
 	protected getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {
 		const asHeight = Number(idOrHeight);
 		// NOTE: This assumes all block ids are sha256 and never a valid number below this threshold.
-		return !Number.isNaN(asHeight) && asHeight <= Number.MAX_SAFE_INTEGER ? { number: asHeight } : { hash: idOrHeight };
+		return !Number.isNaN(asHeight) && asHeight <= Number.MAX_SAFE_INTEGER
+			? { number: asHeight }
+			: { hash: idOrHeight };
 	}
 }
