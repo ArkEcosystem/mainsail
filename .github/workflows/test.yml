@@ -357,7 +357,6 @@ jobs:
 
             - name: Running checks for ${{ matrix.name }}
               run: |
-                  docker ps -a
                   container_id=$(docker ps -a | grep 'consensus-checks' | awk '{print $1}')
                   while docker ps | grep -q $container_id; do echo "checks running..."; sleep 5; done
                   exit_code=$(docker container inspect $container_id --format='{{.State.ExitCode}}')
