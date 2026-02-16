@@ -29,6 +29,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			return;
 		}
 
+		await this.app.get<Sync>(Identifiers.ApiSync.Service).flush();
+
 		await this.app.get<Listeners>(Identifiers.ApiSync.Listener).dispose();
 	}
 
