@@ -37,7 +37,7 @@ export type TransactionTokenTransfer = {
 		tokenSymbol: string;
 		tokenName: string;
 		tokenDecimals: number;
-	}
+	};
 };
 
 @injectable()
@@ -83,9 +83,9 @@ export class TransactionResource implements Contracts.Api.Resource {
 				...(resource.decodedError ? { decodedError: resource.decodedError } : {}),
 				...(resource.fullReceipt
 					? {
-						logs: resource.logs,
-						output: resource.output,
-					}
+							logs: resource.logs,
+							output: resource.output,
+						}
 					: {}),
 			},
 

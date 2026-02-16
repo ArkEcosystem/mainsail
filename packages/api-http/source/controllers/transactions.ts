@@ -32,7 +32,10 @@ export class TransactionsController extends Controller {
 		);
 
 		return this.toPagination(
-			await this.enrichTransactionResult(transactions, { fullReceipt: request.query.fullReceipt, includeTokens: request.query.includeTokens }),
+			await this.enrichTransactionResult(transactions, {
+				fullReceipt: request.query.fullReceipt,
+				includeTokens: request.query.includeTokens,
+			}),
 			TransactionResource,
 		);
 	}
@@ -59,7 +62,10 @@ export class TransactionsController extends Controller {
 		}
 
 		return this.respondWithResource(
-			await this.enrichTransaction(transaction, { fullReceipt: request.query.fullReceipt, tokens: transferredTokens }),
+			await this.enrichTransaction(transaction, {
+				fullReceipt: request.query.fullReceipt,
+				tokens: transferredTokens,
+			}),
 			TransactionResource,
 		);
 	}
