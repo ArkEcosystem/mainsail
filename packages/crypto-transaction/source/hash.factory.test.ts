@@ -1,6 +1,6 @@
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { Utils } from "./utilities.js";
+import { HashFactory } from "./hash.factory.js";
 import {
 	Deserialized,
 } from "../test/fixtures/index.js";
@@ -8,12 +8,12 @@ import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
 	app: Application;
-	hasher: Utils;
-}>("Serializer", ({ it, beforeEach, assert }) => {
+	hasher: HashFactory;
+}>("HashFactory", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.hasher = context.app.resolve(Utils)
+		context.hasher = context.app.resolve(HashFactory)
 	});
 
 	it("#toHash - should be ok", async ({ hasher }) => {

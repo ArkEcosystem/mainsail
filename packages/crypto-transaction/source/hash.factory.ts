@@ -7,7 +7,7 @@ import { ByteArray, toBytes, toRlp } from "viem";
 import { toBytesCompat } from "./serializer.js";
 
 @injectable()
-export class Utils implements Contracts.Crypto.TransactionHashFactory {
+export class HashFactory implements Contracts.Crypto.TransactionHashFactory {
 	public async toHashUnsigned(transaction: Contracts.Crypto.TransactionUnsignedSerializable): Promise<Buffer> {
 		const fields = [
 			...this.#getBaseFields(transaction),
