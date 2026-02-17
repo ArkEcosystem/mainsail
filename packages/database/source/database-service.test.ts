@@ -245,7 +245,7 @@ describe<{
 	it.skip("#findCommitBuffers - should return commit buffer", async ({ databaseService, genesisCommit }) => {
 		console.log((await databaseService.findCommitBuffers(0, 1))[0].toString("hex"));
 
-		console.log("GENESIS")
+		console.log("GENESIS");
 
 		console.log(genesisCommit.serialized);
 
@@ -292,8 +292,6 @@ describe<{
 		// 		genesisCommit.block.transactions[i],
 		// 	);
 		// }
-
-
 	});
 
 	it("#readCommits - should return commits", async ({ databaseService, genesisCommit }) => {
