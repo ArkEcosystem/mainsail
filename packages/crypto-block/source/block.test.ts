@@ -29,6 +29,9 @@ describe<{}>("Block", ({ it, assert }) => {
 
 		assertBlockData(assert, block, blockData);
 		assert.equal(block.serialized, "serialized_content");
-		assert.equal(block.transactions.map((tx) => ({ ...tx.toData() })), [indexedTransaction1, indexedTransaction2]);
+		assert.equal(
+			block.transactions.map((tx) => ({ ...tx.toData() })),
+			[indexedTransaction1, indexedTransaction2],
+		);
 	});
 });
