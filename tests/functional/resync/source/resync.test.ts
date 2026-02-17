@@ -132,4 +132,8 @@ describe<{
 
         assert.true(await forgeTransactions(context, [transferTx]));
     });
+
+    it.skip("should be ok with legacy wallets", async ({ syncNode }) => {
+        // TODO
+    });
 });
