@@ -7,7 +7,7 @@ describe("TransactionError", ({ it, assert }) => {
 		const testCases = [
 			{
 				error: "InvalidUsername",
-				transaction: { data: { gasLimit: 21000 } } as Contracts.Crypto.Transaction,
+				transaction: { gasLimit: 21000 } as Contracts.Crypto.Transaction,
 				receipt: {
 					output: Buffer.from("50ef3288", "hex"),
 					status: 0,
@@ -15,7 +15,7 @@ describe("TransactionError", ({ it, assert }) => {
 			},
 			{
 				error: "RecipientsAndAmountsMismatch",
-				transaction: { data: { gasLimit: 21000 } } as Contracts.Crypto.Transaction,
+				transaction: { gasLimit: 21000 } as Contracts.Crypto.Transaction,
 				receipt: {
 					output: Buffer.from("cdaa5276", "hex"),
 					status: 0,
@@ -23,7 +23,7 @@ describe("TransactionError", ({ it, assert }) => {
 			},
 			{
 				error: "InvalidValue",
-				transaction: { data: { gasLimit: 21000 } } as Contracts.Crypto.Transaction,
+				transaction: { gasLimit: 21000 } as Contracts.Crypto.Transaction,
 				receipt: {
 					output: Buffer.from("aa7feadc", "hex"),
 					status: 0,
@@ -31,7 +31,7 @@ describe("TransactionError", ({ it, assert }) => {
 			},
 			{
 				error: "Error (Caller is not allowed)", // revert("Caller is not allowed")
-				transaction: { data: { gasLimit: 21000 } } as Contracts.Crypto.Transaction,
+				transaction: { gasLimit: 21000 } as Contracts.Crypto.Transaction,
 				receipt: {
 					output: Buffer.from(
 						"08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001543616c6c6572206973206e6f7420616c6c6f7765640000000000000000000000",
@@ -42,7 +42,7 @@ describe("TransactionError", ({ it, assert }) => {
 			},
 			{
 				error: "Panic (0x1): An `assert` condition failed", // assert(false) - also see https://docs.soliditylang.org/en/latest/control-structures.html#panic-via-assert-and-error-via-require
-				transaction: { data: { gasLimit: 21000 } } as Contracts.Crypto.Transaction,
+				transaction: { gasLimit: 21000 } as Contracts.Crypto.Transaction,
 				receipt: {
 					output: Buffer.from(
 						"4e487b710000000000000000000000000000000000000000000000000000000000000001",
@@ -53,7 +53,7 @@ describe("TransactionError", ({ it, assert }) => {
 			},
 			{
 				error: "Panic (0x12): Division or modulo by zero", // Division By Zero
-				transaction: { data: { gasLimit: 21000 } } as Contracts.Crypto.Transaction,
+				transaction: { gasLimit: 21000 } as Contracts.Crypto.Transaction,
 				receipt: {
 					output: Buffer.from(
 						"4e487b710000000000000000000000000000000000000000000000000000000000000012",
@@ -64,7 +64,7 @@ describe("TransactionError", ({ it, assert }) => {
 			},
 			{
 				error: "out of gas",
-				transaction: { data: { gasLimit: 21000 } } as Contracts.Crypto.Transaction,
+				transaction: { gasLimit: 21000 } as Contracts.Crypto.Transaction,
 				receipt: {
 					output: Buffer.alloc(0),
 					gasUsed: 21000n,
@@ -73,7 +73,7 @@ describe("TransactionError", ({ it, assert }) => {
 			},
 			{
 				error: "execution reverted", // generic fallback
-				transaction: { data: { gasLimit: 21000 } } as Contracts.Crypto.Transaction,
+				transaction: { gasLimit: 21000 } as Contracts.Crypto.Transaction,
 				receipt: {
 					output: Buffer.from("ffffffff", "hex"),
 					status: 0,
@@ -81,7 +81,7 @@ describe("TransactionError", ({ it, assert }) => {
 			},
 			{
 				error: "execution reverted", // generic fallback
-				transaction: { data: { gasLimit: 21000 } } as Contracts.Crypto.Transaction,
+				transaction: { gasLimit: 21000 } as Contracts.Crypto.Transaction,
 				receipt: {
 					output: Buffer.from("ff"),
 					status: 0,
@@ -89,7 +89,7 @@ describe("TransactionError", ({ it, assert }) => {
 			},
 			{
 				error: "execution reverted", // generic fallback
-				transaction: { data: { gasLimit: 21000 } } as Contracts.Crypto.Transaction,
+				transaction: { gasLimit: 21000 } as Contracts.Crypto.Transaction,
 				receipt: {
 					output: Buffer.alloc(0),
 					status: 0,
@@ -97,7 +97,7 @@ describe("TransactionError", ({ it, assert }) => {
 			},
 			{
 				error: "execution reverted", // generic fallback
-				transaction: { data: { gasLimit: 30000 } } as Contracts.Crypto.Transaction,
+				transaction: { gasLimit: 30000 } as Contracts.Crypto.Transaction,
 				receipt: {
 					output: Buffer.alloc(0),
 					gasUsed: 21000n,
