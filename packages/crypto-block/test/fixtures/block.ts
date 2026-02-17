@@ -57,7 +57,7 @@ export const blockDataWithTransactions: Contracts.Crypto.BlockData = {
 	timestamp: 1_703_128_709_748,
 	transactions: [
 		{
-			data: "",
+			data: "0x",
 			from: "0xE33074cBE63A1f86cc8EAb97b2099732F15284fE",
 			gasLimit: 1_000_000,
 			gasPrice: 5_000_000_000,
@@ -74,7 +74,7 @@ export const blockDataWithTransactions: Contracts.Crypto.BlockData = {
 			value: BigNumber.ZERO,
 		},
 		{
-			data: "",
+			data: "0x",
 			from: "0x8ae872F64bA0731f66F847f4e8Fc0796dF0bCc08",
 			gasLimit: 1_000_000,
 			gasPrice: 5_000_000_000,
@@ -111,7 +111,7 @@ export const blockDataWithTransactionsJson: Contracts.Crypto.BlockJson = {
 	timestamp: 1_703_128_709_748,
 	transactions: [
 		{
-			data: "",
+			data: "0x",
 			from: "0xE33074cBE63A1f86cc8EAb97b2099732F15284fE",
 			gasLimit: 1_000_000,
 			gasPrice: 5_000_000_000,
@@ -126,7 +126,7 @@ export const blockDataWithTransactionsJson: Contracts.Crypto.BlockJson = {
 			value: "0",
 		},
 		{
-			data: "",
+			data: "0x",
 			from: "0x8ae872F64bA0731f66F847f4e8Fc0796dF0bCc08",
 			gasLimit: 1_000_000,
 			gasPrice: 5_000_000_000,

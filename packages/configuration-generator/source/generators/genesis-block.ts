@@ -173,7 +173,7 @@ export class GenesisBlockGenerator extends Generator {
 				abi: ConsensusAbi.abi,
 				args: [`0x${sender.consensusKeys.publicKey}`],
 				functionName: "registerValidator",
-			}).slice(2);
+			});
 
 			result[index] = await (
 				await this.app
@@ -200,7 +200,7 @@ export class GenesisBlockGenerator extends Generator {
 				abi: ConsensusAbi.abi,
 				args: [sender.address],
 				functionName: "vote",
-			}).slice(2);
+			});
 
 			result[index] = await (
 				await this.app
@@ -283,7 +283,7 @@ export class GenesisBlockGenerator extends Generator {
 					timestamp,
 					validatorAddress: proposer,
 				},
-				data: Buffer.from(transaction.data, "hex"),
+				data: Buffer.from(transaction.data.slice(2), "hex"),
 				from: transaction.from,
 				gasLimit: BigInt(transaction.gasLimit),
 				gasPrice: BigInt(transaction.gasPrice),
