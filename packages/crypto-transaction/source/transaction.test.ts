@@ -2,7 +2,7 @@ import { describe } from "@mainsail/test-runner";
 import { transactionTransferData, serializedTransactionTransfer } from "../test/fixtures/transaction.js";
 import { Transaction } from "./transaction.js";
 
-describe("Signer", ({ it, assert }) => {
+describe("Transaction", ({ it, assert }) => {
 	it("should create transaction and convert toData", () => {
 		const transaction = new Transaction(transactionTransferData, Buffer.from(serializedTransactionTransfer, "hex"));
 
