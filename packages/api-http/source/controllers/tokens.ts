@@ -119,6 +119,10 @@ export class TokensController extends Controller {
 			tokenTransfersQuery.where("tf.address = :address", { address: request.params.address });
 		}
 
+		if (request.query.transactionHash) {
+			tokenTransfersQuery.andWhere("tf.transaction_hash = :transactionHash", { transactionHash: request.query.transactionHash });
+		}
+
 		if (request.query.from) {
 			const from = Array.isArray(request.query.from) ? request.query.from : [request.query.from];
 			tokenTransfersQuery.andWhere("tf.from IN (:...from)", { from });

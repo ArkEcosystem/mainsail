@@ -7,6 +7,7 @@ import { TokensController } from "../controllers/tokens.js";
 import { address } from "../schemas/schemas.js";
 import { tokenNameSchema } from "../schemas/tokens.js";
 import { walletAddressSchema } from "../schemas/wallets.js";
+import { transactionHashSchema } from "../schemas/transactions.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(TokensController);
@@ -43,6 +44,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				query: Joi.object({
 					from: Schemas.orEqualCriteria(walletAddressSchema),
 					to: Schemas.orEqualCriteria(walletAddressSchema),
+					transactionHash: Schemas.orEqualCriteria(transactionHashSchema),
 				}).concat(Schemas.pagination),
 			},
 		},
@@ -73,6 +75,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				query: Joi.object({
 					from: Schemas.orEqualCriteria(walletAddressSchema),
 					to: Schemas.orEqualCriteria(walletAddressSchema),
+					transactionHash: Schemas.orEqualCriteria(transactionHashSchema),
 				}).concat(Schemas.pagination),
 			},
 		},
