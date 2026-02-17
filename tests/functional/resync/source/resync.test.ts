@@ -51,4 +51,36 @@ describe<{
 
         assert.true(await forgeTransactions(context, [unvoteTx]));
     });
+
+    it("should be ok with usernames", async ({ syncNode }) => {
+        const wallets = await getWallets(syncNode);
+
+        const context = { app: syncNode, wallets };
+        const randomWallet = await Utils.getRandomColdWallet(context);
+
+        const fundTx = await EvmCalls.makeEvmCall(context, {
+            recipient: randomWallet.address,
+            value: parseEther("300"),
+        });
+        assert.true(await forgeTransactions(context, [fundTx]));
+
+        const usernameTx = await EvmCalls.makeUsernameRegistration(context, {
+            sender: randomWallet.keyPair,
+            username: "bob",
+        });
+        assert.true(await forgeTransactions(context, [usernameTx]));
+
+        const usernameResignationTx = await EvmCalls.makeUsernameResignation(context, {
+            sender: randomWallet.keyPair,
+        });
+
+        assert.true(await forgeTransactions(context, [usernameResignationTx]));
+
+        const reregisterUsernameTx = await EvmCalls.makeUsernameRegistration(context, {
+            sender: wallets[0],
+            username: "bob"
+        });
+
+        assert.true(await forgeTransactions(context, [reregisterUsernameTx]));
+    });
 });
