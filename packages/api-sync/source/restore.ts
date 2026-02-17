@@ -633,75 +633,76 @@ export class Restore {
 					attributes: {
 						...(validatorAttributes
 							? {
-								validatorFee: validatorAttributes.fee,
-								validatorPublicKey: validatorAttributes.blsPublicKey,
-								validatorResigned: validatorAttributes.isResigned,
-								validatorVoteBalance: validatorAttributes.voteBalance,
-								validatorVotersCount: validatorAttributes.votersCount,
+									validatorFee: validatorAttributes.fee,
+									validatorPublicKey: validatorAttributes.blsPublicKey,
+									validatorResigned: validatorAttributes.isResigned,
+									validatorVoteBalance: validatorAttributes.voteBalance,
+									validatorVotersCount: validatorAttributes.votersCount,
 
-								...(validatorAttributes.totalForgedFees.isGreaterThan(0)
-									? { validatorForgedFees: validatorAttributes.totalForgedFees.toFixed() }
-									: {}),
-								...(validatorAttributes.totalForgedRewards.isGreaterThan(0)
-									? { validatorForgedRewards: validatorAttributes.totalForgedRewards.toFixed() }
-									: {}),
-								...(validatorAttributes.totalForgedFees
-									.plus(validatorAttributes.totalForgedRewards)
-									.isGreaterThan(0)
-									? {
-										validatorForgedTotal: validatorAttributes.totalForgedFees
-											.plus(validatorAttributes.totalForgedRewards)
-											.toFixed(),
-									}
-									: {}),
-								...(validatorAttributes.producedBlocks > 0
-									? { validatorProducedBlocks: validatorAttributes.producedBlocks }
-									: {}),
-								...(validatorAttributes.lastBlock
-									? {
-										validatorLastBlock: {
-											hash: validatorAttributes.lastBlock.hash,
-											number: validatorAttributes.lastBlock.number,
-											timestamp: validatorAttributes.lastBlock.timestamp,
-										}
-									} : {}),
+									...(validatorAttributes.totalForgedFees.isGreaterThan(0)
+										? { validatorForgedFees: validatorAttributes.totalForgedFees.toFixed() }
+										: {}),
+									...(validatorAttributes.totalForgedRewards.isGreaterThan(0)
+										? { validatorForgedRewards: validatorAttributes.totalForgedRewards.toFixed() }
+										: {}),
+									...(validatorAttributes.totalForgedFees
+										.plus(validatorAttributes.totalForgedRewards)
+										.isGreaterThan(0)
+										? {
+												validatorForgedTotal: validatorAttributes.totalForgedFees
+													.plus(validatorAttributes.totalForgedRewards)
+													.toFixed(),
+											}
+										: {}),
+									...(validatorAttributes.producedBlocks > 0
+										? { validatorProducedBlocks: validatorAttributes.producedBlocks }
+										: {}),
+									...(validatorAttributes.lastBlock
+										? {
+												validatorLastBlock: {
+													hash: validatorAttributes.lastBlock.hash,
+													number: validatorAttributes.lastBlock.number,
+													timestamp: validatorAttributes.lastBlock.timestamp,
+												},
+											}
+										: {}),
 
-								// updated at end of db transaction
-								// - validatorRank
-								// - validatorApproval
-							}
+									// updated at end of db transaction
+									// - validatorRank
+									// - validatorApproval
+								}
 							: {}),
 						...(userAttributes
 							? {
-								...(userAttributes.username ? { username: userAttributes.username } : {}),
-								...(userAttributes.vote ? { vote: userAttributes.vote } : {}),
-								...(userAttributes.legacyNonce !== undefined
-									? { legacyNonce: userAttributes.legacyNonce.toString() }
-									: {}),
-								...(userAttributes.legacyMerge
-									? // merged legacy cold wallets
-									{ isLegacy: true, legacyMerge: userAttributes.legacyMerge }
-									: {}),
-							}
+									...(userAttributes.username ? { username: userAttributes.username } : {}),
+									...(userAttributes.vote ? { vote: userAttributes.vote } : {}),
+									...(userAttributes.legacyNonce !== undefined
+										? { legacyNonce: userAttributes.legacyNonce.toString() }
+										: {}),
+									...(userAttributes.legacyMerge
+										? // merged legacy cold wallets
+											{ isLegacy: true, legacyMerge: userAttributes.legacyMerge }
+										: {}),
+								}
 							: {}),
 						...(context.legacyAddresses.has(account.address)
 							? {
-								// all legacy non-cold wallets
-								isLegacy: true,
-							}
+									// all legacy non-cold wallets
+									isLegacy: true,
+								}
 							: {}),
 						...(legacyAttributes && Object.keys(legacyAttributes).length > 0
 							? {
-								...(legacyAttributes.legacyNonce !== undefined
-									? { legacyNonce: legacyAttributes.legacyNonce.toString() }
-									: {}),
-								...(legacyAttributes.secondPublicKey
-									? { secondPublicKey: legacyAttributes.secondPublicKey }
-									: {}),
-								...(legacyAttributes.multiSignature
-									? { multiSignature: legacyAttributes.multiSignature }
-									: {}),
-							}
+									...(legacyAttributes.legacyNonce !== undefined
+										? { legacyNonce: legacyAttributes.legacyNonce.toString() }
+										: {}),
+									...(legacyAttributes.secondPublicKey
+										? { secondPublicKey: legacyAttributes.secondPublicKey }
+										: {}),
+									...(legacyAttributes.multiSignature
+										? { multiSignature: legacyAttributes.multiSignature }
+										: {}),
+								}
 							: {}),
 					} as string, // is converted into JSONB column
 					balance: BigNumber.make(account.balance).toFixed(),
@@ -749,11 +750,11 @@ export class Restore {
 					balance: BigNumber.make(wallet.balance).toFixed(),
 					...(Object.keys(wallet.legacyAttributes).length > 0
 						? {
-							attributes: {
-								...wallet.legacyAttributes,
-								...{ legacyNonce: wallet.legacyAttributes.legacyNonce?.toString() },
-							},
-						}
+								attributes: {
+									...wallet.legacyAttributes,
+									...{ legacyNonce: wallet.legacyAttributes.legacyNonce?.toString() },
+								},
+							}
 						: {}),
 					mergeInfoTransactionHash: wallet.mergeInfo?.txHash,
 					mergeInfoWalletAddress: wallet.mergeInfo?.address,
