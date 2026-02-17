@@ -51,6 +51,9 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 					return;
 				}
 
+				console.log("COMMIT STORAGE", commitStorage.transactions[53]);
+				console.log("COMMIT DATA", commitStorage.transactions[53].data.toString("hex"));
+
 				const commit = await this.commitFactory.fromStorage(commitStorage);
 				return Buffer.from(commit.serialized, "hex");
 			}),
@@ -105,8 +108,10 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	public async findBlocks(start: number, end: number): Promise<Contracts.Crypto.Block[]> {
+		const commitBuffers = await this.findCommitBuffers(start, end);
+
 		return await this.#map(
-			await this.findCommitBuffers(start, end),
+			commitBuffers,
 			async (block: Buffer) => (await this.commitFactory.fromBytes(block)).block,
 		);
 	}
