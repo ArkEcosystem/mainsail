@@ -120,7 +120,9 @@ export class TokensController extends Controller {
 		}
 
 		if (request.query.transactionHash) {
-			tokenTransfersQuery.andWhere("tf.transaction_hash = :transactionHash", { transactionHash: request.query.transactionHash });
+			tokenTransfersQuery.andWhere("tf.transaction_hash = :transactionHash", {
+				transactionHash: request.query.transactionHash,
+			});
 		}
 
 		if (request.query.from) {
