@@ -15,7 +15,7 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 			toBytesCompat(transaction.gasLimit), // gasLimit - 2
 			toBytes(transaction.to || "0x"), // to - 3
 			toBytesCompat(transaction.value.toBigInt()), // value - 4
-			toBytes(transaction.data.startsWith("0x") ? transaction.data : `0x${transaction.data}`), // data - 5
+			toBytes(transaction.data), // data - 5
 			toBytesCompat(v), // v - 6
 			toBytesCompat(`0x${transaction.r}`), // r - 7
 			toBytesCompat(`0x${transaction.s}`), // s - 8
@@ -35,7 +35,7 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 			toBytesCompat(transaction.gasLimit), // gasLimit - 2
 			toBytes(transaction.to || "0x"), // to - 3
 			toBytesCompat(transaction.value.toBigInt()), // value - 4
-			toBytes(transaction.data.startsWith("0x") ? transaction.data : `0x${transaction.data}`), // data - 5
+			toBytes(transaction.data), // data - 5
 			toBytesCompat(transaction.network), // v - 6
 			toBytesCompat(0), // r - 7
 			toBytesCompat(0), // s - 8
