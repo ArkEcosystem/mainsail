@@ -62,7 +62,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	): Promise<Contracts.Crypto.BlockTransaction> {
 		const transactionData: Contracts.Crypto.TransactionData = {
 			...transaction,
-			data: transaction.data.toString("hex"),
+			data: "0x" + transaction.data.toString("hex"),
 			gasLimit: Number(transaction.gasLimit),
 			gasPrice: Number(transaction.gasPrice),
 			hash: transaction.txHash,

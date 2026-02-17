@@ -238,7 +238,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 
 			transactions.push({
 				blockNumber: block.number,
-				data: Buffer.from(transaction.data, "hex"),
+				data: Buffer.from(transaction.data.slice(2), "hex"),
 				from: transaction.from,
 				gasLimit: BigInt(transaction.gasLimit),
 				gasPrice: BigInt(transaction.gasPrice),
