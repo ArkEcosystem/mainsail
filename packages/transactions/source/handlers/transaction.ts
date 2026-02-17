@@ -50,7 +50,7 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 
 		const preverified = await evm.preverifyTransaction({
 			blockGasLimit: BigInt(milestone.block.maxGasLimit),
-			data: Buffer.from(transaction.data, "hex"),
+			data: Buffer.from(transaction.data.slice(2), "hex"),
 			from: transaction.from,
 			gasLimit: BigInt(transaction.gasLimit),
 			gasPrice: BigInt(transaction.gasPrice),
@@ -80,7 +80,7 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 			const { instance, blockContext } = context.evm;
 			const data = {
 				blockContext,
-				data: Buffer.from(transaction.data, "hex"),
+				data: Buffer.from(transaction.data.slice(2), "hex"),
 				from: transaction.from,
 				gasLimit: BigInt(transaction.gasLimit),
 				gasPrice: BigInt(transaction.gasPrice),
