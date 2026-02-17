@@ -83,4 +83,31 @@ describe<{
 
         assert.true(await forgeTransactions(context, [reregisterUsernameTx]));
     });
+
+    it("should be ok with validators", async ({ syncNode }) => {
+        const wallets = await getWallets(syncNode);
+
+        const context = { app: syncNode, wallets };
+        const randomWallet = await Utils.getRandomColdWallet(context);
+
+        const fundTx = await EvmCalls.makeEvmCall(context, {
+            recipient: randomWallet.address,
+            value: parseEther("300"),
+        });
+        assert.true(await forgeTransactions(context, [fundTx]));
+
+        const { publicKey: validatorPublicKey } = await getRandomConsensusKeyPair(context);
+        const validatorRegistrationTx = await EvmCalls.makeValidatorRegistration(context, {
+            sender: randomWallet.keyPair,
+            validatorPublicKey,
+        });
+
+        assert.true(await forgeTransactions(context, [validatorRegistrationTx]));
+
+        const validatorResignationTx = await EvmCalls.makeValidatorResignation(context, {
+            sender: randomWallet.keyPair,
+        });
+
+        assert.true(await forgeTransactions(context, [validatorResignationTx]));
+    });
 });
