@@ -32,7 +32,7 @@ describe<{
 	it.only("fromHex - should deserialize well-formed transactions", async ({ factory }) => {
 		for (const [serialized, transaction] of [
 			[Serialized.transactionTransfer, Transactions.transactionTransfer],
-			// [Serialized.transactionContractCall, Transactions.transactionContractCall],
+			[Serialized.transactionContractCall, Transactions.transactionContractCall],
 			// [Serialized.transactionContractCallWithSecondSignature, Transactions.transactionContractCallWithSecondSignature],
 			// [Serialized.transactionDeploy, Transactions.transactionDeploy],
 		]) {

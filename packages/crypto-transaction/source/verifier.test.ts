@@ -22,7 +22,7 @@ describe<{
 		gasPrice: 5000000000,
 		gasLimit: 1000000,
 		nonce: BigNumber.ZERO,
-		data: "",
+		data: "0x",
 		v: 0,
 		r: "921101a4583fb153ec00e501f3c2e2636114e1c8c58d2df8a19426cc066a6768",
 		s: "22db4bce1e0ace485ce0838d178b4d5bcfa9f69b315a14c580d9b01e5c980bdd",

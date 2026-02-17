@@ -23,7 +23,7 @@ describe<{
 		gasPrice: 5 * 1e9,
 		network: 10_000,
 		nonce: 1,
-		data: "",
+		data: "0x",
 		value: 0,
 	};
 
@@ -119,7 +119,7 @@ describe<{
 	it("networkByte - should not be ok", ({ validator }) => {
 		assert.defined(validator.validate("networkByte", 123).error);
 		assert.defined(validator.validate("networkByte", null).error);
-		assert.defined(validator.validate("networkByte").error);
+		assert.defined(validator.validate("networkByte", undefined).error);
 		assert.defined(validator.validate("networkByte", {}).error);
 	});
 

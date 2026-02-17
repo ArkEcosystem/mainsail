@@ -135,15 +135,9 @@ export const makeKeywords = (
 				const maxBytecodeLength = maximumGasLimit / 16;
 				const minBytecodeLength = 0;
 
-				const regex = new RegExp(`^(0x)?[0-9a-fA-F]{${minBytecodeLength},${maxBytecodeLength}}$`);
+				const regex = new RegExp(`^(0x)[0-9a-fA-F]{${minBytecodeLength},${maxBytecodeLength}}$`);
 				if (!regex.test(data)) {
 					return false;
-				}
-
-				if (parentSchema && parentSchema.parentData && parentSchema.parentDataProperty) {
-					parentSchema.parentData[parentSchema.parentDataProperty] = data.startsWith("0x")
-						? data.slice(2)
-						: data;
 				}
 
 				return true;
@@ -155,7 +149,6 @@ export const makeKeywords = (
 			properties: {},
 			type: "object",
 		},
-		modifying: true,
 	};
 
 	return {

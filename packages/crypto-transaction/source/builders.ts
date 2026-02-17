@@ -42,7 +42,7 @@ export class TransactionBuilder {
 		this.data.from = "";
 		this.data.gasLimit = 1_000_000;
 		this.data.gasPrice = 5 * 1e9;
-		this.data.data = "";
+		this.data.data = "0x";
 	}
 
 	public async build(data: Partial<Contracts.Crypto.TransactionData> = {}): Promise<Contracts.Crypto.Transaction> {

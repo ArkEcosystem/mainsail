@@ -115,10 +115,8 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined(context.validator.validate("test", "").error);
 		assert.undefined(context.validator.validate("test", "0x00").error);
 		assert.undefined(context.validator.validate("test", "0x").error);
-		assert.undefined(context.validator.validate("test", "00").error);
 
 		const maxBytecodeLength = cryptoJson.milestones[0].gas!.maximumGasLimit / 16;
 		const maxPayload = "0x" + "a".repeat(maxBytecodeLength);
@@ -126,36 +124,12 @@ describe<{
 
 		assert.defined(context.validator.validate("test", maxPayload + "aa").error);
 
+		assert.defined(context.validator.validate("test", "").error);
+		assert.defined(context.validator.validate("test", "00").error);
 		assert.defined(context.validator.validate("test", 1).error);
 		assert.defined(context.validator.validate("test", 0).error);
 		assert.defined(context.validator.validate("test", -1).error);
 		assert.defined(context.validator.validate("test", Number.MAX_SAFE_INTEGER).error);
 		assert.defined(context.validator.validate("test", "asdf").error);
-	});
-
-	it("keyword bytecode should remove 0x prefix", (context) => {
-		const schema = {
-			$id: "test",
-			type: "object",
-			properties: {
-				payload: { bytecode: {} },
-			},
-		};
-
-		context.validator.addSchema(schema);
-
-		const withPrefix = {
-			payload: "0xdead",
-		};
-
-		assert.undefined(context.validator.validate("test", withPrefix).error);
-		assert.equal(withPrefix.payload, "dead");
-
-		const withoutPrefix = {
-			payload: "dead",
-		};
-
-		assert.undefined(context.validator.validate("test", withoutPrefix).error);
-		assert.equal(withoutPrefix.payload, "dead");
 	});
 });

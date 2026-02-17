@@ -1,7 +1,7 @@
 import { BigNumber } from "@mainsail/utils";
 
 export const transactionTransfer = {
-	data: "",
+	data: "0x",
 	gasLimit: 1000000,
 	gasPrice: 5000000000,
 	network: 10000,

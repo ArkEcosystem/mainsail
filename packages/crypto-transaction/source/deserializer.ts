@@ -216,6 +216,6 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 	}
 
 	#parseData(value: Hex): string {
-		return value === "0x" ? "" : value;
+		return value;
 	}
 }
