@@ -110,4 +110,26 @@ describe<{
 
         assert.true(await forgeTransactions(context, [validatorResignationTx]));
     });
+
+    it("should be ok with tokens", async ({ syncNode }) => {
+        const wallets = await getWallets(syncNode);
+
+        const context = { app: syncNode, wallets };
+        const deployTx = await EvmCalls.makeEvmCallDeployErc20Contract(context);
+        const erc20Address = getCreateAddress({
+            from: deployTx.data.from as Hex,
+            nonce: 2n,
+        });
+
+        assert.true(await forgeTransactions(context, [deployTx]));
+
+        const randomWallet = await Utils.getRandomColdWallet(context);
+
+        const transferTx = await EvmCalls.makeEvmCall(context, {
+            recipient: erc20Address,
+            payload: EvmCalls.encodeErc20Transfer(randomWallet.address, parseEther("1000"))
+        });
+
+        assert.true(await forgeTransactions(context, [transferTx]));
+    });
 });
