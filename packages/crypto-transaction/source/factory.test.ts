@@ -6,12 +6,6 @@ import {
 	TransactionSchemaError,
 } from "@mainsail/exceptions";
 
-import {
-	serializedTransactionContractCall,
-	serializedTransactionContractCallWithSecondSignature,
-	serializedTransactionDeploy,
-	serializedTransactionTransfer,
-} from "../test/fixtures/transaction.js";
 import { Serialized, Transactions, Storage, Json } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
@@ -63,7 +57,7 @@ describe<{
 
 	it("fromHex - should reject transaction with trailing bytes", async ({ factory }) => {
 		for (const hex of ["00", "01", "deadbeef", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			const serializedWithTrailingBytes = serializedTransactionTransfer + hex;
+			const serializedWithTrailingBytes = Serialized.transactionTransfer + hex;
 			await assert.rejects(
 				async () => factory.fromHex(serializedWithTrailingBytes),
 				"Failed to deserialize transaction, encountered invalid bytes: decoded RLP contains trailing bytes",
@@ -73,7 +67,7 @@ describe<{
 
 	it("fromHex - should reject transaction with leading bytes", async ({ factory }) => {
 		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			const serializedWithTrailingBytes = hex + serializedTransactionTransfer;
+			const serializedWithTrailingBytes = hex + Serialized.transactionTransfer;
 			await assert.rejects(
 				async () => factory.fromHex(serializedWithTrailingBytes),
 				"Failed to deserialize transaction, encountered invalid bytes: decode RLP not a list",
@@ -83,7 +77,7 @@ describe<{
 
 	it("fromHex - should reject transaction with leading bytes", async ({ factory }) => {
 		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			const serializedWithTrailingBytes = hex + serializedTransactionTransfer;
+			const serializedWithTrailingBytes = hex + Serialized.transactionTransfer;
 			await assert.rejects(
 				async () => factory.fromHex(serializedWithTrailingBytes),
 				"Failed to deserialize transaction, encountered invalid bytes: decode RLP not a list",
@@ -105,10 +99,10 @@ describe<{
 
 	it("fromBytes - should deserialize well-formed transactions", async ({ factory }) => {
 		for (const serialized of [
-			serializedTransactionTransfer,
-			serializedTransactionContractCall,
-			serializedTransactionContractCallWithSecondSignature,
-			serializedTransactionDeploy,
+			Serialized.transactionTransfer,
+			Serialized.transactionContractCall,
+			Serialized.transactionContractCallWithSecondSignature,
+			Serialized.transactionDeploy,
 		]) {
 			await assert.resolves(async () => factory.fromBytes(Buffer.from(serialized, "hex")));
 		}

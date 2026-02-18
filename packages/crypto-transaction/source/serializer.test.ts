@@ -2,12 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import {
-	serializedTransactionContractCall,
-	serializedTransactionContractCallWithSecondSignature,
-	serializedTransactionDeploy,
-	serializedTransactionTransfer,
-} from "../test/fixtures/transaction";
+import { Serialized } from "../test/fixtures/index";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
@@ -28,10 +23,10 @@ describe<{
 
 	it("should be ok", async ({ serializer, deserializer }) => {
 		for (const serialized of [
-			serializedTransactionContractCall,
-			serializedTransactionContractCallWithSecondSignature,
-			serializedTransactionDeploy,
-			serializedTransactionTransfer,
+			Serialized.transactionContractCall,
+			Serialized.transactionContractCallWithSecondSignature,
+			Serialized.transactionDeploy,
+			Serialized.transactionTransfer,
 		]) {
 			const deserialized = await deserializer.deserialize(Buffer.from(serialized, "hex"));
 			const reserialized = await serializer.serialize(deserialized.data);
@@ -43,10 +38,10 @@ describe<{
 	// TODO: Check why network doesn't match
 	// it("should be ok without signature", async ({ serializer, deserializer }) => {
 	// 	for (const serialized of [
-	// 		serializedTransactionContractCall,
-	// 		serializedTransactionContractCallWithSecondSignature,
-	// 		serializedTransactionDeploy,
-	// 		serializedTransactionTransfer,
+	// 		Serialized.transactionContractCall,
+	// 		Serialized.transactionContractCallWithSecondSignature,
+	// 		Serialized.transactionDeploy,
+	// 		Serialized.transactionTransfer,
 	// 	]) {
 	// 		const deserializedFull = await deserializer.deserialize(Buffer.from(serialized, "hex"));
 	// 		const reserialized = await serializer.serialize(deserializedFull.data, { excludeSignature: true });
