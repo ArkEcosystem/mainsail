@@ -5,6 +5,8 @@ import { BigNumber } from "@mainsail/utils";
 import { describe } from "@mainsail/test-runner";
 import { Transactions, Serialized } from "../test/fixtures/index";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
+import { InvalidLegacySecondSignatureError, MissingLegacySecondSignatureError } from "@mainsail/exceptions";
+
 
 describe<{
 	app: Application;
@@ -126,10 +128,21 @@ describe<{
 		}
 	});
 
-	// it("verifyLegacySecondSignature - should be ok", async ({ factory, verifier }) => {
-	// 	const transaction = await factory.fromHex(serializedTransactionContractCallWithSecondSignature);
+	it("verifyLegacySecondSignature - should be ok", async ({ factory, verifier }) => {
+		const transaction = await factory.fromHex(Serialized.transactionTransferWithSecondSignature);
 
-	// 	console.log(transaction);
-	// 	// assert.undefined((await verifier.verifyLegacySecondSignature(transaction.toData(), false)).error);
-	// });
+		assert.true(await verifier.verifyLegacySecondSignature(transaction.toData(), "02f0f1217bace23ac2ac9438b65a8dcc693905bee511b49d5ade499a8c8da8a3e4"));
+	});
+
+	it("verifyLegacySecondSignature - should throw if invalid", async ({ factory, verifier }) => {
+		const transaction = await factory.fromHex(Serialized.transactionTransferWithSecondSignature);
+
+		await assert.rejects(() => 	 verifier.verifyLegacySecondSignature(transaction.toData(), "02f0f1217bace23ac2ac9438b65a8dcc693905bee511b49d5ade499a8c8da8a3e6"), InvalidLegacySecondSignatureError);
+	});
+
+	it("verifyLegacySecondSignature - should throw if legacySecondSignature is missing", async ({ factory, verifier }) => {
+		const transaction = await factory.fromHex(Serialized.transactionTransfer);
+
+		await assert.rejects(() => 	 verifier.verifyLegacySecondSignature(transaction.toData(), "02f0f1217bace23ac2ac9438b65a8dcc693905bee511b49d5ade499a8c8da8a3e4"), MissingLegacySecondSignatureError);
+	});
 });
