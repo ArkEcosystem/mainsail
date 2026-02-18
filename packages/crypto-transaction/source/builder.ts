@@ -17,6 +17,9 @@ export class TransactionBuilder {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	protected readonly factory!: TransactionFactory;
 
+	@inject(Identifiers.Cryptography.Legacy.Identity.AddressFactory)
+	private readonly legacyAddressFactory!: Contracts.Crypto.AddressFactory;
+
 	@inject(Identifiers.Cryptography.Identity.KeyPair.Factory)
 	@tagged("type", "wallet")
 	private readonly keyPairFactory!: Contracts.Crypto.KeyPairFactory;
@@ -32,17 +35,24 @@ export class TransactionBuilder {
 
 	public data!: Utils.Mutable<Contracts.Crypto.TransactionData>;
 
-	protected signWithSenderAsRecipient = false;
-
 	@postConstruct()
 	public postConstruct(): void {
-		this.initializeData();
-
-		this.data.value = BigNumber.ZERO;
-		this.data.from = "";
-		this.data.gasLimit = 1_000_000;
-		this.data.gasPrice = 5 * 1e9;
-		this.data.data = "0x";
+		this.data = {
+			data: "0x",
+			from: "",
+			gasLimit: 1_000_000,
+			gasPrice: 5 * 1e9,
+			hash: undefined,
+			network: this.configuration.get<number>("network.chainId"),
+			nonce: BigNumber.ZERO,
+			r: "0",
+			s: "0",
+			senderLegacyAddress: "",
+			senderPublicKey: "",
+			to: undefined,
+			v: 0,
+			value: BigNumber.ZERO,
+		}
 	}
 
 	public async build(data: Partial<Contracts.Crypto.TransactionData> = {}): Promise<Contracts.Crypto.Transaction> {
@@ -139,7 +149,9 @@ export class TransactionBuilder {
 		}
 
 		const struct: Contracts.Crypto.TransactionData = {
+			data: this.data.data,
 			from: this.data.from,
+			gasLimit: this.data.gasLimit,
 			gasPrice: this.data.gasPrice,
 			hash: await this.#getHash(),
 			legacySecondSignature: this.data.legacySecondSignature,
@@ -147,11 +159,12 @@ export class TransactionBuilder {
 			nonce: this.data.nonce,
 			r: this.data.r,
 			s: this.data.s,
+			senderLegacyAddress: this.data.senderLegacyAddress,
 			senderPublicKey: this.data.senderPublicKey,
 			to: this.data.to,
 			v: this.data.v,
 			value: this.data.value,
-		} as Contracts.Crypto.TransactionData;
+		};
 
 		return struct;
 	}
@@ -163,10 +176,7 @@ export class TransactionBuilder {
 	async #signWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TransactionBuilder> {
 		this.data.senderPublicKey = keys.publicKey;
 		this.data.from = await this.addressFactory.fromPublicKey(keys.publicKey);
-
-		if (this.signWithSenderAsRecipient) {
-			this.data.to = this.data.from;
-		}
+		this.data.senderLegacyAddress = await this.legacyAddressFactory.fromPublicKey(keys.publicKey);
 
 		const data = this.#getSigningObject();
 		const { error } = await this.verifier.verifySchemaUnsigned(data);
@@ -197,27 +207,16 @@ export class TransactionBuilder {
 		return this.instance();
 	}
 
-	#getSigningObject(): Contracts.Crypto.TransactionData {
-		const data: Contracts.Crypto.TransactionData = {
-			...this.data,
+	#getSigningObject(): Contracts.Crypto.TransactionUnsignedSerializable {
+		return {
+			data: this.data.data,
+			gasLimit: this.data.gasLimit,
+			gasPrice: this.data.gasPrice,
+			network: this.data.network,
+			nonce: this.data.nonce,
+			to: this.data.to,
+			value: this.data.value,
 		};
-
-		for (const key of Object.keys(data)) {
-			if (["model", "id"].includes(key)) {
-				delete data[key];
-			}
-		}
-
-		return data;
-	}
-
-	protected initializeData(): void {
-		this.data = {
-			gasPrice: 0,
-			id: undefined,
-			network: this.configuration.get<number>("network.chainId"),
-			nonce: BigNumber.ZERO,
-		} as unknown as Contracts.Crypto.TransactionData;
 	}
 
 	protected instance(): TransactionBuilder {

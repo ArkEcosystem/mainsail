@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { BigNumber } from "@mainsail/utils";
 
-import { TransactionBuilder } from "../source/builders.js";
+import { TransactionBuilder } from "../source/builder.js";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";

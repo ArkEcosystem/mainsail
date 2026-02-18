@@ -1,5 +1,5 @@
 export * from "./block-transaction.js";
-export * from "./builders.js";
+export * from "./builder.js";
 export * from "./deserializer.js";
 export * from "./factory.js";
 export * from "./hash.factory.js";
