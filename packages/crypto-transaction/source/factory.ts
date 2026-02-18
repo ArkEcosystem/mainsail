@@ -5,7 +5,6 @@ import {
 	DuplicateParticipantInMultiSignatureError,
 	InvalidTransactionBytesError,
 	TransactionSchemaError,
-	TransactionVersionError,
 } from "@mainsail/exceptions";
 import { assert, BigNumber } from "@mainsail/utils";
 
@@ -144,7 +143,6 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			return new Transaction(tx, serialized);
 		} catch (error) {
 			if (
-				error instanceof TransactionVersionError ||
 				error instanceof TransactionSchemaError ||
 				error instanceof DuplicateParticipantInMultiSignatureError
 			) {

@@ -6,8 +6,7 @@ import { ByteArray, Hex, toBytes, toRlp } from "viem";
 export class Serializer implements Contracts.Crypto.TransactionSerializer {
 	public async serialize(transaction: Contracts.Crypto.TransactionSerializable): Promise<Buffer> {
 		// Legacy with EIP-155
-		const normalizedV = transaction.v;
-		const v = transaction.network * 2 + 35 + normalizedV;
+		const v = transaction.network * 2 + 35 + transaction.v;
 
 		const fields = [
 			toBytesCompat(transaction.nonce.toBigInt()), // nonce - 0

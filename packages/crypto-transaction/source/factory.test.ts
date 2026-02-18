@@ -3,13 +3,16 @@ import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import {
+	TransactionSchemaError,
+} from "@mainsail/exceptions";
+
+import {
 	serializedTransactionContractCall,
 	serializedTransactionContractCallWithSecondSignature,
 	serializedTransactionDeploy,
 	serializedTransactionTransfer,
-	transactionTransfer,
 } from "../test/fixtures/transaction.js";
-import { Serialized, Transactions, Storage } from "../test/fixtures/index.js";
+import { Serialized, Transactions, Storage, Json } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
@@ -24,9 +27,20 @@ describe<{
 		);
 	});
 
-	it("fromJson - should deserialize well-formed transaction", async ({ factory }) => {
-		const tx = await factory.fromJson(transactionTransfer);
-		assert.equal(tx.serialized, Buffer.from(serializedTransactionTransfer, "hex"));
+	it("fromJson - should be ok", async ({ factory }) => {
+		for (const [json, transaction] of [
+			[Json.transactionTransfer, Transactions.transactionTransfer],
+			[Json.transactionContractCall, Transactions.transactionContractCall],
+			[Json.transactionContractCallWithSecondSignature, Transactions.transactionContractCallWithSecondSignature],
+			[Json.transactionDeploy, Transactions.transactionDeploy],
+		]) {
+			const tx = await factory.fromJson(json);
+
+			assert.equal(tx.serialized.toString("hex"), transaction.serialized.toString("hex"));
+
+			const {  serialized: _, ...transactionData } = transaction;
+			assert.equal(tx.toData(), transactionData);
+		}
 	});
 
 	it("fromHex - should deserialize well-formed transactions", async ({ factory }) => {
@@ -49,6 +63,16 @@ describe<{
 			await assert.rejects(
 				async () => factory.fromHex(serializedWithTrailingBytes),
 				"Failed to deserialize transaction, encountered invalid bytes: decoded RLP contains trailing bytes",
+			);
+		}
+	});
+
+	it("fromHex - should reject transaction with leading bytes", async ({ factory }) => {
+		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
+			const serializedWithTrailingBytes = hex + serializedTransactionTransfer;
+			await assert.rejects(
+				async () => factory.fromHex(serializedWithTrailingBytes),
+				"Failed to deserialize transaction, encountered invalid bytes: decode RLP not a list",
 			);
 		}
 	});
@@ -93,8 +117,22 @@ describe<{
 		}
 	});
 
-	it("fromData - should be ok", async ({ factory }) => {
-		const transaction = await factory.fromData((await factory.fromJson(transactionTransfer)));
-		assert.equal(transaction.serialized.toString("hex"), serializedTransactionTransfer);
+	it("fromData - should deserialize well-formed transaction", async ({ factory }) => {
+		for (const [data, transaction] of [
+			[Transactions.transactionTransfer, Transactions.transactionTransfer],
+			[Transactions.transactionContractCall, Transactions.transactionContractCall],
+			[Transactions.transactionContractCallWithSecondSignature, Transactions.transactionContractCallWithSecondSignature],
+			[Transactions.transactionDeploy, Transactions.transactionDeploy],
+		]) {
+			const tx = await factory.fromData(data);
+			assert.equal(tx.serialized, transaction.serialized);
+
+			const {  serialized: _, ...transactionData } = transaction;
+			assert.equal(tx.toData(), transactionData);
+		}
+	});
+
+	it("fromData - should throw if schema is invalid", async ({ factory }) => {
+		await assert.rejects(() => factory.fromData({ ...Transactions.transactionTransfer, value: "invalid" } as any), TransactionSchemaError);
 	});
 });

@@ -65,6 +65,8 @@ export interface TransactionJson {
 	readonly v: number;
 	readonly r: string;
 	readonly s: string;
+
+	readonly legacySecondSignature?: string;
 }
 
 export interface TransactionJsonCrypto extends TransactionJson {
