@@ -26,11 +26,15 @@ describe("BlockTransaction", ({ it, assert }) => {
 	});
 
 	it("should create transaction and convert toData with legacySecondSignature", () => {
-		const tx = new BlockTransaction(Transactions.transactionContractCallWithSecondSignature, Buffer.from(Serialized.transactionContractCallWithSecondSignature, "hex"), {
-			transactionIndex: 1,
-			blockNumber: 1,
-			blockHash: "0000000000000000000000000000000000000000000000000000000000000000",
-		});
+		const tx = new BlockTransaction(
+			Transactions.transactionContractCallWithSecondSignature,
+			Buffer.from(Serialized.transactionContractCallWithSecondSignature, "hex"),
+			{
+				transactionIndex: 1,
+				blockNumber: 1,
+				blockHash: "0000000000000000000000000000000000000000000000000000000000000000",
+			},
+		);
 
 		const { serialized: _, ...transactionData } = Transactions.transactionContractCallWithSecondSignature;
 

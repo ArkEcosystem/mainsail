@@ -1,4 +1,4 @@
-import type { Contracts } from "@mainsail/contracts"
+import type { Contracts } from "@mainsail/contracts";
 
 import {
 	transactionContractCall as Deserialized_transactionContractCall,
@@ -6,7 +6,6 @@ import {
 	transactionDeploy as Deserialized_transactionDeploy,
 	transactionTransfer as Deserialized_transactionTransfer,
 } from "./transactions.js";
-
 
 const convertToJsonData = (transaction: Contracts.Crypto.TransactionData): Contracts.Crypto.TransactionJson => ({
 	data: transaction.data.toString("hex"),
@@ -28,6 +27,8 @@ export const transactionTransfer = convertToJsonData(Deserialized_transactionTra
 
 export const transactionContractCall = convertToJsonData(Deserialized_transactionContractCall);
 
-export const transactionContractCallWithSecondSignature = convertToJsonData(Deserialized_transactionContractCallWithSecondSignature);
+export const transactionContractCallWithSecondSignature = convertToJsonData(
+	Deserialized_transactionContractCallWithSecondSignature,
+);
 
 export const transactionDeploy = convertToJsonData(Deserialized_transactionDeploy);

@@ -2,9 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import {
-	TransactionSchemaError,
-} from "@mainsail/exceptions";
+import { TransactionSchemaError } from "@mainsail/exceptions";
 
 import { Serialized, Transactions, Storage, Json } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -36,7 +34,7 @@ describe<{
 
 			assert.equal(tx.serialized.toString("hex"), transaction.serialized.toString("hex"));
 
-			const {  serialized: _, ...transactionData } = transaction;
+			const { serialized: _, ...transactionData } = transaction;
 			assert.equal(tx.toData(), transactionData);
 		}
 	});
@@ -45,7 +43,10 @@ describe<{
 		for (const [serialized, transaction] of [
 			[Serialized.transactionTransfer, Transactions.transactionTransfer],
 			[Serialized.transactionContractCall, Transactions.transactionContractCall],
-			[Serialized.transactionContractCallWithSecondSignature, Transactions.transactionContractCallWithSecondSignature],
+			[
+				Serialized.transactionContractCallWithSecondSignature,
+				Transactions.transactionContractCallWithSecondSignature,
+			],
 			[Serialized.transactionDeploy, Transactions.transactionDeploy],
 		]) {
 			const tx = await factory.fromHex(serialized);
@@ -91,10 +92,7 @@ describe<{
 			v: 2,
 		});
 
-		await assert.rejects(
-			async () => factory.fromHex(serialized.toString("hex")),
-			TransactionSchemaError,
-		);
+		await assert.rejects(async () => factory.fromHex(serialized.toString("hex")), TransactionSchemaError);
 	});
 
 	it("fromBytes - should deserialize well-formed transactions", async ({ factory }) => {
@@ -112,13 +110,16 @@ describe<{
 		for (const [storage, transaction] of [
 			[Storage.transactionTransfer, Transactions.transactionTransfer],
 			[Storage.transactionContractCall, Transactions.transactionContractCall],
-			[Storage.transactionContractCallWithSecondSignature, Transactions.transactionContractCallWithSecondSignature],
+			[
+				Storage.transactionContractCallWithSecondSignature,
+				Transactions.transactionContractCallWithSecondSignature,
+			],
 			[Storage.transactionDeploy, Transactions.transactionDeploy],
 		]) {
 			const tx = await factory.fromStorage(storage);
 			assert.equal(tx.serialized, transaction.serialized);
 
-			const {  serialized: _, ...transactionData } = transaction;
+			const { serialized: _, ...transactionData } = transaction;
 			assert.equal(tx.toData(), transactionData);
 
 			assert.equal(tx.blockHash, storage.blockHash);
@@ -131,18 +132,24 @@ describe<{
 		for (const [data, transaction] of [
 			[Transactions.transactionTransfer, Transactions.transactionTransfer],
 			[Transactions.transactionContractCall, Transactions.transactionContractCall],
-			[Transactions.transactionContractCallWithSecondSignature, Transactions.transactionContractCallWithSecondSignature],
+			[
+				Transactions.transactionContractCallWithSecondSignature,
+				Transactions.transactionContractCallWithSecondSignature,
+			],
 			[Transactions.transactionDeploy, Transactions.transactionDeploy],
 		]) {
 			const tx = await factory.fromData(data);
 			assert.equal(tx.serialized, transaction.serialized);
 
-			const {  serialized: _, ...transactionData } = transaction;
+			const { serialized: _, ...transactionData } = transaction;
 			assert.equal(tx.toData(), transactionData);
 		}
 	});
 
 	it("fromData - should throw if schema is invalid", async ({ factory }) => {
-		await assert.rejects(() => factory.fromData({ ...Transactions.transactionTransfer, value: "invalid" } as any), TransactionSchemaError);
+		await assert.rejects(
+			() => factory.fromData({ ...Transactions.transactionTransfer, value: "invalid" } as any),
+			TransactionSchemaError,
+		);
 	});
 });

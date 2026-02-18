@@ -52,7 +52,7 @@ export class TransactionBuilder {
 			to: undefined,
 			v: 0,
 			value: BigNumber.ZERO,
-		}
+		};
 	}
 
 	public async build(data: Partial<Contracts.Crypto.TransactionData> = {}): Promise<Contracts.Crypto.Transaction> {

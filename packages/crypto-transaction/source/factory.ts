@@ -140,10 +140,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 
 			return new Transaction(tx, serialized);
 		} catch (error) {
-			if (
-				error instanceof TransactionSchemaError ||
-				error instanceof DuplicateParticipantInMultiSignatureError
-			) {
+			if (error instanceof TransactionSchemaError || error instanceof DuplicateParticipantInMultiSignatureError) {
 				throw error;
 			}
 
