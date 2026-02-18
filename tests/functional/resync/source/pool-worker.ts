@@ -27,7 +27,7 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 		const sendersAddresses: Set<string> = new Set();
 
 		for (const transaction of unit.getBlock().transactions) {
-			sendersAddresses.add(transaction.data.from);
+			sendersAddresses.add(transaction.from);
 		}
 
 		await this.transactionPoolMempool.reAddTransactions([...sendersAddresses.keys()]);
