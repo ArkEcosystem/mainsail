@@ -25,7 +25,7 @@ const convertToStorageData = (transaction: Contracts.Crypto.TransactionData): Co
 	...block,
 });
 
-export const transactionTransfer: Contracts.Crypto.TransactionStorageDataExtended = convertToStorageData(Deserialized_transactionTransfer);
+export const transactionTransfer = convertToStorageData(Deserialized_transactionTransfer);
 
 export const transactionContractCall = convertToStorageData(Deserialized_transactionContractCall);
 

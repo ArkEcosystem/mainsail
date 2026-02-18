@@ -9,7 +9,7 @@ import {
 	serializedTransactionTransfer,
 	transactionTransfer,
 } from "../test/fixtures/transaction.js";
-import { Serialized, Transactions } from "../test/fixtures/index.js";
+import { Serialized, Transactions, Storage } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
@@ -22,11 +22,6 @@ describe<{
 		context.factory = context.app.get<Contracts.Crypto.TransactionFactory>(
 			Identifiers.Cryptography.Transaction.Factory,
 		);
-	});
-
-	it("fromStorage - should deserialize well-formed transaction", async ({ factory }) => {
-		const tx = await factory.fromJson(transactionTransfer);
-		assert.equal(tx.serialized, Buffer.from(serializedTransactionTransfer, "hex"));
 	});
 
 	it("fromJson - should deserialize well-formed transaction", async ({ factory }) => {
@@ -44,7 +39,7 @@ describe<{
 			const tx = await factory.fromHex(serialized);
 
 			assert.equal(tx.serialized, transaction.serialized);
-			assert.equal({ ...tx, serialized: undefined }, { ...transaction, serialized: undefined });
+			assert.equal({ ...tx.toData(), serialized: undefined }, { ...transaction, serialized: undefined });
 		}
 	});
 
@@ -76,6 +71,25 @@ describe<{
 			serializedTransactionDeploy,
 		]) {
 			await assert.resolves(async () => factory.fromBytes(Buffer.from(serialized, "hex")));
+		}
+	});
+
+	it("fromStorage - should deserialize well-formed transaction", async ({ factory }) => {
+		for (const [storage, transaction] of [
+			[Storage.transactionTransfer, Transactions.transactionTransfer],
+			[Storage.transactionContractCall, Transactions.transactionContractCall],
+			[Storage.transactionContractCallWithSecondSignature, Transactions.transactionContractCallWithSecondSignature],
+			[Storage.transactionDeploy, Transactions.transactionDeploy],
+		]) {
+			const tx = await factory.fromStorage(storage);
+			assert.equal(tx.serialized, transaction.serialized);
+
+			const {  serialized: _, ...transactionData } = transaction;
+			assert.equal(tx.toData(), transactionData);
+
+			assert.equal(tx.blockHash, storage.blockHash);
+			assert.equal(tx.blockNumber, storage.blockNumber);
+			assert.equal(tx.transactionIndex, storage.index);
 		}
 	});
 
