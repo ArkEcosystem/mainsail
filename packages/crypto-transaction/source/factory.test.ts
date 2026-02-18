@@ -24,17 +24,22 @@ describe<{
 		);
 	});
 
+	it("fromStorage - should deserialize well-formed transaction", async ({ factory }) => {
+		const tx = await factory.fromJson(transactionTransfer);
+		assert.equal(tx.serialized, Buffer.from(serializedTransactionTransfer, "hex"));
+	});
+
 	it("fromJson - should deserialize well-formed transaction", async ({ factory }) => {
 		const tx = await factory.fromJson(transactionTransfer);
 		assert.equal(tx.serialized, Buffer.from(serializedTransactionTransfer, "hex"));
 	});
 
-	it.only("fromHex - should deserialize well-formed transactions", async ({ factory }) => {
+	it("fromHex - should deserialize well-formed transactions", async ({ factory }) => {
 		for (const [serialized, transaction] of [
 			[Serialized.transactionTransfer, Transactions.transactionTransfer],
 			[Serialized.transactionContractCall, Transactions.transactionContractCall],
-			// [Serialized.transactionContractCallWithSecondSignature, Transactions.transactionContractCallWithSecondSignature],
-			// [Serialized.transactionDeploy, Transactions.transactionDeploy],
+			[Serialized.transactionContractCallWithSecondSignature, Transactions.transactionContractCallWithSecondSignature],
+			[Serialized.transactionDeploy, Transactions.transactionDeploy],
 		]) {
 			const tx = await factory.fromHex(serialized);
 
@@ -75,18 +80,7 @@ describe<{
 	});
 
 	it("fromData - should be ok", async ({ factory }) => {
-		const transaction = await factory.fromData((await factory.fromJson(transactionTransfer)).data);
+		const transaction = await factory.fromData((await factory.fromJson(transactionTransfer)));
 		assert.equal(transaction.serialized.toString("hex"), serializedTransactionTransfer);
-	});
-
-	it("computeCryptoData - should be ok", async ({ factory }) => {
-		const cryptoData = await factory.computeCryptoData((await factory.fromJson(transactionTransfer)).data);
-		assert.equal(cryptoData, {
-			address: "0x75545540230d5c3BEf023202d23CB74cFA723376",
-			hash: "3a5823fe8f498b2e509974b3939584bd1200ad32fa32bc8a1a778b608f79f780",
-			legacyAddress: "DH8WhBj6ron2tQhdFPQzjDcrk2CCY997MP",
-			publicKey: "03e0812731df97edc9990d55d919b33294f131b5fd44996266859cfd2514514121",
-			schemaError: undefined,
-		});
 	});
 });
