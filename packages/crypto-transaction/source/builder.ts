@@ -42,7 +42,7 @@ export class TransactionBuilder {
 			from: "",
 			gasLimit: 1_000_000,
 			gasPrice: 5 * 1e9,
-			hash: undefined,
+			hash: "",
 			network: this.configuration.get<number>("network.chainId"),
 			nonce: BigNumber.ZERO,
 			r: "0",
@@ -56,7 +56,8 @@ export class TransactionBuilder {
 	}
 
 	public async build(data: Partial<Contracts.Crypto.TransactionData> = {}): Promise<Contracts.Crypto.Transaction> {
-		return this.factory.fromData({ ...this.data, ...data });
+		const { hash: _, ...dataToCreate } = { ...this.data, ...data };
+		return this.factory.fromData(dataToCreate);
 	}
 
 	public nonce(nonce: string): TransactionBuilder {
@@ -64,48 +65,36 @@ export class TransactionBuilder {
 			this.data.nonce = BigNumber.make(nonce);
 		}
 
-		return this.instance();
+		return this;
 	}
 
 	public network(network: number): TransactionBuilder {
 		this.data.network = network;
-
-		return this.instance();
+		return this;
 	}
 
 	public gasPrice(gasPrice: number): TransactionBuilder {
 		this.data.gasPrice = gasPrice;
-
-		return this.instance();
-	}
-
-	public value(value: string): TransactionBuilder {
-		this.data.value = BigNumber.make(value);
-
-		return this.instance();
-	}
-
-	public senderAddress(senderAddress: string): TransactionBuilder {
-		this.data.from = senderAddress;
-
-		return this.instance();
-	}
-
-	public recipientAddress(recipientAddress: string): TransactionBuilder {
-		this.data.to = recipientAddress;
-
-		return this.instance();
-	}
-
-	public payload(payload: string): TransactionBuilder {
-		this.data.data = payload.startsWith("0x") ? payload : `0x${payload}`;
-
 		return this;
 	}
 
 	public gasLimit(gasLimit: number): TransactionBuilder {
 		this.data.gasLimit = gasLimit;
+		return this;
+	}
 
+	public value(value: string): TransactionBuilder {
+		this.data.value = BigNumber.make(value);
+		return this;
+	}
+
+	public recipientAddress(recipientAddress: string): TransactionBuilder {
+		this.data.to = recipientAddress;
+		return this;
+	}
+
+	public payload(payload: string): TransactionBuilder {
+		this.data.data = payload.startsWith("0x") ? payload : `0x${payload}`;
 		return this;
 	}
 
@@ -190,7 +179,7 @@ export class TransactionBuilder {
 		this.data.r = signature.r;
 		this.data.s = signature.s;
 
-		return this.instance();
+		return this;
 	}
 
 	async #legacySecondSignWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TransactionBuilder> {
@@ -204,7 +193,7 @@ export class TransactionBuilder {
 
 		this.data.legacySecondSignature = signature;
 
-		return this.instance();
+		return this;
 	}
 
 	#getSigningObject(): Contracts.Crypto.TransactionUnsignedSerializable {
@@ -217,9 +206,5 @@ export class TransactionBuilder {
 			to: this.data.to,
 			value: this.data.value,
 		};
-	}
-
-	protected instance(): TransactionBuilder {
-		return this;
 	}
 }
