@@ -61,7 +61,7 @@ describe<{
 		assert.equal(errors, {
 			"0": {
 				message:
-					'Invalid transaction data: data/gasPrice must pass "transactionGasPrice" keyword validation, data must match a schema in anyOf',
+					'Invalid transaction data: data/gasPrice must pass "transactionGasPrice" keyword validation',
 				type: "ERR_BAD_DATA",
 			},
 		});
@@ -80,7 +80,7 @@ describe<{
 		assert.true(await isTransactionCommitted(context, deployTx));
 
 		const erc20Address = getCreateAddress({
-			from: deployTx.data as Hex,
+			from: deployTx.from as Hex,
 			nonce: 2n,
 		});
 
