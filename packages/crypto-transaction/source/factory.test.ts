@@ -18,12 +18,16 @@ import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 describe<{
 	app: Application;
 	factory: Contracts.Crypto.TransactionFactory;
+	serializer: Contracts.Crypto.TransactionSerializer;
 }>("Factory", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
 		context.factory = context.app.get<Contracts.Crypto.TransactionFactory>(
 			Identifiers.Cryptography.Transaction.Factory,
+		);
+		context.serializer = context.app.get<Contracts.Crypto.TransactionSerializer>(
+			Identifiers.Cryptography.Transaction.Serializer,
 		);
 	});
 
@@ -85,6 +89,18 @@ describe<{
 				"Failed to deserialize transaction, encountered invalid bytes: decode RLP not a list",
 			);
 		}
+	});
+
+	it("fromHex - should reject transaction with schema errors", async ({ factory, serializer }) => {
+		const serialized = await serializer.serialize({
+			...Transactions.transactionTransfer,
+			v: 2,
+		});
+
+		await assert.rejects(
+			async () => factory.fromHex(serialized.toString("hex")),
+			TransactionSchemaError,
+		);
 	});
 
 	it("fromBytes - should deserialize well-formed transactions", async ({ factory }) => {

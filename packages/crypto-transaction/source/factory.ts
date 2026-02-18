@@ -118,8 +118,6 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			v: data.v,
 		});
 
-		// const { error } = await this.verifier.verifySchema(data, strict);
-
 		return {
 			from: await this.addressFactory.fromPublicKey(senderPublicKey),
 			hash: hash.toString("hex"),
