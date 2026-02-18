@@ -49,7 +49,6 @@ export interface TransactionStorageDataExtended extends TransactionStorageData {
 }
 
 export interface TransactionJson {
-	readonly hash: string;
 	readonly network: number;
 
 	readonly from: string;
@@ -66,6 +65,10 @@ export interface TransactionJson {
 	readonly v: number;
 	readonly r: string;
 	readonly s: string;
+}
+
+export interface TransactionJsonCrypto extends TransactionJson {
+	readonly hash: string;
 }
 
 export interface SerializeOptions {

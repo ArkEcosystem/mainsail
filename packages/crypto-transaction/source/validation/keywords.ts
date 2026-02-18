@@ -54,7 +54,7 @@ export const makeKeywords = (
 						if (!valid && parentSchema && parentSchema.parentData && parentSchema.parentData.hash) {
 							if (genesisTransactionsLookup.size === 0) {
 								const genesisBlock =
-									configuration.get<Contracts.Crypto.BlockJson>("genesisBlock.block");
+									configuration.get<Contracts.Crypto.BlockJsonCrypto>("genesisBlock.block");
 								for (const transaction of genesisBlock?.transactions || []) {
 									genesisTransactionsLookup.add(transaction.hash);
 								}
