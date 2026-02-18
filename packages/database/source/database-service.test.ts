@@ -258,7 +258,7 @@ describe<{
 	});
 
 	it("#findBlocks - should return blocks", async ({ databaseService, genesisCommit }) => {
-		for(let i = 0; i < genesisCommit.block.transactions.length; i++) {
+		for (let i = 0; i < genesisCommit.block.transactions.length; i++) {
 			assert.equal(
 				(await databaseService.findBlocks(0, 1))[0].transactions[i],
 				genesisCommit.block.transactions[i],
