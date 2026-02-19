@@ -2,7 +2,7 @@ import type { Contracts, Utils } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import clone from "lodash.clonedeep";
 
-import { BlockSchemaError } from "@mainsail/exceptions";
+import { BlockSchemaError, InvalidBlockBytesError } from "@mainsail/exceptions";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import {
@@ -97,6 +97,24 @@ describe<{
 		assert.equal(block.serialized, serializedWithTransactions);
 
 		assert.length(block.transactions, blockDataWithTransactionsClone.transactions.length);
+	});
+
+	it("#fromHex - should reject block with trailing bytes", async ({ factory }) => {
+		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
+			await assert.rejects(
+				async () => factory.fromHex(serialized + hex),
+				InvalidBlockBytesError
+			);
+		}
+	});
+
+	it("#fromHex - should reject block with leading bytes", async ({ factory }) => {
+		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
+			await assert.rejects(
+				async () => factory.fromHex(hex + serialized),
+				InvalidBlockBytesError
+			);
+		}
 	});
 
 	it("#fromBytes - should create a block instance from a buffer", async ({ factory }) => {
