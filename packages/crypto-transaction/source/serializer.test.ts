@@ -36,25 +36,25 @@ describe<{
 
 	// TODO: Compar with another library
 	// TODO: Check why network doesn't match
-	// it("should be ok without signature", async ({ serializer, deserializer }) => {
-	// 	for (const serialized of [
-	// 		Serialized.transactionContractCall,
-	// 		Serialized.transactionContractCallWithSecondSignature,
-	// 		Serialized.transactionDeploy,
-	// 		Serialized.transactionTransfer,
-	// 	]) {
-	// 		const deserializedFull = await deserializer.deserialize(Buffer.from(serialized, "hex"));
-	// 		const reserialized = await serializer.serialize(deserializedFull.data, { excludeSignature: true });
-	// 		const deserializedWithoutSignature = await deserializer.deserialize(reserialized);
+	it("should be ok without signature", async ({ serializer, deserializer }) => {
+		for (const serialized of [
+			Serialized.transactionContractCall,
+			Serialized.transactionContractCallWithSecondSignature,
+			Serialized.transactionDeploy,
+			Serialized.transactionTransfer,
+		]) {
+			const deserializedFull = await deserializer.deserialize(Buffer.from(serialized, "hex"));
+			const reserialized = await serializer.serialize(deserializedFull.data);
+			const deserializedWithoutSignature = await deserializer.deserialize(reserialized);
 
-	// 		// Remove v,r, s
-	// 		const deserializedFullData = (({ v, r, s, ...rest }) => rest)(deserializedFull.data);
-	// 		const deserializedWithoutSignatureData = (({ v, r, s, ...rest }) => rest)(deserializedWithoutSignature.data);
+			// Remove v,r, s
+			const deserializedFullData = (({ v, r, s, ...rest }) => rest)(deserializedFull.data);
+			const deserializedWithoutSignatureData = (({ v, r, s, ...rest }) => rest)(deserializedWithoutSignature.data);
 
-	// 		console.log("Deserialzied:", deserializedFullData);
-	// 		console.log("Reserialized:", deserializedWithoutSignatureData);
+			console.log("Deserialzied:", deserializedFullData);
+			console.log("Reserialized:", deserializedWithoutSignatureData);
 
-	// 		assert.equal(deserializedFullData, deserializedWithoutSignatureData);
-	// 	}
-	// });
+			assert.equal(deserializedFullData, deserializedWithoutSignatureData);
+		}
+	});
 });

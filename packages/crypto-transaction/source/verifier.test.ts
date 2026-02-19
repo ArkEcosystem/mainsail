@@ -69,12 +69,6 @@ describe<{
 	it("verifyHash - should be false if v, r, s or senderPublicKey are modified", async ({ factory, verifier }) => {
 		assert.true(await verifier.verifyHash(txData));
 
-		// TODO: Check
-		// assert.false(await verifier.verifyHash({
-		// 	...txData,
-		// 	v: 1,
-		// }));
-
 		// Changed last character
 		assert.false(
 			await verifier.verifyHash({
