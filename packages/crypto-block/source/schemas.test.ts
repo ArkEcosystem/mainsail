@@ -65,6 +65,7 @@ describe<{
 		blockSignature: "123",
 		proposer: "0x" + "A".repeat(40),
 		number: 0,
+		round: 0,
 		hash: "1".repeat(64),
 		transactionsCount: 0,
 		payloadSize: 0,
@@ -89,20 +90,21 @@ describe<{
 
 	it("blockHeader - should not be ok if any required field is missing", ({ validator }) => {
 		const requiredFields = [
-			"fee",
-			"gasUsed",
 			"hash",
-			"logsBloom",
-			"number",
-			"parentHash",
-			"payloadSize",
-			"proposer",
-			"reward",
-			"stateRoot",
-			"timestamp",
-			"transactionsCount",
-			"transactionsRoot",
 			"version",
+			"timestamp",
+			"number",
+			"round",
+			"parentHash",
+			"stateRoot",
+			"logsBloom",
+			"transactionsCount",
+			"gasUsed",
+			"fee",
+			"reward",
+			"payloadSize",
+			"transactionsRoot",
+			"proposer",
 		];
 
 		for (const field of requiredFields) {
