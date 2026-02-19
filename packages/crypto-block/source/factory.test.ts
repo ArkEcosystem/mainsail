@@ -7,11 +7,15 @@ import { describe } from "@mainsail/test-runner";
 import {
 	blockData,
 	blockDataJson,
+	blockHeaderStorage,
 	blockDataWithTransactions,
 	blockDataWithTransactionsJson,
+	blockHeaderWithTransactionsStorage,
 	serialized,
 	serializedWithTransactions,
-} from "../test/fixtures/block";
+	transactionsFromStorage,
+	transactionsData
+} from "../test/fixtures/index.js";
 import { assertBlockData, assertTransactionData } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { BlockFactory } from "./factory";
@@ -106,6 +110,43 @@ describe<{
 		assert.equal(block.serialized, serializedWithTransactions);
 
 		assert.length(block.transactions, blockDataWithTransactionsClone.transactions.length);
+	});
+
+	it("#fromStorage - should create a block header from storage", async ({ factory }) => {
+		const blockHeaderFromStorage = await factory.fromStorage(blockHeaderStorage, []);
+
+		assertBlockData(assert, blockHeaderFromStorage, blockData);
+		assert.equal(blockHeaderFromStorage.serialized, "");
+		assert.equal(blockHeaderFromStorage.transactions.length, 0);
+
+		const blockHeaderFromStorageWithTransactions = await factory.fromStorage(blockHeaderWithTransactionsStorage, transactionsFromStorage);
+		assertBlockData(assert, blockHeaderFromStorageWithTransactions, blockDataWithTransactionsClone);
+		assert.equal(blockHeaderFromStorageWithTransactions.serialized, "");
+
+		assert.equal(blockHeaderFromStorageWithTransactions.transactions.length, transactionsFromStorage.length);
+		assert.equal(blockHeaderFromStorageWithTransactions.transactions[0].toData(), transactionsData[0]);
+		assert.equal(blockHeaderFromStorageWithTransactions.transactions[1].toData(), transactionsData[1]);
+
+		assert.equal(blockHeaderFromStorageWithTransactions.transactions[0].transactionIndex, 0);
+		assert.equal(blockHeaderFromStorageWithTransactions.transactions[1].transactionIndex, 1);
+
+		assert.equal(blockHeaderFromStorageWithTransactions.transactions[0].blockNumber, blockDataWithTransactionsClone.number);
+		assert.equal(blockHeaderFromStorageWithTransactions.transactions[1].blockNumber, blockDataWithTransactionsClone.number);
+		assert.equal(blockHeaderFromStorageWithTransactions.transactions[0].blockHash, blockDataWithTransactionsClone.hash);
+		assert.equal(blockHeaderFromStorageWithTransactions.transactions[1].blockHash, blockDataWithTransactionsClone.hash);
+	});
+
+	it("#headerFromStorage - should create a block header from storage", async ({ factory }) => {
+		const blockHeaderFromStorage = await factory.headerFromStorage(blockHeaderStorage);
+
+		assertBlockData(assert, blockHeaderFromStorage, blockData);
+		assert.undefined(blockHeaderFromStorage.serialized);
+		assert.undefined(blockHeaderFromStorage.transactions);
+
+		const blockHeaderFromStorageWithTransactions = await factory.headerFromStorage(blockHeaderWithTransactionsStorage);
+		assertBlockData(assert, blockHeaderFromStorageWithTransactions, blockDataWithTransactionsClone);
+		assert.undefined(blockHeaderFromStorageWithTransactions.serialized);
+		assert.undefined(blockHeaderFromStorageWithTransactions.transactions);
 	});
 
 	it("#fromData - should create a block instance from an object", async (context) => {
