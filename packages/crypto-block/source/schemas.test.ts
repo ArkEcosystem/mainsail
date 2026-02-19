@@ -103,24 +103,26 @@ describe<{
 		assert.defined(validator.validate("logsBloom", "a".repeat(length + 1)).error);
 	});
 
+	/* eslint-disable sort-keys-fix/sort-keys-fix */
 	const blockOriginal = {
-		blockSignature: "123",
-		proposer: "0x" + "A".repeat(40),
+		hash: "1".repeat(64),
+		version: 1,
+		timestamp: 0,
 		number: 0,
 		round: 0,
-		hash: "1".repeat(64),
-		transactionsCount: 0,
-		payloadSize: 0,
-		transactionsRoot: "123",
 		parentHash: "0".repeat(64),
-		reward: 0,
 		stateRoot: "0".repeat(64),
 		logsBloom: "0".repeat(512),
-		timestamp: 0,
-		fee: 0,
+		transactionsCount: 0,
 		gasUsed: 0,
-		version: 1,
+		fee: 0,
+		reward: 0,
+		payloadSize: 0,
+		transactionsRoot: "123",
+		proposer: "0x" + "A".repeat(40),
+
 	};
+	/* eslint-enable sort-keys-fix/sort-keys-fix */
 
 	it("blockHeader - should be ok", async ({ validator }) => {
 		const block = {
