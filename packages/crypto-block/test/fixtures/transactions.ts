@@ -17,6 +17,24 @@ const convertToTransactionJson = (data: Contracts.Crypto.TransactionData): Contr
 	value: data.value.toString(),
 });
 
+const convertToStorage = (data: Contracts.Crypto.TransactionData, index: number): Contracts.Evm.TransactionStorageData => ({
+	blockNumber: 2,
+	data: Buffer.from(data.data.slice(2), "hex"),
+	from: data.from,
+	gasLimit: BigInt(data.gasLimit),
+	gasPrice: BigInt(data.gasPrice),
+	index,
+	legacySecondSignature: data.legacySecondSignature,
+	nonce: BigInt(data.nonce.toString()),
+	r: data.r,
+	s: data.s,
+	senderPublicKey: data.senderPublicKey,
+	to: data.to,
+	txHash: data.hash,
+	v: data.v,
+	value: BigInt(data.value.toString()),
+});
+
 export const transaction1Data: Contracts.Crypto.TransactionData = {
 	data: "0x",
 	from: "0xE33074cBE63A1f86cc8EAb97b2099732F15284fE",
@@ -52,5 +70,7 @@ export const transaction2Data: Contracts.Crypto.TransactionData = {
 	v: 0,
 	value: BigNumber.ZERO
 }
+
+export const transactionsStorage = [convertToStorage(transaction1Data, 0), convertToStorage(transaction2Data, 1)];
 
 export const transaction2Json: Contracts.Crypto.TransactionJson = convertToTransactionJson(transaction2Data);
