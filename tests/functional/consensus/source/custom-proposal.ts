@@ -59,7 +59,7 @@ export const makeCustomProposal = async (
 	};
 
 	const transactionData: Contracts.Crypto.TransactionData[] = [];
-	let payloadSize = transactions.length * 2;
+	let payloadSize = 2;
 
 	for (const [index,transaction] of transactions.entries()) {
 		let result = { gasRefunded: 0n, gasUsed: 0n, logs: [] as any, status: 0 };
@@ -90,10 +90,10 @@ export const makeCustomProposal = async (
 
 		const buffer = Buffer.alloc(transaction.serialized.byteLength + 2);
 		buffer.writeUint16LE(transaction.serialized.byteLength, 0);
-		buffer.fill(transaction.serialized, 2, transaction.serialized.byteLength + 2);
+		buffer.fill(transaction.serialized, 2, transaction.serialized.byteLength);
 		transactionBuffers.push(buffer);
 
-		payloadSize += transaction.serialized.length;
+		payloadSize += transaction.serialized.byteLength + 2;
 	}
 
 	await transactionValidator.getEvm().dispose();
@@ -104,7 +104,7 @@ export const makeCustomProposal = async (
 		{
 			fee: totals.fee,
 			gasUsed: totals.gasUsed,
-			logsBloom: "0".repeat(64),
+			logsBloom: "0".repeat(512),
 			number: Number(commitKey.blockNumber),
 			parentHash: previousBlock.hash,
 			payloadSize,
