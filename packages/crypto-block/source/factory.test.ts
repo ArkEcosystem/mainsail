@@ -115,12 +115,12 @@ describe<{
 		const blockHeaderFromStorage = await factory.fromStorage(blockHeaderStorage, []);
 
 		assertBlockData(assert, blockHeaderFromStorage, blockData);
-		assert.equal(blockHeaderFromStorage.serialized, "");
+		assert.equal(blockHeaderFromStorage.serialized, serialized);
 		assert.equal(blockHeaderFromStorage.transactions.length, 0);
 
 		const blockHeaderFromStorageWithTransactions = await factory.fromStorage(blockHeaderWithTransactionsStorage, transactionsFromStorage);
 		assertBlockData(assert, blockHeaderFromStorageWithTransactions, blockDataWithTransactionsClone);
-		assert.equal(blockHeaderFromStorageWithTransactions.serialized, "");
+		assert.equal(blockHeaderFromStorageWithTransactions.serialized, serializedWithTransactions);
 
 		assert.equal(blockHeaderFromStorageWithTransactions.transactions.length, transactionsFromStorage.length);
 		assert.equal(blockHeaderFromStorageWithTransactions.transactions[0].toData(), transactionsData[0]);

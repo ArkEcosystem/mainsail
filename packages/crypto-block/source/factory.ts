@@ -55,11 +55,13 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 			transactions.map((tx) => this.transactionFactory.fromStorage({ ...tx, blockHash: header.hash })),
 		);
 
+		const data = await this.headerFromStorage(header);
+
+		const serialized = await this.serializer.serializeWithTransactions({ ...data, transactions: parsedTransactions });
+
 		return new Block({
-			data: {
-				...(await this.headerFromStorage(header)),
-			},
-			serialized: "",
+			data,
+			serialized: serialized.toString("hex"),
 			transactions: parsedTransactions,
 		});
 	}
