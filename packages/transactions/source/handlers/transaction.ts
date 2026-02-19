@@ -28,8 +28,8 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 	private readonly state!: Contracts.State.State;
 
 	public async verify(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
-		assert.string(transaction.data.from);
-		return this.verifier.verifyHash(transaction.data);
+		assert.string(transaction.from);
+		return this.verifier.verifyHash(transaction);
 	}
 
 	public async throwIfCannotBeApplied(
@@ -39,9 +39,9 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 	): Promise<void> {
 		// Legacy
 		if (sender.hasLegacySecondPublicKey()) {
-			await this.verifier.verifyLegacySecondSignature(transaction.data, sender.legacySecondPublicKey());
+			await this.verifier.verifyLegacySecondSignature(transaction, sender.legacySecondPublicKey());
 		} else {
-			if (transaction.data.legacySecondSignature) {
+			if (transaction.legacySecondSignature) {
 				throw new UnexpectedLegacySecondSignatureError();
 			}
 		}
@@ -50,16 +50,16 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 
 		const preverified = await evm.preverifyTransaction({
 			blockGasLimit: BigInt(milestone.block.maxGasLimit),
-			data: Buffer.from(transaction.data.data, "hex"),
-			from: transaction.data.from,
-			gasLimit: BigInt(transaction.data.gasLimit),
-			gasPrice: BigInt(transaction.data.gasPrice),
-			legacyAddress: transaction.data.senderLegacyAddress,
-			nonce: transaction.data.nonce.toBigInt(),
+			data: Buffer.from(transaction.data.slice(2), "hex"),
+			from: transaction.from,
+			gasLimit: BigInt(transaction.gasLimit),
+			gasPrice: BigInt(transaction.gasPrice),
+			legacyAddress: transaction.senderLegacyAddress,
+			nonce: transaction.nonce.toBigInt(),
 			specId: milestone.evmSpec,
-			to: transaction.data.to,
-			txHash: transaction.data.hash,
-			value: transaction.data.value.toBigInt(),
+			to: transaction.to,
+			txHash: transaction.hash,
+			value: transaction.value.toBigInt(),
 		});
 
 		if (!preverified.success) {
@@ -70,33 +70,34 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 	public async apply(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
+		index: number,
 	): Promise<Contracts.Evm.TransactionReceipt> {
 		assert.string(transaction.hash);
 
 		const { evmSpec } = this.configuration.getMilestone();
 
-		const { from, senderLegacyAddress } = transaction.data;
-
 		try {
 			const { instance, blockContext } = context.evm;
-			const { receipt } = await instance.process({
+			const data = {
 				blockContext,
-				data: Buffer.from(transaction.data.data, "hex"),
-				from,
-				gasLimit: BigInt(transaction.data.gasLimit),
-				gasPrice: BigInt(transaction.data.gasPrice),
-				index: transaction.data.transactionIndex,
-				legacyAddress: senderLegacyAddress,
-				nonce: transaction.data.nonce.toBigInt(),
+				data: Buffer.from(transaction.data.slice(2), "hex"),
+				from: transaction.from,
+				gasLimit: BigInt(transaction.gasLimit),
+				gasPrice: BigInt(transaction.gasPrice),
+				index,
+				legacyAddress: transaction.senderLegacyAddress,
+				nonce: transaction.nonce.toBigInt(),
 				specId: evmSpec,
-				to: transaction.data.to,
+				to: transaction.to,
 				txHash: transaction.hash,
-				value: transaction.data.value.toBigInt(),
-			});
+				value: transaction.value.toBigInt(),
+			};
+
+			const { receipt } = await instance.process(data);
 
 			void this.#emit(Events.EvmEvent.TransactionReceipt, {
 				receipt,
-				sender: from,
+				sender: transaction.from,
 				transactionId: transaction.hash,
 			});
 

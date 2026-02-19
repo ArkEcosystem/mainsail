@@ -61,7 +61,7 @@ describe<{
 		assert.equal(errors, {
 			"0": {
 				message:
-					'Invalid transaction data: data/gasPrice must pass "transactionGasPrice" keyword validation, data must match a schema in anyOf',
+					'Invalid transaction data: data/gasPrice must pass "transactionGasPrice" keyword validation',
 				type: "ERR_BAD_DATA",
 			},
 		});
@@ -80,7 +80,7 @@ describe<{
 		assert.true(await isTransactionCommitted(context, deployTx));
 
 		const erc20Address = getCreateAddress({
-			from: deployTx.data.from as Hex,
+			from: deployTx.from as Hex,
 			nonce: 2n,
 		});
 
@@ -239,7 +239,7 @@ describe<{
 
 		assert.equal(
 			legacyAfterSpent.balance,
-			legacyAfter.balance - spentValue - receipt!.gasUsed * BigInt(spentTx.data.gasPrice),
+			legacyAfter.balance - spentValue - receipt!.gasUsed * BigInt(spentTx.gasPrice),
 		);
 
 		const recipientAfter = await evm.getAccountInfo(randomWallet.address);
@@ -332,7 +332,7 @@ describe<{
 		await waitBlock(context);
 
 		for (let i = 0; i < 10; i++) {
-			if (txs[i].data.nonce.isEqualTo(replacementTx.data.nonce)) {
+			if (txs[i].nonce.isEqualTo(replacementTx.nonce)) {
 				assert.false(await isTransactionCommitted(context, txs[i]));
 				assert.true(await isTransactionCommitted(context, replacementTx));
 			} else {
@@ -425,9 +425,9 @@ describe<{
 		await waitBlock(context);
 
 		for (let i = 0; i < 10; i++) {
-			if (txs[i].data.nonce.isLessThan(replacementTx.data.nonce)) {
+			if (txs[i].nonce.isLessThan(replacementTx.nonce)) {
 				assert.true(await isTransactionCommitted(context, txs[i]));
-			} else if (txs[i].data.nonce.isEqualTo(replacementTx.data.nonce)) {
+			} else if (txs[i].nonce.isEqualTo(replacementTx.nonce)) {
 				assert.false(await isTransactionCommitted(context, txs[i]));
 				assert.true(await isTransactionCommitted(context, replacementTx));
 			} else {

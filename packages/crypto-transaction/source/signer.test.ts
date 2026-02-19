@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { BigNumber } from "@mainsail/utils";
 
-import { TransactionBuilder } from "../source/builders.js";
+import { TransactionBuilder } from "../source/builder.js";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -40,7 +40,7 @@ describe<{
 	});
 
 	it("should sign signature", async (context) => {
-		const signature = await context.signer.sign(context.transaction.data, context.keyPair);
+		const signature = await context.signer.sign(context.transaction, context.keyPair);
 
 		assert.equal(signature, {
 			r: "295ffb1befa5259bba46d532affa13f52f1e50f9418a2579982b121b4ef3553a",
@@ -50,7 +50,7 @@ describe<{
 	});
 
 	it("should sign legacy signature", async (context) => {
-		const signature = await context.signer.legacySecondSign(context.transaction.data, context.keyPair);
+		const signature = await context.signer.legacySecondSign(context.transaction, context.keyPair);
 
 		assert.equal(
 			signature,

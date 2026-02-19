@@ -9,44 +9,24 @@ export class Signer implements Contracts.Crypto.TransactionSigner {
 	@tagged("type", "wallet")
 	private readonly signatureFactory!: Contracts.Crypto.SignatureEcdsa;
 
-	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils!: Contracts.Crypto.TransactionUtilities;
+	@inject(Identifiers.Cryptography.Transaction.HashFactory)
+	private readonly hashFactory!: Contracts.Crypto.TransactionHashFactory;
 
 	public async sign(
-		transaction: Contracts.Crypto.TransactionData,
+		transaction: Contracts.Crypto.TransactionUnsignedSerializable,
 		keys: Contracts.Crypto.KeyPair,
-		options?: Contracts.Crypto.SerializeOptions,
 	): Promise<Contracts.Crypto.EcdsaSignature> {
-		if (!options || options.excludeSignature === undefined) {
-			options = { excludeSignature: true, ...options };
-		}
-
-		const hash: Buffer = await this.utils.toHash(transaction, options);
-		const signature = await this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));
-
-		transaction.v = signature.v;
-		transaction.r = signature.r;
-		transaction.s = signature.s;
-
-		return signature;
+		const hash: Buffer = await this.hashFactory.toHashUnsigned(transaction);
+		return this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));
 	}
 
 	public async legacySecondSign(
-		transaction: Contracts.Crypto.TransactionData,
+		transaction: Contracts.Crypto.TransactionUnsignedSerializable,
 		keys: Contracts.Crypto.KeyPair,
-		options?: Contracts.Crypto.SerializeOptions,
 	): Promise<string> {
-		if (!options || options.excludeSignature === undefined) {
-			options = { excludeSignature: true, ...options };
-		}
-
-		const hash: Buffer = await this.utils.toHash(transaction, options);
+		const hash: Buffer = await this.hashFactory.toHashUnsigned(transaction);
 		const { r, s, v } = await this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));
 
-		const legacySecondSignature = formatEcdsaSignature(r, s, v);
-
-		transaction.legacySecondSignature = legacySecondSignature;
-
-		return legacySecondSignature;
+		return formatEcdsaSignature(r, s, v);
 	}
 }

@@ -279,7 +279,7 @@ export class TokenParserService implements TokenParser {
 				isNew: true,
 				token: {
 					address,
-					deploymentHash: transaction.data.to === undefined ? transaction.hash : undefined,
+					deploymentHash: transaction.to === undefined ? transaction.hash : undefined,
 					...parsed,
 				},
 			});

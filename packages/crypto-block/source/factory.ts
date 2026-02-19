@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts, Utils } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import { BlockSchemaError } from "@mainsail/exceptions";
 import { BigNumber } from "@mainsail/utils";
 
@@ -51,7 +51,9 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		header: Contracts.Evm.BlockHeaderStorageData,
 		transactions: Contracts.Evm.TransactionStorageData[],
 	): Promise<Contracts.Crypto.Block> {
-		const parsedTransactions = await Promise.all(transactions.map((tx) => this.transactionFactory.fromStorage(tx)));
+		const parsedTransactions = await Promise.all(
+			transactions.map((tx) => this.transactionFactory.fromStorage({ ...tx, blockHash: header.hash })),
+		);
 
 		return new Block({
 			data: {
@@ -85,17 +87,16 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	}
 
 	public async fromJson(json: Contracts.Crypto.BlockJson): Promise<Contracts.Crypto.Block> {
-		// @ts-ignore
-		const data: Utils.Mutable<Contracts.Crypto.BlockData> = { ...json };
-		data.fee = BigNumber.make(data.fee);
-		data.reward = BigNumber.make(data.reward);
-
-		if (data.transactions) {
-			for (const transaction of data.transactions) {
-				transaction.value = BigNumber.make(transaction.value);
-				transaction.nonce = BigNumber.make(transaction.nonce);
-			}
-		}
+		const data: Contracts.Crypto.BlockData = {
+			...json,
+			fee: BigNumber.make(json.fee),
+			reward: BigNumber.make(json.reward),
+			transactions: json.transactions.map((tx) => ({
+				...tx,
+				nonce: BigNumber.make(tx.nonce),
+				value: BigNumber.make(tx.value),
+			})),
+		};
 
 		return this.fromData(data);
 	}

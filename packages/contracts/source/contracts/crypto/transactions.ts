@@ -4,132 +4,122 @@ import type { TransactionStorageData } from "../evm/storage.js";
 import type { EcdsaSignature, KeyPair } from "./identities.js";
 import type { SchemaValidationResult } from "./validator.js";
 
-export interface Transaction {
-	readonly hash: string;
+export interface TransactionUnsignedSerializable {
+	readonly network: number;
 
-	data: TransactionData;
-	serialized: Buffer;
+	readonly to?: string;
+	readonly value: BigNumber;
+
+	readonly gasPrice: number;
+	readonly gasLimit: number;
+	readonly nonce: BigNumber;
+	readonly data: string;
 }
 
-export type TransactionSchema = Record<string, unknown>;
+export interface TransactionSerializable extends TransactionUnsignedSerializable {
+	readonly v: number;
+	readonly r: string;
+	readonly s: string;
 
-export interface TransactionData {
-	network: number;
-
-	from: string;
-	senderLegacyAddress?: string;
-	senderPublicKey: string;
-	to?: string;
-
-	value: BigNumber;
-
-	gasPrice: number;
-	gasLimit: number;
-
-	nonce: BigNumber;
-	data: string;
-
-	hash: string;
-
-	v?: number;
-	r?: string;
-	s?: string;
-	legacySecondSignature?: string;
-
-	transactionIndex?: number;
-	gasUsed?: number;
-	blockHash?: string;
-	blockNumber?: number;
-}
-
-export interface TransactionJson {
-	network?: number;
-
-	from: string;
-	senderPublicKey: string;
-	to?: string;
-
-	value: string;
-
-	gasLimit: number;
-	gasPrice: number;
-
-	nonce: string;
-	data: string;
-
-	hash?: string;
-
-	v?: number;
-	r?: string;
-	s?: string;
-
-	transactionIndex?: number;
-	gasUsed?: number;
-	blockHash?: string;
-	blockNumber?: number;
-}
-
-export interface SerializeOptions {
-	excludeSignature?: boolean;
-	// TODO: consider passing pre-allocated buffer
+	readonly legacySecondSignature?: string;
 }
 
 export interface TransactionCryptoData {
 	readonly hash: string;
-	readonly publicKey: string;
-	readonly address: string;
-	readonly legacyAddress?: string;
-	readonly schemaError?: string;
+	readonly from: string;
+	readonly senderPublicKey: string;
+	readonly senderLegacyAddress: string;
 }
 
-export interface TransactionServiceProvider {
-	register(): Promise<void>;
+export interface TransactionData extends TransactionSerializable, TransactionCryptoData {}
+
+export interface Transaction extends TransactionData {
+	readonly serialized: Buffer;
+	toData(): TransactionData;
+}
+
+export interface BlockTransaction extends Transaction {
+	readonly transactionIndex: number;
+	readonly blockHash: string;
+	readonly blockNumber: number;
+}
+
+export interface TransactionStorageDataExtended extends TransactionStorageData {
+	readonly blockHash: string;
+}
+
+export interface TransactionJson {
+	readonly network: number;
+
+	readonly from: string;
+	readonly senderPublicKey: string;
+	readonly to?: string;
+
+	readonly value: string;
+
+	readonly gasLimit: number;
+	readonly gasPrice: number;
+	readonly nonce: string;
+	readonly data: string;
+
+	readonly v: number;
+	readonly r: string;
+	readonly s: string;
+
+	readonly legacySecondSignature?: string;
+}
+
+export interface TransactionJsonCrypto extends TransactionJson {
+	readonly hash: string;
+}
+
+export interface SerializeOptions {
+	excludeSignature: boolean;
 }
 
 export interface TransactionVerifier {
 	verifyHash(data: TransactionData): Promise<boolean>;
-
-	verifySchema(
-		data: Omit<TransactionData, "hash">,
-		strict?: boolean,
-	): Promise<SchemaValidationResult<TransactionData>>;
-
-	verifyLegacySecondSignature(data: TransactionData, legacySecondPublicKey: string): Promise<boolean>;
+	verifySchemaUnsigned(
+		data: TransactionUnsignedSerializable,
+	): Promise<SchemaValidationResult<TransactionUnsignedSerializable>>;
+	verifySchemaSigned(data: TransactionSerializable): Promise<SchemaValidationResult<TransactionSerializable>>;
+	verifySchemaStrict(data: TransactionData): Promise<SchemaValidationResult<TransactionData>>;
+	verifyLegacySecondSignature(data: TransactionSerializable, legacySecondPublicKey: string): Promise<boolean>;
 }
 
 export interface TransactionSigner {
-	sign(transaction: TransactionData, keys: KeyPair, options?: SerializeOptions): Promise<EcdsaSignature>;
-	legacySecondSign(transaction: TransactionData, keys: KeyPair, options?: SerializeOptions): Promise<string>;
+	sign(
+		transaction: TransactionUnsignedSerializable,
+		keys: KeyPair,
+		options?: SerializeOptions,
+	): Promise<EcdsaSignature>;
+	legacySecondSign(
+		transaction: TransactionUnsignedSerializable,
+		keys: KeyPair,
+		options?: SerializeOptions,
+	): Promise<string>;
 }
 
 export interface TransactionSerializer {
-	serialize(transaction: Transaction, options?: SerializeOptions): Promise<Buffer>;
+	serialize(transaction: TransactionSerializable): Promise<Buffer>;
+	serializeUnsigned(transaction: TransactionUnsignedSerializable): Promise<Buffer>;
 }
 
 export interface TransactionDeserializer {
-	deserialize(serialized: Buffer): Promise<Transaction>;
+	deserialize(serialized: Buffer): Promise<{ data: TransactionSerializable; serialized: Buffer }>;
 }
 
 export interface TransactionFactory {
 	fromHex(hex: string): Promise<Transaction>;
-
 	fromBytes(buff: Buffer, strict?: boolean): Promise<Transaction>;
-
 	fromJson(json: TransactionJson): Promise<Transaction>;
-
-	fromData(data: TransactionData, strict?: boolean): Promise<Transaction>;
-
-	fromStorage(data: TransactionStorageData): Promise<Transaction>;
-
-	computeCryptoData(data: TransactionData): Promise<TransactionCryptoData>;
+	fromData(data: TransactionSerializable, strict?: boolean): Promise<Transaction>;
+	fromStorage(data: TransactionStorageDataExtended): Promise<BlockTransaction>;
 }
 
-export interface TransactionUtilities {
-	resolve(data: TransactionData): Transaction;
-
-	toBytes(data: TransactionData): Promise<Buffer>;
-
-	toHash(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;
-
-	getHash(transaction: Transaction): Promise<string>;
+export interface TransactionHashFactory {
+	toHashUnsigned(transaction: TransactionUnsignedSerializable): Promise<Buffer>;
+	toHash(transaction: TransactionSerializable): Promise<Buffer>;
 }
+
+export type TransactionSchema = Record<string, unknown>;

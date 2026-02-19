@@ -16,7 +16,7 @@ export class LegacyAttributeVerifier implements Contracts.Processor.Handler {
 		const senders = new Map<string, Contracts.Evm.LegacyAttributes | undefined | null>();
 
 		for (const transaction of unit.getBlock().transactions) {
-			const { from, legacySecondSignature, senderLegacyAddress } = transaction.data;
+			const { from, legacySecondSignature, senderLegacyAddress } = transaction;
 			if (!senders.has(from)) {
 				senders.set(from, await this.evm.getLegacyAttributes(from, senderLegacyAddress));
 			}
@@ -31,10 +31,7 @@ export class LegacyAttributeVerifier implements Contracts.Processor.Handler {
 				continue;
 			}
 
-			await this.transactionVerifier.verifyLegacySecondSignature(
-				transaction.data,
-				legacyAttributes.secondPublicKey,
-			);
+			await this.transactionVerifier.verifyLegacySecondSignature(transaction, legacyAttributes.secondPublicKey);
 		}
 	}
 }

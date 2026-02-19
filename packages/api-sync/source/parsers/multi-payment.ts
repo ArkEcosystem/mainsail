@@ -9,7 +9,7 @@ export function parseMultiPayments(
 	transaction: Contracts.Crypto.Transaction,
 	receipt: Contracts.Evm.TransactionReceipt,
 ): Models.MultiPayment[] {
-	if (transaction.data.to !== multiPaymentContractAddress) {
+	if (transaction.to !== multiPaymentContractAddress) {
 		return [];
 	}
 
@@ -24,7 +24,7 @@ export function parseMultiPayments(
 
 		return {
 			amount: amount.toString(),
-			hash: transaction.data.hash,
+			hash: transaction.hash,
 			logIndex,
 			success,
 			to: recipient,

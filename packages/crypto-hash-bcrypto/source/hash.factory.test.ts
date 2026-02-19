@@ -43,4 +43,18 @@ describe("HashFactory", ({ assert, it }) => {
 			"42a873ac3abd02122d27e80486c6fa1ef78694e8505fcec9cbcc8a7728ba8949",
 		);
 	});
+
+	it("should create a hash with the KECCAK256 method", async () => {
+		assert.is(
+			Buffer.from(await new HashFactory().keccak256(Buffer.from("Hello World"))).toString("hex"),
+			"592fa743889fc7f92ac2a37bb1f5ba1daf2a5c84741ca0e0061d243a2e6707ba",
+		);
+
+		assert.is(
+			Buffer.from(
+				await new HashFactory().keccak256([Buffer.from("Hello"), Buffer.from(" "), Buffer.from("World")]),
+			).toString("hex"),
+			"592fa743889fc7f92ac2a37bb1f5ba1daf2a5c84741ca0e0061d243a2e6707ba",
+		);
+	});
 });

@@ -419,8 +419,7 @@ export class Restore {
 					const receipt = receipts[transaction.hash];
 					assert.defined(receipt);
 
-					const { data } = transaction;
-					const { senderPublicKey } = data;
+					const { senderPublicKey } = transaction;
 					const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
 					const parsedUsernames = parseUsernames(usernameContractAddress, transaction, receipt);
 					const {
@@ -450,26 +449,26 @@ export class Restore {
 						blockNumber: block.number.toFixed(),
 						cumulativeGasUsed: Number(receipt.cumulativeGasUsed),
 
-						data: data.data,
+						data: transaction.data,
 
 						decodedError: parseTransactionError(transaction, receipt),
 
 						// Receipt data
 						deployedContractAddress: receipt.contractAddress,
 
-						from: data.from,
+						from: transaction.from,
 
-						gas: data.gasLimit,
+						gas: transaction.gasLimit,
 
-						gasPrice: data.gasPrice,
+						gasPrice: transaction.gasPrice,
 
 						gasRefunded: Number(receipt.gasRefunded),
 
 						gasUsed: Number(receipt.gasUsed),
 
-						hash: data.hash,
+						hash: transaction.hash,
 
-						legacySecondSignature: data.legacySecondSignature,
+						legacySecondSignature: transaction.legacySecondSignature,
 
 						logs: receipt.logs as unknown as string, // is converted into JSONB column
 
@@ -478,16 +477,16 @@ export class Restore {
 								? [...new Set(parsedMultiPayments.map((mp) => mp.to))]
 								: undefined,
 
-						nonce: data.nonce.toFixed(),
+						nonce: transaction.nonce.toFixed(),
 
 						output: receipt.output,
-						senderPublicKey: data.senderPublicKey,
-						signature: formatEcdsaSignature(data.r!, data.s!, data.v!),
+						senderPublicKey: transaction.senderPublicKey,
+						signature: formatEcdsaSignature(transaction.r!, transaction.s!, transaction.v!),
 						status: receipt.status,
 						timestamp: block.timestamp.toFixed(),
-						to: data.to,
-						transactionIndex: data.transactionIndex!,
-						value: data.value.toFixed(),
+						to: transaction.to,
+						transactionIndex: transaction.transactionIndex!,
+						value: transaction.value.toFixed(),
 					});
 
 					multiPayments.push(...parsedMultiPayments);

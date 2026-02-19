@@ -37,11 +37,11 @@ export interface TransactionStorageData {
 	readonly txHash: string;
 	readonly index: number;
 	readonly blockNumber: number;
-	readonly legacySecondSignature?: string;
 
 	readonly v: number;
 	readonly r: string;
 	readonly s: string;
+	readonly legacySecondSignature?: string;
 }
 
 export interface CommitStorageData {

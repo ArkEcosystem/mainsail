@@ -10,6 +10,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Hash.Size.HASH256).toConstantValue(32);
 		this.app.bind(Identifiers.Cryptography.Hash.Size.RIPEMD160).toConstantValue(20);
 		this.app.bind(Identifiers.Cryptography.Hash.Size.SHA256).toConstantValue(32);
+		this.app.bind(Identifiers.Cryptography.Hash.Size.KECCAK256).toConstantValue(32);
 
 		this.app.bind(Identifiers.Cryptography.Hash.Factory).to(HashFactory).inSingletonScope();
 	}

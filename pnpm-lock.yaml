@@ -1276,6 +1276,9 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../crypto-transaction
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -1316,9 +1319,6 @@ importers:
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -1829,9 +1829,6 @@ importers:
       ajv:
         specifier: 8.17.1
         version: 8.17.1
-      bcrypto:
-        specifier: 5.5.2
-        version: 5.5.2
       viem:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
@@ -3512,6 +3509,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../../../packages/contracts
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-address-base58
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../../../packages/crypto-address-keccak256

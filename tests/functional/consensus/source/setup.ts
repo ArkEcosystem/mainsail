@@ -83,6 +83,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/crypto-key-pair-ecdsa",
 		"@mainsail/crypto-signature-bls12-381",
 		"@mainsail/crypto-key-pair-bls12-381",
+		"@mainsail/crypto-address-base58",
 		"@mainsail/crypto-address-keccak256",
 		"@mainsail/crypto-wif",
 		"@mainsail/serializer",

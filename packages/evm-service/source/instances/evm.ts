@@ -231,28 +231,28 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		const transactions: JsTransactionData[] = [];
 
 		for (const transaction of block.transactions) {
-			assert.number(transaction.data.transactionIndex);
-			assert.defined(transaction.data.r);
-			assert.defined(transaction.data.s);
-			assert.defined(transaction.data.v);
+			assert.number(transaction.transactionIndex);
+			assert.defined(transaction.r);
+			assert.defined(transaction.s);
+			assert.defined(transaction.v);
 
 			transactions.push({
 				blockNumber: block.number,
-				data: Buffer.from(transaction.data.data, "hex"),
-				from: transaction.data.from,
-				gasLimit: BigInt(transaction.data.gasLimit),
-				gasPrice: BigInt(transaction.data.gasPrice),
-				index: transaction.data.transactionIndex,
-				legacyAddress: transaction.data.senderLegacyAddress,
-				legacySecondSignature: transaction.data.legacySecondSignature,
-				nonce: transaction.data.nonce.toBigInt(),
-				r: transaction.data.r,
-				s: transaction.data.s,
-				senderPublicKey: transaction.data.senderPublicKey,
-				to: transaction.data.to,
+				data: Buffer.from(transaction.data.slice(2), "hex"),
+				from: transaction.from,
+				gasLimit: BigInt(transaction.gasLimit),
+				gasPrice: BigInt(transaction.gasPrice),
+				index: transaction.transactionIndex,
+				legacyAddress: transaction.senderLegacyAddress,
+				legacySecondSignature: transaction.legacySecondSignature,
+				nonce: transaction.nonce.toBigInt(),
+				r: transaction.r,
+				s: transaction.s,
+				senderPublicKey: transaction.senderPublicKey,
+				to: transaction.to,
 				txHash: transaction.hash,
-				v: transaction.data.v,
-				value: transaction.data.value.toBigInt(),
+				v: transaction.v,
+				value: transaction.value.toBigInt(),
 			});
 		}
 
