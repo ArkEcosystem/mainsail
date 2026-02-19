@@ -41,24 +41,66 @@ describe<{
 	});
 
 	it("blockHash - should be ok", ({ validator }) => {
-		const lenght = 64;
+		const length = 64;
 		const validChars = "0123456789abcdef";
 
 		for (const char of validChars) {
-			assert.undefined(validator.validate("blockHash", char.repeat(lenght)).error);
+			assert.undefined(validator.validate("blockHash", char.repeat(length)).error);
 		}
 	});
 
 	it("blockHash - should not be ok", ({ validator }) => {
-		const lenght = 64;
+		const length = 64;
 		const invalidChars = "ABCDEFGHIJKLMNOghijklmno$%!+-";
 
 		for (const char of invalidChars) {
-			assert.defined(validator.validate("blockHash", char.repeat(lenght)).error);
+			assert.defined(validator.validate("blockHash", char.repeat(length)).error);
 		}
 
-		assert.defined(validator.validate("blockHash", "a".repeat(lenght - 1)).error);
-		assert.defined(validator.validate("blockHash", "a".repeat(lenght + 1)).error);
+		assert.defined(validator.validate("blockHash", "a".repeat(length - 1)).error);
+		assert.defined(validator.validate("blockHash", "a".repeat(length + 1)).error);
+	});
+
+	it("prefixedBlockHash - should be ok", ({ validator }) => {
+		const length = 64;
+		const validChars = "0123456789abcdef";
+
+		for (const char of validChars) {
+			assert.undefined(validator.validate("prefixedBlockHash", "0x" + char.repeat(length)).error);
+		}
+	});
+
+	it("prefixedBlockHash - should not be ok", ({ validator }) => {
+		const length = 64;
+		const invalidChars = "ABCDEFGHIJKLMNOghijklmno$%!+-";
+
+		for (const char of invalidChars) {
+			assert.defined(validator.validate("prefixedBlockHash", "0x" + char.repeat(length)).error);
+		}
+
+		assert.defined(validator.validate("prefixedBlockHash", "0x" + "a".repeat(length - 1)).error);
+		assert.defined(validator.validate("prefixedBlockHash", "0x" + "a".repeat(length + 1)).error);
+	});
+
+	it("logsBloom - should be ok", ({ validator }) => {
+		const length = 512;
+		const validChars = "0123456789abcdef";
+
+		for (const char of validChars) {
+			assert.undefined(validator.validate("logsBloom", char.repeat(length)).error);
+		}
+	});
+
+	it("logsBloom - should not be ok", ({ validator }) => {
+		const length = 512;
+		const invalidChars = "ABCDEFGHIJKLMNOghijklmno$%!+-";
+
+		for (const char of invalidChars) {
+			assert.defined(validator.validate("logsBloom", char.repeat(length)).error);
+		}
+
+		assert.defined(validator.validate("logsBloom", "a".repeat(length - 1)).error);
+		assert.defined(validator.validate("logsBloom", "a".repeat(length + 1)).error);
 	});
 
 	const blockOriginal = {
