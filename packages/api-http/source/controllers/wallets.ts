@@ -134,6 +134,7 @@ export class WalletsController extends Controller {
 			? request.query.addresses
 			: [request.query.addresses];
 
+		const minBalance = request.query.minBalance ?? this.apiConfiguration.getOptional("tokens.defaultMinimumBalance", 0.01);
 		const pagination = this.getListingPage(request);
 
 		const tokenPaginatedQuery = this.tokenRepositoryFactory()
@@ -144,10 +145,10 @@ export class WalletsController extends Controller {
 					FROM token_holders th
 					WHERE th.token_address = tok.address
 						AND th.address IN (:...addresses)
-						AND th.balance > 0
+						AND th.balance / POW(10, tok.decimals) >= :minBalance
 					LIMIT 1
 	    	)`,
-				{ addresses: walletAddresses },
+				{ addresses: walletAddresses, minBalance },
 			);
 
 		TokensController.andWhereNameSearch(tokenPaginatedQuery, request.query.name);
@@ -189,11 +190,12 @@ export class WalletsController extends Controller {
 		const tokenHoldersQuery = this.tokenHolderRepositoryFactory()
 			.createQueryBuilder("th")
 			.select(["th.token_address AS token", "th.address AS address", "th.balance AS balance"])
+			.innerJoin(Models.Token, "tok", "tok.address = th.token_address")
 			.where("th.address IN (:...addresses)", { addresses: walletAddresses })
-			.andWhere("th.balance > 0")
 			.andWhere("th.token_address IN (:...tokenAddresses)", {
 				tokenAddresses: Object.keys(tokenMetadata),
 			})
+			.andWhere("th.balance / POW(10, tok.decimals) >= :minBalance", { minBalance })
 			.orderBy("th.token_address", "ASC")
 			.addOrderBy("th.balance", "DESC")
 			.addOrderBy("th.address", "ASC");
@@ -279,12 +281,13 @@ export class WalletsController extends Controller {
 
 	private async getTokens(request: Hapi.Request, walletAddress: string) {
 		const pagination = this.getListingPage(request);
+		const minBalance = request.query.minBalance ?? this.apiConfiguration.getOptional("tokens.defaultMinimumBalance", 0.01);
 
 		const tokenHoldersQuery = this.tokenHolderRepositoryFactory()
 			.createQueryBuilder("th")
 			.innerJoin(Models.Token, "tok", "tok.address = th.token_address")
 			.where("th.address = :address", { address: walletAddress })
-			.andWhere("th.balance > 0");
+			.andWhere("th.balance / POW(10, tok.decimals) >= :minBalance", { minBalance });
 
 		TokensController.andWhereNameSearch(tokenHoldersQuery, request.query.name);
 

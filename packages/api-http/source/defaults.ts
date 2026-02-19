@@ -46,4 +46,7 @@ export const defaults = {
 			},
 		},
 	},
+	tokens: {
+		defaultMinimumBalance: Environment.get(EnvironmentVariables.MAINSAIL_API_TOKENS_DEFAULT_MINIMUM_BALANCE, 0.01)
+	},
 };
