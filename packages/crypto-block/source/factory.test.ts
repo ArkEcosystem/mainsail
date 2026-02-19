@@ -2,6 +2,7 @@ import type { Contracts, Utils } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import clone from "lodash.clonedeep";
 
+import { BlockSchemaError } from "@mainsail/exceptions";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import {
@@ -176,9 +177,10 @@ describe<{
 		factory,
 	}) => {
 		const b2 = Object.assign({}, blockData, { fee: "abcd" });
+
 		await assert.rejects(
 			() => factory.fromData(b2),
-			'Invalid data at /fee: must pass "bignumber" keyword validation: undefined',
+			`Height (2): data/fee must pass "bignumber" keyword validation`
 		);
 	});
 
@@ -190,7 +192,7 @@ describe<{
 
 		await assert.rejects(
 			() => factory.fromData(partialBlock),
-			" Invalid data: must have required property 'proposer': undefined",
+			"Height (2): data must have required property 'proposer'",
 		);
 	});
 

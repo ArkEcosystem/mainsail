@@ -128,18 +128,15 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	}
 
 	async #verify(data: Contracts.Crypto.BlockHeader): Promise<void> {
-		const result = this.validator.validate("block", data);
+		const { error } = this.validator.validate("block", data);
 
-		if (!result.error) {
+		if (!error) {
 			return;
 		}
 
-		for (const error of result.errors ?? []) {
-			throw new BlockSchemaError(
-				data.number,
-				`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
-					`${error.message}: ${JSON.stringify(error.data)}`,
-			);
-		}
+		throw new BlockSchemaError(
+			data.number,
+			error
+		);
 	}
 }
