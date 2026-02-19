@@ -20,7 +20,6 @@ import { Deserializer } from "../../source/deserializer.js";
 import { BlockFactory } from "../../source/factory.js";
 import { HashFactory } from "../../source/hash.factory.js";
 import { Serializer } from "../../source/serializer.js";
-// import { prepareBlock } from "./prepare-block.js";
 
 export const prepareSandbox = async (context) => {
 	context.app = new Application();
@@ -68,6 +67,4 @@ export const prepareSandbox = async (context) => {
 	context.app.bind(Identifiers.Cryptography.Block.Deserializer).to(Deserializer);
 	context.app.bind(Identifiers.Cryptography.Block.HashFactory).to(HashFactory);
 	context.app.bind(Identifiers.Cryptography.Block.Factory).to(BlockFactory);
-
-	// await prepareBlock(context);
 };
