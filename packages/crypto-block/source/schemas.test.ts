@@ -116,23 +116,54 @@ describe<{
 		}
 	});
 
-	it("blockHeader - proposer should be publicKey", ({ validator }) => {
+	it("blockHeader - hash should be blockHash", ({ validator }) => {
 		assert.true(
 			validator
 				.validate("blockHeader", {
 					...blockOriginal,
-					proposer: "a".repeat(63),
+					hash: "1",
 				})
-				.error!.includes("proposer"),
+				.error!.includes("hash"),
+		);
+	});
+
+	it("blockHeader - version should be 1", ({ validator }) => {
+		assert.true(
+			validator
+				.validate("blockHeader", {
+					...blockOriginal,
+					version: 0,
+				})
+				.error!.includes("version"),
 		);
 
 		assert.true(
 			validator
 				.validate("blockHeader", {
 					...blockOriginal,
-					proposer: "a".repeat(65),
+					version: 2,
 				})
-				.error!.includes("proposer"),
+				.error!.includes("version"),
+		);
+	});
+
+	it("blockHeader - timestamp should be integer & min 0", ({ validator }) => {
+		assert.true(
+			validator
+				.validate("blockHeader", {
+					...blockOriginal,
+					timestamp: "1",
+				})
+				.error!.includes("timestamp"),
+		);
+
+		assert.true(
+			validator
+				.validate("blockHeader", {
+					...blockOriginal,
+					timestamp: -1,
+				})
+				.error!.includes("timestamp"),
 		);
 	});
 
@@ -160,16 +191,23 @@ describe<{
 		}
 	});
 
-	it("blockHeader - hash should be blockHash", ({ validator }) => {
+	// TODO: Round
+
+
+	it("blockHeader - parentHash should be blockHash", ({ validator }) => {
 		assert.true(
 			validator
 				.validate("blockHeader", {
 					...blockOriginal,
-					hash: "1",
+					parentHash: "1",
 				})
-				.error!.includes("hash"),
+				.error!.includes("parentHash"),
 		);
 	});
+
+	// TODO: stateRoot
+
+	// TODO: logsBloom
 
 	it("blockHeader - transactionsCount should be integer & min 0", ({ validator }) => {
 		assert.true(
@@ -191,43 +229,16 @@ describe<{
 		);
 	});
 
-	it("blockHeader - transactionsRoot should be hex", ({ validator }) => {
-		const block = {
-			...blockOriginal,
-			transactionsRoot: "GHIJK",
-		};
+	// TODO: gasUsed
 
-		assert.true(validator.validate("blockHeader", block).error!.includes("transactionsRoot"));
-	});
-
-	it("blockHeader - payloadSize should be integer & min 0", ({ validator }) => {
+	it("blockHeader - fee should be bigNumber & min 0", ({ validator }) => {
 		assert.true(
 			validator
 				.validate("blockHeader", {
 					...blockOriginal,
-					payloadSize: "1",
+					fee: -1,
 				})
-				.error!.includes("payloadSize"),
-		);
-
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					payloadSize: -1,
-				})
-				.error!.includes("payloadSize"),
-		);
-	});
-
-	it("blockHeader - parentHash should be blockHash", ({ validator }) => {
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					parentHash: "1",
-				})
-				.error!.includes("parentHash"),
+				.error!.includes("fee"),
 		);
 	});
 
@@ -250,56 +261,55 @@ describe<{
 		);
 	});
 
-	it("blockHeader - timestamp should be integer & min 0", ({ validator }) => {
+	it("blockHeader - payloadSize should be integer & min 0", ({ validator }) => {
 		assert.true(
 			validator
 				.validate("blockHeader", {
 					...blockOriginal,
-					timestamp: "1",
+					payloadSize: "1",
 				})
-				.error!.includes("timestamp"),
+				.error!.includes("payloadSize"),
 		);
 
 		assert.true(
 			validator
 				.validate("blockHeader", {
 					...blockOriginal,
-					timestamp: -1,
+					payloadSize: -1,
 				})
-				.error!.includes("timestamp"),
+				.error!.includes("payloadSize"),
 		);
 	});
 
-	it("blockHeader - fee should be bigNumber & min 0", ({ validator }) => {
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					fee: -1,
-				})
-				.error!.includes("fee"),
-		);
+	it("blockHeader - transactionsRoot should be hex", ({ validator }) => {
+		const block = {
+			...blockOriginal,
+			transactionsRoot: "GHIJK",
+		};
+
+		assert.true(validator.validate("blockHeader", block).error!.includes("transactionsRoot"));
 	});
 
-	it("blockHeader - version should be 1", ({ validator }) => {
+	it("blockHeader - proposer should be publicKey", ({ validator }) => {
 		assert.true(
 			validator
 				.validate("blockHeader", {
 					...blockOriginal,
-					version: 0,
+					proposer: "a".repeat(63),
 				})
-				.error!.includes("version"),
+				.error!.includes("proposer"),
 		);
 
 		assert.true(
 			validator
 				.validate("blockHeader", {
 					...blockOriginal,
-					version: 2,
+					proposer: "a".repeat(65),
 				})
-				.error!.includes("version"),
+				.error!.includes("proposer"),
 		);
 	});
+
 
 	it("block - transactions count should be equal transactionsCount", ({ validator }) => {
 		validator.removeSchema("transactions");
