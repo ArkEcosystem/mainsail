@@ -117,7 +117,7 @@ describe<{
         const context = { app: syncNode, wallets };
         const deployTx = await EvmCalls.makeEvmCallDeployErc20Contract(context);
         const erc20Address = getCreateAddress({
-            from: deployTx.data.from as Hex,
+            from: deployTx.from as Hex,
             nonce: 2n,
         });
 
