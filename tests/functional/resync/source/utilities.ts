@@ -43,33 +43,21 @@ export const isTransactionCommitted = async (
     { app }: { app: Contracts.Kernel.Application },
     { hash }: Contracts.Crypto.Transaction,
 ): Promise<boolean> => {
-    const store = app.get<Contracts.State.Store>(Identifiers.State.Store);
-    const currentBlockNumber = store.getBlockNumber();
-
     const evm = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
     const database = app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
-    const forgedBlocks = await database.findBlocks(
-        currentBlockNumber - 5,
-        currentBlockNumber + 5 /* just a buffer in case tx got included after target height */,
-    );
-
-    let foundAndSuccess = false;
-    for (const block of forgedBlocks) {
-        const found = block.transactions.some((transaction) => transaction.hash === hash);
-        if (found) {
-            const result = await evm.getReceipt(BigInt(block.number), hash);
-            if (!result.receipt || result.receipt.status !== 1) {
-                console.log("unexpected result", result);
-                console.log(result.receipt?.output?.toString("hex"));
-                break;
-            }
-
-            foundAndSuccess = true;
-            break;
-        }
+    const transaction = await database.getTransactionByHash(hash);
+    if (!transaction) {
+        return false;
     }
 
-    return foundAndSuccess;
+    const result = await evm.getReceipt(BigInt(transaction.blockNumber), hash);
+    if (!result.receipt || result.receipt.status !== 1) {
+        console.log("unexpected result", result);
+        console.log(result.receipt?.output?.toString("hex"));
+        return false;
+    }
+
+    return true;
 };
 
 export const getWallets = async (app: Contracts.Kernel.Application): Promise<Contracts.Crypto.KeyPair[]> => {
