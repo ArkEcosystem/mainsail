@@ -161,7 +161,7 @@ describe<{
 	});
 
 	it("transactionBaseSchema - value should be big number min 0", ({ validator }) => {
-		const validValues = [BigNumber.ZERO, BigNumber.ONE,BigNumber.make(100)];
+		const validValues = [BigNumber.ZERO, BigNumber.ONE, BigNumber.make(100)];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
@@ -171,7 +171,22 @@ describe<{
 			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
-		const invalidValues = [0, "0",  "1", -1, "-1", 1.1,  100, "100",  BigNumber.make(-1), -1, null, undefined, {}, "test"];
+		const invalidValues = [
+			0,
+			"0",
+			"1",
+			-1,
+			"-1",
+			1.1,
+			100,
+			"100",
+			BigNumber.make(-1),
+			-1,
+			null,
+			undefined,
+			{},
+			"test",
+		];
 
 		for (const value of invalidValues) {
 			const transaction = {
@@ -271,7 +286,7 @@ describe<{
 	});
 
 	it("transactionBaseSchema - nonce should be big number min 0", ({ validator }) => {
-		const validValues = [BigNumber.ZERO, BigNumber.ONE,BigNumber.make(100)];
+		const validValues = [BigNumber.ZERO, BigNumber.ONE, BigNumber.make(100)];
 
 		for (const value of validValues) {
 			const transaction = {
@@ -282,7 +297,22 @@ describe<{
 			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
-		const invalidValues = [0, "0",  "1", -1, "-1", 1.1,  100, "100",  BigNumber.make(-1), -1, null, undefined, {}, "test"];
+		const invalidValues = [
+			0,
+			"0",
+			"1",
+			-1,
+			"-1",
+			1.1,
+			100,
+			"100",
+			BigNumber.make(-1),
+			-1,
+			null,
+			undefined,
+			{},
+			"test",
+		];
 
 		for (const value of invalidValues) {
 			const transaction = {

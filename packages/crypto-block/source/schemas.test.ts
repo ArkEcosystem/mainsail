@@ -163,7 +163,6 @@ describe<{
 		payloadSize: 0,
 		transactionsRoot: "0".repeat(64),
 		proposer: "0x" + "A".repeat(40),
-
 	};
 	/* eslint-enable sort-keys-fix/sort-keys-fix */
 
@@ -256,7 +255,8 @@ describe<{
 						timestamp,
 					})
 					.error!.includes("timestamp"),
-		)};
+			);
+		}
 	});
 
 	it("blockHeader - number should be integer & min 0", ({ validator }) => {
@@ -307,7 +307,6 @@ describe<{
 		}
 	});
 
-
 	it("blockHeader - parentHash should be blockHash", ({ validator }) => {
 		const validValues = ["0".repeat(64), "1".repeat(64)];
 		for (const parentHash of validValues) {
@@ -331,7 +330,6 @@ describe<{
 			);
 		}
 	});
-
 
 	it("blockHeader - stateRoot should be hex", ({ validator }) => {
 		const validValues = ["0".repeat(64), "1".repeat(64)];
@@ -533,7 +531,6 @@ describe<{
 			);
 		}
 	});
-
 
 	it("block - transactions count should be equal transactionsCount", ({ validator }) => {
 		validator.removeSchema("transactions");

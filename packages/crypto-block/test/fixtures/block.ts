@@ -94,7 +94,7 @@ export const blockDataWithTransactionsJson: Contracts.Crypto.BlockJson = {
 	round: 1,
 	stateRoot: "0000000000000000000000000000000000000000000000000000000000000000",
 	timestamp: 1_703_128_709_748,
-	transactions: [transaction1Json,transaction2Json],
+	transactions: [transaction1Json, transaction2Json],
 	transactionsCount: 2,
 	transactionsRoot: "f01a3a2a2990990a64211feb47e2fa25c048decb3420ee52562fdc4931225c0f",
 	version: 1,

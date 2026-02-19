@@ -58,7 +58,10 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		);
 
 		const data = await this.headerFromStorage(header);
-		const serialized = await this.serializer.serializeWithTransactions({ ...data, transactions: parsedTransactions });
+		const serialized = await this.serializer.serializeWithTransactions({
+			...data,
+			transactions: parsedTransactions,
+		});
 
 		return new Block({
 			data,
@@ -137,9 +140,6 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 			return;
 		}
 
-		throw new BlockSchemaError(
-			data.number,
-			error
-		);
+		throw new BlockSchemaError(data.number, error);
 	}
 }

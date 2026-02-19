@@ -15,7 +15,7 @@ import {
 	serialized,
 	serializedWithTransactions,
 	transactionsFromStorage,
-	transactionsData
+	transactionsData,
 } from "../test/fixtures/index.js";
 import { assertBlockData, assertTransactionData } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -79,7 +79,7 @@ describe<{
 	});
 
 	it("#make - should throw if it is not verified", async ({ factory }) => {
-		await assert.rejects(() => factory.make({...blockData,transactionsCount: 6 }, []), BlockSchemaError);
+		await assert.rejects(() => factory.make({ ...blockData, transactionsCount: 6 }, []), BlockSchemaError);
 	});
 
 	it("#fromHex - should create a block instance from hex", async ({ factory }) => {
@@ -101,19 +101,13 @@ describe<{
 
 	it("#fromHex - should reject block with trailing bytes", async ({ factory }) => {
 		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			await assert.rejects(
-				async () => factory.fromHex(serialized + hex),
-				InvalidBlockBytesError
-			);
+			await assert.rejects(async () => factory.fromHex(serialized + hex), InvalidBlockBytesError);
 		}
 	});
 
 	it("#fromHex - should reject block with leading bytes", async ({ factory }) => {
 		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			await assert.rejects(
-				async () => factory.fromHex(hex + serialized),
-				InvalidBlockBytesError
-			);
+			await assert.rejects(async () => factory.fromHex(hex + serialized), InvalidBlockBytesError);
 		}
 	});
 
@@ -141,7 +135,10 @@ describe<{
 		assert.equal(blockHeaderFromStorage.serialized, serialized);
 		assert.equal(blockHeaderFromStorage.transactions.length, 0);
 
-		const blockHeaderFromStorageWithTransactions = await factory.fromStorage(blockHeaderWithTransactionsStorage, transactionsFromStorage);
+		const blockHeaderFromStorageWithTransactions = await factory.fromStorage(
+			blockHeaderWithTransactionsStorage,
+			transactionsFromStorage,
+		);
 		assertBlockData(assert, blockHeaderFromStorageWithTransactions, blockDataWithTransactionsClone);
 		assert.equal(blockHeaderFromStorageWithTransactions.serialized, serializedWithTransactions);
 
@@ -152,10 +149,22 @@ describe<{
 		assert.equal(blockHeaderFromStorageWithTransactions.transactions[0].transactionIndex, 0);
 		assert.equal(blockHeaderFromStorageWithTransactions.transactions[1].transactionIndex, 1);
 
-		assert.equal(blockHeaderFromStorageWithTransactions.transactions[0].blockNumber, blockDataWithTransactionsClone.number);
-		assert.equal(blockHeaderFromStorageWithTransactions.transactions[1].blockNumber, blockDataWithTransactionsClone.number);
-		assert.equal(blockHeaderFromStorageWithTransactions.transactions[0].blockHash, blockDataWithTransactionsClone.hash);
-		assert.equal(blockHeaderFromStorageWithTransactions.transactions[1].blockHash, blockDataWithTransactionsClone.hash);
+		assert.equal(
+			blockHeaderFromStorageWithTransactions.transactions[0].blockNumber,
+			blockDataWithTransactionsClone.number,
+		);
+		assert.equal(
+			blockHeaderFromStorageWithTransactions.transactions[1].blockNumber,
+			blockDataWithTransactionsClone.number,
+		);
+		assert.equal(
+			blockHeaderFromStorageWithTransactions.transactions[0].blockHash,
+			blockDataWithTransactionsClone.hash,
+		);
+		assert.equal(
+			blockHeaderFromStorageWithTransactions.transactions[1].blockHash,
+			blockDataWithTransactionsClone.hash,
+		);
 	});
 
 	it("#headerFromStorage - should create a block header from storage", async ({ factory }) => {
@@ -165,7 +174,9 @@ describe<{
 		assert.undefined(blockHeaderFromStorage.serialized);
 		assert.undefined(blockHeaderFromStorage.transactions);
 
-		const blockHeaderFromStorageWithTransactions = await factory.headerFromStorage(blockHeaderWithTransactionsStorage);
+		const blockHeaderFromStorageWithTransactions = await factory.headerFromStorage(
+			blockHeaderWithTransactionsStorage,
+		);
 		assertBlockData(assert, blockHeaderFromStorageWithTransactions, blockDataWithTransactionsClone);
 		assert.undefined(blockHeaderFromStorageWithTransactions.serialized);
 		assert.undefined(blockHeaderFromStorageWithTransactions.transactions);
@@ -201,7 +212,7 @@ describe<{
 
 		await assert.rejects(
 			() => factory.fromData(b2),
-			`Height (2): data/fee must pass "bignumber" keyword validation`
+			`Height (2): data/fee must pass "bignumber" keyword validation`,
 		);
 	});
 
@@ -228,7 +239,6 @@ describe<{
 	it("#fromJson - should create a block instance with transactions from JSON", async ({ factory }) => {
 		const block = await factory.fromJson(blockDataWithTransactionsJson);
 
-
 		assertBlockData(assert, block, blockDataWithTransactionsClone);
 		assert.string(block.serialized);
 		assert.length(block.transactions, blockDataWithTransactionsClone.transactions.length);
@@ -243,9 +253,6 @@ describe<{
 	});
 
 	it("#fromJson - should throw if invalid input data", async ({ factory }) => {
-		await assert.rejects(
-			() => factory.fromJson({...blockDataJson, transactionsCount: 6 }),
-			BlockSchemaError
-		);
+		await assert.rejects(() => factory.fromJson({ ...blockDataJson, transactionsCount: 6 }), BlockSchemaError);
 	});
 });

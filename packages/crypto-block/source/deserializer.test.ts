@@ -22,7 +22,9 @@ describe<{
 		assert.equal(deserialized.transactions, []);
 	});
 
-	it("#deserializeWithTransactions - should correctly deserialize a block with transactions", async ({ deserializer }) => {
+	it("#deserializeWithTransactions - should correctly deserialize a block with transactions", async ({
+		deserializer,
+	}) => {
 		const deserialized = await deserializer.deserializeWithTransactions(
 			Buffer.from(serializedWithTransactions, "hex"),
 		);
@@ -42,13 +44,19 @@ describe<{
 
 	it("#deserializeWithTransactions - should throw with trailing bytes", async ({ deserializer }) => {
 		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			await assert.rejects(() => deserializer.deserializeWithTransactions(Buffer.from(serialized + hex, "hex")), InvalidBlockBytesError);
+			await assert.rejects(
+				() => deserializer.deserializeWithTransactions(Buffer.from(serialized + hex, "hex")),
+				InvalidBlockBytesError,
+			);
 		}
 	});
 
 	it("#deserializeWithTransactions - should throw with leading bytes", async ({ deserializer }) => {
 		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			await assert.rejects(() => deserializer.deserializeWithTransactions(Buffer.from(hex + serialized, "hex")), InvalidBlockBytesError);
+			await assert.rejects(
+				() => deserializer.deserializeWithTransactions(Buffer.from(hex + serialized, "hex")),
+				InvalidBlockBytesError,
+			);
 		}
 	});
 
@@ -66,16 +74,21 @@ describe<{
 		assert.undefined(deserialized.transactions);
 	});
 
-
 	it("#deserializeHeader - should throw with trailing bytes", async ({ deserializer }) => {
 		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			await assert.rejects(() => deserializer.deserializeHeader(Buffer.from(serialized + hex, "hex")), InvalidBlockBytesError);
+			await assert.rejects(
+				() => deserializer.deserializeHeader(Buffer.from(serialized + hex, "hex")),
+				InvalidBlockBytesError,
+			);
 		}
 	});
 
 	it("#deserializeHeader - should throw with leading bytes", async ({ deserializer }) => {
 		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			await assert.rejects(() => deserializer.deserializeHeader(Buffer.from(hex + serialized, "hex")), InvalidBlockBytesError);
+			await assert.rejects(
+				() => deserializer.deserializeHeader(Buffer.from(hex + serialized, "hex")),
+				InvalidBlockBytesError,
+			);
 		}
 	});
 });

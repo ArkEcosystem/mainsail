@@ -62,8 +62,10 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 			},
 		);
 
-		if(buffer.getRemainderLength() !== header.payloadSize) {
-			throw new InvalidBlockBytesError(`Payload size ${header.payloadSize} does not match actual payload size ${buffer.getRemainderLength()}`);
+		if (buffer.getRemainderLength() !== header.payloadSize) {
+			throw new InvalidBlockBytesError(
+				`Payload size ${header.payloadSize} does not match actual payload size ${buffer.getRemainderLength()}`,
+			);
 		}
 
 		return header;

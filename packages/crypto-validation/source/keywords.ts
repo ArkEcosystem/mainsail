@@ -22,7 +22,7 @@ export const makeKeywords = (
 			const minimum = schema.minimum !== undefined ? schema.minimum : 0;
 			const maximum = schema.maximum !== undefined ? schema.maximum : BigNumber.UINT256_MAX;
 
-			if(!(data instanceof BigNumber)) {
+			if (!(data instanceof BigNumber)) {
 				return false;
 			}
 
