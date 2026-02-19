@@ -55,6 +55,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 
             CREATE INDEX token_holders_address ON token_holders ("address");
             CREATE INDEX token_holders_address_token ON token_holders ("address", "token_address");
+            CREATE INDEX token_holders_token_address_balance ON token_holders ("address", "token_address", "balance");
 
             CREATE INDEX token_transfers_all ON token_transfers ("block_number" DESC, "index" DESC);
             CREATE INDEX token_transfers_all_from ON token_transfers ("from", "block_number" DESC, "index" DESC);
@@ -127,6 +128,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 
             DROP INDEX token_holders_address;
             DROP INDEX token_holders_address_token;
+            DROP INDEX token_holders_token_address_balance;
 
             DROP INDEX token_transfers_all;
             DROP INDEX token_transfers_all_from;

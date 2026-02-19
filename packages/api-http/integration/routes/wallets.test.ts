@@ -269,6 +269,26 @@ describe<{
 				path: "/wallets/tokens?addresses=0x0000000000000000000000000000000000000000",
 				result: [],
 			},
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens?minBalance=99999850`,
+				result: walletTokensResponse,
+			},
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens?minBalance=99999851`,
+				result: [walletTokensResponse[1]],
+			},
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens?minBalance=100000000`,
+				result: [walletTokensResponse[1]],
+			},
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens?minBalance=100000001`,
+				result: [],
+			},
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens?minBalance=2`,
+				result: walletTokensResponse,
+			},
 		];
 
 		for (const { path, result } of testCases) {
@@ -323,6 +343,39 @@ describe<{
 			{
 				path: `${path}&name=ETH`,
 				result: [],
+			},
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
+	});
+
+	it("/wallets/tokens?addresses&minBalance", async () => {
+		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenHolderRepository.save(tokenHolders);
+
+		const path =
+			"/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7";
+
+		const testCases = [
+			{
+				path: `${path}&minBalance=0`,
+				result: walletTokenHoldersResponse,
+			},
+			{
+				path: `${path}&minBalance=0.01`,
+				result: walletTokenHoldersResponse,
+			},
+			{
+				path: `${path}&minBalance=100000001`,
+				result: [],
+			},
+			{
+				path: `${path}&minBalance=100000000`,
+				result: walletTokenHoldersResponse.slice(1),
 			},
 		];
 
