@@ -2,6 +2,7 @@ import type { Contracts, Utils } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import clone from "lodash.clonedeep";
 
+import { BlockSchemaError } from "@mainsail/exceptions";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import {
@@ -75,6 +76,10 @@ describe<{
 		for (let index = 0; index < transactions.length; index++) {
 			assertTransactionData(assert, block.transactions[index], transactions[index]);
 		}
+	});
+
+	it("#make - should throw if it is not verified", async ({ factory }) => {
+		await assert.rejects(() => factory.make({...blockData,transactionsCount: 6 }, []), BlockSchemaError);
 	});
 
 	it("#fromHex - should create a block instance from hex", async ({ factory }) => {
@@ -217,5 +222,12 @@ describe<{
 				blockDataWithTransactionsClone.transactions[index],
 			);
 		}
+	});
+
+	it("#fromJson - should throw if invalid input data", async ({ factory }) => {
+		await assert.rejects(
+			() => factory.fromJson({...blockDataJson, transactionsCount: 6 }),
+			BlockSchemaError
+		);
 	});
 });

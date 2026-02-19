@@ -30,6 +30,8 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	): Promise<Contracts.Crypto.Block> {
 		const block: Contracts.Crypto.BlockHeader = { ...data, hash: await this.hashFactory.make(data) };
 
+		await this.#verify({ ...block, transactions });
+
 		const serialized: Buffer = await this.serializer.serializeWithTransactions({ ...data, transactions });
 
 		return new Block({
@@ -56,7 +58,6 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		);
 
 		const data = await this.headerFromStorage(header);
-
 		const serialized = await this.serializer.serializeWithTransactions({ ...data, transactions: parsedTransactions });
 
 		return new Block({
@@ -121,7 +122,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	async #fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.Block> {
 		const deserialized = await this.deserializer.deserializeWithTransactions(serialized);
 
-		await this.#verify(deserialized.data);
+		await this.#verify({ ...deserialized.data, transactions: deserialized.transactions });
 
 		return new Block({
 			...deserialized,
@@ -129,7 +130,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		});
 	}
 
-	async #verify(data: Contracts.Crypto.BlockHeader): Promise<void> {
+	async #verify(data: Contracts.Crypto.BlockData): Promise<void> {
 		const { error } = this.validator.validate("block", data);
 
 		if (!error) {
