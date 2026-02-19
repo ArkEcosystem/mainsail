@@ -123,7 +123,7 @@ describe<{
 					...blockOriginal,
 					proposer: "a".repeat(63),
 				})
-				.error.includes("proposer"),
+				.error!.includes("proposer"),
 		);
 
 		assert.true(
@@ -132,7 +132,7 @@ describe<{
 					...blockOriginal,
 					proposer: "a".repeat(65),
 				})
-				.error.includes("proposer"),
+				.error!.includes("proposer"),
 		);
 	});
 
@@ -155,7 +155,7 @@ describe<{
 						...blockOriginal,
 						number,
 					})
-					.error.includes("number"),
+					.error!.includes("number"),
 			);
 		}
 	});
@@ -167,7 +167,7 @@ describe<{
 					...blockOriginal,
 					hash: "1",
 				})
-				.error.includes("hash"),
+				.error!.includes("hash"),
 		);
 	});
 
@@ -178,7 +178,7 @@ describe<{
 					...blockOriginal,
 					transactionsCount: "1",
 				})
-				.error.includes("transactionsCount"),
+				.error!.includes("transactionsCount"),
 		);
 
 		assert.true(
@@ -187,7 +187,7 @@ describe<{
 					...blockOriginal,
 					transactionsCount: -1,
 				})
-				.error.includes("transactionsCount"),
+				.error!.includes("transactionsCount"),
 		);
 	});
 
@@ -197,7 +197,7 @@ describe<{
 			transactionsRoot: "GHIJK",
 		};
 
-		assert.true(validator.validate("blockHeader", block).error.includes("transactionsRoot"));
+		assert.true(validator.validate("blockHeader", block).error!.includes("transactionsRoot"));
 	});
 
 	it("blockHeader - payloadSize should be integer & min 0", ({ validator }) => {
@@ -207,7 +207,7 @@ describe<{
 					...blockOriginal,
 					payloadSize: "1",
 				})
-				.error.includes("payloadSize"),
+				.error!.includes("payloadSize"),
 		);
 
 		assert.true(
@@ -216,7 +216,7 @@ describe<{
 					...blockOriginal,
 					payloadSize: -1,
 				})
-				.error.includes("payloadSize"),
+				.error!.includes("payloadSize"),
 		);
 	});
 
@@ -227,7 +227,7 @@ describe<{
 					...blockOriginal,
 					parentHash: "1",
 				})
-				.error.includes("parentHash"),
+				.error!.includes("parentHash"),
 		);
 	});
 
@@ -238,7 +238,7 @@ describe<{
 					...blockOriginal,
 					reward: "-1",
 				})
-				.error.includes("reward"),
+				.error!.includes("reward"),
 		);
 		assert.true(
 			validator
@@ -246,7 +246,7 @@ describe<{
 					...blockOriginal,
 					reward: -1,
 				})
-				.error.includes("reward"),
+				.error!.includes("reward"),
 		);
 	});
 
@@ -257,7 +257,7 @@ describe<{
 					...blockOriginal,
 					timestamp: "1",
 				})
-				.error.includes("timestamp"),
+				.error!.includes("timestamp"),
 		);
 
 		assert.true(
@@ -266,7 +266,7 @@ describe<{
 					...blockOriginal,
 					timestamp: -1,
 				})
-				.error.includes("timestamp"),
+				.error!.includes("timestamp"),
 		);
 	});
 
@@ -277,7 +277,7 @@ describe<{
 					...blockOriginal,
 					fee: -1,
 				})
-				.error.includes("fee"),
+				.error!.includes("fee"),
 		);
 	});
 
@@ -288,7 +288,7 @@ describe<{
 					...blockOriginal,
 					version: 0,
 				})
-				.error.includes("version"),
+				.error!.includes("version"),
 		);
 
 		assert.true(
@@ -297,7 +297,7 @@ describe<{
 					...blockOriginal,
 					version: 2,
 				})
-				.error.includes("version"),
+				.error!.includes("version"),
 		);
 	});
 
