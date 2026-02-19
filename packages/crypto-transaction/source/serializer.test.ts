@@ -49,7 +49,9 @@ describe<{
 
 			// Remove v,r, s
 			const deserializedFullData = (({ v, r, s, ...rest }) => rest)(deserializedFull.data);
-			const deserializedWithoutSignatureData = (({ v, r, s, ...rest }) => rest)(deserializedWithoutSignature.data);
+			const deserializedWithoutSignatureData = (({ v, r, s, ...rest }) => rest)(
+				deserializedWithoutSignature.data,
+			);
 
 			console.log("Deserialzied:", deserializedFullData);
 			console.log("Reserialized:", deserializedWithoutSignatureData);
