@@ -15,15 +15,15 @@ describe<{
 		context.deserializer = context.app.resolve(Deserializer);
 	});
 
-	it("#deserialize - should correctly deserialize a block", async ({ deserializer }) => {
-		const deserialized = await deserializer.deserializeHeader(Buffer.from(serialized, "hex"));
 
-		assertBlockData(assert, deserialized, blockData);
+	it("#deserializeWithTransactions - should correctly deserialize a block", async ({ deserializer }) => {
+		const deserialized = await deserializer.deserializeWithTransactions(Buffer.from(serialized, "hex"));
 
-		assert.undefined(deserialized.transactions);
+		assertBlockData(assert, deserialized.data, blockData);
+		assert.equal(deserialized.transactions, []);
 	});
 
-	it.only("#deserialize - should correctly deserialize a block with transactions", async ({ deserializer }) => {
+	it("#deserializeWithTransactions - should correctly deserialize a block with transactions", async ({ deserializer }) => {
 		const deserialized = await deserializer.deserializeWithTransactions(
 			Buffer.from(serializedWithTransactions, "hex"),
 		);
@@ -45,7 +45,6 @@ describe<{
 		const deserialized = await deserializer.deserializeHeader(Buffer.from(serialized, "hex"));
 
 		assertBlockData(assert, deserialized, blockData);
-
 		assert.undefined(deserialized.transactions);
 	});
 
@@ -53,7 +52,6 @@ describe<{
 		const deserialized = await deserializer.deserializeHeader(Buffer.from(serializedWithTransactions, "hex"));
 
 		assertBlockData(assert, deserialized, blockDataWithTransactions);
-
 		assert.undefined(deserialized.transactions);
 	});
 });
