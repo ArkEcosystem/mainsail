@@ -34,6 +34,6 @@ export class EthGetTransactionByBlockNumberAndIndex implements Contracts.Api.RPC
 			return null;
 		}
 
-		return this.app.resolve(TransactionResource).transform(transaction.data);
+		return this.app.resolve(TransactionResource).transform(transaction);
 	}
 }

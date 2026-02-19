@@ -8,15 +8,13 @@ describe<{
 }>("Errors", ({ it, assert, beforeAll }) => {
 	beforeAll((context) => {
 		context.transaction = {
-			data: {
-				amount: BigNumber.make(100),
-				gasPrice: 900 * 1e9,
-				hash: "dummy-tx-id",
-				network: 30,
-				nonce: BigNumber.make(1),
-				from: "dummy-sender-key",
-				type: 0,
-			},
+			amount: BigNumber.make(100),
+			gasPrice: 900 * 1e9,
+			hash: "dummy-tx-id",
+			network: 30,
+			nonce: BigNumber.make(1),
+			from: "dummy-sender-key",
+			type: 0,
 			hash: "dummy-tx-id",
 			key: "some-key",
 			serialized: Buffer.from("dummy"),

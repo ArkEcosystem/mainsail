@@ -192,16 +192,16 @@ describe<{
 					timestamp: BigInt(genesisCommit.block.timestamp),
 					validatorAddress: genesisCommit.block.proposer,
 				},
-				data: Buffer.from(transaction.data.data, "hex"),
-				from: transaction.data.from,
-				gasLimit: BigInt(transaction.data.gasLimit),
-				gasPrice: BigInt(transaction.data.gasPrice),
-				index: transaction.data.transactionIndex,
-				nonce: transaction.data.nonce.toBigInt(),
+				data: Buffer.from(transaction.data.slice(2), "hex"),
+				from: transaction.from,
+				gasLimit: BigInt(transaction.gasLimit),
+				gasPrice: BigInt(transaction.gasPrice),
+				index: transaction.transactionIndex,
+				nonce: transaction.nonce.toBigInt(),
 				specId: Enums.Evm.SpecId.LATEST,
-				to: transaction.data.to,
+				to: transaction.to,
 				txHash: transaction.hash,
-				value: transaction.data.value.toBigInt(),
+				value: transaction.value.toBigInt(),
 			});
 
 			if (receipt.status !== 1) {
@@ -258,7 +258,12 @@ describe<{
 	});
 
 	it("#findBlocks - should return blocks", async ({ databaseService, genesisCommit }) => {
-		assert.equal(await databaseService.findBlocks(0, 1), [genesisCommit.block]);
+		for (let i = 0; i < genesisCommit.block.transactions.length; i++) {
+			assert.equal(
+				(await databaseService.findBlocks(0, 1))[0].transactions[i],
+				genesisCommit.block.transactions[i],
+			);
+		}
 	});
 
 	it("#readCommits - should return commits", async ({ databaseService, genesisCommit }) => {
@@ -306,14 +311,14 @@ describe<{
 	// TODO: Check all fields are matching
 	it("#getTransactionByHash - should return transaction", async ({ databaseService, genesisCommit }) => {
 		assert.equal(
-			(await databaseService.getTransactionByHash(genesisCommit.block.transactions[0].hash))?.data.hash,
+			(await databaseService.getTransactionByHash(genesisCommit.block.transactions[0].hash))?.hash,
 			genesisCommit.block.transactions[0].hash,
 		);
 	});
 
 	it("#getTransactionByBlockHashAndIndex - should return transaction", async ({ databaseService, genesisCommit }) => {
 		assert.equal(
-			(await databaseService.getTransactionByBlockHashAndIndex(genesisCommit.block.hash, 0))?.data.hash,
+			(await databaseService.getTransactionByBlockHashAndIndex(genesisCommit.block.hash, 0))?.hash,
 			genesisCommit.block.transactions[0].hash,
 		);
 	});
@@ -323,7 +328,7 @@ describe<{
 		genesisCommit,
 	}) => {
 		assert.equal(
-			(await databaseService.getTransactionByBlockNumberAndIndex(0, 0))?.data.hash,
+			(await databaseService.getTransactionByBlockNumberAndIndex(0, 0))?.hash,
 			genesisCommit.block.transactions[0].hash,
 		);
 	});

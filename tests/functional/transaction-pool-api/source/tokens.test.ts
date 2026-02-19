@@ -44,7 +44,7 @@ describe<{
 		await waitBlock(context, 2);
 
 		const erc20Address = getCreateAddress({
-			from: deployTx.data.from as Hex,
+			from: deployTx.from as Hex,
 			nonce: 2n,
 		});
 

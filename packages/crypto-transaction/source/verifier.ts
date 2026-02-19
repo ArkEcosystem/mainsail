@@ -3,8 +3,6 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { InvalidLegacySecondSignatureError, MissingLegacySecondSignatureError } from "@mainsail/exceptions";
 
-import { schemas } from "./validation/schemas.js";
-
 @injectable()
 export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	@inject(Identifiers.Cryptography.Signature.Instance)
@@ -14,8 +12,8 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.Validator;
 
-	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils!: Contracts.Crypto.TransactionUtilities;
+	@inject(Identifiers.Cryptography.Transaction.HashFactory)
+	private readonly hashFactory!: Contracts.Crypto.TransactionHashFactory;
 
 	public async verifyHash(data: Contracts.Crypto.TransactionData): Promise<boolean> {
 		const { v, r, s, senderPublicKey } = data;
@@ -24,23 +22,30 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 			return false;
 		}
 
-		const hash: Buffer = await this.utils.toHash(data, {
-			excludeSignature: true,
-		});
-
+		const hash: Buffer = await this.hashFactory.toHashUnsigned(data);
 		return this.signatureFactory.verifyRecoverable({ r, s, v }, hash, Buffer.from(senderPublicKey, "hex"));
 	}
 
-	public async verifySchema(
+	public async verifySchemaUnsigned(
+		data: Contracts.Crypto.TransactionUnsignedSerializable,
+	): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionUnsignedSerializable>> {
+		return this.validator.validate("transaction", data);
+	}
+
+	public async verifySchemaSigned(
+		data: Contracts.Crypto.TransactionSerializable,
+	): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionSerializable>> {
+		return this.validator.validate("transactionSigned", data);
+	}
+
+	public async verifySchemaStrict(
 		data: Contracts.Crypto.TransactionData,
-		strict: boolean,
 	): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionData>> {
-		const { $id } = schemas.transaction;
-		return this.validator.validate(strict ? `${$id}Strict` : `${$id}`, data);
+		return this.validator.validate("transactionStrict", data);
 	}
 
 	public async verifyLegacySecondSignature(
-		data: Contracts.Crypto.TransactionData,
+		data: Contracts.Crypto.TransactionSerializable,
 		legacySecondPublicKey: string,
 	): Promise<boolean> {
 		const { legacySecondSignature } = data;
@@ -53,9 +58,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 		const s = legacySecondSignature.slice(64, 128);
 		const v = Number.parseInt(legacySecondSignature.slice(128, 130), 16);
 
-		const hash: Buffer = await this.utils.toHash(data, {
-			excludeSignature: true,
-		});
+		const hash: Buffer = await this.hashFactory.toHashUnsigned(data);
 
 		const verified = await this.signatureFactory.verifyRecoverable(
 			{ r, s, v },

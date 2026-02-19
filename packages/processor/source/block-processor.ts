@@ -57,7 +57,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	protected readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<Contracts.Processor.BlockProcessorResult> {
-		const processResult = { gasUsed: 0, receipts: new Map(), success: false };
+		const processResult = { feeUsed: BigNumber.ZERO, gasUsed: 0, receipts: new Map(), success: false };
 
 		try {
 			await this.verifier.verify(unit);
@@ -77,15 +77,15 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 					await sleep(0);
 				}
 
-				const receipt = await this.transactionProcessor.process(unit, transaction);
+				const receipt = await this.transactionProcessor.process(unit, transaction, index);
 				processResult.receipts.set(transaction.hash, receipt);
 
-				transaction.data.gasUsed = Number(receipt.gasUsed);
 				this.#consumeGas(block, processResult, Number(receipt.gasUsed));
+				this.#consumeFee(block, processResult, transaction, Number(receipt.gasUsed));
 			}
 
 			this.#verifyConsumedAllGas(block, processResult);
-			this.#verifyTotalFee(block);
+			this.#verifyTotalFee(block, processResult);
 			await this.#updateRewardsAndVotes(unit);
 			await this.#calculateRoundValidators(unit);
 			await this.#verifyStateRoot(block);
@@ -168,37 +168,40 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		processorResult: Contracts.Processor.BlockProcessorResult,
 		gasUsed: number,
 	): void {
-		const totalGas = block.gasUsed;
-
-		if (processorResult.gasUsed + gasUsed > totalGas) {
+		if (processorResult.gasUsed + gasUsed > block.gasUsed) {
 			throw new Error("Cannot consume more gas");
 		}
 
 		processorResult.gasUsed += gasUsed;
 	}
 
+	#consumeFee(
+		block: Contracts.Crypto.Block,
+		processorResult: Contracts.Processor.BlockProcessorResult,
+		transaction: Contracts.Crypto.BlockTransaction,
+		gasUsed: number,
+	): void {
+		const fee = this.feeCalculator.calculateConsumed(gasUsed, transaction.gasPrice);
+
+		if (processorResult.feeUsed.plus(fee).isGreaterThan(block.fee)) {
+			throw new Error("Cannot consume more fee");
+		}
+
+		processorResult.feeUsed = processorResult.feeUsed.plus(fee);
+	}
+
 	#verifyConsumedAllGas(
 		block: Contracts.Crypto.Block,
 		processorResult: Contracts.Processor.BlockProcessorResult,
 	): void {
-		const totalGas = block.gasUsed;
-		if (totalGas !== processorResult.gasUsed) {
-			throw new Error(`Block gas ${totalGas} does not match consumed gas ${processorResult.gasUsed}`);
+		if (block.gasUsed !== processorResult.gasUsed) {
+			throw new Error(`Block gas ${block.gasUsed} does not match consumed gas ${processorResult.gasUsed}`);
 		}
 	}
 
-	#verifyTotalFee(block: Contracts.Crypto.Block): void {
-		let totalGas = BigNumber.ZERO;
-		for (const transaction of block.transactions) {
-			assert.defined(transaction.data.gasUsed);
-
-			totalGas = totalGas.plus(
-				this.feeCalculator.calculateConsumed(transaction.data.gasUsed, transaction.data.gasPrice),
-			);
-		}
-
-		if (!totalGas.isEqualTo(block.fee)) {
-			throw new Error(`Block fee ${block.fee} does not match consumed fee ${totalGas}`);
+	#verifyTotalFee(block: Contracts.Crypto.Block, processorResult: Contracts.Processor.BlockProcessorResult): void {
+		if (!processorResult.feeUsed.isEqualTo(block.fee)) {
+			throw new Error(`Block fee ${block.fee} does not match consumed fee ${processorResult.feeUsed}`);
 		}
 	}
 
@@ -249,7 +252,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			return;
 		}
 
-		void this.#emit(Events.TransactionEvent.Applied, transaction.data);
+		void this.#emit(Events.TransactionEvent.Applied, transaction);
 	}
 
 	async #updateRewardsAndVotes(unit: Contracts.Processor.ProcessableUnit) {

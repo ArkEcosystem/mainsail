@@ -1,7 +1,5 @@
 import type { SchemaObject } from "ajv";
 
-import { signedSchema, strictSchema } from "./utilities.js";
-
 const transactionHash: SchemaObject = {
 	$id: "transactionHash",
 	allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
@@ -22,37 +20,53 @@ const networkByte: SchemaObject = {
 const transaction: SchemaObject = {
 	$id: "transaction",
 	properties: {
-		data: { bytecode: {} },
-		from: { $ref: "address" },
+		/* eslint-disable sort-keys-fix/sort-keys-fix */
+		hash: { $ref: "transactionHash" }, // Signed
 
+		network: { $ref: "networkByte" },
+		to: { $ref: "address" },
+		value: { bignumber: { maximum: undefined, minimum: 0 } },
 		gasLimit: { transactionGasLimit: {} },
 		gasPrice: { transactionGasPrice: {} },
+		nonce: { bignumber: { minimum: 0 } },
+		data: { bytecode: {} },
 
-		hash: { $ref: "transactionHash" },
+		from: { $ref: "address" },
+		senderPublicKey: { $ref: "publicKey" },
+		senderLegacyAddress: { type: "string" },
 
-		// Legacy
+		// Signed
+		v: { maximum: 1, minimum: 0, type: "number" },
+		r: {
+			allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
+			type: "string",
+		},
+		s: {
+			allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
+			type: "string",
+		},
+
 		legacySecondSignature: {
 			allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }],
 			type: "string",
 		},
-
-		network: { $ref: "networkByte" },
-
-		nonce: { bignumber: { minimum: 0 } },
-
-		r: { $ref: "hex" },
-		s: { $ref: "hex" },
-
-		senderLegacyAddress: { type: "string" },
-
-		senderPublicKey: { $ref: "publicKey" },
-
-		to: { $ref: "address" },
-		v: { maximum: 1, minimum: 0, type: "number" },
-		value: { bignumber: { maximum: undefined, minimum: 0 } },
+		/* eslint-enable sort-keys-fix/sort-keys-fix */
 	},
-	required: ["network", "from", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
+	required: ["network", "gasPrice", "gasLimit", "value", "nonce", "data"],
 	type: "object",
+};
+
+const transactionSigned: SchemaObject = {
+	...transaction,
+	$id: "transactionSigned",
+	required: [...transaction.required, "v", "r", "s"],
+};
+
+const transactionStrict: SchemaObject = {
+	...transactionSigned,
+	$id: "transactionStrict",
+	required: [...transactionSigned.required, "hash", "from", "senderPublicKey", "senderLegacyAddress"],
+	unevaluatedProperties: false,
 };
 
 const transactions = {
@@ -66,7 +80,7 @@ export const schemas = {
 	prefixedTransactionHash,
 	transaction,
 	transactionHash,
-	transactionSigned: signedSchema(transaction),
-	transactionStrict: strictSchema(transaction),
+	transactionSigned,
+	transactionStrict,
 	transactions,
 };

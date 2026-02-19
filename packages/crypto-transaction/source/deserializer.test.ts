@@ -2,14 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import {
-	serializedTransactionContractCall,
-	serializedTransactionContractCallWithSecondSignature,
-	serializedTransactionDeploy,
-	serializedTransactionTransfer,
-	serializedTransactionTransferEqualGreater11Fields,
-	serializedTransactionTransferLessThan9Fields,
-} from "../test/fixtures/transaction";
+import { Deserialized, Serialized } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
@@ -25,20 +18,23 @@ describe<{
 	});
 
 	it("should be ok", async ({ deserializer }) => {
-		for (const serialized of [
-			serializedTransactionContractCall,
-			serializedTransactionContractCallWithSecondSignature,
-			serializedTransactionDeploy,
-			serializedTransactionTransfer,
+		for (const [serialized, deserialized] of [
+			[Serialized.transactionContractCall, Deserialized.transactionContractCall],
+			[
+				Serialized.transactionContractCallWithSecondSignature,
+				Deserialized.transactionContractCallWithSecondSignature,
+			],
+			[Serialized.transactionDeploy, Deserialized.transactionDeploy],
+			[Serialized.transactionTransfer, Deserialized.transactionTransfer],
 		]) {
-			await assert.resolves(async () => deserializer.deserialize(Buffer.from(serialized, "hex")));
+			await assert.equal((await deserializer.deserialize(Buffer.from(serialized, "hex"))).data, deserialized);
 		}
 	});
 
 	it("should not deserialize transaction with invalid number of fields", async ({ deserializer }) => {
 		for (const [serialized, error] of [
-			[serializedTransactionTransferLessThan9Fields, "decoded RLP contains too few fields"],
-			[serializedTransactionTransferEqualGreater11Fields, "decoded RLP contains too many fields"],
+			[Serialized.transactionTransferLessThan9Fields, "decoded RLP contains too few fields"],
+			[Serialized.transactionTransferEqualGreater11Fields, "decoded RLP contains too many fields"],
 		]) {
 			await assert.rejects(async () => deserializer.deserialize(Buffer.from(serialized, "hex")), error);
 		}

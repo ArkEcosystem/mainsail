@@ -207,7 +207,6 @@ pub struct TxContext {
     pub nonce: u64,
     pub data: Bytes,
     pub tx_hash: B256,
-    pub index: Option<u32>,
     pub block_context: BlockContext,
     pub spec_id: SpecId,
 }
@@ -507,7 +506,6 @@ impl TryFrom<JsTransactionContext> for TxContext {
             nonce: value.nonce.get_u64().1,
             data: utils::convert_js_buffer_to_bytes(value.data),
             tx_hash: utils::convert_string_to_b256(value.tx_hash)?,
-            index: value.index,
             block_context: value.block_context.try_into()?,
             spec_id: parse_spec_id(value.spec_id)?,
         };

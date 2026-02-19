@@ -1,8 +1,15 @@
 import { Enums, Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { assert, Lock } from "@mainsail/utils";
+import { assert, BigNumber, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
+
+const FAILED_PROCESSOR_RESULT: Contracts.Processor.BlockProcessorResult = {
+	feeUsed: BigNumber.ZERO,
+	gasUsed: 0,
+	receipts: new Map(),
+	success: false,
+};
 
 @injectable()
 export class Consensus implements Contracts.Consensus.Service {
@@ -618,7 +625,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				await proposal.deserializeData();
 
 				if (!(await this.proposalProcessor.hasValidLockProof(proposal))) {
-					roundState.setProcessorResult({ gasUsed: 0, receipts: new Map(), success: false });
+					roundState.setProcessorResult(FAILED_PROCESSOR_RESULT);
 					return;
 				}
 
@@ -629,7 +636,7 @@ export class Consensus implements Contracts.Consensus.Service {
 					"consensus",
 				);
 
-				roundState.setProcessorResult({ gasUsed: 0, receipts: new Map(), success: false });
+				roundState.setProcessorResult(FAILED_PROCESSOR_RESULT);
 			}
 		}
 	}
@@ -639,7 +646,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			try {
 				commitState.setProcessorResult(await this.processor.process(commitState));
 			} catch {
-				commitState.setProcessorResult({ gasUsed: 0, receipts: new Map(), success: false });
+				commitState.setProcessorResult(FAILED_PROCESSOR_RESULT);
 			}
 		}
 	}

@@ -365,12 +365,12 @@ export class Snapshot {
 				if (receipt) {
 					const consumedGas = this.app
 						.get<Contracts.BlockchainUtils.FeeCalculator>(Identifiers.BlockchainUtils.FeeCalculator)
-						.calculateConsumed(transaction.data.gasPrice, Number(receipt.receipt.gasUsed));
+						.calculateConsumed(transaction.gasPrice, Number(receipt.receipt.gasUsed));
 					console.log(
 						"found receipt with",
 						receipt.sender,
 						receipt.receipt.gasUsed,
-						transaction.data.gasPrice,
+						transaction.gasPrice,
 						consumedGas,
 					);
 
@@ -389,12 +389,12 @@ export class Snapshot {
 
 					// add transferred value to recipient (if any)
 					if (
-						transaction.data.to &&
-						transaction.data.value.isGreaterThan(0) &&
+						transaction.to &&
+						transaction.value.isGreaterThan(0) &&
 						receipt.receipt.status === 1
 					) {
-						await negativeBalanceChange(receipt.sender, transaction.data.value);
-						await positiveBalanceChange(transaction.data.to, transaction.data.value);
+						await negativeBalanceChange(receipt.sender, transaction.value);
+						await positiveBalanceChange(transaction.to, transaction.value);
 					}
 
 					const consensusContract = this.app.get<string>(
@@ -402,7 +402,7 @@ export class Snapshot {
 					);
 
 					// Refund Validator Fee
-					if (transaction.data.to === consensusContract) {
+					if (transaction.to === consensusContract) {
 						const consensusAbi = parseAbi(["event ValidatorResigned(address addr)"] as const);
 
 						const resignations = parseEventLogs({
@@ -413,7 +413,7 @@ export class Snapshot {
 
 						for (const resignation of resignations) {
 							await negativeBalanceChange(
-								transaction.data.to,
+								transaction.to,
 								BigNumber.make(configuration.getMilestone().validatorRegistrationFee),
 							);
 							await positiveBalanceChange(
@@ -427,7 +427,7 @@ export class Snapshot {
 					const multiPaymentContract = this.app.get<string>(
 						EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
 					);
-					if (transaction.data.to === multiPaymentContract) {
+					if (transaction.to === multiPaymentContract) {
 						const paymentAbi = parseAbi([
 							"event Payment(address indexed recipient, uint256 amount, bool success)",
 						] as const);
