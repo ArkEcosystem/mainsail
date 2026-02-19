@@ -1,7 +1,7 @@
 import type { AnySchemaObject } from "ajv";
 
 export const schemas: Record<
-	"block" | "blockHash" | "prefixedBlockHash" | "blockHeader" | "logsBloom",
+	"block" | "blockHash" | "prefixedBlockHash" | "blockHeader" | "logsBloom" | "stateRoot" | "transactionsRoot",
 	AnySchemaObject
 > = {
 	block: {
@@ -38,14 +38,14 @@ export const schemas: Record<
 			number: { minimum: 0, type: "integer" },
 			round: { minimum: 0, type: "integer" },
 			parentHash: { $ref: "blockHash" },
-			stateRoot: { $ref: "hex" },
+			stateRoot: { $ref: "stateRoot" },
 			logsBloom: { $ref: "logsBloom" },
 			transactionsCount: { minimum: 0, type: "integer" },
 			gasUsed: { minimum: 0, type: "integer" },
 			fee: { bignumber: { minimum: 0 } },
 			reward: { bignumber: { minimum: 0 } },
 			payloadSize: { minimum: 0, type: "integer" },
-			transactionsRoot: { $ref: "hex" },
+			transactionsRoot: { $ref: "transactionsRoot" },
 			proposer: { $ref: "address" },
 			/* eslint-enable sort-keys-fix/sort-keys-fix */
 		},
@@ -86,6 +86,28 @@ export const schemas: Record<
 				$ref: "prefixedQuantityHex",
 				maxLength: 66,
 				minLength: 66,
+			},
+		],
+		type: "string",
+	},
+	stateRoot: {
+		$id: "stateRoot",
+		allOf: [
+			{
+				$ref: "hex",
+				maxLength: 64,
+				minLength: 64,
+			},
+		],
+		type: "string",
+	},
+	transactionsRoot: {
+		$id: "transactionsRoot",
+		allOf: [
+			{
+				$ref: "hex",
+				maxLength: 64,
+				minLength: 64,
 			},
 		],
 		type: "string",

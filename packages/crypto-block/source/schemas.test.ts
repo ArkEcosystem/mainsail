@@ -103,6 +103,48 @@ describe<{
 		assert.defined(validator.validate("logsBloom", "a".repeat(length + 1)).error);
 	});
 
+	it("stateRoot - should be ok", ({ validator }) => {
+		const length = 64;
+		const validChars = "0123456789abcdef";
+
+		for (const char of validChars) {
+			assert.undefined(validator.validate("stateRoot", char.repeat(length)).error);
+		}
+	});
+
+	it("stateRoot - should not be ok", ({ validator }) => {
+		const length = 64;
+		const invalidChars = "ABCDEFGHIJKLMNOghijklmno$%!+-";
+
+		for (const char of invalidChars) {
+			assert.defined(validator.validate("stateRoot", char.repeat(length)).error);
+		}
+
+		assert.defined(validator.validate("stateRoot", "a".repeat(length - 1)).error);
+		assert.defined(validator.validate("stateRoot", "a".repeat(length + 1)).error);
+	});
+
+	it("transactionsRoot - should be ok", ({ validator }) => {
+		const length = 64;
+		const validChars = "0123456789abcdef";
+
+		for (const char of validChars) {
+			assert.undefined(validator.validate("transactionsRoot", char.repeat(length)).error);
+		}
+	});
+
+	it("transactionsRoot - should not be ok", ({ validator }) => {
+		const length = 64;
+		const invalidChars = "ABCDEFGHIJKLMNOghijklmno$%!+-";
+
+		for (const char of invalidChars) {
+			assert.defined(validator.validate("transactionsRoot", char.repeat(length)).error);
+		}
+
+		assert.defined(validator.validate("transactionsRoot", "a".repeat(length - 1)).error);
+		assert.defined(validator.validate("transactionsRoot", "a".repeat(length + 1)).error);
+	});
+
 	/* eslint-disable sort-keys-fix/sort-keys-fix */
 	const blockOriginal = {
 		hash: "1".repeat(64),
@@ -118,7 +160,7 @@ describe<{
 		fee: 0,
 		reward: 0,
 		payloadSize: 0,
-		transactionsRoot: "123",
+		transactionsRoot: "0".repeat(64),
 		proposer: "0x" + "A".repeat(40),
 
 	};
