@@ -1,0 +1,14 @@
+{
+    "address": "0xA5d751A5F645856fDE0931DbE543099198a44B50",
+    "consensusKeys": {
+        "compressed": true,
+        "privateKey": "5769d4fd653476011911494814d88524b9f454c7435670b470ffb34baeb48491",
+        "publicKey": "80ad4d6e3096d0c442652695516f1d1834fc9c8878f284fd53632d16b3a7118301c7768936d65222d48197da759687ad"
+    },
+    "keys": {
+        "compressed": true,
+        "privateKey": "8b7cc084bea7fdd769282c6f0c3dada16bfe512c4546831e7b14179f9f09a72e",
+        "publicKey": "02a251c8dd30cb0b672ca74eadd6076c6d6bf6e592a8b3672943dc308126899e7c"
+    },
+    "passphrase": "deer flock law wrestle boss kidney matter hour claw pole barely property story dismiss inquiry remove flame dog estate hub million place pave category"
+}
