@@ -2,7 +2,6 @@ import type { Contracts, Utils } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import clone from "lodash.clonedeep";
 
-import { BlockSchemaError } from "@mainsail/exceptions";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import {
@@ -31,7 +30,6 @@ describe<{
 	serializer: Serializer;
 }>("Factory", ({ it, assert, beforeEach }) => {
 	const blockDataOriginal = clone(blockData);
-	// Recalculated id
 	const blockDataWithTransactionsOriginal = clone(blockDataWithTransactions);
 	let blockDataClone: Utils.Mutable<Contracts.Crypto.BlockData>;
 	let blockDataWithTransactionsClone: Utils.Mutable<Contracts.Crypto.BlockData>;
@@ -199,9 +197,6 @@ describe<{
 	it("#fromJson - should create a block instance from JSON", async ({ factory }) => {
 		const block = await factory.fromJson(blockDataJson);
 
-		// Recalculated id
-		blockDataClone.hash = blockDataJson.hash;
-
 		assertBlockData(assert, block, blockDataClone);
 		assert.equal(block.transactions, []);
 		assert.string(block.serialized);
@@ -210,17 +205,12 @@ describe<{
 	it("#fromJson - should create a block instance with transactions from JSON", async ({ factory }) => {
 		const block = await factory.fromJson(blockDataWithTransactionsJson);
 
-		// Recalculated id
-		blockDataWithTransactionsClone.hash = blockDataWithTransactionsJson.hash;
 
 		assertBlockData(assert, block, blockDataWithTransactionsClone);
 		assert.string(block.serialized);
 		assert.length(block.transactions, blockDataWithTransactionsClone.transactions.length);
 
 		for (let index = 0; index < blockDataWithTransactionsClone.transactions.length; index++) {
-			// Recalculated id
-			blockDataWithTransactionsClone.transactions[index].hash = block.transactions[index].hash;
-
 			assertTransactionData(
 				assert,
 				block.transactions[index],
