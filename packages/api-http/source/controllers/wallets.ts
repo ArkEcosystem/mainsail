@@ -134,7 +134,8 @@ export class WalletsController extends Controller {
 			? request.query.addresses
 			: [request.query.addresses];
 
-		const minBalance = request.query.minBalance ?? this.apiConfiguration.getOptional("tokens.defaultMinimumBalance", 0.01);
+		const minBalance =
+			request.query.minBalance ?? this.apiConfiguration.getOptional("tokens.defaultMinimumBalance", 0.01);
 		const pagination = this.getListingPage(request);
 
 		const tokenPaginatedQuery = this.tokenRepositoryFactory()
@@ -281,7 +282,8 @@ export class WalletsController extends Controller {
 
 	private async getTokens(request: Hapi.Request, walletAddress: string) {
 		const pagination = this.getListingPage(request);
-		const minBalance = request.query.minBalance ?? this.apiConfiguration.getOptional("tokens.defaultMinimumBalance", 0.01);
+		const minBalance =
+			request.query.minBalance ?? this.apiConfiguration.getOptional("tokens.defaultMinimumBalance", 0.01);
 
 		const tokenHoldersQuery = this.tokenHolderRepositoryFactory()
 			.createQueryBuilder("th")
