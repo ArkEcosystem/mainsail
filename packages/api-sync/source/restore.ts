@@ -406,7 +406,7 @@ export class Restore {
 				} else {
 					validatorAttributes.producedBlocks += 1;
 					validatorAttributes.totalForgedFees = validatorAttributes.totalForgedFees.plus(block.fee);
-					validatorAttributes.totalForgedRewards = validatorAttributes.totalForgedFees.plus(block.reward);
+					validatorAttributes.totalForgedRewards = validatorAttributes.totalForgedRewards.plus(block.reward);
 					validatorAttributes.lastBlock = block;
 				}
 
@@ -653,14 +653,18 @@ export class Restore {
 													.toFixed(),
 											}
 										: {}),
-									validatorLastBlock: validatorAttributes.lastBlock
+									...(validatorAttributes.producedBlocks > 0
+										? { validatorProducedBlocks: validatorAttributes.producedBlocks }
+										: {}),
+									...(validatorAttributes.lastBlock
 										? {
-												hash: validatorAttributes.lastBlock.hash,
-												number: validatorAttributes.lastBlock.number,
-												timestamp: validatorAttributes.lastBlock.timestamp,
+												validatorLastBlock: {
+													hash: validatorAttributes.lastBlock.hash,
+													number: validatorAttributes.lastBlock.number,
+													timestamp: validatorAttributes.lastBlock.timestamp,
+												},
 											}
-										: {},
-									validatorProducedBlocks: validatorAttributes.producedBlocks,
+										: {}),
 
 									// updated at end of db transaction
 									// - validatorRank
