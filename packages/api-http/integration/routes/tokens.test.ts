@@ -243,6 +243,23 @@ describe<{
 				},
 			},
 			{
+				query: `?addresses=0x432b093d9542B905C87587607491C369408475b4`,
+				result: {
+					data: tokenTransfersResponse.filter((t) =>
+						t.from === "0x432b093d9542B905C87587607491C369408475b4" ||
+						t.to === "0x432b093d9542B905C87587607491C369408475b4"
+					),
+					statusCode: 200,
+				},
+			},
+			{
+				query: `?addresses=0x0000000000000000000000000000000000000001`,
+				result: {
+					data: [],
+					statusCode: 200,
+				},
+			},
+			{
 				query: "?limit=1",
 				result: {
 					data: tokenTransfersResponse.slice(0, 1),
