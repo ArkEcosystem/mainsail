@@ -59,6 +59,7 @@ describe<{
 			assert.equal(ownTx.data.data, viemTx.data || "0x");
 
 			assert.equal(ownTx.data.v, Number(viemTx.v) - (2 * 10000 + 35));
+			assert.equal(ownTx.data.v, Number(viemTx.yParity)),
 			assert.equal("0x" + ownTx.data.r, viemTx.r);
 			assert.equal("0x" + ownTx.data.s, viemTx.s);
 		}
