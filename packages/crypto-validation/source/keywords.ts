@@ -4,7 +4,7 @@ import type { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
 export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
-): { maxBytes: FuncKeywordDefinition; bignum: FuncKeywordDefinition } => {
+): { maxBytes: FuncKeywordDefinition; bignumber: FuncKeywordDefinition } => {
 	const maxBytes: FuncKeywordDefinition = {
 		compile: (schema) => (data) => Buffer.byteLength(data, "utf8") <= schema,
 		errors: false,
@@ -16,28 +16,21 @@ export const makeKeywords = (
 		type: "string",
 	};
 
-	const bignum: FuncKeywordDefinition = {
-		// TODO: Check type
+	const bignumber: FuncKeywordDefinition = {
 		// @ts-ignore
 		compile: (schema) => (data, parentSchema: AnySchemaObject) => {
 			const minimum = schema.minimum !== undefined ? schema.minimum : 0;
 			const maximum = schema.maximum !== undefined ? schema.maximum : BigNumber.UINT256_MAX;
 
-			if (data !== 0 && !data) {
+			if (!(data instanceof BigNumber)) {
 				return false;
 			}
 
-			try {
-				const bignum = BigNumber.make(data);
+			if (data.isLessThan(minimum)) {
+				return false;
+			}
 
-				if (bignum.isLessThan(minimum)) {
-					return false;
-				}
-
-				if (bignum.isGreaterThan(maximum)) {
-					return false;
-				}
-			} catch {
+			if (data.isGreaterThan(maximum)) {
 				return false;
 			}
 
@@ -54,5 +47,5 @@ export const makeKeywords = (
 		},
 	};
 
-	return { bignum, maxBytes };
+	return { bignumber, maxBytes };
 };

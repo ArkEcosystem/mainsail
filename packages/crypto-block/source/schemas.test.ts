@@ -1,4 +1,5 @@
 import { Identifiers } from "@mainsail/constants";
+import { BigNumber } from "@mainsail/utils";
 import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
 import { Configuration } from "@mainsail/crypto-config";
 import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-ecdsa";
@@ -41,43 +42,129 @@ describe<{
 	});
 
 	it("blockHash - should be ok", ({ validator }) => {
-		const lenght = 64;
+		const length = 64;
 		const validChars = "0123456789abcdef";
 
 		for (const char of validChars) {
-			assert.undefined(validator.validate("blockHash", char.repeat(lenght)).error);
+			assert.undefined(validator.validate("blockHash", char.repeat(length)).error);
 		}
 	});
 
 	it("blockHash - should not be ok", ({ validator }) => {
-		const lenght = 64;
+		const length = 64;
 		const invalidChars = "ABCDEFGHIJKLMNOghijklmno$%!+-";
 
 		for (const char of invalidChars) {
-			assert.defined(validator.validate("blockHash", char.repeat(lenght)).error);
+			assert.defined(validator.validate("blockHash", char.repeat(length)).error);
 		}
 
-		assert.defined(validator.validate("blockHash", "a".repeat(lenght - 1)).error);
-		assert.defined(validator.validate("blockHash", "a".repeat(lenght + 1)).error);
+		assert.defined(validator.validate("blockHash", "a".repeat(length - 1)).error);
+		assert.defined(validator.validate("blockHash", "a".repeat(length + 1)).error);
 	});
 
+	it("prefixedBlockHash - should be ok", ({ validator }) => {
+		const length = 64;
+		const validChars = "0123456789abcdef";
+
+		for (const char of validChars) {
+			assert.undefined(validator.validate("prefixedBlockHash", "0x" + char.repeat(length)).error);
+		}
+	});
+
+	it("prefixedBlockHash - should not be ok", ({ validator }) => {
+		const length = 64;
+		const invalidChars = "ABCDEFGHIJKLMNOghijklmno$%!+-";
+
+		for (const char of invalidChars) {
+			assert.defined(validator.validate("prefixedBlockHash", "0x" + char.repeat(length)).error);
+		}
+
+		assert.defined(validator.validate("prefixedBlockHash", "0x" + "a".repeat(length - 1)).error);
+		assert.defined(validator.validate("prefixedBlockHash", "0x" + "a".repeat(length + 1)).error);
+	});
+
+	it("logsBloom - should be ok", ({ validator }) => {
+		const length = 512;
+		const validChars = "0123456789abcdef";
+
+		for (const char of validChars) {
+			assert.undefined(validator.validate("logsBloom", char.repeat(length)).error);
+		}
+	});
+
+	it("logsBloom - should not be ok", ({ validator }) => {
+		const length = 512;
+		const invalidChars = "ABCDEFGHIJKLMNOghijklmno$%!+-";
+
+		for (const char of invalidChars) {
+			assert.defined(validator.validate("logsBloom", char.repeat(length)).error);
+		}
+
+		assert.defined(validator.validate("logsBloom", "a".repeat(length - 1)).error);
+		assert.defined(validator.validate("logsBloom", "a".repeat(length + 1)).error);
+	});
+
+	it("stateRoot - should be ok", ({ validator }) => {
+		const length = 64;
+		const validChars = "0123456789abcdef";
+
+		for (const char of validChars) {
+			assert.undefined(validator.validate("stateRoot", char.repeat(length)).error);
+		}
+	});
+
+	it("stateRoot - should not be ok", ({ validator }) => {
+		const length = 64;
+		const invalidChars = "ABCDEFGHIJKLMNOghijklmno$%!+-";
+
+		for (const char of invalidChars) {
+			assert.defined(validator.validate("stateRoot", char.repeat(length)).error);
+		}
+
+		assert.defined(validator.validate("stateRoot", "a".repeat(length - 1)).error);
+		assert.defined(validator.validate("stateRoot", "a".repeat(length + 1)).error);
+	});
+
+	it("transactionsRoot - should be ok", ({ validator }) => {
+		const length = 64;
+		const validChars = "0123456789abcdef";
+
+		for (const char of validChars) {
+			assert.undefined(validator.validate("transactionsRoot", char.repeat(length)).error);
+		}
+	});
+
+	it("transactionsRoot - should not be ok", ({ validator }) => {
+		const length = 64;
+		const invalidChars = "ABCDEFGHIJKLMNOghijklmno$%!+-";
+
+		for (const char of invalidChars) {
+			assert.defined(validator.validate("transactionsRoot", char.repeat(length)).error);
+		}
+
+		assert.defined(validator.validate("transactionsRoot", "a".repeat(length - 1)).error);
+		assert.defined(validator.validate("transactionsRoot", "a".repeat(length + 1)).error);
+	});
+
+	/* eslint-disable sort-keys-fix/sort-keys-fix */
 	const blockOriginal = {
-		blockSignature: "123",
-		proposer: "0x" + "A".repeat(40),
-		number: 0,
 		hash: "1".repeat(64),
-		transactionsCount: 0,
-		payloadSize: 0,
-		transactionsRoot: "123",
+		version: 1,
+		timestamp: 0,
+		number: 0,
+		round: 0,
 		parentHash: "0".repeat(64),
-		reward: 0,
 		stateRoot: "0".repeat(64),
 		logsBloom: "0".repeat(512),
-		timestamp: 0,
-		fee: 0,
+		transactionsCount: 0,
 		gasUsed: 0,
-		version: 1,
+		fee: BigNumber.ZERO,
+		reward: BigNumber.ZERO,
+		payloadSize: 0,
+		transactionsRoot: "0".repeat(64),
+		proposer: "0x" + "A".repeat(40),
 	};
+	/* eslint-enable sort-keys-fix/sort-keys-fix */
 
 	it("blockHeader - should be ok", async ({ validator }) => {
 		const block = {
@@ -89,20 +176,21 @@ describe<{
 
 	it("blockHeader - should not be ok if any required field is missing", ({ validator }) => {
 		const requiredFields = [
-			"fee",
-			"gasUsed",
 			"hash",
-			"logsBloom",
-			"number",
-			"parentHash",
-			"payloadSize",
-			"proposer",
-			"reward",
-			"stateRoot",
-			"timestamp",
-			"transactionsCount",
-			"transactionsRoot",
 			"version",
+			"timestamp",
+			"number",
+			"round",
+			"parentHash",
+			"stateRoot",
+			"logsBloom",
+			"transactionsCount",
+			"gasUsed",
+			"fee",
+			"reward",
+			"payloadSize",
+			"transactionsRoot",
+			"proposer",
 		];
 
 		for (const field of requiredFields) {
@@ -110,28 +198,65 @@ describe<{
 
 			delete blockWithoutField[field];
 
-			assert.defined(validator.validate("blockHeader", blockWithoutField).error);
+			assert.true(validator.validate("blockHeader", blockWithoutField).error?.includes(field) ?? false);
 		}
 	});
 
-	it("blockHeader - proposer should be publicKey", ({ validator }) => {
+	it("blockHeader - hash should be blockHash", ({ validator }) => {
 		assert.true(
 			validator
 				.validate("blockHeader", {
 					...blockOriginal,
-					proposer: "a".repeat(63),
+					hash: "1",
 				})
-				.error.includes("proposer"),
+				.error!.includes("hash"),
+		);
+	});
+
+	it("blockHeader - version should be 1", ({ validator }) => {
+		assert.true(
+			validator
+				.validate("blockHeader", {
+					...blockOriginal,
+					version: 0,
+				})
+				.error!.includes("version"),
 		);
 
 		assert.true(
 			validator
 				.validate("blockHeader", {
 					...blockOriginal,
-					proposer: "a".repeat(65),
+					version: 2,
 				})
-				.error.includes("proposer"),
+				.error!.includes("version"),
 		);
+	});
+
+	it("blockHeader - timestamp should be integer & min 0", ({ validator }) => {
+		// OK
+		const validValues = [0, 1, 2];
+		for (const timestamp of validValues) {
+			assert.undefined(
+				validator.validate("blockHeader", {
+					...blockOriginal,
+					timestamp,
+				}).error,
+			);
+		}
+
+		// Not Ok
+		const invalidValues = ["0", "1", 0.12, 1.234, -1, -0.23, null, undefined];
+		for (const timestamp of invalidValues) {
+			assert.true(
+				validator
+					.validate("blockHeader", {
+						...blockOriginal,
+						timestamp,
+					})
+					.error!.includes("timestamp"),
+			);
+		}
 	});
 
 	it("blockHeader - number should be integer & min 0", ({ validator }) => {
@@ -153,40 +278,225 @@ describe<{
 						...blockOriginal,
 						number,
 					})
-					.error.includes("number"),
+					.error!.includes("number"),
 			);
 		}
 	});
 
-	it("blockHeader - hash should be blockHash", ({ validator }) => {
-		assert.true(
-			validator
-				.validate("blockHeader", {
+	it("blockHeader - round should be integer & min 0", ({ validator }) => {
+		// Integer OK
+		for (const round of [0, 1, 2]) {
+			assert.undefined(
+				validator.validate("blockHeader", {
 					...blockOriginal,
-					hash: "1",
-				})
-				.error.includes("hash"),
-		);
+					round,
+				}).error,
+			);
+		}
+
+		// NOT OK
+		for (const round of ["0", "1", 0.12, 1.234, -1, -0.23, null, undefined]) {
+			assert.true(
+				validator
+					.validate("blockHeader", {
+						...blockOriginal,
+						round,
+					})
+					.error!.includes("round"),
+			);
+		}
+	});
+
+	it("blockHeader - parentHash should be blockHash", ({ validator }) => {
+		const validValues = ["0".repeat(64), "1".repeat(64)];
+		for (const parentHash of validValues) {
+			assert.undefined(
+				validator.validate("blockHeader", {
+					...blockOriginal,
+					parentHash,
+				}).error,
+			);
+		}
+
+		const invalidValues = ["1", "0".repeat(63), "0".repeat(65), "GHIJK"];
+		for (const parentHash of invalidValues) {
+			assert.true(
+				validator
+					.validate("blockHeader", {
+						...blockOriginal,
+						parentHash,
+					})
+					.error!.includes("parentHash"),
+			);
+		}
+	});
+
+	it("blockHeader - stateRoot should be hex", ({ validator }) => {
+		const validValues = ["0".repeat(64), "1".repeat(64)];
+		for (const stateRoot of validValues) {
+			assert.undefined(
+				validator.validate("blockHeader", {
+					...blockOriginal,
+					stateRoot,
+				}).error,
+			);
+		}
+
+		const invalidValues = ["1", "0".repeat(63), "0".repeat(65), "GHIJK"];
+		for (const stateRoot of invalidValues) {
+			assert.true(
+				validator
+					.validate("blockHeader", {
+						...blockOriginal,
+						stateRoot,
+					})
+					.error!.includes("stateRoot"),
+			);
+		}
+	});
+
+	it("blockHeader - logsBloom should be hex", ({ validator }) => {
+		const validValues = ["0".repeat(512), "1".repeat(512)];
+		for (const logsBloom of validValues) {
+			assert.undefined(
+				validator.validate("blockHeader", {
+					...blockOriginal,
+					logsBloom,
+				}).error,
+			);
+		}
+
+		const invalidValues = ["1", "0".repeat(511), "0".repeat(513), "GHIJK"];
+		for (const logsBloom of invalidValues) {
+			assert.true(
+				validator
+					.validate("blockHeader", {
+						...blockOriginal,
+						logsBloom,
+					})
+					.error!.includes("logsBloom"),
+			);
+		}
 	});
 
 	it("blockHeader - transactionsCount should be integer & min 0", ({ validator }) => {
-		assert.true(
-			validator
-				.validate("blockHeader", {
+		// Integer OK
+		for (const transactionsCount of [0, 1, 2]) {
+			assert.undefined(
+				validator.validate("blockHeader", {
 					...blockOriginal,
-					transactionsCount: "1",
-				})
-				.error.includes("transactionsCount"),
-		);
+					transactionsCount,
+				}).error,
+			);
+		}
 
-		assert.true(
-			validator
-				.validate("blockHeader", {
+		// NOT OK
+		for (const transactionsCount of ["0", "1", 0.12, 1.234, -1, -0.23, null, undefined]) {
+			assert.true(
+				validator
+					.validate("blockHeader", {
+						...blockOriginal,
+						transactionsCount,
+					})
+					.error!.includes("transactionsCount"),
+			);
+		}
+	});
+
+	it("blockHeader - gasUsed should be integer & min 0", ({ validator }) => {
+		// Integer OK
+		for (const gasUsed of [0, 1, 2]) {
+			assert.undefined(
+				validator.validate("blockHeader", {
 					...blockOriginal,
-					transactionsCount: -1,
-				})
-				.error.includes("transactionsCount"),
-		);
+					gasUsed,
+				}).error,
+			);
+		}
+
+		// NOT OK
+		for (const gasUsed of ["0", "1", 0.12, 1.234, -1, -0.23, null, undefined]) {
+			assert.true(
+				validator
+					.validate("blockHeader", {
+						...blockOriginal,
+						gasUsed,
+					})
+					.error!.includes("gasUsed"),
+			);
+		}
+	});
+
+	it("blockHeader - fee should be bigNumber & min 0", ({ validator }) => {
+		// Integer OK
+		for (const fee of [BigNumber.ZERO, BigNumber.ONE, BigNumber.make(2)]) {
+			assert.undefined(
+				validator.validate("blockHeader", {
+					...blockOriginal,
+					fee,
+				}).error,
+			);
+		}
+
+		// NOT OK
+		for (const fee of [0, 1, "0", "1", BigNumber.make(-1), null, undefined]) {
+			assert.true(
+				validator
+					.validate("blockHeader", {
+						...blockOriginal,
+						fee,
+					})
+					.error!.includes("fee"),
+			);
+		}
+	});
+
+	it("blockHeader - reward should be bigNumber & min 0", ({ validator }) => {
+		// Integer OK
+		for (const reward of [BigNumber.ZERO, BigNumber.ONE, BigNumber.make(2)]) {
+			assert.undefined(
+				validator.validate("blockHeader", {
+					...blockOriginal,
+					reward,
+				}).error,
+			);
+		}
+
+		// NOT OK
+		for (const reward of [0, 1, "0", "1", BigNumber.make(-1), null, undefined]) {
+			assert.true(
+				validator
+					.validate("blockHeader", {
+						...blockOriginal,
+						reward,
+					})
+					.error!.includes("reward"),
+			);
+		}
+	});
+
+	it("blockHeader - payloadSize should be integer & min 0", ({ validator }) => {
+		// Integer OK
+		for (const payloadSize of [0, 1, 2]) {
+			assert.undefined(
+				validator.validate("blockHeader", {
+					...blockOriginal,
+					payloadSize,
+				}).error,
+			);
+		}
+
+		// NOT OK
+		for (const payloadSize of ["0", "1", 0.12, 1.234, -1, -0.23, null, undefined]) {
+			assert.true(
+				validator
+					.validate("blockHeader", {
+						...blockOriginal,
+						payloadSize,
+					})
+					.error!.includes("payloadSize"),
+			);
+		}
 	});
 
 	it("blockHeader - transactionsRoot should be hex", ({ validator }) => {
@@ -195,108 +505,31 @@ describe<{
 			transactionsRoot: "GHIJK",
 		};
 
-		assert.true(validator.validate("blockHeader", block).error.includes("transactionsRoot"));
+		assert.true(validator.validate("blockHeader", block).error!.includes("transactionsRoot"));
 	});
 
-	it("blockHeader - payloadSize should be integer & min 0", ({ validator }) => {
-		assert.true(
-			validator
-				.validate("blockHeader", {
+	it("blockHeader - proposer should be address", ({ validator }) => {
+		const validValues = ["0x" + "A".repeat(40), "0x" + "a".repeat(40), "0x" + "1".repeat(40)];
+		for (const proposer of validValues) {
+			assert.undefined(
+				validator.validate("blockHeader", {
 					...blockOriginal,
-					payloadSize: "1",
-				})
-				.error.includes("payloadSize"),
-		);
+					proposer,
+				}).error,
+			);
+		}
 
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					payloadSize: -1,
-				})
-				.error.includes("payloadSize"),
-		);
-	});
-
-	it("blockHeader - parentHash should be blockHash", ({ validator }) => {
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					parentHash: "1",
-				})
-				.error.includes("parentHash"),
-		);
-	});
-
-	it("blockHeader - reward should be bigNumber & min 0", ({ validator }) => {
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					reward: "-1",
-				})
-				.error.includes("reward"),
-		);
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					reward: -1,
-				})
-				.error.includes("reward"),
-		);
-	});
-
-	it("blockHeader - timestamp should be integer & min 0", ({ validator }) => {
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					timestamp: "1",
-				})
-				.error.includes("timestamp"),
-		);
-
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					timestamp: -1,
-				})
-				.error.includes("timestamp"),
-		);
-	});
-
-	it("blockHeader - fee should be bigNumber & min 0", ({ validator }) => {
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					fee: -1,
-				})
-				.error.includes("fee"),
-		);
-	});
-
-	it("blockHeader - version should be 1", ({ validator }) => {
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					version: 0,
-				})
-				.error.includes("version"),
-		);
-
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					version: 2,
-				})
-				.error.includes("version"),
-		);
+		const invalidValues = ["0x" + "G".repeat(40), "0x" + "A".repeat(39), "0x" + "A".repeat(41), "GHIJK"];
+		for (const proposer of invalidValues) {
+			assert.true(
+				validator
+					.validate("blockHeader", {
+						...blockOriginal,
+						proposer,
+					})
+					.error!.includes("proposer"),
+			);
+		}
 	});
 
 	it("block - transactions count should be equal transactionsCount", ({ validator }) => {

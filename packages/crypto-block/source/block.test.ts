@@ -33,5 +33,7 @@ describe<{}>("Block", ({ it, assert }) => {
 			block.transactions.map((tx) => ({ ...tx.toData() })),
 			[indexedTransaction1, indexedTransaction2],
 		);
+
+		assert.equal(block.toData(), { ...blockData, transactions: [indexedTransaction1, indexedTransaction2] });
 	});
 });

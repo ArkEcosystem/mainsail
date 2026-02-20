@@ -12,8 +12,8 @@ import type {
 export type BlockTag = "latest" | "finalized" | "safe";
 
 export interface BlockHeaderRaw {
-	readonly timestamp: number;
 	readonly version: number;
+	readonly timestamp: number;
 	readonly number: number;
 	readonly round: number;
 	readonly parentHash: string;

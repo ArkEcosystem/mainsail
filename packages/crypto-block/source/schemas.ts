@@ -1,7 +1,7 @@
 import type { AnySchemaObject } from "ajv";
 
 export const schemas: Record<
-	"block" | "blockHash" | "prefixedBlockHash" | "blockHeader" | "logsBloom",
+	"block" | "blockHash" | "prefixedBlockHash" | "blockHeader" | "logsBloom" | "stateRoot" | "transactionsRoot",
 	AnySchemaObject
 > = {
 	block: {
@@ -31,36 +31,40 @@ export const schemas: Record<
 	blockHeader: {
 		$id: "blockHeader",
 		properties: {
-			fee: { bignumber: { minimum: 0 } },
-			gasUsed: { minimum: 0, type: "integer" },
+			/* eslint-disable sort-keys-fix/sort-keys-fix */
 			hash: { $ref: "blockHash" },
-			logsBloom: { $ref: "logsBloom" },
-			number: { minimum: 0, type: "integer" },
-			parentHash: { $ref: "blockHash" },
-			payloadSize: { minimum: 0, type: "integer" },
-			proposer: { $ref: "address" },
-			reward: { bignumber: { minimum: 0 } },
-			stateRoot: { $ref: "hex" },
-			timestamp: { maximum: 2 ** 48 - 1, minimum: 0, type: "integer" },
-			transactionsCount: { minimum: 0, type: "integer" },
-			transactionsRoot: { $ref: "hex" },
 			version: { enum: [1] },
+			timestamp: { maximum: 2 ** 48 - 1, minimum: 0, type: "integer" },
+			number: { minimum: 0, type: "integer" },
+			round: { minimum: 0, type: "integer" },
+			parentHash: { $ref: "blockHash" },
+			stateRoot: { $ref: "stateRoot" },
+			logsBloom: { $ref: "logsBloom" },
+			transactionsCount: { minimum: 0, type: "integer" },
+			gasUsed: { minimum: 0, type: "integer" },
+			fee: { bignumber: { minimum: 0 } },
+			reward: { bignumber: { minimum: 0 } },
+			payloadSize: { minimum: 0, type: "integer" },
+			transactionsRoot: { $ref: "transactionsRoot" },
+			proposer: { $ref: "address" },
+			/* eslint-enable sort-keys-fix/sort-keys-fix */
 		},
 		required: [
-			"fee",
-			"gasUsed",
 			"hash",
-			"logsBloom",
-			"number",
-			"parentHash",
-			"payloadSize",
-			"proposer",
-			"reward",
-			"stateRoot",
-			"timestamp",
-			"transactionsCount",
-			"transactionsRoot",
 			"version",
+			"timestamp",
+			"number",
+			"round",
+			"parentHash",
+			"stateRoot",
+			"logsBloom",
+			"transactionsCount",
+			"gasUsed",
+			"fee",
+			"reward",
+			"payloadSize",
+			"transactionsRoot",
+			"proposer",
 		],
 		type: "object",
 	},
@@ -82,6 +86,28 @@ export const schemas: Record<
 				$ref: "prefixedQuantityHex",
 				maxLength: 66,
 				minLength: 66,
+			},
+		],
+		type: "string",
+	},
+	stateRoot: {
+		$id: "stateRoot",
+		allOf: [
+			{
+				$ref: "hex",
+				maxLength: 64,
+				minLength: 64,
+			},
+		],
+		type: "string",
+	},
+	transactionsRoot: {
+		$id: "transactionsRoot",
+		allOf: [
+			{
+				$ref: "hex",
+				maxLength: 64,
+				minLength: 64,
 			},
 		],
 		type: "string",

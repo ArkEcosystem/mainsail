@@ -145,6 +145,12 @@ export class PreviousBlockIdFormatError extends Exception {
 	}
 }
 
+export class InvalidBlockBytesError extends Exception {
+	public constructor(message: string) {
+		super(`Failed to deserialize block, encountered invalid bytes: ${message}`);
+	}
+}
+
 export class EvmCallIncompleteAssetError extends Exception {
 	public constructor() {
 		super(`EvmCall asset is incomplete`);
