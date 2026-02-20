@@ -63,7 +63,7 @@ describe<{
 		}
 	});
 
-	it.only("#deserializeWithTransactions - should throw with trailing bytes", async ({ deserializer, serializer }) => {
+	it("#deserializeWithTransactions - should throw with trailing bytes", async ({ deserializer, serializer }) => {
 		const deserialized = await deserializer.deserializeWithTransactions(Buffer.from(serialized, "hex"));
 
 		for (const hex of ["00", "01", "43012323", "aa", "0".repeat(256)]) {
