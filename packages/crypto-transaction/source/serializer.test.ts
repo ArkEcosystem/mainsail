@@ -38,9 +38,12 @@ describe<{
 	it("#serialize - should give same result for predefined transactions", async ({ serializer, deserializer }) => {
 		for (const [serialized, transaction] of [
 			[Serialized.transactionContractCall, Transactions.transactionContractCall],
-			[Serialized.transactionContractCallWithSecondSignature, Transactions.transactionContractCallWithSecondSignature],
+			[
+				Serialized.transactionContractCallWithSecondSignature,
+				Transactions.transactionContractCallWithSecondSignature,
+			],
 			[Serialized.transactionDeploy, Transactions.transactionDeploy],
-			[Serialized.transactionTransfer, Transactions.transactionTransfer]
+			[Serialized.transactionTransfer, Transactions.transactionTransfer],
 		]) {
 			const reserialized = await serializer.serialize(transaction);
 			assert.equal(serialized, reserialized.toString("hex"));
@@ -72,7 +75,7 @@ describe<{
 		for (const transaction of [
 			Transactions.transactionContractCall,
 			Transactions.transactionDeploy,
-			Transactions.transactionTransfer
+			Transactions.transactionTransfer,
 		]) {
 			const ownSerialized = await serializer.serializeUnsigned(transaction);
 
@@ -84,7 +87,7 @@ describe<{
 				to: transaction.to,
 				value: BigInt(transaction.value.toString()),
 				data: transaction.data === "0x" ? undefined : transaction.data,
-			}
+			};
 			const viemSerialized = serializeTransaction(viemTransaction);
 
 			assert.equal("0x" + ownSerialized.toString("hex"), viemSerialized);
@@ -95,7 +98,7 @@ describe<{
 		for (const transaction of [
 			Transactions.transactionContractCall,
 			Transactions.transactionDeploy,
-			Transactions.transactionTransfer
+			Transactions.transactionTransfer,
 		]) {
 			const ownSerialized = await serializer.serialize(transaction);
 
@@ -107,13 +110,13 @@ describe<{
 				to: transaction.to,
 				value: BigInt(transaction.value.toString()),
 				data: transaction.data === "0x" ? undefined : transaction.data,
-			}
+			};
 
 			const signature = {
 				r: "0x" + transaction.r,
 				s: "0x" + transaction.s,
 				v: BigInt(transaction.v + (2 * 10000 + 35)),
-			}
+			};
 
 			const viemSerialized = serializeTransaction(viemTransaction, signature);
 			assert.equal("0x" + ownSerialized.toString("hex"), viemSerialized);
