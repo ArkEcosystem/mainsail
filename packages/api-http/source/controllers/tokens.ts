@@ -132,14 +132,11 @@ export class TokensController extends Controller {
 
 			tokenTransfersQuery.andWhere(
 				new TypeOrm.Brackets((b) => {
-					b.where("tf.from IN (:...addresses)", { addresses })
-						.orWhere(
-							"tf.to IN (:...addresses)",
-							{ addresses },
-						);
+					b.where("tf.from IN (:...addresses)", { addresses }).orWhere("tf.to IN (:...addresses)", {
+						addresses,
+					});
 				}),
 			);
-
 		} else {
 			if (request.query.from) {
 				const from = Array.isArray(request.query.from) ? request.query.from : [request.query.from];
