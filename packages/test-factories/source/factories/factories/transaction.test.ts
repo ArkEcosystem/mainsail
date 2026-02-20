@@ -33,9 +33,9 @@ describe<{
 			.withOptions(options)
 			.make();
 
-		assert.undefined(transaction.data.v);
-		assert.undefined(transaction.data.r);
-		assert.undefined(transaction.data.s);
+		assert.equal(transaction.data.v, 0);
+		assert.equal(transaction.data.r, "");
+		assert.equal(transaction.data.s, "");
 	});
 
 	it("Transfer - should sign it with a single passphrase", async ({ factoryBuilder }) => {

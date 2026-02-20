@@ -6,4 +6,6 @@ export interface HashFactory {
 	sha256(data: HashInput): Buffer;
 
 	hash256(data: HashInput): Buffer;
+
+	keccak256(data: HashInput): Buffer;
 }

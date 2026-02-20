@@ -9,10 +9,10 @@ type SenderMempoolSelectorFunction = (
 ) => Contracts.Crypto.Transaction[];
 
 const sortByHighestGasPrice = (a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) =>
-	b.data.gasPrice - a.data.gasPrice;
+	b.gasPrice - a.gasPrice;
 
 const sortByLowestGasPrice = (a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) =>
-	a.data.gasPrice - b.data.gasPrice;
+	a.gasPrice - b.gasPrice;
 
 export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 	public transactions: Contracts.Crypto.Transaction[];
@@ -114,7 +114,7 @@ export class Query implements Contracts.TransactionPool.Query {
 				continue;
 			}
 
-			transactionsBySenderMempool[transactions[0].data.from] = transactions;
+			transactionsBySenderMempool[transactions[0].from] = transactions;
 		}
 
 		// Add first transaction of each sender mempool
@@ -135,7 +135,7 @@ export class Query implements Contracts.TransactionPool.Query {
 			selectedTransactions.push(transaction);
 
 			// Remove the selected transaction from sender mempool
-			const senderMempool = transactionsBySenderMempool[transaction.data.from];
+			const senderMempool = transactionsBySenderMempool[transaction.from];
 			senderMempool.shift();
 
 			// If the sender has more transactions, add the next one to the queue

@@ -73,7 +73,7 @@ export class Validator implements Contracts.Validator.Validator {
 		const previousBlock = this.stateStore.getLastBlock();
 		const blockNumber = previousBlock.number + 1;
 
-		const { logsBloom, stateRoot, transactions } = await this.#getTransactionsForForging(
+		const { logsBloom, stateRoot, transactions, gasUsed, fee } = await this.#getTransactionsForForging(
 			generatorAddress,
 			timestamp,
 			{
@@ -81,7 +81,7 @@ export class Validator implements Contracts.Validator.Validator {
 				round: BigInt(round),
 			},
 		);
-		return this.#makeBlock(round, generatorAddress, logsBloom, stateRoot, transactions, timestamp);
+		return this.#makeBlock(round, generatorAddress, logsBloom, stateRoot, transactions, timestamp, gasUsed, fee);
 	}
 
 	public async propose(
@@ -143,7 +143,13 @@ export class Validator implements Contracts.Validator.Validator {
 		generatorAddress: string,
 		timestamp: number,
 		commitKey: Contracts.Evm.CommitKey,
-	): Promise<{ logsBloom: string; stateRoot: string; transactions: Contracts.Crypto.Transaction[] }> {
+	): Promise<{
+		logsBloom: string;
+		stateRoot: string;
+		transactions: Contracts.Crypto.Transaction[];
+		gasUsed: number;
+		fee: BigNumber;
+	}> {
 		const transactionBytes = await this.txPoolWorker.getTransactionBytes();
 
 		const validator = this.createTransactionValidator();
@@ -159,21 +165,22 @@ export class Validator implements Contracts.Validator.Validator {
 			const previousBlock = this.stateStore.getLastBlock();
 			const milestone = this.cryptoConfiguration.getMilestone();
 			let gasLeft = milestone.block.maxGasLimit;
+			let gasUsed = 0;
+			let fee = BigNumber.ZERO;
 
 			// txCollatorFactor% of the time for block preparation, the rest is for  block and proposal serialization and signing
 			const timeLimit =
 				performance.now() +
 				milestone.timeouts.blockPrepareTime * this.configuration.getRequired<number>("txCollatorFactor");
 
-			for (const bytes of transactionBytes) {
+			for (const [index, bytes] of transactionBytes.entries()) {
 				if (performance.now() > timeLimit) {
 					break;
 				}
 
 				const transaction = await this.transactionFactory.fromBytes(bytes);
-				transaction.data.transactionIndex = candidateTransactions.length;
 
-				if (failedSenders.has(transaction.data.senderPublicKey)) {
+				if (failedSenders.has(transaction.senderPublicKey)) {
 					continue;
 				}
 
@@ -184,7 +191,7 @@ export class Validator implements Contracts.Validator.Validator {
 
 					let optimisticExecution = false;
 
-					const gasLimit = transaction.data.gasLimit;
+					const gasLimit = transaction.gasLimit;
 					if (gasLeft - gasLimit < 0) {
 						// Optimistically execute transaction even if the gas limit exceeds the remaining
 						// block space since there's possibly still space to fit the actual gas consumed.
@@ -202,6 +209,7 @@ export class Validator implements Contracts.Validator.Validator {
 					const result = await validator.validate(
 						{ commitKey, gasLimit: milestone.block.maxGasLimit, generatorAddress, timestamp },
 						transaction,
+						index,
 					);
 
 					gasLeft -= Number(result.gasUsed);
@@ -219,16 +227,19 @@ export class Validator implements Contracts.Validator.Validator {
 						break;
 					}
 
-					transaction.data.gasUsed = Number(result.gasUsed);
+					gasUsed += Number(result.gasUsed);
+					fee = fee.plus(
+						this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, Number(result.gasUsed)),
+					);
 					candidateTransactions.push(transaction);
 				} catch (error) {
 					this.logger.warn(
-						`tx ${transaction.hash} from ${transaction.data.from} failed to collate: ${error.message}`,
+						`tx ${transaction.hash} from ${transaction.from} failed to collate: ${error.message}`,
 					);
 
-					await this.txPoolWorker.removeTransaction(transaction.data.from, transaction.hash);
+					await this.txPoolWorker.removeTransaction(transaction.from, transaction.hash);
 
-					failedSenders.add(transaction.data.senderPublicKey);
+					failedSenders.add(transaction.senderPublicKey);
 				}
 			}
 
@@ -256,6 +267,8 @@ export class Validator implements Contracts.Validator.Validator {
 			const stateRoot = await evm.stateRoot(commitKey, previousBlock.stateRoot);
 
 			return {
+				fee,
+				gasUsed,
 				logsBloom,
 				stateRoot,
 				transactions: candidateTransactions,
@@ -272,15 +285,13 @@ export class Validator implements Contracts.Validator.Validator {
 		stateRoot: string,
 		transactions: Contracts.Crypto.Transaction[],
 		timestamp: number,
+		gasUsed: number,
+		fee: BigNumber,
 	): Promise<Contracts.Crypto.Block> {
 		const previousBlock = this.stateStore.getLastBlock();
 		const number = previousBlock.number + 1;
 		const milestone = this.cryptoConfiguration.getMilestone(number);
 
-		const totals: { fee: BigNumber; gasUsed: number } = {
-			fee: BigNumber.ZERO,
-			gasUsed: 0,
-		};
 		const payloadBuffers: Buffer[] = [];
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
 
@@ -289,23 +300,17 @@ export class Validator implements Contracts.Validator.Validator {
 		let payloadSize = transactions.length * 4;
 
 		for (const transaction of transactions) {
-			const { data, serialized } = transaction;
-			assert.string(data.hash);
-			assert.number(data.gasUsed);
+			assert.string(transaction.hash);
 
-			assert.number(data.gasUsed);
-			totals.fee = totals.fee.plus(this.gasFeeCalculator.calculateConsumed(data.gasPrice, data.gasUsed));
-			totals.gasUsed += data.gasUsed;
-
-			payloadBuffers.push(Buffer.from(data.hash, "hex"));
-			transactionData.push(data);
-			payloadSize += serialized.length;
+			payloadBuffers.push(Buffer.from(transaction.hash, "hex"));
+			transactionData.push(transaction.toData());
+			payloadSize += transaction.serialized.length;
 		}
 
 		return this.blockFactory.make(
 			{
-				fee: totals.fee,
-				gasUsed: totals.gasUsed,
+				fee,
+				gasUsed,
 				logsBloom,
 				number,
 				parentHash: previousBlock.hash,

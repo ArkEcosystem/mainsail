@@ -1,4 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
+import { BlockTransaction } from "@mainsail/crypto-transaction";
 import type { BigNumber } from "@mainsail/utils";
 
 interface BlockArguments {
@@ -24,7 +25,7 @@ export class Block implements Contracts.Crypto.Block {
 	public readonly proposer: string;
 	public readonly hash: string;
 	public readonly serialized: string;
-	public readonly transactions: Contracts.Crypto.Transaction[];
+	public readonly transactions: Contracts.Crypto.BlockTransaction[];
 
 	public constructor({ data, serialized, transactions }: BlockArguments) {
 		this.timestamp = data.timestamp;
@@ -45,10 +46,14 @@ export class Block implements Contracts.Crypto.Block {
 		this.hash = data.hash;
 		this.serialized = serialized;
 
-		this.transactions = transactions.map((transaction, index) => {
-			transaction.data.transactionIndex = index;
-			return transaction;
-		});
+		this.transactions = transactions.map(
+			(transaction, index) =>
+				new BlockTransaction(transaction, transaction.serialized, {
+					blockHash: this.hash,
+					blockNumber: this.number,
+					transactionIndex: index,
+				}),
+		);
 	}
 
 	toData(): Contracts.Crypto.BlockData {
@@ -69,8 +74,8 @@ export class Block implements Contracts.Crypto.Block {
 			transactionsRoot: this.transactionsRoot,
 			proposer: this.proposer,
 			hash: this.hash,
-			transactions: this.transactions.map((transaction) => transaction.data),
-			/* eslint- sort-keys-fix/sort-keys-fix */
+			transactions: this.transactions.map((transaction) => transaction.toData()),
+			/* eslint-enable sort-keys-fix/sort-keys-fix */
 		};
 	}
 }

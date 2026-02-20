@@ -82,6 +82,7 @@ export const Identifiers = {
 			Factory: Symbol("Crypto<Hash.Factory>"),
 			Size: {
 				HASH256: Symbol("Crypto<Hash.Size.HASH256>"),
+				KECCAK256: Symbol("Crypto<Hash.Size.KECCAK256>"),
 				RIPEMD160: Symbol("Crypto<Hash.Size.RIPEMD160>"),
 				SHA256: Symbol("Crypto<Hash.Size.SHA256>"),
 			},
@@ -132,10 +133,10 @@ export const Identifiers = {
 		Transaction: {
 			Deserializer: Symbol("Crypto<Transaction.Deserializer>"),
 			Factory: Symbol("Crypto<Transaction.Factory>"),
+			HashFactory: Symbol("Crypto<Transaction.HashFactory>"),
 			Registry: Symbol("Crypto<Transaction.Registry>"),
 			Serializer: Symbol("Crypto<Transaction.Serializer>"),
 			Signer: Symbol("Crypto<Transaction.Signer>"),
-			Utils: Symbol("Crypto<Transaction.Utils>"),
 			Verifier: Symbol("Crypto<Transaction.Verifier>"),
 		},
 

@@ -33,10 +33,6 @@ const applyModifiers = (entity: TransactionBuilder, options: TransactionOptions)
 		entity.nonce(options.nonce);
 	}
 
-	if (options.senderAddress) {
-		entity.senderAddress(options.senderAddress);
-	}
-
 	if (options.recipientAddress) {
 		entity.recipientAddress(options.recipientAddress);
 	}

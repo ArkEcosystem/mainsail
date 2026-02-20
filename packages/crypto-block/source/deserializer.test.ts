@@ -35,7 +35,7 @@ describe<{
 		for (let index = 0; index < blockDataWithTransactions.transactions.length; index++) {
 			assertTransactionData(
 				assert,
-				deserialized.transactions[index].data,
+				deserialized.transactions[index],
 				blockDataWithTransactions.transactions[index],
 			);
 		}

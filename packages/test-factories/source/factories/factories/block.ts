@@ -70,16 +70,15 @@ export const registerBlockFactory = async (
 		let payloadSize = transactions.length * 4;
 
 		for (const transaction of transactions) {
-			const { data, serialized } = transaction;
-			assert.string(data.hash);
+			assert.string(transaction.hash);
 
-			totals.gasPrice = totals.gasPrice.plus(data.gasPrice);
+			totals.gasPrice = totals.gasPrice.plus(transaction.gasPrice);
 			// TODO: calculate actual gas used
-			totals.gasUsed += data.gasLimit;
+			totals.gasUsed += transaction.gasLimit;
 
-			payloadBuffers.push(Buffer.from(data.hash, "hex"));
-			transactionData.push(data);
-			payloadSize += serialized.length;
+			payloadBuffers.push(Buffer.from(transaction.hash, "hex"));
+			transactionData.push(transaction.toData());
+			payloadSize += transaction.serialized.length;
 		}
 
 		const passphrase = options.passphrase || secrets[0];

@@ -125,7 +125,5 @@ export const makeApplication = async (
 	app.bind(InternalIdentifiers.Generator.Wallet).to(WalletGenerator);
 	app.bind(InternalIdentifiers.Generator.Peers).to(PeersGenerator);
 
-	app.unbind(Identifiers.Cryptography.Legacy.Identity.AddressFactory);
-
 	return app;
 };

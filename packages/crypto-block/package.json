@@ -23,6 +23,7 @@
 	"dependencies": {
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
+		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
@@ -38,7 +39,6 @@
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/crypto-signature-bls12-381": "workspace:*",
 		"@mainsail/crypto-signature-ecdsa": "workspace:*",
-		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/serializer": "workspace:*",

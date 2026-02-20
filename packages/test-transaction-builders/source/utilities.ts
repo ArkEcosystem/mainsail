@@ -21,6 +21,7 @@ const applyCustomSignature = async (
 	let serialized = transaction.serialized.subarray(0, transaction.serialized.byteLength - signatureSize);
 	serialized = Buffer.concat([serialized, Buffer.from(signature, "hex")]);
 
+	// @ts-ignore
 	transaction.serialized = serialized;
 
 	// TODO

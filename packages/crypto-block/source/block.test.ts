@@ -18,10 +18,8 @@ describe<{}>("Block", ({ it, assert }) => {
 		const transaction1 = await transactionBuilder1.build();
 		const transaction2 = await transactionBuilder2.build();
 
-		const indexedTransaction1 = clone(transaction1);
-		indexedTransaction1.data.transactionIndex = 1;
-		const indexedTransaction2 = clone(transaction2);
-		indexedTransaction2.data.transactionIndex = 1;
+		const indexedTransaction1 = clone(transaction1).toData();
+		const indexedTransaction2 = clone(transaction2).toData();
 
 		const block = new Block({
 			data: blockData,
@@ -31,6 +29,9 @@ describe<{}>("Block", ({ it, assert }) => {
 
 		assertBlockData(assert, block, blockData);
 		assert.equal(block.serialized, "serialized_content");
-		assert.equal(block.transactions, [indexedTransaction1, indexedTransaction2]);
+		assert.equal(
+			block.transactions.map((tx) => ({ ...tx.toData() })),
+			[indexedTransaction1, indexedTransaction2],
+		);
 	});
 });

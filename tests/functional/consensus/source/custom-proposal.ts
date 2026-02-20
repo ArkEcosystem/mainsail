@@ -61,7 +61,7 @@ export const makeCustomProposal = async (
 	const transactionData: Contracts.Crypto.TransactionData[] = [];
 	let payloadSize = transactions.length * 2;
 
-	for (const transaction of transactions) {
+	for (const [index,transaction] of transactions.entries()) {
 		let result = { gasRefunded: 0n, gasUsed: 0n, logs: [] as any, status: 0 };
 
 		try {
@@ -73,28 +73,27 @@ export const makeCustomProposal = async (
 					timestamp: dayjs().valueOf(),
 				},
 				transaction,
+				index,
 			);
 		} catch {
-			result = { ...result, gasUsed: BigInt(transaction.data.gasLimit) };
+			result = { ...result, gasUsed: BigInt(transaction.gasLimit) };
 		}
 
-		const { data, serialized } = transaction;
-		assert.string(data.hash);
+		assert.string(transaction.hash);
+		transactionData.push(transaction);
 
-		transactionData.push(data);
-
-		totals.amount = totals.amount.plus(data.value);
-		totals.fee = totals.fee.plus(BigNumber.make(data.gasPrice).times(result.gasUsed));
+		totals.amount = totals.amount.plus(transaction.value);
+		totals.fee = totals.fee.plus(BigNumber.make(transaction.gasPrice).times(result.gasUsed));
 		totals.gasUsed += Number(result.gasUsed);
 
-		payloadBuffers.push(Buffer.from(data.hash, "hex"));
+		payloadBuffers.push(Buffer.from(transaction.hash, "hex"));
 
-		const buffer = Buffer.alloc(serialized.byteLength + 2);
-		buffer.writeUint16LE(serialized.byteLength, 0);
-		buffer.fill(serialized, 2, serialized.byteLength + 2);
+		const buffer = Buffer.alloc(transaction.serialized.byteLength + 2);
+		buffer.writeUint16LE(transaction.serialized.byteLength, 0);
+		buffer.fill(transaction.serialized, 2, transaction.serialized.byteLength + 2);
 		transactionBuffers.push(buffer);
 
-		payloadSize += serialized.length;
+		payloadSize += transaction.serialized.length;
 	}
 
 	await transactionValidator.getEvm().dispose();

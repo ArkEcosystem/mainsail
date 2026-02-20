@@ -70,7 +70,7 @@ describe<{
 		assert.equal(block.serialized, serializedWithTransactions);
 
 		for (let index = 0; index < transactions.length; index++) {
-			assertTransactionData(assert, block.transactions[index].data, transactions[index].data);
+			assertTransactionData(assert, block.transactions[index], transactions[index]);
 		}
 	});
 
@@ -125,7 +125,7 @@ describe<{
 		for (let index = 0; index < blockDataWithTransactionsOriginal.transactions.length; index++) {
 			assertTransactionData(
 				assert,
-				block.transactions[index].data,
+				block.transactions[index],
 				blockDataWithTransactionsOriginal.transactions[index],
 			);
 		}
@@ -176,11 +176,11 @@ describe<{
 
 		for (let index = 0; index < blockDataWithTransactionsClone.transactions.length; index++) {
 			// Recalculated id
-			blockDataWithTransactionsClone.transactions[index].hash = block.transactions[index].data.hash;
+			blockDataWithTransactionsClone.transactions[index].hash = block.transactions[index].hash;
 
 			assertTransactionData(
 				assert,
-				block.transactions[index].data,
+				block.transactions[index],
 				blockDataWithTransactionsClone.transactions[index],
 			);
 		}

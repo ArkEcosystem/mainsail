@@ -13,7 +13,7 @@ export const makeKeywords = (
 	const network: FuncKeywordDefinition = {
 		compile() {
 			return (data) => {
-				const chainId = configuration.get("network.chainId");
+				const chainId = configuration.get<number | undefined>("network.chainId");
 				if (!chainId) {
 					return true;
 				}
@@ -39,10 +39,10 @@ export const makeKeywords = (
 				} = configuration.getMilestone();
 
 				try {
-					const bignum = BigNumber.make(data);
-					if (bignum.isLessThan(minimumGasPrice)) {
+					const value = BigNumber.make(data);
+					if (value.isLessThan(minimumGasPrice)) {
 						// Accept 0 gasFee when processing genesis block only
-						if (!bignum.isZero()) {
+						if (!value.isZero()) {
 							return false;
 						}
 
@@ -53,9 +53,8 @@ export const makeKeywords = (
 						// Otherwise lookup by transaction hash
 						if (!valid && parentSchema && parentSchema.parentData && parentSchema.parentData.hash) {
 							if (genesisTransactionsLookup.size === 0) {
-								const genesisBlock = configuration.get<Contracts.Crypto.BlockData | undefined>(
-									"genesisBlock.block",
-								);
+								const genesisBlock =
+									configuration.get<Contracts.Crypto.BlockJsonCrypto>("genesisBlock.block");
 								for (const transaction of genesisBlock?.transactions || []) {
 									genesisTransactionsLookup.add(transaction.hash);
 								}
@@ -69,7 +68,7 @@ export const makeKeywords = (
 
 					// The upper limit technically isn't needed and solely acts as a safeguard
 					// as there's no legit reason to go beyond it.
-					if (bignum.isGreaterThan(maximumGasPrice)) {
+					if (value.isGreaterThan(maximumGasPrice)) {
 						return false;
 					}
 				} catch {
@@ -136,15 +135,9 @@ export const makeKeywords = (
 				const maxBytecodeLength = maximumGasLimit / 16;
 				const minBytecodeLength = 0;
 
-				const regex = new RegExp(`^(0x)?[0-9a-fA-F]{${minBytecodeLength},${maxBytecodeLength}}$`);
+				const regex = new RegExp(`^(0x)[0-9a-fA-F]{${minBytecodeLength},${maxBytecodeLength}}$`);
 				if (!regex.test(data)) {
 					return false;
-				}
-
-				if (parentSchema && parentSchema.parentData && parentSchema.parentDataProperty) {
-					parentSchema.parentData[parentSchema.parentDataProperty] = data.startsWith("0x")
-						? data.slice(2)
-						: data;
 				}
 
 				return true;
@@ -156,7 +149,6 @@ export const makeKeywords = (
 			properties: {},
 			type: "object",
 		},
-		modifying: true,
 	};
 
 	return {

@@ -1,5 +1,5 @@
 import { TypeOrm } from "@mainsail/api-database";
-import { Identifiers } from "@mainsail/constants";
+import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { Application, Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { resolve } from "path";
@@ -193,6 +193,8 @@ const getPluginConfiguration = async (
 
 
 const bootstrap = async (app: Contracts.Kernel.Application): Promise<void> => {
+	process.env[EnvironmentVariables.MAINSAIL_API_SYNC_LOG_EXTRA] = "true";
+
 	const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const commitFactory = app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
 

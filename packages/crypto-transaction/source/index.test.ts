@@ -30,8 +30,8 @@ describe("Index", ({ assert, it }) => {
 		assert.defined(index.Transaction);
 	});
 
-	it("should export Utils", () => {
-		assert.defined(index.Utils);
+	it("should export HashFactory", () => {
+		assert.defined(index.HashFactory);
 	});
 
 	it("should export Verifier", () => {
