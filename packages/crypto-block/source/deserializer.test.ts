@@ -70,9 +70,11 @@ describe<{
 			const data = {
 				...deserialized.data,
 				payloadSize: deserialized.data.payloadSize + hex.length / 2, // each byte is represented by 2 hex characters
-			}
+			};
 
-			const serializedAltered = (await serializer.serializeWithTransactions({ ...data, transactions: deserialized.transactions })).toString("hex");
+			const serializedAltered = (
+				await serializer.serializeWithTransactions({ ...data, transactions: deserialized.transactions })
+			).toString("hex");
 			const buff = Buffer.from(serializedAltered.slice(0, serializedAltered.length - hex.length) + hex, "hex");
 
 			// Header can't detect it, because the payload size is correct

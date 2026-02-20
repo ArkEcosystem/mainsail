@@ -44,9 +44,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 		}
 
 		if (buffer.getRemainderLength() !== 0) {
-			throw new InvalidBlockBytesError(
-				`Found trailing bytes of length ${buffer.getRemainderLength()}`,
-			);
+			throw new InvalidBlockBytesError(`Found trailing bytes of length ${buffer.getRemainderLength()}`);
 		}
 
 		return {
