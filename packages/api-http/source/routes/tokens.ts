@@ -42,6 +42,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				query: Joi.object({
+					addresses: Schemas.orEqualCriteria(walletAddressSchema),
 					from: Schemas.orEqualCriteria(walletAddressSchema),
 					to: Schemas.orEqualCriteria(walletAddressSchema),
 					transactionHash: Schemas.orEqualCriteria(transactionHashSchema),
