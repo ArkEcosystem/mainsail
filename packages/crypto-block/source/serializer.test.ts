@@ -25,7 +25,7 @@ describe<{
 	});
 
 	it("#size - should return size with transactions", async ({ serializer }) => {
-		assert.equal(serializer.totalSize(blockDataWithTransactions), 687);
+		assert.equal(serializer.totalSize(blockDataWithTransactions), 679);
 	});
 
 	it("#serialize - should serialize and deserialize block", async ({ serializer, deserializer }) => {
@@ -49,6 +49,11 @@ describe<{
 						.fromData(transaction),
 			),
 		);
+
+		let payloadSize = transactions.length * 4;
+		for (const transaction of transactions) {
+			payloadSize += transaction.serialized.length;
+		}
 
 		const serialized = await serializer.serializeWithTransactions({
 			...blockDataWithTransactions,

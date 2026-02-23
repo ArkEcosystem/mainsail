@@ -109,7 +109,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 		return await this.#map(
 			commitBuffers,
-			async (block: Buffer) => (await this.commitFactory.fromBytes(block)).block,
+			async (buffer: Buffer) => (await this.commitFactory.fromBytes(buffer)).block,
 		);
 	}
 

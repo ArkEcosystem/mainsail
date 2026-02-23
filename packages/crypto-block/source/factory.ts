@@ -30,6 +30,8 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	): Promise<Contracts.Crypto.Block> {
 		const block: Contracts.Crypto.BlockHeader = { ...data, hash: await this.hashFactory.make(data) };
 
+		await this.#verify({ ...block, transactions });
+
 		const serialized: Buffer = await this.serializer.serializeWithTransactions({ ...data, transactions });
 
 		return new Block({
@@ -55,11 +57,15 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 			transactions.map((tx) => this.transactionFactory.fromStorage({ ...tx, blockHash: header.hash })),
 		);
 
+		const data = await this.headerFromStorage(header);
+		const serialized = await this.serializer.serializeWithTransactions({
+			...data,
+			transactions: parsedTransactions,
+		});
+
 		return new Block({
-			data: {
-				...(await this.headerFromStorage(header)),
-			},
-			serialized: "",
+			data,
+			serialized: serialized.toString("hex"),
 			transactions: parsedTransactions,
 		});
 	}
@@ -102,7 +108,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	}
 
 	public async fromData(data: Contracts.Crypto.BlockData): Promise<Contracts.Crypto.Block> {
-		await this.#applySchema(data);
+		await this.#verify(data);
 
 		const transactions = await Promise.all(
 			data.transactions.map((tx) => this.transactionFactory.fromData(tx, false)),
@@ -119,13 +125,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	async #fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.Block> {
 		const deserialized = await this.deserializer.deserializeWithTransactions(serialized);
 
-		await this.#applySchema(deserialized.data);
-
-		// TODO: Validate transactions and block header related to transactions ()
-
-		// if (validated) {
-		// 	deserialized.data = validated;
-		// }
+		await this.#verify({ ...deserialized.data, transactions: deserialized.transactions });
 
 		return new Block({
 			...deserialized,
@@ -133,43 +133,13 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		});
 	}
 
-	async #applySchema(data: Contracts.Crypto.BlockHeader): Promise<void> {
-		const result = this.validator.validate("blockHeader", data);
+	async #verify(data: Contracts.Crypto.BlockData): Promise<void> {
+		const { error } = this.validator.validate("block", data);
 
-		if (!result.error) {
+		if (!error) {
 			return;
 		}
 
-		for (const error of result.errors ?? []) {
-			throw new BlockSchemaError(
-				data.number,
-				`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
-					`${error.message}: ${JSON.stringify(error.data)}`,
-			);
-
-			// let fatal = false;
-
-			// const match = error.instancePath.match(/\.transactions\[(\d+)]/);
-			// if (match === null) {
-			// 	fatal = true;
-			// } else {
-			// 	if (data.transactions) {
-			// 		const txIndex = Number(match[1]);
-			// 		const tx = data.transactions[txIndex];
-
-			// 		if (tx.hash === undefined) {
-			// 			fatal = true;
-			// 		}
-			// 	}
-			// }
-
-			// if (fatal) {
-			// 	throw new BlockSchemaError(
-			// 		data.number,
-			// 		`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
-			// 			`${error.message}: ${JSON.stringify(error.data)}`,
-			// 	);
-			// }
-		}
+		throw new BlockSchemaError(data.number, error);
 	}
 }
