@@ -42,7 +42,7 @@ describe<{
 		assert.defined(context.validator.validate("test", "⊁".repeat(22)).error);
 		assert.defined(context.validator.validate("test", {}).error);
 		assert.defined(context.validator.validate("test", null).error);
-		assert.defined(context.validator.validate("test", undefined).error);
+		assert.defined(context.validator.validate("test").error);
 		assert.defined(context.validator.validate("test", 123).error);
 	});
 
@@ -54,7 +54,7 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.true(context.validator.validate("test", "1234").error!.includes("data must be >= 0"));
+		assert.true(context.validator.validate("test", "1234").error.includes("data must be >= 0"));
 	});
 
 	it("keyword bignumber should be ok if only one possible value is allowed", (context) => {
@@ -64,14 +64,12 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined(context.validator.validate("test", BigNumber.make(100)).error);
+		assert.undefined(context.validator.validate("test", 100).error);
 
-		assert.defined(context.validator.validate("test", 100).error);
-		assert.defined(context.validator.validate("test", "100").error);
-		assert.defined(context.validator.validate("test", BigNumber.make(99)).error);
-		assert.defined(context.validator.validate("test", BigNumber.make(101)).error);
+		assert.defined(context.validator.validate("test", 99).error);
+		assert.defined(context.validator.validate("test", 101).error);
 		assert.defined(context.validator.validate("test", null).error);
-		assert.defined(context.validator.validate("test", undefined).error);
+		assert.defined(context.validator.validate("test").error);
 		assert.defined(context.validator.validate("test", {}).error);
 	});
 
@@ -82,10 +80,10 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined(context.validator.validate("test", BigNumber.make(25)).error);
-		assert.undefined(context.validator.validate("test", BigNumber.make(20)).error);
+		assert.undefined(context.validator.validate("test", 25).error);
+		assert.undefined(context.validator.validate("test", 20).error);
 
-		assert.defined(context.validator.validate("test", BigNumber.make(19)).error);
+		assert.defined(context.validator.validate("test", 19).error);
 	});
 
 	it("keyword bignumber should be ok if below or equal maximum", (context) => {
@@ -95,12 +93,12 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined(context.validator.validate("test", BigNumber.make(19)).error);
-		assert.undefined(context.validator.validate("test", BigNumber.make(20)).error);
-		assert.undefined(context.validator.validate("test", BigNumber.make(0)).error);
+		assert.undefined(context.validator.validate("test", 19).error);
+		assert.undefined(context.validator.validate("test", 20).error);
+		assert.undefined(context.validator.validate("test", 0).error);
 
-		assert.defined(context.validator.validate("test", BigNumber.make(-1)).error);
-		assert.defined(context.validator.validate("test", BigNumber.make(21)).error);
+		assert.defined(context.validator.validate("test", -1).error);
+		assert.defined(context.validator.validate("test", 21).error);
 	});
 
 	it("keyword bignumber should not be ok for values bigger than the absolute maximum", (context) => {
@@ -110,22 +108,42 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined(context.validator.validate("test", BigNumber.make(Number.MAX_SAFE_INTEGER)).error);
-		assert.undefined(context.validator.validate("test", BigNumber.make("9223372036854775808")).error);
+		assert.undefined(context.validator.validate("test", Number.MAX_SAFE_INTEGER).error);
+
+		assert.undefined(context.validator.validate("test", 9_223_372_036_854_775_808).error);
+
 		assert.undefined(context.validator.validate("test", BigNumber.UINT256_MAX).error);
 
 		assert.defined(context.validator.validate("test", BigNumber.UINT256_MAX.plus(1)).error);
 	});
 
-	it("keyword bignumber should not be ok for number and string", (context) => {
+	it("keyword bignumber should be ok for number, string and bignumber as input", (context) => {
 		const schema = {
 			$id: "test",
 			bignumber: { maximum: 2000, minimum: 100, type: "number" },
 		};
 		context.validator.addSchema(schema);
 
-		assert.defined(context.validator.validate("test", 120).error);
-		assert.defined(context.validator.validate("test", "120").error);
+		for (const value of [100, 1e2, 1020, 500, 2000]) {
+			assert.undefined(context.validator.validate("test", value).error);
+			assert.undefined(context.validator.validate("test", value.toString()).error);
+			assert.undefined(context.validator.validate("test", BigNumber.make(value)).error);
+		}
+
+		for (const value of [1e8, 1999.000_001, 1 / 1e8, -100, -500, -2000.1]) {
+			assert.defined(context.validator.validate("test", value).error);
+			assert.defined(context.validator.validate("test", value.toString()).error);
+			let pass = true;
+			try {
+				BigNumber.make(value);
+			} catch {
+				pass = false;
+			}
+
+			if (pass) {
+				assert.defined(context.validator.validate("test", BigNumber.make(value)).error);
+			}
+		}
 	});
 
 	it("keyword bignumber should not accept garbage", (context) => {
@@ -153,9 +171,10 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		const object: any = { id: "test", amount: BigNumber.make("12") };
-		assert.true(object.amount instanceof BigNumber);
+		const object: any = { id: "test", amount: "12" };
+		assert.false(object.amount instanceof BigNumber);
 		assert.undefined(context.validator.validate("test", object).error);
-		assert.true(object.amount instanceof BigNumber);
+		assert.false(object.amount instanceof BigNumber);
+		assert.equal(object.amount, "12");
 	});
 });

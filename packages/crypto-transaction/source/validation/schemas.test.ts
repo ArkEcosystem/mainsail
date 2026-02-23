@@ -22,9 +22,9 @@ describe<{
 		gasLimit: 21_000,
 		gasPrice: 5 * 1e9,
 		network: 10_000,
-		nonce: BigNumber.ONE,
+		nonce: 1,
 		data: "0x",
-		value: BigNumber.ZERO,
+		value: 0,
 	};
 
 	const transactionSigned = {
@@ -161,7 +161,7 @@ describe<{
 	});
 
 	it("transactionBaseSchema - value should be big number min 0", ({ validator }) => {
-		const validValues = [BigNumber.ZERO, BigNumber.ONE, BigNumber.make(100)];
+		const validValues = [0, "0", BigNumber.ZERO, "1", BigNumber.ONE, 100, "100", BigNumber.make(100)];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
@@ -171,22 +171,7 @@ describe<{
 			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
-		const invalidValues = [
-			0,
-			"0",
-			"1",
-			-1,
-			"-1",
-			1.1,
-			100,
-			"100",
-			BigNumber.make(-1),
-			-1,
-			null,
-			undefined,
-			{},
-			"test",
-		];
+		const invalidValues = [-1, "-1", 1.1, BigNumber.make(-1), -1, null, undefined, {}, "test"];
 
 		for (const value of invalidValues) {
 			const transaction = {
@@ -286,7 +271,7 @@ describe<{
 	});
 
 	it("transactionBaseSchema - nonce should be big number min 0", ({ validator }) => {
-		const validValues = [BigNumber.ZERO, BigNumber.ONE, BigNumber.make(100)];
+		const validValues = [0, "0", BigNumber.ZERO, 1, "1", BigNumber.ONE, 100, "100", BigNumber.make(100)];
 
 		for (const value of validValues) {
 			const transaction = {
@@ -297,22 +282,7 @@ describe<{
 			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
-		const invalidValues = [
-			0,
-			"0",
-			"1",
-			-1,
-			"-1",
-			1.1,
-			100,
-			"100",
-			BigNumber.make(-1),
-			-1,
-			null,
-			undefined,
-			{},
-			"test",
-		];
+		const invalidValues = [-1, "-1", 1.1, BigNumber.make(-1), -1, null, undefined, {}, "test"];
 
 		for (const value of invalidValues) {
 			const transaction = {

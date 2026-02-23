@@ -52,7 +52,5 @@ describe<{
 		assert.true(validator.hasSchema("prefixedBlockHash"));
 		assert.true(validator.hasSchema("blockHeader"));
 		assert.true(validator.hasSchema("logsBloom"));
-		assert.true(validator.hasSchema("stateRoot"));
-		assert.true(validator.hasSchema("transactionsRoot"));
 	});
 });

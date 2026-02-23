@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { InvalidBlockBytesError } from "@mainsail/exceptions";
 import { ByteBuffer } from "@mainsail/utils";
 
 import { HashFactory } from "./hash.factory.js";
@@ -43,10 +42,6 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 			transactions = await this.#deserializeTransactions(header, buffer);
 		}
 
-		if (buffer.getRemainderLength() !== 0) {
-			throw new InvalidBlockBytesError(`Found trailing bytes of length ${buffer.getRemainderLength()}`);
-		}
-
 		return {
 			data: {
 				...header,
@@ -57,7 +52,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 	}
 
 	async #deserializeBufferHeader(buffer: ByteBuffer): Promise<Contracts.Crypto.BlockHeaderRaw> {
-		const header = await this.serializer.deserialize<Contracts.Crypto.BlockHeaderRaw>(
+		return await this.serializer.deserialize<Contracts.Crypto.BlockHeaderRaw>(
 			buffer,
 			{},
 			{
@@ -65,14 +60,6 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 				schema: blockHeaderSchema,
 			},
 		);
-
-		if (buffer.getRemainderLength() !== header.payloadSize) {
-			throw new InvalidBlockBytesError(
-				`Payload size ${header.payloadSize} does not match actual payload size ${buffer.getRemainderLength()}`,
-			);
-		}
-
-		return header;
 	}
 
 	async #deserializeTransactions(

@@ -11,6 +11,7 @@ export class HashFactory {
 	private readonly serializer!: Contracts.Crypto.BlockSerializer;
 
 	public async make(data: Contracts.Crypto.BlockHeaderRaw): Promise<string> {
-		return this.hashFactory.sha256(await this.serializer.serializeHeader(data)).toString("hex");
+		const buffer = this.hashFactory.sha256(await this.serializer.serializeHeader(data));
+		return buffer.toString("hex");
 	}
 }

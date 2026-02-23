@@ -7,24 +7,24 @@ import { HashFactory } from "./hash.factory";
 describe<{
 	app: Application;
 	hashFactory: HashFactory;
-}>("HashFactory", ({ it, assert, beforeEach }) => {
+}>("IdFactory", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
 		context.hashFactory = context.app.resolve(HashFactory);
 	});
 
-	it("#make - should return block hash", async ({ hashFactory }) => {
-		const hash = await hashFactory.make(blockData);
+	it("#make - should return block id", async ({ hashFactory }) => {
+		const id = await hashFactory.make(blockData);
 
-		assert.string(hash);
-		assert.equal(hash, blockData.hash);
+		assert.string(id);
+		assert.equal(id, blockData.hash);
 	});
 
-	it("#make - should return block hash with transactions", async ({ hashFactory }) => {
-		const hash = await hashFactory.make(blockDataWithTransactions);
+	it("#make - should return block id with transactions", async ({ hashFactory }) => {
+		const id = await hashFactory.make(blockDataWithTransactions);
 
-		assert.string(hash);
-		assert.equal(hash, blockDataWithTransactions.hash);
+		assert.string(id);
+		assert.equal(id, blockDataWithTransactions.hash);
 	});
 });

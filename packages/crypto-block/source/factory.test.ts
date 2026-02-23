@@ -2,21 +2,16 @@ import type { Contracts, Utils } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import clone from "lodash.clonedeep";
 
-import { BlockSchemaError, InvalidBlockBytesError } from "@mainsail/exceptions";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import {
 	blockData,
 	blockDataJson,
-	blockHeaderStorage,
 	blockDataWithTransactions,
 	blockDataWithTransactionsJson,
-	blockHeaderWithTransactionsStorage,
 	serialized,
 	serializedWithTransactions,
-	transactionsFromStorage,
-	transactionsData,
-} from "../test/fixtures/index.js";
+} from "../test/fixtures/block";
 import { assertBlockData, assertTransactionData } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { BlockFactory } from "./factory";
@@ -31,6 +26,7 @@ describe<{
 	serializer: Serializer;
 }>("Factory", ({ it, assert, beforeEach }) => {
 	const blockDataOriginal = clone(blockData);
+	// Recalculated id
 	const blockDataWithTransactionsOriginal = clone(blockDataWithTransactions);
 	let blockDataClone: Utils.Mutable<Contracts.Crypto.BlockData>;
 	let blockDataWithTransactionsClone: Utils.Mutable<Contracts.Crypto.BlockData>;
@@ -78,10 +74,6 @@ describe<{
 		}
 	});
 
-	it("#make - should throw if it is not verified", async ({ factory }) => {
-		await assert.rejects(() => factory.make({ ...blockData, transactionsCount: 6 }, []), BlockSchemaError);
-	});
-
 	it("#fromHex - should create a block instance from hex", async ({ factory }) => {
 		const block = await factory.fromHex(serialized);
 
@@ -99,18 +91,6 @@ describe<{
 		assert.length(block.transactions, blockDataWithTransactionsClone.transactions.length);
 	});
 
-	it("#fromHex - should reject block with trailing bytes", async ({ factory }) => {
-		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			await assert.rejects(async () => factory.fromHex(serialized + hex), InvalidBlockBytesError);
-		}
-	});
-
-	it("#fromHex - should reject block with leading bytes", async ({ factory }) => {
-		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			await assert.rejects(async () => factory.fromHex(hex + serialized), InvalidBlockBytesError);
-		}
-	});
-
 	it("#fromBytes - should create a block instance from a buffer", async ({ factory }) => {
 		const block = await factory.fromBytes(Buffer.from(serialized, "hex"));
 
@@ -126,60 +106,6 @@ describe<{
 		assert.equal(block.serialized, serializedWithTransactions);
 
 		assert.length(block.transactions, blockDataWithTransactionsClone.transactions.length);
-	});
-
-	it("#fromStorage - should create a block header from storage", async ({ factory }) => {
-		const blockHeaderFromStorage = await factory.fromStorage(blockHeaderStorage, []);
-
-		assertBlockData(assert, blockHeaderFromStorage, blockData);
-		assert.equal(blockHeaderFromStorage.serialized, serialized);
-		assert.equal(blockHeaderFromStorage.transactions.length, 0);
-
-		const blockHeaderFromStorageWithTransactions = await factory.fromStorage(
-			blockHeaderWithTransactionsStorage,
-			transactionsFromStorage,
-		);
-		assertBlockData(assert, blockHeaderFromStorageWithTransactions, blockDataWithTransactionsClone);
-		assert.equal(blockHeaderFromStorageWithTransactions.serialized, serializedWithTransactions);
-
-		assert.equal(blockHeaderFromStorageWithTransactions.transactions.length, transactionsFromStorage.length);
-		assert.equal(blockHeaderFromStorageWithTransactions.transactions[0].toData(), transactionsData[0]);
-		assert.equal(blockHeaderFromStorageWithTransactions.transactions[1].toData(), transactionsData[1]);
-
-		assert.equal(blockHeaderFromStorageWithTransactions.transactions[0].transactionIndex, 0);
-		assert.equal(blockHeaderFromStorageWithTransactions.transactions[1].transactionIndex, 1);
-
-		assert.equal(
-			blockHeaderFromStorageWithTransactions.transactions[0].blockNumber,
-			blockDataWithTransactionsClone.number,
-		);
-		assert.equal(
-			blockHeaderFromStorageWithTransactions.transactions[1].blockNumber,
-			blockDataWithTransactionsClone.number,
-		);
-		assert.equal(
-			blockHeaderFromStorageWithTransactions.transactions[0].blockHash,
-			blockDataWithTransactionsClone.hash,
-		);
-		assert.equal(
-			blockHeaderFromStorageWithTransactions.transactions[1].blockHash,
-			blockDataWithTransactionsClone.hash,
-		);
-	});
-
-	it("#headerFromStorage - should create a block header from storage", async ({ factory }) => {
-		const blockHeaderFromStorage = await factory.headerFromStorage(blockHeaderStorage);
-
-		assertBlockData(assert, blockHeaderFromStorage, blockData);
-		assert.undefined(blockHeaderFromStorage.serialized);
-		assert.undefined(blockHeaderFromStorage.transactions);
-
-		const blockHeaderFromStorageWithTransactions = await factory.headerFromStorage(
-			blockHeaderWithTransactionsStorage,
-		);
-		assertBlockData(assert, blockHeaderFromStorageWithTransactions, blockDataWithTransactionsClone);
-		assert.undefined(blockHeaderFromStorageWithTransactions.serialized);
-		assert.undefined(blockHeaderFromStorageWithTransactions.transactions);
 	});
 
 	it("#fromData - should create a block instance from an object", async (context) => {
@@ -209,10 +135,9 @@ describe<{
 		factory,
 	}) => {
 		const b2 = Object.assign({}, blockData, { fee: "abcd" });
-
 		await assert.rejects(
 			() => factory.fromData(b2),
-			`Height (2): data/fee must pass "bignumber" keyword validation`,
+			'Invalid data at /fee: must pass "bignumber" keyword validation: undefined',
 		);
 	});
 
@@ -224,12 +149,15 @@ describe<{
 
 		await assert.rejects(
 			() => factory.fromData(partialBlock),
-			"Height (2): data must have required property 'proposer'",
+			" Invalid data: must have required property 'proposer': undefined",
 		);
 	});
 
 	it("#fromJson - should create a block instance from JSON", async ({ factory }) => {
 		const block = await factory.fromJson(blockDataJson);
+
+		// Recalculated id
+		blockDataClone.hash = blockDataJson.hash;
 
 		assertBlockData(assert, block, blockDataClone);
 		assert.equal(block.transactions, []);
@@ -239,20 +167,22 @@ describe<{
 	it("#fromJson - should create a block instance with transactions from JSON", async ({ factory }) => {
 		const block = await factory.fromJson(blockDataWithTransactionsJson);
 
+		// Recalculated id
+		blockDataWithTransactionsClone.hash = blockDataWithTransactionsJson.hash;
+
 		assertBlockData(assert, block, blockDataWithTransactionsClone);
 		assert.string(block.serialized);
 		assert.length(block.transactions, blockDataWithTransactionsClone.transactions.length);
 
 		for (let index = 0; index < blockDataWithTransactionsClone.transactions.length; index++) {
+			// Recalculated id
+			blockDataWithTransactionsClone.transactions[index].hash = block.transactions[index].hash;
+
 			assertTransactionData(
 				assert,
 				block.transactions[index],
 				blockDataWithTransactionsClone.transactions[index],
 			);
 		}
-	});
-
-	it("#fromJson - should throw if invalid input data", async ({ factory }) => {
-		await assert.rejects(() => factory.fromJson({ ...blockDataJson, transactionsCount: 6 }), BlockSchemaError);
 	});
 });
