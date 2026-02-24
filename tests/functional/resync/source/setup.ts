@@ -239,6 +239,11 @@ const bootstrap = async (app: Contracts.Kernel.Application): Promise<void> => {
 			throw new Error("Failed to process genesis block");
 		}
 
+		// TODO:
+		// if (!result || !result.success) {
+		// 	throw new Error("Failed to process genesis block");
+		// }
+
 		commitState.setProcessorResult(result);
 		await blockProcessor.commit(commitState);
 	} else {
