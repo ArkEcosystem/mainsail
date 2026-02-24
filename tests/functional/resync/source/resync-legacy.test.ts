@@ -39,8 +39,8 @@ describe<{
             .getTagged<Contracts.Crypto.KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory, "type", "wallet")
             .fromMnemonic(mnemonic);
 
-        const legacyWalletAddress = await syncNode.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-            .fromPublicKey(legacyWalletKeyPair.publicKey);
+        // const legacyWalletAddress = await syncNode.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
+        //     .fromPublicKey(legacyWalletKeyPair.publicKey);
 
         // console.log(legacyWalletAddress, legacyWalletKeyPair);
 
