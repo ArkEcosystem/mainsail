@@ -151,7 +151,7 @@ const configurations = [
 		snapshot: {
 			// reuse existing snapshot to build new genesis block
 			// also see commit: 718b4cf2f1b49df9b80e6474be06fa97acc80d44
-			path: "../../tests/functional/resync/paths/config-snapshot/snapshot/edccff0c18f4384efed02b5bf8475bde2477a1802dcbef0f6d263208d15defe9.compressed",
+			path: "../../tests/functional/resync/paths/config-snapshot/snapshot/1da143265e42d4520aa7f9e4d6ba8c40412c120b84092435f48ec754b6fefed5.compressed",
 		},
 		postGenerate: (location) => {
 			// Functional tests run on single node
