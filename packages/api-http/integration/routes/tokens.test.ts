@@ -245,9 +245,10 @@ describe<{
 			{
 				query: `?addresses=0x432b093d9542B905C87587607491C369408475b4`,
 				result: {
-					data: tokenTransfersResponse.filter((t) =>
-						t.from === "0x432b093d9542B905C87587607491C369408475b4" ||
-						t.to === "0x432b093d9542B905C87587607491C369408475b4"
+					data: tokenTransfersResponse.filter(
+						(t) =>
+							t.from === "0x432b093d9542B905C87587607491C369408475b4" ||
+							t.to === "0x432b093d9542B905C87587607491C369408475b4",
 					),
 					statusCode: 200,
 				},

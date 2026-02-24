@@ -49,7 +49,7 @@ const setupHttp = async (app: Application): Promise<CoreApiHttp> => {
 		server: { http: { enabled: true, host: "127.0.0.1", port: 4003 }, https: { enabled: false } },
 		tokens: {
 			defaultMinimumBalance: 0.01,
-		}
+		},
 	});
 
 	const server = app.resolve(CoreApiHttp);
