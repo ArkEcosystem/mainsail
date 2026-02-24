@@ -129,6 +129,49 @@ const configurations = [
 			}
 		},
 	},
+	// tests/functional/resync/paths/config-snapshot/
+	{
+		network: "devnet",
+		symbol: "TѦ",
+		token: "ARK",
+		distribute: true,
+		premine: "125000000000000000000000000",
+		chainId: 10000,
+		validators: 5,
+		initialHeight: 0,
+		overwriteConfig: true,
+		mockFakeValidatorBlsKeys: true,
+		timeouts: {
+			blockPrepareTime: 100,
+			blockTime: 100,
+			stageTimeout: 100,
+			stageTimeoutIncrease: 100,
+			tolerance: 100,
+		},
+		snapshot: {
+			// reuse existing snapshot to build new genesis block
+			// also see commit: 718b4cf2f1b49df9b80e6474be06fa97acc80d44
+			path: "../../tests/functional/resync/paths/config-snapshot/snapshot/edccff0c18f4384efed02b5bf8475bde2477a1802dcbef0f6d263208d15defe9.compressed",
+		},
+		postGenerate: (location) => {
+			// Functional tests run on single node
+			const __dirname = path.dirname(fileURLToPath(import.meta.url));
+			const source = path.join(location, "crypto.json");
+			const target = path.join(
+				__dirname,
+				"..",
+				"..",
+				"..",
+				"tests",
+				"functional",
+				"resync",
+				"paths",
+				"config-snapshot",
+				"crypto.json",
+			);
+			copyFileSync(source, target);
+		},
+	},
 
 	// E2E Consensus
 	// tests/e2e/consensus

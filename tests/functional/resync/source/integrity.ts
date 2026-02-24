@@ -5,7 +5,7 @@ import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import type { assert } from "@mainsail/test-runner";
 
-import { runDatabaseQuery, setupRestoreNode, shutdown } from "./setup.js";
+import { runDatabaseQuery, setupLegacyRestoreNode, setupRestoreNode, shutdown } from "./setup.js";
 
 type TableHashes = ReadonlyArray<TableHash>;
 interface TableHash {
@@ -169,14 +169,7 @@ const patchDatabase = async (syncNode: Contracts.Kernel.Application, restoreNode
     });
 }
 
-export const verifyNodeIntegrity = async (t: typeof assert, syncNode: Contracts.Kernel.Application, dataDirectory: string): Promise<void> => {
-    // Stop sync node to cease writes
-    await shutdown(syncNode);
-
-    // Bootstrap restore node which triggers a restore to a fresh postgres database
-    // by reusing the sync node's evm.db
-    const restoreNode = await setupRestoreNode(dataDirectory);
-
+const verifySyncAndRestoreNodeIntegrity = async (t: typeof assert, syncNode: Contracts.Kernel.Application, restoreNode: Contracts.Kernel.Application): Promise<void> => {
     try {
         // Check that both nodes wrote the exact same data to postgres
         await verifyIntegrity(t, syncNode, restoreNode);
@@ -187,5 +180,27 @@ export const verifyNodeIntegrity = async (t: typeof assert, syncNode: Contracts.
     } finally {
         await shutdown(restoreNode);
     }
+}
+
+export const verifyNodeIntegrity = async (t: typeof assert, syncNode: Contracts.Kernel.Application, dataDirectory: string): Promise<void> => {
+    // Stop sync node to cease writes
+    await shutdown(syncNode);
+
+    // Bootstrap restore node which triggers a restore to a fresh postgres database
+    // by reusing the sync node's evm.db
+    const restoreNode = await setupRestoreNode(dataDirectory);
+
+    await verifySyncAndRestoreNodeIntegrity(t, syncNode, restoreNode);
+}
+
+export const verifyLegacyNodeIntegrity = async (t: typeof assert, syncNode: Contracts.Kernel.Application, dataDirectory: string): Promise<void> => {
+    // Stop sync node to cease writes
+    await shutdown(syncNode);
+
+    // Bootstrap restore node which triggers a restore to a fresh postgres database
+    // by reusing the sync node's evm.db
+    const restoreNode = await setupLegacyRestoreNode(dataDirectory);
+
+    await verifySyncAndRestoreNodeIntegrity(t, syncNode, restoreNode);
 }
 

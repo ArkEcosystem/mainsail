@@ -12,7 +12,18 @@ type PluginOptions = Record<string, any>;
 const setupSyncNode = async (dataDirectory: string): Promise<Contracts.Kernel.Application> => {
 	const app = new Application();
 
-	await setupNode(app, dataDirectory, "sync-node");
+	await setupNode(app, dataDirectory, "../paths/config", "sync-node");
+
+	const consensus = app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
+	void consensus.run();
+
+	return app;
+};
+
+const setupLegacySyncNode = async (dataDirectory: string): Promise<Contracts.Kernel.Application> => {
+	const app = new Application();
+
+	await setupNode(app, dataDirectory, "../paths/config-snapshot", "sync-node-legacy");
 
 	const consensus = app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
 	void consensus.run();
@@ -23,12 +34,20 @@ const setupSyncNode = async (dataDirectory: string): Promise<Contracts.Kernel.Ap
 const setupRestoreNode = async (dataDirectory: string): Promise<Contracts.Kernel.Application> => {
 	const app = new Application();
 
-	await setupNode(app, dataDirectory, "restore-node");
+	await setupNode(app, dataDirectory, "../paths/config", "restore-node");
 
 	return app;
 }
 
-const setupNode = async (app: Application, dataDirectory: string, name: string): Promise<void> => {
+const setupLegacyRestoreNode = async (dataDirectory: string): Promise<Contracts.Kernel.Application> => {
+	const app = new Application();
+
+	await setupNode(app, dataDirectory, "../paths/config-snapshot", "restore-node-legacy");
+
+	return app;
+}
+
+const setupNode = async (app: Application, dataDirectory: string, configDirectory: string, name: string): Promise<void> => {
 	app.bind(Identifiers.Application.Name).toConstantValue(name);
 	app.bind(Identifiers.Application.Version).toConstantValue("1.0");
 	app.bind(Identifiers.Config.Flags).toConstantValue({});
@@ -69,7 +88,7 @@ const setupNode = async (app: Application, dataDirectory: string, name: string):
 
 	// RegisterBaseBindings
 	app.bind("path.data").toConstantValue(dataDirectory);
-	app.bind("path.config").toConstantValue(resolve(import.meta.dirname, "../paths/config"));
+	app.bind("path.config").toConstantValue(resolve(import.meta.dirname, configDirectory));
 	app.bind("path.cache").toConstantValue("");
 	app.bind("path.log").toConstantValue("");
 	app.bind("path.temp").toConstantValue("");
@@ -124,6 +143,7 @@ const setupNode = async (app: Application, dataDirectory: string, name: string):
 		"@mainsail/api-sync",
 		"@mainsail/blockchain-utils",
 		"@mainsail/crypto-transaction",
+		"@mainsail/snapshot-legacy-importer",
 		"@mainsail/state",
 		"@mainsail/transactions",
 		"@mainsail/transaction-pool-service",
@@ -212,20 +232,7 @@ const bootstrap = async (app: Contracts.Kernel.Application): Promise<void> => {
 
 		const blockProcessor = app.get<Contracts.Processor.BlockProcessor>(Identifiers.Processor.BlockProcessor);
 
-		//const evm = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
-
-		// await evm.prepareNextCommit({
-		// 	commitKey: {
-		// 		blockHash: commitState.getBlock().hash,
-		// 		blockNumber: BigInt(commitState.blockNumber),
-		// 		round: BigInt(commitState.round),
-		// 	},
-		// });
-
-		// Import some legacy cold wallets
-		// const legacyColdWallets = await getLegacyColdWallets(app);
-		// await evm.importLegacyColdWallets(legacyColdWallets.map(({ legacyColdWallet }) => legacyColdWallet));
-		//
+		await tryImportSnapshot(app, genesisCommit);
 
 		const result = await blockProcessor.process(commitState);
 		if (!result) {
@@ -248,6 +255,23 @@ const bootstrap = async (app: Contracts.Kernel.Application): Promise<void> => {
 
 	app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 };
+
+const tryImportSnapshot = async (app: Contracts.Kernel.Application, genesisCommit: Contracts.Crypto.Commit): Promise<void> => {
+	const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
+	const milestone = configuration.getMilestone();
+
+	// assume snapshot is present if the previous block points to a non-zero hash
+	if (genesisCommit.block.parentHash === "0000000000000000000000000000000000000000000000000000000000000000") {
+		if (milestone.snapshot) {
+			throw new Error("Previous block is set to snapshot, but there is no snapshot defined in milestones");
+		}
+
+		return;
+	}
+
+	const snapshotImporter = app.get<Contracts.Snapshot.LegacyImporter>(Identifiers.Snapshot.Legacy.Importer);
+	await snapshotImporter.run(genesisCommit);
+}
 
 const ensureDatabaseExists = async (database: string): Promise<void> => {
 	// run from default postgres database
@@ -302,4 +326,4 @@ const shutdown = async (app: Contracts.Kernel.Application): Promise<void> => {
 	}
 };
 
-export { bootstrap, runDatabaseQuery, setupRestoreNode, setupSyncNode, shutdown };
+export { bootstrap, runDatabaseQuery, setupLegacyRestoreNode, setupLegacySyncNode, setupRestoreNode, setupSyncNode, shutdown };
