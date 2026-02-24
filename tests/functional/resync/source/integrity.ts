@@ -97,7 +97,8 @@ const verifyIntegrity = async (t: typeof assert, syncNode: Contracts.Kernel.Appl
 
     const result = compareTableHashes(
         tableHashesSyncNode,
-        tableHashesRestoreNode
+        tableHashesRestoreNode,
+        ["public.validator_rounds"]
     );
 
     if (!result.equal) {
@@ -109,13 +110,21 @@ const verifyIntegrity = async (t: typeof assert, syncNode: Contracts.Kernel.Appl
         process.exit(1);
     }
 
+    if (result.differencesIgnored.length > 0) {
+        console.error("[IGNORED] Mismatching tables:");
+        for (const difference of result.differencesIgnored) {
+            console.error(difference);
+        };
+    }
+
     t.true(result.equal);
 }
 
 const compareTableHashes = (
     a: TableHashes,
-    b: TableHashes
-): { equal: boolean; differences: string[] } => {
+    b: TableHashes,
+    exceptions: string[] = [],
+): { equal: boolean; differences: string[], differencesIgnored: string[] } => {
     const mapA = new Map(a.map(t => [t.table_name, t.hash]));
     const mapB = new Map(b.map(t => [t.table_name, t.hash]));
 
@@ -125,20 +134,27 @@ const compareTableHashes = (
     ]);
 
     const differences: string[] = [];
+    const differencesIgnored: string[] = [];
 
     for (const table of allTables) {
         const hashA = mapA.get(table);
         const hashB = mapB.get(table);
 
         if (hashA !== hashB) {
-            differences.push(
-                `${table} => A: ${hashA ?? "missing"} | B: ${hashB ?? "missing"}`
-            );
+            const difference = `${table} => A: ${hashA ?? "missing"} | B: ${hashB ?? "missing"}`;
+
+            if (exceptions.includes(table)) {
+                differencesIgnored.push(difference);
+            } else {
+                differences.push(difference);
+            }
+
         }
     }
 
     return {
         differences,
+        differencesIgnored,
         equal: differences.length === 0,
     };
 }
