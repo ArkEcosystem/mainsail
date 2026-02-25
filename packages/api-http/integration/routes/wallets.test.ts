@@ -13,6 +13,7 @@ import multiPaymentWallets from "../../test/fixtures/multi_payments.wallets.json
 import multiPaymentTransactionsResponse from "../../test/fixtures/multi_payments.transactions.response.json";
 import tokens from "../../test/fixtures/tokens.json";
 import tokenHolders from "../../test/fixtures/token_holders.json";
+import tokenWhitelist from "../../test/fixtures/token_whitelist.json";
 import walletsTokens from "../../test/fixtures/wallets_tokens.json";
 import walletTokensResponse from "../../test/fixtures/wallet_tokens.response.json";
 import walletTokenHoldersResponse from "../../test/fixtures/wallet_token_holders.response.json";
@@ -259,6 +260,7 @@ describe<{
 		await apiContext.walletRepository.save(walletsTokens);
 		await apiContext.tokenRepository.save(tokens);
 		await apiContext.tokenHolderRepository.save(tokenHolders);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
 
 		const testCases = [
 			{
@@ -301,6 +303,7 @@ describe<{
 	it("/wallets/tokens?addresses", async () => {
 		await apiContext.tokenRepository.save(tokens);
 		await apiContext.tokenHolderRepository.save(tokenHolders);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
 
 		const testCases = [
 			{
@@ -323,6 +326,7 @@ describe<{
 	it("/wallets/tokens?addresses&names", async () => {
 		await apiContext.tokenRepository.save(tokens);
 		await apiContext.tokenHolderRepository.save(tokenHolders);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
 
 		const path =
 			"/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7";
@@ -356,6 +360,7 @@ describe<{
 	it("/wallets/tokens?addresses&minBalance", async () => {
 		await apiContext.tokenRepository.save(tokens);
 		await apiContext.tokenHolderRepository.save(tokenHolders);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
 
 		const path =
 			"/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7";
@@ -389,6 +394,7 @@ describe<{
 	it("/wallets/tokens pagination", async () => {
 		await apiContext.tokenRepository.save(tokens);
 		await apiContext.tokenHolderRepository.save(tokenHolders);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
 
 		const testCases = [
 			{
@@ -415,6 +421,64 @@ describe<{
 
 		for (const { path, result } of testCases) {
 			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
+	});
+
+	it("/wallets/tokens?ignoreWhitelist", async () => {
+		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenHolderRepository.save(tokenHolders);
+
+		const testCases = [
+			{
+				path: "/wallets/tokens?ignoreWhitelist=true&limit=5&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: walletTokenHoldersResponse,
+			},
+			{
+				path: "/wallets/tokens?ignoreWhitelist=false&limit=5&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: [],
+			},
+			{
+				path: "/wallets/tokens?limit=5&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: [],
+			},
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
+	});
+
+	it("/wallets/tokens custom whitelist (POST)", async () => {
+		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenHolderRepository.save(tokenHolders);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist.slice(1, 2));
+
+		const testCases = [
+			{
+				method: "POST",
+				path: "/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: [walletTokenHoldersResponse[2]],
+			},
+			{
+				method: "POST",
+				body: JSON.stringify({ whitelist: [tokens[0].address] }),
+				path: "/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: [walletTokenHoldersResponse[0], walletTokenHoldersResponse[2]],
+			},
+			{
+				method: "POST",
+				body: JSON.stringify({ whitelist: tokens.map(t => t.address) }),
+				path: "/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: walletTokenHoldersResponse,
+			},
+		];
+
+		for (const { path, result, body, method } of testCases) {
+			const { statusCode, data } = await request(path, { ...options, body, method });
 			assert.equal(statusCode, 200);
 			assert.equal(data.data, result);
 		}
