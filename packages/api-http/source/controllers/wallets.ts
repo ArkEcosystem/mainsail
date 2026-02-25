@@ -152,6 +152,7 @@ export class WalletsController extends Controller {
 				{ addresses: walletAddresses, minBalance },
 			);
 
+		TokensController.andWhereWhitelisted(tokenPaginatedQuery, request);
 		TokensController.andWhereNameSearch(tokenPaginatedQuery, request.query.name);
 
 		const [pageTokensRows, totalCountRow] = await Promise.all([
@@ -291,6 +292,7 @@ export class WalletsController extends Controller {
 			.where("th.address = :address", { address: walletAddress })
 			.andWhere("th.balance / POW(10, tok.decimals) >= :minBalance", { minBalance });
 
+		TokensController.andWhereWhitelisted(tokenHoldersQuery, request);
 		TokensController.andWhereNameSearch(tokenHoldersQuery, request.query.name);
 
 		const [pageTokenHolderRows, totalCountRow] = await Promise.all([

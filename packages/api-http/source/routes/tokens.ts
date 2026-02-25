@@ -24,6 +24,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				query: Joi.object({
+					ignoreWhitelist: Joi.bool().default(false),
 					name: Schemas.orEqualCriteria(tokenNameSchema),
 				}).concat(Schemas.pagination),
 			},

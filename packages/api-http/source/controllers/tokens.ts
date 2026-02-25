@@ -48,6 +48,7 @@ export class TokensController extends Controller {
 
 		const tokensQuery = this.tokenRepositoryFactory().createQueryBuilder("tok").select();
 
+		TokensController.andWhereWhitelisted(tokensQuery, request);
 		TokensController.andWhereNameSearch(tokensQuery, request.query.name);
 
 		const [tokens, totalCount] = await TokensController.optionallyOrderedByName(
@@ -235,6 +236,37 @@ export class TokensController extends Controller {
 			.select()
 			.where("address = :address", { address })
 			.getOne();
+	}
+
+	public static andWhereWhitelisted(
+		queryBuilder: TypeOrm.SelectQueryBuilder<Models.TokenHolder | Models.Token>,
+		request: Hapi.Request,
+	): void {
+		if (request.query.ignoreWhitelist) {
+			return;
+		}
+
+		// POST allows user to whitelist selected tokens explicitly.
+		if (request.method === "post") {
+			const customWhitelist = request.payload as string[];
+			if (customWhitelist.length > 0) {
+				queryBuilder
+					.leftJoin(
+						Models.TokenWhitelist,
+						"tw",
+						"tw.address = tok.address"
+					)
+					.andWhere(
+						new TypeOrm.Brackets((qb) => {
+							qb.where("tw.address IS NOT NULL")
+								.orWhere("tok.address IN (:...customWhitelist)", { customWhitelist });
+						})
+					);
+				return;
+			}
+		}
+
+		queryBuilder.innerJoin(Models.TokenWhitelist, "tw", "tw.address = tok.address");
 	}
 
 	public static andWhereNameSearch(
