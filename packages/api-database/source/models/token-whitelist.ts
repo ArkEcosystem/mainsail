@@ -22,5 +22,4 @@ export class TokenWhitelist {
 		type: "timestamptz",
 	})
 	public readonly createdAt!: string;
-
 }

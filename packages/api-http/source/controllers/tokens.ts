@@ -250,18 +250,13 @@ export class TokensController extends Controller {
 		if (request.method === "post") {
 			const customWhitelist = (request.payload as unknown as { whitelist: string[] })?.whitelist ?? [];
 			if (customWhitelist.length > 0) {
-				queryBuilder
-					.leftJoin(
-						Models.TokenWhitelist,
-						"tw",
-						"tw.address = tok.address"
-					)
-					.andWhere(
-						new TypeOrm.Brackets((qb) => {
-							qb.where("tw.address IS NOT NULL")
-								.orWhere("tok.address IN (:...customWhitelist)", { customWhitelist });
-						})
-					);
+				queryBuilder.leftJoin(Models.TokenWhitelist, "tw", "tw.address = tok.address").andWhere(
+					new TypeOrm.Brackets((qb) => {
+						qb.where("tw.address IS NOT NULL").orWhere("tok.address IN (:...customWhitelist)", {
+							customWhitelist,
+						});
+					}),
+				);
 				return;
 			}
 		}

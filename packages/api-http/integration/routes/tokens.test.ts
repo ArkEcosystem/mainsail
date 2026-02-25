@@ -174,7 +174,7 @@ describe<{
 			},
 			{
 				query: "",
-				body: JSON.stringify({ whitelist: tokens.map(t => t.address) }),
+				body: JSON.stringify({ whitelist: tokens.map((t) => t.address) }),
 				method: "POST",
 				result: {
 					data: [...tokens].sort((a, b) => a.address.localeCompare(b.address)),

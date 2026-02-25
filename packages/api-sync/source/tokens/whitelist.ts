@@ -1,7 +1,7 @@
 import {
-    Contracts as ApiDatabaseContracts,
-    Identifiers as ApiDatabaseIdentifiers,
-    Models,
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Models,
 } from "@mainsail/api-database";
 import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
@@ -11,136 +11,142 @@ import { http } from "@mainsail/utils";
 import { isValidPgTimestamptz, sanitizeComment } from "./sanitizers.js";
 
 interface WhitelistedToken {
-    address: string;
-    comment?: string;
-    createdAt: string;
+	address: string;
+	comment?: string;
+	createdAt: string;
 }
 
 @injectable()
 export class TokenWhitelist {
-    @inject(Identifiers.ServiceProvider.Configuration)
-    @tagged("plugin", "api-sync")
-    private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "api-sync")
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
-    @inject(ApiDatabaseIdentifiers.DataSource)
-    private readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
+	@inject(ApiDatabaseIdentifiers.DataSource)
+	private readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
 
-    @inject(Identifiers.ApiSync.Logger)
-    private readonly logger!: Contracts.ApiSync.Logger;
+	@inject(Identifiers.ApiSync.Logger)
+	private readonly logger!: Contracts.ApiSync.Logger;
 
-    @inject(Identifiers.Cryptography.Identity.Address.Factory)
-    private readonly addressFactory!: Contracts.Crypto.AddressFactory;
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
-    #syncInterval?: NodeJS.Timeout;
+	#syncInterval?: NodeJS.Timeout;
 
-    public async bootstrap(): Promise<void> {
-        const syncInterval = this.#getTokenWhitelistRefreshIntervalMs();
+	public async bootstrap(): Promise<void> {
+		const syncInterval = this.#getTokenWhitelistRefreshIntervalMs();
 
-        let running = false;
+		let running = false;
 
-        this.logger.info(`Starting TokenWhitelist using remote: ${this.#getTokenWhitelistRemoteUrl()}`);
+		this.logger.info(`Starting TokenWhitelist using remote: ${this.#getTokenWhitelistRemoteUrl()}`);
 
-        this.#syncWhitelist().catch(error => this.logger.error(`#syncWhitelist failed: ${error}`)).finally(() => {
-            this.#syncInterval = setInterval(async () => {
-                if (running) {
-                    return;
-                }
+		this.#syncWhitelist()
+			.catch((error) => this.logger.error(`#syncWhitelist failed: ${error}`))
+			.finally(() => {
+				this.#syncInterval = setInterval(async () => {
+					if (running) {
+						return;
+					}
 
-                running = true;
+					running = true;
 
-                try {
-                    await this.#syncWhitelist();
-                } catch (ex) {
-                    this.logger.error(`#syncWhitelist failed: ${ex}`);
-                } finally {
-                    running = false;
-                }
+					try {
+						await this.#syncWhitelist();
+					} catch (ex) {
+						this.logger.error(`#syncWhitelist failed: ${ex}`);
+					} finally {
+						running = false;
+					}
+				}, syncInterval);
+			});
+	}
 
-            }, syncInterval);
-        });
+	public async dispose(): Promise<void> {
+		clearInterval(this.#syncInterval);
+	}
 
-    }
+	async #syncWhitelist(): Promise<void> {
+		const latestWhitelist = await this.#fetchWhitelist();
+		if (!latestWhitelist) {
+			return;
+		}
 
-    public async dispose(): Promise<void> {
-        clearInterval(this.#syncInterval);
-    }
+		const sanitizedWhitelist = await this.#sanitizeWhitelist(latestWhitelist);
 
-    async #syncWhitelist(): Promise<void> {
-        const latestWhitelist = await this.#fetchWhitelist();
-        if (!latestWhitelist) {
-            return;
-        }
+		this.logger.debug(`updating token whitelist (size: ${sanitizedWhitelist.length})`);
 
-        const sanitizedWhitelist = await this.#sanitizeWhitelist(latestWhitelist);
+		await this.dataSource.transaction(async (entityManager) => {
+			await entityManager.clear(Models.TokenWhitelist);
+			await entityManager.save(Models.TokenWhitelist, sanitizedWhitelist, { chunk: 1000 });
+		});
+	}
 
-        this.logger.debug(`updating token whitelist (size: ${sanitizedWhitelist.length})`);
+	async #fetchWhitelist(): Promise<WhitelistedToken[] | undefined> {
+		const remoteUrl = this.#getTokenWhitelistRemoteUrl();
+		if (!remoteUrl) {
+			return undefined;
+		}
 
-        await this.dataSource.transaction(async (entityManager) => {
-            await entityManager.clear(Models.TokenWhitelist);
-            await entityManager.save(Models.TokenWhitelist, sanitizedWhitelist, { chunk: 1000 });
-        });
-    }
+		try {
+			const { data } = await http.get<string>(this.#getTokenWhitelistRemoteUrl(), {
+				maxContentLength: 16 * Units.KILOBYTE,
+				timeout: 2500,
+			});
+			return JSON.parse(data) as WhitelistedToken[];
+		} catch (error) {
+			this.logger.error(`fetchWhitelist failed: ${error}`);
+		}
 
-    async #fetchWhitelist(): Promise<WhitelistedToken[] | undefined> {
-        const remoteUrl = this.#getTokenWhitelistRemoteUrl();
-        if (!remoteUrl) {
-            return undefined;
-        }
+		return undefined;
+	}
 
-        try {
-            const { data } = await http.get<string>(this.#getTokenWhitelistRemoteUrl(), { maxContentLength: 16 * Units.KILOBYTE, timeout: 2500, });
-            return JSON.parse(data) as WhitelistedToken[];
-        } catch (error) {
-            this.logger.error(`fetchWhitelist failed: ${error}`);
-        }
+	async #sanitizeWhitelist(whitelist: WhitelistedToken[]): Promise<WhitelistedToken[]> {
+		const sanitized: WhitelistedToken[] = [];
 
-        return undefined;
-    }
+		for (const token of whitelist) {
+			const sanitizedToken = await this.#sanitizeToken(token);
+			if (!sanitizedToken) {
+				continue;
+			}
 
-    async #sanitizeWhitelist(whitelist: WhitelistedToken[]): Promise<WhitelistedToken[]> {
-        const sanitized: WhitelistedToken[] = [];
+			sanitized.push(sanitizedToken);
+		}
 
-        for (const token of whitelist) {
-            const sanitizedToken = await this.#sanitizeToken(token);
-            if (!sanitizedToken) {
-                continue;
-            }
+		return sanitized;
+	}
 
-            sanitized.push(sanitizedToken);
-        }
+	async #sanitizeToken(token: WhitelistedToken): Promise<WhitelistedToken | undefined> {
+		try {
+			if (!(await this.addressFactory.validate(token.address))) {
+				this.logger.debugExtra(`ignoring token for whitelist because of malformed address: ${token.address}`);
+				return undefined;
+			}
 
-        return sanitized;
-    }
+			if (!isValidPgTimestamptz(token.createdAt)) {
+				this.logger.debugExtra(
+					`ignoring token ${token.address} for whitelist because of malformed timestamp: ${token.createdAt}`,
+				);
+				return undefined;
+			}
 
-    async #sanitizeToken(token: WhitelistedToken): Promise<WhitelistedToken | undefined> {
-        try {
-            if (!(await this.addressFactory.validate(token.address))) {
-                this.logger.debugExtra(`ignoring token for whitelist because of malformed address: ${token.address}`);
-                return undefined;
-            }
+			if (token.comment) {
+				token.comment = sanitizeComment(token.comment);
+			}
+		} catch (error) {
+			this.logger.debugExtra(
+				`ignoring token ${token.address} for whitelist because of exception: ${error.message}`,
+			);
+			return undefined;
+		}
 
-            if (!isValidPgTimestamptz(token.createdAt)) {
-                this.logger.debugExtra(`ignoring token ${token.address} for whitelist because of malformed timestamp: ${token.createdAt}`);
-                return undefined;
-            }
+		return token;
+	}
 
-            if (token.comment) {
-                token.comment = sanitizeComment(token.comment);
-            }
+	#getTokenWhitelistRemoteUrl(): string {
+		return this.pluginConfiguration.getRequired<string>("tokenWhitelistRemoteUrl");
+	}
 
-        } catch (error) {
-            this.logger.debugExtra(`ignoring token ${token.address} for whitelist because of exception: ${error.message}`);
-            return undefined;
-        }
-
-        return token;
-    }
-
-    #getTokenWhitelistRemoteUrl(): string {
-        return this.pluginConfiguration.getRequired<string>("tokenWhitelistRemoteUrl");
-    }
-
-    #getTokenWhitelistRefreshIntervalMs(): number {
-        return this.pluginConfiguration.getRequired<number>("tokenWhitelistRefreshInterval");
-    }
+	#getTokenWhitelistRefreshIntervalMs(): number {
+		return this.pluginConfiguration.getRequired<number>("tokenWhitelistRefreshInterval");
+	}
 }

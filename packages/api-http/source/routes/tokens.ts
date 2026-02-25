@@ -28,7 +28,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				},
 			},
 			validate: {
-				query: tokensQuerySchema
+				query: tokensQuerySchema,
 			},
 		},
 		path: "/tokens",
@@ -47,7 +47,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				payload: Joi.object({
 					whitelist: Joi.array().items(Schemas.addressSchema).max(100).empty(null).default([]),
 				}).empty(null),
-				query: tokensQuerySchema
+				query: tokensQuerySchema,
 			},
 		},
 		path: "/tokens",
