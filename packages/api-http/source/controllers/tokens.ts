@@ -11,6 +11,7 @@ import { inject, injectable } from "@mainsail/container";
 import { TokenResource } from "../resources/token.js";
 import { TokenHolderResource } from "../resources/token-holder.js";
 import { TokenTransferResource } from "../resources/token-transfer.js";
+import { TokenWhitelistResource } from "../resources/token-whitelist.js";
 import { Controller } from "./controller.js";
 
 type TokenTransferRaw = {
@@ -38,6 +39,9 @@ export class TokensController extends Controller {
 
 	@inject(ApiDatabaseIdentifiers.TokenTransferRepositoryFactory)
 	private readonly tokenTransferRepositoryFactory!: ApiDatabaseContracts.TokenTransferRepositoryFactory;
+
+	@inject(ApiDatabaseIdentifiers.TokenWhitelistRepositoryFactory)
+	private readonly tokenWhitelistRepositoryFactory!: ApiDatabaseContracts.TokenWhitelistRepositoryFactory;
 
 	public async index(request: Hapi.Request): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
@@ -104,6 +108,26 @@ export class TokensController extends Controller {
 
 	public async tokenTransfers(request: Hapi.Request): Promise<object> {
 		return this.getTokenTransfers(request);
+	}
+
+	public async whitelist(request: Hapi.Request): Promise<object> {
+		const pagination = this.getListingPage(request);
+		const [tokenWhitelist, totalCount] = await this.tokenWhitelistRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.orderBy("address", "ASC")
+			.limit(pagination.limit)
+			.offset(pagination.offset)
+			.getManyAndCount();
+
+		return this.toPagination(
+			{
+				meta: { totalCountIsEstimate: false },
+				results: tokenWhitelist,
+				totalCount,
+			},
+			TokenWhitelistResource,
+		);
 	}
 
 	private async getTokenTransfers(request: Hapi.Request): Promise<object> {

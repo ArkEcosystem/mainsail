@@ -53,6 +53,22 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
+		handler: (request: Hapi.Request) => controller.whitelist(request),
+		method: "GET",
+		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
+			validate: {
+				query: Schemas.pagination,
+			},
+		},
+		path: "/tokens/whitelist",
+	});
+
+	server.route({
 		handler: (request: Hapi.Request) => controller.show(request),
 		method: "GET",
 		options: {
