@@ -81,7 +81,7 @@ export class ApiContext {
 		private app: Application,
 		private readonly apiHttp: CoreApiHttp,
 		private readonly apiDatabase: CoreApiDatabase,
-	) {}
+	) { }
 
 	public get dataSource(): ApiDatabaseContracts.RepositoryDataSource {
 		return this.app.get<ApiDatabaseContracts.RepositoryDataSource>(ApiDatabaseIdentifiers.DataSource);
@@ -160,6 +160,12 @@ export class ApiContext {
 	public get tokenTransferRepository(): ApiDatabaseContracts.TokenTransferRepository {
 		return this.app.get<ApiDatabaseContracts.TokenTransferRepositoryFactory>(
 			ApiDatabaseIdentifiers.TokenTransferRepositoryFactory,
+		)();
+	}
+
+	public get tokenWhitelistRepository(): ApiDatabaseContracts.TokenWhitelistRepository {
+		return this.app.get<ApiDatabaseContracts.TokenWhitelistRepositoryFactory>(
+			ApiDatabaseIdentifiers.TokenWhitelistRepositoryFactory,
 		)();
 	}
 

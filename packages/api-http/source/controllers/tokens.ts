@@ -248,7 +248,7 @@ export class TokensController extends Controller {
 
 		// POST allows user to whitelist selected tokens explicitly.
 		if (request.method === "post") {
-			const customWhitelist = request.payload as string[];
+			const customWhitelist = (request.payload as unknown as { whitelist: string[] })?.whitelist ?? [];
 			if (customWhitelist.length > 0) {
 				queryBuilder
 					.leftJoin(
