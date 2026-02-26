@@ -483,33 +483,4 @@ describe<{
 			assert.equal(data.data, result);
 		}
 	});
-
-	it("/wallets returns token count", async () => {
-		await apiContext.walletRepository.save(wallets);
-		await apiContext.tokenRepository.save(tokens);
-		await apiContext.tokenHolderRepository.save(tokenHolders);
-
-		const wallet = wallets[0];
-		const tokenWallet = wallets.find((w) => w.address === tokenHolders[2].address);
-
-		const testCases = [
-			{
-				id: wallet.address,
-				result: { ...wallet, tokenCount: 0 },
-			},
-			{
-				id: tokenWallet!.address,
-				result: { ...tokenWallet, tokenCount: 1 },
-			},
-		];
-
-		for (const { id, result } of testCases) {
-			const {
-				statusCode,
-				data: { data },
-			} = await request(`/wallets/${id}`, options);
-			assert.equal(statusCode, 200);
-			assert.equal(data, result);
-		}
-	});
 });

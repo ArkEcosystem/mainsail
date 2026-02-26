@@ -707,7 +707,6 @@ export class Restore {
 					balance: BigNumber.make(account.balance).toFixed(),
 					nonce: BigNumber.make(account.nonce).toFixed(),
 					publicKey: context.addressToPublicKey[account.address] ?? null,
-					tokenCount: undefined,
 					updated_at: "0",
 				});
 
