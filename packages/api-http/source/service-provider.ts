@@ -81,10 +81,6 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 					estimateTotalCount: Joi.bool().required(),
 				}).required(),
 
-				tokens: Joi.object({
-					defaultMinimumBalance: Joi.number().positive().allow(0).required(),
-				}).required(),
-
 				plugins: Joi.object({
 					cache: Joi.object({
 						checkperiod: Joi.number().integer().min(0).required(),
@@ -107,6 +103,10 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 					socketTimeout: Joi.number().integer().min(0).required(),
 					trustProxy: Joi.bool().required(),
 					whitelist: Joi.array().items(Joi.string()).required(),
+				}).required(),
+
+				tokens: Joi.object({
+					defaultMinimumBalance: Joi.number().positive().allow(0).required(),
 				}).required(),
 			}).unknown(true),
 		);
