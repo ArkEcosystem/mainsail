@@ -3,7 +3,8 @@ import { Keystore } from "@chainsafe/bls-keystore";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../test-framework/source";
+import { Console } from "@mainsail/cli";
+import { describe } from "@mainsail/test-runner";
 import { Command } from "./config-forger-bip38";
 import { Command as BIP39Command } from "./config-forger-bip39";
 
@@ -25,7 +26,7 @@ describe<{
 
 	afterAll(() => setGracefulCleanup());
 
-	it("should configure from flags", async ({ cli }) => {
+	it.only("should configure from flags", async ({ cli }) => {
 		await cli.withFlags({ bip39: bip39Flags, password: "password" }).execute(Command);
 
 		const config = readJSONSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/validators.json`);

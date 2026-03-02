@@ -75,7 +75,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.storage.removeTransaction(transaction.hash);
 				this.#txRebroadcastCooldowns.delete(transaction.hash);
 				this.logger.debug(`Removed tx ${transaction.hash}`);
-				void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.data);
+				void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction);
 			}
 
 			await this.#cleanUp();
@@ -99,7 +99,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			this.storage.addTransaction({
 				blockNumber: this.stateStore.getBlockNumber(),
 				hash: transaction.hash,
-				senderPublicKey: transaction.data.senderPublicKey,
+				senderPublicKey: transaction.senderPublicKey,
 				serialized: transaction.serialized,
 			});
 
@@ -108,12 +108,12 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.logger.debug(`tx ${transaction.hash} added to pool`);
 				this.#txRebroadcastCooldowns.set(transaction.hash, this.stateStore.getBlockNumber());
 
-				void this.events.dispatch(Events.TransactionEvent.AddedToPool, transaction.data);
+				void this.events.dispatch(Events.TransactionEvent.AddedToPool, transaction);
 			} catch (error) {
 				this.storage.removeTransaction(transaction.hash);
 				this.logger.warn(`tx ${transaction.hash} failed to enter pool: ${error.message}`);
 
-				void this.events.dispatch(Events.TransactionEvent.RejectedByPool, transaction.data);
+				void this.events.dispatch(Events.TransactionEvent.RejectedByPool, transaction);
 
 				throw error instanceof PoolError ? error : new PoolError(error.message, "ERR_OTHER");
 			}
@@ -220,7 +220,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 		const transaction = await this.poolQuery.getFromLowestPriority().first();
 
-		const removedTransactions = await this.mempool.removeTransaction(transaction.data.from, transaction.hash);
+		const removedTransactions = await this.mempool.removeTransaction(transaction.from, transaction.hash);
 
 		for (const removedTransaction of removedTransactions) {
 			this.storage.removeTransaction(removedTransaction.hash);
@@ -247,8 +247,8 @@ export class Service implements Contracts.TransactionPool.Service {
 
 		if (this.getPoolSize() >= maxTransactionsInPool) {
 			const lowest = await this.poolQuery.getFromLowestPriority().first();
-			if (BigNumber.make(transaction.data.gasPrice).isLessThanEqual(lowest.data.gasPrice)) {
-				throw new TransactionPoolFullError(transaction, lowest.data.gasPrice);
+			if (BigNumber.make(transaction.gasPrice).isLessThanEqual(lowest.gasPrice)) {
+				throw new TransactionPoolFullError(transaction, lowest.gasPrice);
 			}
 
 			await this.#removeLowestPriorityTransaction();

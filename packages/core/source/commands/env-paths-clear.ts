@@ -1,6 +1,8 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
-import { Commands, Contracts, Identifiers } from "@mainsail/cli";
+import { Commands } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { injectable, postConstruct } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { existsSync, readdirSync } from "fs";
 import { emptyDirSync, removeSync } from "fs-extra/esm";
 import Joi from "joi";
@@ -28,43 +30,46 @@ export class Command extends Commands.Command {
 
 	public async execute(): Promise<void> {
 		if (this.hasFlag("data") || this.hasFlag("all")) {
-			await this.#clearDir("Data", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).data);
+			await this.#clearDir("Data", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).data);
 		}
 
 		if (this.hasFlag("consensusData")) {
-			await this.#clearDb("consensus", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).data);
+			await this.#clearDb("consensus", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).data);
 		}
 
 		if (this.hasFlag("txPoolData")) {
-			await this.#clearDb("transaction-pool", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).data);
+			await this.#clearDb(
+				"transaction-pool",
+				this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).data,
+			);
 		}
 
 		if (this.hasFlag("config") || this.hasFlag("all")) {
-			await this.#clearDir("Config", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).config);
+			await this.#clearDir("Config", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).config);
 		}
 
 		if (this.hasFlag("cache") || this.hasFlag("all")) {
-			await this.#clearDir("Cache", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).cache);
+			await this.#clearDir("Cache", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).cache);
 		}
 
 		if (this.hasFlag("log") || this.hasFlag("all")) {
-			await this.#clearDir("Log", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).log);
+			await this.#clearDir("Log", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).log);
 		}
 		if (this.hasFlag("temp") || this.hasFlag("all")) {
-			await this.#clearDir("Temp", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).temp);
+			await this.#clearDir("Temp", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).temp);
 		}
 
 		if (this.hasFlag("state-export")) {
 			await this.#clearDir(
 				"State export",
-				join(this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).data, "state-export"),
+				join(this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).data, "state-export"),
 			);
 		}
 
 		if (this.hasFlag("plugins")) {
 			await this.#clearDir(
 				"Plugins",
-				join(this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).data, "plugins"),
+				join(this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).data, "plugins"),
 			);
 		}
 	}

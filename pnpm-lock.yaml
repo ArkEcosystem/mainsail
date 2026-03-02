@@ -150,6 +150,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -223,6 +226,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/ip':
         specifier: 1.1.3
         version: 1.1.3
@@ -263,6 +269,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/pg':
         specifier: 8.15.5
         version: 8.15.5
@@ -306,6 +315,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/semver':
         specifier: 7.7.0
         version: 7.7.0
@@ -364,6 +376,9 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -413,6 +428,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/ip':
         specifier: 1.1.3
         version: 1.1.3
@@ -465,6 +483,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -496,6 +517,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/ip':
         specifier: 1.1.3
         version: 1.1.3
@@ -527,6 +551,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -546,6 +573,12 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
+      esmock:
+        specifier: 2.7.3
+        version: 2.7.3
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -698,18 +731,21 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -771,6 +807,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -808,6 +847,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       esmock:
         specifier: 2.7.1
         version: 2.7.1
@@ -836,12 +878,24 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
+      '@types/tmp':
+        specifier: 0.2.6
+        version: 0.2.6
+      tmp:
+        specifier: 0.2.5
+        version: 0.2.5
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
   packages/constants:
     devDependencies:
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -855,6 +909,12 @@ importers:
         specifier: 0.2.2
         version: 0.2.2
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -876,6 +936,12 @@ importers:
       dayjs:
         specifier: 1.11.13
         version: 1.11.13
+      env-paths:
+        specifier: 3.0.0
+        version: 3.0.0
+      execa:
+        specifier: 9.6.0
+        version: 9.6.0
       inversify:
         specifier: 7.10.3
         version: 7.10.3(reflect-metadata@0.2.2)
@@ -958,27 +1024,21 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
       '@mainsail/crypto-key-pair-bls12-381':
         specifier: workspace:*
         version: link:../crypto-key-pair-bls12-381
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
       '@mainsail/crypto-proposal':
         specifier: workspace:*
         version: link:../crypto-proposal
-      '@mainsail/crypto-signature-schnorr':
+      '@mainsail/crypto-signature-bls12-381':
         specifier: workspace:*
-        version: link:../crypto-signature-schnorr
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -1094,6 +1154,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -1127,12 +1190,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      bcrypto:
-        specifier: 5.5.2
-        version: 5.5.2
       bstring:
         specifier: 0.3.9
         version: 0.3.9
@@ -1143,15 +1200,18 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/crypto-hash-bcrypto':
+        specifier: workspace:*
+        version: link:../crypto-hash-bcrypto
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1192,12 +1252,12 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1216,6 +1276,9 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../crypto-transaction
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
@@ -1241,21 +1304,21 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -1265,6 +1328,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1314,18 +1380,21 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
-      '@mainsail/crypto-key-pair-schnorr':
+      '@mainsail/crypto-key-pair-bls12-381':
         specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
+        version: link:../crypto-key-pair-bls12-381
+      '@mainsail/crypto-key-pair-ecdsa':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -1341,6 +1410,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1381,6 +1453,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/lodash.clone':
         specifier: 4.5.9
         version: 4.5.9
@@ -1390,31 +1465,6 @@ importers:
       '@types/lodash.set':
         specifier: 4.3.9
         version: 4.3.9
-      uvu:
-        specifier: 0.5.6
-        version: 0.5.6
-
-  packages/crypto-consensus-bls12-381:
-    dependencies:
-      '@mainsail/constants':
-        specifier: workspace:*
-        version: link:../constants
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/crypto-key-pair-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-bls12-381
-      '@mainsail/crypto-signature-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-signature-bls12-381
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-    devDependencies:
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1437,6 +1487,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1483,6 +1536,9 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1526,98 +1582,9 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
-      '@mainsail/validation':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../validation
-      bip39:
-        specifier: 3.1.0
-        version: 3.1.0
-      uvu:
-        specifier: 0.5.6
-        version: 0.5.6
-
-  packages/crypto-key-pair-ed25519:
-    dependencies:
-      '@mainsail/constants':
-        specifier: workspace:*
-        version: link:../constants
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/exceptions':
-        specifier: workspace:*
-        version: link:../exceptions
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      '@noble/ed25519':
-        specifier: 2.3.0
-        version: 2.3.0
-      '@noble/hashes':
-        specifier: 1.8.0
-        version: 1.8.0
-      '@scure/bip39':
-        specifier: 1.6.0
-        version: 1.6.0
-      wif:
-        specifier: 5.0.0
-        version: 5.0.0
-    devDependencies:
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
-      bip39:
-        specifier: 3.1.0
-        version: 3.1.0
-      uvu:
-        specifier: 0.5.6
-        version: 0.5.6
-
-  packages/crypto-key-pair-schnorr:
-    dependencies:
-      '@mainsail/constants':
-        specifier: workspace:*
-        version: link:../constants
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/exceptions':
-        specifier: workspace:*
-        version: link:../exceptions
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      bcrypto:
-        specifier: 5.5.2
-        version: 5.5.2
-      wif:
-        specifier: 5.0.0
-        version: 5.0.0
-    devDependencies:
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1664,18 +1631,21 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-proposal':
         specifier: workspace:*
         version: link:../crypto-proposal
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -1691,6 +1661,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -1737,15 +1710,18 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -1761,6 +1737,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -1782,9 +1761,6 @@ importers:
       '@mainsail/crypto-key-pair-bls12-381':
         specifier: workspace:*
         version: link:../crypto-key-pair-bls12-381
-      '@mainsail/exceptions':
-        specifier: workspace:*
-        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1795,6 +1771,15 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../crypto-validation
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1807,15 +1792,9 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/exceptions':
-        specifier: workspace:*
-        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
       bcrypto:
         specifier: 5.5.2
         version: 5.5.2
@@ -1823,34 +1802,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      uvu:
-        specifier: 0.5.6
-        version: 0.5.6
-
-  packages/crypto-signature-schnorr:
-    dependencies:
-      '@mainsail/constants':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../constants
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/exceptions':
-        specifier: workspace:*
-        version: link:../exceptions
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      bcrypto:
-        specifier: 5.5.2
-        version: 5.5.2
-    devDependencies:
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1875,9 +1829,6 @@ importers:
       ajv:
         specifier: 8.17.1
         version: 8.17.1
-      bcrypto:
-        specifier: 5.5.2
-        version: 5.5.2
       viem:
         specifier: 2.34.0
         version: 2.34.0(typescript@5.9.2)(zod@3.24.4)
@@ -1912,6 +1863,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -1946,6 +1900,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1974,9 +1931,12 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-key-pair-schnorr':
+      '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
+        version: link:../crypto-key-pair-ecdsa
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2002,6 +1962,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/chance':
         specifier: 1.1.7
         version: 1.1.7
@@ -2033,6 +1996,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/consensus':
+        specifier: workspace:*
+        version: link:../consensus
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
@@ -2051,15 +2017,18 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -2075,9 +2044,15 @@ importers:
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../evm-service
+      '@mainsail/processor':
+        specifier: workspace:*
+        version: link:../processor
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -2118,6 +2093,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2149,6 +2127,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/seedrandom':
         specifier: 3.0.8
         version: 3.0.8
@@ -2165,6 +2146,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2226,6 +2210,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -2260,6 +2247,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2345,6 +2335,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/capture-console':
         specifier: 1.0.5
         version: 1.0.5
@@ -2431,6 +2424,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/capture-console':
         specifier: 1.0.5
         version: 1.0.5
@@ -2486,6 +2482,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2511,6 +2510,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2539,6 +2541,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/hapi__sntp':
         specifier: 3.1.4
         version: 3.1.4
@@ -2636,9 +2641,9 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -2697,6 +2702,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2722,6 +2730,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2768,6 +2779,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -2820,6 +2834,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -2842,9 +2859,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-transaction':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../crypto-transaction
+        version: link:../test-runner
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -2854,27 +2871,18 @@ importers:
       '@types/sinon':
         specifier: 17.0.4
         version: 17.0.4
-      sinon:
-        specifier: 21.0.0
-        version: 21.0.0
       uvu:
         specifier: 0.5.6
         version: 0.5.6
 
-  packages/test-framework:
+  packages/test-factories:
     dependencies:
-      '@mainsail/cli':
-        specifier: workspace:*
-        version: link:../cli
       '@mainsail/configuration-generator':
         specifier: workspace:*
         version: link:../configuration-generator
       '@mainsail/constants':
         specifier: workspace:*
         version: link:../constants
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
       '@mainsail/crypto-address-base58':
         specifier: workspace:*
         version: link:../crypto-address-base58
@@ -2890,18 +2898,21 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -2920,9 +2931,6 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/test-runner':
-        specifier: workspace:*
-        version: link:../test-runner
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2935,34 +2943,22 @@ importers:
       dayjs:
         specifier: 1.11.13
         version: 1.11.13
-      fs-extra:
-        specifier: 11.3.1
-        version: 11.3.1
       memoizee:
         specifier: 0.4.17
         version: 0.4.17
-      tmp:
-        specifier: 0.2.5
-        version: 0.2.5
     devDependencies:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/chance':
         specifier: 1.1.7
         version: 1.1.7
-      '@types/fs-extra':
-        specifier: 11.0.4
-        version: 11.0.4
       '@types/memoizee':
         specifier: 0.4.12
         version: 0.4.12
-      '@types/tmp':
-        specifier: 0.2.6
-        version: 0.2.6
-      joi:
-        specifier: 18.0.0
-        version: 18.0.0
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -3012,9 +3008,6 @@ importers:
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
-      '@mainsail/test-framework':
-        specifier: workspace:*
-        version: link:../test-framework
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -3059,6 +3052,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -3099,6 +3095,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/better-sqlite3':
         specifier: 7.6.13
         version: 7.6.13
@@ -3133,6 +3132,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -3158,6 +3160,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -3198,6 +3203,9 @@ importers:
       '@hapi/hapi':
         specifier: 21.4.3
         version: 21.4.3
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/micromatch':
         specifier: 4.0.10
         version: 4.0.10
@@ -3247,6 +3255,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -3293,21 +3304,24 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
-      '@mainsail/crypto-key-pair-schnorr':
+      '@mainsail/crypto-key-pair-bls12-381':
         specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
+        version: link:../crypto-key-pair-bls12-381
+      '@mainsail/crypto-key-pair-ecdsa':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
       '@mainsail/crypto-proposal':
         specifier: workspace:*
         version: link:../crypto-proposal
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -3323,9 +3337,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../test-framework
+        version: link:../test-runner
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -3372,6 +3386,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -3390,6 +3407,9 @@ importers:
       '@mainsail/constants':
         specifier: workspace:*
         version: link:../../../packages/constants
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../../../packages/container
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../../../packages/contracts
@@ -3399,9 +3419,15 @@ importers:
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../../../packages/evm-contracts
-      '@mainsail/test-framework':
+      '@mainsail/kernel':
         specifier: workspace:*
-        version: link:../../../packages/test-framework
+        version: link:../../../packages/kernel
+      '@mainsail/test-factories':
+        specifier: workspace:*
+        version: link:../../../packages/test-factories
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../../../packages/test-runner
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../../../packages/utils
@@ -3483,6 +3509,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../../../packages/contracts
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-address-base58
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../../../packages/crypto-address-keccak256
@@ -3495,12 +3524,12 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../../../packages/crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../../../packages/crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../../../packages/crypto-key-pair-ecdsa
@@ -3510,6 +3539,9 @@ importers:
       '@mainsail/crypto-proposal':
         specifier: workspace:*
         version: link:../../../packages/crypto-proposal
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../../../packages/crypto-signature-ecdsa
@@ -3555,9 +3587,6 @@ importers:
       '@mainsail/state':
         specifier: workspace:*
         version: link:../../../packages/state
-      '@mainsail/test-framework':
-        specifier: workspace:*
-        version: link:../../../packages/test-framework
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../../../packages/test-runner
@@ -3591,6 +3620,150 @@ importers:
       fs-extra:
         specifier: 11.2.0
         version: 11.2.0
+      tmp:
+        specifier: 0.2.3
+        version: 0.2.3
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
+      viem:
+        specifier: 2.33.1
+        version: 2.33.1(typescript@5.9.2)(zod@3.24.4)
+
+  tests/functional/resync:
+    devDependencies:
+      '@mainsail/api-database':
+        specifier: workspace:*
+        version: link:../../../packages/api-database
+      '@mainsail/api-sync':
+        specifier: workspace:*
+        version: link:../../../packages/api-sync
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../../../packages/blockchain-utils
+      '@mainsail/consensus':
+        specifier: workspace:*
+        version: link:../../../packages/consensus
+      '@mainsail/consensus-storage':
+        specifier: workspace:*
+        version: link:../../../packages/consensus-storage
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../../../packages/constants
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../../../packages/container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-address-base58
+      '@mainsail/crypto-address-keccak256':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-address-keccak256
+      '@mainsail/crypto-block':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-block
+      '@mainsail/crypto-commit':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-commit
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-config
+      '@mainsail/crypto-hash-bcrypto':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-key-pair-bls12-381
+      '@mainsail/crypto-key-pair-ecdsa':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-key-pair-ecdsa
+      '@mainsail/crypto-messages':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-messages
+      '@mainsail/crypto-proposal':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-proposal
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-signature-bls12-381
+      '@mainsail/crypto-signature-ecdsa':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-signature-ecdsa
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-transaction
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-validation
+      '@mainsail/crypto-wif':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-wif
+      '@mainsail/crypto-worker':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-worker
+      '@mainsail/database':
+        specifier: workspace:*
+        version: link:../../../packages/database
+      '@mainsail/evm-api-worker':
+        specifier: workspace:*
+        version: link:../../../packages/evm-api-worker
+      '@mainsail/evm-consensus':
+        specifier: workspace:*
+        version: link:../../../packages/evm-consensus
+      '@mainsail/evm-contracts':
+        specifier: workspace:*
+        version: link:../../../packages/evm-contracts
+      '@mainsail/evm-service':
+        specifier: workspace:*
+        version: link:../../../packages/evm-service
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../../../packages/kernel
+      '@mainsail/logger-pino':
+        specifier: workspace:*
+        version: link:../../../packages/logger-pino
+      '@mainsail/processor':
+        specifier: workspace:*
+        version: link:../../../packages/processor
+      '@mainsail/serializer':
+        specifier: workspace:*
+        version: link:../../../packages/serializer
+      '@mainsail/snapshot-legacy-importer':
+        specifier: workspace:*
+        version: link:../../../packages/snapshot-legacy-importer
+      '@mainsail/state':
+        specifier: workspace:*
+        version: link:../../../packages/state
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../../../packages/test-runner
+      '@mainsail/test-transaction-builders':
+        specifier: workspace:*
+        version: link:../../../packages/test-transaction-builders
+      '@mainsail/transaction-pool-service':
+        specifier: workspace:*
+        version: link:../../../packages/transaction-pool-service
+      '@mainsail/transaction-pool-worker':
+        specifier: workspace:*
+        version: link:../../../packages/transaction-pool-worker
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../../../packages/transactions
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../../../packages/utils
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../../../packages/validation
+      '@mainsail/validator':
+        specifier: workspace:*
+        version: link:../../../packages/validator
+      '@types/tmp':
+        specifier: 0.2.6
+        version: 0.2.6
       tmp:
         specifier: 0.2.3
         version: 0.2.3
@@ -3642,24 +3815,24 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../../../packages/crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../../../packages/crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../../../packages/crypto-key-pair-ecdsa
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-key-pair-schnorr
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../../../packages/crypto-messages
       '@mainsail/crypto-proposal':
         specifier: workspace:*
         version: link:../../../packages/crypto-proposal
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../../../packages/crypto-signature-ecdsa
@@ -3705,9 +3878,9 @@ importers:
       '@mainsail/state':
         specifier: workspace:*
         version: link:../../../packages/state
-      '@mainsail/test-framework':
+      '@mainsail/test-runner':
         specifier: workspace:*
-        version: link:../../../packages/test-framework
+        version: link:../../../packages/test-runner
       '@mainsail/test-transaction-builders':
         specifier: workspace:*
         version: link:../../../packages/test-transaction-builders
@@ -3830,24 +4003,28 @@ packages:
     engines: {node: '>= 16'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@chainsafe/blst-linux-arm64-musl@2.2.0':
     resolution: {integrity: sha512-0Vn0luxLYVgC3lvWT1MapFHSAoz99PldqjhilXTGv0AcAk/X5LXPH2RC9Dp2KJGqthyUkpbk1j47jUBfBI+BIg==}
     engines: {node: '>= 16'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@chainsafe/blst-linux-x64-gnu@2.2.0':
     resolution: {integrity: sha512-gEY/z2SDBA7kXtFEI9VNhWTJAIjx16jdeAyCaS2k4ACGurWZaWk+Ee4KniTsr4WieSqeuNTUr7Pdja0Sr4EKNQ==}
     engines: {node: '>= 16'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@chainsafe/blst-linux-x64-musl@2.2.0':
     resolution: {integrity: sha512-58GKtiUmtVSuerRzPEcMNQZpICPboBKFnL7+1Wo+PSuajkvbae7tEFrFTtWeMoKIPgOEsPMnk96LF+0yNgavUg==}
     engines: {node: '>= 16'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@chainsafe/blst-win32-x64-msvc@2.2.0':
     resolution: {integrity: sha512-UFrZshl4dfX5Uh2zeKXAZtrkQ+otczHMON2tsrapQNICWmfHZrzE6pKuBL+9QeGAbgflwpbz7+D5nQRDpiuHxQ==}
@@ -4591,42 +4768,49 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@napi-rs/lzma-linux-arm64-musl@1.4.4':
     resolution: {integrity: sha512-rm43dqf5pw5HV3EineWl4IBbzg3Iwuiucl614AyhLHmSHTf6/AJJID7rqwM8Qbhe2abM+9NT+2WI9HRM1ZtkJA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@napi-rs/lzma-linux-ppc64-gnu@1.4.4':
     resolution: {integrity: sha512-QzNVcCdq6j4LYOtLUDEyE9wg8tY8kmbQ6TZrqjYQUD2nebTW24lmzFhdeI3xzUzVN5rRt4js1UnL1cPCT5HrSw==}
     engines: {node: '>= 10'}
     cpu: [ppc64]
     os: [linux]
+    libc: [glibc]
 
   '@napi-rs/lzma-linux-riscv64-gnu@1.4.4':
     resolution: {integrity: sha512-7jpyKpBX0LpklkmGBzz1cQJ/QRN+E6h1xSZVeN6KCtLBrCd6LCX3owZMRzSYmdpI6Zr30DrWo0HOUZiKMzgzBg==}
     engines: {node: '>= 10'}
     cpu: [riscv64]
     os: [linux]
+    libc: [glibc]
 
   '@napi-rs/lzma-linux-s390x-gnu@1.4.4':
     resolution: {integrity: sha512-ngUxVZIytn2UHY92RnijtT11VhWO32mfa1LFX03GWMWdQl50bV/IqcZR0WYRWlBCd7DZrOf16AY2IR/lwovE7A==}
     engines: {node: '>= 10'}
     cpu: [s390x]
     os: [linux]
+    libc: [glibc]
 
   '@napi-rs/lzma-linux-x64-gnu@1.4.4':
     resolution: {integrity: sha512-mUGH8hpWJU4FXhn61cD7sHTUEBiWU5JYOhh6ErCIZ0BOoBH/0kYPptfqvJA6G9EfVIcfbtYKxJYYtFC5sbf+eA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@napi-rs/lzma-linux-x64-musl@1.4.4':
     resolution: {integrity: sha512-ysM4mYSfWGO2h8YZVn0GH7zMZX42hU0h7IomC4/oBJmAk5BIlOGnRB8XQmyz1A7neSi6aByjAlZmW4CrZlI9Uw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@napi-rs/lzma-wasm32-wasi@1.4.4':
     resolution: {integrity: sha512-MyDIU8a6jJqhK4L1ISFrb9OeKaGlI3FptCo2JFoEWYaenWHRwEepFqkyuECeIe34xtU2jtJcpXhEtpnCxuAE1Q==}
@@ -4696,36 +4880,42 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@napi-rs/tar-linux-arm64-musl@1.0.0':
     resolution: {integrity: sha512-KlrlAxNaZbWvGKgr4g4Cm5dRdwlogBaF3fvysaqR0kT8pA4ODBHtjsbx+ErhrQNDfg6QZIEfmFn3lrsTG/lqUA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@napi-rs/tar-linux-ppc64-gnu@1.0.0':
     resolution: {integrity: sha512-IbB4I8RFcvKI/zGsboUQPmlKoXfXgNOMiJw7Cbe7T1OBeYzDy6n/yEUEaG4zIbocxqjRVsF4ElrW1V/0Ihlqzg==}
     engines: {node: '>= 10'}
     cpu: [ppc64]
     os: [linux]
+    libc: [glibc]
 
   '@napi-rs/tar-linux-s390x-gnu@1.0.0':
     resolution: {integrity: sha512-Tl4HSo07u3TLsNQ4KEVfYKdHVNfF/k0o5KQlyGnePiO34Kb+NfaqSKMspjSkrmXKEc0PjB+u9af3BZdTUwml4Q==}
     engines: {node: '>= 10'}
     cpu: [s390x]
     os: [linux]
+    libc: [glibc]
 
   '@napi-rs/tar-linux-x64-gnu@1.0.0':
     resolution: {integrity: sha512-Xe57Yz4MKSeG6HGECiIHuBKFwAuqs2fzwblTdMd1CoSgaaUc/K/dKTDWZwPtjC0Hh5pM86K0WZuwggbsjmFGNg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@napi-rs/tar-linux-x64-musl@1.0.0':
     resolution: {integrity: sha512-VA4RXspXyelNAtaFEf2ZLnTYXRILVlH20OGV0oqzuUcQzpwEwK2cJbYtYHK+yCYpxrNbEGsAwN+12LYJMW+NlA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@napi-rs/tar-wasm32-wasi@1.0.0':
     resolution: {integrity: sha512-yPMq3jMldKOi6rbbhKp+7zfaRsA2toIfRV7TbqSzwz64S5euiMrsZQcrq3F9oTtFu4wCSLo83IsNdgoVuiy44g==}
@@ -4792,24 +4982,28 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@napi-rs/wasm-tools-linux-arm64-musl@1.0.0':
     resolution: {integrity: sha512-54BWWTg5I9n77PRUKErBe3BKqkmbjm0GRpUKJgGdlcessC9Oxa/yVDy2BPtmJP1pQR3VabkXR63H+ZGaH5qKxw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@napi-rs/wasm-tools-linux-x64-gnu@1.0.0':
     resolution: {integrity: sha512-wpRkiy0QBM/zpaGAn5I1HfddQul0vGrdlindT2UHtOYK1zvam524M6LJXBtmhBkXS5a4F2HZiZXns8Wuc7dq4w==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@napi-rs/wasm-tools-linux-x64-musl@1.0.0':
     resolution: {integrity: sha512-Ua94ruWB18uKyIz/nj+by2ZxfBbFzbqiiD564ocBHGbrUffpR6Us74uVwxO7rImc/WvCfJqap9ezqmaTvmK7SA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@napi-rs/wasm-tools-wasm32-wasi@1.0.0':
     resolution: {integrity: sha512-gWVdt1UK575VKTnFRcYTe0qMZA5bFV2w69qDAhX8hG6tajjxbVyvu4jgsYvv/bJrBrxFsNbXMlEU1d0X7iWziA==}
@@ -4859,9 +5053,6 @@ packages:
   '@noble/curves@1.9.6':
     resolution: {integrity: sha512-GIKz/j99FRthB8icyJQA51E8Uk5hXmdyThjgQXRKiv9h0zeRlzSCLIzFw6K1LotZ3XuB7yzlf76qk7uBmTdFqA==}
     engines: {node: ^14.21.3 || >=16}
-
-  '@noble/ed25519@2.3.0':
-    resolution: {integrity: sha512-M7dvXL2B92/M7dw9+gzuydL8qn/jiqNHaoR3Q+cb1q1GHV7uwE17WCyFMG+Y+TZb5izcaXk5TdJRrDUxHXL78A==}
 
   '@noble/hashes@1.3.2':
     resolution: {integrity: sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ==}
@@ -5005,24 +5196,28 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@nrwl/nx-linux-arm64-musl@15.9.7':
     resolution: {integrity: sha512-zyStqjEcmbvLbejdTOrLUSEdhnxNtdQXlmOuymznCzYUEGRv+4f7OAepD3yRoR0a/57SSORZmmGQB7XHZoYZJA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@nrwl/nx-linux-x64-gnu@15.9.7':
     resolution: {integrity: sha512-saNK5i2A8pKO3Il+Ejk/KStTApUpWgCxjeUz9G+T8A+QHeDloZYH2c7pU/P3jA9QoNeKwjVO9wYQllPL9loeVg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@nrwl/nx-linux-x64-musl@15.9.7':
     resolution: {integrity: sha512-extIUThYN94m4Vj4iZggt6hhMZWQSukBCo8pp91JHnDcryBg7SnYmnikwtY1ZAFyyRiNFBLCKNIDFGkKkSrZ9Q==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@nrwl/nx-win32-arm64-msvc@15.9.7':
     resolution: {integrity: sha512-GSQ54hJ5AAnKZb4KP4cmBnJ1oC4ILxnrG1mekxeM65c1RtWg9NpBwZ8E0gU3xNrTv8ZNsBeKi/9UhXBxhsIh8A==}
@@ -7029,6 +7224,10 @@ packages:
 
   esmock@2.7.1:
     resolution: {integrity: sha512-YgtZ6TSwRbdqFLkJwxVCYkt0rzKpjHb0tbDqSjWvbkm8Uy5Tm5W6ixICb3FVRkAd1uQlLOXiIn7OPY4F4f18cw==}
+    engines: {node: '>=14.16.0'}
+
+  esmock@2.7.3:
+    resolution: {integrity: sha512-/M/YZOjgyLaVoY6K83pwCsGE1AJQnj4S4GyXLYgi/Y79KL8EeW6WU7Rmjc89UO7jv6ec8+j34rKeWOfiLeEu0A==}
     engines: {node: '>=14.16.0'}
 
   esniff@2.0.1:
@@ -12101,8 +12300,6 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.8.0
 
-  '@noble/ed25519@2.3.0': {}
-
   '@noble/hashes@1.3.2': {}
 
   '@noble/hashes@1.4.0': {}
@@ -13372,7 +13569,7 @@ snapshots:
 
   bip39@3.1.0:
     dependencies:
-      '@noble/hashes': 1.7.1
+      '@noble/hashes': 1.8.0
 
   bl@4.1.0:
     dependencies:
@@ -14634,6 +14831,8 @@ snapshots:
       - supports-color
 
   esmock@2.7.1: {}
+
+  esmock@2.7.3: {}
 
   esniff@2.0.1:
     dependencies:
@@ -16124,7 +16323,7 @@ snapshots:
 
   load-json-file@4.0.0:
     dependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       parse-json: 4.0.0
       pify: 3.0.0
       strip-bom: 3.0.0
@@ -16679,7 +16878,7 @@ snapshots:
       env-paths: 2.2.1
       exponential-backoff: 3.1.2
       glob: 7.2.3
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       make-fetch-happen: 10.2.1
       nopt: 6.0.0
       npmlog: 6.0.2

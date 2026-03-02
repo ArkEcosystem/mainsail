@@ -1,8 +1,7 @@
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import capcon from "capture-console";
 
-import { describe } from "../../../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { Application } from "../../../application";
 import { MemoryLogger } from "./memory";
 
@@ -20,7 +19,7 @@ describe<{
 
 		// @ts-ignore
 		capcon.startCapture(console._stderr, (stderr) => (context.message = stderr.toString()));
-		const app = new Application(new Container());
+		const app = new Application();
 
 		context.logger = await app.resolve<Contracts.Kernel.Logger>(MemoryLogger).make();
 	});

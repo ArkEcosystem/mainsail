@@ -1,31 +1,33 @@
 import { Identifiers } from "@mainsail/constants";
 import { schemas as blockSchemas } from "@mainsail/crypto-block";
 import { Configuration } from "@mainsail/crypto-config";
-import { schemas as consensusSchemas } from "@mainsail/crypto-consensus-bls12-381";
+import { schemas as keyPairBlsSchemas } from "@mainsail/crypto-key-pair-bls12-381";
+import { schemas as signatureBlsSchemas } from "@mainsail/crypto-signature-bls12-381";
 import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
-import { describe, Sandbox } from "../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { proposalData } from "../test/fixtures/index.js";
 import { makeKeywords as makeMessageKeywords } from "./keywords";
 import { schemas } from "./schemas";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	validator: Validator;
 }>("Schemas", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.validator = context.app.resolve(Validator);
 
 		for (const keyword of Object.values({
-			...makeBaseKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
-			...makeMessageKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeBaseKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeMessageKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
 		})) {
 			context.validator.addKeyword(keyword);
 		}
@@ -33,7 +35,8 @@ describe<{
 		for (const schema of Object.values({
 			...baseSchemas,
 			...blockSchemas,
-			...consensusSchemas,
+			...keyPairBlsSchemas,
+			...signatureBlsSchemas,
 			...schemas,
 		})) {
 			context.validator.addSchema(schema);

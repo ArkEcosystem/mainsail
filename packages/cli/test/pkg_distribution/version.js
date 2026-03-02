@@ -11,13 +11,14 @@ var __decorate =
 				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
 		return (c > 3 && r && Object.defineProperty(target, key, r), r);
 	};
-import { Commands, Identifiers } from "../../distribution/index.js";
+import { Commands } from "../../distribution/index.js";
 import { injectable } from "../../../container/distribution/index.js";
+import { Identifiers } from "@mainsail/constants";
 let Command = class Command extends Commands.Command {
 	signature = "version";
 	description = "Display the current installed version of Core.";
 	async execute() {
-		console.log(this.app.get(Identifiers.Package).version);
+		console.log(this.app.get(Identifiers.Cli.Package).version);
 	}
 };
 Command = __decorate([injectable()], Command);

@@ -19,18 +19,16 @@ import type {
 import { buildSignedTransaction, getAddressByPublicKey } from "./utilities.js";
 
 export const makeEvmCall = async (
-	{ sandbox, wallets }: Context,
+	{ app, wallets }: Context,
 	options: EvmCallOptions = {},
 ): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
 	let { value, sender, recipient, gasPrice, gasLimit, payload } = options;
 	sender = sender ?? wallets[0];
 
 	gasPrice = gasPrice ?? 5 * 1e9;
 
 	if (!payload) {
-		const senderRecipient = await getAddressByPublicKey({ sandbox }, sender.publicKey);
+		const senderRecipient = await getAddressByPublicKey({ app }, sender.publicKey);
 		payload = encodeErc20Transfer(senderRecipient, parseEther("1"));
 	}
 
@@ -49,15 +47,13 @@ export const makeEvmCall = async (
 		.gasLimit(gasLimit ?? 100_000)
 		.payload(payload);
 
-	return buildSignedTransaction(sandbox, builder, sender, options);
+	return buildSignedTransaction(app, builder, sender, options);
 };
 
 export const makeEvmCallDeployErc20Contract = async (
-	{ sandbox, wallets }: Context,
+	{ app, wallets }: Context,
 	options: EvmCallOptions = {},
 ): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
 	let { sender, gasPrice, gasLimit, payload } = options;
 	sender = sender ?? wallets[0];
 
@@ -73,15 +69,13 @@ export const makeEvmCallDeployErc20Contract = async (
 		.gasLimit(gasLimit ?? 2_000_000)
 		.payload(payload);
 
-	return buildSignedTransaction(sandbox, builder, sender, options);
+	return buildSignedTransaction(app, builder, sender, options);
 };
 
 export const makeValidatorRegistration = async (
-	{ sandbox, wallets }: Context,
+	{ app, wallets }: Context,
 	options: ValidatorRegistrationOptions = {},
 ): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
 	let { value, sender, recipient, gasPrice, gasLimit, payload } = options;
 	sender = sender ?? wallets[0];
 
@@ -112,15 +106,13 @@ export const makeValidatorRegistration = async (
 		.gasLimit(gasLimit ?? 300_000)
 		.payload(payload);
 
-	return buildSignedTransaction(sandbox, builder, sender, options);
+	return buildSignedTransaction(app, builder, sender, options);
 };
 
 export const makeValidatorResignation = async (
-	{ sandbox, wallets }: Context,
+	{ app, wallets }: Context,
 	options: ValidatorResignationOptions = {},
 ): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
 	let { sender, recipient, gasPrice, gasLimit, payload } = options;
 	sender = sender ?? wallets[0];
 
@@ -145,15 +137,13 @@ export const makeValidatorResignation = async (
 		.gasLimit(gasLimit ?? 300_000)
 		.payload(payload);
 
-	return buildSignedTransaction(sandbox, builder, sender, options);
+	return buildSignedTransaction(app, builder, sender, options);
 };
 
 export const makeValidatorVote = async (
-	{ sandbox, wallets }: Context,
+	{ app, wallets }: Context,
 	options: VoteOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
 	let { sender, recipient, gasPrice, gasLimit, payload } = options;
 	sender = sender ?? wallets[0];
 
@@ -178,15 +168,13 @@ export const makeValidatorVote = async (
 		.gasLimit(gasLimit ?? 300_000)
 		.payload(payload);
 
-	return buildSignedTransaction(sandbox, builder, sender, options);
+	return buildSignedTransaction(app, builder, sender, options);
 };
 
 export const makeValidatorUnvote = async (
-	{ sandbox, wallets }: Context,
+	{ app, wallets }: Context,
 	options: UnvoteOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
 	let { sender, recipient, gasPrice, gasLimit, payload } = options;
 	sender = sender ?? wallets[0];
 
@@ -211,15 +199,13 @@ export const makeValidatorUnvote = async (
 		.gasLimit(gasLimit ?? 300_000)
 		.payload(payload);
 
-	return buildSignedTransaction(sandbox, builder, sender, options);
+	return buildSignedTransaction(app, builder, sender, options);
 };
 
 export const makeUsernameRegistration = async (
-	{ sandbox, wallets }: Context,
+	{ app, wallets }: Context,
 	options: UsernameRegistrationOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
 	let { sender, recipient, gasPrice, gasLimit, payload } = options;
 	sender = sender ?? wallets[0];
 
@@ -244,15 +230,13 @@ export const makeUsernameRegistration = async (
 		.gasLimit(gasLimit ?? 300_000)
 		.payload(payload);
 
-	return buildSignedTransaction(sandbox, builder, sender, options);
+	return buildSignedTransaction(app, builder, sender, options);
 };
 
 export const makeUsernameResignation = async (
-	{ sandbox, wallets }: Context,
+	{ app, wallets }: Context,
 	options: UsernameResignationOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
 	let { sender, recipient, gasPrice, gasLimit, payload } = options;
 	sender = sender ?? wallets[0];
 
@@ -277,7 +261,7 @@ export const makeUsernameResignation = async (
 		.gasLimit(gasLimit ?? 300_000)
 		.payload(payload);
 
-	return buildSignedTransaction(sandbox, builder, sender, options);
+	return buildSignedTransaction(app, builder, sender, options);
 };
 
 export const encodeErc20Transfer = (recipient: string, amount: number | string | bigint): string =>
@@ -367,10 +351,10 @@ export const getErc20BalanceOf = async (
 };
 
 export const callViewFunction = async (
-	{ sandbox }: Context,
+	{ app }: Context,
 	viewContext: Omit<Contracts.Evm.TransactionViewContext, "specId">,
 ): Promise<Contracts.Evm.ViewResult> => {
-	const instance = sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+	const instance = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 	return instance.view({ ...viewContext, specId: Enums.Evm.SpecId.LATEST });
 };
 

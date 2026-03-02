@@ -7,6 +7,7 @@ import { Listeners } from "./listeners.js";
 import { Logger } from "./logger.js";
 import { TokenParserService } from "./parsers/tokens.js";
 import { Sync } from "./service.js";
+import { TokenWhitelist } from "./tokens/whitelist.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -18,6 +19,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.ApiSync.Listener).to(Listeners).inSingletonScope();
 		this.app.bind(Identifiers.ApiSync.Logger).to(Logger).inSingletonScope();
 		this.app.bind(Identifiers.ApiSync.TokenParser).to(TokenParserService).inSingletonScope();
+		this.app.bind(Identifiers.ApiSync.TokenWhitelist).to(TokenWhitelist).inSingletonScope();
 		this.app.bind(Identifiers.ApiSync.Service).to(Sync).inSingletonScope();
 
 		// Listen to events during register, so we can catch all boot events.
@@ -29,7 +31,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			return;
 		}
 
+		await this.app.get<Sync>(Identifiers.ApiSync.Service).flush();
+
 		await this.app.get<Listeners>(Identifiers.ApiSync.Listener).dispose();
+		await this.app.get<TokenWhitelist>(Identifiers.ApiSync.TokenWhitelist).dispose();
 	}
 
 	public configSchema(): Joi.ObjectSchema {

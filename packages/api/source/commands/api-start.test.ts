@@ -1,7 +1,7 @@
-import { Identifiers, Services } from "@mainsail/cli";
+import { Services, Console } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { dirSync, setGracefulCleanup } from "tmp";
-
-import { Console, describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { Command } from "./api-start";
 
 describe<{
@@ -12,7 +12,7 @@ describe<{
 		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
 		context.cli = new Console();
-		context.processManager = context.cli.app.get(Identifiers.ProcessManager);
+		context.processManager = context.cli.app.get(Identifiers.Cli.Service.ProcessManager);
 	});
 
 	afterAll(() => setGracefulCleanup());

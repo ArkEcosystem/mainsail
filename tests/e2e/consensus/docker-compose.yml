@@ -46,7 +46,6 @@ services:
 
     node0: &nodeDefinition
         build: ./nodes
-        image: mainsail
         volumes:
             - ./../../../:/mainsail
         depends_on:
@@ -123,3 +122,4 @@ services:
             MAINSAIL_API_EVM_DISABLED: "0"
             MAINSAIL_API_EVM_HOST: 0.0.0.0
             MAINSAIL_API_EVM_PORT: 4008
+            MAINSAIL_API_SYNC_LOG_EXTRA: "true"

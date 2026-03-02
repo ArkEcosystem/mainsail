@@ -15,6 +15,7 @@
 		"signature": "6583d9537fc78a339b3b518c5337c51254f301b8c2cbb29db2a881d20923426770ab552bfb4b06f865b29280e295c933862912c45591698565efe8ec386f9da301",
 		"receipt": {
 			"gasRefunded": 0,
+			"cumulativeGasUsed": 116802,
 			"gasUsed": 116802,
 			"status": 1
 		}

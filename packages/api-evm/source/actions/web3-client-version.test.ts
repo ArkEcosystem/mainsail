@@ -1,23 +1,22 @@
 import { Identifiers } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation";
-
-import { describe, Sandbox } from "../../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { Web3ClientVersionAction } from "./index.js";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	action: Web3ClientVersionAction;
 	validator: Validator;
 }>("Web3ClientVersionAction", ({ beforeEach, it, assert }) => {
 	const version = "0.0.1";
 
 	beforeEach(async (context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application();
+		context.app.bind(Identifiers.Application.Version).toConstantValue(version);
 
-		context.sandbox.app.bind(Identifiers.Application.Version).toConstantValue(version);
-
-		context.action = context.sandbox.app.resolve(Web3ClientVersionAction);
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.action = context.app.resolve(Web3ClientVersionAction);
+		context.validator = context.app.resolve(Validator);
 	});
 
 	it("should have a name", ({ action }) => {

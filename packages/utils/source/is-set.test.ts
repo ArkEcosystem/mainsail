@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { isSet } from "./is-set";
 
 describe("isSet", async ({ assert, it, nock, loader }) => {

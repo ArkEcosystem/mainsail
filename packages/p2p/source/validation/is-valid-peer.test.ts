@@ -1,6 +1,6 @@
 import os from "os";
 
-import { describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { isLocalHost, isValidPeerIp } from "./is-valid-peer";
 
 describe("isValidPeer", ({ it, assert }) => {

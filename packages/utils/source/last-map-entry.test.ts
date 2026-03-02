@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { lastMapEntry } from "./last-map-entry";
 
 describe("lastMapEntry", async ({ assert, it, nock, loader }) => {

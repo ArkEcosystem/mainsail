@@ -1,8 +1,9 @@
 import { Events, Identifiers } from "@mainsail/constants";
 import moment from "moment-timezone";
 
-import { describe, Sandbox } from "../../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { CronJob } from "./cron-job";
+import { Application } from "../../application";
 
 const days: Record<string, string> = {
 	friday: "2019-08-23 00:00:00",
@@ -14,11 +15,11 @@ const days: Record<string, string> = {
 	wednesday: "2019-08-21 00:00:00",
 };
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	job: CronJob;
 	timeFaker: any;
 	mockEventDispatcher: any;
-}>("CronJob", ({ assert, beforeEach, clock, it, spy, spyFn, match }) => {
+}>("CronJob", ({ beforeEach, clock, it, spy, spyFn, match }) => {
 	const expectExecutionAfterDelay = (context: any, callback: CronJob, minutes: number): void => {
 		const dispatchSpy = spy(context.mockEventDispatcher, "dispatch");
 
@@ -85,13 +86,11 @@ describe<{
 			dispatch: () => {},
 		};
 
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
-		context.sandbox.app
-			.bind(Identifiers.Services.EventDispatcher.Service)
-			.toConstantValue(context.mockEventDispatcher);
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.mockEventDispatcher);
 
-		context.job = context.sandbox.app.resolve<CronJob>(CronJob);
+		context.job = context.app.resolve<CronJob>(CronJob);
 	});
 
 	it("should execute on cron", (context) => {

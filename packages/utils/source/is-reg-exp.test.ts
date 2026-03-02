@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { isRegExp } from "./is-reg-exp";
 
 describe("isRegExp", async ({ assert, it, nock, loader }) => {

@@ -19,7 +19,7 @@
 			"path": "../evm-contracts"
 		},
 		{
-			"path": "../test-framework"
+			"path": "../test-runner"
 		},
 		{
 			"path": "../utils"

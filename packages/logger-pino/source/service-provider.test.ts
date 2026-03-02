@@ -1,10 +1,9 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { Application, Providers, Services } from "@mainsail/kernel";
 import { AnySchema } from "joi";
 import { dirSync } from "tmp";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from "./service-provider";
 
 const importFresh = (moduleName) => import(`${moduleName}?${Date.now()}`);
@@ -13,7 +12,7 @@ const loadDefaults = async () => (await importFresh("./defaults")).defaults;
 
 describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Config.Flags).toConstantValue("core");
 		context.app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
 		context.app.bind(Identifiers.Application.Thread).toConstantValue("main");

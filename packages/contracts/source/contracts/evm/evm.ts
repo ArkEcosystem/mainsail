@@ -191,6 +191,7 @@ export interface CommitKey {
 }
 
 export interface TransactionReceipt {
+	readonly cumulativeGasUsed: bigint;
 	readonly gasUsed: bigint;
 	readonly gasRefunded: bigint;
 	readonly status: number;

@@ -13,6 +13,7 @@ import { TransactionResource } from "../resources/index.js";
 import { TokenHolderResource } from "../resources/token-holder.js";
 import { WalletResource } from "../resources/wallet.js";
 import { Controller } from "./controller.js";
+import { TokensController } from "./tokens.js";
 
 type TokenHolderRaw = {
 	token: string;
@@ -125,42 +126,54 @@ export class WalletsController extends Controller {
 	}
 
 	public async tokens(request: Hapi.Request): Promise<object> {
+		if (!request.query.addresses) {
+			return this.getEmptyPage();
+		}
+
 		const walletAddresses = Array.isArray(request.query.addresses)
 			? request.query.addresses
 			: [request.query.addresses];
 
+		const minBalance =
+			request.query.minBalance ?? this.apiConfiguration.getRequired("tokens.defaultMinimumBalance");
 		const pagination = this.getListingPage(request);
 
 		const tokenPaginatedQuery = this.tokenRepositoryFactory()
-			.createQueryBuilder("t")
+			.createQueryBuilder("tok")
 			.where(
 				`EXISTS (
 					SELECT 1
 					FROM token_holders th
-					WHERE th.token_address = t.address
+					WHERE th.token_address = tok.address
 						AND th.address IN (:...addresses)
-						AND th.balance > 0
+						AND th.balance / POW(10, tok.decimals) >= :minBalance
 					LIMIT 1
 	    	)`,
-				{ addresses: walletAddresses },
+				{ addresses: walletAddresses, minBalance },
 			);
 
+		TokensController.andWhereWhitelisted(tokenPaginatedQuery, request);
+		TokensController.andWhereNameSearch(tokenPaginatedQuery, request.query.name);
+
 		const [pageTokensRows, totalCountRow] = await Promise.all([
-			tokenPaginatedQuery
-				.clone()
-				.select([
-					"t.address AS token",
-					"t.symbol AS symbol",
-					"t.name AS name",
-					"t.decimals AS decimals",
-					"t.total_supply AS supply",
-				])
-				.offset(pagination.offset)
-				.limit(pagination.limit)
-				.orderBy("t.address", "ASC")
+			TokensController.optionallyOrderedByName(
+				tokenPaginatedQuery
+					.clone()
+					.select([
+						"tok.address AS token",
+						"tok.symbol AS symbol",
+						"tok.name AS name",
+						"tok.decimals AS decimals",
+						"tok.total_supply AS supply",
+					])
+					.offset(pagination.offset)
+					.limit(pagination.limit),
+				request.query.name,
+			)
+				.addOrderBy("tok.address", "ASC")
 				.getRawMany<TokenMetadata>(),
 
-			tokenPaginatedQuery.clone().select("COUNT(DISTINCT t.address)", "cnt").getRawOne<{ cnt: string }>(),
+			tokenPaginatedQuery.clone().select("COUNT(DISTINCT tok.address)", "cnt").getRawOne<{ cnt: string }>(),
 		]);
 
 		const tokenMetadata = pageTokensRows.reduce<Record<string, TokenMetadata>>(
@@ -179,11 +192,12 @@ export class WalletsController extends Controller {
 		const tokenHoldersQuery = this.tokenHolderRepositoryFactory()
 			.createQueryBuilder("th")
 			.select(["th.token_address AS token", "th.address AS address", "th.balance AS balance"])
+			.innerJoin(Models.Token, "tok", "tok.address = th.token_address")
 			.where("th.address IN (:...addresses)", { addresses: walletAddresses })
-			.andWhere("th.balance > 0")
 			.andWhere("th.token_address IN (:...tokenAddresses)", {
 				tokenAddresses: Object.keys(tokenMetadata),
 			})
+			.andWhere("th.balance / POW(10, tok.decimals) >= :minBalance", { minBalance })
 			.orderBy("th.token_address", "ASC")
 			.addOrderBy("th.balance", "DESC")
 			.addOrderBy("th.address", "ASC");
@@ -238,13 +252,8 @@ export class WalletsController extends Controller {
 
 	public async tokensShow(request: Hapi.Request): Promise<object> {
 		const walletId = request.params.id as string;
-
 		const wallet = await this.getWallet(walletId);
-		if (!wallet) {
-			return Boom.notFound("Wallet not found");
-		}
-
-		return this.getTokens(request, wallet);
+		return this.getTokens(request, wallet?.address ?? walletId);
 	}
 
 	private async getTransactions(request: Hapi.Request, criteria: Search.Criteria.TransactionCriteria) {
@@ -264,26 +273,59 @@ export class WalletsController extends Controller {
 		);
 
 		return this.toPagination(
-			await this.enrichTransactionResult(transactions, { fullReceipt: request.query.fullReceipt }),
+			await this.enrichTransactionResult(transactions, {
+				fullReceipt: request.query.fullReceipt,
+				includeTokens: request.query.includeTokens,
+			}),
 			TransactionResource,
 		);
 	}
 
-	private async getTokens(request: Hapi.Request, wallet: Models.Wallet) {
+	private async getTokens(request: Hapi.Request, walletAddress: string) {
 		const pagination = this.getListingPage(request);
+		const minBalance =
+			request.query.minBalance ?? this.apiConfiguration.getRequired("tokens.defaultMinimumBalance");
 
-		const [tokens, totalCount] = await this.tokenHolderRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.where("address = :address", { address: wallet.address })
-			.offset(pagination.offset)
-			.limit(pagination.limit)
-			.getManyAndCount();
+		const tokenHoldersQuery = this.tokenHolderRepositoryFactory()
+			.createQueryBuilder("th")
+			.innerJoin(Models.Token, "tok", "tok.address = th.token_address")
+			.where("th.address = :address", { address: walletAddress })
+			.andWhere("th.balance / POW(10, tok.decimals) >= :minBalance", { minBalance });
+
+		TokensController.andWhereWhitelisted(tokenHoldersQuery, request);
+		TokensController.andWhereNameSearch(tokenHoldersQuery, request.query.name);
+
+		const [pageTokenHolderRows, totalCountRow] = await Promise.all([
+			TokensController.optionallyOrderedByName(
+				tokenHoldersQuery
+					.clone()
+					.select([
+						`th.token_address AS "tokenAddress"`,
+						"th.address AS address",
+						"th.balance AS balance",
+						"tok.name AS name",
+						"tok.symbol AS symbol",
+						"tok.decimals AS decimals",
+						"tok.total_supply AS supply",
+					])
+					.offset(pagination.offset)
+					.limit(pagination.limit),
+				request.query.name,
+			)
+				.addOrderBy("th.token_address", "ASC")
+				.addOrderBy("th.balance", "DESC")
+				.addOrderBy("th.address", "ASC")
+				.getRawMany(),
+
+			tokenHoldersQuery.clone().select("COUNT(DISTINCT th.address)", "cnt").getRawOne<{ cnt: string }>(),
+		]);
+
+		const totalCount = Number(totalCountRow?.cnt ?? 0);
 
 		return this.toPagination(
 			{
 				meta: { totalCountIsEstimate: false },
-				results: tokens,
+				results: pageTokenHolderRows,
 				totalCount,
 			},
 			TokenHolderResource,

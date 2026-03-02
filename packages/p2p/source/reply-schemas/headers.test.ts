@@ -1,20 +1,21 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { describe, Sandbox } from "../../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { headers as data } from "../../test/fixtures/responses/headers";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
 import { headers } from "./headers";
 
 type Context = {
-	sandbox: Sandbox;
+	app: Application;
 	validator: Validator;
 };
 
 describe<Context>("Headers Schema", ({ it, assert, beforeEach, each }) => {
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.validator = context.app.resolve(Validator);
 
 		prepareValidatorContext(context);
 	});

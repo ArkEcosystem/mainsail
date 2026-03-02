@@ -1,7 +1,8 @@
 import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 
-import { describe, Sandbox } from "../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { Scheduler } from "./scheduler";
 
 let currentTimestamp: number;
@@ -11,7 +12,7 @@ const { Scheduler: SchedulerProxy } = await esmock("./scheduler", {
 });
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	scheduler: Scheduler;
 }>("Scheduler", ({ beforeEach, it, assert, spy, clock, stub }) => {
 	currentTimestamp = 0;
@@ -41,13 +42,13 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
-		context.sandbox.app.bind(Identifiers.Consensus.Service).toConstantValue(consensus);
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
-		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue(store);
+		context.app.bind(Identifiers.Consensus.Service).toConstantValue(consensus);
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
+		context.app.bind(Identifiers.State.Store).toConstantValue(store);
 
-		context.scheduler = context.sandbox.app.resolve(SchedulerProxy);
+		context.scheduler = context.app.resolve(SchedulerProxy);
 	});
 
 	it("should be instantiated", async ({ scheduler }) => {
@@ -56,9 +57,7 @@ describe<{
 
 	it("#getNextBlockTimestamp - should return previous block timestamp + blockTime", async ({ scheduler }) => {
 		const spyOnGetLatBlock = stub(store, "getLastBlock").returnValue({
-			data: {
-				timestamp: 0,
-			},
+			timestamp: 0,
 		});
 
 		assert.equal(scheduler.getNextBlockTimestamp(0), 8000);
@@ -67,9 +66,7 @@ describe<{
 
 	it("#getNextBlockTimestamp - should return previous block commitTime + blockPrepareTime", async ({ scheduler }) => {
 		const spyOnGetLatBlock = stub(store, "getLastBlock").returnValue({
-			data: {
-				timestamp: 0,
-			},
+			timestamp: 0,
 		});
 
 		assert.equal(scheduler.getNextBlockTimestamp(6000), 10_000);

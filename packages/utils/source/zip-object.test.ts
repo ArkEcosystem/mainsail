@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { zipObject } from "./zip-object";
 
 describe("zipObject", async ({ assert, it, nock, loader }) => {

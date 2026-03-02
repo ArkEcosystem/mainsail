@@ -1,10 +1,9 @@
 import Joi from "joi";
-import { PluginDependency } from "../../../source/contracts/kernel";
+
+import type { PluginDependency } from "../../../source/contracts/kernel";
 import { ServiceProvider } from "../../../source/providers";
 
 export class StubServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}
@@ -15,8 +14,6 @@ export class StubServiceProvider extends ServiceProvider {
 }
 
 export class RequiredServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}
@@ -27,8 +24,6 @@ export class RequiredServiceProvider extends ServiceProvider {
 }
 
 export class InvalidConfigurationServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}
@@ -41,8 +36,6 @@ export class InvalidConfigurationServiceProvider extends ServiceProvider {
 }
 
 export class RequiredInvalidConfigurationServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}
@@ -59,8 +52,6 @@ export class RequiredInvalidConfigurationServiceProvider extends ServiceProvider
 }
 
 export class ValidConfigurationServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}
@@ -77,8 +68,6 @@ export class ValidConfigurationServiceProvider extends ServiceProvider {
 }
 
 export class RequiredDependencyCanBeFoundServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}
@@ -89,8 +78,6 @@ export class RequiredDependencyCanBeFoundServiceProvider extends ServiceProvider
 }
 
 export class RequiredDependencyCannotBeFoundServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}
@@ -101,8 +88,6 @@ export class RequiredDependencyCannotBeFoundServiceProvider extends ServiceProvi
 }
 
 export class RequiredDependencyCannotBeFoundAsyncServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}
@@ -113,8 +98,6 @@ export class RequiredDependencyCannotBeFoundAsyncServiceProvider extends Service
 }
 
 export class OptionalDependencyCannotBeFoundServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}
@@ -125,32 +108,26 @@ export class OptionalDependencyCannotBeFoundServiceProvider extends ServiceProvi
 }
 
 export class RequiredDependencyVersionCanBeSatisfiedServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}
 
 	public dependencies(): PluginDependency[] {
-		return [{ name: "dep", version: "<=2.0.0", required: true }];
+		return [{ name: "dep", required: true, version: "<=2.0.0" }];
 	}
 }
 
 export class RequiredDependencyVersionCannotBeSatisfiedServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}
 
 	public dependencies(): PluginDependency[] {
-		return [{ name: "dep", version: ">=2.0.0", required: true }];
+		return [{ name: "dep", required: true, version: ">=2.0.0" }];
 	}
 }
 
 export class OptionalDependencyVersionCannotBeSatisfiedServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}
@@ -161,8 +138,6 @@ export class OptionalDependencyVersionCannotBeSatisfiedServiceProvider extends S
 }
 
 export class FaultyBootServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public async boot(): Promise<void> {
 		throw new Error("Boot Error");
 	}
@@ -177,8 +152,6 @@ export class FaultyBootServiceProvider extends ServiceProvider {
 }
 
 export class RequiredFaultyBootServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public async boot(): Promise<void> {
 		throw new Error("Boot Error");
 	}
@@ -193,8 +166,6 @@ export class RequiredFaultyBootServiceProvider extends ServiceProvider {
 }
 
 export class DeferredServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}
@@ -213,8 +184,6 @@ export class DeferredServiceProvider extends ServiceProvider {
 }
 
 export class DeferredBootServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}
@@ -229,8 +198,6 @@ export class DeferredBootServiceProvider extends ServiceProvider {
 }
 
 export class DeferredDisposeServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-
 	public name(): string {
 		return "stub";
 	}

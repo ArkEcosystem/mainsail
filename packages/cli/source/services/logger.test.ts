@@ -1,7 +1,8 @@
-import { Console, describe } from "../../../test-framework/source";
-import { Identifiers } from "../ioc/index.js";
+import { describe } from "@mainsail/test-runner";
+import { Identifiers } from "@mainsail/constants";
 import { Output } from "../output";
 import { Logger } from "./logger";
+import { Console } from "../test/index.js";
 
 describe<{
 	logger: Logger;
@@ -70,7 +71,7 @@ describe<{
 	});
 
 	it("should not log a message if the output is quiet", ({ cli, logger }) => {
-		cli.app.get<Output>(Identifiers.Output).setVerbosity(0);
+		cli.app.get<Output>(Identifiers.Cli.Output.Instance).setVerbosity(0);
 
 		const spyConsole = spy(console, "log");
 

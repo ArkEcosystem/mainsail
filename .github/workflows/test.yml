@@ -158,26 +158,18 @@ jobs:
               run: cd packages/crypto-commit && pnpm run test:coverage
             - name: Test crypto-config
               run: cd packages/crypto-config && pnpm run test:coverage
-            - name: Test crypto-consensus-bls12-381
-              run: cd packages/crypto-consensus-bls12-381 && pnpm run test:coverage
             - name: Test crypto-hash-bcrypto
               run: cd packages/crypto-hash-bcrypto && pnpm run test:coverage
             - name: Test crypto-key-pair-bls12-381
               run: cd packages/crypto-key-pair-bls12-381 && pnpm run test:coverage
             - name: Test crypto-key-pair-ecdsa
               run: cd packages/crypto-key-pair-ecdsa && pnpm run test:coverage
-            - name: Test crypto-key-pair-ed25519
-              run: cd packages/crypto-key-pair-ed25519 && pnpm run test:coverage
-            - name: Test crypto-key-pair-schnorr
-              run: cd packages/crypto-key-pair-schnorr && pnpm run test:coverage
             - name: Test crypto-messages
               run: cd packages/crypto-messages && pnpm run test:coverage
             - name: Test crypto-signature-bls12-381
               run: cd packages/crypto-signature-bls12-381 && pnpm run test:coverage
             - name: Test crypto-signature-ecdsa
               run: cd packages/crypto-signature-ecdsa && pnpm run test:coverage
-            - name: Test crypto-signature-schnorr
-              run: cd packages/crypto-signature-schnorr && pnpm run test:coverage
             - name: Test crypto-transaction
               run: cd packages/crypto-transaction && pnpm run test:coverage
             - name: Test crypto-validation
@@ -222,8 +214,6 @@ jobs:
               run: cd packages/snapshot-legacy-importer && pnpm run test:coverage
             - name: Test state
               run: cd packages/state && pnpm run test:coverage
-            - name: Test test-framework
-              run: cd packages/test-framework && pnpm run test:coverage
             - name: Test test-runner
               run: cd packages/test-runner && pnpm run test:coverage
             - name: Test test-transaction-builders
@@ -623,7 +613,7 @@ jobs:
         strategy:
             matrix:
                 node-version: [22.x]
-                name: ["transaction-pool-api", "consensus"]
+                name: ["transaction-pool-api", "consensus", "resync"]
 
         services:
             postgres:

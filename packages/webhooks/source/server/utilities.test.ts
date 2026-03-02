@@ -1,7 +1,7 @@
 import { notFound } from "@hapi/boom";
 import { Events } from "@mainsail/constants";
 
-import { describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { Webhook } from "../interfaces";
 import { respondWithResource } from "./utilities";
 

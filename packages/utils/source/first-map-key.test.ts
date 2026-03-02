@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { firstMapKey } from "./first-map-key";
 
 describe("#firstMapKey", ({ it, assert }) => {

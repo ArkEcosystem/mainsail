@@ -3,16 +3,12 @@ import { Configuration } from "@mainsail/crypto-config";
 import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
-import { describe, Sandbox } from "../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from "./service-provider";
 
-type Context = {
-	validator: Validator;
-	sandbox: Sandbox;
-};
-
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	validator: Partial<Validator>;
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ it, beforeEach, assert, spy }) => {
@@ -22,12 +18,12 @@ describe<{
 			addSchema: () => {},
 		};
 
-		context.sandbox = new Sandbox();
-		context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue(context.validator);
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.app = new Application();
+		context.app.bind(Identifiers.Cryptography.Validator).toConstantValue(context.validator);
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
-		context.serviceProvider = context.sandbox.app.resolve(ServiceProvider);
+		context.serviceProvider = context.app.resolve(ServiceProvider);
 	});
 
 	it("should register", async ({ validator, serviceProvider }) => {

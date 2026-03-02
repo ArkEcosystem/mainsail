@@ -1,6 +1,6 @@
 import { Enums } from "@mainsail/constants";
 
-import { describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { MilestonesGenerator } from "./milestones";
 
 describe<{

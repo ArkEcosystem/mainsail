@@ -11,7 +11,7 @@ export function parseUsernames(
 	transaction: Contracts.Crypto.Transaction,
 	receipt: Contracts.Evm.TransactionReceipt,
 ): { address: string; username: string | undefined }[] {
-	if (transaction.data.to !== usernamesContractAddress) {
+	if (transaction.to !== usernamesContractAddress) {
 		return [];
 	}
 

@@ -1,17 +1,17 @@
 import { readFileSync } from "node:fs";
 
 import { Enums, Identifiers } from "@mainsail/constants";
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CryptoCommit } from "@mainsail/crypto-commit";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
-import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
+import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CryptoMessages } from "@mainsail/crypto-messages";
+import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-signature-bls12-381";
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
@@ -45,7 +45,7 @@ export const makeApplication = async (
 ): Promise<Application> => {
 	options = { address: "keccak256", name: "mainsail", ...options };
 
-	const app = new Application(new Container());
+	const app = new Application();
 	app.bind(Identifiers.Application.Name).toConstantValue(options.name);
 	app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({
 		dispatch: () => {},
@@ -79,7 +79,8 @@ export const makeApplication = async (
 	await app.resolve(CoreCryptoAddressKeccak256).register();
 	await app.resolve(CryptoMessages).register();
 	await app.resolve(CryptoCommit).register();
-	await app.resolve(CoreCryptoConsensus).register();
+	await app.resolve(CoreCryptoSignatureBls).register();
+	await app.resolve(CoreCryptoKeyPairBls).register();
 	await app.resolve(CoreCryptoWif).register();
 	await app.resolve(CoreCryptoBlock).register();
 	await app.resolve(CoreEvmConsensus).register();
@@ -123,8 +124,6 @@ export const makeApplication = async (
 	app.bind(InternalIdentifiers.Generator.Network).to(NetworkGenerator);
 	app.bind(InternalIdentifiers.Generator.Wallet).to(WalletGenerator);
 	app.bind(InternalIdentifiers.Generator.Peers).to(PeersGenerator);
-
-	app.unbind(Identifiers.Cryptography.Legacy.Identity.AddressFactory);
 
 	return app;
 };

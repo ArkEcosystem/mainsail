@@ -1,9 +1,8 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
-import { describeSkip } from "../../../test-framework/source";
+import { describeSkip } from "@mainsail/test-runner";
 import { Application } from "../application";
 import { ConfigRepository } from "../services/config";
 import { PluginManifest } from "./plugin-manifest";
@@ -13,7 +12,7 @@ describeSkip<{
 	pluginManifest: PluginManifest;
 }>("PluginManifest", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Config.Repository).to(ConfigRepository).inSingletonScope();
 		context.app
 			.bind(Identifiers.Services.Filesystem.Service)

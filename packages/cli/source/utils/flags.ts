@@ -1,7 +1,7 @@
-import type { AnyObject } from "../contracts.js";
+import type { Contracts } from "@mainsail/contracts";
 
 export const Flags = {
-	castFlagsToString(flags: AnyObject, ignoreKeys: string[] = []): string {
+	castFlagsToString(flags: Contracts.Cli.AnyObject, ignoreKeys: string[] = []): string {
 		const stringFlags: string[] = [];
 
 		for (const [key, value] of Object.entries(flags)) {

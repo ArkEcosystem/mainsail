@@ -28,15 +28,16 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	async process(
 		unit: Contracts.Processor.ProcessableUnit,
 		transaction: Contracts.Crypto.Transaction,
+		index: number,
 	): Promise<Contracts.Evm.TransactionReceipt> {
 		const block = unit.getBlock();
 
-		const milestone = this.configuration.getMilestone(block.header.number);
+		const milestone = this.configuration.getMilestone(block.number);
 
 		const commitKey: Contracts.Evm.CommitKey = {
-			blockHash: block.header.hash,
-			blockNumber: BigInt(block.header.number),
-			round: BigInt(block.header.round),
+			blockHash: block.hash,
+			blockNumber: BigInt(block.number),
+			round: BigInt(block.round),
 		};
 
 		const transactionHandlerContext: Contracts.Transactions.TransactionHandlerContext = {
@@ -44,8 +45,8 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 				blockContext: {
 					commitKey,
 					gasLimit: BigInt(milestone.block.maxGasLimit),
-					timestamp: BigInt(block.header.timestamp),
-					validatorAddress: block.header.proposer,
+					timestamp: BigInt(block.timestamp),
+					validatorAddress: block.proposer,
 				},
 				instance: this.evm,
 			},
@@ -55,11 +56,11 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			throw new InvalidSignatureError();
 		}
 
-		const receipt = await this.transactionHandler.apply(transactionHandlerContext, transaction);
+		const receipt = await this.transactionHandler.apply(transactionHandlerContext, transaction, index);
 
-		const feeConsumed = this.feeCalculator.calculateConsumed(transaction.data.gasPrice, Number(receipt.gasUsed));
+		const feeConsumed = this.feeCalculator.calculateConsumed(transaction.gasPrice, Number(receipt.gasUsed));
 		this.logger.debug(
-			`executed EVM call (status=${receipt.status}, from=${transaction.data.from} to=${transaction.data.to} gasUsed=${receipt.gasUsed} paidNativeFee=${formatCurrency(this.configuration, feeConsumed)} deployed=${receipt.contractAddress ?? ""})`,
+			`executed EVM call (status=${receipt.status}, from=${transaction.from} to=${transaction.to} gasUsed=${receipt.gasUsed} paidNativeFee=${formatCurrency(this.configuration, feeConsumed)} deployed=${receipt.contractAddress ?? ""})`,
 			"consensus",
 		);
 

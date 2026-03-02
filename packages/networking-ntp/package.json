@@ -30,6 +30,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/test-runner": "workspace:*",
 		"@types/hapi__sntp": "3.1.4",
 		"uvu": "0.5.6"
 	},

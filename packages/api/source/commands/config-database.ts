@@ -1,12 +1,13 @@
-import { Commands, Contracts as CliContracts, Identifiers, Services } from "@mainsail/cli";
+import { Commands } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
-	@inject(Identifiers.Environment)
-	private readonly environment!: Services.Environment;
+	@inject(Identifiers.Cli.Service.Environment)
+	private readonly environment!: Contracts.Cli.Environment;
 
 	public signature = "config:database";
 
@@ -81,12 +82,12 @@ export class Command extends Commands.Command {
 		this.environment.updateVariables(environmentFile, this.#confirm(response));
 	}
 
-	#confirm(flags: Contracts.Types.JsonObject): CliContracts.AnyObject {
-		const variables: CliContracts.AnyObject = {};
+	#confirm(flags: Contracts.Types.JsonObject): Contracts.Cli.AnyObject {
+		const variables: Contracts.Cli.AnyObject = {};
 
 		for (const option of this.#validFlags) {
 			if (flags[option] !== undefined) {
-				variables[`MAINSAIL_DB_${option.toUpperCase()}`] = flags[option] as CliContracts.InputValue;
+				variables[`MAINSAIL_DB_${option.toUpperCase()}`] = flags[option] as Contracts.Cli.InputValue;
 			}
 		}
 

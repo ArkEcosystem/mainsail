@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { min } from "./min";
 
 describe("min", async ({ assert, it, nock, loader }) => {

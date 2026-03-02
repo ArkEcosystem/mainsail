@@ -20,7 +20,7 @@ TARGET_PROJECT_DIR=../../$TARGET_PROJECT_DIR
 
 declare -a arr=(
     "container" "contracts" "crypto-address-base58" "crypto-config"
-    "crypto-hash-bcrypto" "crypto-key-pair-ecdsa" "crypto-signature-schnorr-secp256k1"
+    "crypto-hash-bcrypto" "crypto-key-pair-ecdsa"
     "crypto-transaction" "crypto-transaction-multi-payment" "crypto-transaction-transfer"
     "crypto-transaction-username-registration" "crypto-transaction-username-resignation" "crypto-transaction-validator-registration"
     "crypto-transaction-validator-resignation" "crypto-transaction-vote" "crypto-validation"

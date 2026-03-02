@@ -1,7 +1,7 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { http } from "./http";
 import { sleep } from "./sleep";
 

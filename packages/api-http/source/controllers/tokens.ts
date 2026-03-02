@@ -4,12 +4,14 @@ import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
+	TypeOrm,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
 import { TokenResource } from "../resources/token.js";
 import { TokenHolderResource } from "../resources/token-holder.js";
 import { TokenTransferResource } from "../resources/token-transfer.js";
+import { TokenWhitelistResource } from "../resources/token-whitelist.js";
 import { Controller } from "./controller.js";
 
 type TokenTransferRaw = {
@@ -38,14 +40,22 @@ export class TokensController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TokenTransferRepositoryFactory)
 	private readonly tokenTransferRepositoryFactory!: ApiDatabaseContracts.TokenTransferRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.TokenWhitelistRepositoryFactory)
+	private readonly tokenWhitelistRepositoryFactory!: ApiDatabaseContracts.TokenWhitelistRepositoryFactory;
+
 	public async index(request: Hapi.Request): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 
-		const [tokens, totalCount] = await this.tokenRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.offset(pagination.offset)
-			.limit(pagination.limit)
+		const tokensQuery = this.tokenRepositoryFactory().createQueryBuilder("tok").select();
+
+		TokensController.andWhereWhitelisted(tokensQuery, request);
+		TokensController.andWhereNameSearch(tokensQuery, request.query.name);
+
+		const [tokens, totalCount] = await TokensController.optionallyOrderedByName(
+			tokensQuery.offset(pagination.offset).limit(pagination.limit),
+			request.query.name,
+		)
+			.addOrderBy("tok.address", "ASC")
 			.getManyAndCount();
 
 		return this.toPagination(
@@ -101,6 +111,26 @@ export class TokensController extends Controller {
 		return this.getTokenTransfers(request);
 	}
 
+	public async whitelist(request: Hapi.Request): Promise<object> {
+		const pagination = this.getListingPage(request);
+		const [tokenWhitelist, totalCount] = await this.tokenWhitelistRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.orderBy("address", "ASC")
+			.limit(pagination.limit)
+			.offset(pagination.offset)
+			.getManyAndCount();
+
+		return this.toPagination(
+			{
+				meta: { totalCountIsEstimate: false },
+				results: tokenWhitelist,
+				totalCount,
+			},
+			TokenWhitelistResource,
+		);
+	}
+
 	private async getTokenTransfers(request: Hapi.Request): Promise<object> {
 		const pagination = this.getListingPage(request);
 		const tokenTransfersQuery = this.tokenTransferRepositoryFactory().createQueryBuilder("tf");
@@ -114,14 +144,34 @@ export class TokensController extends Controller {
 			tokenTransfersQuery.where("tf.address = :address", { address: request.params.address });
 		}
 
-		if (request.query.from) {
-			const from = Array.isArray(request.query.from) ? request.query.from : [request.query.from];
-			tokenTransfersQuery.andWhere("tf.from IN (:...from)", { from });
+		if (request.query.transactionHash) {
+			tokenTransfersQuery.andWhere("tf.transaction_hash = :transactionHash", {
+				transactionHash: request.query.transactionHash,
+			});
 		}
 
-		if (request.query.to) {
-			const to = Array.isArray(request.query.to) ? request.query.to : [request.query.to];
-			tokenTransfersQuery.andWhere("tf.to IN (:...to)", { to });
+		if (request.query.addresses) {
+			const addresses = Array.isArray(request.query.addresses)
+				? request.query.addresses
+				: [request.query.addresses];
+
+			tokenTransfersQuery.andWhere(
+				new TypeOrm.Brackets((b) => {
+					b.where("tf.from IN (:...addresses)", { addresses }).orWhere("tf.to IN (:...addresses)", {
+						addresses,
+					});
+				}),
+			);
+		} else {
+			if (request.query.from) {
+				const from = Array.isArray(request.query.from) ? request.query.from : [request.query.from];
+				tokenTransfersQuery.andWhere("tf.from IN (:...from)", { from });
+			}
+
+			if (request.query.to) {
+				const to = Array.isArray(request.query.to) ? request.query.to : [request.query.to];
+				tokenTransfersQuery.andWhere("tf.to IN (:...to)", { to });
+			}
 		}
 
 		const [tokenTranfersRows, totalCountRow] = await Promise.all([
@@ -186,5 +236,84 @@ export class TokensController extends Controller {
 			.select()
 			.where("address = :address", { address })
 			.getOne();
+	}
+
+	public static andWhereWhitelisted(
+		queryBuilder: TypeOrm.SelectQueryBuilder<Models.TokenHolder | Models.Token>,
+		request: Hapi.Request,
+	): void {
+		if (request.query.ignoreWhitelist) {
+			return;
+		}
+
+		// POST allows user to whitelist selected tokens explicitly.
+		if (request.method === "post") {
+			const customWhitelist = (request.payload as unknown as { whitelist: string[] })?.whitelist ?? [];
+			if (customWhitelist.length > 0) {
+				queryBuilder.leftJoin(Models.TokenWhitelist, "tw", "tw.address = tok.address").andWhere(
+					new TypeOrm.Brackets((qb) => {
+						qb.where("tw.address IS NOT NULL").orWhere("tok.address IN (:...customWhitelist)", {
+							customWhitelist,
+						});
+					}),
+				);
+				return;
+			}
+		}
+
+		queryBuilder.innerJoin(Models.TokenWhitelist, "tw", "tw.address = tok.address");
+	}
+
+	public static andWhereNameSearch(
+		queryBuilder: TypeOrm.SelectQueryBuilder<Models.TokenHolder | Models.Token>,
+		nameQuery?: string,
+	): void {
+		const nameSearch = ((nameQuery as string) ?? "").trim();
+		if (!nameSearch) {
+			return;
+		}
+
+		const nameSearchLower = nameSearch.toLowerCase();
+		const isShort = nameSearch.length > 0 && nameSearch.length <= 2;
+
+		queryBuilder.andWhere(
+			new TypeOrm.Brackets((b) => {
+				if (isShort) {
+					// For short queries, use the faster prefix index
+					b.where("lower(tok.symbol) LIKE :prefix", { prefix: `${nameSearchLower}%` }).orWhere(
+						"lower(tok.name) LIKE :prefix",
+						{ prefix: `${nameSearchLower}%` },
+					);
+				} else {
+					// Otherwise trigram index
+					b.where("tok.symbol ILIKE :like", { like: `%${nameSearchLower}%` }).orWhere(
+						"tok.name ILIKE :like",
+						{ like: `%${nameSearchLower}%` },
+					);
+				}
+			}),
+		);
+	}
+
+	public static optionallyOrderedByName(
+		queryBuilder: TypeOrm.SelectQueryBuilder<Models.TokenHolder | Models.Token>,
+		nameQuery?: string,
+	): TypeOrm.SelectQueryBuilder<Models.TokenHolder | Models.Token> {
+		const nameSearch = ((nameQuery as string) ?? "").trim();
+		if (!nameSearch) {
+			return queryBuilder;
+		}
+
+		queryBuilder
+			.addOrderBy(
+				`CASE WHEN lower(tok.symbol) LIKE :orderByPrefix THEN 0
+	   			WHEN lower(tok.name) LIKE :orderByPrefix THEN 1
+	   			ELSE 2
+	 		END`,
+				"ASC",
+			)
+			.setParameter("orderByPrefix", `${nameSearch.toLowerCase()}%`);
+
+		return queryBuilder;
 	}
 }

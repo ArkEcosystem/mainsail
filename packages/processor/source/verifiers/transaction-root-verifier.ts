@@ -20,8 +20,8 @@ export class TransactionsRootVerifier implements Contracts.Processor.Handler {
 			payloadBuffers.push(Buffer.from(transaction.hash, "hex"));
 		}
 
-		const transactionsRoot = await this.hashFactory.sha256(payloadBuffers);
-		if (transactionsRoot.toString("hex") !== block.data.transactionsRoot) {
+		const transactionsRoot = this.hashFactory.sha256(payloadBuffers);
+		if (transactionsRoot.toString("hex") !== block.transactionsRoot) {
 			throw new InvalidTransactionsRoot(block, transactionsRoot.toString("hex"));
 		}
 	}

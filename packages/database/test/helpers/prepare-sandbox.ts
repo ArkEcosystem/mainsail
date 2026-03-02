@@ -1,72 +1,84 @@
-import type { Contracts } from "@mainsail/contracts";
+import { ServiceProvider as Consensus } from "@mainsail/consensus";
 import { Identifiers } from "@mainsail/constants";
-
-import crypto from "../../../core/bin/config/devnet/core/crypto.json";
-import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
+import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
+import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
-import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoCommit } from "@mainsail/crypto-commit";
+import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
+import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
+import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-signature-bls12-381";
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
-import { ServiceProvider as CoreCryptoConsensusBls12381 } from "@mainsail/crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
-import { ServiceProvider as CoreEvents } from "@mainsail/kernel/source/services/events";
-import { ServiceProvider as CoreTriggers } from "@mainsail/kernel/source/services/triggers";
+import { Application } from "@mainsail/kernel";
+import { ServiceProvider as Processor } from "@mainsail/processor";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
-import { Sandbox } from "../../../test-framework/source";
 import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { dirSync } from "tmp";
 
-export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
-	context.sandbox = new Sandbox();
+import crypto from "../../../core/bin/config/devnet/core/crypto.json";
 
-	await context.sandbox.app.resolve(CoreTriggers).register();
-	await context.sandbox.app.resolve(CoreEvents).register();
+export const prepareSandbox = async (context: { app?: Application }): Promise<void> => {
+	context.app = new Application();
 
-	await context.sandbox.app.resolve(CoreSerializer).register();
-	await context.sandbox.app.resolve(CoreValidation).register();
+	await context.app.resolve(CoreSerializer).register();
+	await context.app.resolve(CoreValidation).register();
 
 	try {
-		await context.sandbox.app.resolve(CoreCryptoConfig).register();
+		await context.app.resolve(CoreCryptoConfig).register();
 	} catch {}
 
-	await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();
+	await context.app.resolve(CoreCryptoHashBcrypto).register();
 
-	await context.sandbox.app.resolve(CoreCryptoSignatureEcdsa).register();
-	await context.sandbox.app.resolve(CoreCryptoKeyPairEcdsa).register();
+	await context.app.resolve(CoreCryptoSignatureEcdsa).register();
+	await context.app.resolve(CoreCryptoKeyPairEcdsa).register();
 
-	await context.sandbox.app.resolve(CoreCryptoAddressKeccak256).register();
-	await context.sandbox.app.resolve(CoreCryptoAddressBase58).register();
-	await context.sandbox.app.resolve(CoreCryptoConsensusBls12381).register();
+	await context.app.resolve(CoreCryptoAddressKeccak256).register();
+	await context.app.resolve(CoreCryptoAddressBase58).register();
+	await context.app.resolve(CoreCryptoSignatureBls).register();
+	await context.app.resolve(CoreCryptoKeyPairBls).register();
 
-	await context.sandbox.app.resolve(CoreCryptoValidation).register();
-	await context.sandbox.app.resolve(CoreCryptoWif).register();
+	await context.app.resolve(CoreCryptoValidation).register();
+	await context.app.resolve(CoreCryptoWif).register();
 
-	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({
-		info: (msg) => console.log(msg),
-		debug: (msg) => console.log(msg),
+	context.app.bind(Identifiers.Services.Log.Service).toConstantValue({
+		debug: (message) => console.log(message),
+		info: (message) => console.log(message),
 	});
-	context.sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
+	context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
-	context.sandbox.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
-	context.sandbox.app.useDataPath(dirSync().name);
+	context.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
+	context.app.useDataPath(dirSync().name);
 
-	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
-	await context.sandbox.app.resolve(CoreTransactions).register();
-	await context.sandbox.app.resolve(CoreCryptoBlock).register();
-	await context.sandbox.app.resolve(CoreCryptoCommit).register();
+	await context.app.resolve(CoreCryptoTransaction).register();
+	await context.app.resolve(CoreTransactions).register();
+	await context.app.resolve(CoreCryptoBlock).register();
+	await context.app.resolve(CoreCryptoCommit).register();
+	await context.app.resolve(Processor).register();
+	await context.app.resolve(Consensus).register();
 
-	context.sandbox.app.bind(Identifiers.State.Store).toConstantValue({
+	context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue({
+		getRoundValidators: () => [],
+	});
+	context.app.bind(Identifiers.State.State).toConstantValue({
+		isBootstrap: () => true,
+	});
+	context.app.bind(Identifiers.BlockchainUtils.RoundCalculator).toConstantValue({
+		isNewRound: () => false,
+	});
+	context.app.bind(Identifiers.Database.Service).toConstantValue({
+		onCommit: () => {},
+	});
+
+	context.app.bind(Identifiers.State.Store).toConstantValue({
 		getLastBlock: () => ({
-			data: {
-				number: 1,
-				id: "0000000000000000000000000000000000000000000000000000000000000000",
-			},
+			id: "0000000000000000000000000000000000000000000000000000000000000000",
+			number: 1,
 		}),
 	});
 };

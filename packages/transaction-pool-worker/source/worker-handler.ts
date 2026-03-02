@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 
@@ -16,7 +15,7 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 	#app!: Contracts.Kernel.Application;
 
 	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
-		const app: Contracts.Kernel.Application = new Application(new Container());
+		const app: Contracts.Kernel.Application = new Application();
 
 		await app.bootstrap({
 			flags,

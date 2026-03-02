@@ -94,6 +94,7 @@ pub struct JsTransactionReceipt {
     pub tx_hash: Option<String>,
 
     pub gas_used: BigInt,
+    pub cumulative_gas_used: BigInt,
     pub gas_refunded: BigInt,
     pub status: u8,
     pub contract_address: Option<String>,
@@ -123,6 +124,7 @@ impl JsTransactionReceipt {
     pub fn new(receipt: TxReceipt) -> Self {
         JsTransactionReceipt {
             gas_used: receipt.gas_used.into(),
+            cumulative_gas_used: receipt.cumulative_gas_used.into(),
             gas_refunded: receipt.gas_refunded.into(),
             status: receipt.success as u8,
             contract_address: receipt.contract_address,

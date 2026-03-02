@@ -1,8 +1,9 @@
 import prompts from "prompts";
 
-import { Console, describe } from "../../../test-framework/source";
-import { Identifiers } from "../ioc/index.js";
+import { describe } from "@mainsail/test-runner";
+import { Identifiers } from "@mainsail/constants";
 import { Select } from "./select";
+import { Console } from "../test/index.js";
 
 describe<{
 	component: Select;
@@ -10,8 +11,8 @@ describe<{
 }>("Log", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Select).to(Select).inSingletonScope();
-		context.component = context.cli.app.get(Identifiers.Select);
+		context.cli.app.rebind(Identifiers.Cli.Component.Select).to(Select).inSingletonScope();
+		context.component = context.cli.app.get(Identifiers.Cli.Component.Select);
 	});
 
 	it("should render the component", async ({ component, cli }) => {

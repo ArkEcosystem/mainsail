@@ -1,32 +1,31 @@
 import type { Contracts } from "@mainsail/contracts";
 import * as Exceptions from "@mainsail/exceptions";
-import { Sandbox } from "@mainsail/test-framework";
 import { assert } from "@mainsail/test-runner";
 
 import { getLastCommit, snoozeForInvalidBlock } from "./utilities.js";
 
-export const assertBlockNumber = async (sandbox: Sandbox | Sandbox[], blockNumber: number): Promise<void> => {
-	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
+export const assertBlockNumber = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], blockNumber: number): Promise<void> => {
+	const nodes = Array.isArray(app) ? app : [app];
 
 	for (const node of nodes) {
 		const commit = await getLastCommit(node);
 		assert.defined(commit);
-		assert.equal(commit.block.data.number, blockNumber);
+		assert.equal(commit.block.number, blockNumber);
 	}
 };
 
-export const assertBlockRound = async (sandbox: Sandbox | Sandbox[], round: number): Promise<void> => {
-	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
+export const assertBlockRound = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], round: number): Promise<void> => {
+	const nodes = Array.isArray(app) ? app : [app];
 
 	for (const node of nodes) {
 		const commit = await getLastCommit(node);
 		assert.defined(commit);
-		assert.equal(commit.block.data.round, round);
+		assert.equal(commit.block.round, round);
 	}
 };
 
-export const assertCommitRound = async (sandbox: Sandbox | Sandbox[], round: number): Promise<void> => {
-	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
+export const assertCommitRound = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], round: number): Promise<void> => {
+	const nodes = Array.isArray(app) ? app : [app];
 
 	for (const node of nodes) {
 		const commit = await getLastCommit(node);
@@ -35,28 +34,28 @@ export const assertCommitRound = async (sandbox: Sandbox | Sandbox[], round: num
 	}
 };
 
-export const assertBlockHash = async (sandbox: Sandbox | Sandbox[], id?: string): Promise<void> => {
-	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
+export const assertBlockHash = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], id?: string): Promise<void> => {
+	const nodes = Array.isArray(app) ? app : [app];
 
 	if (id === undefined) {
 		const commit = await getLastCommit(nodes[0]);
-		id = commit.block.data.hash;
+		id = commit.block.hash;
 	}
 
 	for (const node of nodes) {
 		const commit = await getLastCommit(node);
 		assert.defined(commit);
-		assert.equal(commit.block!.data.hash, id);
+		assert.equal(commit.block!.hash, id);
 	}
 };
 
 export const assertInvalidBlock = async (
 	exception: Contracts.Kernel.Container.Newable<Exceptions.Exception>,
-	sandbox: Sandbox | Sandbox[],
+	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
 	blockNumber: number,
 	round: number = 0,
 ): Promise<void> => {
-	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
+	const nodes = Array.isArray(app) ? app : [app];
 	const invalidBlocks = await snoozeForInvalidBlock(nodes, blockNumber);
 
 	assert.length(nodes, invalidBlocks.length);

@@ -1,12 +1,12 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { yellow } from "kleur/colors";
 
-import { Identifiers } from "../ioc/index.js";
 import type { Logger } from "../services/logger.js";
 
 @injectable()
 export class Title {
-	@inject(Identifiers.Logger)
+	@inject(Identifiers.Cli.Service.Logger)
 	private readonly logger!: Logger;
 
 	public async render(title: string): Promise<void> {

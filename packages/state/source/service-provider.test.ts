@@ -1,16 +1,15 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { Application, Services } from "@mainsail/kernel";
 
-import { describe } from "../../test-framework/source";
-import { ServiceProvider } from ".";
+import { describe } from "@mainsail/test-runner";
+import { ServiceProvider } from "./service-provider.js";
 
 describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ beforeEach, it, assert }) => {
 	beforeEach((context) => {
-		const app = new Application(new Container());
+		const app = new Application();
 		app.bind(Identifiers.Services.Trigger.Service).to(Services.Triggers.Triggers).inSingletonScope();
 		app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 		app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});

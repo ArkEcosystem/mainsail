@@ -145,7 +145,8 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const { number, round, hash } = unit.getBlock().header;
+		const { number, round, hash } = unit.getBlock();
+
 		const commitData = await this.#prepareCommitData(unit);
 
 		const result = await this.#evm.commit(
@@ -184,7 +185,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 
 	public async getBlockNumberByHash(blockHash: string): Promise<number | undefined | null> {
 		const result = await this.#evm.getBlockNumberByHash(blockHash);
-		if (!result) {
+		if (result === null || result === undefined) {
 			return undefined;
 		}
 
@@ -227,53 +228,51 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 
 		const { block, proof } = await unit.getCommit();
 
-		const { header } = block;
-
 		const transactions: JsTransactionData[] = [];
 
 		for (const transaction of block.transactions) {
-			assert.number(transaction.data.transactionIndex);
-			assert.defined(transaction.data.r);
-			assert.defined(transaction.data.s);
-			assert.defined(transaction.data.v);
+			assert.number(transaction.transactionIndex);
+			assert.defined(transaction.r);
+			assert.defined(transaction.s);
+			assert.defined(transaction.v);
 
 			transactions.push({
-				blockNumber: header.number,
-				data: Buffer.from(transaction.data.data, "hex"),
-				from: transaction.data.from,
-				gasLimit: BigInt(transaction.data.gasLimit),
-				gasPrice: BigInt(transaction.data.gasPrice),
-				index: transaction.data.transactionIndex,
-				legacyAddress: transaction.data.senderLegacyAddress,
-				legacySecondSignature: transaction.data.legacySecondSignature,
-				nonce: transaction.data.nonce.toBigInt(),
-				r: transaction.data.r,
-				s: transaction.data.s,
-				senderPublicKey: transaction.data.senderPublicKey,
-				to: transaction.data.to,
+				blockNumber: block.number,
+				data: Buffer.from(transaction.data.slice(2), "hex"),
+				from: transaction.from,
+				gasLimit: BigInt(transaction.gasLimit),
+				gasPrice: BigInt(transaction.gasPrice),
+				index: transaction.transactionIndex,
+				legacyAddress: transaction.senderLegacyAddress,
+				legacySecondSignature: transaction.legacySecondSignature,
+				nonce: transaction.nonce.toBigInt(),
+				r: transaction.r,
+				s: transaction.s,
+				senderPublicKey: transaction.senderPublicKey,
+				to: transaction.to,
 				txHash: transaction.hash,
-				v: transaction.data.v,
-				value: transaction.data.value.toBigInt(),
+				v: transaction.v,
+				value: transaction.value.toBigInt(),
 			});
 		}
 
 		return {
 			header: {
-				fee: header.fee.toBigInt(),
-				gasUsed: header.gasUsed,
-				hash: header.hash,
-				logsBloom: header.logsBloom,
-				number: header.number,
-				parentHash: header.parentHash,
-				payloadSize: header.payloadSize,
-				proposer: header.proposer,
-				reward: header.reward.toBigInt(),
-				round: header.round,
-				stateRoot: header.stateRoot,
-				timestamp: BigInt(header.timestamp),
-				transactionsCount: header.transactionsCount,
-				transactionsRoot: header.transactionsRoot,
-				version: header.version,
+				fee: block.fee.toBigInt(),
+				gasUsed: block.gasUsed,
+				hash: block.hash,
+				logsBloom: block.logsBloom,
+				number: block.number,
+				parentHash: block.parentHash,
+				payloadSize: block.payloadSize,
+				proposer: block.proposer,
+				reward: block.reward.toBigInt(),
+				round: block.round,
+				stateRoot: block.stateRoot,
+				timestamp: BigInt(block.timestamp),
+				transactionsCount: block.transactionsCount,
+				transactionsRoot: block.transactionsRoot,
+				version: block.version,
 			},
 			proof: {
 				round: proof.round,

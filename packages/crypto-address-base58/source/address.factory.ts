@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Hash256, RIPEMD160 } from "bcrypto";
 import { base58 } from "bstring";
 
 @injectable()
@@ -17,12 +16,16 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 	@tagged("type", "wallet")
 	private readonly publicKeyFactory!: Contracts.Crypto.PublicKeyFactory;
 
+	@inject(Identifiers.Cryptography.Hash.Factory)
+	@tagged("type", "wallet")
+	private readonly hashFactory!: Contracts.Crypto.HashFactory;
+
 	public async fromMnemonic(passphrase: string): Promise<string> {
 		return this.fromPublicKey((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey);
 	}
 
 	public async fromPublicKey(publicKey: string): Promise<string> {
-		const buffer: Buffer = RIPEMD160.digest(Buffer.from(publicKey, "hex"));
+		const buffer: Buffer = this.hashFactory.ripemd160(Buffer.from(publicKey, "hex"));
 		const payload: Buffer = Buffer.alloc(21);
 
 		payload.writeUInt8(this.configuration.get("network.pubKeyHash"), 0);
@@ -37,10 +40,6 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 
 	public async fromMultiSignatureAsset(asset: Contracts.Crypto.MultiSignatureAsset): Promise<string> {
 		return this.fromPublicKey(await this.publicKeyFactory.fromMultiSignatureAsset(asset));
-	}
-
-	public async fromPrivateKey(privateKey: Contracts.Crypto.KeyPair): Promise<string> {
-		return this.fromPublicKey(privateKey.publicKey);
 	}
 
 	public async fromBuffer(buffer: Buffer): Promise<string> {
@@ -68,7 +67,7 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 	}
 
 	#encodeCheck(buffer: Buffer): string {
-		const checksum = Hash256.digest(buffer);
+		const checksum = this.hashFactory.hash256(buffer);
 
 		return base58.encode(Buffer.concat([buffer, checksum], buffer.length + 4));
 	}
@@ -76,7 +75,7 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 	#decodeCheck(address: string): Buffer {
 		const buffer: Buffer = base58.decode(address);
 		const payload: Buffer = buffer.subarray(0, -4);
-		const checksum: Buffer = Hash256.digest(payload);
+		const checksum: Buffer = this.hashFactory.hash256(payload);
 
 		if (checksum.readUInt32LE(0) !== buffer.subarray(-4).readUInt32LE(0)) {
 			throw new Error("Invalid checksum for base58 string.");

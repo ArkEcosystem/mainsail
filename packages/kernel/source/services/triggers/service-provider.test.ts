@@ -1,7 +1,6 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 
-import { describe } from "../../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { Application } from "../../application";
 import { ServiceProvider, Triggers } from "./index";
 
@@ -9,7 +8,7 @@ describe<{
 	app: Application;
 }>("TriggersServiceProvider", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 	});
 	it(".register", async (context) => {
 		assert.false(context.app.isBound(Identifiers.Services.Trigger.Service));

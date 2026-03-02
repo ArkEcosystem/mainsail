@@ -1,20 +1,22 @@
-import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
+import { Commands } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { prettyBytes, prettyTime } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 @injectable()
 export class Command extends Commands.Command {
-	@inject(Identifiers.ProcessManager)
-	private readonly processManager!: Services.ProcessManager;
+	@inject(Identifiers.Cli.Service.ProcessManager)
+	private readonly processManager!: Contracts.Cli.ProcessManager;
 
 	public signature = "top";
 
 	public description = "List all Core daemons.";
 
 	public async execute(): Promise<void> {
-		const processes: Contracts.ProcessDescription[] = (this.processManager.list() || []).filter(
-			(p: Contracts.ProcessDescription) => p.name.startsWith("mainsail"),
+		const processes: Contracts.Cli.ProcessDescription[] = (this.processManager.list() || []).filter(
+			(p: Contracts.Cli.ProcessDescription) => p.name.startsWith("mainsail"),
 		);
 
 		if (!processes || Object.keys(processes).length === 0) {

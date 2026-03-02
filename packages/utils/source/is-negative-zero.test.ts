@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { isNegativeZero } from "./is-negative-zero";
 
 describe("isNegativeZero", async ({ assert, it, nock, loader }) => {

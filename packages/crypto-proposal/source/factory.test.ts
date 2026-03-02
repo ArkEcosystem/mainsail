@@ -2,8 +2,10 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
-import { describe, Factories, Sandbox } from "../../test-framework/source";
-import { Types } from "../../test-framework/source/factories";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
+import { Factories } from "../../test-factories/source/index.js";
+import { Types } from "../../test-factories/source/factories";
 import {
 	blockData,
 	proposalData,
@@ -17,7 +19,7 @@ import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Factory } from "./factory";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	factory: Factory;
 	blockFactory: Contracts.Crypto.BlockFactory;
 	identity: Types.Identity;
@@ -35,30 +37,26 @@ describe<{
 				return {
 					// @ts-ignore
 					consensusSignature: (method, message, privateKey) =>
-						context.sandbox.app
+						context.app
 							.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
 							[method](message, privateKey),
 					// @ts-ignore
 					transactionFactory: (method, message, privateKey) =>
-						context.sandbox.app
-							.get(Identifiers.Cryptography.Transaction.Factory)!
-							[method](message, privateKey),
+						context.app.get(Identifiers.Cryptography.Transaction.Factory)![method](message, privateKey),
 				};
 			},
 		};
 
-		context.sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(validatorSet);
-		context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
+		context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(validatorSet);
+		context.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
-		context.factory = context.sandbox.app.resolve(Factory);
-		context.blockFactory = context.sandbox.app.get<Contracts.Crypto.BlockFactory>(
-			Identifiers.Cryptography.Block.Factory,
-		);
+		context.factory = context.app.resolve(Factory);
+		context.blockFactory = context.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
 
 		const identityFactory = await Factories.factory<Factories.Types.Identity>("Identity", crypto);
 		const identity = await identityFactory
 			.withOptions({
-				app: context.sandbox.app,
+				app: context.app,
 				keyType: "consensus",
 				passphrase: validatorMnemonic,
 			})
@@ -85,13 +83,9 @@ describe<{
 		);
 	});
 
-	it("#makeProposal - should correctly make signed proposal, with validRound", async ({
-		blockFactory,
-		factory,
-		identity,
-	}) => {
+	it("#makeProposal - should correctly make signed proposal, with validRound", async ({ factory, identity }) => {
 		const data: Contracts.Crypto.ProposedData = {
-			block: await blockFactory.fromData(blockData),
+			block: blockData,
 			serialized: serializedBlock,
 		};
 

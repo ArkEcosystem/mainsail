@@ -18,9 +18,6 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	@inject(Identifiers.ConsensusStorage.Storage.ConsensusState)
 	private readonly stateStorage!: Database<Contracts.Consensus.StateData>;
 
-	@inject(Identifiers.ValidatorSet.Service)
-	private readonly validatorSet!: Contracts.ValidatorSet.Service;
-
 	@inject(Identifiers.Cryptography.Proposal.Factory)
 	private readonly proposalFactory!: Contracts.Crypto.ProposalFactory;
 
@@ -69,18 +66,16 @@ export class Service implements Contracts.ConsensusStorage.Service {
 
 			// Proposals
 			for (const proposal of proposals) {
-				const validator = this.validatorSet.getValidator(proposal.validatorIndex);
 				this.proposalStorage.putSync(
-					`${proposal.round}-${validator.blsPublicKey}`,
+					`${proposal.round}-${proposal.validatorIndex}`,
 					proposal.serialized.toString("hex"),
 				);
 			}
 
 			// Messages
 			for (const message of messages) {
-				const validator = this.validatorSet.getValidator(message.validatorIndex);
 				this.messageStorage.putSync(
-					`${message.round}-${validator.blsPublicKey}-${message.type}`,
+					`${message.round}-${message.validatorIndex}-${message.type}`,
 					message.serialized.toString("hex"),
 				);
 			}

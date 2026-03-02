@@ -3,22 +3,23 @@ import { Configuration } from "@mainsail/crypto-config";
 import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json";
-import { describe, Sandbox } from "../../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { makeKeywords } from "./keywords";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	validator: Validator;
 }>("Keywords", ({ it, beforeEach, assert }) => {
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.validator = context.app.resolve(Validator);
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
-		const configuration = context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		const configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
 		configuration.setHeight(0);
 
 		const keywords = makeKeywords(configuration);
@@ -54,7 +55,7 @@ describe<{
 	});
 
 	it("keyword network - should return true when network is not set in configuration", (context) => {
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).set("network", {});
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).set("network", {});
 
 		const schema = {
 			$id: "test",
@@ -75,7 +76,7 @@ describe<{
 		context.validator.addSchema(schema);
 
 		// Accept 0 gasFee for genesis block
-		const configuration = context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		const configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
 		configuration.setHeight(1); // simulate non-genesis block
 
 		assert.undefined(context.validator.validate("test", cryptoJson.milestones[0].gas!.minimumGasPrice).error);
@@ -114,10 +115,8 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined(context.validator.validate("test", "").error);
 		assert.undefined(context.validator.validate("test", "0x00").error);
 		assert.undefined(context.validator.validate("test", "0x").error);
-		assert.undefined(context.validator.validate("test", "00").error);
 
 		const maxBytecodeLength = cryptoJson.milestones[0].gas!.maximumGasLimit / 16;
 		const maxPayload = "0x" + "a".repeat(maxBytecodeLength);
@@ -125,36 +124,12 @@ describe<{
 
 		assert.defined(context.validator.validate("test", maxPayload + "aa").error);
 
+		assert.defined(context.validator.validate("test", "").error);
+		assert.defined(context.validator.validate("test", "00").error);
 		assert.defined(context.validator.validate("test", 1).error);
 		assert.defined(context.validator.validate("test", 0).error);
 		assert.defined(context.validator.validate("test", -1).error);
 		assert.defined(context.validator.validate("test", Number.MAX_SAFE_INTEGER).error);
 		assert.defined(context.validator.validate("test", "asdf").error);
-	});
-
-	it("keyword bytecode should remove 0x prefix", (context) => {
-		const schema = {
-			$id: "test",
-			type: "object",
-			properties: {
-				payload: { bytecode: {} },
-			},
-		};
-
-		context.validator.addSchema(schema);
-
-		const withPrefix = {
-			payload: "0xdead",
-		};
-
-		assert.undefined(context.validator.validate("test", withPrefix).error);
-		assert.equal(withPrefix.payload, "dead");
-
-		const withoutPrefix = {
-			payload: "dead",
-		};
-
-		assert.undefined(context.validator.validate("test", withoutPrefix).error);
-		assert.equal(withoutPrefix.payload, "dead");
 	});
 });

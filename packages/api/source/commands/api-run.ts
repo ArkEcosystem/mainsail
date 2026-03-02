@@ -1,5 +1,6 @@
-import { Commands, Contracts, Utils } from "@mainsail/cli";
+import { Commands, Utils } from "@mainsail/cli";
 import { injectable, postConstruct } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 import { readJSONSync } from "fs-extra/esm";
 import Joi from "joi";
@@ -23,7 +24,7 @@ export class Command extends Commands.Command {
 		const { name } = readJSONSync(path.resolve(new URL(".", import.meta.url).pathname, "../../package.json"));
 		assert.string(name);
 
-		const flags: Contracts.AnyObject = {
+		const flags: Contracts.Cli.AnyObject = {
 			...this.getFlags(),
 			allowMissingConfigFiles: true,
 			name: name.split("/")[1],

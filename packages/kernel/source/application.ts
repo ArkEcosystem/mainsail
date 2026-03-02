@@ -1,6 +1,7 @@
 import { exit } from "node:process";
 
 import { Events, Identifiers } from "@mainsail/constants";
+import { Application as BaseApplication } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { DirectoryCannotBeFound } from "@mainsail/exceptions";
 import { join } from "path";
@@ -12,11 +13,13 @@ import { ServiceProviderRepository } from "./providers/index.js";
 import { ConfigRepository } from "./services/config/index.js";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider.js";
 
-export class Application implements Contracts.Kernel.Application {
+export class Application extends BaseApplication implements Contracts.Kernel.Application {
 	#booted = false;
 	#terminating = false;
 
-	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
+	public constructor() {
+		super();
+
 		this.bind<Contracts.Kernel.Application>(Identifiers.Application.Instance).toConstantValue(this);
 
 		this.bind<ConfigRepository>(Identifiers.Config.Repository).to(ConfigRepository).inSingletonScope();
@@ -135,33 +138,6 @@ export class Application implements Contracts.Kernel.Application {
 		return !isMainThread;
 	}
 
-	public enableMaintenance(): void {
-		// writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: Date.now() }));
-		// this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice(
-		// 	"Application is now in maintenance mode.",
-		// );
-		// // eslint-disable-next-line @typescript-eslint/no-floating-promises
-		// this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service).dispatch(
-		// 	"kernel.maintenance",
-		// 	true,
-		// );
-	}
-
-	public disableMaintenance(): void {
-		// removeSync(this.tempPath("maintenance"));
-		// this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice("Application is now live.");
-		// // eslint-disable-next-line @typescript-eslint/no-floating-promises
-		// this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service).dispatch(
-		// 	"kernel.maintenance",
-		// 	false,
-		// );
-	}
-
-	public isDownForMaintenance(): boolean {
-		// existsSync(this.tempPath("maintenance"));
-		return false;
-	}
-
 	public async terminate(reason?: string, error?: Error): Promise<never> {
 		this.#booted = false;
 
@@ -209,54 +185,6 @@ export class Application implements Contracts.Kernel.Application {
 		);
 
 		exit(1);
-	}
-
-	public bind<T>(
-		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
-	): Contracts.Kernel.Container.BindToFluentSyntax<T> {
-		return this.container.bind(serviceIdentifier);
-	}
-
-	public rebind<T>(
-		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
-	): Contracts.Kernel.Container.BindToFluentSyntax<T> {
-		if (this.container.isBound(serviceIdentifier)) {
-			this.container.unbindSync(serviceIdentifier);
-		}
-
-		return this.container.bind(serviceIdentifier);
-	}
-
-	public unbind<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): void {
-		return this.container.unbindSync(serviceIdentifier);
-	}
-
-	public get<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): T {
-		return this.container.get(serviceIdentifier);
-	}
-
-	public getTagged<T>(
-		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
-		key: string | number | symbol,
-		value: string,
-	): T {
-		return this.container.get(serviceIdentifier, { tag: { key, value } });
-	}
-
-	public isBound<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): boolean {
-		return this.container.isBound(serviceIdentifier);
-	}
-
-	public isBoundTagged<T>(
-		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
-		key: string | number | symbol,
-		value: string,
-	): boolean {
-		return this.container.isBound(serviceIdentifier, { tag: { key, value } });
-	}
-
-	public resolve<T>(constructorFunction: Contracts.Kernel.Container.Newable<T>): T {
-		return this.container.get(constructorFunction, { autobind: true });
 	}
 
 	async #bootstrapWith(type: string): Promise<void> {

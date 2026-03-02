@@ -1,18 +1,15 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
-import { describeSkip } from "../../../test-framework/source";
+import { describeSkip } from "@mainsail/test-runner";
 import { Application } from "../application";
 import { ServiceProvider, ServiceProviderRepository } from "../providers";
 import { ConfigRepository } from "../services/config";
 import { MemoryEventDispatcher } from "../services/events";
 import { LoadServiceProviders } from "./load-service-providers";
 
-class StubServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
-}
+class StubServiceProvider extends ServiceProvider {}
 
 describeSkip<{
 	app: Application;
@@ -20,7 +17,7 @@ describeSkip<{
 	serviceProviderRepository: ServiceProviderRepository;
 }>("LoadServiceProviders", ({ assert, beforeEach, it, stub }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
 		context.app
 			.bind(Identifiers.Services.Filesystem.Service)

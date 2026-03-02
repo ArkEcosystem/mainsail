@@ -1,5 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { parseTransactionError, UsernamesAbi } from "@mainsail/evm-contracts";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
 import { setup, shutdown } from "./setup.js";
@@ -14,7 +14,7 @@ import {
 import { decodeEventLog, Hex, parseEther } from "viem";
 
 describe<{
-	sandbox: Sandbox;
+	app: Contracts.Kernel.Application;
 	snapshot: Snapshot;
 	wallets: Contracts.Crypto.KeyPair[];
 	legacyColdWallets: {
@@ -23,15 +23,15 @@ describe<{
 	}[];
 }>("Usernames", ({ beforeEach, afterEach, it, assert }) => {
 	beforeEach(async (context) => {
-		context.sandbox = await setup();
-		context.wallets = await getWallets(context.sandbox);
-		context.snapshot = await takeSnapshot(context.sandbox);
+		context.app = await setup();
+		context.wallets = await getWallets(context.app);
+		context.snapshot = await takeSnapshot(context.app);
 	});
 
-	afterEach(async ({ sandbox, snapshot }) => {
+	afterEach(async ({ app, snapshot }) => {
 		await snapshot.validate();
 
-		await shutdown(sandbox);
+		await shutdown(app);
 	});
 
 	it("should accept and commit username registration", async (context) => {

@@ -1,14 +1,15 @@
 import { Enums } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { describe, Sandbox } from "../../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { headers } from "../../test/fixtures/responses/headers";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
 import { constants } from "../constants";
 import { getPeers } from "./get-peers";
 
 type Context = {
-	sandbox: Sandbox;
+	app: Application;
 	validator: Validator;
 };
 
@@ -21,9 +22,9 @@ describe<Context>("GetPeers Schema", ({ it, assert, beforeEach, each }) => {
 			peers: [{ ip: "127.0.0.1", port: 4000, protocol: Enums.Api.Protocol.Http }],
 		};
 
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.validator = context.app.resolve(Validator);
 
 		prepareValidatorContext(context);
 	});

@@ -1,7 +1,6 @@
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { InvalidArgumentException } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
 import { ServiceProvider } from "./service-provider.js";
@@ -22,8 +21,6 @@ export class ServiceProviderRepository {
 
 	readonly #deferredProviders: Set<string> = new Set<string>();
 
-	readonly #aliases: Map<string, string> = new Map<string, string>();
-
 	public all(): Array<[string, ServiceProvider]> {
 		return [...this.#serviceProviders.entries()];
 	}
@@ -33,9 +30,7 @@ export class ServiceProviderRepository {
 	}
 
 	public get(name: string): ServiceProvider {
-		const serviceProvider: ServiceProvider | undefined = this.#serviceProviders.get(
-			this.#aliases.get(name) || name,
-		);
+		const serviceProvider: ServiceProvider | undefined = this.#serviceProviders.get(name);
 		assert.defined(serviceProvider);
 
 		return serviceProvider;
@@ -43,18 +38,6 @@ export class ServiceProviderRepository {
 
 	public set(name: string, provider: ServiceProvider): void {
 		this.#serviceProviders.set(name, provider);
-	}
-
-	public alias(name: string, alias: string): void {
-		if (this.#aliases.has(alias)) {
-			throw new InvalidArgumentException(`The alias [${alias}] is already in use.`);
-		}
-
-		if (!this.#serviceProviders.has(name)) {
-			throw new InvalidArgumentException(`The service provider [${name}] is unknown.`);
-		}
-
-		this.#aliases.set(alias, name);
 	}
 
 	public has(name: string): boolean {

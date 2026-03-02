@@ -1,16 +1,17 @@
 import prompts from "prompts";
+import { Identifiers } from "@mainsail/constants";
 
-import { Console, describe } from "../../../test-framework/source";
-import { Identifiers } from "../ioc/index.js";
+import { describe } from "@mainsail/test-runner";
 import { Ask } from "./ask";
+import { Console } from "../test/index.js";
 
 describe<{
 	component: Ask;
 }>("Ask", ({ beforeEach, it, assert }) => {
 	beforeEach((context) => {
 		const cli = new Console();
-		cli.app.rebind(Identifiers.Ask).to(Ask).inSingletonScope();
-		context.component = cli.app.get(Identifiers.Ask);
+		cli.app.rebind(Identifiers.Cli.Component.Ask).to(Ask).inSingletonScope();
+		context.component = cli.app.get(Identifiers.Cli.Component.Ask);
 	});
 
 	it("should render the component", async ({ component }) => {

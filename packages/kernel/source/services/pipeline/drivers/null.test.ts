@@ -1,4 +1,4 @@
-import { describe } from "../../../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { NullPipeline } from "./null";
 
 describe("NullPipeline.pipe", ({ assert, it }) => {

@@ -1,9 +1,10 @@
 import { bold, red, white } from "kleur/colors";
 import os from "os";
+import { Identifiers } from "@mainsail/constants";
 
-import { Console, describe } from "../../../test-framework/source";
-import { Identifiers } from "../ioc/index.js";
+import { describe } from "@mainsail/test-runner";
 import { AppHeader } from "./app-header";
+import { Console } from "../test/index.ts";
 
 describe<{
 	component: AppHeader;
@@ -12,8 +13,8 @@ describe<{
 	beforeEach((context) => {
 		context.cli = new Console();
 
-		context.cli.app.rebind(Identifiers.AppHeader).to(AppHeader).inSingletonScope();
-		context.component = context.cli.app.get(Identifiers.AppHeader);
+		context.cli.app.rebind(Identifiers.Cli.Component.AppHeader).to(AppHeader).inSingletonScope();
+		context.component = context.cli.app.get(Identifiers.Cli.Component.AppHeader);
 	});
 
 	it("should render the component", ({ component, cli }) => {

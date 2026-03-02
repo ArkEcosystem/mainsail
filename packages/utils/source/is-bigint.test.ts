@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { isBigInt } from "./is-bigint";
 
 describe("isBigInt", async ({ assert, it, nock, loader }) => {

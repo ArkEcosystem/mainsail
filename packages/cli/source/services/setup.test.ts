@@ -1,6 +1,7 @@
-import { Console, describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { execa } from "../execa";
 import { Setup } from "./setup";
+import { Console } from "../test/index.js";
 
 describe<{
 	setup: Setup;

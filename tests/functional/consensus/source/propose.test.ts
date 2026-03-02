@@ -1,7 +1,7 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
@@ -21,7 +21,7 @@ import { makeCustomProposal, makeTransactionBuilderContext } from "./custom-prop
 import { EvmCalls } from "@mainsail/test-transaction-builders";
 
 describe<{
-	nodes: Sandbox[];
+	nodes: Contracts.Kernel.Application[],
 	validators: Validator[];
 	p2p: P2PRegistry;
 }>("Propose", ({ beforeEach, afterEach, it, assert, stub }) => {
@@ -55,26 +55,26 @@ describe<{
 		await assertBlockNumber(nodes, 1);
 		await assertBlockRound(nodes, 0);
 		await assertBlockHash(nodes);
-		assert.equal((await getLastCommit(nodes[0])).block.data.proposer, validators[0].address);
+		assert.equal((await getLastCommit(nodes[0])).block.proposer, validators[0].address);
 
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
 		await assertBlockRound(nodes, 0);
 		await assertBlockHash(nodes);
-		assert.equal((await getLastCommit(nodes[0])).block.data.proposer, validators[0].address);
+		assert.equal((await getLastCommit(nodes[0])).block.proposer, validators[0].address);
 
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 3);
 		await assertBlockRound(nodes, 0);
 		await assertBlockHash(nodes);
-		assert.equal((await getLastCommit(nodes[0])).block.data.proposer, validators[0].address);
+		assert.equal((await getLastCommit(nodes[0])).block.proposer, validators[0].address);
 	});
 
 	it("#missing propose - should not accept block", async ({ nodes }) => {
 		const node0 = nodes[0];
-		const stubPropose = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
 
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
@@ -97,9 +97,9 @@ describe<{
 	it("#missing propose - should not accept block for 3 rounds", async ({ nodes }) => {
 		const rounds = 3;
 		const node0 = nodes[0];
-		const stubPropose = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
 
-		stubPropose.callsFake(async () => {});
+		stubPropose.callsFake(async () => { });
 
 		await runMany(nodes);
 
@@ -120,7 +120,7 @@ describe<{
 
 	it("#invalid proposer - should not accept block", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
-		const stubPropose = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
 
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
@@ -161,7 +161,7 @@ describe<{
 
 	it("#double propose - one by one - should take the first proposal", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
-		const stubPropose = stub(nodes[0].app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(nodes[0].get<Consensus>(Identifiers.Consensus.Service), "propose");
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
 		});
@@ -178,7 +178,7 @@ describe<{
 
 		await assertBlockNumber(nodes, 1);
 		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes, proposal0.getData().block.data.hash);
+		await assertBlockHash(nodes, proposal0.getData().block.hash);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -191,18 +191,18 @@ describe<{
 				.map((prevote) => prevote.blockHash)
 				.sort(),
 			[
-				proposal0.getData().block.data.hash,
-				proposal0.getData().block.data.hash,
-				proposal0.getData().block.data.hash,
-				proposal0.getData().block.data.hash,
-				proposal0.getData().block.data.hash,
+				proposal0.getData().block.hash,
+				proposal0.getData().block.hash,
+				proposal0.getData().block.hash,
+				proposal0.getData().block.hash,
+				proposal0.getData().block.hash,
 			].sort(),
 		);
 
 		// Assert all nodes precommit
 		assert.equal(
 			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockHash),
-			Array.from({ length: totalNodes }).fill(proposal0.getData().block.data.hash),
+			Array.from({ length: totalNodes }).fill(proposal0.getData().block.hash),
 		);
 
 		// Next block
@@ -213,7 +213,7 @@ describe<{
 
 	it("#double propose - 50 : 50 split - should not accept block", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
-		const stubPropose = stub(nodes[0].app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(nodes[0].get<Consensus>(Identifiers.Consensus.Service), "propose");
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
 		});
@@ -243,11 +243,11 @@ describe<{
 				.map((prevote) => prevote.blockHash)
 				.sort(),
 			[
-				proposal0.getData().block.data.hash,
-				proposal0.getData().block.data.hash,
-				proposal1.getData().block.data.hash,
-				proposal1.getData().block.data.hash,
-				proposal0.getData().block.data.hash,
+				proposal0.getData().block.hash,
+				proposal0.getData().block.hash,
+				proposal1.getData().block.hash,
+				proposal1.getData().block.hash,
+				proposal0.getData().block.hash,
 			].sort(),
 		);
 
@@ -267,8 +267,8 @@ describe<{
 		const rounds = 3;
 
 		const node0 = nodes[0];
-		const stubPropose = stub(nodes[0].app.get<Consensus>(Identifiers.Consensus.Service), "propose");
-		stubPropose.callsFake(async () => {});
+		const stubPropose = stub(nodes[0].get<Consensus>(Identifiers.Consensus.Service), "propose");
+		stubPropose.callsFake(async () => { });
 
 		await runMany(nodes);
 
@@ -292,11 +292,11 @@ describe<{
 					.map((prevote) => prevote.blockHash)
 					.sort(),
 				[
-					proposal0.getData().block.data.hash,
-					proposal0.getData().block.data.hash,
-					proposal0.getData().block.data.hash,
-					proposal1.getData().block.data.hash,
-					proposal1.getData().block.data.hash,
+					proposal0.getData().block.hash,
+					proposal0.getData().block.hash,
+					proposal0.getData().block.hash,
+					proposal1.getData().block.hash,
+					proposal1.getData().block.hash,
 				].sort(),
 			);
 
@@ -326,7 +326,7 @@ describe<{
 		p2p,
 	}) => {
 		const node0 = nodes[0];
-		const stubPropose = stub(nodes[0].app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(nodes[0].get<Consensus>(Identifiers.Consensus.Service), "propose");
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
 		});
@@ -357,22 +357,22 @@ describe<{
 				.map((prevote) => prevote.blockHash)
 				.sort(),
 			[
-				proposal0.getData().block.data.hash,
-				proposal0.getData().block.data.hash,
-				proposal0.getData().block.data.hash,
-				proposal0.getData().block.data.hash,
-				proposal1.getData().block.data.hash,
+				proposal0.getData().block.hash,
+				proposal0.getData().block.hash,
+				proposal0.getData().block.hash,
+				proposal0.getData().block.hash,
+				proposal1.getData().block.hash,
 			].sort(),
 		);
 
 		// // Assert all nodes precommit (null)
 		assert.equal(
 			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockHash),
-			Array.from({ length: totalNodes - 1 }).fill(proposal0.getData().block.data.hash),
+			Array.from({ length: totalNodes - 1 }).fill(proposal0.getData().block.hash),
 		);
 
 		// Download blocks
-		await p2p.postCommit(nodes[4].app, await getLastCommit(nodes[0]));
+		await p2p.postCommit(nodes[4], await getLastCommit(nodes[0]));
 		await snoozeForBlock([nodes[4]], 1);
 
 		// Next block
@@ -383,7 +383,7 @@ describe<{
 
 	it("#multi propose - propose per node - should not accept block", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
-		const stubPropose = stub(nodes[0].app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(nodes[0].get<Consensus>(Identifiers.Consensus.Service), "propose");
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
 		});
@@ -419,11 +419,11 @@ describe<{
 				.map((prevote) => prevote.blockHash)
 				.sort(),
 			[
-				proposal0.getData().block.data.hash,
-				proposal2.getData().block.data.hash,
-				proposal4.getData().block.data.hash,
-				proposal3.getData().block.data.hash,
-				proposal1.getData().block.data.hash,
+				proposal0.getData().block.hash,
+				proposal2.getData().block.hash,
+				proposal4.getData().block.hash,
+				proposal3.getData().block.hash,
+				proposal1.getData().block.hash,
 			].sort(),
 		);
 
@@ -442,7 +442,7 @@ describe<{
 	it("should propose block with evm calls", async ({ nodes, validators }) => {
 		const node0 = nodes[0];
 
-		const stubPropose = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
 		stubPropose.callsFake(async () => {
 			const context = makeTransactionBuilderContext(node0, nodes, validators);
 
@@ -453,9 +453,9 @@ describe<{
 				);
 			}
 
-			const proposal = await makeCustomProposal({ node: node0, validators }, transactions);
+			const proposal = await makeCustomProposal({ app: node0, validators }, transactions);
 
-			void node0.app
+			void node0
 				.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
 				.process(proposal);
 

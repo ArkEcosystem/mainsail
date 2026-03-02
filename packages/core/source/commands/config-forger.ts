@@ -61,7 +61,7 @@ export class Command extends Commands.Command {
 	}
 
 	private async initializeAndExecute(
-		commandSignature: Contracts.Kernel.Container.Newable<Commands.Command>,
+		commandSignature: Contracts.Kernel.Container.Newable<Contracts.Cli.Command>,
 	): Promise<void> {
 		const cmd = this.app.resolve(commandSignature);
 

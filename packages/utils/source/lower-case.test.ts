@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { lowerCase } from "./lower-case";
 
 describe("lowerCase", async ({ assert, it, nock, loader }) => {

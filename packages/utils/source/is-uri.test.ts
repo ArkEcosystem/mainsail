@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { isURI } from "./is-uri";
 
 describe("isURI", async ({ assert, it, nock, loader }) => {

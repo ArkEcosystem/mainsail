@@ -1,14 +1,15 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { validatorKeys } from "../test/fixtures/validator-keys";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { BIP39 } from "./keys/bip39";
 import { Validator } from "./validator";
+import { Application } from "@mainsail/kernel";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	validator: Contracts.Validator.Validator;
 	generatorAddress: string;
 }>("Validator", ({ it, assert, beforeEach }) => {
@@ -16,11 +17,11 @@ describe<{
 		await prepareSandbox(context);
 
 		const { consensusKeyPair, mnemonic } = validatorKeys[0];
-		context.validator = context.sandbox.app
+		context.validator = context.app
 			.resolve<Contracts.Validator.Validator>(Validator)
 			.configure(await new BIP39().configure(consensusKeyPair));
 
-		context.generatorAddress = await context.sandbox.app
+		context.generatorAddress = await context.app
 			.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 			.fromMnemonic(mnemonic);
 	});
@@ -32,7 +33,7 @@ describe<{
 	it("#prepareBlock - should prepare block", async ({ validator, generatorAddress }) => {
 		const block = await validator.prepareBlock(generatorAddress, 1, 0);
 		assert.defined(block);
-		assert.equal(block.data.number, 2);
+		assert.equal(block.number, 2);
 	});
 
 	it("#propose - should create signed proposal", async ({ validator, generatorAddress }) => {
@@ -44,14 +45,14 @@ describe<{
 
 	it("#prevote - should create signed prevote", async ({ validator, generatorAddress }) => {
 		const block = await validator.prepareBlock(generatorAddress, 1, 0);
-		const prevote = await validator.prevote(0, 1, 1, block.header.hash);
+		const prevote = await validator.prevote(0, 1, 1, block.hash);
 		assert.defined(prevote);
 		assert.defined(prevote.signature);
 	});
 
 	it("#precommit - should create signed precommit", async ({ validator, generatorAddress }) => {
 		const block = await validator.prepareBlock(generatorAddress, 1, 0);
-		const precommit = await validator.precommit(0, 1, 1, block.header.hash);
+		const precommit = await validator.precommit(0, 1, 1, block.hash);
 		assert.defined(precommit);
 		assert.defined(precommit.signature);
 	});

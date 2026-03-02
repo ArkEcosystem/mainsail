@@ -15,6 +15,7 @@ node $MAINSAIL env:set --key=MAINSAIL_API_TRANSACTION_POOL_PORT --value=4007
 node $MAINSAIL env:set --key=MAINSAIL_API_EVM_HOST --value=0.0.0.0
 node $MAINSAIL env:set --key=MAINSAIL_API_EVM_PORT --value=4008
 node $MAINSAIL env:set --key=MAINSAIL_API_SYNC_ENABLED --value=true
+node $MAINSAIL env:set --key=MAINSAIL_API_SYNC_LOG_EXTRA --value=true
 
 node $MAINSAIL env:set --key=MAINSAIL_DB_USERNAME --value=test_db
 node $MAINSAIL env:set --key=MAINSAIL_DB_PASSWORD --value=password

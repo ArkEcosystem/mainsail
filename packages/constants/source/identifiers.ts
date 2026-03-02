@@ -1,14 +1,19 @@
+import { AppIdentifiers } from "./app-identifiers.js";
+import { CliIdentifiers } from "./cli-identifiers.js";
+
 export const Identifiers = {
+	...CliIdentifiers,
 	ApiSync: {
 		Listener: Symbol("ApiSync<Listener>"),
 		Logger: Symbol("ApiSync<Logger>"),
 		Service: Symbol("ApiSync<Service>"),
 		TokenParser: Symbol.for("ApiSync<TokenParser>"),
+		TokenWhitelist: Symbol.for("ApiSync<TokenWhitelist>"),
 	},
 	Application: {
 		Environment: Symbol("Application<Environment>"),
-		Instance: Symbol("Application<Instance>"),
-		Name: Symbol("Application<Name>"),
+		Instance: AppIdentifiers.Instance,
+		Name: AppIdentifiers.Name,
 		Thread: Symbol("Application<Thread>"),
 		Version: Symbol("Application<Version>"),
 	},
@@ -78,6 +83,7 @@ export const Identifiers = {
 			Factory: Symbol("Crypto<Hash.Factory>"),
 			Size: {
 				HASH256: Symbol("Crypto<Hash.Size.HASH256>"),
+				KECCAK256: Symbol("Crypto<Hash.Size.KECCAK256>"),
 				RIPEMD160: Symbol("Crypto<Hash.Size.RIPEMD160>"),
 				SHA256: Symbol("Crypto<Hash.Size.SHA256>"),
 			},
@@ -106,8 +112,6 @@ export const Identifiers = {
 		Legacy: {
 			Identity: {
 				AddressFactory: Symbol("Crypto<Legacy.Identity.Address.Factory>"),
-				AddressSerializer: Symbol("Crypto<Legacy.Identity.Address.Serializer>"),
-				AddressSize: Symbol("Crypto<Legacy.Identity.Address.Size>"),
 			},
 		},
 		Message: {
@@ -124,18 +128,16 @@ export const Identifiers = {
 		Serializer: Symbol("Crypto<Serializer>"),
 		Signature: {
 			Instance: Symbol("Crypto<Signature.Instance>"),
+			Serializer: Symbol("Crypto<Signature.Serializer>"),
 			Size: Symbol("Crypto<Signature.Size>"),
-		},
-		Size: {
-			Signature: Symbol("Crypto<Size.Signature>"),
 		},
 		Transaction: {
 			Deserializer: Symbol("Crypto<Transaction.Deserializer>"),
 			Factory: Symbol("Crypto<Transaction.Factory>"),
+			HashFactory: Symbol("Crypto<Transaction.HashFactory>"),
 			Registry: Symbol("Crypto<Transaction.Registry>"),
 			Serializer: Symbol("Crypto<Transaction.Serializer>"),
 			Signer: Symbol("Crypto<Transaction.Signer>"),
-			Utils: Symbol("Crypto<Transaction.Utils>"),
 			Verifier: Symbol("Crypto<Transaction.Verifier>"),
 		},
 

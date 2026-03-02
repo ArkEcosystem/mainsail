@@ -35,7 +35,6 @@ services:
 
     node: &nodeDefinition
         build: ./nodes
-        image: mainsail
         volumes:
             - ./../../../:/mainsail
             - ./entrypoint.sh:/entrypoint.sh

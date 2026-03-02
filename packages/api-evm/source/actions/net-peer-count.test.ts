@@ -1,11 +1,11 @@
 import { Identifiers } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation";
-
-import { describe, Sandbox } from "../../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { NetPeerCountAction } from "./index.js";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	action: NetPeerCountAction;
 	validator: Validator;
 	state: any;
@@ -15,12 +15,11 @@ describe<{
 			peerCount: 0,
 		};
 
-		context.sandbox = new Sandbox();
+		context.app = new Application();
+		context.app.bind(Identifiers.Evm.State).toConstantValue(context.state);
 
-		context.sandbox.app.bind(Identifiers.Evm.State).toConstantValue(context.state);
-
-		context.action = context.sandbox.app.resolve(NetPeerCountAction);
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.action = context.app.resolve(NetPeerCountAction);
+		context.validator = context.app.resolve(Validator);
 	});
 
 	it("should have a name", ({ action }) => {

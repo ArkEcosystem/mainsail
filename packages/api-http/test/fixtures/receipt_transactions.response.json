@@ -14,6 +14,7 @@
 		"value": "0",
 		"timestamp": "1719983081747",
 		"receipt": {
+			"cumulativeGasUsed": 116802,
 			"gasRefunded": 0,
 			"gasUsed": 116802,
 			"status": 1
@@ -35,6 +36,7 @@
 		"timestamp": "1719974985376",
 		"receipt": {
 			"deployedContractAddress": "0x0a26D3630D5EC868767d7F4563Fab98D31601A6e",
+			"cumulativeGasUsed": 116802,
 			"gasRefunded": 0,
 			"gasUsed": 116802,
 			"status": 1

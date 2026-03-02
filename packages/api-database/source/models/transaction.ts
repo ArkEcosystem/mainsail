@@ -120,6 +120,12 @@ export class Transaction {
 		nullable: false,
 		type: "integer",
 	})
+	public readonly cumulativeGasUsed!: number;
+
+	@Column({
+		nullable: false,
+		type: "integer",
+	})
 	public readonly gasRefunded!: number;
 
 	@Column({

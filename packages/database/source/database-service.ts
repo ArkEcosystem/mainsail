@@ -12,9 +12,6 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
-	@inject(Identifiers.Cryptography.Commit.Serializer)
-	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
-
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
@@ -49,16 +46,13 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 		const buffers = await Promise.all(
 			blockNumbers.map(async (blockNumber: number) => {
-				try {
-					const commitStorage = await this.#readCommitStorage(blockNumber);
-					if (!commitStorage) {
-						return;
-					}
-
-					return this.commitSerializer.serializeCommit(await this.commitFactory.fromStorage(commitStorage));
-				} catch {
+				const commitStorage = await this.#readCommitStorage(blockNumber);
+				if (!commitStorage) {
 					return;
 				}
+
+				const commit = await this.commitFactory.fromStorage(commitStorage);
+				return Buffer.from(commit.serialized, "hex");
 			}),
 		);
 
@@ -89,8 +83,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		const data = await this.#readBlockHeaderData(blockNumber);
 
 		if (data) {
-			const { header } = await this.blockFactory.fromStorage(data, []);
-			return header;
+			return this.blockFactory.headerFromStorage(data);
 		}
 
 		return undefined;
@@ -105,21 +98,22 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 		const data = await this.#readBlockHeaderData(blockNumber);
 		if (data) {
-			const { header } = await this.blockFactory.fromStorage(data, []);
-			return header;
+			return this.blockFactory.headerFromStorage(data);
 		}
 
 		return undefined;
 	}
 
 	public async findBlocks(start: number, end: number): Promise<Contracts.Crypto.Block[]> {
+		const commitBuffers = await this.findCommitBuffers(start, end);
+
 		return await this.#map(
-			await this.findCommitBuffers(start, end),
-			async (block: Buffer) => (await this.commitFactory.fromBytes(block)).block,
+			commitBuffers,
+			async (buffer: Buffer) => (await this.commitFactory.fromBytes(buffer)).block,
 		);
 	}
 
-	public async getTransactionByHash(transactionHash: string): Promise<Contracts.Crypto.Transaction | undefined> {
+	public async getTransactionByHash(transactionHash: string): Promise<Contracts.Crypto.BlockTransaction | undefined> {
 		const key = await this.storage.getTransactionKeyByHash(transactionHash);
 		if (!key) {
 			return undefined;
@@ -131,7 +125,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	public async getTransactionByBlockHashAndIndex(
 		blockHash: string,
 		index: number,
-	): Promise<Contracts.Crypto.Transaction | undefined> {
+	): Promise<Contracts.Crypto.BlockTransaction | undefined> {
 		// Verify if the block exists
 		const blockNumber = await this.#getBlockNumberByHash(blockHash);
 		if (blockNumber === undefined) {
@@ -144,7 +138,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	public async getTransactionByBlockNumberAndIndex(
 		blockNumber: number,
 		index: number,
-	): Promise<Contracts.Crypto.Transaction | undefined> {
+	): Promise<Contracts.Crypto.BlockTransaction | undefined> {
 		return this.#readTransaction(`${blockNumber}-${index}`);
 	}
 
@@ -173,7 +167,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const commit = await unit.getCommit();
-		this.#state.blockNumber = commit.block.data.number;
+		this.#state.blockNumber = commit.block.number;
 		this.#state.totalRound += commit.proof.round + 1;
 	}
 
@@ -195,21 +189,16 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return this.storage.getBlockHeaderData(blockNumber);
 	}
 
-	async #readTransaction(key: string): Promise<Contracts.Crypto.Transaction | undefined> {
+	async #readTransaction(key: string): Promise<Contracts.Crypto.BlockTransaction | undefined> {
 		const transactionStorageData = await this.storage.getTransactionData(key);
 		if (!transactionStorageData) {
 			return undefined;
 		}
 
-		const transaction = await this.transactionFactory.fromStorage(transactionStorageData);
-
-		assert.defined<number>(transaction.data.blockNumber);
-		const blockHeaderData = await this.#readBlockHeaderData(transaction.data.blockNumber);
+		const blockHeaderData = await this.#readBlockHeaderData(transactionStorageData.blockNumber);
 		assert.defined(blockHeaderData);
 
-		transaction.data.blockHash = blockHeaderData.hash;
-
-		return transaction;
+		return this.transactionFactory.fromStorage({ ...transactionStorageData, blockHash: blockHeaderData.hash });
 	}
 
 	async #map<T, U>(data: U[], callback: (...arguments_: U[]) => Promise<T>): Promise<T[]> {

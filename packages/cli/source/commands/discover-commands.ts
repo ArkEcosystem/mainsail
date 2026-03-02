@@ -1,26 +1,24 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { lstatSync, readdirSync } from "fs";
 
-import { Application } from "../contracts.js";
-import { Identifiers } from "../ioc/index.js";
-import { Command, CommandList } from "./command.js";
-
 @injectable()
-export class DiscoverCommands {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Application;
+export class DiscoverCommands implements Contracts.Cli.DiscoverCommands {
+	@inject(Identifiers.Cli.Application.Instance)
+	private readonly app!: Contracts.Cli.Application;
 
-	public async within(path: string): Promise<CommandList> {
+	public async within(path: string): Promise<Contracts.Cli.CommandList> {
 		const commandFiles: string[] = readdirSync(path)
 			.map((item: string) => `${path}/${item}`)
 			.filter((item: string) => lstatSync(item).isFile())
 			.filter((item: string) => item.endsWith(".js"));
 
-		const commands: CommandList = {};
+		const commands: Contracts.Cli.CommandList = {};
 
 		for (const file of commandFiles) {
 			const { Command } = await import(file);
-			const commandInstance: Command = this.app.resolve(Command);
+			const commandInstance = this.app.resolve<Contracts.Cli.Command>(Command);
 
 			if (!commandInstance.isHidden) {
 				commands[commandInstance.signature] = commandInstance;
@@ -30,8 +28,8 @@ export class DiscoverCommands {
 		return commands;
 	}
 
-	public async from(packages: string[]): Promise<CommandList> {
-		const commands: CommandList = {};
+	public async from(packages: string[]): Promise<Contracts.Cli.CommandList> {
+		const commands: Contracts.Cli.CommandList = {};
 
 		if (!Array.isArray(packages) || packages.length <= 0) {
 			return commands;
@@ -41,7 +39,7 @@ export class DiscoverCommands {
 			try {
 				const { Commands } = await import(package_);
 				for (const CMD of Commands) {
-					const commandInstance: Command = this.app.resolve(CMD);
+					const commandInstance = this.app.resolve<Contracts.Cli.Command>(CMD);
 
 					if (!commandInstance.isHidden) {
 						commands[commandInstance.signature] = commandInstance;

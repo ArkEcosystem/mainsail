@@ -18,7 +18,7 @@ export class SizeVerifier implements Contracts.Processor.Handler {
 		const { maxPayload } = this.configuration.getMilestone().block;
 		const block = unit.getBlock();
 
-		const totalSize = this.headerSize() + block.header.payloadSize;
+		const totalSize = this.headerSize() + block.payloadSize;
 		if (totalSize > maxPayload) {
 			throw new MaxPayloadExceeded(block, totalSize, maxPayload);
 		}
@@ -33,7 +33,7 @@ export class SizeVerifier implements Contracts.Processor.Handler {
 			totalPayloadLength += transaction.serialized.byteLength;
 		}
 
-		if (totalPayloadLength !== block.data.payloadSize) {
+		if (totalPayloadLength !== block.payloadSize) {
 			throw new InvalidPayloadSize(block, totalSize, totalPayloadLength);
 		}
 	}

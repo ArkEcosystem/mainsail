@@ -1,10 +1,11 @@
 import { Identifiers } from "@mainsail/constants";
 
-import { describe, Sandbox } from "../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { ProposerCalculator } from "./proposer-calculator";
 
 type Context = {
-	sandbox: Sandbox;
+	app: Application;
 	proposerCalculator: ProposerCalculator;
 	stateStore: any;
 	configuration: any;
@@ -12,7 +13,7 @@ type Context = {
 
 describe<Context>("ProposerCalculator", ({ assert, it, beforeEach }) => {
 	beforeEach((context: Context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
 		context.stateStore = {
 			getTotalRound: () => 0,
@@ -26,10 +27,10 @@ describe<Context>("ProposerCalculator", ({ assert, it, beforeEach }) => {
 			},
 		};
 
-		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue(context.stateStore);
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
+		context.app.bind(Identifiers.State.Store).toConstantValue(context.stateStore);
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 
-		context.proposerCalculator = context.sandbox.app.resolve(ProposerCalculator);
+		context.proposerCalculator = context.app.resolve(ProposerCalculator);
 	});
 
 	it("should return correct validator index", async ({ proposerCalculator }) => {

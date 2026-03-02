@@ -2,12 +2,13 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { BigNumber } from "@mainsail/utils";
 
-import { TransactionBuilder } from "../source/builders.js";
-import { describe, Sandbox } from "../../test-framework/source";
+import { TransactionBuilder } from "../source/builder.js";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	signer: Contracts.Crypto.TransactionSigner;
 	keyPair: Contracts.Crypto.KeyPair;
 	transaction: Contracts.Crypto.Transaction;
@@ -15,11 +16,11 @@ describe<{
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.signer = context.sandbox.app.get<Contracts.Crypto.TransactionSigner>(
+		context.signer = context.app.get<Contracts.Crypto.TransactionSigner>(
 			Identifiers.Cryptography.Transaction.Signer,
 		);
 
-		context.keyPair = await context.sandbox.app
+		context.keyPair = await context.app
 			.getTagged<Contracts.Crypto.KeyPairFactory>(
 				Identifiers.Cryptography.Identity.KeyPair.Factory,
 				"type",
@@ -27,7 +28,7 @@ describe<{
 			)
 			.fromMnemonic("secret");
 
-		const builder = context.sandbox.app.resolve(TransactionBuilder);
+		const builder = context.app.resolve(TransactionBuilder);
 		context.transaction = await (
 			await builder
 				.gasPrice(5 * 1e9)
@@ -39,7 +40,7 @@ describe<{
 	});
 
 	it("should sign signature", async (context) => {
-		const signature = await context.signer.sign(context.transaction.data, context.keyPair);
+		const signature = await context.signer.sign(context.transaction, context.keyPair);
 
 		assert.equal(signature, {
 			r: "295ffb1befa5259bba46d532affa13f52f1e50f9418a2579982b121b4ef3553a",
@@ -49,7 +50,7 @@ describe<{
 	});
 
 	it("should sign legacy signature", async (context) => {
-		const signature = await context.signer.legacySecondSign(context.transaction.data, context.keyPair);
+		const signature = await context.signer.legacySecondSign(context.transaction, context.keyPair);
 
 		assert.equal(
 			signature,

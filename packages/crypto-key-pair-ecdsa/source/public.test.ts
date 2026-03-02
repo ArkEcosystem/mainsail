@@ -1,40 +1,41 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
+import { Application } from "@mainsail/kernel";
+import * as Exceptions from "@mainsail/exceptions";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { KeyPairFactory } from "./pair";
 import { PublicKeyFactory } from "./public";
 
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
-describe<{ container: Container }>("PrivateKeyFactory", ({ assert, beforeEach, each, it }) => {
+describe<{ app: Application; factory: PublicKeyFactory }>("PrivateKeyFactory", ({ assert, beforeEach, each, it }) => {
 	beforeEach((context) => {
-		context.container = new Container();
-		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.container.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
+		context.app = new Application();
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
+
+		context.factory = context.app.resolve(PublicKeyFactory);
 	});
 
-	it("should derive a key pair from an mnemonic", async (context) => {
+	it("should derive a key pair from an mnemonic", async ({ factory }) => {
 		assert.is(
-			await context.container.get(PublicKeyFactory, { autobind: true }).fromMnemonic(mnemonic),
+			await factory.fromMnemonic(mnemonic),
 			"03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f",
 		);
 	});
 
-	it("should derive from a WIF", async (context) => {
+	it("should derive from a WIF", async ({ factory }) => {
 		assert.is(
-			await context.container
-				.get(PublicKeyFactory, { autobind: true })
-				.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn", 128),
+			await factory.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"),
 			"0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
 		);
 	});
 
-	it("should derive from a musig", async (context) => {
+	it("should derive from a musig", async ({ factory }) => {
 		assert.is(
-			await context.container.get(PublicKeyFactory, { autobind: true }).fromMultiSignatureAsset({
+			await factory.fromMultiSignatureAsset({
 				min: 3,
 				publicKeys: [
 					"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
@@ -46,10 +47,55 @@ describe<{ container: Container }>("PrivateKeyFactory", ({ assert, beforeEach, e
 		);
 	});
 
+	it("should throw if min < 1", async ({ factory }) => {
+		await assert.rejects(
+			() =>
+				factory.fromMultiSignatureAsset({
+					min: 0,
+					publicKeys: [
+						"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
+						"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
+						"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
+					],
+				}),
+			"The multi signature asset is invalid.",
+		);
+	});
+
+	it("should throw if min > publicKeys.length", async ({ factory }) => {
+		await assert.rejects(
+			() =>
+				factory.fromMultiSignatureAsset({
+					min: 4,
+					publicKeys: [
+						"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
+						"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
+						"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
+					],
+				}),
+			"The multi signature asset is invalid.",
+		);
+	});
+
+	it("should throw if publicKey is invalid", async ({ factory }) => {
+		await assert.rejects(
+			() =>
+				factory.fromMultiSignatureAsset({
+					min: 1,
+					publicKeys: [
+						"0",
+						"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
+						"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
+					],
+				}),
+			"Expected 0 to be a valid public key",
+		);
+	});
+
 	each(
 		"should pass with valid public keys",
 		async ({ context, dataset }) => {
-			assert.true(await context.container.get(PublicKeyFactory, { autobind: true }).verify(dataset));
+			assert.true(await context.factory.verify(dataset));
 		},
 		[
 			"02b54f00d9de5a3ace28913fe78a15afcfe242926e94d9b517d06d2705b261f992",
@@ -67,7 +113,7 @@ describe<{ container: Container }>("PrivateKeyFactory", ({ assert, beforeEach, e
 	each(
 		"should fail with invalid public keys",
 		async ({ context, dataset }) => {
-			assert.false(await context.container.get(PublicKeyFactory, { autobind: true }).verify(dataset));
+			assert.false(await context.factory.verify(dataset));
 		},
 		[
 			"0",
@@ -82,4 +128,8 @@ describe<{ container: Container }>("PrivateKeyFactory", ({ assert, beforeEach, e
 			"22337416a26d8d49ec27059bd0589c49bb474029c3627715380f4df83fb431aece",
 		],
 	);
+
+	it("#aggregate - should throw not implemented", async ({ factory }) => {
+		await assert.rejects(() => factory.aggregate([]), Exceptions.NotImplemented);
+	});
 });

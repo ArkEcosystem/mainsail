@@ -57,6 +57,12 @@ export class MessageSchemaError extends Exception {
 	}
 }
 
+export class MessageDeserializationError extends Exception {
+	public constructor(message: string) {
+		super(`Message deserialization failed: ${message}`);
+	}
+}
+
 export class InvalidTransactionBytesError extends Exception {
 	public constructor(message: string) {
 		super(`Failed to deserialize transaction, encountered invalid bytes: ${message}`);
@@ -136,6 +142,12 @@ export class PreviousBlockIdFormatError extends Exception {
 				`must use full SHA256 block id, but the next block (at ${thisBlockHeight}) ` +
 				`contains previous block id "${previousBlockId}"`,
 		);
+	}
+}
+
+export class InvalidBlockBytesError extends Exception {
+	public constructor(message: string) {
+		super(`Failed to deserialize block, encountered invalid bytes: ${message}`);
 	}
 }
 

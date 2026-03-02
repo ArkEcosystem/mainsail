@@ -79,7 +79,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	async #verifyHighestCommonBlock(peer: Contracts.P2P.Peer, state: Contracts.P2P.PeerState): Promise<void> {
 		const block = this.stateStore.getLastBlock();
 
-		const blockNumberToRequest = state.blockNumber < block.data.number ? state.blockNumber : block.data.number;
+		const blockNumberToRequest = state.blockNumber < block.number ? state.blockNumber : block.number;
 
 		const { blocks } = await this.communicator.getBlocks(peer, { fromBlockNumber: blockNumberToRequest, limit: 1 });
 
@@ -91,15 +91,15 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		const receivedCommit = await this.commitFactory.fromBytes(blocks[0]);
 
 		const blockToCompare =
-			block.data.number === blockNumberToRequest ? block : await this.database.getBlock(blockNumberToRequest);
+			block.number === blockNumberToRequest ? block : await this.database.getBlock(blockNumberToRequest);
 
 		assert.defined(blockToCompare);
 
-		if (receivedCommit.block.data.number !== blockToCompare.data.number) {
+		if (receivedCommit.block.number !== blockToCompare.number) {
 			throw new Error("Received block does not match the requested block number");
 		}
 
-		if (receivedCommit.block.data.hash !== blockToCompare.data.hash) {
+		if (receivedCommit.block.hash !== blockToCompare.hash) {
 			throw new Error("Received block does not match the requested hash. Peer is on a different chain.");
 		}
 	}

@@ -115,7 +115,7 @@ impl EvmInner {
         let result = self.transact_evm(tx_ctx.into());
 
         Ok(match result {
-            Ok(r) => {
+            Ok((r, _)) => {
                 // if !r.is_success() {
                 //     self.logger
                 //         .log(LogLevel::Warn, format!("view call failed: {:?}", r));
@@ -260,7 +260,7 @@ impl EvmInner {
             tx_hash: None,
             stateful: true,
         }) {
-            Ok(receipt) => {
+            Ok((receipt, _)) => {
                 self.logger.log(
                     LogLevel::Debug,
                     format!(
@@ -346,7 +346,7 @@ impl EvmInner {
                     tx_hash: None,
                     stateful: true,
                 }) {
-                    Ok(receipt) => {
+                    Ok((receipt, _)) => {
                         self.logger.log(
                             LogLevel::Debug,
                             format!(
@@ -986,8 +986,8 @@ impl EvmInner {
         ctx: ExecutionContext,
     ) -> std::result::Result<TxReceipt, EVMError<String>> {
         match self.transact_evm(ctx.into()) {
-            Ok(result) => {
-                let receipt = map_execution_result(result);
+            Ok((result, cumulative_gas_used)) => {
+                let receipt = map_execution_result(result, cumulative_gas_used);
                 Ok(receipt)
             }
             Err(err) => {
@@ -1010,7 +1010,7 @@ impl EvmInner {
         &mut self,
         ctx: ExecutionContext,
     ) -> std::result::Result<
-        ExecutionResult,
+        (ExecutionResult, u64),
         EVMError<EvmDatabaseError<mainsail_evm_core::db::Error>>,
     > {
         let mut state_builder = State::builder().with_bundle_update();
@@ -1067,6 +1067,8 @@ impl EvmInner {
             Ok(result) => {
                 let ResultAndState { state, result } = result;
 
+                let mut cumulative_gas_used = 0;
+
                 // Update state if transaction is part of a commit
                 if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key)
                     && ctx.stateful
@@ -1078,7 +1080,12 @@ impl EvmInner {
                         pending_commit.cache = std::mem::take(&mut state_db.cache);
 
                         if let Some(tx_hash) = ctx.tx_hash {
-                            pending_commit.results.insert(tx_hash, result.clone());
+                            pending_commit.cumulative_gas_used += result.gas_used();
+                            pending_commit.results.insert(
+                                tx_hash,
+                                (result.clone(), pending_commit.cumulative_gas_used),
+                            );
+                            cumulative_gas_used = pending_commit.cumulative_gas_used;
                         }
 
                         pending_commit.transitions.add_transitions(
@@ -1093,7 +1100,7 @@ impl EvmInner {
                     }
                 }
 
-                Ok(result)
+                Ok((result, cumulative_gas_used))
             }
             Err(err) => Err(err),
         }

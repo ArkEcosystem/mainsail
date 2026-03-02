@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import * as schemas from "./schemas";
 
 describe<{}>("Schemas", ({ it, assert }) => {

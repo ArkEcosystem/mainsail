@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { numberToHex } from "./number-to-hex";
 
 describe("numberToHex", async ({ assert, it, nock, loader }) => {

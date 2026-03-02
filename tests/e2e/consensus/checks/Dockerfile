@@ -22,6 +22,7 @@ RUN npm install -g npm@latest \
 
     
 COPY *.mjs package.json ./
+COPY abis/ abis/
 
 RUN npm install
 

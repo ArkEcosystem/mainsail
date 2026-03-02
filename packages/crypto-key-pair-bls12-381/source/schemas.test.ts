@@ -5,23 +5,24 @@ import { Validator } from "@mainsail/validation/source/validator";
 import { generateMnemonic } from "bip39";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
-import { describe, Sandbox } from "../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { KeyPairFactory } from "./pair";
 import { schemas } from "./schemas";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	validator: Validator;
 }>("Schemas", ({ it, assert, beforeEach }) => {
 	const length = 96;
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.validator = context.app.resolve(Validator);
 
 		for (const schema of Object.values({
 			...baseSchemas,
@@ -32,33 +33,33 @@ describe<{
 	});
 
 	it("publicKey - should be ok", ({ validator }) => {
-		assert.undefined(validator.validate("publicKey", "0".repeat(length)).error);
+		assert.undefined(validator.validate("consensusPublicKey", "0".repeat(length)).error);
 
 		const validChars = "0123456789abcdef";
 
 		for (const char of validChars) {
-			assert.undefined(validator.validate("publicKey", char.repeat(length)).error);
+			assert.undefined(validator.validate("consensusPublicKey", char.repeat(length)).error);
 		}
 	});
 
 	it("publicKey - should be ok from key pair factory", async (context) => {
-		const kayPair = await context.sandbox.app.resolve(KeyPairFactory).fromMnemonic(generateMnemonic(256));
+		const kayPair = await context.app.resolve(KeyPairFactory).fromMnemonic(generateMnemonic(256));
 
-		assert.undefined(context.validator.validate("publicKey", kayPair.publicKey).error);
+		assert.undefined(context.validator.validate("consensusPublicKey", kayPair.publicKey).error);
 	});
 
 	it("publicKey - should not be ok", ({ validator }) => {
-		assert.defined(validator.validate("publicKey", "0".repeat(length - 1)).error);
-		assert.defined(validator.validate("publicKey", "0".repeat(length + 1)).error);
-		assert.defined(validator.validate("publicKey", 123).error);
-		assert.defined(validator.validate("publicKey", null).error);
-		assert.defined(validator.validate("publicKey").error);
-		assert.defined(validator.validate("publicKey", {}).error);
+		assert.defined(validator.validate("consensusPublicKey", "0".repeat(length - 1)).error);
+		assert.defined(validator.validate("consensusPublicKey", "0".repeat(length + 1)).error);
+		assert.defined(validator.validate("consensusPublicKey", 123).error);
+		assert.defined(validator.validate("consensusPublicKey", null).error);
+		assert.defined(validator.validate("consensusPublicKey").error);
+		assert.defined(validator.validate("consensusPublicKey", {}).error);
 
 		const invalidChars = "ABCDEFGHIJKLghijkl!#$%&'|+/";
 
 		for (const char of invalidChars) {
-			assert.defined(validator.validate("publicKey", char.repeat(64)).error);
+			assert.defined(validator.validate("consensusPublicKey", char.repeat(64)).error);
 		}
 	});
 });

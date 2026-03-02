@@ -1,8 +1,7 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 
-import { describe } from "../../../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { Application } from "../../../application";
 import { MemoryEventDispatcher } from "../../events";
 import { MemoryCacheStore } from "./memory";
@@ -24,7 +23,7 @@ describe<{
 	store: MemoryCacheStore<string, number>;
 }>("MemoryCacheStore", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
 

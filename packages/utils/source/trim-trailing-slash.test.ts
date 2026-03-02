@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { trimTrailingSlash } from "./trim-trailing-slash";
 
 describe("trimTrailingSlash", async ({ assert, it, nock, loader }) => {

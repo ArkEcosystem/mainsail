@@ -47,9 +47,9 @@ export const getApiHttp = async (peer, path) => {
         if (response.statusCode !== 200) {
             console.log(JSON.stringify(response.data));
 
-            return response.data.data;
+            return response.data;
         } else {
-            return response.data.data;
+            return response.data;
         }
     } catch (err) {
         console.error(`getApiHttp failed: ${err.message}`);

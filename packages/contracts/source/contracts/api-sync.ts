@@ -3,7 +3,7 @@ import type { Logger as MainLogger, LoggerContext } from "./kernel/index.js";
 
 export interface Service extends CommitHandler {
 	bootstrap(): Promise<void>;
-	beforeCommit(): Promise<void>;
+	flush(): Promise<void>;
 	getLastSyncedBlockHeight(): Promise<number>;
 }
 

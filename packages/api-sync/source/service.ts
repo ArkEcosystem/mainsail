@@ -15,6 +15,7 @@ import { performance } from "perf_hooks";
 import { Listeners, TokenParser } from "./contracts.js";
 import { parseMultiPayments } from "./parsers/index.js";
 import { Restore } from "./restore.js";
+import { TokenWhitelist } from "./tokens/whitelist.js";
 
 interface DeferredSync {
 	block: Models.Block;
@@ -28,8 +29,6 @@ interface DeferredSync {
 	mergedLegacyColdWallets: ({ legacyAddress: string } & Contracts.Evm.AccountMergeInfo)[];
 	newMilestones?: Contracts.Crypto.Milestone;
 }
-
-const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve) => queue.once("drain", resolve));
 
 @injectable()
 export class Sync implements Contracts.ApiSync.Service {
@@ -117,6 +116,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.ApiSync.TokenParser)
 	private readonly tokenParser!: TokenParser;
 
+	@inject(Identifiers.ApiSync.TokenWhitelist)
+	private readonly tokenWhitelist!: TokenWhitelist;
+
 	public async bootstrap(): Promise<void> {
 		await this.migrations.synchronizeEntities();
 		await this.#resetDatabaseIfNecessary();
@@ -132,20 +134,21 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		await this.listeners.bootstrap();
 
+		await this.tokenWhitelist.bootstrap();
+
 		await this.#queue.start();
 	}
 
-	public async beforeCommit(): Promise<void> {
-		while (this.#queue.size() > 0) {
-			await drainQueue(this.#queue);
-		}
+	public async flush(): Promise<void> {
+		await this.#queue.drain();
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const commit = await unit.getCommit();
 
+		const header = commit.block;
 		const {
-			block: { header, transactions: blockTransactions },
+			block: { transactions: blockTransactions },
 			proof,
 		} = commit;
 
@@ -165,10 +168,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		);
 
 		for (const transaction of blockTransactions) {
-			const {
-				data,
-				data: { senderPublicKey },
-			} = transaction;
+			const { senderPublicKey } = transaction;
 			if (!publicKeyToAddress[senderPublicKey]) {
 				const address = await this.addressFactory.fromPublicKey(senderPublicKey);
 				publicKeyToAddress[senderPublicKey] = address;
@@ -188,26 +188,28 @@ export class Sync implements Contracts.ApiSync.Service {
 			transactions.push({
 				blockHash: header.hash,
 				blockNumber: header.number.toFixed(),
-				data: data.data,
+				cumulativeGasUsed: Number(receipt.cumulativeGasUsed),
+
+				data: transaction.data,
 
 				decodedError: parseTransactionError(transaction, receipt),
 
 				// Receipt data
 				deployedContractAddress: receipt.contractAddress,
 
-				from: data.from,
+				from: transaction.from,
 
-				gas: data.gasLimit,
+				gas: transaction.gasLimit,
 
-				gasPrice: data.gasPrice,
+				gasPrice: transaction.gasPrice,
 
 				gasRefunded: Number(receipt.gasRefunded),
 
 				gasUsed: Number(receipt.gasUsed),
 
-				hash: data.hash,
+				hash: transaction.hash,
 
-				legacySecondSignature: data.legacySecondSignature,
+				legacySecondSignature: transaction.legacySecondSignature,
 
 				// is converted into JSONB column
 				logs: receipt.logs as unknown as string,
@@ -215,16 +217,16 @@ export class Sync implements Contracts.ApiSync.Service {
 				multiPaymentRecipients:
 					parsedMultiPayments.length > 0 ? [...new Set(parsedMultiPayments.map((mp) => mp.to))] : undefined,
 
-				nonce: data.nonce.toFixed(),
+				nonce: transaction.nonce.toFixed(),
 
 				output: receipt.output,
-				senderPublicKey: data.senderPublicKey,
-				signature: formatEcdsaSignature(data.r!, data.s!, data.v!),
+				senderPublicKey: transaction.senderPublicKey,
+				signature: formatEcdsaSignature(transaction.r!, transaction.s!, transaction.v!),
 				status: receipt.status,
 				timestamp: header.timestamp.toFixed(),
-				to: data.to,
-				transactionIndex: data.transactionIndex!,
-				value: data.value.toFixed(),
+				to: transaction.to,
+				transactionIndex: transaction.transactionIndex!,
+				value: transaction.value.toFixed(),
 			});
 
 			multiPayments.push(...parsedMultiPayments);
@@ -575,6 +577,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			'secondPublicKey', "Wallet".attributes->>'secondPublicKey',
 			'multiSignature', "Wallet".attributes->>'multiSignature',
 			'legacyMerge', "Wallet".attributes->>'legacyMerge',
+			'legacyNonce', "Wallet".attributes->>'legacyNonce',
 
 			-- if any unvote is present, it will overwrite the previous vote
 			'vote',
@@ -629,7 +632,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		const genesisHeight = this.configuration.getGenesisHeight();
 		const lastHeight = (await this.databaseService.isEmpty())
 			? genesisHeight
-			: (await this.databaseService.getLastCommit()).block.header.number;
+			: (await this.databaseService.getLastCommit()).block.number;
 
 		const inMaintenance = await this.systemRepositoryFactory().inMaintenance();
 		const [blocks] = await this.dataSource.query(
@@ -656,6 +659,9 @@ export class Sync implements Contracts.ApiSync.Service {
 			await (this.dataSource as TypeOrm.DataSource)
 				.createQueryRunner()
 				.query("CREATE EXTENSION IF NOT EXISTS citext;");
+			await (this.dataSource as TypeOrm.DataSource)
+				.createQueryRunner()
+				.query("CREATE EXTENSION IF NOT EXISTS pg_trgm;");
 		} catch (error) {
 			await this.app.terminate("failed to reset database", error);
 		}

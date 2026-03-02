@@ -1,4 +1,4 @@
-import { describeWithContext } from "../../test-framework/source";
+import { describeWithContext } from "@mainsail/test-runner";
 import { sortByDesc } from "./sort-by-desc";
 
 describeWithContext(

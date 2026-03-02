@@ -1,22 +1,20 @@
 import * as Exceptions from "@mainsail/exceptions";
 import { BigNumber } from "@mainsail/utils";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 
 describe<{
 	transaction: any;
 }>("Errors", ({ it, assert, beforeAll }) => {
 	beforeAll((context) => {
 		context.transaction = {
-			data: {
-				amount: BigNumber.make(100),
-				gasPrice: 900 * 1e9,
-				hash: "dummy-tx-id",
-				network: 30,
-				nonce: BigNumber.make(1),
-				from: "dummy-sender-key",
-				type: 0,
-			},
+			amount: BigNumber.make(100),
+			gasPrice: 900 * 1e9,
+			hash: "dummy-tx-id",
+			network: 30,
+			nonce: BigNumber.make(1),
+			from: "dummy-sender-key",
+			type: 0,
 			hash: "dummy-tx-id",
 			key: "some-key",
 			serialized: Buffer.from("dummy"),

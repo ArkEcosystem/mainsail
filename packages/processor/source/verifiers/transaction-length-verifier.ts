@@ -11,7 +11,7 @@ export class TransactionLengthVerifier implements Contracts.Processor.Handler {
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const block = unit.getBlock();
 
-		if (block.transactions.length !== block.data.transactionsCount) {
+		if (block.transactions.length !== block.transactionsCount) {
 			throw new InvalidTransactionsLength(block);
 		}
 	}

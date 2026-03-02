@@ -1,9 +1,7 @@
 import type { JsonObject } from "../types/index.js";
-import type { BindToFluentSyntax, Container, Newable, ServiceIdentifier } from "./container.js";
+import type { BindToFluentSyntax, Newable, ServiceIdentifier } from "./container.js";
 
 export interface Application {
-	readonly container: Container;
-
 	bootstrap({ flags, plugins }: { flags: JsonObject; plugins?: JsonObject }): Promise<void>;
 
 	boot(): Promise<void>;
@@ -47,12 +45,6 @@ export interface Application {
 	isBooted(): boolean;
 
 	isWorker(): boolean;
-
-	enableMaintenance(): void;
-
-	disableMaintenance(): void;
-
-	isDownForMaintenance(): boolean;
 
 	terminate(reason?: string, error?: Error): Promise<never>;
 

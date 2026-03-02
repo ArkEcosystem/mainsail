@@ -104,6 +104,10 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 					trustProxy: Joi.bool().required(),
 					whitelist: Joi.array().items(Joi.string()).required(),
 				}).required(),
+
+				tokens: Joi.object({
+					defaultMinimumBalance: Joi.number().positive().allow(0).required(),
+				}).required(),
 			}).unknown(true),
 		);
 	}

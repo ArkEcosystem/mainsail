@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { BigNumber } from "@mainsail/utils";
 import { Query, QueryIterable } from ".";
 
@@ -26,63 +26,39 @@ describe<{
 
 	beforeEach((context) => {
 		context.sender1Transaction100 = {
-			data: {
-				amount: BigNumber.make(100),
-				gasPrice: 100 * 1e9,
-				nonce: BigNumber.make(1),
-				from: "sender1",
-				type: 0,
-				version: 2,
-			},
+			amount: BigNumber.make(100),
+			gasPrice: 100 * 1e9,
+			nonce: BigNumber.make(1),
+			from: "sender1",
 			hash: "dummy-tx-id",
-			key: "some-key",
 			serialized: Buffer.from("dummy"),
-			type: 0,
 		};
 
 		context.sender1Transaction200 = {
-			data: {
-				amount: BigNumber.make(100),
-				gasPrice: 200 * 1e9,
-				nonce: BigNumber.make(2),
-				from: "sender1",
-				type: 0,
-				version: 0,
-			},
+			amount: BigNumber.make(100),
+			gasPrice: 200 * 1e9,
+			nonce: BigNumber.make(2),
+			from: "sender1",
 			hash: "dummy-tx-id-2",
-			key: "some-key-2",
 			serialized: Buffer.from("dummy-2"),
-			type: 0,
 		};
 
 		context.sender2Transaction100 = {
-			data: {
-				amount: BigNumber.make(100),
-				gasPrice: 300 * 1e9,
-				nonce: BigNumber.make(3),
-				from: "sender2",
-				type: 1,
-				version: 2,
-			},
+			amount: BigNumber.make(100),
+			gasPrice: 300 * 1e9,
+			nonce: BigNumber.make(3),
+			from: "sender2",
 			hash: "dummy-tx-id-3",
-			key: "some-key-3",
 			serialized: Buffer.from("dummy-3"),
-			type: 0,
 		};
 
 		context.sender2Transaction200 = {
-			data: {
-				amount: BigNumber.make(100),
-				gasPrice: 400 * 1e9,
-				nonce: BigNumber.make(4),
-				from: "sender2",
-				type: 0,
-				version: 2,
-			},
+			amount: BigNumber.make(100),
+			gasPrice: 400 * 1e9,
+			nonce: BigNumber.make(4),
+			from: "sender2",
 			hash: "dummy-tx-id-4",
-			key: "some-key-3",
 			serialized: Buffer.from("dummy-4"),
-			type: 0,
 		};
 	});
 
@@ -160,7 +136,7 @@ describe<{
 		const query = context.container.get(Query, { autobind: true });
 		const result = await query
 			.getFromHighestPriority()
-			.wherePredicate(async (t) => t.data.from === "sender2")
+			.wherePredicate(async (t) => t.from === "sender2")
 			.all();
 
 		assert.equal(result, [context.sender2Transaction100, context.sender2Transaction200]);

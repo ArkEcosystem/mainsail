@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { isLessThanOrEqual } from "./is-less-than-or-equal";
 
 describe("isLessThanOrEqual", async ({ assert, it, nock, loader }) => {

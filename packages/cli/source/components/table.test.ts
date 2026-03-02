@@ -1,6 +1,7 @@
-import { Console, describe } from "../../../test-framework/source";
-import { Identifiers } from "../ioc/index.js";
+import { describe } from "@mainsail/test-runner";
+import { Identifiers } from "@mainsail/constants";
 import { Table } from "./table";
+import { Console } from "../test/index.js";
 
 describe<{
 	component: Table;
@@ -8,8 +9,8 @@ describe<{
 }>("Table", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Table).to(Table).inSingletonScope();
-		context.component = context.cli.app.get(Identifiers.Table);
+		context.cli.app.rebind(Identifiers.Cli.Component.Table).to(Table).inSingletonScope();
+		context.component = context.cli.app.get(Identifiers.Cli.Component.Table);
 	});
 
 	it("should render the component", async ({ component, cli }) => {

@@ -14,6 +14,7 @@ import type {
 	Token,
 	TokenHolder,
 	TokenTransfer,
+	TokenWhitelist,
 	Transaction,
 	ValidatorRound,
 	Wallet,
@@ -107,6 +108,8 @@ export type TokenHolderRepositoryExtension = Record<string, unknown>;
 export type TokenHolderRepository = ExtendedRepository<TokenHolder> & TokenHolderRepositoryExtension;
 export type TokenTransferRepositoryExtension = Record<string, unknown>;
 export type TokenTransferRepository = ExtendedRepository<TokenTransfer> & TokenTransferRepositoryExtension;
+export type TokenWhitelistRepositoryExtension = Record<string, unknown>;
+export type TokenWhitelistRepository = ExtendedRepository<TokenWhitelist> & TokenWhitelistRepositoryExtension;
 
 export type SystemRepositoryExtension = {
 	inMaintenance(): Promise<boolean>;
@@ -140,6 +143,7 @@ export type TransactionRepositoryFactory = (customDataSource?: RepositoryDataSou
 export type TokenRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenRepository;
 export type TokenHolderRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenHolderRepository;
 export type TokenTransferRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenTransferRepository;
+export type TokenWhitelistRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenWhitelistRepository;
 export type MultiPaymentRepositoryFactory = (customDataSource?: RepositoryDataSource) => MultiPaymentRepository;
 export type ValidatorRoundRepositoryFactory = (customDataSource?: RepositoryDataSource) => ValidatorRoundRepository;
 export type PluginRepositoryFactory = (customDataSource?: RepositoryDataSource) => PluginRepository;
@@ -148,7 +152,7 @@ export type SystemRepositoryFactory = (customDataSource?: RepositoryDataSource) 
 export type WalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => WalletRepository;
 export type LegacyColdWalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => LegacyColdWalletRepository;
 
-export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
+export type { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
 
 export interface Migrations {
 	synchronizeEntities(): Promise<void>;

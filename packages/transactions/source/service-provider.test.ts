@@ -1,7 +1,6 @@
-import { Container } from "@mainsail/container";
 import { Application } from "@mainsail/kernel";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from "./service-provider";
 
 describe<{
@@ -9,7 +8,7 @@ describe<{
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);
 	});
 

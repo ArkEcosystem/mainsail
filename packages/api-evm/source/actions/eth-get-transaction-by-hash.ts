@@ -31,6 +31,6 @@ export class EthGetTransactionByHash implements Contracts.Api.RPC.Action<[string
 			return null;
 		}
 
-		return this.app.resolve(TransactionResource).transform(transaction.data);
+		return this.app.resolve(TransactionResource).transform(transaction);
 	}
 }

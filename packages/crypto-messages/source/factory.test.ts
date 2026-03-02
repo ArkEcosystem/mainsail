@@ -1,9 +1,12 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers, Enums } from "@mainsail/constants";
 
+import { MessageSchemaError } from "@mainsail/exceptions";
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
-import { describe, Factories, Sandbox } from "../../test-framework/source";
-import { Types } from "../../test-framework/source/factories";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
+import { Factories } from "../../test-factories/source/index.js";
+import { Types } from "../../test-factories/source/factories";
 import {
 	prevoteData,
 	precommitData,
@@ -20,7 +23,7 @@ import { toData } from "../test/helpers/utilities.js";
 import { Factory } from "./factory";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	factory: Factory;
 	blockFactory: Contracts.Crypto.BlockFactory;
 	identity: Types.Identity;
@@ -38,30 +41,26 @@ describe<{
 				return {
 					// @ts-ignore
 					consensusSignature: (method, message, privateKey) =>
-						context.sandbox.app
+						context.app
 							.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
 							[method](message, privateKey),
 					// @ts-ignore
 					transactionFactory: (method, message, privateKey) =>
-						context.sandbox.app
-							.get(Identifiers.Cryptography.Transaction.Factory)!
-							[method](message, privateKey),
+						context.app.get(Identifiers.Cryptography.Transaction.Factory)![method](message, privateKey),
 				};
 			},
 		};
 
-		context.sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(validatorSet);
-		context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
+		context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(validatorSet);
+		context.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
-		context.factory = context.sandbox.app.resolve(Factory);
-		context.blockFactory = context.sandbox.app.get<Contracts.Crypto.BlockFactory>(
-			Identifiers.Cryptography.Block.Factory,
-		);
+		context.factory = context.app.resolve(Factory);
+		context.blockFactory = context.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
 
 		const identityFactory = await Factories.factory<Factories.Types.Identity>("Identity", crypto);
 		const identity = await identityFactory
 			.withOptions({
-				app: context.sandbox.app,
+				app: context.app,
 				keyType: "consensus",
 				passphrase: validatorMnemonic,
 			})
@@ -118,6 +117,15 @@ describe<{
 		);
 	});
 
+	it("#makeMessage - should throw if schema is invalid", async ({ factory, identity }) => {
+		const invalidPrecommitData = {
+			...precommitData,
+			blockNumber: 0, // invalid block number
+		};
+
+		await assert.rejects(() => factory.makeMessage(invalidPrecommitData, identity.keys), MessageSchemaError);
+	});
+
 	it("#makeMessageFromBytes - should be ok for prevote", async ({ factory }) => {
 		const prevote = await factory.makeMessageFromBytes(Buffer.from(serializedPrevote, "hex"));
 
@@ -140,5 +148,19 @@ describe<{
 		const precommit = await factory.makeMessageFromBytes(Buffer.from(serializedPrecommitNoBlock, "hex"));
 
 		assert.equal(toData(precommit), precommitDataNoBlock);
+	});
+
+	it("#makeMessageFromBytes - should throw if extra bytes are present", async ({ factory }) => {
+		await assert.rejects(
+			() => factory.makeMessageFromBytes(Buffer.from(serializedPrecommitNoBlock + "00", "hex")),
+			"Message deserialization failed: 1 bytes remaining",
+		);
+	});
+
+	it("#makeMessageFromBytes - should throw if missing bytes are present", async ({ factory }) => {
+		await assert.rejects(
+			() => factory.makeMessageFromBytes(Buffer.from(serializedPrecommitNoBlock.slice(0, -2), "hex")),
+			"Message deserialization failed: Read over buffer boundary.",
+		);
 	});
 });

@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { isAsyncFunction } from "./is-async-function";
 
 describe("isAsyncFunction", async ({ assert, it, nock, loader }) => {

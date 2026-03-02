@@ -1,7 +1,9 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
+import { Application } from "@mainsail/kernel";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa";
-import { describe, Factories, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
+import { Factories } from "@mainsail/test-factories";
 import { ethers } from "ethers";
 
 import crypto from "../config/core/crypto.json";
@@ -13,7 +15,7 @@ const URL = "http://127.0.0.1:4008/api";
 const TX_INCLUDE_DELAY = 5000;
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	localClient: LocalClient;
 	clients: Client[];
 	privateKey: string;
@@ -25,11 +27,11 @@ describe<{
 		context.clients = [context.localClient];
 		context.clients = [context.localClient, new EthersClient(URL), new ViemClient(URL)];
 
-		const sandbox = new Sandbox();
-		context.sandbox = sandbox;
-		sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
+		const app = new Application();
+		context.app = app;
+		app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 
-		const keyPairFactory = sandbox.app.resolve(KeyPairFactory);
+		const keyPairFactory = app.resolve(KeyPairFactory);
 		const keyPair = await keyPairFactory.fromMnemonic(secrets[0]);
 		context.privateKey = `0x${keyPair.privateKey}`;
 		context.address = ethers.computeAddress(`0x${keyPair.publicKey}`);

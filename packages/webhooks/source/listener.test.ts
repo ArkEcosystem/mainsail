@@ -1,11 +1,10 @@
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers, Events } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { dummyWebhook } from "../test/fixtures/assets";
 import { conditions } from "./conditions";
 import { Database } from "./database";
@@ -40,7 +39,7 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		const app = new Application(new Container());
+		const app = new Application();
 		app.bind("path.cache").toConstantValue(dirSync().name);
 
 		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);

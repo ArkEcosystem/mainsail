@@ -1,7 +1,8 @@
 import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 
-import { describe, Sandbox } from "../../../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { GetStatusController } from "./get-status";
 
 const { GetStatusController: GetStatusControllerProxy } = await esmock("./get-status", {
@@ -11,24 +12,25 @@ const { GetStatusController: GetStatusControllerProxy } = await esmock("./get-st
 });
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	controller: GetStatusController;
 }>("GetStatusController", ({ it, assert, beforeEach, stub }) => {
 	const store = { getLastBlock: () => {} };
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
-		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue(store);
+		context.app.bind(Identifiers.State.Store).toConstantValue(store);
 
-		context.controller = context.sandbox.app.resolve(GetStatusControllerProxy);
+		context.controller = context.app.resolve(GetStatusControllerProxy);
 	});
 
 	it("should return the status based on last block", async ({ controller }) => {
 		const number = 1987;
 		const hash = "984003423092345907";
 		const lastBlock = {
-			data: { number, hash },
+			number,
+			hash,
 		};
 
 		stub(store, "getLastBlock").returnValue(lastBlock);

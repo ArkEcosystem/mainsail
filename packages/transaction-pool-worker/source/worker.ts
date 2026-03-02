@@ -57,19 +57,19 @@ export class Worker implements Contracts.TransactionPool.Worker {
 
 		const block = unit.getBlock();
 		for (const transaction of block.transactions) {
-			sendersAddresses.add(transaction.data.from);
+			sendersAddresses.add(transaction.from);
 		}
 
 		// TODO: get syncing status from p2p service
 		const nowMs = dayjs().valueOf();
 		const { blockTime } = this.configuration.getMilestone().timeouts;
-		const isSyncing = block.header.timestamp < nowMs - blockTime * 3;
+		const isSyncing = block.timestamp < nowMs - blockTime * 3;
 
 		await this.ipcSubprocess.sendRequest(
 			"commit",
 			unit.blockNumber,
 			[...sendersAddresses.keys()],
-			block.header.gasUsed,
+			block.gasUsed,
 			isSyncing,
 		);
 	}

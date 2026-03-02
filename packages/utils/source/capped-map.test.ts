@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { CappedMap } from "./capped-map";
 
 describe("Capped Map", ({ it, assert }) => {

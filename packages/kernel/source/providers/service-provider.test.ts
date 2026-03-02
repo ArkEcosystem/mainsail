@@ -1,9 +1,8 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
-import { describeSkip } from "../../../test-framework/source";
+import { describeSkip } from "@mainsail/test-runner";
 import { Application } from "../application";
 import { PluginConfiguration } from "./plugin-configuration";
 import { PluginManifest } from "./plugin-manifest";
@@ -17,7 +16,7 @@ describeSkip<{
 	app: Application;
 }>("ServiceProvider", ({ assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app
 			.bind(Identifiers.Services.Filesystem.Service)
 			.toConstantValue({ existsSync: () => true, readJSONSync: (path: string) => readJSONSync(path) });
@@ -86,19 +85,6 @@ describeSkip<{
 
 	it(".version (no manifest)", (context) => {
 		assert.undefined(context.app.resolve(StubServiceProvider).version());
-	});
-
-	it(".alias", (context) => {
-		const serviceProvider: ServiceProvider = context.app.resolve(StubServiceProvider);
-
-		const pluginManifest = context.app.resolve(PluginManifest);
-		serviceProvider.setManifest(pluginManifest.discover(resolve(__dirname, "../../test/stubs/stub-plugin")));
-
-		assert.is(serviceProvider.alias(), "some-alias");
-	});
-
-	it(".alias (no manifest)", (context) => {
-		assert.undefined(context.app.resolve(StubServiceProvider).alias());
 	});
 
 	it(".config", (context) => {

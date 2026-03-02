@@ -1,16 +1,18 @@
-import type { Contracts as ApiDatabaseContracts, Models } from "@mainsail/api-database";
+import type { Contracts as ApiDatabaseContracts, Models, TypeOrm } from "@mainsail/api-database";
 import type { Contracts } from "@mainsail/contracts";
 
 export interface EventListener extends Contracts.Kernel.EventListener {
 	register(): Promise<void>;
 	boot(): Promise<void>;
 	dispose(): Promise<void>;
+	flush(entityManager: TypeOrm.EntityManager): Promise<void>;
 }
 
 export interface Listeners {
 	register(): Promise<void>;
 	bootstrap(): Promise<void>;
 	dispose(): Promise<void>;
+	flush(entityManager: TypeOrm.EntityManager): Promise<void>;
 }
 
 export type TokenParserResult = {

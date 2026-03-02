@@ -1,4 +1,4 @@
-import { describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { RateLimiter } from "../rate-limiter";
 import { buildRateLimiter } from "./build-rate-limiter";
 

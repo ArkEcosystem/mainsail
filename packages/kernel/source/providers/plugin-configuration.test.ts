@@ -1,8 +1,7 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { join } from "path";
 
-import { describe } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { Application } from "../application";
 import { ConfigRepository } from "../services/config";
 import { PluginConfiguration } from "./plugin-configuration";
@@ -12,7 +11,7 @@ describe<{
 	pluginConfiguration: PluginConfiguration;
 }>("PluginConfiguration", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.pluginConfiguration = context.app.resolve<PluginConfiguration>(PluginConfiguration);
 	});
 

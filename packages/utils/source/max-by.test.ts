@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { maxBy } from "./max-by";
 
 describe("maxBy", async ({ assert, it, nock, loader }) => {

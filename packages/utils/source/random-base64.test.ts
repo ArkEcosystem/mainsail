@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { randomBase64 } from "./random-base64";
 
 describe("#randomBase64", ({ it, assert }) => {

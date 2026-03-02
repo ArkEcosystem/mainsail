@@ -6,13 +6,13 @@ import { Controller } from "./controller.js";
 @injectable()
 export class BlockchainController extends Controller {
 	public async index(request: Hapi.Request): Promise<object> {
-		const { data } = this.stateStore.getLastBlock();
+		const block = this.stateStore.getLastBlock();
 
 		return {
 			data: {
 				block: {
-					hash: data.hash,
-					height: data.number,
+					hash: block.hash,
+					height: block.number,
 				},
 			},
 		};

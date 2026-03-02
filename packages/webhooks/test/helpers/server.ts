@@ -1,4 +1,3 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import { Application, Services } from "@mainsail/kernel";
 import { dirSync, setGracefulCleanup } from "tmp";
@@ -19,7 +18,7 @@ const initApp = (context: Context) => {
 		notice: () => {},
 	};
 
-	context.app = new Application(new Container());
+	context.app = new Application();
 	context.app
 		.bind(Identifiers.Services.EventDispatcher.Service)
 		.to(Services.Events.MemoryEventDispatcher)

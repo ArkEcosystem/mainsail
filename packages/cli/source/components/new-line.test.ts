@@ -1,6 +1,7 @@
-import { Console, describe } from "../../../test-framework/source";
-import { Identifiers } from "../ioc/index.js";
+import { describe } from "@mainsail/test-runner";
+import { Identifiers } from "@mainsail/constants";
 import { NewLine } from "./new-line";
+import { Console } from "../test/index.js";
 
 describe<{
 	component: NewLine;
@@ -8,12 +9,12 @@ describe<{
 }>("NewLine", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.NewLine).to(NewLine).inSingletonScope();
-		context.component = context.cli.app.get(Identifiers.NewLine);
+		context.cli.app.rebind(Identifiers.Cli.Component.NewLine).to(NewLine).inSingletonScope();
+		context.component = context.cli.app.get(Identifiers.Cli.Component.NewLine);
 	});
 
 	it("should render the component", async ({ component, cli }) => {
-		const spyOnLog = spy(cli.app.get(Identifiers.Logger), "log");
+		const spyOnLog = spy(cli.app.get(Identifiers.Cli.Service.Logger), "log");
 
 		component.render();
 

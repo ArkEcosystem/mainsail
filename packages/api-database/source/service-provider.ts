@@ -20,6 +20,7 @@ import {
 	TokenHolderRepository,
 	TokenRepository,
 	TokenTransferRepository,
+	TokenWhitelistRepository,
 	TransactionRepository,
 	ValidatorRoundRepository,
 	WalletRepository,
@@ -40,6 +41,7 @@ import {
 	Token,
 	TokenHolder,
 	TokenTransfer,
+	TokenWhitelist,
 	Transaction,
 	ValidatorRound,
 	Wallet,
@@ -58,6 +60,7 @@ import {
 	makeTokenHolderRepository,
 	makeTokenRepository,
 	makeTokenTransferRepository,
+	makeTokenWhitelistRepository,
 	makeTransactionRepository,
 	makeValidatorRoundRepository,
 	makeWalletRepository,
@@ -107,6 +110,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					Token,
 					TokenHolder,
 					TokenTransfer,
+					TokenWhitelist,
 					MultiPayment,
 					ValidatorRound,
 					Wallet,
@@ -123,6 +127,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			// Migrations are handled during bootstrap elsewhere in the main process (see sync.ts)
 			await dataSource.initialize();
 			await dataSource.createQueryRunner().query("CREATE EXTENSION IF NOT EXISTS citext;");
+			await dataSource.createQueryRunner().query("CREATE EXTENSION IF NOT EXISTS pg_trgm;");
 
 			this.app.bind(Identifiers.DataSource).toConstantValue(dataSource);
 			this.app.bind(Identifiers.Migrations).to(Migrations).inSingletonScope();
@@ -217,6 +222,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeTokenTransferRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind<() => TokenWhitelistRepository>(Identifiers.TokenWhitelistRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeTokenWhitelistRepository(customDataSource ?? dataSource),
 				);
 
 			this.app

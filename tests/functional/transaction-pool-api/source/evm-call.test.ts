@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
@@ -16,7 +16,7 @@ import {
 import { getCreateAddress, Hex, parseEther, parseGwei } from "viem";
 
 describe<{
-	sandbox: Sandbox;
+	app: Contracts.Kernel.Application;
 	snapshot: Snapshot;
 	wallets: Contracts.Crypto.KeyPair[];
 	legacyColdWallets: {
@@ -26,16 +26,16 @@ describe<{
 	}[];
 }>("EVM Call", ({ beforeEach, afterEach, it, assert }) => {
 	beforeEach(async (context) => {
-		context.sandbox = await setup();
-		context.wallets = await getWallets(context.sandbox);
-		context.legacyColdWallets = await getLegacyColdWallets(context.sandbox);
-		context.snapshot = await takeSnapshot(context.sandbox);
+		context.app = await setup();
+		context.wallets = await getWallets(context.app);
+		context.legacyColdWallets = await getLegacyColdWallets(context.app);
+		context.snapshot = await takeSnapshot(context.app);
 	});
 
-	afterEach(async ({ sandbox, snapshot }) => {
+	afterEach(async ({ app, snapshot }) => {
 		await snapshot.validate();
 
-		await shutdown(sandbox);
+		await shutdown(app);
 	});
 
 	it("should accept and commit evm call", async (context) => {
@@ -61,7 +61,7 @@ describe<{
 		assert.equal(errors, {
 			"0": {
 				message:
-					'Invalid transaction data: data/gasPrice must pass "transactionGasPrice" keyword validation, data must match a schema in anyOf',
+					'Invalid transaction data: data/gasPrice must pass "transactionGasPrice" keyword validation',
 				type: "ERR_BAD_DATA",
 			},
 		});
@@ -80,7 +80,7 @@ describe<{
 		assert.true(await isTransactionCommitted(context, deployTx));
 
 		const erc20Address = getCreateAddress({
-			from: deployTx.data.from as Hex,
+			from: deployTx.from as Hex,
 			nonce: 2n,
 		});
 
@@ -109,7 +109,7 @@ describe<{
 	it("should accept legacy cold wallet transaction", async (context) => {
 		const [legacyColdWallet] = context.legacyColdWallets;
 
-		const evm = context.sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+		const evm = context.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 
 		const legacyBefore = await evm.getAccountInfoExtended(
 			legacyColdWallet.mainsailAddress,
@@ -144,7 +144,7 @@ describe<{
 	it("should accept consecutive legacy cold wallet transactions", async (context) => {
 		const [legacyColdWallet] = context.legacyColdWallets;
 
-		const evm = context.sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+		const evm = context.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 
 		const legacyBefore = await evm.getAccountInfoExtended(
 			legacyColdWallet.mainsailAddress,
@@ -186,7 +186,7 @@ describe<{
 		const [fundedWallet] = context.wallets;
 		const [legacyColdWallet] = context.legacyColdWallets;
 
-		const evm = context.sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+		const evm = context.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 
 		const legacyBefore = await evm.getAccountInfoExtended(
 			legacyColdWallet.mainsailAddress,
@@ -239,7 +239,7 @@ describe<{
 
 		assert.equal(
 			legacyAfterSpent.balance,
-			legacyAfter.balance - spentValue - receipt!.gasUsed * BigInt(spentTx.data.gasPrice),
+			legacyAfter.balance - spentValue - receipt!.gasUsed * BigInt(spentTx.gasPrice),
 		);
 
 		const recipientAfter = await evm.getAccountInfo(randomWallet.address);
@@ -249,7 +249,7 @@ describe<{
 	it("should not accept legacy cold wallet transaction with insufficient balance", async (context) => {
 		const [legacyColdWallet] = context.legacyColdWallets;
 
-		const evm = context.sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+		const evm = context.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 
 		const legacyBefore = await evm.getAccountInfoExtended(
 			legacyColdWallet.mainsailAddress,
@@ -332,7 +332,7 @@ describe<{
 		await waitBlock(context);
 
 		for (let i = 0; i < 10; i++) {
-			if (txs[i].data.nonce.isEqualTo(replacementTx.data.nonce)) {
+			if (txs[i].nonce.isEqualTo(replacementTx.nonce)) {
 				assert.false(await isTransactionCommitted(context, txs[i]));
 				assert.true(await isTransactionCommitted(context, replacementTx));
 			} else {
@@ -425,9 +425,9 @@ describe<{
 		await waitBlock(context);
 
 		for (let i = 0; i < 10; i++) {
-			if (txs[i].data.nonce.isLessThan(replacementTx.data.nonce)) {
+			if (txs[i].nonce.isLessThan(replacementTx.nonce)) {
 				assert.true(await isTransactionCommitted(context, txs[i]));
-			} else if (txs[i].data.nonce.isEqualTo(replacementTx.data.nonce)) {
+			} else if (txs[i].nonce.isEqualTo(replacementTx.nonce)) {
 				assert.false(await isTransactionCommitted(context, txs[i]));
 				assert.true(await isTransactionCommitted(context, replacementTx));
 			} else {
@@ -468,7 +468,7 @@ describe<{
 		const randomWallet1 = await Utils.getRandomColdWallet(context);
 		const randomWallet2 = await Utils.getRandomColdWallet(context);
 
-		const multiPaymentContract = context.sandbox.app.get<string>(
+		const multiPaymentContract = context.app.get<string>(
 			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
 		);
 

@@ -20,6 +20,7 @@
 			"0xedDC1bDa4dF43C5b112edb177baf7e0A0B87DD9f"
 		],
 		"status": 1,
+		"cumulativeGasUsed": 116802,
 		"gasUsed": 116802,
 		"gasRefunded": 0,
 		"logs": [

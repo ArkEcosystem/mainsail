@@ -1,7 +1,8 @@
 import { Identifiers } from "@mainsail/constants";
 import esmock from "esmock";
 
-import { describeSkip, Sandbox } from "../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describeSkip } from "@mainsail/test-runner";
 import { Peer } from "./peer";
 import { PeerConnector } from "./peer-connector";
 
@@ -28,7 +29,7 @@ const { PeerConnector: PeerConnectorProxy } = await esmock("./peer-connector", {
 });
 
 describeSkip<{
-	sandbox: Sandbox;
+	app: Application;
 	peerConnector: PeerConnector;
 }>("PeerConnector", ({ it, assert, beforeEach, stub, spy, spyFn }) => {
 	const logger = { debug: () => {}, error: () => {}, info: () => {}, warn: () => {} };
@@ -36,11 +37,11 @@ describeSkip<{
 		onDelay = () => {};
 		ClientMock.onConstructor = () => {};
 
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 
-		context.peerConnector = context.sandbox.app.resolve(PeerConnectorProxy);
+		context.peerConnector = context.app.resolve(PeerConnectorProxy);
 	});
 
 	it("#all - should return a empty array when there are no connections", ({ peerConnector }) => {

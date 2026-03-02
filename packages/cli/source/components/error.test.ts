@@ -1,8 +1,9 @@
 import { bgRed, white } from "kleur/colors";
+import { Identifiers } from "@mainsail/constants";
 
-import { Console, describe } from "../../../test-framework/source";
-import { Identifiers } from "../ioc/index.js";
+import { describe } from "@mainsail/test-runner";
 import { Error } from "./error";
+import { Console } from "../test/index.js";
 
 describe<{
 	component: Error;
@@ -10,12 +11,12 @@ describe<{
 }>("Error", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Error).to(Error).inSingletonScope();
-		context.component = context.cli.app.get(Identifiers.Error);
+		context.cli.app.rebind(Identifiers.Cli.Component.Error).to(Error).inSingletonScope();
+		context.component = context.cli.app.get(Identifiers.Cli.Component.Error);
 	});
 
 	it("should render the component", async ({ component, cli }) => {
-		const spyOnError = spy(cli.app.get(Identifiers.Logger), "error");
+		const spyOnError = spy(cli.app.get(Identifiers.Cli.Service.Logger), "error");
 
 		component.render("Hello World");
 

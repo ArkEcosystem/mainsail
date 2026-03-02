@@ -67,22 +67,13 @@
 			"path": "../crypto-config"
 		},
 		{
-			"path": "../crypto-consensus-bls12-381"
-		},
-		{
 			"path": "../crypto-hash-bcrypto"
 		},
 		{
 			"path": "../crypto-key-pair-bls12-381"
 		},
 		{
-			"path": "../crypto-key-pair-schnorr"
-		},
-		{
 			"path": "../crypto-messages"
-		},
-		{
-			"path": "../crypto-signature-schnorr"
 		},
 		{
 			"path": "../crypto-transaction"

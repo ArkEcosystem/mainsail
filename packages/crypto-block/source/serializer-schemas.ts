@@ -1,7 +1,7 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import type { Contracts } from "@mainsail/contracts";
 
-export const schema: Record<string, Contracts.Serializer.DeserializationSchema> = {
+export const blockHeaderSchema: Record<string, Contracts.Serializer.DeserializationSchema> = {
 	version: {
 		type: "uint8",
 	},
@@ -53,8 +53,8 @@ export const transactionsSchema: Record<string, Contracts.Serializer.Serializati
 	},
 };
 
-export const schemaWithTransactions: Record<string, Contracts.Serializer.SerializationSchema> = {
-	...schema,
+export const blockSchema: Record<string, Contracts.Serializer.SerializationSchema> = {
+	...blockHeaderSchema,
 	transactions: {
 		type: "transactions",
 	},

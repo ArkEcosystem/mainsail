@@ -1,6 +1,6 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import { Identifiers } from "@mainsail/constants";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import { sleep } from "@mainsail/utils";
 
 import crypto from "../config/crypto.json" with { type: "json" };
@@ -17,9 +17,10 @@ import {
 	prepareNodeValidators,
 	snoozeForBlock,
 } from "./utilities.js";
+import type { Contracts } from "@mainsail/contracts";
 
 describe<{
-	nodes: Sandbox[];
+	nodes: Contracts.Kernel.Application[],
 	validators: Validator[];
 	p2p: P2PRegistry;
 }>("Precommit", ({ beforeEach, afterEach, it, assert, stub }) => {
@@ -47,7 +48,7 @@ describe<{
 
 	it("should confirm block, if < minority does not precommit", async ({ nodes, p2p }) => {
 		const node0 = nodes[0];
-		const stubPrecommit = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		const stubPrecommit = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "precommit");
 
 		stubPrecommit.callsFake(async () => {
 			stubPrecommit.restore();
@@ -74,13 +75,13 @@ describe<{
 
 	it("should not confirm block, if > minority does not precommit", async ({ nodes, p2p }) => {
 		const node0 = nodes[0];
-		const stubPrecommit0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		const stubPrecommit0 = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "precommit");
 		stubPrecommit0.callsFake(async () => {
 			stubPrecommit0.restore();
 		});
 
 		const node1 = nodes[1];
-		const stubPrecommit1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		const stubPrecommit1 = stub(node1.get<Consensus>(Identifiers.Consensus.Service), "precommit");
 		stubPrecommit1.callsFake(async () => {
 			stubPrecommit1.restore();
 		});
@@ -93,7 +94,7 @@ describe<{
 
 	it("should confirm block, if < minority precommits null", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
-		const stubPrecommit = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		const stubPrecommit = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "precommit");
 		const precommit = await makePrecommit(node0, validators[0], 1, 0);
 
 		stubPrecommit.callsFake(async () => {
@@ -121,10 +122,10 @@ describe<{
 				.sort(),
 			[
 				undefined,
-				commit.block.data.hash,
-				commit.block.data.hash,
-				commit.block.data.hash,
-				commit.block.data.hash,
+				commit.block.hash,
+				commit.block.hash,
+				commit.block.hash,
+				commit.block.hash,
 			].sort(),
 		);
 
@@ -138,13 +139,13 @@ describe<{
 
 	it("should re-propose block, if one missed, malicious sends null", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
-		const stubPrecommit0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		const stubPrecommit0 = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "precommit");
 		stubPrecommit0.callsFake(async () => {
 			stubPrecommit0.restore();
 		});
 
 		const node1 = nodes[1];
-		const stubPrecommit1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		const stubPrecommit1 = stub(node1.get<Consensus>(Identifiers.Consensus.Service), "precommit");
 		const precommit1 = await makePrecommit(node1, validators[1], 1, 0);
 		stubPrecommit1.callsFake(async () => {
 			stubPrecommit1.restore();
@@ -170,7 +171,7 @@ describe<{
 				.getMessages(1, 0)
 				.map((prevote) => prevote.blockHash)
 				.sort(),
-			[undefined, commit.block.data.hash, commit.block.data.hash, commit.block.data.hash].sort(),
+			[undefined, commit.block.hash, commit.block.hash, commit.block.hash].sort(),
 		);
 
 		// Next block
@@ -187,7 +188,7 @@ describe<{
 		p2p,
 	}) => {
 		const node0 = nodes[0];
-		const stubPrecommit0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		const stubPrecommit0 = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "precommit");
 		stubPrecommit0.callsFake(async () => {
 			stubPrecommit0.restore();
 		});
@@ -195,8 +196,8 @@ describe<{
 		const proposal = await makeProposal(node0, validators[0], 1, 0, Date.now());
 
 		const node1 = nodes[1];
-		const stubPrecommit1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
-		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal.getData().block.data.hash);
+		const stubPrecommit1 = stub(node1.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal.getData().block.hash);
 		stubPrecommit1.callsFake(async () => {
 			stubPrecommit1.restore();
 			await p2p.broadcastMessage(precommit1);
@@ -222,10 +223,10 @@ describe<{
 				.map((prevote) => prevote.blockHash)
 				.sort(),
 			[
-				proposal.getData().block.data.hash,
-				commit.block.data.hash,
-				commit.block.data.hash,
-				commit.block.data.hash,
+				proposal.getData().block.hash,
+				commit.block.hash,
+				commit.block.hash,
+				commit.block.hash,
 			].sort(),
 		);
 
@@ -243,7 +244,7 @@ describe<{
 		p2p,
 	}) => {
 		const node0 = nodes[0];
-		const stubPrecommit0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		const stubPrecommit0 = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "precommit");
 		stubPrecommit0.callsFake(async () => {
 			stubPrecommit0.restore();
 		});
@@ -255,12 +256,12 @@ describe<{
 		const proposal4 = await makeProposal(node0, validators[0], 1, 0, Date.now());
 
 		const node1 = nodes[1];
-		const stubPrecommit1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
-		const precommit0 = await makePrecommit(node1, validators[1], 1, 0, proposal0.getData().block.data.hash);
-		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal1.getData().block.data.hash);
-		const precommit2 = await makePrecommit(node1, validators[1], 1, 0, proposal2.getData().block.data.hash);
-		const precommit3 = await makePrecommit(node1, validators[1], 1, 0, proposal3.getData().block.data.hash);
-		const precommit4 = await makePrecommit(node1, validators[1], 1, 0, proposal4.getData().block.data.hash);
+		const stubPrecommit1 = stub(node1.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		const precommit0 = await makePrecommit(node1, validators[1], 1, 0, proposal0.getData().block.hash);
+		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal1.getData().block.hash);
+		const precommit2 = await makePrecommit(node1, validators[1], 1, 0, proposal2.getData().block.hash);
+		const precommit3 = await makePrecommit(node1, validators[1], 1, 0, proposal3.getData().block.hash);
+		const precommit4 = await makePrecommit(node1, validators[1], 1, 0, proposal4.getData().block.hash);
 		stubPrecommit1.callsFake(async () => {
 			stubPrecommit1.restore();
 			await p2p.broadcastMessage(precommit0);
@@ -290,14 +291,14 @@ describe<{
 				.map((prevote) => prevote.blockHash)
 				.sort(),
 			[
-				proposal0.getData().block.data.hash,
-				proposal1.getData().block.data.hash,
-				proposal2.getData().block.data.hash,
-				proposal3.getData().block.data.hash,
-				proposal4.getData().block.data.hash,
-				commit.block.data.hash,
-				commit.block.data.hash,
-				commit.block.data.hash,
+				proposal0.getData().block.hash,
+				proposal1.getData().block.hash,
+				proposal2.getData().block.hash,
+				proposal3.getData().block.hash,
+				proposal4.getData().block.hash,
+				commit.block.hash,
+				commit.block.hash,
+				commit.block.hash,
 			].sort(),
 		);
 

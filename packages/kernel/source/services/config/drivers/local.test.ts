@@ -1,9 +1,8 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 import { join } from "path";
 
-import { describe } from "../../../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { Application } from "../../../application";
 import { MemoryEventDispatcher } from "../../events";
 import { JoiValidator } from "../../validation/drivers/joi";
@@ -15,7 +14,7 @@ describe<{
 	configLoader: LocalConfigLoader;
 }>("LocalConfigLoader", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container());
+		context.app = new Application();
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(new MemoryEventDispatcher());
 		context.app.bind(Identifiers.Config.Flags).toConstantValue({});
 		context.app.bind(Identifiers.Config.Plugins).toConstantValue({});

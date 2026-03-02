@@ -1,5 +1,4 @@
 import { Identifiers } from "@mainsail/constants";
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
@@ -18,7 +17,7 @@ export const makeApplication = async (
 ): Promise<Application> => {
 	options = { name: "mainsail", ...options };
 
-	const app = new Application(new Container());
+	const app = new Application();
 	app.bind(Identifiers.Application.Name).toConstantValue(options.name);
 	app.bind(Identifiers.Application.Thread).toConstantValue("");
 

@@ -10,7 +10,7 @@ pub fn calculate(pending_commit: &PendingCommit) -> Result<Bloom, crate::db::Err
 
     let receipt_blooms = results
         .values()
-        .map(|r| Bloom::from_iter(r.logs()))
+        .map(|(r, _)| Bloom::from_iter(r.logs()))
         .collect::<Vec<Bloom>>();
 
     let logs_bloom = receipt_blooms
@@ -88,7 +88,7 @@ fn test_calculate_logs_bloom() {
             revm::primitives::b256!(
                 "0000000000000000000000000000000000000000000000000000000000000001"
             ),
-            _logs(test_case.logs),
+            (_logs(test_case.logs), 0),
         );
 
         let result = calculate(&pending).expect("ok");

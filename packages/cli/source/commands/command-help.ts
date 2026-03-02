@@ -1,10 +1,9 @@
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { blue, bold } from "kleur/colors";
 
 import { AppHeader } from "../components/index.js";
-import { Application, InputArguments } from "../contracts.js";
-import { Identifiers } from "../ioc/index.js";
 
 interface CommandInterface {
 	readonly signature: string;
@@ -12,21 +11,21 @@ interface CommandInterface {
 	readonly isHidden: boolean;
 
 	readonly definition: {
-		getArguments(): InputArguments;
-		getFlags(): InputArguments;
+		getArguments(): Contracts.Cli.InputArguments;
+		getFlags(): Contracts.Cli.InputArguments;
 	};
 }
 
 @injectable()
 export class CommandHelp {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Application;
+	@inject(Identifiers.Cli.Application.Instance)
+	protected readonly app!: Contracts.Cli.Application;
 
-	@inject(Identifiers.Package)
+	@inject(Identifiers.Cli.Package)
 	protected readonly pkg!: Contracts.Types.PackageJson;
 
 	public render(command: CommandInterface): string {
-		let helpMessage = `${this.app.get<AppHeader>(Identifiers.AppHeader).render()}
+		let helpMessage = `${this.app.get<AppHeader>(Identifiers.Cli.Component.AppHeader).render()}
 
 ${blue(bold("Description"))}
 ${command.description}`;

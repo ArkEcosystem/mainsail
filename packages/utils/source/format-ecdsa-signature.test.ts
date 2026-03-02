@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { formatEcdsaSignature } from "./format-ecdsa-signature.js";
 
 describe("#formatEcdsaSignature", ({ it, assert }) => {

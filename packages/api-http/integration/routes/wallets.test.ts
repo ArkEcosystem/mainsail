@@ -1,4 +1,5 @@
-import { describe, Sandbox } from "../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
+import { Application } from "@mainsail/kernel";
 import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
@@ -12,12 +13,13 @@ import multiPaymentWallets from "../../test/fixtures/multi_payments.wallets.json
 import multiPaymentTransactionsResponse from "../../test/fixtures/multi_payments.transactions.response.json";
 import tokens from "../../test/fixtures/tokens.json";
 import tokenHolders from "../../test/fixtures/token_holders.json";
+import tokenWhitelist from "../../test/fixtures/token_whitelist.json";
 import walletsTokens from "../../test/fixtures/wallets_tokens.json";
 import walletTokensResponse from "../../test/fixtures/wallet_tokens.response.json";
 import walletTokenHoldersResponse from "../../test/fixtures/wallet_token_holders.response.json";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 }>("Wallets", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 
@@ -258,6 +260,7 @@ describe<{
 		await apiContext.walletRepository.save(walletsTokens);
 		await apiContext.tokenRepository.save(tokens);
 		await apiContext.tokenHolderRepository.save(tokenHolders);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
 
 		const testCases = [
 			{
@@ -267,6 +270,26 @@ describe<{
 			{
 				path: "/wallets/tokens?addresses=0x0000000000000000000000000000000000000000",
 				result: [],
+			},
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens?minBalance=99999850`,
+				result: walletTokensResponse,
+			},
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens?minBalance=99999851`,
+				result: [walletTokensResponse[1]],
+			},
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens?minBalance=100000000`,
+				result: [walletTokensResponse[1]],
+			},
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens?minBalance=100000001`,
+				result: [],
+			},
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens?minBalance=2`,
+				result: walletTokensResponse,
 			},
 		];
 
@@ -280,6 +303,7 @@ describe<{
 	it("/wallets/tokens?addresses", async () => {
 		await apiContext.tokenRepository.save(tokens);
 		await apiContext.tokenHolderRepository.save(tokenHolders);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
 
 		const testCases = [
 			{
@@ -299,9 +323,78 @@ describe<{
 		}
 	});
 
+	it("/wallets/tokens?addresses&names", async () => {
+		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenHolderRepository.save(tokenHolders);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
+
+		const path =
+			"/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7";
+
+		const testCases = [
+			{
+				path: `${path}&name=DARK20`,
+				result: [walletTokenHoldersResponse[0]],
+			},
+			{
+				path: `${path}&name=ARK`,
+				result: walletTokenHoldersResponse,
+			},
+			{
+				path: `${path}&name=!!`,
+				result: [walletTokenHoldersResponse[1]],
+			},
+			{
+				path: `${path}&name=ETH`,
+				result: [],
+			},
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
+	});
+
+	it("/wallets/tokens?addresses&minBalance", async () => {
+		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenHolderRepository.save(tokenHolders);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
+
+		const path =
+			"/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7";
+
+		const testCases = [
+			{
+				path: `${path}&minBalance=0`,
+				result: walletTokenHoldersResponse,
+			},
+			{
+				path: `${path}&minBalance=0.01`,
+				result: walletTokenHoldersResponse,
+			},
+			{
+				path: `${path}&minBalance=100000001`,
+				result: [],
+			},
+			{
+				path: `${path}&minBalance=100000000`,
+				result: walletTokenHoldersResponse.slice(1),
+			},
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
+	});
+
 	it("/wallets/tokens pagination", async () => {
 		await apiContext.tokenRepository.save(tokens);
 		await apiContext.tokenHolderRepository.save(tokenHolders);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
 
 		const testCases = [
 			{
@@ -333,32 +426,61 @@ describe<{
 		}
 	});
 
-	it("/wallets returns token count", async () => {
-		await apiContext.walletRepository.save(wallets);
+	it("/wallets/tokens?ignoreWhitelist", async () => {
 		await apiContext.tokenRepository.save(tokens);
 		await apiContext.tokenHolderRepository.save(tokenHolders);
 
-		const wallet = wallets[0];
-		const tokenWallet = wallets.find((w) => w.address === tokenHolders[2].address);
-
 		const testCases = [
 			{
-				id: wallet.address,
-				result: { ...wallet, tokenCount: 0 },
+				path: "/wallets/tokens?ignoreWhitelist=true&limit=5&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: walletTokenHoldersResponse,
 			},
 			{
-				id: tokenWallet!.address,
-				result: { ...tokenWallet, tokenCount: 1 },
+				path: "/wallets/tokens?ignoreWhitelist=false&limit=5&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: [],
+			},
+			{
+				path: "/wallets/tokens?limit=5&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: [],
 			},
 		];
 
-		for (const { id, result } of testCases) {
-			const {
-				statusCode,
-				data: { data },
-			} = await request(`/wallets/${id}`, options);
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
 			assert.equal(statusCode, 200);
-			assert.equal(data, result);
+			assert.equal(data.data, result);
+		}
+	});
+
+	it("/wallets/tokens custom whitelist (POST)", async () => {
+		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenHolderRepository.save(tokenHolders);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist.slice(1, 2));
+
+		const testCases = [
+			{
+				method: "POST",
+				path: "/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: [walletTokenHoldersResponse[2]],
+			},
+			{
+				method: "POST",
+				body: JSON.stringify({ whitelist: [tokens[0].address] }),
+				path: "/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: [walletTokenHoldersResponse[0], walletTokenHoldersResponse[2]],
+			},
+			{
+				method: "POST",
+				body: JSON.stringify({ whitelist: tokens.map((t) => t.address) }),
+				path: "/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: walletTokenHoldersResponse,
+			},
+		];
+
+		for (const { path, result, body, method } of testCases) {
+			const { statusCode, data } = await request(path, { ...options, body, method });
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
 		}
 	});
 });

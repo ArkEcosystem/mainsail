@@ -1,11 +1,11 @@
 import { Identifiers } from "@mainsail/constants";
 import { Validator } from "@mainsail/validation";
-
-import { describe, Sandbox } from "../../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { EthBlockNumberAction } from "./index.js";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	action: EthBlockNumberAction;
 	validator: Validator;
 	store: any;
@@ -19,12 +19,11 @@ describe<{
 			},
 		};
 
-		context.sandbox = new Sandbox();
+		context.app = new Application();
+		context.app.bind(Identifiers.State.Store).toConstantValue(context.store);
 
-		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue(context.store);
-
-		context.action = context.sandbox.app.resolve(EthBlockNumberAction);
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.action = context.app.resolve(EthBlockNumberAction);
+		context.validator = context.app.resolve(Validator);
 	});
 
 	it("should have a name", ({ action }) => {

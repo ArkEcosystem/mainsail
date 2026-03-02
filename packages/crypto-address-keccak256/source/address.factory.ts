@@ -2,8 +2,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Keccak256, secp256k1 } from "bcrypto";
-import { Address, getAddress, Hex, isAddress, toBytes, toHex } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
+import { Address, getAddress, isAddress, toBytes, toHex } from "viem";
 
 @injectable()
 export class AddressFactory implements Contracts.Crypto.AddressFactory {
@@ -31,10 +30,6 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 		return this.fromPublicKey(await this.publicKeyFactory.fromMultiSignatureAsset(asset));
 	}
 
-	public async fromPrivateKey(privateKey: Contracts.Crypto.KeyPair): Promise<string> {
-		return this.fromPublicKey(privateKey.publicKey);
-	}
-
 	public async fromBuffer(buffer: Buffer): Promise<string> {
 		return getAddress(toHex(buffer));
 	}
@@ -50,12 +45,8 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 	// Convert compressed and uncompressed public keys to Ethereum address
 	// https://github.com/wevm/viem/discussions/2044
 	#computeAddress(publicKey: string): Address {
-		// Schnorr public keys are treated as private keys (replicated ethers.js behavior)
-		if (publicKey.length === 64) {
-			return privateKeyToAccount((publicKey.startsWith("0x") ? publicKey : `0x${publicKey}`) as Hex).address;
-		}
-
 		let publicKeyBytes = Buffer.from(publicKey, "hex");
+
 		if (publicKeyBytes.length === 33) {
 			publicKeyBytes = secp256k1.publicKeyConvert(publicKeyBytes, false);
 		}

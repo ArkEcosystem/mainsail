@@ -1,17 +1,16 @@
+import type { Contracts } from "@mainsail/contracts";
 import type { AnySchema } from "joi";
 
-import type { InputArgument, InputArguments } from "../contracts.js";
-
 export class InputDefinition {
-	readonly #arguments: InputArguments = {};
+	readonly #arguments: Contracts.Cli.InputArguments = {};
 
-	readonly #flags: InputArguments = {};
+	readonly #flags: Contracts.Cli.InputArguments = {};
 
-	public getArguments(): InputArguments {
+	public getArguments(): Contracts.Cli.InputArguments {
 		return this.#arguments;
 	}
 
-	public getArgument(name: string): InputArgument {
+	public getArgument(name: string): Contracts.Cli.InputArgument {
 		return this.#arguments[name];
 	}
 
@@ -25,11 +24,11 @@ export class InputDefinition {
 		return this.#arguments[name] !== undefined;
 	}
 
-	public getFlags(): InputArguments {
+	public getFlags(): Contracts.Cli.InputArguments {
 		return this.#flags;
 	}
 
-	public getFlag(name: string): InputArgument {
+	public getFlag(name: string): Contracts.Cli.InputArgument {
 		return this.#flags[name];
 	}
 

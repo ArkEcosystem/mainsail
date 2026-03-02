@@ -1,29 +1,31 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
-import { ServiceProvider as Schnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { schemas as baseSchemas } from "@mainsail/crypto-validation";
-import { ServiceProvider as CoreValidation } from "@mainsail/validation";
+import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
+import { ServiceProvider as Validation } from "@mainsail/validation";
+import { ServiceProvider as CryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { Validator } from "@mainsail/validation/source/validator";
 import { generateMnemonic } from "bip39";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
-import { describe, Sandbox } from "../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { AddressFactory } from "./address.factory";
 import { schemas } from "./schemas";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	validator: Validator;
 }>("Schemas", ({ it, assert, beforeEach }) => {
 	const length = 34;
 
 	beforeEach(async (context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
-		context.sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
 			genesisBlock: {
 				// @ts-ignore
 				block: {
@@ -40,9 +42,10 @@ describe<{
 			],
 		});
 
-		await context.sandbox.app.resolve(CoreValidation).register();
+		await context.app.resolve(Validation).register();
+		await context.app.resolve(CryptoHashBcrypto).register();
 
-		context.validator = context.sandbox.app.get(Identifiers.Cryptography.Validator);
+		context.validator = context.app.get(Identifiers.Cryptography.Validator);
 
 		for (const schema of Object.values({
 			...baseSchemas,
@@ -63,18 +66,18 @@ describe<{
 	});
 
 	it("address - should be ok for factory", async (context) => {
-		await context.sandbox.app.resolve<Schnorr>(Schnorr).register();
+		await context.app.resolve<ECDSA>(ECDSA).register();
 
 		assert.undefined(
 			context.validator.validate(
 				"legacyAddress",
-				await context.sandbox.app.resolve(AddressFactory).fromMnemonic(generateMnemonic(256)),
+				await context.app.resolve(AddressFactory).fromMnemonic(generateMnemonic(256)),
 			).error,
 		);
 	});
 
 	it("address - should not be ok", ({ validator }) => {
-		assert.defined(validator.validate("legacyAddress", "a".repeat(length - 1)).error);
+		assert.defined(validator.validate("legacyAddress", "a".repeat(length - 2)).error);
 		assert.defined(validator.validate("legacyAddress", "a".repeat(length + 1)).error);
 		assert.defined(validator.validate("legacyAddress", 123).error);
 		assert.defined(validator.validate("legacyAddress", null).error);

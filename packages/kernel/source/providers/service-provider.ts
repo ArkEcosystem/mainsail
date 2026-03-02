@@ -5,7 +5,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { PluginManifest } from "./plugin-manifest.js";
 
 @injectable()
-export abstract class ServiceProvider {
+export class ServiceProvider {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
@@ -40,14 +40,6 @@ export abstract class ServiceProvider {
 	public version(): string | undefined {
 		if (this.#packageManifest) {
 			return this.#packageManifest.get("version");
-		}
-
-		return undefined;
-	}
-
-	public alias(): string | undefined {
-		if (this.#packageManifest) {
-			return this.#packageManifest.get("arkecosystem.core.alias");
 		}
 
 		return undefined;
@@ -93,5 +85,5 @@ export abstract class ServiceProvider {
 		return false;
 	}
 
-	public abstract register(): Promise<void>;
+	public async register(): Promise<void> {}
 }

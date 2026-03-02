@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { isEmptyMap } from "./is-empty-map";
 
 describe("isEmptyMap", async ({ assert, it, nock, loader }) => {

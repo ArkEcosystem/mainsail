@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { majorityMinority } from "../test/fixtures/active-validators";
 import { isMinority } from "./is-minority";
 

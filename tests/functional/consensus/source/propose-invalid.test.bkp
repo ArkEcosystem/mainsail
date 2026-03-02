@@ -1,6 +1,6 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe } from "@mainsail/test-runner";
 import {
 	MultiSignatureRegistrations,
 	Transfers,
@@ -21,7 +21,7 @@ import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import { getValidators, prepareNodeValidators, snoozeForBlock } from "./utilities.js";
 
 describe<{
-	nodes: Sandbox[];
+	nodes: Contracts.Kernel.Application[],
 	validators: Validator[];
 	p2p: P2PRegistry;
 }>("Propose Invalid Blocks", ({ beforeEach, afterEach, each, stub }) => {

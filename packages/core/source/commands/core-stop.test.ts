@@ -1,5 +1,7 @@
-import { Identifiers, Services } from "@mainsail/cli";
-import { Console, describe } from "../../../test-framework/source";
+import { Console } from "@mainsail/cli";
+import { describe } from "@mainsail/test-runner";
+import { Services } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 
 import { Command } from "./core-stop";
 
@@ -9,7 +11,7 @@ describe<{
 }>("CoreStopCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.processManager = context.cli.app.get(Identifiers.ProcessManager);
+		context.processManager = context.cli.app.get(Identifiers.Cli.Service.ProcessManager);
 	});
 
 	it("should throw if the process does not exist", async ({ processManager, cli }) => {

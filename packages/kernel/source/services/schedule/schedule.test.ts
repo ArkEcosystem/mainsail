@@ -1,7 +1,6 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 
-import { describe } from "../../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { Application } from "../../application";
 import { MemoryEventDispatcher } from "../events";
 import { BlockJob } from "./block-job";
@@ -10,14 +9,10 @@ import { Schedule } from "./schedule";
 
 describe<{
 	app: Application;
-	container: Container;
 	scheduleService: Schedule;
 }>("Schedule", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.container = new Container();
-		context.container.snapshot();
-
-		context.app = new Application(context.container);
+		context.app = new Application();
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher);
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 

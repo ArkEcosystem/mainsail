@@ -31,6 +31,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/test-runner": "workspace:*",
 		"@types/seedrandom": "3.0.8",
 		"uvu": "0.5.6"
 	},

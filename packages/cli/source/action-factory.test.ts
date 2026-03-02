@@ -1,6 +1,7 @@
-import { Console, describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
+import { Identifiers } from "@mainsail/constants";
 import { ActionFactory } from "./action-factory";
-import { Identifiers } from "./ioc";
+import { Console } from "./test/index.js";
 
 describe<{
 	cli: Console;
@@ -23,15 +24,15 @@ describe<{
 			spy.calledOnce();
 		},
 		[
-			["abortErroredProcess", Identifiers.AbortErroredProcess],
-			["abortMissingProcess", Identifiers.AbortMissingProcess],
-			["abortRunningProcess", Identifiers.AbortRunningProcess],
-			["abortStoppedProcess", Identifiers.AbortStoppedProcess],
-			["abortUnknownProcess", Identifiers.AbortUnknownProcess],
-			["daemonizeProcess", Identifiers.DaemonizeProcess],
-			["restartProcess", Identifiers.RestartProcess],
-			["restartRunningProcess", Identifiers.RestartRunningProcess],
-			["restartRunningProcessWithPrompt", Identifiers.RestartRunningProcessWithPrompt],
+			["abortErroredProcess", Identifiers.Cli.Action.AbortErroredProcess],
+			["abortMissingProcess", Identifiers.Cli.Action.AbortMissingProcess],
+			["abortRunningProcess", Identifiers.Cli.Action.AbortRunningProcess],
+			["abortStoppedProcess", Identifiers.Cli.Action.AbortStoppedProcess],
+			["abortUnknownProcess", Identifiers.Cli.Action.AbortUnknownProcess],
+			["daemonizeProcess", Identifiers.Cli.Action.DaemonizeProcess],
+			["restartProcess", Identifiers.Cli.Action.RestartProcess],
+			["restartRunningProcess", Identifiers.Cli.Action.RestartRunningProcess],
+			["restartRunningProcessWithPrompt", Identifiers.Cli.Action.RestartRunningProcessWithPrompt],
 		],
 	);
 });

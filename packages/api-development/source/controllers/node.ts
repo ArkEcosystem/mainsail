@@ -19,9 +19,9 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				blockNumber: lastBlock.data.number,
+				blockNumber: lastBlock.number,
 				networkBlockNumber: networkBlockNumber,
-				synced: lastBlock.data.number >= networkBlockNumber - 1,
+				synced: lastBlock.number >= networkBlockNumber - 1,
 			},
 		};
 	}

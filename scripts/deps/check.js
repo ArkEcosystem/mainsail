@@ -34,7 +34,6 @@ const EXCEPTIONS = {
 	"@mainsail/configuration-generator": {
 		dependencies: [
 			"@mainsail/crypto-key-pair-ecdsa",
-			"@mainsail/crypto-signature-schnorr-secp256k1",
 			"@mainsail/snapshot-legacy-exporter",
 		],
 		devDependencies: [],
@@ -59,18 +58,15 @@ const EXCEPTIONS = {
 			"@mainsail/crypto-block",
 			"@mainsail/crypto-commit",
 			"@mainsail/crypto-config",
-			"@mainsail/crypto-consensus-bls12-381",
+			"@mainsail/crypto-signature-bls12-381",
+			"@mainsail/crypto-key-pair-bls12-381",
 			"@mainsail/crypto-hash-bcrypto",
 			"@mainsail/crypto-hash-noble",
 			"@mainsail/crypto-hash-wasm",
 			"@mainsail/crypto-key-pair-bls12-381",
 			"@mainsail/crypto-key-pair-ecdsa",
-			"@mainsail/crypto-key-pair-ed25519",
-			"@mainsail/crypto-key-pair-schnorr",
 			"@mainsail/crypto-messages",
 			"@mainsail/crypto-proposal",
-			"@mainsail/crypto-signature-schnorr-secp256k1",
-			"@mainsail/crypto-signature-schnorr",
 			"@mainsail/crypto-transaction",
 			"@mainsail/crypto-validation",
 			"@mainsail/crypto-wif",
@@ -108,6 +104,12 @@ const EXCEPTIONS = {
 	},
 	"@mainsail/crypto-key-pair-bls12-381": {
 		dependencies: ["@chainsafe/blst"],
+	},
+	"@mainsail/test-factories": {
+		dependencies: [
+			"@mainsail/configuration-generator",
+		],
+		devDependencies: [],
 	},
 };
 

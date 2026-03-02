@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 
-import { describe } from "../../../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { getPeerConfig } from "./get-peer-config";
 
 describe("getPeerConfig", ({ it, assert, beforeEach }) => {

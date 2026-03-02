@@ -1,4 +1,4 @@
-import { describeSkip } from "../../../test-framework/source";
+import { describeSkip } from "@mainsail/test-runner";
 
 import * as Hapi from "@hapi/hapi";
 import * as Hoek from "@hapi/hoek";

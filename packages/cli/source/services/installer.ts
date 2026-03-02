@@ -1,4 +1,5 @@
 import { injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { rcompare, satisfies } from "semver";
 
 import { execa } from "../execa.js";
@@ -13,7 +14,7 @@ type Package = {
  * @class Installer
  */
 @injectable()
-export class Installer {
+export class Installer implements Contracts.Cli.Installer {
 	/**
 	 * @param {string} pkg
 	 * @memberof Installer

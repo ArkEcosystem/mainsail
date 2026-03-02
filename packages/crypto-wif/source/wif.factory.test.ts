@@ -1,24 +1,25 @@
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
-import { KeyPairFactory } from "@mainsail/crypto-key-pair-schnorr/source/pair";
+import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa/source/pair";
 
-import { describe, Sandbox } from "../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { mnemonic, wif } from "../test/identity.json";
 import { devnet } from "../test/networks.json";
 import { WIFFactory } from "./wif.factory";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	factory: WIFFactory;
 }>("Identities - WIFFactory", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({
 			genesisBlock: {
 				block: {
-					height: 0,
+					number: 0,
 				},
 			},
 			milestones: [],
@@ -26,24 +27,19 @@ describe<{
 			network: devnet,
 		});
 
-		context.sandbox.app
-			.bind(Identifiers.Cryptography.Identity.KeyPair.Factory)
-			.to(KeyPairFactory)
-			.inSingletonScope();
+		context.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
 
-		context.factory = context.sandbox.app.resolve(WIFFactory);
+		context.factory = context.app.resolve(WIFFactory);
 	});
 
 	it("#fromMnemonic - should be OK", async ({ factory }) => {
 		assert.equal(await factory.fromMnemonic(mnemonic), wif);
 	});
 
-	it("#fromKeys -  should be OK", async ({ factory, sandbox }) => {
+	it("#fromKeys -  should be OK", async ({ factory, app }) => {
 		assert.equal(
 			await factory.fromKeys(
-				await sandbox.app
-					.get<KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory)
-					.fromMnemonic(mnemonic),
+				await app.get<KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory).fromMnemonic(mnemonic),
 			),
 			wif,
 		);

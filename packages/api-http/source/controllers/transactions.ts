@@ -8,7 +8,7 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
-import { TransactionResource } from "../resources/index.js";
+import { TransactionResource, TransactionTokenTransfer } from "../resources/index.js";
 import { Controller } from "./controller.js";
 
 @injectable()
@@ -32,7 +32,10 @@ export class TransactionsController extends Controller {
 		);
 
 		return this.toPagination(
-			await this.enrichTransactionResult(transactions, { fullReceipt: request.query.fullReceipt }),
+			await this.enrichTransactionResult(transactions, {
+				fullReceipt: request.query.fullReceipt,
+				includeTokens: request.query.includeTokens,
+			}),
 			TransactionResource,
 		);
 	}
@@ -52,8 +55,17 @@ export class TransactionsController extends Controller {
 			return Boom.notFound();
 		}
 
+		let transferredTokens: TransactionTokenTransfer[] | undefined = undefined;
+		if (request.query.includeTokens) {
+			const fetched = await this.fetchTransactionTransferredTokens([transaction.hash]);
+			transferredTokens = fetched[transaction.hash];
+		}
+
 		return this.respondWithResource(
-			await this.enrichTransaction(transaction, undefined, request.query.fullReceipt),
+			await this.enrichTransaction(transaction, {
+				fullReceipt: request.query.fullReceipt,
+				tokens: transferredTokens,
+			}),
 			TransactionResource,
 		);
 	}

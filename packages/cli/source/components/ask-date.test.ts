@@ -1,16 +1,17 @@
 import prompts from "prompts";
+import { Identifiers } from "@mainsail/constants";
 
-import { Console, describe } from "../../../test-framework/source";
-import { Identifiers } from "../ioc/index.js";
+import { describe } from "@mainsail/test-runner";
 import { AskDate } from "./ask-date";
+import { Console } from "../test/index.ts";
 
 describe<{
 	component: AskDate;
 }>("AskDate", ({ beforeEach, it, assert }) => {
 	beforeEach((context) => {
 		const cli = new Console();
-		cli.app.rebind(Identifiers.AskDate).to(AskDate).inSingletonScope();
-		context.component = cli.app.get<AskDate>(Identifiers.AskDate);
+		cli.app.rebind(Identifiers.Cli.Component.AskDate).to(AskDate).inSingletonScope();
+		context.component = cli.app.get<AskDate>(Identifiers.Cli.Component.AskDate);
 	});
 
 	it("should render the component", async ({ component }) => {

@@ -1,14 +1,15 @@
-import { describe, Sandbox } from "../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { State } from "./state";
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	state: State;
 }>("State", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
-		context.state = context.sandbox.app.resolve(State);
+		context.state = context.app.resolve(State);
 	});
 
 	it("#isBootstrap - should return true by default", ({ state }) => {

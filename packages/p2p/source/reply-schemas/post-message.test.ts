@@ -1,12 +1,13 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { describe, Sandbox } from "@mainsail/test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { headers } from "../../test/fixtures/responses/headers";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
 import { postMessage } from "./post-message.js";
 
 type Context = {
-	sandbox: Sandbox;
+	app: Application;
 	validator: Validator;
 };
 
@@ -16,9 +17,9 @@ describe<Context>("PostMessage Schema", ({ it, assert, beforeEach, each }) => {
 	};
 
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
-		context.validator = context.sandbox.app.resolve(Validator);
+		context.validator = context.app.resolve(Validator);
 
 		prepareValidatorContext(context);
 	});

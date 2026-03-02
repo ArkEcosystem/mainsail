@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { keyBy } from "./key-by";
 
 describe("keyBy", async ({ assert, it, nock, loader }) => {

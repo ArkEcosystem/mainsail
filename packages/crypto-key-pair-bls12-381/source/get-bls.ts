@@ -1,3 +1,4 @@
+/* c8 ignore start */
 import { getImplementation } from "@chainsafe/bls/getImplementation";
 import type { IBls } from "@chainsafe/bls/types";
 
@@ -14,3 +15,4 @@ export const getBls = async (): Promise<IBls> => {
 
 	return _bls;
 };
+/* c8 ignore stop */

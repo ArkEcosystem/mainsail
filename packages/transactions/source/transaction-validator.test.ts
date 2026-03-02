@@ -2,7 +2,7 @@
 // import { AssertionError } from "assert";
 // import { SinonSpy } from "sinon";
 
-// import { describeSkip } from "../../test-framework";
+// import { describeSkip } from "../../test-runner";
 // import { makeVoteTransactions } from "../test/make-vote-transactions";
 // import { setUp } from "../test/setup";
 // import { TransactionValidator } from "./transaction-validator";

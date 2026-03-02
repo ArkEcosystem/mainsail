@@ -2,7 +2,7 @@ import type { Block, Commit, CommitHandler } from "../crypto/index.js";
 
 export interface Store extends CommitHandler {
 	getGenesisCommit(): Commit;
-	setGenesisCommit(block: Commit): void;
+	setGenesisCommit(genesisCommit: Commit): void;
 
 	getLastBlock(): Block;
 	setLastBlock(block: Block): void;

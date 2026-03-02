@@ -1,31 +1,34 @@
 import { BigNumber } from "@mainsail/utils";
 import { Identifiers } from "@mainsail/constants";
-
-import { describe, Sandbox } from "../../../test-framework/source";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { Wallet } from ".";
 
 describe<{
-	sandbox: Sandbox;
-}>("Models - Wallet", ({ it, assert, beforeEach }) => {
+	app: Application;
+	evm: any;
+}>("Models - Wallet", ({ it, assert, beforeEach, stub }) => {
 	beforeEach((context) => {
-		context.sandbox = new Sandbox();
-		context.sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue({
+		context.evm = {
 			getAccountInfo: async () => ({ balance: 0n, nonce: 0n }),
 			getAccountInfoExtended: async () => ({ balance: 0n, nonce: 0n, legacyAttributes: {} }),
-		});
+		};
+
+		context.app = new Application();
+		context.app.bind(Identifiers.Evm.Instance).toConstantValue(context.evm);
 	});
 
-	it("returns the address", async ({ sandbox }) => {
+	it("returns the address", async ({ app }) => {
 		const address = "Abcde";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 
 		assert.equal(wallet.getAddress(), address);
 	});
 
-	it("returns the legacy address", async ({ sandbox }) => {
+	it("returns the legacy address", async ({ app }) => {
 		const address = "Abcde";
 		const legacyAddress = "Fghij";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 		assert.equal(wallet.getAddress(), address);
 		assert.undefined(wallet.getLegacyAddress());
 
@@ -35,9 +38,22 @@ describe<{
 		assert.equal(wallet.getLegacyAddress(), legacyAddress);
 	});
 
-	it("should set and get balance", async ({ sandbox }) => {
+	it("should take balance and nonce from emv", async ({ evm, app }) => {
+		stub(evm, "getAccountInfoExtended").returnValue({
+			balance: 2n,
+			nonce: 3n,
+			legacyAttributes: {},
+		});
+
+		const wallet = await app.resolve(Wallet).init("Abcde");
+
+		assert.equal(wallet.getBalance(), BigNumber.make(2));
+		assert.equal(wallet.getNonce(), BigNumber.make(3));
+	});
+
+	it("should set and get balance", async ({ app }) => {
 		const address = "Abcde";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 
 		assert.equal(wallet.getBalance(), BigNumber.ZERO);
 
@@ -45,9 +61,9 @@ describe<{
 		assert.equal(wallet.getBalance(), BigNumber.ONE);
 	});
 
-	it("should set and get nonce", async ({ sandbox }) => {
+	it("should set and get nonce", async ({ app }) => {
 		const address = "Abcde";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 
 		assert.equal(wallet.getNonce(), BigNumber.ZERO);
 
@@ -55,9 +71,9 @@ describe<{
 		assert.equal(wallet.getNonce(), BigNumber.ONE);
 	});
 
-	it("should increase balance", async ({ sandbox }) => {
+	it("should increase balance", async ({ app }) => {
 		const address = "Abcde";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 
 		assert.equal(wallet.getBalance(), BigNumber.ZERO);
 
@@ -65,9 +81,9 @@ describe<{
 		assert.equal(wallet.getBalance(), BigNumber.ONE);
 	});
 
-	it("should decrease balance", async ({ sandbox }) => {
+	it("should decrease balance", async ({ app }) => {
 		const address = "Abcde";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 
 		assert.equal(wallet.getBalance(), BigNumber.ZERO);
 
@@ -75,9 +91,9 @@ describe<{
 		assert.equal(wallet.getBalance(), BigNumber.make("-1"));
 	});
 
-	it("should increase nonce", async ({ sandbox }) => {
+	it("should increase nonce", async ({ app }) => {
 		const address = "Abcde";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 
 		assert.equal(wallet.getNonce(), BigNumber.ZERO);
 
@@ -86,13 +102,54 @@ describe<{
 		assert.equal(wallet.getNonce(), BigNumber.ONE);
 	});
 
-	it("should decrease nonce", async ({ sandbox }) => {
+	it("should decrease nonce", async ({ app }) => {
 		const address = "Abcde";
-		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		const wallet = await app.resolve(Wallet).init(address);
 
 		assert.equal(wallet.getNonce(), BigNumber.ZERO);
 
 		wallet.decreaseNonce();
 		assert.equal(wallet.getNonce(), BigNumber.make("-1"));
+	});
+
+	it("#getLegacyAddress - should get address", async ({ app }) => {
+		const legacyAddress = "legacyAddress";
+		const wallet = await app.resolve(Wallet).init("Abcde", legacyAddress);
+
+		assert.equal(wallet.getLegacyAddress(), legacyAddress);
+	});
+
+	it("#hasLegacySecondPublicKey - should return false", async ({ app }) => {
+		const wallet = await app.resolve(Wallet).init("Abcde");
+
+		assert.false(wallet.hasLegacySecondPublicKey());
+	});
+
+	it("#hasLegacySecondPublicKey - should return true", async ({ app, evm }) => {
+		stub(evm, "getAccountInfoExtended").returnValue({
+			balance: 0n,
+			nonce: 0n,
+			legacyAttributes: {
+				secondPublicKey: "secondPublicKey",
+			},
+		});
+
+		const wallet = await app.resolve(Wallet).init("Abcde");
+
+		assert.true(wallet.hasLegacySecondPublicKey());
+	});
+
+	it("#legacySecondPublicKey - should return string", async ({ app, evm }) => {
+		stub(evm, "getAccountInfoExtended").returnValue({
+			balance: 0n,
+			nonce: 0n,
+			legacyAttributes: {
+				secondPublicKey: "secondPublicKey",
+			},
+		});
+
+		const wallet = await app.resolve(Wallet).init("Abcde");
+
+		assert.equal(wallet.legacySecondPublicKey(), "secondPublicKey");
 	});
 });

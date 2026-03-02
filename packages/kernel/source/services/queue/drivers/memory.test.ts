@@ -4,7 +4,8 @@ import { sleep } from "@mainsail/utils";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 
-import { describe, Sandbox } from "../../../../../test-framework/source";
+import { Application } from "../../../application";
+import { describe } from "@mainsail/test-runner";
 import { MemoryQueue } from "./memory";
 
 EventEmitter.prototype.constructor = Object.prototype.constructor;
@@ -18,7 +19,7 @@ class DummyJob implements Contracts.Kernel.QueueJob {
 }
 
 describe<{
-	sandbox: Sandbox;
+	app: Application;
 	driver: MemoryQueue;
 	eventDispatcher: any;
 	logger: any;
@@ -33,11 +34,11 @@ describe<{
 		};
 		context.jobMethod = () => {};
 
-		context.sandbox = new Sandbox();
+		context.app = new Application();
 
-		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
-		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
-		context.driver = context.sandbox.app.resolve<MemoryQueue>(MemoryQueue);
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
+		context.driver = context.app.resolve<MemoryQueue>(MemoryQueue);
 	});
 
 	it("Start should process job", async (context) => {
@@ -418,6 +419,42 @@ describe<{
 		assert.lt(methodFinish2 - methodFinish1, 60);
 
 		onDrain.calledOnce();
+	});
+
+	it("Drain should process all queued jobs", async (context) => {
+		const jobMethod1 = stubFn().callsFake(async () => {
+			await sleep(50);
+		});
+
+		const jobMethod2 = stubFn().callsFake(async () => {
+			await sleep(50);
+		});
+
+		await context.driver.push(new DummyJob(async () => await jobMethod1.call()));
+		await context.driver.push(new DummyJob(async () => await jobMethod2.call()));
+
+		assert.is(context.driver.size(), 2);
+
+		await context.driver.drain();
+
+		assert.is(context.driver.size(), 0);
+
+		jobMethod1.calledOnce();
+		jobMethod2.calledOnce();
+
+		assert.false(context.driver.isStarted());
+		assert.false(context.driver.isRunning());
+	});
+
+	it("Drain should process empty queue", async (context) => {
+		assert.is(context.driver.size(), 0);
+
+		await context.driver.drain();
+
+		assert.is(context.driver.size(), 0);
+
+		assert.false(context.driver.isStarted());
+		assert.false(context.driver.isRunning());
 	});
 
 	it("Later should push job with delay", async (context) => {

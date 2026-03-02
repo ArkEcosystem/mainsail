@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { castArray } from "./cast-array";
 
 describe("#castArray", ({ it, assert }) => {

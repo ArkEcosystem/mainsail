@@ -58,7 +58,7 @@ export class TransactionPoolFullError extends PoolError {
 
 	public constructor(transaction: Contracts.Crypto.Transaction, required: number) {
 		super(
-			`tx ${transaction.hash} fee ${transaction.data.gasPrice} is lower than ${required} already in pool`,
+			`tx ${transaction.hash} fee ${transaction.gasPrice} is lower than ${required} already in pool`,
 			"ERR_POOL_FULL",
 		);
 		this.required = required;
@@ -94,7 +94,7 @@ export class TransactionFromWrongNetworkError extends PoolError {
 
 	public constructor(transaction: Contracts.Crypto.Transaction, currentNetwork: number) {
 		super(
-			`tx ${transaction.hash} network ${transaction.data.network} doesn't match node's network ${currentNetwork}`,
+			`tx ${transaction.hash} network ${transaction.network} doesn't match node's network ${currentNetwork}`,
 			"ERR_WRONG_NETWORK",
 		);
 		this.currentNetwork = currentNetwork;

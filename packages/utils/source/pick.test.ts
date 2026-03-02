@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework/source";
+import { describe } from "@mainsail/test-runner";
 import { pick } from "./pick";
 
 describe("pick", async ({ assert, it, nock, loader }) => {

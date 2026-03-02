@@ -3,7 +3,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { ConsensusAbi, ERC1967ProxyAbi, MultiPaymentAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { assert, BigNumber } from "@mainsail/utils";
-import { Address, encodeDeployData, encodeFunctionData, getCreateAddress, Hex, sha256, toBytes } from "viem";
+import { Address, encodeDeployData, encodeFunctionData, getCreateAddress, Hex, toBytes } from "viem";
 
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
 
@@ -35,12 +35,16 @@ export class Deployer {
 	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
 	private readonly deployerAddress!: Address;
 
+	@inject(Identifiers.Cryptography.Hash.Factory)
+	private readonly hashFactory!: Contracts.Crypto.HashFactory;
+
 	#genesisBlockInfo!: GenesisBlockInfo;
 
 	#nonce = 0;
 	#needsCommit = false;
 
-	#generateTxHash = () => sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
+	#generateTxHash = () =>
+		this.hashFactory.sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).toString("hex");
 
 	public async deploy(genesisBlockInfo: GenesisBlockInfo): Promise<void> {
 		this.#genesisBlockInfo = genesisBlockInfo;
@@ -61,7 +65,7 @@ export class Deployer {
 		if (this.#needsCommit) {
 			await this.evm.onCommit({
 				commitKey,
-				getBlock: () => ({ header: { ...commitKey, number: commitKey.blockNumber } }),
+				getBlock: () => ({ ...commitKey, number: commitKey.blockNumber }),
 				setAccountUpdates: () => ({}),
 			} as unknown as Contracts.Processor.ProcessableUnit);
 		}

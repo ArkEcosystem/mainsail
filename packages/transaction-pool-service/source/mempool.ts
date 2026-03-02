@@ -39,7 +39,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	}
 
 	public async addTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
-		const { from, senderLegacyAddress } = transaction.data;
+		const { from, senderLegacyAddress } = transaction;
 
 		let senderMempool = this.#senderMempools.get(from);
 		if (!senderMempool) {
@@ -50,7 +50,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 
 		try {
 			// When receiving a nonce less than or equal to the current nonce try to replace it.
-			if (transaction.data.nonce.isLessThanEqual(senderMempool.getNonce())) {
+			if (transaction.nonce.isLessThanEqual(senderMempool.getNonce())) {
 				await this.#tryReplaceTransaction(transaction, senderMempool);
 			} else {
 				await senderMempool.addTransaction(transaction);

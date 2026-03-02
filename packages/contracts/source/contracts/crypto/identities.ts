@@ -10,63 +10,56 @@ export interface KeyPair {
 
 export interface AddressFactory {
 	fromMnemonic(mnemonic: string): Promise<string>;
-
 	fromPublicKey(publicKey: string): Promise<string>;
-
 	fromWIF(wif: string): Promise<string>;
-
 	fromMultiSignatureAsset(asset: MultiSignatureAsset): Promise<string>;
-
-	fromPrivateKey(privateKey: KeyPair): Promise<string>;
-
 	fromBuffer(buffer: Buffer): Promise<string>;
-
 	toBuffer(address: string): Promise<Buffer>;
-
 	validate(address: string): Promise<boolean>;
 }
 
 export interface PublicKeyFactory {
 	fromMnemonic(mnemonic: string): Promise<string>;
-
 	fromWIF(wif: string): Promise<string>;
-
 	fromMultiSignatureAsset(asset: MultiSignatureAsset): Promise<string>;
-
 	verify(publicKey: string): Promise<boolean>;
-
 	aggregate(publicKeys: Buffer[]): Promise<string>;
 }
 
 export interface PrivateKeyFactory {
 	fromMnemonic(mnemonic: string): Promise<string>;
-
 	fromWIF(wif: string): Promise<string>;
 }
 
 export interface KeyPairFactory {
 	fromMnemonic(mnemonic: string): Promise<KeyPair>;
-
 	fromPrivateKey(privateKey: Buffer): Promise<KeyPair>;
-
 	fromWIF(wif: string): Promise<KeyPair>;
 }
 
 export interface WIFFactory {
 	fromMnemonic(mnemonic: string): Promise<string>;
-
 	fromKeys(keys: KeyPair): Promise<string>;
 }
 
 export interface AddressSerializer {
 	serialize(buffer: ByteBuffer, address: Buffer): void;
-
 	deserialize(buffer: ByteBuffer): Buffer;
 }
 
 export interface PublicKeySerializer {
 	serialize(buffer: ByteBuffer, publicKey: string): void;
+	deserialize(buffer: ByteBuffer): Buffer;
+}
 
+export interface SignatureBls {
+	sign(message: Buffer, privateKey: Buffer): Promise<string>;
+	verify(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean>;
+	aggregate(signatures: Buffer[]): Promise<string>;
+}
+
+export interface SignatureSerializer {
+	serialize(buffer: ByteBuffer, signature: string): void;
 	deserialize(buffer: ByteBuffer): Buffer;
 }
 
@@ -76,20 +69,8 @@ export interface EcdsaSignature {
 	v: number;
 }
 
-export interface Signature {
-	sign(message: Buffer, privateKey: Buffer): Promise<string>;
-
-	verify(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean>;
-
-	serialize(buffer: ByteBuffer, signature: string): void;
-
-	deserialize(buffer: ByteBuffer): Buffer;
-
-	aggregate(signatures: Buffer[]): Promise<string>;
-
+export interface SignatureEcdsa {
 	signRecoverable(message: Buffer, privateKey: Buffer): Promise<EcdsaSignature>;
-
 	verifyRecoverable(signature: EcdsaSignature, message: Buffer, publicKey: Buffer): Promise<boolean>;
-
 	recoverPublicKey(message: Buffer, signature: EcdsaSignature): string;
 }
