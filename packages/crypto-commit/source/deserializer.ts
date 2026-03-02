@@ -16,13 +16,9 @@ export class Deserializer implements Contracts.Crypto.CommitDeserializer {
 	public async deserializeCommitProof(serialized: Buffer): Promise<Contracts.Crypto.CommitProof> {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		const proof = {} as Contracts.Crypto.CommitProof;
-
-		await this.serializer.deserialize<Contracts.Crypto.CommitProof>(buffer, proof, {
+		return this.serializer.deserialize<Contracts.Crypto.CommitProof>(buffer, {}, {
 			length: this.proofSize(),
 			schema,
 		});
-
-		return proof;
 	}
 }
