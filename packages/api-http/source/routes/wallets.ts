@@ -5,6 +5,7 @@ import Joi from "joi";
 
 import { WalletsController } from "../controllers/wallets.js";
 import {
+	tokenBalanceSchema,
 	tokenNameSchema,
 	transactionCriteriaSchemas,
 	transactionsOrderBy,
@@ -88,6 +89,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				query: Joi.object({
 					...transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
+					includeTokens: Joi.bool().default(false),
 					orderBy: transactionsOrderBy,
 				})
 					.concat(transactionSortingSchema)
@@ -113,6 +115,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				query: Joi.object({
 					...transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
+					includeTokens: Joi.bool().default(false),
 					orderBy: transactionsOrderBy,
 				})
 					.concat(transactionSortingSchema)
@@ -138,6 +141,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				query: Joi.object({
 					...transactionCriteriaSchemas,
 					fullReceipt: Joi.bool().default(false),
+					includeTokens: Joi.bool().default(false),
 					orderBy: transactionsOrderBy,
 				})
 					.concat(transactionSortingSchema)
@@ -184,6 +188,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			validate: {
 				query: Joi.object({
 					addresses: Schemas.orEqualCriteria(walletAddressSchema),
+					minBalance: Schemas.orNumericCriteria(tokenBalanceSchema),
 					name: Schemas.orEqualCriteria(tokenNameSchema),
 				}).concat(Schemas.pagination),
 			},
@@ -205,6 +210,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					id: walletParameterSchema,
 				}),
 				query: Joi.object({
+					minBalance: Schemas.orNumericCriteria(tokenBalanceSchema),
 					name: Schemas.orEqualCriteria(tokenNameSchema),
 				}).concat(Schemas.pagination),
 			},

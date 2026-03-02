@@ -119,14 +119,34 @@ export class TokensController extends Controller {
 			tokenTransfersQuery.where("tf.address = :address", { address: request.params.address });
 		}
 
-		if (request.query.from) {
-			const from = Array.isArray(request.query.from) ? request.query.from : [request.query.from];
-			tokenTransfersQuery.andWhere("tf.from IN (:...from)", { from });
+		if (request.query.transactionHash) {
+			tokenTransfersQuery.andWhere("tf.transaction_hash = :transactionHash", {
+				transactionHash: request.query.transactionHash,
+			});
 		}
 
-		if (request.query.to) {
-			const to = Array.isArray(request.query.to) ? request.query.to : [request.query.to];
-			tokenTransfersQuery.andWhere("tf.to IN (:...to)", { to });
+		if (request.query.addresses) {
+			const addresses = Array.isArray(request.query.addresses)
+				? request.query.addresses
+				: [request.query.addresses];
+
+			tokenTransfersQuery.andWhere(
+				new TypeOrm.Brackets((b) => {
+					b.where("tf.from IN (:...addresses)", { addresses }).orWhere("tf.to IN (:...addresses)", {
+						addresses,
+					});
+				}),
+			);
+		} else {
+			if (request.query.from) {
+				const from = Array.isArray(request.query.from) ? request.query.from : [request.query.from];
+				tokenTransfersQuery.andWhere("tf.from IN (:...from)", { from });
+			}
+
+			if (request.query.to) {
+				const to = Array.isArray(request.query.to) ? request.query.to : [request.query.to];
+				tokenTransfersQuery.andWhere("tf.to IN (:...to)", { to });
+			}
 		}
 
 		const [tokenTranfersRows, totalCountRow] = await Promise.all([
