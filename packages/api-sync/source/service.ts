@@ -571,6 +571,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			'secondPublicKey', "Wallet".attributes->>'secondPublicKey',
 			'multiSignature', "Wallet".attributes->>'multiSignature',
 			'legacyMerge', "Wallet".attributes->>'legacyMerge',
+			'legacyNonce', "Wallet".attributes->>'legacyNonce',
 
 			-- if any unvote is present, it will overwrite the previous vote
 			'vote',

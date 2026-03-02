@@ -3731,6 +3731,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../../../packages/serializer
+      '@mainsail/snapshot-legacy-importer':
+        specifier: workspace:*
+        version: link:../../../packages/snapshot-legacy-importer
       '@mainsail/state':
         specifier: workspace:*
         version: link:../../../packages/state

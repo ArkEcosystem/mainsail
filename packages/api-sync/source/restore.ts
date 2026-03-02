@@ -822,6 +822,7 @@ export class Restore {
 			const validatorAddresses: string[] = [];
 			const votes: string[] = [];
 
+			// TODO: this doesn't represent the actual proposer order
 			for (const validator of validators) {
 				validatorAddresses.push(validator.address);
 				votes.push(validator.voteBalance.toFixed());

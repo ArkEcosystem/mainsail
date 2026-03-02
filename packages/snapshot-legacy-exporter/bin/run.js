@@ -36,8 +36,8 @@ async function run() {
 	// 		{ arkAddress: "DFfEqb9Caqi7jmdkeg861eURxL8DS3pK8x", publicKey: "0269051b0fe83c5bfc5e343ccb63c40d575666cf9476057bb2b66b1ae3827cb08a", balance: "50000000000", legacyNonce: 100,
 	// 			attributes: { delegate: { username: "valdiator_5" }}
 	// 		},
-	// 		{ arkAddress: "DFfFDrrppKzVTK5frHYh6JJP73UeD2MZnC", publicKey: "02a1a95d0445074b2ef84c66ffcb203ef838c398a8b802ef7441d6ffc88b326d1e", balance: "10", legacyNonce: 5 },
-	// 		{ arkAddress: "DFFgVGsEoVQtnVoaBoHHZJyqWEX8tsxzwP", publicKey: undefined, balance: "20", legacyNonce: 0 }
+	// 		{ arkAddress: "D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib", publicKey: "034151a3ec46b5670a682b0a63394f863587d1bc97483b1b6c70eb58e7f0aed192", balance: "1000000", legacyNonce: 5 },
+	// 		{ arkAddress: "DFFgVGsEoVQtnVoaBoHHZJyqWEX8tsxzwP", publicKey: undefined, balance: "255555", legacyNonce: 0 }
 	// 	]
 	// );
 }
