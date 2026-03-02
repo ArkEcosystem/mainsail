@@ -35,7 +35,7 @@ export abstract class AbstractListener<TEventData, TEntity extends object> imple
 	@inject(Identifiers.ApiSync.Logger)
 	protected readonly logger!: Contracts.ApiSync.Logger;
 
-	#syncInterval?: NodeJS.Timeout;
+	#syncTimeout?: NodeJS.Timeout;
 	#addedEvents: Map<string, TEventData> = new Map();
 	#removedEvents: Map<string, TEventData> = new Map();
 
@@ -48,15 +48,23 @@ export abstract class AbstractListener<TEventData, TEntity extends object> imple
 	public async boot(): Promise<void> {
 		await this.#truncate();
 
+		void this.#startSyncLoop();
+	}
+
+	async #startSyncLoop(): Promise<void> {
 		const syncInterval = this.getSyncIntervalMs();
 
-		this.#syncInterval = setInterval(async () => {
+		const run = async () => {
 			try {
 				await this.#syncToDatabaseTransaction();
 			} catch (ex) {
 				this.logger.error(`#syncToDatabaseTransaction failed: ${ex}`);
+			} finally {
+				this.#syncTimeout = setTimeout(run, syncInterval);
 			}
-		}, syncInterval);
+		};
+
+		void run();
 	}
 
 	public async dispose(): Promise<void> {
@@ -64,8 +72,8 @@ export abstract class AbstractListener<TEventData, TEntity extends object> imple
 			this.events.forget(eventName, this);
 		}
 
-		if (this.#syncInterval) {
-			clearInterval(this.#syncInterval);
+		if (this.#syncTimeout) {
+			clearTimeout(this.#syncTimeout);
 		}
 	}
 
