@@ -2,6 +2,8 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
+import { schema } from "./serializer-schemas.js";
+
 @injectable()
 export class Serializer implements Contracts.Crypto.CommitSerializer {
 	@inject(Identifiers.Cryptography.Serializer)
@@ -16,17 +18,7 @@ export class Serializer implements Contracts.Crypto.CommitSerializer {
 	public async serializeCommitProof(commit: Contracts.Crypto.CommitProof): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.CommitProof>(commit, {
 			length: this.proofSize(),
-			schema: {
-				round: {
-					type: "uint32",
-				},
-				signature: {
-					type: "consensusSignature",
-				},
-				validators: {
-					type: "validatorSet",
-				},
-			},
+			schema,
 			skip: 0,
 		});
 	}
