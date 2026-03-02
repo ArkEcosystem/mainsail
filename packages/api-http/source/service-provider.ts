@@ -81,6 +81,10 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 					estimateTotalCount: Joi.bool().required(),
 				}).required(),
 
+				tokens: Joi.object({
+					defaultMinimumBalance: Joi.number().positive().allow(0).required(),
+				}).required(),
+
 				plugins: Joi.object({
 					cache: Joi.object({
 						checkperiod: Joi.number().integer().min(0).required(),
