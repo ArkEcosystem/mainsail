@@ -11,6 +11,7 @@ import { inject, injectable } from "@mainsail/container";
 import { TokenResource } from "../resources/token.js";
 import { TokenHolderResource } from "../resources/token-holder.js";
 import { TokenTransferResource } from "../resources/token-transfer.js";
+import { TokenWhitelistResource } from "../resources/token-whitelist.js";
 import { Controller } from "./controller.js";
 
 type TokenTransferRaw = {
@@ -39,11 +40,15 @@ export class TokensController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TokenTransferRepositoryFactory)
 	private readonly tokenTransferRepositoryFactory!: ApiDatabaseContracts.TokenTransferRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.TokenWhitelistRepositoryFactory)
+	private readonly tokenWhitelistRepositoryFactory!: ApiDatabaseContracts.TokenWhitelistRepositoryFactory;
+
 	public async index(request: Hapi.Request): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 
 		const tokensQuery = this.tokenRepositoryFactory().createQueryBuilder("tok").select();
 
+		TokensController.andWhereWhitelisted(tokensQuery, request);
 		TokensController.andWhereNameSearch(tokensQuery, request.query.name);
 
 		const [tokens, totalCount] = await TokensController.optionallyOrderedByName(
@@ -104,6 +109,26 @@ export class TokensController extends Controller {
 
 	public async tokenTransfers(request: Hapi.Request): Promise<object> {
 		return this.getTokenTransfers(request);
+	}
+
+	public async whitelist(request: Hapi.Request): Promise<object> {
+		const pagination = this.getListingPage(request);
+		const [tokenWhitelist, totalCount] = await this.tokenWhitelistRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.orderBy("address", "ASC")
+			.limit(pagination.limit)
+			.offset(pagination.offset)
+			.getManyAndCount();
+
+		return this.toPagination(
+			{
+				meta: { totalCountIsEstimate: false },
+				results: tokenWhitelist,
+				totalCount,
+			},
+			TokenWhitelistResource,
+		);
 	}
 
 	private async getTokenTransfers(request: Hapi.Request): Promise<object> {
@@ -211,6 +236,32 @@ export class TokensController extends Controller {
 			.select()
 			.where("address = :address", { address })
 			.getOne();
+	}
+
+	public static andWhereWhitelisted(
+		queryBuilder: TypeOrm.SelectQueryBuilder<Models.TokenHolder | Models.Token>,
+		request: Hapi.Request,
+	): void {
+		if (request.query.ignoreWhitelist) {
+			return;
+		}
+
+		// POST allows user to whitelist selected tokens explicitly.
+		if (request.method === "post") {
+			const customWhitelist = (request.payload as unknown as { whitelist: string[] })?.whitelist ?? [];
+			if (customWhitelist.length > 0) {
+				queryBuilder.leftJoin(Models.TokenWhitelist, "tw", "tw.address = tok.address").andWhere(
+					new TypeOrm.Brackets((qb) => {
+						qb.where("tw.address IS NOT NULL").orWhere("tok.address IN (:...customWhitelist)", {
+							customWhitelist,
+						});
+					}),
+				);
+				return;
+			}
+		}
+
+		queryBuilder.innerJoin(Models.TokenWhitelist, "tw", "tw.address = tok.address");
 	}
 
 	public static andWhereNameSearch(

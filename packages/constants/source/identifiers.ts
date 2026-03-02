@@ -8,6 +8,7 @@ export const Identifiers = {
 		Logger: Symbol("ApiSync<Logger>"),
 		Service: Symbol("ApiSync<Service>"),
 		TokenParser: Symbol.for("ApiSync<TokenParser>"),
+		TokenWhitelist: Symbol.for("ApiSync<TokenWhitelist>"),
 	},
 	Application: {
 		Environment: Symbol("Application<Environment>"),

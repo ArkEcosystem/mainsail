@@ -163,6 +163,12 @@ export class ApiContext {
 		)();
 	}
 
+	public get tokenWhitelistRepository(): ApiDatabaseContracts.TokenWhitelistRepository {
+		return this.app.get<ApiDatabaseContracts.TokenWhitelistRepositoryFactory>(
+			ApiDatabaseIdentifiers.TokenWhitelistRepositoryFactory,
+		)();
+	}
+
 	public async reset() {
 		const dataSource = this.app.get<any>(ApiDatabaseIdentifiers.DataSource);
 		await dataSource.dropDatabase();

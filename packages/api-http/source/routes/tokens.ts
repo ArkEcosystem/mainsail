@@ -13,6 +13,11 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(TokensController);
 	server.bind(controller);
 
+	const tokensQuerySchema = Joi.object({
+		ignoreWhitelist: Joi.bool().default(false),
+		name: Schemas.orEqualCriteria(tokenNameSchema),
+	}).concat(Schemas.pagination);
+
 	server.route({
 		handler: (request: Hapi.Request) => controller.index(request),
 		method: "GET",
@@ -23,9 +28,26 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				},
 			},
 			validate: {
-				query: Joi.object({
-					name: Schemas.orEqualCriteria(tokenNameSchema),
-				}).concat(Schemas.pagination),
+				query: tokensQuerySchema,
+			},
+		},
+		path: "/tokens",
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.index(request),
+		method: "POST",
+		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
+			validate: {
+				payload: Joi.object({
+					whitelist: Joi.array().items(Schemas.addressSchema).max(100).empty(null).default([]),
+				}).empty(null),
+				query: tokensQuerySchema,
 			},
 		},
 		path: "/tokens",
@@ -50,6 +72,22 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 		},
 		path: "/tokens/transfers",
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.whitelist(request),
+		method: "GET",
+		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
+			validate: {
+				query: Schemas.pagination,
+			},
+		},
+		path: "/tokens/whitelist",
 	});
 
 	server.route({

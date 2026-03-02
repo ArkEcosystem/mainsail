@@ -8,6 +8,7 @@ import tokenHolders from "../../test/fixtures/token_holders.json";
 import tokenTransferTokens from "../../test/fixtures/token_transfer.tokens.json";
 import tokenTransferTransactions from "../../test/fixtures/token_transfer.transactions.json";
 import tokenTransfers from "../../test/fixtures/token_transfers.json";
+import tokenWhitelist from "../../test/fixtures/token_whitelist.json";
 import tokenTransfersResponse from "../../test/fixtures/token_transfers.response.json";
 
 describe<{
@@ -37,6 +38,7 @@ describe<{
 
 	it("/tokens", async () => {
 		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
 
 		const testCases = [
 			{
@@ -103,6 +105,99 @@ describe<{
 				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
 			} else {
 				const { statusCode, data } = await request(endpoint, options);
+				assert.equal(statusCode, result.statusCode);
+				assert.equal(data.data, result.data);
+			}
+		}
+	});
+
+	it("/tokens?ignoreWhitelist", async () => {
+		await apiContext.tokenRepository.save(tokens);
+
+		const testCases = [
+			{
+				query: "?ignoreWhitelist=true",
+				result: {
+					data: [...tokens].sort((a, b) => a.address.localeCompare(b.address)),
+					statusCode: 200,
+				},
+			},
+			{
+				query: "?ignoreWhitelist=false",
+				result: {
+					data: [],
+					statusCode: 200,
+				},
+			},
+			{
+				query: "",
+				result: {
+					data: [],
+					statusCode: 200,
+				},
+			},
+		];
+
+		for (const { query, result } of testCases) {
+			const endpoint = `/tokens${query}`;
+			if (result.statusCode === 404) {
+				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
+			} else {
+				const { statusCode, data } = await request(endpoint, options);
+				assert.equal(statusCode, result.statusCode);
+				assert.equal(data.data, result.data);
+			}
+		}
+	});
+
+	it("/tokens custom whitelist (POST)", async () => {
+		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist.slice(0, 1));
+
+		const testCases = [
+			{
+				query: "",
+				method: "POST",
+				result: {
+					data: [tokens[0]],
+					statusCode: 200,
+				},
+			},
+			{
+				query: "",
+				body: JSON.stringify({ whitelist: [tokens[1].address] }),
+				method: "POST",
+				result: {
+					data: [tokens[0], tokens[1]],
+					statusCode: 200,
+				},
+			},
+			{
+				query: "",
+				body: JSON.stringify({ whitelist: tokens.map((t) => t.address) }),
+				method: "POST",
+				result: {
+					data: [...tokens].sort((a, b) => a.address.localeCompare(b.address)),
+					statusCode: 200,
+				},
+			},
+			{
+				query: "",
+				body: JSON.stringify({ whitelist: ["0x0000000000000000000000000000000000000000"] }),
+				method: "POST",
+				result: {
+					data: [tokens[0]],
+					statusCode: 200,
+				},
+			},
+		];
+
+		for (const { query, result, body, method } of testCases) {
+			const endpoint = `/tokens${query}`;
+			if (result.statusCode === 404) {
+				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
+			} else {
+				const { statusCode, data } = await request(endpoint, { ...options, body, method });
 				assert.equal(statusCode, result.statusCode);
 				assert.equal(data.data, result.data);
 			}

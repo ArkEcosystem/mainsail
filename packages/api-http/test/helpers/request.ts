@@ -11,8 +11,11 @@ export const request = async <T = Record<string, any>>(
 	if (options?.fullReceipt !== undefined) {
 		fullReceipt += (path.includes("?") ? "&" : "?") + `fullReceipt=${options.fullReceipt}`;
 	}
+	const response = await got(`http://localhost:4003/api/${path}${fullReceipt}`, {
+		body: options?.body ?? undefined,
+		method: options?.method ?? "GET",
+	});
 
-	const response = await got(`http://localhost:4003/api/${path}${fullReceipt}`);
 	const { statusCode, headers, body } = response;
 	return { data: JSON.parse(body) as T, headers, statusCode };
 };

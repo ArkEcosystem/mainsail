@@ -15,6 +15,7 @@ import { performance } from "perf_hooks";
 import { Listeners, TokenParser } from "./contracts.js";
 import { parseMultiPayments } from "./parsers/index.js";
 import { Restore } from "./restore.js";
+import { TokenWhitelist } from "./tokens/whitelist.js";
 
 interface DeferredSync {
 	block: Models.Block;
@@ -115,6 +116,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.ApiSync.TokenParser)
 	private readonly tokenParser!: TokenParser;
 
+	@inject(Identifiers.ApiSync.TokenWhitelist)
+	private readonly tokenWhitelist!: TokenWhitelist;
+
 	public async bootstrap(): Promise<void> {
 		await this.migrations.synchronizeEntities();
 		await this.#resetDatabaseIfNecessary();
@@ -129,6 +133,8 @@ export class Sync implements Contracts.ApiSync.Service {
 		}
 
 		await this.listeners.bootstrap();
+
+		await this.tokenWhitelist.bootstrap();
 
 		await this.#queue.start();
 	}
