@@ -37,8 +37,8 @@ export class TokensController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TokenHolderRepositoryFactory)
 	private readonly tokenHolderRepositoryFactory!: ApiDatabaseContracts.TokenHolderRepositoryFactory;
 
-	@inject(ApiDatabaseIdentifiers.TokenTransferRepositoryFactory)
-	private readonly tokenTransferRepositoryFactory!: ApiDatabaseContracts.TokenTransferRepositoryFactory;
+	@inject(ApiDatabaseIdentifiers.TokenActionRepositoryFactory)
+	private readonly tokenActionRepositoryFactory!: ApiDatabaseContracts.TokenActionRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.TokenWhitelistRepositoryFactory)
 	private readonly tokenWhitelistRepositoryFactory!: ApiDatabaseContracts.TokenWhitelistRepositoryFactory;
@@ -104,11 +104,19 @@ export class TokensController extends Controller {
 	}
 
 	public async transfers(request: Hapi.Request): Promise<object> {
-		return this.getTokenTransfers(request);
+		return this.getTokenActions(Models.TokenActionEnum.Transfer, request);
 	}
 
 	public async tokenTransfers(request: Hapi.Request): Promise<object> {
-		return this.getTokenTransfers(request);
+		return this.getTokenActions(Models.TokenActionEnum.Transfer, request);
+	}
+
+	public async approvals(request: Hapi.Request): Promise<object> {
+		return this.getTokenActions(Models.TokenActionEnum.Approval, request);
+	}
+
+	public async tokenApprovals(request: Hapi.Request): Promise<object> {
+		return this.getTokenActions(Models.TokenActionEnum.Approval, request);
 	}
 
 	public async whitelist(request: Hapi.Request): Promise<object> {
@@ -131,9 +139,11 @@ export class TokensController extends Controller {
 		);
 	}
 
-	private async getTokenTransfers(request: Hapi.Request): Promise<object> {
+	private async getTokenActions(action: Models.TokenActionEnum, request: Hapi.Request): Promise<object> {
 		const pagination = this.getListingPage(request);
-		const tokenTransfersQuery = this.tokenTransferRepositoryFactory().createQueryBuilder("tf");
+		const tokenActionsQuery = this.tokenActionRepositoryFactory()
+			.createQueryBuilder("tf")
+			.where("tf.action = :action", { action });
 
 		if (request.params.address) {
 			const token = await this.getToken(request.params.address);
@@ -141,11 +151,11 @@ export class TokensController extends Controller {
 				return Boom.notFound("Token not found");
 			}
 
-			tokenTransfersQuery.where("tf.address = :address", { address: request.params.address });
+			tokenActionsQuery.andWhere("tf.address = :address", { address: request.params.address });
 		}
 
 		if (request.query.transactionHash) {
-			tokenTransfersQuery.andWhere("tf.transaction_hash = :transactionHash", {
+			tokenActionsQuery.andWhere("tf.transaction_hash = :transactionHash", {
 				transactionHash: request.query.transactionHash,
 			});
 		}
@@ -155,7 +165,7 @@ export class TokensController extends Controller {
 				? request.query.addresses
 				: [request.query.addresses];
 
-			tokenTransfersQuery.andWhere(
+			tokenActionsQuery.andWhere(
 				new TypeOrm.Brackets((b) => {
 					b.where("tf.from IN (:...addresses)", { addresses }).orWhere("tf.to IN (:...addresses)", {
 						addresses,
@@ -165,17 +175,17 @@ export class TokensController extends Controller {
 		} else {
 			if (request.query.from) {
 				const from = Array.isArray(request.query.from) ? request.query.from : [request.query.from];
-				tokenTransfersQuery.andWhere("tf.from IN (:...from)", { from });
+				tokenActionsQuery.andWhere("tf.from IN (:...from)", { from });
 			}
 
 			if (request.query.to) {
 				const to = Array.isArray(request.query.to) ? request.query.to : [request.query.to];
-				tokenTransfersQuery.andWhere("tf.to IN (:...to)", { to });
+				tokenActionsQuery.andWhere("tf.to IN (:...to)", { to });
 			}
 		}
 
-		const [tokenTranfersRows, totalCountRow] = await Promise.all([
-			tokenTransfersQuery
+		const [tokenActionsRows, totalCountRow] = await Promise.all([
+			tokenActionsQuery
 				.clone()
 				.select([
 					'tf."from" AS "from"',
@@ -199,7 +209,7 @@ export class TokensController extends Controller {
 				.offset(pagination.offset)
 				.getRawMany<TokenTransferRaw>(),
 
-			tokenTransfersQuery.clone().select("COUNT(1)", "cnt").getRawOne<{ cnt: string }>(),
+			tokenActionsQuery.clone().select("COUNT(1)", "cnt").getRawOne<{ cnt: string }>(),
 		]);
 
 		const totalCount = Number(totalCountRow?.cnt ?? 0);
@@ -207,20 +217,20 @@ export class TokensController extends Controller {
 		return this.toPagination(
 			{
 				meta: { totalCountIsEstimate: false },
-				results: tokenTranfersRows.map((transfer) => ({
+				results: tokenActionsRows.map((row) => ({
 					/* eslint-disable sort-keys-fix/sort-keys-fix */
-					transactionHash: transfer.transactionHash,
-					from: transfer.from,
-					to: transfer.to,
-					value: transfer.value,
-					functionSig: `0x${transfer.functionSig.toString("hex")}`,
-					blockNumber: transfer.blockNumber,
-					timestamp: transfer.timestamp,
+					transactionHash: row.transactionHash,
+					from: row.from,
+					to: row.to,
+					value: row.value,
+					functionSig: `0x${row.functionSig.toString("hex")}`,
+					blockNumber: row.blockNumber,
+					timestamp: row.timestamp,
 					token: {
-						address: transfer.tokenAddress,
-						name: transfer.tokenName,
-						symbol: transfer.tokenSymbol,
-						decimals: transfer.tokenDecimals,
+						address: row.tokenAddress,
+						name: row.tokenName,
+						symbol: row.tokenSymbol,
+						decimals: row.tokenDecimals,
 					},
 					/* eslint-enable sort-keys-fix/sort-keys-fix */
 				})),

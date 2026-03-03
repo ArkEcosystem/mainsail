@@ -14,8 +14,8 @@ import { assert } from "@mainsail/utils";
 import {
 	EnrichedBlock,
 	EnrichedTransaction,
-	TransactionTokenTransfer,
-	TransactionTokenTransferRaw,
+	TransactionTokenAction,
+	TransactionTokenActionRaw,
 } from "../resources/index.js";
 
 @injectable()
@@ -129,16 +129,16 @@ export class Controller extends AbstractController {
 	): Promise<Search.ResultsPage<EnrichedTransaction>> {
 		const state = context?.state ?? (await this.getState());
 
-		let transferredTokens: Record<string, TransactionTokenTransfer[]> = {};
+		let tokens: Record<string, TransactionTokenAction[]> = {};
 		if (context?.includeTokens) {
-			transferredTokens = await this.fetchTransactionTransferredTokens(resultPage.results.map((t) => t.hash));
+			tokens = await this.fetchTransactionTokens(resultPage.results.map((t) => t.hash));
 		}
 
 		return {
 			...resultPage,
 			results: await Promise.all(
 				resultPage.results.map((tx) =>
-					this.enrichTransaction(tx, { ...context, state, tokens: transferredTokens[tx.hash] }),
+					this.enrichTransaction(tx, { ...context, state, tokens: tokens[tx.hash] }),
 				),
 			),
 		};
@@ -146,21 +146,22 @@ export class Controller extends AbstractController {
 
 	protected async enrichTransaction(
 		transaction: Models.Transaction,
-		context?: { state?: Models.State; fullReceipt?: boolean; tokens?: TransactionTokenTransfer[] },
+		context?: { state?: Models.State; fullReceipt?: boolean; tokens?: TransactionTokenAction[] },
 	): Promise<EnrichedTransaction> {
 		const [state] = await Promise.all([context?.state ? context.state : this.getState()]);
 
 		return { ...transaction, fullReceipt: context?.fullReceipt ?? false, state, tokens: context?.tokens };
 	}
 
-	protected async fetchTransactionTransferredTokens(
+	protected async fetchTransactionTokens(
 		transactionHashes: string[],
-	): Promise<Record<string, TransactionTokenTransfer[]>> {
+	): Promise<Record<string, TransactionTokenAction[]>> {
 		const maxTokensPerTx = 10;
 
 		const sql = `
 SELECT
   h.transaction_hash AS "transactionHash",
+  tt.action AS "action",
   tt.from AS "from",
   tt.to AS "to",
   tt.value AS "value",
@@ -175,7 +176,7 @@ FROM
     SELECT
       *
     FROM
-      token_transfers tt
+      token_actions tt
     WHERE
       tt.transaction_hash = h.transaction_hash
     ORDER BY
@@ -188,17 +189,15 @@ ORDER BY
   h.transaction_hash ASC,
   tt.index ASC
 `;
-		const rows = await this.dataSource.query<TransactionTokenTransferRaw[]>(sql, [
-			transactionHashes,
-			maxTokensPerTx,
-		]);
+		const rows = await this.dataSource.query<TransactionTokenActionRaw[]>(sql, [transactionHashes, maxTokensPerTx]);
 
-		return rows.reduce<Record<string, TransactionTokenTransfer[]>>((accumulator, current) => {
+		return rows.reduce<Record<string, TransactionTokenAction[]>>((accumulator, current) => {
 			if (!accumulator[current.transactionHash]) {
 				accumulator[current.transactionHash] = [];
 			}
 
 			accumulator[current.transactionHash].push({
+				action: current.action,
 				from: current.from,
 				index: current.index,
 				metadata: {

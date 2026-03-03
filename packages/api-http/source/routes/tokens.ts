@@ -75,6 +75,27 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
+		handler: (request: Hapi.Request) => controller.approvals(request),
+		method: "GET",
+		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
+			validate: {
+				query: Joi.object({
+					addresses: Schemas.orEqualCriteria(walletAddressSchema),
+					from: Schemas.orEqualCriteria(walletAddressSchema),
+					to: Schemas.orEqualCriteria(walletAddressSchema),
+					transactionHash: Schemas.orEqualCriteria(transactionHashSchema),
+				}).concat(Schemas.pagination),
+			},
+		},
+		path: "/tokens/approvals",
+	});
+
+	server.route({
 		handler: (request: Hapi.Request) => controller.whitelist(request),
 		method: "GET",
 		options: {
@@ -119,6 +140,24 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 		},
 		path: "/tokens/{address}/transfers",
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.tokenApprovals(request),
+		method: "GET",
+		options: {
+			validate: {
+				params: Joi.object({
+					address,
+				}),
+				query: Joi.object({
+					from: Schemas.orEqualCriteria(walletAddressSchema),
+					to: Schemas.orEqualCriteria(walletAddressSchema),
+					transactionHash: Schemas.orEqualCriteria(transactionHashSchema),
+				}).concat(Schemas.pagination),
+			},
+		},
+		path: "/tokens/{address}/approvals",
 	});
 
 	server.route({
