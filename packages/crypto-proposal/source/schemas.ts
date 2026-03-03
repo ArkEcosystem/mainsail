@@ -1,6 +1,17 @@
 import type { AnySchemaObject } from "ajv";
 
-export const schemas: Record<"proposal" | "proposalLockProof" | "validatorBitmap", AnySchemaObject> = {
+export const schemas: Record<"lockProof" | "proposal" | "validatorBitmap", AnySchemaObject> = {
+	lockProof: {
+		$id: "lockProof",
+		properties: {
+			signature: { $ref: "consensusSignature" },
+			validators: {
+				$ref: "validatorBitmap",
+			},
+		},
+		required: ["signature", "validators"],
+		type: "object",
+	},
 	proposal: {
 		$id: "proposal",
 		properties: {
@@ -17,17 +28,6 @@ export const schemas: Record<"proposal" | "proposalLockProof" | "validatorBitmap
 			validatorIndex: { isValidatorIndex: {} },
 		},
 		required: ["round", "data", "validatorIndex", "signature"],
-		type: "object",
-	},
-	proposalLockProof: {
-		$id: "lockProof",
-		properties: {
-			signature: { $ref: "consensusSignature" },
-			validators: {
-				$ref: "validatorBitmap",
-			},
-		},
-		required: ["signature", "validators"],
 		type: "object",
 	},
 	validatorBitmap: {
