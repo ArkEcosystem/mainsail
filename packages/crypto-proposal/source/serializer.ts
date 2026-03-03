@@ -16,6 +16,16 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 	@inject(Identifiers.Cryptography.Proposal.LockProofSize)
 	private readonly lockProofSize!: () => number;
 
+	public async serializeProposalUnsigned(
+		proposal: Contracts.Crypto.SerializableProposalData,
+	): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.SerializableProposalData>(proposal, {
+			length: this.#unsignedProposalSize(proposal),
+			schema: schemaForSignature,
+			skip: 0,
+		});
+	}
+
 	public async serializeProposal(
 		proposal: Contracts.Crypto.SerializableProposalData,
 	): Promise<Buffer> {
@@ -24,16 +34,6 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 				this.#unsignedProposalSize(proposal) +
 				this.signatureSize, // signature
 			schema,
-			skip: 0,
-		});
-	}
-
-	public async serializeProposalUnsigned(
-		proposal: Contracts.Crypto.SerializableProposalData,
-	): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.SerializableProposalData>(proposal, {
-			length: this.#unsignedProposalSize(proposal),
-			schema: schemaForSignature,
 			skip: 0,
 		});
 	}

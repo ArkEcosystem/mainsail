@@ -53,8 +53,8 @@ export interface ProposalFactory {
 }
 
 export interface ProposalSerializer {
-	serializeProposal(proposal: SerializableProposalData): Promise<Buffer>;
 	serializeProposalUnsigned(proposal: SerializableProposalData): Promise<Buffer>;
+	serializeProposal(proposal: SerializableProposalData): Promise<Buffer>;
 	serializeProposed(proposedData: ProposedDataSerializable): Promise<Buffer>;
 	serializeLockProof(proof: AggregatedSignature): Promise<Buffer>;
 }
