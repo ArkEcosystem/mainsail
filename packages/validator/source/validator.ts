@@ -91,7 +91,7 @@ export class Validator implements Contracts.Validator.Validator {
 		block: Contracts.Crypto.Block,
 		lockProof?: Contracts.Crypto.AggregatedSignature,
 	): Promise<Contracts.Crypto.Proposal> {
-		const serializedProposedBlock = await this.proposalSerializer.serializeProposed({ block, lockProof });
+		const serializedProposedBlock = await this.proposalSerializer.serializeProposedData({ block, lockProof });
 		return this.proposalFactory.makeProposal(
 			{
 				data: { serialized: serializedProposedBlock.toString("hex") },

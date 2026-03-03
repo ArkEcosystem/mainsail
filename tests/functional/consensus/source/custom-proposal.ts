@@ -124,7 +124,7 @@ export const makeCustomProposal = async (
 		Identifiers.Cryptography.Proposal.Serializer,
 	);
 
-	const proposedBytes = await messageSerializer.serializeProposed({
+	const proposedBytes = await messageSerializer.serializeProposedData({
 		block,
 		lockProof: undefined,
 	});
