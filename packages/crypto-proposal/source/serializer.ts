@@ -21,11 +21,7 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.SerializableProposalData>(proposal, {
 			length:
-				4 + // round
-				(proposal.validRound === undefined ? 1 : 5) + // validRound
-				4 + // serialized data length
-				proposal.data.serialized.length / 2 + // serialized data
-				1 + // validatorIndex
+				this.#unsignedProposalSize(proposal) +
 				this.signatureSize, // signature
 			schema,
 			skip: 0,
@@ -36,12 +32,7 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 		proposal: Contracts.Crypto.SerializableProposalData,
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.SerializableProposalData>(proposal, {
-			length:
-				4 + // round
-				(proposal.validRound === undefined ? 1 : 5) + // validRound
-				4 + // serialized data length
-				proposal.data.serialized.length / 2 + // serialized data
-				1, // validatorIndex
+			length: this.#unsignedProposalSize(proposal),
 			schema: schemaForSignature,
 			skip: 0,
 		});
@@ -67,5 +58,15 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 		}
 
 		return Buffer.concat([Buffer.of(0), serializedBlock]);
+	}
+
+	#unsignedProposalSize(proposal: Contracts.Crypto.SerializableProposalData): number {
+		return (
+			4 + // round
+			(proposal.validRound === undefined ? 1 : 5) + // validRound
+			4 + // serialized data length
+			proposal.data.serialized.length / 2 + // serialized data
+			1 // validatorIndex
+		);
 	}
 }
