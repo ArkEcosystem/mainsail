@@ -17,9 +17,9 @@ import {
 	RepositoryDataSource,
 	StateRepository,
 	SystemRepository,
+	TokenActionRepository,
 	TokenHolderRepository,
 	TokenRepository,
-	TokenTransferRepository,
 	TokenWhitelistRepository,
 	TransactionRepository,
 	ValidatorRoundRepository,
@@ -39,8 +39,8 @@ import {
 	State,
 	System,
 	Token,
+	TokenAction,
 	TokenHolder,
-	TokenTransfer,
 	TokenWhitelist,
 	Transaction,
 	ValidatorRound,
@@ -57,9 +57,9 @@ import {
 	makePluginRepository,
 	makeStateRepository,
 	makeSystemRepository,
+	makeTokenActionRepository,
 	makeTokenHolderRepository,
 	makeTokenRepository,
-	makeTokenTransferRepository,
 	makeTokenWhitelistRepository,
 	makeTransactionRepository,
 	makeValidatorRoundRepository,
@@ -108,8 +108,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					System,
 					Transaction,
 					Token,
+					TokenAction,
 					TokenHolder,
-					TokenTransfer,
 					TokenWhitelist,
 					MultiPayment,
 					ValidatorRound,
@@ -218,10 +218,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				);
 
 			this.app
-				.bind<() => TokenTransferRepository>(Identifiers.TokenTransferRepositoryFactory)
+				.bind<() => TokenActionRepository>(Identifiers.TokenActionRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
-						makeTokenTransferRepository(customDataSource ?? dataSource),
+						makeTokenActionRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
