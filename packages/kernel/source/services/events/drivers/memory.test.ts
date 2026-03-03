@@ -6,7 +6,7 @@ import { MemoryEventDispatcher } from "./memory";
 class DummyClass implements Contracts.Kernel.EventListener {
 	public constructor(private readonly method?) {}
 
-	public async handle({name, data }: { name: string; data: any }): Promise<void> {
+	public async handle({ name, data }: { name: string; data: any }): Promise<void> {
 		this.method(name, data);
 	}
 }
@@ -159,7 +159,6 @@ describe<{
 		context.dummyCallerSpy.calledWith("firstEvent");
 		context.dummyCallerSpy.calledWith("secondEvent");
 	});
-
 
 	it("should clear all listeners", async (context) => {
 		context.emitter.listen("firstEvent", context.dummyListener);

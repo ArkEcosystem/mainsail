@@ -25,7 +25,10 @@ export class BlockJob implements Job {
 			});
 		};
 
-		this.eventDispatcher.listen(Events.BlockEvent.Received, new ExecuteCallbackWhenReady(onCallback, this.blockCount));
+		this.eventDispatcher.listen(
+			Events.BlockEvent.Received,
+			new ExecuteCallbackWhenReady(onCallback, this.blockCount),
+		);
 	}
 
 	public cron(blockCount: number): this {
