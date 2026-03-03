@@ -132,7 +132,7 @@ export const snoozeForBlock = async (app: Contracts.Kernel.Application | Contrac
 			);
 
 			const listener = {
-				handle: ({ data }: { data: Contracts.Crypto.BlockData }) => {
+				handle: async ({ data }: { data: Contracts.Crypto.BlockData }): Promise<void> => {
 					if (!blockNumber || data.number >= blockNumber) {
 						eventDispatcher.forget(event, listener);
 						resolve();
@@ -159,7 +159,7 @@ export const snoozeForRound = async (app: Contracts.Kernel.Application | Contrac
 			);
 
 			const listener = {
-				handle: ({ data: state }: { data: Contracts.Consensus.State }) => {
+				handle: async ({ data: state }: { data: Contracts.Consensus.State }): Promise<void> => {
 					if (!round || state.round >= round) {
 						eventDispatcher.forget(event, listener);
 						resolve();
@@ -195,7 +195,7 @@ export async function snoozeForInvalidBlock(
 			);
 
 			const listener = {
-				handle: ({ data: { block, error } }: { data: InvalidBlock }) => {
+				handle: async ({ data: { block, error } }: { data: InvalidBlock }): Promise<void> => {
 					if (!blockNumber || block.number >= blockNumber) {
 						eventDispatcher.forget(event, listener);
 						resolve({ block, error });
