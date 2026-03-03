@@ -6,10 +6,6 @@ import { Validator } from "@mainsail/validation";
 import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from "./service-provider";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/crypto-validation";
-import { ServiceProvider as TransactionServiceProvider } from "@mainsail/crypto-transaction";
-import { ServiceProvider as AddressServiceProvider } from "@mainsail/crypto-address-keccak256";
-import { ServiceProvider as KeyPairServiceProvider } from "@mainsail/crypto-key-pair-ecdsa";
-import { ServiceProvider as HashBcryptoServiceProvider } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as SignatureBlsServiceProvider } from "@mainsail/crypto-signature-bls12-381";
 
 describe<{
@@ -26,10 +22,6 @@ describe<{
 		app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 
 		await app.resolve(ValidationServiceProvider).register();
-		// await app.resolve(HashBcryptoServiceProvider).register();
-		// await app.resolve(KeyPairServiceProvider).register();
-		// await app.resolve(AddressServiceProvider).register();
-		// await app.resolve(TransactionServiceProvider).register();
 		await app.resolve(SignatureBlsServiceProvider).register();
 
 		context.serviceProvider = app.resolve(ServiceProvider);
@@ -48,7 +40,7 @@ describe<{
 		assert.equal(lockProofSize(), 96 + 1 + 8);
 
 		assert.true(validator.hasSchema("proposal"));
-		// assert.true(validator.hasSchema("lockProof"));
-		// assert.true(validator.hasSchema("validatorBitmap"));
+		assert.true(validator.hasSchema("lockProof"));
+		assert.true(validator.hasSchema("validatorBitmap"));
 	});
 });

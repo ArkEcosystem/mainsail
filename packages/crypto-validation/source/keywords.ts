@@ -4,7 +4,7 @@ import type { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
 export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
-): { maxBytes: FuncKeywordDefinition; bignumber: FuncKeywordDefinition } => {
+): { maxBytes: FuncKeywordDefinition; bignumber: FuncKeywordDefinition; buffer: FuncKeywordDefinition } => {
 	const maxBytes: FuncKeywordDefinition = {
 		compile: (schema) => (data) => Buffer.byteLength(data, "utf8") <= schema,
 		errors: false,
@@ -47,5 +47,16 @@ export const makeKeywords = (
 		},
 	};
 
-	return { bignumber, maxBytes };
+	const buffer: FuncKeywordDefinition = {
+		compile() {
+			return (data) => Buffer.isBuffer(data);
+		},
+		errors: false,
+		keyword: "buffer",
+		metaSchema: {
+			type: "object",
+		},
+	}
+
+	return { bignumber, buffer, maxBytes };
 };
