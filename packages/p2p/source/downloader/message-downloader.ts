@@ -67,7 +67,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	@postConstruct()
 	public initialize(): void {
 		this.events.listen(Events.BlockEvent.Applied, {
-			handle: () => {
+			handle: async (): Promise<void> => {
 				this.#downloadsByBlockNumber.delete(this.stateStore.getBlockNumber());
 				this.#fullDownloadsByBlockNumber.delete(this.stateStore.getBlockNumber());
 			},

@@ -1,5 +1,5 @@
 export interface EventListener<T = unknown> {
-	handle(payload: { name: string; data: T }): void;
+	handle(payload: { name: string; data: T }): Promise<void>;
 }
 
 export interface EventDispatcher<T = unknown> {
@@ -21,13 +21,5 @@ export interface EventDispatcher<T = unknown> {
 
 	dispatch<T = unknown>(event: string, data?: T): Promise<void>;
 
-	dispatchSeq<T = unknown>(event: string, data?: T): Promise<void>;
-
-	dispatchSync<T = unknown>(event: string, data?: T): void;
-
 	dispatchMany<T = unknown>(events: Array<[string, T]>): Promise<void>;
-
-	dispatchManySeq<T = unknown>(events: Array<[string, T]>): Promise<void>;
-
-	dispatchManySync<T = unknown>(events: Array<[string, T]>): void;
 }
