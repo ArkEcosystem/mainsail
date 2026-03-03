@@ -1,5 +1,5 @@
 export interface EventListener<T = unknown> {
-	handle(payload: { name: string; data: T }): void;
+	handle(payload: { name: string; data: T }): Promise<void>;
 }
 
 export interface EventDispatcher<T = unknown> {

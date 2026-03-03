@@ -27,8 +27,8 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		this.eventDispatcher.listen(Events.WebhookEvent.Removed, this);
 	}
 
-	public handle(payload: { name: string; data: unknown }): void {
-		void this.reloadWebhooks();
+	public async handle(payload: { name: string; data: unknown }): Promise<void> {
+		await this.reloadWebhooks();
 	}
 
 	public registerEventHandler<T>(event: string, callback: Contracts.Kernel.IPC.EventCallback<T>): void {
