@@ -129,14 +129,13 @@ export const makeCustomProposal = async (
 		lockProof: undefined,
 	});
 
-	const serializedProposal = await messageSerializer.serializeProposal(
+	const serializedProposal = await messageSerializer.serializeProposalUnsigned(
 		{
 			data: { serialized: proposedBytes.toString("hex") },
 			round,
 			validRound: undefined,
 			validatorIndex: 0,
 		},
-		{ includeSignature: false },
 	);
 
 	const proposalSignature = await app
