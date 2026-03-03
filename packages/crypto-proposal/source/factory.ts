@@ -35,7 +35,7 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 	): Promise<Contracts.Crypto.Proposal> {
 		const worker = await this.workerPool.getWorker();
 
-		const bytes = await this.serializer.serializeProposal(data, { includeSignature: false });
+		const bytes = await this.serializer.serializeProposalUnsigned(data);
 		const signature = await worker.consensusSignature("sign", bytes, Buffer.from(keyPair.privateKey, "hex"));
 		const serialized = Buffer.concat([bytes, Buffer.from(signature, "hex")]);
 		return this.makeProposalFromBytes(serialized);
@@ -56,7 +56,7 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 		);
 
 		if (!serialized) {
-			serialized = await this.serializer.serializeProposal(proposalData, { includeSignature: true });
+			serialized = await this.serializer.serializeProposal(proposalData);
 		}
 
 		return this.app.resolve<Proposal>(Proposal).initialize({

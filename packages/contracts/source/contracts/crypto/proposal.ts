@@ -51,12 +51,9 @@ export interface ProposalFactory {
 	makeProposedDataFromBytes(data: Buffer): Promise<ProposedData>;
 }
 
-export interface SerializeProposalOptions {
-	includeSignature?: boolean;
-}
-
 export interface ProposalSerializer {
-	serializeProposal(proposal: SerializableProposalData, options: SerializeProposalOptions): Promise<Buffer>;
+	serializeProposal(proposal: SerializableProposalData): Promise<Buffer>;
+	serializeProposalUnsigned(proposal: SerializableProposalData): Promise<Buffer>;
 	serializeProposed(proposedBlock: ProposedBlockSerializable): Promise<Buffer>;
 	serializeLockProof(proof: AggregatedSignature): Promise<Buffer>;
 }
