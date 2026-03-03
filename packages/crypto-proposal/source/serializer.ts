@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
-import { lockProofSchema, schema, schemaForSignature } from "./serializer-schemas.js";
+import { lockProofSchema, schema, schemaUnsigned } from "./serializer-schemas.js";
 
 @injectable()
 export class Serializer implements Contracts.Crypto.ProposalSerializer {
@@ -21,7 +21,7 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.SerializableProposalData>(proposal, {
 			length: this.#unsignedProposalSize(proposal),
-			schema: schemaForSignature,
+			schema: schemaUnsigned,
 			skip: 0,
 		});
 	}
