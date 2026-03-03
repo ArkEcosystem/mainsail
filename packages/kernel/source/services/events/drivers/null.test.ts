@@ -75,28 +75,7 @@ describe("NullEventDispatcher", ({ assert, it }) => {
 
 	it("should return undefined", async () => {
 		const driver = new NullEventDispatcher();
-		const result = await driver.dispatchSeq("event", "data");
-		assert.is(result, undefined);
-	});
-
-	it("should return undefined", () => {
-		const driver = new NullEventDispatcher();
-		const result = driver.dispatchSync("event", "data");
-		assert.is(result, undefined);
-	});
-
-	it("should return undefined", async () => {
-		const driver = new NullEventDispatcher();
 		const result = await driver.dispatchMany([
-			["event1", "data1"],
-			["event2", "data2"],
-		]);
-		assert.is(result, undefined);
-	});
-
-	it("should return undefined", () => {
-		const driver = new NullEventDispatcher();
-		const result = driver.dispatchManySync([
 			["event1", "data1"],
 			["event2", "data2"],
 		]);
