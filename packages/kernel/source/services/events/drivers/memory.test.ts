@@ -6,8 +6,8 @@ import { MemoryEventDispatcher } from "./memory";
 class DummyClass implements Contracts.Kernel.EventListener {
 	public constructor(private readonly method?) {}
 
-	public handle(): void {
-		this.method();
+	public async handle({name, data }: { name: string; data: any }): Promise<void> {
+		this.method(name, data);
 	}
 }
 
@@ -57,7 +57,7 @@ describe<{
 		context.emitter.listen("*", context.dummyListener);
 
 		await context.emitter.dispatch("firstEvent");
-		await context.emitter.dispatchSeq("firstEvent");
+		await context.emitter.dispatch("firstEvent");
 
 		context.dummyCallerSpy.calledTimes(2);
 	});
@@ -84,29 +84,23 @@ describe<{
 	it("should listen once", async (context) => {
 		context.emitter.listenOnce("firstEvent", context.dummyListener);
 
-		context.emitter.dispatchSync("firstEvent");
-		context.emitter.dispatchSync("firstEvent");
-		context.emitter.dispatchSync("firstEvent");
-
-		context.dummyCallerSpy.calledOnce();
-
-		context.emitter.dispatchSync("firstEvent");
-		context.emitter.dispatchSync("firstEvent");
-		context.emitter.dispatchSync("firstEvent");
+		await context.emitter.dispatch("firstEvent");
+		await context.emitter.dispatch("firstEvent");
+		await context.emitter.dispatch("firstEvent");
 
 		context.dummyCallerSpy.calledOnce();
 	});
 
-	it("should remove an event listener", (context) => {
+	it("should remove an event listener", async (context) => {
 		context.emitter.listen("firstEvent", context.dummyListener);
 
-		context.emitter.dispatchSync("firstEvent");
+		await context.emitter.dispatch("firstEvent");
 
 		context.dummyCallerSpy.calledOnce();
 
 		context.emitter.forget("firstEvent", context.dummyListener);
 
-		context.emitter.dispatchSync("firstEvent");
+		await context.emitter.dispatch("firstEvent");
 
 		context.dummyCallerSpy.calledOnce();
 	});
@@ -134,7 +128,7 @@ describe<{
 	it("should not execute an event listener without await", async (context) => {
 		context.emitter.listen("firstEvent", context.dummyListener);
 
-		context.emitter.dispatch("firstEvent");
+		void context.emitter.dispatch("firstEvent");
 
 		context.dummyCallerSpy.neverCalled();
 	});
@@ -142,53 +136,9 @@ describe<{
 	it("should execute a wildcard listener with await", async (context) => {
 		context.emitter.listen("*", context.dummyListener);
 
-		await context.emitter.dispatchSeq("firstEvent");
+		await context.emitter.dispatch("firstEvent");
 
 		context.dummyCallerSpy.calledOnce();
-	});
-
-	it("should not execute an event listener without await (async behaviour)", async (context) => {
-		context.emitter.listen("firstEvent", context.dummyListener);
-
-		context.emitter.dispatchSeq("firstEvent");
-
-		context.dummyCallerSpy.neverCalled();
-	});
-
-	it("should emit all events in sequence", async (context) => {
-		context.emitter.listen("firstEvent", context.dummyListener);
-		context.emitter.listen("firstEvent", new DummyClass(context.dummyCaller));
-		context.emitter.listen("firstEvent", new DummyClass(context.dummyCaller));
-
-		await context.emitter.dispatchSeq("firstEvent");
-
-		context.dummyCallerSpy.calledTimes(3);
-	});
-
-	it("should execute an event listener without await", (context) => {
-		context.emitter.listen("firstEvent", context.dummyListener);
-
-		context.emitter.dispatchSync("firstEvent");
-
-		context.dummyCallerSpy.calledOnce();
-	});
-
-	it("should execute a wildcard listener without await", (context) => {
-		context.emitter.listen("*", context.dummyListener);
-
-		context.emitter.dispatchSync("firstEvent");
-
-		context.dummyCallerSpy.calledOnce();
-	});
-
-	it("should emit all events in sequence", (context) => {
-		context.emitter.listen("firstEvent", context.dummyListener);
-		context.emitter.listen("firstEvent", new DummyClass(context.dummyCaller));
-		context.emitter.listen("firstEvent", new DummyClass(context.dummyCaller));
-
-		context.emitter.dispatchSync("firstEvent");
-
-		context.dummyCallerSpy.calledTimes(3);
 	});
 
 	it("should emit all events", async (context) => {
@@ -206,41 +156,10 @@ describe<{
 		]);
 
 		context.dummyCallerSpy.calledTimes(6);
+		context.dummyCallerSpy.calledWith("firstEvent");
+		context.dummyCallerSpy.calledWith("secondEvent");
 	});
 
-	it("should emit all events", async (context) => {
-		context.emitter.listen("firstEvent", new DummyClass(context.dummyCaller));
-		context.emitter.listen("firstEvent", new DummyClass(context.dummyCaller));
-		context.emitter.listen("firstEvent", new DummyClass(context.dummyCaller));
-
-		context.emitter.listen("secondEvent", new DummyClass(context.dummyCaller));
-		context.emitter.listen("secondEvent", new DummyClass(context.dummyCaller));
-		context.emitter.listen("secondEvent", new DummyClass(context.dummyCaller));
-
-		await context.emitter.dispatchManySeq([
-			["firstEvent", undefined],
-			["secondEvent", undefined],
-		]);
-
-		context.dummyCallerSpy.calledTimes(6);
-	});
-
-	it("should emit all events", async (context) => {
-		context.emitter.listen("firstEvent", new DummyClass(context.dummyCaller));
-		context.emitter.listen("firstEvent", new DummyClass(context.dummyCaller));
-		context.emitter.listen("firstEvent", new DummyClass(context.dummyCaller));
-
-		context.emitter.listen("secondEvent", new DummyClass(context.dummyCaller));
-		context.emitter.listen("secondEvent", new DummyClass(context.dummyCaller));
-		context.emitter.listen("secondEvent", new DummyClass(context.dummyCaller));
-
-		context.emitter.dispatchManySync([
-			["firstEvent", undefined],
-			["secondEvent", undefined],
-		]);
-
-		context.dummyCallerSpy.calledTimes(6);
-	});
 
 	it("should clear all listeners", async (context) => {
 		context.emitter.listen("firstEvent", context.dummyListener);

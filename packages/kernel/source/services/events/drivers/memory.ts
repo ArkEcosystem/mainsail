@@ -115,7 +115,6 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 	}
 
 	#getListenersByPattern(event: string): Contracts.Kernel.EventListener[] {
-		// @ts-ignore
 		const matches: string[] = mm([...this.#listeners.keys()], event);
 
 		let eventListeners: Contracts.Kernel.EventListener[] = [];
