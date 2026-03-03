@@ -23,13 +23,14 @@ export interface SerializableProposalData {
 	readonly signature?: string;
 }
 
-export interface ProposedData {
+export type ProposedDataSerializable = {
 	readonly block: Block;
 	readonly lockProof?: AggregatedSignature;
-	readonly serialized: string;
 }
 
-export type ProposedBlockSerializable = Omit<ProposedData, "serialized">;
+export interface ProposedData extends ProposedDataSerializable {
+	readonly serialized: string;
+}
 
 export interface Proposal extends Omit<ProposalData, "data"> {
 	isDataDeserialized: boolean;
@@ -54,7 +55,7 @@ export interface ProposalFactory {
 export interface ProposalSerializer {
 	serializeProposal(proposal: SerializableProposalData): Promise<Buffer>;
 	serializeProposalUnsigned(proposal: SerializableProposalData): Promise<Buffer>;
-	serializeProposed(proposedBlock: ProposedBlockSerializable): Promise<Buffer>;
+	serializeProposed(proposedData: ProposedDataSerializable): Promise<Buffer>;
 	serializeLockProof(proof: AggregatedSignature): Promise<Buffer>;
 }
 

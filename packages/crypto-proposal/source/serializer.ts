@@ -55,13 +55,13 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 		});
 	}
 
-	public async serializeProposed(proposedBlock: Contracts.Crypto.ProposedBlockSerializable): Promise<Buffer> {
-		const serializedBlock = Buffer.from(proposedBlock.block.serialized, "hex");
+	public async serializeProposed(proposedData: Contracts.Crypto.ProposedDataSerializable): Promise<Buffer> {
+		const serializedBlock = Buffer.from(proposedData.block.serialized, "hex");
 
 		// NOTE: The lock proof is undefined most of the time, hence we can safe a lot of bytes
 		// here by explicitly storing it's length instead of padding it with zero bytes.
-		if (proposedBlock.lockProof) {
-			const serializedLockProof = await this.serializeLockProof(proposedBlock.lockProof);
+		if (proposedData.lockProof) {
+			const serializedLockProof = await this.serializeLockProof(proposedData.lockProof);
 			const proofLength = Buffer.of(serializedLockProof.length);
 			return Buffer.concat([proofLength, serializedLockProof, serializedBlock]);
 		}
