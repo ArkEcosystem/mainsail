@@ -13,7 +13,7 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 
 	public async boot(flags: Contracts.TransactionPool.WorkerFlags): Promise<void> { }
 
-	public handle(): void { }
+	public async handle(): Promise<void> { }
 
 	public async start(): Promise<void> { }
 
