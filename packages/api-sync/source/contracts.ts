@@ -18,7 +18,7 @@ export interface Listeners {
 export type TokenParserResult = {
 	tokens: Models.Token[];
 	tokenHolders: Models.TokenHolder[];
-	tokenTransfers: Models.TokenTransfer[];
+	tokenActions: Models.TokenAction[];
 };
 export interface TokenParser {
 	parseReceipt(
