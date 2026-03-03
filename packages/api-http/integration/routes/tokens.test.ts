@@ -7,9 +7,10 @@ import tokens from "../../test/fixtures/tokens.json";
 import tokenHolders from "../../test/fixtures/token_holders.json";
 import tokenTransferTokens from "../../test/fixtures/token_transfer.tokens.json";
 import tokenTransferTransactions from "../../test/fixtures/token_transfer.transactions.json";
-import tokenTransfers from "../../test/fixtures/token_transfers.json";
+import tokenActions from "../../test/fixtures/token_actions.json";
 import tokenWhitelist from "../../test/fixtures/token_whitelist.json";
 import tokenTransfersResponse from "../../test/fixtures/token_transfers.response.json";
+import tokenApprovalsResponse from "../../test/fixtures/token_approvals.response.json";
 
 describe<{
 	app: Application;
@@ -289,7 +290,7 @@ describe<{
 	it("/tokens/transfers", async () => {
 		await apiContext.tokenRepository.save(tokenTransferTokens);
 		await apiContext.transactionRepository.save(tokenTransferTransactions);
-		await apiContext.tokenTransferRepository.save(tokenTransfers);
+		await apiContext.tokenActionRepository.save(tokenActions);
 
 		const testCases = [
 			{
@@ -379,7 +380,7 @@ describe<{
 	it("/tokens/{}/transfers", async () => {
 		await apiContext.tokenRepository.save(tokenTransferTokens);
 		await apiContext.transactionRepository.save(tokenTransferTransactions);
-		await apiContext.tokenTransferRepository.save(tokenTransfers);
+		await apiContext.tokenActionRepository.save(tokenActions);
 
 		const testCases = [
 			{
@@ -401,6 +402,41 @@ describe<{
 
 		for (const { query, token, result } of testCases) {
 			const endpoint = `/tokens/${token}/transfers${query}`;
+			if (result.statusCode === 404) {
+				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
+			} else {
+				const { statusCode, data } = await request(endpoint, options);
+				assert.equal(statusCode, result.statusCode);
+				assert.equal(data.results, result.data);
+			}
+		}
+	});
+
+	it("/tokens/{}/approvals", async () => {
+		await apiContext.tokenRepository.save(tokenTransferTokens);
+		await apiContext.transactionRepository.save(tokenTransferTransactions);
+		await apiContext.tokenActionRepository.save(tokenActions);
+
+		const testCases = [
+			{
+				query: "",
+				token: tokenTransferTokens[1].address,
+				result: {
+					data: tokenApprovalsResponse.filter((t) => t.token.address === tokenTransferTokens[1].address),
+					statusCode: 200,
+				},
+			},
+			{
+				query: "",
+				token: "0xdead78251073157e400c3d8d2ed92a85c958f9fa",
+				result: {
+					statusCode: 404,
+				},
+			},
+		];
+
+		for (const { query, token, result } of testCases) {
+			const endpoint = `/tokens/${token}/approvals${query}`;
 			if (result.statusCode === 404) {
 				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
 			} else {

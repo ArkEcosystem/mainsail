@@ -57,10 +57,7 @@ describe<{
 		tokenHolders = await getAllTokenHolders(context);
 
 		assert.length(tokenHolders, 1);
-		assert.equal(
-			tokenHolders[0].address,
-			await getAddressByPublicKey(context.app, context.wallets[0].publicKey),
-		);
+		assert.equal(tokenHolders[0].address, await getAddressByPublicKey(context.app, context.wallets[0].publicKey));
 		assert.equal(tokenHolders[0].tokenAddress, erc20Address.toLowerCase());
 		assert.equal(tokenHolders[0].balance, parseEther("100000000").toString());
 
@@ -84,16 +81,45 @@ describe<{
 		tokenHolders = await getAllTokenHolders(context);
 		assert.length(tokenHolders, 2);
 
-		assert.equal(
-			tokenHolders[0].address,
-			await getAddressByPublicKey(context.app, context.wallets[0].publicKey),
-		);
+		assert.equal(tokenHolders[0].address, await getAddressByPublicKey(context.app, context.wallets[0].publicKey));
 		assert.equal(tokenHolders[0].tokenAddress, erc20Address.toLowerCase());
 		assert.equal(tokenHolders[0].balance, (parseEther("100000000") - transferAmount).toString());
 
 		assert.equal(tokenHolders[1].address, randomWallet.address);
 		assert.equal(tokenHolders[1].tokenAddress, erc20Address.toLowerCase());
 		assert.equal(tokenHolders[1].balance, transferAmount.toString());
+	});
+
+	it("should ingest token approvals", async (context) => {
+		const deployTx = await EvmCalls.makeEvmCallDeployErc20Contract(context);
+
+		let approvals = await getAllTokenApprovals(context);
+		assert.empty(approvals);
+
+		await addTransactionsToPool(context, [deployTx]);
+		await waitBlock(context, 2);
+
+		const erc20Address = getCreateAddress({
+			from: deployTx.from as Hex,
+			nonce: 2n,
+		});
+
+		// api-sync updates approvals
+		const transferAmount = parseEther("1234");
+		const randomWallet = await Utils.getRandomColdWallet(context);
+		const transferTx = await EvmCalls.makeEvmCall(context, {
+			recipient: erc20Address,
+			payload: EvmCalls.encodeErc20Approve(randomWallet.address, transferAmount),
+		});
+
+		await addTransactionsToPool(context, [transferTx]);
+		await waitBlock(context, 2);
+
+		approvals = await getAllTokenApprovals(context);
+		assert.length(approvals, 1);
+		assert.equal(approvals[0].from, transferTx.from);
+		assert.equal(approvals[0].to, randomWallet.address);
+		assert.equal(approvals[0].value, transferAmount.toString());
 	});
 
 	const getAllTokens = async ({ app }: { app: Contracts.Kernel.Application }): Promise<Models.Token[]> => {
@@ -104,11 +130,36 @@ describe<{
 		return tokenRepositoryFactory().createQueryBuilder().getMany();
 	};
 
-	const getAllTokenHolders = async ({ app }: { app: Contracts.Kernel.Application }): Promise<Models.TokenHolder[]> => {
+	const getAllTokenHolders = async ({
+		app,
+	}: {
+		app: Contracts.Kernel.Application;
+	}): Promise<Models.TokenHolder[]> => {
 		const tokenHolderRepositoryFactory = app.get<ApiDatabaseContracts.TokenHolderRepositoryFactory>(
 			ApiDatabaseIdentifiers.TokenHolderRepositoryFactory,
 		);
 
 		return tokenHolderRepositoryFactory().createQueryBuilder().getMany();
+	};
+
+	const getAllTokenApprovals = async ({
+		app,
+	}: {
+		app: Contracts.Kernel.Application;
+	}): Promise<Models.TokenAction[]> => {
+		const actions = await getAllTokenActions({ app });
+		return actions.filter(({ action }) => action === Models.TokenActionEnum.Approval);
+	};
+
+	const getAllTokenActions = async ({
+		app,
+	}: {
+		app: Contracts.Kernel.Application;
+	}): Promise<Models.TokenAction[]> => {
+		const tokenActionFactory = app.get<ApiDatabaseContracts.TokenActionRepositoryFactory>(
+			ApiDatabaseIdentifiers.TokenActionRepositoryFactory,
+		);
+
+		return tokenActionFactory().createQueryBuilder().getMany();
 	};
 });
