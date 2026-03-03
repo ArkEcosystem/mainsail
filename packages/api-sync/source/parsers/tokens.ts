@@ -1,6 +1,5 @@
 import type { Contracts as ApiDatabaseContracts } from "@mainsail/api-database";
-import { Models } from "@mainsail/api-database";
-import { Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
+import { Identifiers as ApiDatabaseIdentifiers, Models } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";

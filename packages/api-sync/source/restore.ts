@@ -193,9 +193,9 @@ export class Restore {
 				publicKeyToAddress: {},
 				stateRepository: this.stateRepositoryFactory(entityManager),
 
+				tokenActionRepository: this.tokenActionRepositoryFactory(entityManager),
 				tokenHolderRepository: this.tokenHolderRepositoryFactory(entityManager),
 				tokenRepository: this.tokenRepositoryFactory(entityManager),
-				tokenActionRepository: this.tokenActionRepositoryFactory(entityManager),
 
 				totalSupply: BigNumber.ZERO,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
@@ -257,9 +257,9 @@ export class Restore {
 				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
 				multiPaymentRepository: this.multiPaymentRepositoryFactory(entityManager),
 				stateRepository: this.stateRepositoryFactory(entityManager),
+				tokenActionRepository: this.tokenActionRepositoryFactory(entityManager),
 				tokenHolderRepository: this.tokenHolderRepositoryFactory(entityManager),
 				tokenRepository: this.tokenRepositoryFactory(entityManager),
-				tokenActionRepository: this.tokenActionRepositoryFactory(entityManager),
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
 				walletRepository: this.walletRepositoryFactory(entityManager),
