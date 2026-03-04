@@ -45,6 +45,8 @@ interface RestoreContext extends RepositoryContext {
 
 	validatorAttributes: Record<string, ValidatorAttributes>;
 	userAttributes: Record<string, UserAttributes>;
+
+	validatorRounds: Record<number, Contracts.Shared.RoundInfo & { totalRound: number }>;
 }
 
 interface ValidatorAttributes {
@@ -100,6 +102,9 @@ export class Restore {
 
 	@inject(Identifiers.BlockchainUtils.RoundCalculator)
 	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
+
+	@inject(Identifiers.BlockchainUtils.ProposerCalculator)
+	private readonly proposerCalculator!: Contracts.BlockchainUtils.ProposerCalculator;
 
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
@@ -202,6 +207,7 @@ export class Restore {
 				userAttributes: {},
 				validatorAttributes: {},
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
+				validatorRounds: {},
 				walletRepository: this.walletRepositoryFactory(entityManager),
 			};
 
@@ -289,6 +295,7 @@ export class Restore {
 			tokenHolderRepository,
 			tokenTransferRepository,
 			mostRecentCommit,
+			validatorRounds,
 		} = context;
 
 		const BATCH_SIZE = 1000;
@@ -375,6 +382,7 @@ export class Restore {
 				}
 			};
 
+			let totalRound = 0;
 			for await (const { proof, block } of commits) {
 				blocks.push({
 					commitRound: proof.round,
@@ -411,6 +419,13 @@ export class Restore {
 				}
 
 				ingestedBlocks++;
+
+				totalRound += block.round + 1;
+
+				if (this.roundCalculator.isNewRound(block.number + 1)) {
+					const nextRound = this.roundCalculator.calculateRound(block.number + 1);
+					validatorRounds[nextRound.round] = { ...nextRound, totalRound };
+				}
 
 				// Handle transactions
 				const receipts = await this.evm.getReceiptsByBlockNumber(BigInt(block.number));
@@ -797,45 +812,60 @@ export class Restore {
 	async #ingestValidatorRounds(context: RestoreContext): Promise<void> {
 		const t0 = performance.now();
 
-		let totalRounds = 0;
-		let validatorRounds: Models.ValidatorRound[] = [];
+		const { validatorRoundRepository, validatorRounds } = context;
+
+		let ingestedValidatorRounds = 0;
+		let validatorRoundsToIngest: Models.ValidatorRound[] = [];
 
 		const CHUNK_SIZE = 1000;
 
 		const insert = async () => {
-			if (validatorRounds.length === 0) {
+			if (validatorRoundsToIngest.length === 0) {
 				return;
 			}
 
-			await context.validatorRoundRepository
+			await validatorRoundRepository
 				.createQueryBuilder()
 				.insert()
 				.orIgnore()
-				.values(validatorRounds)
+				.values(validatorRoundsToIngest)
 				.execute();
 
-			validatorRounds = [];
+			validatorRoundsToIngest = [];
 		};
 
 		for await (const { round, roundHeight, validators } of this.consensusContractService.getValidatorRounds()) {
-			const validatorAddresses: string[] = [];
-			const votes: string[] = [];
+			const validatorAddresses: string[] = Array.from({ length: validators.length });
+			const votes: string[] = Array.from({ length: validators.length });
 
-			// TODO: this doesn't represent the actual proposer order
-			for (const validator of validators) {
-				validatorAddresses.push(validator.address);
-				votes.push(validator.voteBalance.toFixed());
+			for (let index = 0; index < validators.length; index++) {
+				const validatorRound = validatorRounds[round];
+				if (validatorRound.maxValidators !== validators.length) {
+					throw new Error(
+						`mismatch in expected (${validatorRound.maxValidators}) and actual (${validators.length}) validator count`,
+					);
+				}
+
+				const proposerIndex = this.proposerCalculator.getValidatorIndexFrom(
+					validatorRound.maxValidators,
+					validatorRound.totalRound,
+					index,
+				);
+
+				const proposer = validators[proposerIndex];
+				validatorAddresses[index] = proposer.address;
+				votes[index] = proposer.voteBalance.toFixed();
 			}
 
-			validatorRounds.push({
+			validatorRoundsToIngest.push({
 				round,
 				roundHeight,
 				validators: validatorAddresses,
 				votes,
 			});
-			totalRounds += 1;
+			ingestedValidatorRounds += 1;
 
-			if (validatorRounds.length === CHUNK_SIZE) {
+			if (validatorRoundsToIngest.length === CHUNK_SIZE) {
 				await insert();
 			}
 		}
@@ -843,7 +873,7 @@ export class Restore {
 		await insert();
 
 		const t1 = performance.now();
-		this.logger.info(`Restored ${totalRounds.toLocaleString()} validator rounds in ${t1 - t0}ms`);
+		this.logger.info(`Restored ${ingestedValidatorRounds.toLocaleString()} validator rounds in ${t1 - t0}ms`);
 	}
 
 	async #ingestConfiguration(context: RestoreContext): Promise<void> {

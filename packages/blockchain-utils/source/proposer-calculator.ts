@@ -12,9 +12,12 @@ export class ProposerCalculator implements Contracts.BlockchainUtils.ProposerCal
 
 	public getValidatorIndex(round: number): number {
 		const { roundValidators } = this.configuration.getMilestone();
+		return this.getValidatorIndexFrom(roundValidators, this.stateStore.getTotalRound(), round);
+	}
 
+	public getValidatorIndexFrom(roundValidators: number, totalRound: number, round: number): number {
 		// This method will work fine on roundValidators change.
 		// We are not trying to get sequential indexes on value change, because validators are randomized every round.
-		return (this.stateStore.getTotalRound() + round) % roundValidators;
+		return (totalRound + round) % roundValidators;
 	}
 }

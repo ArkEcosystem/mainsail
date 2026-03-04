@@ -20,4 +20,5 @@ export interface TimestampCalculator {
 
 export interface ProposerCalculator {
 	getValidatorIndex(round: number): number;
+	getValidatorIndexFrom(roundValidators: number, totalRound: number, round: number): number;
 }
