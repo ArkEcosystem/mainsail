@@ -2,9 +2,6 @@ import type { Block, BlockHeader } from "./block.js";
 import type { KeyPair } from "./identities.js";
 import type { AggregatedSignature } from "./signatures.js";
 
-type WithoutSignature<T> = Omit<T, "signature">;
-export type MakeProposalData = WithoutSignature<SerializableProposalData>;
-
 export interface ProposalData {
 	readonly blockHeader: BlockHeader;
 	readonly lockProof?: AggregatedSignature;
@@ -15,12 +12,15 @@ export interface ProposalData {
 	readonly signature: string;
 }
 
-export interface SerializableProposalData {
+export interface ProposalDataSerializableUnsigned {
 	readonly round: number;
 	readonly validRound?: number;
 	readonly data: { serialized: string };
 	readonly validatorIndex: number;
-	readonly signature?: string;
+}
+
+export interface ProposalDataSerializable extends ProposalDataSerializableUnsigned {
+	readonly signature: string;
 }
 
 export type ProposedDataSerializable = {
@@ -40,21 +40,21 @@ export interface Proposal extends Omit<ProposalData, "data"> {
 	deserializeData(): Promise<void>;
 	getData(): ProposedData;
 
-	toSerializableData(): SerializableProposalData;
+	toSerializableData(): ProposalDataSerializable;
 	toData(): ProposalData;
 	toString(): string;
 }
 
 export interface ProposalFactory {
-	makeProposal(data: MakeProposalData, keyPair: KeyPair): Promise<Proposal>;
+	makeProposal(data: ProposalDataSerializableUnsigned, keyPair: KeyPair): Promise<Proposal>;
 	makeProposalFromBytes(data: Buffer): Promise<Proposal>;
 	makeProposalFromData(data: ProposalData): Promise<Proposal>;
 	makeProposedDataFromBytes(data: Buffer): Promise<ProposedData>;
 }
 
 export interface ProposalSerializer {
-	serializeProposalUnsigned(proposal: SerializableProposalData): Promise<Buffer>;
-	serializeProposal(proposal: SerializableProposalData): Promise<Buffer>;
+	serializeProposalUnsigned(proposal: ProposalDataSerializableUnsigned): Promise<Buffer>;
+	serializeProposal(proposal: ProposalDataSerializable): Promise<Buffer>;
 	serializeProposedData(proposedData: ProposedDataSerializable): Promise<Buffer>;
 	serializeLockProof(proof: AggregatedSignature): Promise<Buffer>;
 }

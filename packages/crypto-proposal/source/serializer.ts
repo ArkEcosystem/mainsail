@@ -17,9 +17,9 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 	private readonly lockProofSize!: () => number;
 
 	public async serializeProposalUnsigned(
-		proposal: Contracts.Crypto.SerializableProposalData,
+		proposal: Contracts.Crypto.ProposalDataSerializableUnsigned,
 	): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.SerializableProposalData>(proposal, {
+		return this.serializer.serialize(proposal, {
 			length: this.#unsignedProposalSize(proposal),
 			schema: schemaUnsigned,
 			skip: 0,
@@ -27,9 +27,9 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 	}
 
 	public async serializeProposal(
-		proposal: Contracts.Crypto.SerializableProposalData,
+		proposal: Contracts.Crypto.ProposalDataSerializable,
 	): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.SerializableProposalData>(proposal, {
+		return this.serializer.serialize(proposal, {
 			length:
 				this.#unsignedProposalSize(proposal) +
 				this.signatureSize, // signature
@@ -39,7 +39,7 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 	}
 
 	public async serializeLockProof(lockProof: Contracts.Crypto.AggregatedSignature): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.AggregatedSignature>(lockProof, {
+		return this.serializer.serialize(lockProof, {
 			length: this.lockProofSize(),
 			schema: lockProofSchema,
 			skip: 0,
@@ -60,7 +60,7 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 		return Buffer.concat([Buffer.of(0), serializedBlock]);
 	}
 
-	#unsignedProposalSize(proposal: Contracts.Crypto.SerializableProposalData): number {
+	#unsignedProposalSize(proposal: Contracts.Crypto.ProposalDataSerializableUnsigned): number {
 		return (
 			4 + // round
 			(proposal.validRound === undefined ? 1 : 5) + // validRound

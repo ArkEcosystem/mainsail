@@ -30,7 +30,7 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
 	public async makeProposal(
-		data: Contracts.Crypto.MakeProposalData,
+		data: Contracts.Crypto.ProposalDataSerializableUnsigned,
 		keyPair: Contracts.Crypto.KeyPair,
 	): Promise<Contracts.Crypto.Proposal> {
 		const worker = await this.workerPool.getWorker();

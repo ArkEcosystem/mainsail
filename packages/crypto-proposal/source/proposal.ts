@@ -99,7 +99,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		});
 	}
 
-	public toSerializableData(): Contracts.Crypto.SerializableProposalData {
+	public toSerializableData(): Contracts.Crypto.ProposalDataSerializable {
 		return {
 			data: { serialized: this.#dataSerialized },
 			round: this.#round,
