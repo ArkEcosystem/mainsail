@@ -23,6 +23,8 @@ describe<{
 	it("#deserializeProposal - should correctly deserialize", async ({ deserializer }) => {
 		const deserialized = await deserializer.deserializeProposal(Buffer.from(serializedProposal, "hex"));
 		assertProposal(assert, deserialized, proposalData);
+
+		console.log("Deserialized proposal:", deserialized);
 	});
 
 	it("#deserializeProposal - should correctly deserialize, with validRound", async ({ deserializer }) => {

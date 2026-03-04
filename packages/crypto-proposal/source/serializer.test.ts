@@ -8,7 +8,7 @@ import {
 	serializedProposal,
 	serializedProposalLockProof,
 	serializedProposalData,
-	serializedProposalDataWithLockProof,
+	serializedProposedDataWithLockProof,
 	serializedProposalDataWithValidRound,
 	serializedProposalDataWithValidRoundForSignature,
 	serializedProposalForSignature,
@@ -114,6 +114,6 @@ describe<{
 				},
 			);
 
-		assert.equal(serialized.toString("hex"), serializedProposalDataWithLockProof);
+		assert.equal(serialized.toString("hex"), serializedProposedDataWithLockProof);
 	});
 });
