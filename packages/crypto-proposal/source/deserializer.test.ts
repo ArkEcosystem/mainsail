@@ -1,10 +1,9 @@
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import {
-	proposalData,
-	proposalDataWithValidRound,
-	serializedProposal,
-	serializedProposalWithValidRound,
+	Proposal,
+	lockProof,
+	serializedLockProof
 } from "../test/fixtures/index.js";
 import { assertProposal } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -20,15 +19,13 @@ describe<{
 		context.deserializer = context.app.resolve(Deserializer);
 	});
 
-	// it("#deserializeProposal - should correctly deserialize", async ({ deserializer }) => {
-	// 	const deserialized = await deserializer.deserializeProposal(Buffer.from(serializedProposal, "hex"));
-	// 	assertProposal(assert, deserialized, proposalData);
-	// });
+	it("#deserializeProposal - should correctly deserialize", async ({ deserializer }) => {
+		const deserialized = await deserializer.deserializeProposal(Buffer.from(Proposal.proposalSerialized, "hex"));
+		assertProposal(assert, deserialized, Proposal.proposalData);
+	});
 
-	// it("#deserializeProposal - should correctly deserialize, with validRound", async ({ deserializer }) => {
-	// 	const deserialized = await deserializer.deserializeProposal(
-	// 		Buffer.from(serializedProposalWithValidRound, "hex"),
-	// 	);
-	// 	assertProposal(assert, deserialized, proposalDataWithValidRound);
-	// });
+	it("#deserializeLockProof - should correctly deserialize", async ({ deserializer }) => {
+		const deserialized = await deserializer.deserializeLockProof(Buffer.from(serializedLockProof, "hex"));
+		assert.equal(deserialized, lockProof);
+	});
 });
