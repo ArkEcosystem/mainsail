@@ -7,6 +7,7 @@ import { WalletsController } from "../controllers/wallets.js";
 import {
 	tokenBalanceSchema,
 	tokenNameSchema,
+	tokenWhitelistPayloadSchema,
 	transactionCriteriaSchemas,
 	transactionsOrderBy,
 	transactionSortingSchema,
@@ -209,9 +210,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				},
 			},
 			validate: {
-				payload: Joi.object({
-					whitelist: Joi.array().items(Schemas.addressSchema).max(100).empty(null).default([]),
-				}).empty(null),
+				payload: tokenWhitelistPayloadSchema,
 				query: walletTokensQuerySchema,
 			},
 		},
@@ -256,9 +255,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				params: Joi.object({
 					id: walletParameterSchema,
 				}),
-				payload: Joi.object({
-					whitelist: Joi.array().items(Schemas.addressSchema).max(100).empty(null).default([]),
-				}).empty(null),
+				payload: tokenWhitelistPayloadSchema,
 				query: walletTokensIdQuerySchema,
 			},
 		},

@@ -133,7 +133,11 @@ export class TokensController extends Controller {
 
 	private async getTokenTransfers(request: Hapi.Request): Promise<object> {
 		const pagination = this.getListingPage(request);
-		const tokenTransfersQuery = this.tokenTransferRepositoryFactory().createQueryBuilder("tf");
+		const tokenTransfersQuery = this.tokenTransferRepositoryFactory()
+			.createQueryBuilder("tf")
+			.innerJoin(Models.Token, "tok", "tok.address = tf.address");
+
+		TokensController.andWhereWhitelisted(tokenTransfersQuery, request);
 
 		if (request.params.address) {
 			const token = await this.getToken(request.params.address);
@@ -192,7 +196,6 @@ export class TokensController extends Controller {
 					'tok."decimals" AS "tokenDecimals"',
 				])
 				.innerJoin(Models.Transaction, "t", "t.hash = tf.transaction_hash")
-				.innerJoin(Models.Token, "tok", "tok.address = tf.address")
 				.orderBy("tf.block_number", "DESC")
 				.addOrderBy("tf.index", "DESC")
 				.limit(pagination.limit)
@@ -239,7 +242,7 @@ export class TokensController extends Controller {
 	}
 
 	public static andWhereWhitelisted(
-		queryBuilder: TypeOrm.SelectQueryBuilder<Models.TokenHolder | Models.Token>,
+		queryBuilder: TypeOrm.SelectQueryBuilder<Models.TokenTransfer | Models.TokenHolder | Models.Token>,
 		request: Hapi.Request,
 	): void {
 		if (request.query.ignoreWhitelist) {
