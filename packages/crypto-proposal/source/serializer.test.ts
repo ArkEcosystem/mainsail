@@ -4,9 +4,9 @@ import {
 	proposalData,
 	proposalDataWithValidRound,
 	serializedBlock,
-	proposalLockProof,
+	lockProof,
 	serializedProposal,
-	serializedProposalLockProof,
+	serializedLockProof,
 	serializedProposalData,
 	serializedProposedDataWithLockProof,
 	serializedProposalDataWithValidRound,
@@ -85,12 +85,12 @@ describe<{
 	});
 
 	it("#serializeLockProof - should serialize and deserialize lock proof", async ({ deserializer, serializer }) => {
-		const serialized = (await serializer.serializeLockProof(proposalLockProof)).toString("hex");
-		assert.equal(serialized, serializedProposalLockProof);
+		const serialized = (await serializer.serializeLockProof(lockProof)).toString("hex");
+		assert.equal(serialized, serializedLockProof);
 
 		const deserialized = await deserializer.deserializeLockProof(Buffer.from(serialized, "hex"));
-		assert.equal(proposalLockProof.signature, deserialized.signature);
-		assert.equal(proposalLockProof.validators, deserialized.validators);
+		assert.equal(lockProof.signature, deserialized.signature);
+		assert.equal(lockProof.validators, deserialized.validators);
 	});
 
 	it("#serializeProposedData - should correctly serialize block", async ({ serializer }) => {
@@ -110,7 +110,7 @@ describe<{
 			await serializer.serializeProposedData(
 				{
 					block: { serialized: serializedBlock },
-					lockProof: proposalLockProof
+					lockProof: lockProof
 				},
 			);
 
