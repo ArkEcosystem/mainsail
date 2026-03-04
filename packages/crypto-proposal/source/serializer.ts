@@ -46,7 +46,7 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 		});
 	}
 
-	public async serializeProposedData(proposedData: Contracts.Crypto.ProposedDataSerializable): Promise<Buffer> {
+	public async serializePayload(proposedData: Contracts.Crypto.ProposedPayloadSerializable): Promise<Buffer> {
 		const serializedBlock = Buffer.from(proposedData.block.serialized, "hex");
 
 		// NOTE: The lock proof is undefined most of the time, hence we can safe a lot of bytes

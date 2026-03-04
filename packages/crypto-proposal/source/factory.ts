@@ -68,7 +68,7 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 		});
 	}
 
-	async makeProposedDataFromBytes(bytes: Buffer): Promise<Contracts.Crypto.ProposedData> {
+	async makePayloadFromBytes(bytes: Buffer): Promise<Contracts.Crypto.ProposedPayload> {
 		const buffer = ByteBuffer.fromBuffer(bytes);
 
 		const lockProofLength = buffer.readUint8();
