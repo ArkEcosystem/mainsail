@@ -5,6 +5,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import {
 	Proposal,
+	ProposalWithValidRound,
 	lockProof,
 	serializedLockProof
 } from "../test/fixtures/index.js";
@@ -52,26 +53,28 @@ describe<{
 	});
 
 	it("#serializePayload - should correctly serialize", async ({ serializer }) => {
-		const serialized = await serializer.serializePayload(Proposal.payload);
-
-		assert.equal(serialized.toString("hex"), Proposal.payloadSerialized);
+		for(const { payload, payloadSerialized } of [Proposal, ProposalWithValidRound]) {
+			const serialized = await serializer.serializePayload(payload);
+			assert.equal(serialized.toString("hex"), payloadSerialized);
+		}
 	});
 
 	it("#serializeProposalUnsigned - should correctly serialize", async ({ serializer }) => {
-		const serialized = await serializer.serializeProposalUnsigned(Proposal.proposalDataSerializableUnsigned);
-
-		assert.equal(serialized.toString("hex"), Proposal.proposalSerializedUnsigned);
+		for(const { proposalDataSerializableUnsigned, proposalSerializedUnsigned } of [Proposal, ProposalWithValidRound]) {
+			const serialized = await serializer.serializeProposalUnsigned(proposalDataSerializableUnsigned);
+			assert.equal(serialized.toString("hex"), proposalSerializedUnsigned);
+		}
 	});
 
 	it("#serializeProposal - should correctly serialize", async ({ serializer }) => {
-		const serialized = await serializer.serializeProposal(Proposal.proposalDataSerializable);
-
-		assert.equal(serialized.toString("hex"), Proposal.proposalSerialized);
+		for(const { proposalDataSerializable, proposalSerialized } of [Proposal, ProposalWithValidRound]) {
+			const serialized = await serializer.serializeProposal(proposalDataSerializable);
+			assert.equal(serialized.toString("hex"), proposalSerialized);
+		}
 	});
 
 	it("#serializeLockProof - should correctly serialize", async ({ serializer }) => {
 		const serialized = (await serializer.serializeLockProof(lockProof)).toString("hex");
-
 		assert.equal(serialized, serializedLockProof);
 	});
 });

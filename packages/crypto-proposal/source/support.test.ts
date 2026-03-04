@@ -5,6 +5,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import {
 	Proposal,
+	ProposalWithValidRound,
 	blockData,
 	validatorMnemonic
 } from "../test/fixtures/index.js";
@@ -77,15 +78,17 @@ describe<{
 
 
 	it("#serializePayload - should correctly serialize", async ({ serializer }) => {
-		const serialized = await serializer.serializePayload(Proposal.payload);
+		const serialized = await serializer.serializePayload(ProposalWithValidRound.payload);
 
-		assert.equal(serialized.toString("hex"), Proposal.payloadSerialized);
+		assert.equal(serialized.toString("hex"), ProposalWithValidRound.payloadSerialized);
 	});
 
 	it("#serializeProposalUnsigned - should correctly serialize", async ({ serializer, app, factory }) => {
-		const serialized = await serializer.serializeProposalUnsigned(Proposal.proposalDataSerializableUnsigned);
+		const serialized = await serializer.serializeProposalUnsigned(ProposalWithValidRound.proposalDataSerializableUnsigned);
 
-		assert.equal(serialized.toString("hex"), Proposal.proposalSerializedUnsigned);
+		console.log(serialized.toString("hex"));
+
+		assert.equal(serialized.toString("hex"), ProposalWithValidRound.proposalSerializedUnsigned);
 
 		const keyPairFactory = app.getTagged<Contracts.Crypto.KeyPairFactory>(
 			Identifiers.Cryptography.Identity.KeyPair.Factory,
@@ -95,14 +98,17 @@ describe<{
 
 		const keyPair = await keyPairFactory.fromMnemonic(validatorMnemonic);
 
-		const proposal = await factory.makeProposal(Proposal.proposalDataSerializableUnsigned, keyPair);
+		const proposal = await factory.makeProposal(ProposalWithValidRound.proposalDataSerializableUnsigned, keyPair);
 
-		assert.equal(proposal.serialized.toString("hex"), Proposal.proposalSerialized);
+		// console.log(proposal.signature);
+		// console.log(proposal.serialized.toString("hex"));
+
+		assert.equal(proposal.serialized.toString("hex"), ProposalWithValidRound.proposalSerialized);
 	});
 
 	it("#serializeProposal - should correctly serialize", async ({ serializer, app, factory }) => {
-		const serialized = await serializer.serializeProposal(Proposal.proposalDataSerializable);
+		const serialized = await serializer.serializeProposal(ProposalWithValidRound.proposalDataSerializable);
 
-		assert.equal(serialized.toString("hex"), Proposal.proposalSerialized);
+		assert.equal(serialized.toString("hex"), ProposalWithValidRound.proposalSerialized);
 	});
 });
