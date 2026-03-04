@@ -52,8 +52,8 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	const tokensTransfersQuerySchema = Joi.object({
-		ignoreWhitelist: Joi.bool().default(false),
 		from: Schemas.orEqualCriteria(walletAddressSchema),
+		ignoreWhitelist: Joi.bool().default(false),
 		to: Schemas.orEqualCriteria(walletAddressSchema),
 		transactionHash: Schemas.orEqualCriteria(transactionHashSchema),
 	}).concat(Schemas.pagination);
