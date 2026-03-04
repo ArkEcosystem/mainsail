@@ -4,10 +4,10 @@ import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-add
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
-import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-signature-bls12-381";
-import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
+import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
+import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-signature-bls12-381";
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
@@ -20,7 +20,6 @@ import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
 import { Deserializer } from "../../source/deserializer.js";
 import { Factory } from "../../source/factory.js";
-import { makeKeywords } from "../../source/keywords.js";
 import { schemas } from "../../source/schemas.js";
 import { Serializer } from "../../source/serializer.js";
 
@@ -65,10 +64,6 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 			8 // validator set bitmap
 		);
 	});
-
-	for (const keyword of Object.values(makeKeywords(context.app.get(Identifiers.Cryptography.Configuration)))) {
-		context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
-	}
 
 	for (const schema of Object.values(schemas)) {
 		context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
