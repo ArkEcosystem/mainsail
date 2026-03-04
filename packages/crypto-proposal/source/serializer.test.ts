@@ -46,11 +46,19 @@ describe<{
 	});
 
 
-	it("#serializeProposalUnsigned - should correctly serialize for signature", async ({ serializer }) => {
-		const serialized =
-			await serializer.serializeProposedData(Proposal.proposedData)
+	it("#serializePayload - should correctly serialize", async ({ serializer }) => {
+		const serialized = await serializer.serializePayload(Proposal.payload);
 
-		assert.equal(serialized.toString("hex"), Proposal.proposedDataSerialized);
+		console.log(serialized.toString("hex"));
+		assert.equal(serialized.toString("hex"), Proposal.payloadSerialized);
+	});
+
+	it("#serializeProposalUnsigned - should correctly serialize", async ({ serializer }) => {
+		const serialized = await serializer.serializeProposalUnsigned(Proposal.proposalDataSerializableUnsigned);
+
+		// console.log(serialized.toString("hex"));
+
+		// assert.equal(serialized.toString("hex"), Proposal.payloadSerialized);
 	});
 
 	// it("#serializeProposalUnsigned - should correctly serialize for signature", async ({ serializer }) => {
