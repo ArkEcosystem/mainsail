@@ -290,6 +290,7 @@ describe<{
 		await apiContext.tokenRepository.save(tokenTransferTokens);
 		await apiContext.transactionRepository.save(tokenTransferTransactions);
 		await apiContext.tokenTransferRepository.save(tokenTransfers);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
 
 		const testCases = [
 			{
@@ -380,6 +381,7 @@ describe<{
 		await apiContext.tokenRepository.save(tokenTransferTokens);
 		await apiContext.transactionRepository.save(tokenTransferTransactions);
 		await apiContext.tokenTransferRepository.save(tokenTransfers);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
 
 		const testCases = [
 			{

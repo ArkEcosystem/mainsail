@@ -98,7 +98,7 @@ const verifyIntegrity = async (t: typeof assert, syncNode: Contracts.Kernel.Appl
     const result = compareTableHashes(
         tableHashesSyncNode,
         tableHashesRestoreNode,
-        ["public.validator_rounds"]
+        []
     );
 
     if (!result.equal) {
