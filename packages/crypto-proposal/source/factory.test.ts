@@ -12,7 +12,7 @@ import {
 	proposalDataWithValidRound,
 	serializedBlock,
 	serializedProposal,
-	serializedProposalDataWithValidRound,
+	serializedProposalWithValidRound,
 	validatorMnemonic,
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -108,13 +108,11 @@ describe<{
 	it("#makeProposalFromBytes - should be ok", async ({ factory }) => {
 		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposal, "hex"));
 
-		const data = proposal.toData();
-
 		assert.equal(proposal.toData(), proposalData);
 	});
 
 	it("#makeProposalFromBytes - should be ok, with validRound", async ({ factory }) => {
-		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposalDataWithValidRound, "hex"));
+		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposalWithValidRound, "hex"));
 
 		assert.equal(proposal.toData(), proposalDataWithValidRound);
 	});

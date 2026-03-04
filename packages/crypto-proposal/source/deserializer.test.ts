@@ -4,7 +4,7 @@ import {
 	proposalData,
 	proposalDataWithValidRound,
 	serializedProposal,
-	serializedProposalDataWithValidRound,
+	serializedProposalWithValidRound,
 } from "../test/fixtures/index.js";
 import { assertProposal } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -27,7 +27,7 @@ describe<{
 
 	it("#deserializeProposal - should correctly deserialize, with validRound", async ({ deserializer }) => {
 		const deserialized = await deserializer.deserializeProposal(
-			Buffer.from(serializedProposalDataWithValidRound, "hex"),
+			Buffer.from(serializedProposalWithValidRound, "hex"),
 		);
 		assertProposal(assert, deserialized, proposalDataWithValidRound);
 	});

@@ -9,9 +9,9 @@ import {
 	serializedLockProof,
 	serializedProposalData,
 	serializedProposedDataWithLockProof,
-	serializedProposalDataWithValidRound,
-	serializedProposalDataWithValidRoundForSignature,
-	serializedProposalForSignature,
+	serializedProposalWithValidRound,
+	serializedProposalDataWithValidRoundUnsigned,
+	serializedProposalUnsigned,
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Deserializer } from "./deserializer";
@@ -39,7 +39,7 @@ describe<{
 				}
 			)
 
-		assert.equal(serialized.toString("hex"), serializedProposalForSignature);
+		assert.equal(serialized.toString("hex"), serializedProposalUnsigned);
 	});
 
 	it("#serializeProposalUnsigned - should correctly serialize for signature, with valid round", async ({ serializer }) => {
@@ -53,7 +53,7 @@ describe<{
 				},
 			)
 
-		assert.equal(serialized.toString("hex"), serializedProposalDataWithValidRoundForSignature);
+		assert.equal(serialized.toString("hex"), serializedProposalDataWithValidRoundUnsigned);
 	});
 
 	it("#serializeProposal - should correctly serialize with signature", async ({ serializer }) => {
@@ -81,7 +81,7 @@ describe<{
 				},
 			);
 
-		assert.equal(serialized.toString("hex"), serializedProposalDataWithValidRound);
+		assert.equal(serialized.toString("hex"), serializedProposalWithValidRound);
 	});
 
 	it("#serializeLockProof - should serialize and deserialize lock proof", async ({ deserializer, serializer }) => {
