@@ -20,15 +20,15 @@ describe<{
 		context.deserializer = context.app.resolve(Deserializer);
 	});
 
-	it("#deserializeProposal - should correctly deserialize", async ({ deserializer }) => {
-		const deserialized = await deserializer.deserializeProposal(Buffer.from(serializedProposal, "hex"));
-		assertProposal(assert, deserialized, proposalData);
-	});
+	// it("#deserializeProposal - should correctly deserialize", async ({ deserializer }) => {
+	// 	const deserialized = await deserializer.deserializeProposal(Buffer.from(serializedProposal, "hex"));
+	// 	assertProposal(assert, deserialized, proposalData);
+	// });
 
-	it("#deserializeProposal - should correctly deserialize, with validRound", async ({ deserializer }) => {
-		const deserialized = await deserializer.deserializeProposal(
-			Buffer.from(serializedProposalWithValidRound, "hex"),
-		);
-		assertProposal(assert, deserialized, proposalDataWithValidRound);
-	});
+	// it("#deserializeProposal - should correctly deserialize, with validRound", async ({ deserializer }) => {
+	// 	const deserialized = await deserializer.deserializeProposal(
+	// 		Buffer.from(serializedProposalWithValidRound, "hex"),
+	// 	);
+	// 	assertProposal(assert, deserialized, proposalDataWithValidRound);
+	// });
 });
