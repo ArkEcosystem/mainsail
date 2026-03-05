@@ -6,6 +6,7 @@ import {
 	Proposal,
 	ProposalWithValidRound,
 	ProposalWithLockProof,
+	ProposalWithLockProofAndValidRound,
 	lockProof,
 	serializedLockProof
 } from "../test/fixtures/index.js";
@@ -21,7 +22,7 @@ describe<{
 	deserializer: Deserializer;
 	factory: Factory;
 }>("Serializer", ({ it, assert, beforeEach }) => {
-	const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof];
+	const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof, ProposalWithLockProofAndValidRound];
 
 	beforeEach(async (context) => {
 		await prepareSandbox(context);

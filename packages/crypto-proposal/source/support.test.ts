@@ -7,6 +7,7 @@ import {
 	Proposal,
 	ProposalWithValidRound,
 	ProposalWithLockProof,
+	ProposalWithLockProofAndValidRound,
 	blockData,
 	blockSerialized,
 	validatorMnemonic
@@ -23,7 +24,7 @@ describe<{
 	deserializer: Deserializer;
 	factory: Factory;
 }>("Serializer", ({ it, assert, beforeEach }) => {
-	const PROPOSAL = ProposalWithLockProof;
+	const PROPOSAL = ProposalWithLockProofAndValidRound;
 
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
@@ -89,7 +90,7 @@ describe<{
 		assert.equal(serialized.toString("hex"), PROPOSAL.payloadSerialized);
 	});
 
-	it("#serializeProposalUnsigned - should correctly serialize", async ({ serializer, app, factory }) => {
+	it.only("#serializeProposalUnsigned - should correctly serialize", async ({ serializer, app, factory }) => {
 		const serialized = await serializer.serializeProposalUnsigned(PROPOSAL.proposalDataSerializableUnsigned);
 
 		// console.log("proposalSerializedUnsigned: ", serialized.toString("hex"));

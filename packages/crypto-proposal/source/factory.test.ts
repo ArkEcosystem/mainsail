@@ -11,6 +11,7 @@ import {
 	Proposal,
 	ProposalWithValidRound,
 	ProposalWithLockProof,
+	ProposalWithLockProofAndValidRound,
 	validatorMnemonic,
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -22,7 +23,7 @@ describe<{
 	blockFactory: Contracts.Crypto.BlockFactory;
 	identity: Types.Identity;
 }>("Factory", ({ it, assert, beforeEach }) => {
-	const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof];
+	const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof, ProposalWithLockProofAndValidRound];
 
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
