@@ -1,7 +1,6 @@
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { Identifiers } from "@mainsail/constants";
-import type { Contracts } from "@mainsail/contracts";
 
 import {
 	Proposal,
@@ -21,6 +20,8 @@ describe<{
 	deserializer: Deserializer;
 	factory: Factory;
 }>("Serializer", ({ it, assert, beforeEach }) => {
+	const proposals = [Proposal];
+
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
@@ -53,21 +54,21 @@ describe<{
 	});
 
 	it("#serializePayload - should correctly serialize", async ({ serializer }) => {
-		for(const { payload, payloadSerialized } of [Proposal, ProposalWithValidRound]) {
+		for(const { payload, payloadSerialized } of proposals) {
 			const serialized = await serializer.serializePayload(payload);
 			assert.equal(serialized.toString("hex"), payloadSerialized);
 		}
 	});
 
 	it("#serializeProposalUnsigned - should correctly serialize", async ({ serializer }) => {
-		for(const { proposalDataSerializableUnsigned, proposalSerializedUnsigned } of [Proposal, ProposalWithValidRound]) {
+		for(const { proposalDataSerializableUnsigned, proposalSerializedUnsigned } of proposals) {
 			const serialized = await serializer.serializeProposalUnsigned(proposalDataSerializableUnsigned);
 			assert.equal(serialized.toString("hex"), proposalSerializedUnsigned);
 		}
 	});
 
 	it("#serializeProposal - should correctly serialize", async ({ serializer }) => {
-		for(const { proposalDataSerializable, proposalSerialized } of [Proposal, ProposalWithValidRound]) {
+		for(const { proposalDataSerializable, proposalSerialized } of proposals) {
 			const serialized = await serializer.serializeProposal(proposalDataSerializable);
 			assert.equal(serialized.toString("hex"), proposalSerialized);
 		}

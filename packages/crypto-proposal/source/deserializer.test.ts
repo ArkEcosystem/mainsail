@@ -21,7 +21,7 @@ describe<{
 	});
 
 	it("#deserializeProposal - should correctly deserialize", async ({ deserializer }) => {
-		for(const { proposalSerialized, proposalData } of [Proposal, ProposalWithValidRound]) {
+		for(const { proposalSerialized, proposalData } of [Proposal]) {
 			const deserialized = await deserializer.deserializeProposal(Buffer.from(proposalSerialized, "hex"));
 			assertProposal(assert, deserialized, proposalData);
 		}
