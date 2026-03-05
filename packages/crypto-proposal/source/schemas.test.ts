@@ -9,13 +9,15 @@ import { Validator } from "@mainsail/validation/source/validator";
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { proposalData } from "../test/fixtures/index.js";
+import { Proposal, ProposalWithValidRound } from "../test/fixtures/index.js";
 import { schemas } from "./schemas";
 
 describe<{
 	app: Application;
 	validator: Validator;
 }>("Schemas", ({ it, assert, beforeEach }) => {
+	const proposals = [Proposal, ProposalWithValidRound];
+
 	beforeEach((context) => {
 		context.app = new Application();
 
@@ -42,7 +44,9 @@ describe<{
 	});
 
 	it("proposal - should be ok", ({ validator }) => {
-		const result = validator.validate("proposal", proposalData);
-		assert.undefined(result.error);
+		for(const { proposalData } of proposals) {
+			const result = validator.validate("proposal", proposalData);
+			assert.undefined(result.error);
+		}
 	});
 });

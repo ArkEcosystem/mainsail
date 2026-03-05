@@ -20,7 +20,7 @@ describe<{
 	deserializer: Deserializer;
 	factory: Factory;
 }>("Serializer", ({ it, assert, beforeEach }) => {
-	const proposals = [Proposal];
+	const proposals = [Proposal, ProposalWithValidRound];
 
 	beforeEach(async (context) => {
 		await prepareSandbox(context);

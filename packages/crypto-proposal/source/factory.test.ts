@@ -9,6 +9,7 @@ import { Types } from "../../test-factories/source/factories";
 import {
 	blockHeader,
 	Proposal,
+	ProposalWithValidRound,
 	validatorMnemonic,
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -20,6 +21,8 @@ describe<{
 	blockFactory: Contracts.Crypto.BlockFactory;
 	identity: Types.Identity;
 }>("Factory", ({ it, assert, beforeEach }) => {
+	const proposals = [Proposal, ProposalWithValidRound];
+
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
@@ -62,51 +65,59 @@ describe<{
 	});
 
 	it("#makeProposal - should correctly make signed proposal", async ({ factory, identity }) => {
-		const proposal = await factory.makeProposal(
-			Proposal.proposalDataSerializableUnsigned,
-			identity.keys,
-		);
+		for(const { proposalDataSerializableUnsigned, proposalDataSerializable, proposalData } of proposals) {
+			const proposal = await factory.makeProposal(
+				proposalDataSerializableUnsigned,
+				identity.keys,
+			);
 
-		assert.equal(
-			proposal.toSerializableData(),
-			Proposal.proposalDataSerializable
-		);
-		assert.equal(proposal.blockHeader, blockHeader);
-		assert.equal(proposal.toData(), Proposal.proposalData);
+			assert.equal(
+				proposal.toSerializableData(),
+				proposalDataSerializable
+			);
+			assert.equal(proposal.blockHeader, blockHeader);
+			assert.equal(proposal.toData(), proposalData);
+		}
 	});
 
 	it("#makeProposalFromBytes - should be ok", async ({ factory }) => {
-		const proposal = await factory.makeProposalFromBytes(Buffer.from(Proposal.proposalSerialized, "hex"));
+		for(const { proposalSerialized, proposalDataSerializable, proposalData } of proposals) {
+			const proposal = await factory.makeProposalFromBytes(Buffer.from(proposalSerialized, "hex"));
 
-		assert.equal(
-			proposal.toSerializableData(),
-			Proposal.proposalDataSerializable
-		);
-		assert.equal(proposal.blockHeader, blockHeader);
-		assert.equal(proposal.toData(), Proposal.proposalData);
+			assert.equal(
+				proposal.toSerializableData(),
+				proposalDataSerializable
+			);
+			assert.equal(proposal.blockHeader, blockHeader);
+			assert.equal(proposal.toData(), proposalData);
+		}
 	});
 
 	it("#makeProposalFromData - should be ok", async ({ factory }) => {
-		const proposal = await factory.makeProposalFromData(Proposal.proposalData);
+		for(const { proposalDataSerializable, proposalData } of proposals) {
+			const proposal = await factory.makeProposalFromData(proposalData);
 
-		assert.equal(
-			proposal.toSerializableData(),
-			Proposal.proposalDataSerializable
-		);
-		assert.equal(proposal.blockHeader, blockHeader);
-		assert.equal(proposal.toData(), Proposal.proposalData);
+			assert.equal(
+				proposal.toSerializableData(),
+				proposalDataSerializable
+			);
+			assert.equal(proposal.blockHeader, blockHeader);
+			assert.equal(proposal.toData(), proposalData);
+		}
 	});
 
 	it("#makeProposalFromData - should be ok", async ({ factory }) => {
-		const payload = await factory.makePayloadFromBytes(Buffer.from(Proposal.payloadSerialized, "hex"));
+		for(const { payloadSerialized, payload } of proposals) {
+			const newPayload = await factory.makePayloadFromBytes(Buffer.from(payloadSerialized, "hex"));
 
-		assert.equal(
-			payload.block.serialized,
-			Proposal.payload.block.serialized
-		);
-		assert.equal(
-			payload.lockProof,
-			Proposal.payload.lockProof
-		);
+			assert.equal(
+				newPayload.block.serialized,
+				payload.block.serialized
+			);
+			assert.equal(
+				newPayload.lockProof,
+				payload.lockProof
+			);
+		}
 	});
 });

@@ -5,6 +5,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import {
 	Proposal,
+	ProposalWithValidRound,
 	blockData,
 	blockSerialized,
 	validatorMnemonic
@@ -21,6 +22,8 @@ describe<{
 	deserializer: Deserializer;
 	factory: Factory;
 }>("Serializer", ({ it, assert, beforeEach }) => {
+	const PROPOSAL = ProposalWithValidRound;
+
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
@@ -52,7 +55,7 @@ describe<{
 		context.factory = context.app.resolve(Factory);
 	});
 
-	it.only("CREATE DATA", async ({ app }) => {
+	it("CREATE DATA", async ({ app }) => {
 		const blockSerializer = app.get<Contracts.Crypto.BlockSerializer>(Identifiers.Cryptography.Block.Serializer);
 		const blockDeserializer = app.get<Contracts.Crypto.BlockDeserializer>(Identifiers.Cryptography.Block.Deserializer);
 		const transactionSerializer = app.get<Contracts.Crypto.TransactionSerializer>(Identifiers.Cryptography.Transaction.Serializer);
@@ -80,17 +83,17 @@ describe<{
 
 
 	it("#serializePayload - should correctly serialize", async ({ serializer }) => {
-		const serialized = await serializer.serializePayload(Proposal.payload);
+		const serialized = await serializer.serializePayload(PROPOSAL.payload);
 
-		assert.equal(serialized.toString("hex"), Proposal.payloadSerialized);
+		assert.equal(serialized.toString("hex"), PROPOSAL.payloadSerialized);
 	});
 
 	it("#serializeProposalUnsigned - should correctly serialize", async ({ serializer, app, factory }) => {
-		const serialized = await serializer.serializeProposalUnsigned(Proposal.proposalDataSerializableUnsigned);
+		const serialized = await serializer.serializeProposalUnsigned(PROPOSAL.proposalDataSerializableUnsigned);
 
 		console.log(serialized.toString("hex"));
 
-		assert.equal(serialized.toString("hex"), Proposal.proposalSerializedUnsigned);
+		assert.equal(serialized.toString("hex"), PROPOSAL.proposalSerializedUnsigned);
 
 		const keyPairFactory = app.getTagged<Contracts.Crypto.KeyPairFactory>(
 			Identifiers.Cryptography.Identity.KeyPair.Factory,
@@ -100,17 +103,17 @@ describe<{
 
 		const keyPair = await keyPairFactory.fromMnemonic(validatorMnemonic);
 
-		const proposal = await factory.makeProposal(Proposal.proposalDataSerializableUnsigned, keyPair);
+		const proposal = await factory.makeProposal(PROPOSAL.proposalDataSerializableUnsigned, keyPair);
 
 		console.log("signature: ", proposal.signature);
 		console.log("proposalSerialized: ", proposal.serialized.toString("hex"));
 
-		assert.equal(proposal.serialized.toString("hex"), Proposal.proposalSerialized);
+		assert.equal(proposal.serialized.toString("hex"), PROPOSAL.proposalSerialized);
 	});
 
-	it("#serializeProposal - should correctly serialize", async ({ serializer, app, factory }) => {
-		const serialized = await serializer.serializeProposal(Proposal.proposalDataSerializable);
+	it("#serializeProposal - should correctly serialize", async ({ serializer }) => {
+		const serialized = await serializer.serializeProposal(PROPOSAL.proposalDataSerializable);
 
-		assert.equal(serialized.toString("hex"), Proposal.proposalSerialized);
+		assert.equal(serialized.toString("hex"), PROPOSAL.proposalSerialized);
 	});
 });
