@@ -72,10 +72,8 @@ describe<{
 			proposal.toSerializableData(),
 			Proposal.proposalDataSerializable
 		);
-
-		console.log("Block Header: ", proposal.blockHeader);
-
-		// assert.equal(proposal.blockHeader, blockHeader);
+		assert.equal(proposal.blockHeader, blockHeader);
+		assert.equal(proposal.toData(), Proposal.proposalData);
 	});
 
 	// it("#makeProposalFromBytes - should be ok", async ({ factory }) => {

@@ -52,7 +52,7 @@ describe<{
 		context.factory = context.app.resolve(Factory);
 	});
 
-	it("CREATE DATA", async ({ app }) => {
+	it.only("CREATE DATA", async ({ app }) => {
 		const blockSerializer = app.get<Contracts.Crypto.BlockSerializer>(Identifiers.Cryptography.Block.Serializer);
 		const blockDeserializer = app.get<Contracts.Crypto.BlockDeserializer>(Identifiers.Cryptography.Block.Deserializer);
 		const transactionSerializer = app.get<Contracts.Crypto.TransactionSerializer>(Identifiers.Cryptography.Transaction.Serializer);
@@ -74,7 +74,7 @@ describe<{
 		const blockFactory = app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
 		const block = await blockFactory.fromHex(blockSer.toString("hex"));
 
-		// console.log(block);
+		console.log(block);
 		console.log("blockSerialized: ", blockSer.toString("hex"));
 	});
 
@@ -85,7 +85,7 @@ describe<{
 		assert.equal(serialized.toString("hex"), Proposal.payloadSerialized);
 	});
 
-	it.only("#serializeProposalUnsigned - should correctly serialize", async ({ serializer, app, factory }) => {
+	it("#serializeProposalUnsigned - should correctly serialize", async ({ serializer, app, factory }) => {
 		const serialized = await serializer.serializeProposalUnsigned(Proposal.proposalDataSerializableUnsigned);
 
 		console.log(serialized.toString("hex"));
