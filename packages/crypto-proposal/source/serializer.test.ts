@@ -8,7 +8,7 @@ import {
 	ProposalWithLockProof,
 	ProposalWithLockProofAndValidRound,
 	lockProof,
-	serializedLockProof
+	serializedLockProof,
 } from "../test/fixtures/index.js";
 
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -56,21 +56,21 @@ describe<{
 	});
 
 	it("#serializePayload - should correctly serialize", async ({ serializer }) => {
-		for(const { payload, payloadSerialized } of proposals) {
+		for (const { payload, payloadSerialized } of proposals) {
 			const serialized = await serializer.serializePayload(payload);
 			assert.equal(serialized.toString("hex"), payloadSerialized);
 		}
 	});
 
 	it("#serializeProposalUnsigned - should correctly serialize", async ({ serializer }) => {
-		for(const { proposalDataSerializableUnsigned, proposalSerializedUnsigned } of proposals) {
+		for (const { proposalDataSerializableUnsigned, proposalSerializedUnsigned } of proposals) {
 			const serialized = await serializer.serializeProposalUnsigned(proposalDataSerializableUnsigned);
 			assert.equal(serialized.toString("hex"), proposalSerializedUnsigned);
 		}
 	});
 
 	it("#serializeProposal - should correctly serialize", async ({ serializer }) => {
-		for(const { proposalDataSerializable, proposalSerialized } of proposals) {
+		for (const { proposalDataSerializable, proposalSerialized } of proposals) {
 			const serialized = await serializer.serializeProposal(proposalDataSerializable);
 			assert.equal(serialized.toString("hex"), proposalSerialized);
 		}

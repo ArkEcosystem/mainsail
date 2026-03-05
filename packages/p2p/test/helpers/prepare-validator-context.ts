@@ -22,7 +22,7 @@ export const prepareValidatorContext = (context: Context) => {
 
 	const configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
 
-	for(const keyword of Object.values(makeCryptoValidationKeywords(configuration))) {
+	for (const keyword of Object.values(makeCryptoValidationKeywords(configuration))) {
 		context.validator.addKeyword(keyword);
 	}
 

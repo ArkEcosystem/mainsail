@@ -26,13 +26,9 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 		});
 	}
 
-	public async serializeProposal(
-		proposal: Contracts.Crypto.ProposalDataSerializable,
-	): Promise<Buffer> {
+	public async serializeProposal(proposal: Contracts.Crypto.ProposalDataSerializable): Promise<Buffer> {
 		return this.serializer.serialize(proposal, {
-			length:
-				this.#unsignedProposalSize(proposal) +
-				this.signatureSize, // signature
+			length: this.#unsignedProposalSize(proposal) + this.signatureSize, // signature
 			schema,
 			skip: 0,
 		});

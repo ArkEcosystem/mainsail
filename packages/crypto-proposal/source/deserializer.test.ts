@@ -6,7 +6,7 @@ import {
 	ProposalWithLockProof,
 	ProposalWithLockProofAndValidRound,
 	lockProof,
-	serializedLockProof
+	serializedLockProof,
 } from "../test/fixtures/index.js";
 import { assertProposal } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -23,7 +23,12 @@ describe<{
 	});
 
 	it("#deserializeProposal - should correctly deserialize", async ({ deserializer }) => {
-		for(const { proposalSerialized, proposalData } of [Proposal, ProposalWithValidRound, ProposalWithLockProof, ProposalWithLockProofAndValidRound]) {
+		for (const { proposalSerialized, proposalData } of [
+			Proposal,
+			ProposalWithValidRound,
+			ProposalWithLockProof,
+			ProposalWithLockProofAndValidRound,
+		]) {
 			const deserialized = await deserializer.deserializeProposal(Buffer.from(proposalSerialized, "hex"));
 			assertProposal(assert, deserialized, proposalData);
 		}

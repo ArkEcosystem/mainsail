@@ -38,10 +38,15 @@ const parseBlockNumber = (parentSchema): number | undefined => {
 	return Buffer.from(serialized.slice(offset, offset + 8), "hex").readUInt32LE();
 };
 
-
 export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
-): { maxBytes: FuncKeywordDefinition; bignumber: FuncKeywordDefinition; buffer: FuncKeywordDefinition, isValidatorIndex: FuncKeywordDefinition, limitToRoundValidators: FuncKeywordDefinition } => {
+): {
+	maxBytes: FuncKeywordDefinition;
+	bignumber: FuncKeywordDefinition;
+	buffer: FuncKeywordDefinition;
+	isValidatorIndex: FuncKeywordDefinition;
+	limitToRoundValidators: FuncKeywordDefinition;
+} => {
 	const maxBytes: FuncKeywordDefinition = {
 		compile: (schema) => (data) => Buffer.byteLength(data, "utf8") <= schema,
 		errors: false,
@@ -93,9 +98,9 @@ export const makeKeywords = (
 		metaSchema: {
 			type: "object",
 		},
-	}
+	};
 
-		const limitToRoundValidators: FuncKeywordDefinition = {
+	const limitToRoundValidators: FuncKeywordDefinition = {
 		// TODO: Check type (same as bignum)
 		// @ts-ignore
 		compile(schema: { minimum?: number }) {

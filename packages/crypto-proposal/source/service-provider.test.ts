@@ -35,7 +35,6 @@ describe<{
 		assert.true(app.isBound(Identifiers.Cryptography.Proposal.Deserializer));
 		assert.true(app.isBound(Identifiers.Cryptography.Proposal.Factory));
 
-
 		const lockProofSize = app.get<() => number>(Identifiers.Cryptography.Proposal.LockProofSize);
 		assert.equal(lockProofSize(), 96 + 1 + 8);
 

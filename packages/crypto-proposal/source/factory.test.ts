@@ -67,59 +67,41 @@ describe<{
 	});
 
 	it("#makeProposal - should correctly make signed proposal", async ({ factory, identity }) => {
-		for(const { proposalDataSerializableUnsigned, proposalDataSerializable, proposalData } of proposals) {
-			const proposal = await factory.makeProposal(
-				proposalDataSerializableUnsigned,
-				identity.keys,
-			);
+		for (const { proposalDataSerializableUnsigned, proposalDataSerializable, proposalData } of proposals) {
+			const proposal = await factory.makeProposal(proposalDataSerializableUnsigned, identity.keys);
 
-			assert.equal(
-				proposal.toSerializableData(),
-				proposalDataSerializable
-			);
+			assert.equal(proposal.toSerializableData(), proposalDataSerializable);
 			assert.equal(proposal.blockHeader, blockHeader);
 			assert.equal(proposal.toData(), proposalData);
 		}
 	});
 
 	it("#makeProposalFromBytes - should be ok", async ({ factory }) => {
-		for(const { proposalSerialized, proposalDataSerializable, proposalData } of proposals) {
+		for (const { proposalSerialized, proposalDataSerializable, proposalData } of proposals) {
 			const proposal = await factory.makeProposalFromBytes(Buffer.from(proposalSerialized, "hex"));
 
-			assert.equal(
-				proposal.toSerializableData(),
-				proposalDataSerializable
-			);
+			assert.equal(proposal.toSerializableData(), proposalDataSerializable);
 			assert.equal(proposal.blockHeader, blockHeader);
 			assert.equal(proposal.toData(), proposalData);
 		}
 	});
 
 	it("#makeProposalFromData - should be ok", async ({ factory }) => {
-		for(const { proposalDataSerializable, proposalData } of proposals) {
+		for (const { proposalDataSerializable, proposalData } of proposals) {
 			const proposal = await factory.makeProposalFromData(proposalData);
 
-			assert.equal(
-				proposal.toSerializableData(),
-				proposalDataSerializable
-			);
+			assert.equal(proposal.toSerializableData(), proposalDataSerializable);
 			assert.equal(proposal.blockHeader, blockHeader);
 			assert.equal(proposal.toData(), proposalData);
 		}
 	});
 
 	it("#makeProposalFromData - should be ok", async ({ factory }) => {
-		for(const { payloadSerialized, payload } of proposals) {
+		for (const { payloadSerialized, payload } of proposals) {
 			const newPayload = await factory.makePayloadFromBytes(Buffer.from(payloadSerialized, "hex"));
 
-			assert.equal(
-				newPayload.block.serialized,
-				payload.block.serialized
-			);
-			assert.equal(
-				newPayload.lockProof,
-				payload.lockProof
-			);
+			assert.equal(newPayload.block.serialized, payload.block.serialized);
+			assert.equal(newPayload.lockProof, payload.lockProof);
 		}
 	});
 });

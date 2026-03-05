@@ -21,7 +21,7 @@ export interface ProposalData extends ProposalDataSerializable {
 export type ProposedPayloadSerializable = {
 	readonly block: Block;
 	readonly lockProof?: AggregatedSignature;
-}
+};
 
 export interface ProposedPayload extends ProposedPayloadSerializable {
 	readonly serialized: string;

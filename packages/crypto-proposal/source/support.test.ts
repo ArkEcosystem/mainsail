@@ -10,7 +10,7 @@ import {
 	ProposalWithLockProofAndValidRound,
 	blockData,
 	blockSerialized,
-	validatorMnemonic
+	validatorMnemonic,
 } from "../test/fixtures/index.js";
 
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -59,12 +59,18 @@ describe<{
 
 	it("CREATE DATA", async ({ app }) => {
 		const blockSerializer = app.get<Contracts.Crypto.BlockSerializer>(Identifiers.Cryptography.Block.Serializer);
-		const blockDeserializer = app.get<Contracts.Crypto.BlockDeserializer>(Identifiers.Cryptography.Block.Deserializer);
-		const transactionSerializer = app.get<Contracts.Crypto.TransactionSerializer>(Identifiers.Cryptography.Transaction.Serializer);
+		const blockDeserializer = app.get<Contracts.Crypto.BlockDeserializer>(
+			Identifiers.Cryptography.Block.Deserializer,
+		);
+		const transactionSerializer = app.get<Contracts.Crypto.TransactionSerializer>(
+			Identifiers.Cryptography.Transaction.Serializer,
+		);
 
 		const blockHeaderSerialized = await blockSerializer.serializeHeader(blockData);
 
-		const transactionsSerialized = await Promise.all(blockData.transactions.map((transaction) => transactionSerializer.serialize(transaction)));
+		const transactionsSerialized = await Promise.all(
+			blockData.transactions.map((transaction) => transactionSerializer.serialize(transaction)),
+		);
 
 		// console.log(blockHeaderSerialized.toString("hex"));
 		// console.log(transactionsSerialized.map((tx) => tx.toString("hex")));
@@ -82,7 +88,6 @@ describe<{
 		console.log(block);
 		console.log("blockSerialized: ", blockSer.toString("hex"));
 	});
-
 
 	it("#serializePayload - should correctly serialize", async ({ serializer }) => {
 		const serialized = await serializer.serializePayload(PROPOSAL.payload);

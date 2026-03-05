@@ -219,7 +219,6 @@ describe<{
 		assert.defined(context.validator.validate("test", 1).error);
 	});
 
-
 	it("keyword limitToRoundValidators - should be ok with minimum", (context) => {
 		const schema = {
 			$id: "test",
