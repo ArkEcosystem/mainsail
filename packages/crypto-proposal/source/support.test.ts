@@ -7,6 +7,7 @@ import {
 	Proposal,
 	ProposalWithValidRound,
 	blockData,
+	blockSerialized,
 	validatorMnemonic
 } from "../test/fixtures/index.js";
 
@@ -52,28 +53,31 @@ describe<{
 		context.factory = context.app.resolve(Factory);
 	});
 
-	it.skip("#serializePayload - should correctly serialize", async ({ app }) => {
+	it.only("#serializePayload - should correctly serialize", async ({ app }) => {
 		const blockSerializer = app.get<Contracts.Crypto.BlockSerializer>(Identifiers.Cryptography.Block.Serializer);
+		const blockDeserializer = app.get<Contracts.Crypto.BlockDeserializer>(Identifiers.Cryptography.Block.Deserializer);
 		const transactionSerializer = app.get<Contracts.Crypto.TransactionSerializer>(Identifiers.Cryptography.Transaction.Serializer);
 
 		const blockHeaderSerialized = await blockSerializer.serializeHeader(blockData);
 
 		const transactionsSerialized = await Promise.all(blockData.transactions.map((transaction) => transactionSerializer.serialize(transaction)));
 
-		console.log(blockHeaderSerialized.toString("hex"));
-		console.log(transactionsSerialized.map((tx) => tx.toString("hex")));
+		// console.log(blockHeaderSerialized.toString("hex"));
+		// console.log(transactionsSerialized.map((tx) => tx.toString("hex")));
 
-		const blockSerialized = await blockSerializer.serializeWithTransactions({
+		const blockSer = await blockSerializer.serializeWithTransactions({
 			...blockData,
 			transactions: transactionsSerialized.map((serialized) => ({ serialized })),
 		});
 
-		console.log(blockSerialized.toString("hex"));
+		// console.log(blockSerialized.toString("hex"));
 
 		const blockFactory = app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
-		const block = await blockFactory.fromHex(blockSerialized.toString("hex"));
+		const block = await blockFactory.fromHex(blockSer.toString("hex"));
+		const blockHeader = await blockDeserializer.deserializeHeader(Buffer.from(blockSerialized, "hex"));
 
 		console.log(block);
+		console.log(blockSer.toString("hex"));
 	});
 
 
