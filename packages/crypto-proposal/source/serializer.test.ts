@@ -5,6 +5,7 @@ import { Identifiers } from "@mainsail/constants";
 import {
 	Proposal,
 	ProposalWithValidRound,
+	ProposalWithLockProof,
 	lockProof,
 	serializedLockProof
 } from "../test/fixtures/index.js";
@@ -20,7 +21,7 @@ describe<{
 	deserializer: Deserializer;
 	factory: Factory;
 }>("Serializer", ({ it, assert, beforeEach }) => {
-	const proposals = [Proposal, ProposalWithValidRound];
+	const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof];
 
 	beforeEach(async (context) => {
 		await prepareSandbox(context);

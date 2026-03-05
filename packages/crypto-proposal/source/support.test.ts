@@ -6,6 +6,7 @@ import type { Contracts } from "@mainsail/contracts";
 import {
 	Proposal,
 	ProposalWithValidRound,
+	ProposalWithLockProof,
 	blockData,
 	blockSerialized,
 	validatorMnemonic
@@ -22,7 +23,7 @@ describe<{
 	deserializer: Deserializer;
 	factory: Factory;
 }>("Serializer", ({ it, assert, beforeEach }) => {
-	const PROPOSAL = ProposalWithValidRound;
+	const PROPOSAL = ProposalWithLockProof;
 
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
@@ -91,7 +92,7 @@ describe<{
 	it("#serializeProposalUnsigned - should correctly serialize", async ({ serializer, app, factory }) => {
 		const serialized = await serializer.serializeProposalUnsigned(PROPOSAL.proposalDataSerializableUnsigned);
 
-		console.log(serialized.toString("hex"));
+		// console.log("proposalSerializedUnsigned: ", serialized.toString("hex"));
 
 		assert.equal(serialized.toString("hex"), PROPOSAL.proposalSerializedUnsigned);
 

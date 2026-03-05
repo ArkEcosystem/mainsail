@@ -3,6 +3,7 @@ import { describe } from "@mainsail/test-runner";
 import {
 	Proposal,
 	ProposalWithValidRound,
+	ProposalWithLockProof,
 	lockProof,
 	serializedLockProof
 } from "../test/fixtures/index.js";
@@ -21,7 +22,7 @@ describe<{
 	});
 
 	it("#deserializeProposal - should correctly deserialize", async ({ deserializer }) => {
-		for(const { proposalSerialized, proposalData } of [Proposal, ProposalWithValidRound]) {
+		for(const { proposalSerialized, proposalData } of [Proposal, ProposalWithValidRound, ProposalWithLockProof]) {
 			const deserialized = await deserializer.deserializeProposal(Buffer.from(proposalSerialized, "hex"));
 			assertProposal(assert, deserialized, proposalData);
 		}
