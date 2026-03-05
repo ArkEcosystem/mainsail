@@ -9,7 +9,6 @@ import { Types } from "../../test-factories/source/factories";
 import {
 	blockHeader,
 	Proposal,
-	serializedBlock,
 	validatorMnemonic,
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -76,10 +75,38 @@ describe<{
 		assert.equal(proposal.toData(), Proposal.proposalData);
 	});
 
-	// it("#makeProposalFromBytes - should be ok", async ({ factory }) => {
-	// 	const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposal, "hex"));
+	it("#makeProposalFromBytes - should be ok", async ({ factory }) => {
+		const proposal = await factory.makeProposalFromBytes(Buffer.from(Proposal.proposalSerialized, "hex"));
 
-	// 	assert.equal(proposal.toData(), proposalData);
-	// });
+		assert.equal(
+			proposal.toSerializableData(),
+			Proposal.proposalDataSerializable
+		);
+		assert.equal(proposal.blockHeader, blockHeader);
+		assert.equal(proposal.toData(), Proposal.proposalData);
+	});
 
+	it("#makeProposalFromData - should be ok", async ({ factory }) => {
+		const proposal = await factory.makeProposalFromData(Proposal.proposalData);
+
+		assert.equal(
+			proposal.toSerializableData(),
+			Proposal.proposalDataSerializable
+		);
+		assert.equal(proposal.blockHeader, blockHeader);
+		assert.equal(proposal.toData(), Proposal.proposalData);
+	});
+
+	it("#makeProposalFromData - should be ok", async ({ factory }) => {
+		const payload = await factory.makePayloadFromBytes(Buffer.from(Proposal.payloadSerialized, "hex"));
+
+		assert.equal(
+			payload.block.serialized,
+			Proposal.payload.block.serialized
+		);
+		assert.equal(
+			payload.lockProof,
+			Proposal.payload.lockProof
+		);
+	});
 });
