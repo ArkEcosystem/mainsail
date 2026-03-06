@@ -22,6 +22,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     account::AccountInfoExtended,
+    bytecode::StoredBytecode,
     compression::CompressedBincode,
     historical::{AccountHistory, HistoricalAccountData},
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
@@ -163,7 +164,7 @@ pub(crate) struct InnerStorage {
         >,
     >,
     pub commits: heed::Database<HeedBlockNumber, CompressedBincode<CommitReceipts>>,
-    pub contracts: heed::Database<HashWrapper, CompressedBincode<Bytecode>>,
+    pub contracts: heed::Database<HashWrapper, CompressedBincode<StoredBytecode>>,
     pub legacy_attributes:
         heed::Database<AddressWrapper, CompressedBincode<LegacyAccountAttributes>>,
     pub legacy_cold_wallets:
@@ -316,6 +317,8 @@ impl PersistentDBOptions {
 pub enum Error {
     #[error("IO error: {0}")]
     IO(#[from] std::io::Error),
+    #[error("BytecodeDecode error: {0}")]
+    BytecodeDecode(#[from] revm::bytecode::BytecodeDecodeError),
     #[error("heed error: {0}")]
     Heed(#[from] heed::Error),
     #[error("state error: {0}")]
@@ -394,7 +397,7 @@ impl PersistentDB {
             &mut wtxn,
             Some("commits"),
         )?;
-        let contracts = env.create_database::<HashWrapper, CompressedBincode<Bytecode>>(
+        let contracts = env.create_database::<HashWrapper, CompressedBincode<StoredBytecode>>(
             &mut wtxn,
             Some("contracts"),
         )?;
@@ -779,7 +782,7 @@ impl DatabaseRef for PersistentDB {
             None => Default::default(),
         };
 
-        Ok(contract)
+        Ok(contract.try_into()?)
     }
 
     fn storage_ref(&self, address: Address, index: U256) -> Result<U256, Self::Error> {
@@ -904,9 +907,11 @@ impl PersistentDB {
 
             // Update contracts
             for (hash, bytecode) in contracts.into_iter() {
-                inner
-                    .contracts
-                    .put(rwtxn, &HashWrapper(*hash), &CompressedBincode(&bytecode))?;
+                inner.contracts.put(
+                    rwtxn,
+                    &HashWrapper(*hash),
+                    &CompressedBincode(&bytecode.clone().into()),
+                )?;
             }
 
             // Update storage
