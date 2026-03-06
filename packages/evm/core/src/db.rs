@@ -21,7 +21,7 @@ use revm::{
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    account::AccountInfoExtended,
+    account::{AccountInfoExtended, StoredAccountInfo},
     bytecode::StoredBytecode,
     compression::CompressedBincode,
     historical::{AccountHistory, HistoricalAccountData},
@@ -156,7 +156,7 @@ pub(crate) struct CommitReceipts {
 }
 
 pub(crate) struct InnerStorage {
-    pub accounts: heed::Database<AddressWrapper, CompressedBincode<AccountInfo>>,
+    pub accounts: heed::Database<AddressWrapper, CompressedBincode<StoredAccountInfo>>,
     pub accounts_history: Option<
         heed::Database<
             HeedBlockNumber,
@@ -379,10 +379,11 @@ impl PersistentDB {
         let tx_env = env.clone();
         let mut wtxn = tx_env.write_txn()?;
 
-        let accounts = env.create_database::<AddressWrapper, CompressedBincode<AccountInfo>>(
-            &mut wtxn,
-            Some("accounts"),
-        )?;
+        let accounts = env
+            .create_database::<AddressWrapper, CompressedBincode<StoredAccountInfo>>(
+                &mut wtxn,
+                Some("accounts"),
+            )?;
 
         let (accounts_history_db, accounts_history) = match opts.history_size {
             Some(history_size) if history_size > 0 => {
@@ -760,7 +761,7 @@ impl DatabaseRef for PersistentDB {
         let inner = self.inner.borrow();
 
         let basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
-            Some(account) => account.0,
+            Some(account) => account.0.into(),
             None => match &self.genesis_info {
                 Some(genesis) if genesis.account == address => revm::state::AccountInfo {
                     balance: genesis.initial_supply,
@@ -861,9 +862,15 @@ impl PersistentDB {
                 let address = AddressWrapper(*address);
 
                 if let Some(account) = account {
-                    inner
-                        .accounts
-                        .put(rwtxn, &address, &CompressedBincode(account))?;
+                    inner.accounts.put(
+                        rwtxn,
+                        &address,
+                        &CompressedBincode(&StoredAccountInfo::new(
+                            account.balance,
+                            account.nonce,
+                            account.code_hash,
+                        )),
+                    )?;
                 } else {
                     inner.accounts.delete(rwtxn, &address)?;
                 }
@@ -1661,7 +1668,7 @@ fn test_read_accounts() {
                 .put(
                     &mut wtxn,
                     &AddressWrapper(*address),
-                    &CompressedBincode(&AccountInfo {
+                    &CompressedBincode(&StoredAccountInfo {
                         balance: U256::from(index),
                         nonce: index as u64,
                         ..Default::default()
