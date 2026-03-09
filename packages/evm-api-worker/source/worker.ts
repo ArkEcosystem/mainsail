@@ -29,8 +29,8 @@ export class Worker implements Contracts.Evm.Worker {
 		this.ipcSubprocess.registerEventHandler(event, callback);
 	}
 
-	public handle(payload: { name: string; data: unknown }): void {
-		void this.setPeerCount(this.p2pRepository.getPeers().length);
+	public async handle(payload: { name: string; data: unknown }): Promise<void> {
+		await this.setPeerCount(this.p2pRepository.getPeers().length);
 	}
 
 	public async boot(flags: Contracts.Evm.WorkerFlags): Promise<void> {

@@ -51,7 +51,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@postConstruct()
 	public initialize(): void {
 		this.events.listen(Events.CryptoEvent.MilestoneChanged, {
-			handle: () => this.#disconnectInvalidPeers(),
+			handle: async (): Promise<void> => this.#disconnectInvalidPeers(),
 		});
 
 		this.transactionPoolWorker.registerEventHandler("peer.removed", (ip: string) => {

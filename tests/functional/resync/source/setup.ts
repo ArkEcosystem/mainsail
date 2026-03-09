@@ -295,7 +295,7 @@ const ensureDatabaseExists = async (database: string): Promise<void> => {
 const runDatabaseQuery = async <T>(databaseName: string, callback: (dataSource: TypeOrm.DataSource) => Promise<T>): Promise<T> => {
 	const nodeDatabase = new TypeOrm.DataSource({
 		database: databaseName,
-		host: "127.0.0.1",
+		host: process.env.MAINSAIL_DB_HOST || "127.0.0.1",
 		password: "password",
 		port: 5432,
 		type: "postgres",

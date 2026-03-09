@@ -45,23 +45,7 @@ export class NullEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		//
 	}
 
-	public async dispatchSeq<T = unknown>(event: string, data?: T): Promise<void> {
-		//
-	}
-
-	public dispatchSync<T = unknown>(event: string, data?: T): void {
-		//
-	}
-
 	public async dispatchMany<T = unknown>(events: Array<[string, T]>): Promise<void> {
-		//
-	}
-
-	public async dispatchManySeq<T = unknown>(events: Array<[string, T]>): Promise<void> {
-		//
-	}
-
-	public dispatchManySync<T = unknown>(events: Array<[string, T]>): void {
 		//
 	}
 }
