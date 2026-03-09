@@ -21,7 +21,8 @@ use revm::{
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    account::AccountInfoExtended,
+    account::{AccountInfoExtended, StoredAccountInfo},
+    bytecode::StoredBytecode,
     compression::CompressedBincode,
     historical::{AccountHistory, HistoricalAccountData},
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
@@ -155,7 +156,7 @@ pub(crate) struct CommitReceipts {
 }
 
 pub(crate) struct InnerStorage {
-    pub accounts: heed::Database<AddressWrapper, CompressedBincode<AccountInfo>>,
+    pub accounts: heed::Database<AddressWrapper, CompressedBincode<StoredAccountInfo>>,
     pub accounts_history: Option<
         heed::Database<
             HeedBlockNumber,
@@ -163,7 +164,7 @@ pub(crate) struct InnerStorage {
         >,
     >,
     pub commits: heed::Database<HeedBlockNumber, CompressedBincode<CommitReceipts>>,
-    pub contracts: heed::Database<HashWrapper, CompressedBincode<Bytecode>>,
+    pub contracts: heed::Database<HashWrapper, CompressedBincode<StoredBytecode>>,
     pub legacy_attributes:
         heed::Database<AddressWrapper, CompressedBincode<LegacyAccountAttributes>>,
     pub legacy_cold_wallets:
@@ -316,6 +317,8 @@ impl PersistentDBOptions {
 pub enum Error {
     #[error("IO error: {0}")]
     IO(#[from] std::io::Error),
+    #[error("BytecodeDecode error: {0}")]
+    BytecodeDecode(#[from] revm::bytecode::BytecodeDecodeError),
     #[error("heed error: {0}")]
     Heed(#[from] heed::Error),
     #[error("state error: {0}")]
@@ -376,10 +379,11 @@ impl PersistentDB {
         let tx_env = env.clone();
         let mut wtxn = tx_env.write_txn()?;
 
-        let accounts = env.create_database::<AddressWrapper, CompressedBincode<AccountInfo>>(
-            &mut wtxn,
-            Some("accounts"),
-        )?;
+        let accounts = env
+            .create_database::<AddressWrapper, CompressedBincode<StoredAccountInfo>>(
+                &mut wtxn,
+                Some("accounts"),
+            )?;
 
         let (accounts_history_db, accounts_history) = match opts.history_size {
             Some(history_size) if history_size > 0 => {
@@ -394,7 +398,7 @@ impl PersistentDB {
             &mut wtxn,
             Some("commits"),
         )?;
-        let contracts = env.create_database::<HashWrapper, CompressedBincode<Bytecode>>(
+        let contracts = env.create_database::<HashWrapper, CompressedBincode<StoredBytecode>>(
             &mut wtxn,
             Some("contracts"),
         )?;
@@ -757,7 +761,7 @@ impl DatabaseRef for PersistentDB {
         let inner = self.inner.borrow();
 
         let basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
-            Some(account) => account.0,
+            Some(account) => account.0.into(),
             None => match &self.genesis_info {
                 Some(genesis) if genesis.account == address => revm::state::AccountInfo {
                     balance: genesis.initial_supply,
@@ -779,7 +783,7 @@ impl DatabaseRef for PersistentDB {
             None => Default::default(),
         };
 
-        Ok(contract)
+        Ok(contract.try_into()?)
     }
 
     fn storage_ref(&self, address: Address, index: U256) -> Result<U256, Self::Error> {
@@ -858,9 +862,15 @@ impl PersistentDB {
                 let address = AddressWrapper(*address);
 
                 if let Some(account) = account {
-                    inner
-                        .accounts
-                        .put(rwtxn, &address, &CompressedBincode(account))?;
+                    inner.accounts.put(
+                        rwtxn,
+                        &address,
+                        &CompressedBincode(&StoredAccountInfo::new(
+                            account.balance,
+                            account.nonce,
+                            account.code_hash,
+                        )),
+                    )?;
                 } else {
                     inner.accounts.delete(rwtxn, &address)?;
                 }
@@ -904,9 +914,11 @@ impl PersistentDB {
 
             // Update contracts
             for (hash, bytecode) in contracts.into_iter() {
-                inner
-                    .contracts
-                    .put(rwtxn, &HashWrapper(*hash), &CompressedBincode(&bytecode))?;
+                inner.contracts.put(
+                    rwtxn,
+                    &HashWrapper(*hash),
+                    &CompressedBincode(&bytecode.clone().into()),
+                )?;
             }
 
             // Update storage
@@ -1656,7 +1668,7 @@ fn test_read_accounts() {
                 .put(
                     &mut wtxn,
                     &AddressWrapper(*address),
-                    &CompressedBincode(&AccountInfo {
+                    &CompressedBincode(&StoredAccountInfo {
                         balance: U256::from(index),
                         nonce: index as u64,
                         ..Default::default()
