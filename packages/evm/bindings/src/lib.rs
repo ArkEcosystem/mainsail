@@ -37,7 +37,7 @@ use revm::{
     database::{State, TransitionAccount, WrapDatabaseRef, bal::EvmDatabaseError},
     handler::EvmTr,
     primitives::{Address, B256, Bytes, TxKind, U256, hex::ToHexExt, map::HashMap},
-    state::{AccountInfo, Bytecode},
+    state::AccountInfo,
 };
 
 mod ctx;
@@ -173,10 +173,7 @@ impl EvmInner {
                         EVMError::Database(format!("code lookup failed: {}", err).into())
                     })?;
 
-                Ok(match code {
-                    Bytecode::LegacyAnalyzed(code) => code.original_bytes(),
-                    Bytecode::Eip7702(code) => code.raw.clone(),
-                })
+                Ok(code.original_bytes())
             }
             None => Ok(Default::default()),
         }
