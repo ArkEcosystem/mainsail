@@ -151,41 +151,35 @@ describe<{
 		}
 	});
 
-	it("/tokens custom whitelist (POST)", async () => {
+	it("/tokens?whitelist", async () => {
 		await apiContext.tokenRepository.save(tokens);
 		await apiContext.tokenWhitelistRepository.save(tokenWhitelist.slice(0, 1));
 
 		const testCases = [
 			{
 				query: "",
-				method: "POST",
 				result: {
 					data: [tokens[0]],
 					statusCode: 200,
 				},
 			},
 			{
-				query: "",
-				body: JSON.stringify({ whitelist: [tokens[1].address] }),
-				method: "POST",
+				query: `?whitelist=${tokens[1].address}`,
 				result: {
 					data: [tokens[0], tokens[1]],
 					statusCode: 200,
 				},
 			},
 			{
-				query: "",
-				body: JSON.stringify({ whitelist: tokens.map((t) => t.address) }),
-				method: "POST",
+				query: `?whitelist=${tokens.map((t) => t.address).join(",")}`,
 				result: {
 					data: [...tokens].sort((a, b) => a.address.localeCompare(b.address)),
 					statusCode: 200,
 				},
 			},
 			{
-				query: "",
+				query: `?whitelist=0x0000000000000000000000000000000000000000`,
 				body: JSON.stringify({ whitelist: ["0x0000000000000000000000000000000000000000"] }),
-				method: "POST",
 				result: {
 					data: [tokens[0]],
 					statusCode: 200,
@@ -193,12 +187,12 @@ describe<{
 			},
 		];
 
-		for (const { query, result, body, method } of testCases) {
+		for (const { query, result } of testCases) {
 			const endpoint = `/tokens${query}`;
 			if (result.statusCode === 404) {
 				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
 			} else {
-				const { statusCode, data } = await request(endpoint, { ...options, body, method });
+				const { statusCode, data } = await request(endpoint, { ...options });
 				assert.equal(statusCode, result.statusCode);
 				assert.equal(data.data, result.data);
 			}
