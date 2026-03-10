@@ -258,9 +258,10 @@ export class TokensController extends Controller {
 			return;
 		}
 
-		// POST allows user to whitelist selected tokens explicitly.
-		if (request.method === "post") {
-			const customWhitelist = (request.payload as unknown as { whitelist: string[] })?.whitelist ?? [];
+		if (request.query.whitelist) {
+			const customWhitelist = (Array.isArray(request.query.whitelist)
+				? request.query.whitelist
+				: request.query.whitelist.split(",")) as unknown as string[];
 			if (customWhitelist.length > 0) {
 				queryBuilder.leftJoin(Models.TokenWhitelist, "tw", "tw.address = tok.address").andWhere(
 					new TypeOrm.Brackets((qb) => {
