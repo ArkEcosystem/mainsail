@@ -271,6 +271,13 @@ export const encodeErc20Transfer = (recipient: string, amount: number | string |
 		functionName: "transfer",
 	}).slice(2);
 
+export const encodeErc20Approve = (spender: string, amount: number | string | bigint): string =>
+	encodeFunctionData({
+		abi: DARK20.abi,
+		args: [spender, amount],
+		functionName: "approve",
+	}).slice(2);
+
 export const encodeMultiPayment = (recipients: string[], amounts: (number | string | bigint)[]): string =>
 	encodeFunctionData({
 		abi: MultiPaymentAbi.abi,

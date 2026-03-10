@@ -10,10 +10,11 @@ type AnyTransaction = Partial<T_AND> & Pick<T_OR, keyof T_OR>;
 export interface EnrichedTransaction extends AnyTransaction {
 	state: Models.State;
 	fullReceipt: boolean;
-	tokens?: TransactionTokenTransfer[];
+	tokens?: TransactionTokenAction[];
 }
 
-export type TransactionTokenTransferRaw = {
+export type TransactionTokenActionRaw = {
+	action: string;
 	transactionHash: string;
 	from: string;
 	to: string;
@@ -26,7 +27,8 @@ export type TransactionTokenTransferRaw = {
 	tokenDecimals: number;
 };
 
-export type TransactionTokenTransfer = {
+export type TransactionTokenAction = {
+	action: string;
 	from: string;
 	to: string;
 	value: string;
