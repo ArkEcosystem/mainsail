@@ -7,7 +7,6 @@ import { WalletsController } from "../controllers/wallets.js";
 import {
 	tokenBalanceSchema,
 	tokenNameSchema,
-	tokenWhitelistPayloadSchema,
 	transactionCriteriaSchemas,
 	transactionsOrderBy,
 	transactionSortingSchema,
@@ -177,13 +176,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		path: "/wallets/{id}/votes",
 	});
 
-	const walletTokensQuerySchema = Joi.object({
-		addresses: Schemas.orEqualCriteria(walletAddressSchema),
-		ignoreWhitelist: Joi.bool().default(false),
-		minBalance: Schemas.orNumericCriteria(tokenBalanceSchema),
-		name: Schemas.orEqualCriteria(tokenNameSchema),
-	}).concat(Schemas.pagination);
-
 	server.route({
 		handler: (request: Hapi.Request) => controller.tokens(request),
 		method: "GET",
@@ -194,34 +186,17 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				},
 			},
 			validate: {
-				query: walletTokensQuerySchema,
+				query: Joi.object({
+					addresses: Schemas.orEqualCriteria(walletAddressSchema),
+					ignoreWhitelist: Joi.bool().default(false),
+					minBalance: Schemas.orNumericCriteria(tokenBalanceSchema),
+					name: Schemas.orEqualCriteria(tokenNameSchema),
+					whitelist: Schemas.orEqualCriteria(walletAddressSchema),
+				}).concat(Schemas.pagination),
 			},
 		},
 		path: "/wallets/tokens",
 	});
-
-	server.route({
-		handler: (request: Hapi.Request) => controller.tokens(request),
-		method: "POST",
-		options: {
-			plugins: {
-				pagination: {
-					enabled: true,
-				},
-			},
-			validate: {
-				payload: tokenWhitelistPayloadSchema,
-				query: walletTokensQuerySchema,
-			},
-		},
-		path: "/wallets/tokens",
-	});
-
-	const walletTokensIdQuerySchema = Joi.object({
-		ignoreWhitelist: Joi.bool().default(false),
-		minBalance: Schemas.orNumericCriteria(tokenBalanceSchema),
-		name: Schemas.orEqualCriteria(tokenNameSchema),
-	}).concat(Schemas.pagination);
 
 	server.route({
 		handler: (request: Hapi.Request) => controller.tokensShow(request),
@@ -236,27 +211,12 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				params: Joi.object({
 					id: walletParameterSchema,
 				}),
-				query: walletTokensIdQuerySchema,
-			},
-		},
-		path: "/wallets/{id}/tokens",
-	});
-
-	server.route({
-		handler: (request: Hapi.Request) => controller.tokensShow(request),
-		method: "POST",
-		options: {
-			plugins: {
-				pagination: {
-					enabled: true,
-				},
-			},
-			validate: {
-				params: Joi.object({
-					id: walletParameterSchema,
-				}),
-				payload: tokenWhitelistPayloadSchema,
-				query: walletTokensIdQuerySchema,
+				query: Joi.object({
+					ignoreWhitelist: Joi.bool().default(false),
+					minBalance: Schemas.orNumericCriteria(tokenBalanceSchema),
+					name: Schemas.orEqualCriteria(tokenNameSchema),
+					whitelist: Schemas.orEqualCriteria(walletAddressSchema),
+				}).concat(Schemas.pagination),
 			},
 		},
 		path: "/wallets/{id}/tokens",

@@ -57,13 +57,13 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX token_holders_address_token ON token_holders ("address", "token_address");
             CREATE INDEX token_holders_token_address_balance ON token_holders ("address", "token_address", "balance");
 
-            CREATE INDEX token_transfers_all ON token_transfers ("block_number" DESC, "index" DESC);
-            CREATE INDEX token_transfers_all_from ON token_transfers ("from", "block_number" DESC, "index" DESC);
-            CREATE INDEX token_transfers_all_to ON token_transfers ("to", "block_number" DESC, "index" DESC);
-            CREATE INDEX token_transfers_address ON token_transfers ("address", "block_number" DESC, "index" DESC);
-            CREATE INDEX token_transfers_address_from ON token_transfers ("address", "from", "block_number" DESC, "index" DESC);
-            CREATE INDEX token_transfers_address_to ON token_transfers ("address", "to", "block_number" DESC, "index" DESC );
-            CREATE INDEX token_transfers_tx_hash ON token_transfers ("transaction_hash");
+            CREATE INDEX token_actions_all ON token_actions (action, "block_number" DESC, "index" DESC);
+            CREATE INDEX token_actions_all_from ON token_actions (action, "from", "block_number" DESC, "index" DESC);
+            CREATE INDEX token_actions_all_to ON token_actions (action, "to", "block_number" DESC, "index" DESC);
+            CREATE INDEX token_actions_address ON token_actions (action, "address", "block_number" DESC, "index" DESC);
+            CREATE INDEX token_actions_address_from ON token_actions (action, "address", "from", "block_number" DESC, "index" DESC);
+            CREATE INDEX token_actions_address_to ON token_actions (action, "address", "to", "block_number" DESC, "index" DESC );
+            CREATE INDEX token_actions_tx_hash ON token_actions ("transaction_hash");
 
             -- when >= 3 chars
             CREATE INDEX tokens_symbol_trgm ON tokens USING gin (symbol gin_trgm_ops);
@@ -130,13 +130,13 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX token_holders_address_token;
             DROP INDEX token_holders_token_address_balance;
 
-            DROP INDEX token_transfers_all;
-            DROP INDEX token_transfers_all_from;
-            DROP INDEX token_transfers_all_to;
-            DROP INDEX token_transfers_address;
-            DROP INDEX token_transfers_address_from;
-            DROP INDEX token_transfers_address_to;
-            DROP INDEX token_transfers_tx_hash;
+            DROP INDEX token_actions_all;
+            DROP INDEX token_actions_all_from;
+            DROP INDEX token_actions_all_to;
+            DROP INDEX token_actions_address;
+            DROP INDEX token_actions_address_from;
+            DROP INDEX token_actions_address_to;
+            DROP INDEX token_actions_tx_hash;
         `);
 	}
 }

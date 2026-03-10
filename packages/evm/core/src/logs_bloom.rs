@@ -40,8 +40,7 @@ fn test_calculate_logs_bloom() {
                     )
                 })
                 .collect::<Vec<revm::primitives::Log>>(),
-            gas_refunded: 0,
-            gas_used: 0,
+            gas: revm::context::result::ResultGas::default(),
             output: revm::context::result::Output::Call(Default::default()),
             reason: revm::context::result::SuccessReason::Stop,
         };

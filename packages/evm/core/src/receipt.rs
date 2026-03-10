@@ -18,15 +18,11 @@ pub struct TxReceipt {
 pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -> TxReceipt {
     match result {
         ExecutionResult::Success {
-            gas_used,
-            gas_refunded,
-            output,
-            logs,
-            ..
+            gas, output, logs, ..
         } => match output {
             Output::Call(output) => TxReceipt {
-                gas_used,
-                gas_refunded,
+                gas_used: gas.used(),
+                gas_refunded: gas.inner_refunded(),
                 cumulative_gas_used,
                 success: 1,
                 contract_address: None,
@@ -34,8 +30,8 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
                 output: Some(output),
             },
             Output::Create(output, address) => TxReceipt {
-                gas_used,
-                gas_refunded,
+                gas_used: gas.used(),
+                gas_refunded: gas.inner_refunded(),
                 cumulative_gas_used,
                 success: 1,
                 contract_address: address.map(|address| address.to_string()),
@@ -43,8 +39,8 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
                 output: Some(output),
             },
         },
-        ExecutionResult::Revert { gas_used, output } => TxReceipt {
-            gas_used,
+        ExecutionResult::Revert { gas, output, .. } => TxReceipt {
+            gas_used: gas.used(),
             success: 0,
             cumulative_gas_used,
             gas_refunded: 0,
@@ -52,8 +48,8 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
             logs: None,
             output: Some(output),
         },
-        ExecutionResult::Halt { gas_used, .. } => TxReceipt {
-            gas_used,
+        ExecutionResult::Halt { gas, .. } => TxReceipt {
+            gas_used: gas.used(),
             success: 0,
             cumulative_gas_used,
             gas_refunded: 0,

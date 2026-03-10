@@ -60,12 +60,11 @@ const setupHttp = async (app: Application): Promise<CoreApiHttp> => {
 	return server;
 };
 
-// TODO: either use env or hardcode same values for postgres in CI
 const databaseOptions = {
 	database: "test_db",
 	dropSchema: false,
 	entityPrefix: "public.",
-	host: "localhost",
+	host: process.env.MAINSAIL_DB_HOST || "localhost",
 	logger: "simple-console",
 	logging: false,
 	migrationsRun: false,
@@ -157,9 +156,9 @@ export class ApiContext {
 		)();
 	}
 
-	public get tokenTransferRepository(): ApiDatabaseContracts.TokenTransferRepository {
-		return this.app.get<ApiDatabaseContracts.TokenTransferRepositoryFactory>(
-			ApiDatabaseIdentifiers.TokenTransferRepositoryFactory,
+	public get tokenActionRepository(): ApiDatabaseContracts.TokenActionRepository {
+		return this.app.get<ApiDatabaseContracts.TokenActionRepositoryFactory>(
+			ApiDatabaseIdentifiers.TokenActionRepositoryFactory,
 		)();
 	}
 
