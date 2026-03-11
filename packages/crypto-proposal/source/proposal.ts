@@ -84,7 +84,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 
 	public getPayload(): Contracts.Crypto.ProposedPayload {
 		if (this.#payload === undefined) {
-			throw new Error("Proposed data is not deserialized.");
+			throw new Error("Proposed payload is not deserialized.");
 		}
 
 		return this.#payload;
