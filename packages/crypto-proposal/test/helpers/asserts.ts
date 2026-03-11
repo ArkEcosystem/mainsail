@@ -28,7 +28,23 @@ export const assertProposal = (assert, data1, data2) => {
 };
 
 export const assertBlock = (assert, data1, data2) => {
-	const fields = ["fee", "gasUsed", "hash", "logsBloom", "number", "parentHash", "payloadSize", "proposer", "reward", "round", "stateRoot", "timestamp", "transactionsCount", "transactionsRoot", "version"];
+	const fields = [
+		"fee",
+		"gasUsed",
+		"hash",
+		"logsBloom",
+		"number",
+		"parentHash",
+		"payloadSize",
+		"proposer",
+		"reward",
+		"round",
+		"stateRoot",
+		"timestamp",
+		"transactionsCount",
+		"transactionsRoot",
+		"version",
+	];
 	for (const field of fields) {
 		assert.equal(data1[field].toString(), data2[field].toString());
 	}

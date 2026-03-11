@@ -9,7 +9,7 @@ import {
 	Proposal as ProposalWithoutValidRound,
 	ProposalWithValidRound,
 	ProposalWithLockProof,
-	ProposalWithLockProofAndValidRound
+	ProposalWithLockProofAndValidRound,
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Proposal } from "./proposal.js";
@@ -19,7 +19,6 @@ describe<{
 	app: Application;
 	proposal: Proposal;
 }>("Proposal", ({ it, beforeEach, assert, spy }) => {
-
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
@@ -36,7 +35,13 @@ describe<{
 
 		context.app.bind(Identifiers.State.Store).toConstantValue({});
 		context.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
-		context.proposal = context.app.resolve(Proposal).initialize({ ...ProposalWithoutValidRound.proposalData, dataSerialized: ProposalWithoutValidRound.payloadSerialized, serialized: Buffer.from(ProposalWithoutValidRound.proposalSerialized, "hex") });
+		context.proposal = context.app
+			.resolve(Proposal)
+			.initialize({
+				...ProposalWithoutValidRound.proposalData,
+				dataSerialized: ProposalWithoutValidRound.payloadSerialized,
+				serialized: Buffer.from(ProposalWithoutValidRound.proposalSerialized, "hex"),
+			});
 	});
 
 	it("#isDataDeserialized", async ({ proposal }) => {

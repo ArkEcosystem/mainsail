@@ -46,7 +46,9 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 
 		this.#verifySchema("proposal", proposalData);
 
-		const { blockHeader, lockProof } = await this.#getLockProofAndBlockHeader(Buffer.from(proposalData.data.serialized, "hex"));
+		const { blockHeader, lockProof } = await this.#getLockProofAndBlockHeader(
+			Buffer.from(proposalData.data.serialized, "hex"),
+		);
 
 		return this.app.resolve<Proposal>(Proposal).initialize({
 			...proposalData,
@@ -70,9 +72,7 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 		};
 	}
 
-	async #getLockProof(
-		buffer: ByteBuffer,
-	): Promise<Contracts.Crypto.AggregatedSignature | undefined> {
+	async #getLockProof(buffer: ByteBuffer): Promise<Contracts.Crypto.AggregatedSignature | undefined> {
 		const lockProofLength = buffer.readUint8();
 
 		let lockProof: Contracts.Crypto.AggregatedSignature | undefined;

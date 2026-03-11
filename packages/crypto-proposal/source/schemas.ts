@@ -31,5 +31,5 @@ export const schemas: Record<"lockProof" | "proposal", AnySchemaObject> = {
 		},
 		required: ["round", "data", "validatorIndex", "signature"],
 		type: "object",
-	}
+	},
 };
