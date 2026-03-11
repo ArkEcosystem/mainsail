@@ -19,7 +19,7 @@ export const schemas: Record<"lockProof" | "proposal", AnySchemaObject> = {
 		$id: "proposal",
 		additionalProperties: false,
 		properties: {
-			payloadSerialized: { type: "hex" },
+			payloadSerialized: { $ref: "hex" },
 			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
 			validRound: { minimum: 0, type: "integer" },
