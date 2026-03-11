@@ -3,6 +3,7 @@ import type { AnySchemaObject } from "ajv";
 export const schemas: Record<"lockProof" | "proposal", AnySchemaObject> = {
 	lockProof: {
 		$id: "lockProof",
+		additionalProperties: false,
 		properties: {
 			signature: { $ref: "consensusSignature" },
 			validators: {
