@@ -25,12 +25,10 @@ describe<{
 
 		const workerPool = {
 			getWorker: () => ({
-				// @ts-ignore
 				consensusSignature: (method, message, privateKey) =>
 					context.app
 						.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
 						[method](message, privateKey),
-				// @ts-ignore
 				transactionFactory: (method, message, privateKey) =>
 					context.app.get(Identifiers.Cryptography.Transaction.Factory)![method](message, privateKey),
 			}),
@@ -41,8 +39,12 @@ describe<{
 		context.proposal = context.app.resolve(Proposal).initialize({ ...ProposalWithoutValidRound.proposalData, dataSerialized: ProposalWithoutValidRound.payloadSerialized, serialized: Buffer.from(ProposalWithoutValidRound.proposalSerialized, "hex") });
 	});
 
-	it("#isDataDeserialized", ({ proposal }) => {
-		assert.equal(proposal.isDataDeserialized, false);
+	it("#isDataDeserialized", async ({ proposal }) => {
+		assert.false(proposal.isDataDeserialized);
+
+		await proposal.deserializeData();
+
+		assert.true(proposal.isDataDeserialized);
 	});
 
 	it("#blockHeader", ({ proposal }) => {
@@ -79,6 +81,7 @@ describe<{
 
 	it("#deserializeData - should be ok", async ({ proposal }) => {
 		await proposal.deserializeData();
+
 		assertBlock(assert, proposal.getPayload().block, blockHeader);
 		assert.undefined(proposal.getPayload().lockProof);
 		assert.equal(proposal.getPayload().block.transactions.length, 2);

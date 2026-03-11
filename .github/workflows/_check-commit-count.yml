@@ -1,10 +1,11 @@
 name: CI
 
-on: pull_request
+on:
+    workflow_call:
 
 permissions:
-    pull-requests: write
-    contents: read
+    pull-requests: read
+    issues: write
 
 jobs:
     check-commits:
@@ -16,6 +17,11 @@ jobs:
               with:
                   script: |
                       const pr = context.payload.pull_request;
+                      if (!pr) {
+                        core.setFailed("This reusable workflow must be called from a pull_request workflow.");
+                        return;
+                      }
+
                       const commits = await github.rest.pulls.listCommits({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
