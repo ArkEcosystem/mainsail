@@ -86,17 +86,7 @@ describe<{
 		}
 	});
 
-	it("#makeProposalFromData - should be ok", async ({ factory }) => {
-		for (const { proposalDataSerializable, proposalData } of proposals) {
-			const proposal = await factory.makeProposalFromData(proposalData);
-
-			assert.equal(proposal.toSerializableData(), proposalDataSerializable);
-			assert.equal(proposal.blockHeader, blockHeader);
-			assert.equal(proposal.toData(), proposalData);
-		}
-	});
-
-	it("#makeProposalFromData - should be ok", async ({ factory }) => {
+	it("#makePayloadFromBytes - should be ok", async ({ factory }) => {
 		for (const { payloadSerialized, payload } of proposals) {
 			const newPayload = await factory.makePayloadFromBytes(Buffer.from(payloadSerialized, "hex"));
 

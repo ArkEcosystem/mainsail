@@ -41,22 +41,12 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 		return this.makeProposalFromBytes(serialized);
 	}
 
-	public async makeProposalFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Proposal> {
-		const data = await this.deserializer.deserializeProposal(bytes);
-		return this.makeProposalFromData(data, bytes);
-	}
+	public async makeProposalFromBytes(serialized: Buffer): Promise<Contracts.Crypto.Proposal> {
+		const proposalData = await this.deserializer.deserializeProposal(serialized);
 
-	public async makeProposalFromData(
-		proposalData: Contracts.Crypto.ProposalData,
-		serialized?: Buffer,
-	): Promise<Contracts.Crypto.Proposal> {
 		this.#verifySchema("proposal", proposalData);
 
 		const { blockHeader, lockProof } = await this.#getLockProofAndBlockHeader(Buffer.from(proposalData.data.serialized, "hex"));
-
-		if (!serialized) {
-			serialized = await this.serializer.serializeProposal(proposalData);
-		}
 
 		return this.app.resolve<Proposal>(Proposal).initialize({
 			...proposalData,

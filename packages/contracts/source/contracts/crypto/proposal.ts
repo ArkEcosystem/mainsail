@@ -43,7 +43,6 @@ export interface Proposal extends Omit<ProposalData, "data"> {
 export interface ProposalFactory {
 	makeProposal(data: ProposalDataSerializableUnsigned, keyPair: KeyPair): Promise<Proposal>;
 	makeProposalFromBytes(data: Buffer): Promise<Proposal>;
-	makeProposalFromData(data: ProposalData): Promise<Proposal>;
 	makePayloadFromBytes(data: Buffer): Promise<ProposedPayload>;
 }
 
