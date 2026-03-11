@@ -66,15 +66,18 @@ describe<{
 	});
 
 	it("proposal - data should not allow additional fields", ({ validator }) => {
-		const proposalCopy = { ...Proposal.proposalDataSerializable, data: { ...Proposal.proposalDataSerializable.data, extraField: "extraValue" } };
+		const proposalCopy = {
+			...Proposal.proposalDataSerializable,
+			data: { ...Proposal.proposalDataSerializable.data, extraField: "extraValue" },
+		};
 		const result = validator.validate("proposal", proposalCopy);
 		assert.defined(result.error);
 		assert.true(result.error!.includes("additional properties"));
 	});
 
 	it("proposal - should not allow missing properties except [validRound]", ({ validator }) => {
-		const requiredKeys = Object.keys(schemas.proposal.properties).filter(key => key !== "validRound");
-		for(let key of requiredKeys) {
+		const requiredKeys = Object.keys(schemas.proposal.properties).filter((key) => key !== "validRound");
+		for (let key of requiredKeys) {
 			const proposalCopy = { ...Proposal.proposalDataSerializable, [key]: undefined };
 			const result = validator.validate("proposal", proposalCopy);
 			assert.defined(result.error);
@@ -91,7 +94,7 @@ describe<{
 
 	it("lockProof - all fields are required", ({ validator }) => {
 		const keys = Object.keys(schemas.lockProof.properties);
-		for(let key of keys) {
+		for (let key of keys) {
 			const lockProofCopy = { ...lockProof, [key]: undefined };
 			const result = validator.validate("lockProof", lockProofCopy);
 			assert.defined(result.error);
@@ -106,9 +109,8 @@ describe<{
 		assert.true(result.error!.includes("additional properties"));
 	});
 
-
 	it("lockProof - signature should be ok", ({ validator }) => {
-		for(let char of "0123456789abcdef") {
+		for (let char of "0123456789abcdef") {
 			const result = validator.validate("lockProof", {
 				signature: char.repeat(192),
 				validators: Array(53).fill(true),
@@ -116,8 +118,14 @@ describe<{
 			assert.undefined(result.error);
 		}
 
-		const invalidSignatures = ["0".repeat(191), "0".repeat(193), "g".repeat(192), "0".repeat(191) + "g", ...(["A", "B", "C", "D", "E", "F"].map(char => char.repeat(192)))];
-		for(let signature of invalidSignatures) {
+		const invalidSignatures = [
+			"0".repeat(191),
+			"0".repeat(193),
+			"g".repeat(192),
+			"0".repeat(191) + "g",
+			...["A", "B", "C", "D", "E", "F"].map((char) => char.repeat(192)),
+		];
+		for (let signature of invalidSignatures) {
 			const result = validator.validate("lockProof", {
 				signature,
 				validators: Array(53).fill(true),
@@ -130,9 +138,13 @@ describe<{
 	it("lockProof - validators should be ok", ({ validator }) => {
 		const NUMBER_OF_VALIDATORS = 53;
 
-		const validValidators = [Array(NUMBER_OF_VALIDATORS).fill(true), Array(NUMBER_OF_VALIDATORS).fill(false), [...Array(20).fill(true), ...Array(33).fill(false)]];
+		const validValidators = [
+			Array(NUMBER_OF_VALIDATORS).fill(true),
+			Array(NUMBER_OF_VALIDATORS).fill(false),
+			[...Array(20).fill(true), ...Array(33).fill(false)],
+		];
 
-		for(let validators of validValidators) {
+		for (let validators of validValidators) {
 			const result = validator.validate("lockProof", {
 				signature,
 				validators,
@@ -148,9 +160,9 @@ describe<{
 			Array(NUMBER_OF_VALIDATORS).fill(undefined),
 			Array(NUMBER_OF_VALIDATORS).fill("a"),
 			Array(NUMBER_OF_VALIDATORS).fill({}),
-			Array(NUMBER_OF_VALIDATORS).fill(null)
+			Array(NUMBER_OF_VALIDATORS).fill(null),
 		];
-		for(let validators of invalidValidators) {
+		for (let validators of invalidValidators) {
 			const result = validator.validate("lockProof", {
 				signature,
 				validators,
