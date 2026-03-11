@@ -42,7 +42,7 @@ describe<{
 	it("#isDataDeserialized", async ({ proposal }) => {
 		assert.false(proposal.isDataDeserialized);
 
-		await proposal.deserializeData();
+		await proposal.deserializePayload();
 
 		assert.true(proposal.isDataDeserialized);
 	});
@@ -80,7 +80,7 @@ describe<{
 	});
 
 	it("#deserializeData - should be ok", async ({ proposal }) => {
-		await proposal.deserializeData();
+		await proposal.deserializePayload();
 
 		assertBlock(assert, proposal.getPayload().block, blockHeader);
 		assert.undefined(proposal.getPayload().lockProof);
@@ -91,8 +91,8 @@ describe<{
 		const proposalFactory = app.get<Contracts.Crypto.ProposalFactory>(Identifiers.Cryptography.Proposal.Factory);
 		const spyMakePayloadFromBytes = spy(proposalFactory, "makePayloadFromBytes");
 
-		await proposal.deserializeData();
-		await proposal.deserializeData();
+		await proposal.deserializePayload();
+		await proposal.deserializePayload();
 		spyMakePayloadFromBytes.calledOnce();
 	});
 

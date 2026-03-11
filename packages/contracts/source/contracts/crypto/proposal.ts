@@ -32,7 +32,7 @@ export interface Proposal extends Omit<ProposalData, "data"> {
 
 	readonly serialized: Buffer;
 
-	deserializeData(): Promise<void>;
+	deserializePayload(): Promise<void>;
 	getPayload(): ProposedPayload;
 
 	toSerializableData(): ProposalDataSerializable;

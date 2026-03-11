@@ -153,7 +153,7 @@ export const makeCustomProposal = async (
 		validatorIndex: 0,
 	});
 
-	await proposal.deserializeData();
+	await proposal.deserializePayload();
 
 	return proposal;
 };

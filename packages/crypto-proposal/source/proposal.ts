@@ -74,7 +74,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		return this.#serialized;
 	}
 
-	public async deserializeData(): Promise<void> {
+	public async deserializePayload(): Promise<void> {
 		if (this.#payload !== undefined) {
 			return;
 		}
