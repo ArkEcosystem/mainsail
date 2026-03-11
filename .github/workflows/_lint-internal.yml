@@ -1,6 +1,10 @@
 name: Linting (Internal)
 
-on: pull_request
+on:
+    workflow_call:
+        secrets:
+            GH_TOKEN:
+                required: true
 
 permissions:
     contents: read
@@ -8,11 +12,7 @@ permissions:
 jobs:
     source:
         runs-on: ubuntu-latest
-        if: github.event.pull_request.head.repo.full_name == github.repository
-        
-        permissions:
-          contents: write
-        
+
         strategy:
             matrix:
                 node-version: [22.x]
@@ -20,7 +20,10 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with:
-                ref: ${{ github.head_ref }}
+                  ref: ${{ github.head_ref }}
+                  token: ${{ secrets.GH_TOKEN }}
+                  persist-credentials: true
+                  fetch-depth: 0
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v4
