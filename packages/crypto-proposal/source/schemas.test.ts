@@ -14,6 +14,7 @@ import {
 	ProposalWithValidRound,
 	ProposalWithLockProof,
 	ProposalWithLockProofAndValidRound,
+	lockProof,
 } from "../test/fixtures/index.js";
 import { schemas } from "./schemas";
 
@@ -28,6 +29,7 @@ describe<{
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
 
 		context.validator = context.app.resolve(Validator);
 
@@ -53,5 +55,13 @@ describe<{
 			const result = validator.validate("proposal", proposalData);
 			assert.undefined(result.error);
 		}
+	});
+
+	it("lockProof - should be ok", ({ validator }) => {
+		const result = validator.validate("lockProof", lockProof);
+
+		console.log(result.error);
+
+		assert.undefined(result.error);
 	});
 });

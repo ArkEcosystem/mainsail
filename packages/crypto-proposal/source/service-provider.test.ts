@@ -40,6 +40,5 @@ describe<{
 
 		assert.true(validator.hasSchema("proposal"));
 		assert.true(validator.hasSchema("lockProof"));
-		assert.true(validator.hasSchema("validatorBitmap"));
 	});
 });
