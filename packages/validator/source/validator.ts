@@ -94,7 +94,7 @@ export class Validator implements Contracts.Validator.Validator {
 		const serializedProposedData = await this.proposalSerializer.serializePayload({ block, lockProof });
 		return this.proposalFactory.makeProposal(
 			{
-				data: { serialized: serializedProposedData.toString("hex") },
+				payloadSerialized: serializedProposedData.toString("hex"),
 				round,
 				validRound,
 				validatorIndex,

@@ -46,14 +46,11 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 
 		this.#verifySchema("proposal", proposalData);
 
-		const { blockHeader, lockProof } = await this.#getLockProofAndBlockHeader(
-			Buffer.from(proposalData.data.serialized, "hex"),
-		);
+		const { blockHeader, lockProof } = await this.#getLockProofAndBlockHeader(Buffer.from(proposalData.payloadSerialized, "hex"));
 
 		return this.app.resolve<Proposal>(Proposal).initialize({
 			...proposalData,
 			blockHeader,
-			dataSerialized: proposalData.data.serialized,
 			lockProof,
 			serialized,
 		});

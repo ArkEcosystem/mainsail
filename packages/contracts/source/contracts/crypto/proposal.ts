@@ -5,7 +5,7 @@ import type { AggregatedSignature } from "./signatures.js";
 export interface ProposalDataSerializableUnsigned {
 	readonly round: number;
 	readonly validRound?: number;
-	readonly data: { serialized: string };
+	readonly payloadSerialized: string;
 	readonly validatorIndex: number;
 }
 
@@ -27,7 +27,7 @@ export interface ProposedPayload extends ProposedPayloadSerializable {
 	readonly serialized: string;
 }
 
-export interface Proposal extends Omit<ProposalData, "data"> {
+export interface Proposal extends ProposalData {
 	isDataDeserialized: boolean;
 
 	readonly serialized: Buffer;

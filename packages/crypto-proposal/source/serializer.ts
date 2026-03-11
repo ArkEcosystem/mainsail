@@ -61,7 +61,7 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 			4 + // round
 			(proposal.validRound === undefined ? 1 : 5) + // validRound
 			4 + // serialized data length
-			proposal.data.serialized.length / 2 + // serialized data
+			proposal.payloadSerialized.length / 2 + // serialized data
 			1 // validatorIndex
 		);
 	}

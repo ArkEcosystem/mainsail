@@ -19,20 +19,13 @@ export const schemas: Record<"lockProof" | "proposal", AnySchemaObject> = {
 		$id: "proposal",
 		additionalProperties: false,
 		properties: {
-			data: {
-				additionalProperties: false,
-				properties: {
-					serialized: { $ref: "hex" },
-				},
-				required: ["serialized"],
-				type: "object",
-			},
+			payloadSerialized: { type: "hex" },
 			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
 			validRound: { minimum: 0, type: "integer" },
 			validatorIndex: { isValidatorIndex: {} },
 		},
-		required: ["round", "data", "validatorIndex", "signature"],
+		required: ["round", "payloadSerialized", "validatorIndex", "signature"],
 		type: "object",
 	},
 };

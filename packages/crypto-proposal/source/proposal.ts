@@ -11,7 +11,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 	#lockProof?: Contracts.Crypto.AggregatedSignature;
 	#round!: number;
 	#validRound?: number;
-	#dataSerialized!: string;
+	#payloadSerialized!: string;
 	#payload?: Contracts.Crypto.ProposedPayload;
 	#validatorIndex!: number;
 	#signature!: string;
@@ -22,19 +22,18 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		validatorIndex,
 		blockHeader,
 		lockProof,
-		dataSerialized,
+		payloadSerialized,
 		validRound,
 		signature,
 		serialized,
-	}: Omit<Contracts.Crypto.ProposalData, "data"> & {
-		dataSerialized: string;
+	}: Contracts.Crypto.ProposalData & {
 		serialized: Buffer;
 	}): Proposal {
 		this.#blockHeader = blockHeader;
 		this.#lockProof = lockProof;
 		this.#round = round;
 		this.#validRound = validRound;
-		this.#dataSerialized = dataSerialized;
+		this.#payloadSerialized = payloadSerialized;
 		this.#validatorIndex = validatorIndex;
 		this.#signature = signature;
 		this.#serialized = serialized;
@@ -62,6 +61,10 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		return this.#validRound;
 	}
 
+	public get payloadSerialized(): string {
+		return this.#payloadSerialized;
+	}
+
 	public get validatorIndex(): number {
 		return this.#validatorIndex;
 	}
@@ -79,7 +82,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 			return;
 		}
 
-		this.#payload = await this.proposalFactory.makePayloadFromBytes(Buffer.from(this.#dataSerialized, "hex"));
+		this.#payload = await this.proposalFactory.makePayloadFromBytes(Buffer.from(this.#payloadSerialized, "hex"));
 	}
 
 	public getPayload(): Contracts.Crypto.ProposedPayload {
@@ -101,7 +104,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 
 	public toSerializableData(): Contracts.Crypto.ProposalDataSerializable {
 		return {
-			data: { serialized: this.#dataSerialized },
+			payloadSerialized: this.#payloadSerialized,
 			round: this.#round,
 			signature: this.#signature,
 			validRound: this.#validRound,
@@ -112,8 +115,8 @@ export class Proposal implements Contracts.Crypto.Proposal {
 	public toData(): Contracts.Crypto.ProposalData {
 		return {
 			blockHeader: this.#blockHeader,
-			data: { serialized: this.#dataSerialized },
 			lockProof: this.#lockProof,
+			payloadSerialized: this.#payloadSerialized,
 			round: this.#round,
 			signature: this.#signature,
 			validRound: this.#validRound,
