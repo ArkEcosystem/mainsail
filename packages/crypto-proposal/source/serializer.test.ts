@@ -77,7 +77,8 @@ describe<{
 	});
 
 	it("#serializeLockProof - should correctly serialize", async ({ serializer }) => {
-		const serialized = (await serializer.serializeLockProof(lockProof)).toString("hex");
-		assert.equal(serialized, serializedLockProof);
+		const serialized = await serializer.serializeLockProof(lockProof);
+
+		assert.equal(serialized.toString("hex"), serializedLockProof);
 	});
 });

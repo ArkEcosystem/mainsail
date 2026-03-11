@@ -17,6 +17,7 @@ import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Deserializer } from "./deserializer";
 import { Serializer } from "./serializer";
 import { Factory } from "./factory.js";
+import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 
 describe<{
 	app: Application;
@@ -28,6 +29,9 @@ describe<{
 
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
+
+		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
 
 		const wallet = {};
 		const validatorSet = {

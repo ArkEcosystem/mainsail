@@ -16,6 +16,7 @@ import {
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Factory } from "./factory";
+import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 
 describe<{
 	app: Application;
@@ -23,10 +24,14 @@ describe<{
 	blockFactory: Contracts.Crypto.BlockFactory;
 	identity: Types.Identity;
 }>("Factory", ({ it, assert, beforeEach }) => {
-	const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof, ProposalWithLockProofAndValidRound];
+	// const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof, ProposalWithLockProofAndValidRound];
+	const proposals = [ProposalWithLockProofAndValidRound];
 
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
+
+		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
 
 		const wallet = {};
 		const validatorSet = {

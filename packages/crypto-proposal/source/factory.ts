@@ -80,7 +80,7 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 			const lockProofBuffer = buffer.readBytes(lockProofLength);
 			lockProof = await this.deserializer.deserializeLockProof(lockProofBuffer);
 
-			// TODO: Verify schema
+			this.#verifySchema("lockProof", lockProof);
 		}
 
 		return lockProof;
