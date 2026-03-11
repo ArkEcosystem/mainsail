@@ -52,11 +52,37 @@ describe<{
 	});
 
 	it("proposal - should be ok", ({ validator }) => {
-		for (const { proposalData } of proposals) {
-			const result = validator.validate("proposal", proposalData);
+		for (const { proposalDataSerializable } of proposals) {
+			const result = validator.validate("proposal", proposalDataSerializable);
 			assert.undefined(result.error);
 		}
 	});
+
+	it("proposal - should not allow additional fields", ({ validator }) => {
+		const proposalCopy = { ...Proposal.proposalDataSerializable, extraField: "extraValue" };
+		const result = validator.validate("proposal", proposalCopy);
+		assert.defined(result.error);
+		assert.true(result.error!.includes("additional properties"));
+	});
+
+	it("proposal - data should not allow additional fields", ({ validator }) => {
+		const proposalCopy = { ...Proposal.proposalDataSerializable, data: { ...Proposal.proposalDataSerializable.data, extraField: "extraValue" } };
+		const result = validator.validate("proposal", proposalCopy);
+		assert.defined(result.error);
+		assert.true(result.error!.includes("additional properties"));
+	});
+
+	it("proposal - should not allow missing properties except [validRound]", ({ validator }) => {
+		const requiredKeys = Object.keys(schemas.proposal.properties).filter(key => key !== "validRound");
+		for(let key of requiredKeys) {
+			const proposalCopy = { ...Proposal.proposalDataSerializable, [key]: undefined };
+			const result = validator.validate("proposal", proposalCopy);
+			assert.defined(result.error);
+			assert.true(result.error?.includes(key));
+		}
+	});
+
+	// TODO: Check same for data
 
 	it("lockProof - should be ok", ({ validator }) => {
 		const result = validator.validate("lockProof", lockProof);

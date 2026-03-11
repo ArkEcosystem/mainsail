@@ -17,8 +17,10 @@ export const schemas: Record<"lockProof" | "proposal", AnySchemaObject> = {
 	},
 	proposal: {
 		$id: "proposal",
+		additionalProperties: false,
 		properties: {
 			data: {
+				additionalProperties: false,
 				properties: {
 					serialized: { $ref: "hex" },
 				},
