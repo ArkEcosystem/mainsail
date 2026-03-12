@@ -13,20 +13,20 @@ const workflow = {
 			"runs-on": "ubuntu-latest",
 			steps: [
 				{
-					uses: "actions/checkout@v4",
+					uses: "actions/checkout@v6.0.2",
 					with: {
 						ref: "${{ github.head_ref }}",
 					},
 				},
 				{
-					uses: "actions/setup-node@v4",
+					uses: "actions/setup-node@v6.3.0",
 					with: {
 						"node-version": "${{ matrix.node-version }}",
 					},
 				},
 				{
 					name: "Setup pnpm",
-					uses: "pnpm/action-setup@v4",
+					uses: "pnpm/action-setup@v4.3.0",
 					with: {
 						run_install: false,
 						version: "latest",
@@ -41,7 +41,7 @@ const workflow = {
 				},
 				{
 					name: "Cache pnpm modules",
-					uses: "actions/cache@v4",
+					uses: "actions/cache@v5.0.3",
 					with: {
 						key: "${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}",
 						path: "${{ steps.pnpm-cache.outputs.STORE_PATH }}",
@@ -50,7 +50,7 @@ const workflow = {
 				},
 				{
 					name: "Cache lerna",
-					uses: "actions/cache@v4",
+					uses: "actions/cache@v5.0.3",
 					with: {
 						key: "${{ runner.os }}-lerna",
 						path: "./.cache",

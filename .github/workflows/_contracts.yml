@@ -22,7 +22,7 @@ jobs:
             run:
                 working-directory: contracts
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6.0.2
 
             - name: Install Foundry
               uses: foundry-rs/foundry-toolchain@v1

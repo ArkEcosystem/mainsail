@@ -13,7 +13,7 @@ jobs:
         steps:
             - name: Check number of commits in PR
               id: commits
-              uses: actions/github-script@v6
+              uses: actions/github-script@v8
               with:
                   script: |
                       const pr = context.payload.pull_request;
@@ -32,7 +32,7 @@ jobs:
 
             - name: Comment for internal PRs
               if: steps.commits.outputs.count < 2 && steps.commits.outputs.from_fork == 'false'
-              uses: actions/github-script@v6
+              uses: actions/github-script@v8
               with:
                   script: |
                       github.rest.issues.createComment({
