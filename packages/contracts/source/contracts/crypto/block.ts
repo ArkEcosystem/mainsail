@@ -76,6 +76,7 @@ export interface BlockFactory {
 	fromBytes(buff: Buffer): Promise<Block>;
 	fromJson(json: BlockJson): Promise<Block>;
 	fromStorage(header: BlockHeaderStorageData, transactions: TransactionStorageData[]): Promise<Block>;
+	headerFromBytes(buff: Buffer): Promise<BlockHeader>;
 	headerFromStorage(header: BlockHeaderStorageData): Promise<BlockHeader>;
 }
 

@@ -29,7 +29,8 @@ describe<{
 	factory: BlockFactory;
 	txFactory: Contracts.Crypto.TransactionFactory;
 	serializer: Serializer;
-}>("Factory", ({ it, assert, beforeEach }) => {
+	validator: Contracts.Crypto.Validator;
+}>("Factory", ({ it, assert, beforeEach, spy }) => {
 	const blockDataOriginal = clone(blockData);
 	const blockDataWithTransactionsOriginal = clone(blockDataWithTransactions);
 	let blockDataClone: Utils.Mutable<Contracts.Crypto.BlockData>;
@@ -45,6 +46,7 @@ describe<{
 			context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
 		}
 
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 		context.factory = context.app.resolve(BlockFactory);
 		context.serializer = context.app.resolve(Serializer);
 		context.txFactory = context.app.get<Contracts.Crypto.TransactionFactory>(
@@ -165,6 +167,25 @@ describe<{
 			blockHeaderFromStorageWithTransactions.transactions[1].blockHash,
 			blockDataWithTransactionsClone.hash,
 		);
+	});
+
+	it("#headerFromBytes - should create a block header from bytes", async ({ factory, validator }) => {
+		const spyValidate = spy(validator, "validate");
+
+		const blockHeader = await factory.headerFromBytes(Buffer.from(serialized, "hex"));
+
+		assertBlockData(assert, blockHeader, blockData);
+		assert.undefined(blockHeader.serialized);
+		assert.undefined(blockHeader.transactions);
+
+		const blockHeaderWithTransactions = await factory.headerFromBytes(Buffer.from(serializedWithTransactions, "hex"));
+
+		assertBlockData(assert, blockHeaderWithTransactions, blockDataWithTransactions);
+		assert.undefined(blockHeaderWithTransactions.serialized);
+		assert.undefined(blockHeaderWithTransactions.transactions);
+
+		spyValidate.calledTimes(2);
+		spyValidate.calledWith("blockHeader");
 	});
 
 	it("#headerFromStorage - should create a block header from storage", async ({ factory }) => {
