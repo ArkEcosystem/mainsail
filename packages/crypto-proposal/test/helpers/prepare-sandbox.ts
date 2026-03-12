@@ -23,7 +23,7 @@ import { Factory } from "../../source/factory.js";
 import { schemas } from "../../source/schemas.js";
 import { Serializer } from "../../source/serializer.js";
 
-export const prepareSandbox = async (context: { app?: Application }): Promise<void> => {
+export const prepareSandbox = async (context: { app?: Application }): Promise<{ app: Application }> => {
 	context.app = new Application();
 
 	context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
@@ -68,4 +68,6 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	for (const schema of Object.values(schemas)) {
 		context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
 	}
+
+	return context;
 };

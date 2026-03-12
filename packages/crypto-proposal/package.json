@@ -19,6 +19,7 @@
 		"test:coverage:file": "c8 -r=text -r=lcov --all pnpm run test:file",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
 		"test:file": "pnpm run uvu source",
+		"test:fixtures": "tsx --tsconfig ../../tsconfig.test.json ./test/helpers/generate-fixtures.ts",
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
