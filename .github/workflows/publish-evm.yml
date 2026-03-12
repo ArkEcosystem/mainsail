@@ -45,15 +45,15 @@ jobs:
         runs-on: ${{ matrix.settings.host }}
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6.0.2
 
             - name: Setup node
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6.3.0
               with:
                   node-version: "22.x"
 
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v4.3.0
               with:
                   run_install: false
                   version: latest
@@ -63,7 +63,7 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache@v4
+              uses: actions/cache@v5.0.3
               with:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -94,16 +94,16 @@ jobs:
         needs:
             - build
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6.0.2
 
             - name: Setup node
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6.3.0
               with:
                   node-version: "22.x"
                   registry-url: https://registry.npmjs.org/
 
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v4.3.0
               with:
                   run_install: false
                   version: latest
@@ -113,7 +113,7 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache@v4
+              uses: actions/cache@v5.0.3
               with:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}

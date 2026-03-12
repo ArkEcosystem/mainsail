@@ -10,7 +10,29 @@ permissions:
     contents: read
 
 jobs:
+    circuit-breaker:
+        runs-on: ubuntu-latest
+        outputs:
+            is_lint_fix: ${{ steps.detect.outputs.is_lint_fix }}
+        steps:
+            - uses: actions/checkout@v6.0.2
+              with:
+                  ref: ${{ github.event.pull_request.head.sha }}
+                  fetch-depth: 1
+
+            - id: detect
+              shell: bash
+              run: |
+                  msg="$(git log -1 --pretty=%B)"
+                  if grep -Fq '[ci-lint-fix]' <<<"$msg"; then
+                    echo "is_lint_fix=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "is_lint_fix=false" >> "$GITHUB_OUTPUT"
+                  fi
+
     source:
+        needs: circuit-breaker
+        if: ${{ needs.circuit-breaker.outputs.is_lint_fix != 'true' }}
         runs-on: ubuntu-latest
 
         strategy:
@@ -18,20 +40,20 @@ jobs:
                 node-version: [22.x]
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6.0.2
               with:
                   ref: ${{ github.head_ref }}
                   token: ${{ secrets.GH_TOKEN }}
                   persist-credentials: true
-                  fetch-depth: 0
+                  fetch-depth: 1
 
             - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6.3.0
               with:
                   node-version: ${{ matrix.node-version }}
 
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v4.3.0
               with:
                   version: latest
                   run_install: false
@@ -42,7 +64,7 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
             - name: Cache pnpm modules
-              uses: actions/cache@v4
+              uses: actions/cache@v5.0.3
               with:
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -70,6 +92,6 @@ jobs:
               run: |
                   forge fmt
 
-            - uses: stefanzweifel/git-auto-commit-action@v5
+            - uses: stefanzweifel/git-auto-commit-action@v7.1.0
               with:
-                  commit_message: "style: resolve style guide violations"
+                  commit_message: "style: resolve style guide violations [ci-lint-fix]"
