@@ -24,13 +24,11 @@ describe<{
 	blockFactory: Contracts.Crypto.BlockFactory;
 	identity: Types.Identity;
 }>("Factory", ({ it, assert, beforeEach }) => {
-	// const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof, ProposalWithLockProofAndValidRound];
-	const proposals = [ProposalWithLockProofAndValidRound];
+	const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof, ProposalWithLockProofAndValidRound];
 
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
 
 		const wallet = {};

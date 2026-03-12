@@ -98,6 +98,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 			block: this.#blockHeader.hash,
 			blockNumber: this.#blockHeader.number,
 			round: this.#round,
+			validRound: this.#validRound,
 			validatorIndex: this.#validatorIndex,
 		});
 	}

@@ -5,11 +5,9 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import {
 	blockHeader,
-	blockSerialized,
 	Proposal as ProposalWithoutValidRound,
-	ProposalWithValidRound,
-	ProposalWithLockProof,
 	ProposalWithLockProofAndValidRound,
+	lockProof,
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Proposal } from "./proposal.js";
@@ -18,9 +16,12 @@ import { assertBlock } from "../test/helpers/asserts";
 describe<{
 	app: Application;
 	proposal: Proposal;
+	proposalFull: Proposal;
 }>("Proposal", ({ it, beforeEach, assert, spy }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
+
+		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
 
 		const workerPool = {
 			getWorker: () => ({
@@ -37,8 +38,11 @@ describe<{
 		context.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 		context.proposal = context.app.resolve(Proposal).initialize({
 			...ProposalWithoutValidRound.proposalData,
-			dataSerialized: ProposalWithoutValidRound.payloadSerialized,
 			serialized: Buffer.from(ProposalWithoutValidRound.proposalSerialized, "hex"),
+		});
+		context.proposalFull = context.app.resolve(Proposal).initialize({
+			...ProposalWithLockProofAndValidRound.proposalData,
+			serialized: Buffer.from(ProposalWithLockProofAndValidRound.proposalSerialized, "hex"),
 		});
 	});
 
@@ -50,44 +54,62 @@ describe<{
 		assert.true(proposal.isDataDeserialized);
 	});
 
-	it("#blockHeader", ({ proposal }) => {
+	it("#blockHeader", ({ proposal, proposalFull }) => {
 		assert.equal(proposal.blockHeader, blockHeader);
+		assert.equal(proposalFull.blockHeader, blockHeader);
 	});
 
-	it("#lockProof - should be undefined", ({ proposal }) => {
+	it("#lockProof - should be ok", ({ proposal, proposalFull }) => {
 		assert.undefined(proposal.lockProof);
+		assert.equal(proposalFull.lockProof, lockProof);
 	});
 
-	it("#round", ({ proposal }) => {
+	it("#round", ({ proposal, proposalFull}) => {
 		assert.equal(proposal.round, 1);
+		assert.equal(proposalFull.round, 1);
 	});
 
-	it("#validRound", ({ proposal }) => {
+	it("#validRound", ({ proposal, proposalFull }) => {
 		assert.undefined(proposal.validRound);
+		assert.equal(proposalFull.validRound, 0);
 	});
 
-	it("#validatorIndex", ({ proposal }) => {
+	it("#payloadSerialized", ({ proposal, proposalFull }) => {
+		assert.equal(proposal.payloadSerialized, ProposalWithoutValidRound.payloadSerialized);
+		assert.equal(proposalFull.payloadSerialized, ProposalWithLockProofAndValidRound.payloadSerialized);
+	});
+
+	it("#validatorIndex", ({ proposal, proposalFull }) => {
 		assert.equal(proposal.validatorIndex, 0);
+		assert.equal(proposalFull.validatorIndex, 0);
 	});
 
-	it("#signature", ({ proposal }) => {
-		assert.equal(proposal.signature, ProposalWithoutValidRound.proposalData.signature);
+	it("#signature", ({ proposal, proposalFull }) => {
+		assert.equal(proposal.signature, ProposalWithoutValidRound.signature);
+		assert.equal(proposalFull.signature, ProposalWithLockProofAndValidRound.signature);
 	});
 
-	it("#serialized", ({ proposal }) => {
+	it("#serialized", ({ proposal, proposalFull }) => {
 		assert.equal(proposal.serialized.toString("hex"), ProposalWithoutValidRound.proposalSerialized);
+		assert.equal(proposalFull.serialized.toString("hex"), ProposalWithLockProofAndValidRound.proposalSerialized);
 	});
 
 	it("#getData - should throw error if not deserialized", async ({ proposal }) => {
 		assert.throws(() => proposal.getPayload(), "Proposed payload is not deserialized.");
 	});
 
-	it("#deserializeData - should be ok", async ({ proposal }) => {
+	it("#deserializeData - should be ok", async ({ proposal, proposalFull }) => {
 		await proposal.deserializePayload();
 
 		assertBlock(assert, proposal.getPayload().block, blockHeader);
 		assert.undefined(proposal.getPayload().lockProof);
 		assert.equal(proposal.getPayload().block.transactions.length, 2);
+
+
+		await proposalFull.deserializePayload();
+		assertBlock(assert, proposalFull.getPayload().block, blockHeader);
+		assert.equal(proposalFull.getPayload().lockProof, lockProof);
+		assert.equal(proposalFull.getPayload().block.transactions.length, 2);
 	});
 
 	it("#deserializeData - should deserialize only once", async ({ proposal, app }) => {
@@ -99,18 +121,25 @@ describe<{
 		spyMakePayloadFromBytes.calledOnce();
 	});
 
-	it("#toString - should be ok", ({ proposal }) => {
+	it("#toString - should be ok", ({ proposal, proposalFull }) => {
 		assert.equal(
 			proposal.toString(),
 			`{"block":"a82964de6a37876e9e955cb5f97f6c25b9f52871cdb66c4dae9b33f0c832df65","blockNumber":2,"round":1,"validatorIndex":0}`,
 		);
+
+		assert.equal(
+			proposalFull.toString(),
+			`{"block":"a82964de6a37876e9e955cb5f97f6c25b9f52871cdb66c4dae9b33f0c832df65","blockNumber":2,"round":1,"validRound":0,"validatorIndex":0}`,
+		);
 	});
 
-	it("#toSerializableData", ({ proposal }) => {
+	it("#toSerializableData", ({ proposal, proposalFull }) => {
 		assert.equal(proposal.toSerializableData(), ProposalWithoutValidRound.proposalDataSerializable);
+		assert.equal(proposalFull.toSerializableData(), ProposalWithLockProofAndValidRound.proposalDataSerializable);
 	});
 
-	it("#toData", ({ proposal }) => {
+	it("#toData", ({ proposal, proposalFull }) => {
 		assert.equal(proposal.toData(), ProposalWithoutValidRound.proposalData);
+		assert.equal(proposalFull.toData(), ProposalWithLockProofAndValidRound.proposalData);
 	});
 });
