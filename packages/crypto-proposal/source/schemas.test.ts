@@ -85,7 +85,97 @@ describe<{
 		}
 	});
 
-	// TODO: Check same for data
+	it("proposal - round should be ok", ({ validator }) => {
+		const validRounds = [0, 1, 10, 100, 1000];
+		for (let round of validRounds) {
+			const proposalCopy = { ...Proposal.proposalDataSerializable, round };
+			const result = validator.validate("proposal", proposalCopy);
+			assert.undefined(result.error);
+		}
+
+		const invalidRounds = [-1, -10, 1.5, "1", null, undefined];
+		for (let round of invalidRounds) {
+			const proposalCopy = { ...Proposal.proposalDataSerializable, round };
+			const result = validator.validate("proposal", proposalCopy);
+			assert.defined(result.error);
+			assert.true(result.error!.includes("round"));
+		}
+	});
+
+	it("proposal - validRound should be ok", ({ validator }) => {
+		const valid = [0, 1, 10, 100, 1000, undefined];
+		for (let validRound of valid) {
+			const proposalCopy = { ...Proposal.proposalDataSerializable, validRound };
+			const result = validator.validate("proposal", proposalCopy);
+			assert.undefined(result.error);
+		}
+
+		const invalid = [-1, -10, 1.5, "1", null, {}, []];
+		for (let validRound of invalid) {
+			const proposalCopy = { ...Proposal.proposalDataSerializable, validRound };
+			const result = validator.validate("proposal", proposalCopy);
+			assert.defined(result.error);
+			assert.true(result.error!.includes("validRound"));
+		}
+	});
+
+	it("proposal - validatorIndex should be ok", ({ validator }) => {
+		const valid = [0, 1, 10 , 52];
+		for (let validatorIndex of valid) {
+			const proposalCopy = { ...Proposal.proposalDataSerializable, validatorIndex };
+			const result = validator.validate("proposal", proposalCopy);
+			assert.undefined(result.error);
+		}
+
+		const invalid = [-1, -10, 1.5, "1", null, {}, [], 53];
+		for (let validatorIndex of invalid) {
+			const proposalCopy = { ...Proposal.proposalDataSerializable, validatorIndex };
+			const result = validator.validate("proposal", proposalCopy);
+			assert.defined(result.error);
+			assert.true(result.error!.includes("validatorIndex"));
+		}
+	});
+
+
+	it("proposal - payloadSerialized should be ok", ({ validator }) => {
+		const valid = ["0", "00", "0123456789abcdef"];
+		for (let payloadSerialized of valid) {
+			const proposalCopy = { ...Proposal.proposalDataSerializable, payloadSerialized };
+			const result = validator.validate("proposal", proposalCopy);
+			assert.undefined(result.error);
+		}
+
+		const invalidPayloads = ["", "A", {}, [], null, undefined];
+		for (let payloadSerialized of invalidPayloads) {
+			const proposalCopy = { ...Proposal.proposalDataSerializable, payloadSerialized };
+			const result = validator.validate("proposal", proposalCopy);
+			assert.defined(result.error);
+			assert.true(result.error!.includes("payloadSerialized"));
+		}
+	});
+
+	it("proposal - signature should be ok", ({ validator }) => {
+		for (let char of "0123456789abcdef") {
+			const proposalCopy = { ...Proposal.proposalDataSerializable, signature: char.repeat(192) };
+			const result = validator.validate("proposal", proposalCopy);
+			assert.undefined(result.error);
+		}
+
+		const invalidSignatures = [
+			"0".repeat(191),
+			"0".repeat(193),
+			"g".repeat(192),
+			"0".repeat(191) + "g",
+			...["A", "B", "C", "D", "E", "F"].map((char) => char.repeat(192)),
+		];
+		for (let signature of invalidSignatures) {
+			const proposalCopy = { ...Proposal.proposalDataSerializable, signature };
+			const result = validator.validate("proposal", proposalCopy);
+			assert.defined(result.error);
+			assert.true(result.error!.includes("signature"));
+		}
+	});
+
 
 	it("lockProof - should be ok", ({ validator }) => {
 		const result = validator.validate("lockProof", lockProof);
