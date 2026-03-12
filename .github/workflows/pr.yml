@@ -5,7 +5,7 @@ on:
         types: [opened, synchronize, reopened, ready_for_review]
 
 concurrency:
-    group: pr-${{ github.event.pull_request.number }}
+    group: ${{ github.workflow }}-pr-${{ github.event.pull_request.number }}
     cancel-in-progress: true
 
 permissions:
@@ -51,7 +51,7 @@ jobs:
             - contracts
             - lint-internal
             - lint-external
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         outputs:
             run_tests: ${{ steps.decide.outputs.run_tests }}
 
@@ -100,7 +100,7 @@ jobs:
 
     test:
         needs: [prechecks-gate]
-        if: ${{ always() && needs['prechecks-gate'].outputs.run_tests == 'true' }}
+        if: ${{ !cancelled() && needs['prechecks-gate'].outputs.run_tests == 'true' }}
         uses: ./.github/workflows/_test.yml
         secrets:
             CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
