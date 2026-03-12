@@ -6,7 +6,7 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { Factories } from "../../test-factories/source/index.js";
 import { Types } from "../../test-factories/source/factories";
-import { MessageSchemaError } from "@mainsail/exceptions";
+import { MessageSchemaError, InvalidBlockBytesError, InvalidProposalBytesError } from "@mainsail/exceptions";
 
 import {
 	blockHeader,
@@ -94,12 +94,46 @@ describe<{
 		}
 	});
 
+	it("#makeProposalFromBytes - should throw with trailing bytes", async ({ factory }) => {
+		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
+			await assert.rejects(
+				() => factory.makeProposalFromBytes(Buffer.from(Proposal.proposalSerialized + hex, "hex")),
+				InvalidProposalBytesError,
+			);
+		}
+	});
+
+	it("#makeProposalFromBytes - should throw with leading bytes", async ({ factory }) => {
+		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
+			await assert.rejects(
+				() => factory.makeProposalFromBytes(Buffer.from(hex + Proposal.proposalSerialized, "hex")),
+			);
+		}
+	});
+
 	it("#makePayloadFromBytes - should be ok", async ({ factory }) => {
 		for (const { payloadSerialized, payload } of proposals) {
 			const newPayload = await factory.makePayloadFromBytes(Buffer.from(payloadSerialized, "hex"));
 
 			assert.equal(newPayload.block.serialized, payload.block.serialized);
 			assert.equal(newPayload.lockProof, payload.lockProof);
+		}
+	});
+
+	it("#makePayloadFromBytes - should throw with trailing bytes", async ({ factory }) => {
+		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
+			await assert.rejects(
+				() => factory.makePayloadFromBytes(Buffer.from(Proposal.payloadSerialized + hex, "hex")),
+				InvalidBlockBytesError,
+			);
+		}
+	});
+
+	it("#makePayloadFromBytes - should throw with leading bytes", async ({ factory }) => {
+		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
+			await assert.rejects(
+				() => factory.makePayloadFromBytes(Buffer.from(hex + Proposal.payloadSerialized, "hex"))
+			);
 		}
 	});
 });

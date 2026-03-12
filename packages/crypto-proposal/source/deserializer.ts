@@ -1,6 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+import { InvalidProposalBytesError } from "@mainsail/exceptions";
 import { ByteBuffer } from "@mainsail/utils";
 
 import { lockProofSchema, schema } from "./serializer-schemas.js";
@@ -21,6 +22,10 @@ export class Deserializer implements Contracts.Crypto.ProposalDeserializer {
 		await this.serializer.deserialize<Contracts.Crypto.ProposalData>(buffer, proposal, {
 			schema,
 		});
+
+		if (buffer.getRemainderLength() !== 0) {
+			throw new InvalidProposalBytesError(`Found trailing bytes of length ${buffer.getRemainderLength()}`);
+		}
 
 		return proposal;
 	}

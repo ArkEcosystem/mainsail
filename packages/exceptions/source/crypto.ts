@@ -414,3 +414,10 @@ export class MultiPaymentAmountMismatchError extends Exception {
 		super(`Payment amounts mismatch.`);
 	}
 }
+
+
+export class InvalidProposalBytesError extends Exception {
+	public constructor(message: string) {
+		super(`Failed to deserialize proposal, encountered invalid bytes: ${message}`);
+	}
+}
