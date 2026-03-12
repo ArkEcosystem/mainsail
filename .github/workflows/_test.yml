@@ -260,6 +260,9 @@ jobs:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-integration
         runs-on: ubuntu-latest
+
+        timeout-minutes: 15
+
         services:
             postgres:
                 image: postgres:18-alpine
@@ -610,6 +613,8 @@ jobs:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-functional-${{matrix.name}}
         runs-on: ubuntu-latest
+
+        timeout-minutes: 15
 
         strategy:
             matrix:
