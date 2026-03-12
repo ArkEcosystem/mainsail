@@ -9,11 +9,11 @@ export const schemaUnsigned: Record<string, Contracts.Serializer.SerializationSc
 		optional: true,
 		type: "uint32",
 	},
-	payloadSerialized: {
-		type: "hex",
-	},
 	validatorIndex: {
 		type: "uint8",
+	},
+	payloadSerialized: {
+		type: "hex",
 	},
 };
 
