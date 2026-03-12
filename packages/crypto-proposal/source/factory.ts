@@ -20,9 +20,6 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
-	@inject(Identifiers.Cryptography.Block.Deserializer)
-	private readonly blockDeserializer!: Contracts.Crypto.BlockDeserializer;
-
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.Validator;
 
@@ -87,19 +84,13 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 		return lockProof;
 	}
 
-	async #getBlockHeader(buffer: ByteBuffer): Promise<Contracts.Crypto.BlockHeader> {
-		// TODO: Verify schema or use factory
-
-		return this.blockDeserializer.deserializeHeader(buffer.getRemainder());
-	}
-
 	async #getLockProofAndBlockHeader(
 		bytes: Buffer,
 	): Promise<{ blockHeader: Contracts.Crypto.BlockHeader; lockProof?: Contracts.Crypto.AggregatedSignature }> {
 		const buffer = ByteBuffer.fromBuffer(bytes);
 
 		const lockProof = await this.#getLockProof(buffer);
-		const blockHeader = await this.#getBlockHeader(buffer);
+		const blockHeader = await this.blockFactory.headerFromBytes(buffer.getRemainder());
 
 		return {
 			blockHeader,
