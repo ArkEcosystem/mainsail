@@ -35,6 +35,8 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 	): Promise<Contracts.Crypto.Proposal> {
 		const worker = await this.workerPool.getWorker();
 
+		this.#verifySchema("proposalUnsigned", data);
+
 		const bytes = await this.serializer.serializeProposalUnsigned(data);
 		const signature = await worker.consensusSignature("sign", bytes, Buffer.from(keyPair.privateKey, "hex"));
 		const serialized = Buffer.concat([bytes, Buffer.from(signature, "hex")]);

@@ -1,6 +1,19 @@
 import type { AnySchemaObject } from "ajv";
 
-export const schemas: Record<"lockProof" | "proposal", AnySchemaObject> = {
+const proposalUnsigned = {
+	$id: "proposalUnsigned",
+	additionalProperties: false,
+	properties: {
+		payloadSerialized: { $ref: "hex" },
+		round: { minimum: 0, type: "integer" },
+		validRound: { minimum: 0, type: "integer" },
+		validatorIndex: { isValidatorIndex: {} },
+	},
+	required: ["round", "payloadSerialized", "validatorIndex"],
+	type: "object",
+}
+
+export const schemas: Record<"lockProof" | "proposal" | "proposalUnsigned", AnySchemaObject> = {
 	lockProof: {
 		$id: "lockProof",
 		additionalProperties: false,
@@ -19,13 +32,11 @@ export const schemas: Record<"lockProof" | "proposal", AnySchemaObject> = {
 		$id: "proposal",
 		additionalProperties: false,
 		properties: {
-			payloadSerialized: { $ref: "hex" },
-			round: { minimum: 0, type: "integer" },
+			...proposalUnsigned.properties,
 			signature: { $ref: "consensusSignature" },
-			validRound: { minimum: 0, type: "integer" },
-			validatorIndex: { isValidatorIndex: {} },
 		},
-		required: ["round", "payloadSerialized", "validatorIndex", "signature"],
+		required: [...proposalUnsigned.required, "signature"],
 		type: "object",
 	},
+	proposalUnsigned,
 };

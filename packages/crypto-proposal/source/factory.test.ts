@@ -6,6 +6,8 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { Factories } from "../../test-factories/source/index.js";
 import { Types } from "../../test-factories/source/factories";
+import { MessageSchemaError } from "@mainsail/exceptions";
+
 import {
 	blockHeader,
 	Proposal,
@@ -16,7 +18,6 @@ import {
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Factory } from "./factory";
-import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 
 describe<{
 	app: Application;
@@ -77,6 +78,10 @@ describe<{
 			assert.equal(proposal.blockHeader, blockHeader);
 			assert.equal(proposal.toData(), proposalData);
 		}
+	});
+
+	it("#makeProposal - should fail if schema error", async ({ factory, identity }) => {
+		await assert.rejects(() => factory.makeProposal({...Proposal.proposalDataSerializableUnsigned, round: -1}, identity.keys), MessageSchemaError);
 	});
 
 	it("#makeProposalFromBytes - should be ok", async ({ factory }) => {

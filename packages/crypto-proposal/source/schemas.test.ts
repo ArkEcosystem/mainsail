@@ -51,6 +51,21 @@ describe<{
 		}
 	});
 
+	it("proposalUnsigned - should be ok", ({ validator }) => {
+		for (const { proposalDataSerializableUnsigned } of proposals) {
+			const result = validator.validate("proposalUnsigned", proposalDataSerializableUnsigned);
+			assert.undefined(result.error);
+		}
+	});
+
+	it("proposalUnsigned - should not allow additional fields", ({ validator }) => {
+		const proposalCopy = { ...Proposal.proposalDataSerializableUnsigned, extraField: "extraValue" };
+		const result = validator.validate("proposalUnsigned", proposalCopy);
+		assert.defined(result.error);
+		assert.true(result.error!.includes("additional properties"));
+	});
+
+
 	it("proposal - should be ok", ({ validator }) => {
 		for (const { proposalDataSerializable } of proposals) {
 			const result = validator.validate("proposal", proposalDataSerializable);
@@ -60,16 +75,6 @@ describe<{
 
 	it("proposal - should not allow additional fields", ({ validator }) => {
 		const proposalCopy = { ...Proposal.proposalDataSerializable, extraField: "extraValue" };
-		const result = validator.validate("proposal", proposalCopy);
-		assert.defined(result.error);
-		assert.true(result.error!.includes("additional properties"));
-	});
-
-	it("proposal - data should not allow additional fields", ({ validator }) => {
-		const proposalCopy = {
-			...Proposal.proposalDataSerializable,
-			data: { ...Proposal.proposalDataSerializable.data, extraField: "extraValue" },
-		};
 		const result = validator.validate("proposal", proposalCopy);
 		assert.defined(result.error);
 		assert.true(result.error!.includes("additional properties"));
