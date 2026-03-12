@@ -178,7 +178,9 @@ describe<{
 		assert.undefined(blockHeader.serialized);
 		assert.undefined(blockHeader.transactions);
 
-		const blockHeaderWithTransactions = await factory.headerFromBytes(Buffer.from(serializedWithTransactions, "hex"));
+		const blockHeaderWithTransactions = await factory.headerFromBytes(
+			Buffer.from(serializedWithTransactions, "hex"),
+		);
 
 		assertBlockData(assert, blockHeaderWithTransactions, blockDataWithTransactions);
 		assert.undefined(blockHeaderWithTransactions.serialized);

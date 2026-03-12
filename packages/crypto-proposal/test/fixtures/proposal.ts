@@ -26,10 +26,7 @@ export const proposalDataSerializableUnsigned: Contracts.Crypto.ProposalDataSeri
 	validatorIndex: 0,
 };
 
-
-export const proposalSerializedUnsigned = 
-	"010000000000a8020000" + 
-	payloadSerialized; 
+export const proposalSerializedUnsigned = "010000000000a8020000" + payloadSerialized;
 
 export const signature =
 	"930af1e95c49a6743a5b0c8db05ea47566b7cf93e6730320029ebd72191fc4c196ee15fc00090de2769e36be319b4c9a17fae06667de3c40c820d185fd18526315f85659ffb7b99502f1e30ebff5d60ff63d0c33d65fbb21f0948920eba24ffd";
@@ -39,10 +36,7 @@ export const proposalDataSerializable: Contracts.Crypto.ProposalDataSerializable
 	signature,
 };
 
-export const proposalSerialized = 
-	"010000000000a8020000" + 
-	payloadSerialized + 
-	signature; 
+export const proposalSerialized = "010000000000a8020000" + payloadSerialized + signature;
 
 export const proposalData: Contracts.Crypto.ProposalData = {
 	...proposalDataSerializable,

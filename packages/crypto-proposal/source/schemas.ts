@@ -11,7 +11,7 @@ const proposalUnsigned = {
 	},
 	required: ["round", "payloadSerialized", "validatorIndex"],
 	type: "object",
-}
+};
 
 export const schemas: Record<"lockProof" | "proposal" | "proposalUnsigned", AnySchemaObject> = {
 	lockProof: {

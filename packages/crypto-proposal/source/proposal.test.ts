@@ -64,7 +64,7 @@ describe<{
 		assert.equal(proposalFull.lockProof, lockProof);
 	});
 
-	it("#round", ({ proposal, proposalFull}) => {
+	it("#round", ({ proposal, proposalFull }) => {
 		assert.equal(proposal.round, 1);
 		assert.equal(proposalFull.round, 1);
 	});
@@ -104,7 +104,6 @@ describe<{
 		assertBlock(assert, proposal.getPayload().block, blockHeader);
 		assert.undefined(proposal.getPayload().lockProof);
 		assert.equal(proposal.getPayload().block.transactions.length, 2);
-
 
 		await proposalFull.deserializePayload();
 		assertBlock(assert, proposalFull.getPayload().block, blockHeader);

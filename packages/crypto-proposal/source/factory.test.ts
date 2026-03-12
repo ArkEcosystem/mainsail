@@ -81,7 +81,10 @@ describe<{
 	});
 
 	it("#makeProposal - should fail if schema error", async ({ factory, identity }) => {
-		await assert.rejects(() => factory.makeProposal({...Proposal.proposalDataSerializableUnsigned, round: -1}, identity.keys), MessageSchemaError);
+		await assert.rejects(
+			() => factory.makeProposal({ ...Proposal.proposalDataSerializableUnsigned, round: -1 }, identity.keys),
+			MessageSchemaError,
+		);
 	});
 
 	it("#makeProposalFromBytes - should be ok", async ({ factory }) => {
@@ -105,8 +108,8 @@ describe<{
 
 	it("#makeProposalFromBytes - should throw with leading bytes", async ({ factory }) => {
 		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			await assert.rejects(
-				() => factory.makeProposalFromBytes(Buffer.from(hex + Proposal.proposalSerialized, "hex")),
+			await assert.rejects(() =>
+				factory.makeProposalFromBytes(Buffer.from(hex + Proposal.proposalSerialized, "hex")),
 			);
 		}
 	});
@@ -131,8 +134,8 @@ describe<{
 
 	it("#makePayloadFromBytes - should throw with leading bytes", async ({ factory }) => {
 		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
-			await assert.rejects(
-				() => factory.makePayloadFromBytes(Buffer.from(hex + Proposal.payloadSerialized, "hex"))
+			await assert.rejects(() =>
+				factory.makePayloadFromBytes(Buffer.from(hex + Proposal.payloadSerialized, "hex")),
 			);
 		}
 	});

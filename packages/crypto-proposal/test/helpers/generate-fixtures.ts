@@ -5,17 +5,15 @@ import type { Application } from "@mainsail/kernel";
 import { Deserializer } from "../../source/deserializer.js";
 import { Factory } from "../../source/factory.js";
 import { Serializer } from "../../source/serializer.js";
-import { blockData,Proposal, validatorMnemonic } from "../fixtures/index.js";
+import { blockData, Proposal, validatorMnemonic } from "../fixtures/index.js";
 import { prepareSandbox } from "./prepare-sandbox.js";
-
 
 type Context = {
 	app: Application;
 	serializer: Serializer;
 	deserializer: Deserializer;
 	factory: Factory;
-}
-
+};
 
 const PROPOSAL = Proposal;
 
@@ -37,7 +35,7 @@ const beforeEach = async (context: Context) => {
 					[method](message, privateKey),
 			transactionFactory: (method, message, privateKey) =>
 				context.app.get(Identifiers.Cryptography.Transaction.Factory)![method](message, privateKey),
-			}),
+		}),
 	};
 
 	context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(validatorSet);
@@ -98,8 +96,7 @@ const serializeProposal = async ({ serializer, app, factory }: Context) => {
 	console.log("proposalSerialized: ", proposal.serialized.toString("hex"));
 };
 
-
-const context = await prepareSandbox({}) as Context;
+const context = (await prepareSandbox({})) as Context;
 await beforeEach(context);
 await createBlock(context);
 await serializePayload(context);

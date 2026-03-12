@@ -65,7 +65,6 @@ describe<{
 		assert.true(result.error!.includes("additional properties"));
 	});
 
-
 	it("proposal - should be ok", ({ validator }) => {
 		for (const { proposalDataSerializable } of proposals) {
 			const result = validator.validate("proposal", proposalDataSerializable);
@@ -125,7 +124,7 @@ describe<{
 	});
 
 	it("proposal - validatorIndex should be ok", ({ validator }) => {
-		const valid = [0, 1, 10 , 52];
+		const valid = [0, 1, 10, 52];
 		for (let validatorIndex of valid) {
 			const proposalCopy = { ...Proposal.proposalDataSerializable, validatorIndex };
 			const result = validator.validate("proposal", proposalCopy);
@@ -140,7 +139,6 @@ describe<{
 			assert.true(result.error!.includes("validatorIndex"));
 		}
 	});
-
 
 	it("proposal - payloadSerialized should be ok", ({ validator }) => {
 		const valid = ["0", "00", "0123456789abcdef"];
@@ -180,7 +178,6 @@ describe<{
 			assert.true(result.error!.includes("signature"));
 		}
 	});
-
 
 	it("lockProof - should be ok", ({ validator }) => {
 		const result = validator.validate("lockProof", lockProof);
