@@ -124,14 +124,14 @@ export const makeCustomProposal = async (
 		Identifiers.Cryptography.Proposal.Serializer,
 	);
 
-	const proposedBytes = await messageSerializer.serializeProposedData({
+	const proposedBytes = await messageSerializer.serializePayload({
 		block,
 		lockProof: undefined,
 	});
 
 	const serializedProposal = await messageSerializer.serializeProposalUnsigned(
 		{
-			data: { serialized: proposedBytes.toString("hex") },
+			payloadSerialized:  proposedBytes.toString("hex"),
 			round,
 			validRound: undefined,
 			validatorIndex: 0,
@@ -146,7 +146,7 @@ export const makeCustomProposal = async (
 
 	const proposal = app.resolve(Proposal).initialize({
 		blockHeader: block,
-		dataSerialized: proposedBytes.toString("hex"),
+		payloadSerialized: proposedBytes.toString("hex"),
 		round,
 		serialized: signedProposal,
 		signature: proposalSignature,
