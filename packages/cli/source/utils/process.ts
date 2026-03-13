@@ -94,11 +94,10 @@ export class Process implements Contracts.Cli.Process {
 			`Tailing last ${lines} lines for [${this.#processName}] process (change the value with --lines option)`,
 		);
 
-		void readLastLines.read(file, lines)
-			.then((output) => {
-				console.log(output.trim());
-				return output;
-			});
+		void readLastLines.read(file, lines).then((output) => {
+			console.log(output.trim());
+			return output;
+		});
 
 		const log = new Tail(file);
 
