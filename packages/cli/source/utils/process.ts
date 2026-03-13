@@ -79,7 +79,7 @@ export class Process implements Contracts.Cli.Process {
 			});
 	}
 
-	public async log(showErrors: boolean, lines: number): Promise<void> {
+	public log(showErrors: boolean, lines: number): void {
 		this.app.get<AbortMissingProcess>(Identifiers.Cli.Action.AbortMissingProcess).execute(this.#processName);
 
 		const proc = this.processManager.describe(this.#processName);
@@ -94,7 +94,11 @@ export class Process implements Contracts.Cli.Process {
 			`Tailing last ${lines} lines for [${this.#processName}] process (change the value with --lines option)`,
 		);
 
-		console.log((await readLastLines.read(file, lines)).trim());
+		void readLastLines.read(file, lines)
+			.then((output) => {
+				console.log(output.trim());
+				return output;
+			});
 
 		const log = new Tail(file);
 
