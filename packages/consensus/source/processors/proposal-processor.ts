@@ -127,7 +127,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	async #hasValidSignature(proposal: Contracts.Crypto.Proposal): Promise<boolean> {
 		return this.consensusSignature.verify(
 			Buffer.from(proposal.signature, "hex"),
-			await this.proposalSerializer.serializeProposal(proposal.toSerializableData(), { includeSignature: false }),
+			await this.proposalSerializer.serializeProposalUnsigned(proposal.toSerializableData()),
 			Buffer.from(this.validatorSet.getValidator(proposal.validatorIndex).blsPublicKey, "hex"),
 		);
 	}

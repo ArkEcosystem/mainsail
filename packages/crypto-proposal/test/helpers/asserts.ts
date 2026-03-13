@@ -21,7 +21,30 @@ function deepEqual(object1, object2) {
 }
 
 export const assertProposal = (assert, data1, data2) => {
-	const fields = ["round", "data", "validatorIndex", "signature"];
+	const fields = ["round", "payloadSerialized", "validatorIndex", "signature"];
+	for (const field of fields) {
+		assert.equal(data1[field].toString(), data2[field].toString());
+	}
+};
+
+export const assertBlock = (assert, data1, data2) => {
+	const fields = [
+		"fee",
+		"gasUsed",
+		"hash",
+		"logsBloom",
+		"number",
+		"parentHash",
+		"payloadSize",
+		"proposer",
+		"reward",
+		"round",
+		"stateRoot",
+		"timestamp",
+		"transactionsCount",
+		"transactionsRoot",
+		"version",
+	];
 	for (const field of fields) {
 		assert.equal(data1[field].toString(), data2[field].toString());
 	}

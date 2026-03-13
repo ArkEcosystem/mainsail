@@ -20,9 +20,6 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
-	@inject(Identifiers.Cryptography.Block.Deserializer)
-	private readonly blockDeserializer!: Contracts.Crypto.BlockDeserializer;
-
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.Validator;
 
@@ -30,54 +27,40 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
 	public async makeProposal(
-		data: Contracts.Crypto.MakeProposalData,
+		data: Contracts.Crypto.ProposalDataSerializableUnsigned,
 		keyPair: Contracts.Crypto.KeyPair,
 	): Promise<Contracts.Crypto.Proposal> {
 		const worker = await this.workerPool.getWorker();
 
-		const bytes = await this.serializer.serializeProposal(data, { includeSignature: false });
+		this.#verifySchema("proposalUnsigned", data);
+
+		const bytes = await this.serializer.serializeProposalUnsigned(data);
 		const signature = await worker.consensusSignature("sign", bytes, Buffer.from(keyPair.privateKey, "hex"));
 		const serialized = Buffer.concat([bytes, Buffer.from(signature, "hex")]);
 		return this.makeProposalFromBytes(serialized);
 	}
 
-	public async makeProposalFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Proposal> {
-		const data = await this.deserializer.deserializeProposal(bytes);
-		return this.makeProposalFromData(data, bytes);
-	}
+	public async makeProposalFromBytes(serialized: Buffer): Promise<Contracts.Crypto.Proposal> {
+		const proposalData = await this.deserializer.deserializeProposal(serialized);
 
-	public async makeProposalFromData(
-		proposalData: Contracts.Crypto.ProposalData,
-		serialized?: Buffer,
-	): Promise<Contracts.Crypto.Proposal> {
-		this.#applySchema("proposal", proposalData);
-		const { blockHeader, lockProof } = await this.#getLockProofAndBlockHeaderFromProposedData(
-			Buffer.from(proposalData.data.serialized, "hex"),
+		this.#verifySchema("proposal", proposalData);
+
+		const { blockHeader, lockProof } = await this.#getLockProofAndBlockHeader(
+			Buffer.from(proposalData.payloadSerialized, "hex"),
 		);
-
-		if (!serialized) {
-			serialized = await this.serializer.serializeProposal(proposalData, { includeSignature: true });
-		}
 
 		return this.app.resolve<Proposal>(Proposal).initialize({
 			...proposalData,
 			blockHeader,
-			dataSerialized: proposalData.data.serialized,
 			lockProof,
 			serialized,
 		});
 	}
 
-	async makeProposedDataFromBytes(bytes: Buffer): Promise<Contracts.Crypto.ProposedData> {
+	async makePayloadFromBytes(bytes: Buffer): Promise<Contracts.Crypto.ProposedPayload> {
 		const buffer = ByteBuffer.fromBuffer(bytes);
 
-		const lockProofLength = buffer.readUint8();
-		let lockProof: Contracts.Crypto.AggregatedSignature | undefined;
-		if (lockProofLength > 0) {
-			const lockProofBuffer = buffer.readBytes(lockProofLength);
-			lockProof = await this.deserializer.deserializeLockProof(lockProofBuffer);
-		}
-
+		const lockProof = await this.#getLockProof(buffer);
 		const block = await this.blockFactory.fromBytes(buffer.getRemainder());
 
 		return {
@@ -87,31 +70,39 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 		};
 	}
 
-	async #getLockProofAndBlockHeaderFromProposedData(
-		bytes: Buffer,
-	): Promise<{ blockHeader: Contracts.Crypto.BlockHeader; lockProof?: Contracts.Crypto.AggregatedSignature }> {
-		const buffer = ByteBuffer.fromBuffer(bytes);
-
+	async #getLockProof(buffer: ByteBuffer): Promise<Contracts.Crypto.AggregatedSignature | undefined> {
 		const lockProofLength = buffer.readUint8();
 
 		let lockProof: Contracts.Crypto.AggregatedSignature | undefined;
 		if (lockProofLength > 0) {
 			const lockProofBuffer = buffer.readBytes(lockProofLength);
 			lockProof = await this.deserializer.deserializeLockProof(lockProofBuffer);
+
+			this.#verifySchema("lockProof", lockProof);
 		}
 
-		const blockHeader = await this.blockDeserializer.deserializeHeader(buffer.getRemainder());
-
-		return { blockHeader, lockProof };
+		return lockProof;
 	}
 
-	#applySchema<T>(schema: string, data: T): T {
+	async #getLockProofAndBlockHeader(
+		bytes: Buffer,
+	): Promise<{ blockHeader: Contracts.Crypto.BlockHeader; lockProof?: Contracts.Crypto.AggregatedSignature }> {
+		const buffer = ByteBuffer.fromBuffer(bytes);
+
+		const lockProof = await this.#getLockProof(buffer);
+		const blockHeader = await this.blockFactory.headerFromBytes(buffer.getRemainder());
+
+		return {
+			blockHeader,
+			lockProof,
+		};
+	}
+
+	#verifySchema<T>(schema: string, data: T): void {
 		const result = this.validator.validate(schema, data);
 
-		if (!result.error) {
-			return result.value;
+		if (result.error) {
+			throw new MessageSchemaError(schema, result.error);
 		}
-
-		throw new MessageSchemaError(schema, result.error);
 	}
 }

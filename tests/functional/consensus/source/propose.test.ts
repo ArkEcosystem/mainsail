@@ -178,7 +178,7 @@ describe<{
 
 		await assertBlockNumber(nodes, 1);
 		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes, proposal0.getData().block.hash);
+		await assertBlockHash(nodes, proposal0.getPayload().block.hash);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -191,18 +191,18 @@ describe<{
 				.map((prevote) => prevote.blockHash)
 				.sort(),
 			[
-				proposal0.getData().block.hash,
-				proposal0.getData().block.hash,
-				proposal0.getData().block.hash,
-				proposal0.getData().block.hash,
-				proposal0.getData().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
 			].sort(),
 		);
 
 		// Assert all nodes precommit
 		assert.equal(
 			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockHash),
-			Array.from({ length: totalNodes }).fill(proposal0.getData().block.hash),
+			Array.from({ length: totalNodes }).fill(proposal0.getPayload().block.hash),
 		);
 
 		// Next block
@@ -243,11 +243,11 @@ describe<{
 				.map((prevote) => prevote.blockHash)
 				.sort(),
 			[
-				proposal0.getData().block.hash,
-				proposal0.getData().block.hash,
-				proposal1.getData().block.hash,
-				proposal1.getData().block.hash,
-				proposal0.getData().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal1.getPayload().block.hash,
+				proposal1.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
 			].sort(),
 		);
 
@@ -292,11 +292,11 @@ describe<{
 					.map((prevote) => prevote.blockHash)
 					.sort(),
 				[
-					proposal0.getData().block.hash,
-					proposal0.getData().block.hash,
-					proposal0.getData().block.hash,
-					proposal1.getData().block.hash,
-					proposal1.getData().block.hash,
+					proposal0.getPayload().block.hash,
+					proposal0.getPayload().block.hash,
+					proposal0.getPayload().block.hash,
+					proposal1.getPayload().block.hash,
+					proposal1.getPayload().block.hash,
 				].sort(),
 			);
 
@@ -357,18 +357,18 @@ describe<{
 				.map((prevote) => prevote.blockHash)
 				.sort(),
 			[
-				proposal0.getData().block.hash,
-				proposal0.getData().block.hash,
-				proposal0.getData().block.hash,
-				proposal0.getData().block.hash,
-				proposal1.getData().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal1.getPayload().block.hash,
 			].sort(),
 		);
 
 		// // Assert all nodes precommit (null)
 		assert.equal(
 			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockHash),
-			Array.from({ length: totalNodes - 1 }).fill(proposal0.getData().block.hash),
+			Array.from({ length: totalNodes - 1 }).fill(proposal0.getPayload().block.hash),
 		);
 
 		// Download blocks
@@ -419,11 +419,11 @@ describe<{
 				.map((prevote) => prevote.blockHash)
 				.sort(),
 			[
-				proposal0.getData().block.hash,
-				proposal2.getData().block.hash,
-				proposal4.getData().block.hash,
-				proposal3.getData().block.hash,
-				proposal1.getData().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal2.getPayload().block.hash,
+				proposal4.getPayload().block.hash,
+				proposal3.getPayload().block.hash,
+				proposal1.getPayload().block.hash,
 			].sort(),
 		);
 

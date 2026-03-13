@@ -30,7 +30,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	): Promise<Contracts.Crypto.Block> {
 		const block: Contracts.Crypto.BlockHeader = { ...data, hash: await this.hashFactory.make(data) };
 
-		await this.#verify({ ...block, transactions });
+		await this.#verify("block", { ...block, transactions });
 
 		const serialized: Buffer = await this.serializer.serializeWithTransactions({ ...data, transactions });
 
@@ -68,6 +68,13 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 			serialized: serialized.toString("hex"),
 			transactions: parsedTransactions,
 		});
+	}
+
+	public async headerFromBytes(serialized: Buffer): Promise<Contracts.Crypto.BlockHeader> {
+		const blockHeader = await this.deserializer.deserializeHeader(serialized);
+		await this.#verify("blockHeader", blockHeader);
+
+		return blockHeader;
 	}
 
 	public async headerFromStorage(
@@ -108,7 +115,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	}
 
 	public async fromData(data: Contracts.Crypto.BlockData): Promise<Contracts.Crypto.Block> {
-		await this.#verify(data);
+		await this.#verify("block", data);
 
 		const transactions = await Promise.all(
 			data.transactions.map((tx) => this.transactionFactory.fromData(tx, false)),
@@ -125,7 +132,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	async #fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.Block> {
 		const deserialized = await this.deserializer.deserializeWithTransactions(serialized);
 
-		await this.#verify({ ...deserialized.data, transactions: deserialized.transactions });
+		await this.#verify("block", { ...deserialized.data, transactions: deserialized.transactions });
 
 		return new Block({
 			...deserialized,
@@ -133,13 +140,11 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		});
 	}
 
-	async #verify(data: Contracts.Crypto.BlockData): Promise<void> {
-		const { error } = this.validator.validate("block", data);
+	async #verify(schema: string, data: Contracts.Crypto.BlockData | Contracts.Crypto.BlockHeader): Promise<void> {
+		const { error } = this.validator.validate(schema, data);
 
-		if (!error) {
-			return;
+		if (error) {
+			throw new BlockSchemaError(data.number, error);
 		}
-
-		throw new BlockSchemaError(data.number, error);
 	}
 }

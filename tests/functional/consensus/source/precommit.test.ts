@@ -197,7 +197,7 @@ describe<{
 
 		const node1 = nodes[1];
 		const stubPrecommit1 = stub(node1.get<Consensus>(Identifiers.Consensus.Service), "precommit");
-		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal.getData().block.hash);
+		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal.getPayload().block.hash);
 		stubPrecommit1.callsFake(async () => {
 			stubPrecommit1.restore();
 			await p2p.broadcastMessage(precommit1);
@@ -223,7 +223,7 @@ describe<{
 				.map((prevote) => prevote.blockHash)
 				.sort(),
 			[
-				proposal.getData().block.hash,
+				proposal.getPayload().block.hash,
 				commit.block.hash,
 				commit.block.hash,
 				commit.block.hash,
@@ -257,11 +257,11 @@ describe<{
 
 		const node1 = nodes[1];
 		const stubPrecommit1 = stub(node1.get<Consensus>(Identifiers.Consensus.Service), "precommit");
-		const precommit0 = await makePrecommit(node1, validators[1], 1, 0, proposal0.getData().block.hash);
-		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal1.getData().block.hash);
-		const precommit2 = await makePrecommit(node1, validators[1], 1, 0, proposal2.getData().block.hash);
-		const precommit3 = await makePrecommit(node1, validators[1], 1, 0, proposal3.getData().block.hash);
-		const precommit4 = await makePrecommit(node1, validators[1], 1, 0, proposal4.getData().block.hash);
+		const precommit0 = await makePrecommit(node1, validators[1], 1, 0, proposal0.getPayload().block.hash);
+		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal1.getPayload().block.hash);
+		const precommit2 = await makePrecommit(node1, validators[1], 1, 0, proposal2.getPayload().block.hash);
+		const precommit3 = await makePrecommit(node1, validators[1], 1, 0, proposal3.getPayload().block.hash);
+		const precommit4 = await makePrecommit(node1, validators[1], 1, 0, proposal4.getPayload().block.hash);
 		stubPrecommit1.callsFake(async () => {
 			stubPrecommit1.restore();
 			await p2p.broadcastMessage(precommit0);
@@ -291,11 +291,11 @@ describe<{
 				.map((prevote) => prevote.blockHash)
 				.sort(),
 			[
-				proposal0.getData().block.hash,
-				proposal1.getData().block.hash,
-				proposal2.getData().block.hash,
-				proposal3.getData().block.hash,
-				proposal4.getData().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal1.getPayload().block.hash,
+				proposal2.getPayload().block.hash,
+				proposal3.getPayload().block.hash,
+				proposal4.getPayload().block.hash,
 				commit.block.hash,
 				commit.block.hash,
 				commit.block.hash,

@@ -37,7 +37,6 @@
 		"@mainsail/crypto-hash-bcrypto": "workspace:*",
 		"@mainsail/crypto-key-pair-bls12-381": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
-		"@mainsail/crypto-proposal": "workspace:*",
 		"@mainsail/crypto-signature-bls12-381": "workspace:*",
 		"@mainsail/crypto-signature-ecdsa": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",

@@ -1,7 +1,7 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import type { Contracts } from "@mainsail/contracts";
 
-export const schemaForSignature: Record<string, Contracts.Serializer.SerializationSchema> = {
+export const schemaUnsigned: Record<string, Contracts.Serializer.SerializationSchema> = {
 	round: {
 		type: "uint32",
 	},
@@ -9,16 +9,16 @@ export const schemaForSignature: Record<string, Contracts.Serializer.Serializati
 		optional: true,
 		type: "uint32",
 	},
-	data: {
-		type: "hex",
-	},
 	validatorIndex: {
 		type: "uint8",
+	},
+	payloadSerialized: {
+		type: "hex",
 	},
 };
 
 export const schema: Record<string, Contracts.Serializer.SerializationSchema> = {
-	...schemaForSignature,
+	...schemaUnsigned,
 	signature: {
 		type: "consensusSignature",
 	},

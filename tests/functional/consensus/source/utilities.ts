@@ -69,7 +69,7 @@ export const makeProposal = async (
 	const block = await proposer.prepareBlock(validator.address, round, timestamp);
 	const proposal = await proposer.propose(0, round, undefined, block);
 
-	await proposal.deserializeData();
+	await proposal.deserializePayload();
 	return proposal;
 };
 

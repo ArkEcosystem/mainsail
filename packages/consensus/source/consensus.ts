@@ -622,7 +622,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		const proposal = roundState.getProposal();
 		if (!roundState.hasProcessorResult() && proposal) {
 			try {
-				await proposal.deserializeData();
+				await proposal.deserializePayload();
 
 				if (!(await this.proposalProcessor.hasValidLockProof(proposal))) {
 					roundState.setProcessorResult(FAILED_PROCESSOR_RESULT);

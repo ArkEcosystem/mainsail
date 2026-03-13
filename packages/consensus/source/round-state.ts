@@ -103,7 +103,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 	public getBlock(): Contracts.Crypto.Block {
 		if (this.#proposal && this.#proposal.isDataDeserialized) {
-			return this.#proposal.getData().block;
+			return this.#proposal.getPayload().block;
 		}
 
 		throw new Error("Block is not available, because proposal is not set or deserialized");
@@ -117,7 +117,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 			assert.defined(proposal);
 
 			const round = proposal.round;
-			const block = proposal.getData().block;
+			const block = proposal.getPayload().block;
 
 			const commit: Contracts.Crypto.CommitSerializable = {
 				block,

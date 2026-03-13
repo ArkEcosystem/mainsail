@@ -120,9 +120,9 @@ export class Serializer implements Contracts.Serializer.Serializer {
 			}
 
 			if (schema.type === "hex") {
-				assert.string(data[property]["serialized"]);
+				assert.string(data[property]);
 
-				const serialized = Buffer.from(data[property]["serialized"], "hex");
+				const serialized = Buffer.from(data[property], "hex");
 				result.writeUint32(serialized.length);
 				result.writeBytes(serialized);
 				continue;
@@ -227,7 +227,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 			}
 
 			if (schema.type === "hex") {
-				target[property] = { serialized: source.readBytes(source.readUint32()).toString("hex") };
+				target[property] = source.readBytes(source.readUint32()).toString("hex");
 				continue;
 			}
 
