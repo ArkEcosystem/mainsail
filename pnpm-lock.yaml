@@ -2629,9 +2629,6 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-proposal':
-        specifier: workspace:*
-        version: link:../crypto-proposal
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
