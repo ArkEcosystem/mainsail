@@ -9,20 +9,23 @@ export class Watcher {
 	private readonly app!: Contracts.Kernel.Application;
 
 	#watcher!: nsfw.NSFW;
+	#configFiles = new Set([".env", "validators.json", "peers.json", "plugins.js", "plugins.json"]);
 
 	public async boot(): Promise<void> {
-		const configFiles = new Set([".env", "validators.json", "peers.json", "plugins.js", "plugins.json"]);
-
-		this.#watcher = await nsfw(this.app.configPath(), async (events) => {
-			for (const event of events) {
-				if (event.action === nsfw.ActionType.MODIFIED && configFiles.has(event.file)) {
-					await this.app.reboot();
-					break;
-				}
-			}
+		this.#watcher = await nsfw(this.app.configPath(), (events) => {
+			void this.#handleEvents(events);
 		});
 
 		await this.#watcher.start();
+	}
+
+	async #handleEvents(events: nsfw.FileChangeEvent[]) {
+		for (const event of events) {
+			if (event.action === nsfw.ActionType.MODIFIED && this.#configFiles.has(event.file)) {
+				await this.app.reboot();
+				break;
+			}
+		}
 	}
 
 	public async dispose(): Promise<void> {
