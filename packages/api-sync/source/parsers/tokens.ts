@@ -1,5 +1,5 @@
-import type { Contracts as ApiDatabaseContracts, Models } from "@mainsail/api-database";
-import { Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
+import type { Contracts as ApiDatabaseContracts } from "@mainsail/api-database";
+import { Identifiers as ApiDatabaseIdentifiers, Models } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -31,7 +31,10 @@ type Erc20MetadataCall = Omit<ContractFunctionParameters<typeof erc20MetadataFun
 
 type PreparedErc20Call = { call: Erc20Call | Erc20MetadataCall; data: string };
 
-const erc20AbiEvents = parseAbi(["event Transfer(address indexed from, address indexed to, uint256 value)"] as const);
+const erc20AbiEvents = parseAbi([
+	"event Transfer(address indexed from, address indexed to, uint256 value)",
+	"event Approval(address indexed owner, address indexed spender, uint256 value)",
+] as const);
 
 type TokenMetadata = {
 	totalSupply: string;
@@ -70,7 +73,7 @@ export class TokenParserService implements TokenParser {
 	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	#tokenCache!: LRUCache<string, Models.Token>;
-	#transferIndexes: Map<`0x${string}`, number> = new Map<`0x${string}`, number>();
+	#actionIndexes: Map<`0x${string}`, number> = new Map<`0x${string}`, number>();
 	#previousBlockNumber!: number;
 
 	#preparedFunctionCalls: PreparedErc20Call[] = [];
@@ -142,10 +145,14 @@ export class TokenParserService implements TokenParser {
 		transaction: Contracts.Crypto.Transaction,
 		receipt: Contracts.Evm.TransactionReceipt,
 		tokenRepository?: ApiDatabaseContracts.TokenRepository,
-	): Promise<{ tokens: Models.Token[]; tokenHolders: Models.TokenHolder[]; tokenTransfers: Models.TokenTransfer[] }> {
+	): Promise<{
+		tokens: Models.Token[];
+		tokenHolders: Models.TokenHolder[];
+		tokenActions: Models.TokenAction[];
+	}> {
 		const tokens: Models.Token[] = [];
 		const tokenHolders: Models.TokenHolder[] = [];
-		const tokenTransfers: Models.TokenTransfer[] = [];
+		const tokenActions: Models.TokenAction[] = [];
 
 		if (this.#previousBlockNumber !== header.number) {
 			this.#resetTransferIndexes(header.number);
@@ -155,7 +162,7 @@ export class TokenParserService implements TokenParser {
 
 		const eventLogs = parseEventLogs({
 			abi: erc20AbiEvents,
-			eventName: "Transfer",
+			eventName: ["Transfer", "Approval"],
 			logs: receipt.logs ?? [],
 		});
 
@@ -163,7 +170,31 @@ export class TokenParserService implements TokenParser {
 		const dirtyContractAddresses = new Set<string>();
 
 		for (const event of eventLogs) {
-			const { from, to, value } = event.args;
+			// Emitted events during deployment can have a event.logIndex of undefined and
+			// we only care about having a accurate sort order, so we manage an index manually.
+			const actionIndex = (this.#actionIndexes.get(event.address) ?? -1) + 1;
+			this.#actionIndexes.set(event.address, actionIndex);
+
+			let from: `0x${string}`;
+			let to: `0x${string}`;
+			let value: bigint;
+			let action: Models.TokenActionEnum;
+
+			switch (event.eventName) {
+				case "Transfer": {
+					({ from, to, value } = event.args);
+					action = Models.TokenActionEnum.Transfer;
+					break;
+				}
+				case "Approval": {
+					({ owner: from, spender: to, value } = event.args);
+					action = Models.TokenActionEnum.Approval;
+					break;
+				}
+				default: {
+					throw new Error("unsupported token event");
+				}
+			}
 
 			for (const account of [from, to]) {
 				if (!dirtyAccounts.has(account)) {
@@ -175,16 +206,12 @@ export class TokenParserService implements TokenParser {
 			dirtyAccounts.get(to)?.add(event.address);
 			dirtyContractAddresses.add(event.address);
 
-			// Emitted events during deployment can have a event.logIndex of undefined and
-			// we only care about having a accurate sort order, so we manage an index manually.
-			const transferIndex = (this.#transferIndexes.get(event.address) ?? -1) + 1;
-			this.#transferIndexes.set(event.address, transferIndex);
-
-			tokenTransfers.push({
+			tokenActions.push({
+				action,
 				address: event.address,
 				blockNumber,
 				from,
-				index: transferIndex,
+				index: actionIndex,
 				to,
 				transactionHash: transaction.hash,
 				value: value.toString(),
@@ -204,12 +231,12 @@ export class TokenParserService implements TokenParser {
 					// Skip anything if not deemed a token.
 					if (!foundTokens.has(contract)) {
 						this.logger.debugExtra(
-							`Ignoring transfer in contract '${receipt.contractAddress}' because it does not implemented expected ERC20 ABI.`,
+							`Ignoring tx to contract '${receipt.contractAddress}' because it does not implemented expected ERC20 ABI.`,
 						);
 						continue;
 					} else {
 						this.logger.debugExtra(
-							`Detected ERC20 transfer affecting '${account}' in contract '${contract}' (cached: ${this.#tokenCache.has(contract)})`,
+							`Detected ERC20 tx affecting '${account}' in contract '${contract}' (cached: ${this.#tokenCache.has(contract)})`,
 						);
 					}
 
@@ -233,7 +260,7 @@ export class TokenParserService implements TokenParser {
 			}
 		}
 
-		return { tokenHolders, tokenTransfers, tokens };
+		return { tokenActions, tokenHolders, tokens };
 	}
 
 	async #getTokens(
@@ -376,7 +403,7 @@ export class TokenParserService implements TokenParser {
 	}
 
 	#resetTransferIndexes(blockNumber: number = -1): void {
-		this.#transferIndexes.clear();
+		this.#actionIndexes.clear();
 		this.#previousBlockNumber = blockNumber;
 	}
 }

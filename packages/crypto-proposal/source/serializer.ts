@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
-import { lockProofSchema, schema, schemaForSignature } from "./serializer-schemas.js";
+import { lockProofSchema, schema, schemaUnsigned } from "./serializer-schemas.js";
 
 @injectable()
 export class Serializer implements Contracts.Crypto.ProposalSerializer {
@@ -16,42 +16,53 @@ export class Serializer implements Contracts.Crypto.ProposalSerializer {
 	@inject(Identifiers.Cryptography.Proposal.LockProofSize)
 	private readonly lockProofSize!: () => number;
 
-	public async serializeProposal(
-		proposal: Contracts.Crypto.SerializableProposalData,
-		options: Contracts.Crypto.SerializeProposalOptions,
+	public async serializeProposalUnsigned(
+		proposal: Contracts.Crypto.ProposalDataSerializableUnsigned,
 	): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.SerializableProposalData>(proposal, {
-			length:
-				4 + // round
-				(proposal.validRound === undefined ? 1 : 5) + // validRound
-				4 + // serialized data length
-				proposal.data.serialized.length / 2 + // serialized data
-				1 + // validatorIndex
-				(options.includeSignature ? this.signatureSize : 0), // signature
-			schema: options.includeSignature ? schema : schemaForSignature,
+		return this.serializer.serialize(proposal, {
+			length: this.#unsignedProposalSize(proposal),
+			schema: schemaUnsigned,
+			skip: 0,
+		});
+	}
+
+	public async serializeProposal(proposal: Contracts.Crypto.ProposalDataSerializable): Promise<Buffer> {
+		return this.serializer.serialize(proposal, {
+			length: this.#unsignedProposalSize(proposal) + this.signatureSize, // signature
+			schema,
 			skip: 0,
 		});
 	}
 
 	public async serializeLockProof(lockProof: Contracts.Crypto.AggregatedSignature): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.AggregatedSignature>(lockProof, {
+		return this.serializer.serialize(lockProof, {
 			length: this.lockProofSize(),
 			schema: lockProofSchema,
 			skip: 0,
 		});
 	}
 
-	public async serializeProposed(proposedBlock: Contracts.Crypto.ProposedBlockSerializable): Promise<Buffer> {
-		const serializedBlock = Buffer.from(proposedBlock.block.serialized, "hex");
+	public async serializePayload(proposedData: Contracts.Crypto.ProposedPayloadSerializable): Promise<Buffer> {
+		const serializedBlock = Buffer.from(proposedData.block.serialized, "hex");
 
 		// NOTE: The lock proof is undefined most of the time, hence we can safe a lot of bytes
 		// here by explicitly storing it's length instead of padding it with zero bytes.
-		if (proposedBlock.lockProof) {
-			const serializedLockProof = await this.serializeLockProof(proposedBlock.lockProof);
+		if (proposedData.lockProof) {
+			const serializedLockProof = await this.serializeLockProof(proposedData.lockProof);
 			const proofLength = Buffer.of(serializedLockProof.length);
 			return Buffer.concat([proofLength, serializedLockProof, serializedBlock]);
 		}
 
 		return Buffer.concat([Buffer.of(0), serializedBlock]);
+	}
+
+	#unsignedProposalSize(proposal: Contracts.Crypto.ProposalDataSerializableUnsigned): number {
+		return (
+			4 + // round
+			(proposal.validRound === undefined ? 1 : 5) + // validRound
+			4 + // serialized data length
+			proposal.payloadSerialized.length / 2 + // serialized data
+			1 // validatorIndex
+		);
 	}
 }

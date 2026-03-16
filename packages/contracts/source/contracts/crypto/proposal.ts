@@ -2,62 +2,54 @@ import type { Block, BlockHeader } from "./block.js";
 import type { KeyPair } from "./identities.js";
 import type { AggregatedSignature } from "./signatures.js";
 
-type WithoutSignature<T> = Omit<T, "signature">;
-export type MakeProposalData = WithoutSignature<SerializableProposalData>;
-
-export interface ProposalData {
-	readonly blockHeader: BlockHeader;
-	readonly lockProof?: AggregatedSignature;
+export interface ProposalDataSerializableUnsigned {
 	readonly round: number;
-	readonly data: { serialized: string };
-	readonly validatorIndex: number;
 	readonly validRound?: number;
+	readonly payloadSerialized: string;
+	readonly validatorIndex: number;
+}
+
+export interface ProposalDataSerializable extends ProposalDataSerializableUnsigned {
 	readonly signature: string;
 }
 
-export interface SerializableProposalData {
-	readonly round: number;
-	readonly validRound?: number;
-	readonly data: { serialized: string };
-	readonly validatorIndex: number;
-	readonly signature?: string;
+export interface ProposalData extends ProposalDataSerializable {
+	readonly blockHeader: BlockHeader;
+	readonly lockProof?: AggregatedSignature;
 }
 
-export interface ProposedData {
+export type ProposedPayloadSerializable = {
 	readonly block: Block;
 	readonly lockProof?: AggregatedSignature;
+};
+
+export interface ProposedPayload extends ProposedPayloadSerializable {
 	readonly serialized: string;
 }
 
-export type ProposedBlockSerializable = Omit<ProposedData, "serialized">;
-
-export interface Proposal extends Omit<ProposalData, "data"> {
+export interface Proposal extends ProposalData {
 	isDataDeserialized: boolean;
 
 	readonly serialized: Buffer;
 
-	deserializeData(): Promise<void>;
-	getData(): ProposedData;
+	deserializePayload(): Promise<void>;
+	getPayload(): ProposedPayload;
 
-	toSerializableData(): SerializableProposalData;
+	toSerializableData(): ProposalDataSerializable;
 	toData(): ProposalData;
 	toString(): string;
 }
 
 export interface ProposalFactory {
-	makeProposal(data: MakeProposalData, keyPair: KeyPair): Promise<Proposal>;
+	makeProposal(data: ProposalDataSerializableUnsigned, keyPair: KeyPair): Promise<Proposal>;
 	makeProposalFromBytes(data: Buffer): Promise<Proposal>;
-	makeProposalFromData(data: ProposalData): Promise<Proposal>;
-	makeProposedDataFromBytes(data: Buffer): Promise<ProposedData>;
-}
-
-export interface SerializeProposalOptions {
-	includeSignature?: boolean;
+	makePayloadFromBytes(data: Buffer): Promise<ProposedPayload>;
 }
 
 export interface ProposalSerializer {
-	serializeProposal(proposal: SerializableProposalData, options: SerializeProposalOptions): Promise<Buffer>;
-	serializeProposed(proposedBlock: ProposedBlockSerializable): Promise<Buffer>;
+	serializeProposalUnsigned(proposal: ProposalDataSerializableUnsigned): Promise<Buffer>;
+	serializeProposal(proposal: ProposalDataSerializable): Promise<Buffer>;
+	serializePayload(payload: ProposedPayloadSerializable): Promise<Buffer>;
 	serializeLockProof(proof: AggregatedSignature): Promise<Buffer>;
 }
 

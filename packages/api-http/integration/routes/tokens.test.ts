@@ -7,9 +7,10 @@ import tokens from "../../test/fixtures/tokens.json";
 import tokenHolders from "../../test/fixtures/token_holders.json";
 import tokenTransferTokens from "../../test/fixtures/token_transfer.tokens.json";
 import tokenTransferTransactions from "../../test/fixtures/token_transfer.transactions.json";
-import tokenTransfers from "../../test/fixtures/token_transfers.json";
+import tokenActions from "../../test/fixtures/token_actions.json";
 import tokenWhitelist from "../../test/fixtures/token_whitelist.json";
 import tokenTransfersResponse from "../../test/fixtures/token_transfers.response.json";
+import tokenApprovalsResponse from "../../test/fixtures/token_approvals.response.json";
 
 describe<{
 	app: Application;
@@ -150,41 +151,35 @@ describe<{
 		}
 	});
 
-	it("/tokens custom whitelist (POST)", async () => {
+	it("/tokens?whitelist", async () => {
 		await apiContext.tokenRepository.save(tokens);
 		await apiContext.tokenWhitelistRepository.save(tokenWhitelist.slice(0, 1));
 
 		const testCases = [
 			{
 				query: "",
-				method: "POST",
 				result: {
 					data: [tokens[0]],
 					statusCode: 200,
 				},
 			},
 			{
-				query: "",
-				body: JSON.stringify({ whitelist: [tokens[1].address] }),
-				method: "POST",
+				query: `?whitelist=${tokens[1].address}`,
 				result: {
 					data: [tokens[0], tokens[1]],
 					statusCode: 200,
 				},
 			},
 			{
-				query: "",
-				body: JSON.stringify({ whitelist: tokens.map((t) => t.address) }),
-				method: "POST",
+				query: `?whitelist=${tokens.map((t) => t.address).join(",")}`,
 				result: {
 					data: [...tokens].sort((a, b) => a.address.localeCompare(b.address)),
 					statusCode: 200,
 				},
 			},
 			{
-				query: "",
+				query: `?whitelist=0x0000000000000000000000000000000000000000`,
 				body: JSON.stringify({ whitelist: ["0x0000000000000000000000000000000000000000"] }),
-				method: "POST",
 				result: {
 					data: [tokens[0]],
 					statusCode: 200,
@@ -192,12 +187,12 @@ describe<{
 			},
 		];
 
-		for (const { query, result, body, method } of testCases) {
+		for (const { query, result } of testCases) {
 			const endpoint = `/tokens${query}`;
 			if (result.statusCode === 404) {
 				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
 			} else {
-				const { statusCode, data } = await request(endpoint, { ...options, body, method });
+				const { statusCode, data } = await request(endpoint, { ...options });
 				assert.equal(statusCode, result.statusCode);
 				assert.equal(data.data, result.data);
 			}
@@ -289,7 +284,8 @@ describe<{
 	it("/tokens/transfers", async () => {
 		await apiContext.tokenRepository.save(tokenTransferTokens);
 		await apiContext.transactionRepository.save(tokenTransferTransactions);
-		await apiContext.tokenTransferRepository.save(tokenTransfers);
+		await apiContext.tokenActionRepository.save(tokenActions);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
 
 		const testCases = [
 			{
@@ -379,7 +375,8 @@ describe<{
 	it("/tokens/{}/transfers", async () => {
 		await apiContext.tokenRepository.save(tokenTransferTokens);
 		await apiContext.transactionRepository.save(tokenTransferTransactions);
-		await apiContext.tokenTransferRepository.save(tokenTransfers);
+		await apiContext.tokenActionRepository.save(tokenActions);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
 
 		const testCases = [
 			{
@@ -401,6 +398,42 @@ describe<{
 
 		for (const { query, token, result } of testCases) {
 			const endpoint = `/tokens/${token}/transfers${query}`;
+			if (result.statusCode === 404) {
+				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
+			} else {
+				const { statusCode, data } = await request(endpoint, options);
+				assert.equal(statusCode, result.statusCode);
+				assert.equal(data.results, result.data);
+			}
+		}
+	});
+
+	it("/tokens/{}/approvals", async () => {
+		await apiContext.tokenRepository.save(tokenTransferTokens);
+		await apiContext.transactionRepository.save(tokenTransferTransactions);
+		await apiContext.tokenActionRepository.save(tokenActions);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
+
+		const testCases = [
+			{
+				query: "",
+				token: tokenTransferTokens[1].address,
+				result: {
+					data: tokenApprovalsResponse.filter((t) => t.token.address === tokenTransferTokens[1].address),
+					statusCode: 200,
+				},
+			},
+			{
+				query: "",
+				token: "0xdead78251073157e400c3d8d2ed92a85c958f9fa",
+				result: {
+					statusCode: 404,
+				},
+			},
+		];
+
+		for (const { query, token, result } of testCases) {
+			const endpoint = `/tokens/${token}/approvals${query}`;
 			if (result.statusCode === 404) {
 				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
 			} else {

@@ -1,9 +1,10 @@
 name: Test
 
 on:
-    pull_request:
-    push:
-        branches: [develop, main]
+    workflow_call:
+        secrets:
+            CODECOV_TOKEN:
+                required: true
 
 permissions:
     contents: read
@@ -23,15 +24,15 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6.0.2
               with:
                   ref: ${{ github.head_ref }}
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v6.3.0
               with:
                   node-version: ${{ matrix.node-version }}
 
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v4.3.0
               with:
                   run_install: false
                   version: latest
@@ -42,7 +43,7 @@ jobs:
               shell: bash
 
             - name: Cache pnpm modules
-              uses: actions/cache@v4
+              uses: actions/cache@v5.0.3
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -76,14 +77,14 @@ jobs:
             group: ${{ github.head_ref }}-unit
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6.0.2
               with:
                   ref: ${{ github.head_ref }}
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v6.3.0
               with:
                   node-version: ${{ matrix.node-version }}
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v4.3.0
               with:
                   run_install: false
                   version: latest
@@ -92,12 +93,12 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@v5.0.3
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@v5.0.3
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.cache
@@ -259,6 +260,9 @@ jobs:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-integration
         runs-on: ubuntu-latest
+
+        timeout-minutes: 15
+
         services:
             postgres:
                 image: postgres:18-alpine
@@ -271,14 +275,14 @@ jobs:
                 options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6.0.2
               with:
                   ref: ${{ github.head_ref }}
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v6.3.0
               with:
                   node-version: ${{ matrix.node-version }}
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v4.3.0
               with:
                   run_install: false
                   version: latest
@@ -287,12 +291,12 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@v5.0.3
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@v5.0.3
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.cache
@@ -322,14 +326,14 @@ jobs:
                 name: ["consensus"]
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6.0.2
               with:
                   ref: ${{ github.head_ref }}
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v6.3.0
               with:
                   node-version: ${{ matrix.node-version }}
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v4.3.0
               with:
                   run_install: false
                   version: latest
@@ -338,12 +342,12 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@v5.0.3
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@v5.0.3
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.cache
@@ -407,14 +411,14 @@ jobs:
                 name: ["clients"]
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6.0.2
               with:
                   ref: ${{ github.head_ref }}
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v6.3.0
               with:
                   node-version: ${{ matrix.node-version }}
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v4.3.0
               with:
                   run_install: false
                   version: latest
@@ -423,12 +427,12 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@v5.0.3
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@v5.0.3
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.cache
@@ -465,14 +469,14 @@ jobs:
                 name: ["snapshot"]
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6.0.2
               with:
                   ref: ${{ github.head_ref }}
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v6.3.0
               with:
                   node-version: ${{ matrix.node-version }}
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v4.3.0
               with:
                   run_install: false
                   version: latest
@@ -481,12 +485,12 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@v5.0.3
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@v5.0.3
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.cache
@@ -544,14 +548,14 @@ jobs:
                 name: ["sync"]
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6.0.2
               with:
                   ref: ${{ github.head_ref }}
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v6.3.0
               with:
                   node-version: ${{ matrix.node-version }}
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v4.3.0
               with:
                   run_install: false
                   version: latest
@@ -560,12 +564,12 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@v5.0.3
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@v5.0.3
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.cache
@@ -610,6 +614,8 @@ jobs:
             group: ${{ github.head_ref }}-functional-${{matrix.name}}
         runs-on: ubuntu-latest
 
+        timeout-minutes: 15
+
         strategy:
             matrix:
                 node-version: [22.x]
@@ -627,14 +633,14 @@ jobs:
                 options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6.0.2
               with:
                   ref: ${{ github.head_ref }}
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v6.3.0
               with:
                   node-version: ${{ matrix.node-version }}
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v4.3.0
               with:
                   run_install: false
                   version: latest
@@ -643,12 +649,12 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@v5.0.3
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             - name: Cache lerna
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@v5.0.3
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.cache

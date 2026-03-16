@@ -1,111 +1,84 @@
-import type { Contracts } from "@mainsail/contracts";
-
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { Identifiers } from "@mainsail/constants";
+
 import {
-	proposalData,
-	proposalDataWithValidRound,
-	serializedBlock,
-	serializedProposal,
-	serializedProposalDataWithValidRound,
-	serializedProposalDataWithValidRoundForSignature,
-	serializedProposalForSignature,
+	Proposal,
+	ProposalWithValidRound,
+	ProposalWithLockProof,
+	ProposalWithLockProofAndValidRound,
+	lockProof,
+	serializedLockProof,
 } from "../test/fixtures/index.js";
+
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Deserializer } from "./deserializer";
 import { Serializer } from "./serializer";
+import { Factory } from "./factory.js";
 
 describe<{
 	app: Application;
 	serializer: Serializer;
 	deserializer: Deserializer;
+	factory: Factory;
 }>("Serializer", ({ it, assert, beforeEach }) => {
+	const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof, ProposalWithLockProofAndValidRound];
+
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.serializer = context.app.resolve(Serializer);
-		context.deserializer = context.app.resolve(Deserializer);
-	});
-
-	it("#serializeProposal - should correctly serialize for signature", async ({ serializer }) => {
-		const serialized = (
-			await serializer.serializeProposal(
-				{
-					data: { serialized: serializedBlock },
-					round: proposalData.round,
-					validatorIndex: proposalData.validatorIndex,
-				},
-				{ includeSignature: false },
-			)
-		).toString("hex");
-
-		assert.equal(serialized, serializedProposalForSignature);
-	});
-
-	it("#serializeProposal - should correctly serialize with signature", async ({ serializer }) => {
-		const serialized = (
-			await serializer.serializeProposal(
-				{
-					data: { serialized: serializedBlock },
-					round: proposalData.round,
-					signature: proposalData.signature,
-					validatorIndex: proposalData.validatorIndex,
-				},
-				{ includeSignature: true },
-			)
-		).toString("hex");
-
-		assert.equal(serialized, serializedProposal);
-	});
-
-	it("#serializeProposal - should correctly serialize for signature, with valid round", async ({ serializer }) => {
-		const serialized = (
-			await serializer.serializeProposal(
-				{
-					data: { serialized: serializedBlock },
-					round: proposalDataWithValidRound.round,
-					validRound: proposalDataWithValidRound.validRound,
-					validatorIndex: proposalDataWithValidRound.validatorIndex,
-				},
-				{ includeSignature: false },
-			)
-		).toString("hex");
-
-		assert.equal(serialized, serializedProposalDataWithValidRoundForSignature);
-	});
-
-	it("#serializeProposal - should correctly serialize with signature, with valid round", async ({ serializer }) => {
-		const serialized = (
-			await serializer.serializeProposal(
-				{
-					data: { serialized: serializedBlock },
-					round: proposalDataWithValidRound.round,
-					signature: proposalDataWithValidRound.signature,
-					validRound: proposalDataWithValidRound.validRound,
-					validatorIndex: proposalDataWithValidRound.validatorIndex,
-				},
-				{ includeSignature: true },
-			)
-		).toString("hex");
-
-		assert.equal(serialized, serializedProposalDataWithValidRound);
-	});
-
-	it("#serialize - should serialize and deserialize lock proof", async ({ deserializer, serializer }) => {
-		const proposalLockProof: Contracts.Crypto.AggregatedSignature = {
-			signature:
-				"927628d67c385fe216aa800def9cce0c09f5f9fbf836583d7c07ab6a98e1b5681802c92f81ad54984236a07fa389dbab1519f3c91ad39a505a61c3624a88c65da71fe721d7af0ed452516771b94d027be713dba68e14fa2c9680e35b63f0e038",
-			validators: [true, true, true, false, false, true, true, true, true, false],
+		const wallet = {};
+		const validatorSet = {
+			getRoundValidators: () => [wallet],
 		};
 
-		const serializedProposalLockProof =
-			"927628d67c385fe216aa800def9cce0c09f5f9fbf836583d7c07ab6a98e1b5681802c92f81ad54984236a07fa389dbab1519f3c91ad39a505a61c3624a88c65da71fe721d7af0ed452516771b94d027be713dba68e14fa2c9680e35b63f0e0380ae701000000000000";
+		const workerPool = {
+			getWorker: () => {
+				return {
+					// @ts-ignore
+					consensusSignature: (method, message, privateKey) =>
+						context.app
+							.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
+							[method](message, privateKey),
+					// @ts-ignore
+					transactionFactory: (method, message, privateKey) =>
+						context.app.get(Identifiers.Cryptography.Transaction.Factory)![method](message, privateKey),
+				};
+			},
+		};
 
-		const serialized = (await serializer.serializeLockProof(proposalLockProof)).toString("hex");
-		assert.equal(serialized, serializedProposalLockProof);
+		context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(validatorSet);
+		context.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
-		const deserialized = await deserializer.deserializeLockProof(Buffer.from(serialized, "hex"));
-		assert.equal(proposalLockProof.signature, deserialized.signature);
-		assert.equal(proposalLockProof.validators, deserialized.validators);
+		context.serializer = context.app.resolve(Serializer);
+		context.deserializer = context.app.resolve(Deserializer);
+		context.factory = context.app.resolve(Factory);
+	});
+
+	it("#serializePayload - should correctly serialize", async ({ serializer }) => {
+		for (const { payload, payloadSerialized } of proposals) {
+			const serialized = await serializer.serializePayload(payload);
+			assert.equal(serialized.toString("hex"), payloadSerialized);
+		}
+	});
+
+	it("#serializeProposalUnsigned - should correctly serialize", async ({ serializer }) => {
+		for (const { proposalDataSerializableUnsigned, proposalSerializedUnsigned } of proposals) {
+			const serialized = await serializer.serializeProposalUnsigned(proposalDataSerializableUnsigned);
+			assert.equal(serialized.toString("hex"), proposalSerializedUnsigned);
+		}
+	});
+
+	it("#serializeProposal - should correctly serialize", async ({ serializer }) => {
+		for (const { proposalDataSerializable, proposalSerialized } of proposals) {
+			const serialized = await serializer.serializeProposal(proposalDataSerializable);
+			assert.equal(serialized.toString("hex"), proposalSerialized);
+		}
+	});
+
+	it("#serializeLockProof - should correctly serialize", async ({ serializer }) => {
+		const serialized = await serializer.serializeLockProof(lockProof);
+
+		assert.equal(serialized.toString("hex"), serializedLockProof);
 	});
 });

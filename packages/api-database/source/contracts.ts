@@ -12,8 +12,8 @@ import type {
 	State,
 	System,
 	Token,
+	TokenAction,
 	TokenHolder,
-	TokenTransfer,
 	TokenWhitelist,
 	Transaction,
 	ValidatorRound,
@@ -106,8 +106,8 @@ export type TokenRepositoryExtension = Record<string, unknown>;
 export type TokenRepository = ExtendedRepository<Token> & TokenRepositoryExtension;
 export type TokenHolderRepositoryExtension = Record<string, unknown>;
 export type TokenHolderRepository = ExtendedRepository<TokenHolder> & TokenHolderRepositoryExtension;
-export type TokenTransferRepositoryExtension = Record<string, unknown>;
-export type TokenTransferRepository = ExtendedRepository<TokenTransfer> & TokenTransferRepositoryExtension;
+export type TokenActionRepositoryExtension = Record<string, unknown>;
+export type TokenActionRepository = ExtendedRepository<TokenAction> & TokenActionRepositoryExtension;
 export type TokenWhitelistRepositoryExtension = Record<string, unknown>;
 export type TokenWhitelistRepository = ExtendedRepository<TokenWhitelist> & TokenWhitelistRepositoryExtension;
 
@@ -142,7 +142,7 @@ export type PeerRepositoryFactory = (customDataSource?: RepositoryDataSource) =>
 export type TransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => TransactionRepository;
 export type TokenRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenRepository;
 export type TokenHolderRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenHolderRepository;
-export type TokenTransferRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenTransferRepository;
+export type TokenActionRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenActionRepository;
 export type TokenWhitelistRepositoryFactory = (customDataSource?: RepositoryDataSource) => TokenWhitelistRepository;
 export type MultiPaymentRepositoryFactory = (customDataSource?: RepositoryDataSource) => MultiPaymentRepository;
 export type ValidatorRoundRepositoryFactory = (customDataSource?: RepositoryDataSource) => ValidatorRoundRepository;

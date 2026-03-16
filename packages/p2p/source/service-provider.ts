@@ -48,7 +48,7 @@ import { Throttle } from "./throttle.js";
 import { TxPoolNode } from "./tx-pool-node.js";
 import { TxPoolNodeVerifier } from "./tx-pool-node-verifier.js";
 import { normalizeUrl } from "./utils/index.js";
-import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation/index.js";
+import { makeFormats, sanitizeRemoteAddress } from "./validation/index.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -227,10 +227,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerValidation(): void {
-		for (const keyword of Object.values(makeKeywords())) {
-			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
-		}
-
 		for (const [name, format] of Object.entries(makeFormats())) {
 			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addFormat(name, format);
 		}

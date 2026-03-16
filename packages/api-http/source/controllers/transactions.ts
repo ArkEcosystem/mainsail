@@ -8,7 +8,7 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
-import { TransactionResource, TransactionTokenTransfer } from "../resources/index.js";
+import { TransactionResource, TransactionTokenAction } from "../resources/index.js";
 import { Controller } from "./controller.js";
 
 @injectable()
@@ -55,9 +55,9 @@ export class TransactionsController extends Controller {
 			return Boom.notFound();
 		}
 
-		let transferredTokens: TransactionTokenTransfer[] | undefined = undefined;
+		let transferredTokens: TransactionTokenAction[] | undefined = undefined;
 		if (request.query.includeTokens) {
-			const fetched = await this.fetchTransactionTransferredTokens([transaction.hash]);
+			const fetched = await this.fetchTransactionTokens([transaction.hash]);
 			transferredTokens = fetched[transaction.hash];
 		}
 

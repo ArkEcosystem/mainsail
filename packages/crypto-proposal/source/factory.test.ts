@@ -6,13 +6,14 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { Factories } from "../../test-factories/source/index.js";
 import { Types } from "../../test-factories/source/factories";
+import { MessageSchemaError, InvalidBlockBytesError, InvalidProposalBytesError } from "@mainsail/exceptions";
+
 import {
-	blockData,
-	proposalData,
-	proposalDataWithValidRound,
-	serializedBlock,
-	serializedProposal,
-	serializedProposalDataWithValidRound,
+	blockHeader,
+	Proposal,
+	ProposalWithValidRound,
+	ProposalWithLockProof,
+	ProposalWithLockProofAndValidRound,
 	validatorMnemonic,
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -24,8 +25,12 @@ describe<{
 	blockFactory: Contracts.Crypto.BlockFactory;
 	identity: Types.Identity;
 }>("Factory", ({ it, assert, beforeEach }) => {
+	const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof, ProposalWithLockProofAndValidRound];
+
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
+
+		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
 
 		const wallet = {};
 		const validatorSet = {
@@ -66,56 +71,72 @@ describe<{
 	});
 
 	it("#makeProposal - should correctly make signed proposal", async ({ factory, identity }) => {
-		const proposal = await factory.makeProposal(
-			{
-				data: {
-					serialized: serializedBlock,
-				},
-				round: 1,
-				validatorIndex: 0,
-			},
-			identity.keys,
-		);
+		for (const { proposalDataSerializableUnsigned, proposalDataSerializable, proposalData } of proposals) {
+			const proposal = await factory.makeProposal(proposalDataSerializableUnsigned, identity.keys);
 
-		assert.equal(
-			proposal.signature,
-			"b7010f03f72afb5437da8f7ee039a7fee75d6e9c7b02e1b9cbd4ce844cdc0e81233fd312cdd493e4ef2c2a6ac3c9fc8a1967f06a1a205c3daf369ac77f0a895717c520af5e341a3925d23b126d847a6fd1e194a010b89082039e1e5b44352616",
-		);
+			assert.equal(proposal.toSerializableData(), proposalDataSerializable);
+			assert.equal(proposal.blockHeader, blockHeader);
+			assert.equal(proposal.toData(), proposalData);
+		}
 	});
 
-	it("#makeProposal - should correctly make signed proposal, with validRound", async ({ factory, identity }) => {
-		const data: Contracts.Crypto.ProposedData = {
-			block: blockData,
-			serialized: serializedBlock,
-		};
-
-		const proposal = await factory.makeProposal(
-			{
-				data,
-				round: 1,
-				validRound: 0,
-				validatorIndex: 0,
-			},
-			identity.keys,
-		);
-
-		assert.equal(
-			proposal.signature,
-			"892af5249f657e320738dc71719b542a1b8f662e134b47dab751144688d78b5d7f5cb33e97de3643f3534fb0ca3c5c6407b2322406127dbd9067e2d19837a2ff1f1ecb4d745f3f891b5c40f1659b8047d311a93eaf159cd614b2fb634d067d19",
+	it("#makeProposal - should fail if schema error", async ({ factory, identity }) => {
+		await assert.rejects(
+			() => factory.makeProposal({ ...Proposal.proposalDataSerializableUnsigned, round: -1 }, identity.keys),
+			MessageSchemaError,
 		);
 	});
 
 	it("#makeProposalFromBytes - should be ok", async ({ factory }) => {
-		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposal, "hex"));
+		for (const { proposalSerialized, proposalDataSerializable, proposalData } of proposals) {
+			const proposal = await factory.makeProposalFromBytes(Buffer.from(proposalSerialized, "hex"));
 
-		const data = proposal.toData();
-
-		assert.equal(proposal.toData(), proposalData);
+			assert.equal(proposal.toSerializableData(), proposalDataSerializable);
+			assert.equal(proposal.blockHeader, blockHeader);
+			assert.equal(proposal.toData(), proposalData);
+		}
 	});
 
-	it("#makeProposalFromBytes - should be ok, with validRound", async ({ factory }) => {
-		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposalDataWithValidRound, "hex"));
+	it("#makeProposalFromBytes - should throw with trailing bytes", async ({ factory }) => {
+		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
+			await assert.rejects(
+				() => factory.makeProposalFromBytes(Buffer.from(Proposal.proposalSerialized + hex, "hex")),
+				InvalidProposalBytesError,
+			);
+		}
+	});
 
-		assert.equal(proposal.toData(), proposalDataWithValidRound);
+	it("#makeProposalFromBytes - should throw with leading bytes", async ({ factory }) => {
+		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
+			await assert.rejects(() =>
+				factory.makeProposalFromBytes(Buffer.from(hex + Proposal.proposalSerialized, "hex")),
+			);
+		}
+	});
+
+	it("#makePayloadFromBytes - should be ok", async ({ factory }) => {
+		for (const { payloadSerialized, payload } of proposals) {
+			const newPayload = await factory.makePayloadFromBytes(Buffer.from(payloadSerialized, "hex"));
+
+			assert.equal(newPayload.block.serialized, payload.block.serialized);
+			assert.equal(newPayload.lockProof, payload.lockProof);
+		}
+	});
+
+	it("#makePayloadFromBytes - should throw with trailing bytes", async ({ factory }) => {
+		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
+			await assert.rejects(
+				() => factory.makePayloadFromBytes(Buffer.from(Proposal.payloadSerialized + hex, "hex")),
+				InvalidBlockBytesError,
+			);
+		}
+	});
+
+	it("#makePayloadFromBytes - should throw with leading bytes", async ({ factory }) => {
+		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
+			await assert.rejects(() =>
+				factory.makePayloadFromBytes(Buffer.from(hex + Proposal.payloadSerialized, "hex")),
+			);
+		}
 	});
 });

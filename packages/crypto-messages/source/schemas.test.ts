@@ -10,7 +10,6 @@ import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { prevoteData, prevoteDataNoBlock } from "../test/fixtures/index.js";
-import { makeKeywords as makeProposalKeywords } from "@mainsail/crypto-proposal/source/keywords.js";
 import { schemas } from "./schemas";
 
 describe<{
@@ -27,7 +26,6 @@ describe<{
 
 		for (const keyword of Object.values({
 			...makeBaseKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
-			...makeProposalKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
 		})) {
 			context.validator.addKeyword(keyword);
 		}

@@ -13,11 +13,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(TokensController);
 	server.bind(controller);
 
-	const tokensQuerySchema = Joi.object({
-		ignoreWhitelist: Joi.bool().default(false),
-		name: Schemas.orEqualCriteria(tokenNameSchema),
-	}).concat(Schemas.pagination);
-
 	server.route({
 		handler: (request: Hapi.Request) => controller.index(request),
 		method: "GET",
@@ -28,26 +23,11 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				},
 			},
 			validate: {
-				query: tokensQuerySchema,
-			},
-		},
-		path: "/tokens",
-	});
-
-	server.route({
-		handler: (request: Hapi.Request) => controller.index(request),
-		method: "POST",
-		options: {
-			plugins: {
-				pagination: {
-					enabled: true,
-				},
-			},
-			validate: {
-				payload: Joi.object({
-					whitelist: Joi.array().items(Schemas.addressSchema).max(100).empty(null).default([]),
-				}).empty(null),
-				query: tokensQuerySchema,
+				query: Joi.object({
+					ignoreWhitelist: Joi.bool().default(false),
+					name: Schemas.orEqualCriteria(tokenNameSchema),
+					whitelist: Schemas.orEqualCriteria(Schemas.addressSchema),
+				}).concat(Schemas.pagination),
 			},
 		},
 		path: "/tokens",
@@ -66,12 +46,36 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				query: Joi.object({
 					addresses: Schemas.orEqualCriteria(walletAddressSchema),
 					from: Schemas.orEqualCriteria(walletAddressSchema),
+					ignoreWhitelist: Joi.bool().default(false),
 					to: Schemas.orEqualCriteria(walletAddressSchema),
 					transactionHash: Schemas.orEqualCriteria(transactionHashSchema),
+					whitelist: Schemas.orEqualCriteria(walletAddressSchema),
 				}).concat(Schemas.pagination),
 			},
 		},
 		path: "/tokens/transfers",
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.approvals(request),
+		method: "GET",
+		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
+			validate: {
+				query: Joi.object({
+					addresses: Schemas.orEqualCriteria(walletAddressSchema),
+					from: Schemas.orEqualCriteria(walletAddressSchema),
+					to: Schemas.orEqualCriteria(walletAddressSchema),
+					transactionHash: Schemas.orEqualCriteria(transactionHashSchema),
+					whitelist: Schemas.orEqualCriteria(walletAddressSchema),
+				}).concat(Schemas.pagination),
+			},
+		},
+		path: "/tokens/approvals",
 	});
 
 	server.route({
@@ -119,6 +123,24 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 		},
 		path: "/tokens/{address}/transfers",
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.tokenApprovals(request),
+		method: "GET",
+		options: {
+			validate: {
+				params: Joi.object({
+					address,
+				}),
+				query: Joi.object({
+					from: Schemas.orEqualCriteria(walletAddressSchema),
+					to: Schemas.orEqualCriteria(walletAddressSchema),
+					transactionHash: Schemas.orEqualCriteria(transactionHashSchema),
+				}).concat(Schemas.pagination),
+			},
+		},
+		path: "/tokens/{address}/approvals",
 	});
 
 	server.route({

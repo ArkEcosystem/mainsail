@@ -2,7 +2,11 @@ import { describe } from "@mainsail/test-runner";
 import { Application } from "@mainsail/kernel";
 import receiptTransactions from "../../test/fixtures/receipt_transactions.json";
 import receiptTransactionsResponse from "../../test/fixtures/receipt_transactions.response.json";
+import tokens from "../../test/fixtures/tokens.json";
+import tokenActions from "../../test/fixtures/token_actions.json";
 import transactions from "../../test/fixtures/transactions.json";
+import transactionsTokens from "../../test/fixtures/transactions.tokens.json";
+import transactionsTokensResponse from "../../test/fixtures/transactions.tokens.response.json";
 import transactionsResponse from "../../test/fixtures/transactions.response.json";
 import wallets from "../../test/fixtures/wallets.json";
 import { ApiContext, prepareSandbox } from "../../test/helpers/prepare-sandbox";
@@ -101,6 +105,18 @@ describe<{
 		const { statusCode, data } = await request(`/transactions/${hash}`, options);
 		assert.equal(statusCode, 200);
 		assert.equal(data.data, transactionsResponse.at(-1));
+	});
+
+	it("/transactions/{hash}?includeTokens", async () => {
+		await apiContext.transactionRepository.save(transactionsTokens);
+		await apiContext.tokenActionRepository.save(tokenActions);
+		await apiContext.tokenRepository.save(tokens);
+
+		for (const result of transactionsTokensResponse) {
+			const { statusCode, data } = await request(`/transactions/${result.hash}?includeTokens=true`, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
 	});
 
 	it("/transactions with receipt enriched", async () => {

@@ -7,7 +7,6 @@ import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
-import { makeKeywords } from "@mainsail/crypto-proposal/source/keywords.js";
 import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-signature-bls12-381";
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
@@ -52,10 +51,6 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	context.app.bind(Identifiers.Cryptography.Message.Serializer).to(Serializer);
 	context.app.bind(Identifiers.Cryptography.Message.Deserializer).to(Deserializer);
 	context.app.bind(Identifiers.Cryptography.Message.Factory).to(Factory).inSingletonScope();
-
-	for (const keyword of Object.values(makeKeywords(context.app.get(Identifiers.Cryptography.Configuration)))) {
-		context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
-	}
 
 	for (const schema of Object.values(schemas)) {
 		context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);

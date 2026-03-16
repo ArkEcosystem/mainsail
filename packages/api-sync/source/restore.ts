@@ -25,7 +25,7 @@ interface RepositoryContext {
 	readonly multiPaymentRepository: ApiDatabaseContracts.MultiPaymentRepository;
 	readonly tokenRepository: ApiDatabaseContracts.TokenRepository;
 	readonly tokenHolderRepository: ApiDatabaseContracts.TokenHolderRepository;
-	readonly tokenTransferRepository: ApiDatabaseContracts.TokenTransferRepository;
+	readonly tokenActionRepository: ApiDatabaseContracts.TokenActionRepository;
 	readonly validatorRoundRepository: ApiDatabaseContracts.ValidatorRoundRepository;
 	readonly walletRepository: ApiDatabaseContracts.WalletRepository;
 	readonly legacyColdWalletRepository: ApiDatabaseContracts.LegacyColdWalletRepository;
@@ -45,6 +45,8 @@ interface RestoreContext extends RepositoryContext {
 
 	validatorAttributes: Record<string, ValidatorAttributes>;
 	userAttributes: Record<string, UserAttributes>;
+
+	validatorRounds: Record<number, Contracts.Shared.RoundInfo & { totalRound: number }>;
 }
 
 interface ValidatorAttributes {
@@ -101,6 +103,9 @@ export class Restore {
 	@inject(Identifiers.BlockchainUtils.RoundCalculator)
 	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
 
+	@inject(Identifiers.BlockchainUtils.ProposerCalculator)
+	private readonly proposerCalculator!: Contracts.BlockchainUtils.ProposerCalculator;
+
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
 
@@ -128,8 +133,8 @@ export class Restore {
 	@inject(ApiDatabaseIdentifiers.TokenHolderRepositoryFactory)
 	private readonly tokenHolderRepositoryFactory!: ApiDatabaseContracts.TokenHolderRepositoryFactory;
 
-	@inject(ApiDatabaseIdentifiers.TokenTransferRepositoryFactory)
-	private readonly tokenTransferRepositoryFactory!: ApiDatabaseContracts.TokenTransferRepositoryFactory;
+	@inject(ApiDatabaseIdentifiers.TokenActionRepositoryFactory)
+	private readonly tokenActionRepositoryFactory!: ApiDatabaseContracts.TokenActionRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
 	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.ValidatorRoundRepositoryFactory;
@@ -193,15 +198,16 @@ export class Restore {
 				publicKeyToAddress: {},
 				stateRepository: this.stateRepositoryFactory(entityManager),
 
+				tokenActionRepository: this.tokenActionRepositoryFactory(entityManager),
 				tokenHolderRepository: this.tokenHolderRepositoryFactory(entityManager),
 				tokenRepository: this.tokenRepositoryFactory(entityManager),
-				tokenTransferRepository: this.tokenTransferRepositoryFactory(entityManager),
 
 				totalSupply: BigNumber.ZERO,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				userAttributes: {},
 				validatorAttributes: {},
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
+				validatorRounds: {},
 				walletRepository: this.walletRepositoryFactory(entityManager),
 			};
 
@@ -257,9 +263,9 @@ export class Restore {
 				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
 				multiPaymentRepository: this.multiPaymentRepositoryFactory(entityManager),
 				stateRepository: this.stateRepositoryFactory(entityManager),
+				tokenActionRepository: this.tokenActionRepositoryFactory(entityManager),
 				tokenHolderRepository: this.tokenHolderRepositoryFactory(entityManager),
 				tokenRepository: this.tokenRepositoryFactory(entityManager),
-				tokenTransferRepository: this.tokenTransferRepositoryFactory(entityManager),
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
 				walletRepository: this.walletRepositoryFactory(entityManager),
@@ -287,8 +293,9 @@ export class Restore {
 			multiPaymentRepository,
 			tokenRepository,
 			tokenHolderRepository,
-			tokenTransferRepository,
+			tokenActionRepository: tokenTransferRepository,
 			mostRecentCommit,
+			validatorRounds,
 		} = context;
 
 		const BATCH_SIZE = 1000;
@@ -318,7 +325,7 @@ export class Restore {
 			const multiPayments: Models.MultiPayment[] = [];
 			const tokens: Map<string, Models.Token> = new Map();
 			const tokenHolders: Map<string, Models.TokenHolder> = new Map();
-			const tokenTransfers: Models.TokenTransfer[] = [];
+			const tokenActions: Models.TokenAction[] = [];
 
 			const insertTransactions = async () => {
 				if (transactions.length === 0) {
@@ -363,18 +370,19 @@ export class Restore {
 					tokenHolders.clear();
 				}
 
-				if (tokenTransfers.length > 0) {
+				if (tokenActions.length > 0) {
 					await tokenTransferRepository
 						.createQueryBuilder()
 						.insert()
 						.orIgnore()
-						.values(tokenTransfers)
+						.values(tokenActions)
 						.execute();
 
-					tokenTransfers.length = 0;
+					tokenActions.length = 0;
 				}
 			};
 
+			let totalRound = 0;
 			for await (const { proof, block } of commits) {
 				blocks.push({
 					commitRound: proof.round,
@@ -412,6 +420,13 @@ export class Restore {
 
 				ingestedBlocks++;
 
+				totalRound += block.round + 1;
+
+				if (this.roundCalculator.isNewRound(block.number + 1)) {
+					const nextRound = this.roundCalculator.calculateRound(block.number + 1);
+					validatorRounds[nextRound.round] = { ...nextRound, totalRound };
+				}
+
 				// Handle transactions
 				const receipts = await this.evm.getReceiptsByBlockNumber(BigInt(block.number));
 
@@ -425,7 +440,7 @@ export class Restore {
 					const {
 						tokens: parsedTokens,
 						tokenHolders: parsedTokenHolders,
-						tokenTransfers: parsedTokenTransfers,
+						tokenActions: parsedTokenActions,
 					} = await this.tokenParser.parseReceipt(block, transaction, receipt, tokenRepository);
 
 					if (!context.publicKeyToAddress[senderPublicKey]) {
@@ -490,7 +505,7 @@ export class Restore {
 					});
 
 					multiPayments.push(...parsedMultiPayments);
-					tokenTransfers.push(...parsedTokenTransfers);
+					tokenActions.push(...parsedTokenActions);
 
 					for (const token of parsedTokens) {
 						tokens.set(token.address, token);
@@ -508,7 +523,7 @@ export class Restore {
 						await insertMultiPayments();
 					}
 
-					if (tokens.size + tokenHolders.size + tokenTransfers.length >= CHUNK_SIZE) {
+					if (tokens.size + tokenHolders.size + tokenActions.length >= CHUNK_SIZE) {
 						await insertTokens();
 					}
 
@@ -797,45 +812,60 @@ export class Restore {
 	async #ingestValidatorRounds(context: RestoreContext): Promise<void> {
 		const t0 = performance.now();
 
-		let totalRounds = 0;
-		let validatorRounds: Models.ValidatorRound[] = [];
+		const { validatorRoundRepository, validatorRounds } = context;
+
+		let ingestedValidatorRounds = 0;
+		let validatorRoundsToIngest: Models.ValidatorRound[] = [];
 
 		const CHUNK_SIZE = 1000;
 
 		const insert = async () => {
-			if (validatorRounds.length === 0) {
+			if (validatorRoundsToIngest.length === 0) {
 				return;
 			}
 
-			await context.validatorRoundRepository
+			await validatorRoundRepository
 				.createQueryBuilder()
 				.insert()
 				.orIgnore()
-				.values(validatorRounds)
+				.values(validatorRoundsToIngest)
 				.execute();
 
-			validatorRounds = [];
+			validatorRoundsToIngest = [];
 		};
 
 		for await (const { round, roundHeight, validators } of this.consensusContractService.getValidatorRounds()) {
-			const validatorAddresses: string[] = [];
-			const votes: string[] = [];
+			const validatorAddresses: string[] = Array.from({ length: validators.length });
+			const votes: string[] = Array.from({ length: validators.length });
 
-			// TODO: this doesn't represent the actual proposer order
-			for (const validator of validators) {
-				validatorAddresses.push(validator.address);
-				votes.push(validator.voteBalance.toFixed());
+			for (let index = 0; index < validators.length; index++) {
+				const validatorRound = validatorRounds[round];
+				if (validatorRound.maxValidators !== validators.length) {
+					throw new Error(
+						`mismatch in expected (${validatorRound.maxValidators}) and actual (${validators.length}) validator count`,
+					);
+				}
+
+				const proposerIndex = this.proposerCalculator.getValidatorIndexFrom(
+					validatorRound.maxValidators,
+					validatorRound.totalRound,
+					index,
+				);
+
+				const proposer = validators[proposerIndex];
+				validatorAddresses[index] = proposer.address;
+				votes[index] = proposer.voteBalance.toFixed();
 			}
 
-			validatorRounds.push({
+			validatorRoundsToIngest.push({
 				round,
 				roundHeight,
 				validators: validatorAddresses,
 				votes,
 			});
-			totalRounds += 1;
+			ingestedValidatorRounds += 1;
 
-			if (validatorRounds.length === CHUNK_SIZE) {
+			if (validatorRoundsToIngest.length === CHUNK_SIZE) {
 				await insert();
 			}
 		}
@@ -843,7 +873,7 @@ export class Restore {
 		await insert();
 
 		const t1 = performance.now();
-		this.logger.info(`Restored ${totalRounds.toLocaleString()} validator rounds in ${t1 - t0}ms`);
+		this.logger.info(`Restored ${ingestedValidatorRounds.toLocaleString()} validator rounds in ${t1 - t0}ms`);
 	}
 
 	async #ingestConfiguration(context: RestoreContext): Promise<void> {

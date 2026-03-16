@@ -59,11 +59,11 @@ export class Snapshot {
 		>(Identifiers.Services.EventDispatcher.Service);
 
 		const listener = {
-			handle: ({
+			handle: async ({
 				data,
 			}: {
 				data: { receipt: Contracts.Evm.TransactionReceipt; sender: string; transactionId: string };
-			}) => {
+			}): Promise<void> => {
 				const { sender, receipt, transactionId } = data;
 
 				console.log("got receipt", sender, transactionId, receipt);

@@ -1,6 +1,10 @@
 name: CI
 
-on: pull_request
+on:
+    workflow_call:
+        secrets:
+            CODECOV_TOKEN:
+                required: true
 
 permissions:
     contents: read
@@ -13,11 +17,12 @@ jobs:
     check:
         name: contracts
         runs-on: ubuntu-latest
+
         defaults:
             run:
                 working-directory: contracts
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6.0.2
 
             - name: Install Foundry
               uses: foundry-rs/foundry-toolchain@v1
