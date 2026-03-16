@@ -60,7 +60,9 @@ export abstract class AbstractListener<TEventData, TEntity extends object> imple
 			} catch (ex) {
 				this.logger.error(`#syncToDatabaseTransaction failed: ${ex}`);
 			} finally {
-				this.#syncTimeout = setTimeout(run, syncInterval);
+				this.#syncTimeout = setTimeout(() => {
+					void run();
+				}, syncInterval);
 			}
 		};
 

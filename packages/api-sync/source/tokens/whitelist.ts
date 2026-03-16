@@ -31,38 +31,32 @@ export class TokenWhitelist {
 	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
-	#syncInterval?: NodeJS.Timeout;
+	#syncTimeout?: NodeJS.Timeout;
 
 	public async bootstrap(): Promise<void> {
 		const syncInterval = this.#getTokenWhitelistRefreshIntervalMs();
 
-		let running = false;
-
 		this.logger.info(`Starting TokenWhitelist using remote: ${this.#getTokenWhitelistRemoteUrl()}`);
 
-		this.#syncWhitelist()
-			.catch((error) => this.logger.error(`#syncWhitelist failed: ${error}`))
-			.finally(() => {
-				this.#syncInterval = setInterval(async () => {
-					if (running) {
-						return;
-					}
-
-					running = true;
-
-					try {
-						await this.#syncWhitelist();
-					} catch (ex) {
-						this.logger.error(`#syncWhitelist failed: ${ex}`);
-					} finally {
-						running = false;
-					}
+		const run = async () => {
+			try {
+				await this.#syncWhitelist();
+			} catch (ex) {
+				this.logger.error(`#syncWhitelist failed: ${ex}`);
+			} finally {
+				this.#syncTimeout = setTimeout(() => {
+					void run();
 				}, syncInterval);
-			});
+			}
+		};
+
+		void run();
 	}
 
 	public async dispose(): Promise<void> {
-		clearInterval(this.#syncInterval);
+		if (this.#syncTimeout) {
+			clearTimeout(this.#syncTimeout);
+		}
 	}
 
 	async #syncWhitelist(): Promise<void> {
