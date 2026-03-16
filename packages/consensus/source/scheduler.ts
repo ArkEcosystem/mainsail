@@ -33,9 +33,13 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 
 		const timeout = Math.max(0, timestamp - dayjs().valueOf());
 
-		this.#timeoutStartRound = setTimeout(async () => {
+		const run = async () => {
 			await this.#getConsensus().onTimeoutStartRound();
 			this.#timeoutStartRound = undefined;
+		};
+
+		this.#timeoutStartRound = setTimeout(() => {
+			void run();
 		}, timeout);
 
 		return true;
@@ -46,9 +50,13 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 			return false;
 		}
 
-		this.#timeoutPropose = setTimeout(async () => {
+		const run = async () => {
 			await this.#getConsensus().onTimeoutPropose(height, round);
 			this.#timeoutPropose = undefined;
+		};
+
+		this.#timeoutPropose = setTimeout(() => {
+			void run();
 		}, this.#getTimeout(round));
 
 		return true;
@@ -59,9 +67,13 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 			return false;
 		}
 
-		this.#timeoutPrevote = setTimeout(async () => {
+		const run = async () => {
 			await this.#getConsensus().onTimeoutPrevote(height, round);
 			this.#timeoutPrevote = undefined;
+		};
+
+		this.#timeoutPrevote = setTimeout(() => {
+			void run();
 		}, this.#getTimeout(round));
 
 		return true;
@@ -72,9 +84,13 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 			return false;
 		}
 
-		this.#timeoutPrecommit = setTimeout(async () => {
+		const run = async () => {
 			await this.#getConsensus().onTimeoutPrecommit(height, round);
 			this.#timeoutPrecommit = undefined;
+		};
+
+		this.#timeoutPrecommit = setTimeout(() => {
+			void run();
 		}, this.#getTimeout(round));
 
 		return true;
