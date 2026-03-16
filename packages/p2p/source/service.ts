@@ -64,7 +64,9 @@ export class Service implements Contracts.P2P.Service {
 		await this.#checkReceivedMessages();
 
 		if (!this.#disposed) {
-			this.#mainLoopTimeout = setTimeout(() => this.mainLoop(), 2000);
+			this.#mainLoopTimeout = setTimeout(() => {
+				void this.mainLoop();
+			}, 2000);
 		}
 	}
 
@@ -108,7 +110,9 @@ export class Service implements Contracts.P2P.Service {
 
 		if (!this.#disposed) {
 			const nextTimeout = randomNumber(10, 20) * 60 * 1000;
-			this.#apiNodeCheckLoopTimeout = setTimeout(() => this.#checkApiNodes(), nextTimeout);
+			this.#apiNodeCheckLoopTimeout = setTimeout(() => {
+				void this.#checkApiNodes();
+			}, nextTimeout);
 		}
 	}
 
@@ -125,31 +129,19 @@ export class Service implements Contracts.P2P.Service {
 
 		this.logger.info(`Checking ${pluralize("peer", max, true)}`, "p2p");
 
-		// we use Promise.race to cut loose in case some communicator.ping() does not resolve within the delay
-		// in that case we want to keep on with our program execution while ping promises can finish in the background
-		await new Promise<void>(async (resolve) => {
-			let isResolved = false;
-
-			// Simulates Promise.race, but doesn't cause "multipleResolvers" process error
-			const resolvesFirst = () => {
-				if (!isResolved) {
-					isResolved = true;
-					resolve();
-				}
-			};
-
-			await Promise.all(
+		// Wait until either all pings finish or pingDelay elapses.
+		// If the delay wins, continue program execution and let the remaining ping promises finish in the background.
+		await Promise.race([
+			Promise.all(
 				peers.map(async (peer) => {
 					if (!(await this.peerVerifier.verify(peer))) {
 						unresponsivePeers++;
-
 						this.peerDisposer.disposePeer(peer.ip);
 					}
 				}),
-			).then(resolvesFirst);
-
-			await delay(pingDelay).finally(resolvesFirst);
-		});
+			),
+			delay(pingDelay),
+		]);
 
 		if (unresponsivePeers > 0) {
 			this.logger.debug(`Removed ${pluralize("peer", unresponsivePeers, true)}`, "p2p");
