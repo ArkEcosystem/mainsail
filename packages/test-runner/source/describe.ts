@@ -17,11 +17,11 @@ type ContextFunction<T> = () => T;
 type ContextCallback<T> = (context: T) => Promise<void> | void;
 
 interface CallbackArguments<T> {
-	afterAll: (callback_: ContextCallback<T>) => void;
-	afterEach: (callback_: ContextCallback<T>) => void;
+	afterAll: (callback_: ContextCallback<T>) => Promise<void>;
+	afterEach: (callback_: ContextCallback<T>) => Promise<void>;
 	assert: typeof assert;
-	beforeAll: (callback_: ContextCallback<T>) => void;
-	beforeEach: (callback_: ContextCallback<T>) => void;
+	beforeAll: (callback_: ContextCallback<T>) => Promise<void>;
+	beforeEach: (callback_: ContextCallback<T>) => Promise<void>;
 	clock: (config?: number | Date | { now?: number | Date | undefined }) => sinon.SinonFakeTimers;
 
 	dataset: unknown;
