@@ -77,7 +77,7 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 	}
 
 	public async later(delay: number, job: Contracts.Kernel.QueueJob): Promise<void> {
-		setTimeout(() => this.push(job), delay);
+		setTimeout(() => void this.push(job), delay);
 	}
 
 	public async bulk(jobs: Contracts.Kernel.QueueJob[]): Promise<void> {

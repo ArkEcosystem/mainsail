@@ -1,6 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+import { setTimeoutAsync } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 @injectable()
@@ -33,7 +34,7 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 
 		const timeout = Math.max(0, timestamp - dayjs().valueOf());
 
-		this.#timeoutStartRound = setTimeout(async () => {
+		this.#timeoutStartRound = setTimeoutAsync(async () => {
 			await this.#getConsensus().onTimeoutStartRound();
 			this.#timeoutStartRound = undefined;
 		}, timeout);
@@ -46,7 +47,7 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 			return false;
 		}
 
-		this.#timeoutPropose = setTimeout(async () => {
+		this.#timeoutPropose = setTimeoutAsync(async () => {
 			await this.#getConsensus().onTimeoutPropose(height, round);
 			this.#timeoutPropose = undefined;
 		}, this.#getTimeout(round));
@@ -59,7 +60,7 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 			return false;
 		}
 
-		this.#timeoutPrevote = setTimeout(async () => {
+		this.#timeoutPrevote = setTimeoutAsync(async () => {
 			await this.#getConsensus().onTimeoutPrevote(height, round);
 			this.#timeoutPrevote = undefined;
 		}, this.#getTimeout(round));
@@ -72,7 +73,7 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 			return false;
 		}
 
-		this.#timeoutPrecommit = setTimeout(async () => {
+		this.#timeoutPrecommit = setTimeoutAsync(async () => {
 			await this.#getConsensus().onTimeoutPrecommit(height, round);
 			this.#timeoutPrecommit = undefined;
 		}, this.#getTimeout(round));

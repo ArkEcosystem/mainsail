@@ -169,6 +169,7 @@ export * from "./reverse.js";
 export * from "./sample.js";
 export * from "./semver.js";
 export * from "./set.js";
+export * from "./set-timeout-async.js";
 export * from "./shuffle.js";
 export * from "./sleep.js";
 export * from "./snake-case.js";

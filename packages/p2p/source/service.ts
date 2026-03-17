@@ -64,7 +64,9 @@ export class Service implements Contracts.P2P.Service {
 		await this.#checkReceivedMessages();
 
 		if (!this.#disposed) {
-			this.#mainLoopTimeout = setTimeout(() => this.mainLoop(), 2000);
+			this.#mainLoopTimeout = setTimeout(() => {
+				void this.mainLoop();
+			}, 2000);
 		}
 	}
 
@@ -108,7 +110,9 @@ export class Service implements Contracts.P2P.Service {
 
 		if (!this.#disposed) {
 			const nextTimeout = randomNumber(10, 20) * 60 * 1000;
-			this.#apiNodeCheckLoopTimeout = setTimeout(() => this.#checkApiNodes(), nextTimeout);
+			this.#apiNodeCheckLoopTimeout = setTimeout(() => {
+				void this.#checkApiNodes();
+			}, nextTimeout);
 		}
 	}
 
@@ -127,6 +131,8 @@ export class Service implements Contracts.P2P.Service {
 
 		// we use Promise.race to cut loose in case some communicator.ping() does not resolve within the delay
 		// in that case we want to keep on with our program execution while ping promises can finish in the background
+		// TODO: revisit
+		/* eslint-disable @typescript-eslint/no-misused-promises */
 		await new Promise<void>(async (resolve) => {
 			let isResolved = false;
 
@@ -150,6 +156,7 @@ export class Service implements Contracts.P2P.Service {
 
 			await delay(pingDelay).finally(resolvesFirst);
 		});
+		/* eslint-enable */
 
 		if (unresponsivePeers > 0) {
 			this.logger.debug(`Removed ${pluralize("peer", unresponsivePeers, true)}`, "p2p");

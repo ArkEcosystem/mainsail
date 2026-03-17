@@ -57,7 +57,7 @@ export default [
 			"@typescript-eslint/no-empty-object": "off",
 			"@typescript-eslint/no-explicit-any": "error",
 			"@typescript-eslint/no-floating-promises": "error",
-			"@typescript-eslint/no-misused-promises": "warn",
+			"@typescript-eslint/no-misused-promises": "error",
 			"@typescript-eslint/no-non-null-asserted-optional-chain": "off",
 			"@typescript-eslint/no-non-null-assertion": "warn",
 			"@typescript-eslint/no-redundant-type-constituents": "warn",
