@@ -7,6 +7,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { NotImplemented } from "@mainsail/exceptions";
+import { setTimeoutAsync } from "@mainsail/utils";
 
 import { EventListener } from "../contracts.js";
 
@@ -60,9 +61,7 @@ export abstract class AbstractListener<TEventData, TEntity extends object> imple
 			} catch (ex) {
 				this.logger.error(`#syncToDatabaseTransaction failed: ${ex}`);
 			} finally {
-				this.#syncTimeout = setTimeout(() => {
-					void run();
-				}, syncInterval);
+				this.#syncTimeout = setTimeoutAsync(run, syncInterval);
 			}
 		};
 
