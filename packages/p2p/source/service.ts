@@ -129,19 +129,34 @@ export class Service implements Contracts.P2P.Service {
 
 		this.logger.info(`Checking ${pluralize("peer", max, true)}`, "p2p");
 
-		// Wait until either all pings finish or pingDelay elapses.
-		// If the delay wins, continue program execution and let the remaining ping promises finish in the background.
-		await Promise.race([
-			Promise.all(
+		// we use Promise.race to cut loose in case some communicator.ping() does not resolve within the delay
+		// in that case we want to keep on with our program execution while ping promises can finish in the background
+		// TODO: revisit
+		/* eslint-disable @typescript-eslint/no-misused-promises */
+		await new Promise<void>(async (resolve) => {
+			let isResolved = false;
+
+			// Simulates Promise.race, but doesn't cause "multipleResolvers" process error
+			const resolvesFirst = () => {
+				if (!isResolved) {
+					isResolved = true;
+					resolve();
+				}
+			};
+
+			await Promise.all(
 				peers.map(async (peer) => {
 					if (!(await this.peerVerifier.verify(peer))) {
 						unresponsivePeers++;
+
 						this.peerDisposer.disposePeer(peer.ip);
 					}
 				}),
-			),
-			delay(pingDelay),
-		]);
+			).then(resolvesFirst);
+
+			await delay(pingDelay).finally(resolvesFirst);
+		});
+		/* eslint-enable */
 
 		if (unresponsivePeers > 0) {
 			this.logger.debug(`Removed ${pluralize("peer", unresponsivePeers, true)}`, "p2p");
