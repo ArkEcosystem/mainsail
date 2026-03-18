@@ -2,34 +2,22 @@ import { Identifiers } from "@mainsail/constants";
 
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { assertCommitProofData } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Deserializer } from "./deserializer";
-import { Serializer } from "./serializer";
+import { commitProof1, commitProof2, commitProofSerialized1, commitProofSerialized2 } from "../test/fixtures/index.ts";
 
 describe<{
 	app: Application;
-	serializer: Serializer;
 	deserializer: Deserializer;
 }>("Deserializer", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.serializer = context.app.get<Serializer>(Identifiers.Cryptography.Commit.Serializer);
 		context.deserializer = context.app.get<Deserializer>(Identifiers.Cryptography.Commit.Deserializer);
 	});
 
-	it("#deserializeCommitProof - should deserialize commit proof", async ({ serializer, deserializer }) => {
-		const proof = {
-			round: 1,
-			signature:
-				"97a16d3e938a1bc6866701b946e703cfa502d57a226e540f270c16585405378e93086dfb3b32ab2039aa2c197177c66b0fec074df5bfac037efd3dc41d98d50455a69ff1934d503ef69dffa08429f75e5677efca4f2de36d46f8258635e32a95",
-			validators: Array.from<boolean>({ length: 51 }).fill(true),
-		};
-
-		const serialized = await serializer.serializeCommitProof(proof);
-		const deserialized = await deserializer.deserializeCommitProof(serialized);
-
-		assertCommitProofData(assert, deserialized, proof);
+	it("#deserializeCommitProof - should deserialize commit proof", async ({ deserializer }) => {
+		assert.equal(await deserializer.deserializeCommitProof(Buffer.from(commitProofSerialized1, "hex")), commitProof1);
+		assert.equal(await deserializer.deserializeCommitProof(Buffer.from(commitProofSerialized2, "hex")), commitProof2);
 	});
 });
