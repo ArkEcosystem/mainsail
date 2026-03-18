@@ -6,7 +6,7 @@ import {
 	TypeOrm,
 } from "@mainsail/api-database";
 import { Commands } from "@mainsail/cli";
-import { Identifiers } from "@mainsail/constants";
+import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { injectable, postConstruct } from "@mainsail/container";
 import { Providers, Services } from "@mainsail/kernel";
 import { parse } from "envfile";
@@ -37,16 +37,16 @@ export class Command extends Commands.Command {
 
 		const config = {
 			applicationName: "mainsail/api",
-			database: this.#fromEnv(environment, "MAINSAIL_DB_DATABASE"),
+			database: this.#fromEnv(environment, EnvironmentVariables.MAINSAIL_DB_DATABASE),
 			dropSchema: true,
 			entityPrefix: "public.",
-			host: this.#fromEnv(environment, "MAINSAIL_DB_HOST"),
+			host: this.#fromEnv(environment, EnvironmentVariables.MAINSAIL_DB_HOST),
 			logger: "simple-console",
 			logging: false,
-			password: this.#fromEnv(environment, "MAINSAIL_DB_PASSWORD"),
-			port: Number.parseInt(this.#fromEnv(environment, "MAINSAIL_DB_PORT")),
+			password: this.#fromEnv(environment, EnvironmentVariables.MAINSAIL_DB_PASSWORD),
+			port: Number.parseInt(this.#fromEnv(environment, EnvironmentVariables.MAINSAIL_DB_PORT)),
 			type: "postgres",
-			username: this.#fromEnv(environment, "MAINSAIL_DB_USERNAME"),
+			username: this.#fromEnv(environment, EnvironmentVariables.MAINSAIL_DB_USERNAME),
 		};
 
 		if (!this.hasFlag("force")) {
@@ -71,7 +71,7 @@ export class Command extends Commands.Command {
 					database: config,
 					enabled: true,
 				})[property],
-		} as unknown as Providers.PluginConfiguration);
+		} as Providers.PluginConfiguration);
 
 		try {
 			await this.components.taskList([
