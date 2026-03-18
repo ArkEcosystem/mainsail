@@ -6,7 +6,8 @@ import { describe } from "@mainsail/test-runner";
 
 import { prepareSandbox, assertBlockData } from "../test/helpers/index.ts";
 import { CommitFactory } from "./factory";
-import { commitSerialized, blockSerialized, commitProof1, blockData, blockDataJson } from "../test/fixtures/index.ts";
+import { commitSerialized, blockSerialized, commitProof1, blockData, blockDataJson, blockHeaderStorage } from "../test/fixtures/index.ts";
+import { validatorSetPack } from "@mainsail/utils";
 
 describe<{
 	app: Application;
@@ -45,5 +46,29 @@ describe<{
 		assertBlockData(assert, commit.block, blockData);
 		assert.equal(commit.proof, commitProof1);
 		assert.equal(commit.serialized, commitSerialized);
+	});
+
+	it("#fromStorage - should create commit from storage", async ({ factory,  }) => {
+		const commitStorage: Contracts.Evm.CommitStorageData = {
+			proof: {
+				round: commitProof1.round,
+				signature: commitProof1.signature,
+				validatorSet: validatorSetPack(commitProof1.validators),
+			},
+			header: blockHeaderStorage,
+			transactions: [],
+		};
+
+		const commit = await factory.fromStorage(commitStorage);
+
+		console.log(commit);
+
+		assert.equal(commit.proof, commitProof1);
+		assert.equal(commit.block.transactions, []);
+		assertBlockData(assert, commit.block, blockData);
+
+		// assert.equal(commit.block.serialized, blockSerialized);
+		// const expectedSerialized = await serializer.serializeCommit(commit);
+		// assert.equal(commit.serialized, commitSerialized);
 	});
 });
