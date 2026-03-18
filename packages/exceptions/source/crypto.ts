@@ -420,3 +420,9 @@ export class InvalidProposalBytesError extends Exception {
 		super(`Failed to deserialize proposal, encountered invalid bytes: ${message}`);
 	}
 }
+
+export class InvalidCommitProofBytesError extends Exception {
+	public constructor(message: string) {
+		super(`Failed to deserialize commit proof, encountered invalid bytes: ${message}`);
+	}
+}
