@@ -67,6 +67,7 @@ describe<{
 		assert.equal(commit.block.transactions, []);
 		assertBlockData(assert, commit.block, blockData);
 
+		// TODO: Check
 		// assert.equal(commit.block.serialized, blockSerialized);
 		// const expectedSerialized = await serializer.serializeCommit(commit);
 		// assert.equal(commit.serialized, commitSerialized);
