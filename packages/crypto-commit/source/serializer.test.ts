@@ -4,7 +4,14 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Serializer } from "./serializer";
-import { commitProof1, commitProof2, commitProofSerialized1, commitProofSerialized2, commit, commitSerialized } from "../test/fixtures/index.ts";
+import {
+	commitProof1,
+	commitProof2,
+	commitProofSerialized1,
+	commitProofSerialized2,
+	commit,
+	commitSerialized,
+} from "../test/fixtures/index.ts";
 
 describe<{
 	app: Application;

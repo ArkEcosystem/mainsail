@@ -18,10 +18,15 @@ describe<{
 	});
 
 	it("#deserializeCommitProof - should deserialize commit proof", async ({ deserializer }) => {
-		assert.equal(await deserializer.deserializeCommitProof(Buffer.from(commitProofSerialized1, "hex")), commitProof1);
-		assert.equal(await deserializer.deserializeCommitProof(Buffer.from(commitProofSerialized2, "hex")), commitProof2);
+		assert.equal(
+			await deserializer.deserializeCommitProof(Buffer.from(commitProofSerialized1, "hex")),
+			commitProof1,
+		);
+		assert.equal(
+			await deserializer.deserializeCommitProof(Buffer.from(commitProofSerialized2, "hex")),
+			commitProof2,
+		);
 	});
-
 
 	it("#deserializeCommitProof - should throw with leading bytes", async ({ deserializer }) => {
 		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {

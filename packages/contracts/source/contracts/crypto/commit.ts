@@ -10,7 +10,7 @@ export interface CommitJson {
 export type CommitSerializable = {
 	readonly block: Block;
 	readonly proof: CommitProof;
-}
+};
 
 export interface Commit extends CommitSerializable {
 	readonly serialized: string;

@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { InvalidCommitProofBytesError } from "@mainsail/exceptions";
 import type { Contracts } from "@mainsail/contracts";
+import { InvalidCommitProofBytesError } from "@mainsail/exceptions";
 import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()

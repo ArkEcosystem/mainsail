@@ -6,7 +6,14 @@ import { describe } from "@mainsail/test-runner";
 
 import { prepareSandbox, assertBlockData } from "../test/helpers/index.ts";
 import { CommitFactory } from "./factory";
-import { commitSerialized, blockSerialized, commitProof1, blockData, blockDataJson, blockHeaderStorage } from "../test/fixtures/index.ts";
+import {
+	commitSerialized,
+	blockSerialized,
+	commitProof1,
+	blockData,
+	blockDataJson,
+	blockHeaderStorage,
+} from "../test/fixtures/index.ts";
 import { validatorSetPack } from "@mainsail/utils";
 
 describe<{
@@ -17,9 +24,7 @@ describe<{
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.configuration = context.app.get<Contracts.Crypto.Configuration>(
-			Identifiers.Cryptography.Configuration,
-		);
+		context.configuration = context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 		context.configuration.setHeight(1);
 
 		context.factory = context.app.resolve(CommitFactory);
@@ -48,7 +53,7 @@ describe<{
 		assert.equal(commit.serialized, commitSerialized);
 	});
 
-	it("#fromStorage - should create commit from storage", async ({ factory,  }) => {
+	it("#fromStorage - should create commit from storage", async ({ factory }) => {
 		const commitStorage: Contracts.Evm.CommitStorageData = {
 			proof: {
 				round: commitProof1.round,
