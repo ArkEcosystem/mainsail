@@ -7,9 +7,12 @@ export interface CommitJson {
 	readonly serialized: string;
 }
 
-export interface Commit {
+export type CommitSerializable = {
 	readonly block: Block;
 	readonly proof: CommitProof;
+}
+
+export interface Commit extends CommitSerializable {
 	readonly serialized: string;
 }
 
@@ -18,7 +21,6 @@ export interface CommitData {
 	readonly proof: CommitProof;
 	readonly serialized: string;
 }
-export type CommitSerializable = Omit<Commit, "serialized">;
 
 export interface CommitFactory {
 	fromBytes(buff: Buffer): Promise<Commit>;
@@ -34,7 +36,6 @@ export interface CommitProof {
 
 export interface CommitSerializer {
 	serializeCommitProof(proof: CommitProof): Promise<Buffer>;
-
 	serializeCommit(commit: CommitSerializable): Promise<Buffer>;
 }
 
