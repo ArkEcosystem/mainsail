@@ -116,6 +116,9 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
       '@mainsail/logger-pino':
         specifier: workspace:*
         version: link:../logger-pino
