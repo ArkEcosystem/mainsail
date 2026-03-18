@@ -1,3 +1,5 @@
+import { exit } from "node:process";
+
 import { Identifiers } from "@mainsail/constants";
 import { Application as BaseApplication } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -19,5 +21,25 @@ export class Application extends BaseApplication {
 		const path: string = this.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Console)[type];
 
 		return resolve(file ? `${path}/${file}` : path);
+	}
+
+	public name(): string {
+		return "Cli";
+	}
+
+	public isWorker(): boolean {
+		return false;
+	}
+
+	public async terminate(reason?: string, error?: Error): Promise<never> {
+		if (reason) {
+			console.log(`CLI shutdown: ${reason}`);
+		}
+
+		if (error) {
+			console.log(error.stack ?? error.message);
+		}
+
+		exit(1);
 	}
 }
