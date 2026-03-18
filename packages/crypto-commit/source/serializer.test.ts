@@ -4,7 +4,7 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Serializer } from "./serializer";
-import { commitProof1, commitProof2, commitProofSerialized1, commitProofSerialized2 } from "../test/fixtures/index.ts";
+import { commitProof1, commitProof2, commitProofSerialized1, commitProofSerialized2, commit, commitSerialized } from "../test/fixtures/index.ts";
 
 describe<{
 	app: Application;
@@ -22,5 +22,11 @@ describe<{
 
 		assert.equal(serialized1.toString("hex"), commitProofSerialized1);
 		assert.equal(serialized2.toString("hex"), commitProofSerialized2);
+	});
+
+	it("#serialize - should serialize commit", async ({ serializer }) => {
+		const serialized = await serializer.serializeCommit(commit);
+
+		assert.equal(serialized.toString("hex"), commitSerialized);
 	});
 });
