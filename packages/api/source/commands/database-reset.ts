@@ -15,13 +15,13 @@ import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
-	public signature = "db:truncate";
+	public signature = "db:reset";
 
-	public description = "Truncate the API database.";
+	public description = "Reset the API database.";
 
 	@postConstruct()
 	public configure(): void {
-		this.definition.setFlag("force", "Force drop of database without confirmation.", Joi.boolean());
+		this.definition.setFlag("force", "Force reset of database without confirmation.", Joi.boolean());
 	}
 
 	public async execute(): Promise<void> {
@@ -52,10 +52,10 @@ export class Command extends Commands.Command {
 		if (!this.hasFlag("force")) {
 			if (
 				!(await this.components.confirm(
-					`⚠️  You are about to TRUNCATE the database "${config.database}". All data will be LOST. Continue?`,
+					`⚠️  You are about to RESET the database "${config.database}". All data will be LOST. Continue?`,
 				))
 			) {
-				this.components.log("Aborting. Database was not dropped.");
+				this.components.log("Aborting. Database was not reset.");
 				return;
 			}
 		}
