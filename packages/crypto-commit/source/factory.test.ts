@@ -13,6 +13,7 @@ import {
 	blockData,
 	blockDataJson,
 	blockHeaderStorage,
+	transactionsStorage,
 } from "../test/fixtures/index.ts";
 import { validatorSetPack } from "@mainsail/utils";
 
@@ -61,20 +62,15 @@ describe<{
 				validatorSet: validatorSetPack(commitProof1.validators),
 			},
 			header: blockHeaderStorage,
-			transactions: [],
+			transactions: transactionsStorage,
 		};
 
 		const commit = await factory.fromStorage(commitStorage);
 
-		console.log(commit);
-
 		assert.equal(commit.proof, commitProof1);
-		assert.equal(commit.block.transactions, []);
+		assert.equal(commit.block.transactions.length, blockData.transactions.length);
 		assertBlockData(assert, commit.block, blockData);
-
-		// TODO: Check
-		// assert.equal(commit.block.serialized, blockSerialized);
-		// const expectedSerialized = await serializer.serializeCommit(commit);
-		// assert.equal(commit.serialized, commitSerialized);
+		assert.equal(commit.block.serialized, blockSerialized);
+		assert.equal(commit.serialized, commitSerialized);
 	});
 });
