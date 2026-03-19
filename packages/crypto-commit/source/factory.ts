@@ -1,6 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+import { MessageSchemaError } from "@mainsail/exceptions";
 import { ByteBuffer, validatorSetUnpack } from "@mainsail/utils";
 
 @injectable()
@@ -20,11 +21,15 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 	@inject(Identifiers.Cryptography.Commit.ProofSize)
 	private readonly proofSize!: () => number;
 
+	@inject(Identifiers.Cryptography.Validator)
+	private readonly validator!: Contracts.Crypto.Validator;
+
 	public async fromBytes(buff: Buffer): Promise<Contracts.Crypto.Commit> {
 		const buffer = ByteBuffer.fromBuffer(buff);
 
 		const proofBuffer = buffer.readBytes(this.proofSize());
 		const proof = await this.commitDeserializer.deserializeCommitProof(proofBuffer);
+		this.#verifySchema("commitProof", proof);
 
 		const block = await this.blockFactory.fromBytes(buffer.getRemainder());
 
@@ -64,5 +69,13 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 			proof: json.proof,
 			serialized: json.serialized,
 		};
+	}
+
+	#verifySchema<T>(schema: string, data: T): void {
+		const result = this.validator.validate(schema, data);
+
+		if (result.error) {
+			throw new MessageSchemaError(schema, result.error);
+		}
 	}
 }

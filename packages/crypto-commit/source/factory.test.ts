@@ -6,6 +6,7 @@ import { describe } from "@mainsail/test-runner";
 
 import { prepareSandbox, assertBlockData } from "../test/helpers/index.ts";
 import { CommitFactory } from "./factory";
+import { schemas } from "./schemas";
 import {
 	commitSerialized,
 	blockSerialized,
@@ -24,6 +25,10 @@ describe<{
 }>("Factory", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
+
+		for (const schema of Object.values(schemas)) {
+			context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
+		}
 
 		context.configuration = context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 		context.configuration.setHeight(1);
