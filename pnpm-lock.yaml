@@ -1370,6 +1370,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      ajv:
+        specifier: 8.17.1
+        version: 8.17.1
     devDependencies:
       '@mainsail/contracts':
         specifier: workspace:*
