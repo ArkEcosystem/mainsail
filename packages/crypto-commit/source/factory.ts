@@ -33,11 +33,15 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 
 		const block = await this.blockFactory.fromBytes(buffer.getRemainder());
 
-		return {
+		const commit = {
 			block,
 			proof,
 			serialized: buff.toString("hex"),
 		};
+
+		this.#verifySchema("commit", commit);
+
+		return commit;
 	}
 
 	public async fromStorage(data: Contracts.Evm.CommitStorageData): Promise<Contracts.Crypto.Commit> {
@@ -56,19 +60,24 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 
 		const serialized = await this.commitSerializer.serializeCommit(commit);
 
-		return {
+		const commitWithSerialized = {
 			...commit,
 			serialized: serialized.toString("hex"),
 		};
+		this.#verifySchema("commit", commitWithSerialized);
+
+		return commitWithSerialized;
 	}
 
 	public async fromJson(json: Contracts.Crypto.CommitJson): Promise<Contracts.Crypto.Commit> {
 		const block = await this.blockFactory.fromJson(json.block);
-		return {
+		const commit = {
 			block,
 			proof: json.proof,
 			serialized: json.serialized,
 		};
+		this.#verifySchema("commit", commit);
+		return commit;
 	}
 
 	#verifySchema<T>(schema: string, data: T): void {
