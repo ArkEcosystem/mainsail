@@ -1,8 +1,12 @@
 import { Identifiers } from "@mainsail/constants";
+import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
+import { schemas as base58addressSchemas } from "@mainsail/crypto-address-base58";
 import { schemas as blockSchemas } from "@mainsail/crypto-block";
 import { Configuration } from "@mainsail/crypto-config";
+import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-ecdsa";
 import { schemas as signatureBlsSchemas } from "@mainsail/crypto-signature-bls12-381";
 import { schemas as transactionSchemas } from "@mainsail/crypto-transaction/source/validation/index.js";
+import { makeKeywords as makeTransactionKeywords } from "@mainsail/crypto-transaction/source/validation/keywords.js";
 import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation/source/validator";
 
@@ -27,13 +31,17 @@ describe<{
 
 		for (const keyword of Object.values({
 			...makeBaseKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeTransactionKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
 		})) {
 			context.validator.addKeyword(keyword);
 		}
 
 		for (const schema of Object.values({
 			...baseSchemas,
+			...addressSchemas,
+			...base58addressSchemas,
 			...blockSchemas,
+			...keyPairSchemas,
 			...signatureBlsSchemas,
 			...transactionSchemas,
 			...schemas,
@@ -43,17 +51,32 @@ describe<{
 	});
 
 	it("commit - should be ok", ({ validator }) => {
+		const blockDataWithBytecode = {
+			...blockData,
+			transactions: blockData.transactions.map((tx) => ({
+				...tx,
+				data: "0x",
+			})),
+		};
 		const result = validator.validate("commit", {
-			block: blockData,
+			block: blockDataWithBytecode,
 			proof: commitProof1,
 			serialized: commitSerialized,
 		});
+
 		assert.undefined(result.error);
 	});
 
 	it("commit - should not allow additional fields", ({ validator }) => {
+		const blockDataWithBytecode = {
+			...blockData,
+			transactions: blockData.transactions.map((tx) => ({
+				...tx,
+				data: "0x",
+			})),
+		};
 		const result = validator.validate("commit", {
-			block: blockData,
+			block: blockDataWithBytecode,
 			proof: commitProof1,
 			serialized: commitSerialized,
 			extraField: "extraValue",
@@ -63,9 +86,21 @@ describe<{
 	});
 
 	it("commit - all fields are required", ({ validator }) => {
+		const blockDataWithBytecode = {
+			...blockData,
+			transactions: blockData.transactions.map((tx) => ({
+				...tx,
+				data: "0x",
+			})),
+		};
 		const keys = Object.keys(schemas.commit.properties);
 		for (const key of keys) {
-			const commitCopy = { block: blockData, proof: commitProof1, serialized: commitSerialized, [key]: undefined };
+			const commitCopy = {
+				block: blockDataWithBytecode,
+				proof: commitProof1,
+				serialized: commitSerialized,
+				[key]: undefined,
+			};
 			const result = validator.validate("commit", commitCopy);
 			assert.defined(result.error);
 			assert.true(result.error?.includes(key));
