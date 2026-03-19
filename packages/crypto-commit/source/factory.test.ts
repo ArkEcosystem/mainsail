@@ -3,6 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { MessageSchemaError } from "@mainsail/exceptions";
 
 import { prepareSandbox, assertBlockData } from "../test/helpers/index.ts";
 import { CommitFactory } from "./factory";
@@ -43,6 +44,18 @@ describe<{
 		assertBlockData(assert, commit.block, blockData);
 		assert.equal(commit.block.serialized, blockSerialized);
 		assert.equal(commit.serialized, commitSerialized);
+	});
+
+	it("#fromBytes - should throw on invalid schema", async ({ factory }) => {
+		const bytes = Buffer.from(commitSerialized, "hex");
+		const signatureSize = commitProof1.signature.length / 2;
+		const validatorLengthOffset = 4 + signatureSize; // 4 bytes for round + signature size
+
+		// Set validator length to 1 and fill the rest of the proof with zeros to make it invalid
+		bytes[validatorLengthOffset] = 1;
+		bytes.fill(0, validatorLengthOffset + 1, validatorLengthOffset + 1 + 8); // Fill the rest of the proof with zeros
+
+		await assert.rejects(async () => factory.fromBytes(bytes), MessageSchemaError);
 	});
 
 	it("#fromJson - should create commit from json", async ({ factory, configuration }) => {
