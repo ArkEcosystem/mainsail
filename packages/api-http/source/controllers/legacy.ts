@@ -1,3 +1,4 @@
+import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
@@ -29,5 +30,21 @@ export class LegacyController extends Controller {
 			},
 			LegacyColdWalletResource,
 		);
+	}
+
+	public async showColdWallet(request: Hapi.Request): Promise<object> {
+		const legacyAddress = request.params.address;
+
+		const wallet = await this.legacyColdWalletRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.where("address = :legacyAddress", { legacyAddress })
+			.getOne();
+
+		if (!wallet) {
+			return Boom.notFound("Cold Wallet not found");
+		}
+
+		return this.respondWithResource(wallet, LegacyColdWalletResource);
 	}
 }
