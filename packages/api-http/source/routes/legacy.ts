@@ -4,6 +4,7 @@ import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { LegacyController } from "../controllers/legacy.js";
+import { legacyAddressSchema } from "../schemas/legacy.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(LegacyController);
@@ -23,5 +24,19 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 		},
 		path: "/legacy/cold-wallets",
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.showColdWallet(request),
+		method: "GET",
+		options: {
+			validate: {
+				params: Joi.object({
+					address: legacyAddressSchema,
+				}),
+				query: Joi.object({}),
+			},
+		},
+		path: "/legacy/cold-wallets/{address}",
 	});
 };
