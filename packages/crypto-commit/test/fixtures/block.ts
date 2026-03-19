@@ -117,7 +117,7 @@ export const tx2Storage: Contracts.Evm.TransactionStorageData = {
 	to: "0xBe89811e15f611C1db12e59679b6F3DC1F430155",
 	index: 1,
 	v: 0,
-	value: BigInt(0)	,
+	value: BigInt(0),
 };
 
 export const tx2Serialized =
