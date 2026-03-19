@@ -138,6 +138,12 @@ export class ApiContext {
 		)();
 	}
 
+	public get legacyColdWalletRepository(): ApiDatabaseContracts.LegacyColdWalletRepository {
+		return this.app.get<ApiDatabaseContracts.LegacyColdWalletRepositoryFactory>(
+			ApiDatabaseIdentifiers.LegacyColdWalletRepositoryFactory,
+		)();
+	}
+
 	public get validatorRoundRepository(): ApiDatabaseContracts.ValidatorRoundRepository {
 		return this.app.get<ApiDatabaseContracts.ValidatorRoundRepositoryFactory>(
 			ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory,
