@@ -1,13 +1,15 @@
 import { Identifiers } from "@mainsail/constants";
+import { schemas as blockSchemas } from "@mainsail/crypto-block";
 import { Configuration } from "@mainsail/crypto-config";
 import { schemas as signatureBlsSchemas } from "@mainsail/crypto-signature-bls12-381";
+import { schemas as transactionSchemas } from "@mainsail/crypto-transaction/source/validation/index.js";
 import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { commitProof1, commitProof2 } from "../test/fixtures/index.js";
+import { blockData, commitProof1, commitProof2, commitSerialized } from "../test/fixtures/index.js";
 import { schemas } from "./schemas";
 
 describe<{
@@ -31,10 +33,42 @@ describe<{
 
 		for (const schema of Object.values({
 			...baseSchemas,
+			...blockSchemas,
 			...signatureBlsSchemas,
+			...transactionSchemas,
 			...schemas,
 		})) {
 			context.validator.addSchema(schema);
+		}
+	});
+
+	it("commit - should be ok", ({ validator }) => {
+		const result = validator.validate("commit", {
+			block: blockData,
+			proof: commitProof1,
+			serialized: commitSerialized,
+		});
+		assert.undefined(result.error);
+	});
+
+	it("commit - should not allow additional fields", ({ validator }) => {
+		const result = validator.validate("commit", {
+			block: blockData,
+			proof: commitProof1,
+			serialized: commitSerialized,
+			extraField: "extraValue",
+		});
+		assert.defined(result.error);
+		assert.true(result.error!.includes("additional properties"));
+	});
+
+	it("commit - all fields are required", ({ validator }) => {
+		const keys = Object.keys(schemas.commit.properties);
+		for (const key of keys) {
+			const commitCopy = { block: blockData, proof: commitProof1, serialized: commitSerialized, [key]: undefined };
+			const result = validator.validate("commit", commitCopy);
+			assert.defined(result.error);
+			assert.true(result.error?.includes(key));
 		}
 	});
 
