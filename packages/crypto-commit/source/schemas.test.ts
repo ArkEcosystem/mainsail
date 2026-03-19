@@ -86,6 +86,23 @@ describe<{
 		}
 	});
 
+	it("commit - serialized should be hex", ({ validator }) => {
+		const blockDataWithBytecode = {
+			...blockData,
+			transactions: blockData.transactions.map((tx) => ({
+				...tx,
+				data: "0x",
+			})),
+		};
+		const result = validator.validate("commit", {
+			block: blockDataWithBytecode,
+			proof: commitProof1,
+			serialized: "zz",
+		});
+		assert.defined(result.error);
+		assert.true(result.error!.includes("serialized"));
+	});
+
 	it("commitProof - should be ok", ({ validator }) => {
 		const result1 = validator.validate("commitProof", commitProof1);
 		assert.undefined(result1.error);

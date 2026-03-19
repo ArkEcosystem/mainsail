@@ -72,6 +72,16 @@ describe<{
 		assert.equal(commit.serialized, commitSerialized);
 	});
 
+	it("#fromJson - should throw on invalid schema", async ({ factory }) => {
+		const commitJson: Contracts.Crypto.CommitJson = {
+			block: blockDataJson,
+			proof: commitProof1,
+			serialized: "zz",
+		};
+
+		await assert.rejects(async () => factory.fromJson(commitJson), MessageSchemaError);
+	});
+
 	it("#fromStorage - should create commit from storage", async ({ factory }) => {
 		const commitStorage: Contracts.Evm.CommitStorageData = {
 			proof: {
