@@ -1,6 +1,17 @@
 import type { AnySchemaObject } from "ajv";
 
-export const schemas: Record<"commitProof", AnySchemaObject> = {
+export const schemas: Record<"commit" | "commitProof", AnySchemaObject> = {
+	commit: {
+		$id: "commit",
+		additionalProperties: false,
+		properties: {
+			block: { $ref: "block" },
+			proof: { $ref: "commitProof" },
+			serialized: { $ref: "hex" },
+		},
+		required: ["block", "proof", "serialized"],
+		type: "object",
+	},
 	commitProof: {
 		$id: "commitProof",
 		additionalProperties: false,
@@ -15,5 +26,5 @@ export const schemas: Record<"commitProof", AnySchemaObject> = {
 		},
 		required: ["round", "signature", "validators"],
 		type: "object",
-	}
+	},
 };
