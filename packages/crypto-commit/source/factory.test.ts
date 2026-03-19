@@ -101,4 +101,18 @@ describe<{
 		assert.equal(commit.block.serialized, blockSerialized);
 		assert.equal(commit.serialized, commitSerialized);
 	});
+
+	it("#fromStorage - should throw on invalid schema", async ({ factory }) => {
+		const commitStorage: Contracts.Evm.CommitStorageData = {
+			proof: {
+				round: commitProof1.round,
+				signature: "zz",
+				validatorSet: validatorSetPack(commitProof1.validators),
+			},
+			header: blockHeaderStorage,
+			transactions: transactionsStorage,
+		};
+
+		await assert.rejects(async () => factory.fromStorage(commitStorage), MessageSchemaError);
+	});
 });
