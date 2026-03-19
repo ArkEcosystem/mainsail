@@ -51,15 +51,8 @@ describe<{
 	});
 
 	it("commit - should be ok", ({ validator }) => {
-		const blockDataWithBytecode = {
-			...blockData,
-			transactions: blockData.transactions.map((tx) => ({
-				...tx,
-				data: "0x",
-			})),
-		};
 		const result = validator.validate("commit", {
-			block: blockDataWithBytecode,
+			block: blockData,
 			proof: commitProof1,
 			serialized: commitSerialized,
 		});
@@ -68,15 +61,8 @@ describe<{
 	});
 
 	it("commit - should not allow additional fields", ({ validator }) => {
-		const blockDataWithBytecode = {
-			...blockData,
-			transactions: blockData.transactions.map((tx) => ({
-				...tx,
-				data: "0x",
-			})),
-		};
 		const result = validator.validate("commit", {
-			block: blockDataWithBytecode,
+			block: blockData,
 			proof: commitProof1,
 			serialized: commitSerialized,
 			extraField: "extraValue",
@@ -86,17 +72,10 @@ describe<{
 	});
 
 	it("commit - all fields are required", ({ validator }) => {
-		const blockDataWithBytecode = {
-			...blockData,
-			transactions: blockData.transactions.map((tx) => ({
-				...tx,
-				data: "0x",
-			})),
-		};
 		const keys = Object.keys(schemas.commit.properties);
 		for (const key of keys) {
 			const commitCopy = {
-				block: blockDataWithBytecode,
+				block: blockData,
 				proof: commitProof1,
 				serialized: commitSerialized,
 				[key]: undefined,
