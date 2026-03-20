@@ -19,19 +19,21 @@ import { schemas } from "./schemas";
 describe<{
 	app: Application;
 	validator: Validator;
-}>("Schemas", ({ it, assert, beforeEach }) => {
+	configuration: Configuration;
+}>("Schemas", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
 		context.app = new Application();
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
+		context.configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		context.configuration.setConfig(cryptoJson);
+		context.configuration.setHeight(1);
 
 		context.validator = context.app.resolve(Validator);
 
 		for (const keyword of Object.values({
-			...makeBaseKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
-			...makeTransactionKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeBaseKeywords(context.configuration),
+			...makeTransactionKeywords(context.configuration),
 		})) {
 			context.validator.addKeyword(keyword);
 		}
@@ -58,6 +60,21 @@ describe<{
 		});
 
 		assert.undefined(result.error);
+	});
+
+
+	it("commit - should correctly parse block number", ({ validator, configuration }) => {
+		const spyGetMilestone = spy(configuration, "getMilestone");
+
+		const result = validator.validate("commit", {
+			block: blockData,
+			proof: commitProof1,
+			serialized: commitSerialized,
+		});
+		assert.undefined(result.error);
+
+		spyGetMilestone.calledTimes(7); // 6 x for block.number and 1 x for limitToRoundValidators
+		spyGetMilestone.calledWith(blockData.number);
 	});
 
 	it("commit - should not allow additional fields", ({ validator }) => {
