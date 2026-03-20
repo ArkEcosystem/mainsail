@@ -199,15 +199,21 @@ describe<{
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone(1);
 
+		// Valid cases
 		let matrix = new Array(roundValidators).fill(true);
 		assert.undefined(context.validator.validate("test", matrix).error);
 
 		matrix = new Array(roundValidators).fill(false);
 		assert.undefined(context.validator.validate("test", matrix).error);
 
+		// We don't check for boolean values, that should be defined at schema level
 		matrix = new Array(roundValidators).fill(1);
 		assert.undefined(context.validator.validate("test", matrix).error);
 
+		matrix = new Array(roundValidators).fill("a");
+		assert.undefined(context.validator.validate("test", matrix).error);
+
+		// Invalid cases
 		matrix = new Array(roundValidators - 1).fill(false);
 		assert.defined(context.validator.validate("test", matrix).error);
 
