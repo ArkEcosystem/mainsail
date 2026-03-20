@@ -18,6 +18,7 @@ import {
 } from "../test/fixtures/index.js";
 import { schemas } from "./schemas";
 import { signature } from "../test/fixtures/proposal.js";
+import { numberArray } from "@mainsail/utils";
 
 describe<{
 	app: Application;
@@ -182,7 +183,7 @@ describe<{
 	});
 
 	it("lockProof - should be ok", ({ validator }) => {
-		const result = validator.validate("lockProof", lockProof);
+		const result = validator.validate("lockProof", { ...lockProof, number: 1 });
 		assert.undefined(result.error);
 	});
 
@@ -190,7 +191,7 @@ describe<{
 		const keys = Object.keys(schemas.lockProof.properties);
 		for (let key of keys) {
 			if (key === "number") continue;
-			const lockProofCopy = { ...lockProof, [key]: undefined };
+			const lockProofCopy = { ...lockProof, [key]: undefined, number: 1 };
 			const result = validator.validate("lockProof", lockProofCopy);
 			assert.defined(result.error);
 			assert.true(result.error?.includes(key));
@@ -198,7 +199,7 @@ describe<{
 	});
 
 	it("lockProof - should not allow additional fields", ({ validator }) => {
-		const lockProofCopy = { ...lockProof, extraField: "extraValue" };
+		const lockProofCopy = { ...lockProof, extraField: "extraValue", number: 1 };
 		const result = validator.validate("lockProof", lockProofCopy);
 		assert.defined(result.error);
 		assert.true(result.error!.includes("additional properties"));
@@ -207,6 +208,7 @@ describe<{
 	it("lockProof - signature should be ok", ({ validator }) => {
 		for (let char of "0123456789abcdef") {
 			const result = validator.validate("lockProof", {
+				number: 1,
 				signature: char.repeat(192),
 				validators: Array(53).fill(true),
 			});
@@ -224,6 +226,7 @@ describe<{
 			const result = validator.validate("lockProof", {
 				signature,
 				validators: Array(53).fill(true),
+				number: 1,
 			});
 			assert.defined(result.error);
 			assert.true(result.error!.includes("signature"));
@@ -241,6 +244,7 @@ describe<{
 
 		for (let validators of validValidators) {
 			const result = validator.validate("lockProof", {
+				number: 1,
 				signature,
 				validators,
 			});
@@ -261,6 +265,7 @@ describe<{
 			const result = validator.validate("lockProof", {
 				signature,
 				validators,
+				number: 1,
 			});
 			assert.defined(result.error);
 			assert.true(result.error!.includes("validators"));

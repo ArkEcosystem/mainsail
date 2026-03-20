@@ -27,7 +27,7 @@ export const schemas: Record<"lockProof" | "proposal" | "proposalUnsigned", AnyS
 			// NOTE: This is not an actual property of the lock proof, but we need it to validate the lock proof against the correct set of validators.
 			 number: { minimum: 0, type: "integer" },
 		},
-		required: ["signature", "validators"],
+		required: ["signature", "validators", "number"],
 		type: "object",
 	},
 	proposal: {
