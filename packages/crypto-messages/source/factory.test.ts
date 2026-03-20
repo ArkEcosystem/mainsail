@@ -30,6 +30,7 @@ describe<{
 }>("Factory", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
+		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setHeight(1); // Required by schema to set number for validators
 
 		const wallet = {};
 		const validatorSet = {
