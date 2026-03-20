@@ -77,8 +77,6 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 		if (lockProofLength > 0) {
 			const lockProofBuffer = buffer.readBytes(lockProofLength);
 			lockProof = await this.deserializer.deserializeLockProof(lockProofBuffer);
-
-			this.#verifySchema("lockProof", lockProof);
 		}
 
 		return lockProof;
@@ -91,6 +89,10 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 
 		const lockProof = await this.#getLockProof(buffer);
 		const blockHeader = await this.blockFactory.headerFromBytes(buffer.getRemainder());
+
+		if(lockProof) {
+			this.#verifySchema("lockProof", { ...lockProof, number: blockHeader.number });
+		}
 
 		return {
 			blockHeader,

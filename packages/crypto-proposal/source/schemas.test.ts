@@ -186,9 +186,10 @@ describe<{
 		assert.undefined(result.error);
 	});
 
-	it("lockProof - all fields are required", ({ validator }) => {
+	it("lockProof - all fields are required (except number)", ({ validator }) => {
 		const keys = Object.keys(schemas.lockProof.properties);
 		for (let key of keys) {
+			if (key === "number") continue;
 			const lockProofCopy = { ...lockProof, [key]: undefined };
 			const result = validator.validate("lockProof", lockProofCopy);
 			assert.defined(result.error);
@@ -274,5 +275,15 @@ describe<{
 
 		spyConfigurationGetMilestone.calledOnce();
 		spyConfigurationGetMilestone.calledWith(2);
+	});
+
+	it("lockProof - should correctly parse block number from number", ({ validator , configuration}) => {
+		const spyConfigurationGetMilestone = spy(configuration, "getMilestone");
+
+		const result = validator.validate("lockProof", { ...lockProof, number: 3 });
+		assert.undefined(result.error);
+
+		spyConfigurationGetMilestone.calledOnce();
+		spyConfigurationGetMilestone.calledWith(3);
 	});
 });

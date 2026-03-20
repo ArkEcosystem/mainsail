@@ -21,9 +21,11 @@ export const schemas: Record<"lockProof" | "proposal" | "proposalUnsigned", AnyS
 			signature: { $ref: "consensusSignature" },
 			validators: {
 				items: { type: "boolean" },
-				limitToRoundValidators: {},
+				limitToRoundValidators: { blockNumberPath: "number" },
 				type: "array",
 			},
+			// NOTE: This is not an actual property of the lock proof, but we need it to validate the lock proof against the correct set of validators.
+			 number: { minimum: 0, type: "integer" },
 		},
 		required: ["signature", "validators"],
 		type: "object",
