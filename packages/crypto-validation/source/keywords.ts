@@ -62,7 +62,7 @@ export const makeKeywords = (
 	};
 
 
-	// Use by: crypto-proposal
+	// Use by: crypto-proposal, p2p
 	const limitToRoundValidators: FuncKeywordDefinition = {
 		// @ts-ignore
 		compile(schema: { minimum?: number }) {
