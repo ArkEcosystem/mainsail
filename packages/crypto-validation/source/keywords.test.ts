@@ -238,10 +238,10 @@ describe<{
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone(1);
 
-		for(const minimum of [0, 1, roundValidators - 1, roundValidators]) {
+		for (const minimum of [0, 1, roundValidators - 1, roundValidators]) {
 			let matrix = new Array(minimum).fill(true);
 			assert.undefined(context.validator.validate("test", matrix).error);
-		};
+		}
 
 		let matrix = new Array(roundValidators + 1).fill(true);
 		assert.defined(context.validator.validate("test", matrix).error);

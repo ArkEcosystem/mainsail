@@ -60,7 +60,6 @@ export const makeKeywords = (
 		keyword: "buffer",
 	};
 
-
 	// Use by: crypto-proposal, p2p
 	const limitToRoundValidators: FuncKeywordDefinition = {
 		compile(schema: { minimum?: number }) {
