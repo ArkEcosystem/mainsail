@@ -232,15 +232,13 @@ describe<{
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone(1);
 
-		let matrix = new Array(roundValidators).fill(true);
-		assert.undefined(context.validator.validate("test", matrix).error);
+		for(const minimum of [0, 1, roundValidators - 1, roundValidators]) {
+			let matrix = new Array(minimum).fill(true);
+			assert.undefined(context.validator.validate("test", matrix).error);
+		};
 
-		matrix = new Array(roundValidators + 1).fill(true);
+		let matrix = new Array(roundValidators + 1).fill(true);
 		assert.defined(context.validator.validate("test", matrix).error);
-
-		assert.undefined(context.validator.validate("test", []).error);
-		assert.undefined(context.validator.validate("test", [false]).error);
-		assert.undefined(context.validator.validate("test", [true]).error);
 	});
 
 	it("keyword isValidatorIndex - should be ok", (context) => {
