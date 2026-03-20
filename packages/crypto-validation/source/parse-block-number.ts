@@ -1,12 +1,15 @@
-import type { AnySchemaObject } from "ajv";
+// Copy form ajv
+export interface DataValidationCxt<T extends string | number = string | number> {
+	rootData: Record<string, any> | any[];
+}
 
-export const parseBlockNumber = (path: string | undefined,  parentSchema: AnySchemaObject): number | undefined => {
-	if (path === undefined) {
+export const parseBlockNumber = (path: string | undefined,  parentSchema: DataValidationCxt | undefined): number | undefined => {
+	if (path === undefined || parentSchema === undefined) {
 		return undefined;
 	}
 
 	if (path === "payloadSerialized") {
-		return parseSerializedPayload(parentSchema.rootData?.payloadSerialized);
+		return parseSerializedPayload(parentSchema.rootData?.["payloadSerialized"]);
 	}
 
 	return parseOnPath(path, parentSchema.rootData);
