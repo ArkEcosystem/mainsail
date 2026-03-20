@@ -1,25 +1,22 @@
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
-import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
+import { Validator } from "@mainsail/validation";
 import { describe } from "@mainsail/test-runner";
+import { schemas } from "./schemas";
 import { ServiceProvider } from "./service-provider";
 
 describe<{
 	app: Application;
-	validator: Partial<Validator>;
+	validator: Validator;
 	serviceProvider: ServiceProvider;
-}>("ServiceProvider", ({ it, beforeEach, assert, spy }) => {
+}>("ServiceProvider", ({ it, beforeEach, assert }) => {
 	beforeEach((context) => {
-		context.validator = {
-			addKeyword: () => {},
-			addSchema: () => {},
-		};
-
 		context.app = new Application();
-		context.app.bind(Identifiers.Cryptography.Validator).toConstantValue(context.validator);
+		context.app.bind(Identifiers.Cryptography.Validator).to(Validator).inSingletonScope();
+		context.validator = context.app.get<Validator>(Identifiers.Cryptography.Validator);
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
@@ -27,12 +24,11 @@ describe<{
 	});
 
 	it("should register", async ({ validator, serviceProvider }) => {
-		const spyOnExtend = spy(validator, "addKeyword");
-		const spyOnAddSchema = spy(validator, "addSchema");
-
 		await assert.resolves(() => serviceProvider.register());
 
-		spyOnExtend.called();
-		spyOnAddSchema.called();
+		assert.true(validator.hasSchema("alphanumeric"));
+		assert.true(validator.hasSchema("hex"));
+		assert.true(validator.hasSchema("prefixedDataHex"));
+		assert.true(validator.hasSchema("prefixedQuantityHex"));
 	});
 });
