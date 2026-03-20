@@ -22,20 +22,22 @@ import { signature } from "../test/fixtures/proposal.js";
 describe<{
 	app: Application;
 	validator: Validator;
-}>("Schemas", ({ it, assert, beforeEach }) => {
+	configuration: Configuration;
+}>("Schemas", ({ it, assert, beforeEach, spy }) => {
 	const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof, ProposalWithLockProofAndValidRound];
 
 	beforeEach((context) => {
 		context.app = new Application();
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
+		context.configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		context.configuration.setConfig(cryptoJson);
+		context.configuration.setHeight(1);
 
 		context.validator = context.app.resolve(Validator);
 
 		for (const keyword of Object.values({
-			...makeBaseKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeBaseKeywords(context.configuration),
 		})) {
 			context.validator.addKeyword(keyword);
 		}
@@ -262,5 +264,15 @@ describe<{
 			assert.defined(result.error);
 			assert.true(result.error!.includes("validators"));
 		}
+	});
+
+	it("proposalUnsigned - should correctly deserialize block number from payloadSerialized", ({ validator , configuration}) => {
+		const spyConfigurationGetMilestone = spy(configuration, "getMilestone");
+
+		const result = validator.validate("proposalUnsigned", Proposal.proposalDataSerializableUnsigned);
+		assert.undefined(result.error);
+
+		spyConfigurationGetMilestone.calledOnce();
+		spyConfigurationGetMilestone.calledWith(2);
 	});
 });
