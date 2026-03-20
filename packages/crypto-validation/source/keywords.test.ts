@@ -262,6 +262,7 @@ describe<{
 			assert.undefined(context.validator.validate("test", index).error);
 		}
 
+		assert.defined(context.validator.validate("test", -1).error);
 		assert.defined(context.validator.validate("test", 50.000_01).error);
 		assert.defined(context.validator.validate("test", roundValidators).error);
 		assert.defined(context.validator.validate("test", roundValidators + 1).error);
