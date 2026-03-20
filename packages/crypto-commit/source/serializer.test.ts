@@ -2,38 +2,38 @@ import { Identifiers } from "@mainsail/constants";
 
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { assertCommitProofData } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
-import { Deserializer } from "./deserializer";
 import { Serializer } from "./serializer";
+import {
+	commitProof1,
+	commitProof2,
+	commitProofSerialized1,
+	commitProofSerialized2,
+	commit,
+	commitSerialized,
+} from "../test/fixtures/index.ts";
 
 describe<{
 	app: Application;
 	serializer: Serializer;
-	deserializer: Deserializer;
 }>("Serializer", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
 		context.serializer = context.app.get<Serializer>(Identifiers.Cryptography.Commit.Serializer);
-		context.deserializer = context.app.get<Deserializer>(Identifiers.Cryptography.Commit.Deserializer);
 	});
 
-	it("#size - should return proof size", async ({ serializer }) => {
-		assert.equal(serializer.proofSize(), 109);
+	it("#serialize - should serialize commit proof", async ({ serializer }) => {
+		const serialized1 = await serializer.serializeCommitProof(commitProof1);
+		const serialized2 = await serializer.serializeCommitProof(commitProof2);
+
+		assert.equal(serialized1.toString("hex"), commitProofSerialized1);
+		assert.equal(serialized2.toString("hex"), commitProofSerialized2);
 	});
 
-	it("#serialize - should serialize and deserialize commit proof", async ({ serializer, deserializer }) => {
-		const proof = {
-			round: 1,
-			signature:
-				"97a16d3e938a1bc6866701b946e703cfa502d57a226e540f270c16585405378e93086dfb3b32ab2039aa2c197177c66b0fec074df5bfac037efd3dc41d98d50455a69ff1934d503ef69dffa08429f75e5677efca4f2de36d46f8258635e32a95",
-			validators: Array.from<boolean>({ length: 51 }).fill(true),
-		};
+	it("#serialize - should serialize commit", async ({ serializer }) => {
+		const serialized = await serializer.serializeCommit(commit);
 
-		const serialized = await serializer.serializeCommitProof(proof);
-		const deserialized = await deserializer.deserializeCommitProof(serialized);
-
-		assertCommitProofData(assert, deserialized, proof);
+		assert.equal(serialized.toString("hex"), commitSerialized);
 	});
 });

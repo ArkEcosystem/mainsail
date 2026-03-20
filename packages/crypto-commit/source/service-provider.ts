@@ -1,9 +1,11 @@
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
+import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { Deserializer } from "./deserializer.js";
 import { CommitFactory } from "./factory.js";
+import { schemas } from "./schemas.js";
 import { Serializer } from "./serializer.js";
 
 @injectable()
@@ -22,5 +24,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Commit.Deserializer).to(Deserializer).inSingletonScope();
 
 		this.app.bind(Identifiers.Cryptography.Commit.Factory).to(CommitFactory).inSingletonScope();
+
+		for (const schema of Object.values(schemas)) {
+			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
+		}
 	}
 }

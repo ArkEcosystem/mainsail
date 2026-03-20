@@ -1361,12 +1361,18 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
+      '@mainsail/exceptions':
+        specifier: workspace:*
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      ajv:
+        specifier: 8.17.1
+        version: 8.17.1
     devDependencies:
       '@mainsail/contracts':
         specifier: workspace:*

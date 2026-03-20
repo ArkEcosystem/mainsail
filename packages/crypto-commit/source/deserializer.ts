@@ -1,6 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+import { InvalidCommitProofBytesError } from "@mainsail/exceptions";
 import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
@@ -30,6 +31,10 @@ export class Deserializer implements Contracts.Crypto.CommitDeserializer {
 				},
 			},
 		});
+
+		if (buffer.getRemainderLength() !== 0) {
+			throw new InvalidCommitProofBytesError(`Found trailing bytes of length ${buffer.getRemainderLength()}`);
+		}
 
 		return proof;
 	}
