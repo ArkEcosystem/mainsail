@@ -7,8 +7,8 @@ const parseBlockNumber = (parentSchema): number | undefined => {
 		return undefined;
 	}
 
-	if (parentSchema.parentData.blockNumber) {
-		// prevotes / precommits
+	// prevotes / precommits
+	if (parentSchema.parentData.blockNumber !== undefined) {
 		return parentSchema.parentData.blockNumber;
 	}
 
@@ -20,7 +20,6 @@ const parseBlockNumber = (parentSchema): number | undefined => {
 	// We can extract the block number at a fixed offset here, without needing to deserialize the whole block.
 
 	// See packages/crypto-messages/source/serializer.ts#serializeProposed for reference.
-
 	const serialized = parentSchema.parentData.data.serialized;
 	if (!serialized) {
 		return undefined;
@@ -97,6 +96,8 @@ export const makeKeywords = (
 		keyword: "buffer",
 	};
 
+
+	// Use by: crypto-proposal
 	const limitToRoundValidators: FuncKeywordDefinition = {
 		// TODO: Check type (same as bignum)
 		// @ts-ignore
@@ -127,6 +128,7 @@ export const makeKeywords = (
 		},
 	};
 
+	// Used by: crypto-messages (prevotes / precommits) and crypto-proposal
 	const isValidatorIndex: FuncKeywordDefinition = {
 		// @ts-ignore
 		compile() {
