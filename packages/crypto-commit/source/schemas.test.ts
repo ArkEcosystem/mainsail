@@ -182,8 +182,9 @@ describe<{
 		}
 
 		const invalidValidators = [
-			Array(NUMBER_OF_VALIDATORS - 1).fill(true),
-			Array(NUMBER_OF_VALIDATORS + 1).fill(true),
+			// TODO: Allowing different lengths of validators array should be considered in the future, but for now we check during signature check
+			// Array(NUMBER_OF_VALIDATORS - 1).fill(true),
+			// Array(NUMBER_OF_VALIDATORS + 1).fill(true),
 			Array(NUMBER_OF_VALIDATORS).fill(1),
 			Array(NUMBER_OF_VALIDATORS).fill(0),
 			Array(NUMBER_OF_VALIDATORS).fill(undefined),

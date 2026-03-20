@@ -5,7 +5,7 @@ export const schemas: Record<"commit" | "commitProof", AnySchemaObject> = {
 		$id: "commit",
 		additionalProperties: false,
 		properties: {
-			block: { type: "object" },
+			block: { $ref: "block" },
 			proof: { $ref: "commitProof" },
 			serialized: { $ref: "hex" },
 		},
@@ -20,7 +20,6 @@ export const schemas: Record<"commit" | "commitProof", AnySchemaObject> = {
 			signature: { $ref: "consensusSignature" },
 			validators: {
 				items: { type: "boolean" },
-				limitToRoundValidators: {},
 				type: "array",
 			},
 		},

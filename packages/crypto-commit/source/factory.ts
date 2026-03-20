@@ -64,7 +64,6 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 			...commit,
 			serialized: serialized.toString("hex"),
 		};
-		this.#verifySchema("commit", commitWithSerialized);
 
 		return commitWithSerialized;
 	}
