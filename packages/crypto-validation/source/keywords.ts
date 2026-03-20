@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
-import type { FuncKeywordDefinition } from "ajv";
+import type { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 import { parseBlockNumber } from "./parse-block-number.js";
 
 export const makeKeywords = (
@@ -63,13 +63,13 @@ export const makeKeywords = (
 
 	// Use by: crypto-proposal, p2p
 	const limitToRoundValidators: FuncKeywordDefinition = {
-		compile(schema: { minimum?: number }) {
-			return (data, parentSchema) => {
+		compile(schema: { minimum?: number; blockNumberPath?: string }) {
+			return (data, parentSchema: AnySchemaObject) => {
 				if (!Array.isArray(data)) {
 					return false;
 				}
 
-				const blockNumber = parseBlockNumber(parentSchema);
+				const blockNumber = parseBlockNumber(schema.blockNumberPath, parentSchema);
 				const { roundValidators } = configuration.getMilestone(blockNumber);
 				const minimum = schema.minimum !== undefined ? schema.minimum : roundValidators;
 
@@ -84,6 +84,7 @@ export const makeKeywords = (
 		keyword: "limitToRoundValidators",
 		metaSchema: {
 			properties: {
+				blockNumberPath: { type: "string" },
 				minimum: { type: "integer" },
 			},
 			type: "object",
@@ -92,8 +93,8 @@ export const makeKeywords = (
 
 	// Used by: crypto-messages (prevotes / precommits) and crypto-proposal
 	const isValidatorIndex: FuncKeywordDefinition = {
-		compile() {
-			return (data, parentSchema) => {
+		compile(schema: { blockNumberPath?: string }) {
+			return (data, parentSchema: AnySchemaObject) => {
 				if (!Number.isInteger(data)) {
 					return false;
 				}
@@ -102,13 +103,19 @@ export const makeKeywords = (
 					return false;
 				}
 
-				const blockNumber = parseBlockNumber(parentSchema);
+				const blockNumber = parseBlockNumber(schema.blockNumberPath, parentSchema);
 				const { roundValidators } = configuration.getMilestone(blockNumber);
 
 				return data < roundValidators;
 			};
 		},
 		errors: false,
+		metaSchema: {
+		properties: {
+			blockNumberPath: { type: "string" },
+		},
+		type: "object",
+		},
 		keyword: "isValidatorIndex",
 	};
 

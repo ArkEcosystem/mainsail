@@ -1,6 +1,6 @@
 import type { AnySchemaObject } from "ajv";
 
-export const parseBlockNumber = (path: string, parentSchema: AnySchemaObject): number | undefined => {
+export const parseBlockNumber = (path: string | undefined,  parentSchema: AnySchemaObject): number | undefined => {
 	if (path === undefined) {
 		return undefined;
 	}
