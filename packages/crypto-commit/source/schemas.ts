@@ -5,7 +5,7 @@ export const schemas: Record<"commit" | "commitProof", AnySchemaObject> = {
 		$id: "commit",
 		additionalProperties: false,
 		properties: {
-			block: { $ref: "block" },
+			block: { type: "object" },
 			proof: { $ref: "commitProof" },
 			serialized: { $ref: "hex" },
 		},
