@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
-import type { AnySchemaObject, FuncKeywordDefinition } from "ajv";
+import type { FuncKeywordDefinition } from "ajv";
 
 export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
@@ -23,8 +23,7 @@ export const makeKeywords = (
 	};
 
 	const bignumber: FuncKeywordDefinition = {
-		// @ts-ignore
-		compile: (schema) => (data, parentSchema: AnySchemaObject) => {
+		compile: (schema) => (data) => {
 			const minimum = schema.minimum !== undefined ? schema.minimum : 0;
 			const maximum = schema.maximum !== undefined ? schema.maximum : BigNumber.UINT256_MAX;
 
@@ -64,9 +63,8 @@ export const makeKeywords = (
 
 	// Use by: crypto-proposal, p2p
 	const limitToRoundValidators: FuncKeywordDefinition = {
-		// @ts-ignore
 		compile(schema: { minimum?: number }) {
-			return (data, parentSchema: AnySchemaObject) => {
+			return (data) => {
 				if (!Array.isArray(data)) {
 					return false;
 				}
@@ -93,9 +91,8 @@ export const makeKeywords = (
 
 	// Used by: crypto-messages (prevotes / precommits) and crypto-proposal
 	const isValidatorIndex: FuncKeywordDefinition = {
-		// @ts-ignore
 		compile() {
-			return (data, parentSchema: AnySchemaObject) => {
+			return (data) => {
 				if (!Number.isInteger(data)) {
 					return false;
 				}
