@@ -1,6 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 import type { FuncKeywordDefinition } from "ajv";
+import { parseBlockNumber } from "./parse-block-number.js";
 
 export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
@@ -63,12 +64,13 @@ export const makeKeywords = (
 	// Use by: crypto-proposal, p2p
 	const limitToRoundValidators: FuncKeywordDefinition = {
 		compile(schema: { minimum?: number }) {
-			return (data) => {
+			return (data, parentSchema) => {
 				if (!Array.isArray(data)) {
 					return false;
 				}
 
-				const { roundValidators } = configuration.getMilestone();
+				const blockNumber = parseBlockNumber(parentSchema);
+				const { roundValidators } = configuration.getMilestone(blockNumber);
 				const minimum = schema.minimum !== undefined ? schema.minimum : roundValidators;
 
 				if (data.length < minimum || data.length > roundValidators) {
@@ -91,7 +93,7 @@ export const makeKeywords = (
 	// Used by: crypto-messages (prevotes / precommits) and crypto-proposal
 	const isValidatorIndex: FuncKeywordDefinition = {
 		compile() {
-			return (data) => {
+			return (data, parentSchema) => {
 				if (!Number.isInteger(data)) {
 					return false;
 				}
@@ -100,7 +102,8 @@ export const makeKeywords = (
 					return false;
 				}
 
-				const { roundValidators } = configuration.getMilestone();
+				const blockNumber = parseBlockNumber(parentSchema);
+				const { roundValidators } = configuration.getMilestone(blockNumber);
 
 				return data < roundValidators;
 			};
