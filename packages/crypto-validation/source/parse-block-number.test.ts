@@ -1,10 +1,14 @@
-
 import { Validator } from "@mainsail/validation/source/validator";
 
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { parseBlockNumber } from "./parse-block-number";
-import { Proposal, ProposalWithLockProof, ProposalWithLockProofAndValidRound, ProposalWithValidRound } from "../../crypto-proposal/test/fixtures/index.js";
+import {
+	Proposal,
+	ProposalWithLockProof,
+	ProposalWithLockProofAndValidRound,
+	ProposalWithValidRound,
+} from "../../crypto-proposal/test/fixtures/index.js";
 
 describe<{
 	app: Application;
@@ -27,7 +31,7 @@ describe<{
 	it("should return undefined if value at path is not a number", () => {
 		const result = parseBlockNumber("some.path", {
 			rootData: {
-				some: {	path: "not a number" },
+				some: { path: "not a number" },
 			},
 		});
 		assert.undefined(result);
@@ -36,7 +40,7 @@ describe<{
 	it("should return undefined if value at path is string representation of a number", () => {
 		const result = parseBlockNumber("some.path", {
 			rootData: {
-				some: {	path: "42" },
+				some: { path: "42" },
 			},
 		});
 		assert.undefined(result);
@@ -54,7 +58,7 @@ describe<{
 	it("should return the number at the specified path (nested)", () => {
 		const result = parseBlockNumber("some.path", {
 			rootData: {
-				some: {	path: 42 },
+				some: { path: 42 },
 			},
 		});
 		assert.equal(result, 42);
@@ -79,13 +83,18 @@ describe<{
 	it("should return the block number from payloadSerialized", () => {
 		const payloadSerialized = Proposal.payloadSerialized;
 
-		for(const payloadSerialized of [Proposal.payloadSerialized, ProposalWithLockProof.payloadSerialized, ProposalWithLockProofAndValidRound.payloadSerialized, ProposalWithValidRound.payloadSerialized]) {
+		for (const payloadSerialized of [
+			Proposal.payloadSerialized,
+			ProposalWithLockProof.payloadSerialized,
+			ProposalWithLockProofAndValidRound.payloadSerialized,
+			ProposalWithValidRound.payloadSerialized,
+		]) {
 			const result = parseBlockNumber("payloadSerialized", {
 				rootData: {
 					payloadSerialized,
 				},
 			});
 			assert.equal(result, 2);
-		};
+		}
 	});
 });

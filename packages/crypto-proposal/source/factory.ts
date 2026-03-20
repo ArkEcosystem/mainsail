@@ -90,7 +90,7 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 		const lockProof = await this.#getLockProof(buffer);
 		const blockHeader = await this.blockFactory.headerFromBytes(buffer.getRemainder());
 
-		if(lockProof) {
+		if (lockProof) {
 			this.#verifySchema("lockProof", { ...lockProof, number: blockHeader.number });
 		}
 

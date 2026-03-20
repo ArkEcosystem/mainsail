@@ -272,7 +272,10 @@ describe<{
 		}
 	});
 
-	it("proposalUnsigned - should correctly deserialize block number from payloadSerialized", ({ validator , configuration}) => {
+	it("proposalUnsigned - should correctly deserialize block number from payloadSerialized", ({
+		validator,
+		configuration,
+	}) => {
 		const spyConfigurationGetMilestone = spy(configuration, "getMilestone");
 
 		const result = validator.validate("proposalUnsigned", Proposal.proposalDataSerializableUnsigned);
@@ -282,7 +285,7 @@ describe<{
 		spyConfigurationGetMilestone.calledWith(2);
 	});
 
-	it("lockProof - should correctly parse block number from number", ({ validator , configuration}) => {
+	it("lockProof - should correctly parse block number from number", ({ validator, configuration }) => {
 		const spyConfigurationGetMilestone = spy(configuration, "getMilestone");
 
 		const result = validator.validate("lockProof", { ...lockProof, number: 3 });

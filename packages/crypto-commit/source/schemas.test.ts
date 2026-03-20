@@ -62,7 +62,6 @@ describe<{
 		assert.undefined(result.error);
 	});
 
-
 	it("commit - should correctly parse block number", ({ validator, configuration }) => {
 		const spyGetMilestone = spy(configuration, "getMilestone");
 

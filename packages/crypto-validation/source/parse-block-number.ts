@@ -14,12 +14,12 @@ const parseOnPath = (path: string, rootData: object): number | undefined => {
 		current = current[part];
 	}
 
-	if(typeof current === "number") {
+	if (typeof current === "number") {
 		return current;
 	}
 
 	return undefined;
-}
+};
 
 // Proposals contain the block only in serialized form (hex).
 // We can extract the block number at a fixed offset here, without needing to deserialize the whole block.
@@ -38,10 +38,12 @@ const parseSerializedPayload = (serialized): number | undefined => {
 	// blockNumber: 4 byte (8 hex)
 	const offset = lockProofSize + 2 + 12;
 	return Buffer.from(serialized.slice(offset, offset + 8), "hex").readUInt32LE();
-}
+};
 
-
-export const parseBlockNumber = (path: string | undefined,  parentSchema: DataValidationCxt | undefined): number | undefined => {
+export const parseBlockNumber = (
+	path: string | undefined,
+	parentSchema: DataValidationCxt | undefined,
+): number | undefined => {
 	if (path === undefined || parentSchema === undefined) {
 		return undefined;
 	}
@@ -52,4 +54,3 @@ export const parseBlockNumber = (path: string | undefined,  parentSchema: DataVa
 
 	return parseOnPath(path, parentSchema.rootData);
 };
-

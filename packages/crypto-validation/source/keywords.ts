@@ -1,6 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
-import type {  FuncKeywordDefinition } from "ajv";
+import type { FuncKeywordDefinition } from "ajv";
+
 import { parseBlockNumber } from "./parse-block-number.js";
 
 export const makeKeywords = (
@@ -110,13 +111,13 @@ export const makeKeywords = (
 			};
 		},
 		errors: false,
-		metaSchema: {
-		properties: {
-			blockNumberPath: { type: "string" },
-		},
-		type: "object",
-		},
 		keyword: "isValidatorIndex",
+		metaSchema: {
+			properties: {
+				blockNumberPath: { type: "string" },
+			},
+			type: "object",
+		},
 	};
 
 	return { bignumber, buffer, isValidatorIndex, limitToRoundValidators, maxBytes };
