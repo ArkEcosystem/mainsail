@@ -1,23 +1,11 @@
-// Copy form ajv
-export interface DataValidationCxt<T extends string | number = string | number> {
-	rootData: Record<string, any> | any[];
+// Copied form ajv and modified
+interface DataValidationCxt {
+	rootData: Record<string, unknown> | unknown[];
 }
-
-export const parseBlockNumber = (path: string | undefined,  parentSchema: DataValidationCxt | undefined): number | undefined => {
-	if (path === undefined || parentSchema === undefined) {
-		return undefined;
-	}
-
-	if (path === "payloadSerialized") {
-		return parseSerializedPayload(parentSchema.rootData?.["payloadSerialized"]);
-	}
-
-	return parseOnPath(path, parentSchema.rootData);
-};
 
 const parseOnPath = (path: string, rootData: object): number | undefined => {
 	const parts = path.split(".");
-	let current: any = rootData;
+	let current = rootData;
 
 	for (const part of parts) {
 		if (current[part] === undefined) {
@@ -51,3 +39,17 @@ const parseSerializedPayload = (serialized): number | undefined => {
 	const offset = lockProofSize + 2 + 12;
 	return Buffer.from(serialized.slice(offset, offset + 8), "hex").readUInt32LE();
 }
+
+
+export const parseBlockNumber = (path: string | undefined,  parentSchema: DataValidationCxt | undefined): number | undefined => {
+	if (path === undefined || parentSchema === undefined) {
+		return undefined;
+	}
+
+	if (path === "payloadSerialized") {
+		return parseSerializedPayload(parentSchema.rootData?.["payloadSerialized"]);
+	}
+
+	return parseOnPath(path, parentSchema.rootData);
+};
+
