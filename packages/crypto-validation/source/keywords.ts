@@ -95,9 +95,6 @@ export const makeKeywords = (
 		},
 		errors: false,
 		keyword: "buffer",
-		metaSchema: {
-			type: "object",
-		},
 	};
 
 	const limitToRoundValidators: FuncKeywordDefinition = {
@@ -131,25 +128,25 @@ export const makeKeywords = (
 	};
 
 	const isValidatorIndex: FuncKeywordDefinition = {
-		// TODO: Check type (same as bignum)
 		// @ts-ignore
 		compile() {
 			return (data, parentSchema: AnySchemaObject) => {
-				const blockNumber = parseBlockNumber(parentSchema);
-				const { roundValidators } = configuration.getMilestone(blockNumber);
-
 				if (!Number.isInteger(data)) {
 					return false;
 				}
 
-				return data >= 0 && data < roundValidators;
+				if (data < 0) {
+					return false;
+				}
+
+				const blockNumber = parseBlockNumber(parentSchema);
+				const { roundValidators } = configuration.getMilestone(blockNumber);
+
+				return data < roundValidators;
 			};
 		},
 		errors: false,
 		keyword: "isValidatorIndex",
-		metaSchema: {
-			type: "object",
-		},
 	};
 
 	return { bignumber, buffer, isValidatorIndex, limitToRoundValidators, maxBytes };
