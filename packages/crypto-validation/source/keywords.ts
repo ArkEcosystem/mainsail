@@ -1,42 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
-import type { AnySchemaObject, FuncKeywordDefinition } from "ajv";
-
-const parseBlockNumber = (parentSchema): number | undefined => {
-	if (!parentSchema || !parentSchema.parentData) {
-		return undefined;
-	}
-
-	if (parentSchema.parentData.blockNumber) {
-		// prevotes / precommits
-		return parentSchema.parentData.blockNumber;
-	}
-
-	if (!parentSchema.parentData.data) {
-		return undefined;
-	}
-
-	// Proposals contain the block only in serialized form (hex).
-	// We can extract the block number at a fixed offset here, without needing to deserialize the whole block.
-
-	// See packages/crypto-messages/source/serializer.ts#serializeProposed for reference.
-
-	const serialized = parentSchema.parentData.data.serialized;
-	if (!serialized) {
-		return undefined;
-	}
-
-	if (serialized.length < 30) {
-		return undefined;
-	}
-
-	const lockProofSize = 2 + Number.parseInt(serialized.slice(0, 2), 16) * 2;
-	// version: 1 byte (2 hex)
-	// timestamp: 6 bytes (12 hex)
-	// blockNumber: 4 byte (8 hex)
-	const offset = lockProofSize + 2 + 12;
-	return Buffer.from(serialized.slice(offset, offset + 8), "hex").readUInt32LE();
-};
+import type { FuncKeywordDefinition } from "ajv";
 
 export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
@@ -59,8 +23,7 @@ export const makeKeywords = (
 	};
 
 	const bignumber: FuncKeywordDefinition = {
-		// @ts-ignore
-		compile: (schema) => (data, parentSchema: AnySchemaObject) => {
+		compile: (schema) => (data) => {
 			const minimum = schema.minimum !== undefined ? schema.minimum : 0;
 			const maximum = schema.maximum !== undefined ? schema.maximum : BigNumber.UINT256_MAX;
 
@@ -95,22 +58,17 @@ export const makeKeywords = (
 		},
 		errors: false,
 		keyword: "buffer",
-		metaSchema: {
-			type: "object",
-		},
 	};
 
+	// Use by: crypto-proposal, p2p
 	const limitToRoundValidators: FuncKeywordDefinition = {
-		// TODO: Check type (same as bignum)
-		// @ts-ignore
 		compile(schema: { minimum?: number }) {
-			return (data, parentSchema: AnySchemaObject) => {
+			return (data) => {
 				if (!Array.isArray(data)) {
 					return false;
 				}
 
-				const blockNumber = parseBlockNumber(parentSchema);
-				const { roundValidators } = configuration.getMilestone(blockNumber);
+				const { roundValidators } = configuration.getMilestone();
 				const minimum = schema.minimum !== undefined ? schema.minimum : roundValidators;
 
 				if (data.length < minimum || data.length > roundValidators) {
@@ -130,26 +88,25 @@ export const makeKeywords = (
 		},
 	};
 
+	// Used by: crypto-messages (prevotes / precommits) and crypto-proposal
 	const isValidatorIndex: FuncKeywordDefinition = {
-		// TODO: Check type (same as bignum)
-		// @ts-ignore
 		compile() {
-			return (data, parentSchema: AnySchemaObject) => {
-				const blockNumber = parseBlockNumber(parentSchema);
-				const { roundValidators } = configuration.getMilestone(blockNumber);
-
+			return (data) => {
 				if (!Number.isInteger(data)) {
 					return false;
 				}
 
-				return data >= 0 && data < roundValidators;
+				if (data < 0) {
+					return false;
+				}
+
+				const { roundValidators } = configuration.getMilestone();
+
+				return data < roundValidators;
 			};
 		},
 		errors: false,
 		keyword: "isValidatorIndex",
-		metaSchema: {
-			type: "object",
-		},
 	};
 
 	return { bignumber, buffer, isValidatorIndex, limitToRoundValidators, maxBytes };

@@ -75,4 +75,46 @@ describe<{
 			assert.defined(validator.validate("hex", char.repeat(20)).error);
 		}
 	});
+
+	it("prefixedDataHex - should be ok", ({ validator }) => {
+		const validValues = ["0x", "0x00", "0x0123", "0x0123456789abcdef"];
+
+		for (const value of validValues) {
+			assert.undefined(validator.validate("prefixedDataHex", value).error);
+		}
+	});
+
+	it("prefixedDataHex - should not be ok", ({ validator }) => {
+		const invalidValues = ["0x0", "0x000", "deadbeef", "0xGG", "0X00"];
+
+		for (const value of invalidValues) {
+			assert.defined(validator.validate("prefixedDataHex", value).error);
+		}
+
+		assert.defined(validator.validate("prefixedDataHex", 123).error);
+		assert.defined(validator.validate("prefixedDataHex", null).error);
+		assert.defined(validator.validate("prefixedDataHex").error);
+		assert.defined(validator.validate("prefixedDataHex", {}).error);
+	});
+
+	it("prefixedQuantityHex - should be ok", ({ validator }) => {
+		const validValues = ["0x0", "0x1", "0x01", "0x123456789abcdef"];
+
+		for (const value of validValues) {
+			assert.undefined(validator.validate("prefixedQuantityHex", value).error);
+		}
+	});
+
+	it("prefixedQuantityHex - should not be ok", ({ validator }) => {
+		const invalidValues = ["0x", "deadbeef", "0xGG", "0X01"];
+
+		for (const value of invalidValues) {
+			assert.defined(validator.validate("prefixedQuantityHex", value).error);
+		}
+
+		assert.defined(validator.validate("prefixedQuantityHex", 123).error);
+		assert.defined(validator.validate("prefixedQuantityHex", null).error);
+		assert.defined(validator.validate("prefixedQuantityHex").error);
+		assert.defined(validator.validate("prefixedQuantityHex", {}).error);
+	});
 });

@@ -21,6 +21,7 @@ describe<{
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1); // Required by schema to set number for validators
 
 		context.validator = context.app.resolve(Validator);
 
