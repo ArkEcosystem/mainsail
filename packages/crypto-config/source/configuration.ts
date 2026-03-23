@@ -10,7 +10,6 @@ import set from "lodash.set";
 type Config = {
 	config: Contracts.Crypto.NetworkConfig;
 	milestone: { data: Contracts.Crypto.Milestone; index: number };
-	milestones: Contracts.Crypto.Milestone[];
 };
 
 @injectable()
@@ -61,8 +60,10 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			height = this.#height;
 		}
 
-		return this.#configuration.milestones.some((milestone) => milestone.height === height);
+		return this.#configuration.config.milestones.some((milestone) => milestone.height === height);
 	}
+
+
 
 	public getMilestone(height?: number): Contracts.Crypto.Milestone {
 		assert.defined(this.#configuration);
@@ -71,7 +72,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			height = this.#height;
 		}
 
-		const milestones = this.#configuration.milestones;
+		const milestones = this.#configuration.config.milestones;
 		const milestone = this.#configuration.milestone;
 
 		while (milestone.index < milestones.length - 1 && height >= milestones[milestone.index + 1].height) {
@@ -118,7 +119,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 	): Contracts.Crypto.MilestoneSearchResult<Contracts.Crypto.Milestone[K]> {
 		assert.defined(this.#configuration);
 
-		const milestones = this.#configuration.milestones;
+		const milestones = this.#configuration.config.milestones;
 
 		for (let index = 0; index < milestones.length; index++) {
 			const milestone = milestones[index];
@@ -144,31 +145,29 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 	public getMilestones(): Contracts.Crypto.Milestone[] {
 		assert.defined(this.#configuration);
-		return this.#configuration.milestones;
+		return this.#configuration.config.milestones;
 	}
 
 	public getMaxRoundValidators(): number {
 		assert.defined(this.#configuration);
-		return Math.max(...this.#configuration.milestones.map((milestone) => milestone.roundValidators));
+		return Math.max(...this.#configuration.config.milestones.map((milestone) => milestone.roundValidators));
 	}
 
 	#buildConstants(config: Contracts.Crypto.NetworkConfigPartial): void {
 		this.#checkRoundValidators(config);
 
-		const milestones = this.#buildMilestones(config);
-
+		const buildConfig = {
+			genesisBlock: clone(config.genesisBlock),
+			milestones: this.#buildMilestones(config),
+			network: clone(config.network),
+		}
 
 		this.#configuration = {
-			config: {
-				genesisBlock: clone(config.genesisBlock),
-				milestones,
-				network: clone(config.network),
-			},
+			config: buildConfig,
 			milestone: {
-				data: milestones[0],
+				data: buildConfig.milestones[0],
 				index: 0,
 			},
-			milestones,
 		};
 	}
 
