@@ -35,5 +35,5 @@ export interface Configuration {
 
 	getMilestones(): Milestone[];
 
-	getRoundValidators(): number;
+	getMaxRoundValidators(): number;
 }

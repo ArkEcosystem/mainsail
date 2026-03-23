@@ -7,51 +7,39 @@ import clone from "lodash.clone";
 import get from "lodash.get";
 import set from "lodash.set";
 
+type Config = {
+	config: Contracts.Crypto.NetworkConfig;
+	milestone: { data: Contracts.Crypto.Milestone; index: number };
+	milestones: Contracts.Crypto.Milestone[];
+};
+
 @injectable()
 export class Configuration implements Contracts.Crypto.Configuration {
-	#config: Contracts.Crypto.NetworkConfig | undefined;
-	#milestone: { data: Contracts.Crypto.Milestone; index: number } | undefined;
-	#milestones: Contracts.Crypto.Milestone[] | undefined;
+	#configuration: Config | undefined = undefined;;
 	#originalMilestones: Contracts.Crypto.MilestonePartial[] | undefined;
 	#height = 0;
-	#roundValidators = 0;
+
 
 	public setConfig(config: Contracts.Crypto.NetworkConfigPartial): void {
-		this.#config = {
-			genesisBlock: clone(config.genesisBlock),
-			milestones: clone(config.milestones) as Contracts.Crypto.Milestone[],
-			network: clone(config.network),
-		};
-		this.#height = this.#config.genesisBlock.block.number;
+		this.#originalMilestones = clone(config.milestones);
+		this.#height = config.genesisBlock.block.number;
 
-		this.#validateMilestones();
-		this.#buildConstants();
-
-		this.#originalMilestones = config.milestones;
+		this.#buildConstants(config);
 	}
 
 	public all(): Contracts.Crypto.NetworkConfig | undefined {
-		return this.#config;
+		return this.#configuration?.config;
 	}
 
 	public set<T = unknown>(key: string, value: T): void {
-		assert.defined(this.#config);
-		set(this.#config, key, clone(value));
+		assert.defined(this.#configuration);
+		set(this.#configuration.config, key, clone(value));
 
-		try {
-			this.#validateMilestones();
-
-			this.#buildConstants();
-
-			// TODO: this doesn't make any sense?
-			this.#originalMilestones = (value as unknown as Contracts.Crypto.NetworkConfig).milestones;
-		} catch {
-			//
-		}
+		this.#buildConstants(this.#configuration.config);
 	}
 
 	public get<T = unknown>(key: string): T {
-		return get(this.#config, key);
+		return get(this.#configuration?.config, key);
 	}
 
 	public setHeight(value: number): void {
@@ -63,45 +51,44 @@ export class Configuration implements Contracts.Crypto.Configuration {
 	}
 
 	public getGenesisHeight(): number {
-		assert.defined(this.#config);
-		return this.#config.genesisBlock.block.number;
+		assert.defined(this.#configuration);
+		return this.#configuration.config.genesisBlock.block.number;
 	}
 
 	public isNewMilestone(height?: number): boolean {
+		assert.defined(this.#configuration);
+
 		if (height === undefined) {
 			height = this.#height;
 		}
 
-		if (!this.#milestones) {
-			throw new Error("Milestones are not initialized");
-		}
-
-		return this.#milestones.some((milestone) => milestone.height === height);
+		return this.#configuration.milestones.some((milestone) => milestone.height === height);
 	}
 
 	public getMilestone(height?: number): Contracts.Crypto.Milestone {
-		if (!this.#milestone || !this.#milestones) {
-			throw new Error(`Milestones are not initialized`);
-		}
+		assert.defined(this.#configuration);
 
 		if (height === undefined) {
 			height = this.#height;
 		}
 
+		const milestones = this.#configuration.milestones;
+		const milestone = this.#configuration.milestone;
+
 		while (
-			this.#milestone.index < this.#milestones.length - 1 &&
-			height >= this.#milestones[this.#milestone.index + 1].height
+			milestone.index < milestones.length - 1 &&
+			height >= milestones[milestone.index + 1].height
 		) {
-			this.#milestone.index++;
-			this.#milestone.data = this.#milestones[this.#milestone.index];
+			milestone.index++;
+			milestone.data = milestones[milestone.index];
 		}
 
-		while (height < this.#milestones[this.#milestone.index].height) {
-			this.#milestone.index--;
-			this.#milestone.data = this.#milestones[this.#milestone.index];
+		while (height < milestones[milestone.index].height) {
+			milestone.index--;
+			milestone.data = milestones[milestone.index];
 		}
 
-		return this.#milestone.data;
+		return milestone.data;
 	}
 
 	public getMilestoneDiff(height?: number): Contracts.Crypto.MilestoneDiff {
@@ -133,12 +120,12 @@ export class Configuration implements Contracts.Crypto.Configuration {
 		previousMilestone: number,
 		key: K,
 	): Contracts.Crypto.MilestoneSearchResult<Contracts.Crypto.Milestone[K]> {
-		if (!this.#milestones || this.#milestones.length === 0) {
-			throw new Error(`Attempted to get next milestone but none were set`);
-		}
+		assert.defined(this.#configuration);
 
-		for (let index = 0; index < this.#milestones.length; index++) {
-			const milestone = this.#milestones[index];
+		const milestones = this.#configuration.milestones;
+
+		for (let index = 0; index < milestones.length; index++) {
+			const milestone = milestones[index];
 			if (
 				milestone[key] &&
 				milestone[key] !== this.getMilestone(previousMilestone)[key] &&
@@ -160,57 +147,54 @@ export class Configuration implements Contracts.Crypto.Configuration {
 	}
 
 	public getMilestones(): Contracts.Crypto.Milestone[] {
-		if (!this.#milestones) {
-			throw new Error(`Milestones are not initialized`);
-		}
-
-		return this.#milestones;
+		assert.defined(this.#configuration);
+		return this.#configuration.milestones;
 	}
 
-	public getRoundValidators(): number {
-		return this.#roundValidators;
+	public getMaxRoundValidators(): number {
+		assert.defined(this.#configuration);
+
+		return this.#configuration.milestones.reduce((max, milestone) => Math.max(max, milestone.roundValidators ?? 0), 0);
 	}
 
-	#buildConstants(): void {
-		assert.defined(this.#config);
+	#buildConstants(config: Contracts.Crypto.NetworkConfigPartial): void {
+		this.#validateMilestones(config);
 
-		this.#milestones = this.#config.milestones.sort((a, b) => a.height - b.height);
-		this.#milestone = {
-			data: this.#milestones[0],
+		const milestones = config.milestones.sort((a, b) => a.height - b.height) as Contracts.Crypto.Milestone[];
+		const milestone = {
+			data: milestones[0],
 			index: 0,
 		};
 
 		let lastMerged = 0;
 
-		const overwriteMerge = (destination, source, options) => source;
-
-		this.#roundValidators = this.#milestone.data?.roundValidators ?? 0;
-
-		while (lastMerged < this.#milestones.length - 1) {
-			this.#milestones[lastMerged + 1] = deepmerge(
-				this.#milestones[lastMerged],
-				this.#milestones[lastMerged + 1],
+		while (lastMerged < milestones.length - 1) {
+			milestones[lastMerged + 1] = deepmerge(
+				milestones[lastMerged],
+				milestones[lastMerged + 1],
 				{
-					arrayMerge: overwriteMerge,
+					arrayMerge: (destination, source, options) => source,
 				},
-			);
-
-			this.#roundValidators = Math.max(
-				this.#roundValidators ?? 0,
-				this.#milestones[lastMerged].roundValidators,
-				this.#milestones[lastMerged + 1].roundValidators,
 			);
 
 			lastMerged++;
 		}
+
+		this.#configuration = {
+			config: {
+				genesisBlock: clone(config.genesisBlock),
+				milestones: clone(milestones as Contracts.Crypto.Milestone[]),
+				network: clone(config.network),
+			},
+			milestone,
+			milestones,
+		}
 	}
 
-	#validateMilestones(): void {
-		assert.defined(this.#config);
+	#validateMilestones(config: Contracts.Crypto.NetworkConfigPartial): void {
+		const initialHeight = config.genesisBlock.block.number;
 
-		const initialHeight = this.#config.genesisBlock.block.number;
-
-		const validatorMilestones = this.#config.milestones
+		const validatorMilestones = config.milestones
 			.sort((a, b) => a.height - b.height)
 			.filter((milestone) => milestone.roundValidators !== undefined);
 
@@ -236,6 +220,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 				continue;
 			}
 
+			assert.defined(previous.roundValidators);
 			if ((current.height - Math.max(previous.height, 1)) % previous.roundValidators !== 0) {
 				throw new InvalidMilestoneConfigurationError(
 					`Bad milestone at height: ${current.height}. The number of validators can only be changed at the beginning of a new round.`,

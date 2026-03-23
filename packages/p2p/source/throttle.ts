@@ -31,7 +31,7 @@ export class Throttle {
 
 			remoteAccess: [],
 
-			roundValidators: this.cryptoConfiguration.getRoundValidators(),
+			roundValidators: this.cryptoConfiguration.getMaxRoundValidators(),
 			// White listing anybody here means we would not throttle ourselves when sending
 			// them requests, ie we could spam them.
 			whitelist: [],

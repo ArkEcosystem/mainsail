@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 export const makeHeaders = (configuration: Contracts.Crypto.Configuration): Joi.ObjectSchema => {
-	const roundValidators = configuration.getRoundValidators();
+	const roundValidators = configuration.getMaxRoundValidators();
 
 	return Joi.object({
 		blockNumber: Joi.number().integer().min(1).required(),
