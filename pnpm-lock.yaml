@@ -1468,6 +1468,9 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       '@types/lodash.clone':
         specifier: 4.5.9
         version: 4.5.9

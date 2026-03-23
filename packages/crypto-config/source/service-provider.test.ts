@@ -5,6 +5,7 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 
 import { ServiceProvider } from "./service-provider";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 type Context = {
 	app: Application;
@@ -12,8 +13,10 @@ type Context = {
 };
 
 describe<Context>("ServiceProvider", ({ assert, it, beforeEach }) => {
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app = new Application();
+
+		await context.app.resolve(ValidationServiceProvider).register();
 
 		const configRepository = context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository);
 		configRepository.set("crypto.genesisBlock", cryptoJson.genesisBlock);

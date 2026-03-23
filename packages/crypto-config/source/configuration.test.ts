@@ -1,13 +1,28 @@
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "@mainsail/test-runner";
+import { Application} from "@mainsail/kernel";
 import { Configuration } from "./configuration";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
+
+import { schemas } from "./schemas.js";
 
 describe<{
+	app: Application;
 	configManager: Configuration;
 }>("Configuration", ({ it, beforeEach, assert }) => {
-	beforeEach((context) => {
-		context.configManager = new Configuration();
+	beforeEach(async (context) => {
+		context.app = new Application();
 
+		await context.app.resolve(ValidationServiceProvider).register();
+
+		const validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
+		for (const schema of Object.values(schemas)) {
+			validator.addSchema(schema);
+		}
+
+		context.configManager = context.app.resolve(Configuration);
 		context.configManager.setConfig(cryptoJson);
 	});
 
