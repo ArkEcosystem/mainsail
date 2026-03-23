@@ -2,6 +2,8 @@ import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 import type { FuncKeywordDefinition } from "ajv";
 
+import { parseBlockNumber } from "./parse-block-number.js";
+
 export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
 ): {
@@ -62,13 +64,14 @@ export const makeKeywords = (
 
 	// Use by: crypto-proposal, p2p
 	const limitToRoundValidators: FuncKeywordDefinition = {
-		compile(schema: { minimum?: number }) {
-			return (data) => {
+		compile(schema: { minimum?: number; blockNumberPath?: string }) {
+			return (data, parentSchema) => {
 				if (!Array.isArray(data)) {
 					return false;
 				}
 
-				const { roundValidators } = configuration.getMilestone();
+				const blockNumber = parseBlockNumber(schema.blockNumberPath, parentSchema);
+				const { roundValidators } = configuration.getMilestone(blockNumber);
 				const minimum = schema.minimum !== undefined ? schema.minimum : roundValidators;
 
 				if (data.length < minimum || data.length > roundValidators) {
@@ -82,6 +85,7 @@ export const makeKeywords = (
 		keyword: "limitToRoundValidators",
 		metaSchema: {
 			properties: {
+				blockNumberPath: { type: "string" },
 				minimum: { type: "integer" },
 			},
 			type: "object",
@@ -90,8 +94,8 @@ export const makeKeywords = (
 
 	// Used by: crypto-messages (prevotes / precommits) and crypto-proposal
 	const isValidatorIndex: FuncKeywordDefinition = {
-		compile() {
-			return (data) => {
+		compile(schema: { blockNumberPath?: string }) {
+			return (data, parentSchema) => {
 				if (!Number.isInteger(data)) {
 					return false;
 				}
@@ -100,13 +104,20 @@ export const makeKeywords = (
 					return false;
 				}
 
-				const { roundValidators } = configuration.getMilestone();
+				const blockNumber = parseBlockNumber(schema.blockNumberPath, parentSchema);
+				const { roundValidators } = configuration.getMilestone(blockNumber);
 
 				return data < roundValidators;
 			};
 		},
 		errors: false,
 		keyword: "isValidatorIndex",
+		metaSchema: {
+			properties: {
+				blockNumberPath: { type: "string" },
+			},
+			type: "object",
+		},
 	};
 
 	return { bignumber, buffer, isValidatorIndex, limitToRoundValidators, maxBytes };

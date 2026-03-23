@@ -11,7 +11,7 @@ export const schemas: Record<"message", AnySchemaObject> = {
 			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
 			type: { enum: [Enums.Crypto.MessageType.Prevote, Enums.Crypto.MessageType.Precommit] },
-			validatorIndex: { isValidatorIndex: {} },
+			validatorIndex: { isValidatorIndex: { blockNumberPath: "blockNumber" } },
 		},
 		required: ["type", "blockNumber", "round", "validatorIndex", "signature"],
 		type: "object",

@@ -29,7 +29,6 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 
 		const proofBuffer = buffer.readBytes(this.proofSize());
 		const proof = await this.commitDeserializer.deserializeCommitProof(proofBuffer);
-		this.#verifySchema("commitProof", proof);
 
 		const block = await this.blockFactory.fromBytes(buffer.getRemainder());
 
@@ -39,7 +38,7 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 			serialized: buff.toString("hex"),
 		};
 
-		this.#verifySchema("commit", commit);
+		this.#verifySchema(commit);
 
 		return commit;
 	}
@@ -75,15 +74,15 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 			proof: json.proof,
 			serialized: json.serialized,
 		};
-		this.#verifySchema("commit", commit);
+		this.#verifySchema(commit);
 		return commit;
 	}
 
-	#verifySchema<T>(schema: string, data: T): void {
-		const result = this.validator.validate(schema, data);
+	#verifySchema<T>(data: T): void {
+		const result = this.validator.validate("commit", data);
 
 		if (result.error) {
-			throw new MessageSchemaError(schema, result.error);
+			throw new MessageSchemaError("commit", result.error);
 		}
 	}
 }
