@@ -155,14 +155,28 @@ export class Configuration implements Contracts.Crypto.Configuration {
 	#buildConstants(config: Contracts.Crypto.NetworkConfigPartial): void {
 		this.#checkRoundValidators(config);
 
-		const milestones = config.milestones.sort((a, b) => a.height - b.height) as Contracts.Crypto.Milestone[];
-		const milestone = {
-			data: milestones[0],
-			index: 0,
+		const milestones = this.#buildMilestones(config);
+
+
+		this.#configuration = {
+			config: {
+				genesisBlock: clone(config.genesisBlock),
+				milestones,
+				network: clone(config.network),
+			},
+			milestone: {
+				data: milestones[0],
+				index: 0,
+			},
+			milestones,
 		};
+	}
+
+	#buildMilestones(config: Contracts.Crypto.NetworkConfigPartial): Contracts.Crypto.Milestone[] {
+		const milestones = clone(config.milestones) as Contracts.Crypto.Milestone[];
+		milestones.sort((a, b) => a.height - b.height)
 
 		let lastMerged = 0;
-
 		while (lastMerged < milestones.length - 1) {
 			milestones[lastMerged + 1] = deepmerge(milestones[lastMerged], milestones[lastMerged + 1], {
 				arrayMerge: (destination, source, options) => source,
@@ -171,15 +185,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			lastMerged++;
 		}
 
-		this.#configuration = {
-			config: {
-				genesisBlock: clone(config.genesisBlock),
-				milestones: clone(milestones as Contracts.Crypto.Milestone[]),
-				network: clone(config.network),
-			},
-			milestone,
-			milestones,
-		};
+		return milestones;
 	}
 
 	#checkRoundValidators(config: Contracts.Crypto.NetworkConfigPartial): void {
