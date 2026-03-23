@@ -153,8 +153,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 	public getMaxRoundValidators(): number {
 		assert.defined(this.#configuration);
-
-		return this.#configuration.milestones.reduce((max, milestone) => Math.max(max, milestone.roundValidators ?? 0), 0);
+		return Math.max(...this.#configuration.milestones.map((milestone) => milestone.roundValidators));
 	}
 
 	#buildConstants(config: Contracts.Crypto.NetworkConfigPartial): void {
