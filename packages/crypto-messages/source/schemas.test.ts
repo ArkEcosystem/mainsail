@@ -15,18 +15,20 @@ import { schemas } from "./schemas";
 describe<{
 	app: Application;
 	validator: Validator;
-}>("Schemas", ({ it, assert, beforeEach }) => {
+	configuration: Configuration;
+}>("Schemas", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
 		context.app = new Application();
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1); // Required by schema to set number for validators
+		context.configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		context.configuration.setConfig(cryptoJson);
+		context.configuration.setHeight(1); // Required by schema to set number for validators
 
 		context.validator = context.app.resolve(Validator);
 
 		for (const keyword of Object.values({
-			...makeBaseKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeBaseKeywords(context.configuration),
 		})) {
 			context.validator.addKeyword(keyword);
 		}
@@ -143,5 +145,15 @@ describe<{
 	it("message - should throw with extra fields", async ({ validator }) => {
 		const result = validator.validate("message", { ...prevoteData, extraField: 123 });
 		assert.defined(result.error);
+	});
+
+	it("message - should correctly parse block number", async ({ validator, configuration }) => {
+		const spyGetMilestone = spy(configuration, "getMilestone");
+
+		const result = validator.validate("message", { ...prevoteData, blockNumber: 3 });
+		assert.undefined(result.error);
+
+		spyGetMilestone.calledOnce();
+		spyGetMilestone.calledWith(3);
 	});
 });
