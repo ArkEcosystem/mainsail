@@ -184,7 +184,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 	#buildConstants(): void {
 		if (!this.#config) {
-			throw new Error();
+			throw new Error("Configuration is not initialized");
 		}
 
 		this.#milestones = this.#config.milestones.sort((a, b) => a.height - b.height);
@@ -220,7 +220,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 	#validateMilestones(): void {
 		if (!this.#config) {
-			throw new Error();
+			throw new Error("Configuration is not initialized");
 		}
 
 		const initialHeight = this.#config.genesisBlock.block.number;
