@@ -242,6 +242,12 @@ describe<{
 		assert.equal(diff.height, `${cryptoJson.milestones[0].height} => ${cryptoJson.milestones[1].height}`);
 	});
 
+	it("getMilestoneDiff - should use set height if height is not provided", ({ configManager }) => {
+		configManager.setHeight(cryptoJson.milestones[1].height);
+		const diff = configManager.getMilestoneDiff();
+		assert.equal(diff.height, `${cryptoJson.milestones[0].height} => ${cryptoJson.milestones[1].height}`);
+	});
+
 	it("getNextMilestoneByKey - should get all milestones", ({ configManager }) => {
 		const milestones = [
 			{ height: 1, reward: "8" },
