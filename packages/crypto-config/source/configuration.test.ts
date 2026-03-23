@@ -156,11 +156,9 @@ describe<{
 		assert.equal(configManager.getMilestone(5).reward, "0");
 	});
 
-	it("getNextMilestoneByKey - should throw an error if configuration is not set", ({ }) => {
+	it("getNextMilestoneByKey - should throw an error if configuration is not set", ({}) => {
 		const configManager = new Configuration();
-		assert.throws(
-			() => configManager.getNextMilestoneWithNewKey(1, "evmSpec"),
-		);
+		assert.throws(() => configManager.getNextMilestoneWithNewKey(1, "evmSpec"));
 	});
 
 	it("getNextMilestoneByKey - should throw an error if roundValidators is 0", ({ configManager }) => {

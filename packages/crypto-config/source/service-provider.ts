@@ -10,7 +10,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-		this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(this.#fromConfigRepository());
+		this.app
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.setConfig(this.#fromConfigRepository());
 	}
 
 	#fromConfigRepository(): Contracts.Crypto.NetworkConfigPartial {

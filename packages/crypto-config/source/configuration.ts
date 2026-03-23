@@ -15,10 +15,9 @@ type Config = {
 
 @injectable()
 export class Configuration implements Contracts.Crypto.Configuration {
-	#configuration: Config | undefined = undefined;;
+	#configuration: Config | undefined = undefined;
 	#originalMilestones: Contracts.Crypto.MilestonePartial[] | undefined;
 	#height = 0;
-
 
 	public setConfig(config: Contracts.Crypto.NetworkConfigPartial): void {
 		this.#originalMilestones = clone(config.milestones);
@@ -75,10 +74,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 		const milestones = this.#configuration.milestones;
 		const milestone = this.#configuration.milestone;
 
-		while (
-			milestone.index < milestones.length - 1 &&
-			height >= milestones[milestone.index + 1].height
-		) {
+		while (milestone.index < milestones.length - 1 && height >= milestones[milestone.index + 1].height) {
 			milestone.index++;
 			milestone.data = milestones[milestone.index];
 		}
@@ -168,13 +164,9 @@ export class Configuration implements Contracts.Crypto.Configuration {
 		let lastMerged = 0;
 
 		while (lastMerged < milestones.length - 1) {
-			milestones[lastMerged + 1] = deepmerge(
-				milestones[lastMerged],
-				milestones[lastMerged + 1],
-				{
-					arrayMerge: (destination, source, options) => source,
-				},
-			);
+			milestones[lastMerged + 1] = deepmerge(milestones[lastMerged], milestones[lastMerged + 1], {
+				arrayMerge: (destination, source, options) => source,
+			});
 
 			lastMerged++;
 		}
@@ -187,7 +179,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			},
 			milestone,
 			milestones,
-		}
+		};
 	}
 
 	#checkRoundValidators(config: Contracts.Crypto.NetworkConfigPartial): void {
@@ -222,7 +214,6 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			if (previous.roundValidators === current.roundValidators) {
 				continue;
 			}
-
 
 			if ((current.height - Math.max(previous.height, 1)) % previous.roundValidators !== 0) {
 				throw new InvalidMilestoneConfigurationError(
