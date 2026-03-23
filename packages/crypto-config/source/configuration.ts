@@ -1,6 +1,7 @@
-import { injectable } from "@mainsail/container";
+import { Identifiers } from "@mainsail/constants";
+import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { InvalidMilestoneConfigurationError, InvalidNumberOfRoundValidatorsError } from "@mainsail/exceptions";
+import { InvalidMilestoneConfigurationError, InvalidNumberOfRoundValidatorsError, MessageSchemaError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 import deepmerge from "deepmerge";
 import clone from "lodash.clone";
@@ -14,6 +15,9 @@ type Config = {
 
 @injectable()
 export class Configuration implements Contracts.Crypto.Configuration {
+	@inject(Identifiers.Cryptography.Validator)
+	private readonly validator!: Contracts.Crypto.Validator;
+
 	#configuration: Config | undefined = undefined;
 	#originalMilestones: Contracts.Crypto.MilestonePartial[] | undefined;
 	#height = 0;
@@ -162,6 +166,8 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			network: clone(config.network),
 		}
 
+		this.#verifyConfig(buildConfig);
+
 		this.#configuration = {
 			config: buildConfig,
 			milestone: {
@@ -169,6 +175,15 @@ export class Configuration implements Contracts.Crypto.Configuration {
 				index: 0,
 			},
 		};
+	}
+
+
+	#verifyConfig<T>(config: Contracts.Crypto.NetworkConfig): void {
+		const result = this.validator.validate("cryptoConfig", config);
+
+		if (result.error) {
+			throw new MessageSchemaError("cryptoConfig", result.error);
+		}
 	}
 
 	#buildMilestones(config: Contracts.Crypto.NetworkConfigPartial): Contracts.Crypto.Milestone[] {
