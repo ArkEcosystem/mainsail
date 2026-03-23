@@ -86,7 +86,6 @@ export class NodeController extends Controller {
 				explorer: network.client.explorer,
 				nethash: network.nethash,
 				ports: this.buildPortMapping(plugins),
-				slip44: network.slip44,
 				symbol: network.client.symbol,
 				token: network.client.token,
 				version: network.pubKeyHash,

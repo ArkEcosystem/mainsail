@@ -121,10 +121,9 @@ const network: AnySchemaObject = {
 			type: "string",
 		},
 		pubKeyHash: { minimum: 0, type: "integer" },
-		slip44: { minimum: 0, type: "integer" },
 		wif: { minimum: 0, type: "integer" },
 	},
-	required: ["chainId", "client", "name",  "nethash", "pubKeyHash", "slip44", "wif"],
+	required: ["chainId", "client", "name",  "nethash", "pubKeyHash", "wif"],
 	type: "object",
 };
 

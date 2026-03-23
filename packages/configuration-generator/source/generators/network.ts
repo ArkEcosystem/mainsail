@@ -25,7 +25,6 @@ export class NetworkGenerator {
 				)
 				.toString("hex"),
 			pubKeyHash: options.pubKeyHash,
-			slip44: 1,
 			wif: options.wif,
 		};
 	}
