@@ -35,17 +35,6 @@ export class Configuration implements Contracts.Crypto.Configuration {
 	}
 
 	public set<T = unknown>(key: string, value: T): void {
-		if (!this.#config) {
-			this.#config = {
-				// @ts-ignore
-				genesisBlock: {},
-				// @ts-ignore
-				milestones: {},
-				// @ts-ignore
-				network: {},
-			};
-		}
-
 		assert.defined(this.#config);
 		set(this.#config, key, clone(value));
 
@@ -183,9 +172,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 	}
 
 	#buildConstants(): void {
-		if (!this.#config) {
-			throw new Error("Configuration is not initialized");
-		}
+		assert.defined(this.#config);
 
 		this.#milestones = this.#config.milestones.sort((a, b) => a.height - b.height);
 		this.#milestone = {
@@ -219,9 +206,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 	}
 
 	#validateMilestones(): void {
-		if (!this.#config) {
-			throw new Error("Configuration is not initialized");
-		}
+		assert.defined(this.#config);
 
 		const initialHeight = this.#config.genesisBlock.block.number;
 

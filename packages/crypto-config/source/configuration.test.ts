@@ -21,10 +21,10 @@ describe<{
 		assert.containKeys(configManager.all(), ["network", "milestones", "genesisBlock"]);
 	});
 
-	it("should allow set before config is initialized", () => {
+	it("should throw on set before config is initialized", () => {
 		const fresh = new Configuration();
-		fresh.set("network.nethash", "dummy");
-		assert.equal(fresh.get("network.nethash"), "dummy");
+
+		assert.throws(() => fresh.set("network.nethash", "dummy"));
 	});
 
 	it('key should be "set"', ({ configManager }) => {
