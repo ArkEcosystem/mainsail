@@ -157,7 +157,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 	}
 
 	#buildConstants(config: Contracts.Crypto.NetworkConfigPartial): void {
-		this.#validateMilestones(config);
+		this.#checkRoundValidators(config);
 
 		const milestones = config.milestones.sort((a, b) => a.height - b.height) as Contracts.Crypto.Milestone[];
 		const milestone = {
@@ -190,36 +190,40 @@ export class Configuration implements Contracts.Crypto.Configuration {
 		}
 	}
 
-	#validateMilestones(config: Contracts.Crypto.NetworkConfigPartial): void {
+	#checkRoundValidators(config: Contracts.Crypto.NetworkConfigPartial): void {
 		const initialHeight = config.genesisBlock.block.number;
 
-		const validatorMilestones = config.milestones
+		const milestones = config.milestones
 			.sort((a, b) => a.height - b.height)
 			.filter((milestone) => milestone.roundValidators !== undefined);
 
-		for (let index = 0; index < validatorMilestones.length; index++) {
-			const current = validatorMilestones[index];
+		for (let index = 0; index < milestones.length; index++) {
+			const current = milestones[index];
 			if (current.height > initialHeight && current.roundValidators === 0) {
 				throw new InvalidNumberOfRoundValidatorsError(
 					`Bad milestone at height: ${current.height}. The number of validators must be greater than 0.`,
 				);
 			}
 
+			// Can't get previous milestone for the first milestone, so skip it
 			if (index === 0) {
 				continue;
 			}
 
-			const previous = validatorMilestones[index - 1];
+			const previous = milestones[index - 1];
+			assert.defined(previous.roundValidators);
 
-			if (previous.roundValidators === current.roundValidators) {
-				continue;
-			}
-
+			// Skip genesis milestone with 0  round validators
 			if (previous.height === initialHeight && previous.roundValidators === 0) {
 				continue;
 			}
 
-			assert.defined(previous.roundValidators);
+			// Skip on no change
+			if (previous.roundValidators === current.roundValidators) {
+				continue;
+			}
+
+
 			if ((current.height - Math.max(previous.height, 1)) % previous.roundValidators !== 0) {
 				throw new InvalidMilestoneConfigurationError(
 					`Bad milestone at height: ${current.height}. The number of validators can only be changed at the beginning of a new round.`,
