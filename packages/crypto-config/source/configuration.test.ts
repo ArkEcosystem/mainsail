@@ -21,9 +21,14 @@ describe<{
 		assert.containKeys(configManager.all(), ["network", "milestones", "genesisBlock"]);
 	});
 
+	it("should allow set before config is initialized", () => {
+		const fresh = new Configuration();
+		fresh.set("network.nethash", "dummy");
+		assert.equal(fresh.get("network.nethash"), "dummy");
+	});
+
 	it('key should be "set"', ({ configManager }) => {
 		configManager.set("key", "value");
-
 		assert.equal(configManager.get("key"), "value");
 	});
 
@@ -122,6 +127,30 @@ describe<{
 		assert.false(configManager.isNewMilestone(999_999));
 	});
 
+	it("should throw in isNewMilestone when milestones are not initialized", ({ configManager }) => {
+		const fresh = new Configuration();
+		assert.throws(() => fresh.isNewMilestone(), "Milestones are not initialized");
+	});
+
+	it("should throw in getMilestone when milestones are not initialized", ({ configManager }) => {
+		const fresh = new Configuration();
+		assert.throws(() => fresh.getMilestone(), "Milestones are not initialized");
+	});
+
+	it("should walk milestone index backwards when height decreases", ({ configManager }) => {
+		configManager.setConfig({
+			...cryptoJson,
+			milestones: [
+				{ height: 0, roundValidators: 53, reward: "0" },
+				{ height: 10, roundValidators: 53, reward: "1" },
+				{ height: 20, roundValidators: 53, reward: "2" },
+			],
+		});
+
+		assert.equal(configManager.getMilestone(15).reward, "1");
+		assert.equal(configManager.getMilestone(5).reward, "0");
+	});
+
 	it("getNextMilestoneByKey - should throw an error if no milestones are set", ({ configManager }) => {
 		configManager.setConfig({ ...cryptoJson, milestones: [] });
 		assert.throws(
@@ -195,6 +224,20 @@ describe<{
 		assert.equal(configManager.getNextMilestoneWithNewKey(1_750_000, "evmSpec"), expected);
 	});
 
+	it("getMilestoneDiff - should return empty diff when no original milestones are set", () => {
+		const fresh = new Configuration();
+		assert.equal(fresh.getMilestoneDiff(), {});
+	});
+
+	it("getMilestoneDiff - should return empty diff for first milestone", ({ configManager }) => {
+		assert.equal(configManager.getMilestoneDiff(0), {});
+	});
+
+	it("getMilestoneDiff - should return diff for a later milestone", ({ configManager }) => {
+		const diff = configManager.getMilestoneDiff(cryptoJson.milestones[1].height);
+		assert.equal(diff.height, `${cryptoJson.milestones[0].height} => ${cryptoJson.milestones[1].height}`);
+	});
+
 	it("getNextMilestoneByKey - should get all milestones", ({ configManager }) => {
 		const milestones = [
 			{ height: 1, reward: "8" },
@@ -229,6 +272,29 @@ describe<{
 		assert.equal(configManager.getNextMilestoneWithNewKey(4, "reward"), thirdMilestone);
 		assert.equal(configManager.getNextMilestoneWithNewKey(6, "reward"), fourthMilestone);
 		assert.equal(configManager.getNextMilestoneWithNewKey(8, "reward"), emptyMilestone);
+	});
+
+	it("should return genesis height", ({ configManager }) => {
+		assert.equal(configManager.getGenesisHeight(), cryptoJson.genesisBlock.block.number);
+	});
+
+	it("getMilestones - should throw when milestones are not initialized", () => {
+		const fresh = new Configuration();
+		assert.throws(() => fresh.getMilestones(), "Milestones are not initialized");
+	});
+
+	it("should throw if round validators change mid-round", ({ configManager }) => {
+		assert.throws(
+			() =>
+				configManager.setConfig({
+					...cryptoJson,
+					milestones: [
+						{ height: 1, roundValidators: 53 },
+						{ height: 2, roundValidators: 54 },
+					],
+				}),
+			"Bad milestone at height: 2. The number of validators can only be changed at the beginning of a new round.",
+		);
 	});
 
 	it("getRoundValidators - should return maximum round validators from all milestones", ({ configManager }) => {

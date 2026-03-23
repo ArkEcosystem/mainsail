@@ -84,7 +84,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 		}
 
 		if (!this.#milestones) {
-			throw new Error();
+			throw new Error("Milestones are not initialized");
 		}
 
 		return this.#milestones.some((milestone) => milestone.height === height);
