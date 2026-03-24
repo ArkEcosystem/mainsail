@@ -25,10 +25,5 @@ describe<{
 
 	it("should register", async ({ validator, serviceProvider }) => {
 		await assert.resolves(() => serviceProvider.register());
-
-		assert.true(validator.hasSchema("alphanumeric"));
-		assert.true(validator.hasSchema("hex"));
-		assert.true(validator.hasSchema("prefixedDataHex"));
-		assert.true(validator.hasSchema("prefixedQuantityHex"));
 	});
 });

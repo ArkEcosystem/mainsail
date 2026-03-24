@@ -6,6 +6,10 @@ describe("Index", ({ assert, it }) => {
 		assert.defined(index.ServiceProvider);
 	});
 
+	it("should export schemas", () => {
+		assert.defined(index.schemas);
+	});
+
 	it("should export Validator", () => {
 		assert.defined(index.Validator);
 	});

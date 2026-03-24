@@ -9,10 +9,10 @@ import { makeKeywords } from "./keywords.js";
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		await this.#registerKeywords();
+		this.#registerKeywords();
 	}
 
-	async #registerKeywords(): Promise<void> {
+	#registerKeywords(): void {
 		for (const keyword of Object.values(
 			makeKeywords(this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)),
 		)) {
