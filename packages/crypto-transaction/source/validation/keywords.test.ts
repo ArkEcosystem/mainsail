@@ -1,20 +1,22 @@
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
-import { Validator } from "@mainsail/validation/source/validator";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { Contracts } from "@mainsail/contracts";
 import { makeKeywords } from "./keywords";
 
 describe<{
 	app: Application;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 }>("Keywords", ({ it, beforeEach, assert }) => {
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app = new Application();
 
-		context.validator = context.app.resolve(Validator);
+		await context.app.resolve(ValidationServiceProvider).register();
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);

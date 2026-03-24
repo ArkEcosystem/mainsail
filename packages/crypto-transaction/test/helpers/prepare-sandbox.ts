@@ -23,8 +23,8 @@ export const prepareSandbox = async (context: { app: Application }) => {
 	context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => {} });
 	context.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
-	await context.app.resolve(CoreSerializer).register();
 	await context.app.resolve(CoreValidation).register();
+	await context.app.resolve(CoreSerializer).register();
 	await context.app.resolve(CoreCryptoConfig).register();
 	await context.app.resolve(CoreCryptoValidation).register();
 	await context.app.resolve(CoreCryptoHashBcrypto).register();

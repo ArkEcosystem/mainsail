@@ -4,9 +4,9 @@ import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
 import { schemas as base58addressSchemas } from "@mainsail/crypto-address-base58";
 import { Configuration } from "@mainsail/crypto-config";
 import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-ecdsa";
-import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/crypto-validation";
+import { makeKeywords as makeBaseKeywords } from "@mainsail/crypto-validation";
 import { BigNumber } from "@mainsail/utils";
-import { Validator } from "@mainsail/validation/source/validator";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
@@ -16,7 +16,7 @@ import { schemas } from "./schemas";
 
 describe<{
 	app: Application;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 }>("Schemas", ({ it, assert, beforeEach }) => {
 	const transactionOriginal = {
 		gasLimit: 21_000,
@@ -38,13 +38,16 @@ describe<{
 		s: "2".repeat(64),
 	};
 
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app = new Application();
+
+		await context.app.resolve(ValidationServiceProvider).register();
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
-		context.validator = context.app.resolve(Validator);
+
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const keyword of Object.values({
 			...makeBaseKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
@@ -54,7 +57,6 @@ describe<{
 		}
 
 		for (const schema of Object.values({
-			...baseSchemas,
 			...keyPairSchemas,
 			...addressSchemas,
 			...base58addressSchemas,
