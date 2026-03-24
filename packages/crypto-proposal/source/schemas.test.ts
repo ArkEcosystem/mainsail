@@ -3,12 +3,13 @@ import { schemas as blockSchemas } from "@mainsail/crypto-block";
 import { Configuration } from "@mainsail/crypto-config";
 import { schemas as keyPairBlsSchemas } from "@mainsail/crypto-key-pair-bls12-381";
 import { schemas as signatureBlsSchemas } from "@mainsail/crypto-signature-bls12-381";
-import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/crypto-validation";
-import { Validator } from "@mainsail/validation/source/validator";
+import { makeKeywords as makeBaseKeywords } from "@mainsail/crypto-validation";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { Contracts } from "@mainsail/contracts";
 import {
 	Proposal,
 	ProposalWithValidRound,
@@ -27,15 +28,17 @@ describe<{
 }>("Schemas", ({ it, assert, beforeEach, spy }) => {
 	const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof, ProposalWithLockProofAndValidRound];
 
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app = new Application();
+
+		await context.app.resolve(ValidationServiceProvider).register();
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
 		context.configuration.setConfig(cryptoJson);
 		context.configuration.setHeight(1);
 
-		context.validator = context.app.resolve(Validator);
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const keyword of Object.values({
 			...makeBaseKeywords(context.configuration),
@@ -44,7 +47,6 @@ describe<{
 		}
 
 		for (const schema of Object.values({
-			...baseSchemas,
 			...blockSchemas,
 			...keyPairBlsSchemas,
 			...signatureBlsSchemas,
