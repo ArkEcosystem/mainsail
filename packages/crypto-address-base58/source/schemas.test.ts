@@ -1,11 +1,9 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
-import { schemas as baseSchemas } from "@mainsail/crypto-validation";
 import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
-import { ServiceProvider as Validation } from "@mainsail/validation";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { ServiceProvider as CryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
-import { Validator } from "@mainsail/validation/source/validator";
 import { generateMnemonic } from "bip39";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
@@ -16,7 +14,7 @@ import { schemas } from "./schemas";
 
 describe<{
 	app: Application;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 }>("Schemas", ({ it, assert, beforeEach }) => {
 	const length = 34;
 
@@ -25,6 +23,7 @@ describe<{
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+
 		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
 			genesisBlock: {
 				// @ts-ignore
@@ -42,13 +41,12 @@ describe<{
 			],
 		});
 
-		await context.app.resolve(Validation).register();
+		await context.app.resolve(ValidationServiceProvider).register();
 		await context.app.resolve(CryptoHashBcrypto).register();
 
-		context.validator = context.app.get(Identifiers.Cryptography.Validator);
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const schema of Object.values({
-			...baseSchemas,
 			...schemas,
 		})) {
 			context.validator.addSchema(schema);
