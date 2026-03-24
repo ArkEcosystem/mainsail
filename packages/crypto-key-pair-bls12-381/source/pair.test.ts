@@ -1,6 +1,7 @@
 import { Application } from "@mainsail/kernel";
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import { describe } from "@mainsail/test-runner";
 import { KeyPairFactory } from "./pair";
@@ -9,8 +10,9 @@ const mnemonic =
 	"question measure debris increase false feature journey height fun agent coach office only shell nation skill track upset distance behave easy devote floor shy";
 
 describe<{ app: Application; factory: KeyPairFactory }>("KeyPairFactory", ({ assert, beforeEach, it }) => {
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app = new Application();
+		await context.app.resolve(ValidationServiceProvider).register();
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
 		context.factory = context.app.resolve(KeyPairFactory);

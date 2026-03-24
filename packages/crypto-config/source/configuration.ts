@@ -15,8 +15,8 @@ type Config = {
 
 @injectable()
 export class Configuration implements Contracts.Crypto.Configuration {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
+	@inject(Identifiers.Cryptography.Validator)
+	private readonly validator!: Contracts.Crypto.Validator;
 
 	#configuration: Config | undefined = undefined;
 	#originalMilestones: Contracts.Crypto.MilestonePartial[] | undefined;
@@ -176,8 +176,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 	}
 
 	#verifyConfig<T>(config: Contracts.Crypto.NetworkConfig): void {
-		const validator = this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
-		validator.validate("cryptoConfig", config);
+		this.validator.validate("cryptoConfig", config);
 		// const result = validator.validate("cryptoConfig", config);
 
 		// if (result.error) {

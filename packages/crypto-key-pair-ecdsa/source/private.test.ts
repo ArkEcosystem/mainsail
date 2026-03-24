@@ -1,5 +1,6 @@
 import { Application } from "@mainsail/kernel";
 import { Identifiers } from "@mainsail/constants";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { Configuration } from "@mainsail/crypto-config";
 
 import { describe } from "@mainsail/test-runner";
@@ -13,8 +14,9 @@ describe<{
 	app: Application;
 	factory: PrivateKeyFactory;
 }>("PrivateKeyFactory", ({ assert, beforeEach, it }) => {
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app = new Application();
+		await context.app.resolve(ValidationServiceProvider).register();
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
 		context.factory = context.app.resolve(PrivateKeyFactory);
