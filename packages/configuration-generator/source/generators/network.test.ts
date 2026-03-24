@@ -1,5 +1,6 @@
 import { describe } from "@mainsail/test-runner";
 import { Application } from "@mainsail/kernel";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { ServiceProvider as CryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { NetworkGenerator } from "./network";
 
@@ -10,6 +11,7 @@ describe<{
 }>("NetworkGenerator", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
+		await context.app.resolve(ValidationServiceProvider).register();
 		await context.app.resolve(CryptoHashBcrypto).register();
 
 		context.generator = context.app.resolve(NetworkGenerator);
@@ -36,7 +38,6 @@ describe<{
 				name: "devnet",
 				nethash: "5af6dc1dd8714713cf69dd13fbb4ffb1fc1836cb009682303248cbfede600d39",
 				pubKeyHash: 123,
-				slip44: 1,
 				wif: 44,
 			},
 		);
@@ -64,7 +65,6 @@ describe<{
 				name: "devnet",
 				nethash: "03e8eabf43d7fcee4ecd7c73d41be913ea0f8b582edfd8383570eb7e504df863",
 				pubKeyHash: 123,
-				slip44: 1,
 				wif: 44,
 			},
 		);
