@@ -2,6 +2,7 @@ import { Identifiers } from "@mainsail/constants";
 
 import { Application } from "@mainsail/kernel";
 import { Validator } from "@mainsail/validation";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/crypto-validation";
 import { describe } from "@mainsail/test-runner";
 import { ServiceProvider as SignatureBlsServiceProvider } from "@mainsail/crypto-signature-bls12-381";
@@ -12,17 +13,19 @@ import { ServiceProvider as HashBcryptoServiceProvider } from "@mainsail/crypto-
 import { ServiceProvider as BlockServiceProvider } from "@mainsail/crypto-block";
 
 import { ServiceProvider } from "./service-provider";
+import { Contracts } from "@mainsail/contracts";
 
 describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 }>("ServiceProvider", ({ beforeEach, it, assert }) => {
 	beforeEach(async (context) => {
 		const app = new Application();
 
-		app.bind(Identifiers.Cryptography.Validator).to(Validator).inSingletonScope();
-		context.validator = app.get<Validator>(Identifiers.Cryptography.Validator);
+		await app.resolve(ValidationServiceProvider).register();
+
+		context.validator = app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 

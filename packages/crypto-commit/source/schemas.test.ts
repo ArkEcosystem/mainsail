@@ -7,29 +7,32 @@ import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-ecdsa";
 import { schemas as signatureBlsSchemas } from "@mainsail/crypto-signature-bls12-381";
 import { schemas as transactionSchemas } from "@mainsail/crypto-transaction/source/validation/index.js";
 import { makeKeywords as makeTransactionKeywords } from "@mainsail/crypto-transaction/source/validation/keywords.js";
-import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/crypto-validation";
-import { Validator } from "@mainsail/validation/source/validator";
+import { makeKeywords as makeBaseKeywords } from "@mainsail/crypto-validation";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { Contracts } from "@mainsail/crypto-validation";
 import { blockData, commitProof1, commitProof2, commitSerialized } from "../test/fixtures/index.js";
 import { schemas } from "./schemas";
 
 describe<{
 	app: Application;
-	validator: Validator;
-	configuration: Configuration;
+	validator: Contracts.Crypto.Validator;
+	configuration: Contracts.Crypto.Configuration;
 }>("Schemas", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
 		context.app = new Application();
 
+		context.app.resolve(ValidationServiceProvider).register();
+
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		context.configuration = context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 		context.configuration.setConfig(cryptoJson);
 		context.configuration.setHeight(1);
 
-		context.validator = context.app.resolve(Validator);
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const keyword of Object.values({
 			...makeBaseKeywords(context.configuration),
@@ -39,7 +42,6 @@ describe<{
 		}
 
 		for (const schema of Object.values({
-			...baseSchemas,
 			...addressSchemas,
 			...base58addressSchemas,
 			...blockSchemas,
