@@ -1,6 +1,6 @@
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "@mainsail/test-runner";
-import { Application} from "@mainsail/kernel";
+import { Application } from "@mainsail/kernel";
 import { Configuration } from "./configuration";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import type { Contracts } from "@mainsail/contracts";

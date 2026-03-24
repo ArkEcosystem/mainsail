@@ -26,16 +26,16 @@
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"deepmerge": "4.3.1",
 		"ajv": "8.17.1",
+		"deepmerge": "4.3.1",
 		"lodash.clone": "4.5.0",
 		"lodash.get": "4.4.2",
 		"lodash.set": "4.3.2"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/validation": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"@types/lodash.clone": "4.5.9",
 		"@types/lodash.get": "4.4.9",
 		"@types/lodash.set": "4.3.9",

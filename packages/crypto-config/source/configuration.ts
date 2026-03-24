@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 // @ts-ignore
-import { InvalidMilestoneConfigurationError, InvalidNumberOfRoundValidatorsError, MessageSchemaError } from "@mainsail/exceptions";
+import { InvalidMilestoneConfigurationError, InvalidNumberOfRoundValidatorsError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 import deepmerge from "deepmerge";
 import clone from "lodash.clone";
@@ -71,8 +71,6 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 		return this.#configuration.config.milestones.some((milestone) => milestone.height === height);
 	}
-
-
 
 	public getMilestone(height?: number): Contracts.Crypto.Milestone {
 		assert.defined(this.#configuration);
@@ -169,7 +167,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			genesisBlock: clone(config.genesisBlock),
 			milestones: this.#buildMilestones(config),
 			network: clone(config.network),
-		}
+		};
 
 		this.#verifyConfig(buildConfig);
 
@@ -181,7 +179,6 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			},
 		};
 	}
-
 
 	#verifyConfig<T>(config: Contracts.Crypto.NetworkConfig): void {
 		if (true) {
@@ -198,7 +195,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 	#buildMilestones(config: Contracts.Crypto.NetworkConfigPartial): Contracts.Crypto.Milestone[] {
 		const milestones = clone(config.milestones) as Contracts.Crypto.Milestone[];
-		milestones.sort((a, b) => a.height - b.height)
+		milestones.sort((a, b) => a.height - b.height);
 
 		let lastMerged = 0;
 		while (lastMerged < milestones.length - 1) {

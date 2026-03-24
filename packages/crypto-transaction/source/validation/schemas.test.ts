@@ -46,7 +46,6 @@ describe<{
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
-
 		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const keyword of Object.values({

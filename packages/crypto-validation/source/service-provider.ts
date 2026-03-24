@@ -5,7 +5,6 @@ import { Providers } from "@mainsail/kernel";
 
 import { makeKeywords } from "./keywords.js";
 
-
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

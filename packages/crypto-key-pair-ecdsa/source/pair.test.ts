@@ -9,8 +9,8 @@ const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
 describe<{
-	app: Application
-	factory: KeyPairFactory
+	app: Application;
+	factory: KeyPairFactory;
 }>("KeyPairFactory", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.app = new Application();
@@ -29,8 +29,9 @@ describe<{
 
 	it("should derive a key pair from an mnemonic", async ({ factory }) => {
 		assert.equal(
-			await factory
-				.fromPrivateKey(Buffer.from("814857ce48e291893feab95df02e1dbf7ad3994ba46f247f77e4eefd5d8734a2", "hex")),
+			await factory.fromPrivateKey(
+				Buffer.from("814857ce48e291893feab95df02e1dbf7ad3994ba46f247f77e4eefd5d8734a2", "hex"),
+			),
 			{
 				compressed: true,
 				privateKey: "814857ce48e291893feab95df02e1dbf7ad3994ba46f247f77e4eefd5d8734a2",
@@ -40,14 +41,10 @@ describe<{
 	});
 
 	it("should derive from a WIF", async ({ factory }) => {
-		assert.equal(
-			await factory
-				.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"),
-			{
-				compressed: true,
-				privateKey: "0000000000000000000000000000000000000000000000000000000000000001",
-				publicKey: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
-			},
-		);
+		assert.equal(await factory.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"), {
+			compressed: true,
+			privateKey: "0000000000000000000000000000000000000000000000000000000000000001",
+			publicKey: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+		});
 	});
 });

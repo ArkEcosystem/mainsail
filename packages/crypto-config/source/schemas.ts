@@ -45,17 +45,11 @@ const milestoneTimeouts: AnySchemaObject = {
 const milestoneSnapshot: AnySchemaObject = {
 	properties: {
 		previousGenesisBlockHash: {
-			allOf: [
-				{ $ref: "hex" },
-				{ maxLength: 64, minLength: 64 },
-			],
+			allOf: [{ $ref: "hex" }, { maxLength: 64, minLength: 64 }],
 			type: "string",
 		},
 		snapshotHash: {
-			allOf: [
-				{ $ref: "hex" },
-				{ maxLength: 64, minLength: 64 },
-			],
+			allOf: [{ $ref: "hex" }, { maxLength: 64, minLength: 64 }],
 			type: "string",
 		},
 	},
@@ -89,7 +83,18 @@ const milestone: AnySchemaObject = {
 		timeouts: milestoneTimeouts,
 		validatorRegistrationFee: { type: "string" },
 	},
-	required: ["block", "epoch", "evmSpec", "gas", "height", "reward", "roundValidators", "satoshi", "timeouts", "validatorRegistrationFee"],
+	required: [
+		"block",
+		"epoch",
+		"evmSpec",
+		"gas",
+		"height",
+		"reward",
+		"roundValidators",
+		"satoshi",
+		"timeouts",
+		"validatorRegistrationFee",
+	],
 	type: "object",
 };
 
@@ -114,16 +119,13 @@ const network: AnySchemaObject = {
 		},
 		name: { type: "string" },
 		nethash: {
-			allOf: [
-				{ $ref: "hex" },
-				{ maxLength: 64, minLength: 64 },
-			],
+			allOf: [{ $ref: "hex" }, { maxLength: 64, minLength: 64 }],
 			type: "string",
 		},
 		pubKeyHash: { minimum: 0, type: "integer" },
 		wif: { minimum: 0, type: "integer" },
 	},
-	required: ["chainId", "client", "name",  "nethash", "pubKeyHash", "wif"],
+	required: ["chainId", "client", "name", "nethash", "pubKeyHash", "wif"],
 	type: "object",
 };
 
@@ -139,7 +141,7 @@ const cryptoConfig: AnySchemaObject = {
 	type: "object",
 };
 
-export const schemas: Record<"network" | "milestone" | "milestones" | "cryptoConfig",  AnySchemaObject> = {
+export const schemas: Record<"network" | "milestone" | "milestones" | "cryptoConfig", AnySchemaObject> = {
 	cryptoConfig,
 	milestone,
 	milestones,
