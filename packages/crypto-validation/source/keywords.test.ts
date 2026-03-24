@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 import { BigNumber } from "@mainsail/utils";
-import { Validator } from "@mainsail/validation/source/validator";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import type { Contracts } from "@mainsail/contracts";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
@@ -11,16 +11,16 @@ import { makeKeywords } from "./keywords";
 
 describe<{
 	app: Application;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 }>("Keywords", ({ it, beforeEach, assert }) => {
 	beforeEach((context) => {
 		context.app = new Application();
+		context.app.resolve(ValidationServiceProvider).register();
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
-
-		context.validator = context.app.resolve(Validator);
 
 		const keywords = makeKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration));
 		for (const keyword of Object.values(keywords)) {

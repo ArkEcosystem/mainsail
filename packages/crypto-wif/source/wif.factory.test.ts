@@ -1,12 +1,13 @@
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa/source/pair";
 
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { mnemonic, wif } from "../test/identity.json";
-import { devnet } from "../test/networks.json";
 import { WIFFactory } from "./wif.factory";
+import cryptoConfig from "../../core/bin/config/devnet/core/crypto.json";
 
 describe<{
 	app: Application;
@@ -14,18 +15,11 @@ describe<{
 }>("Identities - WIFFactory", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
 		context.app = new Application();
+		context.app.resolve(ValidationServiceProvider).register();
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({
-			genesisBlock: {
-				block: {
-					number: 0,
-				},
-			},
-			milestones: [],
-			// @ts-ignore
-			network: devnet,
-		});
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoConfig);
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).set("network.wif", 170);
 
 		context.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
 

@@ -20,31 +20,13 @@ describe<{
 
 	beforeEach(async (context) => {
 		context.app = new Application();
+		await context.app.resolve(ValidationServiceProvider).register();
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
-		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
-			genesisBlock: {
-				// @ts-ignore
-				block: {
-					height: 0,
-				},
-			},
-			milestones: [
-				// @ts-ignore
-				{
-					address: {
-						base58: 23,
-					},
-				},
-			],
-		});
-
-		await context.app.resolve(ValidationServiceProvider).register();
 		await context.app.resolve(CryptoHashBcrypto).register();
-
-		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const schema of Object.values({
 			...schemas,

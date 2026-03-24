@@ -26,6 +26,7 @@ import { ServiceProvider as CoreTriggers } from "../../../kernel/source/services
 
 export const prepareSandbox = async (context: { app?: Application }): Promise<void> => {
 	context.app = new Application();
+	await context.app.resolve(CoreValidation).register();
 
 	context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 	context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
@@ -35,7 +36,6 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	await context.app.resolve(CoreEvents).register();
 
 	await context.app.resolve(CoreSerializer).register();
-	await context.app.resolve(CoreValidation).register();
 	await context.app.resolve(BlockchainUtilities).register();
 
 	await context.app.resolve(CoreCryptoHashBcrypto).register();

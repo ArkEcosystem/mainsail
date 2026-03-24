@@ -18,13 +18,11 @@ describe<{
 
 	beforeEach(async (context) => {
 		context.app = new Application();
+		await context.app.resolve(ValidatorServiceProvider).register();
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
-
-		await context.app.resolve(ValidatorServiceProvider).register();
-
-		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const schema of Object.values({
 			...schemas,

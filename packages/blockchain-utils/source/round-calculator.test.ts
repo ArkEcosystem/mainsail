@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
-
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { Configuration } from "../../crypto-config/distribution/index";
 import { Application } from "@mainsail/kernel";
@@ -13,10 +13,10 @@ type Context = {
 	roundCalculator: RoundCalculator;
 };
 
-const setup = (context: Context) => {
+const setup = async (context: Context) => {
 	context.app = new Application();
+	await context.app.resolve(ValidationServiceProvider).register();
 	context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-
 	context.configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
 	context.configuration.setConfig(crypto);
 

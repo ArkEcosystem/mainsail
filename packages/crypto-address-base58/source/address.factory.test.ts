@@ -16,11 +16,12 @@ const wif = "SGq4xLgZKCGxs7bjmwnBrWcT4C1ADFEermj846KC97FSv1WFD1dA";
 describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
+		await context.app.resolve(ValidationServiceProvider).register();
+
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoConfig);
 		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).set("network.wif", 170);
 
-		await context.app.resolve(ValidationServiceProvider).register();
 		await context.app.resolve<ECDSA>(ECDSA).register();
 		await context.app.resolve<CryptoHashBcrypto>(CryptoHashBcrypto).register();
 	});
