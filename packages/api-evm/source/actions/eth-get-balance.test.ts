@@ -1,16 +1,17 @@
 import { Identifiers } from "@mainsail/constants";
 import { schemas as keccak256Schemas } from "@mainsail/crypto-address-keccak256";
-import { schemas as validationSchemas } from "@mainsail/crypto-validation";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { Validator } from "@mainsail/validation";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { Contracts } from "@mainsail/contracts";
 import { schemas } from "../validation/index.js";
 import { EthGetBalanceAction } from "./index.js";
 
 describe<{
 	app: Application;
 	action: EthGetBalanceAction;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 	evm: any;
 }>("EthGetBalanceAction", ({ beforeEach, it, assert }) => {
 	let balance = BigInt(0);
@@ -25,10 +26,12 @@ describe<{
 		};
 
 		context.app = new Application();
+		await context.app.resolve(ValidationServiceProvider).register();
+
 		context.app.bind(Identifiers.Evm.Instance).toConstantValue(context.evm);
 
 		context.action = context.app.resolve(EthGetBalanceAction);
-		context.validator = context.app.resolve(Validator);
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 	});
 
 	it("should have a name", ({ action }) => {
