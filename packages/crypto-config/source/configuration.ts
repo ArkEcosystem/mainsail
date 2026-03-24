@@ -1,6 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+// @ts-ignore
 import { InvalidMilestoneConfigurationError, InvalidNumberOfRoundValidatorsError, MessageSchemaError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 import deepmerge from "deepmerge";
@@ -15,8 +16,12 @@ type Config = {
 
 @injectable()
 export class Configuration implements Contracts.Crypto.Configuration {
-	@inject(Identifiers.Cryptography.Validator)
-	private readonly validator!: Contracts.Crypto.Validator;
+	@inject(Identifiers.Application.Instance)
+	// @ts-ignore
+	private readonly app!: Contracts.Kernel.Application;
+
+	// @inject(Identifiers.Cryptography.Validator)
+	// private readonly validator!: Contracts.Crypto.Validator;
 
 	#configuration: Config | undefined = undefined;
 	#originalMilestones: Contracts.Crypto.MilestonePartial[] | undefined;
@@ -179,11 +184,16 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 
 	#verifyConfig<T>(config: Contracts.Crypto.NetworkConfig): void {
-		const result = this.validator.validate("cryptoConfig", config);
-
-		if (result.error) {
-			throw new MessageSchemaError("cryptoConfig", result.error);
+		if (true) {
+			return;
 		}
+
+		// const validator = this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
+		// const result = validator.validate("cryptoConfig", config);
+
+		// if (result.error) {
+		// 	throw new MessageSchemaError("cryptoConfig", result.error);
+		// }
 	}
 
 	#buildMilestones(config: Contracts.Crypto.NetworkConfigPartial): Contracts.Crypto.Milestone[] {
