@@ -5,6 +5,7 @@ import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
+import cryptoConfig from "../../core/bin/config/devnet/core/crypto.json";
 
 import { describe } from "@mainsail/test-runner";
 import { AddressFactory } from "./address.factory";
@@ -16,9 +17,8 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	beforeEach(async (context) => {
 		context.app = new Application();
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app
-			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-			.set("network.pubKeyHash", 30);
+		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoConfig);
+		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).set("network.wif", 170);
 
 		await context.app.resolve(CoreValidation).register();
 		await context.app.resolve<ECDSA>(ECDSA).register();
