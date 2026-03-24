@@ -1,7 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { schemas as keccak256Schemas } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
-import { Validator } from "@mainsail/validation";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { Contracts } from "@mainsail/contracts";
@@ -40,7 +39,6 @@ describe<{
 
 	it("schema should be array with 0 parameters", ({ action, validator }) => {
 		validator.addSchema(keccak256Schemas.address);
-		validator.addSchema(validationSchemas.prefixedQuantityHex);
 		validator.addSchema(schemas.blockTag);
 		validator.addSchema(action.schema);
 

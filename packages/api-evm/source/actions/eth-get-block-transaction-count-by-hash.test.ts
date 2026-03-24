@@ -30,7 +30,6 @@ describe<{
 	});
 
 	it("schema should be array with 0 parameters", ({ action, validator }) => {
-		validator.addSchema(cryptoValidationSchemas.prefixedQuantityHex);
 		validator.addSchema(cryptoBlockSchemas.prefixedBlockHash);
 		validator.addSchema(action.schema);
 
