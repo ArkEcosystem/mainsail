@@ -1,20 +1,20 @@
-import { Validator } from "@mainsail/validation/source/validator";
-
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { Contracts } from "@mainsail/contracts";
 import { headers } from "../../test/fixtures/responses/headers";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
 import { getMessages } from "./get-messages";
+import { Identifiers } from "@mainsail/constants/distribution/identifiers";
 
 type Context = {
 	app: Application;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 };
 
 describe<Context>("GetMessages Schema", ({ it, assert, beforeEach, each }) => {
 	let data;
 
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		data = {
 			headers,
 			precommits: [],
@@ -22,10 +22,8 @@ describe<Context>("GetMessages Schema", ({ it, assert, beforeEach, each }) => {
 		};
 
 		context.app = new Application();
-
-		context.validator = context.app.resolve(Validator);
-
-		prepareValidatorContext(context);
+		await prepareValidatorContext(context);
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 	});
 
 	it("should pass validation", ({ validator }) => {

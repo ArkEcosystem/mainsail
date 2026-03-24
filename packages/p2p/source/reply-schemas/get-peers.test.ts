@@ -1,8 +1,7 @@
-import { Enums } from "@mainsail/constants";
-import { Validator } from "@mainsail/validation/source/validator";
-
+import { Enums, Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { Contracts } from "@mainsail/contracts";
 import { headers } from "../../test/fixtures/responses/headers";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
 import { constants } from "../constants";
@@ -10,23 +9,21 @@ import { getPeers } from "./get-peers";
 
 type Context = {
 	app: Application;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 };
 
 describe<Context>("GetPeers Schema", ({ it, assert, beforeEach, each }) => {
 	let data;
 
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		data = {
 			headers,
 			peers: [{ ip: "127.0.0.1", port: 4000, protocol: Enums.Api.Protocol.Http }],
 		};
 
 		context.app = new Application();
-
-		context.validator = context.app.resolve(Validator);
-
-		prepareValidatorContext(context);
+		await prepareValidatorContext(context);
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 	});
 
 	it("should pass validation", ({ validator }) => {
