@@ -108,7 +108,7 @@ export const makeApplication = async (
 				},
 			},
 		],
-	});
+	}, false);
 
 	app.bind(InternalIdentifiers.Application).toConstantValue(app);
 	app.bind(InternalIdentifiers.ConfigurationGenerator).to(ConfigurationGenerator);

@@ -50,7 +50,7 @@ describe<{
 					validatorRegistrationFee: "250",
 				},
 			],
-		});
+		}, false);
 
 		context.generator = app.get<GenesisBlockGenerator>(Identifiers.Generator.GenesisBlock);
 		context.mnemonicGenerator = app.get<MnemonicGenerator>(Identifiers.Generator.Mnemonic);

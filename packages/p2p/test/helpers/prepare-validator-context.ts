@@ -1,6 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 import { schemas as cryptoBlockSchemas } from "@mainsail/crypto-block/distribution/index.js";
-import { Configuration } from "@mainsail/crypto-config";
+import {  ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 import { schemas as cryptoTransactionSchemas } from "@mainsail/crypto-transaction";
 import { makeKeywords as makeCryptoValidationKeywords } from "@mainsail/crypto-validation";
 import type { Application } from "@mainsail/kernel";
@@ -15,13 +16,13 @@ type Context = {
 };
 
 export const prepareValidatorContext = async (context: Context) => {
+	context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
+
 	await context.app.resolve(ValidationServiceProvider).register();
+	await context.app.resolve(CryptoConfigServiceProvider).register();
 
-	context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-	context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
-	context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
-
-	const configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+	const configuration = context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
+	configuration.setHeight(1);
 
 	const validator = context.app.get<Validator>(Identifiers.Cryptography.Validator);
 	for (const keyword of Object.values(makeCryptoValidationKeywords(configuration))) {

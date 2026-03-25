@@ -1,15 +1,16 @@
 import { ServiceProvider as BlockchainUtilities } from "@mainsail/blockchain-utils";
 import { Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
-import { Configuration } from "@mainsail/crypto-config";
-import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-signature-bls12-381";
-import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
+import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CoreCryptoMessages } from "@mainsail/crypto-messages";
 import { ServiceProvider as CoreCryptoProposal } from "@mainsail/crypto-proposal";
+import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-signature-bls12-381";
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
@@ -26,11 +27,10 @@ import { ServiceProvider as CoreTriggers } from "../../../kernel/source/services
 
 export const prepareSandbox = async (context: { app?: Application }): Promise<void> => {
 	context.app = new Application();
+	context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
 	await context.app.resolve(CoreValidation).register();
-
-	context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-	context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
-	context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
+	await context.app.resolve(CryptoConfigServiceProvider).register();
+	context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
 
 	await context.app.resolve(CoreTriggers).register();
 	await context.app.resolve(CoreEvents).register();
