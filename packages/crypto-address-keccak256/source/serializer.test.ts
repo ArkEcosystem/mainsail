@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
-import { ServiceProvider as CoreValidation } from "@mainsail/validation";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { ByteBuffer } from "@mainsail/utils";
 import { Buffer } from "buffer";
 
@@ -17,10 +17,9 @@ describe<{
 }>("AddressSerializer", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
-
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-		await context.app.resolve(CoreValidation).register();
+		await context.app.resolve(ValidationServiceProvider).register();
 		await context.app.resolve<ECDSA>(ECDSA).register();
 
 		context.serializer = context.app.resolve(AddressSerializer);

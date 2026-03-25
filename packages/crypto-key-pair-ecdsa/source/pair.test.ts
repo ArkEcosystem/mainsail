@@ -1,6 +1,7 @@
-import { Container } from "@mainsail/container";
+import { Application } from "@mainsail/kernel";
 import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import { describe } from "@mainsail/test-runner";
 import { KeyPairFactory } from "./pair";
@@ -8,25 +9,31 @@ import { KeyPairFactory } from "./pair";
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
-describe<{ container: Container }>("KeyPairFactory", ({ assert, beforeEach, it }) => {
-	beforeEach((context) => {
-		context.container = new Container();
-		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+describe<{
+	app: Application;
+	factory: KeyPairFactory;
+}>("KeyPairFactory", ({ assert, beforeEach, it }) => {
+	beforeEach(async (context) => {
+		context.app = new Application();
+		await context.app.resolve(ValidationServiceProvider).register();
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+
+		context.factory = context.app.resolve(KeyPairFactory);
 	});
 
-	it("should derive a key pair from an mnemonic", async (context) => {
-		assert.equal(await context.container.get(KeyPairFactory, { autobind: true }).fromMnemonic(mnemonic), {
+	it("should derive a key pair from an mnemonic", async ({ factory }) => {
+		assert.equal(await factory.fromMnemonic(mnemonic), {
 			compressed: true,
 			privateKey: "814857ce48e291893feab95df02e1dbf7ad3994ba46f247f77e4eefd5d8734a2",
 			publicKey: "03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f",
 		});
 	});
 
-	it("should derive a key pair from an mnemonic", async (context) => {
+	it("should derive a key pair from an mnemonic", async ({ factory }) => {
 		assert.equal(
-			await context.container
-				.get(KeyPairFactory, { autobind: true })
-				.fromPrivateKey(Buffer.from("814857ce48e291893feab95df02e1dbf7ad3994ba46f247f77e4eefd5d8734a2", "hex")),
+			await factory.fromPrivateKey(
+				Buffer.from("814857ce48e291893feab95df02e1dbf7ad3994ba46f247f77e4eefd5d8734a2", "hex"),
+			),
 			{
 				compressed: true,
 				privateKey: "814857ce48e291893feab95df02e1dbf7ad3994ba46f247f77e4eefd5d8734a2",
@@ -35,16 +42,11 @@ describe<{ container: Container }>("KeyPairFactory", ({ assert, beforeEach, it }
 		);
 	});
 
-	it("should derive from a WIF", async (context) => {
-		assert.equal(
-			await context.container
-				.get(KeyPairFactory, { autobind: true })
-				.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn", 128),
-			{
-				compressed: true,
-				privateKey: "0000000000000000000000000000000000000000000000000000000000000001",
-				publicKey: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
-			},
-		);
+	it("should derive from a WIF", async ({ factory }) => {
+		assert.equal(await factory.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"), {
+			compressed: true,
+			privateKey: "0000000000000000000000000000000000000000000000000000000000000001",
+			publicKey: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+		});
 	});
 });

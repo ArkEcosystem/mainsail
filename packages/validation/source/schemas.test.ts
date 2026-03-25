@@ -1,11 +1,7 @@
-import { Identifiers } from "@mainsail/constants";
-import { Configuration } from "@mainsail/crypto-config";
-import { Validator } from "@mainsail/validation/source/validator";
+import { Validator } from "./validator.js";
 
-import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { makeKeywords } from "./keywords";
 import { schemas } from "./schemas";
 
 describe<{
@@ -15,15 +11,7 @@ describe<{
 	beforeEach((context) => {
 		context.app = new Application();
 
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
-
 		context.validator = context.app.resolve(Validator);
-
-		const keywords = makeKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration));
-		for (const keyword of Object.values(keywords)) {
-			context.validator.addKeyword(keyword);
-		}
 
 		for (const schema of Object.values(schemas)) {
 			context.validator.addSchema(schema);

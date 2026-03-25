@@ -376,9 +376,6 @@ importers:
       '@mainsail/crypto-block':
         specifier: workspace:*
         version: link:../crypto-block
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -554,9 +551,15 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1209,9 +1212,6 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -1255,9 +1255,6 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -1446,6 +1443,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      ajv:
+        specifier: 8.17.1
+        version: 8.17.1
       deepmerge:
         specifier: 4.3.1
         version: 4.3.1
@@ -1465,6 +1465,9 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       '@types/lodash.clone':
         specifier: 4.5.9
         version: 4.5.9
@@ -1542,9 +1545,6 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -1588,9 +1588,6 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -1777,9 +1774,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -1943,6 +1937,9 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       uvu:
         specifier: 0.5.6
         version: 0.5.6

@@ -1,5 +1,6 @@
 import { Keystore } from "@chainsafe/bls-keystore";
 import { Commands } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { injectable, postConstruct } from "@mainsail/container";
 import { ServiceProvider as CryptoServiceProvider } from "@mainsail/crypto-config";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-bls12-381";
@@ -22,6 +23,9 @@ export class Command extends Commands.Command {
 
 	@postConstruct()
 	public configure(): void {
+		// Required by KeyPairFactory, but it is not used. It is part of WIF implementation.
+		this.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
+
 		this.definition
 			.setFlag("bip39", "A validator plain text passphrase. Referred to as BIP39.", Joi.string())
 			.setFlag("password", "A custom password that encrypts the BIP39. Referred to as BIP38.", Joi.string());

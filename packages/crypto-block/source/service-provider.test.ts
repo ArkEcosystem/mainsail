@@ -1,11 +1,12 @@
 import { Identifiers } from "@mainsail/constants";
 
 import { Application } from "@mainsail/kernel";
-import { Validator } from "@mainsail/validation";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import { describe } from "@mainsail/test-runner";
+import { Contracts } from "@mainsail/contracts";
 import { ServiceProvider } from "./service-provider";
-import { ServiceProvider as ValidationServiceProvider } from "@mainsail/crypto-validation";
+import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/crypto-validation";
 import { ServiceProvider as TransactionServiceProvider } from "@mainsail/crypto-transaction";
 import { ServiceProvider as AddressServiceProvider } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as KeyPairServiceProvider } from "@mainsail/crypto-key-pair-ecdsa";
@@ -14,17 +15,17 @@ import { ServiceProvider as HashBcryptoServiceProvider } from "@mainsail/crypto-
 describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 }>("ServiceProvider", ({ beforeEach, it, assert }) => {
 	beforeEach(async (context) => {
 		const app = new Application();
+		await app.resolve(ValidationServiceProvider).register();
 
-		app.bind(Identifiers.Cryptography.Validator).to(Validator).inSingletonScope();
-		context.validator = app.get<Validator>(Identifiers.Cryptography.Validator);
+		context.validator = app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 
-		await app.resolve(ValidationServiceProvider).register();
+		await app.resolve(CryptoValidationServiceProvider).register();
 		await app.resolve(HashBcryptoServiceProvider).register();
 		await app.resolve(KeyPairServiceProvider).register();
 		await app.resolve(AddressServiceProvider).register();

@@ -1,14 +1,15 @@
 import { Identifiers } from "@mainsail/constants";
 import { schemas as blockSchemas } from "@mainsail/crypto-block";
-import { Configuration } from "@mainsail/crypto-config";
 import { schemas as keyPairBlsSchemas } from "@mainsail/crypto-key-pair-bls12-381";
 import { schemas as signatureBlsSchemas } from "@mainsail/crypto-signature-bls12-381";
-import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/crypto-validation";
-import { Validator } from "@mainsail/validation/source/validator";
+import { makeKeywords as makeBaseKeywords } from "@mainsail/crypto-validation";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { Contracts } from "@mainsail/contracts";
 import {
 	Proposal,
 	ProposalWithValidRound,
@@ -18,24 +19,25 @@ import {
 } from "../test/fixtures/index.js";
 import { schemas } from "./schemas";
 import { signature } from "../test/fixtures/proposal.js";
-import { numberArray } from "@mainsail/utils";
 
 describe<{
 	app: Application;
-	validator: Validator;
-	configuration: Configuration;
+	validator: Contracts.Crypto.Validator;
+	configuration: Contracts.Crypto.Configuration;
 }>("Schemas", ({ it, assert, beforeEach, spy }) => {
 	const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof, ProposalWithLockProofAndValidRound];
 
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app = new Application();
 
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
-		context.configuration.setConfig(cryptoJson);
+		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
+		await context.app.resolve(ValidationServiceProvider).register();
+		await context.app.resolve(CryptoConfigServiceProvider).register();
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
+		context.configuration = context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 		context.configuration.setHeight(1);
 
-		context.validator = context.app.resolve(Validator);
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const keyword of Object.values({
 			...makeBaseKeywords(context.configuration),
@@ -44,7 +46,6 @@ describe<{
 		}
 
 		for (const schema of Object.values({
-			...baseSchemas,
 			...blockSchemas,
 			...keyPairBlsSchemas,
 			...signatureBlsSchemas,

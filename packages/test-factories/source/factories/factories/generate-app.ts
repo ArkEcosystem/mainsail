@@ -26,10 +26,11 @@ export const generateApp = async (
 	app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 	app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
-	app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-	app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(config);
-
 	await app.resolve(CoreValidation).register();
+
+	app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+	app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(config, false);
+
 	await app.resolve(CoreCryptoValidation).register();
 	await app.resolve(CoreCryptoAddressKeccak256).register();
 	await app.resolve(CoreCryptoAddressBase58).register();

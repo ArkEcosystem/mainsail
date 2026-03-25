@@ -88,27 +88,30 @@ export const makeApplication = async (
 	await app.resolve(CoreSnapshotLegacyImporter).register();
 	await app.resolve(EvmService).register();
 
-	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
-		genesisBlock: {
-			// @ts-ignore
-			block: {
-				number: 0,
-			},
-		},
-		milestones: [
-			{
-				evmSpec: Enums.Evm.SpecId.SHANGHAI,
-				height: 0,
-				timeouts: {
-					blockPrepareTime: 4000,
-					blockTime: 8000,
-					stageTimeout: 2000,
-					stageTimeoutIncrease: 2000,
-					tolerance: 100,
+	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(
+		{
+			genesisBlock: {
+				// @ts-ignore
+				block: {
+					number: 0,
 				},
 			},
-		],
-	});
+			milestones: [
+				{
+					evmSpec: Enums.Evm.SpecId.SHANGHAI,
+					height: 0,
+					timeouts: {
+						blockPrepareTime: 4000,
+						blockTime: 8000,
+						stageTimeout: 2000,
+						stageTimeoutIncrease: 2000,
+						tolerance: 100,
+					},
+				},
+			],
+		},
+		false,
+	);
 
 	app.bind(InternalIdentifiers.Application).toConstantValue(app);
 	app.bind(InternalIdentifiers.ConfigurationGenerator).to(ConfigurationGenerator);

@@ -1,34 +1,28 @@
 import { Identifiers } from "@mainsail/constants";
-import { Configuration } from "@mainsail/crypto-config";
-
+import { Contracts } from "@mainsail/contracts";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
-import { Validator } from "@mainsail/validation";
 import { describe } from "@mainsail/test-runner";
-import { schemas } from "./schemas";
 import { ServiceProvider } from "./service-provider";
 
 describe<{
 	app: Application;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ it, beforeEach, assert }) => {
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app = new Application();
-		context.app.bind(Identifiers.Cryptography.Validator).to(Validator).inSingletonScope();
-		context.validator = context.app.get<Validator>(Identifiers.Cryptography.Validator);
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
+		await context.app.resolve(ValidationServiceProvider).register();
+		await context.app.resolve(CryptoConfigServiceProvider).register();
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		context.serviceProvider = context.app.resolve(ServiceProvider);
 	});
 
-	it("should register", async ({ validator, serviceProvider }) => {
+	it("should register", async ({ serviceProvider }) => {
 		await assert.resolves(() => serviceProvider.register());
-
-		assert.true(validator.hasSchema("alphanumeric"));
-		assert.true(validator.hasSchema("hex"));
-		assert.true(validator.hasSchema("prefixedDataHex"));
-		assert.true(validator.hasSchema("prefixedQuantityHex"));
 	});
 });

@@ -38,7 +38,6 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",
-		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/semver": "7.7.0",

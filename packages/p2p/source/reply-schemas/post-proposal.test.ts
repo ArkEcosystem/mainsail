@@ -1,14 +1,14 @@
-import { Validator } from "@mainsail/validation/source/validator";
-
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { Contracts } from "@mainsail/contracts";
 import { headers } from "../../test/fixtures/responses/headers";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
 import { postProposal } from "./post-proposal";
+import { Identifiers } from "@mainsail/constants/distribution/identifiers";
 
 type Context = {
 	app: Application;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 };
 
 describe<Context>("PostProposal Schema", ({ it, assert, beforeEach, each }) => {
@@ -16,12 +16,10 @@ describe<Context>("PostProposal Schema", ({ it, assert, beforeEach, each }) => {
 		headers,
 	};
 
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app = new Application();
-
-		context.validator = context.app.resolve(Validator);
-
-		prepareValidatorContext(context);
+		await prepareValidatorContext(context);
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 	});
 
 	it("should pass validation", ({ validator }) => {

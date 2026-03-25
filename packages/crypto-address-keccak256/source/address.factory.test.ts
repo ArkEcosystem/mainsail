@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/constants";
 import { Configuration } from "@mainsail/crypto-config";
 import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
 import { Application } from "@mainsail/kernel";
-import { ServiceProvider as CoreValidation } from "@mainsail/validation";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import { describe } from "@mainsail/test-runner";
 import { AddressFactory } from "./address.factory";
@@ -17,7 +17,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		context.app = new Application();
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-		await context.app.resolve(CoreValidation).register();
+		await context.app.resolve(ValidationServiceProvider).register();
 		await context.app.resolve<ECDSA>(ECDSA).register();
 	});
 

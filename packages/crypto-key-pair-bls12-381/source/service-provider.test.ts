@@ -1,26 +1,21 @@
 import { Identifiers } from "@mainsail/constants";
-
 import { Application } from "@mainsail/kernel";
-import { Validator } from "@mainsail/validation";
-import { schemas as baseSchemas } from "@mainsail/crypto-validation";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from "./service-provider";
+import { Contracts } from "@mainsail/contracts";
 
 describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 }>("ServiceProvider", ({ beforeEach, it, assert }) => {
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		const app = new Application();
+		await app.resolve(ValidationServiceProvider).register();
 
-		app.bind(Identifiers.Cryptography.Validator).to(Validator).inSingletonScope();
-		context.validator = app.get<Validator>(Identifiers.Cryptography.Validator);
-
-		for (const schema of Object.values(baseSchemas)) {
-			context.validator.addSchema(schema);
-		}
+		context.validator = app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		context.serviceProvider = app.resolve(ServiceProvider);
 		context.app = app;
