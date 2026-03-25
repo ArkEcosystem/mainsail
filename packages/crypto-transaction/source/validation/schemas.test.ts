@@ -2,11 +2,11 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
 import { schemas as base58addressSchemas } from "@mainsail/crypto-address-base58";
-import { Configuration } from "@mainsail/crypto-config";
 import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-ecdsa";
 import { makeKeywords as makeBaseKeywords } from "@mainsail/crypto-validation";
 import { BigNumber } from "@mainsail/utils";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 
 import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
@@ -40,17 +40,17 @@ describe<{
 
 	beforeEach(async (context) => {
 		context.app = new Application();
-
+		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
 		await context.app.resolve(ValidationServiceProvider).register();
+		await context.app.resolve(CryptoConfigServiceProvider).register();
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
 		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const keyword of Object.values({
-			...makeBaseKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
-			...makeKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeBaseKeywords(context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeKeywords(context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)),
 		})) {
 			context.validator.addKeyword(keyword);
 		}

@@ -1,11 +1,11 @@
 import { Identifiers } from "@mainsail/constants";
 import { BigNumber } from "@mainsail/utils";
 import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
-import { Configuration } from "@mainsail/crypto-config";
 import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-ecdsa";
 import { schemas as transactionSchemas } from "@mainsail/crypto-transaction";
 import { makeKeywords } from "@mainsail/crypto-validation";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
@@ -19,12 +19,9 @@ describe<{
 }>("Schemas", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
-
+		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
 		await context.app.resolve(ValidationServiceProvider).register();
-
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
-
+		await context.app.resolve(CryptoConfigServiceProvider).register();
 		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const keyword of Object.values({

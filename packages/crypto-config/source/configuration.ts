@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { InvalidMilestoneConfigurationError, InvalidNumberOfRoundValidatorsError } from "@mainsail/exceptions";
+import { InvalidMilestoneConfigurationError, InvalidNumberOfRoundValidatorsError, MessageSchemaError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 import deepmerge from "deepmerge";
 import clone from "lodash.clone";
@@ -176,12 +176,11 @@ export class Configuration implements Contracts.Crypto.Configuration {
 	}
 
 	#verifyConfig<T>(config: Contracts.Crypto.NetworkConfig): void {
-		this.validator.validate("cryptoConfig", config);
-		// const result = validator.validate("cryptoConfig", config);
+		const result = this.validator.validate("cryptoConfig", config);
 
-		// if (result.error) {
-		// 	throw new MessageSchemaError("cryptoConfig", result.error);
-		// }
+		if (result.error) {
+			throw new MessageSchemaError("cryptoConfig", result.error);
+		}
 	}
 
 	#buildMilestones(config: Contracts.Crypto.NetworkConfigPartial): Contracts.Crypto.Milestone[] {

@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
-import { Configuration } from "@mainsail/crypto-config";
 import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 import { generateMnemonic } from "bip39";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
@@ -19,11 +19,10 @@ describe<{
 
 	beforeEach(async (context) => {
 		context.app = new Application();
+		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
 		await context.app.resolve(ValidationServiceProvider).register();
+		await context.app.resolve(CryptoConfigServiceProvider).register();
 		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
-
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
 		for (const schema of Object.values({
 			...schemas,

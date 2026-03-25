@@ -1,9 +1,9 @@
 import { Identifiers } from "@mainsail/constants";
 import { schemas as blockSchemas } from "@mainsail/crypto-block";
-import { Configuration } from "@mainsail/crypto-config";
 import { schemas as keyPairBlsSchemas } from "@mainsail/crypto-key-pair-bls12-381";
 import { schemas as signatureBlsSchemas } from "@mainsail/crypto-signature-bls12-381";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/crypto-validation";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
@@ -18,18 +18,18 @@ describe<{
 	validator: Contracts.Crypto.Validator;
 	configuration: Contracts.Crypto.Configuration;
 }>("Schemas", ({ it, assert, beforeEach, spy }) => {
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app = new Application();
 
-		context.app.resolve(ValidationServiceProvider).register();
+		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
+		await context.app.resolve(ValidationServiceProvider).register();
+		await context.app.resolve(CryptoConfigServiceProvider).register();
 
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 		context.configuration = context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
-		context.configuration.setConfig(cryptoJson);
 		context.configuration.setHeight(1); // Required by schema to set number for validators
 
-		context.app.resolve(CryptoValidationServiceProvider).register();
-		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
+		await context.app.resolve(CryptoValidationServiceProvider).register();
 
 		for (const schema of Object.values({
 			...blockSchemas,
