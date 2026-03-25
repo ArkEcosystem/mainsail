@@ -21,10 +21,12 @@ export class Configuration implements Contracts.Crypto.Configuration {
 	#configuration: Config | undefined = undefined;
 	#originalMilestones: Contracts.Crypto.MilestonePartial[] | undefined;
 	#height = 0;
+	#verify = true;
 
-	public setConfig(config: Contracts.Crypto.NetworkConfigPartial): void {
+	public setConfig(config: Contracts.Crypto.NetworkConfigPartial, verify: boolean = true): void {
 		this.#originalMilestones = clone(config.milestones);
 		this.#height = config.genesisBlock.block.number;
+		this.#verify = verify;
 
 		this.#buildConstants(config);
 	}
@@ -164,7 +166,9 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			network: clone(config.network),
 		};
 
-		this.#verifyConfig(buildConfig);
+		if (this.#verify) {
+			this.#verifyConfig(buildConfig);
+		}
 
 		this.#configuration = {
 			config: buildConfig,

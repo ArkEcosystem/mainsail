@@ -1,24 +1,26 @@
 import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
-import crypto from "../../core/bin/config/devnet/core/crypto.json";
-import { Configuration } from "../../crypto-config/distribution/index";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
+import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { RoundCalculator } from "./round-calculator";
+import { Contracts } from "@mainsail/contracts";
 
 type Context = {
 	app: Application;
-	configuration: Configuration;
+	configuration: Contracts.Crypto.Configuration;
 	roundCalculator: RoundCalculator;
 };
 
 const setup = async (context: Context) => {
 	context.app = new Application();
+	context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
 	await context.app.resolve(ValidationServiceProvider).register();
-	context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-	context.configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
-	context.configuration.setConfig(crypto);
+	await context.app.resolve(CryptoConfigServiceProvider).register();
+
+	context.configuration = context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 
 	context.roundCalculator = context.app.resolve<RoundCalculator>(RoundCalculator);
 };
@@ -36,8 +38,8 @@ describe<Context>("Round Calculator - calculateRoundInfoByRound", ({ assert, bef
 			{ roundValidators: 53, height: 54 },
 		];
 
-		const config = { ...crypto, milestones };
-		configuration.setConfig(config);
+		const config = { ...cryptoJson, milestones };
+		configuration.setConfig(config, false);
 
 		const testVector = [
 			// Round 0
@@ -106,8 +108,8 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 	}) => {
 		const milestones = [{ roundValidators: 4, height: 0 }];
 
-		const config = { ...crypto, milestones };
-		configuration.setConfig(config);
+		const config = { ...cryptoJson, milestones };
+		configuration.setConfig(config, false);
 
 		const testVector = [
 			// Round 0
@@ -150,8 +152,8 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 			{ roundValidators: 3, height: 12 },
 		];
 
-		const config = { ...crypto, milestones };
-		configuration.setConfig(config);
+		const config = { ...cryptoJson, milestones };
+		configuration.setConfig(config, false);
 
 		const testVector = [
 			// Round 0 - milestone
@@ -200,8 +202,8 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 			{ roundValidators: 53, height: 15 },
 		];
 
-		const config = { ...crypto, milestones };
-		configuration.setConfig(config);
+		const config = { ...cryptoJson, milestones };
+		configuration.setConfig(config, false);
 
 		const testVector = [
 			// Round 0
@@ -245,8 +247,8 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 			{ roundValidators: 4, height: 4 },
 		];
 
-		const config = { ...crypto, milestones };
-		configuration.setConfig(config);
+		const config = { ...cryptoJson, milestones };
+		configuration.setConfig(config, false);
 
 		const stubGetNextMilestoneWithKey = stub(configuration, "getNextMilestoneWithNewKey")
 			// nextMilestone
@@ -319,6 +321,8 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 	});
 
 	it("should be ok when changing delegate count", ({ configuration, roundCalculator }) => {
+
+
 		const milestones = [
 			{ roundValidators: 1, height: 0 }, // R0
 			{ roundValidators: 2, height: 1 }, // R1
@@ -328,7 +332,10 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 			{ roundValidators: 53, height: 62 }, // R8
 		];
 
-		configuration.set("milestones", milestones);
+		configuration.setConfig({
+			...cryptoJson,
+			milestones,
+		}, false);
 
 		// 1 Delegate
 		assert.true(roundCalculator.isNewRound(0));
@@ -360,9 +367,9 @@ describe<Context>("RoundCalculator - getMilestonesWhichAffectActiveDelegateCount
 
 	it("should return milestones which changes delegate count", ({ configuration, roundCalculator }) => {
 		configuration.setConfig({
-			...crypto,
+			...cryptoJson,
 			milestones: [{ roundValidators: 4, height: 1 }],
-		});
+		}, false);
 
 		const milestones = [
 			{ roundValidators: 4, height: 0 },
@@ -372,8 +379,8 @@ describe<Context>("RoundCalculator - getMilestonesWhichAffectActiveDelegateCount
 			{ roundValidators: 8, height: 15 },
 		];
 
-		const config = { ...crypto, milestones };
-		configuration.setConfig({ ...crypto, milestones: milestones });
+		const config = { ...cryptoJson, milestones };
+		configuration.setConfig({ ...cryptoJson, milestones: milestones }, false);
 
 		assert.length(roundCalculator.getMilestonesWhichAffectActiveValidatorCount(configuration), 2);
 	});

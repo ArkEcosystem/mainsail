@@ -1,24 +1,24 @@
 import { Identifiers } from "@mainsail/constants";
 import { BigNumber } from "@mainsail/utils";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
-import { Configuration } from "../../crypto-config/distribution/index";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { formatCurrency } from "./format.js";
-import { cp } from "fs";
+import { Contracts } from "@mainsail/contracts";
 
 describe<{
 	app: Application;
-	configuration: Configuration;
+	configuration: Contracts.Crypto.Configuration;
 }>("formatCurrency", ({ assert, beforeEach, it }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
+		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
 		await context.app.resolve(ValidationServiceProvider).register();
+		await context.app.resolve(CryptoConfigServiceProvider).register();
 
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-
-		context.configuration = context.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		context.configuration = context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 		context.configuration.setConfig(crypto as any);
 	});
 

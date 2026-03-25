@@ -165,7 +165,7 @@ describe<{
 				{ height: 10, roundValidators: 53, reward: "1" },
 				{ height: 20, roundValidators: 53, reward: "2" },
 			],
-		});
+		}, false);
 
 		assert.equal(configManager.getMilestone(15).reward, "1");
 		assert.equal(configManager.getMilestone(5).reward, "0");
@@ -186,7 +186,7 @@ describe<{
 						height: 0,
 					},
 				],
-			}),
+			}, false),
 		);
 
 		assert.throws(
@@ -269,7 +269,7 @@ describe<{
 			{ height: 8, reward: "8" },
 		];
 		const config = { ...cryptoJson, milestones };
-		configManager.setConfig(config);
+		configManager.setConfig(config, false);
 		const secondMilestone = {
 			data: "9",
 			found: true,
@@ -324,7 +324,7 @@ describe<{
 		configManager.setConfig({
 			...cryptoJson,
 			milestones: [{ roundValidators: 1, height: 1 }],
-		});
+		}, false);
 
 		assert.equal(configManager.getMaxRoundValidators(), 1);
 
@@ -335,7 +335,7 @@ describe<{
 				{ roundValidators: 5, height: 3 },
 				{ roundValidators: 2, height: 8 },
 			],
-		});
+		}, false);
 
 		assert.equal(configManager.getMaxRoundValidators(), 5);
 
@@ -346,7 +346,7 @@ describe<{
 				{ roundValidators: 1, height: 6 },
 				{ roundValidators: 10, height: 7 },
 			],
-		});
+		}, false);
 
 		assert.equal(configManager.getMaxRoundValidators(), 10);
 
@@ -357,14 +357,14 @@ describe<{
 				{ roundValidators: 1, height: 6 },
 				{ roundValidators: 1, height: 7 },
 			],
-		});
+		}, false);
 
 		assert.equal(configManager.getMaxRoundValidators(), 5);
 
 		configManager.setConfig({
 			...cryptoJson,
 			milestones: [{ roundValidators: 1, height: 7 }],
-		});
+		}, false);
 
 		assert.equal(configManager.getMaxRoundValidators(), 1);
 	});
