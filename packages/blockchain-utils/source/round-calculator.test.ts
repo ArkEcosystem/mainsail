@@ -321,8 +321,6 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 	});
 
 	it("should be ok when changing delegate count", ({ configuration, roundCalculator }) => {
-
-
 		const milestones = [
 			{ roundValidators: 1, height: 0 }, // R0
 			{ roundValidators: 2, height: 1 }, // R1
@@ -332,10 +330,13 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 			{ roundValidators: 53, height: 62 }, // R8
 		];
 
-		configuration.setConfig({
-			...cryptoJson,
-			milestones,
-		}, false);
+		configuration.setConfig(
+			{
+				...cryptoJson,
+				milestones,
+			},
+			false,
+		);
 
 		// 1 Delegate
 		assert.true(roundCalculator.isNewRound(0));
@@ -366,10 +367,13 @@ describe<Context>("RoundCalculator - getMilestonesWhichAffectActiveDelegateCount
 	beforeEach(setup);
 
 	it("should return milestones which changes delegate count", ({ configuration, roundCalculator }) => {
-		configuration.setConfig({
-			...cryptoJson,
-			milestones: [{ roundValidators: 4, height: 1 }],
-		}, false);
+		configuration.setConfig(
+			{
+				...cryptoJson,
+				milestones: [{ roundValidators: 4, height: 1 }],
+			},
+			false,
+		);
 
 		const milestones = [
 			{ roundValidators: 4, height: 0 },

@@ -25,32 +25,35 @@ describe<{
 		context.app = app;
 
 		// @ts-ignore
-		app.get<Contracts.Crypto.Configuration>(AppIdentifiers.Cryptography.Configuration).setConfig({
-			genesisBlock: {
-				block: {
-					height: 0,
-				},
-			},
-			milestones: [
-				{
-					address: { bech32m: "ark" },
-					block: { maxGasLimit: 30_000_000, maxPayload: 2_097_152, version: 1 },
-					blockTime: 8000,
-					evmSpec: Enums.Evm.SpecId.SHANGHAI,
-					// @ts-ignore
-					gas: {
-						maximumGasLimit: 2_000_000,
-						maximumGasPrice: 10_000 * 1e9,
-						minimumGasLimit: 21_000,
-						minimumGasPrice: 5 * 1e9,
+		app.get<Contracts.Crypto.Configuration>(AppIdentifiers.Cryptography.Configuration).setConfig(
+			{
+				genesisBlock: {
+					block: {
+						height: 0,
 					},
-
-					height: 0,
-					reward: "0",
-					validatorRegistrationFee: "250",
 				},
-			],
-		}, false);
+				milestones: [
+					{
+						address: { bech32m: "ark" },
+						block: { maxGasLimit: 30_000_000, maxPayload: 2_097_152, version: 1 },
+						blockTime: 8000,
+						evmSpec: Enums.Evm.SpecId.SHANGHAI,
+						// @ts-ignore
+						gas: {
+							maximumGasLimit: 2_000_000,
+							maximumGasPrice: 10_000 * 1e9,
+							minimumGasLimit: 21_000,
+							minimumGasPrice: 5 * 1e9,
+						},
+
+						height: 0,
+						reward: "0",
+						validatorRegistrationFee: "250",
+					},
+				],
+			},
+			false,
+		);
 
 		context.generator = app.get<GenesisBlockGenerator>(Identifiers.Generator.GenesisBlock);
 		context.mnemonicGenerator = app.get<MnemonicGenerator>(Identifiers.Generator.Mnemonic);

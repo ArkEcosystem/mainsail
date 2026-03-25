@@ -1,7 +1,11 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { InvalidMilestoneConfigurationError, InvalidNumberOfRoundValidatorsError, MessageSchemaError } from "@mainsail/exceptions";
+import {
+	InvalidMilestoneConfigurationError,
+	InvalidNumberOfRoundValidatorsError,
+	MessageSchemaError,
+} from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 import deepmerge from "deepmerge";
 import clone from "lodash.clone";

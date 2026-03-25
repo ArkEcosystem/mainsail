@@ -22,7 +22,9 @@ describe<{
 
 		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
 
-		const keywords = makeKeywords(context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration));
+		const keywords = makeKeywords(
+			context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration),
+		);
 		for (const keyword of Object.values(keywords)) {
 			context.validator.addKeyword(keyword);
 		}

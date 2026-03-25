@@ -45,11 +45,12 @@ describe<{
 		await context.app.resolve(CryptoConfigServiceProvider).register();
 		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
-
 		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const keyword of Object.values({
-			...makeBaseKeywords(context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeBaseKeywords(
+				context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration),
+			),
 			...makeKeywords(context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)),
 		})) {
 			context.validator.addKeyword(keyword);

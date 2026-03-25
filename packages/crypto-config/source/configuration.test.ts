@@ -158,14 +158,17 @@ describe<{
 	});
 
 	it("should walk milestone index backwards when height decreases", ({ configManager }) => {
-		configManager.setConfig({
-			...cryptoJson,
-			milestones: [
-				{ height: 0, roundValidators: 53, reward: "0" },
-				{ height: 10, roundValidators: 53, reward: "1" },
-				{ height: 20, roundValidators: 53, reward: "2" },
-			],
-		}, false);
+		configManager.setConfig(
+			{
+				...cryptoJson,
+				milestones: [
+					{ height: 0, roundValidators: 53, reward: "0" },
+					{ height: 10, roundValidators: 53, reward: "1" },
+					{ height: 20, roundValidators: 53, reward: "2" },
+				],
+			},
+			false,
+		);
 
 		assert.equal(configManager.getMilestone(15).reward, "1");
 		assert.equal(configManager.getMilestone(5).reward, "0");
@@ -178,15 +181,18 @@ describe<{
 
 	it("getNextMilestoneByKey - should throw an error if roundValidators is 0", ({ configManager }) => {
 		assert.not.throws(() =>
-			configManager.setConfig({
-				...cryptoJson,
-				milestones: [
-					{
-						roundValidators: 0,
-						height: 0,
-					},
-				],
-			}, false),
+			configManager.setConfig(
+				{
+					...cryptoJson,
+					milestones: [
+						{
+							roundValidators: 0,
+							height: 0,
+						},
+					],
+				},
+				false,
+			),
 		);
 
 		assert.throws(
@@ -321,50 +327,65 @@ describe<{
 	});
 
 	it("getMaxRoundValidators - should return maximum round validators from all milestones", ({ configManager }) => {
-		configManager.setConfig({
-			...cryptoJson,
-			milestones: [{ roundValidators: 1, height: 1 }],
-		}, false);
+		configManager.setConfig(
+			{
+				...cryptoJson,
+				milestones: [{ roundValidators: 1, height: 1 }],
+			},
+			false,
+		);
 
 		assert.equal(configManager.getMaxRoundValidators(), 1);
 
-		configManager.setConfig({
-			...cryptoJson,
-			milestones: [
-				{ roundValidators: 1, height: 1 },
-				{ roundValidators: 5, height: 3 },
-				{ roundValidators: 2, height: 8 },
-			],
-		}, false);
+		configManager.setConfig(
+			{
+				...cryptoJson,
+				milestones: [
+					{ roundValidators: 1, height: 1 },
+					{ roundValidators: 5, height: 3 },
+					{ roundValidators: 2, height: 8 },
+				],
+			},
+			false,
+		);
 
 		assert.equal(configManager.getMaxRoundValidators(), 5);
 
-		configManager.setConfig({
-			...cryptoJson,
-			milestones: [
-				{ roundValidators: 5, height: 1 },
-				{ roundValidators: 1, height: 6 },
-				{ roundValidators: 10, height: 7 },
-			],
-		}, false);
+		configManager.setConfig(
+			{
+				...cryptoJson,
+				milestones: [
+					{ roundValidators: 5, height: 1 },
+					{ roundValidators: 1, height: 6 },
+					{ roundValidators: 10, height: 7 },
+				],
+			},
+			false,
+		);
 
 		assert.equal(configManager.getMaxRoundValidators(), 10);
 
-		configManager.setConfig({
-			...cryptoJson,
-			milestones: [
-				{ roundValidators: 5, height: 1 },
-				{ roundValidators: 1, height: 6 },
-				{ roundValidators: 1, height: 7 },
-			],
-		}, false);
+		configManager.setConfig(
+			{
+				...cryptoJson,
+				milestones: [
+					{ roundValidators: 5, height: 1 },
+					{ roundValidators: 1, height: 6 },
+					{ roundValidators: 1, height: 7 },
+				],
+			},
+			false,
+		);
 
 		assert.equal(configManager.getMaxRoundValidators(), 5);
 
-		configManager.setConfig({
-			...cryptoJson,
-			milestones: [{ roundValidators: 1, height: 7 }],
-		}, false);
+		configManager.setConfig(
+			{
+				...cryptoJson,
+				milestones: [{ roundValidators: 1, height: 7 }],
+			},
+			false,
+		);
 
 		assert.equal(configManager.getMaxRoundValidators(), 1);
 	});

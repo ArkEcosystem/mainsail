@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { schemas as cryptoBlockSchemas } from "@mainsail/crypto-block/distribution/index.js";
-import {  ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 import { schemas as cryptoTransactionSchemas } from "@mainsail/crypto-transaction";
 import { makeKeywords as makeCryptoValidationKeywords } from "@mainsail/crypto-validation";
 import type { Application } from "@mainsail/kernel";
