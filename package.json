@@ -62,7 +62,7 @@
 		"eslint-plugin-unicorn": "62.0.0",
 		"eslint-plugin-unused-imports": "4.3.0",
 		"husky": "9.1.7",
-		"lerna": "6.6.2",
+		"lerna": "9.0.7",
 		"lint-staged": "16.2.6",
 		"madge": "8.0.0",
 		"npm-check-updates": "18.0.2",
