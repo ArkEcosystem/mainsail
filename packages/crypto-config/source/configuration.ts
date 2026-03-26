@@ -50,6 +50,16 @@ export class Configuration implements Contracts.Crypto.Configuration {
 		return get(this.#configuration?.config, key);
 	}
 
+	public getGenesisCommit(): Contracts.Crypto.CommitJsonCrypto {
+		assert.defined(this.#configuration);
+		return this.#configuration.config.genesisBlock;
+	}
+
+	public getNetwork(): Contracts.Crypto.Network {
+		assert.defined(this.#configuration);
+		return this.#configuration.config.network
+	}
+
 	public setHeight(value: number): void {
 		this.#height = value;
 	}

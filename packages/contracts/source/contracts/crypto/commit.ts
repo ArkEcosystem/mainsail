@@ -1,8 +1,14 @@
 import type { CommitStorageData } from "../evm/storage.js";
-import type { Block, BlockData, BlockJson } from "./block.js";
+import type { Block, BlockData, BlockJson, BlockJsonCrypto } from "./block.js";
 
 export interface CommitJson {
 	readonly block: BlockJson;
+	readonly proof: CommitProof;
+	readonly serialized: string;
+}
+
+export interface CommitJsonCrypto {
+	readonly block: BlockJsonCrypto;
 	readonly proof: CommitProof;
 	readonly serialized: string;
 }
