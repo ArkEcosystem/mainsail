@@ -1,35 +1,35 @@
 {
-	"namedInputs": {
-		"default": [
-			"{projectRoot}/source/**/!(*.test).ts",
-			"{projectRoot}/source/**/*.json",
-			"{projectRoot}/core/**/*.rs",
-			"{projectRoot}/bindings/**/*.rs",
-			"{projectRoot}/**/Cargo.toml"
-		],
-		"production": ["default"]
-	},
-	"tasksRunnerOptions": {
-		"default": {
-			"runner": "nx/tasks-runners/default",
-			"options": {
-				"cacheableOperations": ["build"],
-				"cacheDirectory": "./.cache"
-			}
-		}
-	},
-	"targetDefaults": {
-		"build": {
-			"dependsOn": ["^build"],
-			"inputs": ["default"],
-			"outputs": [
-				"{projectRoot}/distribution",
-				"{projectRoot}/tsconfig.tsbuildinfo",
-				"{projectRoot}/index.d.ts",
-				"{projectRoot}/index.js",
-				"{projectRoot}/evm.*.node"
-			]
-		}
-	},
-	"$schema": "./node_modules/nx/schemas/nx-schema.json"
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/source/**/!(*.test).ts",
+      "{projectRoot}/source/**/*.json",
+      "{projectRoot}/core/**/*.rs",
+      "{projectRoot}/bindings/**/*.rs",
+      "{projectRoot}/**/Cargo.toml"
+    ],
+    "production": [
+      "default"
+    ]
+  },
+  "targetDefaults": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default"
+      ],
+      "outputs": [
+        "{projectRoot}/distribution",
+        "{projectRoot}/tsconfig.tsbuildinfo",
+        "{projectRoot}/index.d.ts",
+        "{projectRoot}/index.js",
+        "{projectRoot}/evm.*.node"
+      ],
+      "cache": true
+    }
+  },
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "cacheDirectory": "./.cache",
+  "analytics": false
 }
