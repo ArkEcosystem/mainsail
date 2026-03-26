@@ -226,10 +226,10 @@ describe<{
 	});
 
 	it("transactionBaseSchema - gasPrice should accept 0 for genesis block", ({ app, validator }) => {
-		const configuration = app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 		configuration.setHeight(1);
 
-		const genesisBlock: Contracts.Crypto.BlockData = configuration.get("genesisBlock.block");
+		const genesisBlock: Contracts.Crypto.BlockData = configuration.getGenesisCommit().block;
 
 		const transaction = {
 			...transactionOriginal,
