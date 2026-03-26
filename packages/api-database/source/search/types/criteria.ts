@@ -37,7 +37,6 @@ export type BlockDataWithTransactionData = {
 
 export type TransactionCriteria = {
 	address?: OrEqualCriteria<string>;
-	senderId?: OrEqualCriteria<string>;
 	to?: OrEqualCriteria<string>;
 	hash?: OrEqualCriteria<string>;
 	version?: OrEqualCriteria<number>;

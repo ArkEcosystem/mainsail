@@ -25,13 +25,7 @@ export class TransactionFilter {
 				case "address": {
 					return handleOrCriteria(criteria.address, async (c) =>
 						// @ts-ignore
-						this.handleAddressCriteria(c, walletRepository),
-					);
-				}
-				case "senderId": {
-					return handleOrCriteria(criteria.senderId, async (c) =>
-						// @ts-ignore
-						this.handleSenderIdCriteria(c, walletRepository),
+						this.handleAddressCriteria(c),
 					);
 				}
 				case "to": {
@@ -118,28 +112,11 @@ export class TransactionFilter {
 		walletRepository: WalletRepository,
 	): Promise<Expression<Transaction>> {
 		const expressions: Expression<Transaction>[] = await Promise.all([
-			this.handleSenderIdCriteria(criteria, walletRepository),
+			this.handleSenderAddressCritera(criteria),
 			this.handleRecipientAddressCriteria(criteria),
 		]);
 
 		return { expressions, op: "or" };
-	}
-
-	private static async handleSenderIdCriteria(
-		criteria: EqualCriteria<string>,
-		walletRepository: WalletRepository,
-	): Promise<Expression<Transaction>> {
-		const wallet = await walletRepository
-			.createQueryBuilder()
-			.select("public_key")
-			.where("address = :address", { address: criteria })
-			.getRawOne<{ public_key: string }>();
-
-		if (!wallet || !wallet.public_key) {
-			return { op: "false" };
-		}
-
-		return this.handleSenderPublicKeyCriteria(wallet.public_key);
 	}
 
 	private static async handleSenderPublicKeyCriteria(
