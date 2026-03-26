@@ -30,9 +30,9 @@ export const registerBlockFactory = async (
 	factory.set("Block", async ({ options }: { options: Options }): Promise<Contracts.Crypto.Commit> => {
 		const previousBlock: Contracts.Crypto.BlockData = options.getPreviousBlock
 			? options.getPreviousBlock()
-			: await app
-					.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-					.get("genesisBlock.block");
+			: app
+				.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+				.getGenesisCommit().block as unknown as Contracts.Crypto.BlockData;
 
 		const { reward } = app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
@@ -41,7 +41,7 @@ export const registerBlockFactory = async (
 		const transactions: Contracts.Crypto.Transaction[] = options.transactions || [];
 		if (options.transactionsCount) {
 			const signer = new Signer(
-				app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).all()!,
+				app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).all(),
 				options.nonce ?? "0",
 			);
 

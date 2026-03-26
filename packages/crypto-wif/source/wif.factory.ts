@@ -18,7 +18,7 @@ export class WIFFactory implements Contracts.Crypto.WIFFactory {
 		return encode({
 			compressed,
 			privateKey: Buffer.from(privateKey, "hex"),
-			version: this.configuration.get("network.wif"),
+			version: this.configuration.getNetwork().wif,
 		});
 	}
 
@@ -26,7 +26,7 @@ export class WIFFactory implements Contracts.Crypto.WIFFactory {
 		return encode({
 			compressed: keys.compressed,
 			privateKey: Buffer.from(keys.privateKey, "hex"),
-			version: this.configuration.get("network.wif"),
+			version: this.configuration.getNetwork().wif,
 		});
 	}
 }

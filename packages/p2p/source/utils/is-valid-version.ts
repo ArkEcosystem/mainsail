@@ -30,7 +30,7 @@ export const isValidVersion = (app: Contracts.Kernel.Application, version: strin
 		minimumVersions = configuration.getOptional<string[]>("minimumVersions", []);
 	}
 
-	const includePrerelease: boolean = cryptoConfiguration.get("network.name") !== "mainnet";
+	const includePrerelease: boolean = cryptoConfiguration.getNetwork().name !== "mainnet";
 	return minimumVersions.some((minimumVersion: string) =>
 		semver.satisfies(version, minimumVersion, { includePrerelease }),
 	);

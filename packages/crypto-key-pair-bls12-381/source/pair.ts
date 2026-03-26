@@ -22,7 +22,7 @@ export class KeyPairFactory implements Contracts.Crypto.KeyPairFactory {
 
 	public async fromWIF(wif: string): Promise<Contracts.Crypto.KeyPair> {
 		const bls = await getBls();
-		const decoded = decode(wif, this.configuration.get("network.wif"));
+		const decoded = decode(wif, this.configuration.getNetwork().wif);
 		const privateKey = Buffer.from(decoded.privateKey);
 
 		return {

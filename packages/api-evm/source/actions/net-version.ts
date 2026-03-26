@@ -16,6 +16,6 @@ export class NetVersion implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: []): Promise<string> {
-		return this.configuration.get<number>("network.chainId").toString();
+		return this.configuration.getNetwork().chainId.toString();
 	}
 }

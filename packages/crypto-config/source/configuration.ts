@@ -9,7 +9,6 @@ import {
 import { assert } from "@mainsail/utils";
 import deepmerge from "deepmerge";
 import clone from "lodash.clone";
-import get from "lodash.get";
 import set from "lodash.set";
 
 type Config = {
@@ -35,7 +34,8 @@ export class Configuration implements Contracts.Crypto.Configuration {
 		this.#buildConstants(config);
 	}
 
-	public all(): Contracts.Crypto.NetworkConfig | undefined {
+	public all(): Contracts.Crypto.NetworkConfig {
+		assert.defined(this.#configuration);
 		return this.#configuration?.config;
 	}
 
@@ -44,10 +44,6 @@ export class Configuration implements Contracts.Crypto.Configuration {
 		set(this.#configuration.config, key, clone(value));
 
 		this.#buildConstants(this.#configuration.config);
-	}
-
-	public get<T = unknown>(key: string): T {
-		return get(this.#configuration?.config, key);
 	}
 
 	public getGenesisCommit(): Contracts.Crypto.CommitJsonCrypto {

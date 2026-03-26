@@ -53,14 +53,14 @@ export const getPeerConfig = (app: Contracts.Kernel.Application): Contracts.P2P.
 
 	return {
 		network: {
-			explorer: configuration.get("network.client.explorer"),
-			name: configuration.get("network.name"),
-			nethash: configuration.get("network.nethash"),
+			explorer: configuration.getNetwork().client.explorer,
+			name: configuration.getNetwork().name,
+			nethash: configuration.getNetwork().nethash,
 			token: {
-				name: configuration.get("network.client.token"),
-				symbol: configuration.get("network.client.symbol"),
+				name: configuration.getNetwork().client.token,
+				symbol: configuration.getNetwork().client.symbol,
 			},
-			version: configuration.get("network.pubKeyHash"),
+			version: configuration.getNetwork().pubKeyHash,
 		},
 		plugins: transformPlugins(
 			getPluginsConfig(

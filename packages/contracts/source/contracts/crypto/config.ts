@@ -14,11 +14,9 @@ import type {
 export interface Configuration {
 	setConfig(config: NetworkConfigPartial, verify?: boolean): void;
 
-	all(): NetworkConfig | undefined;
+	all(): NetworkConfig;
 
 	set<T = unknown>(key: string, value: T): void;
-
-	get<T = unknown>(key: string): T;
 
 	getGenesisCommit(): CommitJsonCrypto,
 
