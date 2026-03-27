@@ -82,10 +82,6 @@ describe<{
 				result: [...transactionsResponse].filter((tx) => tx.from === transaction.from),
 			},
 			{
-				path: `/transactions?senderId=${transaction.from}`,
-				result: [...transactionsResponse].filter((tx) => tx.from === transaction.from),
-			},
-			{
 				path: `/transactions?address=${transaction.to}`,
 				result: [...transactionsResponse].filter((tx) => tx.to === transaction.to),
 			},
