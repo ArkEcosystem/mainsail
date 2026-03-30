@@ -6,13 +6,14 @@ import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa/source/pair";
 
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { mnemonic, wif } from "../test/identity.json";
+import { mnemonic, wif, wif170 } from "../test/identity.json";
 import { WIFFactory } from "./wif.factory";
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 
 describe<{
 	app: Application;
 	factory: WIFFactory;
+	configuration: Contracts.Crypto.Configuration;
 }>("Identities - WIFFactory", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
@@ -20,11 +21,19 @@ describe<{
 		await context.app.resolve(ValidationServiceProvider).register();
 		await context.app.resolve(CryptoConfigServiceProvider).register();
 
-		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).set("network.wif", 170);
-
 		context.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
 
+		context.configuration = context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 		context.factory = context.app.resolve(WIFFactory);
+	});
+
+	it("#fromMnemonic - should be OK", async ({ factory }) => {
+		assert.equal(await factory.fromMnemonic(mnemonic), wif);
+	});
+
+	it("#fromMnemonic - should be OK for WIF 170", async ({ factory, configuration }) => {
+		configuration.set("network.wif", 170);
+		assert.equal(await factory.fromMnemonic(mnemonic), wif170);
 	});
 
 	it("#fromMnemonic - should be OK", async ({ factory }) => {
@@ -37,6 +46,16 @@ describe<{
 				await app.get<KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory).fromMnemonic(mnemonic),
 			),
 			wif,
+		);
+	});
+
+	it("#fromKeys -  should be OK for WIF 170", async ({ factory, app, configuration }) => {
+		configuration.set("network.wif", 170);
+		assert.equal(
+			await factory.fromKeys(
+				await app.get<KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory).fromMnemonic(mnemonic),
+			),
+			wif170,
 		);
 	});
 });
