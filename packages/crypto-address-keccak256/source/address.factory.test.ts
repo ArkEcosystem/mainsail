@@ -7,10 +7,8 @@ import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validati
 import { describe } from "@mainsail/test-runner";
 import { AddressFactory } from "./address.factory";
 
-const mnemonic =
-	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
-
-const wif = "SDuW66dyGZ1zPZdN7ncEevbJdjaQTj9pT4LcmKzQ7eLFoyCXEdkx";
+const mnemonic = "this is a top secret mnemonic";
+const wif = "UfDzkBsi7xxjq491zm5tk7rCZ1EouBXsFUWaCvQWxAortbh1zq5T";
 
 describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) => {
 	beforeEach(async (context) => {
@@ -24,7 +22,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	it("should derive an address from an mnemonic", async (context) => {
 		assert.is(
 			await context.app.resolve(AddressFactory).fromMnemonic(mnemonic),
-			"0xC7C50f33278bDe272ffe23865fF9fBd0155a5175",
+			"0xE8F0d8418AF1cE7ADA59c02870FBF38C8909D8ac",
 		);
 	});
 
@@ -66,7 +64,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should derive an address from wif", async (context) => {
-		assert.is(await context.app.resolve(AddressFactory).fromWIF(wif), "0xC7C50f33278bDe272ffe23865fF9fBd0155a5175");
+		assert.is(await context.app.resolve(AddressFactory).fromWIF(wif), "0xE8F0d8418AF1cE7ADA59c02870FBF38C8909D8ac");
 	});
 
 	it("should validate addresses", async (context) => {
