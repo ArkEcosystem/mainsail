@@ -10,8 +10,8 @@ import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "@mainsail/test-runner";
 import { AddressFactory } from "./address.factory";
 
-const mnemonic = "this is a top secret passphrase";
-const wif = "SGq4xLgZKCGxs7bjmwnBrWcT4C1ADFEermj846KC97FSv1WFD1dA";
+const mnemonic = "this is a top secret mnemonic";
+const wif = "UfDzkBsi7xxjq491zm5tk7rCZ1EouBXsFUWaCvQWxAortbh1zq5T";
 
 describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) => {
 	beforeEach(async (context) => {
@@ -20,8 +20,6 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		await context.app.resolve(ValidationServiceProvider).register();
 		await context.app.resolve(CryptoConfigServiceProvider).register();
 
-		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).set("network.wif", 170);
-
 		await context.app.resolve<ECDSA>(ECDSA).register();
 		await context.app.resolve<CryptoHashBcrypto>(CryptoHashBcrypto).register();
 	});
@@ -29,7 +27,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	it("should derive an address from an mnemonic", async (context) => {
 		assert.is(
 			await context.app.resolve(AddressFactory).fromMnemonic(mnemonic),
-			"D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib",
+			"DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa",
 		);
 	});
 
@@ -57,11 +55,11 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	});
 
 	it("should derive an address from wif", async (context) => {
-		assert.is(await context.app.resolve(AddressFactory).fromWIF(wif), "D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib");
+		assert.is(await context.app.resolve(AddressFactory).fromWIF(wif), "DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa");
 	});
 
 	it("should validate addresses", async (context) => {
-		assert.true(await context.app.resolve(AddressFactory).validate("D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"));
+		assert.true(await context.app.resolve(AddressFactory).validate("DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa"));
 		assert.false(
 			await context.app
 				.resolve(AddressFactory)
@@ -73,8 +71,8 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		const addressFactory = context.app.resolve(AddressFactory);
 
 		assert.equal(
-			await addressFactory.fromBuffer(await addressFactory.toBuffer("D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib")),
-			"D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib",
+			await addressFactory.fromBuffer(await addressFactory.toBuffer("DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa")),
+			"DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa",
 		);
 	});
 
@@ -86,7 +84,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 			.set("network.pubKeyHash", 44);
 
 		await assert.rejects(
-			() => addressFactory.toBuffer("D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"),
+			() => addressFactory.toBuffer("DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa"),
 			"Expected address network byte 44, but got 30.",
 		);
 	});
