@@ -11,7 +11,7 @@
 		"build": "lerna run build",
 		"build:rs": "lerna run build --scope=@mainsail/evm",
 		"build:ts": "pnpm run build:rs && lerna run build --ignore=@mainsail/evm",
-		"clean": "pnpm run clean:packages && rm -r .cache",
+		"clean": "pnpm run clean:packages && rm -r .cache  && rm -r .nx",
 		"clean:all": "pnpm run clean && pnpm run clean:node_modules",
 		"clean:node_modules": "rm -rf packages/*/node_modules && rm -rf node_modules",
 		"clean:packages": "rm -rf packages/*/distribution && rm -f packages/*/tsconfig.tsbuildinfo && lerna run clean --parallel",
