@@ -9,7 +9,6 @@
 		"sourceMap": false,
 		"experimentalDecorators": false,
 		"emitDecoratorMetadata": false,
-		"esModuleInterop": false
 	},
 	"include": ["source/**/**.ts"],
 	"references": [
