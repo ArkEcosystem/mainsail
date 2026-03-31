@@ -178,7 +178,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 			legacySecondSignature = fields[9].slice(2);
 		}
 
-		/* eslint-disable sort-keys-fix/sort-keys-fix */
+		/* eslint-disable perfectionist/sort-objects */
 		let transaction: Contracts.Crypto.TransactionSerializable = {
 			network,
 			to,
@@ -198,7 +198,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 				legacySecondSignature,
 			};
 		}
-		/* eslint-enable sort-keys-fix/sort-keys-fix */
+		/* eslint-enable perfectionist/sort-objects */
 
 		return { data: transaction, serialized };
 	}

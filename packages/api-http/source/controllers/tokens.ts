@@ -220,7 +220,7 @@ export class TokensController extends Controller {
 			{
 				meta: { totalCountIsEstimate: false },
 				results: tokenActionsRows.map((row) => ({
-					/* eslint-disable sort-keys-fix/sort-keys-fix */
+					/* eslint-disable perfectionist/sort-objects */
 					transactionHash: row.transactionHash,
 					from: row.from,
 					to: row.to,
@@ -234,7 +234,7 @@ export class TokensController extends Controller {
 						symbol: row.tokenSymbol,
 						decimals: row.tokenDecimals,
 					},
-					/* eslint-enable sort-keys-fix/sort-keys-fix */
+					/* eslint-enable perfectionist/sort-objects */
 				})),
 				totalCount,
 			},

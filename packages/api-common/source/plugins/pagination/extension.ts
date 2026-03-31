@@ -103,7 +103,7 @@ export class Extension {
 				self: getUri(currentPage),
 				totalCount: totalCount ? totalCount : 0,
 			},
-			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+			// eslint-disable-next-line perfectionist/sort-objects
 			data: results,
 		};
 

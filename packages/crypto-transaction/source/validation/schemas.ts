@@ -20,7 +20,7 @@ const networkByte: SchemaObject = {
 const transaction: SchemaObject = {
 	$id: "transaction",
 	properties: {
-		/* eslint-disable sort-keys-fix/sort-keys-fix */
+		/* eslint-disable perfectionist/sort-objects */
 		hash: { $ref: "transactionHash" }, // Signed
 
 		network: { $ref: "networkByte" },
@@ -50,7 +50,7 @@ const transaction: SchemaObject = {
 			allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }],
 			type: "string",
 		},
-		/* eslint-enable sort-keys-fix/sort-keys-fix */
+		/* eslint-enable perfectionist/sort-objects */
 	},
 	required: ["network", "gasPrice", "gasLimit", "value", "nonce", "data"],
 	type: "object",

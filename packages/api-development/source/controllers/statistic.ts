@@ -18,7 +18,7 @@ export class StatisticController extends Controller {
 			const statistic = this.staticService.getRoundStatistic(id)!;
 			return {
 				round: `${statistic.height}-${statistic.round}`,
-				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+				// eslint-disable-next-line perfectionist/sort-objects
 				general: statistic.getGeneralStatistic(),
 			};
 		});
@@ -38,12 +38,12 @@ export class StatisticController extends Controller {
 
 		return {
 			round: `${statistic.height}-${statistic.round}`,
-			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+			// eslint-disable-next-line perfectionist/sort-objects
 			general: statistic.getGeneralStatistic(),
-			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+			// eslint-disable-next-line perfectionist/sort-objects
 			emits: statistic.getEmitStatistics(),
 			pings: statistic.getPingStatistics(),
-			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+			// eslint-disable-next-line perfectionist/sort-objects
 			peers: statistic.getPeerStatistics(),
 		};
 	}
@@ -62,12 +62,12 @@ export class StatisticController extends Controller {
 
 		return {
 			round: `${statistic.height}-${statistic.round}`,
-			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+			// eslint-disable-next-line perfectionist/sort-objects
 			general: statistic.getGeneralStatistic(),
-			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+			// eslint-disable-next-line perfectionist/sort-objects
 			emits: statistic.getEmitStatistics(),
 			pings: statistic.getPingStatistics(),
-			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+			// eslint-disable-next-line perfectionist/sort-objects
 			peers: statistic.getPeerStatistics(),
 		};
 	}

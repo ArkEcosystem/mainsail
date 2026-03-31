@@ -8,7 +8,7 @@ export class ReceiptResource {
 		header: Contracts.Crypto.BlockHeader,
 		receipt: Contracts.Evm.TransactionReceipt,
 	): Promise<object> {
-		/* eslint-disable sort-keys-fix/sort-keys-fix */
+		/* eslint-disable perfectionist/sort-objects */
 		return {
 			transactionHash: `0x${transaction.hash}`,
 			transactionIndex: `0x${transaction.transactionIndex?.toString(16)}`,
@@ -26,6 +26,6 @@ export class ReceiptResource {
 			type: "0x0",
 			status: receipt.status ? "0x1" : "0x0",
 		};
-		/* eslint-enable sort-keys-fix/sort-keys-fix */
+		/* eslint-enable perfectionist/sort-objects */
 	}
 }

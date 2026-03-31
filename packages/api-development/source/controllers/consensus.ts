@@ -57,12 +57,12 @@ export class ConsensusController extends Controller {
 				blockNumber: state.blockNumber,
 				round: state.round,
 				step: state.step,
-				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+				// eslint-disable-next-line perfectionist/sort-objects
 				lockedRound: state.lockedRound,
 				lockedValue: state.lockedValue ? state.lockedValue.getProposal()?.blockHeader.hash : null,
 				validRound: state.validRound,
 				validValue: state.validValue ? state.validValue.getProposal()?.blockHeader.hash : null,
-				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+				// eslint-disable-next-line perfectionist/sort-objects
 				precommits: collectMessages(precommits.sort((a, b) => b.round - a.round)),
 				prevotes: collectMessages(prevotes.sort((a, b) => b.round - a.round)),
 				proposals: proposals

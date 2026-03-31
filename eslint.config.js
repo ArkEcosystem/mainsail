@@ -1,9 +1,8 @@
 import tseslint from "typescript-eslint";
+import perfectionist from "eslint-plugin-perfectionist";
 import prettier from "eslint-plugin-prettier";
 import promise from "eslint-plugin-promise";
-import simpleImportSort from "eslint-plugin-simple-import-sort";
 import sonarjs from "eslint-plugin-sonarjs";
-import sortKeysFix from "eslint-plugin-sort-keys-fix";
 import unicorn from "eslint-plugin-unicorn";
 import unusedImports from "eslint-plugin-unused-imports";
 import esImport from "eslint-plugin-import";
@@ -36,11 +35,10 @@ export default [
 	},
 	{
 		plugins: {
+			perfectionist,
 			prettier: prettier,
 			promise: promise,
-			"simple-import-sort": simpleImportSort,
 			sonarjs: sonarjs,
-			"sort-keys-fix": sortKeysFix,
 			unicorn: unicorn,
 			"unused-imports": unusedImports,
 			import: esImport,
@@ -111,6 +109,16 @@ export default [
 			"no-unneeded-ternary": "warn",
 			"no-unused-expressions": "off",
 			"no-unused-vars": "off",
+			"perfectionist/sort-imports": "warn",
+			"perfectionist/sort-exports": "error",
+			"perfectionist/sort-objects": [
+				"warn",
+				{
+					type: "alphabetical",
+					order: "asc",
+					ignoreCase: false,
+				},
+			],
 			"prefer-const": [
 				"warn",
 				{
@@ -125,8 +133,6 @@ export default [
 			],
 			"promise/always-return": "warn",
 			"promise/param-names": "warn",
-			"simple-import-sort/exports": "error",
-			"simple-import-sort/imports": "warn",
 			"sonarjs/cognitive-complexity": "warn",
 			"sonarjs/no-all-duplicated-branches": "warn",
 			"sonarjs/no-collapsible-if": "warn",
@@ -138,13 +144,6 @@ export default [
 			"sonarjs/no-small-switch": "warn",
 			"sonarjs/no-use-of-empty-return-value": "warn",
 			"sonarjs/prefer-single-boolean-return": "off",
-			"sort-keys-fix/sort-keys-fix": [
-				"warn",
-				"asc",
-				{
-					caseSensitive: true,
-				},
-			],
 			"unicorn/consistent-destructuring": "warn",
 			"unicorn/consistent-function-scoping": "warn",
 			"unicorn/error-message": "warn",
