@@ -1,5 +1,5 @@
 import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
@@ -11,7 +11,7 @@ export class LegacyController extends Controller {
 	@inject(ApiDatabaseIdentifiers.LegacyColdWalletRepositoryFactory)
 	private readonly legacyColdWalletRepositoryFactory!: ApiDatabaseContracts.LegacyColdWalletRepositoryFactory;
 
-	public async coldWallets(request: Hapi.Request): Promise<object> {
+	public async coldWallets(request: Types.HapiRequest): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 
 		const [wallets, totalCount] = await this.legacyColdWalletRepositoryFactory()
@@ -32,7 +32,7 @@ export class LegacyController extends Controller {
 		);
 	}
 
-	public async showColdWallet(request: Hapi.Request): Promise<object> {
+	public async showColdWallet(request: Types.HapiRequest): Promise<object> {
 		const legacyAddress = request.params.address;
 
 		const wallet = await this.legacyColdWalletRepositoryFactory()

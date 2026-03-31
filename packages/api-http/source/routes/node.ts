@@ -1,4 +1,4 @@
-import type Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
@@ -9,31 +9,31 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	server.bind(controller);
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.status(request),
+		handler: (request: Types.HapiRequest) => controller.status(request),
 		method: "GET",
 		path: "/node/status",
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.syncing(request),
+		handler: (request: Types.HapiRequest) => controller.syncing(request),
 		method: "GET",
 		path: "/node/syncing",
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.configuration(request),
+		handler: (request: Types.HapiRequest) => controller.configuration(request),
 		method: "GET",
 		path: "/node/configuration",
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.configurationCrypto(request),
+		handler: (request: Types.HapiRequest) => controller.configurationCrypto(request),
 		method: "GET",
 		path: "/node/configuration/crypto",
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.fees(request),
+		handler: (request: Types.HapiRequest) => controller.fees(request),
 		method: "GET",
 		options: {
 			validate: {

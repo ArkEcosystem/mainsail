@@ -1,5 +1,5 @@
 import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -18,7 +18,7 @@ export class PeersController extends Controller {
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	public async index(
-		request: Hapi.Request,
+		request: Types.HapiRequest,
 	): Promise<Contracts.Api.ResultsPage<ReturnType<PeerResource["transform"]>> | Boom.Boom> {
 		const allPeers: Contracts.P2P.Peer[] = [...this.peerRepository.getPeers()];
 
@@ -91,7 +91,9 @@ export class PeersController extends Controller {
 		return super.toPagination(resultsPage, PeerResource);
 	}
 
-	public async show(request: Hapi.Request): Promise<{ data: ReturnType<PeerResource["transform"]> } | Boom.Boom> {
+	public async show(
+		request: Types.HapiRequest,
+	): Promise<{ data: ReturnType<PeerResource["transform"]> } | Boom.Boom> {
 		if (!this.peerRepository.hasPeer(request.params.ip)) {
 			return Boom.notFound("Peer not found");
 		}
@@ -100,7 +102,7 @@ export class PeersController extends Controller {
 	}
 
 	public async banned(
-		request: Hapi.Request,
+		request: Types.HapiRequest,
 	): Promise<Contracts.Api.ResultsPage<ReturnType<PeerResource["transform"]>> | Boom.Boom> {
 		const result = this.peerDisposer.bannedPeers();
 

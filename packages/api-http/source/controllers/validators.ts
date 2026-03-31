@@ -1,5 +1,5 @@
 import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -18,7 +18,7 @@ export class ValidatorsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
 
-	public async index(request: Hapi.Request): Promise<object> {
+	public async index(request: Types.HapiRequest): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
 		const criteria = this.getQueryCriteria(
@@ -37,7 +37,7 @@ export class ValidatorsController extends Controller {
 		return this.toPagination(wallets, ValidatorResource);
 	}
 
-	public async show(request: Hapi.Request): Promise<object> {
+	public async show(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const validator = await this.getWallet(walletId);
@@ -48,7 +48,7 @@ export class ValidatorsController extends Controller {
 		return this.respondWithResource(validator, ValidatorResource);
 	}
 
-	public async voters(request: Hapi.Request): Promise<object> {
+	public async voters(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const validator = await this.getWallet(walletId);
@@ -79,7 +79,7 @@ export class ValidatorsController extends Controller {
 		return this.toPagination(wallets, WalletResource);
 	}
 
-	public async blocks(request: Hapi.Request): Promise<object> {
+	public async blocks(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const validator = await this.getWallet(walletId);

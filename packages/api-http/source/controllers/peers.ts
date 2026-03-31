@@ -1,5 +1,5 @@
 import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -15,7 +15,7 @@ export class PeersController extends Controller {
 	@inject(ApiDatabaseIdentifiers.PeerRepositoryFactory)
 	private readonly peerRepositoryFactory!: ApiDatabaseContracts.PeerRepositoryFactory;
 
-	public async index(request: Hapi.Request): Promise<object> {
+	public async index(request: Types.HapiRequest): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.PeerCriteria = request.query;
 		const sorting = this.getListingOrder(request);
@@ -26,7 +26,7 @@ export class PeersController extends Controller {
 		return this.toPagination(peers, PeerResource);
 	}
 
-	public async show(request: Hapi.Request): Promise<object> {
+	public async show(request: Types.HapiRequest): Promise<object> {
 		const ip = request.params.ip;
 
 		const peer = await this.peerRepositoryFactory()
@@ -42,7 +42,7 @@ export class PeersController extends Controller {
 		return this.respondWithResource(peer, PeerResource);
 	}
 
-	protected getListingOptions(_request: Hapi.Request): Search.Options {
+	protected getListingOptions(_request: Types.HapiRequest): Search.Options {
 		return {
 			estimateTotalCount: false,
 		};

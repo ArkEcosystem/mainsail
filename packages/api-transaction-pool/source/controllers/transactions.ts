@@ -1,5 +1,5 @@
 import { notFound } from "@hapi/boom";
-import Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import { AbstractController } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
@@ -15,7 +15,7 @@ export class TransactionsController extends AbstractController {
 	@inject(Identifiers.TransactionPool.Query)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	public async store(request: Hapi.Request): Promise<object> {
+	public async store(request: Types.HapiRequest): Promise<object> {
 		const result = await this.processor.process(
 			// @ts-ignore
 			request.payload.transactions.map((transaction: string) => Buffer.from(transaction, "hex")),
@@ -31,7 +31,7 @@ export class TransactionsController extends AbstractController {
 		};
 	}
 
-	public async unconfirmed(request: Hapi.Request): Promise<object> {
+	public async unconfirmed(request: Types.HapiRequest): Promise<object> {
 		const pagination: Contracts.Api.Pagination = super.getListingPage(request);
 
 		const poolQuery = this.poolQuery.getFromHighestPriority();
@@ -74,7 +74,7 @@ export class TransactionsController extends AbstractController {
 		return super.toPagination(resultsPage, TransactionResource);
 	}
 
-	public async showUnconfirmed(request: Hapi.Request): Promise<object> {
+	public async showUnconfirmed(request: Types.HapiRequest): Promise<object> {
 		const transactionQuery: Contracts.TransactionPool.QueryIterable = this.poolQuery
 			.getFromHighestPriority()
 			.whereHash(request.params.hash);

@@ -1,4 +1,4 @@
-import Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import { AbstractController } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
@@ -13,7 +13,7 @@ export class ConfigurationController extends AbstractController {
 	@inject(Identifiers.State.Store)
 	private readonly stateStore!: Contracts.State.Store;
 
-	public async configuration(request: Hapi.Request): Promise<object> {
+	public async configuration(request: Types.HapiRequest): Promise<object> {
 		return {
 			data: {
 				blockNumber: this.stateStore.getBlockNumber(),

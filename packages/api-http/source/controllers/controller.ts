@@ -1,5 +1,4 @@
-import Hapi from "@hapi/hapi";
-import { AbstractController } from "@mainsail/api-common";
+import { AbstractController, Types } from "@mainsail/api-common";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -36,7 +35,7 @@ export class Controller extends AbstractController {
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	protected readonly walletRepositoryFactory!: ApiDatabaseContracts.WalletRepositoryFactory;
 
-	protected getListingOptions(request: Hapi.Request): Search.Options {
+	protected getListingOptions(request: Types.HapiRequest): Search.Options {
 		const estimateTotalCount = this.apiConfiguration.getOptional<boolean>("options.estimateTotalCount", true);
 
 		return {

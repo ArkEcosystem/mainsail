@@ -1,5 +1,5 @@
 import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
@@ -10,7 +10,7 @@ export class ContractsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.ContractRepositoryFactory)
 	private readonly contractRepositoryFactory!: ApiDatabaseContracts.ContractRepositoryFactory;
 
-	public async index(request: Hapi.Request): Promise<object> {
+	public async index(request: Types.HapiRequest): Promise<object> {
 		const contractRepository = this.contractRepositoryFactory();
 
 		const contracts = await contractRepository.createQueryBuilder().orderBy("name").addOrderBy("address").getMany();
@@ -28,7 +28,7 @@ export class ContractsController extends Controller {
 		};
 	}
 
-	public async abi(request: Hapi.Request): Promise<object> {
+	public async abi(request: Types.HapiRequest): Promise<object> {
 		const contractRepository = this.contractRepositoryFactory();
 
 		const contract = await contractRepository

@@ -4,6 +4,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 import type Joi from "joi";
 
+import type { HapiRequest } from "../../types.js";
 import { getConfig } from "./config.js";
 import { Extension } from "./extension.js";
 
@@ -19,8 +20,8 @@ export const pagination = {
 		assert.defined(config);
 		const extension = new Extension(config);
 
-		server.ext("onPreHandler", (request, h) => extension.onPreHandler(request, h));
-		server.ext("onPostHandler", (request, h) => extension.onPostHandler(request, h));
+		server.ext("onPreHandler", (request, h) => extension.onPreHandler(request as unknown as HapiRequest, h));
+		server.ext("onPostHandler", (request, h) => extension.onPostHandler(request as unknown as HapiRequest, h));
 	},
 	version: "1.0.0",
 };

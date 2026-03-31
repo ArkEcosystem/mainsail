@@ -1,4 +1,4 @@
-import type Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import { Schemas } from "@mainsail/api-common";
 import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
@@ -22,7 +22,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	server.bind(controller);
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.index(request),
+		handler: (request: Types.HapiRequest) => controller.index(request),
 		method: "GET",
 		options: {
 			plugins: {
@@ -42,7 +42,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.top(request),
+		handler: (request: Types.HapiRequest) => controller.top(request),
 		method: "GET",
 		options: {
 			plugins: {
@@ -60,7 +60,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.show(request),
+		handler: (request: Types.HapiRequest) => controller.show(request),
 		method: "GET",
 		options: {
 			validate: {
@@ -74,7 +74,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.transactions(request),
+		handler: (request: Types.HapiRequest) => controller.transactions(request),
 		method: "GET",
 		options: {
 			plugins: {
@@ -100,7 +100,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.transactionsSent(request),
+		handler: (request: Types.HapiRequest) => controller.transactionsSent(request),
 		method: "GET",
 		options: {
 			plugins: {
@@ -126,7 +126,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.transactionsReceived(request),
+		handler: (request: Types.HapiRequest) => controller.transactionsReceived(request),
 		method: "GET",
 		options: {
 			plugins: {
@@ -152,7 +152,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.votes(request),
+		handler: (request: Types.HapiRequest) => controller.votes(request),
 		method: "GET",
 		options: {
 			plugins: {
@@ -177,7 +177,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.tokens(request),
+		handler: (request: Types.HapiRequest) => controller.tokens(request),
 		method: "GET",
 		options: {
 			plugins: {
@@ -199,7 +199,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.tokensShow(request),
+		handler: (request: Types.HapiRequest) => controller.tokensShow(request),
 		method: "GET",
 		options: {
 			plugins: {

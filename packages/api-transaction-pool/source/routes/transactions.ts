@@ -1,4 +1,4 @@
-import type Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import { Schemas } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
@@ -28,7 +28,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		.getRequired<number>("maxTransactionBytes");
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.store(request),
+		handler: (request: Types.HapiRequest) => controller.store(request),
 		method: "POST",
 		options: {
 			payload: {
@@ -52,7 +52,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.unconfirmed(request),
+		handler: (request: Types.HapiRequest) => controller.unconfirmed(request),
 		method: "GET",
 		options: {
 			plugins: {
@@ -72,7 +72,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.showUnconfirmed(request),
+		handler: (request: Types.HapiRequest) => controller.showUnconfirmed(request),
 		method: "GET",
 		options: {
 			validate: {

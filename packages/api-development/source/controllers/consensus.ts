@@ -1,4 +1,4 @@
-import Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -16,7 +16,7 @@ export class ConsensusController extends Controller {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	public async state(request: Hapi.Request): Promise<object> {
+	public async state(request: Types.HapiRequest): Promise<object> {
 		const state = this.consensus.getState();
 
 		const roundStates = this.roundStateRepository.getRoundStates();

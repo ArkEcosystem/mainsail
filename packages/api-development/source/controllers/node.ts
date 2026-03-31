@@ -1,4 +1,4 @@
-import Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
@@ -13,7 +13,7 @@ export class NodeController extends Controller {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	public async status(request: Hapi.Request): Promise<object> {
+	public async status(request: Types.HapiRequest): Promise<object> {
 		const lastBlock = this.stateStore.getLastBlock();
 		const networkBlockNumber = this.p2pService.getNetworkBlockNumberPercentile(90);
 
@@ -26,7 +26,7 @@ export class NodeController extends Controller {
 		};
 	}
 
-	public async configurationNode(request: Hapi.Request): Promise<object> {
+	public async configurationNode(request: Types.HapiRequest): Promise<object> {
 		const network = this.configuration.all()!.network;
 
 		return {
@@ -45,7 +45,7 @@ export class NodeController extends Controller {
 		};
 	}
 
-	public async configurationCrypto(request: Hapi.Request): Promise<object> {
+	public async configurationCrypto(request: Types.HapiRequest): Promise<object> {
 		return {
 			data: this.configuration.all(),
 		};
