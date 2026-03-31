@@ -44,7 +44,7 @@ export class Transaction implements Contracts.Crypto.Transaction {
 
 	toData(): Contracts.Crypto.TransactionData {
 		let data: Contracts.Crypto.TransactionData = {
-			/* eslint-disable sort-keys-fix/sort-keys-fix */
+			/* eslint-disable perfectionist/sort-objects */
 			hash: this.hash,
 			network: this.network,
 			from: this.from,
@@ -60,7 +60,7 @@ export class Transaction implements Contracts.Crypto.Transaction {
 			v: this.v,
 			r: this.r,
 			s: this.s,
-			/* eslint-enable sort-keys-fix/sort-keys-fix */
+			/* eslint-enable perfectionist/sort-objects */
 		};
 
 		if (this.legacySecondSignature) {

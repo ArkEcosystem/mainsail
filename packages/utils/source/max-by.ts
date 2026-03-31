@@ -1,4 +1,5 @@
 import type { FunctionReturning } from "./internal/index.js";
+
 import { mapArray } from "./map-array.js";
 
 export const maxBy = <T>(iterable: T[], iteratee: FunctionReturning<[T], number>): T => {

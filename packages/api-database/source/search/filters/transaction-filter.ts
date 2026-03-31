@@ -1,8 +1,9 @@
 import type { WalletRepository } from "../../contracts.js";
 import type { Transaction } from "../../models/index.js";
-import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 import type { EqualCriteria, OrTransactionCriteria, TransactionCriteria } from "../types/criteria.js";
 import type { Expression, MultiPaymentExpression } from "../types/expressions.js";
+
+import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
 export class TransactionFilter {
 	public static async getExpression(

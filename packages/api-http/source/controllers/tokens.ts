@@ -1,5 +1,6 @@
+import type { Types } from "@mainsail/api-common";
+
 import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -8,10 +9,10 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
-import { TokenResource } from "../resources/token.js";
 import { TokenHolderResource } from "../resources/token-holder.js";
 import { TokenTransferResource } from "../resources/token-transfer.js";
 import { TokenWhitelistResource } from "../resources/token-whitelist.js";
+import { TokenResource } from "../resources/token.js";
 import { Controller } from "./controller.js";
 
 type TokenTransferRaw = {
@@ -43,7 +44,7 @@ export class TokensController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TokenWhitelistRepositoryFactory)
 	private readonly tokenWhitelistRepositoryFactory!: ApiDatabaseContracts.TokenWhitelistRepositoryFactory;
 
-	public async index(request: Hapi.Request): Promise<object> {
+	public async index(request: Types.HapiRequest): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 
 		const tokensQuery = this.tokenRepositoryFactory().createQueryBuilder("tok").select();
@@ -68,7 +69,7 @@ export class TokensController extends Controller {
 		);
 	}
 
-	public async show(request: Hapi.Request): Promise<object> {
+	public async show(request: Types.HapiRequest): Promise<object> {
 		const token = await this.getToken(request.params.address);
 
 		if (!token) {
@@ -78,7 +79,7 @@ export class TokensController extends Controller {
 		return this.respondWithResource(token, TokenResource);
 	}
 
-	public async holders(request: Hapi.Request): Promise<object> {
+	public async holders(request: Types.HapiRequest): Promise<object> {
 		const token = await this.getToken(request.params.address);
 
 		if (!token) {
@@ -103,23 +104,23 @@ export class TokensController extends Controller {
 		);
 	}
 
-	public async transfers(request: Hapi.Request): Promise<object> {
+	public async transfers(request: Types.HapiRequest): Promise<object> {
 		return this.getTokenActions(Models.TokenActionEnum.Transfer, request);
 	}
 
-	public async tokenTransfers(request: Hapi.Request): Promise<object> {
+	public async tokenTransfers(request: Types.HapiRequest): Promise<object> {
 		return this.getTokenActions(Models.TokenActionEnum.Transfer, request);
 	}
 
-	public async approvals(request: Hapi.Request): Promise<object> {
+	public async approvals(request: Types.HapiRequest): Promise<object> {
 		return this.getTokenActions(Models.TokenActionEnum.Approval, request);
 	}
 
-	public async tokenApprovals(request: Hapi.Request): Promise<object> {
+	public async tokenApprovals(request: Types.HapiRequest): Promise<object> {
 		return this.getTokenActions(Models.TokenActionEnum.Approval, request);
 	}
 
-	public async whitelist(request: Hapi.Request): Promise<object> {
+	public async whitelist(request: Types.HapiRequest): Promise<object> {
 		const pagination = this.getListingPage(request);
 		const [tokenWhitelist, totalCount] = await this.tokenWhitelistRepositoryFactory()
 			.createQueryBuilder()
@@ -139,7 +140,7 @@ export class TokensController extends Controller {
 		);
 	}
 
-	private async getTokenActions(action: Models.TokenActionEnum, request: Hapi.Request): Promise<object> {
+	private async getTokenActions(action: Models.TokenActionEnum, request: Types.HapiRequest): Promise<object> {
 		const pagination = this.getListingPage(request);
 		const tokenActionsQuery = this.tokenActionRepositoryFactory()
 			.createQueryBuilder("tf")
@@ -220,7 +221,7 @@ export class TokensController extends Controller {
 			{
 				meta: { totalCountIsEstimate: false },
 				results: tokenActionsRows.map((row) => ({
-					/* eslint-disable sort-keys-fix/sort-keys-fix */
+					/* eslint-disable perfectionist/sort-objects */
 					transactionHash: row.transactionHash,
 					from: row.from,
 					to: row.to,
@@ -234,7 +235,7 @@ export class TokensController extends Controller {
 						symbol: row.tokenSymbol,
 						decimals: row.tokenDecimals,
 					},
-					/* eslint-enable sort-keys-fix/sort-keys-fix */
+					/* eslint-enable perfectionist/sort-objects */
 				})),
 				totalCount,
 			},
@@ -252,7 +253,7 @@ export class TokensController extends Controller {
 
 	public static andWhereWhitelisted(
 		queryBuilder: TypeOrm.SelectQueryBuilder<Models.TokenAction | Models.TokenHolder | Models.Token>,
-		request: Hapi.Request,
+		request: Types.HapiRequest,
 	): void {
 		if (request.query.ignoreWhitelist) {
 			return;

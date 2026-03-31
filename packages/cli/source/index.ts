@@ -1,7 +1,7 @@
 export * from "./action-factory.js";
 export * as Actions from "./actions/index.js";
-export * from "./application.js";
 export * from "./application-factory.js";
+export * from "./application.js";
 export * as Commands from "./commands/index.js";
 export * as Components from "./component-factory.js";
 export * from "./component-factory.js";

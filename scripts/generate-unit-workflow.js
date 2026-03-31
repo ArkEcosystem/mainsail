@@ -34,7 +34,7 @@ const workflow = {
 				},
 				{
 					name: "Get pnpm store directory",
-					// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+					// eslint-disable-next-line perfectionist/sort-objects
 					id: "pnpm-cache",
 					run: 'echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT',
 					shell: "bash",

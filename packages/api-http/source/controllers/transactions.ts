@@ -1,5 +1,6 @@
+import type { Types } from "@mainsail/api-common";
+
 import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -16,7 +17,7 @@ export class TransactionsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
-	public async index(request: Hapi.Request): Promise<object> {
+	public async index(request: Types.HapiRequest): Promise<object> {
 		const criteria: Search.Criteria.TransactionCriteria = request.query;
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
@@ -40,7 +41,7 @@ export class TransactionsController extends Controller {
 		);
 	}
 
-	public async show(request: Hapi.Request): Promise<object> {
+	public async show(request: Types.HapiRequest): Promise<object> {
 		const transaction = await this.transactionRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -50,7 +51,7 @@ export class TransactionsController extends Controller {
 		return this.respondEnrichedTransaction(transaction, request);
 	}
 
-	private async respondEnrichedTransaction(transaction: Models.Transaction | null, request: Hapi.Request) {
+	private async respondEnrichedTransaction(transaction: Models.Transaction | null, request: Types.HapiRequest) {
 		if (!transaction) {
 			return Boom.notFound();
 		}

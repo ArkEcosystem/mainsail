@@ -1,14 +1,15 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Keystore } from "@chainsafe/bls-keystore";
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
 
 import { BIP38, BIP39 } from "./keys/index.js";
-import { Validator } from "./validator.js";
 import { ValidatorRepository } from "./validator-repository.js";
+import { Validator } from "./validator.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -20,7 +21,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const validators: Contracts.Validator.Validator[] = [];
 		const validatorConfig = this.app.config<{ secrets: string[]; keystore?: string }>("validators");
 		assert.defined(validatorConfig);
-		const { secrets, keystore } = validatorConfig;
+		const { keystore, secrets } = validatorConfig;
 
 		for (const secret of secrets.values()) {
 			const consensusKeyPair = await this.#getConsensusKeyPairFromSecret(secret);

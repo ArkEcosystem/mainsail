@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { ResponseToolkit } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/typedef */

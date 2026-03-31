@@ -1,11 +1,12 @@
-import Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
+import type { Contracts } from "@mainsail/contracts";
+
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
 	Search,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { ReceiptResource } from "../resources/index.js";
 import { Controller } from "./controller.js";
@@ -15,7 +16,7 @@ export class ReceiptsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
-	public async index(request: Hapi.Request): Promise<object> {
+	public async index(request: Types.HapiRequest): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.ReceiptCriteria = request.query;
 		const sorting = this.getListingOrder(request);
@@ -48,7 +49,7 @@ export class ReceiptsController extends Controller {
 		return this.toPagination(receipts, ReceiptResource);
 	}
 
-	public async show(request: Hapi.Request): Promise<object> {
+	public async show(request: Types.HapiRequest): Promise<object> {
 		const receipt = await this.transactionRepositoryFactory()
 			.createQueryBuilder()
 			.select(this.#getReceiptColumns(request.query.fullReceipt))
@@ -58,7 +59,7 @@ export class ReceiptsController extends Controller {
 		return this.respondWithResource(receipt, ReceiptResource);
 	}
 
-	public async contracts(request: Hapi.Request): Promise<object> {
+	public async contracts(request: Types.HapiRequest): Promise<object> {
 		const criteria: Search.Criteria.ReceiptCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
@@ -84,7 +85,7 @@ export class ReceiptsController extends Controller {
 		return this.toPagination(receipts, ReceiptResource);
 	}
 
-	protected getListingOrder(_request: Hapi.Request): Contracts.Api.Sorting {
+	protected getListingOrder(_request: Types.HapiRequest): Contracts.Api.Sorting {
 		return [
 			{
 				direction: "desc",
@@ -97,7 +98,7 @@ export class ReceiptsController extends Controller {
 		];
 	}
 
-	protected getListingOptions(request: Hapi.Request): Search.Options {
+	protected getListingOptions(request: Types.HapiRequest): Search.Options {
 		const options = super.getListingOptions(request);
 
 		return {

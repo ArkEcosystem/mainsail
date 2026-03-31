@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { BasePlugin } from "./base-plugin.js";
 

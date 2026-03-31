@@ -1,4 +1,5 @@
 import type Hapi from "@hapi/hapi";
+
 import { set } from "@mainsail/utils";
 
 export const commaArrayQuery = {

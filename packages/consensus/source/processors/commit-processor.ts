@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { isMajority } from "@mainsail/blockchain-utils";
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 
@@ -37,7 +38,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 	}
 
 	async hasValidSignature(commit: Contracts.Crypto.Commit): Promise<boolean> {
-		const { proof, block } = commit;
+		const { block, proof } = commit;
 
 		const publicKeys: Buffer[] = [];
 		for (const [index, validator] of proof.validators.entries()) {

@@ -1,4 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
+
 import Joi from "joi";
 
 export const makeHeaders = (configuration: Contracts.Crypto.Configuration): Joi.ObjectSchema => {

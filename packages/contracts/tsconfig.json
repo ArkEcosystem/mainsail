@@ -8,8 +8,7 @@
 		"isolatedDeclarations": true,
 		"sourceMap": false,
 		"experimentalDecorators": false,
-		"emitDecoratorMetadata": false,
-		"esModuleInterop": false
+		"emitDecoratorMetadata": false
 	},
 	"include": ["source/**/**.ts"],
 	"references": [

@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Commands } from "@mainsail/cli";
 import { injectable, postConstruct } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { Command as BIP38Command } from "./config-forger-bip38.js";

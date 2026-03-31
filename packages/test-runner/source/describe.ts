@@ -1,11 +1,13 @@
+import type { Context, Test } from "uvu";
+
 import kleur from "kleur";
 import sinon from "sinon";
-import type { Context, Test } from "uvu";
 import { suite } from "uvu";
 import { z as schema } from "zod";
 
-import { assert } from "./assert.js";
 import type { EachCallback } from "./each.js";
+
+import { assert } from "./assert.js";
 import { each, formatName } from "./each.js";
 import { runHook } from "./hooks.js";
 import { loader } from "./loader.js";

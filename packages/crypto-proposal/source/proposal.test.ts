@@ -128,7 +128,7 @@ describe<{
 
 		assert.equal(
 			proposalFull.toString(),
-			`{"block":"a82964de6a37876e9e955cb5f97f6c25b9f52871cdb66c4dae9b33f0c832df65","blockNumber":2,"round":1,"validRound":0,"validatorIndex":0}`,
+			`{"block":"a82964de6a37876e9e955cb5f97f6c25b9f52871cdb66c4dae9b33f0c832df65","blockNumber":2,"round":1,"validatorIndex":0,"validRound":0}`,
 		);
 	});
 

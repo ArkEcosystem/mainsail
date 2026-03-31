@@ -1,5 +1,6 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { injectable } from "@mainsail/container";
 
 @injectable()
 export class TxPoolNode implements Contracts.P2P.TxPoolNode {

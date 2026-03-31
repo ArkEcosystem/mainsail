@@ -4,9 +4,9 @@ import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { Broadcaster } from "./broadcaster.js";
-import { Peer } from "./peer.js";
 import { PeerCommunicator } from "./peer-communicator.js";
 import { PeerRepository } from "./peer-repository.js";
+import { Peer } from "./peer.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {

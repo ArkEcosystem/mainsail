@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers/index.js";
 import { MemoryPipeline } from "./drivers/memory.js";

@@ -1,5 +1,6 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { injectable } from "@mainsail/container";
 
 import { ClassManager } from "../../support/class-manager.js";
 import { MemoryQueue } from "./drivers/memory.js";

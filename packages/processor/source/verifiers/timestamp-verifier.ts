@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { FutureBlock, InvalidTimestamp } from "@mainsail/exceptions";
 import dayjs from "dayjs";
 

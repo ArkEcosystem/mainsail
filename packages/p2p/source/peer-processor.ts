@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { isBlacklisted, isWhitelisted } from "@mainsail/utils";
 
 import { isValidVersion } from "./utils/index.js";

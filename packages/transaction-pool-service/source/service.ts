@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { EnvironmentVariables, Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { PoolError, TransactionAlreadyInPoolError, TransactionPoolFullError } from "@mainsail/exceptions";
 import { BigNumber, Lock, randomNumber } from "@mainsail/utils";
 
@@ -194,7 +195,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		const lastBlockNumber: number = this.stateStore.getBlockNumber();
 		const expiredBlockNumber: number = lastBlockNumber - maxTransactionAge;
 
-		for (const { senderPublicKey, hash } of this.storage.getOldTransactions(expiredBlockNumber)) {
+		for (const { hash, senderPublicKey } of this.storage.getOldTransactions(expiredBlockNumber)) {
 			const removedTransactions = await this.mempool.removeTransaction(
 				await this.addressFactory.fromPublicKey(senderPublicKey),
 				hash,

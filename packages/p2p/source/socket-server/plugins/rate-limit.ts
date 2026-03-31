@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import Boom from "@hapi/boom";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { RateLimiter } from "../../rate-limiter.js";
 import { buildRateLimiter } from "../../utils/build-rate-limiter.js";

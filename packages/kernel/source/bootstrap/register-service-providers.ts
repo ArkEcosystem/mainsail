@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import {
 	DependencyVersionOutOfRange,
 	InvalidPluginConfiguration,
@@ -85,7 +86,7 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 		);
 
 		for (const dependency of serviceProvider.dependencies()) {
-			const { name, version: constraint, required } = dependency;
+			const { name, required, version: constraint } = dependency;
 
 			const isRequired: boolean = typeof required === "function" ? await required() : !!required;
 

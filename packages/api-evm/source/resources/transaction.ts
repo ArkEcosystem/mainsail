@@ -1,10 +1,11 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { injectable } from "@mainsail/container";
 
 @injectable()
 export class TransactionResource {
 	public async transform(transaction: Contracts.Crypto.BlockTransaction): Promise<object> {
-		/* eslint-disable sort-keys-fix/sort-keys-fix */
+		/* eslint-disable perfectionist/sort-objects */
 		return {
 			blockHash: `0x${transaction.blockHash}`,
 			blockNumber: `0x${transaction.blockNumber?.toString(16)}`,
@@ -24,6 +25,6 @@ export class TransactionResource {
 			r: `0x${transaction.r}`,
 			s: `0x${transaction.s}`,
 		};
-		/* eslint-enable sort-keys-fix/sort-keys-fix */
+		/* eslint-enable perfectionist/sort-objects */
 	}
 }

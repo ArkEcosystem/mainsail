@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 import path from "path";
 import { URL } from "url";

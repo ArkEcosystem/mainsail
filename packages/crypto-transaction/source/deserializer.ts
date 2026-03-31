@@ -1,5 +1,6 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { injectable } from "@mainsail/container";
 import { BigNumber } from "@mainsail/utils";
 import { bytesToHex, getAddress, Hex, hexToBigInt } from "viem";
 
@@ -126,7 +127,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 	public async deserialize(
 		serialized: Buffer,
 	): Promise<{ data: Contracts.Crypto.TransactionSerializable; serialized: Buffer }> {
-		const { start, end } = decodeListBounds(serialized);
+		const { end, start } = decodeListBounds(serialized);
 
 		if (end !== serialized.byteLength) {
 			throw new Error("decoded RLP contains trailing bytes");
@@ -178,7 +179,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 			legacySecondSignature = fields[9].slice(2);
 		}
 
-		/* eslint-disable sort-keys-fix/sort-keys-fix */
+		/* eslint-disable perfectionist/sort-objects */
 		let transaction: Contracts.Crypto.TransactionSerializable = {
 			network,
 			to,
@@ -198,7 +199,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 				legacySecondSignature,
 			};
 		}
-		/* eslint-enable sort-keys-fix/sort-keys-fix */
+		/* eslint-enable perfectionist/sort-objects */
 
 		return { data: transaction, serialized };
 	}

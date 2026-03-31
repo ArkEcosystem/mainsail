@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi } from "@mainsail/evm-contracts";

@@ -1,7 +1,8 @@
 import { strictEqual } from "assert";
 
-import { Factory } from "./factory.js";
 import type { FactoryFunction } from "./types.js";
+
+import { Factory } from "./factory.js";
 
 export class FactoryBuilder {
 	readonly #factories: Map<string, Factory<unknown>> = new Map<string, Factory<unknown>>();

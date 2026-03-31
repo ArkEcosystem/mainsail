@@ -1,9 +1,10 @@
-import Boom, { badData } from "@hapi/boom";
 import type Hapi from "@hapi/hapi";
+import type { Contracts } from "@mainsail/contracts";
+
+import Boom, { badData } from "@hapi/boom";
 import { Request as HapiRequest, Server as HapiServer, ServerInjectOptions, ServerInjectResponse } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { cloneDeep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 

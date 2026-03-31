@@ -1,5 +1,6 @@
-import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { inject, injectable } from "@mainsail/container";
 import { stringify } from "envfile";
 import { copyFileSync, writeFileSync } from "fs";
 import { writeJSONSync } from "fs-extra/esm";

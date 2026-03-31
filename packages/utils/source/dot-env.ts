@@ -1,5 +1,6 @@
-import { readFileSync } from "fs";
 import type { Primitive } from "type-fest";
+
+import { readFileSync } from "fs";
 
 import { isString } from "./is-string.js";
 

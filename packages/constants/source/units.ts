@@ -1,4 +1,4 @@
-/* eslint sort-keys-fix/sort-keys-fix: 0 */
+/* eslint perfectionist/sort-objects: 0 */
 export const Units = {
 	BYTE: 1,
 	KILOBYTE: 1024,

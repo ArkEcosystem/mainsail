@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { InvalidLegacySecondSignatureError, MissingLegacySecondSignatureError } from "@mainsail/exceptions";
 
 @injectable()
@@ -16,7 +17,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	private readonly hashFactory!: Contracts.Crypto.TransactionHashFactory;
 
 	public async verifyHash(data: Contracts.Crypto.TransactionData): Promise<boolean> {
-		const { v, r, s, senderPublicKey } = data;
+		const { r, s, senderPublicKey, v } = data;
 
 		if (v === undefined || !r || !s || !senderPublicKey) {
 			return false;
