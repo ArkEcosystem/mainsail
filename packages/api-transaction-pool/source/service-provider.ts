@@ -5,6 +5,7 @@ import { injectable } from "@mainsail/container";
 
 import Handlers from "./handlers.js";
 import { Server } from "./server.js";
+import Joi from "joi";
 
 @injectable()
 export class ServiceProvider extends AbstractServiceProvider<Server> {
@@ -70,5 +71,27 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				plugin: Plugins.pagination,
 			},
 		] as unknown as Plugin<unknown>[];
+	}
+
+	public configSchema(): Joi.ObjectSchema {
+		return super.configSchema().concat(
+			Joi.object({
+				plugins: Joi.object({
+					pagination: Joi.object({
+						limit: Joi.number().integer().min(0).required(),
+					}).required(),
+					rateLimit: Joi.object({
+						blacklist: Joi.array().items(Joi.string()).required(),
+						duration: Joi.number().integer().min(0).required(),
+						enabled: Joi.bool().required(),
+						points: Joi.number().integer().min(0).required(),
+						whitelist: Joi.array().items(Joi.string()).required(),
+					}).required(),
+					socketTimeout: Joi.number().integer().min(0).required(),
+					trustProxy: Joi.bool().required(),
+					whitelist: Joi.array().items(Joi.string()).required(),
+				}).required(),
+			}).unknown(true),
+		);
 	}
 }

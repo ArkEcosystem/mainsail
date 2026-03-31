@@ -6,6 +6,20 @@ export const defaults = {
 		pagination: {
 			limit: 100,
 		},
+		rateLimit: {
+			blacklist:
+				Environment.get<undefined>(
+					EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_BLACKLIST,
+				)?.split(",") ?? [],
+			duration: Environment.get(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_USER_EXPIRES, 60), // Sec
+			enabled: !Environment.isTrue(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_DISABLED),
+			points: Environment.get(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_USER_LIMIT, 150),
+
+			whitelist:
+				Environment.get<undefined>(
+					EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_WHITELIST,
+				)?.split(",") ?? [],
+		},
 		socketTimeout: 5000,
 		trustProxy: Environment.isTrue(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_TRUST_PROXY),
 		whitelist: ["*"],
