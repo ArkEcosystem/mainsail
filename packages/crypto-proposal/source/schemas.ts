@@ -6,8 +6,8 @@ const proposalUnsigned = {
 	properties: {
 		payloadSerialized: { $ref: "hex" },
 		round: { minimum: 0, type: "integer" },
-		validRound: { minimum: 0, type: "integer" },
 		validatorIndex: { isValidatorIndex: { blockNumberPath: "payloadSerialized" } },
+		validRound: { minimum: 0, type: "integer" },
 	},
 	required: ["round", "payloadSerialized", "validatorIndex"],
 	type: "object",

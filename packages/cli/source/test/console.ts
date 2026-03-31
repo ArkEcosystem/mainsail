@@ -1,5 +1,6 @@
-import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
 
 import { ApplicationFactory } from "../application-factory.js";
 import { Flags } from "../utils/index.js";

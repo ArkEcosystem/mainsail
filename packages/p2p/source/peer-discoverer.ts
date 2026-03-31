@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { Services } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
 import { readJSONSync } from "fs-extra/esm";

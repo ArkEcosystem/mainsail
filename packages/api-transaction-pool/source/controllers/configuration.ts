@@ -1,8 +1,9 @@
 import type { Types } from "@mainsail/api-common";
+import type { Contracts } from "@mainsail/contracts";
+
 import { AbstractController } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class ConfigurationController extends AbstractController {

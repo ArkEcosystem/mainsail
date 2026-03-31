@@ -80,7 +80,7 @@ export const schemas = {
 	prefixedTransactionHash,
 	transaction,
 	transactionHash,
+	transactions,
 	transactionSigned,
 	transactionStrict,
-	transactions,
 };

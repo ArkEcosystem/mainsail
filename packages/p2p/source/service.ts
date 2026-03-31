@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { percentile } from "@mainsail/blockchain-utils";
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { groupBy, pluralize, randomNumber, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 import delay from "delay";

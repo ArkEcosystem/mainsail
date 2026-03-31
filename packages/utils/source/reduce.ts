@@ -1,4 +1,5 @@
 import type { FunctionReturning } from "./internal/index.js";
+
 import { isArray } from "./is-array.js";
 import { reduceArray } from "./reduce-array.js";
 import { reduceObject } from "./reduce-object.js";

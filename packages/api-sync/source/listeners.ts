@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { TypeOrm } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { EventListener, Listeners as IListeners } from "./contracts.js";
 import { ApiNodes } from "./listeners/api-nodes.js";

@@ -1,3 +1,5 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { AbstractController, Types } from "@mainsail/api-common";
 import {
 	Contracts as ApiDatabaseContracts,
@@ -7,7 +9,6 @@ import {
 } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
 import {
@@ -59,7 +60,7 @@ export class Controller extends AbstractController {
 
 	protected async enrichBlockResult(
 		resultPage: Search.ResultsPage<Models.Block>,
-		{ state, generators }: { state?: Models.State; generators: Record<string, Models.Wallet> },
+		{ generators, state }: { state?: Models.State; generators: Record<string, Models.Wallet> },
 	): Promise<Search.ResultsPage<EnrichedBlock>> {
 		state = state ?? (await this.getState());
 

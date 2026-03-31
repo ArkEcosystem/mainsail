@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { TransactionFailedToPreverifyError, UnexpectedLegacySecondSignatureError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
@@ -77,7 +78,7 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		const { evmSpec } = this.configuration.getMilestone();
 
 		try {
-			const { instance, blockContext } = context.evm;
+			const { blockContext, instance } = context.evm;
 			const data = {
 				blockContext,
 				data: Buffer.from(transaction.data.slice(2), "hex"),

@@ -3,6 +3,7 @@ import type {
 	TokenWhitelistRepository,
 	TokenWhitelistRepositoryExtension,
 } from "../contracts.js";
+
 import { TokenWhitelist } from "../models/index.js";
 import { makeExtendedRepository } from "./repository-extension.js";
 

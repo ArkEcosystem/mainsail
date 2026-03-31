@@ -1,4 +1,5 @@
 import type { ConfigurationRepository, ConfigurationRepositoryExtension, RepositoryDataSource } from "../contracts.js";
+
 import { Configuration } from "../models/index.js";
 import { makeExtendedRepository } from "./repository-extension.js";
 

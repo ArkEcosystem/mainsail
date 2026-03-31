@@ -1,5 +1,6 @@
-import Boom from "@hapi/boom";
 import type { Types } from "@mainsail/api-common";
+
+import Boom from "@hapi/boom";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -8,10 +9,10 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
-import { TokenResource } from "../resources/token.js";
 import { TokenHolderResource } from "../resources/token-holder.js";
 import { TokenTransferResource } from "../resources/token-transfer.js";
 import { TokenWhitelistResource } from "../resources/token-whitelist.js";
+import { TokenResource } from "../resources/token.js";
 import { Controller } from "./controller.js";
 
 type TokenTransferRaw = {

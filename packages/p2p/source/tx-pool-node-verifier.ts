@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { http, HttpResponse } from "@mainsail/utils";
 
 const helloWorld = { data: "Hello World from Transaction Pool API!" };

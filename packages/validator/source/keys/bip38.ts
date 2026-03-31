@@ -1,7 +1,7 @@
-import { randomBytes } from "node:crypto";
+import type { Contracts } from "@mainsail/contracts";
 
 import { Keystore } from "@chainsafe/bls-keystore";
-import type { Contracts } from "@mainsail/contracts";
+import { randomBytes } from "node:crypto";
 
 export class BIP38 implements Contracts.Validator.ValidatorKeyPair {
 	#keystore!: Keystore;

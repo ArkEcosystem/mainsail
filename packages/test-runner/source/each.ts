@@ -1,6 +1,6 @@
-import { format as printf } from "node:util";
-
 import type { Test } from "uvu";
+
+import { format as printf } from "node:util";
 
 export const formatName = (template: string, ...arguments_: unknown[]): string => printf(template, ...arguments_);
 

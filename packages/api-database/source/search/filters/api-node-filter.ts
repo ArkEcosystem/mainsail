@@ -1,7 +1,8 @@
 import type { ApiNode } from "../../models/index.js";
-import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 import type { ApiNodeCriteria, OrApiNodeCriteria } from "../types/criteria.js";
 import type { Expression } from "../types/expressions.js";
+
+import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
 export class ApiNodeFilter {
 	public static async getExpression(...criteria: OrApiNodeCriteria[]): Promise<Expression<ApiNode>> {

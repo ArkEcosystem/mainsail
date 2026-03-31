@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import Sntp from "@hapi/sntp";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { shuffle } from "@mainsail/utils";
 
 @injectable()

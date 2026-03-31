@@ -1,14 +1,15 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { Ipc, Providers } from "@mainsail/kernel";
 import Joi from "joi";
 import { cpus } from "os";
 import { URL } from "url";
 import { Worker } from "worker_threads";
 
-import { Worker as WorkerInstance } from "./worker.js";
 import { WorkerPool } from "./worker-pool.js";
+import { Worker as WorkerInstance } from "./worker.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {

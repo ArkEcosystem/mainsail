@@ -1,5 +1,6 @@
-import { filter } from "./filter.js";
 import type { FunctionReturning } from "./internal/index.js";
+
+import { filter } from "./filter.js";
 
 export const pullAllBy = <T, K>(iterable: T[], values: T[], iteratee: FunctionReturning<[T], K>): T[] => {
 	const iterateeValues = new Map<K, K[]>();

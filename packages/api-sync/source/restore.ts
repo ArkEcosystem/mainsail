@@ -1,3 +1,5 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -5,7 +7,6 @@ import {
 } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { parseTransactionError } from "@mainsail/evm-contracts";
 import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
@@ -289,12 +290,12 @@ export class Restore {
 	async #ingestBlocksAndTransactions(context: RestoreContext): Promise<void> {
 		const {
 			blockRepository,
-			transactionRepository,
-			multiPaymentRepository,
-			tokenRepository,
-			tokenHolderRepository,
-			tokenActionRepository: tokenTransferRepository,
 			mostRecentCommit,
+			multiPaymentRepository,
+			tokenActionRepository: tokenTransferRepository,
+			tokenHolderRepository,
+			tokenRepository,
+			transactionRepository,
 			validatorRounds,
 		} = context;
 
@@ -383,7 +384,7 @@ export class Restore {
 			};
 
 			let totalRound = 0;
-			for await (const { proof, block } of commits) {
+			for await (const { block, proof } of commits) {
 				blocks.push({
 					commitRound: proof.round,
 					fee: block.fee.toFixed(),
@@ -438,9 +439,9 @@ export class Restore {
 					const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
 					const parsedUsernames = parseUsernames(usernameContractAddress, transaction, receipt);
 					const {
-						tokens: parsedTokens,
-						tokenHolders: parsedTokenHolders,
 						tokenActions: parsedTokenActions,
+						tokenHolders: parsedTokenHolders,
+						tokens: parsedTokens,
 					} = await this.tokenParser.parseReceipt(block, transaction, receipt, tokenRepository);
 
 					if (!context.publicKeyToAddress[senderPublicKey]) {
@@ -934,16 +935,16 @@ export class Restore {
 
 	async #analyzeTables({
 		blockRepository,
+		configurationRepository,
 		contractRepository,
-		stateRepository,
-		transactionRepository,
-		walletRepository,
 		legacyColdWalletRepository,
 		multiPaymentRepository,
+		stateRepository,
 		tokenHolderRepository,
 		tokenRepository,
-		configurationRepository,
+		transactionRepository,
 		validatorRoundRepository,
+		walletRepository,
 	}: RepositoryContext): Promise<void> {
 		await Promise.all(
 			[

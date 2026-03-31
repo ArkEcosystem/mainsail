@@ -1,5 +1,6 @@
 import type { Types } from "@mainsail/api-common";
 import type { Contracts } from "@mainsail/contracts";
+
 import Joi from "joi";
 
 import { PeersController } from "../controllers/peers.js";

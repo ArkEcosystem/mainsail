@@ -1,7 +1,8 @@
-import { Identifiers, LogLevels } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
-import split from "split2";
 import type { Worker } from "worker_threads";
+
+import { Identifiers, LogLevels } from "@mainsail/constants";
+import split from "split2";
 
 export class Subprocess<T extends Record<string, unknown> = Record<string, unknown>>
 	implements Contracts.Kernel.IPC.Subprocess<T>

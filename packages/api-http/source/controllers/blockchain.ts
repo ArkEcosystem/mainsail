@@ -1,4 +1,5 @@
 import type { Types } from "@mainsail/api-common";
+
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 

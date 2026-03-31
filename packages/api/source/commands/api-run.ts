@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Commands, Utils } from "@mainsail/cli";
 import { injectable, postConstruct } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 import { readJSONSync } from "fs-extra/esm";
 import Joi from "joi";

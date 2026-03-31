@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { parse, stringify } from "envfile";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import path from "path";

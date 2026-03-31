@@ -1,7 +1,8 @@
 import type { Server } from "@hapi/hapi";
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { getPeerIp } from "../../utils/index.js";
 import { BasePlugin } from "./base-plugin.js";

@@ -2,10 +2,10 @@ import { NamedPlugin, Plugin } from "@hapi/hapi";
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
+import Joi from "joi";
 
 import Handlers from "./handlers.js";
 import { Server } from "./server.js";
-import Joi from "joi";
 
 @injectable()
 export class ServiceProvider extends AbstractServiceProvider<Server> {

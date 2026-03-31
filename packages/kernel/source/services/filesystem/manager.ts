@@ -1,5 +1,6 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { injectable } from "@mainsail/container";
 
 import { InstanceManager } from "../../support/instance-manager.js";
 import { LocalFilesystem } from "./drivers/local.js";

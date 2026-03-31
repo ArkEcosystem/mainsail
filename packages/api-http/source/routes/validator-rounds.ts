@@ -1,6 +1,7 @@
 import type { Types } from "@mainsail/api-common";
-import { Schemas } from "@mainsail/api-common";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
 import { ValidatorRoundsController } from "../controllers/validator-rounds.js";

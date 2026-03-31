@@ -1,5 +1,6 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { injectable } from "@mainsail/container";
 import { BigNumber } from "@mainsail/utils";
 import { bytesToHex, getAddress, Hex, hexToBigInt } from "viem";
 
@@ -126,7 +127,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 	public async deserialize(
 		serialized: Buffer,
 	): Promise<{ data: Contracts.Crypto.TransactionSerializable; serialized: Buffer }> {
-		const { start, end } = decodeListBounds(serialized);
+		const { end, start } = decodeListBounds(serialized);
 
 		if (end !== serialized.byteLength) {
 			throw new Error("decoded RLP contains trailing bytes");

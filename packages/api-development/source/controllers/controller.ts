@@ -1,8 +1,9 @@
-import Boom from "@hapi/boom";
 import type { Types } from "@mainsail/api-common";
+import type { Contracts } from "@mainsail/contracts";
+
+import Boom from "@hapi/boom";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { SchemaObject } from "../schemas.js";
 

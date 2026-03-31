@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Models } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 export interface EnrichedBlock extends Models.Block {

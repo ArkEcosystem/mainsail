@@ -1,11 +1,13 @@
 // Based on https://github.com/fknop/hapi-pagination
 
 import type Hapi from "@hapi/hapi";
-import { applyToDefaults } from "@hapi/hoek";
 import type { Utils } from "@mainsail/contracts";
+
+import { applyToDefaults } from "@hapi/hoek";
 import { assert, get } from "@mainsail/utils";
 import Qs from "querystring";
-import { HapiRequest } from "../../types.js";
+
+import type { HapiRequest } from "../../types.js";
 
 export class Extension {
 	private readonly routePathPrefix = "/api";

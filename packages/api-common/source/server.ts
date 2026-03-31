@@ -1,3 +1,5 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import Boom from "@hapi/boom";
 import {
 	Plugin,
@@ -9,7 +11,6 @@ import {
 } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { merge } from "@mainsail/utils";
 import { readFileSync } from "fs";
 

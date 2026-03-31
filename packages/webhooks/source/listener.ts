@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { get, http } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
@@ -17,7 +18,7 @@ export class Listener implements Contracts.Kernel.EventListener<{ name: string; 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async handle({ name, data }: { name: string; data: Contracts.Types.JsonObject }): Promise<void> {
+	public async handle({ data, name }: { name: string; data: Contracts.Types.JsonObject }): Promise<void> {
 		// Skip own events to prevent cycling
 		if (name.includes("webhooks")) {
 			return;

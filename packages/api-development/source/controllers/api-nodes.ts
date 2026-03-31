@@ -1,7 +1,8 @@
 import type { Types } from "@mainsail/api-common";
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { get } from "@mainsail/utils";
 
 import { PeerResource } from "../resources/index.js";

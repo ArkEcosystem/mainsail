@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Proposal implements Contracts.Crypto.Proposal {
@@ -18,14 +19,14 @@ export class Proposal implements Contracts.Crypto.Proposal {
 	#serialized!: Buffer;
 
 	public initialize({
-		round,
-		validatorIndex,
 		blockHeader,
 		lockProof,
 		payloadSerialized,
-		validRound,
-		signature,
+		round,
 		serialized,
+		signature,
+		validatorIndex,
+		validRound,
 	}: Contracts.Crypto.ProposalData & {
 		serialized: Buffer;
 	}): Proposal {
@@ -98,8 +99,8 @@ export class Proposal implements Contracts.Crypto.Proposal {
 			block: this.#blockHeader.hash,
 			blockNumber: this.#blockHeader.number,
 			round: this.#round,
-			validRound: this.#validRound,
 			validatorIndex: this.#validatorIndex,
+			validRound: this.#validRound,
 		});
 	}
 
@@ -108,8 +109,8 @@ export class Proposal implements Contracts.Crypto.Proposal {
 			payloadSerialized: this.#payloadSerialized,
 			round: this.#round,
 			signature: this.#signature,
-			validRound: this.#validRound,
 			validatorIndex: this.#validatorIndex,
+			validRound: this.#validRound,
 		};
 	}
 
@@ -120,8 +121,8 @@ export class Proposal implements Contracts.Crypto.Proposal {
 			payloadSerialized: this.#payloadSerialized,
 			round: this.#round,
 			signature: this.#signature,
-			validRound: this.#validRound,
 			validatorIndex: this.#validatorIndex,
+			validRound: this.#validRound,
 		};
 	}
 }

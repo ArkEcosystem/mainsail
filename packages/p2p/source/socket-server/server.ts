@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Plugin, Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { constants } from "../constants.js";
 import { plugin as hapiNesPlugin } from "../hapi-nes/index.js";

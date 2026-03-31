@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { DriverCannotBeResolved } from "@mainsail/exceptions";
 import { pascalCase } from "@mainsail/utils";
 

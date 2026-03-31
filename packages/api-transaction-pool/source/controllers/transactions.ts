@@ -1,9 +1,10 @@
-import { notFound } from "@hapi/boom";
 import type { Types } from "@mainsail/api-common";
+import type { Contracts } from "@mainsail/contracts";
+
+import { notFound } from "@hapi/boom";
 import { AbstractController } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { TransactionResource } from "../resources/index.js";
 

@@ -1,6 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
-import { BlockTransaction } from "@mainsail/crypto-transaction";
 import type { BigNumber } from "@mainsail/utils";
+
+import { BlockTransaction } from "@mainsail/crypto-transaction";
 
 interface BlockArguments {
 	data: Contracts.Crypto.BlockHeader;

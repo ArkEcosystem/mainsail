@@ -1,7 +1,8 @@
 import type { Types } from "@mainsail/api-common";
+import type { Contracts } from "@mainsail/contracts";
+
 import { Schemas } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
-import type { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { TransactionsController } from "../controllers/transactions.js";

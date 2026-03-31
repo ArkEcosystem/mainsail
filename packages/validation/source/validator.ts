@@ -1,9 +1,10 @@
-import { injectable, postConstruct } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { injectable, postConstruct } from "@mainsail/container";
 import { AnySchema, FormatDefinition, KeywordDefinition, Schema } from "ajv";
-import AjvCore from "ajv/dist/2020.js";
 import formats from "ajv-formats";
 import keywords from "ajv-keywords";
+import AjvCore from "ajv/dist/2020.js";
 
 // Can be removed once upstream is fixed:
 // https://github.com/ajv-validator/ajv/issues/2132

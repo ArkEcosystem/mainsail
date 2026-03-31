@@ -1,8 +1,9 @@
-import Boom from "@hapi/boom";
 import type { Types } from "@mainsail/api-common";
+import type { Contracts } from "@mainsail/contracts";
+
+import Boom from "@hapi/boom";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { Controller } from "./controller.js";
 
@@ -37,12 +38,12 @@ export class StatisticController extends Controller {
 		}
 
 		return {
-			round: `${statistic.height}-${statistic.round}`,
+			pings: statistic.getPingStatistics(),
 			// eslint-disable-next-line perfectionist/sort-objects
 			general: statistic.getGeneralStatistic(),
 			// eslint-disable-next-line perfectionist/sort-objects
 			emits: statistic.getEmitStatistics(),
-			pings: statistic.getPingStatistics(),
+			round: `${statistic.height}-${statistic.round}`,
 			// eslint-disable-next-line perfectionist/sort-objects
 			peers: statistic.getPeerStatistics(),
 		};
@@ -61,12 +62,12 @@ export class StatisticController extends Controller {
 		}
 
 		return {
-			round: `${statistic.height}-${statistic.round}`,
+			pings: statistic.getPingStatistics(),
 			// eslint-disable-next-line perfectionist/sort-objects
 			general: statistic.getGeneralStatistic(),
 			// eslint-disable-next-line perfectionist/sort-objects
 			emits: statistic.getEmitStatistics(),
-			pings: statistic.getPingStatistics(),
+			round: `${statistic.height}-${statistic.round}`,
 			// eslint-disable-next-line perfectionist/sort-objects
 			peers: statistic.getPeerStatistics(),
 		};
