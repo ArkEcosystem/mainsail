@@ -8,7 +8,7 @@
 		"isolatedDeclarations": true,
 		"sourceMap": false,
 		"experimentalDecorators": false,
-		"emitDecoratorMetadata": false,
+		"emitDecoratorMetadata": false
 	},
 	"include": ["source/**/**.ts"],
 	"references": [

@@ -4,9 +4,8 @@ import type { Worker } from "worker_threads";
 import { Identifiers, LogLevels } from "@mainsail/constants";
 import split from "split2";
 
-export class Subprocess<T extends Record<string, unknown> = Record<string, unknown>>
-	implements Contracts.Kernel.IPC.Subprocess<T>
-{
+export class Subprocess<T extends Record<string, unknown> = Record<string, unknown>> implements Contracts.Kernel.IPC
+	.Subprocess<T> {
 	#logLevels = new Set(LogLevels);
 
 	private lastId = 1;

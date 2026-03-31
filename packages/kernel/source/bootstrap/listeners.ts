@@ -6,9 +6,10 @@ import { inject, injectable } from "@mainsail/container";
 import { ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
 
 @injectable()
-export class ChangeServiceProviderState
-	implements Contracts.Kernel.EventListener<{ name: string; data: { name: string } }>
-{
+export class ChangeServiceProviderState implements Contracts.Kernel.EventListener<{
+	name: string;
+	data: { name: string };
+}> {
 	@inject(Identifiers.ServiceProvider.Repository)
 	private readonly serviceProviders!: ServiceProviderRepository;
 
