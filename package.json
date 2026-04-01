@@ -18,7 +18,6 @@
 		"deps": "cross-env-shell ./scripts/deps/update.sh",
 		"deps:check": "node ./scripts/deps/check.js",
 		"deps:types": "./node_modules/typesync/bin/typesync",
-		"docker": "node ./scripts/docker/generate-docker.js",
 		"format": "pnpm run lint && pnpm run prettier",
 		"lint": "eslint packages/*/source --fix",
 		"lint:dry": "eslint packages/*/source",
