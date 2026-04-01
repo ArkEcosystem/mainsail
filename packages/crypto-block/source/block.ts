@@ -1,6 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
-import { BlockTransaction } from "@mainsail/crypto-transaction";
 import type { BigNumber } from "@mainsail/utils";
+
+import { BlockTransaction } from "@mainsail/crypto-transaction";
 
 interface BlockArguments {
 	data: Contracts.Crypto.BlockHeader;
@@ -58,7 +59,7 @@ export class Block implements Contracts.Crypto.Block {
 
 	toData(): Contracts.Crypto.BlockData {
 		return {
-			/* eslint-disable sort-keys-fix/sort-keys-fix */
+			/* eslint-disable perfectionist/sort-objects */
 			timestamp: this.timestamp,
 			version: this.version,
 			number: this.number,
@@ -75,7 +76,7 @@ export class Block implements Contracts.Crypto.Block {
 			proposer: this.proposer,
 			hash: this.hash,
 			transactions: this.transactions.map((transaction) => transaction.toData()),
-			/* eslint-enable sort-keys-fix/sort-keys-fix */
+			/* eslint-enable perfectionist/sort-objects */
 		};
 	}
 }

@@ -37,10 +37,10 @@
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"boxen": "8.0.1",
-		"dayjs": "1.11.13",
+		"dayjs": "1.11.20",
 		"envfile": "7.1.0",
-		"fs-extra": "11.3.1",
-		"joi": "18.0.0",
+		"fs-extra": "11.3.4",
+		"joi": "18.1.2",
 		"kleur": "4.1.5"
 	},
 	"devDependencies": {
@@ -49,9 +49,9 @@
 		"@types/fs-extra": "11.0.4",
 		"@types/prompts": "2.4.9",
 		"@types/tmp": "0.2.6",
-		"cross-env": "10.0.0",
-		"env-paths": "3.0.0",
-		"execa": "9.6.0",
+		"cross-env": "10.1.0",
+		"env-paths": "4.0.0",
+		"execa": "9.6.1",
 		"prompts": "2.4.2",
 		"tmp": "0.2.5",
 		"uvu": "0.5.6"

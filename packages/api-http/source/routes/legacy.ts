@@ -1,6 +1,7 @@
-import type Hapi from "@hapi/hapi";
-import { Schemas } from "@mainsail/api-common";
+import type { Types } from "@mainsail/api-common";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
 import { LegacyController } from "../controllers/legacy.js";
@@ -11,7 +12,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	server.bind(controller);
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.coldWallets(request),
+		handler: (request: Types.HapiRequest) => controller.coldWallets(request),
 		method: "GET",
 		options: {
 			plugins: {
@@ -27,7 +28,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.showColdWallet(request),
+		handler: (request: Types.HapiRequest) => controller.showColdWallet(request),
 		method: "GET",
 		options: {
 			validate: {

@@ -1,5 +1,6 @@
+import type { Types } from "@mainsail/api-common";
+
 import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -62,7 +63,7 @@ export class WalletsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TokenHolderRepositoryFactory)
 	private readonly tokenHolderRepositoryFactory!: ApiDatabaseContracts.TokenHolderRepositoryFactory;
 
-	public async index(request: Hapi.Request): Promise<object> {
+	public async index(request: Types.HapiRequest): Promise<object> {
 		const criteria: Search.Criteria.WalletCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
@@ -73,7 +74,7 @@ export class WalletsController extends Controller {
 		return this.toPagination(wallets, WalletResource);
 	}
 
-	public async top(request: Hapi.Request): Promise<object> {
+	public async top(request: Types.HapiRequest): Promise<object> {
 		const criteria: Search.Criteria.WalletCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
@@ -84,7 +85,7 @@ export class WalletsController extends Controller {
 		return this.toPagination(wallets, WalletResource);
 	}
 
-	public async show(request: Hapi.Request): Promise<object> {
+	public async show(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -92,7 +93,7 @@ export class WalletsController extends Controller {
 		return this.respondWithResource(wallet, WalletResource);
 	}
 
-	public async transactions(request: Hapi.Request): Promise<object> {
+	public async transactions(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -103,7 +104,7 @@ export class WalletsController extends Controller {
 		return this.getTransactions(request, { address: wallet.address });
 	}
 
-	public async transactionsSent(request: Hapi.Request): Promise<object> {
+	public async transactionsSent(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -118,7 +119,7 @@ export class WalletsController extends Controller {
 		return this.getTransactions(request, { senderPublicKey: wallet.publicKey });
 	}
 
-	public async transactionsReceived(request: Hapi.Request): Promise<object> {
+	public async transactionsReceived(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -129,7 +130,7 @@ export class WalletsController extends Controller {
 		return this.getTransactions(request, { to: wallet.address });
 	}
 
-	public async votes(request: Hapi.Request): Promise<object> {
+	public async votes(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -147,7 +148,7 @@ export class WalletsController extends Controller {
 		});
 	}
 
-	public async tokens(request: Hapi.Request): Promise<object> {
+	public async tokens(request: Types.HapiRequest): Promise<object> {
 		if (!request.query.addresses) {
 			return this.getEmptyPage();
 		}
@@ -272,13 +273,13 @@ export class WalletsController extends Controller {
 		);
 	}
 
-	public async tokensShow(request: Hapi.Request): Promise<object> {
+	public async tokensShow(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 		const wallet = await this.getWallet(walletId);
 		return this.getTokens(request, wallet?.address ?? walletId);
 	}
 
-	public async activity(request: Hapi.Request): Promise<object> {
+	public async activity(request: Types.HapiRequest): Promise<object> {
 		const pagination = this.getListingPage(request);
 
 		const addresses = Array.isArray(request.query.addresses) ? request.query.addresses : [request.query.addresses];
@@ -402,7 +403,7 @@ export class WalletsController extends Controller {
 			{
 				meta: { totalCountIsEstimate: false },
 				results: walletActivityRows.map((row) => ({
-					/* eslint-disable sort-keys-fix/sort-keys-fix */
+					/* eslint-disable perfectionist/sort-objects */
 					blockNumber: row.blockNumber,
 					transactionHash: row.transactionHash,
 					transactionIndex: row.transactionIndex,
@@ -421,7 +422,7 @@ export class WalletsController extends Controller {
 								decimals: row.tokenDecimals,
 							}
 						: undefined,
-					/* eslint-enable sort-keys-fix/sort-keys-fix */
+					/* eslint-enable perfectionist/sort-objects */
 				})),
 				totalCount,
 			},
@@ -429,7 +430,7 @@ export class WalletsController extends Controller {
 		);
 	}
 
-	private async getTransactions(request: Hapi.Request, criteria: Search.Criteria.TransactionCriteria) {
+	private async getTransactions(request: Types.HapiRequest, criteria: Search.Criteria.TransactionCriteria) {
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
 		const options = this.getListingOptions(request);
@@ -454,7 +455,7 @@ export class WalletsController extends Controller {
 		);
 	}
 
-	private async getTokens(request: Hapi.Request, walletAddress: string) {
+	private async getTokens(request: Types.HapiRequest, walletAddress: string) {
 		const pagination = this.getListingPage(request);
 		const minBalance =
 			request.query.minBalance ?? this.apiConfiguration.getRequired("tokens.defaultMinimumBalance");

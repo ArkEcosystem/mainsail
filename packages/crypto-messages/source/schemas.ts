@@ -1,5 +1,6 @@
-import { Enums } from "@mainsail/constants";
 import type { AnySchemaObject } from "ajv";
+
+import { Enums } from "@mainsail/constants";
 
 export const schemas: Record<"message", AnySchemaObject> = {
 	message: {

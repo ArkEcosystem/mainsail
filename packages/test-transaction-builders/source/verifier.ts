@@ -1,5 +1,6 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { injectable } from "@mainsail/container";
 
 // Verifier which always accepts everything, useful when using the tx builder with invalid schema data.
 

@@ -1,5 +1,6 @@
+import type { Types } from "@mainsail/api-common";
+
 import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -16,7 +17,7 @@ export class VotesController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
-	public async index(request: Hapi.Request): Promise<object> {
+	public async index(request: Types.HapiRequest): Promise<object> {
 		const criteria: Search.Criteria.TransactionCriteria = {
 			...request.query,
 			data: FunctionSigs.ConsensusV1.Vote,
@@ -41,7 +42,7 @@ export class VotesController extends Controller {
 		);
 	}
 
-	public async show(request: Hapi.Request): Promise<object> {
+	public async show(request: Types.HapiRequest): Promise<object> {
 		const transaction = await this.transactionRepositoryFactory()
 			.createQueryBuilder()
 			.select()

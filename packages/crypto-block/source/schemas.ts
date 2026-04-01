@@ -31,7 +31,7 @@ export const schemas: Record<
 	blockHeader: {
 		$id: "blockHeader",
 		properties: {
-			/* eslint-disable sort-keys-fix/sort-keys-fix */
+			/* eslint-disable perfectionist/sort-objects */
 			hash: { $ref: "blockHash" },
 			version: { enum: [1] },
 			timestamp: { maximum: 2 ** 48 - 1, minimum: 0, type: "integer" },
@@ -47,7 +47,7 @@ export const schemas: Record<
 			payloadSize: { minimum: 0, type: "integer" },
 			transactionsRoot: { $ref: "transactionsRoot" },
 			proposer: { $ref: "address" },
-			/* eslint-enable sort-keys-fix/sort-keys-fix */
+			/* eslint-enable perfectionist/sort-objects */
 		},
 		required: [
 			"hash",

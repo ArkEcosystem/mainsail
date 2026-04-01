@@ -1,4 +1,5 @@
 import type { RepositoryDataSource, TokenRepository, TokenRepositoryExtension } from "../contracts.js";
+
 import { Token } from "../models/index.js";
 import { makeExtendedRepository } from "./repository-extension.js";
 

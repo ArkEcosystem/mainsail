@@ -1,10 +1,12 @@
 import type { Contracts } from "@mainsail/contracts";
+
 import { type TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
+import type { EvmCallOptions, TransferOptions } from "../factories/types.js";
+
 import { registerTransactionFactory } from "../factories/factories/transaction.js";
 import { FactoryBuilder } from "../factories/factory-builder.js";
-import type { EvmCallOptions, TransferOptions } from "../factories/types.js";
 
 export class Signer {
 	#config: Contracts.Crypto.NetworkConfig;

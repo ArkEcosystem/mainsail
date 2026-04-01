@@ -83,6 +83,9 @@ describe<{
 	});
 
 	it("/blocks/{id}/transactions - 404 (Not Found)", async () => {
-		await assert.rejects(async () => request(`/blocks/xxx/transactions`, options), "Response code 404 (Not Found)");
+		await assert.rejects(
+			async () => request(`/blocks/xxx/transactions`, options),
+			"Request failed with status code 404",
+		);
 	});
 });

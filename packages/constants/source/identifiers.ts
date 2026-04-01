@@ -54,16 +54,6 @@ export const Identifiers = {
 			Proposal: Symbol("ConsensusStorage<Storage.Proposal>"),
 		},
 	},
-	CryptoWorker: {
-		Worker: {
-			Factory: Symbol("CryptoWorker<Worker.Factory>"),
-			Instance: Symbol("CryptoWorker<Worker.Instance>"),
-		},
-		WorkerPool: Symbol("CryptoWorker<WorkerPool>"),
-		WorkerSubprocess: {
-			Factory: Symbol("CryptoWorker<WorkerSubprocess.Factory>"),
-		},
-	},
 	Cryptography: {
 		Block: {
 			Deserializer: Symbol("Crypto<Block.Deserializer>"),
@@ -142,6 +132,16 @@ export const Identifiers = {
 		},
 
 		Validator: Symbol("Crypto<Validator>"),
+	},
+	CryptoWorker: {
+		Worker: {
+			Factory: Symbol("CryptoWorker<Worker.Factory>"),
+			Instance: Symbol("CryptoWorker<Worker.Instance>"),
+		},
+		WorkerPool: Symbol("CryptoWorker<WorkerPool>"),
+		WorkerSubprocess: {
+			Factory: Symbol("CryptoWorker<WorkerSubprocess.Factory>"),
+		},
 	},
 	Database: {
 		Instance: {

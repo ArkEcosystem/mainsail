@@ -1,6 +1,7 @@
-import type Hapi from "@hapi/hapi";
-import { Schemas } from "@mainsail/api-common";
+import type { Types } from "@mainsail/api-common";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
 import { TransactionsController } from "../controllers/transactions.js";
@@ -11,7 +12,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	server.bind(controller);
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.index(request),
+		handler: (request: Types.HapiRequest) => controller.index(request),
 		method: "GET",
 		options: {
 			plugins: {
@@ -34,7 +35,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.show(request),
+		handler: (request: Types.HapiRequest) => controller.show(request),
 		method: "GET",
 		options: {
 			validate: {

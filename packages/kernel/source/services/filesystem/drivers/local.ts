@@ -1,7 +1,8 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import type { WriteFileOptions } from "fs";
 import type { EnsureDirOptions } from "fs-extra";
+
+import { injectable } from "@mainsail/container";
 import { resolve } from "path";
 
 @injectable()

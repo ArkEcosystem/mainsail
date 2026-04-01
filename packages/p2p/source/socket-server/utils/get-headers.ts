@@ -1,5 +1,6 @@
-import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
 
 export const getHeaders = (
 	app: Contracts.Kernel.Application,

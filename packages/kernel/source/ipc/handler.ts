@@ -1,4 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
+
 import { parentPort } from "worker_threads";
 
 export class Handler<T extends object> implements Contracts.Kernel.IPC.Handler<T> {

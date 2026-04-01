@@ -1,15 +1,17 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { assert, prettyBytes, prettyTime } from "@mainsail/utils";
 import dayjs from "dayjs";
 import Tail from "nodejs-tail";
 import readLastLines from "read-last-lines";
 
 import type { AbortMissingProcess, AbortStoppedProcess, AbortUnknownProcess } from "../actions/index.js";
+import type { ProcessManager } from "../services/index.js";
+
 import { Application } from "../application.js";
 import { Clear, Spinner, Table } from "../components/index.js";
-import type { ProcessManager } from "../services/index.js";
 
 @injectable()
 export class Process implements Contracts.Cli.Process {

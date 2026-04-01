@@ -1,9 +1,10 @@
 import { isObject } from "@mainsail/utils";
 
 import type { Wallet } from "../../models/index.js";
-import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 import type { EqualCriteria, NumericCriteria, OrWalletCriteria, WalletCriteria } from "../types/criteria.js";
 import type { Expression, JsonFieldCastType, OrExpression } from "../types/expressions.js";
+
+import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
 export class WalletFilter {
 	public static async getExpression(...criteria: OrWalletCriteria[]): Promise<Expression<Wallet>> {

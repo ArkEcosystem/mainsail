@@ -1,9 +1,10 @@
+import type { Contracts } from "@mainsail/contracts";
+import type { Color, Colorette } from "colorette";
+
 import { Identifiers, LogLevels } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { assert, isEmpty } from "@mainsail/utils";
 import chalk, { ChalkInstance } from "chalk";
-import type { Color, Colorette } from "colorette";
 import { error as console_error } from "console";
 import pino, { LogDescriptor } from "pino";
 import { prettyFactory, PrettyOptions } from "pino-pretty";

@@ -1,11 +1,12 @@
 import type { Contracts as ApiDatabaseContracts } from "@mainsail/api-database";
+import type { Contracts } from "@mainsail/contracts";
+import type { ContractFunctionParameters, EncodeFunctionDataParameters } from "viem";
+
 import { Identifiers as ApiDatabaseIdentifiers, Models } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 import { LRUCache } from "lru-cache";
-import type { ContractFunctionParameters, EncodeFunctionDataParameters } from "viem";
 import { decodeFunctionResult, encodeFunctionData, parseAbi, parseEventLogs, toHex, zeroAddress } from "viem";
 
 import { TokenParser } from "../contracts.js";
@@ -243,7 +244,7 @@ export class TokenParserService implements TokenParser {
 					if (!this.#tokenCache.has(contract)) {
 						const foundToken = foundTokens.get(contract);
 						assert.defined(foundToken);
-						const { token, isNew } = foundToken;
+						const { isNew, token } = foundToken;
 						this.#tokenCache.set(contract, token);
 
 						if (isNew) {

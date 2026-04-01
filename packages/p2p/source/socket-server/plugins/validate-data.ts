@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { ResponseToolkit } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { isValidVersion } from "../../utils/index.js";
 import { BasePlugin } from "./base-plugin.js";

@@ -1,4 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
+
 import Joi from "joi";
 
 import { constants } from "../../constants.js";

@@ -1,5 +1,6 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { injectable } from "@mainsail/container";
 import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 

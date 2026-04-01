@@ -1,6 +1,7 @@
+import type { Contracts, Utils } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import type { Contracts, Utils } from "@mainsail/contracts";
 import { MissingTransactionSignatureError, ValidationFailed } from "@mainsail/exceptions";
 import { BigNumber } from "@mainsail/utils";
 

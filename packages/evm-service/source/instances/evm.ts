@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { Evm, JsCommitData, JsTransactionData, LogLevel } from "@mainsail/evm";
 import { assert, validatorSetPack } from "@mainsail/utils";
 
@@ -145,7 +146,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const { number, round, hash } = unit.getBlock();
+		const { hash, number, round } = unit.getBlock();
 
 		const commitData = await this.#prepareCommitData(unit);
 

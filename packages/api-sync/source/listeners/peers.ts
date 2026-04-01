@@ -1,3 +1,5 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -6,7 +8,6 @@ import {
 } from "@mainsail/api-database";
 import { Events } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";
@@ -19,8 +20,8 @@ export class Peers extends AbstractListener<Contracts.P2P.Peer, Models.Peer> {
 	protected getEventMapping(): ListenerEventMapping {
 		return {
 			[Events.PeerEvent.Added]: ListenerEvent.OnAdded,
-			[Events.PeerEvent.Updated]: ListenerEvent.OnAdded, // upsert
 			[Events.PeerEvent.Removed]: ListenerEvent.OnRemoved,
+			[Events.PeerEvent.Updated]: ListenerEvent.OnAdded, // upsert
 		};
 	}
 

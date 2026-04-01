@@ -1,4 +1,4 @@
-import type Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import type { Contracts } from "@mainsail/contracts";
 
 import { ConsensusController } from "../controllers/consensus.js";
@@ -8,7 +8,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	server.bind(controller);
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.state(request),
+		handler: (request: Types.HapiRequest) => controller.state(request),
 		method: "GET",
 		path: "/consensus/state",
 	});

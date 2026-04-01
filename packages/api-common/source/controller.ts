@@ -1,24 +1,25 @@
-import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
-import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 
+import Boom from "@hapi/boom";
+import { Identifiers } from "@mainsail/constants";
+import { inject, injectable } from "@mainsail/container";
+
 import { SchemaObject } from "./schemas.js";
+import { HapiRequest, RequestQuery } from "./types.js";
 
 @injectable()
 export abstract class AbstractController {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	protected getQueryPagination(query: Hapi.RequestQuery): Contracts.Api.Pagination {
+	protected getQueryPagination(query: RequestQuery): Contracts.Api.Pagination {
 		return {
 			limit: query.limit,
 			offset: (query.page - 1) * query.limit || 0,
 		};
 	}
 
-	protected getQueryCriteria(query: Hapi.RequestQuery, schemaObject: SchemaObject): unknown {
+	protected getQueryCriteria(query: RequestQuery, schemaObject: SchemaObject): unknown {
 		const schemaObjectKeys = Object.keys(schemaObject);
 		const criteria = {};
 		for (const [key, value] of Object.entries(query)) {
@@ -29,7 +30,7 @@ export abstract class AbstractController {
 		return criteria;
 	}
 
-	protected getListingPage(request: Hapi.Request): Contracts.Api.Pagination {
+	protected getListingPage(request: HapiRequest): Contracts.Api.Pagination {
 		const pagination = {
 			limit: request.query.limit || 100,
 			offset: (request.query.page - 1) * request.query.limit || 0,
@@ -42,7 +43,7 @@ export abstract class AbstractController {
 		return pagination;
 	}
 
-	protected getListingOrder(request: Hapi.Request): Contracts.Api.Sorting {
+	protected getListingOrder(request: HapiRequest): Contracts.Api.Sorting {
 		if (!request.query.orderBy) {
 			return [];
 		}

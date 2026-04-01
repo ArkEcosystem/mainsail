@@ -1,6 +1,7 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import type { WriteFileOptions } from "fs";
+
+import { injectable } from "@mainsail/container";
 
 @injectable()
 export class NullFilesystem implements Contracts.Kernel.Filesystem {

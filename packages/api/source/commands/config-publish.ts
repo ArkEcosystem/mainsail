@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Commands } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { existsSync } from "fs";
 import { copySync, ensureDirSync, removeSync } from "fs-extra/esm";
 import Joi from "joi";

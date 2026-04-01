@@ -1,5 +1,6 @@
 import type { Models } from "@mainsail/api-database";
 import type { Contracts } from "@mainsail/contracts";
+
 import { parseAbi, parseEventLogs } from "viem";
 
 const paymentAbi = parseAbi(["event Payment(address indexed recipient, uint256 amount, bool success)"] as const);
@@ -20,7 +21,7 @@ export function parseMultiPayments(
 	});
 
 	return payments.map((payment, logIndex) => {
-		const { recipient, amount, success } = payment.args;
+		const { amount, recipient, success } = payment.args;
 
 		return {
 			amount: amount.toString(),

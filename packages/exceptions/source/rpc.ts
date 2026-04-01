@@ -1,5 +1,6 @@
-import { Enums } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Enums } from "@mainsail/constants";
 
 import { Exception } from "./base.js";
 
