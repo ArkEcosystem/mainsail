@@ -252,7 +252,7 @@ export class TokensController extends Controller {
 	}
 
 	public static andWhereWhitelisted(
-		queryBuilder: TypeOrm.SelectQueryBuilder<Models.TokenAction | Models.TokenHolder | Models.Token>,
+		queryBuilder: TypeOrm.SelectQueryBuilder<TypeOrm.ObjectLiteral>,
 		request: Types.HapiRequest,
 	): void {
 		if (request.query.ignoreWhitelist) {

@@ -61,6 +61,24 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
+		handler: (request: Types.HapiRequest) => controller.activity(request),
+		method: "GET",
+		options: {
+			plugins: {
+				pagination: { enabled: true },
+			},
+			validate: {
+				query: Joi.object({
+					addresses: Schemas.orEqualCriteria(walletAddressSchema).required(),
+					ignoreWhitelist: Joi.bool().default(false),
+					whitelist: Schemas.orEqualCriteria(walletAddressSchema),
+				}).concat(Schemas.pagination),
+			},
+		},
+		path: "/wallets/activity",
+	});
+
+	server.route({
 		handler: (request: Types.HapiRequest) => controller.show(request),
 		method: "GET",
 		options: {

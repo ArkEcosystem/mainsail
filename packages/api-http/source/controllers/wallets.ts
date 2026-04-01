@@ -6,6 +6,7 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 	Search,
+	TypeOrm,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { FunctionSigs } from "@mainsail/evm-contracts";
@@ -30,6 +31,24 @@ type TokenMetadata = {
 	supply: string;
 };
 
+type WalletActivityRaw = {
+	transactionHash: string;
+	blockNumber: number;
+	transactionIndex: number;
+	index: number;
+	timestamp: number;
+	from: string;
+	to: string;
+	value: string;
+	functionSig: Buffer;
+	action?: string;
+
+	tokenAddress?: string;
+	tokenName?: string;
+	tokenSymbol?: string;
+	tokenDecimals?: number;
+};
+
 @injectable()
 export class WalletsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
@@ -37,6 +56,9 @@ export class WalletsController extends Controller {
 
 	@inject(ApiDatabaseIdentifiers.TokenRepositoryFactory)
 	private readonly tokenRepositoryFactory!: ApiDatabaseContracts.TokenRepositoryFactory;
+
+	@inject(ApiDatabaseIdentifiers.TokenActionRepositoryFactory)
+	private readonly tokenActionRepositoryFactory!: ApiDatabaseContracts.TokenActionRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.TokenHolderRepositoryFactory)
 	private readonly tokenHolderRepositoryFactory!: ApiDatabaseContracts.TokenHolderRepositoryFactory;
@@ -255,6 +277,157 @@ export class WalletsController extends Controller {
 		const walletId = request.params.id as string;
 		const wallet = await this.getWallet(walletId);
 		return this.getTokens(request, wallet?.address ?? walletId);
+	}
+
+	public async activity(request: Types.HapiRequest): Promise<object> {
+		const pagination = this.getListingPage(request);
+
+		const addresses = Array.isArray(request.query.addresses) ? request.query.addresses : [request.query.addresses];
+
+		if (addresses.length === 0) {
+			return [];
+		}
+
+		// Transactions
+		const transactionsQuery = this.transactionRepositoryFactory()
+			.createQueryBuilder("t")
+			.leftJoin(Models.Token, "tok", `tok.address = t."to"`);
+
+		transactionsQuery.andWhere(
+			new TypeOrm.Brackets((b) => {
+				b.where("t.from IN (:...addresses)", { addresses }).orWhere("t.to IN (:...addresses)", {
+					addresses,
+				});
+			}),
+		);
+
+		const queryTransactions = transactionsQuery
+			.clone()
+			.select([
+				't."hash" AS "transactionHash"',
+				't."timestamp" AS "timestamp"',
+				't."block_number" AS "blockNumber"',
+				't."transaction_index" AS "transactionIndex"',
+				'NULL AS "index"',
+				't."from" AS "from"',
+				't."to" AS "to"',
+				't."value" AS "value"',
+				'NULL AS "action"',
+				'SUBSTRING(t."data" FROM 1 FOR 4) AS "functionSig"',
+
+				'tok."address" AS "tokenAddress"',
+				'tok."name" AS "tokenName"',
+				'tok."symbol" AS "tokenSymbol"',
+				'tok."decimals" AS "tokenDecimals"',
+			])
+			.orderBy("t.block_number", "DESC")
+			.addOrderBy("t.transaction_index", "DESC");
+
+		// Actions
+		const tokenActionsQuery = this.tokenActionRepositoryFactory()
+			.createQueryBuilder("ta")
+			.innerJoin(Models.Token, "tok", "tok.address = ta.address");
+
+		TokensController.andWhereWhitelisted(tokenActionsQuery, request);
+
+		tokenActionsQuery.andWhere(
+			new TypeOrm.Brackets((b) => {
+				b.where("ta.from IN (:...addresses)", { addresses }).orWhere("ta.to IN (:...addresses)", {
+					addresses,
+				});
+			}),
+		);
+
+		const queryTokenActions = tokenActionsQuery
+			.clone()
+			.select([
+				'ta."transaction_hash" AS "transactionHash"',
+				't."timestamp" AS "timestamp"',
+				't."block_number" AS "blockNumber"',
+				't."transaction_index" AS "transactionIndex"',
+				'ta."index" AS "index"',
+				'ta."from" AS "from"',
+				'ta."to" AS "to"',
+				'ta."value" AS "value"',
+				'ta."action" AS "action"',
+				'SUBSTRING(t."data" FROM 1 FOR 4) AS "functionSig"',
+
+				'tok."address" AS "tokenAddress"',
+				'tok."name" AS "tokenName"',
+				'tok."symbol" AS "tokenSymbol"',
+				'tok."decimals" AS "tokenDecimals"',
+			])
+			.innerJoin(Models.Transaction, "t", "t.hash = ta.transaction_hash")
+			.orderBy("ta.block_number", "DESC")
+			.addOrderBy("t.transaction_index", "DESC")
+			.addOrderBy("ta.index", "DESC", "NULLS LAST");
+
+		const parameters = {
+			...queryTransactions.getParameters(),
+			...queryTokenActions.getParameters(),
+		};
+
+		const unionCte = `(${queryTransactions.getQuery()})
+						UNION ALL
+					(${queryTokenActions.getQuery()})
+				`;
+
+		const [walletActivityRows, totalCountRow] = await Promise.all([
+			this.dataSource
+				.createQueryBuilder()
+				.addCommonTableExpression(unionCte, "unioned")
+				.select("u.*")
+				.from("unioned", "u")
+				.limit(pagination.limit)
+				.offset(pagination.offset)
+				.addOrderBy(`"blockNumber"`, "DESC")
+				.addOrderBy(`"transactionIndex"`, "DESC")
+				.addOrderBy(`"index"`, "DESC", "NULLS LAST")
+				.setParameters({
+					...parameters,
+				})
+				.getRawMany<WalletActivityRaw>(),
+			this.dataSource
+				.createQueryBuilder()
+				.addCommonTableExpression(unionCte, "unioned")
+				.select("COUNT(1)")
+				.from("unioned", "u")
+				.setParameters({
+					...parameters,
+				})
+				.getRawOne(),
+		]);
+
+		const totalCount = Number(totalCountRow?.count ?? 0);
+		return this.toPagination(
+			{
+				meta: { totalCountIsEstimate: false },
+				results: walletActivityRows.map((row) => ({
+					/* eslint-disable perfectionist/sort-objects */
+					blockNumber: row.blockNumber,
+					transactionHash: row.transactionHash,
+					transactionIndex: row.transactionIndex,
+					timestamp: row.timestamp,
+					from: row.from,
+					to: row.to,
+					value: row.value,
+					functionSig: `0x${row.functionSig.toString("hex")}`,
+					action: row.action,
+					actionIndex: row.index,
+					token: row.tokenAddress
+						? {
+								address: row.tokenAddress,
+								name: row.tokenName,
+								symbol: row.tokenSymbol,
+								decimals: row.tokenDecimals,
+							}
+						: undefined,
+					/* eslint-enable perfectionist/sort-objects */
+				})),
+				totalCount,
+			},
+			WalletResource,
+		);
 	}
 
 	private async getTransactions(request: Types.HapiRequest, criteria: Search.Criteria.TransactionCriteria) {

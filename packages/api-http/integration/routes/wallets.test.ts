@@ -12,11 +12,14 @@ import multiPaymentTransactions from "../../test/fixtures/multi_payments.transac
 import multiPaymentWallets from "../../test/fixtures/multi_payments.wallets.json";
 import multiPaymentTransactionsResponse from "../../test/fixtures/multi_payments.transactions.response.json";
 import tokens from "../../test/fixtures/tokens.json";
+import tokenActions from "../../test/fixtures/token_actions.json";
 import tokenHolders from "../../test/fixtures/token_holders.json";
 import tokenWhitelist from "../../test/fixtures/token_whitelist.json";
+import tokenTransferTransactions from "../../test/fixtures/token_transfer.transactions.json";
 import walletsTokens from "../../test/fixtures/wallets_tokens.json";
 import walletTokensResponse from "../../test/fixtures/wallet_tokens.response.json";
 import walletTokenHoldersResponse from "../../test/fixtures/wallet_token_holders.response.json";
+import walletActivitiesResponse from "../../test/fixtures/wallets_activity.response.json";
 
 describe<{
 	app: Application;
@@ -290,6 +293,43 @@ describe<{
 			{
 				path: `/wallets/${walletsTokens[0].address}/tokens?minBalance=2`,
 				result: walletTokensResponse,
+			},
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
+	});
+
+	it("/wallets/activity", async () => {
+		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenHolderRepository.save(tokenHolders);
+		await apiContext.tokenActionRepository.save(tokenActions);
+		await apiContext.transactionRepository.save(tokenTransferTransactions);
+		await apiContext.walletRepository.save(wallets);
+
+		const testCases = [
+			{
+				path: `/wallets/activity?addresses=${transactions[0].from}`,
+				result: [walletActivitiesResponse[0]],
+			},
+			{
+				path: `/wallets/activity?addresses=${tokenActions[0].address}`,
+				result: [walletActivitiesResponse[1]],
+			},
+			{
+				path: `/wallets/activity?addresses=${transactions[0].from},${tokenActions[0].address}`,
+				result: [walletActivitiesResponse[0], walletActivitiesResponse[1]],
+			},
+			{
+				path: `/wallets/activity?&addresses=${transactions[0].to}`,
+				result: walletActivitiesResponse.slice(2),
+			},
+			{
+				path: `/wallets/activity?&addresses=${transactions[0].to}&offset=100`,
+				result: [],
 			},
 		];
 
