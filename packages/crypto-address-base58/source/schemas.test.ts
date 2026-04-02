@@ -34,7 +34,7 @@ describe<{
 		}
 	});
 
-	it("address - should be ok", ({ validator }) => {
+	it("#legacyAddress - should be ok", ({ validator }) => {
 		assert.undefined(validator.validate("legacyAddress", "a".repeat(length)).error);
 
 		const validChars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
@@ -44,7 +44,7 @@ describe<{
 		}
 	});
 
-	it("address - should be ok for factory", async (context) => {
+	it("#legacyAddress - should be ok for factory", async (context) => {
 		await context.app.resolve<ECDSA>(ECDSA).register();
 
 		assert.undefined(
@@ -55,7 +55,7 @@ describe<{
 		);
 	});
 
-	it("address - should not be ok", ({ validator }) => {
+	it("#legacyAddress - should not be ok", ({ validator }) => {
 		assert.defined(validator.validate("legacyAddress", "a".repeat(length - 2)).error);
 		assert.defined(validator.validate("legacyAddress", "a".repeat(length + 1)).error);
 		assert.defined(validator.validate("legacyAddress", 123).error);
