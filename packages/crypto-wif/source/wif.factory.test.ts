@@ -57,12 +57,12 @@ describe<{
 	}, wallets);
 
 	each("#toPrivateKey - should be OK", async ({ context: { factory }, dataset: wallet }) => {
-		assert.equal(await factory.toPrivateKey(wallet.wif), wallet.privateKey);
+		assert.equal(await factory.toPrivateKey(wallet.wif), { compressed: true, privateKey: wallet.privateKey });
 	}, wallets);
 
 	each("#toPrivateKey - should be OK for WIF 170", async ({ context: { factory, configuration }, dataset: wallet }) => {
 		configuration.set("network.wif", 170);
-		assert.equal(await factory.toPrivateKey(wallet.wif170), wallet.privateKey);
+		assert.equal(await factory.toPrivateKey(wallet.wif170), { compressed: true, privateKey: wallet.privateKey });
 	}, wallets);
 
 
