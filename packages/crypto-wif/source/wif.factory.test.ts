@@ -6,7 +6,7 @@ import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa/source/pair";
 
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { mnemonic, wif, wif170 } from "../test/identity.json";
+import { wallets } from "../test/index.js";
 import { WIFFactory } from "./wif.factory";
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 
@@ -14,7 +14,7 @@ describe<{
 	app: Application;
 	factory: WIFFactory;
 	configuration: Contracts.Crypto.Configuration;
-}>("Identities - WIFFactory", ({ it, assert, beforeEach }) => {
+}>("Identities - WIFFactory", ({ it, assert, beforeEach, each }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
 		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
@@ -27,35 +27,31 @@ describe<{
 		context.factory = context.app.resolve(WIFFactory);
 	});
 
-	it("#fromMnemonic - should be OK", async ({ factory }) => {
-		assert.equal(await factory.fromMnemonic(mnemonic), wif);
-	});
+	each("#fromMnemonic - should be OK", async ({ context: { factory }, dataset: wallet }) => {
+		assert.equal(await factory.fromMnemonic(wallet.mnemonic), wallet.wif);
+	}, wallets);
 
-	it("#fromMnemonic - should be OK for WIF 170", async ({ factory, configuration }) => {
+	each("#fromMnemonic - should be OK for WIF 170", async ({ context: { factory, configuration }, dataset: wallet }) => {
 		configuration.set("network.wif", 170);
-		assert.equal(await factory.fromMnemonic(mnemonic), wif170);
-	});
+		assert.equal(await factory.fromMnemonic(wallet.mnemonic), wallet.wif170);
+	}, wallets);
 
-	it("#fromMnemonic - should be OK", async ({ factory }) => {
-		assert.equal(await factory.fromMnemonic(mnemonic), wif);
-	});
-
-	it("#fromKeys -  should be OK", async ({ factory, app }) => {
+	each("#fromKeys -  should be OK", async ({ context: { factory, app }, dataset: wallet }) => {
 		assert.equal(
 			await factory.fromKeys(
-				await app.get<KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory).fromMnemonic(mnemonic),
+				await app.get<KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory).fromMnemonic(wallet.mnemonic),
 			),
-			wif,
+			wallet.wif,
 		);
-	});
+	}, wallets);
 
-	it("#fromKeys -  should be OK for WIF 170", async ({ factory, app, configuration }) => {
+	each("#fromKeys -  should be OK for WIF 170", async ({ context: { factory, app, configuration }, dataset: wallet }) => {
 		configuration.set("network.wif", 170);
 		assert.equal(
 			await factory.fromKeys(
-				await app.get<KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory).fromMnemonic(mnemonic),
+				await app.get<KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory).fromMnemonic(wallet.mnemonic),
 			),
-			wif170,
+			wallet.wif170,
 		);
-	});
+	}, wallets);
 });
