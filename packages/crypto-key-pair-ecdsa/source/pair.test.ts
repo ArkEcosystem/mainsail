@@ -1,9 +1,9 @@
 import { Application } from "@mainsail/kernel";
 import { Identifiers } from "@mainsail/constants";
 import { Contracts } from "@mainsail/contracts";
+import { WifNetworkError } from "@mainsail/exceptions";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
-import { ServiceProvider as CryptoWifServiceProvider } from "@mainsail/crypto-wif";
 
 import { describe } from "@mainsail/test-runner";
 import { KeyPairFactory } from "./pair";
@@ -13,14 +13,15 @@ import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 describe<{
 	app: Application;
 	factory: KeyPairFactory;
+	configuration: Contracts.Crypto.Configuration;
 }>("KeyPairFactory", ({ assert, beforeEach, it, each }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
 		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
 		await context.app.resolve(ValidationServiceProvider).register();
 		await context.app.resolve(CryptoConfigServiceProvider).register();
-		await context.app.resolve(CryptoWifServiceProvider).register();
 
+		context.configuration = context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 		context.factory = context.app.resolve(KeyPairFactory);
 	});
 
@@ -55,11 +56,16 @@ describe<{
 	}, wallets);
 
 
-	each("#fromWIF - should derive a key pair from a WIF 170", async ({ context: { factory }, dataset: wallet }) => {
-		assert.equal(await factory.fromWIF(wallet.wif), {
+	each("#fromWIF - should derive a key pair from a WIF 170", async ({ context: { factory, configuration }, dataset: wallet }) => {
+		configuration.set("network.wif", 170);
+		assert.equal(await factory.fromWIF(wallet.wif170), {
 			compressed: true,
 			privateKey: wallet.privateKey,
 			publicKey: wallet.publicKey,
 		});
+	}, wallets);
+
+	each("#fromWIF - should derive a key pair from a WIF 170", async ({ context: { factory }, dataset: wallet }) => {
+		await assert.rejects(() => factory.fromWIF(wallet.wif170), WifNetworkError);
 	}, wallets);
 });

@@ -42,13 +42,6 @@ export interface WIFFactory {
 	fromKeys(keys: KeyPair): Promise<string>;
 }
 
-export interface WIFDecoder {
-	toPrivateKey(wif: string): Promise<{
-		compressed: boolean;
-		privateKey: string;
-	}>;
-}
-
 export interface AddressSerializer {
 	serialize(buffer: ByteBuffer, address: Buffer): void;
 	deserialize(buffer: ByteBuffer): Buffer;

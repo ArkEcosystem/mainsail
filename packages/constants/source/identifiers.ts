@@ -96,7 +96,6 @@ export const Identifiers = {
 				Size: Symbol("Crypto<Identity.PublicKey.Size>"),
 			},
 			Wif: {
-				Decoder: Symbol("Crypto<Identity.Wif.Decoder>"),
 				Factory: Symbol("Crypto<Identity.Wif.Factory>"),
 			},
 		},

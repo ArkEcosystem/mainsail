@@ -4,7 +4,6 @@ import * as Exceptions from "@mainsail/exceptions";
 import { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
-import { ServiceProvider as CryptoWifServiceProvider } from "@mainsail/crypto-wif";
 
 import { describe } from "@mainsail/test-runner";
 import { KeyPairFactory } from "./pair";
@@ -22,7 +21,6 @@ describe<{ app: Application; factory: PublicKeyFactory }>("PrivateKeyFactory", (
 		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
 		await context.app.resolve(ValidationServiceProvider).register();
 		await context.app.resolve(CryptoConfigServiceProvider).register();
-		await context.app.resolve(CryptoWifServiceProvider).register();
 
 		context.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
 		context.factory = context.app.resolve(PublicKeyFactory);

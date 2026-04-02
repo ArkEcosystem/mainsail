@@ -2,12 +2,14 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { WifNetworkError } from "@mainsail/exceptions";
 import { secp256k1, SHA256 } from "bcrypto";
+import { decode } from "wif";
 
 @injectable()
 export class KeyPairFactory implements Contracts.Crypto.KeyPairFactory {
-	@inject(Identifiers.Cryptography.Identity.Wif.Decoder)
-	private readonly wifDecoder!: Contracts.Crypto.WIFDecoder;
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	public async fromMnemonic(mnemonic: string, compressed: boolean = true): Promise<Contracts.Crypto.KeyPair> {
 		return this.fromPrivateKey(SHA256.digest(Buffer.from(mnemonic, "utf8")), compressed);
@@ -22,7 +24,13 @@ export class KeyPairFactory implements Contracts.Crypto.KeyPairFactory {
 	}
 
 	public async fromWIF(wif: string): Promise<Contracts.Crypto.KeyPair> {
-		const decoded = await this.wifDecoder.toPrivateKey(wif);
-		return this.fromPrivateKey(Buffer.from(decoded.privateKey, "hex"), decoded.compressed);
+		const networkVersion = this.configuration.get<number>("network.wif")
+		const decoded = decode(wif);
+
+		if (decoded.version !== networkVersion) {
+			throw new WifNetworkError(networkVersion, decoded.version);
+		}
+
+		return this.fromPrivateKey(Buffer.from(decoded.privateKey), decoded.compressed);
 	}
 }
