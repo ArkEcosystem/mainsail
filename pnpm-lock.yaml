@@ -1931,6 +1931,9 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
+      '@mainsail/exceptions':
+        specifier: workspace:*
+        version: link:../exceptions
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner

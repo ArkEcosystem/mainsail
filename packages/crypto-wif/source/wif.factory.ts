@@ -2,7 +2,8 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { encode } from "wif";
+import { WifNetworkError } from "@mainsail/exceptions";
+import { encode, decode } from "wif";
 
 @injectable()
 export class WIFFactory implements Contracts.Crypto.WIFFactory {
@@ -29,5 +30,16 @@ export class WIFFactory implements Contracts.Crypto.WIFFactory {
 			privateKey: Buffer.from(keys.privateKey, "hex"),
 			version: this.configuration.get("network.wif"),
 		});
+	}
+
+	public async toPrivateKey(wif: string): Promise<string> {
+		const networkVersion = this.configuration.get<number>("network.wif")
+		const decoded = decode(wif);
+
+		if (decoded.version !== networkVersion) {
+			throw new WifNetworkError(networkVersion, decoded.version);
+		}
+
+		return Buffer.from(decoded.privateKey).toString("hex");
 	}
 }

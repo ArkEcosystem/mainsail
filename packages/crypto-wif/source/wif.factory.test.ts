@@ -3,6 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa/source/pair";
+import { WifNetworkError } from "@mainsail/exceptions";
 
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
@@ -53,5 +54,19 @@ describe<{
 			),
 			wallet.wif170,
 		);
+	}, wallets);
+
+	each("#toPrivateKey - should be OK", async ({ context: { factory }, dataset: wallet }) => {
+		assert.equal(await factory.toPrivateKey(wallet.wif), wallet.privateKey);
+	}, wallets);
+
+	each("#toPrivateKey - should be OK for WIF 170", async ({ context: { factory, configuration }, dataset: wallet }) => {
+		configuration.set("network.wif", 170);
+		assert.equal(await factory.toPrivateKey(wallet.wif170), wallet.privateKey);
+	}, wallets);
+
+
+	each("#toPrivateKey - should throw on invalid WIF network version", async ({ context: { factory }, dataset: wallet }) => {
+		await assert.rejects(() => factory.toPrivateKey(wallet.wif170), WifNetworkError);
 	}, wallets);
 });
