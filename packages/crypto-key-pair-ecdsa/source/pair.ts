@@ -6,8 +6,8 @@ import { secp256k1, SHA256 } from "bcrypto";
 
 @injectable()
 export class KeyPairFactory implements Contracts.Crypto.KeyPairFactory {
-	@inject(Identifiers.Cryptography.Identity.Wif.Factory)
-	private readonly wifFactory!: Contracts.Crypto.WIFFactory;
+	@inject(Identifiers.Cryptography.Identity.Wif.Decoder)
+	private readonly wifDecoder!: Contracts.Crypto.WIFDecoder;
 
 	public async fromMnemonic(mnemonic: string, compressed: boolean = true): Promise<Contracts.Crypto.KeyPair> {
 		return this.fromPrivateKey(SHA256.digest(Buffer.from(mnemonic, "utf8")), compressed);
@@ -22,7 +22,7 @@ export class KeyPairFactory implements Contracts.Crypto.KeyPairFactory {
 	}
 
 	public async fromWIF(wif: string): Promise<Contracts.Crypto.KeyPair> {
-		const decoded = await this.wifFactory.toPrivateKey(wif);
+		const decoded = await this.wifDecoder.toPrivateKey(wif);
 		return this.fromPrivateKey(Buffer.from(decoded.privateKey, "hex"), decoded.compressed);
 	}
 }

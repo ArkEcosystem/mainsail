@@ -9,10 +9,12 @@ export class PrivateKeyFactory implements Contracts.Crypto.PrivateKeyFactory {
 	private readonly keyPairFactory!: Contracts.Crypto.KeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
-		return (await this.keyPairFactory.fromMnemonic(mnemonic)).privateKey;
+		const { privateKey } = await this.keyPairFactory.fromMnemonic(mnemonic);
+		return privateKey;
 	}
 
 	public async fromWIF(wif: string): Promise<string> {
-		return (await this.keyPairFactory.fromWIF(wif)).privateKey;
+		const { privateKey } = await this.keyPairFactory.fromWIF(wif);
+		return privateKey;
 	}
 }

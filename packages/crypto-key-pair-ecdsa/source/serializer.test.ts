@@ -1,5 +1,3 @@
-import { Identifiers } from "@mainsail/constants";
-import { Configuration } from "@mainsail/crypto-config";
 import { ByteBuffer } from "@mainsail/utils";
 import { Buffer } from "buffer";
 
@@ -7,28 +5,25 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { PublicKeySerializer } from "./serializer";
 
+import { wallets } from "../../crypto-wif/test/index.js";
+
 describe<{
 	app: Application;
 	serializer: PublicKeySerializer;
-}>("AddressSerializer", ({ it, assert, beforeEach }) => {
+}>("AddressSerializer", ({ it, assert, beforeEach, each }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
-
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-
 		context.serializer = context.app.resolve(PublicKeySerializer);
 	});
 
-	it("should serialize and deserialize address", async ({ serializer }) => {
-		const publicKey = "03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f";
-
+	each("should serialize and deserialize address", async ({ context: { serializer }, dataset: wallet }) => {
 		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(100));
 
-		serializer.serialize(byteBuffer, publicKey);
+		serializer.serialize(byteBuffer, wallet.publicKey);
 		byteBuffer.reset();
 
 		const readBuffer = serializer.deserialize(byteBuffer);
 
-		assert.equal(readBuffer.toString("hex"), publicKey);
-	});
+		assert.equal(readBuffer.toString("hex"), wallet.publicKey);
+	}, wallets);
 });
