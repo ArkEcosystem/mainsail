@@ -31,7 +31,7 @@ describe<{
 		}
 	});
 
-	it("address - should be ok", ({ validator }) => {
+	it("#address - should be ok", ({ validator }) => {
 		const prefix = "0x";
 
 		assert.undefined(validator.validate("address", prefix + "a".repeat(length - prefix.length)).error);
@@ -43,7 +43,7 @@ describe<{
 		}
 	});
 
-	it("address - should be ok for factory", async (context) => {
+	it("#address - should be ok for factory", async (context) => {
 		await context.app.resolve<ECDSA>(ECDSA).register();
 
 		assert.undefined(
@@ -54,7 +54,7 @@ describe<{
 		);
 	});
 
-	it("address - should not be ok", ({ validator }) => {
+	it("#address - should not be ok", ({ validator }) => {
 		const prefix = "0x";
 		const invalidPrefix = "1x";
 
