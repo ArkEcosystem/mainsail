@@ -20,5 +20,6 @@ describe<{
 		await serviceProvider.register();
 
 		assert.true(app.isBound(Identifiers.Cryptography.Identity.Wif.Factory));
+		assert.true(app.isBound(Identifiers.Cryptography.Identity.Wif.Decoder));
 	});
 });

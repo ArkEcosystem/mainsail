@@ -2,11 +2,13 @@ import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 
+import { WIFDecoder } from "./decoder.js";
 import { WIFFactory } from "./wif.factory.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Cryptography.Identity.Wif.Factory).to(WIFFactory).inSingletonScope();
+		this.app.bind(Identifiers.Cryptography.Identity.Wif.Decoder).to(WIFDecoder).inSingletonScope();
 	}
 }

@@ -40,6 +40,9 @@ export interface KeyPairFactory {
 export interface WIFFactory {
 	fromMnemonic(mnemonic: string): Promise<string>;
 	fromKeys(keys: KeyPair): Promise<string>;
+}
+
+export interface WIFDecoder {
 	toPrivateKey(wif: string): Promise<{
 		compressed: boolean;
 		privateKey: string;

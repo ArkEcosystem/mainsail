@@ -3,7 +3,6 @@ import { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa/source/pair";
-import { WifNetworkError } from "@mainsail/exceptions";
 
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
@@ -22,6 +21,8 @@ describe<{
 		await context.app.resolve(ValidationServiceProvider).register();
 		await context.app.resolve(CryptoConfigServiceProvider).register();
 
+
+		context.app.bind(Identifiers.Cryptography.Identity.Wif.Decoder).toConstantValue({});
 		context.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
 
 		context.configuration = context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
@@ -54,19 +55,5 @@ describe<{
 			),
 			wallet.wif170,
 		);
-	}, wallets);
-
-	each("#toPrivateKey - should be OK", async ({ context: { factory }, dataset: wallet }) => {
-		assert.equal(await factory.toPrivateKey(wallet.wif), { compressed: true, privateKey: wallet.privateKey });
-	}, wallets);
-
-	each("#toPrivateKey - should be OK for WIF 170", async ({ context: { factory, configuration }, dataset: wallet }) => {
-		configuration.set("network.wif", 170);
-		assert.equal(await factory.toPrivateKey(wallet.wif170), { compressed: true, privateKey: wallet.privateKey });
-	}, wallets);
-
-
-	each("#toPrivateKey - should throw on invalid WIF network version", async ({ context: { factory }, dataset: wallet }) => {
-		await assert.rejects(() => factory.toPrivateKey(wallet.wif170), WifNetworkError);
 	}, wallets);
 });
