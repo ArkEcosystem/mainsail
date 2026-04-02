@@ -1,8 +1,10 @@
 import { Application } from "@mainsail/kernel";
 import { Identifiers } from "@mainsail/constants";
-import { Configuration } from "@mainsail/crypto-config";
+import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 
+import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "@mainsail/test-runner";
 import { KeyPairFactory } from "./pair";
 
@@ -12,8 +14,10 @@ const mnemonic =
 describe<{ app: Application; factory: KeyPairFactory }>("KeyPairFactory", ({ assert, beforeEach, it }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
+
+		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
 		await context.app.resolve(ValidationServiceProvider).register();
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		await context.app.resolve(CryptoConfigServiceProvider).register();
 
 		context.factory = context.app.resolve(KeyPairFactory);
 	});
@@ -27,7 +31,7 @@ describe<{ app: Application; factory: KeyPairFactory }>("KeyPairFactory", ({ ass
 		});
 	});
 
-	it("should derive a key pair from an mnemonic", async ({ factory }) => {
+	it("should derive a key pair from a private key", async ({ factory }) => {
 		assert.equal(
 			await factory.fromPrivateKey(
 				Buffer.from("3e99d30b3816f60077b1fdb4535ce0e9f9c715e42d1647edc3361fc531fb618f", "hex"),
@@ -42,7 +46,7 @@ describe<{ app: Application; factory: KeyPairFactory }>("KeyPairFactory", ({ ass
 	});
 
 	it("should derive from a WIF", async ({ factory }) => {
-		assert.equal(await factory.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"), {
+		assert.equal(await factory.fromWIF("UfDzkBsi7xxjq491zm5tk7rCZ1EouBXsFUWaCvQWxAortbh1zq5T"), {
 			compressed: true,
 			privateKey: "0000000000000000000000000000000000000000000000000000000000000001",
 			publicKey:
