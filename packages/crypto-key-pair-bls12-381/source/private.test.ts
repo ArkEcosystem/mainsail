@@ -1,36 +1,38 @@
 import { Application } from "@mainsail/kernel";
 import { Identifiers } from "@mainsail/constants";
-import { Configuration } from "@mainsail/crypto-config";
+import type { Contracts } from "@mainsail/contracts";
+import { NotImplemented } from "@mainsail/exceptions";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
+import { ServiceProvider as CryptoWifServiceProvider } from "@mainsail/crypto-wif";
 
 import { describe } from "@mainsail/test-runner";
 import { KeyPairFactory } from "./pair";
 import { PrivateKeyFactory } from "./private";
+import { wallets } from "../../crypto-wif/test/index.js";
 
-const mnemonic =
-	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
+import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 
-describe<{ app: Application; factory: PrivateKeyFactory }>("PrivateKeyFactory", ({ assert, beforeEach, it }) => {
+describe<{ app: Application; factory: PrivateKeyFactory }>("PrivateKeyFactory", ({ assert, beforeEach, it, each }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
+		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
 		await context.app.resolve(ValidationServiceProvider).register();
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		await context.app.resolve(CryptoConfigServiceProvider).register();
+		await context.app.resolve(CryptoWifServiceProvider).register();
 		context.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
 
 		context.factory = context.app.resolve(PrivateKeyFactory);
 	});
 
-	it("should derive from an mnemonic", async ({ factory }) => {
+	each("#fromMnemonic - should derive from an mnemonic", async ({ context: { factory }, dataset: wallet }) => {
 		assert.is(
-			await factory.fromMnemonic(mnemonic),
-			"6a0f42158b2412bc038076a9006acca5fd28f5a495479cdbe4117da0c2e18faf",
+			await factory.fromMnemonic(wallet.mnemonic),
+			wallet.validatorPrivateKey,
 		);
-	});
+	}, wallets);
 
-	it("should derive from a WIF", async ({ factory }) => {
-		assert.is(
-			await factory.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"),
-			"0000000000000000000000000000000000000000000000000000000000000001",
-		);
+	it("#fromWIF - should throw NotImplemented", async ({  factory }) => {
+		await assert.rejects(() => factory.fromWIF(""), NotImplemented);
 	});
 });

@@ -1542,6 +1542,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/crypto-wif':
+        specifier: workspace:*
+        version: link:../crypto-wif
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner

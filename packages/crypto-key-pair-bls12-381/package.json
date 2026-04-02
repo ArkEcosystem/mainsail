@@ -37,6 +37,7 @@
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/validation": "workspace:*",
+		"@mainsail/crypto-wif": "workspace:*",
 		"bip39": "3.1.0",
 		"uvu": "0.5.6"
 	},
