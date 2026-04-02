@@ -1585,18 +1585,12 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-wif':
-        specifier: workspace:*
-        version: link:../crypto-wif
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
-      bip39:
-        specifier: 3.1.0
-        version: 3.1.0
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1934,9 +1928,6 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
-      '@mainsail/exceptions':
-        specifier: workspace:*
-        version: link:../exceptions
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
