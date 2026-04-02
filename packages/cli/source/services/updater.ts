@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { BuildPackages, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { dim, green, reset } from "kleur/colors";
 import latestVersion from "latest-version";
 import { lt, lte } from "semver";

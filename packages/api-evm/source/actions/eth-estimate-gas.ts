@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { RpcError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 import dayjs from "dayjs";
@@ -62,7 +63,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action<[TxData]> 
 
 		const [data] = parameters;
 
-		const { evmSpec, block, gas } = this.configuration.getMilestone();
+		const { block, evmSpec, gas } = this.configuration.getMilestone();
 
 		const accountInfo = await this.evm.getAccountInfo(data.from);
 
@@ -97,7 +98,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action<[TxData]> 
 		};
 
 		// Execute with max allowed gas limit
-		let { success, receipt, executionError } = await this.#execute(context);
+		let { executionError, receipt, success } = await this.#execute(context);
 		if (executionError) {
 			throw new RpcError(`execution reverted: ${executionError}`);
 		}
@@ -118,7 +119,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action<[TxData]> 
 		// check that gas amount and use as a limit for the binary search.
 		const optimisticGasLimit = (receipt.gasUsed + receipt.gasRefunded + 2300n) * (64n / 63n);
 		if (optimisticGasLimit < maxGasLimit) {
-			const { success, executionError } = await this.#execute({ ...context, gasLimit: optimisticGasLimit });
+			const { executionError, success } = await this.#execute({ ...context, gasLimit: optimisticGasLimit });
 			if (executionError) {
 				// This should not happen under normal conditions since if we make it this far the
 				// transaction had run without error at least once before.
@@ -149,7 +150,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action<[TxData]> 
 				midGasLimit = minGasLimit * 2n;
 			}
 
-			({ success, executionError } = await this.#execute({ ...context, gasLimit: midGasLimit }));
+			({ executionError, success } = await this.#execute({ ...context, gasLimit: midGasLimit }));
 			if (executionError) {
 				throw new RpcError(`execution reverted: ${executionError}`);
 			}

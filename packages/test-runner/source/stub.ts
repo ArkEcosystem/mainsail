@@ -2,6 +2,7 @@ import type { SinonStub } from "sinon";
 
 import type { Stub as IStub } from "./contracts.js";
 import type { FakeLike } from "./fake.js";
+
 import { Fake } from "./fake.js";
 
 type SinonStubLike<TArguments extends unknown[], TResult> = FakeLike<TArguments, TResult> &

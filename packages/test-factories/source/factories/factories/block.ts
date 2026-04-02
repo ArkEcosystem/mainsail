@@ -1,11 +1,13 @@
-import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
 import { assert, BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
 
+import type { FactoryBuilder } from "../factory-builder.js";
+
 import secrets from "../../internal/passphrases.json" with { type: "json" };
 import { Signer } from "../../internal/signer.js";
-import type { FactoryBuilder } from "../factory-builder.js";
 import { generateApp } from "./generate-app.js";
 import { GAS_PRICE } from "./transaction.js";
 

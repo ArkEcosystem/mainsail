@@ -1,10 +1,10 @@
-import { inspect } from "node:util";
+import type { Message } from "uvu/assert";
+import type { ZodRawShape } from "zod";
 
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
+import { inspect } from "node:util";
 import { join } from "path";
-import type { Message } from "uvu/assert";
 import { Assertion, equal, fixture, instance, is, match, not, ok, throws, type, unreachable } from "uvu/assert";
-import type { ZodRawShape } from "zod";
 import { z } from "zod";
 
 interface Constructable<T = unknown> {

@@ -1,13 +1,15 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
 
 @injectable()
-export class ChangeServiceProviderState
-	implements Contracts.Kernel.EventListener<{ name: string; data: { name: string } }>
-{
+export class ChangeServiceProviderState implements Contracts.Kernel.EventListener<{
+	name: string;
+	data: { name: string };
+}> {
 	@inject(Identifiers.ServiceProvider.Repository)
 	private readonly serviceProviders!: ServiceProviderRepository;
 
@@ -22,7 +24,7 @@ export class ChangeServiceProviderState
 		return this;
 	}
 
-	public async handle({ name, data }: { name: string; data: { name: string } }): Promise<void> {
+	public async handle({ data, name }: { name: string; data: { name: string } }): Promise<void> {
 		if (name === Events.BlockEvent.Applied) {
 			return this.#changeState();
 		}

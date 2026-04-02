@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { blue, bold } from "kleur/colors";
 
 import { AppHeader } from "../components/index.js";
@@ -54,7 +55,7 @@ ${flags}`;
 			return "";
 		}
 
-		const { options, descriptions, longestProperty } = this.#buildProperties(arguments_);
+		const { descriptions, longestProperty, options } = this.#buildProperties(arguments_);
 
 		const output: string[] = [];
 		for (const [index, option] of options.entries()) {
@@ -71,7 +72,7 @@ ${flags}`;
 			return "";
 		}
 
-		const { options, descriptions, longestProperty } = this.#buildProperties(flags);
+		const { descriptions, longestProperty, options } = this.#buildProperties(flags);
 
 		const output: string[] = [];
 		for (const [index, option] of options.entries()) {

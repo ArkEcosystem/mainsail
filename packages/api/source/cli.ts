@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { ApplicationFactory, Commands, Flags, InputParser, Plugins } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { existsSync } from "fs";
 import { readJSONSync } from "fs-extra/esm";
 import { platform } from "os";

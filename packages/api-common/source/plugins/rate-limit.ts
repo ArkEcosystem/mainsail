@@ -1,7 +1,8 @@
-import Boom from "@hapi/boom";
 import type Hapi from "@hapi/hapi";
-import mm from "micromatch";
 import type { RateLimiterRes } from "rate-limiter-flexible";
+
+import Boom from "@hapi/boom";
+import mm from "micromatch";
 import { RateLimiterMemory, RLWrapperBlackAndWhite } from "rate-limiter-flexible";
 
 import { getIp } from "../utils/index.js";

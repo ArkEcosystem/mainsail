@@ -1,5 +1,6 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { injectable } from "@mainsail/container";
 import { join } from "path";
 
 import { execa } from "../execa.js";
@@ -23,7 +24,7 @@ export class Setup implements Contracts.Cli.Setup {
 	}
 
 	private getGlobalRootDir(): string {
-		const { stdout, exitCode } = execa.sync(`pnpm root -g dir`, { shell: true });
+		const { exitCode, stdout } = execa.sync(`pnpm root -g dir`, { shell: true });
 
 		if (exitCode !== 0) {
 			throw new Error("Cannot determine global pnpm dir");

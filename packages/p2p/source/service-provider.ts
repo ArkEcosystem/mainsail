@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
@@ -10,19 +11,18 @@ import {
 	ValidateAndAcceptApiNodeAction,
 	ValidateAndAcceptPeerAction,
 } from "./actions/index.js";
-import { ApiNode } from "./api-node.js";
 import { ApiNodeDiscoverer } from "./api-node-discoverer.js";
 import { ApiNodeProcessor } from "./api-node-processor.js";
 import { ApiNodeRepository } from "./api-node-repository.js";
 import { ApiNodeVerifier } from "./api-node-verifier.js";
+import { ApiNode } from "./api-node.js";
 import { Broadcaster } from "./broadcaster.js";
 import { BlockDownloader } from "./downloader/block-downloader.js";
 import { MessageDownloader } from "./downloader/message-downloader.js";
 import { ProposalDownloader } from "./downloader/proposal-downloader.js";
-import { Header } from "./header.js";
 import { HeaderService } from "./header-service.js";
+import { Header } from "./header.js";
 import { Logger } from "./logger.js";
-import { Peer } from "./peer.js";
 import { PeerCommunicator } from "./peer-communicator.js";
 import { PeerConnector } from "./peer-connector.js";
 import { PeerDiscoverer } from "./peer-discoverer.js";
@@ -30,6 +30,7 @@ import { PeerDisposer } from "./peer-disposer.js";
 import { PeerProcessor } from "./peer-processor.js";
 import { PeerRepository } from "./peer-repository.js";
 import { PeerVerifier } from "./peer-verifier.js";
+import { Peer } from "./peer.js";
 import { Service } from "./service.js";
 import {
 	GetApiNodesRoute,
@@ -45,8 +46,8 @@ import { Server } from "./socket-server/server.js";
 import { State } from "./state.js";
 import { StatisticLogger, StatisticService } from "./statistic/index.js";
 import { Throttle } from "./throttle.js";
-import { TxPoolNode } from "./tx-pool-node.js";
 import { TxPoolNodeVerifier } from "./tx-pool-node-verifier.js";
+import { TxPoolNode } from "./tx-pool-node.js";
 import { normalizeUrl } from "./utils/index.js";
 import { makeFormats, sanitizeRemoteAddress } from "./validation/index.js";
 

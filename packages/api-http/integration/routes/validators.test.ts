@@ -91,7 +91,7 @@ describe<{
 
 		await assert.rejects(
 			async () => request(`/validators/0x0000000000000000000000000000000000000001/voters`, options),
-			"Response code 404 (Not Found)",
+			"Request failed with status code 404",
 		);
 
 		const validator = validators[0];

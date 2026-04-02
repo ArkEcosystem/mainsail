@@ -1,4 +1,5 @@
 import type { Arguments as Flags } from "yargs-parser";
+
 import yargs from "yargs-parser";
 export type { Arguments as Flags } from "yargs-parser";
 

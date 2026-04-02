@@ -24,7 +24,7 @@
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"ajv": "8.17.1",
+		"ajv": "8.18.0",
 		"ajv-formats": "3.0.1",
 		"ajv-keywords": "5.1.0"
 	},

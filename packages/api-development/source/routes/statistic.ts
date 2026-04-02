@@ -1,5 +1,6 @@
-import type Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import type { Contracts } from "@mainsail/contracts";
+
 import Joi from "joi";
 
 import { StatisticController } from "../controllers/statistic.js";
@@ -9,19 +10,19 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	server.bind(controller);
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.index(request),
+		handler: (request: Types.HapiRequest) => controller.index(request),
 		method: "GET",
 		path: "/statistic",
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.list(request),
+		handler: (request: Types.HapiRequest) => controller.list(request),
 		method: "GET",
 		path: "/statistic/list",
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.show(request),
+		handler: (request: Types.HapiRequest) => controller.show(request),
 		method: "GET",
 		options: {
 			validate: {
@@ -34,7 +35,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.latest(request),
+		handler: (request: Types.HapiRequest) => controller.latest(request),
 		method: "GET",
 		path: "/statistic/latest",
 	});

@@ -145,7 +145,7 @@ describe<{
 		assert.defined(validator.validate("transactionsRoot", "a".repeat(length + 1)).error);
 	});
 
-	/* eslint-disable sort-keys-fix/sort-keys-fix */
+	/* eslint-disable perfectionist/sort-objects */
 	const blockOriginal = {
 		hash: "1".repeat(64),
 		version: 1,
@@ -163,7 +163,7 @@ describe<{
 		transactionsRoot: "0".repeat(64),
 		proposer: "0x" + "A".repeat(40),
 	};
-	/* eslint-enable sort-keys-fix/sort-keys-fix */
+	/* eslint-enable perfectionist/sort-objects */
 
 	it("blockHeader - should be ok", async ({ validator }) => {
 		const block = {

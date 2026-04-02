@@ -27,7 +27,7 @@
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"dayjs": "1.11.13"
+		"dayjs": "1.11.20"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",

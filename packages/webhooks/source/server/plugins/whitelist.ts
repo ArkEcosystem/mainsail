@@ -1,5 +1,6 @@
-import Boom from "@hapi/boom";
 import type Hapi from "@hapi/hapi";
+
+import Boom from "@hapi/boom";
 import { isWhitelisted } from "@mainsail/utils";
 
 export const whitelist = {

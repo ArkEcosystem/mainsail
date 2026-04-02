@@ -1,4 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
+
 import { randomNumber } from "@mainsail/utils";
 
 export const getRandomPeer = (peers: Contracts.P2P.Peer[]): Contracts.P2P.Peer =>

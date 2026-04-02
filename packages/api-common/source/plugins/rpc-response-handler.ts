@@ -1,6 +1,7 @@
 import type { Boom } from "@hapi/boom";
 import type Hapi from "@hapi/hapi";
 import type { ResponseObject, Server as HapiServer } from "@hapi/hapi";
+
 import { Enums } from "@mainsail/constants";
 
 import { Utils as Utilities } from "../rcp/index.js";

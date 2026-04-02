@@ -1,5 +1,6 @@
+import type { Types } from "@mainsail/api-common";
+
 import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { BigNumber, validatorSetUnpack } from "@mainsail/utils";
@@ -14,7 +15,7 @@ export class CommitsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
 	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.ValidatorRoundRepositoryFactory;
 
-	public async show(request: Hapi.Request): Promise<object> {
+	public async show(request: Types.HapiRequest): Promise<object> {
 		const blockRepository = this.blockRepositoryFactory();
 		const validatorRoundRepository = this.validatorRoundRepositoryFactory();
 		const blockCriteria = this.getBlockCriteriaByIdOrHeight(request.params.id);

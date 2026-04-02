@@ -1,5 +1,6 @@
-import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
 import { assert } from "@mainsail/utils";
 
 import { ActionFactory } from "./action-factory.js";
@@ -68,11 +69,10 @@ export class ApplicationFactory {
 
 		// Paths
 		assert.string(package_.name);
-		app.bind(Identifiers.Cli.Paths.Console).toConstantValue(environmentPaths.get(package_.name));
-
-		const applicationName = package_.name?.split("/")[1];
+		const [namespace, applicationName] = package_.name?.split("/");
 		assert.string(applicationName);
 
+		app.bind(Identifiers.Cli.Paths.Console).toConstantValue(environmentPaths.get(namespace));
 		app.bind(Identifiers.Cli.Application.Name).toConstantValue(applicationName);
 
 		// Factories

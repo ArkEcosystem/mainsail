@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import Hapi from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class GetMessagesController implements Contracts.P2P.Controller {
@@ -12,7 +13,7 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 		request: Contracts.P2P.GetMessagesRequest,
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.GetMessagesResponse> {
-		const { blockNumber, round, validatorsSignedPrevote, validatorsSignedPrecommit } = request.payload.headers;
+		const { blockNumber, round, validatorsSignedPrecommit, validatorsSignedPrevote } = request.payload.headers;
 
 		const consensus = this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
 		const roundStateRepo = this.app.get<Contracts.Consensus.RoundStateRepository>(

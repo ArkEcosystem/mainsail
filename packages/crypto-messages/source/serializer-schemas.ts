@@ -1,4 +1,4 @@
-/* eslint-disable sort-keys-fix/sort-keys-fix */
+/* eslint-disable perfectionist/sort-objects */
 import type { Contracts } from "@mainsail/contracts";
 
 export const schemaForSignature: Record<string, Contracts.Serializer.SerializationSchema> = {

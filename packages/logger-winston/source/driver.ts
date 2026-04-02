@@ -1,5 +1,6 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { injectable } from "@mainsail/container";
 import { isEmpty } from "@mainsail/utils";
 import { inspect } from "util";
 import winston from "winston";

@@ -1,6 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
-import { BigNumber } from "@mainsail/utils";
 import type { FuncKeywordDefinition } from "ajv";
+
+import { BigNumber } from "@mainsail/utils";
 
 import { parseBlockNumber } from "./parse-block-number.js";
 

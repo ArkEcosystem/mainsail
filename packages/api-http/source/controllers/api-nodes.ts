@@ -1,4 +1,5 @@
-import Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
+
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -14,7 +15,7 @@ export class ApiNodesController extends Controller {
 	@inject(ApiDatabaseIdentifiers.ApiNodeRepositoryFactory)
 	private readonly apiNodeRepositoryFactory!: ApiDatabaseContracts.ApiNodeRepositoryFactory;
 
-	public async index(request: Hapi.Request): Promise<object> {
+	public async index(request: Types.HapiRequest): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.ApiNodeCriteria = request.query;
 		const sorting = this.getListingOrder(request);
@@ -30,7 +31,7 @@ export class ApiNodesController extends Controller {
 		return this.toPagination(apiNodes, ApiNodeResource);
 	}
 
-	protected getListingOptions(_request: Hapi.Request): Search.Options {
+	protected getListingOptions(_request: Types.HapiRequest): Search.Options {
 		return {
 			estimateTotalCount: false,
 		};

@@ -1,3 +1,5 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -6,7 +8,6 @@ import {
 } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { parseTransactionError } from "@mainsail/evm-contracts";
 import { assert, BigNumber, chunk, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
@@ -180,9 +181,9 @@ export class Sync implements Contracts.ApiSync.Service {
 
 			const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
 			const {
-				tokens: parsedTokens,
-				tokenHolders: parsedTokenHolders,
 				tokenActions: parsedTokenActions,
+				tokenHolders: parsedTokenHolders,
+				tokens: parsedTokens,
 			} = await this.tokenParser.parseReceipt(header, transaction, receipt);
 
 			transactions.push({

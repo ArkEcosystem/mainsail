@@ -1,6 +1,7 @@
 import type { Boom } from "@hapi/boom";
-import { notFound } from "@hapi/boom";
 import type { Contracts } from "@mainsail/contracts";
+
+import { notFound } from "@hapi/boom";
 
 export type WebhookResponse = Contracts.Webhooks.Webhook & { token?: string };
 
