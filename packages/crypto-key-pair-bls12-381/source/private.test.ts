@@ -25,14 +25,15 @@ describe<{ app: Application; factory: PrivateKeyFactory }>("PrivateKeyFactory", 
 		context.factory = context.app.resolve(PrivateKeyFactory);
 	});
 
-	each("#fromMnemonic - should derive from an mnemonic", async ({ context: { factory }, dataset: wallet }) => {
-		assert.is(
-			await factory.fromMnemonic(wallet.mnemonic),
-			wallet.validatorPrivateKey,
-		);
-	}, wallets);
+	each(
+		"#fromMnemonic - should derive from an mnemonic",
+		async ({ context: { factory }, dataset: wallet }) => {
+			assert.is(await factory.fromMnemonic(wallet.mnemonic), wallet.validatorPrivateKey);
+		},
+		wallets,
+	);
 
-	it("#fromWIF - should throw NotImplemented", async ({  factory }) => {
+	it("#fromWIF - should throw NotImplemented", async ({ factory }) => {
 		await assert.rejects(() => factory.fromWIF(""), NotImplemented);
 	});
 });

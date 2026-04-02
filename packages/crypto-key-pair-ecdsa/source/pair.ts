@@ -24,7 +24,7 @@ export class KeyPairFactory implements Contracts.Crypto.KeyPairFactory {
 	}
 
 	public async fromWIF(wif: string): Promise<Contracts.Crypto.KeyPair> {
-		const networkVersion = this.configuration.get<number>("network.wif")
+		const networkVersion = this.configuration.get<number>("network.wif");
 		const decoded = decode(wif);
 
 		if (decoded.version !== networkVersion) {

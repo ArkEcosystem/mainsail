@@ -17,14 +17,18 @@ describe<{
 		context.serializer = context.app.resolve(PublicKeySerializer);
 	});
 
-	each("#serialize - should serialize and deserialize address", async ({  context: { serializer }, dataset: wallet }) => {
-		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(100));
+	each(
+		"#serialize - should serialize and deserialize address",
+		async ({ context: { serializer }, dataset: wallet }) => {
+			const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(100));
 
-		serializer.serialize(byteBuffer, wallet.validatorPublicKey);
-		byteBuffer.reset();
+			serializer.serialize(byteBuffer, wallet.validatorPublicKey);
+			byteBuffer.reset();
 
-		const readBuffer = serializer.deserialize(byteBuffer);
+			const readBuffer = serializer.deserialize(byteBuffer);
 
-		assert.equal(readBuffer.toString("hex"), wallet.validatorPublicKey);
-	}, wallets);
+			assert.equal(readBuffer.toString("hex"), wallet.validatorPublicKey);
+		},
+		wallets,
+	);
 });

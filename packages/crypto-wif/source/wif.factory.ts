@@ -36,7 +36,7 @@ export class WIFFactory implements Contracts.Crypto.WIFFactory {
 		compressed: boolean;
 		privateKey: string;
 	}> {
-		const networkVersion = this.configuration.get<number>("network.wif")
+		const networkVersion = this.configuration.get<number>("network.wif");
 		const decoded = decode(wif);
 
 		if (decoded.version !== networkVersion) {
@@ -46,6 +46,6 @@ export class WIFFactory implements Contracts.Crypto.WIFFactory {
 		return {
 			compressed: decoded.compressed,
 			privateKey: Buffer.from(decoded.privateKey).toString("hex"),
-		}
+		};
 	}
 }

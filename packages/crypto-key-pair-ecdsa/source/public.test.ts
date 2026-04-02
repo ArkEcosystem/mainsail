@@ -26,19 +26,21 @@ describe<{ app: Application; factory: PublicKeyFactory }>("PrivateKeyFactory", (
 		context.factory = context.app.resolve(PublicKeyFactory);
 	});
 
-	each("should derive a key pair from an mnemonic", async ({ context: { factory }, dataset: wallet }) => {
-		assert.is(
-			await factory.fromMnemonic(wallet.mnemonic),
-			wallet.publicKey,
-		);
-	}, wallets);
+	each(
+		"should derive a key pair from an mnemonic",
+		async ({ context: { factory }, dataset: wallet }) => {
+			assert.is(await factory.fromMnemonic(wallet.mnemonic), wallet.publicKey);
+		},
+		wallets,
+	);
 
-	each("should derive from a WIF", async ({ context: { factory }, dataset: wallet }) => {
-		assert.is(
-			await factory.fromWIF(wallet.wif),
-			wallet.publicKey,
-		);
-	}, wallets);
+	each(
+		"should derive from a WIF",
+		async ({ context: { factory }, dataset: wallet }) => {
+			assert.is(await factory.fromWIF(wallet.wif), wallet.publicKey);
+		},
+		wallets,
+	);
 
 	it("should derive from a musig", async ({ factory }) => {
 		assert.is(

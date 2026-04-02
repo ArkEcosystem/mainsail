@@ -25,47 +25,60 @@ describe<{
 		context.factory = context.app.resolve(KeyPairFactory);
 	});
 
-
-	each("#fromMnemonic - should derive a key pair", async ({ context: { factory }, dataset: wallet }) => {
-		assert.equal(await factory.fromMnemonic(wallet.mnemonic), {
-			compressed: true,
-			privateKey: wallet.privateKey,
-			publicKey: wallet.publicKey,
-		});
-	}, wallets);
-
-	each("#fromPrivateKey - should derive a key pair", async ({ context: { factory }, dataset: wallet }) => {
-		assert.equal(
-			await factory.fromPrivateKey(
-				Buffer.from(wallet.privateKey, "hex"),
-			),
-			{
+	each(
+		"#fromMnemonic - should derive a key pair",
+		async ({ context: { factory }, dataset: wallet }) => {
+			assert.equal(await factory.fromMnemonic(wallet.mnemonic), {
 				compressed: true,
 				privateKey: wallet.privateKey,
 				publicKey: wallet.publicKey,
-			},
-		);
-	}, wallets);
+			});
+		},
+		wallets,
+	);
 
-	each("#fromWIF - should derive a key pair from a WIF", async ({ context: { factory }, dataset: wallet }) => {
-		assert.equal(await factory.fromWIF(wallet.wif), {
-			compressed: true,
-			privateKey: wallet.privateKey,
-			publicKey: wallet.publicKey,
-		});
-	}, wallets);
+	each(
+		"#fromPrivateKey - should derive a key pair",
+		async ({ context: { factory }, dataset: wallet }) => {
+			assert.equal(await factory.fromPrivateKey(Buffer.from(wallet.privateKey, "hex")), {
+				compressed: true,
+				privateKey: wallet.privateKey,
+				publicKey: wallet.publicKey,
+			});
+		},
+		wallets,
+	);
 
+	each(
+		"#fromWIF - should derive a key pair from a WIF",
+		async ({ context: { factory }, dataset: wallet }) => {
+			assert.equal(await factory.fromWIF(wallet.wif), {
+				compressed: true,
+				privateKey: wallet.privateKey,
+				publicKey: wallet.publicKey,
+			});
+		},
+		wallets,
+	);
 
-	each("#fromWIF - should derive a key pair from a WIF 170", async ({ context: { factory, configuration }, dataset: wallet }) => {
-		configuration.set("network.wif", 170);
-		assert.equal(await factory.fromWIF(wallet.wif170), {
-			compressed: true,
-			privateKey: wallet.privateKey,
-			publicKey: wallet.publicKey,
-		});
-	}, wallets);
+	each(
+		"#fromWIF - should derive a key pair from a WIF 170",
+		async ({ context: { factory, configuration }, dataset: wallet }) => {
+			configuration.set("network.wif", 170);
+			assert.equal(await factory.fromWIF(wallet.wif170), {
+				compressed: true,
+				privateKey: wallet.privateKey,
+				publicKey: wallet.publicKey,
+			});
+		},
+		wallets,
+	);
 
-	each("#fromWIF - should derive a key pair from a WIF 170", async ({ context: { factory }, dataset: wallet }) => {
-		await assert.rejects(() => factory.fromWIF(wallet.wif170), WifNetworkError);
-	}, wallets);
+	each(
+		"#fromWIF - should derive a key pair from a WIF 170",
+		async ({ context: { factory }, dataset: wallet }) => {
+			await assert.rejects(() => factory.fromWIF(wallet.wif170), WifNetworkError);
+		},
+		wallets,
+	);
 });

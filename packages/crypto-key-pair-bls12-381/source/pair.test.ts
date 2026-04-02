@@ -23,28 +23,31 @@ describe<{ app: Application; factory: KeyPairFactory }>("KeyPairFactory", ({ ass
 		context.factory = context.app.resolve(KeyPairFactory);
 	});
 
-	each("#fromMnemonic - should derive a key pair from mnemonic", async ({ context: { factory }, dataset: wallet }) => {
-		assert.equal(await factory.fromMnemonic(wallet.mnemonic), {
-			compressed: true,
-			privateKey: wallet.validatorPrivateKey,
-			publicKey: wallet.validatorPublicKey,
-		});
-	}, wallets);
-
-	each("#fromPrivateKey - should derive a key pair from a private key", async ({ context: { factory }, dataset: wallet }) => {
-		assert.equal(
-			await factory.fromPrivateKey(
-				Buffer.from(wallet.validatorPrivateKey, "hex"),
-			),
-			{
+	each(
+		"#fromMnemonic - should derive a key pair from mnemonic",
+		async ({ context: { factory }, dataset: wallet }) => {
+			assert.equal(await factory.fromMnemonic(wallet.mnemonic), {
 				compressed: true,
 				privateKey: wallet.validatorPrivateKey,
 				publicKey: wallet.validatorPublicKey,
-			},
-		);
-	}, wallets);
+			});
+		},
+		wallets,
+	);
 
-	it("#fromWIF - should throw NotImplemented", async ({  factory }) => {
+	each(
+		"#fromPrivateKey - should derive a key pair from a private key",
+		async ({ context: { factory }, dataset: wallet }) => {
+			assert.equal(await factory.fromPrivateKey(Buffer.from(wallet.validatorPrivateKey, "hex")), {
+				compressed: true,
+				privateKey: wallet.validatorPrivateKey,
+				publicKey: wallet.validatorPublicKey,
+			});
+		},
+		wallets,
+	);
+
+	it("#fromWIF - should throw NotImplemented", async ({ factory }) => {
 		await assert.rejects(() => factory.fromWIF(""), NotImplemented);
 	});
 });

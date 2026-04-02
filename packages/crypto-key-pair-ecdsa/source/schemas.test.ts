@@ -30,9 +30,13 @@ describe<{
 		}
 	});
 
-	each("publicKey - should be ok", async ({ context: { validator }, dataset: wallet }) => {
-		assert.undefined(validator.validate("publicKey", wallet.publicKey).error);
-	}, wallets);
+	each(
+		"publicKey - should be ok",
+		async ({ context: { validator }, dataset: wallet }) => {
+			assert.undefined(validator.validate("publicKey", wallet.publicKey).error);
+		},
+		wallets,
+	);
 
 	it("publicKey - should be ok for valid chars", ({ validator }) => {
 		assert.undefined(validator.validate("publicKey", "0".repeat(length)).error);

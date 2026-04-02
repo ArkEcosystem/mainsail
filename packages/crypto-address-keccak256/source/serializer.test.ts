@@ -24,16 +24,20 @@ describe<{
 		context.factory = context.app.resolve(AddressFactory);
 	});
 
-	each("#serialize & #deserialize - should serialize and deserialize address", async ({ context: { factory, serializer }, dataset: wallet }) => {
-		const buffer = await factory.toBuffer(wallet.address);
+	each(
+		"#serialize & #deserialize - should serialize and deserialize address",
+		async ({ context: { factory, serializer }, dataset: wallet }) => {
+			const buffer = await factory.toBuffer(wallet.address);
 
-		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(100));
+			const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(100));
 
-		serializer.serialize(byteBuffer, buffer);
-		byteBuffer.reset();
+			serializer.serialize(byteBuffer, buffer);
+			byteBuffer.reset();
 
-		const readBuffer = serializer.deserialize(byteBuffer);
+			const readBuffer = serializer.deserialize(byteBuffer);
 
-		assert.equal(await factory.fromBuffer(readBuffer), wallet.address);
-	}, wallets);
+			assert.equal(await factory.fromBuffer(readBuffer), wallet.address);
+		},
+		wallets,
+	);
 });

@@ -13,7 +13,7 @@ import { AddressFactory } from "./address.factory";
 const mnemonic = "this is a top secret mnemonic";
 const wif = "UfDzkBsi7xxjq491zm5tk7rCZ1EouBXsFUWaCvQWxAortbh1zq5T";
 
-describe<{ app: Application, factory: AddressFactory }>("AddressFactory", ({ assert, beforeEach, it }) => {
+describe<{ app: Application; factory: AddressFactory }>("AddressFactory", ({ assert, beforeEach, it }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
 		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
@@ -26,10 +26,7 @@ describe<{ app: Application, factory: AddressFactory }>("AddressFactory", ({ ass
 	});
 
 	it("#fromMnemonic - should derive an address from an mnemonic", async ({ factory }) => {
-		assert.is(
-			await factory.fromMnemonic(mnemonic),
-			"DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa",
-		);
+		assert.is(await factory.fromMnemonic(mnemonic), "DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa");
 	});
 
 	it("#fromMultiSignatureAsset - should derive an address from multi signature address", async ({ factory }) => {
@@ -59,9 +56,7 @@ describe<{ app: Application, factory: AddressFactory }>("AddressFactory", ({ ass
 
 	it("#validate - should validate addresses", async ({ factory }) => {
 		assert.true(await factory.validate("DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa"));
-		assert.false(
-			await factory.validate("m0d1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"),
-		);
+		assert.false(await factory.validate("m0d1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"));
 	});
 
 	it("#toBuffer & #fromBuffer - should convert between buffer", async ({ factory }) => {
@@ -72,9 +67,7 @@ describe<{ app: Application, factory: AddressFactory }>("AddressFactory", ({ ass
 	});
 
 	it("should throw if pubKeyHash doesn't match", async ({ factory, app }) => {
-		app
-			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-			.set("network.pubKeyHash", 44);
+		app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).set("network.pubKeyHash", 44);
 
 		await assert.rejects(
 			() => factory.toBuffer("DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa"),
