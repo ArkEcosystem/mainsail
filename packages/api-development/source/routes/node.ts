@@ -1,4 +1,4 @@
-import type Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import type { Contracts } from "@mainsail/contracts";
 
 import { NodeController } from "../controllers/node.js";
@@ -8,19 +8,19 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	server.bind(controller);
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.status(request),
+		handler: (request: Types.HapiRequest) => controller.status(request),
 		method: "GET",
 		path: "/node/status",
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.configurationNode(request),
+		handler: (request: Types.HapiRequest) => controller.configurationNode(request),
 		method: "GET",
 		path: "/node/configuration",
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.configurationCrypto(request),
+		handler: (request: Types.HapiRequest) => controller.configurationCrypto(request),
 		method: "GET",
 		path: "/node/configuration/crypto",
 	});

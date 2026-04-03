@@ -1,4 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
+
 import { Application } from "@mainsail/kernel";
 
 export const Builder = {

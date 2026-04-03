@@ -1,3 +1,5 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -5,7 +7,6 @@ import {
 } from "@mainsail/api-database";
 import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { http } from "@mainsail/utils";
 
 import { isValidPgTimestamptz, sanitizeComment } from "./sanitizers.js";

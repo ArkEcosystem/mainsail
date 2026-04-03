@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Commands } from "@mainsail/cli";
 import { BuildPackages, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
 

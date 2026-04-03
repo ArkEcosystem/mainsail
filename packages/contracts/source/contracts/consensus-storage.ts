@@ -3,9 +3,9 @@ import type { Message, Proposal } from "./crypto/index.js";
 
 export interface Service {
 	persist({
-		state,
-		proposals,
 		messages,
+		proposals,
+		state,
 	}: {
 		state: State;
 		proposals: Proposal[];

@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { NamedPlugin, Plugin } from "@hapi/hapi";
 import { Enums, Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 

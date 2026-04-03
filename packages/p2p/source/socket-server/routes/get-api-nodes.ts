@@ -1,5 +1,6 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { injectable } from "@mainsail/container";
 
 import { Routes } from "../../enums.js";
 import { Codecs } from "../codecs/index.js";

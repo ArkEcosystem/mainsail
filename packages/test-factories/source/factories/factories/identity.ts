@@ -1,8 +1,10 @@
-import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
 import { generateMnemonic } from "bip39";
 
 import type { FactoryBuilder } from "../factory-builder.js";
+
 import { generateApp } from "./generate-app.js";
 
 type Options = {

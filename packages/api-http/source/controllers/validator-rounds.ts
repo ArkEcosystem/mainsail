@@ -1,5 +1,6 @@
+import type { Types } from "@mainsail/api-common";
+
 import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
@@ -12,7 +13,7 @@ export class ValidatorRoundsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
 	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.ValidatorRoundRepositoryFactory;
 
-	public async index(request: Hapi.Request): Promise<object> {
+	public async index(request: Types.HapiRequest): Promise<object> {
 		const pagination = this.getQueryPagination(request.query);
 
 		const [validatorRounds, totalCount] = await this.validatorRoundRepositoryFactory()
@@ -33,7 +34,7 @@ export class ValidatorRoundsController extends Controller {
 		);
 	}
 
-	public async show(request: Hapi.Request): Promise<object> {
+	public async show(request: Types.HapiRequest): Promise<object> {
 		const validatorRounds = await this.validatorRoundRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -47,7 +48,7 @@ export class ValidatorRoundsController extends Controller {
 		return this.respondWithResource(validatorRounds, ValidatorRoundResource);
 	}
 
-	public async validators(request: Hapi.Request): Promise<object> {
+	public async validators(request: Types.HapiRequest): Promise<object> {
 		const round = await this.validatorRoundRepositoryFactory()
 			.createQueryBuilder()
 			.select()

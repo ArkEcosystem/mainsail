@@ -19,14 +19,14 @@ export class Application {
 		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
 	): Contracts.Kernel.Container.BindToFluentSyntax<T> {
 		if (this.#container.isBound(serviceIdentifier)) {
-			this.#container.unbindSync(serviceIdentifier);
+			this.#container.unbind(serviceIdentifier);
 		}
 
 		return this.#container.bind(serviceIdentifier);
 	}
 
 	public unbind<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): void {
-		return this.#container.unbindSync(serviceIdentifier);
+		return this.#container.unbind(serviceIdentifier);
 	}
 
 	public get<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): T {

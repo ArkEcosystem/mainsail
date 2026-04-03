@@ -1,6 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
-import { BigNumber } from "@mainsail/utils";
 import type { AnySchemaObject, FuncKeywordDefinition } from "ajv";
+
+import { BigNumber } from "@mainsail/utils";
 
 export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
@@ -32,7 +33,7 @@ export const makeKeywords = (
 
 			return (data, parentSchema: AnySchemaObject) => {
 				const {
-					gas: { minimumGasPrice, maximumGasPrice },
+					gas: { maximumGasPrice, minimumGasPrice },
 				} = configuration.getMilestone();
 
 				try {
@@ -87,7 +88,7 @@ export const makeKeywords = (
 		compile() {
 			return (data) => {
 				const {
-					gas: { minimumGasLimit, maximumGasLimit },
+					gas: { maximumGasLimit, minimumGasLimit },
 				} = configuration.getMilestone();
 
 				try {

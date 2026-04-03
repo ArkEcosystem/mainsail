@@ -1,11 +1,11 @@
-import { Enums, Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Enums, Identifiers } from "@mainsail/constants";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, MultiPaymentAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { decodeFunctionResult, encodeFunctionData, parseEther, toBytes, toHex, zeroAddress } from "viem";
 
-import { default as DARK20 } from "./abis/DARK20.json" with { type: "json" };
 import type {
 	Context,
 	EvmCallOptions,
@@ -16,13 +16,15 @@ import type {
 	ValidatorResignationOptions,
 	VoteOptions,
 } from "./types.js";
+
+import { default as DARK20 } from "./abis/DARK20.json" with { type: "json" };
 import { buildSignedTransaction, getAddressByPublicKey } from "./utilities.js";
 
 export const makeEvmCall = async (
 	{ app, wallets }: Context,
 	options: EvmCallOptions = {},
 ): Promise<Contracts.Crypto.Transaction> => {
-	let { value, sender, recipient, gasPrice, gasLimit, payload } = options;
+	let { gasLimit, gasPrice, payload, recipient, sender, value } = options;
 	sender = sender ?? wallets[0];
 
 	gasPrice = gasPrice ?? 5 * 1e9;
@@ -54,7 +56,7 @@ export const makeEvmCallDeployErc20Contract = async (
 	{ app, wallets }: Context,
 	options: EvmCallOptions = {},
 ): Promise<Contracts.Crypto.Transaction> => {
-	let { sender, gasPrice, gasLimit, payload } = options;
+	let { gasLimit, gasPrice, payload, sender } = options;
 	sender = sender ?? wallets[0];
 
 	gasPrice = gasPrice ?? 5 * 1e9;
@@ -76,7 +78,7 @@ export const makeValidatorRegistration = async (
 	{ app, wallets }: Context,
 	options: ValidatorRegistrationOptions = {},
 ): Promise<Contracts.Crypto.Transaction> => {
-	let { value, sender, recipient, gasPrice, gasLimit, payload } = options;
+	let { gasLimit, gasPrice, payload, recipient, sender, value } = options;
 	sender = sender ?? wallets[0];
 
 	gasPrice = gasPrice ?? 5 * 1e9;
@@ -113,7 +115,7 @@ export const makeValidatorResignation = async (
 	{ app, wallets }: Context,
 	options: ValidatorResignationOptions = {},
 ): Promise<Contracts.Crypto.Transaction> => {
-	let { sender, recipient, gasPrice, gasLimit, payload } = options;
+	let { gasLimit, gasPrice, payload, recipient, sender } = options;
 	sender = sender ?? wallets[0];
 
 	gasPrice = gasPrice ?? 5 * 1e9;
@@ -144,7 +146,7 @@ export const makeValidatorVote = async (
 	{ app, wallets }: Context,
 	options: VoteOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
-	let { sender, recipient, gasPrice, gasLimit, payload } = options;
+	let { gasLimit, gasPrice, payload, recipient, sender } = options;
 	sender = sender ?? wallets[0];
 
 	gasPrice = gasPrice ?? 5 * 1e9;
@@ -175,7 +177,7 @@ export const makeValidatorUnvote = async (
 	{ app, wallets }: Context,
 	options: UnvoteOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
-	let { sender, recipient, gasPrice, gasLimit, payload } = options;
+	let { gasLimit, gasPrice, payload, recipient, sender } = options;
 	sender = sender ?? wallets[0];
 
 	gasPrice = gasPrice ?? 5 * 1e9;
@@ -206,7 +208,7 @@ export const makeUsernameRegistration = async (
 	{ app, wallets }: Context,
 	options: UsernameRegistrationOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
-	let { sender, recipient, gasPrice, gasLimit, payload } = options;
+	let { gasLimit, gasPrice, payload, recipient, sender } = options;
 	sender = sender ?? wallets[0];
 
 	gasPrice = gasPrice ?? 5 * 1e9;
@@ -237,7 +239,7 @@ export const makeUsernameResignation = async (
 	{ app, wallets }: Context,
 	options: UsernameResignationOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
-	let { sender, recipient, gasPrice, gasLimit, payload } = options;
+	let { gasLimit, gasPrice, payload, recipient, sender } = options;
 	sender = sender ?? wallets[0];
 
 	gasPrice = gasPrice ?? 5 * 1e9;

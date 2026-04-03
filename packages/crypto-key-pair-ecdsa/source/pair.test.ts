@@ -1,52 +1,84 @@
 import { Application } from "@mainsail/kernel";
 import { Identifiers } from "@mainsail/constants";
-import { Configuration } from "@mainsail/crypto-config";
+import { Contracts } from "@mainsail/contracts";
+import { WifNetworkError } from "@mainsail/exceptions";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 
 import { describe } from "@mainsail/test-runner";
 import { KeyPairFactory } from "./pair";
-
-const mnemonic =
-	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
+import { wallets } from "../../crypto-wif/test/index.js";
+import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 
 describe<{
 	app: Application;
 	factory: KeyPairFactory;
-}>("KeyPairFactory", ({ assert, beforeEach, it }) => {
+	configuration: Contracts.Crypto.Configuration;
+}>("KeyPairFactory", ({ assert, beforeEach, it, each }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
+		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
 		await context.app.resolve(ValidationServiceProvider).register();
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		await context.app.resolve(CryptoConfigServiceProvider).register();
 
+		context.configuration = context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 		context.factory = context.app.resolve(KeyPairFactory);
 	});
 
-	it("should derive a key pair from an mnemonic", async ({ factory }) => {
-		assert.equal(await factory.fromMnemonic(mnemonic), {
-			compressed: true,
-			privateKey: "814857ce48e291893feab95df02e1dbf7ad3994ba46f247f77e4eefd5d8734a2",
-			publicKey: "03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f",
-		});
-	});
-
-	it("should derive a key pair from an mnemonic", async ({ factory }) => {
-		assert.equal(
-			await factory.fromPrivateKey(
-				Buffer.from("814857ce48e291893feab95df02e1dbf7ad3994ba46f247f77e4eefd5d8734a2", "hex"),
-			),
-			{
+	each(
+		"#fromMnemonic - should derive a key pair",
+		async ({ context: { factory }, dataset: wallet }) => {
+			assert.equal(await factory.fromMnemonic(wallet.mnemonic), {
 				compressed: true,
-				privateKey: "814857ce48e291893feab95df02e1dbf7ad3994ba46f247f77e4eefd5d8734a2",
-				publicKey: "03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f",
-			},
-		);
-	});
+				privateKey: wallet.privateKey,
+				publicKey: wallet.publicKey,
+			});
+		},
+		wallets,
+	);
 
-	it("should derive from a WIF", async ({ factory }) => {
-		assert.equal(await factory.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"), {
-			compressed: true,
-			privateKey: "0000000000000000000000000000000000000000000000000000000000000001",
-			publicKey: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
-		});
-	});
+	each(
+		"#fromPrivateKey - should derive a key pair",
+		async ({ context: { factory }, dataset: wallet }) => {
+			assert.equal(await factory.fromPrivateKey(Buffer.from(wallet.privateKey, "hex")), {
+				compressed: true,
+				privateKey: wallet.privateKey,
+				publicKey: wallet.publicKey,
+			});
+		},
+		wallets,
+	);
+
+	each(
+		"#fromWIF - should derive a key pair from a WIF",
+		async ({ context: { factory }, dataset: wallet }) => {
+			assert.equal(await factory.fromWIF(wallet.wif), {
+				compressed: true,
+				privateKey: wallet.privateKey,
+				publicKey: wallet.publicKey,
+			});
+		},
+		wallets,
+	);
+
+	each(
+		"#fromWIF - should derive a key pair from a WIF 170",
+		async ({ context: { factory, configuration }, dataset: wallet }) => {
+			configuration.set("network.wif", 170);
+			assert.equal(await factory.fromWIF(wallet.wif170), {
+				compressed: true,
+				privateKey: wallet.privateKey,
+				publicKey: wallet.publicKey,
+			});
+		},
+		wallets,
+	);
+
+	each(
+		"#fromWIF - should derive a key pair from a WIF 170",
+		async ({ context: { factory }, dataset: wallet }) => {
+			await assert.rejects(() => factory.fromWIF(wallet.wif170), WifNetworkError);
+		},
+		wallets,
+	);
 });

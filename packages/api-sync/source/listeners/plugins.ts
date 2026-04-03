@@ -1,3 +1,5 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -6,7 +8,6 @@ import {
 } from "@mainsail/api-database";
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";

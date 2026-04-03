@@ -9,15 +9,6 @@
 		],
 		"production": ["default"]
 	},
-	"tasksRunnerOptions": {
-		"default": {
-			"runner": "nx/tasks-runners/default",
-			"options": {
-				"cacheableOperations": ["build"],
-				"cacheDirectory": "./.cache"
-			}
-		}
-	},
 	"targetDefaults": {
 		"build": {
 			"dependsOn": ["^build"],
@@ -28,8 +19,11 @@
 				"{projectRoot}/index.d.ts",
 				"{projectRoot}/index.js",
 				"{projectRoot}/evm.*.node"
-			]
+			],
+			"cache": true
 		}
 	},
-	"$schema": "./node_modules/nx/schemas/nx-schema.json"
+	"$schema": "./node_modules/nx/schemas/nx-schema.json",
+	"cacheDirectory": "./.cache",
+	"analytics": false
 }

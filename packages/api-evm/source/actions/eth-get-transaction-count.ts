@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { getHistoryHeightFromBlockTag } from "../utils/resolve-block-tag.js";
 

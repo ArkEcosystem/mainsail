@@ -1,6 +1,7 @@
+import type { IBls } from "@chainsafe/bls/types";
+
 /* c8 ignore start */
 import { getImplementation } from "@chainsafe/bls/getImplementation";
-import type { IBls } from "@chainsafe/bls/types";
 
 let _bls: IBls | undefined;
 export const getBls = async (): Promise<IBls> => {

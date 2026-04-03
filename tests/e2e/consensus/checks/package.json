@@ -1,5 +1,5 @@
 {
-	"name": "checks",
+	"name": "consensus-checks",
 	"type": "module",
 	"dependencies": {
 		"express": "4.19.2",

@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { Services } from "@mainsail/kernel";
 
 import { ApiNodeProcessor } from "../api-node-processor.js";

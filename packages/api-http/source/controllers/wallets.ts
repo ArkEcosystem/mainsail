@@ -1,10 +1,12 @@
+import type { Types } from "@mainsail/api-common";
+
 import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 	Search,
+	TypeOrm,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { FunctionSigs } from "@mainsail/evm-contracts";
@@ -29,6 +31,24 @@ type TokenMetadata = {
 	supply: string;
 };
 
+type WalletActivityRaw = {
+	transactionHash: string;
+	blockNumber: number;
+	transactionIndex: number;
+	index: number;
+	timestamp: number;
+	from: string;
+	to: string;
+	value: string;
+	functionSig: Buffer;
+	action?: string;
+
+	tokenAddress?: string;
+	tokenName?: string;
+	tokenSymbol?: string;
+	tokenDecimals?: number;
+};
+
 @injectable()
 export class WalletsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
@@ -37,10 +57,13 @@ export class WalletsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TokenRepositoryFactory)
 	private readonly tokenRepositoryFactory!: ApiDatabaseContracts.TokenRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.TokenActionRepositoryFactory)
+	private readonly tokenActionRepositoryFactory!: ApiDatabaseContracts.TokenActionRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.TokenHolderRepositoryFactory)
 	private readonly tokenHolderRepositoryFactory!: ApiDatabaseContracts.TokenHolderRepositoryFactory;
 
-	public async index(request: Hapi.Request): Promise<object> {
+	public async index(request: Types.HapiRequest): Promise<object> {
 		const criteria: Search.Criteria.WalletCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
@@ -51,7 +74,7 @@ export class WalletsController extends Controller {
 		return this.toPagination(wallets, WalletResource);
 	}
 
-	public async top(request: Hapi.Request): Promise<object> {
+	public async top(request: Types.HapiRequest): Promise<object> {
 		const criteria: Search.Criteria.WalletCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
@@ -62,7 +85,7 @@ export class WalletsController extends Controller {
 		return this.toPagination(wallets, WalletResource);
 	}
 
-	public async show(request: Hapi.Request): Promise<object> {
+	public async show(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -70,7 +93,7 @@ export class WalletsController extends Controller {
 		return this.respondWithResource(wallet, WalletResource);
 	}
 
-	public async transactions(request: Hapi.Request): Promise<object> {
+	public async transactions(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -81,7 +104,7 @@ export class WalletsController extends Controller {
 		return this.getTransactions(request, { address: wallet.address });
 	}
 
-	public async transactionsSent(request: Hapi.Request): Promise<object> {
+	public async transactionsSent(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -96,7 +119,7 @@ export class WalletsController extends Controller {
 		return this.getTransactions(request, { senderPublicKey: wallet.publicKey });
 	}
 
-	public async transactionsReceived(request: Hapi.Request): Promise<object> {
+	public async transactionsReceived(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -107,7 +130,7 @@ export class WalletsController extends Controller {
 		return this.getTransactions(request, { to: wallet.address });
 	}
 
-	public async votes(request: Hapi.Request): Promise<object> {
+	public async votes(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -125,7 +148,7 @@ export class WalletsController extends Controller {
 		});
 	}
 
-	public async tokens(request: Hapi.Request): Promise<object> {
+	public async tokens(request: Types.HapiRequest): Promise<object> {
 		if (!request.query.addresses) {
 			return this.getEmptyPage();
 		}
@@ -250,13 +273,164 @@ export class WalletsController extends Controller {
 		);
 	}
 
-	public async tokensShow(request: Hapi.Request): Promise<object> {
+	public async tokensShow(request: Types.HapiRequest): Promise<object> {
 		const walletId = request.params.id as string;
 		const wallet = await this.getWallet(walletId);
 		return this.getTokens(request, wallet?.address ?? walletId);
 	}
 
-	private async getTransactions(request: Hapi.Request, criteria: Search.Criteria.TransactionCriteria) {
+	public async activity(request: Types.HapiRequest): Promise<object> {
+		const pagination = this.getListingPage(request);
+
+		const addresses = Array.isArray(request.query.addresses) ? request.query.addresses : [request.query.addresses];
+
+		if (addresses.length === 0) {
+			return [];
+		}
+
+		// Transactions
+		const transactionsQuery = this.transactionRepositoryFactory()
+			.createQueryBuilder("t")
+			.leftJoin(Models.Token, "tok", `tok.address = t."to"`);
+
+		transactionsQuery.andWhere(
+			new TypeOrm.Brackets((b) => {
+				b.where("t.from IN (:...addresses)", { addresses }).orWhere("t.to IN (:...addresses)", {
+					addresses,
+				});
+			}),
+		);
+
+		const queryTransactions = transactionsQuery
+			.clone()
+			.select([
+				't."hash" AS "transactionHash"',
+				't."timestamp" AS "timestamp"',
+				't."block_number" AS "blockNumber"',
+				't."transaction_index" AS "transactionIndex"',
+				'NULL AS "index"',
+				't."from" AS "from"',
+				't."to" AS "to"',
+				't."value" AS "value"',
+				'NULL AS "action"',
+				'SUBSTRING(t."data" FROM 1 FOR 4) AS "functionSig"',
+
+				'tok."address" AS "tokenAddress"',
+				'tok."name" AS "tokenName"',
+				'tok."symbol" AS "tokenSymbol"',
+				'tok."decimals" AS "tokenDecimals"',
+			])
+			.orderBy("t.block_number", "DESC")
+			.addOrderBy("t.transaction_index", "DESC");
+
+		// Actions
+		const tokenActionsQuery = this.tokenActionRepositoryFactory()
+			.createQueryBuilder("ta")
+			.innerJoin(Models.Token, "tok", "tok.address = ta.address");
+
+		TokensController.andWhereWhitelisted(tokenActionsQuery, request);
+
+		tokenActionsQuery.andWhere(
+			new TypeOrm.Brackets((b) => {
+				b.where("ta.from IN (:...addresses)", { addresses }).orWhere("ta.to IN (:...addresses)", {
+					addresses,
+				});
+			}),
+		);
+
+		const queryTokenActions = tokenActionsQuery
+			.clone()
+			.select([
+				'ta."transaction_hash" AS "transactionHash"',
+				't."timestamp" AS "timestamp"',
+				't."block_number" AS "blockNumber"',
+				't."transaction_index" AS "transactionIndex"',
+				'ta."index" AS "index"',
+				'ta."from" AS "from"',
+				'ta."to" AS "to"',
+				'ta."value" AS "value"',
+				'ta."action" AS "action"',
+				'SUBSTRING(t."data" FROM 1 FOR 4) AS "functionSig"',
+
+				'tok."address" AS "tokenAddress"',
+				'tok."name" AS "tokenName"',
+				'tok."symbol" AS "tokenSymbol"',
+				'tok."decimals" AS "tokenDecimals"',
+			])
+			.innerJoin(Models.Transaction, "t", "t.hash = ta.transaction_hash")
+			.orderBy("ta.block_number", "DESC")
+			.addOrderBy("t.transaction_index", "DESC")
+			.addOrderBy("ta.index", "DESC", "NULLS LAST");
+
+		const parameters = {
+			...queryTransactions.getParameters(),
+			...queryTokenActions.getParameters(),
+		};
+
+		const unionCte = `(${queryTransactions.getQuery()})
+						UNION ALL
+					(${queryTokenActions.getQuery()})
+				`;
+
+		const [walletActivityRows, totalCountRow] = await Promise.all([
+			this.dataSource
+				.createQueryBuilder()
+				.addCommonTableExpression(unionCte, "unioned")
+				.select("u.*")
+				.from("unioned", "u")
+				.limit(pagination.limit)
+				.offset(pagination.offset)
+				.addOrderBy(`"blockNumber"`, "DESC")
+				.addOrderBy(`"transactionIndex"`, "DESC")
+				.addOrderBy(`"index"`, "DESC", "NULLS LAST")
+				.setParameters({
+					...parameters,
+				})
+				.getRawMany<WalletActivityRaw>(),
+			this.dataSource
+				.createQueryBuilder()
+				.addCommonTableExpression(unionCte, "unioned")
+				.select("COUNT(1)")
+				.from("unioned", "u")
+				.setParameters({
+					...parameters,
+				})
+				.getRawOne(),
+		]);
+
+		const totalCount = Number(totalCountRow?.count ?? 0);
+		return this.toPagination(
+			{
+				meta: { totalCountIsEstimate: false },
+				results: walletActivityRows.map((row) => ({
+					/* eslint-disable perfectionist/sort-objects */
+					blockNumber: row.blockNumber,
+					transactionHash: row.transactionHash,
+					transactionIndex: row.transactionIndex,
+					timestamp: row.timestamp,
+					from: row.from,
+					to: row.to,
+					value: row.value,
+					functionSig: `0x${row.functionSig.toString("hex")}`,
+					action: row.action,
+					actionIndex: row.index,
+					token: row.tokenAddress
+						? {
+								address: row.tokenAddress,
+								name: row.tokenName,
+								symbol: row.tokenSymbol,
+								decimals: row.tokenDecimals,
+							}
+						: undefined,
+					/* eslint-enable perfectionist/sort-objects */
+				})),
+				totalCount,
+			},
+			WalletResource,
+		);
+	}
+
+	private async getTransactions(request: Types.HapiRequest, criteria: Search.Criteria.TransactionCriteria) {
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
 		const options = this.getListingOptions(request);
@@ -281,7 +455,7 @@ export class WalletsController extends Controller {
 		);
 	}
 
-	private async getTokens(request: Hapi.Request, walletAddress: string) {
+	private async getTokens(request: Types.HapiRequest, walletAddress: string) {
 		const pagination = this.getListingPage(request);
 		const minBalance =
 			request.query.minBalance ?? this.apiConfiguration.getRequired("tokens.defaultMinimumBalance");

@@ -1,5 +1,6 @@
-import Hapi from "@hapi/hapi";
-import { AbstractController } from "@mainsail/api-common";
+import type { Contracts } from "@mainsail/contracts";
+
+import { AbstractController, Types } from "@mainsail/api-common";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -8,7 +9,6 @@ import {
 } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 
 import {
@@ -36,7 +36,7 @@ export class Controller extends AbstractController {
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	protected readonly walletRepositoryFactory!: ApiDatabaseContracts.WalletRepositoryFactory;
 
-	protected getListingOptions(request: Hapi.Request): Search.Options {
+	protected getListingOptions(request: Types.HapiRequest): Search.Options {
 		const estimateTotalCount = this.apiConfiguration.getOptional<boolean>("options.estimateTotalCount", true);
 
 		return {
@@ -60,7 +60,7 @@ export class Controller extends AbstractController {
 
 	protected async enrichBlockResult(
 		resultPage: Search.ResultsPage<Models.Block>,
-		{ state, generators }: { state?: Models.State; generators: Record<string, Models.Wallet> },
+		{ generators, state }: { state?: Models.State; generators: Record<string, Models.Wallet> },
 	): Promise<Search.ResultsPage<EnrichedBlock>> {
 		state = state ?? (await this.getState());
 

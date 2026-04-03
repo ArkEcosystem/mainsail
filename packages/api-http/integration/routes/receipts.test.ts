@@ -110,7 +110,7 @@ describe<{
 				assert.equal(data, result);
 			} catch (ex) {
 				assert.equal(expectedStatusCode, 404);
-				assert.equal(ex.message, "Response code 404 (Not Found)");
+				assert.startsWith(ex.message, "Request failed with status code 404 (Not Found)");
 			}
 		}
 	});

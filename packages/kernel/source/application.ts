@@ -1,14 +1,15 @@
-import { exit } from "node:process";
+import type { Contracts } from "@mainsail/contracts";
 
 import { Events, Identifiers } from "@mainsail/constants";
 import { Application as BaseApplication } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { DirectoryCannotBeFound } from "@mainsail/exceptions";
+import { exit } from "node:process";
 import { join } from "path";
 import { isMainThread } from "worker_threads";
 
-import { Bootstrappers } from "./bootstrap/index.js";
 import type { ServiceProvider } from "./providers/index.js";
+
+import { Bootstrappers } from "./bootstrap/index.js";
 import { ServiceProviderRepository } from "./providers/index.js";
 import { ConfigRepository } from "./services/config/index.js";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider.js";

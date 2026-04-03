@@ -139,3 +139,6 @@ target
 # Functional
 tests/functional/**/paths/data/**
 !tests/functional/**/paths/data/.gitkeep
+
+.claude/worktrees
+.claude/settings.local.json

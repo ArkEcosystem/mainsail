@@ -1,5 +1,6 @@
+import type { Types } from "@mainsail/api-common";
+
 import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -20,7 +21,7 @@ export class BlocksController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
-	public async index(request: Hapi.Request): Promise<object> {
+	public async index(request: Types.HapiRequest): Promise<object> {
 		const criteria: Search.Criteria.BlockCriteria = request.query;
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
@@ -50,7 +51,7 @@ export class BlocksController extends Controller {
 		);
 	}
 
-	public async first(request: Hapi.Request): Promise<object> {
+	public async first(request: Types.HapiRequest): Promise<object> {
 		const block = await this.blockRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -60,7 +61,7 @@ export class BlocksController extends Controller {
 		return this.respondEnrichedBlock(block, request);
 	}
 
-	public async last(request: Hapi.Request): Promise<object> {
+	public async last(request: Types.HapiRequest): Promise<object> {
 		const block = await this.blockRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -71,7 +72,7 @@ export class BlocksController extends Controller {
 		return this.respondEnrichedBlock(block, request);
 	}
 
-	public async show(request: Hapi.Request): Promise<object> {
+	public async show(request: Types.HapiRequest): Promise<object> {
 		const blockRepository = this.blockRepositoryFactory();
 		const blockCriteria = this.getBlockCriteriaByIdOrHeight(request.params.id);
 
@@ -80,7 +81,7 @@ export class BlocksController extends Controller {
 		return this.respondEnrichedBlock(block, request);
 	}
 
-	public async transactions(request: Hapi.Request): Promise<object> {
+	public async transactions(request: Types.HapiRequest): Promise<object> {
 		const blockCriteria = this.getBlockCriteriaByIdOrHeight(request.params.id);
 		const block = await this.blockRepositoryFactory().findOneByCriteria(blockCriteria);
 
@@ -112,7 +113,7 @@ export class BlocksController extends Controller {
 		);
 	}
 
-	private async respondEnrichedBlock(block: Models.Block | null, request: Hapi.Request): Promise<object> {
+	private async respondEnrichedBlock(block: Models.Block | null, request: Types.HapiRequest): Promise<object> {
 		return this.respondWithResource(await this.enrichBlock(block), BlockResource);
 	}
 }

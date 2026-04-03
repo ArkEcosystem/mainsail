@@ -1,6 +1,7 @@
-import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import type { Providers, Services } from "@mainsail/kernel";
+
+import { Identifiers } from "@mainsail/constants";
 import { assert } from "@mainsail/utils";
 
 type PluginConfig = {

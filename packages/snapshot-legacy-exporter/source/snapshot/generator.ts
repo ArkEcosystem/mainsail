@@ -1,13 +1,13 @@
+import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
+import { inject, injectable } from "@mainsail/container";
+import { Application, Providers } from "@mainsail/kernel";
+import { assert } from "@mainsail/utils";
 import { createHash } from "node:crypto";
 import { writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import { brotliCompress } from "node:zlib";
-
-import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
-import { Application, Providers } from "@mainsail/kernel";
-import { assert } from "@mainsail/utils";
 import { DataSource, EntityManager } from "typeorm";
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
 

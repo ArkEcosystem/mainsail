@@ -1,5 +1,6 @@
-import { filterObject } from "./filter-object.js";
 import type { FunctionReturning } from "./internal/index.js";
+
+import { filterObject } from "./filter-object.js";
 
 export const findKey = <T extends Record<string, T[keyof T]>>(
 	iterable: T,

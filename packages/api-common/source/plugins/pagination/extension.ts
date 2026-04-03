@@ -1,20 +1,23 @@
 // Based on https://github.com/fknop/hapi-pagination
 
 import type Hapi from "@hapi/hapi";
-import { applyToDefaults } from "@hapi/hoek";
 import type { Utils } from "@mainsail/contracts";
+
+import { applyToDefaults } from "@hapi/hoek";
 import { assert, get } from "@mainsail/utils";
 import Qs from "querystring";
+
+import type { HapiRequest } from "../../types.js";
 
 export class Extension {
 	private readonly routePathPrefix = "/api";
 	public constructor(private readonly config: object) {}
 
-	public isValidRoute(request: Hapi.Request): boolean {
+	public isValidRoute(request: HapiRequest): boolean {
 		return this.hasPagination(request);
 	}
 
-	public onPreHandler(request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue {
+	public onPreHandler(request: HapiRequest, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue {
 		if (this.isValidRoute(request)) {
 			const setParameter = (name, defaultValue) => {
 				let value;
@@ -38,7 +41,7 @@ export class Extension {
 		return h.continue;
 	}
 
-	public onPostHandler(request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue {
+	public onPostHandler(request: HapiRequest, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue {
 		if ("isBoom" in request.response) {
 			return h.continue;
 		}
@@ -102,7 +105,7 @@ export class Extension {
 				self: getUri(currentPage),
 				totalCount: totalCount ? totalCount : 0,
 			},
-			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+			// eslint-disable-next-line perfectionist/sort-objects
 			data: results,
 		};
 
@@ -122,7 +125,7 @@ export class Extension {
 		return h.continue;
 	}
 
-	public hasPagination(request: Hapi.Request): boolean {
+	public hasPagination(request: HapiRequest): boolean {
 		const pagination = this.getRoutePaginationOptions(request);
 
 		if (!pagination) {
@@ -132,7 +135,7 @@ export class Extension {
 		return pagination.enabled !== undefined ? pagination.enabled : true;
 	}
 
-	private getRoutePaginationOptions(request: Hapi.Request): { enabled: boolean } | undefined {
+	private getRoutePaginationOptions(request: HapiRequest): { enabled: boolean } | undefined {
 		const { plugins } = request.route.settings;
 		if (!plugins) {
 			return undefined;

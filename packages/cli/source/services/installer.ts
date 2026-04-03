@@ -1,5 +1,6 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
+
+import { injectable } from "@mainsail/container";
 import { rcompare, satisfies } from "semver";
 
 import { execa } from "../execa.js";
@@ -26,7 +27,7 @@ export class Installer implements Contracts.Cli.Installer {
 		const buildPackagesString =
 			space + buildPackages.map((buildPackage) => `--allow-build=${buildPackage}`).join(" ");
 
-		const { stdout, stderr, exitCode } = execa.sync(`pnpm install -g ${package_}@${tag}${buildPackagesString}`, {
+		const { exitCode, stderr, stdout } = execa.sync(`pnpm install -g ${package_}@${tag}${buildPackagesString}`, {
 			shell: true,
 		});
 
@@ -40,7 +41,7 @@ export class Installer implements Contracts.Cli.Installer {
 	}
 
 	public installPeerDependencies(package_: string, tag: string = "latest"): void {
-		const { stdout, stderr, exitCode } = execa.sync(`pnpm info ${package_}@${tag} peerDependencies --json`, {
+		const { exitCode, stderr, stdout } = execa.sync(`pnpm info ${package_}@${tag} peerDependencies --json`, {
 			shell: true,
 		});
 
@@ -61,7 +62,7 @@ export class Installer implements Contracts.Cli.Installer {
 	}
 
 	public installRangeLatest(package_: string, range: string): void {
-		const { stdout, stderr, exitCode } = execa.sync(`pnpm info ${package_} versions --json`, { shell: true });
+		const { exitCode, stderr, stdout } = execa.sync(`pnpm info ${package_} versions --json`, { shell: true });
 
 		if (exitCode !== 0) {
 			throw new Error(`"pnpm info ${package_} versions --json" exited with code ${exitCode}\n${stderr}`);
@@ -79,7 +80,7 @@ export class Installer implements Contracts.Cli.Installer {
 	}
 
 	private getInstalled(): Package[] {
-		const { stdout, stderr, exitCode } = execa.sync(`pnpm list -g --json`, { shell: true });
+		const { exitCode, stderr, stdout } = execa.sync(`pnpm list -g --json`, { shell: true });
 
 		if (exitCode !== 0) {
 			throw new Error(`"pnpm list -g --json" exited with code ${exitCode}\n${stderr}`);

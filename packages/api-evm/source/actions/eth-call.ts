@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { RpcError } from "@mainsail/exceptions";
 import dayjs from "dayjs";
 import { zeroAddress } from "viem";
@@ -107,7 +108,7 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 
 	#getGasPrice(data: TxData, milestone: Contracts.Crypto.Milestone): bigint {
 		const {
-			gas: { minimumGasPrice, maximumGasPrice },
+			gas: { maximumGasPrice, minimumGasPrice },
 		} = milestone;
 
 		// Accept 0 gas price for view calls

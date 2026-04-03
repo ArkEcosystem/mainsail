@@ -59,7 +59,7 @@ describe<{
 
 		await assert.rejects(
 			async () => request(`/legacy/cold-wallets/${fake}`, options),
-			"Response code 404 (Not Found)",
+			"Request failed with status code 404",
 		);
 	});
 });

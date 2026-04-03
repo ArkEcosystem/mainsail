@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { TransactionResource } from "./transaction.js";
 
@@ -15,7 +16,7 @@ export class BlockResource {
 	public async transform(block: Contracts.Crypto.Block, transactionObject: boolean): Promise<object> {
 		const milestone = this.configuration.getMilestone(block.number);
 
-		/* eslint-disable sort-keys-fix/sort-keys-fix */
+		/* eslint-disable perfectionist/sort-objects */
 		return {
 			number: `0x${block.number.toString(16)}`,
 			hash: `0x${block.hash}`,
@@ -40,7 +41,7 @@ export class BlockResource {
 				: block.transactions.map((transaction) => transaction.hash),
 			uncles: [],
 		};
-		/* eslint-enable sort-keys-fix/sort-keys-fix */
+		/* eslint-enable perfectionist/sort-objects */
 	}
 
 	async #transformTransactions(block: Contracts.Crypto.Block): Promise<object[]> {

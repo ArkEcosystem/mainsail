@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class EthGetStorageAtAction implements Contracts.Api.RPC.Action<[string, string, Contracts.Crypto.BlockTag]> {

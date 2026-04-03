@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Enums, Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { assert, BigNumber, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 

@@ -1,5 +1,6 @@
-import { flatten } from "./flatten.js";
 import type { FunctionReturning } from "./internal/types.js";
+
+import { flatten } from "./flatten.js";
 import { uniqBy } from "./uniq-by.js";
 
 export const unionBy = <T>(...arguments_: T[]): T[] => {

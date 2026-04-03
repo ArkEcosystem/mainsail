@@ -1,10 +1,12 @@
-import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
 import { TransactionBuilder, TransactionFactory, Verifier } from "@mainsail/crypto-transaction";
 import { BigNumber, sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
 import type { Context, TransactionOptions } from "./types.js";
+
 import { AcceptAnyTransactionVerifier } from "./verifier.js";
 
 const applyCustomSignature = async (

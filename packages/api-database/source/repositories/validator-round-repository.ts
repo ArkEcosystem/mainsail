@@ -3,6 +3,7 @@ import type {
 	ValidatorRoundRepository,
 	ValidatorRoundRepositoryExtension,
 } from "../contracts.js";
+
 import { ValidatorRound } from "../models/validator-round.js";
 import { makeExtendedRepository } from "./repository-extension.js";
 
