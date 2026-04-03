@@ -142,3 +142,6 @@ tests/functional/**/paths/data/**
 
 .claude/worktrees
 .claude/settings.local.json
+
+packages/evm-generator/paths/data/**
+!packages/evm-generator/paths/data/.gitkeep
