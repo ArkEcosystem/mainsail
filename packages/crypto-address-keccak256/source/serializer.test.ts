@@ -1,7 +1,4 @@
 import { Identifiers } from "@mainsail/constants";
-import { Configuration } from "@mainsail/crypto-config";
-import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
-import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { ByteBuffer } from "@mainsail/utils";
 import { Buffer } from "buffer";
 
@@ -10,33 +7,37 @@ import { describe } from "@mainsail/test-runner";
 import { AddressFactory } from "./address.factory";
 import { AddressSerializer } from "./serializer";
 
+import { wallets } from "../../crypto-wif/test/index.js";
+
 describe<{
 	app: Application;
 	serializer: AddressSerializer;
 	factory: AddressFactory;
-}>("AddressSerializer", ({ it, assert, beforeEach }) => {
+}>("AddressSerializer", ({ it, assert, beforeEach, each }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-		await context.app.resolve(ValidationServiceProvider).register();
-		await context.app.resolve<ECDSA>(ECDSA).register();
+		context.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).toConstantValue({});
+		context.app.bind(Identifiers.Cryptography.Identity.PublicKey.Factory).toConstantValue({});
 
 		context.serializer = context.app.resolve(AddressSerializer);
 		context.factory = context.app.resolve(AddressFactory);
 	});
 
-	it("should serialize and deserialize address", async ({ factory, serializer }) => {
-		const address = "0xC7C50f33278bDe272ffe23865fF9fBd0155a5175";
-		const buffer = await factory.toBuffer(address);
+	each(
+		"#serialize & #deserialize - should serialize and deserialize address",
+		async ({ context: { factory, serializer }, dataset: wallet }) => {
+			const buffer = await factory.toBuffer(wallet.address);
 
-		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(100));
+			const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(100));
 
-		serializer.serialize(byteBuffer, buffer);
-		byteBuffer.reset();
+			serializer.serialize(byteBuffer, buffer);
+			byteBuffer.reset();
 
-		const readBuffer = serializer.deserialize(byteBuffer);
+			const readBuffer = serializer.deserialize(byteBuffer);
 
-		assert.equal(await factory.fromBuffer(readBuffer), address);
-	});
+			assert.equal(await factory.fromBuffer(readBuffer), wallet.address);
+		},
+		wallets,
+	);
 });

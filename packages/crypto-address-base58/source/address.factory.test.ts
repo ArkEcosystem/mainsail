@@ -10,32 +10,28 @@ import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "@mainsail/test-runner";
 import { AddressFactory } from "./address.factory";
 
-const mnemonic = "this is a top secret passphrase";
-const wif = "SGq4xLgZKCGxs7bjmwnBrWcT4C1ADFEermj846KC97FSv1WFD1dA";
+const mnemonic = "this is a top secret mnemonic";
+const wif = "UfDzkBsi7xxjq491zm5tk7rCZ1EouBXsFUWaCvQWxAortbh1zq5T";
 
-describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) => {
+describe<{ app: Application; factory: AddressFactory }>("AddressFactory", ({ assert, beforeEach, it }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
 		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
 		await context.app.resolve(ValidationServiceProvider).register();
 		await context.app.resolve(CryptoConfigServiceProvider).register();
 
-		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).set("network.wif", 170);
-
 		await context.app.resolve<ECDSA>(ECDSA).register();
 		await context.app.resolve<CryptoHashBcrypto>(CryptoHashBcrypto).register();
+		context.factory = context.app.resolve(AddressFactory);
 	});
 
-	it("should derive an address from an mnemonic", async (context) => {
-		assert.is(
-			await context.app.resolve(AddressFactory).fromMnemonic(mnemonic),
-			"D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib",
-		);
+	it("#fromMnemonic - should derive an address from an mnemonic", async ({ factory }) => {
+		assert.is(await factory.fromMnemonic(mnemonic), "DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa");
 	});
 
-	it("should derive an address from multi signature address", async (context) => {
+	it("#fromMultiSignatureAsset - should derive an address from multi signature address", async ({ factory }) => {
 		assert.is(
-			await context.app.resolve(AddressFactory).fromMultiSignatureAsset({
+			await factory.fromMultiSignatureAsset({
 				min: 3,
 				publicKeys: [
 					"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
@@ -47,55 +43,41 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		);
 	});
 
-	it("should derive an address from a public key", async (context) => {
+	it("#fromPublicKey - should derive an address from a public key", async ({ factory }) => {
 		assert.is(
-			await context.app
-				.resolve(AddressFactory)
-				.fromPublicKey("034151a3ec46b5670a682b0a63394f863587d1bc97483b1b6c70eb58e7f0aed192"),
+			await factory.fromPublicKey("034151a3ec46b5670a682b0a63394f863587d1bc97483b1b6c70eb58e7f0aed192"),
 			"D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib",
 		);
 	});
 
-	it("should derive an address from wif", async (context) => {
-		assert.is(await context.app.resolve(AddressFactory).fromWIF(wif), "D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib");
+	it("#fromWIF - should derive an address from wif", async ({ factory }) => {
+		assert.is(await factory.fromWIF(wif), "DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa");
 	});
 
-	it("should validate addresses", async (context) => {
-		assert.true(await context.app.resolve(AddressFactory).validate("D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"));
-		assert.false(
-			await context.app
-				.resolve(AddressFactory)
-				.validate("m0d1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"),
-		);
+	it("#validate - should validate addresses", async ({ factory }) => {
+		assert.true(await factory.validate("DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa"));
+		assert.false(await factory.validate("m0d1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"));
 	});
 
-	it("should convert between buffer", async (context) => {
-		const addressFactory = context.app.resolve(AddressFactory);
-
+	it("#toBuffer & #fromBuffer - should convert between buffer", async ({ factory }) => {
 		assert.equal(
-			await addressFactory.fromBuffer(await addressFactory.toBuffer("D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib")),
-			"D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib",
+			await factory.fromBuffer(await factory.toBuffer("DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa")),
+			"DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa",
 		);
 	});
 
-	it("should throw if pubKeyHash doesn't match", async (context) => {
-		const addressFactory = context.app.resolve(AddressFactory);
-
-		context.app
-			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-			.set("network.pubKeyHash", 44);
+	it("should throw if pubKeyHash doesn't match", async ({ factory, app }) => {
+		app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).set("network.pubKeyHash", 44);
 
 		await assert.rejects(
-			() => addressFactory.toBuffer("D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"),
+			() => factory.toBuffer("DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa"),
 			"Expected address network byte 44, but got 30.",
 		);
 	});
 
-	it("should throw invalid checksum", async (context) => {
-		const addressFactory = context.app.resolve(AddressFactory);
-
+	it("#toBuffer - should throw invalid checksum", async ({ factory }) => {
 		await assert.rejects(
-			() => addressFactory.toBuffer("E61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"),
+			() => factory.toBuffer("E61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"),
 			"Invalid checksum for base58 string.",
 		);
 	});

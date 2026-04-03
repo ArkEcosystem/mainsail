@@ -1532,9 +1532,6 @@ importers:
       bls12-381-keygen:
         specifier: 0.2.4
         version: 0.2.4
-      wif:
-        specifier: 5.0.0
-        version: 5.0.0
     devDependencies:
       '@mainsail/contracts':
         specifier: workspace:*
@@ -1542,6 +1539,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/crypto-wif':
+        specifier: workspace:*
+        version: link:../crypto-wif
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -1591,9 +1591,6 @@ importers:
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
-      bip39:
-        specifier: 3.1.0
-        version: 3.1.0
       uvu:
         specifier: 0.5.6
         version: 0.5.6

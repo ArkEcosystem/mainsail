@@ -12,11 +12,13 @@ export class PublicKeyFactory implements Contracts.Crypto.PublicKeyFactory {
 	private readonly keyPairFactory!: Contracts.Crypto.KeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
-		return (await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey;
+		const { publicKey } = await this.keyPairFactory.fromMnemonic(mnemonic);
+		return publicKey;
 	}
 
 	public async fromWIF(wif: string): Promise<string> {
-		return (await this.keyPairFactory.fromWIF(wif)).publicKey;
+		const { publicKey } = await this.keyPairFactory.fromWIF(wif);
+		return publicKey;
 	}
 
 	public async fromMultiSignatureAsset(asset: Contracts.Crypto.MultiSignatureAsset): Promise<string> {
