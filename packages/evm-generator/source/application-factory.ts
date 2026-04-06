@@ -25,16 +25,12 @@ export const makeApplication = async (
 
 	app.bind(InternalIdentifiers.Application).toConstantValue(app);
 
-	// await app.resolve(Services.Log.ServiceProvider).register();
-
-	// const logger = app.resolve(Logger);
-	// logger.setConfig({
-	// 	all: () => ({ levels: { console: "info" } }),
-	// } as unknown as Contracts.Kernel.PluginConfiguration);
-	// await logger.register();
-
 	await app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
 	await app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
+
+	// HACK
+	const logManager: Services.Log.LogManager = app.get<Services.Log.LogManager>(Identifiers.Services.Log.Manager);
+	logManager.driver().debug = () => {};
 
 	for (const f of ["evm.mdb", "evm.mdb-lock"]) {
 		const path = resolve(import.meta.dirname, `../paths/data/${f}`);
