@@ -48,6 +48,7 @@
 		"@mainsail/processor": "workspace:*",
 		"@mainsail/state": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
+		"@mainsail/test-transaction-builders": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/utils": "workspace:*",

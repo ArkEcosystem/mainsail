@@ -1,5 +1,6 @@
 export const Identifiers = {
-	Application: Symbol.for("Configuration<Application>"),
-	LogService: Symbol.for("Configuration<Logger>"),
-	Generator: Symbol.for("Evm<Generator>"),
+	Application: Symbol.for("EvmGenerator<Application>"),
+	Generator: Symbol.for("EvmGenerator"),
+	LogService: Symbol.for("EvmGenerator<LogService>"),
+	TransactionGenerator: Symbol.for("EvmGenerator<Transactions>"),
 } as const;
