@@ -10,7 +10,13 @@ async function run() {
 	const app = await makeApplication(configCore, {});
 	const generator = app.get(Identifiers.Generator);
 
-	await generator.generate({});
+	await generator.generate({
+		numberOfBlocks: 100,
+		transactionOptions: {
+			minPerBlock: 50,
+			maxPerBlock: 200,
+		},
+	});
 }
 
 run();

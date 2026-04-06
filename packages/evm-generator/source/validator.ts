@@ -5,6 +5,9 @@ import { inject } from "@mainsail/container";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert, BigNumber } from "@mainsail/utils";
 
+import { Identifiers as InternalIdentifiers } from "./identifiers.js";
+import { TransactionGenerator } from "./transaction-generator.js";
+
 export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.State.Store)
 	protected readonly stateStore!: Contracts.State.Store;
@@ -21,6 +24,9 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
+	@inject(Identifiers.BlockchainUtils.FeeCalculator)
+	protected readonly gasFeeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
+
 	@inject(Identifiers.Transaction.Validator.Factory)
 	private readonly createTransactionValidator!: Contracts.Transactions.TransactionValidatorFactory;
 
@@ -35,6 +41,12 @@ export class Validator implements Contracts.Validator.Validator {
 
 	@inject(Identifiers.BlockchainUtils.RoundCalculator)
 	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
+
+	@inject(InternalIdentifiers.TransactionGenerator)
+	private readonly transactionGenerator!: TransactionGenerator;
+
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
@@ -130,13 +142,49 @@ export class Validator implements Contracts.Validator.Validator {
 			await evm.initializeGenesis(this.genesisInfo);
 			await evm.prepareNextCommit({ commitKey });
 
-			const transactions: Contracts.Crypto.Transaction[] = [];
+			const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 
 			const previousBlock = this.stateStore.getLastBlock();
 			const milestone = this.cryptoConfiguration.getMilestone();
-			// let gasLeft = milestone.block.maxGasLimit;
+
+			let gasLeft = milestone.block.maxGasLimit;
 			let gasUsed = 0;
 			let fee = BigNumber.ZERO;
+
+			for await (const transaction of this.transactionGenerator) {
+				let optimisticExecution = false;
+
+				const gasLimit = transaction.gasLimit;
+				if (gasLeft - gasLimit < 0) {
+					optimisticExecution = true;
+					await evm.snapshot(commitKey);
+				}
+
+				const result = await validator.validate(
+					{ commitKey, gasLimit: milestone.block.maxGasLimit, generatorAddress, timestamp },
+					transaction,
+					candidateTransactions.length,
+				);
+
+				gasLeft -= Number(result.gasUsed);
+
+				// Ignore transaction if it uses more than what's left.
+				if (gasLeft < 0) {
+					if (optimisticExecution) {
+						await evm.rollback(commitKey);
+					}
+
+					this.logger.warn(
+						`skipping tx ${transaction.hash} due to insufficient block space (tx.gasUsed=${Number(result.gasUsed)} gasLeft=${gasLeft} optimistic=${optimisticExecution})`,
+					);
+
+					break;
+				}
+
+				gasUsed += Number(result.gasUsed);
+				fee = fee.plus(this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, Number(result.gasUsed)));
+				candidateTransactions.push(transaction);
+			}
 
 			await evm.updateRewardsAndVotes({
 				blockReward: BigNumber.make(milestone.reward).toBigInt(),
@@ -166,7 +214,7 @@ export class Validator implements Contracts.Validator.Validator {
 				gasUsed,
 				logsBloom,
 				stateRoot,
-				transactions: transactions,
+				transactions: candidateTransactions,
 			};
 		} finally {
 			await evm.dispose();

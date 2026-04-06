@@ -8,6 +8,7 @@ import { resolve } from "path";
 
 import { Generator } from "./generator.js";
 import { Identifiers as InternalIdentifiers } from "./identifiers.js";
+import { TransactionGenerator } from "./transaction-generator.js";
 
 export const makeApplication = async (
 	configurationPath: string,
@@ -109,7 +110,8 @@ export const makeApplication = async (
 		await serviceProvider.register();
 	}
 
-	app.bind(InternalIdentifiers.Generator).to(Generator);
+	app.bind(InternalIdentifiers.TransactionGenerator).to(TransactionGenerator).inSingletonScope();
+	app.bind(InternalIdentifiers.Generator).to(Generator).inSingletonScope();
 
 	return app;
 };

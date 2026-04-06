@@ -8,6 +8,7 @@ import { assert, BigNumber } from "@mainsail/utils";
 
 import { Identifiers as InternalIdentifiers } from "./identifiers.js";
 import { loadValidators } from "./load-validators.js";
+import { TransactionGenerator, TransactionGeneratorOptions } from "./transaction-generator.js";
 
 // pub(crate) struct InnerStorage {
 //     pub accounts: heed::Database<AddressWrapper, CompressedBincode<StoredAccountInfo>>,
@@ -39,7 +40,10 @@ import { loadValidators } from "./load-validators.js";
 //     //
 // }
 
-const TARGET_NUMBER_OF_BLOCKS = 1024;
+export interface GeneratorOptions {
+	readonly numberOfBlocks: number;
+	readonly transactionOptions: TransactionGeneratorOptions;
+}
 
 @injectable()
 export class Generator {
@@ -51,9 +55,6 @@ export class Generator {
 
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
-
-	@inject(Identifiers.BlockchainUtils.ProposerCalculator)
-	private readonly proposerCalculator!: Contracts.BlockchainUtils.ProposerCalculator;
 
 	@inject(Identifiers.Consensus.CommitState.Factory)
 	private readonly commitStateFactory!: Contracts.Consensus.CommitStateFactory;
@@ -67,19 +68,25 @@ export class Generator {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
+	@inject(InternalIdentifiers.TransactionGenerator)
+	private readonly transactionGenerator!: TransactionGenerator;
+
 	@inject(Identifiers.State.Store)
 	private stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.State.Store)
 	private readonly store!: Contracts.State.Store;
 
-	public async generate(): Promise<void> {
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
+	public async generate(options: GeneratorOptions): Promise<void> {
 		await this.#initialize();
 
 		let blockNumber = 1;
 		const round = 0;
 
-		for (let index = 0; index < TARGET_NUMBER_OF_BLOCKS; index++) {
+		for (let index = 0; index < options.numberOfBlocks; index++) {
 			const roundState = this.roundStateRepository.getRoundState(blockNumber, round);
 			const registeredProposer = this.validatorsRepository.getValidator(roundState.proposer.blsPublicKey);
 			assert.defined(registeredProposer);
@@ -88,10 +95,16 @@ export class Generator {
 			const previousBlock = this.store.getLastBlock();
 			const nextBlockTimestamp = previousBlock.timestamp + 8000;
 
+			await this.transactionGenerator.prepare(options.transactionOptions);
+
 			const proposedBlock = await registeredProposer.prepareBlock(
 				roundState.proposer.address,
 				round,
 				nextBlockTimestamp,
+			);
+
+			this.logger.info(
+				`Proposed block ${proposedBlock.number} proposer=${proposedBlock.proposer} hash=${proposedBlock.hash} txs=${proposedBlock.transactionsCount} gas=${proposedBlock.gasUsed}`,
 			);
 
 			const proposal = await registeredProposer.propose(
@@ -156,6 +169,8 @@ export class Generator {
 
 		this.stateStore.setGenesisCommit(genesisBlock);
 		await this.#processCommit(genesisBlock);
+
+		await this.transactionGenerator.initialize();
 	}
 
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {
