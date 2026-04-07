@@ -24,7 +24,7 @@ pub fn calculate(
         current_hash,
         pending_commit
             .built_commit
-            .as_ref()
+            .as_mut()
             .expect("state commit exists"),
         committed_hashes,
         &db.genesis_info,
@@ -33,7 +33,7 @@ pub fn calculate(
 
 fn calculate_state_root(
     current_hash: B256,
-    state: &StateCommit,
+    state: &mut StateCommit,
     committed_hashes: Option<(B256, B256, B256)>,
     genesis_info: &Option<GenesisInfo>,
 ) -> Result<B256, crate::db::Error> {
@@ -41,12 +41,12 @@ fn calculate_state_root(
         if let Some(committed_hashes) = committed_hashes {
             committed_hashes
         } else {
-            let state_changes = prepare(state);
+            prepare(state);
 
             (
-                calculate_accounts_hash(&state_changes)?,
-                calculate_contracts_hash(&state_changes)?,
-                calculate_storage_hash(&state_changes)?,
+                calculate_accounts_hash(&state.change_set)?,
+                calculate_contracts_hash(&state.change_set)?,
+                calculate_storage_hash(&state.change_set)?,
             )
         };
 
@@ -109,16 +109,13 @@ where
     Ok(keccak256(bincode::serialize(value)?))
 }
 
-fn prepare(state: &StateCommit) -> StateChangeset {
-    let mut c = state.change_set.clone();
-
-    c.accounts.par_sort_by_key(|a| a.0);
-    c.contracts.par_sort_by_key(|a| a.0);
-    for s in &mut c.storage {
+fn prepare(state: &mut StateCommit) {
+    state.change_set.accounts.par_sort_by_key(|a| a.0);
+    state.change_set.contracts.par_sort_by_key(|a| a.0);
+    for s in &mut state.change_set.storage {
         s.storage.par_sort_by_key(|slot| slot.0);
     }
-    c.storage.par_sort_by_key(|a| a.address);
-    c
+    state.change_set.storage.par_sort_by_key(|a| a.address);
 }
 
 #[cfg(test)]
