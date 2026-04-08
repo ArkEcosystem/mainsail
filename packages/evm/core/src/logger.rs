@@ -46,3 +46,53 @@ impl std::fmt::Display for LogLevel {
         write!(f, "{}", uppercase)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::{sync::mpsc::channel, time::Duration};
+
+    use crate::logger::{LogLevel, Logger};
+
+    #[test]
+    fn test_logger_sends_log_message_through_channel() {
+        let (tx, rx) = channel();
+        let logger = Logger::new(Some(tx));
+
+        logger.log(LogLevel::Info, "hello world".to_string());
+
+        let (level, message) = rx.recv_timeout(Duration::from_millis(100)).unwrap();
+        assert_eq!(level.to_string(), "INFO");
+        assert_eq!(message, "hello world");
+    }
+
+    #[test]
+    fn test_logger_without_sender_does_not_panic() {
+        let logger = Logger::new(None);
+
+        logger.log(LogLevel::Warn, "printed to stdout".to_string());
+    }
+
+    #[test]
+    fn test_logger_with_disconnected_channel_does_not_panic() {
+        let (tx, rx) = channel();
+        drop(rx);
+
+        let logger = Logger::new(Some(tx));
+        logger.log(LogLevel::Alert, "this will fail to send".to_string());
+    }
+
+    #[test]
+    fn test_log_level_display_format() {
+        let cases = [
+            (LogLevel::Info, "INFO"),
+            (LogLevel::Debug, "DEBUG"),
+            (LogLevel::Notice, "NOTICE"),
+            (LogLevel::Alert, "ALERT"),
+            (LogLevel::Warn, "WARN"),
+        ];
+
+        for (level, expected) in cases {
+            assert_eq!(level.to_string(), expected);
+        }
+    }
+}
