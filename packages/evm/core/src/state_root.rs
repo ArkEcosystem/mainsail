@@ -121,7 +121,8 @@ fn prepare(state: &mut StateCommit) {
 #[cfg(test)]
 mod tests {
     use crate::{
-        db::{GenesisInfo, PersistentDB, PersistentDBOptions},
+        db::{GenesisInfo, PendingCommit, PersistentDB, PersistentDBOptions},
+        legacy::LegacyAddress,
         state_changes::StateChangeset,
         state_commit::{StateCommit, build_commit},
         state_root::{calculate, calculate_state_root},
@@ -268,7 +269,17 @@ mod tests {
             )
         );
 
-        let mut pending_commit = Default::default();
+        let mut pending_commit = PendingCommit::default();
+        let legacy_address: LegacyAddress =
+            "DJmvhhiQFSrEQCq9FUxvcLcpcBjx7K3yLt".try_into().unwrap();
+        pending_commit.merged_legacy_cold_wallets.insert(
+            address!("0000000000000000000000000000000000000001"),
+            Some((
+                b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+                legacy_address,
+            )),
+        );
+
         let state_commit = build_commit(&mut pending_commit).expect("ok");
         pending_commit.built_commit = Some(state_commit);
 
@@ -282,7 +293,7 @@ mod tests {
         assert_eq!(
             result,
             revm::primitives::b256!(
-                "8f8b7e90288fa24167aa9507f219efa7b6bde941ec68ef8a4b66a3a922a12afa"
+                "5ca756d93a56e6c15c9e182ff236bd5db21bcde81c2c438d58a32bbd16b4ec3a"
             )
         );
     }
