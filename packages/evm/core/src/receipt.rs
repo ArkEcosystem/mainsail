@@ -59,3 +59,95 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
         },
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::receipt::map_execution_result;
+    use alloy_primitives::address;
+    use bytes::Bytes;
+    use revm::context::result::{ExecutionResult, HaltReason, Output, ResultGas, SuccessReason};
+
+    #[test]
+    fn test_map_execution_result_call() {
+        let result = ExecutionResult::Success {
+            reason: SuccessReason::Stop,
+            gas: ResultGas::new(30000, 25000, 2100, 0, 0),
+            logs: vec![],
+            output: Output::Call(alloy_primitives::Bytes(Bytes::new())),
+        };
+
+        let output = map_execution_result(result, 0);
+
+        assert_eq!(output.contract_address, None);
+        assert_eq!(output.gas_used, 22900);
+        assert_eq!(output.cumulative_gas_used, 0);
+        assert_eq!(output.gas_refunded, 2100);
+        assert_eq!(output.logs, Some(vec![]));
+        assert_eq!(output.output, Some(alloy_primitives::Bytes(Bytes::new())));
+        assert_eq!(output.success, 1);
+    }
+
+    #[test]
+    fn test_map_execution_result_create() {
+        let result = ExecutionResult::Success {
+            reason: SuccessReason::Stop,
+            gas: ResultGas::new(1_000_000, 355_000, 0, 0, 0),
+            logs: vec![],
+            output: Output::Create(
+                alloy_primitives::Bytes(Bytes::new()),
+                Some(address!("0000000000000000000000000000000000000001")),
+            ),
+        };
+
+        let output = map_execution_result(result, 0);
+
+        assert_eq!(
+            output.contract_address,
+            Some(address!("0000000000000000000000000000000000000001").to_string())
+        );
+        assert_eq!(output.gas_used, 355_000);
+        assert_eq!(output.cumulative_gas_used, 0);
+        assert_eq!(output.gas_refunded, 0);
+        assert_eq!(output.logs, Some(vec![]));
+        assert_eq!(output.output, Some(alloy_primitives::Bytes(Bytes::new())));
+        assert_eq!(output.success, 1);
+    }
+
+    #[test]
+    fn test_map_execution_result_revert() {
+        let result = ExecutionResult::Revert {
+            gas: ResultGas::new(30000, 30000, 0, 0, 0),
+            logs: vec![],
+            output: alloy_primitives::Bytes(Bytes::new()),
+        };
+
+        let output = map_execution_result(result, 0);
+
+        assert_eq!(output.contract_address, None);
+        assert_eq!(output.gas_used, 30000);
+        assert_eq!(output.cumulative_gas_used, 0);
+        assert_eq!(output.gas_refunded, 0);
+        assert_eq!(output.logs, None);
+        assert_eq!(output.output, Some(alloy_primitives::Bytes(Bytes::new())));
+        assert_eq!(output.success, 0);
+    }
+
+    #[test]
+    fn test_map_execution_result_halt() {
+        let result = ExecutionResult::Halt {
+            reason: HaltReason::StackOverflow,
+            gas: ResultGas::new(30000, 30000, 0, 0, 0),
+            logs: vec![],
+        };
+
+        let output = map_execution_result(result, 0);
+
+        assert_eq!(output.contract_address, None);
+        assert_eq!(output.gas_used, 30000);
+        assert_eq!(output.cumulative_gas_used, 0);
+        assert_eq!(output.gas_refunded, 0);
+        assert_eq!(output.logs, None);
+        assert_eq!(output.output, None);
+        assert_eq!(output.success, 0);
+    }
+}
