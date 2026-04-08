@@ -1287,6 +1287,21 @@ fn test_open_db() {
 }
 
 #[test]
+fn test_open_db_with_logger() {
+    let tmp = tempfile::Builder::new()
+        .prefix("evm.mdb")
+        .tempdir()
+        .unwrap();
+
+    assert!(
+        PersistentDB::new(
+            PersistentDBOptions::new(tmp.path().to_path_buf()).with_logger(Logger::new(None))
+        )
+        .is_ok()
+    );
+}
+
+#[test]
 fn test_commit_changes() {
     let path = tempfile::Builder::new()
         .prefix("evm.mdb")
@@ -1708,88 +1723,181 @@ fn test_read_accounts() {
     assert_eq!(read, addresses.len());
 }
 
-#[test]
-fn test_read_receipts() {
-    let path = tempfile::Builder::new()
-        .prefix("evm.mdb")
-        .tempdir()
-        .unwrap();
+#[cfg(test)]
+mod tests {
+    use crate::{
+        compression::CompressedBincode,
+        db::{
+            CommitKey, CommitReceipts, LegacyAddressWrapper, PendingCommit, PersistentDB,
+            PersistentDBOptions, StaticStringWrapper, StringWrapper,
+        },
+        legacy::{LegacyAccountAttributes, LegacyAddress},
+        receipt::TxReceipt,
+    };
+    use alloy_primitives::{B256, U256, address, b256};
+    use revm::{primitives::HashMap, state::AccountInfo};
 
-    let db =
-        PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
+    use heed::{BytesDecode, BytesEncode};
 
-    let target_block = 100;
-    let mut total_receipts = 0;
+    #[test]
+    fn test_legacy_address_wrapper() {
+        let legacy_address: LegacyAddress =
+            "DJmvhhiQFSrEQCq9FUxvcLcpcBjx7K3yLt".try_into().unwrap();
 
-    {
-        let mut wtxn = db.env.write_txn().unwrap();
+        let wrapper = LegacyAddressWrapper(legacy_address);
+        let serialized = <LegacyAddressWrapper as BytesEncode>::bytes_encode(&wrapper).expect("ok");
 
-        fn random_b256(seed: u64, offset: u64) -> B256 {
-            use std::collections::hash_map::DefaultHasher;
-            use std::hash::{Hash, Hasher};
-            let mut hasher = DefaultHasher::new();
-            seed.hash(&mut hasher);
-
-            B256::from(U256::from(hasher.finish() + offset))
-        }
-
-        for i in 0..target_block {
-            let block_number = (i + 1) as u64;
-
-            let receipts: HashMap<B256, TxReceipt> = [
-                (random_b256(block_number, 0), TxReceipt::default()),
-                (random_b256(block_number, 1), TxReceipt::default()),
-                (random_b256(block_number, 2), TxReceipt::default()),
-                (random_b256(block_number, 3), TxReceipt::default()),
-            ]
-            .into_iter()
-            .collect();
-
-            total_receipts += receipts.len();
-
-            db.inner
-                .borrow_mut()
-                .commits
-                .put(
-                    &mut wtxn,
-                    &block_number,
-                    &CompressedBincode(&CommitReceipts {
-                        tx_receipts: receipts,
-                        ..Default::default()
-                    }),
-                )
-                .unwrap();
-        }
-        wtxn.commit().unwrap();
+        let deserialized =
+            <LegacyAddressWrapper as BytesDecode>::bytes_decode(&serialized).expect("ok");
+        assert_eq!(legacy_address, deserialized.0);
     }
 
-    const LIMIT: u64 = 7;
-    let mut offset = 0;
+    #[test]
+    fn test_string_wrapper() {
+        let string = "test".to_owned();
 
-    let mut read_block_number = 0;
-    let mut read_receipts = 0;
+        let wrapper = StringWrapper(string);
+        let serialized = <StringWrapper as BytesEncode>::bytes_encode(&wrapper).expect("ok");
+        let deserialized = <StringWrapper as BytesDecode>::bytes_decode(&serialized).expect("ok");
 
-    loop {
-        let (next, items) = db.get_receipts(offset, LIMIT).unwrap();
-        for (block_number, receipts) in items {
-            read_block_number = block_number;
-            read_receipts += receipts.len();
-        }
+        assert_eq!("test", deserialized.0);
+    }
 
-        if next.is_none() {
-            break;
-        }
+    #[test]
+    fn test_static_string_wrapper() {
+        let string = "test";
 
-        match next {
-            Some(next) => {
-                offset = next;
+        let wrapper = StaticStringWrapper(string);
+        let serialized = <StaticStringWrapper as BytesEncode>::bytes_encode(&wrapper).expect("ok");
+
+        assert_eq!(serialized, &b"test"[..]);
+    }
+
+    #[test]
+    fn test_commit_key() {
+        let key = CommitKey(0, 0, B256::ZERO);
+        let mut pending = PendingCommit::new(key);
+
+        let info = AccountInfo {
+            balance: U256::ONE,
+            nonce: 1,
+            code_hash: b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+            account_id: None,
+            code: None,
+        };
+
+        let attributes = LegacyAccountAttributes {
+            legacy_nonce: Some(0),
+            second_public_key: Some("key".into()),
+            multi_signature: None,
+        };
+
+        pending.import_account(
+            address!("0000000000000000000000000000000000000001"),
+            info,
+            Some(attributes),
+        );
+
+        let info = AccountInfo {
+            balance: U256::ZERO,
+            nonce: 0,
+            code_hash: B256::ZERO,
+            account_id: None,
+            code: None,
+        };
+        pending.import_account(
+            address!("0000000000000000000000000000000000000002"),
+            info,
+            None,
+        );
+
+        assert_eq!(pending.transitions.transitions.len(), 2);
+        assert_eq!(pending.legacy_attributes.len(), 1);
+    }
+
+    #[test]
+    fn test_read_receipts() {
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+
+        let db = PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf()))
+            .expect("database");
+
+        let target_block = 100;
+        let mut total_receipts = 0;
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+
+            fn random_b256(seed: u64, offset: u64) -> B256 {
+                use std::collections::hash_map::DefaultHasher;
+                use std::hash::{Hash, Hasher};
+                let mut hasher = DefaultHasher::new();
+                seed.hash(&mut hasher);
+
+                B256::from(U256::from(hasher.finish() + offset))
             }
-            None => {
+
+            for i in 0..target_block {
+                let block_number = (i + 1) as u64;
+
+                let receipts: HashMap<B256, TxReceipt> = [
+                    (random_b256(block_number, 0), TxReceipt::default()),
+                    (random_b256(block_number, 1), TxReceipt::default()),
+                    (random_b256(block_number, 2), TxReceipt::default()),
+                    (random_b256(block_number, 3), TxReceipt::default()),
+                ]
+                .into_iter()
+                .collect();
+
+                total_receipts += receipts.len();
+
+                db.inner
+                    .borrow_mut()
+                    .commits
+                    .put(
+                        &mut wtxn,
+                        &block_number,
+                        &CompressedBincode(&CommitReceipts {
+                            tx_receipts: receipts,
+                            ..Default::default()
+                        }),
+                    )
+                    .unwrap();
+            }
+            wtxn.commit().unwrap();
+        }
+
+        const LIMIT: u64 = 7;
+        let mut offset = 0;
+
+        let mut read_block_number = 0;
+        let mut read_receipts = 0;
+
+        loop {
+            let (next, items) = db.get_receipts(offset, LIMIT).unwrap();
+            for (block_number, receipts) in items {
+                read_block_number = block_number;
+                read_receipts += receipts.len();
+            }
+
+            if next.is_none() {
                 break;
             }
-        }
-    }
 
-    assert_eq!(read_block_number, target_block);
-    assert_eq!(read_receipts, total_receipts);
+            match next {
+                Some(next) => {
+                    offset = next;
+                }
+                None => {
+                    break;
+                }
+            }
+        }
+
+        assert_eq!(read_block_number, target_block);
+        assert_eq!(read_receipts, total_receipts);
+    }
 }
