@@ -1735,14 +1735,14 @@ mod tests {
     use crate::{
         compression::CompressedBincode,
         db::{
-            CommitKey, CommitReceipts, LegacyAddressWrapper, PendingCommit, PersistentDB,
-            PersistentDBOptions, StaticStringWrapper, StringWrapper,
+            BlockHeaderData, CommitKey, CommitReceipts, LegacyAddressWrapper, PendingCommit,
+            PersistentDB, PersistentDBOptions, StaticStringWrapper, StringWrapper,
         },
         legacy::{LegacyAccountAttributes, LegacyAddress},
         receipt::TxReceipt,
     };
     use alloy_primitives::{B256, U256, address, b256};
-    use revm::{primitives::HashMap, state::AccountInfo};
+    use revm::{Database, primitives::HashMap, state::AccountInfo};
 
     use heed::{BytesDecode, BytesEncode};
 
@@ -1823,14 +1823,43 @@ mod tests {
     }
 
     #[test]
-    fn test_read_receipts() {
-        let path = tempfile::Builder::new()
-            .prefix("evm.mdb")
-            .tempdir()
-            .unwrap();
+    fn test_block_hash() {
+        let mut db = create_temp_database();
 
-        let db = PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf()))
-            .expect("database");
+        let hash = db.block_hash(1).unwrap();
+        assert_eq!(hash, B256::ZERO);
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            let inner = db.inner.borrow_mut();
+
+            inner
+                .blocks
+                .put(
+                    &mut wtxn,
+                    &1,
+                    &CompressedBincode(&BlockHeaderData {
+                        hash: b256!(
+                            "0000000000000000000000000000000000000000000000000000000000000001"
+                        ),
+                        ..Default::default()
+                    }),
+                )
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        let hash = db.block_hash(1).unwrap();
+        assert_eq!(
+            hash,
+            b256!("0000000000000000000000000000000000000000000000000000000000000001")
+        );
+    }
+
+    #[test]
+    fn test_read_receipts() {
+        let db = create_temp_database();
 
         let target_block = 100;
         let mut total_receipts = 0;
@@ -1906,5 +1935,17 @@ mod tests {
 
         assert_eq!(read_block_number, target_block);
         assert_eq!(read_receipts, total_receipts);
+    }
+
+    fn create_temp_database() -> PersistentDB {
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+
+        let db = PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf()))
+            .expect("database");
+
+        db
     }
 }
