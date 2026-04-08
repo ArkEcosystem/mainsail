@@ -799,8 +799,15 @@ impl DatabaseRef for PersistentDB {
         }
     }
 
-    fn block_hash_ref(&self, _number: u64) -> Result<B256, Self::Error> {
-        todo!()
+    fn block_hash_ref(&self, number: u64) -> Result<B256, Self::Error> {
+        let txn = self.env.read_txn()?;
+        let inner = self.inner.borrow_mut();
+
+        let data = inner.blocks.get(&txn, &number)?;
+        match data {
+            Some(data) => Ok(data.hash),
+            None => Ok(B256::ZERO),
+        }
     }
 }
 
