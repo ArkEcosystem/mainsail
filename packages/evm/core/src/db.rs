@@ -595,20 +595,6 @@ impl PersistentDB {
         }
     }
 
-    pub fn get_receipt(
-        &self,
-        block_number: u64,
-        tx_hash: B256,
-    ) -> Result<Option<TxReceipt>, Error> {
-        let tx_env = self.env.read_txn()?;
-
-        let commits = self.inner.borrow().commits.get(&tx_env, &block_number)?;
-
-        Ok(match commits {
-            Some(inner) => inner.tx_receipts.get(&tx_hash).cloned(),
-            None => None,
-        })
-    }
 
     pub fn get_historical_account_info(
         &mut self,
@@ -1113,13 +1099,13 @@ impl PersistentDB {
             .is_ok_and(|v| v.is_some())
     }
 
-    pub fn get_committed_receipt(
+    pub fn get_receipt(
         &self,
         block_number: u64,
         tx_hash: B256,
     ) -> Result<(bool, Option<TxReceipt>), Error> {
         let env = self.env.clone();
-        let rtxn = env.read_txn().expect("read");
+        let rtxn = env.read_txn()?;
         let inner = self.inner.borrow();
 
         match inner.commits.get(&rtxn, &block_number)? {
