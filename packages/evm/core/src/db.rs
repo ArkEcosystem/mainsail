@@ -595,9 +595,8 @@ impl PersistentDB {
         }
     }
 
-
     pub fn get_historical_account_info(
-        &mut self,
+        &self,
         block_number: u64,
         address: Address,
     ) -> Result<(Option<AccountInfo>, bool), Error> {
@@ -635,7 +634,7 @@ impl PersistentDB {
     }
 
     pub fn get_legacy_attributes(
-        &mut self,
+        &self,
         address: Address,
     ) -> Result<Option<LegacyAccountAttributes>, Error> {
         let tx_env = self.env.read_txn()?;
@@ -648,7 +647,7 @@ impl PersistentDB {
     }
 
     pub fn get_legacy_cold_wallet(
-        &mut self,
+        &self,
         address: LegacyAddress,
     ) -> Result<Option<LegacyColdWallet>, Error> {
         let tx_env = self.env.read_txn()?;
