@@ -191,14 +191,14 @@ pub struct CommitKey(pub u64, pub u64, pub B256);
 
 pub type BlsSig = revm::primitives::FixedBytes<96>;
 
-#[derive(Default, Debug, Deserialize, Serialize)]
+#[derive(Default, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct ProofData {
     pub round: u32,
     pub signature: BlsSig,
     pub validator_set: u128,
 }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
+#[derive(Default, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct BlockHeaderData {
     pub version: u8,
     pub timestamp: u64,
@@ -217,7 +217,7 @@ pub struct BlockHeaderData {
     pub proposer: Address,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Default, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct TransactionData {
     pub from: Address,
     pub sender_public_key: String,
@@ -237,7 +237,7 @@ pub struct TransactionData {
     pub index: u32,
 }
 
-#[derive(Default)]
+#[derive(Default, PartialEq, Eq)]
 pub struct CommitData {
     pub proof: ProofData,
     pub header: BlockHeaderData,
@@ -269,7 +269,7 @@ pub struct PendingCommit {
     pub built_commit: Option<StateCommit>,
 }
 
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, PartialEq, Eq)]
 pub struct GenesisInfo {
     pub account: Address,
     pub deployer_account: Address,
