@@ -50,48 +50,42 @@ fn calculate_state_root(
             )
         };
 
-    let mut hashes = Vec::with_capacity(5);
 
     let block_number = state.key.0.to_le_bytes();
-    hashes.push(block_number.as_slice());
 
     let genesis_info_hash = match genesis_info {
         Some(info) => calculate_hash(info)?,
         None => B256::ZERO,
     };
 
-    hashes.push(genesis_info_hash.as_slice());
-    hashes.push(current_hash.as_slice());
-    hashes.push(accounts_hash.as_slice());
-    hashes.push(contracts_hash.as_slice());
-    hashes.push(storage_hash.as_slice());
+    let mut hasher = Keccak256::new();
+    hasher.update(block_number);
+    hasher.update(genesis_info_hash);
+    hasher.update(current_hash);
+    hasher.update(commit_hashes.accounts_hash);
+    hasher.update(commit_hashes.contracts_hash);
+    hasher.update(commit_hashes.storage_hash);
 
-    let result = keccak256(hashes.concat());
-
-    Ok(result)
+    Ok((hasher.finalize(), commit_hashes))
 }
 
 pub fn calculate_accounts_hash(state_changes: &StateChangeset) -> Result<B256, crate::db::Error> {
-    let mut hashes = Vec::with_capacity(4);
-    hashes.push(calculate_hash(&state_changes.accounts)?);
+    let mut writer = HashWriter::new();
+    hash_serialize_into(&mut writer, &state_changes.accounts)?;
 
     if !state_changes.legacy_attributes.is_empty() {
-        hashes.push(calculate_hash(&state_changes.legacy_attributes)?);
+        hash_serialize_into(&mut writer, &state_changes.legacy_attributes)?;
     }
 
     if !state_changes.legacy_cold_wallets.is_empty() {
-        hashes.push(calculate_hash(&state_changes.legacy_cold_wallets)?);
+        hash_serialize_into(&mut writer, &state_changes.legacy_cold_wallets)?;
     }
 
     if !state_changes.merged_legacy_cold_wallets.is_empty() {
-        hashes.push(calculate_hash(&state_changes.merged_legacy_cold_wallets)?);
+        hash_serialize_into(&mut writer, &state_changes.merged_legacy_cold_wallets)?;
     }
 
-    if hashes.len() == 1 {
-        Ok(hashes.remove(0))
-    } else {
-        Ok(keccak256(hashes.concat()))
-    }
+    Ok(writer.finalize())
 }
 
 pub fn calculate_contracts_hash(state_changes: &StateChangeset) -> Result<B256, crate::db::Error> {
@@ -114,8 +108,39 @@ fn prepare(state: &mut StateCommit) {
     state.change_set.contracts.par_sort_by_key(|a| a.0);
     for s in &mut state.change_set.storage {
         s.storage.par_sort_by_key(|slot| slot.0);
+struct HashWriter {
+    hasher: Keccak256,
+}
+
+impl HashWriter {
+    fn new() -> Self {
+        Self {
+            hasher: Keccak256::new(),
+        }
     }
-    state.change_set.storage.par_sort_by_key(|a| a.address);
+
+    fn finalize(self) -> B256 {
+        self.hasher.finalize()
+    }
+}
+
+impl Write for HashWriter {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.hasher.update(buf);
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
+
+fn hash_serialize_into<T: Serialize>(
+    writer: &mut HashWriter,
+    value: &T,
+) -> Result<(), crate::db::Error> {
+    bincode::serialize_into(writer, value)?;
+    Ok(())
 }
 
 #[cfg(test)]
