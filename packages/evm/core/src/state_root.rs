@@ -8,7 +8,7 @@ use serde::Serialize;
 use std::io::{self, Write};
 
 use crate::{
-    db::{GenesisInfo, PendingCommit, PersistentDB},
+    db::{CommitHashes, GenesisInfo, PendingCommit, PersistentDB},
     state_changes::StateChangeset,
     state_commit::{StateCommit, build_commit},
 };
@@ -18,14 +18,24 @@ pub fn calculate(
     pending_commit: &mut PendingCommit,
     current_hash: B256,
 ) -> Result<B256, crate::db::Error> {
-    let committed_hashes = db.get_committed_hashes(pending_commit.key.0)?;
+    let mut committed_hashes = db.get_committed_hashes(pending_commit.key.0)?;
+    match (&mut committed_hashes, &pending_commit.commit_hashes) {
+        (None, Some(committed)) => {
+            // take existing
+            committed_hashes.replace(committed.clone());
+        }
+        (Some(committed), Some(pending)) => {
+            assert_eq!(committed, pending);
+        }
+        _ => {}
+    };
 
     if pending_commit.built_commit.is_none() {
         let state_commit = build_commit(pending_commit)?;
         pending_commit.built_commit.replace(state_commit);
     };
 
-    calculate_state_root(
+    let (state_root, commit_hashes) = calculate_state_root(
         current_hash,
         pending_commit
             .built_commit
@@ -33,28 +43,24 @@ pub fn calculate(
             .expect("state commit exists"),
         committed_hashes,
         &db.genesis_info,
-    )
+    )?;
+
+    pending_commit.commit_hashes.replace(commit_hashes);
+
+    Ok(state_root)
 }
 
 fn calculate_state_root(
     current_hash: B256,
     state: &mut StateCommit,
-    committed_hashes: Option<(B256, B256, B256)>,
+    committed_hashes: Option<CommitHashes>,
     genesis_info: &Option<GenesisInfo>,
-) -> Result<B256, crate::db::Error> {
-    let (accounts_hash, contracts_hash, storage_hash) =
-        if let Some(committed_hashes) = committed_hashes {
-            committed_hashes
-        } else {
-            prepare(state);
-
-            (
-                calculate_accounts_hash(&state.change_set)?,
-                calculate_contracts_hash(&state.change_set)?,
-                calculate_storage_hash(&state.change_set)?,
-            )
-        };
-
+) -> Result<(B256, CommitHashes), crate::db::Error> {
+    let commit_hashes = if let Some(committed_hashes) = committed_hashes {
+        committed_hashes
+    } else {
+        calculate_commit_hashes(state)?
+    };
 
     let block_number = state.key.0.to_le_bytes();
 
@@ -72,6 +78,16 @@ fn calculate_state_root(
     hasher.update(commit_hashes.storage_hash);
 
     Ok((hasher.finalize(), commit_hashes))
+}
+
+pub fn calculate_commit_hashes(state: &mut StateCommit) -> Result<CommitHashes, crate::db::Error> {
+    prepare(state);
+
+    Ok(CommitHashes {
+        accounts_hash: calculate_accounts_hash(&state.change_set)?,
+        contracts_hash: calculate_contracts_hash(&state.change_set)?,
+        storage_hash: calculate_storage_hash(&state.change_set)?,
+    })
 }
 
 pub fn calculate_accounts_hash(state_changes: &StateChangeset) -> Result<B256, crate::db::Error> {

@@ -30,7 +30,6 @@ use crate::{
     receipt::{TxReceipt, map_execution_result},
     state_changes,
     state_commit::StateCommit,
-    state_root,
 };
 
 #[derive(Debug)]
@@ -267,6 +266,14 @@ pub struct PendingCommit {
 
     // Optimization to avoid unnecessary (deep) clones of commit data.
     pub built_commit: Option<StateCommit>,
+    pub commit_hashes: Option<CommitHashes>,
+}
+
+#[derive(Clone, Default, Debug, Serialize, Deserialize, PartialEq, Eq)]
+pub struct CommitHashes {
+    pub accounts_hash: B256,
+    pub contracts_hash: B256,
+    pub storage_hash: B256,
 }
 
 #[derive(Clone, Debug, Default, Serialize, PartialEq, Eq)]
@@ -801,6 +808,7 @@ impl PersistentDB {
         &self,
         state_commit: &mut StateCommit,
         commit_data: &Option<CommitData>,
+        commit_hashes: &CommitHashes,
     ) -> Result<(), Error> {
         let StateCommit {
             key,
@@ -808,7 +816,7 @@ impl PersistentDB {
             results,
         } = state_commit;
 
-        match self.commit_to_db(key, change_set, commit_data, results) {
+        match self.commit_to_db(key, change_set, commit_data, commit_hashes, results) {
             Ok(_) => return Ok(()),
             Err(err) => match &err {
                 Error::Heed(heed_err) => match heed_err {
@@ -828,6 +836,7 @@ impl PersistentDB {
         key: &CommitKey,
         change_set: &mut state_changes::StateChangeset,
         commit_data: &Option<CommitData>,
+        commit_hashes: &CommitHashes,
         results: &BTreeMap<B256, (ExecutionResult, u64)>,
     ) -> Result<(), Error> {
         assert!(!self.is_block_committed(key.0));
@@ -1067,9 +1076,9 @@ impl PersistentDB {
                 rwtxn,
                 &key.0,
                 &CompressedBincode(&CommitReceipts {
-                    accounts_hash: state_root::calculate_accounts_hash(&change_set)?,
-                    contracts_hash: state_root::calculate_contracts_hash(&change_set)?,
-                    storage_hash: state_root::calculate_storage_hash(&change_set)?,
+                    accounts_hash: commit_hashes.accounts_hash,
+                    contracts_hash: commit_hashes.contracts_hash,
+                    storage_hash: commit_hashes.storage_hash,
                     tx_receipts,
                 }),
             )?;
@@ -1113,20 +1122,17 @@ impl PersistentDB {
         }
     }
 
-    pub fn get_committed_hashes(
-        &self,
-        block_number: u64,
-    ) -> Result<Option<(B256, B256, B256)>, Error> {
+    pub fn get_committed_hashes(&self, block_number: u64) -> Result<Option<CommitHashes>, Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
 
         match inner.commits.get(&rtxn, &block_number)? {
-            Some(receipts) => Ok(Some((
-                receipts.accounts_hash,
-                receipts.contracts_hash,
-                receipts.storage_hash,
-            ))),
+            Some(receipts) => Ok(Some(CommitHashes {
+                accounts_hash: receipts.accounts_hash,
+                contracts_hash: receipts.contracts_hash,
+                storage_hash: receipts.storage_hash,
+            })),
             None => Ok(None),
         }
     }
@@ -1233,6 +1239,7 @@ impl PendingCommit {
             legacy_cold_wallets: Default::default(),
             merged_legacy_cold_wallets: Default::default(),
             built_commit: Default::default(),
+            commit_hashes: Default::default(),
         }
     }
 
