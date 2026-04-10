@@ -1,6 +1,11 @@
-use rayon::slice::ParallelSliceMut;
+use alloy_primitives::Keccak256;
+use rayon::{
+    iter::{IntoParallelRefMutIterator, ParallelIterator},
+    slice::ParallelSliceMut,
+};
 use revm::primitives::{B256, keccak256};
 use serde::Serialize;
+use std::io::{self, Write};
 
 use crate::{
     db::{GenesisInfo, PendingCommit, PersistentDB},
@@ -104,10 +109,21 @@ where
 }
 
 fn prepare(state: &mut StateCommit) {
-    state.change_set.accounts.par_sort_by_key(|a| a.0);
-    state.change_set.contracts.par_sort_by_key(|a| a.0);
-    for s in &mut state.change_set.storage {
-        s.storage.par_sort_by_key(|slot| slot.0);
+    state.change_set.accounts.par_sort_unstable_by_key(|a| a.0);
+    state.change_set.contracts.par_sort_unstable_by_key(|a| a.0);
+
+    state
+        .change_set
+        .storage
+        .par_iter_mut()
+        .for_each(|s| s.storage.par_sort_unstable_by_key(|slot| slot.0));
+
+    state
+        .change_set
+        .storage
+        .par_sort_unstable_by_key(|a| a.address);
+}
+
 struct HashWriter {
     hasher: Keccak256,
 }

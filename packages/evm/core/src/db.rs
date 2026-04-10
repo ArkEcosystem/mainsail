@@ -845,9 +845,9 @@ impl PersistentDB {
                 merged_legacy_cold_wallets,
             } = change_set;
 
-            accounts.par_sort_by_key(|a| a.0);
-            contracts.par_sort_by_key(|a| a.0);
-            storage.par_sort_by_key(|a| a.address);
+            accounts.par_sort_unstable_by_key(|a| a.0);
+            contracts.par_sort_unstable_by_key(|a| a.0);
+            storage.par_sort_unstable_by_key(|a| a.address);
 
             // Update accounts
             for (address, account) in accounts.iter() {
