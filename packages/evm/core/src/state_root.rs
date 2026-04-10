@@ -177,18 +177,20 @@ fn hash_serialize_into<T: Serialize>(
 
 #[cfg(test)]
 mod tests {
+    use std::io::Write;
+
     use crate::{
-        db::{GenesisInfo, PendingCommit, PersistentDB, PersistentDBOptions},
+        db::{CommitHashes, GenesisInfo, PendingCommit, PersistentDB, PersistentDBOptions},
         legacy::LegacyAddress,
         state_changes::StateChangeset,
         state_commit::{StateCommit, build_commit},
-        state_root::{calculate, calculate_state_root},
+        state_root::{HashWriter, calculate, calculate_state_root},
     };
-    use alloy_primitives::{B256, U256, address, b256};
+    use alloy_primitives::{B256, U256, address, b256, keccak256};
 
     #[test]
     fn test_calculate_state_root_default() {
-        let result =
+        let (result, _) =
             calculate_state_root(B256::ZERO, &mut Default::default(), None, &None).expect("ok");
         assert_eq!(
             result,
@@ -267,25 +269,31 @@ mod tests {
             ..Default::default()
         };
 
-        let result = calculate_state_root(B256::ZERO, &mut state, None, &None).expect("ok");
+        let (result, _) = calculate_state_root(B256::ZERO, &mut state, None, &None).expect("ok");
         assert_eq!(
             result,
             revm::primitives::b256!(
-                "4a89eeb210b50ac79b17f867e55225c6cd9b253dfbddb6f5c0438720b562f95c"
+                "10227181595c4fbd09f30cac2a3de60e5bdbbdc869b9683fdc22dd0d210f63d9"
             )
         );
     }
 
     #[test]
     fn test_calculate_state_root_committed() {
-        let result = calculate_state_root(
+        let (result, _) = calculate_state_root(
             B256::ZERO,
             &mut Default::default(),
-            Some((
-                b256!("0000000000000000000000000000000000000000000000000000000000000001"),
-                b256!("0000000000000000000000000000000000000000000000000000000000000002"),
-                b256!("0000000000000000000000000000000000000000000000000000000000000003"),
-            )),
+            Some(CommitHashes {
+                accounts_hash: b256!(
+                    "0000000000000000000000000000000000000000000000000000000000000001"
+                ),
+                contracts_hash: b256!(
+                    "0000000000000000000000000000000000000000000000000000000000000002"
+                ),
+                storage_hash: b256!(
+                    "0000000000000000000000000000000000000000000000000000000000000003"
+                ),
+            }),
             &Some(GenesisInfo {
                 account: address!("0000000000000000000000000000000000000001"),
                 deployer_account: address!("0000000000000000000000000000000000000002"),
@@ -350,8 +358,24 @@ mod tests {
         assert_eq!(
             result,
             revm::primitives::b256!(
-                "5ca756d93a56e6c15c9e182ff236bd5db21bcde81c2c438d58a32bbd16b4ec3a"
+                "6501f46f58e5a271c238d2787120d7e730cffd65f26ac76758684b82c7c152db"
             )
         );
+    }
+
+    #[test]
+    fn test_hash_writer_matches_keccak256_and_flush_is_ok() {
+        let input = b"hello world";
+
+        let mut writer = HashWriter::new();
+        let written = writer.write(input).unwrap();
+        assert_eq!(written, input.len());
+
+        writer.flush().unwrap();
+
+        let actual = writer.finalize();
+        let expected = keccak256(input);
+
+        assert_eq!(actual, expected);
     }
 }

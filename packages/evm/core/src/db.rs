@@ -1283,10 +1283,10 @@ mod tests {
         account::StoredAccountInfo,
         compression::CompressedBincode,
         db::{
-            AddressWrapper, BlockHeaderData, CommitData, CommitKey, CommitReceipts, HashWrapper,
-            LegacyAddressWrapper, MAP_SIZE_UNIT, PendingCommit, PersistentDB, PersistentDBOptions,
-            ProofData, StaticStringWrapper, StorageEntryWrapper, StringWrapper, TransactionData,
-            next_map_size,
+            AddressWrapper, BlockHeaderData, CommitData, CommitHashes, CommitKey, CommitReceipts,
+            HashWrapper, LegacyAddressWrapper, MAP_SIZE_UNIT, PendingCommit, PersistentDB,
+            PersistentDBOptions, ProofData, StaticStringWrapper, StorageEntryWrapper,
+            StringWrapper, TransactionData, next_map_size,
         },
         historical::HistoricalAccountData,
         legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
@@ -1294,6 +1294,7 @@ mod tests {
         receipt::TxReceipt,
         state_changes::{StateChangeset, StorageChangeset},
         state_commit::{StateCommit, build_commit},
+        state_root,
     };
     use alloy_primitives::{Address, B256, Bytes, FixedBytes, U256, address, b256, hex};
     use revm::{
@@ -1384,6 +1385,7 @@ mod tests {
             PendingCommit {
                 key: CommitKey::default(),
                 transitions: TransitionState { transitions: state },
+                commit_hashes: Some(Default::default()),
                 ..Default::default()
             },
             Default::default(),
@@ -1414,6 +1416,8 @@ mod tests {
         let mut db = create_temp_database();
         let mut pending_commit = PendingCommit::default();
         pending_commit.built_commit = Some(build_commit(&mut pending_commit).unwrap());
+        pending_commit.commit_hashes = Some(CommitHashes::default());
+
         crate::state_commit::commit_to_db(&mut db, pending_commit, Default::default()).unwrap();
     }
 
@@ -1467,6 +1471,7 @@ mod tests {
             PendingCommit {
                 key: CommitKey::default(),
                 transitions: TransitionState { transitions: state },
+                commit_hashes: Some(CommitHashes::default()),
                 ..Default::default()
             },
             Default::default(),
@@ -1522,6 +1527,7 @@ mod tests {
             PendingCommit {
                 key: CommitKey::default(),
                 transitions: TransitionState { transitions: state },
+                commit_hashes: Some(Default::default()),
                 ..Default::default()
             },
             Default::default(),
@@ -1559,6 +1565,7 @@ mod tests {
             PendingCommit {
                 key: CommitKey(1, 0, B256::ZERO),
                 transitions: TransitionState { transitions: state },
+                commit_hashes: Some(Default::default()),
                 ..Default::default()
             },
             Default::default(),
@@ -1621,6 +1628,7 @@ mod tests {
             PendingCommit {
                 key: CommitKey(block_number, 0, B256::ZERO),
                 transitions: TransitionState { transitions: state },
+                commit_hashes: Some(Default::default()),
                 ..Default::default()
             }
         };
@@ -2255,7 +2263,14 @@ mod tests {
         }
 
         let hashes = db.get_committed_hashes(1).unwrap();
-        assert_eq!(hashes, Some((accounts_hash, contracts_hash, storage_hash)));
+        assert_eq!(
+            hashes,
+            Some(CommitHashes {
+                accounts_hash,
+                contracts_hash,
+                storage_hash
+            })
+        );
     }
 
     #[test]
@@ -2662,7 +2677,13 @@ mod tests {
             ..Default::default()
         };
 
-        db.commit(&mut state, &Some(data)).unwrap();
+        let commit_hashes = CommitHashes {
+            accounts_hash: state_root::calculate_accounts_hash(&state.change_set).unwrap(),
+            contracts_hash: state_root::calculate_contracts_hash(&state.change_set).unwrap(),
+            storage_hash: state_root::calculate_storage_hash(&state.change_set).unwrap(),
+        };
+
+        db.commit(&mut state, &Some(data), &commit_hashes).unwrap();
     }
 
     fn create_temp_database() -> PersistentDB {
