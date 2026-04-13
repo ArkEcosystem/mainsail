@@ -16,7 +16,7 @@ export interface TransactionHandler {
 
 	throwIfCannotBeApplied(transaction: Transaction, sender: Wallet, evm: Instance): Promise<void>;
 
-	apply(context: TransactionHandlerContext, transaction: Transaction, index: number): Promise<TransactionReceipt>;
+	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionReceipt>;
 }
 
 export interface TransactionHandlerRegistry {
@@ -46,11 +46,7 @@ export interface TransactionValidatorContext {
 
 export interface TransactionValidator {
 	getEvm(): Instance;
-	validate(
-		context: TransactionValidatorContext,
-		transaction: Transaction,
-		index: number,
-	): Promise<TransactionReceipt>;
+	validate(context: TransactionValidatorContext, transaction: Transaction): Promise<TransactionReceipt>;
 }
 
 export type TransactionValidatorFactory = () => TransactionValidator;
