@@ -1422,6 +1422,16 @@ mod tests {
     }
 
     #[test]
+    fn test_commit_built_without_precomputed_hashes() {
+        let mut db = create_temp_database();
+        let mut pending_commit = PendingCommit::default();
+        pending_commit.built_commit = Some(build_commit(&mut pending_commit).unwrap());
+        pending_commit.commit_hashes = None;
+
+        crate::state_commit::commit_to_db(&mut db, pending_commit, Default::default()).unwrap();
+    }
+
+    #[test]
     fn test_storage() {
         let mut db = create_temp_database();
 
