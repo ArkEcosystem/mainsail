@@ -23,7 +23,7 @@
 		"@napi-rs/cli": "3.6.0"
 	},
 	"engines": {
-		"node": ">=20.x"
+		"node": ">=24"
 	},
 	"napi": {
 		"binaryName": "evm",
