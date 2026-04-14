@@ -37,7 +37,7 @@ pub struct StorageChangeset {
     pub storage: Vec<(U256, StorageSlot)>,
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, PartialEq, Eq)]
 pub struct AccountUpdate {
     pub address: Address,
     pub balance: U256,
@@ -54,7 +54,7 @@ pub struct AccountUpdate {
     pub merge_info: Option<AccountMergeInfo>,
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, PartialEq, Eq)]
 pub struct AccountMergeInfo {
     pub legacy_address: LegacyAddress,
     pub transaction_hash: B256,

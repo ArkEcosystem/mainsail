@@ -22,3 +22,18 @@ impl TryFrom<StoredBytecode> for Bytecode {
         Bytecode::new_raw_checked(stored.raw)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::bytecode::StoredBytecode;
+    use alloy_primitives::Bytes;
+    use revm::state::Bytecode;
+
+    #[test]
+    fn test_bytecode() {
+        let raw_bytecode = Bytecode::new_raw(Bytes::from_static(&[1, 2, 3, 4]));
+        let stored = StoredBytecode::from(raw_bytecode);
+
+        assert_eq!(stored.raw, Bytes::from_static(&[1, 2, 3, 4]));
+    }
+}
