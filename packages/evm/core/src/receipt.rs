@@ -4,7 +4,7 @@ use revm::{
 };
 use serde::{Deserialize, Serialize};
 
-#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct TxReceipt {
     pub gas_used: u64,
     pub cumulative_gas_used: u64,

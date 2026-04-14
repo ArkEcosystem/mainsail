@@ -191,14 +191,14 @@ pub struct CommitKey(pub u64, pub u64, pub B256);
 
 pub type BlsSig = revm::primitives::FixedBytes<96>;
 
-#[derive(Default, Debug, Deserialize, Serialize)]
+#[derive(Default, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct ProofData {
     pub round: u32,
     pub signature: BlsSig,
     pub validator_set: u128,
 }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
+#[derive(Default, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct BlockHeaderData {
     pub version: u8,
     pub timestamp: u64,
@@ -217,7 +217,7 @@ pub struct BlockHeaderData {
     pub proposer: Address,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Default, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct TransactionData {
     pub from: Address,
     pub sender_public_key: String,
@@ -237,7 +237,7 @@ pub struct TransactionData {
     pub index: u32,
 }
 
-#[derive(Default)]
+#[derive(Default, PartialEq, Eq)]
 pub struct CommitData {
     pub proof: ProofData,
     pub header: BlockHeaderData,
@@ -269,7 +269,7 @@ pub struct PendingCommit {
     pub built_commit: Option<StateCommit>,
 }
 
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, PartialEq, Eq)]
 pub struct GenesisInfo {
     pub account: Address,
     pub deployer_account: Address,
@@ -595,23 +595,8 @@ impl PersistentDB {
         }
     }
 
-    pub fn get_receipt(
-        &self,
-        block_number: u64,
-        tx_hash: B256,
-    ) -> Result<Option<TxReceipt>, Error> {
-        let tx_env = self.env.read_txn()?;
-
-        let commits = self.inner.borrow().commits.get(&tx_env, &block_number)?;
-
-        Ok(match commits {
-            Some(inner) => inner.tx_receipts.get(&tx_hash).cloned(),
-            None => None,
-        })
-    }
-
     pub fn get_historical_account_info(
-        &mut self,
+        &self,
         block_number: u64,
         address: Address,
     ) -> Result<(Option<AccountInfo>, bool), Error> {
@@ -649,7 +634,7 @@ impl PersistentDB {
     }
 
     pub fn get_legacy_attributes(
-        &mut self,
+        &self,
         address: Address,
     ) -> Result<Option<LegacyAccountAttributes>, Error> {
         let tx_env = self.env.read_txn()?;
@@ -662,7 +647,7 @@ impl PersistentDB {
     }
 
     pub fn get_legacy_cold_wallet(
-        &mut self,
+        &self,
         address: LegacyAddress,
     ) -> Result<Option<LegacyColdWallet>, Error> {
         let tx_env = self.env.read_txn()?;
@@ -1113,13 +1098,13 @@ impl PersistentDB {
             .is_ok_and(|v| v.is_some())
     }
 
-    pub fn get_committed_receipt(
+    pub fn get_receipt(
         &self,
         block_number: u64,
         tx_hash: B256,
     ) -> Result<(bool, Option<TxReceipt>), Error> {
         let env = self.env.clone();
-        let rtxn = env.read_txn().expect("read");
+        let rtxn = env.read_txn()?;
         let inner = self.inner.borrow();
 
         match inner.commits.get(&rtxn, &block_number)? {
@@ -1283,315 +1268,97 @@ impl PendingCommit {
     }
 }
 
-#[test]
-fn test_open_db() {
-    let tmp = tempfile::Builder::new()
-        .prefix("evm.mdb")
-        .tempdir()
-        .unwrap();
+#[cfg(test)]
+mod tests {
+    use std::collections::BTreeMap;
 
-    assert!(PersistentDB::new(PersistentDBOptions::new(tmp.path().to_path_buf())).is_ok());
-}
-
-#[test]
-fn test_open_db_with_logger() {
-    let tmp = tempfile::Builder::new()
-        .prefix("evm.mdb")
-        .tempdir()
-        .unwrap();
-
-    assert!(
-        PersistentDB::new(
-            PersistentDBOptions::new(tmp.path().to_path_buf()).with_logger(Logger::new(None))
-        )
-        .is_ok()
-    );
-}
-
-#[test]
-fn test_commit_changes() {
-    let path = tempfile::Builder::new()
-        .prefix("evm.mdb")
-        .tempdir()
-        .unwrap();
-
-    let mut db =
-        PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
-
-    // 1) Lookup empty account
-    let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
-    let account = db.basic(address).expect("works").expect("account info");
-
-    assert_eq!(
-        account.code_hash,
-        FixedBytes(hex!(
-            "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
-        ))
-    );
-
-    // 2) Update balance for account
-    let mut state = HashMap::default();
-
-    let mut account = revm::state::Account::new_not_existing(0);
-    account.info.balance = U256::from(100);
-    account.status = revm::state::AccountStatus::Touched;
-
-    let code = Bytecode::new();
-    account.info.code_hash = code.hash_slow();
-    account.info.code = Some(code.clone());
-
-    let mut storage = HashMap::default();
-    storage.insert(
-        U256::from(1),
-        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1234)),
-    );
-    storage.insert(
-        U256::from(2),
-        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(5678)),
-    );
-
-    state.insert(
-        address,
-        revm::database::TransitionAccount {
-            status: revm::database::AccountStatus::InMemoryChange,
-            info: Some(account.info.clone()),
-            previous_status: revm::database::AccountStatus::Loaded,
-            previous_info: None,
-            storage,
-            storage_was_destroyed: false,
+    use crate::{
+        account::StoredAccountInfo,
+        compression::CompressedBincode,
+        db::{
+            AddressWrapper, BlockHeaderData, CommitData, CommitKey, CommitReceipts, HashWrapper,
+            LegacyAddressWrapper, MAP_SIZE_UNIT, PendingCommit, PersistentDB, PersistentDBOptions,
+            ProofData, StaticStringWrapper, StorageEntryWrapper, StringWrapper, TransactionData,
+            next_map_size,
         },
-    );
+        historical::HistoricalAccountData,
+        legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
+        logger::Logger,
+        receipt::TxReceipt,
+        state_changes::{StateChangeset, StorageChangeset},
+        state_commit::{StateCommit, build_commit},
+    };
+    use alloy_primitives::{Address, B256, Bytes, FixedBytes, U256, address, b256, hex};
+    use revm::{
+        Database,
+        context::result::{ExecutionResult, ResultGas, SuccessReason},
+        database::{TransitionState, states::StorageSlot},
+        primitives::HashMap,
+        state::{AccountInfo, Bytecode},
+    };
 
-    crate::state_commit::commit_to_db(
-        &mut db,
-        PendingCommit {
-            key: CommitKey::default(),
-            transitions: TransitionState { transitions: state },
-            ..Default::default()
-        },
-        Default::default(),
-    )
-    .expect("ok");
+    use heed::{BytesDecode, BytesEncode, EnvFlags, EnvOpenOptions};
 
-    // 3) Assert updated storage
+    #[test]
+    fn test_open_db() {
+        let tmp = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
 
-    // Balance
-    let account = db.basic(address).expect("works").expect("account info");
-    assert_eq!(account.balance, U256::from(100));
-
-    // Code
-    assert_eq!(account.code_hash, code.hash_slow());
-    let account_code = db.code_by_hash(code.hash_slow()).expect("code");
-    assert_eq!(account_code, code);
-
-    // Storage
-    let mut account_storage = db.storage(address, U256::from(1)).expect("storage");
-    assert_eq!(account_storage, U256::from(1234));
-
-    account_storage = db.storage(address, U256::from(2)).expect("storage");
-    assert_eq!(account_storage, U256::from(5678));
-}
-
-#[test]
-fn test_storage() {
-    let path = tempfile::Builder::new()
-        .prefix("evm.mdb")
-        .tempdir()
-        .unwrap();
-
-    let mut db =
-        PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
-
-    let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
-    let mut state = HashMap::default();
-
-    let mut account = revm::state::Account::new_not_existing(0);
-    account.status = revm::state::AccountStatus::Touched;
-
-    let mut storage = HashMap::default();
-
-    storage.insert(
-        U256::from(99),
-        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(99)),
-    );
-    storage.insert(
-        U256::from(1),
-        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
-    );
-    storage.insert(
-        U256::from(101),
-        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(101)),
-    );
-    storage.insert(
-        U256::from(2),
-        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(2)),
-    );
-    storage.insert(
-        U256::from(4),
-        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(4)),
-    );
-
-    state.insert(
-        address,
-        revm::database::TransitionAccount {
-            status: revm::database::AccountStatus::InMemoryChange,
-            info: Some(account.info.clone()),
-            previous_status: revm::database::AccountStatus::Loaded,
-            previous_info: None,
-            storage,
-            storage_was_destroyed: false,
-        },
-    );
-
-    crate::state_commit::commit_to_db(
-        &mut db,
-        PendingCommit {
-            key: CommitKey::default(),
-            transitions: TransitionState { transitions: state },
-            ..Default::default()
-        },
-        Default::default(),
-    )
-    .expect("ok");
-
-    // Assert storage is sorted
-
-    let indexes = vec![1, 2, 4, 99, 101];
-
-    // Storage
-    for index in indexes {
-        let account_storage = db.storage(address, U256::from(index)).expect("storage");
-        assert_eq!(account_storage, U256::from(index));
+        assert!(PersistentDB::new(PersistentDBOptions::new(tmp.path().to_path_buf())).is_ok());
     }
-}
 
-#[test]
-fn test_storage_overwrite() {
-    let path = tempfile::Builder::new()
-        .prefix("evm.mdb")
-        .tempdir()
-        .unwrap();
+    #[test]
+    fn test_open_db_with_logger() {
+        let tmp = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
 
-    let mut db =
-        PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
-
-    let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
-    let mut state = HashMap::default();
-
-    let mut account = revm::state::Account::new_not_existing(0);
-    account.status = revm::state::AccountStatus::Touched;
-
-    let mut storage = HashMap::default();
-
-    storage.insert(
-        U256::from(1),
-        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
-    );
-    storage.insert(
-        U256::from(2),
-        revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(2)),
-    );
-
-    state.insert(
-        address,
-        revm::database::TransitionAccount {
-            status: revm::database::AccountStatus::InMemoryChange,
-            info: Some(account.info.clone()),
-            previous_status: revm::database::AccountStatus::Loaded,
-            previous_info: None,
-            storage,
-            storage_was_destroyed: false,
-        },
-    );
-
-    crate::state_commit::commit_to_db(
-        &mut db,
-        PendingCommit {
-            key: CommitKey::default(),
-            transitions: TransitionState { transitions: state },
-            ..Default::default()
-        },
-        Default::default(),
-    )
-    .expect("ok");
-
-    // Assert storage
-    let mut account_storage = db.storage(address, U256::from(1)).expect("storage");
-    assert_eq!(account_storage, U256::from(1));
-    account_storage = db.storage(address, U256::from(2)).expect("storage");
-    assert_eq!(account_storage, U256::from(2));
-
-    // Now overwrite index 1
-    let mut storage = HashMap::default();
-    storage.insert(
-        U256::from(1),
-        revm::database::states::StorageSlot::new_changed(U256::from(1), U256::from(99)),
-    );
-
-    let mut state = HashMap::default();
-    state.insert(
-        address,
-        revm::database::TransitionAccount {
-            status: revm::database::AccountStatus::Changed,
-            info: Some(account.info.clone()),
-            previous_status: revm::database::AccountStatus::Loaded,
-            previous_info: None,
-            storage,
-            storage_was_destroyed: false,
-        },
-    );
-
-    crate::state_commit::commit_to_db(
-        &mut db,
-        PendingCommit {
-            key: CommitKey(1, 0, B256::ZERO),
-            transitions: TransitionState { transitions: state },
-            ..Default::default()
-        },
-        Default::default(),
-    )
-    .expect("ok");
-
-    // Assert storage again
-
-    // - index 1 was overwritte
-    let mut account_storage = db.storage(address, U256::from(1)).expect("storage");
-    assert_eq!(account_storage, U256::from(99));
-
-    // - index 2 remains unchanged
-    account_storage = db.storage(address, U256::from(2)).expect("storage");
-    assert_eq!(account_storage, U256::from(2));
-}
-
-#[test]
-fn test_next_map_size() {
-    let input = vec![0, 1, 2, 3, 4];
-    for i in input {
-        let next = next_map_size(i * MAP_SIZE_UNIT);
-        assert_eq!(next, (i + 1) * MAP_SIZE_UNIT);
+        assert!(
+            PersistentDB::new(
+                PersistentDBOptions::new(tmp.path().to_path_buf()).with_logger(Logger::new(None))
+            )
+            .is_ok()
+        );
     }
-}
 
-#[test]
-fn test_resize_on_commit() {
-    let create_large_commit = |block_number: u64, n: usize| {
-        let mut buf = vec![0; 32];
-        buf[0..8].copy_from_slice(&block_number.to_le_bytes());
-        let address = Address::from_word(ethers_core::utils::keccak256(buf).into());
+    #[test]
+    fn test_commit_changes() {
+        let mut db = create_temp_database();
 
+        // 1) Lookup empty account
+        let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let account = db.basic(address).expect("works").expect("account info");
+
+        assert_eq!(
+            account.code_hash,
+            FixedBytes(hex!(
+                "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+            ))
+        );
+
+        // 2) Update balance for account
         let mut state = HashMap::default();
 
         let mut account = revm::state::Account::new_not_existing(0);
+        account.info.balance = U256::from(100);
         account.status = revm::state::AccountStatus::Touched;
 
-        let mut storage = HashMap::default();
+        let code = Bytecode::new();
+        account.info.code_hash = code.hash_slow();
+        account.info.code = Some(code.clone());
 
-        for i in 0..n {
-            storage.insert(
-                U256::from(i + 1),
-                revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
-            );
-        }
+        let mut storage = HashMap::default();
+        storage.insert(
+            U256::from(1),
+            revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1234)),
+        );
+        storage.insert(
+            U256::from(2),
+            revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(5678)),
+        );
 
         state.insert(
             address,
@@ -1605,146 +1372,499 @@ fn test_resize_on_commit() {
             },
         );
 
-        PendingCommit {
-            key: CommitKey(block_number, 0, B256::ZERO),
-            transitions: TransitionState { transitions: state },
-            ..Default::default()
-        }
-    };
-
-    let path = tempfile::Builder::new()
-        .prefix("evm.mdb")
-        .tempdir()
-        .unwrap();
-
-    let mut env_builder = EnvOpenOptions::new();
-    env_builder.max_dbs(PersistentDB::MAX_DBS);
-    env_builder.map_size(4096 * 10); // start with very small (few kB)
-
-    unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
-
-    let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
-
-    let mut db = PersistentDB::new_with_env(env, Default::default()).expect("open");
-    assert_eq!(db.env.info().map_size, 4096 * 10);
-
-    // large commit to trigger a resize
-    crate::state_commit::commit_to_db(&mut db, create_large_commit(0, 1024), Default::default())
-        .expect("ok");
-
-    // increased to next MAP_SIZE_UNIT
-    assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
-
-    // add more commits without triggering another resize
-    for i in 0..10 {
         crate::state_commit::commit_to_db(
             &mut db,
-            create_large_commit(i + 1, 1024),
+            PendingCommit {
+                key: CommitKey::default(),
+                transitions: TransitionState { transitions: state },
+                ..Default::default()
+            },
             Default::default(),
         )
         .expect("ok");
+
+        // 3) Assert updated storage
+
+        // Balance
+        let account = db.basic(address).expect("works").expect("account info");
+        assert_eq!(account.balance, U256::from(100));
+
+        // Code
+        assert_eq!(account.code_hash, code.hash_slow());
+        let account_code = db.code_by_hash(code.hash_slow()).expect("code");
+        assert_eq!(account_code, code);
+
+        // Storage
+        let mut account_storage = db.storage(address, U256::from(1)).expect("storage");
+        assert_eq!(account_storage, U256::from(1234));
+
+        account_storage = db.storage(address, U256::from(2)).expect("storage");
+        assert_eq!(account_storage, U256::from(5678));
+    }
+
+    #[test]
+    fn test_commit_built() {
+        let mut db = create_temp_database();
+        let mut pending_commit = PendingCommit::default();
+        pending_commit.built_commit = Some(build_commit(&mut pending_commit).unwrap());
+        crate::state_commit::commit_to_db(&mut db, pending_commit, Default::default()).unwrap();
+    }
+
+    #[test]
+    fn test_storage() {
+        let mut db = create_temp_database();
+
+        let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let mut state = HashMap::default();
+
+        let mut account = revm::state::Account::new_not_existing(0);
+        account.status = revm::state::AccountStatus::Touched;
+
+        let mut storage = HashMap::default();
+
+        storage.insert(
+            U256::from(99),
+            revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(99)),
+        );
+        storage.insert(
+            U256::from(1),
+            revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+        );
+        storage.insert(
+            U256::from(101),
+            revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(101)),
+        );
+        storage.insert(
+            U256::from(2),
+            revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(2)),
+        );
+        storage.insert(
+            U256::from(4),
+            revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(4)),
+        );
+
+        state.insert(
+            address,
+            revm::database::TransitionAccount {
+                status: revm::database::AccountStatus::InMemoryChange,
+                info: Some(account.info.clone()),
+                previous_status: revm::database::AccountStatus::Loaded,
+                previous_info: None,
+                storage,
+                storage_was_destroyed: false,
+            },
+        );
+
+        crate::state_commit::commit_to_db(
+            &mut db,
+            PendingCommit {
+                key: CommitKey::default(),
+                transitions: TransitionState { transitions: state },
+                ..Default::default()
+            },
+            Default::default(),
+        )
+        .expect("ok");
+
+        // Assert storage is sorted
+
+        let indexes = vec![1, 2, 4, 99, 101];
+
+        // Storage
+        for index in indexes {
+            let account_storage = db.storage(address, U256::from(index)).expect("storage");
+            assert_eq!(account_storage, U256::from(index));
+        }
+    }
+
+    #[test]
+    fn test_storage_overwrite() {
+        let mut db = create_temp_database();
+
+        let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let mut state = HashMap::default();
+
+        let mut account = revm::state::Account::new_not_existing(0);
+        account.status = revm::state::AccountStatus::Touched;
+
+        let mut storage = HashMap::default();
+
+        storage.insert(
+            U256::from(1),
+            revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+        );
+        storage.insert(
+            U256::from(2),
+            revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(2)),
+        );
+
+        state.insert(
+            address,
+            revm::database::TransitionAccount {
+                status: revm::database::AccountStatus::InMemoryChange,
+                info: Some(account.info.clone()),
+                previous_status: revm::database::AccountStatus::Loaded,
+                previous_info: None,
+                storage,
+                storage_was_destroyed: false,
+            },
+        );
+
+        crate::state_commit::commit_to_db(
+            &mut db,
+            PendingCommit {
+                key: CommitKey::default(),
+                transitions: TransitionState { transitions: state },
+                ..Default::default()
+            },
+            Default::default(),
+        )
+        .expect("ok");
+
+        // Assert storage
+        let mut account_storage = db.storage(address, U256::from(1)).expect("storage");
+        assert_eq!(account_storage, U256::from(1));
+        account_storage = db.storage(address, U256::from(2)).expect("storage");
+        assert_eq!(account_storage, U256::from(2));
+
+        // Now overwrite index 1
+        let mut storage = HashMap::default();
+        storage.insert(
+            U256::from(1),
+            revm::database::states::StorageSlot::new_changed(U256::from(1), U256::from(99)),
+        );
+
+        let mut state = HashMap::default();
+        state.insert(
+            address,
+            revm::database::TransitionAccount {
+                status: revm::database::AccountStatus::Changed,
+                info: Some(account.info.clone()),
+                previous_status: revm::database::AccountStatus::Loaded,
+                previous_info: None,
+                storage,
+                storage_was_destroyed: false,
+            },
+        );
+
+        crate::state_commit::commit_to_db(
+            &mut db,
+            PendingCommit {
+                key: CommitKey(1, 0, B256::ZERO),
+                transitions: TransitionState { transitions: state },
+                ..Default::default()
+            },
+            Default::default(),
+        )
+        .expect("ok");
+
+        // Assert storage again
+
+        // - index 1 was overwritte
+        let mut account_storage = db.storage(address, U256::from(1)).expect("storage");
+        assert_eq!(account_storage, U256::from(99));
+
+        // - index 2 remains unchanged
+        account_storage = db.storage(address, U256::from(2)).expect("storage");
+        assert_eq!(account_storage, U256::from(2));
+    }
+
+    #[test]
+    fn test_next_map_size() {
+        let input = vec![0, 1, 2, 3, 4];
+        for i in input {
+            let next = next_map_size(i * MAP_SIZE_UNIT);
+            assert_eq!(next, (i + 1) * MAP_SIZE_UNIT);
+        }
+    }
+
+    #[test]
+    fn test_resize_on_commit() {
+        let create_large_commit = |block_number: u64, n: usize| {
+            let mut buf = vec![0; 32];
+            buf[0..8].copy_from_slice(&block_number.to_le_bytes());
+            let address = Address::from_word(ethers_core::utils::keccak256(buf).into());
+
+            let mut state = HashMap::default();
+
+            let mut account = revm::state::Account::new_not_existing(0);
+            account.status = revm::state::AccountStatus::Touched;
+
+            let mut storage = HashMap::default();
+
+            for i in 0..n {
+                storage.insert(
+                    U256::from(i + 1),
+                    revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+                );
+            }
+
+            state.insert(
+                address,
+                revm::database::TransitionAccount {
+                    status: revm::database::AccountStatus::InMemoryChange,
+                    info: Some(account.info.clone()),
+                    previous_status: revm::database::AccountStatus::Loaded,
+                    previous_info: None,
+                    storage,
+                    storage_was_destroyed: false,
+                },
+            );
+
+            PendingCommit {
+                key: CommitKey(block_number, 0, B256::ZERO),
+                transitions: TransitionState { transitions: state },
+                ..Default::default()
+            }
+        };
+
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+
+        let mut env_builder = EnvOpenOptions::new();
+        env_builder.max_dbs(PersistentDB::MAX_DBS);
+        env_builder.map_size(4096 * 10); // start with very small (few kB)
+
+        unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
+
+        let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
+
+        let mut db = PersistentDB::new_with_env(env, Default::default()).expect("open");
+        assert_eq!(db.env.info().map_size, 4096 * 10);
+
+        // large commit to trigger a resize
+        crate::state_commit::commit_to_db(
+            &mut db,
+            create_large_commit(0, 1024),
+            Default::default(),
+        )
+        .expect("ok");
+
+        // increased to next MAP_SIZE_UNIT
+        assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
+
+        // add more commits without triggering another resize
+        for i in 0..10 {
+            crate::state_commit::commit_to_db(
+                &mut db,
+                create_large_commit(i + 1, 1024),
+                Default::default(),
+            )
+            .expect("ok");
+            assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
+        }
+
+        // reopen db with initial env size should automatically resize
+        drop(db);
+
+        let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
+        let db = PersistentDB::new_with_env(env, Default::default()).expect("open");
         assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
     }
 
-    // reopen db with initial env size should automatically resize
-    drop(db);
+    #[test]
+    fn test_read_accounts() {
+        let db = create_temp_database();
 
-    let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
-    let db = PersistentDB::new_with_env(env, Default::default()).expect("open");
-    assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
-}
+        let addresses = [
+            address!("27b1fdb04752bbc536007a920d24acb045561c26"),
+            address!("3599689E6292b81B2d85451025146515070129Bb"),
+            address!("42712D45473476b98452f434e72461577D686318"),
+            address!("52908400098527886E0F7030069857D2E4169EE7"),
+            address!("5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed"),
+            address!("6549f4939460DE12611948b3f82b88C3C8975323"),
+            address!("66f9664f97F2b50F62D13eA064982f936dE76657"),
+            address!("8617E340B3D01FA5F11F306F4090FD50E238070D"),
+            address!("88021160C5C792225E4E5452585947470010289D"),
+            address!("D1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb"),
+            address!("dbF03B407c01E7cD3CBea99509d93f8DDDC8C6FB"),
+            address!("de709f2102306220921060314715629080e2fb77"),
+            address!("fB6916095ca1df60bB79Ce92cE3Ea74c37c5d359"),
+        ];
 
-#[test]
-fn test_read_accounts() {
-    let path = tempfile::Builder::new()
-        .prefix("evm.mdb")
-        .tempdir()
-        .unwrap();
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
 
-    let db =
-        PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("database");
+            for (index, address) in addresses.iter().enumerate() {
+                db.inner
+                    .borrow_mut()
+                    .accounts
+                    .put(
+                        &mut wtxn,
+                        &AddressWrapper(*address),
+                        &CompressedBincode(&StoredAccountInfo {
+                            balance: U256::from(index),
+                            nonce: index as u64,
+                            ..Default::default()
+                        }),
+                    )
+                    .unwrap();
 
-    let addresses = [
-        address!("27b1fdb04752bbc536007a920d24acb045561c26"),
-        address!("3599689E6292b81B2d85451025146515070129Bb"),
-        address!("42712D45473476b98452f434e72461577D686318"),
-        address!("52908400098527886E0F7030069857D2E4169EE7"),
-        address!("5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed"),
-        address!("6549f4939460DE12611948b3f82b88C3C8975323"),
-        address!("66f9664f97F2b50F62D13eA064982f936dE76657"),
-        address!("8617E340B3D01FA5F11F306F4090FD50E238070D"),
-        address!("88021160C5C792225E4E5452585947470010289D"),
-        address!("D1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb"),
-        address!("dbF03B407c01E7cD3CBea99509d93f8DDDC8C6FB"),
-        address!("de709f2102306220921060314715629080e2fb77"),
-        address!("fB6916095ca1df60bB79Ce92cE3Ea74c37c5d359"),
-    ];
-
-    {
-        let mut wtxn = db.env.write_txn().unwrap();
-
-        for (index, address) in addresses.iter().enumerate() {
-            db.inner
-                .borrow_mut()
-                .accounts
-                .put(
-                    &mut wtxn,
-                    &AddressWrapper(*address),
-                    &CompressedBincode(&StoredAccountInfo {
-                        balance: U256::from(index),
-                        nonce: index as u64,
-                        ..Default::default()
-                    }),
-                )
-                .unwrap();
-        }
-        wtxn.commit().unwrap();
-    }
-
-    const LIMIT: u64 = 5;
-    let mut offset = 0;
-
-    let mut read = 0;
-
-    loop {
-        let (next, accounts) = db.get_accounts(offset, LIMIT).unwrap();
-        for account in accounts {
-            println!("{:?}", account);
-            read += 1;
-        }
-
-        if next.is_none() {
-            break;
-        }
-
-        match next {
-            Some(next) => {
-                offset = next;
+                db.inner
+                    .borrow_mut()
+                    .legacy_attributes
+                    .put(
+                        &mut wtxn,
+                        &AddressWrapper(*address),
+                        &CompressedBincode(&LegacyAccountAttributes::default()),
+                    )
+                    .unwrap();
             }
-            None => {
+            wtxn.commit().unwrap();
+        }
+
+        const LIMIT: u64 = 5;
+        let mut offset = 0;
+
+        let mut read = 0;
+
+        loop {
+            let (next, accounts) = db.get_accounts(offset, LIMIT).unwrap();
+            for _ in accounts {
+                read += 1;
+            }
+
+            if next.is_none() {
                 break;
             }
+
+            match next {
+                Some(next) => {
+                    offset = next;
+                }
+                None => {
+                    break;
+                }
+            }
         }
+
+        assert_eq!(read, addresses.len());
     }
 
-    assert_eq!(read, addresses.len());
-}
+    #[test]
+    fn test_get_cold_wallets() {
+        let db = create_temp_database();
 
-#[cfg(test)]
-mod tests {
-    use crate::{
-        compression::CompressedBincode,
-        db::{
-            BlockHeaderData, CommitKey, CommitReceipts, LegacyAddressWrapper, PendingCommit,
-            PersistentDB, PersistentDBOptions, StaticStringWrapper, StringWrapper,
-        },
-        legacy::{LegacyAccountAttributes, LegacyAddress},
-        receipt::TxReceipt,
-    };
-    use alloy_primitives::{B256, U256, address, b256};
-    use revm::{Database, primitives::HashMap, state::AccountInfo};
+        let legacy_addresses = [
+            "DBYyh2vXcigrJGUHfvmYxVxEqeH7vomw6x",
+            "D5KU9KrMYXdkEsRbv4y8hvetGbsJwf9z3P",
+            "DJA2sqCbnmR63sD8doGrXrK3fCiqcA4GUw",
+            "DJmvhhiQFSrEQCq9FUxvcLcpcBjx7K3yLt",
+        ];
 
-    use heed::{BytesDecode, BytesEncode};
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+
+            for (index, legacy) in legacy_addresses.iter().enumerate() {
+                let legacy_address: LegacyAddress = (*legacy).try_into().unwrap();
+                db.inner
+                    .borrow_mut()
+                    .legacy_cold_wallets
+                    .put(
+                        &mut wtxn,
+                        &LegacyAddressWrapper(legacy_address),
+                        &CompressedBincode(&LegacyColdWallet {
+                            address: legacy_address,
+                            balance: U256::from(index),
+                            legacy_attributes: Default::default(),
+                            merge_info: None,
+                        }),
+                    )
+                    .unwrap();
+            }
+            wtxn.commit().unwrap();
+        }
+
+        const LIMIT: u64 = 2;
+        let mut offset = 0;
+
+        let mut read = 0;
+
+        loop {
+            let (next, wallets) = db.get_legacy_cold_wallets(offset, LIMIT).unwrap();
+            for wallet in wallets {
+                read += 1;
+
+                let cold_wallet = db.get_legacy_cold_wallet(wallet.address).unwrap();
+                assert_eq!(cold_wallet, Some(wallet));
+            }
+
+            if next.is_none() {
+                break;
+            }
+
+            match next {
+                Some(next) => {
+                    offset = next;
+                }
+                None => {
+                    break;
+                }
+            }
+        }
+
+        assert_eq!(read, legacy_addresses.len());
+    }
+
+    #[test]
+    fn test_get_account_history() {
+        let address1 = address!("0000000000000000000000000000000000000001");
+        let address2 = address!("0000000000000000000000000000000000000002");
+
+        {
+            let db = create_temp_database();
+            let history = db.get_historical_account_info(1, address2).unwrap();
+            assert_eq!(history, (None, false));
+        }
+
+        let db = create_temp_database_opts(|opts| {
+            opts.history_size = Some(8);
+        });
+
+        assert!(db.accounts_history.is_some());
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+
+            let mut entries = BTreeMap::default();
+            entries.insert(
+                address1,
+                HistoricalAccountData {
+                    balance: U256::from(1),
+                    nonce: 0,
+                    code_hash: B256::ZERO,
+                },
+            );
+
+            db.inner
+                .borrow_mut()
+                .accounts_history
+                .unwrap()
+                .put(&mut wtxn, &1, &CompressedBincode(&entries))
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        let history = db.get_historical_account_info(1, address1).unwrap();
+        assert_eq!(
+            history,
+            (
+                Some(AccountInfo {
+                    balance: U256::from(1),
+                    nonce: 0,
+                    code_hash: B256::ZERO,
+                    ..Default::default()
+                }),
+                false
+            )
+        );
+
+        let history = db.get_historical_account_info(1, address2).unwrap();
+        assert_eq!(history, (None, true));
+    }
 
     #[test]
     fn test_legacy_address_wrapper() {
@@ -1823,6 +1943,89 @@ mod tests {
     }
 
     #[test]
+    fn test_basic_ref() {
+        let mut db = create_temp_database();
+
+        let genesis = address!("0000000000000000000000000000000000000000");
+        let account = address!("0000000000000000000000000000000000000001");
+        db.set_genesis_info(crate::db::GenesisInfo {
+            account: genesis,
+            initial_supply: U256::from(1_000_000),
+            ..Default::default()
+        });
+
+        let info = db.basic(genesis).unwrap();
+        assert_eq!(
+            info,
+            Some(AccountInfo {
+                balance: U256::from(1_000_000),
+                ..Default::default()
+            })
+        );
+
+        let info = db.basic(account).unwrap();
+        assert_eq!(info, Some(Default::default()));
+    }
+
+    #[test]
+    fn test_code_by_hash() {
+        let mut db = create_temp_database();
+
+        let hash = b256!("0000000000000000000000000000000000000000000000000000000000000001");
+
+        assert_eq!(db.code_by_hash(B256::ZERO).unwrap(), Default::default());
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            let inner = db.inner.borrow_mut();
+            inner
+                .contracts
+                .put(
+                    &mut wtxn,
+                    &HashWrapper(hash),
+                    &CompressedBincode(
+                        &Bytecode::new_raw(Bytes::from_static(&[0, 1, 2, 3])).into(),
+                    ),
+                )
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        assert_eq!(
+            db.code_by_hash(hash).unwrap().original_byte_slice(),
+            &[0, 1, 2, 3][..]
+        );
+    }
+
+    #[test]
+    fn test_storage_refe() {
+        let mut db = create_temp_database();
+
+        let account = address!("0000000000000000000000000000000000000001");
+
+        assert_eq!(db.storage(account, U256::ZERO).unwrap(), U256::ZERO);
+        assert_eq!(db.storage(account, U256::from(1)).unwrap(), U256::ZERO);
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            let inner = db.inner.borrow_mut();
+            inner
+                .storage
+                .put(
+                    &mut wtxn,
+                    &AddressWrapper(account),
+                    &StorageEntryWrapper(U256::from(1), U256::from(2)),
+                )
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        assert_eq!(db.storage(account, U256::from(1)).unwrap(), U256::from(2));
+    }
+
+    #[test]
     fn test_block_hash() {
         let mut db = create_temp_database();
 
@@ -1855,6 +2058,78 @@ mod tests {
             hash,
             b256!("0000000000000000000000000000000000000000000000000000000000000001")
         );
+    }
+
+    #[test]
+    fn test_open_multiple_same_path() {
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+
+        let db1 =
+            PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("db1");
+
+        let db2 =
+            PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("db2");
+
+        drop(db1);
+        drop(db2);
+
+        assert!(true);
+    }
+
+    #[test]
+    fn test_set_genesis_info() {
+        let mut db = create_temp_database();
+
+        assert_eq!(db.genesis_info, None);
+
+        db.set_genesis_info(Default::default());
+
+        assert_eq!(db.genesis_info, Some(Default::default()));
+    }
+
+    #[test]
+    fn test_get_receipts() {
+        let db = create_temp_database();
+
+        let receipts = db.get_receipts_by_block_number(1).unwrap();
+        assert!(receipts.is_empty());
+
+        let hash = b256!("0000000000000000000000000000000000000000000000000000000000000001");
+
+        let (_, receipt) = db.get_receipt(1, hash).unwrap();
+        assert_eq!(receipt, None);
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+
+            let mut tx_receipts: HashMap<B256, TxReceipt> = Default::default();
+            tx_receipts.insert(hash, Default::default());
+
+            db.inner
+                .borrow_mut()
+                .commits
+                .put(
+                    &mut wtxn,
+                    &1,
+                    &CompressedBincode(&CommitReceipts {
+                        tx_receipts,
+                        ..Default::default()
+                    }),
+                )
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        let receipts = db.get_receipts_by_block_number(1).unwrap();
+        assert_eq!(receipts.len(), 1);
+        assert_eq!(receipts.get(&hash), Some(&Default::default()));
+
+        let (_, receipt) = db.get_receipt(1, hash).unwrap();
+        assert_eq!(receipt, Some(Default::default()));
     }
 
     #[test]
@@ -1937,15 +2212,470 @@ mod tests {
         assert_eq!(read_receipts, total_receipts);
     }
 
+    #[test]
+    fn test_get_committed_hashes() {
+        let db = create_temp_database();
+
+        let hashes = db.get_committed_hashes(1).unwrap();
+        assert_eq!(hashes, None);
+
+        let accounts_hash =
+            b256!("0000000000000000000000000000000000000000000000000000000000000001");
+        let contracts_hash =
+            b256!("0000000000000000000000000000000000000000000000000000000000000002");
+        let storage_hash =
+            b256!("0000000000000000000000000000000000000000000000000000000000000003");
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+
+            db.inner
+                .borrow_mut()
+                .commits
+                .put(
+                    &mut wtxn,
+                    &1,
+                    &CompressedBincode(&CommitReceipts {
+                        accounts_hash,
+                        contracts_hash,
+                        storage_hash,
+                        ..Default::default()
+                    }),
+                )
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        let hashes = db.get_committed_hashes(1).unwrap();
+        assert_eq!(hashes, Some((accounts_hash, contracts_hash, storage_hash)));
+    }
+
+    #[test]
+    fn test_get_legacy_attributes() {
+        let db = create_temp_database();
+
+        let address = address!("0000000000000000000000000000000000000001");
+
+        assert_eq!(db.get_legacy_attributes(address).unwrap(), None);
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+
+            db.inner
+                .borrow_mut()
+                .legacy_attributes
+                .put(
+                    &mut wtxn,
+                    &AddressWrapper(address),
+                    &CompressedBincode(&LegacyAccountAttributes {
+                        legacy_nonce: Some(1234),
+                        second_public_key: Some("key".into()),
+                        multi_signature: None,
+                    }),
+                )
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        assert_eq!(
+            db.get_legacy_attributes(address).unwrap(),
+            Some(LegacyAccountAttributes {
+                legacy_nonce: Some(1234),
+                second_public_key: Some("key".into()),
+                multi_signature: None,
+            })
+        );
+    }
+
+    #[test]
+    fn test_is_empty() {
+        let db = create_temp_database();
+
+        assert_eq!(db.is_empty().unwrap(), true);
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+
+            db.inner
+                .borrow_mut()
+                .blocks
+                .put(
+                    &mut wtxn,
+                    &1,
+                    &CompressedBincode(&BlockHeaderData {
+                        hash: b256!(
+                            "0000000000000000000000000000000000000000000000000000000000000001"
+                        ),
+                        ..Default::default()
+                    }),
+                )
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        assert_eq!(db.is_empty().unwrap(), false);
+    }
+
+    #[test]
+    fn test_get_state() {
+        let db = create_temp_database();
+
+        assert_eq!(db.get_state().unwrap(), (0, 0));
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+
+            db.inner
+                .borrow_mut()
+                .state
+                .put(
+                    &mut wtxn,
+                    &StaticStringWrapper("total_round"),
+                    &Bytes::from_iter(999u64.to_le_bytes()),
+                )
+                .unwrap();
+
+            db.inner
+                .borrow_mut()
+                .blocks
+                .put(
+                    &mut wtxn,
+                    &255,
+                    &CompressedBincode(&BlockHeaderData {
+                        number: 255,
+                        hash: b256!(
+                            "0000000000000000000000000000000000000000000000000000000000000001"
+                        ),
+                        ..Default::default()
+                    }),
+                )
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        assert_eq!(db.get_state().unwrap(), (255, 999));
+    }
+
+    #[test]
+    fn test_get_block_number_by_hash() {
+        let db = create_temp_database();
+
+        let hash = b256!("0000000000000000000000000000000000000000000000000000000000000001");
+        assert_eq!(db.get_block_number_by_hash(hash).unwrap(), None);
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+
+            db.inner
+                .borrow_mut()
+                .blocks_hash_number
+                .put(&mut wtxn, &HashWrapper(hash), &10)
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        assert_eq!(db.get_block_number_by_hash(hash).unwrap(), Some(10));
+    }
+
+    #[test]
+    fn test_get_block_header_data() {
+        let db = create_temp_database();
+
+        assert_eq!(db.get_block_header_data(1).unwrap(), None);
+
+        let hash = b256!("0000000000000000000000000000000000000000000000000000000000000001");
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+
+            db.inner
+                .borrow_mut()
+                .blocks
+                .put(
+                    &mut wtxn,
+                    &1,
+                    &CompressedBincode(&BlockHeaderData {
+                        number: 1,
+                        hash,
+                        ..Default::default()
+                    }),
+                )
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        assert_eq!(
+            db.get_block_header_data(1).unwrap(),
+            Some(BlockHeaderData {
+                hash,
+                number: 1,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn test_get_proof_data() {
+        let db = create_temp_database();
+
+        assert_eq!(db.get_proof_data(1).unwrap(), None);
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+
+            db.inner
+                .borrow_mut()
+                .proofs
+                .put(
+                    &mut wtxn,
+                    &1,
+                    &CompressedBincode(&ProofData {
+                        round: 1,
+                        validator_set: 1234,
+                        ..Default::default()
+                    }),
+                )
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        assert_eq!(
+            db.get_proof_data(1).unwrap(),
+            Some(ProofData {
+                round: 1,
+                validator_set: 1234,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn test_get_transaction_data() {
+        let db = create_temp_database();
+
+        let key = String::from("tx-1");
+        assert_eq!(db.get_transaction_data(key.clone()).unwrap(), None);
+
+        let hash = b256!("0000000000000000000000000000000000000000000000000000000000000001");
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+
+            db.inner
+                .borrow_mut()
+                .transactions
+                .put(
+                    &mut wtxn,
+                    &StringWrapper(key.clone()),
+                    &CompressedBincode(&TransactionData {
+                        tx_hash: hash,
+                        ..Default::default()
+                    }),
+                )
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        assert_eq!(
+            db.get_transaction_data(key.clone()).unwrap(),
+            Some(TransactionData {
+                tx_hash: hash,
+                ..Default::default()
+            })
+        );
+    }
+
+    #[test]
+    fn test_get_transaction_hash_by_hash() {
+        let db = create_temp_database();
+
+        let key = String::from("tx-1");
+        let hash = b256!("0000000000000000000000000000000000000000000000000000000000000001");
+
+        assert_eq!(db.get_transaction_key_by_hash(hash).unwrap(), None);
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+
+            db.inner
+                .borrow_mut()
+                .transactions_hash_key
+                .put(&mut wtxn, &HashWrapper(hash), &key)
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        assert_eq!(db.get_transaction_key_by_hash(hash).unwrap(), Some(key));
+    }
+
+    #[test]
+    fn test_commit() {
+        let db = create_temp_database_opts(|opts| {
+            opts.history_size = Some(8);
+        });
+
+        let block_hash = b256!("0000000000000000000000000000000000000000000000000000000000000001");
+        let key = CommitKey(1, 0, block_hash);
+
+        let account1 = address!("0000000000000000000000000000000000000001");
+        let account2 = address!("0000000000000000000000000000000000000002");
+
+        let mut legacy_attributes: BTreeMap<Address, LegacyAccountAttributes> = Default::default();
+        legacy_attributes.insert(
+            account1,
+            LegacyAccountAttributes {
+                legacy_nonce: Some(2),
+                ..Default::default()
+            },
+        );
+        legacy_attributes.insert(
+            account2,
+            LegacyAccountAttributes {
+                legacy_nonce: Some(9),
+                ..Default::default()
+            },
+        );
+
+        let mut legacy_cold_wallets: BTreeMap<LegacyAddress, LegacyColdWallet> = Default::default();
+        let legacy_addresses = [
+            "DBYyh2vXcigrJGUHfvmYxVxEqeH7vomw6x",
+            "D5KU9KrMYXdkEsRbv4y8hvetGbsJwf9z3P",
+            "DJA2sqCbnmR63sD8doGrXrK3fCiqcA4GUw",
+            "DJmvhhiQFSrEQCq9FUxvcLcpcBjx7K3yLt",
+        ];
+
+        for (index, legacy) in legacy_addresses.iter().enumerate() {
+            let legacy_address = (*legacy).try_into().unwrap();
+
+            legacy_cold_wallets.insert(
+                legacy_address,
+                LegacyColdWallet {
+                    address: legacy_address,
+                    balance: U256::from(index as u64),
+                    ..Default::default()
+                },
+            );
+        }
+
+        let mut merged_legacy_cold_wallets: BTreeMap<Address, (B256, LegacyAddress)> =
+            Default::default();
+        merged_legacy_cold_wallets.insert(
+            account1,
+            (
+                b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+                "DBYyh2vXcigrJGUHfvmYxVxEqeH7vomw6x".try_into().unwrap(),
+            ),
+        );
+
+        let mut results: BTreeMap<B256, (ExecutionResult, u64)> = Default::default();
+        results.insert(
+            b256!("1000000000000000000000000000000000000000000000000000000000000000"),
+            (
+                ExecutionResult::Success {
+                    reason: SuccessReason::Stop,
+                    gas: ResultGas::default(),
+                    logs: Default::default(),
+                    output: revm::context::result::Output::Call(Default::default()),
+                },
+                1234,
+            ),
+        );
+
+        let mut state = StateCommit {
+            key,
+            change_set: StateChangeset {
+                accounts: vec![
+                    (
+                        account1,
+                        Some(AccountInfo {
+                            balance: U256::from(1),
+                            nonce: 1,
+                            ..Default::default()
+                        }),
+                    ),
+                    (account2, None),
+                ],
+                storage: vec![
+                    StorageChangeset {
+                        address: address!("0000000000000000000000000000000000000003"),
+                        storage: vec![(U256::from(1), StorageSlot::new(U256::from(2)))],
+                        ..Default::default()
+                    },
+                    StorageChangeset {
+                        address: address!("0000000000000000000000000000000000000004"),
+                        storage: vec![],
+                        wipe_storage: true,
+                    },
+                    StorageChangeset {
+                        address: address!("0000000000000000000000000000000000000003"),
+                        storage: vec![(U256::from(1), StorageSlot::new(U256::from(2)))],
+                        wipe_storage: true,
+                    },
+                    StorageChangeset {
+                        address: address!("0000000000000000000000000000000000000004"),
+                        storage: vec![(U256::from(1), StorageSlot::new(U256::from(2)))],
+                        ..Default::default()
+                    },
+                    StorageChangeset {
+                        address: address!("0000000000000000000000000000000000000004"),
+                        storage: vec![(U256::from(1), StorageSlot::new(U256::ZERO))],
+                        ..Default::default()
+                    },
+                    StorageChangeset {
+                        address: address!("0000000000000000000000000000000000000005"),
+                        storage: vec![(U256::from(1), StorageSlot::new(U256::from(2)))],
+                        ..Default::default()
+                    },
+                    StorageChangeset {
+                        address: address!("0000000000000000000000000000000000000005"),
+                        storage: vec![(U256::from(1), StorageSlot::new(U256::from(2)))],
+                        ..Default::default()
+                    },
+                ],
+                contracts: vec![(
+                    b256!("1000000000000000000000000000000000000000000000000000000000000000"),
+                    Bytecode::new_legacy(Bytes(Bytes::from_static(&[1, 2, 3, 4]).into())),
+                )],
+                legacy_attributes,
+                legacy_cold_wallets,
+                merged_legacy_cold_wallets,
+            },
+            results,
+        };
+        let data = CommitData {
+            transactions: vec![TransactionData::default()],
+            ..Default::default()
+        };
+
+        db.commit(&mut state, &Some(data)).unwrap();
+    }
+
     fn create_temp_database() -> PersistentDB {
+        let db = create_temp_database_opts(|_| {});
+        db
+    }
+
+    fn create_temp_database_opts<F>(callback: F) -> PersistentDB
+    where
+        F: FnOnce(&mut PersistentDBOptions),
+    {
         let path = tempfile::Builder::new()
             .prefix("evm.mdb")
             .tempdir()
             .unwrap();
 
-        let db = PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf()))
-            .expect("database");
+        let mut opts = PersistentDBOptions::new(path.path().to_path_buf());
+        callback(&mut opts);
 
+        let db = PersistentDB::new(opts).expect("database");
         db
     }
 }
