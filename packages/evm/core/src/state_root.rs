@@ -121,11 +121,172 @@ fn prepare(state: &StateCommit) -> StateChangeset {
     c
 }
 
-#[test]
-fn test_calculate_state_root() {
-    let result = calculate_state_root(B256::ZERO, &Default::default(), None, &None).expect("ok");
-    assert_eq!(
-        result,
-        revm::primitives::b256!("0722d8002560934d7004b8b849101024bf7ec2aaa2c3396f7292d4ac8cdae5ab")
-    );
+#[cfg(test)]
+mod tests {
+    use crate::{
+        db::{GenesisInfo, PersistentDB, PersistentDBOptions},
+        state_changes::StateChangeset,
+        state_commit::{StateCommit, build_commit},
+        state_root::{calculate, calculate_state_root},
+    };
+    use alloy_primitives::{B256, U256, address, b256};
+
+    #[test]
+    fn test_calculate_state_root_default() {
+        let result =
+            calculate_state_root(B256::ZERO, &mut Default::default(), None, &None).expect("ok");
+        assert_eq!(
+            result,
+            revm::primitives::b256!(
+                "0722d8002560934d7004b8b849101024bf7ec2aaa2c3396f7292d4ac8cdae5ab"
+            )
+        );
+    }
+
+    #[test]
+    fn test_calculate_state_root_storage() {
+        use crate::{
+            legacy::{LegacyAccountAttributes, LegacyAddress},
+            state_changes::StorageChangeset,
+        };
+        use alloy_primitives::{U256, address, b256};
+        use revm::{database::states::StorageSlot, state::AccountInfo};
+
+        let mut change_set = StateChangeset::default();
+        change_set.accounts.push((
+            address!("0000000000000000000000000000000000000001"),
+            Some(AccountInfo::from_balance(U256::from(1))),
+        ));
+
+        let storage = vec![
+            (
+                U256::from(1),
+                StorageSlot::new_changed(U256::ZERO, U256::from(1234)),
+            ),
+            (
+                U256::from(2),
+                StorageSlot::new_changed(U256::ZERO, U256::from(5678)),
+            ),
+        ];
+
+        change_set.storage.push(StorageChangeset {
+            address: address!("0000000000000000000000000000000000000002"),
+            storage,
+            ..Default::default()
+        });
+
+        change_set.legacy_attributes.insert(
+            address!("0000000000000000000000000000000000000001"),
+            LegacyAccountAttributes {
+                legacy_nonce: Some(5),
+                second_public_key: Some("".into()),
+                ..Default::default()
+            },
+        );
+
+        let legacy_address: LegacyAddress =
+            "DJmvhhiQFSrEQCq9FUxvcLcpcBjx7K3yLt".try_into().unwrap();
+        change_set.legacy_cold_wallets.insert(
+            legacy_address.clone(),
+            crate::legacy::LegacyColdWallet {
+                address: legacy_address.clone(),
+                balance: U256::from(255),
+                legacy_attributes: LegacyAccountAttributes {
+                    legacy_nonce: Some(3),
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+        );
+
+        change_set.merged_legacy_cold_wallets.insert(
+            address!("0000000000000000000000000000000000000001"),
+            (
+                b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+                legacy_address,
+            ),
+        );
+
+        let mut state = StateCommit {
+            change_set,
+            ..Default::default()
+        };
+
+        let result = calculate_state_root(B256::ZERO, &mut state, None, &None).expect("ok");
+        assert_eq!(
+            result,
+            revm::primitives::b256!(
+                "4a89eeb210b50ac79b17f867e55225c6cd9b253dfbddb6f5c0438720b562f95c"
+            )
+        );
+    }
+
+    #[test]
+    fn test_calculate_state_root_committed() {
+        let result = calculate_state_root(
+            B256::ZERO,
+            &mut Default::default(),
+            Some((
+                b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+                b256!("0000000000000000000000000000000000000000000000000000000000000002"),
+                b256!("0000000000000000000000000000000000000000000000000000000000000003"),
+            )),
+            &Some(GenesisInfo {
+                account: address!("0000000000000000000000000000000000000001"),
+                deployer_account: address!("0000000000000000000000000000000000000002"),
+                validator_contract: address!("0000000000000000000000000000000000000003"),
+                username_contract: address!("0000000000000000000000000000000000000004"),
+                initial_block_number: 0,
+                initial_supply: U256::from(1_000_000),
+            }),
+        )
+        .expect("ok");
+        assert_eq!(
+            result,
+            b256!("4d8a5286c595051367a97a84e8e0cc31ec4ff3b335a300ec713ccfbfd43e0f7d")
+        );
+    }
+
+    #[test]
+    fn test_calculate_with_db() {
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+
+        let mut db = PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf()))
+            .expect("database");
+
+        let result = calculate(
+            &mut db,
+            &mut Default::default(),
+            b256!("0000000000000000000000000000000000000000000000000000000000000000"),
+        )
+        .expect("ok");
+
+        assert_eq!(
+            result,
+            revm::primitives::b256!(
+                "0722d8002560934d7004b8b849101024bf7ec2aaa2c3396f7292d4ac8cdae5ab"
+            )
+        );
+
+        let mut pending_commit = Default::default();
+        let state_commit = build_commit(&mut pending_commit).expect("ok");
+        pending_commit.built_commit = Some(state_commit);
+
+        let result = calculate(
+            &mut db,
+            &mut pending_commit,
+            b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+        )
+        .expect("ok");
+
+        assert_eq!(
+            result,
+            revm::primitives::b256!(
+                "8f8b7e90288fa24167aa9507f219efa7b6bde941ec68ef8a4b66a3a922a12afa"
+            )
+        );
+    }
 }
