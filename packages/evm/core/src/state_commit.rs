@@ -10,6 +10,7 @@ use revm::{
 use crate::{
     db::{CommitData, CommitKey, Error, GenesisInfo, PendingCommit, PersistentDB},
     state_changes::{self, AccountMergeInfo, AccountUpdate},
+    state_root::calculate_commit_hashes,
 };
 
 #[derive(Clone, Debug, Default)]
@@ -86,13 +87,18 @@ pub fn commit_to_db(
         None => build_commit(&mut pending_commit)?,
     };
 
-    match db.commit(&mut commit, &commit_data) {
+    let commit_hashes = match pending_commit.commit_hashes {
+        Some(commit_hashes) => commit_hashes,
+        None => calculate_commit_hashes(&mut commit)?,
+    };
+
+    match db.commit(&mut commit, &commit_data, &commit_hashes) {
         Ok(_) => Ok(collect_dirty_accounts(commit, &genesis_info)),
         Err(err) => match &err {
             Error::DbFull => {
                 // try to resize the db and attempt another commit on success
                 db.resize().and_then(|_| {
-                    db.commit(&mut commit, &commit_data)
+                    db.commit(&mut commit, &commit_data, &commit_hashes)
                         .and_then(|_| Ok(collect_dirty_accounts(commit, &genesis_info)))
                 })
             }

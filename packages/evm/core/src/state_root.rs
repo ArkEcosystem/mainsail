@@ -1,9 +1,14 @@
-use rayon::slice::ParallelSliceMut;
+use alloy_primitives::Keccak256;
+use rayon::{
+    iter::{IntoParallelRefMutIterator, ParallelIterator},
+    slice::ParallelSliceMut,
+};
 use revm::primitives::{B256, keccak256};
 use serde::Serialize;
+use std::io::{self, Write};
 
 use crate::{
-    db::{GenesisInfo, PendingCommit, PersistentDB},
+    db::{CommitHashes, GenesisInfo, PendingCommit, PersistentDB},
     state_changes::StateChangeset,
     state_commit::{StateCommit, build_commit},
 };
@@ -13,14 +18,24 @@ pub fn calculate(
     pending_commit: &mut PendingCommit,
     current_hash: B256,
 ) -> Result<B256, crate::db::Error> {
-    let committed_hashes = db.get_committed_hashes(pending_commit.key.0)?;
+    let mut committed_hashes = db.get_committed_hashes(pending_commit.key.0)?;
+    match (&mut committed_hashes, &pending_commit.commit_hashes) {
+        (None, Some(committed)) => {
+            // take existing
+            committed_hashes.replace(committed.clone());
+        }
+        (Some(committed), Some(pending)) => {
+            assert_eq!(committed, pending);
+        }
+        _ => {}
+    };
 
     if pending_commit.built_commit.is_none() {
         let state_commit = build_commit(pending_commit)?;
         pending_commit.built_commit.replace(state_commit);
     };
 
-    calculate_state_root(
+    let (state_root, commit_hashes) = calculate_state_root(
         current_hash,
         pending_commit
             .built_commit
@@ -28,70 +43,70 @@ pub fn calculate(
             .expect("state commit exists"),
         committed_hashes,
         &db.genesis_info,
-    )
+    )?;
+
+    pending_commit.commit_hashes.replace(commit_hashes);
+
+    Ok(state_root)
 }
 
 fn calculate_state_root(
     current_hash: B256,
     state: &mut StateCommit,
-    committed_hashes: Option<(B256, B256, B256)>,
+    committed_hashes: Option<CommitHashes>,
     genesis_info: &Option<GenesisInfo>,
-) -> Result<B256, crate::db::Error> {
-    let (accounts_hash, contracts_hash, storage_hash) =
-        if let Some(committed_hashes) = committed_hashes {
-            committed_hashes
-        } else {
-            prepare(state);
-
-            (
-                calculate_accounts_hash(&state.change_set)?,
-                calculate_contracts_hash(&state.change_set)?,
-                calculate_storage_hash(&state.change_set)?,
-            )
-        };
-
-    let mut hashes = Vec::with_capacity(5);
+) -> Result<(B256, CommitHashes), crate::db::Error> {
+    let commit_hashes = if let Some(committed_hashes) = committed_hashes {
+        committed_hashes
+    } else {
+        calculate_commit_hashes(state)?
+    };
 
     let block_number = state.key.0.to_le_bytes();
-    hashes.push(block_number.as_slice());
 
     let genesis_info_hash = match genesis_info {
         Some(info) => calculate_hash(info)?,
         None => B256::ZERO,
     };
 
-    hashes.push(genesis_info_hash.as_slice());
-    hashes.push(current_hash.as_slice());
-    hashes.push(accounts_hash.as_slice());
-    hashes.push(contracts_hash.as_slice());
-    hashes.push(storage_hash.as_slice());
+    let mut hasher = Keccak256::new();
+    hasher.update(block_number);
+    hasher.update(genesis_info_hash);
+    hasher.update(current_hash);
+    hasher.update(commit_hashes.accounts_hash);
+    hasher.update(commit_hashes.contracts_hash);
+    hasher.update(commit_hashes.storage_hash);
 
-    let result = keccak256(hashes.concat());
+    Ok((hasher.finalize(), commit_hashes))
+}
 
-    Ok(result)
+pub fn calculate_commit_hashes(state: &mut StateCommit) -> Result<CommitHashes, crate::db::Error> {
+    prepare(state);
+
+    Ok(CommitHashes {
+        accounts_hash: calculate_accounts_hash(&state.change_set)?,
+        contracts_hash: calculate_contracts_hash(&state.change_set)?,
+        storage_hash: calculate_storage_hash(&state.change_set)?,
+    })
 }
 
 pub fn calculate_accounts_hash(state_changes: &StateChangeset) -> Result<B256, crate::db::Error> {
-    let mut hashes = Vec::with_capacity(4);
-    hashes.push(calculate_hash(&state_changes.accounts)?);
+    let mut writer = HashWriter::new();
+    hash_serialize_into(&mut writer, &state_changes.accounts)?;
 
     if !state_changes.legacy_attributes.is_empty() {
-        hashes.push(calculate_hash(&state_changes.legacy_attributes)?);
+        hash_serialize_into(&mut writer, &state_changes.legacy_attributes)?;
     }
 
     if !state_changes.legacy_cold_wallets.is_empty() {
-        hashes.push(calculate_hash(&state_changes.legacy_cold_wallets)?);
+        hash_serialize_into(&mut writer, &state_changes.legacy_cold_wallets)?;
     }
 
     if !state_changes.merged_legacy_cold_wallets.is_empty() {
-        hashes.push(calculate_hash(&state_changes.merged_legacy_cold_wallets)?);
+        hash_serialize_into(&mut writer, &state_changes.merged_legacy_cold_wallets)?;
     }
 
-    if hashes.len() == 1 {
-        Ok(hashes.remove(0))
-    } else {
-        Ok(keccak256(hashes.concat()))
-    }
+    Ok(writer.finalize())
 }
 
 pub fn calculate_contracts_hash(state_changes: &StateChangeset) -> Result<B256, crate::db::Error> {
@@ -110,28 +125,72 @@ where
 }
 
 fn prepare(state: &mut StateCommit) {
-    state.change_set.accounts.par_sort_by_key(|a| a.0);
-    state.change_set.contracts.par_sort_by_key(|a| a.0);
-    for s in &mut state.change_set.storage {
-        s.storage.par_sort_by_key(|slot| slot.0);
+    state.change_set.accounts.par_sort_unstable_by_key(|a| a.0);
+    state.change_set.contracts.par_sort_unstable_by_key(|a| a.0);
+
+    state
+        .change_set
+        .storage
+        .par_iter_mut()
+        .for_each(|s| s.storage.par_sort_unstable_by_key(|slot| slot.0));
+
+    state
+        .change_set
+        .storage
+        .par_sort_unstable_by_key(|a| a.address);
+}
+
+struct HashWriter {
+    hasher: Keccak256,
+}
+
+impl HashWriter {
+    fn new() -> Self {
+        Self {
+            hasher: Keccak256::new(),
+        }
     }
-    state.change_set.storage.par_sort_by_key(|a| a.address);
+
+    fn finalize(self) -> B256 {
+        self.hasher.finalize()
+    }
+}
+
+impl Write for HashWriter {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.hasher.update(buf);
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
+
+fn hash_serialize_into<T: Serialize>(
+    writer: &mut HashWriter,
+    value: &T,
+) -> Result<(), crate::db::Error> {
+    bincode::serialize_into(writer, value)?;
+    Ok(())
 }
 
 #[cfg(test)]
 mod tests {
+    use std::io::Write;
+
     use crate::{
-        db::{GenesisInfo, PendingCommit, PersistentDB, PersistentDBOptions},
+        db::{CommitHashes, GenesisInfo, PendingCommit, PersistentDB, PersistentDBOptions},
         legacy::LegacyAddress,
         state_changes::StateChangeset,
         state_commit::{StateCommit, build_commit},
-        state_root::{calculate, calculate_state_root},
+        state_root::{HashWriter, calculate, calculate_state_root},
     };
-    use alloy_primitives::{B256, U256, address, b256};
+    use alloy_primitives::{B256, U256, address, b256, keccak256};
 
     #[test]
     fn test_calculate_state_root_default() {
-        let result =
+        let (result, _) =
             calculate_state_root(B256::ZERO, &mut Default::default(), None, &None).expect("ok");
         assert_eq!(
             result,
@@ -210,25 +269,31 @@ mod tests {
             ..Default::default()
         };
 
-        let result = calculate_state_root(B256::ZERO, &mut state, None, &None).expect("ok");
+        let (result, _) = calculate_state_root(B256::ZERO, &mut state, None, &None).expect("ok");
         assert_eq!(
             result,
             revm::primitives::b256!(
-                "4a89eeb210b50ac79b17f867e55225c6cd9b253dfbddb6f5c0438720b562f95c"
+                "10227181595c4fbd09f30cac2a3de60e5bdbbdc869b9683fdc22dd0d210f63d9"
             )
         );
     }
 
     #[test]
     fn test_calculate_state_root_committed() {
-        let result = calculate_state_root(
+        let (result, _) = calculate_state_root(
             B256::ZERO,
             &mut Default::default(),
-            Some((
-                b256!("0000000000000000000000000000000000000000000000000000000000000001"),
-                b256!("0000000000000000000000000000000000000000000000000000000000000002"),
-                b256!("0000000000000000000000000000000000000000000000000000000000000003"),
-            )),
+            Some(CommitHashes {
+                accounts_hash: b256!(
+                    "0000000000000000000000000000000000000000000000000000000000000001"
+                ),
+                contracts_hash: b256!(
+                    "0000000000000000000000000000000000000000000000000000000000000002"
+                ),
+                storage_hash: b256!(
+                    "0000000000000000000000000000000000000000000000000000000000000003"
+                ),
+            }),
             &Some(GenesisInfo {
                 account: address!("0000000000000000000000000000000000000001"),
                 deployer_account: address!("0000000000000000000000000000000000000002"),
@@ -293,8 +358,24 @@ mod tests {
         assert_eq!(
             result,
             revm::primitives::b256!(
-                "5ca756d93a56e6c15c9e182ff236bd5db21bcde81c2c438d58a32bbd16b4ec3a"
+                "6501f46f58e5a271c238d2787120d7e730cffd65f26ac76758684b82c7c152db"
             )
         );
+    }
+
+    #[test]
+    fn test_hash_writer_matches_keccak256_and_flush_is_ok() {
+        let input = b"hello world";
+
+        let mut writer = HashWriter::new();
+        let written = writer.write(input).unwrap();
+        assert_eq!(written, input.len());
+
+        writer.flush().unwrap();
+
+        let actual = writer.finalize();
+        let expected = keccak256(input);
+
+        assert_eq!(actual, expected);
     }
 }

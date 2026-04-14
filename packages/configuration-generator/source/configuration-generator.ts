@@ -147,17 +147,20 @@ export class ConfigurationGenerator {
 						)
 						.generate();
 
-					this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
-						genesisBlock: {
-							// @ts-ignore
-							block: {
-								number: internalOptions.initialBlockNumber,
+					this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(
+						{
+							genesisBlock: {
+								// @ts-ignore
+								block: {
+									number: internalOptions.initialBlockNumber,
+								},
 							},
+							milestones,
+							// @ts-ignore
+							network: {},
 						},
-						milestones,
-						// @ts-ignore
-						network: {},
-					});
+						false,
+					);
 
 					if (options.snapshot) {
 						const importer = this.app.get<Contracts.Snapshot.LegacyImporter>(
