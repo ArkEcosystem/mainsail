@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Models } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 // https://stackoverflow.com/a/53742518
 type T_AND = Models.Transaction;

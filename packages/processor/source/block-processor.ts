@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { assert, BigNumber, sleep } from "@mainsail/utils";
 
 @injectable()
@@ -77,7 +78,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 					await sleep(0);
 				}
 
-				const receipt = await this.transactionProcessor.process(unit, transaction, index);
+				const receipt = await this.transactionProcessor.process(unit, transaction);
 				processResult.receipts.set(transaction.hash, receipt);
 
 				this.#consumeGas(block, processResult, Number(receipt.gasUsed));
@@ -277,7 +278,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			return;
 		}
 
-		const { roundValidators, evmSpec } = this.configuration.getMilestone(unit.blockNumber + 1);
+		const { evmSpec, roundValidators } = this.configuration.getMilestone(unit.blockNumber + 1);
 
 		const block = unit.getBlock();
 

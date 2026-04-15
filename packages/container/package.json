@@ -21,7 +21,7 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
-		"inversify": "7.10.3",
+		"inversify": "8.1.0",
 		"reflect-metadata": "0.2.2"
 	},
 	"devDependencies": {
@@ -30,6 +30,6 @@
 		"uvu": "0.5.6"
 	},
 	"engines": {
-		"node": ">=20.x"
+		"node": ">=24"
 	}
 }

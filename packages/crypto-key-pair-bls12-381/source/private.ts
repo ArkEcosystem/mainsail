@@ -1,6 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
+import { NotImplemented } from "@mainsail/exceptions";
 
 @injectable()
 export class PrivateKeyFactory implements Contracts.Crypto.PrivateKeyFactory {
@@ -8,10 +10,11 @@ export class PrivateKeyFactory implements Contracts.Crypto.PrivateKeyFactory {
 	private readonly keyPairFactory!: Contracts.Crypto.KeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
-		return (await this.keyPairFactory.fromMnemonic(mnemonic)).privateKey;
+		const { privateKey } = await this.keyPairFactory.fromMnemonic(mnemonic);
+		return privateKey;
 	}
 
 	public async fromWIF(wif: string): Promise<string> {
-		return (await this.keyPairFactory.fromWIF(wif)).privateKey;
+		throw new NotImplemented(this.constructor.name, "fromWIF");
 	}
 }

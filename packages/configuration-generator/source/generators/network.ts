@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class NetworkGenerator {
@@ -25,7 +26,6 @@ export class NetworkGenerator {
 				)
 				.toString("hex"),
 			pubKeyHash: options.pubKeyHash,
-			slip44: 1,
 			wif: options.wif,
 		};
 	}

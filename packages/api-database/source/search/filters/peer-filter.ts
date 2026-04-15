@@ -1,7 +1,8 @@
 import type { Peer } from "../../models/peer.js";
-import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 import type { OrPeerCriteria, PeerCriteria } from "../types/criteria.js";
 import type { Expression } from "../types/expressions.js";
+
+import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
 export class PeerFilter {
 	public static async getExpression(...criteria: OrPeerCriteria[]): Promise<Expression<Peer>> {

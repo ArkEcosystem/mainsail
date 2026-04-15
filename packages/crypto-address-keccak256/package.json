@@ -26,19 +26,18 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"bcrypto": "5.5.2",
-		"viem": "2.34.0"
+		"viem": "2.47.6"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
-		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"bip39": "3.1.0",
 		"uvu": "0.5.6"
 	},
 	"engines": {
-		"node": ">=20.x"
+		"node": ">=24"
 	}
 }

@@ -1,6 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
+import { MessageSchemaError } from "@mainsail/exceptions";
 import { ByteBuffer, validatorSetUnpack } from "@mainsail/utils";
 
 @injectable()
@@ -20,6 +22,9 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 	@inject(Identifiers.Cryptography.Commit.ProofSize)
 	private readonly proofSize!: () => number;
 
+	@inject(Identifiers.Cryptography.Validator)
+	private readonly validator!: Contracts.Crypto.Validator;
+
 	public async fromBytes(buff: Buffer): Promise<Contracts.Crypto.Commit> {
 		const buffer = ByteBuffer.fromBuffer(buff);
 
@@ -28,11 +33,15 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 
 		const block = await this.blockFactory.fromBytes(buffer.getRemainder());
 
-		return {
+		const commit = {
 			block,
 			proof,
 			serialized: buff.toString("hex"),
 		};
+
+		this.#verifySchema(commit);
+
+		return commit;
 	}
 
 	public async fromStorage(data: Contracts.Evm.CommitStorageData): Promise<Contracts.Crypto.Commit> {
@@ -51,18 +60,30 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 
 		const serialized = await this.commitSerializer.serializeCommit(commit);
 
-		return {
+		const commitWithSerialized = {
 			...commit,
 			serialized: serialized.toString("hex"),
 		};
+
+		return commitWithSerialized;
 	}
 
 	public async fromJson(json: Contracts.Crypto.CommitJson): Promise<Contracts.Crypto.Commit> {
 		const block = await this.blockFactory.fromJson(json.block);
-		return {
+		const commit = {
 			block,
 			proof: json.proof,
 			serialized: json.serialized,
 		};
+		this.#verifySchema(commit);
+		return commit;
+	}
+
+	#verifySchema<T>(data: T): void {
+		const result = this.validator.validate("commit", data);
+
+		if (result.error) {
+			throw new MessageSchemaError("commit", result.error);
+		}
 	}
 }

@@ -7,9 +7,10 @@ import type {
 	TransactionRepositoryExtension,
 	WalletRepository,
 } from "../contracts.js";
+import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search/types/index.js";
+
 import { Transaction } from "../models/index.js";
 import { TransactionFilter } from "../search/filters/transaction-filter.js";
-import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search/types/index.js";
 import { makeExtendedRepository } from "./repository-extension.js";
 
 export const makeTransactionRepository = (dataSource: RepositoryDataSource): TransactionRepository =>

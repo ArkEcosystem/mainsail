@@ -1,7 +1,8 @@
-import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import type { WriteFileOptions } from "fs";
 import type { EnsureDirOptions } from "fs-extra";
+
+import { injectable } from "@mainsail/container";
 import { resolve } from "path";
 
 @injectable()
@@ -80,7 +81,7 @@ export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 		return this.fs
 			.readdirSync(directory)
 			.map((item: string) => `${directory}/${item}`)
-			.filter(async (item: string) => this.fs.lstatSync(item).isFile());
+			.filter((item: string) => this.fs.lstatSync(item).isFile());
 	}
 
 	public async directories(directory: string): Promise<string[]> {
@@ -89,7 +90,7 @@ export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 		return this.fs
 			.readdirSync(directory)
 			.map((item: string) => `${directory}/${item}`)
-			.filter(async (item: string) => this.fs.lstatSync(item).isDirectory());
+			.filter((item: string) => this.fs.lstatSync(item).isDirectory());
 	}
 
 	public async makeDirectory(path: string): Promise<boolean> {

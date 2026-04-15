@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
 import { strictEqual } from "assert";
 
@@ -23,14 +24,13 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 	public async validate(
 		context: Contracts.Transactions.TransactionValidatorContext,
 		transaction: Contracts.Crypto.Transaction,
-		index: number,
 	): Promise<Contracts.Evm.TransactionReceipt> {
 		const deserialized: Contracts.Crypto.Transaction = await this.transactionFactory.fromBytes(
 			transaction.serialized,
 		);
 		strictEqual(transaction.hash, deserialized.hash);
 
-		const { commitKey, gasLimit, timestamp, generatorAddress } = context;
+		const { commitKey, gasLimit, generatorAddress, timestamp } = context;
 
 		const receipt = await this.transactionHandler.apply(
 			{
@@ -45,7 +45,6 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 				},
 			},
 			transaction,
-			index,
 		);
 
 		assert.string(transaction.from);

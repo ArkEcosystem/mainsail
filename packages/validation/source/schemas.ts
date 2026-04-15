@@ -16,6 +16,7 @@ export const schemas: Record<"alphanumeric" | "hex" | "prefixedQuantityHex" | "p
 		pattern: "^0x([0-9a-f]{2})*$",
 		type: "string",
 	},
+	// requires at least one hex character after the "0x" prefix
 	prefixedQuantityHex: {
 		$id: "prefixedQuantityHex",
 		pattern: "^0x[0-9a-f]+$",

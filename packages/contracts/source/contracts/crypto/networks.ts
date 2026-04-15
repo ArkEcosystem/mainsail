@@ -19,7 +19,6 @@ export type Network = {
 	nethash: string;
 	chainId: number;
 	wif: number;
-	slip44: number;
 	client: {
 		token: string;
 		symbol: string;

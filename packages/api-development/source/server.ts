@@ -1,9 +1,10 @@
-import { badData } from "@hapi/boom";
 import type Hapi from "@hapi/hapi";
+import type { Contracts } from "@mainsail/contracts";
+
+import { badData } from "@hapi/boom";
 import { AbstractServer } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Server extends AbstractServer {

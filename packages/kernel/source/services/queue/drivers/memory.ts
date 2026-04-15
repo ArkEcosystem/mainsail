@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 
@@ -77,7 +78,7 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 	}
 
 	public async later(delay: number, job: Contracts.Kernel.QueueJob): Promise<void> {
-		setTimeout(() => this.push(job), delay);
+		setTimeout(() => void this.push(job), delay);
 	}
 
 	public async bulk(jobs: Contracts.Kernel.QueueJob[]): Promise<void> {

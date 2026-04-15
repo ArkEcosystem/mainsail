@@ -15,7 +15,7 @@ import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
-import { ServiceProvider as CoreValidation } from "@mainsail/validation";
+import { ServiceProvider as Validation } from "@mainsail/validation";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
 import { Deserializer } from "../../source/deserializer.js";
@@ -25,11 +25,11 @@ import { Serializer } from "../../source/serializer.js";
 
 export const prepareSandbox = async (context: { app?: Application }): Promise<void> => {
 	context.app = new Application();
+	await context.app.resolve(Validation).register();
 
 	context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
 
 	await context.app.resolve(CoreSerializer).register();
-	await context.app.resolve(CoreValidation).register();
 	await context.app.resolve(CoreCryptoConfig).register();
 
 	context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => {} });

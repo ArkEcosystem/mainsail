@@ -1,3 +1,5 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -5,8 +7,8 @@ import {
 } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { NotImplemented } from "@mainsail/exceptions";
+import { setTimeoutAsync } from "@mainsail/utils";
 
 import { EventListener } from "../contracts.js";
 
@@ -60,7 +62,7 @@ export abstract class AbstractListener<TEventData, TEntity extends object> imple
 			} catch (ex) {
 				this.logger.error(`#syncToDatabaseTransaction failed: ${ex}`);
 			} finally {
-				this.#syncTimeout = setTimeout(run, syncInterval);
+				this.#syncTimeout = setTimeoutAsync(run, syncInterval);
 			}
 		};
 
@@ -98,7 +100,7 @@ export abstract class AbstractListener<TEventData, TEntity extends object> imple
 		dataSource: ApiDatabaseContracts.RepositoryDataSource,
 	): TypeOrm.Repository<TEntity>;
 
-	public async handle({ name, data }: { name: string; data: TEventData }): Promise<void> {
+	public async handle({ data, name }: { name: string; data: TEventData }): Promise<void> {
 		const eventMapping = this.getEventMapping();
 
 		switch (eventMapping[name]) {

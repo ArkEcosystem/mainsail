@@ -27,7 +27,7 @@
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"viem": "2.34.0"
+		"viem": "2.47.6"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
@@ -36,6 +36,6 @@
 		"uvu": "0.5.6"
 	},
 	"engines": {
-		"node": ">=20.x"
+		"node": ">=24"
 	}
 }

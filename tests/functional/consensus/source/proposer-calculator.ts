@@ -6,4 +6,8 @@ export class ProposerCalculator implements Contracts.BlockchainUtils.ProposerCal
 	public getValidatorIndex(round: number): number {
 		return 0;
 	}
+
+	public getValidatorIndexFrom(roundValidators: number, totalRound: number, round: number): number {
+		return 0;
+	}
 }

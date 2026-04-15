@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import Boom from "@hapi/boom";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { RateLimiter } from "../../rate-limiter.js";
 import { buildRateLimiter } from "../../utils/build-rate-limiter.js";
@@ -30,7 +31,7 @@ export class RateLimitPlugin {
 		this.rateLimiter = buildRateLimiter({
 			rateLimit: this.configuration.getRequired<number>("rateLimit"),
 			remoteAccess: this.configuration.getOptional<Array<string>>("remoteAccess", []),
-			roundValidators: this.cryptoConfiguration.getRoundValidators(),
+			roundValidators: this.cryptoConfiguration.getMaxRoundValidators(),
 			whitelist: [],
 		});
 

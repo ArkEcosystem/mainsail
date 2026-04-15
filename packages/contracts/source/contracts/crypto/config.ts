@@ -8,7 +8,7 @@ import type {
 } from "./networks.js";
 
 export interface Configuration {
-	setConfig(config: NetworkConfigPartial): void;
+	setConfig(config: NetworkConfigPartial, verify?: boolean): void;
 
 	all(): NetworkConfig | undefined;
 
@@ -35,5 +35,5 @@ export interface Configuration {
 
 	getMilestones(): Milestone[];
 
-	getRoundValidators(): number;
+	getMaxRoundValidators(): number;
 }

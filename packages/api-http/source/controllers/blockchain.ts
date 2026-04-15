@@ -1,4 +1,5 @@
-import Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
+
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
@@ -9,7 +10,7 @@ export class BlockchainController extends Controller {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
 
-	public async index(request: Hapi.Request): Promise<object> {
+	public async index(request: Types.HapiRequest): Promise<object> {
 		const block = await this.blockRepositoryFactory().getLatest();
 		const state = await this.getState();
 

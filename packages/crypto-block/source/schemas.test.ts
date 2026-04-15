@@ -1,28 +1,28 @@
 import { Identifiers } from "@mainsail/constants";
 import { BigNumber } from "@mainsail/utils";
 import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
-import { Configuration } from "@mainsail/crypto-config";
 import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-ecdsa";
 import { schemas as transactionSchemas } from "@mainsail/crypto-transaction";
-import { makeKeywords, schemas as sharedSchemas } from "@mainsail/crypto-validation";
-import { Validator } from "@mainsail/validation/source/validator";
+import { makeKeywords } from "@mainsail/crypto-validation";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { Contracts } from "@mainsail/contracts";
 import { schemas } from "./schemas";
 
 describe<{
 	app: Application;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 }>("Schemas", ({ it, assert, beforeEach }) => {
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app = new Application();
-
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
-
-		context.validator = context.app.resolve(Validator);
+		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
+		await context.app.resolve(ValidationServiceProvider).register();
+		await context.app.resolve(CryptoConfigServiceProvider).register();
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const keyword of Object.values({
 			...makeKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
@@ -31,7 +31,6 @@ describe<{
 		}
 
 		for (const schema of Object.values({
-			...sharedSchemas,
 			...addressSchemas,
 			...keyPairSchemas,
 			...transactionSchemas,
@@ -146,7 +145,7 @@ describe<{
 		assert.defined(validator.validate("transactionsRoot", "a".repeat(length + 1)).error);
 	});
 
-	/* eslint-disable sort-keys-fix/sort-keys-fix */
+	/* eslint-disable perfectionist/sort-objects */
 	const blockOriginal = {
 		hash: "1".repeat(64),
 		version: 1,
@@ -164,7 +163,7 @@ describe<{
 		transactionsRoot: "0".repeat(64),
 		proposer: "0x" + "A".repeat(40),
 	};
-	/* eslint-enable sort-keys-fix/sort-keys-fix */
+	/* eslint-enable perfectionist/sort-objects */
 
 	it("blockHeader - should be ok", async ({ validator }) => {
 		const block = {

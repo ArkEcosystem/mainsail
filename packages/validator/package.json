@@ -27,7 +27,7 @@
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"joi": "18.0.0"
+		"joi": "18.1.2"
 	},
 	"devDependencies": {
 		"@mainsail/blockchain-utils": "workspace:*",
@@ -53,6 +53,6 @@
 		"uvu": "0.5.6"
 	},
 	"engines": {
-		"node": ">=20.x"
+		"node": ">=24"
 	}
 }

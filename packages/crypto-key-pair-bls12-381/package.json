@@ -28,20 +28,19 @@
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@scure/bip39": "1.6.0",
-		"bls12-381-keygen": "0.2.4",
-		"wif": "5.0.0"
+		"@scure/bip39": "2.0.1",
+		"bls12-381-keygen": "0.2.4"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
-		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"bip39": "3.1.0",
 		"uvu": "0.5.6"
 	},
 	"engines": {
-		"node": ">=20.x"
+		"node": ">=24"
 	}
 }

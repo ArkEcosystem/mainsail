@@ -2,8 +2,9 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { bgRed, white } from "kleur/colors";
 
-import { Runtime } from "../exceptions/index.js";
 import type { Logger } from "../services/logger.js";
+
+import { Runtime } from "../exceptions/index.js";
 
 @injectable()
 export class Fatal {

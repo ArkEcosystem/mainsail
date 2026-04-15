@@ -22,29 +22,28 @@
 	},
 	"dependencies": {
 		"@hapi/boom": "10.0.1",
-		"@hapi/hapi": "21.4.3",
+		"@hapi/hapi": "21.4.7",
 		"@mainsail/api-common": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"ajv": "8.17.1",
-		"dayjs": "1.11.13",
-		"joi": "18.0.0",
-		"viem": "2.34.0"
+		"ajv": "8.18.0",
+		"dayjs": "1.11.20",
+		"joi": "18.1.2",
+		"viem": "2.47.6"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",
-		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"@types/semver": "7.7.0",
+		"@types/semver": "7.7.1",
 		"uvu": "0.5.6"
 	},
 	"engines": {
-		"node": ">=20.x"
+		"node": ">=24"
 	}
 }

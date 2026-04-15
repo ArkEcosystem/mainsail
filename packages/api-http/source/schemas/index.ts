@@ -1,4 +1,5 @@
 export * from "./blocks.js";
+export * from "./legacy.js";
 export * from "./schemas.js";
 export * from "./tokens.js";
 export * from "./transactions.js";

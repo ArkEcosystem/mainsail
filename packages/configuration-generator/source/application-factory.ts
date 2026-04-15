@@ -1,7 +1,6 @@
-import { readFileSync } from "node:fs";
+import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Identifiers } from "@mainsail/constants";
-import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
@@ -23,6 +22,7 @@ import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreSnapshotLegacyImporter } from "@mainsail/snapshot-legacy-importer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { readJSONSync } from "fs-extra/esm";
+import { readFileSync } from "node:fs";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { ConfigurationGenerator } from "./configuration-generator.js";
@@ -88,27 +88,30 @@ export const makeApplication = async (
 	await app.resolve(CoreSnapshotLegacyImporter).register();
 	await app.resolve(EvmService).register();
 
-	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
-		genesisBlock: {
-			// @ts-ignore
-			block: {
-				number: 0,
-			},
-		},
-		milestones: [
-			{
-				evmSpec: Enums.Evm.SpecId.SHANGHAI,
-				height: 0,
-				timeouts: {
-					blockPrepareTime: 4000,
-					blockTime: 8000,
-					stageTimeout: 2000,
-					stageTimeoutIncrease: 2000,
-					tolerance: 100,
+	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(
+		{
+			genesisBlock: {
+				// @ts-ignore
+				block: {
+					number: 0,
 				},
 			},
-		],
-	});
+			milestones: [
+				{
+					evmSpec: Enums.Evm.SpecId.SHANGHAI,
+					height: 0,
+					timeouts: {
+						blockPrepareTime: 4000,
+						blockTime: 8000,
+						stageTimeout: 2000,
+						stageTimeoutIncrease: 2000,
+						tolerance: 100,
+					},
+				},
+			],
+		},
+		false,
+	);
 
 	app.bind(InternalIdentifiers.Application).toConstantValue(app);
 	app.bind(InternalIdentifiers.ConfigurationGenerator).to(ConfigurationGenerator);

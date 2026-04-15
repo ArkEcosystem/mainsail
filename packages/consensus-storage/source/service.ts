@@ -1,8 +1,9 @@
+import type { Contracts } from "@mainsail/contracts";
+import type { Database, RootDatabase } from "lmdb";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/utils";
-import type { Database, RootDatabase } from "lmdb";
 
 @injectable()
 export class Service implements Contracts.ConsensusStorage.Service {
@@ -42,9 +43,9 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	}
 
 	public async persist({
-		state,
-		proposals,
 		messages,
+		proposals,
+		state,
 	}: {
 		state: Contracts.Consensus.State;
 		proposals: Contracts.Crypto.Proposal[];

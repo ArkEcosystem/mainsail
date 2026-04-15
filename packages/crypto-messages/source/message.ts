@@ -10,13 +10,13 @@ export class Message implements Contracts.Crypto.Message {
 	#serialized: Buffer;
 
 	constructor({
-		type,
+		blockHash,
 		blockNumber,
 		round,
-		blockHash,
-		validatorIndex,
-		signature,
 		serialized,
+		signature,
+		type,
+		validatorIndex,
 	}: Contracts.Crypto.MessageData & { serialized: Buffer }) {
 		this.#type = type;
 		this.#blockNumber = blockNumber;

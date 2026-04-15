@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import Hapi from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export abstract class Route implements Contracts.P2P.Route {

@@ -1,7 +1,8 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { formatCurrency } from "@mainsail/blockchain-utils";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { InvalidSignatureError } from "@mainsail/exceptions";
 
 @injectable()
@@ -28,7 +29,6 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	async process(
 		unit: Contracts.Processor.ProcessableUnit,
 		transaction: Contracts.Crypto.Transaction,
-		index: number,
 	): Promise<Contracts.Evm.TransactionReceipt> {
 		const block = unit.getBlock();
 
@@ -56,7 +56,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			throw new InvalidSignatureError();
 		}
 
-		const receipt = await this.transactionHandler.apply(transactionHandlerContext, transaction, index);
+		const receipt = await this.transactionHandler.apply(transactionHandlerContext, transaction);
 
 		const feeConsumed = this.feeCalculator.calculateConsumed(transaction.gasPrice, Number(receipt.gasUsed));
 		this.logger.debug(

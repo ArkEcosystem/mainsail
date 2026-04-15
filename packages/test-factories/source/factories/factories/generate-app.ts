@@ -1,5 +1,6 @@
-import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
@@ -26,10 +27,11 @@ export const generateApp = async (
 	app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 	app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
-	app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-	app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(config);
-
 	await app.resolve(CoreValidation).register();
+
+	app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+	app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(config, false);
+
 	await app.resolve(CoreCryptoValidation).register();
 	await app.resolve(CoreCryptoAddressKeccak256).register();
 	await app.resolve(CoreCryptoAddressBase58).register();

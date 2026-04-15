@@ -23,8 +23,10 @@
 	"dependencies": {
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
+		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*"
+		"@mainsail/utils": "workspace:*",
+		"ajv": "8.18.0"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
@@ -47,6 +49,6 @@
 		"uvu": "0.5.6"
 	},
 	"engines": {
-		"node": ">=20.x"
+		"node": ">=24"
 	}
 }

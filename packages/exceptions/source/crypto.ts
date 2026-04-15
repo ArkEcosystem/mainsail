@@ -33,6 +33,12 @@ export class NetworkVersionError extends Exception {
 	}
 }
 
+export class WifNetworkError extends Exception {
+	public constructor(expected: string | number, given: string | number) {
+		super(`Expected WIF network version to be ${expected}, but got ${given}.`);
+	}
+}
+
 export class PrivateKeyLengthError extends Exception {
 	public constructor(expected: string | number, given: string | number) {
 		super(`Expected length to be ${expected}, but got ${given}.`);
@@ -418,5 +424,11 @@ export class MultiPaymentAmountMismatchError extends Exception {
 export class InvalidProposalBytesError extends Exception {
 	public constructor(message: string) {
 		super(`Failed to deserialize proposal, encountered invalid bytes: ${message}`);
+	}
+}
+
+export class InvalidCommitProofBytesError extends Exception {
+	public constructor(message: string) {
+		super(`Failed to deserialize commit proof, encountered invalid bytes: ${message}`);
 	}
 }

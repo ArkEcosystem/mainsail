@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Enums } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 
 import { execa, Result, SyncResult } from "../execa.js";
 import { Flags } from "../utils/flags.js";

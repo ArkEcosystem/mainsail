@@ -1,12 +1,22 @@
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
+import { schemas } from "./schemas.js";
 import { Validator } from "./validator.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Cryptography.Validator).to(Validator).inSingletonScope();
+
+		this.#registerSchemas();
+	}
+
+	#registerSchemas(): void {
+		for (const schema of Object.values(schemas)) {
+			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
+		}
 	}
 }

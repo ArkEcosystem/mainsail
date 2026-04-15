@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import delay from "delay";
 
 import { RateLimiter } from "./rate-limiter.js";
@@ -31,7 +32,7 @@ export class Throttle {
 
 			remoteAccess: [],
 
-			roundValidators: this.cryptoConfiguration.getRoundValidators(),
+			roundValidators: this.cryptoConfiguration.getMaxRoundValidators(),
 			// White listing anybody here means we would not throttle ourselves when sending
 			// them requests, ie we could spam them.
 			whitelist: [],

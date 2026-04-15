@@ -17,7 +17,7 @@ jobs:
         name: "Build"
         strategy:
             matrix:
-                node-version: [22.x]
+                node-version: [24.x]
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-unit
@@ -71,7 +71,7 @@ jobs:
             - build
         strategy:
             matrix:
-                node-version: [22.x]
+                node-version: [24.x]
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-unit
@@ -255,7 +255,7 @@ jobs:
             - build
         strategy:
             matrix:
-                node-version: [22.x]
+                node-version: [24.x]
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-integration
@@ -322,7 +322,7 @@ jobs:
 
         strategy:
             matrix:
-                node-version: [22.x]
+                node-version: [24.x]
                 name: ["consensus"]
 
         steps:
@@ -407,7 +407,7 @@ jobs:
 
         strategy:
             matrix:
-                node-version: [22.x]
+                node-version: [24.x]
                 name: ["clients"]
 
         steps:
@@ -465,7 +465,7 @@ jobs:
 
         strategy:
             matrix:
-                node-version: [22.x]
+                node-version: [24.x]
                 name: ["snapshot"]
 
         steps:
@@ -544,7 +544,7 @@ jobs:
 
         strategy:
             matrix:
-                node-version: [22.x]
+                node-version: [24.x]
                 name: ["sync"]
 
         steps:
@@ -618,7 +618,7 @@ jobs:
 
         strategy:
             matrix:
-                node-version: [22.x]
+                node-version: [24.x]
                 name: ["transaction-pool-api", "consensus", "resync"]
 
         services:

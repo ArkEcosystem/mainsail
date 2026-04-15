@@ -1,6 +1,7 @@
 import type Hapi from "@hapi/hapi";
-import { Units } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Units } from "@mainsail/constants";
 
 export const BaseRoute = {
 	register(server: Contracts.Api.ApiServer): void {

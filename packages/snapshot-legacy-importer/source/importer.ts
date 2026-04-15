@@ -1,15 +1,15 @@
-import { createHash } from "node:crypto";
-import { promisify } from "node:util";
-import { brotliDecompress } from "node:zlib";
+import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, BigNumber, chunk } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
+import { createHash } from "node:crypto";
+import { promisify } from "node:util";
+import { brotliDecompress } from "node:zlib";
 import path from "path";
 import { encodeFunctionData } from "viem";
 
@@ -407,10 +407,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 					);
 					stats.importedValidatorsWithoutBlsKey++;
 				} else {
-					const entropy = this.hashFactory
-						.sha256(Buffer.from(validator.username, "utf8"))
-						.toString("hex")
-						.slice(0, 32);
+					const entropy = this.hashFactory.sha256(Buffer.from(validator.username, "utf8"));
 					const mnemonic = entropyToMnemonic(entropy);
 
 					const consensusKeyPair = await this.consensusKeyPairFactory.fromMnemonic(mnemonic);

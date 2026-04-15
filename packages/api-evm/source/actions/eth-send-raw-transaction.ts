@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { RpcError } from "@mainsail/exceptions";
 import { Environment } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";

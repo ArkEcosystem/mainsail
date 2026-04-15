@@ -44,6 +44,9 @@ const setupHttp = async (app: Application): Promise<CoreApiHttp> => {
 			pagination: {
 				limit: 100,
 			},
+			rateLimit: {
+				enabled: false,
+			},
 			socketTimeout: 5000,
 		},
 		server: { http: { enabled: true, host: "127.0.0.1", port: 4003 }, https: { enabled: false } },
@@ -135,6 +138,12 @@ export class ApiContext {
 	public get configurationRepository(): ApiDatabaseContracts.ConfigurationRepository {
 		return this.app.get<ApiDatabaseContracts.ConfigurationRepositoryFactory>(
 			ApiDatabaseIdentifiers.ConfigurationRepositoryFactory,
+		)();
+	}
+
+	public get legacyColdWalletRepository(): ApiDatabaseContracts.LegacyColdWalletRepository {
+		return this.app.get<ApiDatabaseContracts.LegacyColdWalletRepositoryFactory>(
+			ApiDatabaseIdentifiers.LegacyColdWalletRepositoryFactory,
 		)();
 	}
 

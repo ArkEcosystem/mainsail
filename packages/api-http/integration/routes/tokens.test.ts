@@ -103,7 +103,7 @@ describe<{
 		for (const { query, result } of testCases) {
 			const endpoint = `/tokens${query}`;
 			if (result.statusCode === 404) {
-				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
+				await assert.rejects(async () => request(endpoint, options), "Request failed with status code 404");
 			} else {
 				const { statusCode, data } = await request(endpoint, options);
 				assert.equal(statusCode, result.statusCode);
@@ -142,7 +142,7 @@ describe<{
 		for (const { query, result } of testCases) {
 			const endpoint = `/tokens${query}`;
 			if (result.statusCode === 404) {
-				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
+				await assert.rejects(async () => request(endpoint, options), "Request failed with status code 404");
 			} else {
 				const { statusCode, data } = await request(endpoint, options);
 				assert.equal(statusCode, result.statusCode);
@@ -190,7 +190,7 @@ describe<{
 		for (const { query, result } of testCases) {
 			const endpoint = `/tokens${query}`;
 			if (result.statusCode === 404) {
-				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
+				await assert.rejects(async () => request(endpoint, options), "Request failed with status code 404");
 			} else {
 				const { statusCode, data } = await request(endpoint, { ...options });
 				assert.equal(statusCode, result.statusCode);
@@ -229,7 +229,7 @@ describe<{
 		for (const { token, result } of testCases) {
 			const endpoint = `/tokens/${token.address}`;
 			if (result.statusCode === 404) {
-				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
+				await assert.rejects(async () => request(endpoint, options), "Request failed with status code 404");
 			} else {
 				const { statusCode, data } = await request(endpoint, options);
 				assert.equal(statusCode, result.statusCode);
@@ -272,7 +272,7 @@ describe<{
 		for (const { token, result } of testCases) {
 			const endpoint = `/tokens/${token.address}/holders`;
 			if (result.statusCode === 404) {
-				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
+				await assert.rejects(async () => request(endpoint, options), "Request failed with status code 404");
 			} else {
 				const { statusCode, data } = await request(endpoint, options);
 				assert.equal(statusCode, result.statusCode);
@@ -363,7 +363,7 @@ describe<{
 		for (const { query, result } of testCases) {
 			const endpoint = `/tokens/transfers${query}`;
 			if (result.statusCode === 404) {
-				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
+				await assert.rejects(async () => request(endpoint, options), "Request failed with status code 404");
 			} else {
 				const { statusCode, data } = await request(endpoint, options);
 				assert.equal(statusCode, result.statusCode);
@@ -399,7 +399,10 @@ describe<{
 		for (const { query, token, result } of testCases) {
 			const endpoint = `/tokens/${token}/transfers${query}`;
 			if (result.statusCode === 404) {
-				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
+				await assert.rejects(
+					async () => request(endpoint, options),
+					"Request failed with status code 404 (Not Found)",
+				);
 			} else {
 				const { statusCode, data } = await request(endpoint, options);
 				assert.equal(statusCode, result.statusCode);
@@ -435,7 +438,7 @@ describe<{
 		for (const { query, token, result } of testCases) {
 			const endpoint = `/tokens/${token}/approvals${query}`;
 			if (result.statusCode === 404) {
-				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
+				await assert.rejects(async () => request(endpoint, options), "Request failed with status code 404");
 			} else {
 				const { statusCode, data } = await request(endpoint, options);
 				assert.equal(statusCode, result.statusCode);

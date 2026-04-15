@@ -1,11 +1,7 @@
-import { Identifiers } from "@mainsail/constants";
-import { Configuration } from "@mainsail/crypto-config";
-import { Validator } from "@mainsail/validation/source/validator";
+import { Validator } from "./validator.js";
 
-import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { makeKeywords } from "./keywords";
 import { schemas } from "./schemas";
 
 describe<{
@@ -15,15 +11,7 @@ describe<{
 	beforeEach((context) => {
 		context.app = new Application();
 
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
-
 		context.validator = context.app.resolve(Validator);
-
-		const keywords = makeKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration));
-		for (const keyword of Object.values(keywords)) {
-			context.validator.addKeyword(keyword);
-		}
 
 		for (const schema of Object.values(schemas)) {
 			context.validator.addSchema(schema);
@@ -74,5 +62,47 @@ describe<{
 			assert.defined(validator.validate("hex", char).error);
 			assert.defined(validator.validate("hex", char.repeat(20)).error);
 		}
+	});
+
+	it("prefixedDataHex - should be ok", ({ validator }) => {
+		const validValues = ["0x", "0x00", "0x0123", "0x0123456789abcdef"];
+
+		for (const value of validValues) {
+			assert.undefined(validator.validate("prefixedDataHex", value).error);
+		}
+	});
+
+	it("prefixedDataHex - should not be ok", ({ validator }) => {
+		const invalidValues = ["0x0", "0x000", "deadbeef", "0xGG", "0X00"];
+
+		for (const value of invalidValues) {
+			assert.defined(validator.validate("prefixedDataHex", value).error);
+		}
+
+		assert.defined(validator.validate("prefixedDataHex", 123).error);
+		assert.defined(validator.validate("prefixedDataHex", null).error);
+		assert.defined(validator.validate("prefixedDataHex").error);
+		assert.defined(validator.validate("prefixedDataHex", {}).error);
+	});
+
+	it("prefixedQuantityHex - should be ok", ({ validator }) => {
+		const validValues = ["0x0", "0x1", "0x01", "0x123456789abcdef"];
+
+		for (const value of validValues) {
+			assert.undefined(validator.validate("prefixedQuantityHex", value).error);
+		}
+	});
+
+	it("prefixedQuantityHex - should not be ok", ({ validator }) => {
+		const invalidValues = ["0x", "deadbeef", "0xGG", "0X01"];
+
+		for (const value of invalidValues) {
+			assert.defined(validator.validate("prefixedQuantityHex", value).error);
+		}
+
+		assert.defined(validator.validate("prefixedQuantityHex", 123).error);
+		assert.defined(validator.validate("prefixedQuantityHex", null).error);
+		assert.defined(validator.validate("prefixedQuantityHex").error);
+		assert.defined(validator.validate("prefixedQuantityHex", {}).error);
 	});
 });

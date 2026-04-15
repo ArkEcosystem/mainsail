@@ -1,7 +1,7 @@
 {
-    "name": "peerdiscovery",
-    "description": "Peer discovery app",
-    "dependencies": {
-        "express": "4.19.2"
-    }
+	"name": "snapshot-peer-discovery",
+	"description": "Peer discovery app",
+	"dependencies": {
+		"express": "4.19.2"
+	}
 }

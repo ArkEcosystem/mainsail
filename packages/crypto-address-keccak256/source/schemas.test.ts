@@ -1,9 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
-import { Configuration } from "@mainsail/crypto-config";
 import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
-import { schemas as baseSchemas } from "@mainsail/crypto-validation";
-import { ServiceProvider as CoreValidation } from "@mainsail/validation";
-import { Validator } from "@mainsail/validation/source/validator";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 import { generateMnemonic } from "bip39";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
@@ -11,32 +9,29 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { AddressFactory } from "./address.factory";
 import { schemas } from "./schemas";
+import { Contracts } from "@mainsail/contracts";
 
 describe<{
 	app: Application;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 }>("Schemas", ({ it, assert, beforeEach }) => {
 	const length = 42;
 
 	beforeEach(async (context) => {
 		context.app = new Application();
-
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
-
-		await context.app.resolve(CoreValidation).register();
-
-		context.validator = context.app.get(Identifiers.Cryptography.Validator);
+		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
+		await context.app.resolve(ValidationServiceProvider).register();
+		await context.app.resolve(CryptoConfigServiceProvider).register();
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const schema of Object.values({
-			...baseSchemas,
 			...schemas,
 		})) {
 			context.validator.addSchema(schema);
 		}
 	});
 
-	it("address - should be ok", ({ validator }) => {
+	it("#address - should be ok", ({ validator }) => {
 		const prefix = "0x";
 
 		assert.undefined(validator.validate("address", prefix + "a".repeat(length - prefix.length)).error);
@@ -48,7 +43,7 @@ describe<{
 		}
 	});
 
-	it("address - should be ok for factory", async (context) => {
+	it("#address - should be ok for factory", async (context) => {
 		await context.app.resolve<ECDSA>(ECDSA).register();
 
 		assert.undefined(
@@ -59,7 +54,7 @@ describe<{
 		);
 	});
 
-	it("address - should not be ok", ({ validator }) => {
+	it("#address - should not be ok", ({ validator }) => {
 		const prefix = "0x";
 		const invalidPrefix = "1x";
 

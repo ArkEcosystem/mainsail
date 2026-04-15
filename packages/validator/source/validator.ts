@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert, BigNumber } from "@mainsail/utils";
 import { performance } from "perf_hooks";
@@ -73,7 +74,7 @@ export class Validator implements Contracts.Validator.Validator {
 		const previousBlock = this.stateStore.getLastBlock();
 		const blockNumber = previousBlock.number + 1;
 
-		const { logsBloom, stateRoot, transactions, gasUsed, fee } = await this.#getTransactionsForForging(
+		const { fee, gasUsed, logsBloom, stateRoot, transactions } = await this.#getTransactionsForForging(
 			generatorAddress,
 			timestamp,
 			{
@@ -96,8 +97,8 @@ export class Validator implements Contracts.Validator.Validator {
 			{
 				payloadSerialized: serializedProposedData.toString("hex"),
 				round,
-				validRound,
 				validatorIndex,
+				validRound,
 			},
 			await this.#keyPair.getKeyPair(),
 		);
@@ -173,7 +174,7 @@ export class Validator implements Contracts.Validator.Validator {
 				performance.now() +
 				milestone.timeouts.blockPrepareTime * this.configuration.getRequired<number>("txCollatorFactor");
 
-			for (const [index, bytes] of transactionBytes.entries()) {
+			for (const bytes of transactionBytes.values()) {
 				if (performance.now() > timeLimit) {
 					break;
 				}
@@ -209,7 +210,6 @@ export class Validator implements Contracts.Validator.Validator {
 					const result = await validator.validate(
 						{ commitKey, gasLimit: milestone.block.maxGasLimit, generatorAddress, timestamp },
 						transaction,
-						index,
 					);
 
 					gasLeft -= Number(result.gasUsed);

@@ -1,14 +1,15 @@
 import { Identifiers } from "@mainsail/constants";
 import { schemas as blockSchemas } from "@mainsail/crypto-block";
-import { Configuration } from "@mainsail/crypto-config";
 import { schemas as keyPairBlsSchemas } from "@mainsail/crypto-key-pair-bls12-381";
 import { schemas as signatureBlsSchemas } from "@mainsail/crypto-signature-bls12-381";
-import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/crypto-validation";
-import { Validator } from "@mainsail/validation/source/validator";
+import { makeKeywords as makeBaseKeywords } from "@mainsail/crypto-validation";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { Contracts } from "@mainsail/contracts";
 import {
 	Proposal,
 	ProposalWithValidRound,
@@ -21,27 +22,30 @@ import { signature } from "../test/fixtures/proposal.js";
 
 describe<{
 	app: Application;
-	validator: Validator;
-}>("Schemas", ({ it, assert, beforeEach }) => {
+	validator: Contracts.Crypto.Validator;
+	configuration: Contracts.Crypto.Configuration;
+}>("Schemas", ({ it, assert, beforeEach, spy }) => {
 	const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof, ProposalWithLockProofAndValidRound];
 
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app = new Application();
 
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
+		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
+		await context.app.resolve(ValidationServiceProvider).register();
+		await context.app.resolve(CryptoConfigServiceProvider).register();
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
+		context.configuration = context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
+		context.configuration.setHeight(1);
 
-		context.validator = context.app.resolve(Validator);
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const keyword of Object.values({
-			...makeBaseKeywords(context.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeBaseKeywords(context.configuration),
 		})) {
 			context.validator.addKeyword(keyword);
 		}
 
 		for (const schema of Object.values({
-			...baseSchemas,
 			...blockSchemas,
 			...keyPairBlsSchemas,
 			...signatureBlsSchemas,
@@ -180,14 +184,15 @@ describe<{
 	});
 
 	it("lockProof - should be ok", ({ validator }) => {
-		const result = validator.validate("lockProof", lockProof);
+		const result = validator.validate("lockProof", { ...lockProof, number: 1 });
 		assert.undefined(result.error);
 	});
 
-	it("lockProof - all fields are required", ({ validator }) => {
+	it("lockProof - all fields are required (except number)", ({ validator }) => {
 		const keys = Object.keys(schemas.lockProof.properties);
 		for (let key of keys) {
-			const lockProofCopy = { ...lockProof, [key]: undefined };
+			if (key === "number") continue;
+			const lockProofCopy = { ...lockProof, [key]: undefined, number: 1 };
 			const result = validator.validate("lockProof", lockProofCopy);
 			assert.defined(result.error);
 			assert.true(result.error?.includes(key));
@@ -195,7 +200,7 @@ describe<{
 	});
 
 	it("lockProof - should not allow additional fields", ({ validator }) => {
-		const lockProofCopy = { ...lockProof, extraField: "extraValue" };
+		const lockProofCopy = { ...lockProof, extraField: "extraValue", number: 1 };
 		const result = validator.validate("lockProof", lockProofCopy);
 		assert.defined(result.error);
 		assert.true(result.error!.includes("additional properties"));
@@ -204,6 +209,7 @@ describe<{
 	it("lockProof - signature should be ok", ({ validator }) => {
 		for (let char of "0123456789abcdef") {
 			const result = validator.validate("lockProof", {
+				number: 1,
 				signature: char.repeat(192),
 				validators: Array(53).fill(true),
 			});
@@ -221,6 +227,7 @@ describe<{
 			const result = validator.validate("lockProof", {
 				signature,
 				validators: Array(53).fill(true),
+				number: 1,
 			});
 			assert.defined(result.error);
 			assert.true(result.error!.includes("signature"));
@@ -238,6 +245,7 @@ describe<{
 
 		for (let validators of validValidators) {
 			const result = validator.validate("lockProof", {
+				number: 1,
 				signature,
 				validators,
 			});
@@ -258,9 +266,33 @@ describe<{
 			const result = validator.validate("lockProof", {
 				signature,
 				validators,
+				number: 1,
 			});
 			assert.defined(result.error);
 			assert.true(result.error!.includes("validators"));
 		}
+	});
+
+	it("proposalUnsigned - should correctly deserialize block number from payloadSerialized", ({
+		validator,
+		configuration,
+	}) => {
+		const spyConfigurationGetMilestone = spy(configuration, "getMilestone");
+
+		const result = validator.validate("proposalUnsigned", Proposal.proposalDataSerializableUnsigned);
+		assert.undefined(result.error);
+
+		spyConfigurationGetMilestone.calledOnce();
+		spyConfigurationGetMilestone.calledWith(2);
+	});
+
+	it("lockProof - should correctly parse block number from number", ({ validator, configuration }) => {
+		const spyConfigurationGetMilestone = spy(configuration, "getMilestone");
+
+		const result = validator.validate("lockProof", { ...lockProof, number: 3 });
+		assert.undefined(result.error);
+
+		spyConfigurationGetMilestone.calledOnce();
+		spyConfigurationGetMilestone.calledWith(3);
 	});
 });

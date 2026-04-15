@@ -1,55 +1,59 @@
 import { Application } from "@mainsail/kernel";
 import { Identifiers } from "@mainsail/constants";
-import * as Exceptions from "@mainsail/exceptions";
-import { Configuration } from "@mainsail/crypto-config";
+import { NotImplemented } from "@mainsail/exceptions";
+import type { Contracts } from "@mainsail/contracts";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
+import { ServiceProvider as CryptoWifServiceProvider } from "@mainsail/crypto-wif";
 
 import { describe } from "@mainsail/test-runner";
 import { KeyPairFactory } from "./pair";
 import { PublicKeyFactory } from "./public";
+import { wallets } from "../../crypto-wif/test/index.js";
 
-const mnemonic =
-	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
+import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 
 describe<{ app: Application; factory: PublicKeyFactory }>("PublicKeyFactory", ({ assert, beforeEach, each, it }) => {
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app = new Application();
-		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
+		await context.app.resolve(ValidationServiceProvider).register();
+		await context.app.resolve(CryptoConfigServiceProvider).register();
+		await context.app.resolve(CryptoWifServiceProvider).register();
 		context.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
 
 		context.factory = context.app.resolve(PublicKeyFactory);
 	});
 
-	it("should derive a key pair from an mnemonic", async ({ factory }) => {
-		assert.is(
-			await factory.fromMnemonic(mnemonic),
-			"95af988701a6fb60e09da41d2ca1a9e0b49e43501bda4255b3ca01073f490c34102b6bbcafde6333185e9980745d72cb",
-		);
+	each(
+		"#fromMnemonic -should derive a key pair from an mnemonic",
+		async ({ context: { factory }, dataset: wallet }) => {
+			assert.is(await factory.fromMnemonic(wallet.mnemonic), wallet.validatorPublicKey);
+		},
+		wallets,
+	);
+
+	it("#fromWIF - should throw NotImplemented", async ({ factory }) => {
+		await assert.rejects(() => factory.fromWIF(""), NotImplemented);
 	});
 
-	it("should derive from a WIF", async ({ factory }) => {
-		assert.is(
-			await factory.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"),
-			"97f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb",
-		);
-	});
-
-	it("should throw not implemented exception when deriving from a musig", async ({ factory }) => {
-		await assert.rejects(async () => factory.fromMultiSignatureAsset({} as any), Exceptions.NotImplemented);
+	it("#fromMultiSignatureAsset - should throw NotImplemented", async ({ factory }) => {
+		await assert.rejects(async () => factory.fromMultiSignatureAsset({} as any), NotImplemented);
 	});
 
 	each(
-		"should pass with valid public keys",
+		"#verify - should pass with valid public keys",
 		async ({ context, dataset }) => {
 			assert.true(await context.factory.verify(dataset));
 		},
 		[
 			"95af988701a6fb60e09da41d2ca1a9e0b49e43501bda4255b3ca01073f490c34102b6bbcafde6333185e9980745d72cb",
 			"97f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb",
-		],
+		].concat(wallets.map((wallet) => wallet.validatorPublicKey)),
 	);
 
 	each(
-		"should fail with invalid public keys",
+		"#verify - should fail with invalid public keys",
 		async ({ context, dataset }) => {
 			assert.false(await context.factory.verify(dataset));
 		},
@@ -67,7 +71,7 @@ describe<{ app: Application; factory: PublicKeyFactory }>("PublicKeyFactory", ({
 		],
 	);
 
-	it("should aggregate public keys", async ({ factory }) => {
+	it("#aggregate - should aggregate public keys", async ({ factory }) => {
 		assert.equal(
 			await factory.aggregate([
 				Buffer.from(

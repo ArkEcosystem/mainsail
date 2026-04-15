@@ -1,5 +1,6 @@
-import type Hapi from "@hapi/hapi";
+import type { Types } from "@mainsail/api-common";
 import type { Contracts } from "@mainsail/contracts";
+
 import Joi from "joi";
 
 import { BlocksController } from "../controllers/blocks.js";
@@ -10,7 +11,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	server.bind(controller);
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.index(request),
+		handler: (request: Types.HapiRequest) => controller.index(request),
 		method: "GET",
 		options: {
 			plugins: {
@@ -28,7 +29,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.first(request),
+		handler: (request: Types.HapiRequest) => controller.first(request),
 		method: "GET",
 		options: {
 			validate: {
@@ -41,7 +42,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.last(request),
+		handler: (request: Types.HapiRequest) => controller.last(request),
 		method: "GET",
 		options: {
 			validate: {
@@ -54,7 +55,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.show(request),
+		handler: (request: Types.HapiRequest) => controller.show(request),
 		method: "GET",
 		options: {
 			validate: {

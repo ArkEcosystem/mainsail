@@ -9,4 +9,7 @@ export interface Application {
 	resolve<T>(constructorFunction: Container.Newable<T>): T;
 	getCorePath(type: string, file?: string): string;
 	getConsolePath(type: string, file?: string): string;
+	name(): string;
+	isWorker(): boolean;
+	terminate(reason?: string, error?: Error): Promise<never>;
 }

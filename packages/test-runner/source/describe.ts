@@ -1,11 +1,13 @@
+import type { Context, Test } from "uvu";
+
 import kleur from "kleur";
 import sinon from "sinon";
-import type { Context, Test } from "uvu";
 import { suite } from "uvu";
 import { z as schema } from "zod";
 
-import { assert } from "./assert.js";
 import type { EachCallback } from "./each.js";
+
+import { assert } from "./assert.js";
 import { each, formatName } from "./each.js";
 import { runHook } from "./hooks.js";
 import { loader } from "./loader.js";
@@ -17,11 +19,11 @@ type ContextFunction<T> = () => T;
 type ContextCallback<T> = (context: T) => Promise<void> | void;
 
 interface CallbackArguments<T> {
-	afterAll: (callback_: ContextCallback<T>) => void;
-	afterEach: (callback_: ContextCallback<T>) => void;
+	afterAll: (callback_: ContextCallback<T>) => Promise<void>;
+	afterEach: (callback_: ContextCallback<T>) => Promise<void>;
 	assert: typeof assert;
-	beforeAll: (callback_: ContextCallback<T>) => void;
-	beforeEach: (callback_: ContextCallback<T>) => void;
+	beforeAll: (callback_: ContextCallback<T>) => Promise<void>;
+	beforeEach: (callback_: ContextCallback<T>) => Promise<void>;
 	clock: (config?: number | Date | { now?: number | Date | undefined }) => sinon.SinonFakeTimers;
 
 	dataset: unknown;

@@ -1,23 +1,24 @@
 import { Identifiers } from "@mainsail/constants";
-import { Validator } from "@mainsail/validation";
-import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { Contracts } from "@mainsail/contracts";
 import { Web3Sha3 } from "./index.js";
 
 describe<{
 	app: Application;
 	action: Web3Sha3;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 }>("Web3Sha3", ({ beforeEach, it, assert }) => {
 	const version = "0.0.1";
 
 	beforeEach(async (context) => {
 		context.app = new Application();
+		await context.app.resolve(ValidationServiceProvider).register();
 		context.app.bind(Identifiers.Application.Version).toConstantValue(version);
 
 		context.action = context.app.resolve(Web3Sha3);
-		context.validator = context.app.resolve(Validator);
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 	});
 
 	it("should have a name", ({ action }) => {
@@ -25,8 +26,6 @@ describe<{
 	});
 
 	it("schema should be ok", ({ action, validator }) => {
-		validator.addSchema(cryptoValidationSchemas.prefixedQuantityHex);
-
 		assert.equal(action.schema, {
 			$id: `jsonRpc_web3_sha3`,
 			maxItems: 1,

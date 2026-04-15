@@ -29,10 +29,12 @@
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"uvu": "0.5.6"
 	},
 	"engines": {
-		"node": ">=20.x"
+		"node": ">=24"
 	}
 }

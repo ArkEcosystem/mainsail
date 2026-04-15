@@ -53,3 +53,60 @@ impl From<StoredAccountInfo> for AccountInfo {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{account::AccountInfoExtended, legacy::LegacyAccountAttributes};
+    use alloy_primitives::{U256, address, b256};
+    use revm::state::AccountInfo;
+
+    #[test]
+    fn test_account_info_parts() {
+        let info = AccountInfo {
+            balance: U256::ONE,
+            nonce: 1,
+            code_hash: b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+            account_id: None,
+            code: None,
+        };
+
+        let attributes = LegacyAccountAttributes {
+            legacy_nonce: Some(0),
+            second_public_key: Some("key".into()),
+            multi_signature: None,
+        };
+
+        let account_info = AccountInfoExtended {
+            address: address!("0000000000000000000000000000000000000001"),
+            info: info.clone(),
+            legacy_attributes: attributes.clone(),
+        };
+
+        let (address, info_part, legacy_attributes) = account_info.into_parts();
+
+        assert_eq!(
+            address,
+            address!("0000000000000000000000000000000000000001")
+        );
+        assert_eq!(info, info_part);
+        assert_eq!(legacy_attributes, Some(attributes));
+
+        let account_info = AccountInfoExtended {
+            address: address!("0000000000000000000000000000000000000001"),
+            info: info.clone(),
+            legacy_attributes: LegacyAccountAttributes {
+                legacy_nonce: None,
+                second_public_key: None,
+                multi_signature: None,
+            },
+        };
+
+        let (address, info_part, legacy_attributes) = account_info.into_parts();
+        assert_eq!(
+            address,
+            address!("0000000000000000000000000000000000000001")
+        );
+        assert_eq!(info, info_part);
+        assert_eq!(legacy_attributes, None);
+    }
+}

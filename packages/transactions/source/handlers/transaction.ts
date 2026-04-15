@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import type { Contracts } from "@mainsail/contracts";
 import { TransactionFailedToPreverifyError, UnexpectedLegacySecondSignatureError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
@@ -70,21 +71,19 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 	public async apply(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-		index: number,
 	): Promise<Contracts.Evm.TransactionReceipt> {
 		assert.string(transaction.hash);
 
 		const { evmSpec } = this.configuration.getMilestone();
 
 		try {
-			const { instance, blockContext } = context.evm;
+			const { blockContext, instance } = context.evm;
 			const data = {
 				blockContext,
 				data: Buffer.from(transaction.data.slice(2), "hex"),
 				from: transaction.from,
 				gasLimit: BigInt(transaction.gasLimit),
 				gasPrice: BigInt(transaction.gasPrice),
-				index,
 				legacyAddress: transaction.senderLegacyAddress,
 				nonce: transaction.nonce.toBigInt(),
 				specId: evmSpec,

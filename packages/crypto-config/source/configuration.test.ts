@@ -1,13 +1,28 @@
 import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "@mainsail/test-runner";
+import { Application } from "@mainsail/kernel";
 import { Configuration } from "./configuration";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
+
+import { schemas } from "./schemas.js";
 
 describe<{
+	app: Application;
 	configManager: Configuration;
 }>("Configuration", ({ it, beforeEach, assert }) => {
-	beforeEach((context) => {
-		context.configManager = new Configuration();
+	beforeEach(async (context) => {
+		context.app = new Application();
 
+		await context.app.resolve(ValidationServiceProvider).register();
+
+		const validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
+		for (const schema of Object.values(schemas)) {
+			validator.addSchema(schema);
+		}
+
+		context.configManager = context.app.resolve(Configuration);
 		context.configManager.setConfig(cryptoJson);
 	});
 
@@ -21,10 +36,20 @@ describe<{
 		assert.containKeys(configManager.all(), ["network", "milestones", "genesisBlock"]);
 	});
 
-	it('key should be "set"', ({ configManager }) => {
-		configManager.set("key", "value");
+	it("should throw on set before config is initialized", () => {
+		const fresh = new Configuration();
 
-		assert.equal(configManager.get("key"), "value");
+		assert.throws(() => fresh.set("network.nethash", "dummy"));
+	});
+
+	it('key should be "set" if it is on config object property', ({ configManager }) => {
+		configManager.set("network.key", "value");
+		assert.equal(configManager.get("network.key"), "value");
+	});
+
+	it('key should not be "set" if it is not on config property', ({ configManager }) => {
+		configManager.set("key", "value");
+		assert.undefined(configManager.get("key"));
 	});
 
 	it('key should be "get"', ({ configManager }) => {
@@ -122,25 +147,52 @@ describe<{
 		assert.false(configManager.isNewMilestone(999_999));
 	});
 
-	it("getNextMilestoneByKey - should throw an error if no milestones are set", ({ configManager }) => {
-		configManager.setConfig({ ...cryptoJson, milestones: [] });
-		assert.throws(
-			() => configManager.getNextMilestoneWithNewKey(1, "evmSpec"),
-			`Attempted to get next milestone but none were set`,
+	it("should throw in isNewMilestone when milestones are not initialized", ({ configManager }) => {
+		const fresh = new Configuration();
+		assert.throws(() => fresh.isNewMilestone());
+	});
+
+	it("should throw in getMilestone when milestones are not initialized", ({ configManager }) => {
+		const fresh = new Configuration();
+		assert.throws(() => fresh.getMilestone());
+	});
+
+	it("should walk milestone index backwards when height decreases", ({ configManager }) => {
+		configManager.setConfig(
+			{
+				...cryptoJson,
+				milestones: [
+					{ height: 0, roundValidators: 53, reward: "0" },
+					{ height: 10, roundValidators: 53, reward: "1" },
+					{ height: 20, roundValidators: 53, reward: "2" },
+				],
+			},
+			false,
 		);
+
+		assert.equal(configManager.getMilestone(15).reward, "1");
+		assert.equal(configManager.getMilestone(5).reward, "0");
+	});
+
+	it("getNextMilestoneByKey - should throw an error if configuration is not set", ({}) => {
+		const configManager = new Configuration();
+		assert.throws(() => configManager.getNextMilestoneWithNewKey(1, "evmSpec"));
 	});
 
 	it("getNextMilestoneByKey - should throw an error if roundValidators is 0", ({ configManager }) => {
 		assert.not.throws(() =>
-			configManager.setConfig({
-				...cryptoJson,
-				milestones: [
-					{
-						roundValidators: 0,
-						height: 0,
-					},
-				],
-			}),
+			configManager.setConfig(
+				{
+					...cryptoJson,
+					milestones: [
+						{
+							roundValidators: 0,
+							height: 0,
+						},
+					],
+				},
+				false,
+			),
 		);
 
 		assert.throws(
@@ -195,6 +247,26 @@ describe<{
 		assert.equal(configManager.getNextMilestoneWithNewKey(1_750_000, "evmSpec"), expected);
 	});
 
+	it("getMilestoneDiff - should return empty diff when no original milestones are set", () => {
+		const fresh = new Configuration();
+		assert.equal(fresh.getMilestoneDiff(), {});
+	});
+
+	it("getMilestoneDiff - should return empty diff for first milestone", ({ configManager }) => {
+		assert.equal(configManager.getMilestoneDiff(0), {});
+	});
+
+	it("getMilestoneDiff - should return diff for a later milestone", ({ configManager }) => {
+		const diff = configManager.getMilestoneDiff(cryptoJson.milestones[1].height);
+		assert.equal(diff.height, `${cryptoJson.milestones[0].height} => ${cryptoJson.milestones[1].height}`);
+	});
+
+	it("getMilestoneDiff - should use set height if height is not provided", ({ configManager }) => {
+		configManager.setHeight(cryptoJson.milestones[1].height);
+		const diff = configManager.getMilestoneDiff();
+		assert.equal(diff.height, `${cryptoJson.milestones[0].height} => ${cryptoJson.milestones[1].height}`);
+	});
+
 	it("getNextMilestoneByKey - should get all milestones", ({ configManager }) => {
 		const milestones = [
 			{ height: 1, reward: "8" },
@@ -203,7 +275,7 @@ describe<{
 			{ height: 8, reward: "8" },
 		];
 		const config = { ...cryptoJson, milestones };
-		configManager.setConfig(config);
+		configManager.setConfig(config, false);
 		const secondMilestone = {
 			data: "9",
 			found: true,
@@ -231,52 +303,90 @@ describe<{
 		assert.equal(configManager.getNextMilestoneWithNewKey(8, "reward"), emptyMilestone);
 	});
 
-	it("getRoundValidators - should return maximum round validators from all milestones", ({ configManager }) => {
-		configManager.setConfig({
-			...cryptoJson,
-			milestones: [{ roundValidators: 1, height: 1 }],
-		});
+	it("should return genesis height", ({ configManager }) => {
+		assert.equal(configManager.getGenesisHeight(), cryptoJson.genesisBlock.block.number);
+	});
 
-		assert.equal(configManager.getRoundValidators(), 1);
+	it("getMilestones - should throw when milestones are not initialized", () => {
+		const fresh = new Configuration();
+		assert.throws(() => fresh.getMilestones());
+	});
 
-		configManager.setConfig({
-			...cryptoJson,
-			milestones: [
-				{ roundValidators: 1, height: 1 },
-				{ roundValidators: 5, height: 3 },
-				{ roundValidators: 2, height: 8 },
-			],
-		});
+	it("should throw if round validators change mid-round", ({ configManager }) => {
+		assert.throws(
+			() =>
+				configManager.setConfig({
+					...cryptoJson,
+					milestones: [
+						{ height: 1, roundValidators: 53 },
+						{ height: 2, roundValidators: 54 },
+					],
+				}),
+			"Bad milestone at height: 2. The number of validators can only be changed at the beginning of a new round.",
+		);
+	});
 
-		assert.equal(configManager.getRoundValidators(), 5);
+	it("getMaxRoundValidators - should return maximum round validators from all milestones", ({ configManager }) => {
+		configManager.setConfig(
+			{
+				...cryptoJson,
+				milestones: [{ roundValidators: 1, height: 1 }],
+			},
+			false,
+		);
 
-		configManager.setConfig({
-			...cryptoJson,
-			milestones: [
-				{ roundValidators: 5, height: 1 },
-				{ roundValidators: 1, height: 6 },
-				{ roundValidators: 10, height: 7 },
-			],
-		});
+		assert.equal(configManager.getMaxRoundValidators(), 1);
 
-		assert.equal(configManager.getRoundValidators(), 10);
+		configManager.setConfig(
+			{
+				...cryptoJson,
+				milestones: [
+					{ roundValidators: 1, height: 1 },
+					{ roundValidators: 5, height: 3 },
+					{ roundValidators: 2, height: 8 },
+				],
+			},
+			false,
+		);
 
-		configManager.setConfig({
-			...cryptoJson,
-			milestones: [
-				{ roundValidators: 5, height: 1 },
-				{ roundValidators: 1, height: 6 },
-				{ roundValidators: 1, height: 7 },
-			],
-		});
+		assert.equal(configManager.getMaxRoundValidators(), 5);
 
-		assert.equal(configManager.getRoundValidators(), 5);
+		configManager.setConfig(
+			{
+				...cryptoJson,
+				milestones: [
+					{ roundValidators: 5, height: 1 },
+					{ roundValidators: 1, height: 6 },
+					{ roundValidators: 10, height: 7 },
+				],
+			},
+			false,
+		);
 
-		configManager.setConfig({
-			...cryptoJson,
-			milestones: [{ roundValidators: 1, height: 7 }],
-		});
+		assert.equal(configManager.getMaxRoundValidators(), 10);
 
-		assert.equal(configManager.getRoundValidators(), 1);
+		configManager.setConfig(
+			{
+				...cryptoJson,
+				milestones: [
+					{ roundValidators: 5, height: 1 },
+					{ roundValidators: 1, height: 6 },
+					{ roundValidators: 1, height: 7 },
+				],
+			},
+			false,
+		);
+
+		assert.equal(configManager.getMaxRoundValidators(), 5);
+
+		configManager.setConfig(
+			{
+				...cryptoJson,
+				milestones: [{ roundValidators: 1, height: 7 }],
+			},
+			false,
+		);
+
+		assert.equal(configManager.getMaxRoundValidators(), 1);
 	});
 });

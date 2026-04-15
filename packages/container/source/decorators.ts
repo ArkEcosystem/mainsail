@@ -1,5 +1,4 @@
 import "reflect-metadata";
-
 import { injectable as importedInjectable, injectFromBase } from "inversify";
 
 export function injectable(): ClassDecorator {

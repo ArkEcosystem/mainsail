@@ -27,9 +27,9 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/state": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"better-sqlite3": "12.2.0",
-		"fs-extra": "11.3.1",
-		"joi": "18.0.0"
+		"better-sqlite3": "12.8.0",
+		"fs-extra": "11.3.4",
+		"joi": "18.1.2"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
@@ -41,6 +41,6 @@
 		"uvu": "0.5.6"
 	},
 	"engines": {
-		"node": ">=20.x"
+		"node": ">=24"
 	}
 }

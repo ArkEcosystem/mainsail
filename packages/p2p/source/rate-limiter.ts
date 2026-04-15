@@ -22,8 +22,8 @@ export class RateLimiter {
 	#endpoints: Map<string, RateLimiterMemory>;
 
 	public constructor({
-		whitelist,
 		configurations,
+		whitelist,
 	}: {
 		whitelist: string[];
 		configurations: RateLimiterConfigurations;

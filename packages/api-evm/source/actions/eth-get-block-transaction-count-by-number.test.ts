@@ -1,26 +1,29 @@
 import { Identifiers } from "@mainsail/constants";
-import { Validator } from "@mainsail/validation";
-import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { Contracts } from "@mainsail/contracts";
 import { EthGetBlockTransactionCountByNumber } from "./index.js";
 
 describe<{
 	app: Application;
 	action: EthGetBlockTransactionCountByNumber;
-	validator: Validator;
+	validator: Contracts.Crypto.Validator;
 	database: any;
-}>("EthGetBlockTransactionCountByHash", ({ beforeEach, it, assert, stub }) => {
+}>("EthGetBlockTransactionCountByNumber", ({ beforeEach, it, assert, stub }) => {
 	beforeEach(async (context) => {
 		context.database = {
 			getBlockHeader: async () => undefined,
 		};
 
 		context.app = new Application();
+
+		context.app.resolve(ValidationServiceProvider).register();
+
 		context.app.bind(Identifiers.Database.Service).toConstantValue(context.database);
 
 		context.action = context.app.resolve(EthGetBlockTransactionCountByNumber);
-		context.validator = context.app.resolve(Validator);
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 	});
 
 	it("should have a name", ({ action }) => {
@@ -28,7 +31,6 @@ describe<{
 	});
 
 	it("schema should be array with 0 parameters", ({ action, validator }) => {
-		validator.addSchema(cryptoValidationSchemas.prefixedQuantityHex);
 		validator.addSchema(action.schema);
 
 		assert.undefined(validator.validate("jsonRpc_eth_getBlockTransactionCountByNumber", ["0x0"]).errors);
