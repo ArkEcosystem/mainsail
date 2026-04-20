@@ -38,7 +38,9 @@ describe<{
 	});
 
 	it("should throw if invalid config is provided", ({ configManager }) => {
-		assert.throws(() => configManager.setConfig({...cryptoJson, network: {...cryptoJson.network, nethash: "dummy"}}));
+		assert.throws(() =>
+			configManager.setConfig({ ...cryptoJson, network: { ...cryptoJson.network, nethash: "dummy" } }),
+		);
 	});
 
 	it("should throw on set before config is initialized", () => {

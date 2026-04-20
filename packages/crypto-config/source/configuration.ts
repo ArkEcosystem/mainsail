@@ -54,7 +54,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 	public getNetwork(): Contracts.Crypto.Network {
 		assert.defined(this.#configuration);
-		return this.#configuration.config.network
+		return this.#configuration.config.network;
 	}
 
 	public setHeight(value: number): void {

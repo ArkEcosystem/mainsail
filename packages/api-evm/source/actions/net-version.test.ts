@@ -17,8 +17,8 @@ describe<{
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
 			getNetwork: () => {
 				return {
-					chainId: 123
-				}
+					chainId: 123,
+				};
 			},
 		});
 

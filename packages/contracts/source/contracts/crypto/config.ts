@@ -1,6 +1,4 @@
-import type {
-	CommitJsonCrypto
-} from "./commit.js";
+import type { CommitJsonCrypto } from "./commit.js";
 import type {
 	Milestone,
 	MilestoneDiff,
@@ -18,9 +16,9 @@ export interface Configuration {
 
 	set<T = unknown>(key: string, value: T): void;
 
-	getGenesisCommit(): CommitJsonCrypto,
+	getGenesisCommit(): CommitJsonCrypto;
 
-	getNetwork(): Network,
+	getNetwork(): Network;
 
 	setHeight(value: number): void;
 

@@ -32,9 +32,8 @@ export const registerBlockFactory = async (
 	factory.set("Block", async ({ options }: { options: Options }): Promise<Contracts.Crypto.Commit> => {
 		const previousBlock: Contracts.Crypto.BlockData = options.getPreviousBlock
 			? options.getPreviousBlock()
-			: app
-				.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-				.getGenesisCommit().block as unknown as Contracts.Crypto.BlockData;
+			: (app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).getGenesisCommit()
+					.block as unknown as Contracts.Crypto.BlockData);
 
 		const { reward } = app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
