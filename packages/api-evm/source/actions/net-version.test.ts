@@ -15,7 +15,11 @@ describe<{
 		context.app = new Application();
 
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
-			get: () => "nethash",
+			getNetwork: () => {
+				return {
+					chainId: 123
+				}
+			},
 		});
 
 		context.action = context.app.resolve(NetVersion);
@@ -41,6 +45,6 @@ describe<{
 	});
 
 	it("should return the web3 client version", async ({ action }) => {
-		assert.equal(await action.handle([]), `nethash`);
+		assert.equal(await action.handle([]), `123`);
 	});
 });
