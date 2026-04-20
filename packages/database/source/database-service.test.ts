@@ -160,9 +160,10 @@ describe<{
 		const commitStateFactory = app.get<Contracts.Consensus.CommitStateFactory>(
 			Identifiers.Consensus.CommitState.Factory,
 		);
+
 		const evm = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 
-		const genesisCommitJson = configuration.get<Contracts.Crypto.CommitJson>("genesisBlock");
+		const genesisCommitJson = configuration.getGenesisCommit();
 		const genesisCommit = await commitFactory.fromJson(genesisCommitJson);
 
 		const commitState = commitStateFactory(genesisCommit);
