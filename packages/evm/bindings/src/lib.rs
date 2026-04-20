@@ -676,7 +676,7 @@ impl EvmInner {
         tx_hash: B256,
     ) -> std::result::Result<Option<TxReceipt>, EVMError<String>> {
         match self.persistent_db.get_receipt(block_number, tx_hash) {
-            Ok(receipt) => Ok(receipt),
+            Ok((_, receipt)) => Ok(receipt),
             Err(err) => Err(EVMError::Database(
                 format!("failed reading receipt: {}", err).into(),
             )),
@@ -698,7 +698,7 @@ impl EvmInner {
 
         let (committed, _) = self
             .persistent_db
-            .get_committed_receipt(commit_key.0, tx_ctx.tx_hash)
+            .get_receipt(commit_key.0, tx_ctx.tx_hash)
             .map_err(|err| EVMError::Database(format!("commit receipt lookup: {}", err).into()))?;
         assert!(!committed);
 

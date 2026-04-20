@@ -118,7 +118,6 @@ export interface TransactionContext {
 	readonly data: Buffer;
 	readonly blockContext: BlockContext;
 	readonly txHash: string;
-	readonly index?: number;
 	readonly specId: SpecId;
 }
 

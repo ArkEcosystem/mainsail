@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/core",
-	"version": "0.0.1-rc.8",
+	"version": "0.0.1-rc.9",
 	"description": "Core CLI commands for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -107,6 +107,6 @@
 		"pm2": "^6.0.8"
 	},
 	"engines": {
-		"node": ">=20.x"
+		"node": ">=24"
 	}
 }

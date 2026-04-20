@@ -1,14 +1,14 @@
 {
-    "address": "0xA5d751A5F645856fDE0931DbE543099198a44B50",
+    "address": "0xd27a09189112D26ED1a243f252da588032d642c9",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "5769d4fd653476011911494814d88524b9f454c7435670b470ffb34baeb48491",
-        "publicKey": "80ad4d6e3096d0c442652695516f1d1834fc9c8878f284fd53632d16b3a7118301c7768936d65222d48197da759687ad"
+        "privateKey": "4ca884dde72cbfc06f5beccfa808a1dfe10220b08075542babd4b63ab72e46cf",
+        "publicKey": "b1d8f05088f1b497a7ff4dfb077126283e80b695d0c35866dc56ded6a40165124c622e526d9e42722522a6cbb48fe37b"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "8b7cc084bea7fdd769282c6f0c3dada16bfe512c4546831e7b14179f9f09a72e",
-        "publicKey": "02a251c8dd30cb0b672ca74eadd6076c6d6bf6e592a8b3672943dc308126899e7c"
+        "privateKey": "f6ef63e4e49be1aaab915fa286b90c0ef67bb78fb75b62969e528c632a4c093e",
+        "publicKey": "02d8df07389b4d9d4c25cfd83a3fb772b2918a56abea0462b1690516c2b743da0a"
     },
-    "passphrase": "deer flock law wrestle boss kidney matter hour claw pole barely property story dismiss inquiry remove flame dog estate hub million place pave category"
+    "passphrase": "parent fine adapt bird rebuild bunker acoustic win seven virus assault winner tragic moral impact leisure lab salad expect please soft spot peace honey"
 }

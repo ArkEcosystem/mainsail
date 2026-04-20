@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/utils",
-	"version": "0.0.1-rc.8",
+	"version": "0.0.1-rc.9",
 	"description": "Performance oriented implementations of commonly used functions in TypeScript.",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -51,6 +51,6 @@
 		"uvu": "0.5.6"
 	},
 	"engines": {
-		"node": ">=20.x"
+		"node": ">=24"
 	}
 }

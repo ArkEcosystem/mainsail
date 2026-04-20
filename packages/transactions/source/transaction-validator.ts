@@ -24,7 +24,6 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 	public async validate(
 		context: Contracts.Transactions.TransactionValidatorContext,
 		transaction: Contracts.Crypto.Transaction,
-		index: number,
 	): Promise<Contracts.Evm.TransactionReceipt> {
 		const deserialized: Contracts.Crypto.Transaction = await this.transactionFactory.fromBytes(
 			transaction.serialized,
@@ -46,7 +45,6 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 				},
 			},
 			transaction,
-			index,
 		);
 
 		assert.string(transaction.from);

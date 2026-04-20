@@ -61,7 +61,7 @@ export const makeCustomProposal = async (
 	const transactionData: Contracts.Crypto.TransactionData[] = [];
 	let payloadSize = 2;
 
-	for (const [index,transaction] of transactions.entries()) {
+	for (const transaction of transactions.values()) {
 		let result = { gasRefunded: 0n, gasUsed: 0n, logs: [] as any, status: 0 };
 
 		try {
@@ -73,7 +73,6 @@ export const makeCustomProposal = async (
 					timestamp: dayjs().valueOf(),
 				},
 				transaction,
-				index,
 			);
 		} catch {
 			result = { ...result, gasUsed: BigInt(transaction.gasLimit) };
@@ -129,14 +128,12 @@ export const makeCustomProposal = async (
 		lockProof: undefined,
 	});
 
-	const serializedProposal = await messageSerializer.serializeProposalUnsigned(
-		{
-			payloadSerialized:  proposedBytes.toString("hex"),
-			round,
-			validRound: undefined,
-			validatorIndex: 0,
-		},
-	);
+	const serializedProposal = await messageSerializer.serializeProposalUnsigned({
+		payloadSerialized: proposedBytes.toString("hex"),
+		round,
+		validRound: undefined,
+		validatorIndex: 0,
+	});
 
 	const proposalSignature = await app
 		.getTagged<Contracts.Crypto.SignatureBls>(Identifiers.Cryptography.Signature.Instance, "type", "consensus")
@@ -158,7 +155,11 @@ export const makeCustomProposal = async (
 	return proposal;
 };
 
-export const makeTransactionBuilderContext = (app: Contracts.Kernel.Application, apps: Contracts.Kernel.Application[], validators: Validator[]) => {
+export const makeTransactionBuilderContext = (
+	app: Contracts.Kernel.Application,
+	apps: Contracts.Kernel.Application[],
+	validators: Validator[],
+) => {
 	const context = {
 		app,
 		wallets: validators.map((v) => ({
