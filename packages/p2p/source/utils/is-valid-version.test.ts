@@ -10,7 +10,9 @@ describe<{
 	app: Application;
 }>("isValidVersion", ({ it, assert, each, beforeEach }) => {
 	const configuration = {
-		get: () => "devnet",
+		getNetwork: () => {
+			return { name: "devnet" };
+		},
 		getMilestone: () => ({
 			p2p: {
 				minimumVersions: ["^2.6.0"],
