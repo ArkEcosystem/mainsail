@@ -66,7 +66,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			gasLimit: Number(transaction.gasLimit),
 			gasPrice: Number(transaction.gasPrice),
 			hash: transaction.txHash,
-			network: this.configuration.get<number>("network.chainId"),
+			network: this.configuration.getNetwork().chainId,
 			nonce: BigNumber.make(transaction.nonce),
 			senderLegacyAddress:
 				transaction.legacyAddress ||

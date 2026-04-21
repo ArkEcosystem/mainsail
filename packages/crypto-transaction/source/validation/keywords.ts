@@ -14,10 +14,7 @@ export const makeKeywords = (
 	const network: FuncKeywordDefinition = {
 		compile() {
 			return (data) => {
-				const chainId = configuration.get<number | undefined>("network.chainId");
-				if (!chainId) {
-					return true;
-				}
+				const chainId = configuration.getNetwork().chainId;
 				return data === chainId;
 			};
 		},
@@ -54,8 +51,7 @@ export const makeKeywords = (
 						// Otherwise lookup by transaction hash
 						if (!valid && parentSchema && parentSchema.parentData && parentSchema.parentData.hash) {
 							if (genesisTransactionsLookup.size === 0) {
-								const genesisBlock =
-									configuration.get<Contracts.Crypto.BlockJsonCrypto>("genesisBlock.block");
+								const genesisBlock = configuration.getGenesisCommit().block;
 								for (const transaction of genesisBlock?.transactions || []) {
 									genesisTransactionsLookup.add(transaction.hash);
 								}

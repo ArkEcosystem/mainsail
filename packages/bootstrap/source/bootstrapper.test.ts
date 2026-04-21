@@ -35,7 +35,7 @@ describe<{
 
 	beforeEach((context) => {
 		context.configuration = {
-			get: () => genesisCommitJson,
+			getGenesisCommit: () => genesisCommitJson,
 			getGenesisHeight: () => 1,
 			getMilestone: () => {},
 		};

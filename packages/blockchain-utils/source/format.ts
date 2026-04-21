@@ -9,7 +9,7 @@ export const formatCurrency = (configuration: Contracts.Crypto.Configuration, am
 		minimumFractionDigits: 0,
 	});
 
-	return `${localeString} ${configuration.get("network.client.symbol")}`;
+	return `${localeString} ${configuration.getNetwork().client.symbol}`;
 };
 
 export const formatNumber = (value: number): string => value.toLocaleString("en");

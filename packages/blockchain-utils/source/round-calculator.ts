@@ -17,7 +17,7 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	public isNewRound(height: number): boolean {
-		const milestones = this.configuration.get<Contracts.Crypto.Milestone[]>("milestones");
+		const milestones = this.configuration.getMilestones();
 		const genesisHeight = this.configuration.getGenesisHeight();
 
 		// Since milestones are merged, find the first milestone to introduce the validator count.

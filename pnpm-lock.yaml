@@ -1449,9 +1449,6 @@ importers:
       lodash.clone:
         specifier: 4.5.0
         version: 4.5.0
-      lodash.get:
-        specifier: 4.4.2
-        version: 4.4.2
       lodash.set:
         specifier: 4.3.2
         version: 4.3.2
@@ -1468,9 +1465,6 @@ importers:
       '@types/lodash.clone':
         specifier: 4.5.9
         version: 4.5.9
-      '@types/lodash.get':
-        specifier: 4.4.9
-        version: 4.4.9
       '@types/lodash.set':
         specifier: 4.3.9
         version: 4.3.9
@@ -5686,9 +5680,6 @@ packages:
   '@types/lodash.clonedeep@4.5.9':
     resolution: {integrity: sha512-19429mWC+FyaAhOLzsS8kZUsI+/GmBAQ0HFiCPsKGU+7pBXOQWhyrY6xNNDwUSX8SMZMJvuFVMF9O5dQOlQK9Q==}
 
-  '@types/lodash.get@4.4.9':
-    resolution: {integrity: sha512-J5dvW98sxmGnamqf+/aLP87PYXyrha9xIgc2ZlHl6OHMFR2Ejdxep50QfU0abO1+CH6+ugx+8wEUN1toImAinA==}
-
   '@types/lodash.set@4.3.9':
     resolution: {integrity: sha512-KOxyNkZpbaggVmqbpr82N2tDVTx05/3/j0f50Es1prxrWB0XYf9p3QNxqcbWb7P1Q9wlvsUSlCFnwlPCIJ46PQ==}
 
@@ -8524,10 +8515,6 @@ packages:
 
   lodash.clonedeep@4.5.0:
     resolution: {integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==}
-
-  lodash.get@4.4.2:
-    resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
-    deprecated: This package is deprecated. Use the optional chaining (?.) operator instead.
 
   lodash.isfunction@3.0.9:
     resolution: {integrity: sha512-AirXNj15uRIMMPihnkInB4i3NHeb4iBtNg9WRWuK2o31S+ePwwNmDPaTL3o7dTJ+VXNZim7rFs4rxN4YU1oUJw==}
@@ -12901,10 +12888,6 @@ snapshots:
     dependencies:
       '@types/lodash': 4.17.20
 
-  '@types/lodash.get@4.4.9':
-    dependencies:
-      '@types/lodash': 4.17.20
-
   '@types/lodash.set@4.3.9':
     dependencies:
       '@types/lodash': 4.17.20
@@ -16082,8 +16065,6 @@ snapshots:
   lodash.clone@4.5.0: {}
 
   lodash.clonedeep@4.5.0: {}
-
-  lodash.get@4.4.2: {}
 
   lodash.isfunction@3.0.9: {}
 

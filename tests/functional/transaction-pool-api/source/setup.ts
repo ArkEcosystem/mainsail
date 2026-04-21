@@ -174,7 +174,7 @@ const bootstrap = async (app: Application) => {
 	const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const commitFactory = app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
 
-	const genesisCommitJson = configuration.get<Contracts.Crypto.CommitJson>("genesisBlock");
+	const genesisCommitJson = configuration.getGenesisCommit();
 	const genesisCommit = await commitFactory.fromJson(genesisCommitJson);
 
 	const store = app.get<Contracts.State.Store>(Identifiers.State.Store);

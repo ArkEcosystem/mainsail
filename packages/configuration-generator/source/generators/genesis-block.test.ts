@@ -24,7 +24,6 @@ describe<{
 
 		context.app = app;
 
-		// @ts-ignore
 		app.get<Contracts.Crypto.Configuration>(AppIdentifiers.Cryptography.Configuration).setConfig(
 			{
 				genesisBlock: {
@@ -51,6 +50,9 @@ describe<{
 						validatorRegistrationFee: "250",
 					},
 				],
+				network: {
+					chainId: 123,
+				},
 			},
 			false,
 		);

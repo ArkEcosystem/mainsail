@@ -44,7 +44,7 @@ export class TransactionBuilder {
 			gasLimit: 1_000_000,
 			gasPrice: 5 * 1e9,
 			hash: "",
-			network: this.configuration.get<number>("network.chainId"),
+			network: this.configuration.getNetwork().chainId,
 			nonce: BigNumber.ZERO,
 			r: "",
 			s: "",

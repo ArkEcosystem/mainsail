@@ -106,7 +106,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new TransactionExceedsMaximumByteSizeError(transaction, maxTransactionBytes);
 		}
 
-		const chainId: number = this.cryptoConfiguration.get("network.chainId");
+		const chainId: number = this.cryptoConfiguration.getNetwork().chainId;
 		if (transaction.network && transaction.network !== chainId) {
 			throw new TransactionFromWrongNetworkError(transaction, chainId);
 		}
