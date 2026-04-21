@@ -29,7 +29,6 @@
 		"ajv": "8.18.0",
 		"deepmerge": "4.3.1",
 		"lodash.clone": "4.5.0",
-		"lodash.get": "4.4.2",
 		"lodash.set": "4.3.2"
 	},
 	"devDependencies": {
@@ -37,7 +36,6 @@
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/lodash.clone": "4.5.9",
-		"@types/lodash.get": "4.4.9",
 		"@types/lodash.set": "4.3.9",
 		"uvu": "0.5.6"
 	},
