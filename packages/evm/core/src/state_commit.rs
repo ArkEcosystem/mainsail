@@ -316,7 +316,7 @@ mod tests {
             (
                 ExecutionResult::Success {
                     reason: SuccessReason::Stop,
-                    gas: ResultGas::new(30000, 30000, 0, 0, 0),
+                    gas: ResultGas::new_with_state_gas(30000, 30000, 0, 0),
                     logs: vec![
                         Log {
                             address: genesis_info.validator_contract,
@@ -377,7 +377,7 @@ mod tests {
             b256!("0000000000000000000000000000000000000000000000000000000000000002"),
             (
                 ExecutionResult::Revert {
-                    gas: ResultGas::new(30000, 30000, 0, 0, 0),
+                    gas: ResultGas::new_with_state_gas(30000, 30000, 0, 0),
                     logs: vec![],
                     output: alloy_primitives::Bytes(Bytes::new()),
                 },
