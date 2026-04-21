@@ -21,7 +21,7 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
             gas, output, logs, ..
         } => match output {
             Output::Call(output) => TxReceipt {
-                gas_used: gas.used(),
+                gas_used: gas.tx_gas_used(),
                 gas_refunded: gas.inner_refunded(),
                 cumulative_gas_used,
                 success: 1,
@@ -30,7 +30,7 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
                 output: Some(output),
             },
             Output::Create(output, address) => TxReceipt {
-                gas_used: gas.used(),
+                gas_used: gas.tx_gas_used(),
                 gas_refunded: gas.inner_refunded(),
                 cumulative_gas_used,
                 success: 1,
@@ -40,7 +40,7 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
             },
         },
         ExecutionResult::Revert { gas, output, .. } => TxReceipt {
-            gas_used: gas.used(),
+            gas_used: gas.tx_gas_used(),
             success: 0,
             cumulative_gas_used,
             gas_refunded: 0,
@@ -49,7 +49,7 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
             output: Some(output),
         },
         ExecutionResult::Halt { gas, .. } => TxReceipt {
-            gas_used: gas.used(),
+            gas_used: gas.tx_gas_used(),
             success: 0,
             cumulative_gas_used,
             gas_refunded: 0,
