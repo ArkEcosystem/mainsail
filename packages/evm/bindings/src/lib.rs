@@ -655,12 +655,14 @@ impl EvmInner {
             ctx.tx(),
             (*ctx.cfg().spec()).into(),
             false,
+            false,
+            0,
         );
 
         Ok(match result {
             Ok(result) => PreverifyTxResult {
                 success: true,
-                initial_gas_used: result.initial_gas,
+                initial_gas_used: result.initial_total_gas,
                 ..Default::default()
             },
             Err(err) => PreverifyTxResult {
@@ -1077,7 +1079,7 @@ impl EvmInner {
                         pending_commit.cache = std::mem::take(&mut state_db.cache);
 
                         if let Some(tx_hash) = ctx.tx_hash {
-                            pending_commit.cumulative_gas_used += result.gas_used();
+                            pending_commit.cumulative_gas_used += result.tx_gas_used();
                             pending_commit.results.insert(
                                 tx_hash,
                                 (result.clone(), pending_commit.cumulative_gas_used),
