@@ -101,15 +101,6 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		assert.string(data.r);
 		assert.string(data.s);
 
-		// Passing via IPC converts BigNumber to '{ value: bigint }'
-		// if ("value" in data.value) {
-		// 	data.value = BigNumber.make(data.value["value"]);
-		// }
-
-		// if ("value" in data.nonce) {
-		// 	data.nonce = BigNumber.make(data.nonce["value"]);
-		// }
-
 		const unsignedHash = await this.hashFactory.toHashUnsigned(data);
 		const hash = await this.hashFactory.toHash(data);
 
