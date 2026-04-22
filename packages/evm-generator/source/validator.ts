@@ -163,7 +163,6 @@ export class Validator implements Contracts.Validator.Validator {
 				const result = await validator.validate(
 					{ commitKey, gasLimit: milestone.block.maxGasLimit, generatorAddress, timestamp },
 					transaction,
-					candidateTransactions.length,
 				);
 
 				gasLeft -= Number(result.gasUsed);
