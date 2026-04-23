@@ -24,7 +24,6 @@ export const makeKeywords = (
 			type: "integer",
 		},
 		type: "string",
-
 	};
 
 	const bignumber: FuncKeywordDefinition = {
@@ -60,7 +59,10 @@ export const makeKeywords = (
 	const bigInt: FuncKeywordDefinition = {
 		compile: (schema) => (data) => {
 			const minimum = schema.minimum !== undefined ? schema.minimum : 0n;
-			const maximum = schema.maximum !== undefined ? schema.maximum : BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+			const maximum =
+				schema.maximum !== undefined
+					? schema.maximum
+					: BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
 
 			if (typeof data !== "bigint") {
 				return false;

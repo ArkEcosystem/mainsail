@@ -172,22 +172,7 @@ describe<{
 			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
-		const invalidValues = [
-			0,
-			"0",
-			"1",
-			-1,
-			"-1",
-			1.1,
-			100,
-			"100",
-			-1n,
-			-1,
-			null,
-			undefined,
-			{},
-			"test",
-		];
+		const invalidValues = [0, "0", "1", -1, "-1", 1.1, 100, "100", -1n, -1, null, undefined, {}, "test"];
 
 		for (const value of invalidValues) {
 			const transaction = {
@@ -298,22 +283,7 @@ describe<{
 			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
-		const invalidValues = [
-			0,
-			"0",
-			"1",
-			-1,
-			"-1",
-			1.1,
-			100,
-			"100",
-			-1n,
-			-1,
-			null,
-			undefined,
-			{},
-			"test",
-		];
+		const invalidValues = [0, "0", "1", -1, "-1", 1.1, 100, "100", -1n, -1, null, undefined, {}, "test"];
 
 		for (const value of invalidValues) {
 			const transaction = {

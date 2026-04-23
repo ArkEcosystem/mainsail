@@ -122,13 +122,14 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		};
 	}
 
-
 	async #fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.Transaction> {
 		try {
 			const { data: transaction } = await this.deserializer.deserialize(serialized);
 
 			const worker = this.workerPool ? await this.workerPool.getWorker() : undefined;
-			const cryptoData = worker ? await worker.transactionFactory("computeCryptoData", transaction) : await this.computeCryptoData(transaction);
+			const cryptoData = worker
+				? await worker.transactionFactory("computeCryptoData", transaction)
+				: await this.computeCryptoData(transaction);
 
 			const tx = { ...cryptoData, ...transaction };
 

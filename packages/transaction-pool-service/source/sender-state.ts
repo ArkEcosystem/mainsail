@@ -60,7 +60,9 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		await this.#validateTransaction(transaction);
 
 		this.#wallet.increaseNonce();
-		this.#wallet.decreaseBalance(BigNumber.make(transaction.value + this.feeCalculator.calculate(transaction).toBigInt()));
+		this.#wallet.decreaseBalance(
+			BigNumber.make(transaction.value + this.feeCalculator.calculate(transaction).toBigInt()),
+		);
 	}
 
 	public async replace(
@@ -72,8 +74,12 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new Error("cannot replace transaction with mismatching nonce");
 		}
 
-		const oldTransactionCost = BigNumber.make(oldTransaction.value + this.feeCalculator.calculate(oldTransaction).toBigInt());
-		const newTransactionCost = BigNumber.make(newTransaction.value + this.feeCalculator.calculate(newTransaction).toBigInt());
+		const oldTransactionCost = BigNumber.make(
+			oldTransaction.value + this.feeCalculator.calculate(oldTransaction).toBigInt(),
+		);
+		const newTransactionCost = BigNumber.make(
+			newTransaction.value + this.feeCalculator.calculate(newTransaction).toBigInt(),
+		);
 
 		const availableBalance = this.#wallet.getBalance().plus(oldTransactionCost);
 		if (availableBalance.isLessThan(newTransactionCost)) {
@@ -93,7 +99,9 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	public revert(transaction: Contracts.Crypto.Transaction): void {
 		this.#wallet.decreaseNonce();
-		this.#wallet.increaseBalance(BigNumber.make(transaction.value + this.feeCalculator.calculate(transaction).toBigInt()));
+		this.#wallet.increaseBalance(
+			BigNumber.make(transaction.value + this.feeCalculator.calculate(transaction).toBigInt()),
+		);
 	}
 
 	async #validateTransaction(
