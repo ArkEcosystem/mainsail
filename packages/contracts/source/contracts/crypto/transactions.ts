@@ -115,6 +115,7 @@ export interface TransactionFactory {
 	fromJson(json: TransactionJson): Promise<Transaction>;
 	fromData(data: TransactionSerializable, strict?: boolean): Promise<Transaction>;
 	fromStorage(data: TransactionStorageDataExtended): Promise<BlockTransaction>;
+	computeCryptoData(data: TransactionSerializable): Promise<TransactionCryptoData>;
 }
 
 export interface TransactionHashFactory {

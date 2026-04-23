@@ -39,6 +39,10 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
+	// @optional()
+	// @inject(Identifiers.CryptoWorker.WorkerPool)
+	// private readonly workerPool!: Contracts.Crypto.WorkerPool;
+
 	public async fromHex(hex: string): Promise<Contracts.Crypto.Transaction> {
 		return this.#fromSerialized(Buffer.from(hex, "hex"));
 	}
@@ -118,9 +122,13 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		};
 	}
 
+
 	async #fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.Transaction> {
 		try {
 			const { data: transaction } = await this.deserializer.deserialize(serialized);
+
+			// const worker = this.workerPool ? await this.workerPool.getWorker() : undefined;
+			// const cryptoData = worker ? await worker.transactionFactory("computeCryptoData", transaction) : await this.computeCryptoData(transaction);
 			const cryptoData = await this.computeCryptoData(transaction);
 
 			const tx = { ...cryptoData, ...transaction };
