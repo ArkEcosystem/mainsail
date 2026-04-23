@@ -1,8 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 import type { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
-import { BigNumber } from "@mainsail/utils";
-
 export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
 ): {
@@ -37,10 +35,10 @@ export const makeKeywords = (
 				} = configuration.getMilestone();
 
 				try {
-					const value = BigNumber.make(data);
-					if (value.isLessThan(minimumGasPrice)) {
+					const value = BigInt(data);
+					if (value < minimumGasPrice) {
 						// Accept 0 gasFee when processing genesis block only
-						if (!value.isZero()) {
+						if (value !== 0n) {
 							return false;
 						}
 
@@ -65,7 +63,7 @@ export const makeKeywords = (
 
 					// The upper limit technically isn't needed and solely acts as a safeguard
 					// as there's no legit reason to go beyond it.
-					if (value.isGreaterThan(maximumGasPrice)) {
+					if (value > maximumGasPrice) {
 						return false;
 					}
 				} catch {
@@ -92,12 +90,12 @@ export const makeKeywords = (
 				} = configuration.getMilestone();
 
 				try {
-					const bignum = BigNumber.make(data);
-					if (bignum.isLessThan(minimumGasLimit)) {
+					const bignum = BigInt(data);
+					if (bignum < minimumGasLimit) {
 						return false;
 					}
 
-					if (bignum.isGreaterThan(maximumGasLimit)) {
+					if (bignum > maximumGasLimit) {
 						return false;
 					}
 				} catch {

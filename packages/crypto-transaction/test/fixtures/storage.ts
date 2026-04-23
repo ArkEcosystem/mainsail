@@ -20,9 +20,9 @@ const convertToStorageData = (
 	gasLimit: BigInt(transaction.gasLimit),
 	gasPrice: BigInt(transaction.gasPrice),
 	index: 0,
-	nonce: transaction.nonce.toBigInt(),
+	nonce: transaction.nonce,
 	txHash: transaction.hash,
-	value: transaction.value.toBigInt(),
+	value: transaction.value,
 	...block,
 });
 

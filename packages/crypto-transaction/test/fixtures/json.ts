@@ -8,19 +8,19 @@ import {
 } from "./transactions.js";
 
 const convertToJsonData = (transaction: Contracts.Crypto.TransactionData): Contracts.Crypto.TransactionJson => ({
-	data: transaction.data.toString("hex"),
+	data: transaction.data,
 	from: transaction.from,
 	gasLimit: Number(transaction.gasLimit.toFixed()),
 	gasPrice: Number(transaction.gasPrice.toFixed()),
 	legacySecondSignature: transaction.legacySecondSignature,
 	network: transaction.network,
-	nonce: transaction.nonce.toFixed(),
+	nonce: transaction.nonce.toString(),
 	r: transaction.r,
 	s: transaction.s,
 	senderPublicKey: transaction.senderPublicKey,
 	to: transaction.to,
 	v: transaction.v,
-	value: transaction.value.toFixed(),
+	value: transaction.value.toString(),
 });
 
 export const transactionTransfer = convertToJsonData(Deserialized_transactionTransfer);
