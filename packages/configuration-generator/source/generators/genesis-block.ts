@@ -288,11 +288,11 @@ export class GenesisBlockGenerator extends Generator {
 				from: transaction.from,
 				gasLimit: BigInt(transaction.gasLimit),
 				gasPrice: BigInt(transaction.gasPrice),
-				nonce: transaction.nonce.toBigInt(),
+				nonce: transaction.nonce,
 				specId: Enums.Evm.SpecId.SHANGHAI,
 				to: transaction.to,
 				txHash: transaction.hash,
-				value: transaction.value.toBigInt(),
+				value: transaction.value,
 			});
 
 			totals.fee = totals.fee.plus(transaction.gasPrice);

@@ -51,7 +51,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 
 		try {
 			// When receiving a nonce less than or equal to the current nonce try to replace it.
-			if (transaction.nonce.isLessThanEqual(senderMempool.getNonce())) {
+			if (transaction.nonce <= senderMempool.getNonce().toBigInt()) {
 				await this.#tryReplaceTransaction(transaction, senderMempool);
 			} else {
 				await senderMempool.addTransaction(transaction);

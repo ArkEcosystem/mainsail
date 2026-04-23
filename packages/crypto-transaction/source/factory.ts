@@ -7,7 +7,7 @@ import {
 	InvalidTransactionBytesError,
 	TransactionSchemaError,
 } from "@mainsail/exceptions";
-import { assert, BigNumber } from "@mainsail/utils";
+import { assert } from "@mainsail/utils";
 
 import { BlockTransaction } from "./block-transaction.js";
 import { Transaction } from "./transaction.js";
@@ -54,8 +54,8 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	public async fromJson(json: Contracts.Crypto.TransactionJson): Promise<Contracts.Crypto.Transaction> {
 		const transactionData: Contracts.Crypto.TransactionSerializable = {
 			...json,
-			nonce: BigNumber.make(json.nonce),
-			value: BigNumber.make(json.value),
+			nonce: BigInt(json.nonce),
+			value: BigInt(json.value),
 		};
 
 		return this.fromData(transactionData);
@@ -71,11 +71,11 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			gasPrice: Number(transaction.gasPrice),
 			hash: transaction.txHash,
 			network: this.configuration.getNetwork().chainId,
-			nonce: BigNumber.make(transaction.nonce),
+			nonce: transaction.nonce,
 			senderLegacyAddress:
 				transaction.legacyAddress ||
 				(await this.legacyAddressFactory.fromPublicKey(transaction.senderPublicKey)), // TODO: Make legacy address mandatory
-			value: BigNumber.make(transaction.value),
+			value: transaction.value,
 		};
 
 		const serialized = await this.serializer.serialize(transactionData);

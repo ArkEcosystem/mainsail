@@ -9,6 +9,7 @@ export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
 ): {
 	maxBytes: FuncKeywordDefinition;
+	bigInt: FuncKeywordDefinition;
 	bignumber: FuncKeywordDefinition;
 	buffer: FuncKeywordDefinition;
 	isValidatorIndex: FuncKeywordDefinition;
@@ -23,6 +24,7 @@ export const makeKeywords = (
 			type: "integer",
 		},
 		type: "string",
+
 	};
 
 	const bignumber: FuncKeywordDefinition = {
@@ -46,6 +48,36 @@ export const makeKeywords = (
 		},
 		errors: false,
 		keyword: "bignumber",
+		metaSchema: {
+			properties: {
+				maximum: { type: "integer" },
+				minimum: { type: "integer" },
+			},
+			type: "object",
+		},
+	};
+
+	const bigInt: FuncKeywordDefinition = {
+		compile: (schema) => (data) => {
+			const minimum = schema.minimum !== undefined ? schema.minimum : 0n;
+			const maximum = schema.maximum !== undefined ? schema.maximum : BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+
+			if (typeof data !== "bigint") {
+				return false;
+			}
+
+			if (data < minimum) {
+				return false;
+			}
+
+			if (data > maximum) {
+				return false;
+			}
+
+			return true;
+		},
+		errors: false,
+		keyword: "bigInt",
 		metaSchema: {
 			properties: {
 				maximum: { type: "integer" },
@@ -121,5 +153,5 @@ export const makeKeywords = (
 		},
 	};
 
-	return { bignumber, buffer, isValidatorIndex, limitToRoundValidators, maxBytes };
+	return { bigInt, bignumber, buffer, isValidatorIndex, limitToRoundValidators, maxBytes };
 };

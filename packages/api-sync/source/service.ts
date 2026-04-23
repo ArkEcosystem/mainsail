@@ -218,7 +218,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				multiPaymentRecipients:
 					parsedMultiPayments.length > 0 ? [...new Set(parsedMultiPayments.map((mp) => mp.to))] : undefined,
 
-				nonce: transaction.nonce.toFixed(),
+				nonce: transaction.nonce.toString(),
 
 				output: receipt.output,
 				senderPublicKey: transaction.senderPublicKey,
@@ -227,7 +227,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				timestamp: header.timestamp.toFixed(),
 				to: transaction.to,
 				transactionIndex: transaction.transactionIndex!,
-				value: transaction.value.toFixed(),
+				value: transaction.value.toString(),
 			});
 
 			multiPayments.push(...parsedMultiPayments);

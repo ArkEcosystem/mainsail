@@ -1,5 +1,4 @@
 import type { Contracts } from "@mainsail/contracts";
-import type { BigNumber } from "@mainsail/utils";
 
 export class Transaction implements Contracts.Crypto.Transaction {
 	public readonly hash: string;
@@ -8,10 +7,10 @@ export class Transaction implements Contracts.Crypto.Transaction {
 	public readonly senderPublicKey: string;
 	public readonly senderLegacyAddress: string;
 	public readonly to?: string;
-	public readonly value: BigNumber;
+	public readonly value: bigint;
 	public readonly gasPrice: number;
 	public readonly gasLimit: number;
-	public readonly nonce: BigNumber;
+	public readonly nonce: bigint;
 	public readonly data: string;
 
 	public readonly v: number;
