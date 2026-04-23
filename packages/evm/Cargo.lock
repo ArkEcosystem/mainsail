@@ -2509,8 +2509,8 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
 name = "heed"
-version = "0.22.0"
-source = "git+https://github.com/ArkEcosystem/heed.git?rev=ce0ff3b8e5571b5b86d879d1b9e9fdf19e908bd9#ce0ff3b8e5571b5b86d879d1b9e9fdf19e908bd9"
+version = "0.22.1"
+source = "git+https://github.com/ArkEcosystem/heed.git?rev=7a7a030113664e004b082e6805431381d9e9140a#7a7a030113664e004b082e6805431381d9e9140a"
 dependencies = [
  "bitflags 2.11.0",
  "byteorder",
@@ -2528,12 +2528,12 @@ dependencies = [
 [[package]]
 name = "heed-traits"
 version = "0.20.0"
-source = "git+https://github.com/ArkEcosystem/heed.git?rev=ce0ff3b8e5571b5b86d879d1b9e9fdf19e908bd9#ce0ff3b8e5571b5b86d879d1b9e9fdf19e908bd9"
+source = "git+https://github.com/ArkEcosystem/heed.git?rev=7a7a030113664e004b082e6805431381d9e9140a#7a7a030113664e004b082e6805431381d9e9140a"
 
 [[package]]
 name = "heed-types"
 version = "0.21.0"
-source = "git+https://github.com/ArkEcosystem/heed.git?rev=ce0ff3b8e5571b5b86d879d1b9e9fdf19e908bd9#ce0ff3b8e5571b5b86d879d1b9e9fdf19e908bd9"
+source = "git+https://github.com/ArkEcosystem/heed.git?rev=7a7a030113664e004b082e6805431381d9e9140a#7a7a030113664e004b082e6805431381d9e9140a"
 dependencies = [
  "bincode",
  "byteorder",
@@ -3023,8 +3023,8 @@ checksum = "6373607a59f0be73a39b6fe456b8192fcc3585f602af20751600e974dd455e77"
 
 [[package]]
 name = "lmdb-master-sys"
-version = "0.2.5"
-source = "git+https://github.com/ArkEcosystem/heed.git?rev=ce0ff3b8e5571b5b86d879d1b9e9fdf19e908bd9#ce0ff3b8e5571b5b86d879d1b9e9fdf19e908bd9"
+version = "0.2.6"
+source = "git+https://github.com/ArkEcosystem/heed.git?rev=7a7a030113664e004b082e6805431381d9e9140a#7a7a030113664e004b082e6805431381d9e9140a"
 dependencies = [
  "cc",
  "doxygen-rs",
