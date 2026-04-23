@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, tagged, optional } from "@mainsail/container";
 import {
 	DuplicateParticipantInMultiSignatureError,
 	InvalidTransactionBytesError,
@@ -39,9 +39,9 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
-	// @optional()
-	// @inject(Identifiers.CryptoWorker.WorkerPool)
-	// private readonly workerPool!: Contracts.Crypto.WorkerPool;
+	@optional()
+	@inject(Identifiers.CryptoWorker.WorkerPool)
+	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
 	public async fromHex(hex: string): Promise<Contracts.Crypto.Transaction> {
 		return this.#fromSerialized(Buffer.from(hex, "hex"));
@@ -127,9 +127,8 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		try {
 			const { data: transaction } = await this.deserializer.deserialize(serialized);
 
-			// const worker = this.workerPool ? await this.workerPool.getWorker() : undefined;
-			// const cryptoData = worker ? await worker.transactionFactory("computeCryptoData", transaction) : await this.computeCryptoData(transaction);
-			const cryptoData = await this.computeCryptoData(transaction);
+			const worker = this.workerPool ? await this.workerPool.getWorker() : undefined;
+			const cryptoData = worker ? await worker.transactionFactory("computeCryptoData", transaction) : await this.computeCryptoData(transaction);
 
 			const tx = { ...cryptoData, ...transaction };
 
