@@ -332,7 +332,7 @@ describe<{
 		await waitBlock(context);
 
 		for (let i = 0; i < 10; i++) {
-			if (txs[i].nonce.isEqualTo(replacementTx.nonce)) {
+			if (txs[i].nonce === replacementTx.nonce) {
 				assert.false(await isTransactionCommitted(context, txs[i]));
 				assert.true(await isTransactionCommitted(context, replacementTx));
 			} else {
@@ -425,9 +425,9 @@ describe<{
 		await waitBlock(context);
 
 		for (let i = 0; i < 10; i++) {
-			if (txs[i].nonce.isLessThan(replacementTx.nonce)) {
+			if (txs[i].nonce < replacementTx.nonce) {
 				assert.true(await isTransactionCommitted(context, txs[i]));
-			} else if (txs[i].nonce.isEqualTo(replacementTx.nonce)) {
+			} else if (txs[i].nonce === replacementTx.nonce) {
 				assert.false(await isTransactionCommitted(context, txs[i]));
 				assert.true(await isTransactionCommitted(context, replacementTx));
 			} else {

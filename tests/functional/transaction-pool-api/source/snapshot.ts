@@ -1,11 +1,12 @@
 import type {
 	Contracts as ApiDatabaseContracts,
 	Models} from "@mainsail/api-database";
+import type { Contracts } from "@mainsail/contracts";
+
 import {
 	Identifiers as ApiDatabaseIdentifiers
 } from "@mainsail/api-database";
 import { Events, Identifiers } from "@mainsail/constants";
-import type { Contracts } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert } from "@mainsail/test-runner";
 import { BigNumber } from "@mainsail/utils";
@@ -28,7 +29,7 @@ export const takeSnapshot = async (app: Contracts.Kernel.Application): Promise<S
 	}
 
 	const legacyColdWallets = await getLegacyColdWallets(app);
-	for (const { mainsailAddress, legacyColdWallet } of legacyColdWallets) {
+	for (const { legacyColdWallet, mainsailAddress } of legacyColdWallets) {
 		await snapshot.addLegacyColdWallet(
 			mainsailAddress,
 			await instance.getAccountInfoExtended(mainsailAddress, legacyColdWallet.address),
@@ -64,7 +65,7 @@ export class Snapshot {
 			}: {
 				data: { receipt: Contracts.Evm.TransactionReceipt; sender: string; transactionId: string };
 			}): Promise<void> => {
-				const { sender, receipt, transactionId } = data;
+				const { receipt, sender, transactionId } = data;
 
 				console.log("got receipt", sender, transactionId, receipt);
 				this.receipts[transactionId] = { receipt, sender };
@@ -326,7 +327,7 @@ export class Snapshot {
 		}
 
 		const blocks = await database.findBlocks(1, (await database.getLastCommit()).block.number);
-		const updateBalanceDelta = async (addressOrPublicKey: string, delta: BigNumber): Promise<void> => {
+		const updateBalanceDelta = async (addressOrPublicKey: string, delta: bigint): Promise<void> => {
 			const account = await getAccountByAddressOrPublicKey({ app: this.app }, addressOrPublicKey);
 
 			if (!accountDeltas[account.address]) {
@@ -336,12 +337,12 @@ export class Snapshot {
 			accountDeltas[account.address].balance = accountDeltas[account.address].balance.plus(delta);
 		};
 
-		const positiveBalanceChange = async (addressOrPublicKey: string, amount: BigNumber): Promise<void> => {
+		const positiveBalanceChange = async (addressOrPublicKey: string, amount: bigint): Promise<void> => {
 			await updateBalanceDelta(addressOrPublicKey, amount);
 		};
 
-		const negativeBalanceChange = async (addressOrPublicKey: string, amount: BigNumber): Promise<void> => {
-			await updateBalanceDelta(addressOrPublicKey, amount.times(-1));
+		const negativeBalanceChange = async (addressOrPublicKey: string, amount: bigint): Promise<void> => {
+			await updateBalanceDelta(addressOrPublicKey, amount * -1n);
 		};
 
 		const incrementNonce = async (height: number, addressOrPublicKey: string): Promise<void> => {
@@ -358,14 +359,14 @@ export class Snapshot {
 		};
 
 		for (const block of blocks) {
-			let totalValidatorFeeReward = BigNumber.ZERO;
+			let totalValidatorFeeReward = 0n;
 
 			for (const transaction of block.transactions) {
 				const receipt = this.receipts[transaction.hash!];
 				if (receipt) {
 					const consumedGas = this.app
 						.get<Contracts.BlockchainUtils.FeeCalculator>(Identifiers.BlockchainUtils.FeeCalculator)
-						.calculateConsumed(transaction.gasPrice, Number(receipt.receipt.gasUsed));
+						.calculateConsumed(transaction.gasPrice, Number(receipt.receipt.gasUsed)).toBigInt();
 					console.log(
 						"found receipt with",
 						receipt.sender,
@@ -374,7 +375,7 @@ export class Snapshot {
 						consumedGas,
 					);
 
-					totalValidatorFeeReward = totalValidatorFeeReward.plus(consumedGas);
+					totalValidatorFeeReward = totalValidatorFeeReward + consumedGas;
 
 					// subtract fee and increase nonce of sender
 					await negativeBalanceChange(receipt.sender, consumedGas);
@@ -390,7 +391,7 @@ export class Snapshot {
 					// add transferred value to recipient (if any)
 					if (
 						transaction.to &&
-						transaction.value.isGreaterThan(0) &&
+						transaction.value > 0n &&
 						receipt.receipt.status === 1
 					) {
 						await negativeBalanceChange(receipt.sender, transaction.value);
@@ -414,11 +415,11 @@ export class Snapshot {
 						for (const resignation of resignations) {
 							await negativeBalanceChange(
 								transaction.to,
-								BigNumber.make(configuration.getMilestone().validatorRegistrationFee),
+								BigInt(configuration.getMilestone().validatorRegistrationFee),
 							);
 							await positiveBalanceChange(
 								resignation.args.addr,
-								BigNumber.make(configuration.getMilestone().validatorRegistrationFee),
+								BigInt(configuration.getMilestone().validatorRegistrationFee),
 							);
 						}
 					}
@@ -439,13 +440,13 @@ export class Snapshot {
 						});
 
 						for (const payment of payments) {
-							const { recipient, amount, success } = payment.args;
+							const { amount, recipient, success } = payment.args;
 							if (!success) {
 								continue;
 							}
 
-							await negativeBalanceChange(multiPaymentContract, BigNumber.make(amount));
-							await positiveBalanceChange(recipient, BigNumber.make(amount));
+							await negativeBalanceChange(multiPaymentContract, BigInt(amount));
+							await positiveBalanceChange(recipient, BigInt(amount));
 						}
 					}
 				}
@@ -458,7 +459,7 @@ export class Snapshot {
 			);
 
 			// Validator balance
-			await positiveBalanceChange(block.proposer, block.reward.plus(totalValidatorFeeReward));
+			await positiveBalanceChange(block.proposer, block.reward.toBigInt() + totalValidatorFeeReward);
 		}
 
 		for (const [address, delta] of Object.entries(this.manualDeltas)) {
