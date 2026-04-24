@@ -459,7 +459,7 @@ export class Snapshot {
 			);
 
 			// Validator balance
-			await positiveBalanceChange(block.proposer, block.reward.toBigInt() + totalValidatorFeeReward);
+			await positiveBalanceChange(block.proposer, block.reward + totalValidatorFeeReward);
 		}
 
 		for (const [address, delta] of Object.entries(this.manualDeltas)) {

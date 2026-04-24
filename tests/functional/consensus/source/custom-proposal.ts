@@ -101,14 +101,14 @@ export const makeCustomProposal = async (
 	const blockFactory = app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
 	const block = await blockFactory.make(
 		{
-			fee: totals.fee,
+			fee: totals.fee.toBigInt(),
 			gasUsed: totals.gasUsed,
 			logsBloom: "0".repeat(512),
 			number: Number(commitKey.blockNumber),
 			parentHash: previousBlock.hash,
 			payloadSize,
 			proposer: validators[0].address,
-			reward: BigNumber.make(milestone.reward),
+			reward: BigInt(milestone.reward),
 			round,
 			stateRoot: "0".repeat(64),
 			timestamp: dayjs().valueOf(),
