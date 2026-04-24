@@ -71,7 +71,6 @@
 		{ "path": "packages/evm-state" },
 		{ "path": "packages/kernel" },
 		{ "path": "packages/logger-pino" },
-		{ "path": "packages/logger-winston" },
 		{ "path": "packages/networking-dns" },
 		{ "path": "packages/networking-ntp" },
 		{ "path": "packages/p2p" },

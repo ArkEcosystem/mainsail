@@ -21,7 +21,7 @@ thiserror = { workspace = true }
 tokio = { workspace = true }
 #heed = { version = "0.20.0", features = [] }
 #heed = { path = "../../../../heed/heed", features = [] }
-heed = { git = "https://github.com/ArkEcosystem/heed.git", rev = "ce0ff3b8e5571b5b86d879d1b9e9fdf19e908bd9", features = [
+heed = { git = "https://github.com/ArkEcosystem/heed.git", rev = "7a7a030113664e004b082e6805431381d9e9140a", features = [
 ] }
 rayon = "1.10.0"
 derive_more = { version = "2" }
