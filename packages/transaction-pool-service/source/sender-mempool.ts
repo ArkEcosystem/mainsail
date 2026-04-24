@@ -87,7 +87,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		// Collect all transactions at a higher or equal nonce
 		const affectedTransactions: Contracts.Crypto.Transaction[] = [];
 		for (const existingTransaction of this.getFromLatest()) {
-			if (existingTransaction.nonce <= newTransaction.nonce) {
+			if (existingTransaction.nonce < newTransaction.nonce) {
 				break;
 			}
 
