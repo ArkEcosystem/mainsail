@@ -246,14 +246,14 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 				index: transaction.transactionIndex,
 				legacyAddress: transaction.senderLegacyAddress,
 				legacySecondSignature: transaction.legacySecondSignature,
-				nonce: transaction.nonce.toBigInt(),
+				nonce: transaction.nonce,
 				r: transaction.r,
 				s: transaction.s,
 				senderPublicKey: transaction.senderPublicKey,
 				to: transaction.to,
 				txHash: transaction.hash,
 				v: transaction.v,
-				value: transaction.value.toBigInt(),
+				value: transaction.value,
 			});
 		}
 

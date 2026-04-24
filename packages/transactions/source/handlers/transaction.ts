@@ -56,11 +56,11 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 			gasLimit: BigInt(transaction.gasLimit),
 			gasPrice: BigInt(transaction.gasPrice),
 			legacyAddress: transaction.senderLegacyAddress,
-			nonce: transaction.nonce.toBigInt(),
+			nonce: transaction.nonce,
 			specId: milestone.evmSpec,
 			to: transaction.to,
 			txHash: transaction.hash,
-			value: transaction.value.toBigInt(),
+			value: transaction.value,
 		});
 
 		if (!preverified.success) {
@@ -85,11 +85,11 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 				gasLimit: BigInt(transaction.gasLimit),
 				gasPrice: BigInt(transaction.gasPrice),
 				legacyAddress: transaction.senderLegacyAddress,
-				nonce: transaction.nonce.toBigInt(),
+				nonce: transaction.nonce,
 				specId: evmSpec,
 				to: transaction.to,
 				txHash: transaction.hash,
-				value: transaction.value.toBigInt(),
+				value: transaction.value,
 			};
 
 			const { receipt } = await instance.process(data);

@@ -1,5 +1,3 @@
-import type { BigNumber } from "@mainsail/utils";
-
 import type { TransactionStorageData } from "../evm/storage.js";
 import type { EcdsaSignature, KeyPair } from "./identities.js";
 import type { SchemaValidationResult } from "./validator.js";
@@ -8,11 +6,11 @@ export interface TransactionUnsignedSerializable {
 	readonly network: number;
 
 	readonly to?: string;
-	readonly value: BigNumber;
+	readonly value: bigint;
 
 	readonly gasPrice: number;
 	readonly gasLimit: number;
-	readonly nonce: BigNumber;
+	readonly nonce: bigint;
 	readonly data: string;
 }
 
@@ -115,6 +113,7 @@ export interface TransactionFactory {
 	fromJson(json: TransactionJson): Promise<Transaction>;
 	fromData(data: TransactionSerializable, strict?: boolean): Promise<Transaction>;
 	fromStorage(data: TransactionStorageDataExtended): Promise<BlockTransaction>;
+	computeCryptoData(data: TransactionSerializable): Promise<TransactionCryptoData>;
 }
 
 export interface TransactionHashFactory {

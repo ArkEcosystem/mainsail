@@ -493,7 +493,7 @@ export class Restore {
 								? [...new Set(parsedMultiPayments.map((mp) => mp.to))]
 								: undefined,
 
-						nonce: transaction.nonce.toFixed(),
+						nonce: transaction.nonce.toString(),
 
 						output: receipt.output,
 						senderPublicKey: transaction.senderPublicKey,
@@ -502,7 +502,7 @@ export class Restore {
 						timestamp: block.timestamp.toFixed(),
 						to: transaction.to,
 						transactionIndex: transaction.transactionIndex!,
-						value: transaction.value.toFixed(),
+						value: transaction.value.toString(),
 					});
 
 					multiPayments.push(...parsedMultiPayments);

@@ -198,11 +198,11 @@ describe<{
 				gasLimit: BigInt(transaction.gasLimit),
 				gasPrice: BigInt(transaction.gasPrice),
 				index: transaction.transactionIndex,
-				nonce: transaction.nonce.toBigInt(),
+				nonce: transaction.nonce,
 				specId: Enums.Evm.SpecId.LATEST,
 				to: transaction.to,
 				txHash: transaction.hash,
-				value: transaction.value.toBigInt(),
+				value: transaction.value,
 			});
 
 			if (receipt.status !== 1) {

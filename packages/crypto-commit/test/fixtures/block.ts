@@ -1,4 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
+
 import { BigNumber } from "@mainsail/utils";
 
 export const validatorMnemonic =
@@ -52,7 +53,7 @@ export const tx1 = {
 	gasPrice: 5_000_000_000,
 	// hash: "65d43d2bed464b6bb1df8d6c0136316d3a3559569904fb16d5e3a8d71ebc2ebc",
 	network: 10_000,
-	nonce: BigNumber.ZERO,
+	nonce: 0n,
 	r: "921101a4583fb153ec00e501f3c2e2636114e1c8c58d2df8a19426cc066a6768",
 	s: "22db4bce1e0ace485ce0838d178b4d5bcfa9f69b315a14c580d9b01e5c980bdd",
 	// senderLegacyAddress: "DUQKzkR4BP5UcWayJMpRXtpEXuw4zPbWhe",
@@ -60,7 +61,7 @@ export const tx1 = {
 	to: "0xBe89811e15f611C1db12e59679b6F3DC1F430155",
 	// transactionIndex: 0,
 	v: 0,
-	value: BigNumber.ZERO,
+	value: 0n,
 };
 
 export const tx1Storage: Contracts.Evm.TransactionStorageData = {
@@ -69,16 +70,16 @@ export const tx1Storage: Contracts.Evm.TransactionStorageData = {
 	from: "0xE33074cBE63A1f86cc8EAb97b2099732F15284fE",
 	gasLimit: BigInt(1_000_000),
 	gasPrice: BigInt(5_000_000_000),
-	txHash: "65d43d2bed464b6bb1df8d6c0136316d3a3559569904fb16d5e3a8d71ebc2ebc",
-	nonce: BigInt(0),
+	index: 0,
+	nonce: 0n,
 	r: "921101a4583fb153ec00e501f3c2e2636114e1c8c58d2df8a19426cc066a6768",
 	s: "22db4bce1e0ace485ce0838d178b4d5bcfa9f69b315a14c580d9b01e5c980bdd",
 	// senderLegacyAddress: "DUQKzkR4BP5UcWayJMpRXtpEXuw4zPbWhe",
 	senderPublicKey: "02daa6f404dbd49c9c74a3d88d65b967a9b51d3465c92833e8e2ede11e7242f014",
 	to: "0xBe89811e15f611C1db12e59679b6F3DC1F430155",
-	index: 0,
+	txHash: "65d43d2bed464b6bb1df8d6c0136316d3a3559569904fb16d5e3a8d71ebc2ebc",
 	v: 0,
-	value: BigInt(0),
+	value: 0n,
 };
 
 export const tx1Serialized =
@@ -91,7 +92,7 @@ export const tx2 = {
 	gasPrice: 5_000_000_000,
 	// hash: "7a74379424e07173c137dd89c29f497b35d8013815b03096b51e67f87c453574",
 	network: 10_000,
-	nonce: BigNumber.ONE,
+	nonce: 1n,
 	r: "6c9842bc78c2f68468cbf8a8f3fec0ae2679707ffb606a4b373dd01a02af55fc",
 	s: "1a4c4d984d750678fb204ce8b7e97d860c974ac1a423f098dc4921acd2be0c7d",
 	// senderLegacyAddress: "DQJTK7of6bPUfJEuL9gUV4qnUyq72eskKe",
@@ -99,7 +100,7 @@ export const tx2 = {
 	to: "0xBe89811e15f611C1db12e59679b6F3DC1F430155",
 	// transactionIndex: 1,
 	v: 0,
-	value: BigNumber.ZERO,
+	value: 0n,
 };
 
 export const tx2Storage: Contracts.Evm.TransactionStorageData = {
@@ -108,14 +109,14 @@ export const tx2Storage: Contracts.Evm.TransactionStorageData = {
 	from: "0x8ae872F64bA0731f66F847f4e8Fc0796dF0bCc08",
 	gasLimit: BigInt(1_000_000),
 	gasPrice: BigInt(5_000_000_000),
-	txHash: "7a74379424e07173c137dd89c29f497b35d8013815b03096b51e67f87c453574",
+	index: 1,
 	nonce: BigInt(1),
 	r: "6c9842bc78c2f68468cbf8a8f3fec0ae2679707ffb606a4b373dd01a02af55fc",
 	s: "1a4c4d984d750678fb204ce8b7e97d860c974ac1a423f098dc4921acd2be0c7d",
 	// senderLegacyAddress: "DQJTK7of6bPUfJEuL9gUV4qnUyq72eskKe",
 	senderPublicKey: "03043bfdf530d59e919323a33d0c8f5ca43f6b50dfe753c9b3e987a4a5233a2a15",
 	to: "0xBe89811e15f611C1db12e59679b6F3DC1F430155",
-	index: 1,
+	txHash: "7a74379424e07173c137dd89c29f497b35d8013815b03096b51e67f87c453574",
 	v: 0,
 	value: BigInt(0),
 };
@@ -135,15 +136,15 @@ export const blockDataJson: Contracts.Crypto.BlockJson = {
 	transactions: [
 		{
 			...tx1,
+			data: "0x",
 			gasPrice: Number(tx1.gasPrice),
 			value: tx1.value.toString(),
-			data: "0x",
 		},
 		{
 			...tx2,
+			data: "0x",
 			gasPrice: Number(tx2.gasPrice),
 			value: tx2.value.toString(),
-			data: "0x",
 		},
 	],
 };

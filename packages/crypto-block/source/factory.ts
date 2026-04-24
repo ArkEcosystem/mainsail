@@ -107,8 +107,8 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 			reward: BigNumber.make(json.reward),
 			transactions: json.transactions.map((tx) => ({
 				...tx,
-				nonce: BigNumber.make(tx.nonce),
-				value: BigNumber.make(tx.value),
+				nonce: BigInt(tx.nonce),
+				value: BigInt(tx.value),
 			})),
 		};
 

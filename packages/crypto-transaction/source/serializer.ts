@@ -10,11 +10,11 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 		const v = transaction.network * 2 + 35 + transaction.v;
 
 		const fields = [
-			toBytesCompat(transaction.nonce.toBigInt()), // nonce - 0
+			toBytesCompat(transaction.nonce), // nonce - 0
 			toBytesCompat(transaction.gasPrice), // gasPrice - 1
 			toBytesCompat(transaction.gasLimit), // gasLimit - 2
 			toBytes(transaction.to || "0x"), // to - 3
-			toBytesCompat(transaction.value.toBigInt()), // value - 4
+			toBytesCompat(transaction.value), // value - 4
 			toBytes(transaction.data), // data - 5
 			toBytesCompat(v), // v - 6
 			toBytesCompat(`0x${transaction.r}`), // r - 7
@@ -30,11 +30,11 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 
 	public async serializeUnsigned(transaction: Contracts.Crypto.TransactionUnsignedSerializable): Promise<Buffer> {
 		const fields = [
-			toBytesCompat(transaction.nonce.toBigInt()), // nonce - 0
+			toBytesCompat(transaction.nonce), // nonce - 0
 			toBytesCompat(transaction.gasPrice), // gasPrice - 1
 			toBytesCompat(transaction.gasLimit), // gasLimit - 2
 			toBytes(transaction.to || "0x"), // to - 3
-			toBytesCompat(transaction.value.toBigInt()), // value - 4
+			toBytesCompat(transaction.value), // value - 4
 			toBytes(transaction.data), // data - 5
 			toBytesCompat(transaction.network), // v - 6
 			toBytesCompat(0), // r - 7

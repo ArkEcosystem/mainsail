@@ -1,7 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { injectable } from "@mainsail/container";
-import { BigNumber } from "@mainsail/utils";
 import { bytesToHex, getAddress, Hex, hexToBigInt } from "viem";
 
 function decodeListBounds(buffer: Uint8Array): { start: number; end: number } {
@@ -153,14 +152,14 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 			throw new Error("decoded RLP contains too few fields");
 		}
 
-		const nonce = BigNumber.make(this.#parseNumber(fields[0]));
+		const nonce = this.#parseBigInt(fields[0]);
 		const gasPrice = this.#parseNumber(fields[1]);
 		const gasLimit = this.#parseNumber(fields[2]);
 
 		const recipientAddressRaw = this.#parseAddress(fields[3]);
 		const to = recipientAddressRaw ? getAddress(recipientAddressRaw) : undefined;
 
-		const value = this.#parseBigNumber(fields[4]);
+		const value = this.#parseBigInt(fields[4]);
 		const data = this.#parseData(fields[5]);
 
 		// Signature
@@ -208,8 +207,8 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		return value === "0x" ? 0 : Number(value);
 	}
 
-	#parseBigNumber(value: Hex): BigNumber {
-		return value === "0x" ? BigNumber.ZERO : BigNumber.make(hexToBigInt(value));
+	#parseBigInt(value: Hex): bigint {
+		return value === "0x" ? 0n : hexToBigInt(value);
 	}
 
 	#parseAddress(value: Hex): string | undefined {

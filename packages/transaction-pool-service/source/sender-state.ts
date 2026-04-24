@@ -60,7 +60,9 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		await this.#validateTransaction(transaction);
 
 		this.#wallet.increaseNonce();
-		this.#wallet.decreaseBalance(transaction.value.plus(this.feeCalculator.calculate(transaction)));
+		this.#wallet.decreaseBalance(
+			BigNumber.make(transaction.value + this.feeCalculator.calculate(transaction).toBigInt()),
+		);
 	}
 
 	public async replace(
@@ -68,12 +70,16 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		newTransaction: Contracts.Crypto.Transaction,
 		currentNonce: BigNumber,
 	): Promise<boolean> {
-		if (!oldTransaction.nonce.isEqualTo(newTransaction.nonce)) {
+		if (oldTransaction.nonce !== newTransaction.nonce) {
 			throw new Error("cannot replace transaction with mismatching nonce");
 		}
 
-		const oldTransactionCost = oldTransaction.value.plus(this.feeCalculator.calculate(oldTransaction));
-		const newTransactionCost = newTransaction.value.plus(this.feeCalculator.calculate(newTransaction));
+		const oldTransactionCost = BigNumber.make(
+			oldTransaction.value + this.feeCalculator.calculate(oldTransaction).toBigInt(),
+		);
+		const newTransactionCost = BigNumber.make(
+			newTransaction.value + this.feeCalculator.calculate(newTransaction).toBigInt(),
+		);
 
 		const availableBalance = this.#wallet.getBalance().plus(oldTransactionCost);
 		if (availableBalance.isLessThan(newTransactionCost)) {
@@ -93,7 +99,9 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	public revert(transaction: Contracts.Crypto.Transaction): void {
 		this.#wallet.decreaseNonce();
-		this.#wallet.increaseBalance(transaction.value.plus(this.feeCalculator.calculate(transaction)));
+		this.#wallet.increaseBalance(
+			BigNumber.make(transaction.value + this.feeCalculator.calculate(transaction).toBigInt()),
+		);
 	}
 
 	async #validateTransaction(
@@ -112,7 +120,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		}
 
 		if (!this.#wallet.getNonce().plus(nonceOffset).isEqualTo(transaction.nonce)) {
-			throw new UnexpectedNonceError(transaction.nonce, this.#wallet);
+			throw new UnexpectedNonceError(BigNumber.make(transaction.nonce), this.#wallet);
 		}
 
 		if (

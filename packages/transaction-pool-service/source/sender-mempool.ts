@@ -87,7 +87,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		// Collect all transactions at a higher or equal nonce
 		const affectedTransactions: Contracts.Crypto.Transaction[] = [];
 		for (const existingTransaction of this.getFromLatest()) {
-			if (existingTransaction.nonce.isLessThan(newTransaction.nonce)) {
+			if (existingTransaction.nonce < newTransaction.nonce) {
 				break;
 			}
 
@@ -102,7 +102,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		const sameNonceTransaction = affectedTransactions.at(-1);
 		assert.defined(sameNonceTransaction);
 
-		if (!sameNonceTransaction.nonce.isEqualTo(newTransaction.nonce)) {
+		if (sameNonceTransaction.nonce !== newTransaction.nonce) {
 			throw new Error("transaction nonce mismatch");
 		}
 
@@ -117,9 +117,9 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		// Try to replace the same nonce transaction.
 		// If it succeeds, we can keep all higher transactions currently in the pool.
 		// Otherwise, all higher transactions must re-added.
-		const index = this.#transactions.findIndex((tx) => tx.nonce.isEqualTo(newTransaction.nonce));
+		const index = this.#transactions.findIndex((tx) => tx.nonce === newTransaction.nonce);
 		if (await this.senderState.replace(sameNonceTransaction, newTransaction, this.senderState.getNonce())) {
-			if (!sameNonceTransaction.nonce.isEqualTo(this.#transactions[index].nonce)) {
+			if (sameNonceTransaction.nonce !== this.#transactions[index].nonce) {
 				throw new Error("expected same transaction nonce");
 			}
 
@@ -135,7 +135,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 
 		// Replace same nonce transaction
 		transactions.reverse();
-		if (!transactions[0].nonce.isEqualTo(newTransaction.nonce)) {
+		if (transactions[0].nonce !== newTransaction.nonce) {
 			throw new Error("expected to replace same transaction nonce");
 		}
 
