@@ -177,9 +177,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 			}
 
 			if (schema.type === "uint256") {
-				target[property] = this.#readOptional<bigint>(schema, source, () =>
-					BigInt(source.readUint256()),
-				);
+				target[property] = this.#readOptional<bigint>(schema, source, () => BigInt(source.readUint256()));
 				continue;
 			}
 

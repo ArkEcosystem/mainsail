@@ -233,10 +233,7 @@ describe<{
 	}) => {
 		const b2 = Object.assign({}, blockData, { fee: "abcd" });
 
-		await assert.rejects(
-			() => factory.fromData(b2),
-			`Height (2): data/fee must pass "bigInt" keyword validation`,
-		);
+		await assert.rejects(() => factory.fromData(b2), `Height (2): data/fee must pass "bigInt" keyword validation`);
 	});
 
 	it("#fromData - should throw on invalid input data - required block property is missing", async ({ factory }) => {
