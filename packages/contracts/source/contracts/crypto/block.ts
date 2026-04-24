@@ -1,5 +1,3 @@
-import type { BigNumber } from "@mainsail/utils";
-
 import type { BlockHeaderStorageData, TransactionStorageData } from "../evm/storage.js";
 import type {
 	BlockTransaction,
@@ -21,8 +19,8 @@ export interface BlockHeaderRaw {
 	readonly logsBloom: string;
 	readonly transactionsCount: number;
 	readonly gasUsed: number;
-	readonly fee: BigNumber;
-	readonly reward: BigNumber;
+	readonly fee: bigint;
+	readonly reward: bigint;
 	readonly payloadSize: number;
 	readonly transactionsRoot: string;
 	readonly proposer: string;

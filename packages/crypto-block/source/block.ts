@@ -1,5 +1,4 @@
 import type { Contracts } from "@mainsail/contracts";
-import type { BigNumber } from "@mainsail/utils";
 
 import { BlockTransaction } from "@mainsail/crypto-transaction";
 
@@ -19,8 +18,8 @@ export class Block implements Contracts.Crypto.Block {
 	public readonly logsBloom: string;
 	public readonly transactionsCount: number;
 	public readonly gasUsed: number;
-	public readonly fee: BigNumber;
-	public readonly reward: BigNumber;
+	public readonly fee: bigint;
+	public readonly reward: bigint;
 	public readonly payloadSize: number;
 	public readonly transactionsRoot: string;
 	public readonly proposer: string;

@@ -387,14 +387,14 @@ export class Restore {
 			for await (const { block, proof } of commits) {
 				blocks.push({
 					commitRound: proof.round,
-					fee: block.fee.toFixed(),
+					fee: block.fee.toString(),
 					gasUsed: block.gasUsed,
 					hash: block.hash,
 					number: block.number.toFixed(),
 					parentHash: block.parentHash,
 					payloadSize: block.payloadSize,
 					proposer: block.proposer,
-					reward: block.reward.toFixed(),
+					reward: block.reward.toString(),
 					round: block.round,
 					signature: proof.signature,
 					stateRoot: block.stateRoot,
