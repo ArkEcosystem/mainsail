@@ -235,7 +235,7 @@ describe<{
 
 		await assert.rejects(
 			() => factory.fromData(b2),
-			`Height (2): data/fee must pass "bignumber" keyword validation`,
+			`Height (2): data/fee must pass "bigInt" keyword validation`,
 		);
 	});
 

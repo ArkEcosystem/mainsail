@@ -1,5 +1,4 @@
 import { Identifiers } from "@mainsail/constants";
-import { BigNumber } from "@mainsail/utils";
 import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
 import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-ecdsa";
 import { schemas as transactionSchemas } from "@mainsail/crypto-transaction";
@@ -157,8 +156,8 @@ describe<{
 		logsBloom: "0".repeat(512),
 		transactionsCount: 0,
 		gasUsed: 0,
-		fee: BigNumber.ZERO,
-		reward: BigNumber.ZERO,
+		fee: 0n,
+		reward: 0n,
 		payloadSize: 0,
 		transactionsRoot: "0".repeat(64),
 		proposer: "0x" + "A".repeat(40),
@@ -426,9 +425,9 @@ describe<{
 		}
 	});
 
-	it("blockHeader - fee should be bigNumber & min 0", ({ validator }) => {
+	it("blockHeader - fee should be bigInt & min 0", ({ validator }) => {
 		// Integer OK
-		for (const fee of [BigNumber.ZERO, BigNumber.ONE, BigNumber.make(2)]) {
+		for (const fee of [0n, 1n, 2n]) {
 			assert.undefined(
 				validator.validate("blockHeader", {
 					...blockOriginal,
@@ -438,7 +437,7 @@ describe<{
 		}
 
 		// NOT OK
-		for (const fee of [0, 1, "0", "1", BigNumber.make(-1), null, undefined]) {
+		for (const fee of [0, 1, "0", "1", -1n, null, undefined]) {
 			assert.true(
 				validator
 					.validate("blockHeader", {
@@ -450,9 +449,9 @@ describe<{
 		}
 	});
 
-	it("blockHeader - reward should be bigNumber & min 0", ({ validator }) => {
+	it("blockHeader - reward should be bigInt & min 0", ({ validator }) => {
 		// Integer OK
-		for (const reward of [BigNumber.ZERO, BigNumber.ONE, BigNumber.make(2)]) {
+		for (const reward of [0n, 1n, 2n]) {
 			assert.undefined(
 				validator.validate("blockHeader", {
 					...blockOriginal,
@@ -462,7 +461,7 @@ describe<{
 		}
 
 		// NOT OK
-		for (const reward of [0, 1, "0", "1", BigNumber.make(-1), null, undefined]) {
+		for (const reward of [0, 1, "0", "1", -1n, null, undefined]) {
 			assert.true(
 				validator
 					.validate("blockHeader", {
