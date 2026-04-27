@@ -112,7 +112,7 @@ describe("HTTP", ({ it, assert, beforeAll, afterAll, each }) => {
 	});
 
 	it("#get - should send a request and throw when the request times out", async () => {
-		await assert.rejects(() => http.get(`${serverURL}/timeout`, { timeout: 1000 }), "socket hang up");
+		await assert.rejects(() => http.get(`${serverURL}/timeout`, { timeout: 1000 }), "Request timed out");
 	});
 
 	it("#head - should send a request and receive status code 200", async () => {
@@ -133,7 +133,7 @@ describe("HTTP", ({ it, assert, beforeAll, afterAll, each }) => {
 	});
 
 	it("#head - should send a request and throw when the request times out", async () => {
-		await assert.rejects(() => http.head(`${serverURL}/timeout`, { timeout: 1000 }), "socket hang up");
+		await assert.rejects(() => http.head(`${serverURL}/timeout`, { timeout: 1000 }), "Request timed out");
 	});
 
 	it("#post - should send a request and receive status code 200", async () => {
