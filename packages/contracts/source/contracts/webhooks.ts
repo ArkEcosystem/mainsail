@@ -1,5 +1,4 @@
-import type { BigNumberType } from "@mainsail/utils";
-
+export type BigNumberType = bigint | number | string
 export type ConditionPrimitive = string | number | boolean;
 export type ConditionBigNumberish = Exclude<BigNumberType, bigint>;
 export type ConditionRange = { min: ConditionBigNumberish; max: ConditionBigNumberish };
