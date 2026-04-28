@@ -400,7 +400,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		return {
 			...this.roundCalculator.calculateRound(number),
 			validators: validatorWallets.map((v) => v.address),
-			votes: validatorWallets.map((v) => v.voteBalance.toFixed()),
+			votes: validatorWallets.map((v) => v.voteBalance.toString()),
 		};
 	}
 

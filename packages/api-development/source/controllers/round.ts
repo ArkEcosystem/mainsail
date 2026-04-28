@@ -32,7 +32,7 @@ export class RoundController extends Controller {
 			...this.roundCalculator.calculateRound(blockNumber),
 			// Map the round validator set (static, vote-weighted, etc.) to actual proposal order
 			validators: orderedValidators.map((validator) => ({
-				voteBalance: validator.voteBalance.toFixed(),
+				voteBalance: validator.voteBalance.toString(),
 
 				wallet: validator,
 			})),

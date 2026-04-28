@@ -1,11 +1,9 @@
-import type { BigNumber } from "@mainsail/utils";
-
 import type { Transaction } from "../crypto/transactions.js";
 
 export interface SenderMempool {
 	isDisposable(): boolean;
 	getSize(): number;
-	getNonce(): BigNumber;
+	getNonce(): bigint;
 
 	getFromEarliest(): Iterable<Transaction>;
 	getFromLatest(): Iterable<Transaction>;

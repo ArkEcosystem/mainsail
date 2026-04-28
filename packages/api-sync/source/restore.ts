@@ -52,12 +52,12 @@ interface RestoreContext extends RepositoryContext {
 
 interface ValidatorAttributes {
 	lastBlock?: Contracts.Crypto.BlockHeader;
-	totalForgedFees: BigNumber;
-	totalForgedRewards: BigNumber;
+	totalForgedFees: bigint;
+	totalForgedRewards: bigint;
 	producedBlocks: number;
 
-	voteBalance: BigNumber;
-	fee: BigNumber;
+	voteBalance: bigint;
+	fee: bigint;
 	votersCount: number;
 	blsPublicKey: string;
 	isResigned: boolean;
@@ -414,8 +414,8 @@ export class Restore {
 					}
 				} else {
 					validatorAttributes.producedBlocks += 1;
-					validatorAttributes.totalForgedFees = validatorAttributes.totalForgedFees.plus(block.fee);
-					validatorAttributes.totalForgedRewards = validatorAttributes.totalForgedRewards.plus(block.reward);
+					validatorAttributes.totalForgedFees = validatorAttributes.totalForgedFees + block.fee;
+					validatorAttributes.totalForgedRewards = validatorAttributes.totalForgedRewards + block.reward;
 					validatorAttributes.lastBlock = block;
 				}
 
@@ -571,8 +571,8 @@ export class Restore {
 				fee: validator.fee,
 				isResigned: validator.isResigned,
 				producedBlocks: 0,
-				totalForgedFees: BigNumber.ZERO,
-				totalForgedRewards: BigNumber.ZERO,
+				totalForgedFees: 0n,
+				totalForgedRewards: 0n,
 				voteBalance: validator.voteBalance,
 				votersCount: validator.votersCount,
 			};
@@ -654,19 +654,19 @@ export class Restore {
 									validatorVoteBalance: validatorAttributes.voteBalance,
 									validatorVotersCount: validatorAttributes.votersCount,
 
-									...(validatorAttributes.totalForgedFees.isGreaterThan(0)
-										? { validatorForgedFees: validatorAttributes.totalForgedFees.toFixed() }
+									...(validatorAttributes.totalForgedFees > 0n
+										? { validatorForgedFees: validatorAttributes.totalForgedFees.toString() }
 										: {}),
-									...(validatorAttributes.totalForgedRewards.isGreaterThan(0)
-										? { validatorForgedRewards: validatorAttributes.totalForgedRewards.toFixed() }
+									...(validatorAttributes.totalForgedRewards > 0n
+										? { validatorForgedRewards: validatorAttributes.totalForgedRewards.toString() }
 										: {}),
 									...(validatorAttributes.totalForgedFees
-										.plus(validatorAttributes.totalForgedRewards)
-										.isGreaterThan(0)
+										+ validatorAttributes.totalForgedRewards
+										> 0n
 										? {
-												validatorForgedTotal: validatorAttributes.totalForgedFees
-													.plus(validatorAttributes.totalForgedRewards)
-													.toFixed(),
+												validatorForgedTotal: (validatorAttributes.totalForgedFees
+													+ validatorAttributes.totalForgedRewards)
+													.toString(),
 											}
 										: {}),
 									...(validatorAttributes.producedBlocks > 0
