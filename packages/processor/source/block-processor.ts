@@ -58,7 +58,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	protected readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<Contracts.Processor.BlockProcessorResult> {
-		const processResult = { feeUsed: BigNumber.ZERO, gasUsed: 0, receipts: new Map(), success: false };
+		const processResult = { feeUsed: 0n, gasUsed: 0, receipts: new Map(), success: false };
 
 		try {
 			await this.verifier.verify(unit);
@@ -184,11 +184,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	): void {
 		const fee = this.feeCalculator.calculateConsumed(gasUsed, BigInt(transaction.gasPrice));
 
-		if (processorResult.feeUsed.plus(fee).isGreaterThan(block.fee)) {
+		if (processorResult.feeUsed + fee > block.fee) {
 			throw new Error("Cannot consume more fee");
 		}
 
-		processorResult.feeUsed = processorResult.feeUsed.plus(fee);
+		processorResult.feeUsed += fee;
 	}
 
 	#verifyConsumedAllGas(
@@ -201,7 +201,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	#verifyTotalFee(block: Contracts.Crypto.Block, processorResult: Contracts.Processor.BlockProcessorResult): void {
-		if (!processorResult.feeUsed.isEqualTo(block.fee)) {
+		if (processorResult.feeUsed !== block.fee) {
 			throw new Error(`Block fee ${block.fee} does not match consumed fee ${processorResult.feeUsed}`);
 		}
 	}

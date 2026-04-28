@@ -2,11 +2,11 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { assert, BigNumber, Lock } from "@mainsail/utils";
+import { assert, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 const FAILED_PROCESSOR_RESULT: Contracts.Processor.BlockProcessorResult = {
-	feeUsed: BigNumber.ZERO,
+	feeUsed: 0n,
 	gasUsed: 0,
 	receipts: new Map(),
 	success: false,
