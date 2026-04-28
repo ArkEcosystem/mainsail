@@ -359,9 +359,6 @@ export namespace shared {
         /** Headers validatorsSignedPrecommit. */
         public validatorsSignedPrecommit: boolean[];
 
-        /** Headers _proposedBlockHash. */
-        public _proposedBlockHash?: "proposedBlockHash";
-
         /**
          * Creates a new Headers instance using the specified properties.
          * @param [properties] Properties to set
