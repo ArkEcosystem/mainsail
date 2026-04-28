@@ -294,6 +294,14 @@ describe<{
 				path: `/wallets/${walletsTokens[0].address}/tokens?minBalance=2`,
 				result: walletTokensResponse,
 			},
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens?tokenAddress=0x0ba3d7cba9701f76f6285733a5a877a557c86034`,
+				result: [walletTokensResponse[0]],
+			},
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens?tokenAddress=0x1ba3d7cba9701f76f6285733a5a877a557c86034`,
+				result: [],
+			},
 		];
 
 		for (const { path, result } of testCases) {
