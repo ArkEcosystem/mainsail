@@ -82,7 +82,16 @@ export class Validator implements Contracts.Validator.Validator {
 				round: BigInt(round),
 			},
 		);
-		return this.#makeBlock(round, generatorAddress, logsBloom, stateRoot, transactions, timestamp, gasUsed, fee);
+		return this.#makeBlock(
+			round,
+			generatorAddress,
+			logsBloom,
+			stateRoot,
+			transactions,
+			timestamp,
+			gasUsed,
+			fee.toBigInt(),
+		);
 	}
 
 	public async propose(
@@ -286,7 +295,7 @@ export class Validator implements Contracts.Validator.Validator {
 		transactions: Contracts.Crypto.Transaction[],
 		timestamp: number,
 		gasUsed: number,
-		fee: BigNumber,
+		fee: bigint,
 	): Promise<Contracts.Crypto.Block> {
 		const previousBlock = this.stateStore.getLastBlock();
 		const number = previousBlock.number + 1;
@@ -316,7 +325,7 @@ export class Validator implements Contracts.Validator.Validator {
 				parentHash: previousBlock.hash,
 				payloadSize,
 				proposer,
-				reward: BigNumber.make(milestone.reward),
+				reward: BigInt(milestone.reward),
 				round,
 				stateRoot,
 				timestamp,

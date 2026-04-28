@@ -259,7 +259,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 
 		return {
 			header: {
-				fee: block.fee.toBigInt(),
+				fee: block.fee,
 				gasUsed: block.gasUsed,
 				hash: block.hash,
 				logsBloom: block.logsBloom,
@@ -267,7 +267,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 				parentHash: block.parentHash,
 				payloadSize: block.payloadSize,
 				proposer: block.proposer,
-				reward: block.reward.toBigInt(),
+				reward: block.reward,
 				round: block.round,
 				stateRoot: block.stateRoot,
 				timestamp: BigInt(block.timestamp),

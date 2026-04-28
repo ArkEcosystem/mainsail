@@ -276,9 +276,9 @@ export class Sync implements Contracts.ApiSync.Service {
 				...(isBlockValidator
 					? {
 							// incrementally applied in UPSERT below
-							validatorForgedFees: header.fee.toFixed(),
-							validatorForgedRewards: header.reward.toFixed(),
-							validatorForgedTotal: header.fee.plus(header.reward).toFixed(),
+							validatorForgedFees: header.fee.toString(),
+							validatorForgedRewards: header.reward.toString(),
+							validatorForgedTotal: (header.fee + header.reward).toString(),
 							validatorLastBlock: {
 								hash: header.hash,
 								number: header.number,
@@ -345,14 +345,14 @@ export class Sync implements Contracts.ApiSync.Service {
 		const deferredSync: DeferredSync = {
 			block: {
 				commitRound: proof.round,
-				fee: header.fee.toFixed(),
+				fee: header.fee.toString(),
 				gasUsed: header.gasUsed,
 				hash: header.hash,
 				number: header.number.toFixed(),
 				parentHash: header.parentHash,
 				payloadSize: header.payloadSize,
 				proposer: header.proposer,
-				reward: header.reward.toFixed(),
+				reward: header.reward.toString(),
 				round: header.round,
 				signature: proof.signature,
 				stateRoot: header.stateRoot,

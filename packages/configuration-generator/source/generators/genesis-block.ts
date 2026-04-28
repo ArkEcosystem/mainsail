@@ -322,7 +322,7 @@ export class GenesisBlockGenerator extends Generator {
 		return {
 			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
-					fee: totals.fee,
+					fee: totals.fee.toBigInt(),
 					gasUsed: totals.gasUsed,
 					logsBloom: await this.evm.logsBloom(commitKey),
 					number: options.initialBlockNumber ?? 0,
@@ -331,7 +331,7 @@ export class GenesisBlockGenerator extends Generator {
 						"0000000000000000000000000000000000000000000000000000000000000000",
 					payloadSize,
 					proposer,
-					reward: BigNumber.ZERO,
+					reward: 0n,
 					round: 0,
 					stateRoot: await this.evm.stateRoot(
 						commitKey,
