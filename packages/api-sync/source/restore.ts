@@ -855,7 +855,7 @@ export class Restore {
 
 				const proposer = validators[proposerIndex];
 				validatorAddresses[index] = proposer.address;
-				votes[index] = proposer.voteBalance.toFixed();
+				votes[index] = proposer.voteBalance.toString();
 			}
 
 			validatorRoundsToIngest.push({
