@@ -1,6 +1,6 @@
 export * as ApiSync from "./api-sync.js";
 export * as Api from "./api/index.js";
-export * as BlockchainUtils from "./blockchain-utils.js";
+export * as BlockchainUtils from "./blockchain-utilities.js";
 export * as Cli from "./cli/index.js";
 export * as ConsensusStorage from "./consensus-storage.js";
 export * as Consensus from "./consensus/index.js";
