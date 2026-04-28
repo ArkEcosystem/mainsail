@@ -98,10 +98,12 @@ const sendRequest = <T>(method: string, url: string, options?: HttpOptions): Pro
 
 		request_.on("error", reject);
 
-		request_.on("timeout", () => request_.abort());
+		request_.on("timeout", () => request_.destroy(new Error("Request timed out")));
 
 		if (options.body) {
-			const body: string = JSON.stringify(options.body);
+			const body: string = JSON.stringify(options.body, (_, value) =>
+				typeof value === "bigint" ? value.toString() : value,
+			);
 
 			request_.setHeader("content-type", "application/json");
 			request_.setHeader("content-length", Buffer.byteLength(body));

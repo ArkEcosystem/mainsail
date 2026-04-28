@@ -11,9 +11,9 @@ export class BlockResource implements Contracts.Api.Resource {
 	public async transform(block: Contracts.Crypto.Block): Promise<object> {
 		return {
 			forged: {
-				fee: block.fee.toFixed(),
-				reward: block.reward.toFixed(),
-				total: block.reward.plus(block.fee).toFixed(),
+				fee: block.fee.toString(),
+				reward: block.reward.toString(),
+				total: (block.reward + block.fee).toString(),
 			},
 			// TODO: Fix
 			// generator: {

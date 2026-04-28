@@ -5,7 +5,7 @@ export const validatorMnemonic =
 	"sudden head royal retire duck discover danger then basic rice wish left whip chronic enrich sun behind idea remind retire coyote select goddess exile";
 
 export const blockHeader: Contracts.Crypto.BlockHeader = {
-	fee: BigNumber.make("10000000000"),
+	fee: 10000000000n,
 	gasUsed: 2000,
 	hash: "a82964de6a37876e9e955cb5f97f6c25b9f52871cdb66c4dae9b33f0c832df65",
 	logsBloom:
@@ -14,7 +14,7 @@ export const blockHeader: Contracts.Crypto.BlockHeader = {
 	parentHash: "0000000000000000000000000000000000000000000000000000000000000000",
 	payloadSize: 218,
 	proposer: "0xB559F4FbB75c378CDd3Dd7CcbFeff9c5c2094E55",
-	reward: BigNumber.ZERO,
+	reward: 0n,
 	round: 1,
 	stateRoot: "0000000000000000000000000000000000000000000000000000000000000000",
 	timestamp: 1703128709748,

@@ -87,7 +87,7 @@ export const registerBlockFactory = async (
 		const commit = {
 			block: await app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
-					fee: BigNumber.make(totals.gasPrice),
+					fee: totals.gasPrice.toBigInt(),
 					gasUsed: totals.gasUsed,
 					logsBloom: "0".repeat(512),
 					number: previousBlock.number + 1,
@@ -100,7 +100,7 @@ export const registerBlockFactory = async (
 							"wallet",
 						)
 						.fromMnemonic(passphrase),
-					reward: BigNumber.make(options.reward || reward),
+					reward: BigInt(options.reward || reward),
 					round: 0,
 					stateRoot: "0".repeat(64),
 					timestamp: options.timestamp || dayjs().valueOf(),
