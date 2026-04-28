@@ -23,9 +23,9 @@ describe<{
 	});
 
 	it("should format currency", ({ configuration }) => {
-		assert.equal(formatCurrency(configuration, BigNumber.ONE), "0.000000000000000001 TѦ");
-		assert.equal(formatCurrency(configuration, BigNumber.ZERO), "0 TѦ");
-		assert.equal(formatCurrency(configuration, BigNumber.make(1e18)), "1 TѦ");
-		assert.equal(formatCurrency(configuration, BigNumber.make(1e18).times(100)), "100 TѦ");
+		assert.equal(formatCurrency(configuration, 1n), "0.000000000000000001 TѦ");
+		assert.equal(formatCurrency(configuration, 0n), "0 TѦ");
+		assert.equal(formatCurrency(configuration, BigInt(1e18)), "1 TѦ");
+		assert.equal(formatCurrency(configuration, BigInt(1e18) * 100n), "100 TѦ");
 	});
 });

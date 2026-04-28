@@ -13,7 +13,7 @@ export const formatCurrency = (configuration: Contracts.Crypto.Configuration, am
 		throw new Error("Invalid decimals");
 	}
 
-	const localeString = (amount / BigInt(denomination)).toLocaleString("en", {
+	const localeString = (Number(amount) / denomination).toLocaleString("en", {
 		maximumFractionDigits: decimals,
 		minimumFractionDigits: 0,
 	});
