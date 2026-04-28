@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { NotImplemented } from "@mainsail/exceptions";
-import { assert, BigNumber, ByteBuffer, validatorSetPack, validatorSetUnpack } from "@mainsail/utils";
+import { assert, ByteBuffer, validatorSetPack, validatorSetUnpack } from "@mainsail/utils";
 
 type TransactionCount = Pick<Contracts.Crypto.BlockHeaderRaw, "transactionsCount">;
 
@@ -182,8 +182,8 @@ export class Serializer implements Contracts.Serializer.Serializer {
 			}
 
 			if (schema.type === "bigint") {
-				target[property] = this.#readOptional<BigNumber>(schema, source, () =>
-					BigNumber.make(source.readUint64().toString()),
+				target[property] = this.#readOptional<bigint>(schema, source, () =>
+					source.readUint64(),
 				);
 
 				continue;
