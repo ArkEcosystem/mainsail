@@ -1,7 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { type TransactionBuilder } from "@mainsail/crypto-transaction";
-import { BigNumber } from "@mainsail/utils";
 
 import type { EvmCallOptions, TransferOptions } from "../factories/types.js";
 
@@ -10,14 +9,14 @@ import { FactoryBuilder } from "../factories/factory-builder.js";
 
 export class Signer {
 	#config: Contracts.Crypto.NetworkConfig;
-	#nonce: BigNumber;
+	#nonce: bigint;
 	#factoryBuilder: FactoryBuilder;
 	#initialized = false;
 
 	public constructor(config: Contracts.Crypto.NetworkConfig, nonce: string) {
 		this.#config = config;
 
-		this.#nonce = BigNumber.make(nonce || 0);
+		this.#nonce = BigInt(nonce || 0);
 
 		this.#factoryBuilder = new FactoryBuilder();
 	}
@@ -25,7 +24,7 @@ export class Signer {
 	public async makeTransfer(options: TransferOptions): Promise<Contracts.Crypto.Transaction> {
 		await this.#initialize();
 
-		options = { ...options, nonce: this.#nonce.toFixed() };
+		options = { ...options, nonce: this.#nonce.toString() };
 
 		const states = ["sign"];
 
@@ -42,7 +41,7 @@ export class Signer {
 	public async makeEvmCall(options: EvmCallOptions): Promise<Contracts.Crypto.Transaction> {
 		await this.#initialize();
 
-		options = { nonce: this.#nonce.toFixed(), ...options };
+		options = { nonce: this.#nonce.toString(), ...options };
 
 		const builder = await this.#factoryBuilder
 			.get<TransactionBuilder>("EvmCall")
@@ -55,7 +54,7 @@ export class Signer {
 	}
 
 	#incrementNonce(): void {
-		this.#nonce = this.#nonce.plus(1);
+		this.#nonce += 1n;
 	}
 
 	async #initialize() {

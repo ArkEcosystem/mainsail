@@ -2,7 +2,6 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
-import { BigNumber } from "@mainsail/utils";
 
 import type { FactoryBuilder } from "../factory-builder.js";
 import type { EvmCallOptions, TransactionOptions, TransferOptions } from "../types.js";
@@ -50,7 +49,7 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 
 		return applyModifiers(
 			transferBuilder
-				.value(BigNumber.make(options.amount || AMOUNT).toFixed())
+				.value(BigInt(options.amount || AMOUNT).toString())
 				.recipientAddress(
 					options.recipientAddress ||
 						(await app

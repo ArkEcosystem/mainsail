@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { assert, BigNumber } from "@mainsail/utils";
+import { assert } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 import type { FactoryBuilder } from "../factory-builder.js";
@@ -62,8 +62,8 @@ export const registerBlockFactory = async (
 			}
 		}
 
-		const totals: { gasPrice: BigNumber; gasUsed: number } = {
-			gasPrice: BigNumber.ZERO,
+		const totals: { gasPrice: bigint; gasUsed: number } = {
+			gasPrice: 0n,
 			gasUsed: 0,
 		};
 		const payloadBuffers: Buffer[] = [];
@@ -73,7 +73,7 @@ export const registerBlockFactory = async (
 		for (const transaction of transactions) {
 			assert.string(transaction.hash);
 
-			totals.gasPrice = totals.gasPrice.plus(transaction.gasPrice);
+			totals.gasPrice += BigInt(transaction.gasPrice);
 			// TODO: calculate actual gas used
 			totals.gasUsed += transaction.gasLimit;
 
@@ -87,7 +87,7 @@ export const registerBlockFactory = async (
 		const commit = {
 			block: await app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
-					fee: totals.gasPrice.toBigInt(),
+					fee: totals.gasPrice,
 					gasUsed: totals.gasUsed,
 					logsBloom: "0".repeat(512),
 					number: previousBlock.number + 1,
