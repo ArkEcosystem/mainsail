@@ -10,7 +10,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { parseTransactionError } from "@mainsail/evm-contracts";
-import { assert, BigNumber, chunk, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
+import { assert, chunk, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { Listeners, TokenParser } from "./contracts.js";
@@ -313,8 +313,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			return [
 				account.address,
 				addressToPublicKey[account.address] ?? null,
-				BigNumber.make(account.balance).toFixed(),
-				BigNumber.make(account.nonce).toFixed(),
+				account.balance.toString(),
+				account.nonce.toString(),
 				attributes,
 				header.number.toFixed(),
 			];
@@ -470,7 +470,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				})
 				.where("id = :id", { id: 1 })
 				.andWhere("blockNumber = :previousBlockNumber", {
-					previousBlockNumber: BigNumber.make(deferred.block.number).minus(1).toFixed(),
+					previousBlockNumber: (BigInt(deferred.block.number) - 1n).toString(),
 				})
 				.execute();
 
