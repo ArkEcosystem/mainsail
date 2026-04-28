@@ -3,7 +3,7 @@ import type { Types } from "@mainsail/api-common";
 import Boom from "@hapi/boom";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
-import { BigNumber, validatorSetUnpack } from "@mainsail/utils";
+import { validatorSetUnpack } from "@mainsail/utils";
 
 import { Controller } from "./controller.js";
 
@@ -35,7 +35,7 @@ export class CommitsController extends Controller {
 
 		if (round) {
 			// map bitmask -> indexes -> round.validators
-			const packed = BigNumber.make(block.validatorSet).toBigInt();
+			const packed = BigInt(block.validatorSet);
 			const unpacked = validatorSetUnpack(packed, round.validators.length);
 			validators = unpacked.filter(Boolean).map((_, index) => round.validators[index]);
 		}

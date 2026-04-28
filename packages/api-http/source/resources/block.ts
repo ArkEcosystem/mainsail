@@ -2,7 +2,6 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Models } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
-import { BigNumber } from "@mainsail/utils";
 
 export interface EnrichedBlock extends Models.Block {
 	state: Models.State;
@@ -32,7 +31,7 @@ export class BlockResource implements Contracts.Api.Resource {
 			round: resource.round,
 			signature: resource.signature,
 			timestamp: resource.timestamp,
-			total: BigNumber.make(resource.reward).plus(resource.fee).toFixed(),
+			total: (resource.reward + resource.fee).toString(),
 			transactionsCount: resource.transactionsCount,
 			transactionsRoot: resource.transactionsRoot,
 			username: resource.generator.attributes?.["username"] ?? undefined,
