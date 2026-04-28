@@ -5,7 +5,7 @@ import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
-import { assert, BigNumber } from "@mainsail/utils";
+import { assert } from "@mainsail/utils";
 import dayjs from "dayjs";
 import { encodeFunctionData } from "viem";
 
@@ -62,8 +62,8 @@ export class GenesisBlockGenerator extends Generator {
 				);
 
 				options.premine = transactions
-					.reduce((accumulator, current) => accumulator.plus(current.value), BigNumber.ZERO)
-					.toFixed();
+					.reduce((accumulator, current) => accumulator + current.value, 0n)
+					.toString();
 			} else {
 				transactions = transactions.concat(
 					await this.#createTransferTransaction(
@@ -113,8 +113,8 @@ export class GenesisBlockGenerator extends Generator {
 				: options.initialBlockNumber,
 			initialSupply: (options.distribute
 				? // Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`)
-					BigNumber.make(options.premine).dividedBy(validatorsCount).times(validatorsCount)
-				: BigNumber.make(options.premine)
+					(BigInt(options.premine) / BigInt(validatorsCount)) * BigInt(validatorsCount)
+				: BigInt(options.premine)
 			).toString(),
 			timestamp: dayjs(options.epoch).valueOf(),
 		});
@@ -151,7 +151,7 @@ export class GenesisBlockGenerator extends Generator {
 		totalPremine: string,
 		chainId: number,
 	): Promise<Contracts.Crypto.Transaction[]> {
-		const amount: string = BigNumber.make(totalPremine).dividedBy(recipients.length).toString();
+		const amount: string = (BigInt(totalPremine) / BigInt(recipients.length)).toString();
 
 		const result: Contracts.Crypto.Transaction[] = [];
 
@@ -248,8 +248,8 @@ export class GenesisBlockGenerator extends Generator {
 		transactions: Contracts.Crypto.Transaction[],
 		options: Contracts.NetworkGenerator.InternalOptions,
 	): Promise<{ block: Contracts.Crypto.Block; transactions: Contracts.Crypto.TransactionData[] }> {
-		const totals: { fee: BigNumber; gasUsed: number } = {
-			fee: BigNumber.ZERO,
+		const totals: { fee: bigint; gasUsed: number } = {
+			fee: 0n,
 			gasUsed: 0,
 		};
 
@@ -295,7 +295,7 @@ export class GenesisBlockGenerator extends Generator {
 				value: transaction.value,
 			});
 
-			totals.fee = totals.fee.plus(transaction.gasPrice);
+			totals.fee += BigInt(transaction.gasPrice);
 			totals.gasUsed += Number(receipt.gasUsed);
 
 			payloadBuffers.push(Buffer.from(transaction.hash, "hex"));
@@ -313,7 +313,7 @@ export class GenesisBlockGenerator extends Generator {
 
 		await this.evm.calculateRoundValidators({
 			commitKey,
-			roundValidators: BigNumber.make(options.validators).toBigInt(),
+			roundValidators: BigInt(options.validators),
 			specId: Enums.Evm.SpecId.SHANGHAI,
 			timestamp,
 			validatorAddress: proposer,
@@ -322,7 +322,7 @@ export class GenesisBlockGenerator extends Generator {
 		return {
 			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
-					fee: totals.fee.toBigInt(),
+					fee: totals.fee,
 					gasUsed: totals.gasUsed,
 					logsBloom: await this.evm.logsBloom(commitKey),
 					number: options.initialBlockNumber ?? 0,
