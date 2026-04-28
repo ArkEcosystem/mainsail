@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
-import { assert, BigNumber } from "@mainsail/utils";
+import { assert } from "@mainsail/utils";
 
 import { Deployer } from "./deployer.js";
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
@@ -38,10 +38,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	#calculateInitialSupply(genesisBlock: Contracts.Crypto.CommitJson): string {
 		const generatorAddress = genesisBlock.block.proposer;
 
-		let supply = BigNumber.ZERO;
+		let supply = 0n;
 
 		for (const transaction of genesisBlock.block.transactions.filter((tx) => tx.from === generatorAddress)) {
-			supply = supply.plus(transaction.value);
+			supply += BigInt(transaction.value);
 		}
 
 		return supply.toString();
