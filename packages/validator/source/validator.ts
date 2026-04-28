@@ -238,7 +238,7 @@ export class Validator implements Contracts.Validator.Validator {
 
 					gasUsed += Number(result.gasUsed);
 					fee = fee.plus(
-						this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, Number(result.gasUsed)),
+						this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, result.gasUsed),
 					);
 					candidateTransactions.push(transaction);
 				} catch (error) {

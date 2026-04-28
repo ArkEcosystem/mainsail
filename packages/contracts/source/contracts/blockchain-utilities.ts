@@ -1,11 +1,9 @@
-import type { BigNumber } from "@mainsail/utils";
-
 import type { Block, Transaction } from "./crypto/index.js";
 import type { RoundInfo } from "./shared/rounds.js";
 
 export interface FeeCalculator {
-	calculate(transaction: Transaction): BigNumber;
-	calculateConsumed(gasPrice: number, gasUsed: number): BigNumber;
+	calculate(transaction: Transaction): bigint;
+	calculateConsumed(gasPrice: number, gasUsed: bigint): bigint;
 }
 
 export interface RoundCalculator {

@@ -182,7 +182,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		transaction: Contracts.Crypto.BlockTransaction,
 		gasUsed: number,
 	): void {
-		const fee = this.feeCalculator.calculateConsumed(gasUsed, transaction.gasPrice);
+		const fee = this.feeCalculator.calculateConsumed(gasUsed, BigInt(transaction.gasPrice));
 
 		if (processorResult.feeUsed.plus(fee).isGreaterThan(block.fee)) {
 			throw new Error("Cannot consume more fee");

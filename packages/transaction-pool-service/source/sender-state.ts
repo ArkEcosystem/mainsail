@@ -61,7 +61,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 		this.#wallet.increaseNonce();
 		this.#wallet.decreaseBalance(
-			BigNumber.make(transaction.value + this.feeCalculator.calculate(transaction).toBigInt()),
+			BigNumber.make(transaction.value + this.feeCalculator.calculate(transaction)),
 		);
 	}
 
@@ -75,10 +75,10 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		}
 
 		const oldTransactionCost = BigNumber.make(
-			oldTransaction.value + this.feeCalculator.calculate(oldTransaction).toBigInt(),
+			oldTransaction.value + this.feeCalculator.calculate(oldTransaction),
 		);
 		const newTransactionCost = BigNumber.make(
-			newTransaction.value + this.feeCalculator.calculate(newTransaction).toBigInt(),
+			newTransaction.value + this.feeCalculator.calculate(newTransaction),
 		);
 
 		const availableBalance = this.#wallet.getBalance().plus(oldTransactionCost);
@@ -100,7 +100,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	public revert(transaction: Contracts.Crypto.Transaction): void {
 		this.#wallet.decreaseNonce();
 		this.#wallet.increaseBalance(
-			BigNumber.make(transaction.value + this.feeCalculator.calculate(transaction).toBigInt()),
+			BigNumber.make(transaction.value + this.feeCalculator.calculate(transaction)),
 		);
 	}
 
