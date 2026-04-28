@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import { assert, BigNumber, sleep } from "@mainsail/utils";
+import { assert, sleep } from "@mainsail/utils";
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
@@ -261,7 +261,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const block = unit.getBlock();
 
 		await this.evm.updateRewardsAndVotes({
-			blockReward: BigNumber.make(milestone.reward).toBigInt(),
+			blockReward: BigInt(milestone.reward),
 			commitKey: {
 				blockHash: block.hash,
 				blockNumber: BigInt(block.number),
@@ -288,7 +288,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 				blockNumber: BigInt(block.number),
 				round: BigInt(block.round),
 			},
-			roundValidators: BigNumber.make(roundValidators).toBigInt(),
+			roundValidators: BigInt(roundValidators),
 			specId: evmSpec,
 			timestamp: BigInt(block.timestamp),
 			validatorAddress: block.proposer,
