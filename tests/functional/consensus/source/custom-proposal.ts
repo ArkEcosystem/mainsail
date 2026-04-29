@@ -2,7 +2,7 @@ import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { Proposal } from "@mainsail/crypto-proposal";
-import { assert, BigNumber } from "@mainsail/utils";
+import { assert } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 import dayjs from "dayjs";
 
@@ -44,9 +44,9 @@ export const makeCustomProposal = async (
 	// - transactions
 	// - amount + fee
 
-	const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
-		amount: BigNumber.ZERO,
-		fee: BigNumber.ZERO,
+	const totals: { amount: bigint; fee: bigint; gasUsed: number } = {
+		amount: 0n,
+		fee: 0n,
 		gasUsed: 0,
 	};
 
@@ -81,8 +81,8 @@ export const makeCustomProposal = async (
 		assert.string(transaction.hash);
 		transactionData.push(transaction);
 
-		totals.amount = totals.amount.plus(transaction.value);
-		totals.fee = totals.fee.plus(BigNumber.make(transaction.gasPrice).times(result.gasUsed));
+		totals.amount += transaction.value;
+		totals.fee += BigInt(transaction.gasPrice) * result.gasUsed;
 		totals.gasUsed += Number(result.gasUsed);
 
 		payloadBuffers.push(Buffer.from(transaction.hash, "hex"));
@@ -101,7 +101,7 @@ export const makeCustomProposal = async (
 	const blockFactory = app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
 	const block = await blockFactory.make(
 		{
-			fee: totals.fee.toBigInt(),
+			fee: totals.fee,
 			gasUsed: totals.gasUsed,
 			logsBloom: "0".repeat(512),
 			number: Number(commitKey.blockNumber),
@@ -173,7 +173,7 @@ export const makeTransactionBuilderContext = (
 		...context,
 		fundedWalletProvider: async (
 			context: { app: Contracts.Kernel.Application; wallets: Contracts.Crypto.KeyPair[] },
-			amount?: BigNumber,
+			amount?: bigint,
 		): Promise<Contracts.Crypto.KeyPair> => {
 			// create a random wallet with funds (without sending a transaction)
 			const { app } = context;

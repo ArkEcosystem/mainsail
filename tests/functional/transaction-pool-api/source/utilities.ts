@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { EvmCalls } from "@mainsail/test-transaction-builders";
-import { assert, BigNumber, sleep } from "@mainsail/utils";
+import { assert, sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
 export const getAddressByPublicKey = async (app: Contracts.Kernel.Application, publicKey: string): Promise<string> => {
@@ -13,7 +13,7 @@ export const getAddressByPublicKey = async (app: Contracts.Kernel.Application, p
 export const getRandomFundedWallet = async (
 	context: { app: Contracts.Kernel.Application; wallets: Contracts.Crypto.KeyPair[] },
 	funder: Contracts.Crypto.KeyPair,
-	amount?: BigNumber,
+	amount?: bigint,
 ): Promise<Contracts.Crypto.KeyPair> => {
 	const {
 		app
@@ -29,9 +29,9 @@ export const getRandomFundedWallet = async (
 		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 		.fromPublicKey(randomKeyPair.publicKey);
 
-	amount = amount ?? BigNumber.make("1000000000000000000");
+	amount = amount ?? 1000000000000000000n;
 
-	const fundTx = await EvmCalls.makeEvmCall(context, { recipient, sender: funder, value: amount.toBigInt() });
+	const fundTx = await EvmCalls.makeEvmCall(context, { recipient, sender: funder, value: amount });
 
 	await addTransactionsToPool(context, [fundTx]);
 	await waitBlock(context);
@@ -114,23 +114,23 @@ export const waitBlock = async ({ app }: { app: Contracts.Kernel.Application }, 
 export const hasBalance = async (
 	{ app }: { app: Contracts.Kernel.Application },
 	address: string,
-	balance: number | string | BigNumber,
-): Promise<boolean> => (await getBalanceByAddress(app, address)).isEqualTo(balance);
+	balance: number | string | bigint,
+): Promise<boolean> => (await getBalanceByAddress(app, address)) === BigInt(balance);
 
 export const publicKeyToAddress = async (app: Contracts.Kernel.Application, publicKey: string): Promise<string> => app
 	.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 	.fromPublicKey(publicKey);
 
-export const getBalanceByPublicKey = async (app: Contracts.Kernel.Application, publicKey: string): Promise<BigNumber> => {
+export const getBalanceByPublicKey = async (app: Contracts.Kernel.Application, publicKey: string): Promise<bigint> => {
 	const address = await publicKeyToAddress(app, publicKey);
 	return getBalanceByAddress(app, address);
 };
 
-export const getBalanceByAddress = async (app: Contracts.Kernel.Application, address: string): Promise<BigNumber> => {
+export const getBalanceByAddress = async (app: Contracts.Kernel.Application, address: string): Promise<bigint> => {
 	const instance = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 	const accountInfo = await instance.getAccountInfo(address);
 
-	return BigNumber.make(accountInfo.balance);
+	return accountInfo.balance;
 };
 
 export const isTransactionCommitted = async (
