@@ -12,7 +12,7 @@ import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 
 import { describe } from "@mainsail/test-runner";
 import { Serializer } from "./serializer";
-import { BigNumber, ByteBuffer } from "@mainsail/utils";
+import { ByteBuffer } from "@mainsail/utils";
 import { NotImplemented } from "@mainsail/exceptions";
 
 describe<{
@@ -72,8 +72,8 @@ describe<{
 			uint32Value: 0x04050607,
 			uint48Value: 0x010203040506,
 			uint64Value: 123_456_789,
-			uint256Value: BigNumber.make("12345678901234567890"),
-			bigintValue: BigNumber.make("987654321"),
+			uint256Value: 12345678901234567890n,
+			bigintValue: 987654321n,
 
 			hashValue: "11".repeat(32),
 			shortHashValue: "22".repeat(4),

@@ -1,5 +1,4 @@
 import { Identifiers } from "@mainsail/constants";
-import { BigNumber } from "@mainsail/utils";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 import type { Contracts } from "@mainsail/contracts";

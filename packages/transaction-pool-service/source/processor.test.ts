@@ -2,7 +2,6 @@ import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 import { Configuration } from "@mainsail/crypto-config";
-import { BigNumber } from "@mainsail/utils";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "@mainsail/test-runner";
@@ -58,9 +57,9 @@ describe<{
 
 		context.transaction1 = {
 			data: {
-				amount: BigNumber.make(100),
+				amount: 100n,
 				id: "dummy-tx-id",
-				nonce: BigNumber.make(1),
+				nonce: 1n,
 				senderPublicKey: "dummy-sender-key",
 				type: 0,
 				version: 2,
@@ -73,9 +72,9 @@ describe<{
 
 		context.transaction2 = {
 			data: {
-				amount: BigNumber.make(100),
+				amount: 100n,
 				id: "dummy-tx-id-2",
-				nonce: BigNumber.make(1),
+				nonce: 1n,
 				senderPublicKey: "dummy-sender-key",
 				type: 0,
 				typeGroup: undefined,

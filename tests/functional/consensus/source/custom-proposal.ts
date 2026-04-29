@@ -192,7 +192,7 @@ export const makeTransactionBuilderContext = (
 			// 	.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 			// 	.fromPublicKey(randomKeyPair.publicKey);
 
-			// amount = amount ?? BigNumber.make("10000000000");
+			// amount = amount ?? 10000000000n;
 
 			// for (const node of nodes) {
 			// 	const { walletRepository } = app
