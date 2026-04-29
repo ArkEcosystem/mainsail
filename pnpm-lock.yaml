@@ -1888,9 +1888,6 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
