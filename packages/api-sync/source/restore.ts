@@ -660,13 +660,13 @@ export class Restore {
 									...(validatorAttributes.totalForgedRewards > 0n
 										? { validatorForgedRewards: validatorAttributes.totalForgedRewards.toString() }
 										: {}),
-									...(validatorAttributes.totalForgedFees
-										+ validatorAttributes.totalForgedRewards
-										> 0n
+									...(validatorAttributes.totalForgedFees + validatorAttributes.totalForgedRewards >
+									0n
 										? {
-												validatorForgedTotal: (validatorAttributes.totalForgedFees
-													+ validatorAttributes.totalForgedRewards)
-													.toString(),
+												validatorForgedTotal: (
+													validatorAttributes.totalForgedFees +
+													validatorAttributes.totalForgedRewards
+												).toString(),
 											}
 										: {}),
 									...(validatorAttributes.producedBlocks > 0

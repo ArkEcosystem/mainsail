@@ -82,16 +82,7 @@ export class Validator implements Contracts.Validator.Validator {
 				round: BigInt(round),
 			},
 		);
-		return this.#makeBlock(
-			round,
-			generatorAddress,
-			logsBloom,
-			stateRoot,
-			transactions,
-			timestamp,
-			gasUsed,
-			fee,
-		);
+		return this.#makeBlock(round, generatorAddress, logsBloom, stateRoot, transactions, timestamp, gasUsed, fee);
 	}
 
 	public async propose(

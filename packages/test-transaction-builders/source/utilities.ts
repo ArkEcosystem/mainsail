@@ -178,10 +178,7 @@ export const waitBlock = async (app: Contracts.Kernel.Application, count: number
 	} while (currentBlockNumber < targetBlockNumber);
 };
 
-export const getRandomFundedWallet = async (
-	context: Context,
-	amount?: bigint,
-): Promise<Contracts.Crypto.KeyPair> => {
+export const getRandomFundedWallet = async (context: Context, amount?: bigint): Promise<Contracts.Crypto.KeyPair> => {
 	if (context.fundedWalletProvider) {
 		return context.fundedWalletProvider(context, amount);
 	}
@@ -207,7 +204,7 @@ export const getRandomFundedWallet = async (
 			.gasPrice(5)
 			.recipientAddress(recipient)
 			.value(amount.toString())
-			.nonce((nonce +1n).toString())
+			.nonce((nonce + 1n).toString())
 			.signWithKeyPair(wallets[0])
 	).build();
 

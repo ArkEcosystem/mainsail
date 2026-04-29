@@ -37,38 +37,26 @@ const eq = (actual: Contracts.Webhooks.ConditionPrimitive, expected: Contracts.W
 
 const falsy = (actual: Contracts.Webhooks.ConditionPrimitive): boolean => actual === false || !toBoolean(actual);
 
-const gt = (
-	actual: Contracts.Webhooks.BigNumberType,
-	expected: Contracts.Webhooks.BigNumberType,
-): boolean => compareBigNumber(actual, expected, "isGreaterThan");
+const gt = (actual: Contracts.Webhooks.BigNumberType, expected: Contracts.Webhooks.BigNumberType): boolean =>
+	compareBigNumber(actual, expected, "isGreaterThan");
 
-const gte = (
-	actual: Contracts.Webhooks.BigNumberType,
-	expected: Contracts.Webhooks.BigNumberType,
-): boolean => compareBigNumber(actual, expected, "isGreaterThanEqual");
+const gte = (actual: Contracts.Webhooks.BigNumberType, expected: Contracts.Webhooks.BigNumberType): boolean =>
+	compareBigNumber(actual, expected, "isGreaterThanEqual");
 
-const lt = (
-	actual: Contracts.Webhooks.BigNumberType,
-	expected: Contracts.Webhooks.BigNumberType,
-): boolean => compareBigNumber(actual, expected, "isLessThan");
+const lt = (actual: Contracts.Webhooks.BigNumberType, expected: Contracts.Webhooks.BigNumberType): boolean =>
+	compareBigNumber(actual, expected, "isLessThan");
 
-const lte = (
-	actual: Contracts.Webhooks.BigNumberType,
-	expected: Contracts.Webhooks.BigNumberType,
-): boolean => compareBigNumber(actual, expected, "isLessThanEqual");
+const lte = (actual: Contracts.Webhooks.BigNumberType, expected: Contracts.Webhooks.BigNumberType): boolean =>
+	compareBigNumber(actual, expected, "isLessThanEqual");
 
-const between = (
-	actual: Contracts.Webhooks.BigNumberType,
-	expected: Contracts.Webhooks.ConditionRange,
-): boolean => gt(actual, expected.min) && lt(actual, expected.max);
+const between = (actual: Contracts.Webhooks.BigNumberType, expected: Contracts.Webhooks.ConditionRange): boolean =>
+	gt(actual, expected.min) && lt(actual, expected.max);
 
 const ne = (actual: Contracts.Webhooks.ConditionPrimitive, expected: Contracts.Webhooks.ConditionPrimitive): boolean =>
 	!eq(actual, expected);
 
-const notBetween = (
-	actual: Contracts.Webhooks.BigNumberType,
-	expected: Contracts.Webhooks.ConditionRange,
-): boolean => !between(actual, expected);
+const notBetween = (actual: Contracts.Webhooks.BigNumberType, expected: Contracts.Webhooks.ConditionRange): boolean =>
+	!between(actual, expected);
 
 const regexp = (actual: string, expected: string | RegExp): boolean => new RegExp(expected).test(actual);
 

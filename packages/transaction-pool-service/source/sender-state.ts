@@ -59,9 +59,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		await this.#validateTransaction(transaction);
 
 		this.#wallet.increaseNonce();
-		this.#wallet.decreaseBalance(
-			transaction.value + this.feeCalculator.calculate(transaction),
-		);
+		this.#wallet.decreaseBalance(transaction.value + this.feeCalculator.calculate(transaction));
 	}
 
 	public async replace(
@@ -94,9 +92,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	public revert(transaction: Contracts.Crypto.Transaction): void {
 		this.#wallet.decreaseNonce();
-		this.#wallet.increaseBalance(
-			transaction.value + this.feeCalculator.calculate(transaction),
-		);
+		this.#wallet.increaseBalance(transaction.value + this.feeCalculator.calculate(transaction));
 	}
 
 	async #validateTransaction(
@@ -114,17 +110,11 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new TransactionFromWrongNetworkError(transaction, chainId);
 		}
 
-		if ((this.#wallet.getNonce() + nonceOffset) !== transaction.nonce) {
+		if (this.#wallet.getNonce() + nonceOffset !== transaction.nonce) {
 			throw new UnexpectedNonceError(transaction.nonce, this.#wallet);
 		}
 
-		if (
-			(this.#wallet
-				.getBalance()
-				+ refund
-				- transaction.value
-				- this.feeCalculator.calculate(transaction)) < 0n
-		) {
+		if (this.#wallet.getBalance() + refund - transaction.value - this.feeCalculator.calculate(transaction) < 0n) {
 			throw new InsufficientBalanceError();
 		}
 

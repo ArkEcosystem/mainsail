@@ -182,9 +182,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 			}
 
 			if (schema.type === "bigint") {
-				target[property] = this.#readOptional<bigint>(schema, source, () =>
-					source.readUint64(),
-				);
+				target[property] = this.#readOptional<bigint>(schema, source, () => source.readUint64());
 
 				continue;
 			}
