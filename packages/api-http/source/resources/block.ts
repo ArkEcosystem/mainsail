@@ -31,7 +31,7 @@ export class BlockResource implements Contracts.Api.Resource {
 			round: resource.round,
 			signature: resource.signature,
 			timestamp: resource.timestamp,
-			total: (resource.reward + resource.fee).toString(),
+			total: (BigInt(resource.reward) + BigInt(resource.fee)).toString(),
 			transactionsCount: resource.transactionsCount,
 			transactionsRoot: resource.transactionsRoot,
 			username: resource.generator.attributes?.["username"] ?? undefined,
