@@ -10,6 +10,11 @@ import { Worker } from "./worker.js";
 
 type PluginOptions = Record<string, any>;
 
+BigInt.prototype.toJSON = function () {
+  const int = Number.parseInt(this.toString());
+  return int ?? this.toString();
+};
+
 const setup = async (): Promise<Contracts.Kernel.Application> => {
 	const app = new Application();
 
