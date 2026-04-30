@@ -79,7 +79,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			return false;
 		}
 
-		const nonceOffset = currentNonce - newTransaction.nonce * -1n;
+		const nonceOffset = (currentNonce - newTransaction.nonce) * -1n;
 		await this.#validateTransaction(newTransaction, nonceOffset, oldTransactionCost);
 
 		// Nonce stays the same
