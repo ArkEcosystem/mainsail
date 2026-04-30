@@ -463,8 +463,15 @@ export class WalletsController extends Controller {
 		const tokenHoldersQuery = this.tokenHolderRepositoryFactory()
 			.createQueryBuilder("th")
 			.innerJoin(Models.Token, "tok", "tok.address = th.token_address")
-			.where("th.address = :address", { address: walletAddress })
-			.andWhere("th.balance / POW(10, tok.decimals) >= :minBalance", { minBalance });
+			.where("th.address = :address", { address: walletAddress });
+
+		if (request.query.tokenAddress) {
+			tokenHoldersQuery.andWhere("th.token_address = :tokenAddress", {
+				tokenAddress: request.query.tokenAddress,
+			});
+		}
+
+		tokenHoldersQuery.andWhere("th.balance / POW(10, tok.decimals) >= :minBalance", { minBalance });
 
 		TokensController.andWhereWhitelisted(tokenHoldersQuery, request);
 		TokensController.andWhereNameSearch(tokenHoldersQuery, request.query.name);

@@ -6,6 +6,7 @@ import Joi from "joi";
 
 import { WalletsController } from "../controllers/wallets.js";
 import {
+	address,
 	tokenBalanceSchema,
 	tokenNameSchema,
 	transactionCriteriaSchemas,
@@ -234,6 +235,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					ignoreWhitelist: Joi.bool().default(false),
 					minBalance: Schemas.orNumericCriteria(tokenBalanceSchema),
 					name: Schemas.orEqualCriteria(tokenNameSchema),
+					tokenAddress: Schemas.orEqualCriteria(address),
 					whitelist: Schemas.orEqualCriteria(walletAddressSchema),
 				}).concat(Schemas.pagination),
 			},
