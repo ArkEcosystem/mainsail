@@ -414,8 +414,8 @@ export class Restore {
 					}
 				} else {
 					validatorAttributes.producedBlocks += 1;
-					validatorAttributes.totalForgedFees = validatorAttributes.totalForgedFees + block.fee;
-					validatorAttributes.totalForgedRewards = validatorAttributes.totalForgedRewards + block.reward;
+					validatorAttributes.totalForgedFees += block.fee;
+					validatorAttributes.totalForgedRewards += block.reward;
 					validatorAttributes.lastBlock = block;
 				}
 
