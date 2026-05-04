@@ -4,6 +4,8 @@ import type {
 import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import type { assert } from "@mainsail/test-runner";
+import { writeFileSync } from "fs";
+
 
 import { runDatabaseQuery, setupLegacyRestoreNode, setupRestoreNode, shutdown } from "./setup.js";
 
@@ -89,17 +91,25 @@ const computeNodeTableHashes = async (node: Contracts.Kernel.Application): Promi
     return tableHashes;
 }
 
-const logWalletsTable = async (node: Contracts.Kernel.Application): Promise<void> => {
-    const wallets = await runDatabaseQuery(node.get<string>(Identifiers.Application.Name), async (dataSource: TypeOrm.DataSource) => {
-        return dataSource.query<TableHashes>(`SELECT * FROM public.wallets;`);
+const orderWalletsTable = async (node: Contracts.Kernel.Application, name: string): Promise<void> => {
+    await runDatabaseQuery(node.get<string>(Identifiers.Application.Name), async (dataSource: TypeOrm.DataSource) => {
+        return dataSource.query<TableHashes>(`SELECT * FROM public.wallets ORDER BY address;`);
     });
-    console.log(wallets);
+}
+
+const logWalletsTable = async (node: Contracts.Kernel.Application, name: string): Promise<void> => {
+    const wallets = await runDatabaseQuery(node.get<string>(Identifiers.Application.Name), async (dataSource: TypeOrm.DataSource) => {
+        return dataSource.query<TableHashes>(`SELECT * FROM public.wallets ORDER BY address;`);
+    });
+
+	writeFileSync(`wallets_${name}.json`, JSON.stringify(wallets, null, 2));
 }
 
 const verifyIntegrity = async (t: typeof assert, syncNode: Contracts.Kernel.Application, restoreNode: Contracts.Kernel.Application): Promise<void> => {
     await patchDatabase(syncNode, restoreNode);
 
-	await logWalletsTable(restoreNode);
+	// await logWalletsTable(syncNode, "syncNode");
+	// await logWalletsTable(restoreNode, "restoreNode");
 
     const tableHashesSyncNode = await computeNodeTableHashes(syncNode);
     const tableHashesRestoreNode = await computeNodeTableHashes(restoreNode);
