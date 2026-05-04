@@ -651,7 +651,7 @@ export class Restore {
 									validatorFee: validatorAttributes.fee,
 									validatorPublicKey: validatorAttributes.blsPublicKey,
 									validatorResigned: validatorAttributes.isResigned,
-									validatorVoteBalance: validatorAttributes.voteBalance,
+									validatorVoteBalance: validatorAttributes.voteBalance.toString(),
 									validatorVotersCount: validatorAttributes.votersCount,
 
 									...(validatorAttributes.totalForgedFees > 0n
