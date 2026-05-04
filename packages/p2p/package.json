@@ -43,7 +43,7 @@
 		"ipaddr.js": "2.3.0",
 		"joi": "18.1.2",
 		"long": "5.3.2",
-		"protobufjs": "8.0.0",
+		"protobufjs": "8.0.3",
 		"rate-limiter-flexible": "10.0.1",
 		"semver": "7.7.4",
 		"ws": "8.20.0"
@@ -63,7 +63,7 @@
 		"@types/ws": "8.18.1",
 		"esmock": "2.7.3",
 		"import-fresh": "4.0.0",
-		"protobufjs-cli": "2.0.0",
+		"protobufjs-cli": "2.0.2",
 		"uvu": "0.5.6"
 	},
 	"engines": {
