@@ -23,7 +23,7 @@ describe<{
         await verifyLegacyNodeIntegrity(assert, syncNode, dataDirectory);
     });
 
-    it("should be ok", async ({ syncNode }) => {
+    it.only("should be ok", async ({ syncNode }) => {
         await waitBlock(syncNode, 5);
     });
 

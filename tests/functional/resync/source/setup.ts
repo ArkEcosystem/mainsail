@@ -104,6 +104,8 @@ const setupNode = async (app: Application, dataDirectory: string, configDirector
 
 	await ensureDatabaseExists(name);
 
+	console.log(`Setting up ${name} with data directory: ${dataDirectory}`);
+
 	const options = {
 		"@mainsail/state": {
 			snapshots: {

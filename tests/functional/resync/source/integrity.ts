@@ -89,8 +89,17 @@ const computeNodeTableHashes = async (node: Contracts.Kernel.Application): Promi
     return tableHashes;
 }
 
+const logWalletsTable = async (node: Contracts.Kernel.Application): Promise<void> => {
+    const wallets = await runDatabaseQuery(node.get<string>(Identifiers.Application.Name), async (dataSource: TypeOrm.DataSource) => {
+        return dataSource.query<TableHashes>(`SELECT * FROM public.wallets;`);
+    });
+    console.log(wallets);
+}
+
 const verifyIntegrity = async (t: typeof assert, syncNode: Contracts.Kernel.Application, restoreNode: Contracts.Kernel.Application): Promise<void> => {
     await patchDatabase(syncNode, restoreNode);
+
+	await logWalletsTable(restoreNode);
 
     const tableHashesSyncNode = await computeNodeTableHashes(syncNode);
     const tableHashesRestoreNode = await computeNodeTableHashes(restoreNode);
@@ -168,7 +177,7 @@ const patchDatabase = async (syncNode: Contracts.Kernel.Application, restoreNode
 
         await dataSource.query(`
             UPDATE plugins
-            SET configuration = 
+            SET configuration =
             jsonb_set(
                 jsonb_set(
                     configuration,
