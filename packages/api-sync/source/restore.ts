@@ -648,7 +648,7 @@ export class Restore {
 					attributes: {
 						...(validatorAttributes
 							? {
-									validatorFee: validatorAttributes.fee,
+									validatorFee: validatorAttributes.fee.toString(),
 									validatorPublicKey: validatorAttributes.blsPublicKey,
 									validatorResigned: validatorAttributes.isResigned,
 									validatorVoteBalance: validatorAttributes.voteBalance.toString(),
