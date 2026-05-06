@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
 	build-essential \
 	libjemalloc2
 
-RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_26.x | bash -
 RUN apt-get install -y nodejs
 
 WORKDIR /home/ubuntu
@@ -20,7 +20,7 @@ RUN npm install -g npm@latest \
 	&& su ubuntu -c "npm install --prefix=/home/ubuntu/.pnpm -g pnpm" \
 	&& su ubuntu -c "export PNPM_HOME=/home/ubuntu/.pnpm/bin"
 
-    
+
 COPY *.mjs package.json ./
 COPY abis/ abis/
 
