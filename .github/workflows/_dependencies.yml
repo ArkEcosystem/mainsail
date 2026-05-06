@@ -43,4 +43,4 @@ jobs:
               run: pnpm run deps:check
         strategy:
             matrix:
-                node-version: [24.x]
+                node-version: [26.x]
