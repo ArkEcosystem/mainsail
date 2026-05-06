@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
-import { assert, BigNumber } from "@mainsail/utils";
+import { assert } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 @injectable()
@@ -82,16 +82,7 @@ export class Validator implements Contracts.Validator.Validator {
 				round: BigInt(round),
 			},
 		);
-		return this.#makeBlock(
-			round,
-			generatorAddress,
-			logsBloom,
-			stateRoot,
-			transactions,
-			timestamp,
-			gasUsed,
-			fee.toBigInt(),
-		);
+		return this.#makeBlock(round, generatorAddress, logsBloom, stateRoot, transactions, timestamp, gasUsed, fee);
 	}
 
 	public async propose(
@@ -158,7 +149,7 @@ export class Validator implements Contracts.Validator.Validator {
 		stateRoot: string;
 		transactions: Contracts.Crypto.Transaction[];
 		gasUsed: number;
-		fee: BigNumber;
+		fee: bigint;
 	}> {
 		const transactionBytes = await this.txPoolWorker.getTransactionBytes();
 
@@ -176,7 +167,7 @@ export class Validator implements Contracts.Validator.Validator {
 			const milestone = this.cryptoConfiguration.getMilestone();
 			let gasLeft = milestone.block.maxGasLimit;
 			let gasUsed = 0;
-			let fee = BigNumber.ZERO;
+			let fee = 0n;
 
 			// txCollatorFactor% of the time for block preparation, the rest is for  block and proposal serialization and signing
 			const timeLimit =
@@ -237,9 +228,7 @@ export class Validator implements Contracts.Validator.Validator {
 					}
 
 					gasUsed += Number(result.gasUsed);
-					fee = fee.plus(
-						this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, Number(result.gasUsed)),
-					);
+					fee += this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, result.gasUsed);
 					candidateTransactions.push(transaction);
 				} catch (error) {
 					this.logger.warn(
@@ -253,7 +242,7 @@ export class Validator implements Contracts.Validator.Validator {
 			}
 
 			await evm.updateRewardsAndVotes({
-				blockReward: BigNumber.make(milestone.reward).toBigInt(),
+				blockReward: BigInt(milestone.reward),
 				commitKey,
 				specId: milestone.evmSpec,
 				timestamp: BigInt(timestamp),
@@ -265,7 +254,7 @@ export class Validator implements Contracts.Validator.Validator {
 
 				await evm.calculateRoundValidators({
 					commitKey,
-					roundValidators: BigNumber.make(roundValidators).toBigInt(),
+					roundValidators: BigInt(roundValidators),
 					specId: milestone.evmSpec,
 					timestamp: BigInt(timestamp),
 					validatorAddress: generatorAddress,

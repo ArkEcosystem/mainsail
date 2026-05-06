@@ -5,7 +5,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
-import { assert, BigNumber, chunk } from "@mainsail/utils";
+import { assert, chunk } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
 import { createHash } from "node:crypto";
 import { promisify } from "node:util";
@@ -178,7 +178,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			hash.update(JSON.stringify(wallet));
 
 			// the received balance is based on 8 decimals; convert it to WEI (18 decimals)
-			const balance = BigNumber.make(wallet.balance).times(1e10).toBigInt();
+			const balance = BigInt(wallet.balance) * BigInt(1e10);
 
 			if (balance < 0) {
 				// skip OG genesis wallet
@@ -203,7 +203,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				balance,
 				ethAddress,
 				legacyAttributes: {
-					legacyNonce: BigNumber.make(wallet.legacyNonce).toBigInt(),
+					legacyNonce: BigInt(wallet.legacyNonce),
 					multiSignature: wallet.attributes?.["multiSignature"]?.["publicKeys"]
 						? (wallet.attributes?.[
 								"multiSignature"

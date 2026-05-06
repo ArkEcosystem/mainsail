@@ -4,7 +4,6 @@ import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 
 import { describeSkip } from "@mainsail/test-runner";
-import { BigNumber } from "../../utils/source/big-number";
 import { SenderMempool } from ".";
 
 describeSkip<{
@@ -30,9 +29,9 @@ describeSkip<{
 
 		const tx1 = {
 			data: {
-				amount: BigNumber.make(100),
-				fee: BigNumber.make(900),
-				nonce: BigNumber.make(1),
+				amount: 100n,
+				fee: 900n,
+				nonce: 1n,
 				senderPublicKey: "dummy-sender-key",
 				type: 1,
 			},
@@ -45,9 +44,9 @@ describeSkip<{
 
 		const tx2 = {
 			data: {
-				amount: BigNumber.make(100),
-				fee: BigNumber.make(900),
-				nonce: BigNumber.make(2),
+				amount: 100n,
+				fee: 900n,
+				nonce: 2n,
 				senderPublicKey: "dummy-sender-key",
 				type: 1,
 			},
@@ -60,9 +59,9 @@ describeSkip<{
 
 		const tx3 = {
 			data: {
-				amount: BigNumber.make(100),
-				fee: BigNumber.make(900),
-				nonce: BigNumber.make(3),
+				amount: 100n,
+				fee: 900n,
+				nonce: 3n,
 				senderPublicKey: "dummy-sender-key",
 				type: 1,
 			},

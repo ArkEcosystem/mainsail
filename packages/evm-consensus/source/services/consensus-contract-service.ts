@@ -3,7 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
-import { BigNumber } from "@mainsail/utils";
 import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
@@ -71,9 +70,9 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 			const validatorWallet: Contracts.State.ValidatorWallet = {
 				address,
 				blsPublicKey: blsPublicKey.slice(2),
-				fee: BigNumber.make(fee),
+				fee: fee,
 				isResigned,
-				voteBalance: BigNumber.make(voteBalance),
+				voteBalance: voteBalance,
 				votersCount: Number(votersCount),
 			};
 
@@ -121,9 +120,9 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 			const validatorWallet: Contracts.State.ValidatorWallet = {
 				address: address,
 				blsPublicKey: blsPublicKey.slice(2),
-				fee: BigNumber.make(fee),
+				fee: fee,
 				isResigned,
-				voteBalance: BigNumber.make(voteBalance),
+				voteBalance: voteBalance,
 				votersCount: Number(votersCount),
 			};
 

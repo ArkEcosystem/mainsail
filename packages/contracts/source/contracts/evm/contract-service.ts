@@ -1,5 +1,3 @@
-import type { BigNumber } from "@mainsail/utils";
-
 import type { ValidatorWallet } from "../state/wallets.js";
 
 export interface DeployerContract {
@@ -16,7 +14,7 @@ export interface Vote {
 }
 
 export interface ValidatorRoundValidator {
-	readonly voteBalance: BigNumber;
+	readonly voteBalance: bigint;
 	readonly address: string;
 }
 

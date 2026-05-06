@@ -2,7 +2,6 @@ export * from "./assert.js";
 export * from "./assign.js";
 export * from "./at.js";
 export * from "./base64.js";
-export * from "./big-number.js";
 export * from "./binary.js";
 export * from "./byte-buffer.js";
 export * from "./camel-case.js";

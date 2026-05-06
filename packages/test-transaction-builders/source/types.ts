@@ -1,12 +1,11 @@
 import type { Contracts } from "@mainsail/contracts";
-import type { BigNumber } from "@mainsail/utils";
 
 export interface Context {
 	app: Contracts.Kernel.Application;
 	wallets: Contracts.Crypto.KeyPair[];
 	fundedWalletProvider?: (
 		context: { app: Contracts.Kernel.Application; wallets: Contracts.Crypto.KeyPair[] },
-		amount?: BigNumber,
+		amount?: bigint,
 	) => Promise<Contracts.Crypto.KeyPair>;
 }
 
@@ -24,7 +23,7 @@ export interface TransactionOptions {
 
 export interface TransferOptions extends TransactionOptions {
 	recipient?: string;
-	amount?: number | string | BigNumber;
+	amount?: number | string | bigint;
 }
 
 export interface EvmCallOptions extends TransactionOptions {

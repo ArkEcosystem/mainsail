@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { assert, BigNumber } from "@mainsail/utils";
+import { assert } from "@mainsail/utils";
 
 @injectable()
 export class Wallet implements Contracts.State.Wallet {
@@ -12,8 +12,8 @@ export class Wallet implements Contracts.State.Wallet {
 
 	protected address!: string;
 	protected legacyAddress: string | undefined;
-	protected balance = BigNumber.ZERO;
-	protected nonce = BigNumber.ZERO;
+	protected balance = 0n;
+	protected nonce = 0n;
 
 	protected legacyAttributes: Contracts.Evm.LegacyAttributes = {};
 
@@ -22,8 +22,8 @@ export class Wallet implements Contracts.State.Wallet {
 		this.legacyAddress = legacyAddress;
 
 		const accountInfo = await this.evm.getAccountInfoExtended(address, legacyAddress);
-		this.balance = BigNumber.make(accountInfo.balance);
-		this.nonce = BigNumber.make(accountInfo.nonce);
+		this.balance = accountInfo.balance;
+		this.nonce = accountInfo.nonce;
 		this.legacyAttributes = accountInfo.legacyAttributes;
 
 		return this;
@@ -33,40 +33,40 @@ export class Wallet implements Contracts.State.Wallet {
 		return this.address;
 	}
 
-	public getBalance(): BigNumber {
+	public getBalance(): bigint {
 		return this.balance;
 	}
 
-	public setBalance(balance: BigNumber): void {
+	public setBalance(balance: bigint): void {
 		this.balance = balance;
 	}
 
-	public getNonce(): BigNumber {
+	public getNonce(): bigint {
 		return this.nonce;
 	}
 
-	public setNonce(nonce: BigNumber): void {
+	public setNonce(nonce: bigint): void {
 		this.nonce = nonce;
 	}
 
-	public increaseBalance(balance: BigNumber): Contracts.State.Wallet {
-		this.setBalance(this.getBalance().plus(balance));
+	public increaseBalance(balance: bigint): Contracts.State.Wallet {
+		this.setBalance(this.getBalance() + balance);
 
 		return this;
 	}
 
-	public decreaseBalance(balance: BigNumber): Contracts.State.Wallet {
-		this.setBalance(this.getBalance().minus(balance));
+	public decreaseBalance(balance: bigint): Contracts.State.Wallet {
+		this.setBalance(this.getBalance() - balance);
 
 		return this;
 	}
 
 	public increaseNonce(): void {
-		this.setNonce(this.getNonce().plus(BigNumber.ONE));
+		this.setNonce(this.getNonce() + 1n);
 	}
 
 	public decreaseNonce(): void {
-		this.setNonce(this.getNonce().minus(BigNumber.ONE));
+		this.setNonce(this.getNonce() - 1n);
 	}
 
 	// Legacy

@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { SenderExceededMaximumTransactionCountError } from "@mainsail/exceptions";
-import { assert, BigNumber, Lock } from "@mainsail/utils";
+import { assert, Lock } from "@mainsail/utils";
 
 @injectable()
 export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
@@ -41,7 +41,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		return [...this.#transactions].reverse();
 	}
 
-	public getNonce(): BigNumber {
+	public getNonce(): bigint {
 		return this.senderState.getNonce();
 	}
 

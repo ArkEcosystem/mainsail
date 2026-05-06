@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { EnvironmentVariables, Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { PoolError, TransactionAlreadyInPoolError, TransactionPoolFullError } from "@mainsail/exceptions";
-import { BigNumber, Lock, randomNumber } from "@mainsail/utils";
+import { Lock, randomNumber } from "@mainsail/utils";
 
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {
@@ -248,7 +248,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 		if (this.getPoolSize() >= maxTransactionsInPool) {
 			const lowest = await this.poolQuery.getFromLowestPriority().first();
-			if (BigNumber.make(transaction.gasPrice).isLessThanEqual(lowest.gasPrice)) {
+			if (transaction.gasPrice <= lowest.gasPrice) {
 				throw new TransactionPoolFullError(transaction, lowest.gasPrice);
 			}
 

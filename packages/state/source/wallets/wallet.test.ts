@@ -1,4 +1,3 @@
-import { BigNumber } from "@mainsail/utils";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
@@ -47,69 +46,69 @@ describe<{
 
 		const wallet = await app.resolve(Wallet).init("Abcde");
 
-		assert.equal(wallet.getBalance(), BigNumber.make(2));
-		assert.equal(wallet.getNonce(), BigNumber.make(3));
+		assert.equal(wallet.getBalance(), 2n);
+		assert.equal(wallet.getNonce(), 3n);
 	});
 
 	it("should set and get balance", async ({ app }) => {
 		const address = "Abcde";
 		const wallet = await app.resolve(Wallet).init(address);
 
-		assert.equal(wallet.getBalance(), BigNumber.ZERO);
+		assert.equal(wallet.getBalance(), 0n);
 
-		wallet.setBalance(BigNumber.ONE);
-		assert.equal(wallet.getBalance(), BigNumber.ONE);
+		wallet.setBalance(1n);
+		assert.equal(wallet.getBalance(), 1n);
 	});
 
 	it("should set and get nonce", async ({ app }) => {
 		const address = "Abcde";
 		const wallet = await app.resolve(Wallet).init(address);
 
-		assert.equal(wallet.getNonce(), BigNumber.ZERO);
+		assert.equal(wallet.getNonce(), 0n);
 
-		wallet.setNonce(BigNumber.ONE);
-		assert.equal(wallet.getNonce(), BigNumber.ONE);
+		wallet.setNonce(1n);
+		assert.equal(wallet.getNonce(), 1n);
 	});
 
 	it("should increase balance", async ({ app }) => {
 		const address = "Abcde";
 		const wallet = await app.resolve(Wallet).init(address);
 
-		assert.equal(wallet.getBalance(), BigNumber.ZERO);
+		assert.equal(wallet.getBalance(), 0n);
 
-		assert.equal(wallet.increaseBalance(BigNumber.ONE), wallet);
-		assert.equal(wallet.getBalance(), BigNumber.ONE);
+		assert.equal(wallet.increaseBalance(1n), wallet);
+		assert.equal(wallet.getBalance(), 1n);
 	});
 
 	it("should decrease balance", async ({ app }) => {
 		const address = "Abcde";
 		const wallet = await app.resolve(Wallet).init(address);
 
-		assert.equal(wallet.getBalance(), BigNumber.ZERO);
+		assert.equal(wallet.getBalance(), 0n);
 
-		assert.equal(wallet.decreaseBalance(BigNumber.ONE), wallet);
-		assert.equal(wallet.getBalance(), BigNumber.make("-1"));
+		assert.equal(wallet.decreaseBalance(1n), wallet);
+		assert.equal(wallet.getBalance(), -1n);
 	});
 
 	it("should increase nonce", async ({ app }) => {
 		const address = "Abcde";
 		const wallet = await app.resolve(Wallet).init(address);
 
-		assert.equal(wallet.getNonce(), BigNumber.ZERO);
+		assert.equal(wallet.getNonce(), 0n);
 
 		wallet.increaseNonce();
 
-		assert.equal(wallet.getNonce(), BigNumber.ONE);
+		assert.equal(wallet.getNonce(), 1n);
 	});
 
 	it("should decrease nonce", async ({ app }) => {
 		const address = "Abcde";
 		const wallet = await app.resolve(Wallet).init(address);
 
-		assert.equal(wallet.getNonce(), BigNumber.ZERO);
+		assert.equal(wallet.getNonce(), 0n);
 
 		wallet.decreaseNonce();
-		assert.equal(wallet.getNonce(), BigNumber.make("-1"));
+		assert.equal(wallet.getNonce(), -1n);
 	});
 
 	it("#getLegacyAddress - should get address", async ({ app }) => {

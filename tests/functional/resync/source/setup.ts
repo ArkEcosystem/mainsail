@@ -9,6 +9,7 @@ import { Worker } from "./worker.js";
 
 type PluginOptions = Record<string, any>;
 
+
 const setupSyncNode = async (dataDirectory: string): Promise<Contracts.Kernel.Application> => {
 	const app = new Application();
 

@@ -2,7 +2,6 @@ import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 
 import { describe } from "@mainsail/test-runner";
-import { BigNumber } from "@mainsail/utils";
 import { Query, QueryIterable } from ".";
 
 describe<{
@@ -26,36 +25,36 @@ describe<{
 
 	beforeEach((context) => {
 		context.sender1Transaction100 = {
-			amount: BigNumber.make(100),
+			amount: 100n,
 			gasPrice: 100 * 1e9,
-			nonce: BigNumber.make(1),
+			nonce: 1n,
 			from: "sender1",
 			hash: "dummy-tx-id",
 			serialized: Buffer.from("dummy"),
 		};
 
 		context.sender1Transaction200 = {
-			amount: BigNumber.make(100),
+			amount: 100n,
 			gasPrice: 200 * 1e9,
-			nonce: BigNumber.make(2),
+			nonce: 2n,
 			from: "sender1",
 			hash: "dummy-tx-id-2",
 			serialized: Buffer.from("dummy-2"),
 		};
 
 		context.sender2Transaction100 = {
-			amount: BigNumber.make(100),
+			amount: 100n,
 			gasPrice: 300 * 1e9,
-			nonce: BigNumber.make(3),
+			nonce: 3n,
 			from: "sender2",
 			hash: "dummy-tx-id-3",
 			serialized: Buffer.from("dummy-3"),
 		};
 
 		context.sender2Transaction200 = {
-			amount: BigNumber.make(100),
+			amount: 100n,
 			gasPrice: 400 * 1e9,
-			nonce: BigNumber.make(4),
+			nonce: 4n,
 			from: "sender2",
 			hash: "dummy-tx-id-4",
 			serialized: Buffer.from("dummy-4"),

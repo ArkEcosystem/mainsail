@@ -7,10 +7,10 @@ describe("FeeCalculator", ({ assert, it }) => {
 	it("should calculate gas consumed", async () => {
 		const feeCalculator = new FeeCalculator();
 
-		assert.equal(feeCalculator.calculateConsumed(5 * 1e9, 21_000).toBigInt(), 105_000_000_000_000n);
+		assert.equal(feeCalculator.calculateConsumed(5 * 1e9, 21_000n), 105_000_000_000_000n);
 
 		assert.equal(
-			feeCalculator.calculate({ gasLimit: 21_000, gasPrice: 5 * 1e9 } as Contracts.Crypto.Transaction).toBigInt(),
+			feeCalculator.calculate({ gasLimit: 21_000, gasPrice: 5 * 1e9 } as Contracts.Crypto.Transaction),
 			105_000_000_000_000n,
 		);
 	});

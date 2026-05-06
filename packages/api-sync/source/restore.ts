@@ -9,7 +9,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { parseTransactionError } from "@mainsail/evm-contracts";
-import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
+import { assert, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { TokenParser } from "./contracts.js";
@@ -42,7 +42,7 @@ interface RestoreContext extends RepositoryContext {
 	mostRecentCommit: Contracts.Crypto.Commit;
 
 	lastBlockNumber: number;
-	totalSupply: BigNumber;
+	totalSupply: bigint;
 
 	validatorAttributes: Record<string, ValidatorAttributes>;
 	userAttributes: Record<string, UserAttributes>;
@@ -52,12 +52,12 @@ interface RestoreContext extends RepositoryContext {
 
 interface ValidatorAttributes {
 	lastBlock?: Contracts.Crypto.BlockHeader;
-	totalForgedFees: BigNumber;
-	totalForgedRewards: BigNumber;
+	totalForgedFees: bigint;
+	totalForgedRewards: bigint;
 	producedBlocks: number;
 
-	voteBalance: BigNumber;
-	fee: BigNumber;
+	voteBalance: bigint;
+	fee: bigint;
 	votersCount: number;
 	blsPublicKey: string;
 	isResigned: boolean;
@@ -203,7 +203,7 @@ export class Restore {
 				tokenHolderRepository: this.tokenHolderRepositoryFactory(entityManager),
 				tokenRepository: this.tokenRepositoryFactory(entityManager),
 
-				totalSupply: BigNumber.ZERO,
+				totalSupply: 0n,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				userAttributes: {},
 				validatorAttributes: {},
@@ -414,8 +414,8 @@ export class Restore {
 					}
 				} else {
 					validatorAttributes.producedBlocks += 1;
-					validatorAttributes.totalForgedFees = validatorAttributes.totalForgedFees.plus(block.fee);
-					validatorAttributes.totalForgedRewards = validatorAttributes.totalForgedRewards.plus(block.reward);
+					validatorAttributes.totalForgedFees += block.fee;
+					validatorAttributes.totalForgedRewards += block.reward;
 					validatorAttributes.lastBlock = block;
 				}
 
@@ -571,8 +571,8 @@ export class Restore {
 				fee: validator.fee,
 				isResigned: validator.isResigned,
 				producedBlocks: 0,
-				totalForgedFees: BigNumber.ZERO,
-				totalForgedRewards: BigNumber.ZERO,
+				totalForgedFees: 0n,
+				totalForgedRewards: 0n,
 				voteBalance: validator.voteBalance,
 				votersCount: validator.votersCount,
 			};
@@ -648,25 +648,25 @@ export class Restore {
 					attributes: {
 						...(validatorAttributes
 							? {
-									validatorFee: validatorAttributes.fee,
+									validatorFee: validatorAttributes.fee.toString(),
 									validatorPublicKey: validatorAttributes.blsPublicKey,
 									validatorResigned: validatorAttributes.isResigned,
-									validatorVoteBalance: validatorAttributes.voteBalance,
+									validatorVoteBalance: validatorAttributes.voteBalance.toString(),
 									validatorVotersCount: validatorAttributes.votersCount,
 
-									...(validatorAttributes.totalForgedFees.isGreaterThan(0)
-										? { validatorForgedFees: validatorAttributes.totalForgedFees.toFixed() }
+									...(validatorAttributes.totalForgedFees > 0n
+										? { validatorForgedFees: validatorAttributes.totalForgedFees.toString() }
 										: {}),
-									...(validatorAttributes.totalForgedRewards.isGreaterThan(0)
-										? { validatorForgedRewards: validatorAttributes.totalForgedRewards.toFixed() }
+									...(validatorAttributes.totalForgedRewards > 0n
+										? { validatorForgedRewards: validatorAttributes.totalForgedRewards.toString() }
 										: {}),
-									...(validatorAttributes.totalForgedFees
-										.plus(validatorAttributes.totalForgedRewards)
-										.isGreaterThan(0)
+									...(validatorAttributes.totalForgedFees + validatorAttributes.totalForgedRewards >
+									0n
 										? {
-												validatorForgedTotal: validatorAttributes.totalForgedFees
-													.plus(validatorAttributes.totalForgedRewards)
-													.toFixed(),
+												validatorForgedTotal: (
+													validatorAttributes.totalForgedFees +
+													validatorAttributes.totalForgedRewards
+												).toString(),
 											}
 										: {}),
 									...(validatorAttributes.producedBlocks > 0
@@ -720,8 +720,8 @@ export class Restore {
 								}
 							: {}),
 					} as string, // is converted into JSONB column
-					balance: BigNumber.make(account.balance).toFixed(),
-					nonce: BigNumber.make(account.nonce).toFixed(),
+					balance: account.balance.toString(),
+					nonce: account.nonce.toString(),
 					publicKey: context.addressToPublicKey[account.address] ?? null,
 					updated_at: "0",
 				});
@@ -737,7 +737,7 @@ export class Restore {
 			offset = result.nextOffset;
 		} while (offset);
 
-		context.totalSupply = context.totalSupply.plus(totalAccountBalance);
+		context.totalSupply += totalAccountBalance;
 
 		const t1 = performance.now();
 		this.logger.info(`Restored ${totalAccounts.toLocaleString()} wallets in ${t1 - t0}ms`);
@@ -761,7 +761,7 @@ export class Restore {
 			for (const wallet of result.wallets) {
 				legacyColdWallets.push({
 					address: wallet.address,
-					balance: BigNumber.make(wallet.balance).toFixed(),
+					balance: wallet.balance.toString(),
 					...(Object.keys(wallet.legacyAttributes).length > 0
 						? {
 								attributes: {
@@ -804,7 +804,7 @@ export class Restore {
 			offset = result.nextOffset;
 		} while (offset);
 
-		context.totalSupply = context.totalSupply.plus(totalLegacyAccountBalance);
+		context.totalSupply += totalLegacyAccountBalance;
 
 		const t1 = performance.now();
 		this.logger.info(`Restored ${totalLegacyAccounts.toLocaleString()} legacy cold wallets in ${t1 - t0}ms`);
@@ -855,7 +855,7 @@ export class Restore {
 
 				const proposer = validators[proposerIndex];
 				validatorAddresses[index] = proposer.address;
-				votes[index] = proposer.voteBalance.toFixed();
+				votes[index] = proposer.voteBalance.toString();
 			}
 
 			validatorRoundsToIngest.push({
@@ -899,7 +899,7 @@ export class Restore {
 			.values({
 				blockNumber: context.lastBlockNumber.toFixed(),
 				id: 1,
-				supply: context.totalSupply.toFixed(),
+				supply: context.totalSupply.toString(),
 			})
 			.execute();
 	}

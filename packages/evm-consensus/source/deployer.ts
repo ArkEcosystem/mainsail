@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { ConsensusAbi, ERC1967ProxyAbi, MultiPaymentAbi, UsernamesAbi } from "@mainsail/evm-contracts";
-import { assert, BigNumber } from "@mainsail/utils";
+import { assert } from "@mainsail/utils";
 import { Address, encodeDeployData, encodeFunctionData, getCreateAddress, Hex, toBytes } from "viem";
 
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
@@ -78,8 +78,8 @@ export class Deployer {
 		const genesisInfo = {
 			account: this.#genesisBlockInfo.generatorAddress,
 			deployerAccount: this.deployerAddress,
-			initialBlockNumber: BigNumber.make(this.#genesisBlockInfo.initialBlockNumber).toBigInt(),
-			initialSupply: BigNumber.make(this.#genesisBlockInfo.initialSupply).toBigInt(),
+			initialBlockNumber: BigInt(this.#genesisBlockInfo.initialBlockNumber),
+			initialSupply: BigInt(this.#genesisBlockInfo.initialSupply),
 
 			usernameContract: getCreateAddress({ from: this.deployerAddress, nonce: 3n }), // PROXY Uses nonce 3
 			validatorContract: getCreateAddress({ from: this.deployerAddress, nonce: 1n }), // PROXY Uses nonce 1
