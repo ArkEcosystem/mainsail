@@ -35,14 +35,6 @@ export class Validator implements Contracts.Validator.Validator {
 		return this.#keyPair.publicKey;
 	}
 
-	public async prepareBlock(
-		generatorAddress: string,
-		round: number,
-		timestamp: number,
-	): Promise<Contracts.Crypto.Block> {
-		return this.blockForger.forgeBlock(generatorAddress, round, timestamp);
-	}
-
 	public async propose(
 		validatorIndex: number,
 		round: number,

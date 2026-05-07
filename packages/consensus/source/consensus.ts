@@ -50,6 +50,9 @@ export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
+	@inject(Identifiers.Forger.Block)
+	private readonly blockForger!: Contracts.Forger.BlockForger;
+
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
@@ -524,7 +527,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			);
 		}
 
-		this.#proposedBlock = this.#proposedBlock = await registeredProposer.prepareBlock(
+		this.#proposedBlock = this.#proposedBlock = await this.blockForger.forgeBlock(
 			roundState.proposer.address,
 			this.#round,
 			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
