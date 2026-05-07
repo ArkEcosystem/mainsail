@@ -153,6 +153,7 @@ const setupNode = async (app: Application, dataDirectory: string, configDirector
 		"@mainsail/crypto-commit",
 		"@mainsail/processor",
 		"@mainsail/evm-consensus",
+		"@mainsail/forger",
 		"@mainsail/validator",
 		"@mainsail/consensus",
 	];

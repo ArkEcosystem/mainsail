@@ -3635,6 +3635,9 @@ importers:
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../../../packages/exceptions
+      '@mainsail/forger':
+        specifier: workspace:*
+        version: link:../../../packages/forger
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../../../packages/kernel
@@ -3782,6 +3785,9 @@ importers:
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../../../packages/evm-service
+      '@mainsail/forger':
+        specifier: workspace:*
+        version: link:../../../packages/forger
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../../../packages/kernel
@@ -3926,6 +3932,9 @@ importers:
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../../../packages/evm-service
+      '@mainsail/forger':
+        specifier: workspace:*
+        version: link:../../../packages/forger
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../../../packages/kernel
