@@ -309,7 +309,9 @@ export const Identifiers = {
 		},
 	},
 	Validator: {
+		BlockForger: Symbol("Transaction<Validator.BlockForger>"),
 		Repository: Symbol("Validator<Repository>"),
+		TransactionForger: Symbol("Transaction<Validator.TransactionForger>"),
 	},
 	ValidatorSet: {
 		Service: Symbol("ValidatorSet<Service>"),
