@@ -4,5 +4,5 @@ import { injectable } from "@mainsail/container";
 
 @injectable()
 export class State implements Contracts.Evm.State {
-	public peerCount = 0;
+	public peersCount = 0;
 }
