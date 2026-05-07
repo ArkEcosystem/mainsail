@@ -7,6 +7,7 @@ export * as Consensus from "./consensus/index.js";
 export * as Crypto from "./crypto/index.js";
 export * as Database from "./database.js";
 export * as Evm from "./evm/index.js";
+export * as Forger from "./forger.js";
 export * as Kernel from "./kernel/index.js";
 export * as NetworkGenerator from "./network-generator.js";
 export * as P2P from "./p2p/index.js";

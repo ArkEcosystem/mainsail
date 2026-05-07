@@ -1,5 +1,4 @@
-import type { AggregatedSignature, Block, KeyPair, Message, Proposal, Transaction } from "./crypto/index.js";
-import type { CommitKey } from "./evm/index.js";
+import type { AggregatedSignature, Block, KeyPair, Message, Proposal } from "./crypto/index.js";
 
 export interface ValidatorKeyPair {
 	readonly publicKey: string;
@@ -34,22 +33,4 @@ export interface Validator {
 export interface ValidatorRepository {
 	getValidator(publicKey: string): Validator | undefined;
 	printLoadedValidators(): void;
-}
-
-export interface TransactionForger {
-	getTransactions(
-		generatorAddress: string,
-		timestamp: number,
-		commitKey: CommitKey,
-	): Promise<{
-		logsBloom: string;
-		stateRoot: string;
-		transactions: Transaction[];
-		gasUsed: number;
-		fee: bigint;
-	}>;
-}
-
-export interface BlockForger {
-	forgeBlock(generatorAddress: string, round: number, timestamp: number): Promise<Block>;
 }

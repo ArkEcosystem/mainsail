@@ -6,7 +6,7 @@ import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus"
 import { performance } from "perf_hooks";
 
 @injectable()
-export class TransactionForger implements Contracts.Validator.TransactionForger {
+export class TransactionForger implements Contracts.Forger.TransactionForger {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "validator")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;

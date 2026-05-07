@@ -5,7 +5,7 @@ import { inject, injectable } from "@mainsail/container";
 import { assert } from "@mainsail/utils";
 
 @injectable()
-export class BlockForger implements Contracts.Validator.BlockForger {
+export class BlockForger implements Contracts.Forger.BlockForger {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
@@ -19,7 +19,7 @@ export class BlockForger implements Contracts.Validator.BlockForger {
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	@inject(Identifiers.Forger.Transaction)
-	protected readonly transactionForger!: Contracts.Validator.TransactionForger;
+	protected readonly transactionForger!: Contracts.Forger.TransactionForger;
 
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	protected readonly gasFeeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
