@@ -1,3 +1,3 @@
 export interface State {
-	peerCount: number;
+	peersCount: number;
 }
