@@ -173,6 +173,10 @@ export const Identifiers = {
 			Factory: Symbol("Evm<WorkerSubprocess.Factory>"),
 		},
 	},
+	Forger: {
+		Block: Symbol("Forger<Block>"),
+		Transaction: Symbol("Forger<Transaction>"),
+	},
 	P2P: {
 		ApiNode: {
 			Discoverer: Symbol("P2P<ApiNode.Discoverer>"),
@@ -309,9 +313,7 @@ export const Identifiers = {
 		},
 	},
 	Validator: {
-		BlockForger: Symbol("Transaction<Validator.BlockForger>"),
 		Repository: Symbol("Validator<Repository>"),
-		TransactionForger: Symbol("Transaction<Validator.TransactionForger>"),
 	},
 	ValidatorSet: {
 		Service: Symbol("ValidatorSet<Service>"),

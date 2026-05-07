@@ -10,8 +10,8 @@ import { TransactionForger } from "./transaction-forger.js";
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.Validator.TransactionForger).to(TransactionForger).inSingletonScope();
-		this.app.bind(Identifiers.Validator.BlockForger).to(BlockForger).inSingletonScope();
+		this.app.bind(Identifiers.Forger.Transaction).to(TransactionForger).inSingletonScope();
+		this.app.bind(Identifiers.Forger.Block).to(BlockForger).inSingletonScope();
 	}
 
 	public configSchema(): Joi.AnySchema {

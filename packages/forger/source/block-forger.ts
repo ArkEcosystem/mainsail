@@ -18,7 +18,7 @@ export class BlockForger implements Contracts.Validator.BlockForger {
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
-	@inject(Identifiers.Validator.TransactionForger)
+	@inject(Identifiers.Forger.Transaction)
 	protected readonly transactionForger!: Contracts.Validator.TransactionForger;
 
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
