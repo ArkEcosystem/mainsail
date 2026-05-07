@@ -6,8 +6,8 @@ ADD entrypoint.sh /entrypoint.sh
 
 ARG mainsail_channel=rc
 
-ENV PNPM_HOME=/home/node/.pnpm/bin
-ENV PATH="${PATH}:${PNPM_HOME}"
+ENV PNPM_HOME=/home/node/.pnpm
+ENV PATH="${PATH}:${PNPM_HOME}/bin"
 
 RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 py3-setuptools git \
     && apk add --no-cache bash sudo git openntpd openssl jemalloc curl \
