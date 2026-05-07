@@ -3339,9 +3339,6 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
-      joi:
-        specifier: 18.1.2
-        version: 18.1.2
     devDependencies:
       '@mainsail/blockchain-utils':
         specifier: workspace:*
