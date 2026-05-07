@@ -17,6 +17,6 @@ export class NetPeerCountAction implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: []): Promise<string> {
-		return `0x${Number(this.state.peersCount).toString(16)}`;
+		return `0x${Number(this.state.peerCount).toString(16)}`;
 	}
 }

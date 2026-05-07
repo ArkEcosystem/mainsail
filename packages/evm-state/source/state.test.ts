@@ -12,12 +12,12 @@ describe<{
 		context.state = app.resolve(State);
 	});
 
-	it("#peersCount - should have default value 0", async ({ state, app }) => {
-		assert.equal(state.peersCount, 0);
+	it("#peerCount - should have default value 0", async ({ state }) => {
+		assert.equal(state.peerCount, 0);
 	});
 
-	it("#peersCount - should be set and read", async ({ state }) => {
-		state.peersCount = 5;
-		assert.equal(state.peersCount, 5);
+	it("#peerCount - should be set and read", async ({ state }) => {
+		state.peerCount = 5;
+		assert.equal(state.peerCount, 5);
 	});
 });
