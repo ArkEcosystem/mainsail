@@ -246,7 +246,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		validatorSet,
 		eventDispatcher,
 		scheduler,
-		forger
+		forger,
 	}) => {
 		const validator = {
 			propose: () => {},
