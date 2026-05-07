@@ -7,9 +7,7 @@ import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
 
-import { BlockForger } from "./block-forger.js";
 import { BIP38, BIP39 } from "./keys/index.js";
-import { TransactionForger } from "./transaction-forger.js";
 import { ValidatorRepository } from "./validator-repository.js";
 import { Validator } from "./validator.js";
 
@@ -17,8 +15,6 @@ import { Validator } from "./validator.js";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Validator.Repository).to(ValidatorRepository).inSingletonScope();
-		this.app.bind(Identifiers.Validator.TransactionForger).to(TransactionForger).inSingletonScope();
-		this.app.bind(Identifiers.Validator.BlockForger).to(BlockForger).inSingletonScope();
 	}
 
 	public async boot(): Promise<void> {
