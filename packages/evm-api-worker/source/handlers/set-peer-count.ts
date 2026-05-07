@@ -8,7 +8,7 @@ export class SetPeerCountHandler {
 	@inject(Identifiers.Evm.State)
 	private readonly state!: Contracts.Evm.State;
 
-	public async handle(peerCount: number): Promise<void> {
-		this.state.peersCount = peerCount;
+	public async handle(peersCount: number): Promise<void> {
+		this.state.peersCount = peersCount;
 	}
 }
