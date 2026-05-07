@@ -2268,9 +2268,6 @@ importers:
 
   packages/forger:
     dependencies:
-      '@chainsafe/bls-keystore':
-        specifier: 3.1.0
-        version: 3.1.0
       '@mainsail/constants':
         specifier: workspace:*
         version: link:../constants
@@ -3336,9 +3333,6 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/evm-consensus':
-        specifier: workspace:*
-        version: link:../evm-consensus
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -3397,6 +3391,9 @@ importers:
       '@mainsail/crypto-wif':
         specifier: workspace:*
         version: link:../crypto-wif
+      '@mainsail/evm-consensus':
+        specifier: workspace:*
+        version: link:../evm-consensus
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
