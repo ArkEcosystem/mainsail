@@ -73,21 +73,5 @@
 		"typescript-eslint": "^8.58.0",
 		"typesync": "0.14.3",
 		"yaml": "2.8.3"
-	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@chainsafe/blst",
-			"@parcel/watcher",
-			"bcrypto",
-			"better-sqlite3",
-			"bstring",
-			"es5-ext",
-			"esbuild",
-			"lmdb",
-			"msgpackr-extract",
-			"nsfw",
-			"nx",
-			"protobufjs"
-		]
 	}
 }
