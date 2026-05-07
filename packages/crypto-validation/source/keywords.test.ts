@@ -60,6 +60,68 @@ describe<{
 		assert.true(context.validator.validate("test", "1234").error!.includes("data must be >= 0"));
 	});
 
+	it("keyword bigInt should be ok if only one possible value is allowed", (context) => {
+		const schema = {
+			$id: "test",
+			bigInt: { maximum: 100, minimum: 100 },
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined(context.validator.validate("test", 100n).error);
+
+		assert.defined(context.validator.validate("test", 100).error);
+		assert.defined(context.validator.validate("test", "100").error);
+		assert.defined(context.validator.validate("test", 99n).error);
+		assert.defined(context.validator.validate("test", 101n).error);
+		assert.defined(context.validator.validate("test", null).error);
+		assert.defined(context.validator.validate("test", undefined).error);
+		assert.defined(context.validator.validate("test", {}).error);
+	});
+
+	it("keyword bigInt should be ok if above or equal minimum", (context) => {
+		const schema = {
+			$id: "test",
+			bigInt: { minimum: 20 },
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined(context.validator.validate("test", 25n).error);
+		assert.undefined(context.validator.validate("test", 20n).error);
+
+		assert.defined(context.validator.validate("test", 19n).error);
+	});
+
+	it("keyword bigInt should be ok if below or equal maximum", (context) => {
+		const schema = {
+			$id: "test",
+			bigInt: { maximum: 20 },
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined(context.validator.validate("test", 19n).error);
+		assert.undefined(context.validator.validate("test", 20n).error);
+		assert.undefined(context.validator.validate("test", 0n).error);
+
+		assert.defined(context.validator.validate("test", -1n).error);
+		assert.defined(context.validator.validate("test", 21n).error);
+	});
+
+	it("keyword bigInt should not be ok for values bigger than the absolute maximum", (context) => {
+		const schema = {
+			$id: "test",
+			bigInt: {},
+		};
+		context.validator.addSchema(schema);
+
+		const UINT256_MAX = (1n << 256n) - 1n;
+
+		assert.undefined(context.validator.validate("test", BigInt(Number.MAX_SAFE_INTEGER)).error);
+		assert.undefined(context.validator.validate("test", BigInt("9223372036854775808")).error);
+		assert.undefined(context.validator.validate("test", BigInt(UINT256_MAX)).error);
+
+		assert.defined(context.validator.validate("test", BigInt(UINT256_MAX) + 1n).error);
+	});
+
 	it("keyword buffer should be ok", (context) => {
 		const schema = {
 			$id: "test",
