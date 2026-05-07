@@ -56,6 +56,8 @@ export const makeProposal = async (
 	round: number,
 	timestamp: number,
 ): Promise<Contracts.Crypto.Proposal> => {
+	const forger = app
+		.get<Contracts.Forger.BlockForger>(Identifiers.Forger.Block);
 	const proposer = app
 		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
 		.getValidator(validator.consensusPublicKey);
@@ -66,7 +68,7 @@ export const makeProposal = async (
 
 	await sleep(1); // Sleep to avoid same timestamp
 
-	const block = await proposer.prepareBlock(validator.address, round, timestamp);
+	const block = await forger.forgeBlock(validator.address, round, timestamp);
 	const proposal = await proposer.propose(0, round, undefined, block);
 
 	await proposal.deserializePayload();
