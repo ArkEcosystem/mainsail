@@ -2061,7 +2061,7 @@ importers:
     devDependencies:
       '@napi-rs/cli':
         specifier: 3.4.0
-        version: 3.4.0(@emnapi/core@1.4.5)(@emnapi/runtime@1.4.5)(@types/node@25.5.0)(node-addon-api@8.5.0)
+        version: 3.4.0(@emnapi/core@1.4.5)(@emnapi/runtime@1.4.5)(@types/node@24.3.0)(node-addon-api@8.5.0)
 
   packages/evm-api-worker:
     dependencies:
@@ -2259,6 +2259,94 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
+
+  packages/forger:
+    dependencies:
+      '@chainsafe/bls-keystore':
+        specifier: 3.1.0
+        version: 3.1.0
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/evm-consensus':
+        specifier: workspace:*
+        version: link:../evm-consensus
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      joi:
+        specifier: 18.1.2
+        version: 18.1.2
+    devDependencies:
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
+      '@mainsail/crypto-address-keccak256':
+        specifier: workspace:*
+        version: link:../crypto-address-keccak256
+      '@mainsail/crypto-block':
+        specifier: workspace:*
+        version: link:../crypto-block
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
+      '@mainsail/crypto-hash-bcrypto':
+        specifier: workspace:*
+        version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
+      '@mainsail/crypto-key-pair-ecdsa':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-messages':
+        specifier: workspace:*
+        version: link:../crypto-messages
+      '@mainsail/crypto-proposal':
+        specifier: workspace:*
+        version: link:../crypto-proposal
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
+      '@mainsail/crypto-signature-ecdsa':
+        specifier: workspace:*
+        version: link:../crypto-signature-ecdsa
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../crypto-transaction
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../crypto-validation
+      '@mainsail/crypto-wif':
+        specifier: workspace:*
+        version: link:../crypto-wif
+      '@mainsail/serializer':
+        specifier: workspace:*
+        version: link:../serializer
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -3417,7 +3505,7 @@ importers:
         version: 0.5.6
       viem:
         specifier: 2.22.15
-        version: 2.22.15(typescript@6.0.2)(zod@3.24.4)
+        version: 2.22.15(typescript@6.0.2)
 
   tests/e2e/consensus/checks:
     dependencies:
@@ -3429,7 +3517,7 @@ importers:
         version: 14.2.1
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@6.0.2)(zod@3.24.4)
+        version: 2.33.1(typescript@6.0.2)
 
   tests/e2e/consensus/peer-discovery:
     dependencies:
@@ -3462,7 +3550,7 @@ importers:
         version: 14.2.1
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@6.0.2)(zod@3.24.4)
+        version: 2.33.1(typescript@6.0.2)
 
   tests/functional/consensus:
     devDependencies:
@@ -3600,7 +3688,7 @@ importers:
         version: 0.5.6
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@6.0.2)(zod@3.24.4)
+        version: 2.33.1(typescript@6.0.2)
 
   tests/functional/resync:
     devDependencies:
@@ -3744,7 +3832,7 @@ importers:
         version: 0.5.6
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@6.0.2)(zod@3.24.4)
+        version: 2.33.1(typescript@6.0.2)
 
   tests/functional/transaction-pool-api:
     devDependencies:
@@ -3885,7 +3973,7 @@ importers:
         version: 0.5.6
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@6.0.2)(zod@3.24.4)
+        version: 2.33.1(typescript@6.0.2)
 
 packages:
 
@@ -5660,9 +5748,6 @@ packages:
 
   '@types/node@24.3.0':
     resolution: {integrity: sha512-aPTXCrfwnDLj4VvXrm+UUCQjNEvJgNA8s5F1cvwQU+3KNltTOkBm1j30uNLyqqPNe7gE3KFzImYoZEfLhp4Yow==}
-
-  '@types/node@25.5.0':
-    resolution: {integrity: sha512-jp2P3tQMSxWugkCUKLRPVUpGaL5MVFwF8RDuSRztfwgN1wmqJeMSbKlnEtQqU8UrhTmzEmZdu2I6v2dpp7XIxw==}
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -10556,9 +10641,6 @@ packages:
   undici-types@7.10.0:
     resolution: {integrity: sha512-t5Fy/nfn+14LuOc2KNYg75vZqClpAiqscVvMygNnlsHBFpSXdJaYtXMcdNLpl/Qvc3P2cB3s6lOV51nqsFq4ag==}
 
-  undici-types@7.18.2:
-    resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
-
   unicorn-magic@0.3.0:
     resolution: {integrity: sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==}
     engines: {node: '>=18'}
@@ -10896,9 +10978,6 @@ packages:
   yoctocolors@2.1.1:
     resolution: {integrity: sha512-GQHQqAopRhwU8Kt1DDM8NjibDXHC8eoh1erhGAJPEyveY9qqVeXvVikNKrDz69sHowPMorbPUrH/mx8c50eiBQ==}
     engines: {node: '>=18'}
-
-  zod@3.24.4:
-    resolution: {integrity: sha512-OdqJE9UDRPwWsrHjLN2F8bPxvwJBK22EHLWtanu0LSYr5YqzsaaW3RMgmjwr8Rypg5k+meEJdSPXJZXE/yqOMg==}
 
   zod@4.3.6:
     resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
@@ -11410,29 +11489,12 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.3.0
 
-  '@inquirer/checkbox@4.3.2(@types/node@25.5.0)':
-    dependencies:
-      '@inquirer/ansi': 1.0.2
-      '@inquirer/core': 10.3.2(@types/node@25.5.0)
-      '@inquirer/figures': 1.0.15
-      '@inquirer/type': 3.0.10(@types/node@25.5.0)
-      yoctocolors-cjs: 2.1.3
-    optionalDependencies:
-      '@types/node': 25.5.0
-
   '@inquirer/confirm@5.1.21(@types/node@24.3.0)':
     dependencies:
       '@inquirer/core': 10.3.2(@types/node@24.3.0)
       '@inquirer/type': 3.0.10(@types/node@24.3.0)
     optionalDependencies:
       '@types/node': 24.3.0
-
-  '@inquirer/confirm@5.1.21(@types/node@25.5.0)':
-    dependencies:
-      '@inquirer/core': 10.3.2(@types/node@25.5.0)
-      '@inquirer/type': 3.0.10(@types/node@25.5.0)
-    optionalDependencies:
-      '@types/node': 25.5.0
 
   '@inquirer/core@10.3.2(@types/node@24.3.0)':
     dependencies:
@@ -11447,19 +11509,6 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.3.0
 
-  '@inquirer/core@10.3.2(@types/node@25.5.0)':
-    dependencies:
-      '@inquirer/ansi': 1.0.2
-      '@inquirer/figures': 1.0.15
-      '@inquirer/type': 3.0.10(@types/node@25.5.0)
-      cli-width: 4.1.0
-      mute-stream: 2.0.0
-      signal-exit: 4.1.0
-      wrap-ansi: 6.2.0
-      yoctocolors-cjs: 2.1.3
-    optionalDependencies:
-      '@types/node': 25.5.0
-
   '@inquirer/editor@4.2.23(@types/node@24.3.0)':
     dependencies:
       '@inquirer/core': 10.3.2(@types/node@24.3.0)
@@ -11467,14 +11516,6 @@ snapshots:
       '@inquirer/type': 3.0.10(@types/node@24.3.0)
     optionalDependencies:
       '@types/node': 24.3.0
-
-  '@inquirer/editor@4.2.23(@types/node@25.5.0)':
-    dependencies:
-      '@inquirer/core': 10.3.2(@types/node@25.5.0)
-      '@inquirer/external-editor': 1.0.3(@types/node@25.5.0)
-      '@inquirer/type': 3.0.10(@types/node@25.5.0)
-    optionalDependencies:
-      '@types/node': 25.5.0
 
   '@inquirer/expand@4.0.23(@types/node@24.3.0)':
     dependencies:
@@ -11484,27 +11525,12 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.3.0
 
-  '@inquirer/expand@4.0.23(@types/node@25.5.0)':
-    dependencies:
-      '@inquirer/core': 10.3.2(@types/node@25.5.0)
-      '@inquirer/type': 3.0.10(@types/node@25.5.0)
-      yoctocolors-cjs: 2.1.3
-    optionalDependencies:
-      '@types/node': 25.5.0
-
   '@inquirer/external-editor@1.0.3(@types/node@24.3.0)':
     dependencies:
       chardet: 2.1.1
       iconv-lite: 0.7.2
     optionalDependencies:
       '@types/node': 24.3.0
-
-  '@inquirer/external-editor@1.0.3(@types/node@25.5.0)':
-    dependencies:
-      chardet: 2.1.1
-      iconv-lite: 0.7.2
-    optionalDependencies:
-      '@types/node': 25.5.0
 
   '@inquirer/figures@1.0.15': {}
 
@@ -11515,26 +11541,12 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.3.0
 
-  '@inquirer/input@4.3.1(@types/node@25.5.0)':
-    dependencies:
-      '@inquirer/core': 10.3.2(@types/node@25.5.0)
-      '@inquirer/type': 3.0.10(@types/node@25.5.0)
-    optionalDependencies:
-      '@types/node': 25.5.0
-
   '@inquirer/number@3.0.23(@types/node@24.3.0)':
     dependencies:
       '@inquirer/core': 10.3.2(@types/node@24.3.0)
       '@inquirer/type': 3.0.10(@types/node@24.3.0)
     optionalDependencies:
       '@types/node': 24.3.0
-
-  '@inquirer/number@3.0.23(@types/node@25.5.0)':
-    dependencies:
-      '@inquirer/core': 10.3.2(@types/node@25.5.0)
-      '@inquirer/type': 3.0.10(@types/node@25.5.0)
-    optionalDependencies:
-      '@types/node': 25.5.0
 
   '@inquirer/password@4.0.23(@types/node@24.3.0)':
     dependencies:
@@ -11543,14 +11555,6 @@ snapshots:
       '@inquirer/type': 3.0.10(@types/node@24.3.0)
     optionalDependencies:
       '@types/node': 24.3.0
-
-  '@inquirer/password@4.0.23(@types/node@25.5.0)':
-    dependencies:
-      '@inquirer/ansi': 1.0.2
-      '@inquirer/core': 10.3.2(@types/node@25.5.0)
-      '@inquirer/type': 3.0.10(@types/node@25.5.0)
-    optionalDependencies:
-      '@types/node': 25.5.0
 
   '@inquirer/prompts@7.10.1(@types/node@24.3.0)':
     dependencies:
@@ -11567,21 +11571,6 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.3.0
 
-  '@inquirer/prompts@7.10.1(@types/node@25.5.0)':
-    dependencies:
-      '@inquirer/checkbox': 4.3.2(@types/node@25.5.0)
-      '@inquirer/confirm': 5.1.21(@types/node@25.5.0)
-      '@inquirer/editor': 4.2.23(@types/node@25.5.0)
-      '@inquirer/expand': 4.0.23(@types/node@25.5.0)
-      '@inquirer/input': 4.3.1(@types/node@25.5.0)
-      '@inquirer/number': 3.0.23(@types/node@25.5.0)
-      '@inquirer/password': 4.0.23(@types/node@25.5.0)
-      '@inquirer/rawlist': 4.1.11(@types/node@25.5.0)
-      '@inquirer/search': 3.2.2(@types/node@25.5.0)
-      '@inquirer/select': 4.4.2(@types/node@25.5.0)
-    optionalDependencies:
-      '@types/node': 25.5.0
-
   '@inquirer/rawlist@4.1.11(@types/node@24.3.0)':
     dependencies:
       '@inquirer/core': 10.3.2(@types/node@24.3.0)
@@ -11589,14 +11578,6 @@ snapshots:
       yoctocolors-cjs: 2.1.3
     optionalDependencies:
       '@types/node': 24.3.0
-
-  '@inquirer/rawlist@4.1.11(@types/node@25.5.0)':
-    dependencies:
-      '@inquirer/core': 10.3.2(@types/node@25.5.0)
-      '@inquirer/type': 3.0.10(@types/node@25.5.0)
-      yoctocolors-cjs: 2.1.3
-    optionalDependencies:
-      '@types/node': 25.5.0
 
   '@inquirer/search@3.2.2(@types/node@24.3.0)':
     dependencies:
@@ -11606,15 +11587,6 @@ snapshots:
       yoctocolors-cjs: 2.1.3
     optionalDependencies:
       '@types/node': 24.3.0
-
-  '@inquirer/search@3.2.2(@types/node@25.5.0)':
-    dependencies:
-      '@inquirer/core': 10.3.2(@types/node@25.5.0)
-      '@inquirer/figures': 1.0.15
-      '@inquirer/type': 3.0.10(@types/node@25.5.0)
-      yoctocolors-cjs: 2.1.3
-    optionalDependencies:
-      '@types/node': 25.5.0
 
   '@inquirer/select@4.4.2(@types/node@24.3.0)':
     dependencies:
@@ -11626,23 +11598,9 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.3.0
 
-  '@inquirer/select@4.4.2(@types/node@25.5.0)':
-    dependencies:
-      '@inquirer/ansi': 1.0.2
-      '@inquirer/core': 10.3.2(@types/node@25.5.0)
-      '@inquirer/figures': 1.0.15
-      '@inquirer/type': 3.0.10(@types/node@25.5.0)
-      yoctocolors-cjs: 2.1.3
-    optionalDependencies:
-      '@types/node': 25.5.0
-
   '@inquirer/type@3.0.10(@types/node@24.3.0)':
     optionalDependencies:
       '@types/node': 24.3.0
-
-  '@inquirer/type@3.0.10(@types/node@25.5.0)':
-    optionalDependencies:
-      '@types/node': 25.5.0
 
   '@inquirer/type@3.0.8(@types/node@24.3.0)':
     optionalDependencies:
@@ -11771,9 +11729,9 @@ snapshots:
       outvariant: 1.4.3
       strict-event-emitter: 0.5.1
 
-  '@napi-rs/cli@3.4.0(@emnapi/core@1.4.5)(@emnapi/runtime@1.4.5)(@types/node@25.5.0)(node-addon-api@8.5.0)':
+  '@napi-rs/cli@3.4.0(@emnapi/core@1.4.5)(@emnapi/runtime@1.4.5)(@types/node@24.3.0)(node-addon-api@8.5.0)':
     dependencies:
-      '@inquirer/prompts': 7.10.1(@types/node@25.5.0)
+      '@inquirer/prompts': 7.10.1(@types/node@24.3.0)
       '@napi-rs/cross-toolchain': 1.0.3(@emnapi/core@1.4.5)(@emnapi/runtime@1.4.5)
       '@napi-rs/wasm-tools': 1.0.1(@emnapi/core@1.4.5)(@emnapi/runtime@1.4.5)
       '@octokit/rest': 22.0.1
@@ -12773,11 +12731,6 @@ snapshots:
     dependencies:
       undici-types: 7.10.0
 
-  '@types/node@25.5.0':
-    dependencies:
-      undici-types: 7.18.2
-    optional: true
-
   '@types/normalize-package-data@2.4.4': {}
 
   '@types/parse-json@4.0.2': {}
@@ -13009,15 +12962,9 @@ snapshots:
 
   abbrev@4.0.0: {}
 
-  abitype@1.0.8(typescript@6.0.2)(zod@3.24.4):
+  abitype@1.0.8(typescript@6.0.2):
     optionalDependencies:
       typescript: 6.0.2
-      zod: 3.24.4
-
-  abitype@1.2.3(typescript@6.0.2)(zod@3.24.4):
-    optionalDependencies:
-      typescript: 6.0.2
-      zod: 3.24.4
 
   abitype@1.2.3(typescript@6.0.2)(zod@4.3.6):
     optionalDependencies:
@@ -16683,21 +16630,21 @@ snapshots:
     transitivePeerDependencies:
       - zod
 
-  ox@0.6.7(typescript@6.0.2)(zod@3.24.4):
+  ox@0.6.7(typescript@6.0.2):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
       '@noble/curves': 1.9.6
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@6.0.2)(zod@3.24.4)
+      abitype: 1.2.3(typescript@6.0.2)(zod@4.3.6)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 6.0.2
     transitivePeerDependencies:
       - zod
 
-  ox@0.8.1(typescript@6.0.2)(zod@3.24.4):
+  ox@0.8.1(typescript@6.0.2):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
       '@noble/ciphers': 1.3.0
@@ -16705,7 +16652,7 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@6.0.2)(zod@3.24.4)
+      abitype: 1.2.3(typescript@6.0.2)(zod@4.3.6)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 6.0.2
@@ -18295,9 +18242,6 @@ snapshots:
 
   undici-types@7.10.0: {}
 
-  undici-types@7.18.2:
-    optional: true
-
   unicorn-magic@0.3.0: {}
 
   unique-filename@4.0.0:
@@ -18362,15 +18306,15 @@ snapshots:
 
   vary@1.1.2: {}
 
-  viem@2.22.15(typescript@6.0.2)(zod@3.24.4):
+  viem@2.22.15(typescript@6.0.2):
     dependencies:
       '@noble/curves': 1.8.1
       '@noble/hashes': 1.7.1
       '@scure/bip32': 1.6.2
       '@scure/bip39': 1.5.4
-      abitype: 1.0.8(typescript@6.0.2)(zod@3.24.4)
+      abitype: 1.0.8(typescript@6.0.2)
       isows: 1.0.6(ws@8.18.0)
-      ox: 0.6.7(typescript@6.0.2)(zod@3.24.4)
+      ox: 0.6.7(typescript@6.0.2)
       ws: 8.18.0
     optionalDependencies:
       typescript: 6.0.2
@@ -18379,15 +18323,15 @@ snapshots:
       - utf-8-validate
       - zod
 
-  viem@2.33.1(typescript@6.0.2)(zod@3.24.4):
+  viem@2.33.1(typescript@6.0.2):
     dependencies:
       '@noble/curves': 1.9.2
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.0.8(typescript@6.0.2)(zod@3.24.4)
+      abitype: 1.0.8(typescript@6.0.2)
       isows: 1.0.7(ws@8.18.2)
-      ox: 0.8.1(typescript@6.0.2)(zod@3.24.4)
+      ox: 0.8.1(typescript@6.0.2)
       ws: 8.18.2
     optionalDependencies:
       typescript: 6.0.2
@@ -18601,8 +18545,5 @@ snapshots:
   yoctocolors-cjs@2.1.3: {}
 
   yoctocolors@2.1.1: {}
-
-  zod@3.24.4:
-    optional: true
 
   zod@4.3.6: {}
