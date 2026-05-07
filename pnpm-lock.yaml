@@ -3394,6 +3394,9 @@ importers:
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../evm-consensus
+      '@mainsail/forger':
+        specifier: workspace:*
+        version: link:../forger
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
