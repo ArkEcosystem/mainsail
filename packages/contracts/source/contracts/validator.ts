@@ -49,3 +49,7 @@ export interface TransactionForger {
 		fee: bigint;
 	}>;
 }
+
+export interface BlockForger {
+	forgeBlock(generatorAddress: string, round: number, timestamp: number): Promise<Block>;
+}
