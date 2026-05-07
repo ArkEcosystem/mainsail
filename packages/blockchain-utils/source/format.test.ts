@@ -10,7 +10,7 @@ import { Contracts } from "@mainsail/contracts";
 describe<{
 	app: Application;
 	configuration: Contracts.Crypto.Configuration;
-}>("formatCurrency", ({ assert, beforeEach, it }) => {
+}>("formatCurrency", ({ assert, beforeEach, it, each }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
 		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
@@ -27,4 +27,11 @@ describe<{
 		assert.equal(formatCurrency(configuration, BigInt(1e18)), "1 TѦ");
 		assert.equal(formatCurrency(configuration, BigInt(1e18) * 100n), "100 TѦ");
 	});
+
+	each("should throw if decimals are invalid", ({ dataset: data, context: { configuration } }) => {
+		const milestones = configuration.getMilestones();
+		milestones[0].satoshi.decimals = data;
+		configuration.set("milestones", milestones);
+		assert.throws(() => formatCurrency(configuration, 1n), "Invalid decimals");
+	}, [21, 100]);
 });
