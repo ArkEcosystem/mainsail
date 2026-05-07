@@ -5,7 +5,6 @@ import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
-import Joi from "joi";
 
 import { BIP38, BIP39 } from "./keys/index.js";
 import { ValidatorRepository } from "./validator-repository.js";
@@ -59,12 +58,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}
 
 		this.app.get<ValidatorRepository>(Identifiers.Validator.Repository).configure(validators);
-	}
-
-	public configSchema(): Joi.AnySchema {
-		return Joi.object({
-			txCollatorFactor: Joi.number().min(0).max(1).required(),
-		}).unknown(true);
 	}
 
 	#getConsensusKeyPairFromSecret(secret: string): Promise<Contracts.Crypto.KeyPair> {
