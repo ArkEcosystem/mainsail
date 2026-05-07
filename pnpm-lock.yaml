@@ -1075,6 +1075,9 @@ importers:
       '@mainsail/exceptions':
         specifier: workspace:*
         version: link:../exceptions
+      '@mainsail/forger':
+        specifier: workspace:*
+        version: link:../forger
       '@mainsail/logger-pino':
         specifier: workspace:*
         version: link:../logger-pino
