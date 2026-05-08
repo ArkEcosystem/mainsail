@@ -8,8 +8,9 @@
 		"plugins/*"
 	],
 	"scripts": {
-		"build": "nx run-many -t build --all",
-		"build:force": "echo \"force-ts $(date +%s)\" > ts-force.flag",
+		"build:ts": "nx run-many -t build --all",
+		"build:ts:token": "echo \"force-ts $(date +%s)\" > ts-force.flag",
+		"build:rs:token": "echo \"force-rs $(date +%s)\" > rs-force.flag",
 		"clean": "pnpm run clean:packages && rm -r .cache  && rm -r .nx",
 		"clean:all": "pnpm run clean && pnpm run clean:node_modules",
 		"clean:node_modules": "rm -rf packages/*/node_modules && rm -rf node_modules",
