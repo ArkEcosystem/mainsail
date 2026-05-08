@@ -1,8 +1,10 @@
 {
 	"namedInputs": {
-		"default": [
+		"typescript": [
 			"{projectRoot}/source/**/!(*.test).ts",
-			"{projectRoot}/source/**/*.json",
+			"{projectRoot}/source/**/*.json"
+		],
+		"evm": [
 			"{projectRoot}/core/**/*.rs",
 			"{projectRoot}/bindings/**/*.rs",
 			"{projectRoot}/**/Cargo.toml"
@@ -18,22 +20,17 @@
 	"targetDefaults": {
 		"build": {
 			"dependsOn": ["^build"],
-			"inputs": ["tsForce", "default"],
+			"inputs": ["tsForce", "typescript"],
 			"outputs": [
 				"{projectRoot}/distribution",
-				"{projectRoot}/tsconfig.tsbuildinfo",
-				"{projectRoot}/index.d.ts",
-				"{projectRoot}/index.js",
-				"{projectRoot}/evm.*.node"
+				"{projectRoot}/tsconfig.tsbuildinfo"
 			],
 			"cache": true
 		},
 		"build-rs": {
 			"dependsOn": [""],
-			"inputs": ["rsForce", "default"],
+			"inputs": ["rsForce", "evm"],
 			"outputs": [
-				"{projectRoot}/distribution",
-				"{projectRoot}/tsconfig.tsbuildinfo",
 				"{projectRoot}/index.d.ts",
 				"{projectRoot}/index.js",
 				"{projectRoot}/evm.*.node"
