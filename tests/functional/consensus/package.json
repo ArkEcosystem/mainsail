@@ -19,6 +19,7 @@
 		"@mainsail/blockchain-utils": "workspace:*",
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
+		"@mainsail/forger": "workspace:*",
 		"@mainsail/test-transaction-builders": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",

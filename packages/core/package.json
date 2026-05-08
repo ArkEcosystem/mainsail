@@ -66,6 +66,7 @@
 		"@mainsail/evm-service": "workspace:*",
 		"@mainsail/evm-state": "workspace:*",
 		"@mainsail/exceptions": "workspace:*",
+		"@mainsail/forger": "workspace:*",
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/networking-dns": "workspace:*",
 		"@mainsail/networking-ntp": "workspace:*",

@@ -173,6 +173,10 @@ export const Identifiers = {
 			Factory: Symbol("Evm<WorkerSubprocess.Factory>"),
 		},
 	},
+	Forger: {
+		Block: Symbol("Forger<Block>"),
+		Transaction: Symbol("Forger<Transaction>"),
+	},
 	P2P: {
 		ApiNode: {
 			Discoverer: Symbol("P2P<ApiNode.Discoverer>"),

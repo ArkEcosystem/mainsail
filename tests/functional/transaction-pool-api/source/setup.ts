@@ -109,6 +109,7 @@ const setup = async (): Promise<Contracts.Kernel.Application> => {
 		"@mainsail/crypto-commit",
 		"@mainsail/processor",
 		"@mainsail/evm-consensus",
+		"@mainsail/forger",
 		"@mainsail/validator",
 		"@mainsail/consensus",
 	];

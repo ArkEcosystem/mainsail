@@ -18,7 +18,7 @@ import type { Validator } from "./contracts.js";
 // 3) concat with serialized transactions buffer
 // 4) manually make & sign proposal
 //
-// 1-3) replicates 'proposer.prepareBlock'
+// 1-3) replicates 'forger.forgeBlock'
 // 4) replicates 'messageFactory.makeProposal'
 export const makeCustomProposal = async (
 	{ app, validators }: { app: Contracts.Kernel.Application; validators: Validator[] },
