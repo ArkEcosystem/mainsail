@@ -8,6 +8,7 @@
 		"plugins/*"
 	],
 	"scripts": {
+		"build": "pnpm run build:rs && pnpm run build:ts",
 		"build:ts": "nx run-many -t build --all",
 		"build:rs": "nx run evm:build-rs",
 		"build:ts:token": "echo \"force-ts $(date +%s)\" > ts-force.flag",
