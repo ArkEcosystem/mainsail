@@ -62,7 +62,7 @@ jobs:
               uses: actions/cache/save@v4
               with:
                   key: lerna-${{ github.sha }}
-                  path: ./.cache
+                  path: ./.nx
 
     unit:
         name: "Unit"
@@ -101,7 +101,7 @@ jobs:
               uses: actions/cache/restore@v5.0.3
               with:
                   key: lerna-${{ github.sha }}
-                  path: ./.cache
+                  path: ./.nx
             - uses: dtolnay/rust-toolchain@stable
               with:
                   components: llvm-tools-preview
@@ -297,7 +297,7 @@ jobs:
               uses: actions/cache/restore@v5.0.3
               with:
                   key: lerna-${{ github.sha }}
-                  path: ./.cache
+                  path: ./.nx
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -348,7 +348,7 @@ jobs:
               uses: actions/cache/restore@v5.0.3
               with:
                   key: lerna-${{ github.sha }}
-                  path: ./.cache
+                  path: ./.nx
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -433,7 +433,7 @@ jobs:
               uses: actions/cache/restore@v5.0.3
               with:
                   key: lerna-${{ github.sha }}
-                  path: ./.cache
+                  path: ./.nx
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -491,7 +491,7 @@ jobs:
               uses: actions/cache/restore@v5.0.3
               with:
                   key: lerna-${{ github.sha }}
-                  path: ./.cache
+                  path: ./.nx
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -570,7 +570,7 @@ jobs:
               uses: actions/cache/restore@v5.0.3
               with:
                   key: lerna-${{ github.sha }}
-                  path: ./.cache
+                  path: ./.nx
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -655,7 +655,7 @@ jobs:
               uses: actions/cache/restore@v5.0.3
               with:
                   key: lerna-${{ github.sha }}
-                  path: ./.cache
+                  path: ./.nx
             - name: Install dependencies
               run: pnpm install
             - name: Build
