@@ -9,6 +9,7 @@
 	],
 	"scripts": {
 		"build": "nx run-many -t build --all",
+		"build:force": "echo \"force-ts $(date +%s)\" > ts-force.flag",
 		"clean": "pnpm run clean:packages && rm -r .cache  && rm -r .nx",
 		"clean:all": "pnpm run clean && pnpm run clean:node_modules",
 		"clean:node_modules": "rm -rf packages/*/node_modules && rm -rf node_modules",

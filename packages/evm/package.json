@@ -8,7 +8,8 @@
 	"types": "index.d.ts",
 	"scripts": {
 		"artifacts": "napi artifacts",
-		"build": "pnpm run clean && pnpm run build-napi",
+		"build": "ls",
+		"build-rs": "pnpm run clean && pnpm run build-napi",
 		"build-napi": "napi build --platform --output-dir ./ --manifest-path bindings/Cargo.toml --release",
 		"build-napi:debug": "napi build --platform --output-dir ./ --manifest-path bindings/Cargo.toml",
 		"clean": "rm -f index.js && rm -f index.d.ts && rm -f evm.*.node && rm -rf target",

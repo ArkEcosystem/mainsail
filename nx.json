@@ -7,12 +7,15 @@
 			"{projectRoot}/bindings/**/*.rs",
 			"{projectRoot}/**/Cargo.toml"
 		],
+		"tsForce": [
+      "{workspaceRoot}/ts-force.flag"
+    ],
 		"production": ["default"]
 	},
 	"targetDefaults": {
 		"build": {
 			"dependsOn": ["^build"],
-			"inputs": ["default"],
+			"inputs": ["tsForce", "default"],
 			"outputs": [
 				"{projectRoot}/distribution",
 				"{projectRoot}/tsconfig.tsbuildinfo",
