@@ -8,7 +8,7 @@ import { performance } from "perf_hooks";
 @injectable()
 export class TransactionForger implements Contracts.Forger.TransactionForger {
 	@inject(Identifiers.ServiceProvider.Configuration)
-	@tagged("plugin", "validator")
+	@tagged("plugin", "forger")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Configuration)
