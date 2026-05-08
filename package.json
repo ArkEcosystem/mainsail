@@ -8,9 +8,7 @@
 		"plugins/*"
 	],
 	"scripts": {
-		"build": "lerna run build",
-		"build:rs": "lerna run build --scope=@mainsail/evm",
-		"build:ts": "pnpm run build:rs && lerna run build --ignore=@mainsail/evm",
+		"build": "nx run-many -t build --all",
 		"clean": "pnpm run clean:packages && rm -r .cache  && rm -r .nx",
 		"clean:all": "pnpm run clean && pnpm run clean:node_modules",
 		"clean:node_modules": "rm -rf packages/*/node_modules && rm -rf node_modules",
