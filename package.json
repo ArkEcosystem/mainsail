@@ -9,6 +9,7 @@
 	],
 	"scripts": {
 		"build:ts": "nx run-many -t build --all",
+		"build:rs": "nx run evm:build-rs",
 		"build:ts:token": "echo \"force-ts $(date +%s)\" > ts-force.flag",
 		"build:rs:token": "echo \"force-rs $(date +%s)\" > rs-force.flag",
 		"clean": "pnpm run clean:packages && rm -r .cache  && rm -r .nx",

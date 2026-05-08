@@ -10,12 +10,27 @@
 		"tsForce": [
       "{workspaceRoot}/ts-force.flag"
     ],
+		"rsForce": [
+      "{workspaceRoot}/rs-force.flag"
+    ],
 		"production": ["default"]
 	},
 	"targetDefaults": {
 		"build": {
 			"dependsOn": ["^build"],
 			"inputs": ["tsForce", "default"],
+			"outputs": [
+				"{projectRoot}/distribution",
+				"{projectRoot}/tsconfig.tsbuildinfo",
+				"{projectRoot}/index.d.ts",
+				"{projectRoot}/index.js",
+				"{projectRoot}/evm.*.node"
+			],
+			"cache": true
+		},
+		"build-rs": {
+			"dependsOn": [""],
+			"inputs": ["rsForce", "default"],
 			"outputs": [
 				"{projectRoot}/distribution",
 				"{projectRoot}/tsconfig.tsbuildinfo",
