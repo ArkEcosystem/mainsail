@@ -6,8 +6,8 @@ mkdir -p "$(dirname "$exclude_file")"
 touch "$exclude_file"
 
 entries=(
-	"ts-force.flag"
-	"rs-force.flag"
+	".build-ts"
+	".build-rs"
 )
 
 for entry in "${entries[@]}"; do

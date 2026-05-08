@@ -9,18 +9,18 @@
 			"{projectRoot}/bindings/**/*.rs",
 			"{projectRoot}/**/Cargo.toml"
 		],
-		"tsForce": [
-      "{workspaceRoot}/ts-force.flag"
+		"tsToken": [
+      "{workspaceRoot}/.build-ts"
     ],
-		"rsForce": [
-      "{workspaceRoot}/rs-force.flag"
+		"rsToken": [
+      "{workspaceRoot}/.build-rs"
     ],
 		"production": ["default"]
 	},
 	"targetDefaults": {
 		"build": {
 			"dependsOn": ["^build"],
-			"inputs": ["tsForce", "typescript"],
+			"inputs": ["tsToken", "typescript"],
 			"outputs": [
 				"{projectRoot}/distribution",
 				"{projectRoot}/tsconfig.tsbuildinfo"
@@ -29,7 +29,7 @@
 		},
 		"build-rs": {
 			"dependsOn": [""],
-			"inputs": ["rsForce", "evm"],
+			"inputs": ["rsToken", "evm"],
 			"outputs": [
 				"{projectRoot}/index.d.ts",
 				"{projectRoot}/index.js",
