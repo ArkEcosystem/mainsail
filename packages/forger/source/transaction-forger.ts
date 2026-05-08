@@ -9,7 +9,7 @@ import { performance } from "perf_hooks";
 export class TransactionForger implements Contracts.Forger.TransactionForger {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "forger")
-	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
@@ -70,7 +70,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 			// txCollatorFactor% of the time for block preparation, the rest is for  block and proposal serialization and signing
 			const timeLimit =
 				performance.now() +
-				milestone.timeouts.blockPrepareTime * this.configuration.getRequired<number>("txCollatorFactor");
+				milestone.timeouts.blockPrepareTime * this.pluginConfiguration.getRequired<number>("txCollatorFactor");
 
 			for (const bytes of transactionBytes.values()) {
 				if (performance.now() > timeLimit) {
