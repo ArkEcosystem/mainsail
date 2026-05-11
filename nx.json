@@ -1,29 +1,25 @@
 {
 	"namedInputs": {
-		"default": [
-			"{projectRoot}/source/**/!(*.test).ts",
-			"{projectRoot}/source/**/*.json",
-			"{projectRoot}/core/**/*.rs",
-			"{projectRoot}/bindings/**/*.rs",
-			"{projectRoot}/**/Cargo.toml"
-		],
+		"typescript": ["{projectRoot}/source/**/!(*.test).ts", "{projectRoot}/source/**/*.json"],
+		"evm": ["{projectRoot}/core/**/*.rs", "{projectRoot}/bindings/**/*.rs", "{projectRoot}/**/Cargo.toml"],
+		"tsToken": ["{workspaceRoot}/.build-ts"],
+		"rsToken": ["{workspaceRoot}/.build-rs"],
 		"production": ["default"]
 	},
 	"targetDefaults": {
 		"build": {
 			"dependsOn": ["^build"],
-			"inputs": ["default"],
-			"outputs": [
-				"{projectRoot}/distribution",
-				"{projectRoot}/tsconfig.tsbuildinfo",
-				"{projectRoot}/index.d.ts",
-				"{projectRoot}/index.js",
-				"{projectRoot}/evm.*.node"
-			],
+			"inputs": ["tsToken", "typescript"],
+			"outputs": ["{projectRoot}/distribution", "{projectRoot}/tsconfig.tsbuildinfo"],
+			"cache": true
+		},
+		"build-rs": {
+			"dependsOn": [""],
+			"inputs": ["rsToken", "evm"],
+			"outputs": ["{projectRoot}/index.d.ts", "{projectRoot}/index.js", "{projectRoot}/evm.*.node"],
 			"cache": true
 		}
 	},
 	"$schema": "./node_modules/nx/schemas/nx-schema.json",
-	"cacheDirectory": "./.cache",
 	"analytics": false
 }
