@@ -1,7 +1,5 @@
 import type { ByteBuffer } from "@mainsail/utils";
 
-import type { MultiSignatureAsset } from "./legacy.js";
-
 export interface KeyPair {
 	publicKey: string;
 	privateKey: string;
@@ -12,7 +10,6 @@ export interface AddressFactory {
 	fromMnemonic(mnemonic: string): Promise<string>;
 	fromPublicKey(publicKey: string): Promise<string>;
 	fromWIF(wif: string): Promise<string>;
-	fromMultiSignatureAsset(asset: MultiSignatureAsset): Promise<string>;
 	fromBuffer(buffer: Buffer): Promise<string>;
 	toBuffer(address: string): Promise<Buffer>;
 	validate(address: string): Promise<boolean>;
@@ -21,7 +18,6 @@ export interface AddressFactory {
 export interface PublicKeyFactory {
 	fromMnemonic(mnemonic: string): Promise<string>;
 	fromWIF(wif: string): Promise<string>;
-	fromMultiSignatureAsset(asset: MultiSignatureAsset): Promise<string>;
 	verify(publicKey: string): Promise<boolean>;
 	aggregate(publicKeys: Buffer[]): Promise<string>;
 }

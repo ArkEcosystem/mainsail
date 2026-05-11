@@ -39,10 +39,6 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 		return this.fromPublicKey(await this.publicKeyFactory.fromWIF(wif));
 	}
 
-	public async fromMultiSignatureAsset(asset: Contracts.Crypto.MultiSignatureAsset): Promise<string> {
-		return this.fromPublicKey(await this.publicKeyFactory.fromMultiSignatureAsset(asset));
-	}
-
 	public async fromBuffer(buffer: Buffer): Promise<string> {
 		return this.#encodeCheck(buffer);
 	}
