@@ -7,6 +7,13 @@ import { performance } from "perf_hooks";
 
 import { TransactionIterable } from "./transaction-iterable.js";
 
+type ProcessTransactionResult = {
+	fee: bigint;
+	gasUsed: number;
+	transactions: Contracts.Crypto.Transaction[];
+	gasLeft: number;
+};
+
 @injectable()
 export class TransactionForger implements Contracts.Forger.TransactionForger {
 	@inject(Identifiers.Application.Instance)
@@ -50,7 +57,6 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	#timeLimit!: number;
 
 	#failedSenders: Set<string> = new Set();
-
 
 	public initialize(
 		generatorAddress: string,
@@ -104,16 +110,13 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 		}
 	}
 
-	async #processTransactions(): Promise<{
-		fee: bigint;
-		gasUsed: number;
-		transactions: Contracts.Crypto.Transaction[];
-	}> {
-		const transactions: Contracts.Crypto.Transaction[] = [];
-
-		let gasLeft = this.#milestone.block.maxGasLimit;
-		let gasUsed = 0;
-		let fee = 0n;
+	async #processTransactions(): Promise<ProcessTransactionResult> {
+		const result: ProcessTransactionResult = {
+			fee: 0n,
+			gasLeft: this.#milestone.block.maxGasLimit,
+			gasUsed: 0,
+			transactions: [] as Contracts.Crypto.Transaction[],
+		};
 
 		const transactionIterable = this.app
 			.resolve<TransactionIterable>(TransactionIterable)
@@ -128,54 +131,65 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 				continue;
 			}
 
-			try {
-				if (gasLeft < 21000) {
-					break;
-				}
+			if (result.gasLeft < 21000) {
+				break;
+			}
 
-				let optimisticExecution = false;
-
-				const gasLimit = transaction.gasLimit;
-				if (gasLeft - gasLimit < 0) {
-					// Optimistically execute transaction even if the gas limit exceeds the remaining
-					// block space since there's possibly still space to fit the actual gas consumed.
-
-					// If the consumed gas exceeds the remaining block space, we ignore the transaction and
-					// calculate the root from the previous state (rollback).
-					optimisticExecution = true;
-					this.logger.info(
-						`attempting optimistic execution of tx ${transaction.hash} (tx.gas=${gasLimit} gasLeft=${gasLeft})`,
-					);
-
-					await this.#evm.snapshot(this.#commitKey);
-				}
-
-				const result = await this.#validateTransaction(transaction);
-
-				gasLeft -= Number(result.gasUsed);
-
-				// Ignore transaction if it uses more than what's left.
-				if (gasLeft < 0) {
-					this.logger.warn(
-						`skipping tx ${transaction.hash} due to insufficient block space (tx.gasUsed=${Number(result.gasUsed)} gasLeft=${gasLeft} optimistic=${optimisticExecution})`,
-					);
-
-					if (optimisticExecution) {
-						await this.#evm.rollback(this.#commitKey);
-					}
-
-					break;
-				}
-
-				gasUsed += Number(result.gasUsed);
-				fee += this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, result.gasUsed);
-				transactions.push(transaction);
-			} catch (error) {
-				await this.#handleFailedTransaction(transaction, error as Error);
+			const processNext = await this.#processTransaction(transaction, result);
+			if (!processNext) {
+				break;
 			}
 		}
 
-		return { fee, gasUsed, transactions };
+		return result;
+	}
+
+	async #processTransaction(
+		transaction: Contracts.Crypto.Transaction,
+		result: ProcessTransactionResult,
+	): Promise<boolean> {
+		try {
+			let optimisticExecution = false;
+
+			if (result.gasLeft - transaction.gasLimit < 0) {
+				// Optimistically execute transaction even if the gas limit exceeds the remaining
+				// block space since there's possibly still space to fit the actual gas consumed.
+
+				// If the consumed gas exceeds the remaining block space, we ignore the transaction and
+				// calculate the root from the previous state (rollback).
+				optimisticExecution = true;
+				this.logger.info(
+					`attempting optimistic execution of tx ${transaction.hash} (tx.gas=${transaction.gasLimit} gasLeft=${result.gasLeft})`,
+				);
+
+				await this.#evm.snapshot(this.#commitKey);
+			}
+
+			const validation = await this.#validateTransaction(transaction);
+
+			result.gasLeft -= Number(validation.gasUsed);
+
+			// Ignore transaction if it uses more than what's left.
+			if (result.gasLeft < 0) {
+				this.logger.warn(
+					`skipping tx ${transaction.hash} due to insufficient block space (tx.gasUsed=${Number(validation.gasUsed)} gasLeft=${transaction.gasLimit} optimistic=${optimisticExecution})`,
+				);
+
+				if (optimisticExecution) {
+					await this.#evm.rollback(this.#commitKey);
+				}
+
+				return false;
+			}
+
+			result.gasUsed += Number(validation.gasUsed);
+			result.fee += this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, validation.gasUsed);
+			result.transactions.push(transaction);
+		} catch (error) {
+			await this.#handleFailedTransaction(transaction, error as Error);
+		}
+
+		return true;
 	}
 
 	async #validateTransaction(transaction: Contracts.Crypto.Transaction): Promise<Contracts.Evm.TransactionReceipt> {
