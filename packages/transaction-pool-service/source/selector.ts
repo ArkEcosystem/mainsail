@@ -3,16 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { injectable, inject } from "@mainsail/container";
 
-type GetBatchOptions = {
-	blockRound: string;
-	maxSize: number;
-	maxBytes: number;
-};
 
-type GetBatchResult = {
-	transactions: Contracts.Crypto.Transaction[];
-	remaining: number;
-};
 
 @injectable()
 export class TransactionSelector {
@@ -23,7 +14,7 @@ export class TransactionSelector {
 	#currentBlockRound = "";
 	#index = 0;
 
-	public async getBatch(options: GetBatchOptions): Promise<GetBatchResult> {
+	public async getBatch(options: Contracts.TransactionPool.GetBatchOptions): Promise<Contracts.TransactionPool.GetBatchResult> {
 		await this.#prepare(options.blockRound);
 
 		const transactions: Contracts.Crypto.Transaction[] = [];
