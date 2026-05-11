@@ -1,4 +1,4 @@
-import type { Transaction } from "../crypto/index.js";
+import type { TransactionData } from "../crypto/index.js";
 
 export type GetBatchOptions = {
 	blockRound: string;
@@ -7,7 +7,7 @@ export type GetBatchOptions = {
 };
 
 export type GetBatchResult = {
-	transactions: Transaction[];
+	transactions: TransactionData[];
 	remaining: number;
 };
 

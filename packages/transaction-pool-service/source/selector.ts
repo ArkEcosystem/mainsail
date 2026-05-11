@@ -3,8 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { injectable, inject } from "@mainsail/container";
 
-
-
 @injectable()
 export class Selector implements Contracts.TransactionPool.Selector {
 	@inject(Identifiers.TransactionPool.Query)
@@ -17,7 +15,7 @@ export class Selector implements Contracts.TransactionPool.Selector {
 	public async getBatch(options: Contracts.TransactionPool.GetBatchOptions): Promise<Contracts.TransactionPool.GetBatchResult> {
 		await this.#prepare(options.blockRound);
 
-		const transactions: Contracts.Crypto.Transaction[] = [];
+		const transactions: Contracts.Crypto.TransactionData[] = [];
 		let bytesLeft = options.maxBytes;
 
 		while (this.#index < this.#transactions.length) {
@@ -27,7 +25,7 @@ export class Selector implements Contracts.TransactionPool.Selector {
 				break;
 			}
 
-			transactions.push(transaction);
+			transactions.push(transaction.toData());
 			bytesLeft -= 4;
 			bytesLeft -= transaction.serialized.length;
 

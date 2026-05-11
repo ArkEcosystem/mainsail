@@ -14,6 +14,9 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
+	@inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
+
 	@inject(Identifiers.State.Store)
 	protected readonly stateStore!: Contracts.State.Store;
 
@@ -75,10 +78,14 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 
 				});
 
-				for (const transaction of batch.transactions) {
+				console.log(`forging batch with ${batch.transactions.length} transactions, remaining in pool: ${batch.remaining}`);
+
+				for (const tx of batch.transactions) {
 					if (performance.now() > timeLimit) {
 						break;
 					}
+
+					const transaction = await this.transactionFactory.fromData(tx);
 
 					if (failedSenders.has(transaction.senderPublicKey)) {
 						continue;
