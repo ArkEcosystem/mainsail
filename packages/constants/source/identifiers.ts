@@ -174,8 +174,7 @@ export const Identifiers = {
 		},
 	},
 	Forger: {
-		Block: Symbol("Forger<Block>"),
-		Transaction: Symbol("Forger<Transaction>"),
+		Block: Symbol("Forger<Block>")
 	},
 	P2P: {
 		ApiNode: {
