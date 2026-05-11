@@ -161,14 +161,11 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 				});
 			}
 
-			const logsBloom = await evm.logsBloom(commitKey);
-			const stateRoot = await evm.stateRoot(commitKey, previousBlock.stateRoot);
-
 			return {
 				fee,
 				gasUsed,
-				logsBloom,
-				stateRoot,
+				logsBloom: await evm.logsBloom(commitKey),
+				stateRoot: await evm.stateRoot(commitKey, previousBlock.stateRoot),
 				transactions: candidateTransactions,
 			};
 		} finally {
