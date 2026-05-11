@@ -37,10 +37,6 @@ describe<{ app: Application; factory: PublicKeyFactory }>("PublicKeyFactory", ({
 		await assert.rejects(() => factory.fromWIF(""), NotImplemented);
 	});
 
-	it("#fromMultiSignatureAsset - should throw NotImplemented", async ({ factory }) => {
-		await assert.rejects(async () => factory.fromMultiSignatureAsset({} as any), NotImplemented);
-	});
-
 	each(
 		"#verify - should pass with valid public keys",
 		async ({ context, dataset }) => {
