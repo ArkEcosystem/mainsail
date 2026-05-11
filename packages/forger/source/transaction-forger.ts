@@ -135,10 +135,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 				break;
 			}
 
-			const processNext = await this.#processTransaction(transaction, result);
-			if (!processNext) {
-				break;
-			}
+			await this.#processTransaction(transaction, result);
 		}
 
 		return result;
@@ -147,17 +144,15 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	async #processTransaction(
 		transaction: Contracts.Crypto.Transaction,
 		result: ProcessTransactionResult,
-	): Promise<boolean> {
+	): Promise<void> {
 		try {
-			let optimisticExecution = false;
-
-			if (result.gasLeft - transaction.gasLimit < 0) {
+			const optimisticExecution = result.gasLeft - transaction.gasLimit < 0;
+			if (optimisticExecution) {
 				// Optimistically execute transaction even if the gas limit exceeds the remaining
 				// block space since there's possibly still space to fit the actual gas consumed.
 
 				// If the consumed gas exceeds the remaining block space, we ignore the transaction and
 				// calculate the root from the previous state (rollback).
-				optimisticExecution = true;
 				this.logger.info(
 					`attempting optimistic execution of tx ${transaction.hash} (tx.gas=${transaction.gasLimit} gasLeft=${result.gasLeft})`,
 				);
@@ -166,20 +161,21 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 			}
 
 			const validation = await this.#validateTransaction(transaction);
-
+			// Reduce gas left even for optimistic executions, to prevent further processing.
 			result.gasLeft -= Number(validation.gasUsed);
 
 			// Ignore transaction if it uses more than what's left.
 			if (result.gasLeft < 0) {
 				this.logger.warn(
-					`skipping tx ${transaction.hash} due to insufficient block space (tx.gasUsed=${Number(validation.gasUsed)} gasLeft=${transaction.gasLimit} optimistic=${optimisticExecution})`,
+					`Skipping tx ${transaction.hash} due to insufficient block space (tx.gasUsed=${Number(validation.gasUsed)} gasLeft=${transaction.gasLimit} optimistic=${optimisticExecution})`,
 				);
 
 				if (optimisticExecution) {
 					await this.#evm.rollback(this.#commitKey);
 				}
 
-				return false;
+				// TODO: This looks wrong. Is transaction removed even if added optimistically.
+				return;
 			}
 
 			result.gasUsed += Number(validation.gasUsed);
@@ -188,8 +184,6 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 		} catch (error) {
 			await this.#handleFailedTransaction(transaction, error as Error);
 		}
-
-		return true;
 	}
 
 	async #validateTransaction(transaction: Contracts.Crypto.Transaction): Promise<Contracts.Evm.TransactionReceipt> {
