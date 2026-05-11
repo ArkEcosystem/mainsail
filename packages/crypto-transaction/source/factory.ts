@@ -3,7 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged, optional } from "@mainsail/container";
 import {
-	DuplicateParticipantInMultiSignatureError,
 	InvalidTransactionBytesError,
 	TransactionSchemaError,
 } from "@mainsail/exceptions";
@@ -140,7 +139,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 
 			return new Transaction(tx, serialized);
 		} catch (error) {
-			if (error instanceof TransactionSchemaError || error instanceof DuplicateParticipantInMultiSignatureError) {
+			if (error instanceof TransactionSchemaError) {
 				throw error;
 			}
 
