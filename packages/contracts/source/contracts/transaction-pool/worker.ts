@@ -2,12 +2,13 @@ import type { CommitHandler } from "../crypto/index.js";
 import type { EventListener } from "../kernel/index.js";
 import type { EventCallback, Subprocess } from "../kernel/ipc.js";
 import type { KeyValuePair } from "../types/index.js";
+import type { GetBatchResult, GetBatchOptions } from "./selector.js";
 
 export type WorkerFlags = KeyValuePair;
 
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
-	getTransactions(): Promise<string[]>;
+	getTransactions(options: GetBatchOptions): Promise<GetBatchResult>;
 	removeTransaction(address: string, id: string): Promise<void>;
 	commit(height: number, sendersAddresses: string[], consumedGas: number, isSyncing: boolean): Promise<void>;
 	setPeer(ip: string): Promise<void>;
