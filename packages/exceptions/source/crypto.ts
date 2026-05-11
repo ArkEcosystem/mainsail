@@ -180,12 +180,6 @@ export class InvalidNumberOfRoundValidatorsError extends Exception {
 	}
 }
 
-export class InvalidMultiSignatureAssetError extends Exception {
-	public constructor() {
-		super(`The multi signature asset is invalid.`);
-	}
-}
-
 export class DuplicateParticipantInMultiSignatureError extends Exception {
 	public constructor() {
 		super(`Invalid multi signature, because duplicate participant found.`);
