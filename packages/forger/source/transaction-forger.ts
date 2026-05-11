@@ -26,9 +26,6 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	@inject(Identifiers.Transaction.Validator.Factory)
 	private readonly createTransactionValidator!: Contracts.Transactions.TransactionValidatorFactory;
 
-	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
-
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -49,8 +46,6 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 		gasUsed: number;
 		fee: bigint;
 	}> {
-		const transactionBytes = await this.txPoolWorker.getTransactionBytes();
-
 		const validator = this.createTransactionValidator();
 		const evm = validator.getEvm();
 
@@ -72,70 +67,81 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 				performance.now() +
 				milestone.timeouts.blockPrepareTime * this.pluginConfiguration.getRequired<number>("txCollatorFactor");
 
-			for (const bytes of transactionBytes.values()) {
-				if (performance.now() > timeLimit) {
-					break;
-				}
+			while (true) {
+				const batch = await this.txPoolWorker.getTransactions({
+					blockRound: "0-0",
+					maxBytes: 10_000_000,
+					maxSize: 100,
 
-				const transaction = await this.transactionFactory.fromBytes(bytes);
+				});
 
-				if (failedSenders.has(transaction.senderPublicKey)) {
-					continue;
-				}
-
-				try {
-					if (gasLeft < 21000) {
+				for (const transaction of batch.transactions) {
+					if (performance.now() > timeLimit) {
 						break;
 					}
 
-					let optimisticExecution = false;
-
-					const gasLimit = transaction.gasLimit;
-					if (gasLeft - gasLimit < 0) {
-						// Optimistically execute transaction even if the gas limit exceeds the remaining
-						// block space since there's possibly still space to fit the actual gas consumed.
-
-						// If the consumed gas exceeds the remaining block space, we ignore the transaction and
-						// calculate the root from the previous state (rollback).
-						optimisticExecution = true;
-						this.logger.info(
-							`attempting optimistic execution of tx ${transaction.hash} (tx.gas=${gasLimit} gasLeft=${gasLeft})`,
-						);
-
-						await evm.snapshot(commitKey);
+					if (failedSenders.has(transaction.senderPublicKey)) {
+						continue;
 					}
 
-					const result = await validator.validate(
-						{ commitKey, gasLimit: milestone.block.maxGasLimit, generatorAddress, timestamp },
-						transaction,
-					);
-
-					gasLeft -= Number(result.gasUsed);
-
-					// Ignore transaction if it uses more than what's left.
-					if (gasLeft < 0) {
-						this.logger.warn(
-							`skipping tx ${transaction.hash} due to insufficient block space (tx.gasUsed=${Number(result.gasUsed)} gasLeft=${gasLeft} optimistic=${optimisticExecution})`,
-						);
-
-						if (optimisticExecution) {
-							await evm.rollback(commitKey);
+					try {
+						if (gasLeft < 21000) {
+							break;
 						}
 
-						break;
+						let optimisticExecution = false;
+
+						const gasLimit = transaction.gasLimit;
+						if (gasLeft - gasLimit < 0) {
+							// Optimistically execute transaction even if the gas limit exceeds the remaining
+							// block space since there's possibly still space to fit the actual gas consumed.
+
+							// If the consumed gas exceeds the remaining block space, we ignore the transaction and
+							// calculate the root from the previous state (rollback).
+							optimisticExecution = true;
+							this.logger.info(
+								`attempting optimistic execution of tx ${transaction.hash} (tx.gas=${gasLimit} gasLeft=${gasLeft})`,
+							);
+
+							await evm.snapshot(commitKey);
+						}
+
+						const result = await validator.validate(
+							{ commitKey, gasLimit: milestone.block.maxGasLimit, generatorAddress, timestamp },
+							transaction,
+						);
+
+						gasLeft -= Number(result.gasUsed);
+
+						// Ignore transaction if it uses more than what's left.
+						if (gasLeft < 0) {
+							this.logger.warn(
+								`skipping tx ${transaction.hash} due to insufficient block space (tx.gasUsed=${Number(result.gasUsed)} gasLeft=${gasLeft} optimistic=${optimisticExecution})`,
+							);
+
+							if (optimisticExecution) {
+								await evm.rollback(commitKey);
+							}
+
+							break;
+						}
+
+						gasUsed += Number(result.gasUsed);
+						fee += this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, result.gasUsed);
+						candidateTransactions.push(transaction);
+					} catch (error) {
+						this.logger.warn(
+							`tx ${transaction.hash} from ${transaction.from} failed to collate: ${error.message}`,
+						);
+
+						await this.txPoolWorker.removeTransaction(transaction.from, transaction.hash);
+
+						failedSenders.add(transaction.senderPublicKey);
 					}
+				}
 
-					gasUsed += Number(result.gasUsed);
-					fee += this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, result.gasUsed);
-					candidateTransactions.push(transaction);
-				} catch (error) {
-					this.logger.warn(
-						`tx ${transaction.hash} from ${transaction.from} failed to collate: ${error.message}`,
-					);
-
-					await this.txPoolWorker.removeTransaction(transaction.from, transaction.hash);
-
-					failedSenders.add(transaction.senderPublicKey);
+				if(batch.remaining === 0) {
+					break;
 				}
 			}
 
