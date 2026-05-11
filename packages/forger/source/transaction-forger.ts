@@ -72,10 +72,9 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 
 			while (true) {
 				const batch = await this.txPoolWorker.getTransactions({
-					blockRound: "0-0",
+					blockRound: `${commitKey.blockNumber}-${commitKey.round}`,
 					maxBytes: 10_000_000,
 					maxSize: 100,
-
 				});
 
 				console.log(`forging batch with ${batch.transactions.length} transactions, remaining in pool: ${batch.remaining}`);
