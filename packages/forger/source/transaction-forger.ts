@@ -164,7 +164,6 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 			// Reduce gas left even for optimistic executions, to prevent further processing.
 			result.gasLeft -= Number(validation.gasUsed);
 
-			// Ignore transaction if it uses more than what's left.
 			if (result.gasLeft < 0) {
 				this.logger.warn(
 					`Skipping tx ${transaction.hash} due to insufficient block space (tx.gasUsed=${Number(validation.gasUsed)} gasLeft=${transaction.gasLimit} optimistic=${optimisticExecution})`,
@@ -172,10 +171,11 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 
 				if (optimisticExecution) {
 					await this.#evm.rollback(this.#commitKey);
+					return;
+				} else {
+					// In practice, this should never happen since the validator should reject transactions that exceed the block gas limit, but we check just in case.
+					throw new Error(`Non-optimistic transaction processing requires more gas than remaining block space (tx.gasUsed=${Number(validation.gasUsed)} gasLeft=${transaction.gasLimit})`);
 				}
-
-				// TODO: This looks wrong. Is transaction removed even if added optimistically.
-				return;
 			}
 
 			result.gasUsed += Number(validation.gasUsed);
