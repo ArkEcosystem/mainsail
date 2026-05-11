@@ -11,7 +11,7 @@ export type GetBatchResult = {
 	remaining: number;
 };
 
-export interface TransactionSelector {
+export interface Selector {
 	getBatch(options: GetBatchOptions): Promise<GetBatchResult>;
 	clear(): void;
 }

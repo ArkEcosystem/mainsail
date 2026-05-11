@@ -9,6 +9,7 @@ import { ThrowIfCannotBeAppliedAction, VerifyTransactionAction } from "./actions
 import { Mempool } from "./mempool.js";
 import { Processor } from "./processor.js";
 import { Query } from "./query.js";
+import { Selector } from "./selector.js";
 import { SenderMempool } from "./sender-mempool.js";
 import { SenderState } from "./sender-state.js";
 import { Service } from "./service.js";
@@ -64,6 +65,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionPool.SenderState).to(SenderState);
 		this.app.bind(Identifiers.TransactionPool.Service).to(Service).inSingletonScope();
 		this.app.bind(Identifiers.TransactionPool.Storage).to(Storage).inSingletonScope();
+		this.app.bind(Identifiers.TransactionPool.Selector).to(Selector).inSingletonScope();
 	}
 
 	#registerActions(): void {

@@ -6,7 +6,7 @@ import { injectable, inject } from "@mainsail/container";
 
 
 @injectable()
-export class TransactionSelector {
+export class Selector implements Contracts.TransactionPool.Selector {
 	@inject(Identifiers.TransactionPool.Query)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
