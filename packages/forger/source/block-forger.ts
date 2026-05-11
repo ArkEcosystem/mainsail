@@ -4,8 +4,13 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { assert } from "@mainsail/utils";
 
+import { TransactionForger } from "./transaction-forger.js";
+
 @injectable()
 export class BlockForger implements Contracts.Forger.BlockForger {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
@@ -18,9 +23,6 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
-	@inject(Identifiers.Forger.Transaction)
-	protected readonly transactionForger!: Contracts.Forger.TransactionForger;
-
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	protected readonly gasFeeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
@@ -32,14 +34,12 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 		const previousBlock = this.stateStore.getLastBlock();
 		const blockNumber = previousBlock.number + 1;
 
-		const { fee, gasUsed, logsBloom, stateRoot, transactions } = await this.transactionForger.getTransactions(
-			generatorAddress,
-			timestamp,
-			{
-				blockNumber: BigInt(blockNumber),
-				round: BigInt(round),
-			},
-		);
+		const transactionForger = this.app.resolve(TransactionForger).initialize(generatorAddress, timestamp, {
+			blockNumber: BigInt(blockNumber),
+			round: BigInt(round),
+		});
+
+		const { fee, gasUsed, logsBloom, stateRoot, transactions } = await transactionForger.getTransactions();
 		return this.#makeBlock(round, generatorAddress, logsBloom, stateRoot, transactions, timestamp, gasUsed, fee);
 	}
 

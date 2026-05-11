@@ -40,11 +40,23 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	protected readonly gasFeeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
-	async getTransactions(
+	#generatorAddress!: string;
+	#timestamp!: number
+	#commitKey!: Contracts.Evm.CommitKey;
+
+	public initialize(
 		generatorAddress: string,
 		timestamp: number,
-		commitKey: Contracts.Evm.CommitKey,
-	): Promise<{
+		commitKey: Contracts.Evm.CommitKey
+	): TransactionForger {
+		this.#generatorAddress = generatorAddress;
+		this.#timestamp = timestamp;
+		this.#commitKey = commitKey;
+
+		return this;
+	}
+
+	async getTransactions(): Promise<{
 		logsBloom: string;
 		stateRoot: string;
 		transactions: Contracts.Crypto.Transaction[];
@@ -56,7 +68,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 
 		try {
 			await evm.initializeGenesis(this.genesisInfo);
-			await evm.prepareNextCommit({ commitKey });
+			await evm.prepareNextCommit({ commitKey: this.#commitKey });
 
 			const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 			const failedSenders: Set<string> = new Set();
@@ -74,7 +86,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 
 			const transactionIterable = this.app
 				.resolve<TransactionIterable>(TransactionIterable)
-				.initialize(commitKey);
+				.initialize(this.#commitKey);
 
 			for await (const transaction of transactionIterable) {
 				if (performance.now() > timeLimit) {
@@ -104,11 +116,11 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 							`attempting optimistic execution of tx ${transaction.hash} (tx.gas=${gasLimit} gasLeft=${gasLeft})`,
 						);
 
-						await evm.snapshot(commitKey);
+						await evm.snapshot(this.#commitKey);
 					}
 
 					const result = await validator.validate(
-						{ commitKey, gasLimit: milestone.block.maxGasLimit, generatorAddress, timestamp },
+						{ commitKey: this.#commitKey, gasLimit: milestone.block.maxGasLimit, generatorAddress: this.#generatorAddress, timestamp: this.#timestamp },
 						transaction,
 					);
 
@@ -121,7 +133,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 						);
 
 						if (optimisticExecution) {
-							await evm.rollback(commitKey);
+							await evm.rollback(this.#commitKey);
 						}
 
 						break;
@@ -143,29 +155,29 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 
 			await evm.updateRewardsAndVotes({
 				blockReward: BigInt(milestone.reward),
-				commitKey,
+				commitKey: this.#commitKey,
 				specId: milestone.evmSpec,
-				timestamp: BigInt(timestamp),
-				validatorAddress: generatorAddress,
+				timestamp: BigInt(this.#timestamp),
+				validatorAddress: this.#generatorAddress,
 			});
 
 			if (this.roundCalculator.isNewRound(previousBlock.number + 2)) {
 				const { roundValidators } = this.cryptoConfiguration.getMilestone(previousBlock.number + 2);
 
 				await evm.calculateRoundValidators({
-					commitKey,
+					commitKey: this.#commitKey,
 					roundValidators: BigInt(roundValidators),
 					specId: milestone.evmSpec,
-					timestamp: BigInt(timestamp),
-					validatorAddress: generatorAddress,
+					timestamp: BigInt(this.#timestamp),
+					validatorAddress: this.#generatorAddress,
 				});
 			}
 
 			return {
 				fee,
 				gasUsed,
-				logsBloom: await evm.logsBloom(commitKey),
-				stateRoot: await evm.stateRoot(commitKey, previousBlock.stateRoot),
+				logsBloom: await evm.logsBloom(this.#commitKey),
+				stateRoot: await evm.stateRoot(this.#commitKey, previousBlock.stateRoot),
 				transactions: candidateTransactions,
 			};
 		} finally {
