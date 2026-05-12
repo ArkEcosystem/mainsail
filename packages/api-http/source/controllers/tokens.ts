@@ -259,23 +259,39 @@ export class TokensController extends Controller {
 			return;
 		}
 
-		if (request.query.whitelist) {
-			const customWhitelist = (Array.isArray(request.query.whitelist)
-				? request.query.whitelist
-				: request.query.whitelist.split(",")) as unknown as string[];
-			if (customWhitelist.length > 0) {
-				queryBuilder.leftJoin(Models.TokenWhitelist, "tw", "tw.address = tok.address").andWhere(
-					new TypeOrm.Brackets((qb) => {
-						qb.where("tw.address IS NOT NULL").orWhere("tok.address IN (:...customWhitelist)", {
-							customWhitelist,
-						});
-					}),
-				);
-				return;
+		const toStringArray = (value: unknown): string[] => {
+			if (!value) {
+				return [];
 			}
+
+			return (Array.isArray(value) ? value : String(value).split(","))
+				.map((v) => String(v).trim())
+				.filter(Boolean);
+		};
+
+		const customWhitelist = toStringArray(request.query.whitelist);
+		const customBlacklist = toStringArray(request.query.blacklist);
+
+		if (customWhitelist.length === 0 && customBlacklist.length === 0) {
+			queryBuilder.innerJoin(Models.TokenWhitelist, "tw", "tw.address = tok.address");
+			return;
 		}
 
-		queryBuilder.innerJoin(Models.TokenWhitelist, "tw", "tw.address = tok.address");
+		if (customWhitelist.length > 0) {
+			queryBuilder.leftJoin(Models.TokenWhitelist, "tw", "tw.address = tok.address").andWhere(
+				new TypeOrm.Brackets((qb) => {
+					qb.where("tw.address IS NOT NULL").orWhere("tok.address IN (:...customWhitelist)", {
+						customWhitelist,
+					});
+				}),
+			);
+		}
+
+		if (customBlacklist.length > 0) {
+			queryBuilder.andWhere("tok.address NOT IN (:...customBlacklist)", {
+				customBlacklist,
+			});
+		}
 	}
 
 	public static andWhereNameSearch(
