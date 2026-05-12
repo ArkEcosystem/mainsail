@@ -46,6 +46,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			validate: {
 				query: Joi.object({
 					addresses: Schemas.orEqualCriteria(walletAddressSchema),
+					blacklist: Schemas.orEqualCriteria(walletAddressSchema),
 					from: Schemas.orEqualCriteria(walletAddressSchema),
 					ignoreWhitelist: Joi.bool().default(false),
 					to: Schemas.orEqualCriteria(walletAddressSchema),
@@ -69,6 +70,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			validate: {
 				query: Joi.object({
 					addresses: Schemas.orEqualCriteria(walletAddressSchema),
+					blacklist: Schemas.orEqualCriteria(walletAddressSchema),
 					from: Schemas.orEqualCriteria(walletAddressSchema),
 					to: Schemas.orEqualCriteria(walletAddressSchema),
 					transactionHash: Schemas.orEqualCriteria(transactionHashSchema),
