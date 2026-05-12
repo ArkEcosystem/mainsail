@@ -5,7 +5,6 @@ export * from "./config.js";
 export * from "./crypto.js";
 export * from "./hash.js";
 export * from "./identities.js";
-export * from "./legacy.js";
 export * from "./messages.js";
 export * from "./networks.js";
 export * from "./proposal.js";

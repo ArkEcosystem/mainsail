@@ -55,20 +55,6 @@ describe<{ app: Application; factory: AddressFactory }>("AddressFactory", ({ ass
 		wallets,
 	);
 
-	it("#fromMultiSignatureAsset - should derive an address from multi signature address", async ({ factory }) => {
-		assert.is(
-			await factory.fromMultiSignatureAsset({
-				min: 3,
-				publicKeys: [
-					"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
-					"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
-					"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
-				],
-			}),
-			"0x970996B998f3C854D9a4D2C327Cc049ae6241C40",
-		);
-	});
-
 	each(
 		"#validate - should be valid",
 		async ({ context: { factory }, dataset: address }) => {

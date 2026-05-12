@@ -2,11 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged, optional } from "@mainsail/container";
-import {
-	DuplicateParticipantInMultiSignatureError,
-	InvalidTransactionBytesError,
-	TransactionSchemaError,
-} from "@mainsail/exceptions";
+import { InvalidTransactionBytesError, TransactionSchemaError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
 import { BlockTransaction } from "./block-transaction.js";
@@ -140,7 +136,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 
 			return new Transaction(tx, serialized);
 		} catch (error) {
-			if (error instanceof TransactionSchemaError || error instanceof DuplicateParticipantInMultiSignatureError) {
+			if (error instanceof TransactionSchemaError) {
 				throw error;
 			}
 

@@ -42,65 +42,6 @@ describe<{ app: Application; factory: PublicKeyFactory }>("PrivateKeyFactory", (
 		wallets,
 	);
 
-	it("should derive from a musig", async ({ factory }) => {
-		assert.is(
-			await factory.fromMultiSignatureAsset({
-				min: 3,
-				publicKeys: [
-					"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
-					"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
-					"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
-				],
-			}),
-			"0321d8b4df000280dd7f3ac8dae0558e214bd6fe736d97cf68ea8a083c024c249c",
-		);
-	});
-
-	it("should throw if min < 1", async ({ factory }) => {
-		await assert.rejects(
-			() =>
-				factory.fromMultiSignatureAsset({
-					min: 0,
-					publicKeys: [
-						"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
-						"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
-						"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
-					],
-				}),
-			"The multi signature asset is invalid.",
-		);
-	});
-
-	it("should throw if min > publicKeys.length", async ({ factory }) => {
-		await assert.rejects(
-			() =>
-				factory.fromMultiSignatureAsset({
-					min: 4,
-					publicKeys: [
-						"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
-						"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
-						"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
-					],
-				}),
-			"The multi signature asset is invalid.",
-		);
-	});
-
-	it("should throw if publicKey is invalid", async ({ factory }) => {
-		await assert.rejects(
-			() =>
-				factory.fromMultiSignatureAsset({
-					min: 1,
-					publicKeys: [
-						"0",
-						"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
-						"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
-					],
-				}),
-			"Expected 0 to be a valid public key",
-		);
-	});
-
 	each(
 		"should pass with valid public keys",
 		async ({ context, dataset }) => {

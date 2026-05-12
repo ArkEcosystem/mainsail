@@ -2,8 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { InvalidMultiSignatureAssetError, NotImplemented, PublicKeyError } from "@mainsail/exceptions";
-import { numberToHex } from "@mainsail/utils";
+import { NotImplemented } from "@mainsail/exceptions";
 import { secp256k1 } from "bcrypto";
 
 @injectable()
@@ -19,27 +18,6 @@ export class PublicKeyFactory implements Contracts.Crypto.PublicKeyFactory {
 	public async fromWIF(wif: string): Promise<string> {
 		const { publicKey } = await this.keyPairFactory.fromWIF(wif);
 		return publicKey;
-	}
-
-	public async fromMultiSignatureAsset(asset: Contracts.Crypto.MultiSignatureAsset): Promise<string> {
-		const { min, publicKeys }: Contracts.Crypto.MultiSignatureAsset = asset;
-
-		for (const publicKey of publicKeys) {
-			if (!(await this.verify(publicKey))) {
-				throw new PublicKeyError(publicKey);
-			}
-		}
-
-		if (min < 1 || min > publicKeys.length) {
-			throw new InvalidMultiSignatureAssetError();
-		}
-
-		const minKey: string = await this.fromMnemonic(numberToHex(min));
-		const keys: string[] = [minKey, ...publicKeys];
-
-		return secp256k1
-			.publicKeyCombine(keys.map((publicKey: string) => Buffer.from(publicKey, "hex")))
-			.toString("hex");
 	}
 
 	public async verify(publicKey: string): Promise<boolean> {
