@@ -39,11 +39,6 @@ export type VoteOptions = TransactionOptions & {
 	publicKey?: string;
 };
 
-export type MultiSignatureOptions = TransactionOptions & {
-	publicKeys?: string[];
-	min?: number;
-};
-
 export type MultiPaymentOptions = TransactionOptions & {
 	payments?: {
 		amount: string;

@@ -13,10 +13,7 @@ export interface TransactionOptions {
 	sender?: Contracts.Crypto.KeyPair;
 	gasPrice?: number;
 	signature?: string;
-	omitParticipantSignatures?: number[];
 	nonceOffset?: number;
-	multiSigKeys?: Contracts.Crypto.KeyPair[];
-	participantSignatures?: string[];
 
 	callback?: (transaction: Contracts.Crypto.Transaction) => Promise<void>;
 }

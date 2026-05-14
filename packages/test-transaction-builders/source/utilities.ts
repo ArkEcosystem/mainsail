@@ -30,32 +30,6 @@ const applyCustomSignature = async (
 	//transaction.data.signature = signature;
 };
 
-const applyCustomSignatures = async (
-	app: Contracts.Kernel.Application,
-	transaction: Contracts.Crypto.Transaction,
-	{ omitParticipantSignatures, participantSignatures }: TransactionOptions,
-) => {
-	throw new Error("unsupported");
-	// if (!omitParticipantSignatures || !participantSignatures) {
-	// 	return;
-	// }
-
-	// let transactionHex = transaction.serialized.toString("hex");
-
-	// omitParticipantSignatures.sort((a, b) => b - a);
-
-	// for (const index of omitParticipantSignatures) {
-	// 	const signatureToOmit = participantSignatures[index];
-
-	// 	const signatureIndex = transactionHex.indexOf(signatureToOmit);
-	// 	transactionHex = transactionHex.slice(0, signatureIndex);
-
-	// 	transaction.data.signatures!.splice(transaction.data.signatures!.indexOf(signatureToOmit), 1);
-	// }
-
-	// transaction.serialized = Buffer.from(transactionHex, "hex");
-};
-
 export const getNonceByPublicKey = async (app: Contracts.Kernel.Application, publicKey: string): Promise<bigint> => {
 	const address = await app
 		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
@@ -79,42 +53,14 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 	(builder as unknown as { verifier: Contracts.Crypto.TransactionVerifier }).verifier =
 		app.resolve(AcceptAnyTransactionVerifier);
 
-	if (options.multiSigKeys) {
-		throw new Error("unsupported");
-		// const participants = options.multiSigKeys;
-		// const multiSigPublicKey = await app
-		// 	.getTagged<Contracts.Crypto.PublicKeyFactory>(
-		// 		Identifiers.Cryptography.Identity.PublicKey.Factory,
-		// 		"type",
-		// 		"wallet",
-		// 	)
-		// 	.fromMultiSignatureAsset({
-		// 		min: participants.length,
-		// 		publicKeys: participants.map((p) => p.publicKey),
-		// 	});
-
-		// const nonce = await getNonceByPublicKey(app, multiSigPublicKey);
-
-		// const { multiSigKeys, nonceOffset = 0 } = options;
-		// builder = builder.nonce(nonce.plus(nonceOffset).toString()).senderPublicKey(multiSigPublicKey);
-
-		// for (const [index, participant] of multiSigKeys.entries()) {
-		// 	builder = await builder.multiSignWithKeyPair(participant, index);
-		// }
-	} else {
-		const nonce = await getNonceByPublicKey(app, keyPair.publicKey);
-		const { nonceOffset = 0 } = options;
-		builder = await builder.nonce((nonce + BigInt(nonceOffset)).toString()).signWithKeyPair(keyPair);
-	}
+	const nonce = await getNonceByPublicKey(app, keyPair.publicKey);
+	const { nonceOffset = 0 } = options;
+	builder = await builder.nonce((nonce + BigInt(nonceOffset)).toString()).signWithKeyPair(keyPair);
 
 	const transaction = await builder.build();
 
 	if (options.signature) {
 		await applyCustomSignature(app, transaction, options.signature);
-	}
-
-	if (options.omitParticipantSignatures) {
-		await applyCustomSignatures(app, transaction, options);
 	}
 
 	if (options.callback) {

@@ -19,14 +19,6 @@ interface EntityOptions {
 const sign = async ({ entity, options }: EntityOptions): Promise<TransactionBuilder> =>
 	entity.sign(options.passphrase || secrets[0]);
 
-const multiSign = async ({ entity, options }: EntityOptions): Promise<TransactionBuilder> =>
-	//	const passphrases: string[] = options.passphrases || [secrets[0], secrets[1], secrets[2]];
-
-	// for (const [index, passphrase] of passphrases.entries()) {
-	// 	await entity.multiSign(passphrase, index);
-	// }
-
-	entity;
 const applyModifiers = (entity: TransactionBuilder, options: TransactionOptions): TransactionBuilder => {
 	entity.gasPrice(options.gasPrice || GAS_PRICE);
 
@@ -64,8 +56,6 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 
 	// @ts-ignore
 	factory.get("Transfer").state("sign", sign);
-	// @ts-ignore
-	factory.get("Transfer").state("multiSign", multiSign);
 };
 
 // export const registerValidatorRegistrationFactory = (
@@ -115,8 +105,6 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 
 // 	// @ts-ignore
 // 	factory.get("Vote").state("sign", sign);
-// 	// @ts-ignore
-// 	factory.get("Vote").state("multiSign", multiSign);
 // };
 
 // export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
@@ -140,40 +128,7 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 
 // 	// @ts-ignore
 // 	factory.get("Unvote").state("sign", sign);
-// 	// @ts-ignore
-// 	factory.get("Unvote").state("multiSign", multiSign);
 // };
-
-// export const registerMultiSignature = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
-// 	factory.set("MultiSignature", async ({ options }: { options: MultiSignatureOptions }) => {
-// 		const publicKeyFactory = app.getTagged<Contracts.Crypto.PublicKeyFactory>(
-// 			Identifiers.Cryptography.Identity.PublicKey.Factory,
-// 			"type",
-// 			"wallet",
-// 		);
-
-// 		const publicKeys: string[] = options.publicKeys || [
-// 			await publicKeyFactory.fromMnemonic(secrets[0]),
-// 			await publicKeyFactory.fromMnemonic(secrets[1]),
-// 			await publicKeyFactory.fromMnemonic(secrets[2]),
-// 		];
-
-// 		return applyModifiers(
-// 			app
-// 				.resolve(MultiSignatureBuilder)
-// 				.multiSignatureAsset({
-// 					min: options.min || 2,
-// 					publicKeys,
-// 				})
-// 				.senderPublicKey(publicKeys[0]),
-// 			options,
-// 		);
-// 	});
-
-// 	// @ts-ignore
-// 	factory.get("MultiSignature").state("sign", sign);
-// 	// @ts-ignore
-// 	factory.get("MultiSignature").state("multiSign", multiSign);
 // };
 
 // export const registerMultiPaymentFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application) => {
@@ -206,8 +161,6 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 
 // 	// @ts-ignore
 // 	factory.get("MultiPayment").state("sign", sign);
-// 	// @ts-ignore
-// 	factory.get("MultiPayment").state("multiSign", multiSign);
 // };
 
 export const registerEvmCallFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
@@ -237,7 +190,6 @@ export const registerTransactionFactory = async (
 	// registerValidatorResignationFactory(factory, app);
 	// registerVoteFactory(factory, app);
 	// registerUnvoteFactory(factory, app);
-	// registerMultiSignature(factory, app);
 	// registerMultiPaymentFactory(factory, app);
 	registerEvmCallFactory(factory, app);
 };

@@ -24,7 +24,7 @@
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"ajv": "8.18.0"
+		"ajv": "8.20.0"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",

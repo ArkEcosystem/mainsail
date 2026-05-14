@@ -22,12 +22,12 @@
 	},
 	"dependencies": {
 		"@hapi/boom": "10.0.1",
-		"@hapi/hapi": "21.4.7",
+		"@hapi/hapi": "21.4.9",
 		"@mainsail/api-common": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"joi": "18.1.2"
+		"joi": "18.2.1"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
