@@ -27,11 +27,11 @@
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"viem": "2.47.6"
+		"viem": "2.48.11"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
-		"@types/chance": "1.1.7",
+		"@types/chance": "1.1.8",
 		"@types/fs-extra": "11.0.4",
 		"uvu": "0.5.6"
 	},

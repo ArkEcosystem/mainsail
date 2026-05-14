@@ -335,13 +335,15 @@ export class TokensController extends Controller {
 		}
 
 		queryBuilder
-			.addOrderBy(
-				`CASE WHEN lower(tok.symbol) LIKE :orderByPrefix THEN 0
-	   			WHEN lower(tok.name) LIKE :orderByPrefix THEN 1
-	   			ELSE 2
-	 		END`,
-				"ASC",
+			.addSelect(
+				`CASE
+			WHEN LOWER(tok.symbol) LIKE :orderByPrefix THEN 0
+			WHEN LOWER(tok.name) LIKE :orderByPrefix THEN 1
+			ELSE 2
+    		END`,
+				"search_rank",
 			)
+			.addOrderBy("search_rank", "ASC")
 			.setParameter("orderByPrefix", `${nameSearch.toLowerCase()}%`);
 
 		return queryBuilder;

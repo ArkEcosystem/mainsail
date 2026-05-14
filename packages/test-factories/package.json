@@ -48,7 +48,7 @@
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
-		"@types/chance": "1.1.7",
+		"@types/chance": "1.1.8",
 		"@types/memoizee": "0.4.12",
 		"uvu": "0.5.6"
 	},
