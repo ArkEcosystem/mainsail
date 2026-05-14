@@ -202,6 +202,7 @@ export class WalletsController extends Controller {
 		const tokenMetadata = pageTokensRows.reduce<Record<string, TokenMetadata>>(
 			(accumulator, row: TokenMetadata) => {
 				if (!accumulator[row.token]) {
+					delete row["search_rank"];
 					accumulator[row.token] = row;
 				}
 
