@@ -11,7 +11,7 @@
 		"/distribution"
 	],
 	"scripts": {
-		"build": "tsc -b",
+		"build": "tsgo -b",
 		"build:watch": "pnpm run clean && tsc -w",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
