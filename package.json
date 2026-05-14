@@ -73,6 +73,7 @@
 		"tsx": "4.21.0",
 		"typedoc": "0.28.19",
 		"typescript": "6.0.3",
+		"@typescript/native-preview": "7.0.0-dev.20260421.2",
 		"typescript-eslint": "^8.59.3",
 		"typesync": "0.14.3",
 		"yaml": "2.9.0"
