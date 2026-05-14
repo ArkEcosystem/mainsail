@@ -32,7 +32,7 @@
 		"@mainsail/validation": "workspace:*",
 		"pg": "8.20.0",
 		"tmp": "0.2.5",
-		"typeorm": "0.3.28"
+		"typeorm": "0.3.29"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",

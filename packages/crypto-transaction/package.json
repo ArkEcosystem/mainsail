@@ -26,8 +26,8 @@
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"ajv": "8.18.0",
-		"viem": "2.47.6"
+		"ajv": "8.20.0",
+		"viem": "2.48.11"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
