@@ -17,7 +17,7 @@ export const slice = <T>(array: T[], start: number, end: number): T[] => {
 	length = start > end ? 0 : (end - start) >>> 0;
 	start >>>= 0;
 
-	const result: T[] = new Array(length);
+	const result: T[] = Array.from({ length });
 
 	while (++index < length) {
 		result[index] = array[index + start];
