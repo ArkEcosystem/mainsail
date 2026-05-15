@@ -1962,9 +1962,6 @@ importers:
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
-      '@types/lodash.clonedeep':
-        specifier: 4.5.9
-        version: 4.5.9
       '@types/tmp':
         specifier: 0.2.6
         version: 0.2.6
