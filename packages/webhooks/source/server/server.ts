@@ -5,7 +5,6 @@ import Boom, { badData } from "@hapi/boom";
 import { Request as HapiRequest, Server as HapiServer, ServerInjectOptions, ServerInjectResponse } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { cloneDeep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
 import { defaults } from "../defaults.js";
@@ -176,9 +175,11 @@ export class Server {
 					return Boom.notFound();
 				}
 
-				const webhook: Contracts.Webhooks.Webhook | undefined = cloneDeep(
-					// @ts-ignore TODO: check typings
-					request.server.app.database.findById(request.params.id),
+				const webhook: Contracts.Webhooks.Webhook | undefined = JSON.parse(
+					JSON.stringify(
+						// @ts-ignore TODO: check typings
+						request.server.app.database.findById(request.params.id),
+					),
 				);
 
 				/* c8 ignore next 3 */
