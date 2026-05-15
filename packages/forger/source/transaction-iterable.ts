@@ -3,7 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
-
 @injectable()
 export class TransactionIterable implements AsyncIterable<Contracts.Crypto.Transaction> {
 	@inject(Identifiers.TransactionPool.Worker)
@@ -16,7 +15,7 @@ export class TransactionIterable implements AsyncIterable<Contracts.Crypto.Trans
 
 	public initialize(commitKey: Contracts.Evm.CommitKey): TransactionIterable {
 		this.#commitKey = commitKey;
-		return this
+		return this;
 	}
 
 	public async *[Symbol.asyncIterator](): AsyncIterator<Contracts.Crypto.Transaction> {
@@ -32,7 +31,7 @@ export class TransactionIterable implements AsyncIterable<Contracts.Crypto.Trans
 				yield transaction;
 			}
 
-			if(batch.transactions.length === 0) {
+			if (batch.transactions.length === 0) {
 				return;
 			}
 		}

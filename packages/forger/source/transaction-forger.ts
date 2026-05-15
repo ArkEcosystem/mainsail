@@ -175,7 +175,9 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 					return;
 				} else {
 					// In practice, this should never happen since the validator should reject transactions that exceed the block gas limit, but we check just in case.
-					throw new Error(`Non-optimistic transaction processing requires more gas than remaining block space (tx.gasUsed=${gasUsed} gasLeft=${transaction.gasLimit})`);
+					throw new Error(
+						`Non-optimistic transaction processing requires more gas than remaining block space (tx.gasUsed=${gasUsed} gasLeft=${transaction.gasLimit})`,
+					);
 				}
 			}
 

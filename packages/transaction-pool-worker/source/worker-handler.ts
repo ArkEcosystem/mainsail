@@ -39,7 +39,9 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 		await this.#app.resolve(CommitHandler).handle(height, sendersAddresses, consumedGas, isSyncing);
 	}
 
-	public async getTransactions(options: Contracts.TransactionPool.GetBatchOptions): Promise<Contracts.TransactionPool.GetBatchResult> {
+	public async getTransactions(
+		options: Contracts.TransactionPool.GetBatchOptions,
+	): Promise<Contracts.TransactionPool.GetBatchResult> {
 		return await this.#app.resolve(GetTransactionsHandler).handle(options);
 	}
 

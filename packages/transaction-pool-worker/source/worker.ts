@@ -79,7 +79,9 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		await this.ipcSubprocess.sendRequest("start", blockNumber);
 	}
 
-	public async getTransactions(options: Contracts.TransactionPool.GetBatchOptions): Promise<Contracts.TransactionPool.GetBatchResult> {
+	public async getTransactions(
+		options: Contracts.TransactionPool.GetBatchOptions,
+	): Promise<Contracts.TransactionPool.GetBatchResult> {
 		return this.ipcSubprocess.sendRequest("getTransactions", options);
 	}
 

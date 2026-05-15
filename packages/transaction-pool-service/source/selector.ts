@@ -12,7 +12,9 @@ export class Selector implements Contracts.TransactionPool.Selector {
 	#currentBlockRound = "";
 	#index = 0;
 
-	public async getBatch(options: Contracts.TransactionPool.GetBatchOptions): Promise<Contracts.TransactionPool.GetBatchResult> {
+	public async getBatch(
+		options: Contracts.TransactionPool.GetBatchOptions,
+	): Promise<Contracts.TransactionPool.GetBatchResult> {
 		await this.#prepare(options.blockRound);
 
 		const transactions: Contracts.Crypto.TransactionData[] = [];
@@ -55,6 +57,6 @@ export class Selector implements Contracts.TransactionPool.Selector {
 
 		this.#currentBlockRound = blockRound;
 		this.#index = 0;
-		this.#transactions = await this.poolQuery.getFromHighestPriority().all()
+		this.#transactions = await this.poolQuery.getFromHighestPriority().all();
 	}
 }
