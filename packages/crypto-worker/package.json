@@ -31,7 +31,6 @@
 		"@mainsail/test-runner": "workspace:*",
 		"@types/chance": "1.1.8",
 		"@types/fs-extra": "11.0.4",
-		"@types/lodash.clonedeep": "4.5.9",
 		"@types/tmp": "0.2.6",
 		"uvu": "0.5.6"
 	},

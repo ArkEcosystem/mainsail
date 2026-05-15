@@ -1,5 +1,3 @@
-import { isGit } from "@mainsail/utils";
-
 import { execa } from "../../execa.js";
 import { AbstractSource } from "./abstract-source.js";
 
@@ -9,7 +7,7 @@ export class Git extends AbstractSource {
 	}
 
 	public async exists(value: string): Promise<boolean> {
-		return isGit(value);
+		return this.#isGit(value);
 	}
 
 	public async update(value: string): Promise<void> {
@@ -23,5 +21,9 @@ export class Git extends AbstractSource {
 
 	protected async preparePackage(value: string): Promise<void> {
 		execa.sync(`git`, ["clone", value, this.getOriginPath()]);
+	}
+
+	#isGit(value: string): boolean {
+		return /(?:git|ssh|https?|git@[\w.-]+):(\/\/)?(.*?)(\.git)(\/?|#[\w.-]+?)$/.test(value);
 	}
 }
