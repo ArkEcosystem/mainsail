@@ -423,6 +423,7 @@ describe<{
 		assert.undefined(errors);
 
 		await waitBlock(context);
+		await waitBlock(context);
 
 		for (let i = 0; i < 10; i++) {
 			if (txs[i].nonce < replacementTx.nonce) {

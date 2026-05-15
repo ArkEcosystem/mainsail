@@ -23,15 +23,7 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 	public getQueueSize(): number {
 		return 0;
 	}
-	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const sendersAddresses: Set<string> = new Set();
-
-		for (const transaction of unit.getBlock().transactions) {
-			sendersAddresses.add(transaction.from);
-		}
-
-		await this.transactionPoolMempool.reAddTransactions([...sendersAddresses.keys()]);
-	}
+	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {}
 
 	public async getTransactions(options: Contracts.TransactionPool.GetBatchOptions): Promise<Contracts.TransactionPool.GetBatchResult> {
 		const result =  {
