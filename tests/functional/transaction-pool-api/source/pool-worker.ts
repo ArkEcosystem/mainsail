@@ -34,10 +34,13 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 	}
 
 	public async getTransactions(options: Contracts.TransactionPool.GetBatchOptions): Promise<Contracts.TransactionPool.GetBatchResult> {
-		return {
+		const result =  {
 			remaining: 0,
 			transactions: (await this.poolQuery.getFromHighestPriority().all()).map((transaction) => transaction.toData()),
 		}
+
+		this.transactionPoolMempool.flush();
+		return result;
 	}
 
 	public async removeTransaction(address: string, hash: string): Promise<void> {
