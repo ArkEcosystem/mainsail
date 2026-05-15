@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { ServiceProvider as BlockchainUtilities } from "@mainsail/blockchain-utils";
 import { Identifiers } from "@mainsail/constants";
-import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
@@ -16,10 +17,10 @@ import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-trans
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
+import { ServiceProvider as Forger } from "@mainsail/forger";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
-import { ServiceProvider as Forger } from "@mainsail/forger";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
@@ -62,7 +63,6 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 
 	const workerPool = {
 		getWorker: () => ({
-			// @ts-ignore
 			consensusSignature: (method, message, privateKey) =>
 				context
 					.app!.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
@@ -72,7 +72,10 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	context.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
 	context.app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
-		getTransactionBytes: async () => [],
+		getTransactions: async () => ({
+			remaining: 0,
+			transactions: [],
+		}),
 	});
 
 	const validator = {
