@@ -1,5 +1,4 @@
 import { describe } from "@mainsail/test-runner";
-import { numberArray } from "./number-array";
 import { shuffle } from "./shuffle";
 
 describe("shuffle", async ({ assert, it, nock, loader }) => {
@@ -11,3 +10,5 @@ describe("shuffle", async ({ assert, it, nock, loader }) => {
 		assert.not.equal(shuffledValues, possibleValues);
 	});
 });
+
+const numberArray = (length: number): number[] => Array.from({ length }, (_, i) => i);

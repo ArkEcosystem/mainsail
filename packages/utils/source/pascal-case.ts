@@ -1,5 +1,4 @@
-import { compoundWords } from "./internal/compound-words.js";
-import { upperFirst } from "./upper-first.js";
-
 export const pascalCase = (value: string): string | undefined =>
-	compoundWords(value, (result: string, word: string) => result + upperFirst(word));
+	/[-_.\s]/.test(value)
+		? value.toLowerCase().replace(/(?:^|[-_.\s]+)([a-z0-9])/g, (_, c) => c.toUpperCase())
+		: value.replace(/^./, (c) => c.toUpperCase());

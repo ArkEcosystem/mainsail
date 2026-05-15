@@ -6,7 +6,6 @@ import { globalAgent as httpsGlobalAgent, request as httpsRequest } from "https"
 import { URL } from "url";
 
 import { isObject } from "./is-object.js";
-import { isUndefined } from "./is-undefined.js";
 
 const sendRequest = <T>(method: string, url: string, options?: HttpOptions): Promise<HttpResponse<T>> =>
 	new Promise((resolve, reject) => {
@@ -43,7 +42,7 @@ const sendRequest = <T>(method: string, url: string, options?: HttpOptions): Pro
 			options.agent = globalAgent;
 		}
 
-		if (isUndefined(options.timeout)) {
+		if (options.timeout === undefined) {
 			options.timeout = 1500;
 		}
 
