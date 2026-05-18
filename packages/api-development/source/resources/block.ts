@@ -1,11 +1,12 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { injectable } from "@mainsail/container";
+import { cloneDeep } from "@mainsail/utils";
 
 @injectable()
 export class BlockResource implements Contracts.Api.Resource {
 	public raw(resource: Contracts.Crypto.Block): object {
-		return JSON.parse(JSON.stringify(resource));
+		return cloneDeep(resource);
 	}
 
 	public async transform(block: Contracts.Crypto.Block): Promise<object> {

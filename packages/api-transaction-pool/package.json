@@ -26,6 +26,7 @@
 		"@mainsail/api-common": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"joi": "18.2.1"
 	},

@@ -1,5 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
+import { cloneDeep } from "@mainsail/utils";
 
 import { Application } from "@mainsail/kernel";
 import { describeSkip } from "@mainsail/test-runner";
@@ -142,7 +143,7 @@ describeSkip<{
 		async ({ context, dataset }) => {
 			const count = dataset;
 
-			const temporaryBlock = JSON.parse(JSON.stringify(context.block));
+			const temporaryBlock = cloneDeep(context.block);
 
 			temporaryBlock.data.id = "random_id";
 
