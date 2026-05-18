@@ -175,7 +175,6 @@ export const Identifiers = {
 	},
 	Forger: {
 		Block: Symbol("Forger<Block>"),
-		Transaction: Symbol("Forger<Transaction>"),
 	},
 	P2P: {
 		ApiNode: {
@@ -301,6 +300,7 @@ export const Identifiers = {
 		Processor: Symbol("TransactionPool<Processor>"),
 		ProcessorExtension: Symbol("TransactionPool<ProcessorExtension>"),
 		Query: Symbol("TransactionPool<Query>"),
+		Selector: Symbol("TransactionPool<Selector>"),
 		SenderMempool: {
 			Factory: Symbol("TransactionPool<SenderMempool.Factory>"),
 		},

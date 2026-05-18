@@ -12,7 +12,7 @@
 		"build:rs": "lerna run build-rs --scope=@mainsail/evm",
 		"build:rs:token": "echo \"force-rs $(date +%s)\" > .build-rs",
 		"build:ts": "lerna run build",
-		"build:ts:token": "echo \"force-ts $(date +%s)\" > .build-ts",
+		"build:ts:token": "echo \"force-ts $(date +%s)\" > .build-ts && pnpm run clean:packages",
 		"clean": "pnpm run clean:packages && rm -r .nx",
 		"clean:all": "pnpm run clean && pnpm run clean:node_modules",
 		"clean:node_modules": "rm -rf packages/*/node_modules && rm -rf node_modules",

@@ -3,6 +3,7 @@ export * from "./client.js";
 export * from "./mempool.js";
 export * from "./processor.js";
 export * from "./query.js";
+export * from "./selector.js";
 export * from "./sender-mempool.js";
 export * from "./sender-state.js";
 export * from "./service.js";

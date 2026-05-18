@@ -14,6 +14,9 @@ export class CommitHandler {
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPoolService!: Contracts.TransactionPool.Service;
 
+	@inject(Identifiers.TransactionPool.Selector)
+	private readonly selector!: Contracts.TransactionPool.Selector;
+
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
@@ -25,6 +28,7 @@ export class CommitHandler {
 	): Promise<void> {
 		try {
 			this.stateStore.setBlockNumber(blockNumber);
+			this.selector.clear();
 
 			if (this.configuration.isNewMilestone()) {
 				void this.transactionPoolService.reAddTransactions();
