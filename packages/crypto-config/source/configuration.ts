@@ -7,10 +7,8 @@ import {
 	InvalidNumberOfRoundValidatorsError,
 	MessageSchemaError,
 } from "@mainsail/exceptions";
-import { assert } from "@mainsail/utils";
+import { assert, cloneDeep, set } from "@mainsail/utils";
 import deepmerge from "deepmerge";
-import clone from "lodash.clone";
-import set from "lodash.set";
 
 type Config = {
 	config: Contracts.Crypto.NetworkConfig;
@@ -28,7 +26,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 	#verify = true;
 
 	public setConfig(config: Contracts.Crypto.NetworkConfigPartial, verify: boolean = true): void {
-		this.#originalMilestones = clone(config.milestones);
+		this.#originalMilestones = cloneDeep(config.milestones);
 		this.#height = config.genesisBlock.block.number;
 		this.#verify = verify;
 
@@ -42,7 +40,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 	public set<T = unknown>(key: string, value: T): void {
 		assert.defined(this.#configuration);
-		set(this.#configuration.config, key, clone(value));
+		set(this.#configuration.config, key, cloneDeep(value));
 
 		this.#buildConstants(this.#configuration.config);
 	}
@@ -172,9 +170,9 @@ export class Configuration implements Contracts.Crypto.Configuration {
 		this.#checkRoundValidators(config);
 
 		const buildConfig = {
-			genesisBlock: clone(config.genesisBlock),
+			genesisBlock: cloneDeep(config.genesisBlock),
 			milestones: this.#buildMilestones(config),
-			network: clone(config.network),
+			network: cloneDeep(config.network),
 		};
 
 		if (this.#verify) {
@@ -199,7 +197,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 	}
 
 	#buildMilestones(config: Contracts.Crypto.NetworkConfigPartial): Contracts.Crypto.Milestone[] {
-		const milestones = clone(config.milestones) as Contracts.Crypto.Milestone[];
+		const milestones = cloneDeep(config.milestones) as Contracts.Crypto.Milestone[];
 		milestones.sort((a, b) => a.height - b.height);
 
 		let lastMerged = 0;

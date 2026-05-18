@@ -7,7 +7,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 
 import { schemas } from "./schemas.js";
-import clone from "lodash.clone";
 
 describe<{
 	app: Application;
