@@ -507,6 +507,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       joi:
         specifier: 18.2.1
         version: 18.2.1
@@ -1334,18 +1337,6 @@ importers:
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
-      '@types/lodash.clone':
-        specifier: 4.5.9
-        version: 4.5.9
-      '@types/lodash.clonedeep':
-        specifier: 4.5.9
-        version: 4.5.9
-      lodash.clone:
-        specifier: 4.5.0
-        version: 4.5.0
-      lodash.clonedeep:
-        specifier: 4.5.0
-        version: 4.5.0
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -1449,12 +1440,6 @@ importers:
       deepmerge:
         specifier: 4.3.1
         version: 4.3.1
-      lodash.clone:
-        specifier: 4.5.0
-        version: 4.5.0
-      lodash.set:
-        specifier: 4.3.2
-        version: 4.3.2
     devDependencies:
       '@mainsail/contracts':
         specifier: workspace:*
@@ -1465,12 +1450,6 @@ importers:
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
-      '@types/lodash.clone':
-        specifier: 4.5.9
-        version: 4.5.9
-      '@types/lodash.set':
-        specifier: 4.3.9
-        version: 4.3.9
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -3229,6 +3208,9 @@ importers:
       deepmerge:
         specifier: 4.3.1
         version: 4.3.1
+      fast-copy:
+        specifier: 4.0.3
+        version: 4.0.3
       fast-sort:
         specifier: 3.4.1
         version: 3.4.1
@@ -5803,18 +5785,6 @@ packages:
   '@types/listr@0.14.10':
     resolution: {integrity: sha512-g5/EazbMACM1JrM/oGtW28vXo4Bv0E03/FIsqqIXbR/CztuHEgR8QAJDrB1Y5bQH7/ISQh0jNV3v65NM29HgAQ==}
 
-  '@types/lodash.clone@4.5.9':
-    resolution: {integrity: sha512-euFSUq+8csIliszqTBSMh7eU41/by1JPQhTNa2gq3dncxC2Z6s87bbzVB9UUBdYDbV+FV5whFDGxz6hOKTY/EQ==}
-
-  '@types/lodash.clonedeep@4.5.9':
-    resolution: {integrity: sha512-19429mWC+FyaAhOLzsS8kZUsI+/GmBAQ0HFiCPsKGU+7pBXOQWhyrY6xNNDwUSX8SMZMJvuFVMF9O5dQOlQK9Q==}
-
-  '@types/lodash.set@4.3.9':
-    resolution: {integrity: sha512-KOxyNkZpbaggVmqbpr82N2tDVTx05/3/j0f50Es1prxrWB0XYf9p3QNxqcbWb7P1Q9wlvsUSlCFnwlPCIJ46PQ==}
-
-  '@types/lodash@4.17.20':
-    resolution: {integrity: sha512-H3MHACvFUEiujabxhaI/ImO6gUrd8oOurg7LQtS7mbwIXA/cUqWrvBsaeJ23aZEPk1TAYkurjfMbSELfoCXlGA==}
-
   '@types/log-process-errors@9.1.0':
     resolution: {integrity: sha512-NUMJHNeD7gepArWABuG8U9gvOtjmxGXS7Vst3QEiw4kPp86fwoKup1m7MCBUjfgXut5cXYNDwPWfAlWb1m3Nrg==}
     deprecated: This is a stub types definition. log-process-errors provides its own type definitions, so you do not need this installed.
@@ -7501,6 +7471,9 @@ packages:
   fast-copy@4.0.2:
     resolution: {integrity: sha512-ybA6PDXIXOXivLJK/z9e+Otk7ve13I4ckBvGO5I2RRmBU1gMHLVDJYEuJYhGwez7YNlYji2M2DvVU+a9mSFDlw==}
 
+  fast-copy@4.0.3:
+    resolution: {integrity: sha512-58apWr0GUiDFM8+3afrO6eYwJBn9ZAhDOzG3L+/9llab/haCARS2UIfffmOurYLwbgDRs8n0rfr6qAAPEAuAQw==}
+
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
 
@@ -8605,13 +8578,6 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
-  lodash.clone@4.5.0:
-    resolution: {integrity: sha512-GhrVeweiTD6uTmmn5hV/lzgCQhccwReIVRLHp7LT4SopOjqEZ5BbX8b5WWEtAKasjmy8hR7ZPwsYlxRCku5odg==}
-    deprecated: This package is deprecated. Use structuredClone instead.
-
-  lodash.clonedeep@4.5.0:
-    resolution: {integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==}
-
   lodash.isfunction@3.0.9:
     resolution: {integrity: sha512-AirXNj15uRIMMPihnkInB4i3NHeb4iBtNg9WRWuK2o31S+ePwwNmDPaTL3o7dTJ+VXNZim7rFs4rxN4YU1oUJw==}
 
@@ -8623,9 +8589,6 @@ packages:
 
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
-
-  lodash.set@4.3.2:
-    resolution: {integrity: sha512-4hNPN5jlm/N/HLMCO43v8BXKq9Z7QdAGc/VGrRD61w8gN9g/6jF9A4L1pbUgBLCffi0w9VsXfTOij5x8iTyFvg==}
 
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
@@ -12962,20 +12925,6 @@ snapshots:
       '@types/node': 24.3.0
       rxjs: 6.6.7
 
-  '@types/lodash.clone@4.5.9':
-    dependencies:
-      '@types/lodash': 4.17.20
-
-  '@types/lodash.clonedeep@4.5.9':
-    dependencies:
-      '@types/lodash': 4.17.20
-
-  '@types/lodash.set@4.3.9':
-    dependencies:
-      '@types/lodash': 4.17.20
-
-  '@types/lodash@4.17.20': {}
-
   '@types/log-process-errors@9.1.0':
     dependencies:
       log-process-errors: 12.0.1
@@ -14881,6 +14830,8 @@ snapshots:
 
   fast-copy@4.0.2: {}
 
+  fast-copy@4.0.3: {}
+
   fast-deep-equal@3.1.3: {}
 
   fast-diff@1.3.0: {}
@@ -16100,10 +16051,6 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
-  lodash.clone@4.5.0: {}
-
-  lodash.clonedeep@4.5.0: {}
-
   lodash.isfunction@3.0.9: {}
 
   lodash.ismatch@4.4.0: {}
@@ -16111,8 +16058,6 @@ snapshots:
   lodash.isnumber@3.0.3: {}
 
   lodash.merge@4.6.2: {}
-
-  lodash.set@4.3.2: {}
 
   lodash@4.17.21: {}
 
