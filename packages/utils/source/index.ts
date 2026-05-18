@@ -1,6 +1,7 @@
 export * from "./assert.js";
 export * from "./byte-buffer.js";
 export * from "./chunk.js";
+export * from "./clone-deep.js";
 export * from "./dot-env.js";
 export * from "./expand-tilde.js";
 export * from "./format-ecdsa-signature.js";
