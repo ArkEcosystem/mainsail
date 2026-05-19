@@ -480,8 +480,29 @@ impl PersistentDB {
         })
     }
 
-    pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) {
+    pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) -> Result<(), Error> {
+        let mut wtxn = self.env.write_txn()?;
+        let inner = self.inner.borrow_mut();
+
+        if inner
+            .accounts
+            .get(&wtxn, &AddressWrapper(genesis_info.account))?
+            .is_none()
+        {
+            inner.accounts.put(
+                &mut wtxn,
+                &AddressWrapper(genesis_info.account),
+                &CompressedBincode(&StoredAccountInfo::new(
+                    genesis_info.initial_supply,
+                    0,
+                    KECCAK_EMPTY,
+                )),
+            )?;
+        }
+
+        wtxn.commit()?;
         self.genesis_info.replace(genesis_info);
+        Ok(())
     }
 
     pub fn get_accounts(
@@ -752,18 +773,12 @@ impl DatabaseRef for PersistentDB {
         let txn = self.env.read_txn()?;
         let inner = self.inner.borrow();
 
-        let basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
-            Some(account) => account.0.into(),
-            None => match &self.genesis_info {
-                Some(genesis) if genesis.account == address => revm::state::AccountInfo {
-                    balance: genesis.initial_supply,
-                    ..Default::default()
-                },
-                _ => AccountInfo::default(),
-            },
-        };
+        let basic = inner
+            .accounts
+            .get(&txn, &AddressWrapper(address))?
+            .map(|a| a.0.into());
 
-        Ok(basic.into())
+        Ok(basic)
     }
 
     fn code_by_hash_ref(&self, code_hash: B256) -> Result<Bytecode, Self::Error> {
