@@ -1311,7 +1311,7 @@ mod tests {
         state_commit::{StateCommit, build_commit},
         state_root,
     };
-    use alloy_primitives::{Address, B256, Bytes, FixedBytes, U256, address, b256, hex};
+    use alloy_primitives::{Address, B256, Bytes, U256, address, b256};
     use revm::{
         Database,
         context::result::{ExecutionResult, ResultGas, SuccessReason},
@@ -1353,14 +1353,8 @@ mod tests {
 
         // 1) Lookup empty account
         let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
-        let account = db.basic(address).expect("works").expect("account info");
-
-        assert_eq!(
-            account.code_hash,
-            FixedBytes(hex!(
-                "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
-            ))
-        );
+        let account = db.basic(address).expect("works");
+        assert_eq!(account, None);
 
         // 2) Update balance for account
         let mut state = HashMap::default();
@@ -1992,7 +1986,8 @@ mod tests {
             account: genesis,
             initial_supply: U256::from(1_000_000),
             ..Default::default()
-        });
+        })
+        .unwrap();
 
         let info = db.basic(genesis).unwrap();
         assert_eq!(
@@ -2004,7 +1999,7 @@ mod tests {
         );
 
         let info = db.basic(account).unwrap();
-        assert_eq!(info, Some(Default::default()));
+        assert_eq!(info, None);
     }
 
     #[test]
@@ -2125,7 +2120,7 @@ mod tests {
 
         assert_eq!(db.genesis_info, None);
 
-        db.set_genesis_info(Default::default());
+        db.set_genesis_info(Default::default()).expect("ok");
 
         assert_eq!(db.genesis_info, Some(Default::default()));
     }
