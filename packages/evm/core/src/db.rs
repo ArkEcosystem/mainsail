@@ -498,9 +498,9 @@ impl PersistentDB {
                     KECCAK_EMPTY,
                 )),
             )?;
+            wtxn.commit()?;
         }
 
-        wtxn.commit()?;
         self.genesis_info.replace(genesis_info);
         Ok(())
     }
