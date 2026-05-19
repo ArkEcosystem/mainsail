@@ -460,7 +460,7 @@ mod tests {
         assert!(cache_account2.account.is_none());
         assert_eq!(
             cache_account2.status,
-            revm::database::AccountStatus::Destroyed
+            revm::database::AccountStatus::LoadedNotExisting
         );
 
         let transition_account1 = pending
@@ -475,16 +475,7 @@ mod tests {
         );
         assert_eq!(transition_account1.storage_was_destroyed, false);
 
-        let transition_account2 = pending
-            .transitions
-            .transitions
-            .get(&account2)
-            .expect("transition_account2");
-        assert!(transition_account2.info.is_none());
-        assert_eq!(
-            transition_account2.status,
-            revm::database::AccountStatus::Destroyed
-        );
-        assert_eq!(transition_account2.storage_was_destroyed, true);
+        let transition_account2 = pending.transitions.transitions.get(&account2);
+        assert_eq!(transition_account2, None);
     }
 }

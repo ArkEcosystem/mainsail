@@ -480,8 +480,29 @@ impl PersistentDB {
         })
     }
 
-    pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) {
+    pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) -> Result<(), Error> {
+        let mut wtxn = self.env.write_txn()?;
+        let inner = self.inner.borrow_mut();
+
+        if inner
+            .accounts
+            .get(&wtxn, &AddressWrapper(genesis_info.account))?
+            .is_none()
+        {
+            inner.accounts.put(
+                &mut wtxn,
+                &AddressWrapper(genesis_info.account),
+                &CompressedBincode(&StoredAccountInfo::new(
+                    genesis_info.initial_supply,
+                    0,
+                    KECCAK_EMPTY,
+                )),
+            )?;
+            wtxn.commit()?;
+        }
+
         self.genesis_info.replace(genesis_info);
+        Ok(())
     }
 
     pub fn get_accounts(
@@ -752,18 +773,12 @@ impl DatabaseRef for PersistentDB {
         let txn = self.env.read_txn()?;
         let inner = self.inner.borrow();
 
-        let basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
-            Some(account) => account.0.into(),
-            None => match &self.genesis_info {
-                Some(genesis) if genesis.account == address => revm::state::AccountInfo {
-                    balance: genesis.initial_supply,
-                    ..Default::default()
-                },
-                _ => AccountInfo::default(),
-            },
-        };
+        let basic = inner
+            .accounts
+            .get(&txn, &AddressWrapper(address))?
+            .map(|a| a.0.into());
 
-        Ok(basic.into())
+        Ok(basic)
     }
 
     fn code_by_hash_ref(&self, code_hash: B256) -> Result<Bytecode, Self::Error> {
@@ -1296,7 +1311,7 @@ mod tests {
         state_commit::{StateCommit, build_commit},
         state_root,
     };
-    use alloy_primitives::{Address, B256, Bytes, FixedBytes, U256, address, b256, hex};
+    use alloy_primitives::{Address, B256, Bytes, U256, address, b256};
     use revm::{
         Database,
         context::result::{ExecutionResult, ResultGas, SuccessReason},
@@ -1338,14 +1353,8 @@ mod tests {
 
         // 1) Lookup empty account
         let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
-        let account = db.basic(address).expect("works").expect("account info");
-
-        assert_eq!(
-            account.code_hash,
-            FixedBytes(hex!(
-                "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
-            ))
-        );
+        let account = db.basic(address).expect("works");
+        assert_eq!(account, None);
 
         // 2) Update balance for account
         let mut state = HashMap::default();
@@ -1977,7 +1986,8 @@ mod tests {
             account: genesis,
             initial_supply: U256::from(1_000_000),
             ..Default::default()
-        });
+        })
+        .unwrap();
 
         let info = db.basic(genesis).unwrap();
         assert_eq!(
@@ -1989,7 +1999,7 @@ mod tests {
         );
 
         let info = db.basic(account).unwrap();
-        assert_eq!(info, Some(Default::default()));
+        assert_eq!(info, None);
     }
 
     #[test]
@@ -2110,7 +2120,7 @@ mod tests {
 
         assert_eq!(db.genesis_info, None);
 
-        db.set_genesis_info(Default::default());
+        db.set_genesis_info(Default::default()).expect("ok");
 
         assert_eq!(db.genesis_info, Some(Default::default()));
     }

@@ -196,16 +196,19 @@ impl EvmInner {
         &mut self,
         genesis_ctx: GenesisContext,
     ) -> std::result::Result<(), EVMError<String>> {
-        self.persistent_db.set_genesis_info(GenesisInfo {
+        match self.persistent_db.set_genesis_info(GenesisInfo {
             account: genesis_ctx.account,
             deployer_account: genesis_ctx.deployer_account,
             validator_contract: genesis_ctx.validator_contract,
             username_contract: genesis_ctx.username_contract,
             initial_block_number: genesis_ctx.initial_block_number,
             initial_supply: genesis_ctx.initial_supply,
-        });
-
-        Ok(())
+        }) {
+            Ok(_) => Ok(()),
+            Err(err) => Err(EVMError::Database(
+                format!("set_genesis_info failed: {}", err).into(),
+            )),
+        }
     }
 
     pub fn calculate_round_validators(
