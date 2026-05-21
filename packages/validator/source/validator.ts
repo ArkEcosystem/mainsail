@@ -69,6 +69,7 @@ export class Validator implements Contracts.Validator.Validator {
 				validatorIndex,
 			},
 			await this.#keyPair.getKeyPair(),
+			this.#getSignatureContext(),
 		);
 	}
 
@@ -87,6 +88,14 @@ export class Validator implements Contracts.Validator.Validator {
 				validatorIndex,
 			},
 			await this.#keyPair.getKeyPair(),
+			this.#getSignatureContext(),
 		);
+	}
+
+	#getSignatureContext(): Contracts.Crypto.SignatureMessageContext {
+		return {
+			genesisBlockHash: this.stateStore.getGenesisCommit().block.hash,
+			previousBlockHash: this.stateStore.getLastBlock().hash,
+		};
 	}
 }

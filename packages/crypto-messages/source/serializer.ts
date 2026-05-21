@@ -32,16 +32,24 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 		});
 	}
 
-	public async serializeMessageForSignature(message: Contracts.Crypto.SignatureMessageData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.SignatureMessageData>(message, {
-			length:
-				1 + // type
-				4 + // blockNumber
-				4 + // round
-				1 + // blockHash presence flag
-				(message.blockHash ? this.hashSize : 0), // blockHash
-			schema: schemaForSignature,
-			skip: 0,
-		});
+	public async serializeMessageForSignature(
+		message: Contracts.Crypto.SignatureMessageData,
+		context: Contracts.Crypto.SignatureMessageContext,
+	): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.SignatureMessageData & Contracts.Crypto.SignatureMessageContext>(
+			{ ...context, ...message },
+			{
+				length:
+					this.hashSize + // genesisBlockHash
+					this.hashSize + // previousBlockHash
+					1 + // type
+					4 + // blockNumber
+					4 + // round
+					1 + // blockHash presence flag
+					(message.blockHash ? this.hashSize : 0), // blockHash
+				schema: schemaForSignature,
+				skip: 0,
+			},
+		);
 	}
 }

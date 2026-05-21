@@ -10,6 +10,11 @@ export interface SignatureMessageData {
 	readonly blockHash?: string;
 }
 
+export interface SignatureMessageContext {
+	readonly genesisBlockHash: string;
+	readonly previousBlockHash: string;
+}
+
 export interface MakeMessageData extends SignatureMessageData {
 	readonly validatorIndex: number;
 }
@@ -24,13 +29,20 @@ export interface Message extends MessageData {
 }
 
 export interface MessageFactory {
-	makeMessage(data: MakeMessageData, keyPair: KeyPair): Promise<Message>;
+	makeMessage(
+		data: MakeMessageData,
+		keyPair: KeyPair,
+		context: SignatureMessageContext,
+	): Promise<Message>;
 	makeMessageFromBytes(data: Buffer): Promise<Message>;
 }
 
 export interface MessageSerializer {
 	serializeMessage(message: MessageData): Promise<Buffer>;
-	serializeMessageForSignature(message: SignatureMessageData): Promise<Buffer>;
+	serializeMessageForSignature(
+		message: SignatureMessageData,
+		context: SignatureMessageContext,
+	): Promise<Buffer>;
 }
 
 export interface MessageDeserializer {

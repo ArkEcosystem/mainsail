@@ -110,7 +110,10 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 		return worker.consensusSignature(
 			"verify",
 			Buffer.from(message.signature, "hex"),
-			await this.serializer.serializeMessageForSignature(message),
+			await this.serializer.serializeMessageForSignature(message, {
+				genesisBlockHash: this.stateStore.getGenesisCommit().block.hash,
+				previousBlockHash: this.stateStore.getLastBlock().hash,
+			}),
 			Buffer.from(this.validatorSet.getValidator(message.validatorIndex).blsPublicKey, "hex"),
 		);
 	}
