@@ -3093,6 +3093,7 @@ dependencies = [
  "alloy-sol-types",
  "anyhow",
  "bincode",
+ "blst",
  "bs58",
  "bytes",
  "derive_more 2.1.1",

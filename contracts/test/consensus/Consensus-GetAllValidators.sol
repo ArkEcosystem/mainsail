@@ -10,12 +10,14 @@ contract ConsensusTest is Base {
         vm.pauseGasMetering();
         assertEq(consensus.validatorsCount(), 0);
 
+        bytes memory pop = createValidPop();
+
         uint256 n = 200;
         for (uint256 i = 0; i < n; i++) {
             address addr = address(uint160(i + 1));
 
             vm.startPrank(addr);
-            consensus.registerValidator(prepareBLSKey(addr));
+            consensus.registerValidator(prepareBLSKey(addr), pop);
             consensus.vote(addr);
             vm.stopPrank();
         }

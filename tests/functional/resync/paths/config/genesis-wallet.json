@@ -1,14 +1,14 @@
 {
-    "address": "0xd27a09189112D26ED1a243f252da588032d642c9",
+    "address": "0xA92D69b4CC15dd3940ff8B247533302D3Bab4Ff2",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "4ca884dde72cbfc06f5beccfa808a1dfe10220b08075542babd4b63ab72e46cf",
-        "publicKey": "b1d8f05088f1b497a7ff4dfb077126283e80b695d0c35866dc56ded6a40165124c622e526d9e42722522a6cbb48fe37b"
+        "privateKey": "40ccc91b2e0a06a4a819947893d48ec617ef4b662aa618eb087e06c0992318ff",
+        "publicKey": "b05c48df326aae69cf0d11d0ede76c5a38f3b50393e4ac61b657603f31c8d9fb69094f2794851b430f1f1d8429652358"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "f6ef63e4e49be1aaab915fa286b90c0ef67bb78fb75b62969e528c632a4c093e",
-        "publicKey": "02d8df07389b4d9d4c25cfd83a3fb772b2918a56abea0462b1690516c2b743da0a"
+        "privateKey": "e7748bfed0a9958a65e54bc76314c43d070da9c3c1c97d9c0c7bc0099fc83c0b",
+        "publicKey": "0300790569f4d0d6d13e8960e73ccb1f91fb986d216ba212a07e192b06924698d9"
     },
-    "passphrase": "parent fine adapt bird rebuild bunker acoustic win seven virus assault winner tragic moral impact leisure lab salad expect please soft spot peace honey"
+    "passphrase": "chimney trip drink twelve scout open confirm unusual flag life response club camera village pill hope silk key absorb skirt phone view divide aspect"
 }

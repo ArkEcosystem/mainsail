@@ -39,13 +39,15 @@ contract ConsensusTest is Base {
     function test_proxy_should_update_and_perserve_variables() public {
         assertEq(consensus.version(), 1);
 
+        bytes memory pop = createValidPop();
+
         // Register valdiators
         vm.startPrank(address(1));
-        consensus.registerValidator(prepareBLSKey(address(1)));
+        consensus.registerValidator(prepareBLSKey(address(1)), pop);
         vm.startPrank(address(2));
-        consensus.registerValidator(prepareBLSKey(address(2)));
+        consensus.registerValidator(prepareBLSKey(address(2)), pop);
         vm.startPrank(address(3));
-        consensus.registerValidator(prepareBLSKey(address(3)));
+        consensus.registerValidator(prepareBLSKey(address(3)), pop);
 
         // Resign valdiator
         consensus.resignValidator();

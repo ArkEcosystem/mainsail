@@ -3,6 +3,7 @@ pragma solidity ^0.8.27;
 
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {BLSPoP} from "./BLSPoP.sol";
 
 // Validators:
 // - Registered validators -> All validators that are registered including resigned validators
@@ -82,6 +83,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     error BlsKeyAlreadyRegistered();
     error BlsKeyIsInvalid();
+    error InvalidProofOfPossession();
 
     error VoteResignedValidator();
     error VoteSameValidator();
@@ -131,6 +133,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         emit FeeUpdated(registrationFee);
     }
 
+    // TODO: import validator without bls public key
     function addValidator(address addr, bytes calldata blsPublicKey, bool isResigned) external onlyOwner {
         if (_rounds.length > 0) {
             revert ImportIsNotAllowed();
@@ -208,13 +211,17 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         emit Voted(voter, validator);
     }
 
-    function registerValidator(bytes calldata blsPublicKey) external payable {
+    function registerValidator(bytes calldata blsPublicKey, bytes calldata proofOfPossession) external payable {
         if (msg.value != _fee) {
             revert InvalidFee();
         }
 
         if (_hasValidator[msg.sender]) {
             revert ValidatorAlreadyRegistered();
+        }
+
+        if (!BLSPoP.verify(blsPublicKey, proofOfPossession)) {
+            revert InvalidProofOfPossession();
         }
 
         _verifyAndRegisterBlsPublicKey(blsPublicKey);
@@ -231,9 +238,13 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         emit ValidatorRegistered(msg.sender, blsPublicKey);
     }
 
-    function updateValidator(bytes calldata blsPublicKey) external {
+    function updateValidator(bytes calldata blsPublicKey, bytes calldata proofOfPossession) external {
         if (!isValidatorRegistered(msg.sender)) {
             revert ValidatorNotRegistered();
+        }
+
+        if (!BLSPoP.verify(blsPublicKey, proofOfPossession)) {
+            revert InvalidProofOfPossession();
         }
 
         _verifyAndRegisterBlsPublicKey(blsPublicKey);

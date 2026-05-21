@@ -31,7 +31,7 @@ export interface EvmCallOptions extends TransactionOptions {
 }
 
 export interface ValidatorRegistrationOptions extends EvmCallOptions {
-	validatorPublicKey?: string;
+	validatorKeyPair: Contracts.Crypto.KeyPair;
 }
 
 export type ValidatorResignationOptions = EvmCallOptions;

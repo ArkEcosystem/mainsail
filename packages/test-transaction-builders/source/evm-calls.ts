@@ -1,10 +1,11 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Identifiers } from "@mainsail/constants";
+import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, MultiPaymentAbi, UsernamesAbi } from "@mainsail/evm-contracts";
-import { decodeFunctionResult, encodeFunctionData, parseEther, toBytes, toHex, zeroAddress } from "viem";
+import { bytesToHex, decodeFunctionResult, encodeFunctionData, parseEther, toBytes, toHex, zeroAddress } from "viem";
 
 import type {
 	Context,
@@ -76,15 +77,16 @@ export const makeEvmCallDeployErc20Contract = async (
 
 export const makeValidatorRegistration = async (
 	{ app, wallets }: Context,
-	options: ValidatorRegistrationOptions = {},
+	options: ValidatorRegistrationOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
-	let { gasLimit, gasPrice, payload, recipient, sender, value } = options;
+	let { gasLimit, gasPrice, payload, recipient, sender, validatorKeyPair, value } = options;
 	sender = sender ?? wallets[0];
 
 	gasPrice = gasPrice ?? 5 * 1e9;
 
 	if (!payload) {
-		payload = encodeValidatorRegistration(options.validatorPublicKey ?? "");
+		const { pop } = buildProofOfPossession(Buffer.from(validatorKeyPair.privateKey, "hex"));
+		payload = encodeValidatorRegistration(validatorKeyPair.publicKey, pop);
 	}
 
 	if (!recipient) {
@@ -105,7 +107,7 @@ export const makeValidatorRegistration = async (
 
 	builder = builder
 		.recipientAddress(recipient)
-		.gasLimit(gasLimit ?? 300_000)
+		.gasLimit(gasLimit ?? 500_000)
 		.payload(payload);
 
 	return buildSignedTransaction(app, builder, sender, options);
@@ -287,10 +289,10 @@ export const encodeMultiPayment = (recipients: string[], amounts: (number | stri
 		functionName: "pay",
 	}).slice(2);
 
-export const encodeValidatorRegistration = (validatorPublicKey: string): string =>
+export const encodeValidatorRegistration = (validatorPublicKey: string, pop: Uint8Array): string =>
 	encodeFunctionData({
 		abi: ConsensusAbi.abi,
-		args: [validatorPublicKey?.startsWith("0x") ? validatorPublicKey : `0x${validatorPublicKey}`],
+		args: [validatorPublicKey?.startsWith("0x") ? validatorPublicKey : `0x${validatorPublicKey}`, bytesToHex(pop)],
 		functionName: "registerValidator",
 	}).slice(2);
 

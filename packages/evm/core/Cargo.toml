@@ -23,6 +23,7 @@ tokio = { workspace = true }
 #heed = { path = "../../../../heed/heed", features = [] }
 heed = { git = "https://github.com/ArkEcosystem/heed.git", rev = "7a7a030113664e004b082e6805431381d9e9140a", features = [
 ] }
+blst = { version = "0.3.16" }
 rayon = "1.10.0"
 derive_more = { version = "2" }
 bytes = { version = "1.0" }

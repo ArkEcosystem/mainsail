@@ -1,14 +1,14 @@
 {
-    "address": "0xA5d751A5F645856fDE0931DbE543099198a44B50",
+    "address": "0xED1A7039b8C7EdB66367D6fC3679e3043e7C3Ca5",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "5769d4fd653476011911494814d88524b9f454c7435670b470ffb34baeb48491",
-        "publicKey": "80ad4d6e3096d0c442652695516f1d1834fc9c8878f284fd53632d16b3a7118301c7768936d65222d48197da759687ad"
+        "privateKey": "71908e4c5acb2d4e79fe8889ffb4003ff354803e96946e72b9bc37d636d41110",
+        "publicKey": "8c26444b3ffb9d3a6f7f592acaf817f03fca09bb0038863c8ee68c005d6be8a4bc118115e61fb58b2bd924bca653555b"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "8b7cc084bea7fdd769282c6f0c3dada16bfe512c4546831e7b14179f9f09a72e",
-        "publicKey": "02a251c8dd30cb0b672ca74eadd6076c6d6bf6e592a8b3672943dc308126899e7c"
+        "privateKey": "a3c4084e4cddfb74f67392713cb63a2ba7c0dd27637f9bc9fee00f8b232fe4a2",
+        "publicKey": "034176344f847abf66ec3309e716cf48ed25a6e37546c1c5c8b064935e5e4dfa20"
     },
-    "passphrase": "deer flock law wrestle boss kidney matter hour claw pole barely property story dismiss inquiry remove flame dog estate hub million place pave category"
+    "passphrase": "pulse senior burger fall intact person loud mind verb amount illegal dry sugar right sweet certain enforce release energy denial pause this gather industry"
 }

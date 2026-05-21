@@ -1,3 +1,4 @@
+export * from "./build-proof-of-possession.js";
 export * from "./get-bls.js";
 export * from "./pair.js";
 export * from "./private.js";
