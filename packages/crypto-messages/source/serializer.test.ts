@@ -123,9 +123,7 @@ describe<{
 		assert.not.equal(a, b);
 	});
 
-	it("#serializeMessage - wire format must not depend on signing context", async ({
-		serializer,
-	}) => {
+	it("#serializeMessage - wire format must not depend on signing context", async ({ serializer }) => {
 		const wire = (await serializer.serializeMessage(prevoteData)).toString("hex");
 		assert.equal(wire, serializedPrevote);
 		assert.false(wire.includes(signatureContext.genesisBlockHash));
