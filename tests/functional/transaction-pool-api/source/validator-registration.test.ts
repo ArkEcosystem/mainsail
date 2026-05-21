@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { describe } from "@mainsail/test-runner";
 import { ConsensusAbi, parseTransactionError } from "@mainsail/evm-contracts";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
+import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
 import {
@@ -169,5 +170,40 @@ describe<{
 
 		const error = parseTransactionError(tx, receipt!);
 		assert.equal(error, "BlsKeyAlreadyRegistered");
+	});
+
+	it("should reject validator registration if PoP is invalid", async (context) => {
+		const randomWallet = await Utils.getRandomColdWallet(context);
+
+		const fundTx = await EvmCalls.makeEvmCall(context, {
+			recipient: randomWallet.address,
+			value: parseEther("1000"),
+		});
+		await addTransactionsToPool(context, [fundTx]);
+		await waitBlock(context);
+
+		const validatorKeyPair = await getRandomConsensusKeyPair(context);
+		const validatorKeyPairFake = await getRandomConsensusKeyPair(context);
+
+		const { pop: fakePop } = buildProofOfPossession(Buffer.from(validatorKeyPairFake.privateKey, "hex"));
+		const payload = EvmCalls.encodeValidatorRegistration(validatorKeyPair.publicKey, fakePop);
+
+		let tx = await EvmCalls.makeValidatorRegistration(context, {
+			sender: randomWallet.keyPair,
+			validatorKeyPair,
+			payload,
+		});
+
+		let { accept } = await addTransactionsToPool(context, [tx]);
+		assert.equal(accept, [0]);
+
+		await waitBlock(context);
+		assert.true(await isTransactionCommitted(context, tx));
+		let receipt = await getTransactionReceipt(context, tx);
+		assert.defined(receipt);
+		assert.equal(receipt!.status, 0);
+
+		const error = parseTransactionError(tx, receipt!);
+		assert.equal(error, "InvalidProofOfPossession");
 	});
 });
