@@ -45,10 +45,10 @@ describe<{
 		await addTransactionsToPool(context, [fundTx]);
 		await waitBlock(context);
 
-		const { publicKey: validatorPublicKey } = await getRandomConsensusKeyPair(context);
+		const validatorKeyPair = await getRandomConsensusKeyPair(context);
 		const tx = await EvmCalls.makeValidatorRegistration(context, {
 			sender: randomWallet.keyPair,
-			validatorPublicKey,
+			validatorKeyPair,
 		});
 
 		const { accept } = await addTransactionsToPool(context, [tx]);
@@ -70,7 +70,7 @@ describe<{
 
 		assert.equal(decoded.args, {
 			addr: randomWallet.address,
-			blsPublicKey: `0x${validatorPublicKey}`,
+			blsPublicKey: `0x${validatorKeyPair.publicKey}`,
 		});
 	});
 
@@ -85,10 +85,10 @@ describe<{
 		await waitBlock(context);
 
 		// Register first time
-		const { publicKey: validatorPublicKey } = await getRandomConsensusKeyPair(context);
+		const validatorKeyPair = await getRandomConsensusKeyPair(context);
 		let tx = await EvmCalls.makeValidatorRegistration(context, {
 			sender: randomWallet.keyPair,
-			validatorPublicKey,
+			validatorKeyPair,
 		});
 
 		let { accept } = await addTransactionsToPool(context, [tx]);
@@ -101,10 +101,10 @@ describe<{
 		assert.equal(receipt!.status, 1);
 
 		// Register second time (different key)
-		const { publicKey: validatorPublicKey2 } = await getRandomConsensusKeyPair(context);
+		const validatorKeyPair2 = await getRandomConsensusKeyPair(context);
 		tx = await EvmCalls.makeValidatorRegistration(context, {
 			sender: randomWallet.keyPair,
-			validatorPublicKey: validatorPublicKey2,
+			validatorKeyPair: validatorKeyPair2,
 		});
 
 		({ accept } = await addTransactionsToPool(context, [tx]));
@@ -134,12 +134,12 @@ describe<{
 			await waitBlock(context);
 		}
 
-		const { publicKey: validatorPublicKey } = await getRandomConsensusKeyPair(context);
+		const validatorKeyPair = await getRandomConsensusKeyPair(context);
 
 		// Register key first time with wallet 1
 		let tx = await EvmCalls.makeValidatorRegistration(context, {
 			sender: randomWallet1.keyPair,
-			validatorPublicKey,
+			validatorKeyPair,
 		});
 
 		let { accept } = await addTransactionsToPool(context, [tx]);
@@ -154,7 +154,7 @@ describe<{
 		// Register key second time with wallet 2
 		tx = await EvmCalls.makeValidatorRegistration(context, {
 			sender: randomWallet2.keyPair,
-			validatorPublicKey,
+			validatorKeyPair,
 		});
 
 		({ accept } = await addTransactionsToPool(context, [tx]));

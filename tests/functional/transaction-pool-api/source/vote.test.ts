@@ -45,10 +45,10 @@ describe<{
 		await addTransactionsToPool(context, [fundTx]);
 		await waitBlock(context);
 
-		const { publicKey: validatorPublicKey } = await getRandomConsensusKeyPair(context);
+		const validatorKeyPair = await getRandomConsensusKeyPair(context);
 		let tx = await EvmCalls.makeValidatorRegistration(context, {
 			sender: randomWallet.keyPair,
-			validatorPublicKey,
+			validatorKeyPair,
 		});
 
 		let { accept } = await addTransactionsToPool(context, [tx]);
@@ -96,10 +96,10 @@ describe<{
 		await addTransactionsToPool(context, [fundTx]);
 		await waitBlock(context);
 
-		const { publicKey: validatorPublicKey } = await getRandomConsensusKeyPair(context);
+		const validatorKeyPair = await getRandomConsensusKeyPair(context);
 		let tx = await EvmCalls.makeValidatorRegistration(context, {
 			sender: randomWallet.keyPair,
-			validatorPublicKey,
+			validatorKeyPair,
 		});
 
 		let { accept } = await addTransactionsToPool(context, [tx]);
@@ -162,10 +162,10 @@ describe<{
 		await addTransactionsToPool(context, [fundTx]);
 		await waitBlock(context);
 
-		const { publicKey: validatorPublicKey } = await getRandomConsensusKeyPair(context);
+		const validatorKeyPair = await getRandomConsensusKeyPair(context);
 		let tx = await EvmCalls.makeValidatorRegistration(context, {
 			sender: randomWallet.keyPair,
-			validatorPublicKey,
+			validatorKeyPair,
 		});
 
 		let { accept } = await addTransactionsToPool(context, [tx]);
@@ -223,10 +223,10 @@ describe<{
 		await addTransactionsToPool(context, [fundTx]);
 		await waitBlock(context);
 
-		const { publicKey: validatorPublicKey } = await getRandomConsensusKeyPair(context);
+		const validatorKeyPair = await getRandomConsensusKeyPair(context);
 		let tx = await EvmCalls.makeValidatorRegistration(context, {
 			sender: randomWallet.keyPair,
-			validatorPublicKey,
+			validatorKeyPair,
 		});
 
 		let { accept } = await addTransactionsToPool(context, [tx]);
