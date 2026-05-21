@@ -55,14 +55,18 @@ export class Message implements Contracts.Crypto.Message {
 		return this.#serialized;
 	}
 
-	toString(): string {
-		return JSON.stringify({
+	toData(): Contracts.Crypto.MessageData {
+		return {
 			blockHash: this.#blockHash,
 			blockNumber: this.#blockNumber,
 			round: this.#round,
 			signature: this.#signature,
 			type: this.#type,
 			validatorIndex: this.#validatorIndex,
-		});
+		};
+	}
+
+	toString(): string {
+		return JSON.stringify(this.toData());
 	}
 }

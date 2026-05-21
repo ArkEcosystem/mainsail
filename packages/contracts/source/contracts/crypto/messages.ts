@@ -25,6 +25,7 @@ export interface MessageData extends MakeMessageData {
 
 export interface Message extends MessageData {
 	readonly serialized: Buffer;
+	toData(): MessageData;
 	toString(): string;
 }
 
