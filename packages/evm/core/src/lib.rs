@@ -7,6 +7,7 @@ pub mod historical;
 pub mod legacy;
 pub mod logger;
 pub mod logs_bloom;
+pub mod precompiles;
 pub mod receipt;
 pub mod state_changes;
 pub mod state_commit;
