@@ -80,4 +80,55 @@ describe<{
 		const serialized = (await serializer.serializeMessage(precommitDataNoBlock)).toString("hex");
 		assert.equal(serialized, serializedPrecommitNoBlock);
 	});
+
+	it("#serializeMessageForSignature - different genesisBlockHash should produce different bytes (cross-chain isolation)", async ({
+		serializer,
+	}) => {
+		const otherChainContext = {
+			...signatureContext,
+			genesisBlockHash: "00000000000000000000000000000000000000000000000000000000000000ff",
+		};
+
+		const a = (await serializer.serializeMessageForSignature(prevoteData, signatureContext)).toString("hex");
+		const b = (await serializer.serializeMessageForSignature(prevoteData, otherChainContext)).toString("hex");
+
+		assert.not.equal(a, b);
+	});
+
+	it("#serializeMessageForSignature - different previousBlockHash should produce different bytes (cross-fork isolation)", async ({
+		serializer,
+	}) => {
+		const otherForkContext = {
+			...signatureContext,
+			previousBlockHash: "00000000000000000000000000000000000000000000000000000000000000ff",
+		};
+
+		const a = (await serializer.serializeMessageForSignature(prevoteData, signatureContext)).toString("hex");
+		const b = (await serializer.serializeMessageForSignature(prevoteData, otherForkContext)).toString("hex");
+
+		assert.not.equal(a, b);
+	});
+
+	it("#serializeMessageForSignature - different previousBlockHash should produce different bytes for NIL vote (cross-fork isolation for NIL)", async ({
+		serializer,
+	}) => {
+		const otherForkContext = {
+			...signatureContext,
+			previousBlockHash: "00000000000000000000000000000000000000000000000000000000000000ff",
+		};
+
+		const a = (await serializer.serializeMessageForSignature(prevoteDataNoBlock, signatureContext)).toString("hex");
+		const b = (await serializer.serializeMessageForSignature(prevoteDataNoBlock, otherForkContext)).toString("hex");
+
+		assert.not.equal(a, b);
+	});
+
+	it("#serializeMessage - wire format must not depend on signing context", async ({
+		serializer,
+	}) => {
+		const wire = (await serializer.serializeMessage(prevoteData)).toString("hex");
+		assert.equal(wire, serializedPrevote);
+		assert.false(wire.includes(signatureContext.genesisBlockHash));
+		assert.false(wire.includes(signatureContext.previousBlockHash));
+	});
 });
