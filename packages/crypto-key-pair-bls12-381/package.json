@@ -38,6 +38,7 @@
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/validation": "workspace:*",
+		"@chainsafe/blst": "2.2.0",
 		"bip39": "3.1.0",
 		"uvu": "0.5.6"
 	},
