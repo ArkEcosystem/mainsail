@@ -18,6 +18,7 @@ use mainsail_evm_core::{
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
     logs_bloom,
+    precompiles::MainsailPrecompiles,
     receipt::{TxReceipt, map_execution_result},
     state_changes::AccountUpdate,
     state_commit, state_root,
@@ -651,7 +652,8 @@ impl EvmInner {
 
                 tx_env.data = ctx.data;
             })
-            .build_mainnet();
+            .build_mainnet()
+            .with_precompiles(MainsailPrecompiles::new(ctx.spec_id));
 
         let ctx = evm.ctx_ref();
         let result = revm::handler::validation::validate_initial_tx_gas(
@@ -1061,7 +1063,8 @@ impl EvmInner {
 
                 tx_env.data = ctx.data;
             })
-            .build_mainnet();
+            .build_mainnet()
+            .with_precompiles(MainsailPrecompiles::new(ctx.spec_id));
 
         let result = evm.replay();
 

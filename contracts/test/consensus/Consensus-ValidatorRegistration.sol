@@ -2,11 +2,14 @@
 pragma solidity ^0.8.13;
 
 import {ConsensusV1} from "@contracts/consensus/ConsensusV1.sol";
+import {BLSPoP} from "@contracts/consensus/BLSPoP.sol";
 import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract ConsensusTest is Base {
     function test_validator_registration_pass_with_default_fee() public {
+        bytes memory pop = createValidPop();
+
         assertEq(consensus.validatorsCount(), 0);
         assertEq(consensus.activeValidatorsCount(), 0);
         address addr = address(1);
@@ -15,7 +18,7 @@ contract ConsensusTest is Base {
         vm.startPrank(addr);
         vm.expectEmit(address(consensus));
         emit ConsensusV1.ValidatorRegistered(addr, prepareBLSKey(addr));
-        consensus.registerValidator(prepareBLSKey(addr));
+        consensus.registerValidator(prepareBLSKey(addr), pop);
         vm.stopPrank();
 
         // Assert
@@ -31,6 +34,8 @@ contract ConsensusTest is Base {
     }
 
     function test_validator_registration_pass_with_adjusted_fee() public {
+        bytes memory pop = createValidPop();
+
         assertEq(consensus.validatorsCount(), 0);
         assertEq(consensus.activeValidatorsCount(), 0);
 
@@ -45,7 +50,7 @@ contract ConsensusTest is Base {
         vm.startPrank(addr);
         vm.expectEmit(address(consensus));
         emit ConsensusV1.ValidatorRegistered(addr, prepareBLSKey(addr));
-        consensus.registerValidator{value: customFee}(prepareBLSKey(addr));
+        consensus.registerValidator{value: customFee}(prepareBLSKey(addr), pop);
         vm.stopPrank();
 
         // Assert
@@ -62,49 +67,66 @@ contract ConsensusTest is Base {
     }
 
     function test_validator_registration_revert_if_fee_is_invalid() public {
+        bytes memory pop = createValidPop();
+
         address payable addr = payable(address(1));
         vm.deal(addr, 100 ether);
         vm.startPrank(addr);
 
         vm.expectRevert(ConsensusV1.InvalidFee.selector);
-        consensus.registerValidator{value: 40 ether}(prepareBLSKey(address(2)));
+        consensus.registerValidator{value: 40 ether}(prepareBLSKey(address(2)), pop);
     }
 
     function test_validator_registration_revert_if_validator_is_already_registered() public {
+        bytes memory pop = createValidPop();
         address addr = address(1);
 
         vm.startPrank(addr);
-        consensus.registerValidator(prepareBLSKey(addr));
+        consensus.registerValidator(prepareBLSKey(addr), pop);
 
         vm.expectRevert(ConsensusV1.ValidatorAlreadyRegistered.selector);
-        consensus.registerValidator(prepareBLSKey(address(2)));
+        consensus.registerValidator(prepareBLSKey(address(2)), pop);
     }
 
     function test_validator_registration_revert_if_bls_key_is_already_registered() public {
+        bytes memory pop = createValidPop();
+
         address addr = address(1);
         vm.startPrank(addr);
 
-        consensus.registerValidator(prepareBLSKey(addr));
+        consensus.registerValidator(prepareBLSKey(addr), pop);
 
         vm.startPrank(address(2));
         vm.expectRevert(ConsensusV1.BlsKeyAlreadyRegistered.selector);
-        consensus.registerValidator(prepareBLSKey(addr));
+        consensus.registerValidator(prepareBLSKey(addr), pop);
     }
 
     function test_validator_registration_revert_if_bls_key_length_is_invalid() public {
+        bytes memory pop = createValidPop();
+
         address addr = address(1);
         vm.startPrank(addr);
 
-        vm.expectRevert(ConsensusV1.BlsKeyIsInvalid.selector);
-        consensus.registerValidator(prepareBLSKey(addr, 46));
-        vm.expectRevert(ConsensusV1.BlsKeyIsInvalid.selector);
-        consensus.registerValidator(prepareBLSKey(addr, 47));
-        vm.expectRevert(ConsensusV1.BlsKeyIsInvalid.selector);
-        consensus.registerValidator(prepareBLSKey(addr, 49));
-        vm.expectRevert(ConsensusV1.BlsKeyIsInvalid.selector);
-        consensus.registerValidator(prepareBLSKey(addr, 50));
-        vm.expectRevert(ConsensusV1.BlsKeyIsInvalid.selector);
-        consensus.registerValidator(new bytes(0));
+        vm.expectRevert(BLSPoP.InvalidInputLength.selector);
+        consensus.registerValidator(prepareBLSKey(addr, 46), pop);
+        vm.expectRevert(BLSPoP.InvalidInputLength.selector);
+        consensus.registerValidator(prepareBLSKey(addr, 47), pop);
+        vm.expectRevert(BLSPoP.InvalidInputLength.selector);
+        consensus.registerValidator(prepareBLSKey(addr, 49), pop);
+        vm.expectRevert(BLSPoP.InvalidInputLength.selector);
+        consensus.registerValidator(prepareBLSKey(addr, 50), pop);
+        vm.expectRevert(BLSPoP.InvalidInputLength.selector);
+        consensus.registerValidator(new bytes(0), pop);
+    }
+
+    function test_validator_registration_revert_if_pop_invalid() public {
+        bytes memory pop = createInvalidPop();
+
+        address addr = address(1);
+        vm.startPrank(addr);
+
+        vm.expectRevert(ConsensusV1.InvalidProofOfPossession.selector);
+        consensus.registerValidator(prepareBLSKey(addr), pop);
     }
 
     function test_is_validator_registered() public {

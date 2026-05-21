@@ -2,12 +2,13 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
+import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { assert } from "@mainsail/utils";
 import dayjs from "dayjs";
-import { encodeFunctionData } from "viem";
+import { bytesToHex, encodeFunctionData } from "viem";
 
 import { Wallet } from "../contracts.js";
 import { Generator } from "./generator.js";
@@ -170,9 +171,10 @@ export class GenesisBlockGenerator extends Generator {
 		const result: Contracts.Crypto.Transaction[] = [];
 
 		for (const [index, sender] of senders.entries()) {
+			const { pop } = buildProofOfPossession(Buffer.from(sender.consensusKeys.privateKey, "hex"));
 			const data = encodeFunctionData({
 				abi: ConsensusAbi.abi,
-				args: [`0x${sender.consensusKeys.publicKey}`],
+				args: [`0x${sender.consensusKeys.publicKey}`, bytesToHex(pop)],
 				functionName: "registerValidator",
 			});
 

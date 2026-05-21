@@ -23,6 +23,7 @@
 	"dependencies": {
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
+		"@mainsail/crypto-key-pair-bls12-381": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",

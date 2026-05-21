@@ -57,6 +57,8 @@ contract ConsensusTest is Base {
     }
 
     function test_validator_resignation_pass_with_adjusted_fee() public {
+        bytes memory pop = createValidPop();
+
         assertEq(consensus.validatorsCount(), 0);
         assertEq(consensus.activeValidatorsCount(), 0);
         assertEq(consensus.resignedValidatorsCount(), 0);
@@ -73,9 +75,9 @@ contract ConsensusTest is Base {
 
         // Act
         vm.startPrank(addr2);
-        consensus.registerValidator{value: customFee}(prepareBLSKey(addr2)); // Add another validator to allow resign
+        consensus.registerValidator{value: customFee}(prepareBLSKey(addr2), pop); // Add another validator to allow resign
         vm.startPrank(addr);
-        consensus.registerValidator{value: customFee}(prepareBLSKey(addr));
+        consensus.registerValidator{value: customFee}(prepareBLSKey(addr), pop);
         vm.stopPrank();
 
         // Assert
@@ -112,6 +114,8 @@ contract ConsensusTest is Base {
     }
 
     function test_validator_resignation_revert_if_receiver_rejected_fee_return() public {
+        bytes memory pop = createValidPop();
+
         assertEq(consensus.validatorsCount(), 0);
         assertEq(consensus.activeValidatorsCount(), 0);
         assertEq(consensus.resignedValidatorsCount(), 0);
@@ -128,9 +132,9 @@ contract ConsensusTest is Base {
 
         // Act
         vm.startPrank(addr2);
-        consensus.registerValidator{value: customFee}(prepareBLSKey(addr2)); // Add another validator to allow resign
+        consensus.registerValidator{value: customFee}(prepareBLSKey(addr2), pop); // Add another validator to allow resign
         vm.startPrank(addr);
-        consensus.registerValidator{value: customFee}(prepareBLSKey(addr));
+        consensus.registerValidator{value: customFee}(prepareBLSKey(addr), pop);
         vm.stopPrank();
 
         // Assert

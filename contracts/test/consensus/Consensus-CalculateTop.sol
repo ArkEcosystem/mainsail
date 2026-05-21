@@ -96,6 +96,8 @@ contract ConsensusTest is Base {
         vm.pauseGasMetering();
         assertEq(consensus.validatorsCount(), 0);
 
+        bytes memory pop = createValidPop();
+
         uint256 n = 55;
         uint256 balance = 50;
         for (uint256 i = 0; i < n; i++) {
@@ -107,7 +109,7 @@ contract ConsensusTest is Base {
                 balance -= 1; // the last spots share same number of votes
             }
 
-            consensus.registerValidator(prepareBLSKey(addr));
+            consensus.registerValidator(prepareBLSKey(addr), pop);
             consensus.vote(addr);
             vm.stopPrank();
         }
@@ -142,6 +144,8 @@ contract ConsensusTest is Base {
         vm.pauseGasMetering();
         assertEq(consensus.validatorsCount(), 0);
 
+        bytes memory pop = createValidPop();
+
         address highest = address(0);
         uint256 highestBalance = 0;
 
@@ -164,7 +168,7 @@ contract ConsensusTest is Base {
 
             vm.startPrank(addr);
 
-            consensus.registerValidator(prepareBLSKey(addr));
+            consensus.registerValidator(prepareBLSKey(addr), pop);
             consensus.vote(addr);
             vm.stopPrank();
         }
