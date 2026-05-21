@@ -4,14 +4,20 @@ pragma solidity ^0.8.13;
 import {Test, console} from "@forge-std/Test.sol";
 import {ConsensusV1} from "@contracts/consensus/ConsensusV1.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {MockBlsPopVerify} from "./MockBlsPopVerify.sol";
 
 contract Base is Test {
+    address internal constant BLS_POP_PRECOMPILE = 0x0000000000000000000000000000000001181200;
+
     ConsensusV1 public consensus;
 
     // Marker to ignore coverage for this contract
     function test() public {}
 
     function setUp() public {
+        MockBlsPopVerify mock = new MockBlsPopVerify();
+        vm.etch(BLS_POP_PRECOMPILE, address(mock).code);
+
         bytes memory data = abi.encode(ConsensusV1.initialize.selector, 0);
         address proxy = address(new ERC1967Proxy(address(new ConsensusV1()), data));
         consensus = ConsensusV1(proxy);
@@ -69,7 +75,7 @@ contract Base is Test {
         }
 
         vm.startPrank(addr);
-        consensus.registerValidator(validatorKey);
+        consensus.registerValidator(validatorKey, createValidPop());
         vm.stopPrank();
 
         ConsensusV1.Validator memory validator = consensus.getValidator(addr);
@@ -82,5 +88,18 @@ contract Base is Test {
         vm.startPrank(addr);
         consensus.resignValidator();
         vm.stopPrank();
+    }
+
+    function createValidPop() internal pure returns (bytes memory) {
+        bytes memory pop = new bytes(96);
+        pop[95] = 0x01;
+
+        return pop;
+    }
+
+    function createInvalidPop() internal pure returns (bytes memory) {
+        bytes memory pop = new bytes(96);
+
+        return pop;
     }
 }

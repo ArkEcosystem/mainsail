@@ -20,9 +20,11 @@ contract ConsensusTest is Base {
     }
 
     function test_should_return_round_with_one_validator() public {
+        bytes memory pop = createValidPop();
+
         address addr = address(1);
         vm.startPrank(addr);
-        consensus.registerValidator(prepareBLSKey(addr));
+        consensus.registerValidator(prepareBLSKey(addr), pop);
         vm.stopPrank();
 
         consensus.calculateRoundValidators(1);
@@ -36,9 +38,11 @@ contract ConsensusTest is Base {
     }
 
     function test_should_keep_historic_vote_balance() public {
+        bytes memory pop = createValidPop();
+
         address addr = address(1);
         vm.startPrank(addr);
-        consensus.registerValidator(prepareBLSKey(addr));
+        consensus.registerValidator(prepareBLSKey(addr), pop);
         vm.stopPrank();
 
         // ConsensusV1.Round 1
@@ -99,9 +103,11 @@ contract ConsensusTest is Base {
     }
 
     function test_slice_should_work() public {
+        bytes memory pop = createValidPop();
+
         address addr = address(1);
         vm.startPrank(addr);
-        consensus.registerValidator(prepareBLSKey(addr));
+        consensus.registerValidator(prepareBLSKey(addr), pop);
         vm.stopPrank();
 
         // Create 3 rounds
