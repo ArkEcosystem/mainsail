@@ -1,8 +1,8 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Identifiers } from "@mainsail/constants";
-import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
+import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, MultiPaymentAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { bytesToHex, decodeFunctionResult, encodeFunctionData, parseEther, toBytes, toHex, zeroAddress } from "viem";
