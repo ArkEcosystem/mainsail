@@ -36,7 +36,9 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 		message: Contracts.Crypto.SignatureMessageData,
 		context: Contracts.Crypto.SignatureMessageContext,
 	): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.SignatureMessageData & Contracts.Crypto.SignatureMessageContext>(
+		return this.serializer.serialize<
+			Contracts.Crypto.SignatureMessageData & Contracts.Crypto.SignatureMessageContext
+		>(
 			{ ...context, ...message },
 			{
 				length:

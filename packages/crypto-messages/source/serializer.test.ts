@@ -32,7 +32,9 @@ describe<{
 	});
 
 	it("#serializeMessage - should correctly serialize prevote for signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializeMessageForSignature(prevoteData, signatureContext)).toString("hex");
+		const serialized = (await serializer.serializeMessageForSignature(prevoteData, signatureContext)).toString(
+			"hex",
+		);
 		assert.equal(serialized, serializedPrevoteForSignature);
 	});
 
@@ -44,9 +46,9 @@ describe<{
 	});
 
 	it("#serializeMessage - should correctly serialize prevote without block for signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializeMessageForSignature(prevoteDataNoBlock, signatureContext)).toString(
-			"hex",
-		);
+		const serialized = (
+			await serializer.serializeMessageForSignature(prevoteDataNoBlock, signatureContext)
+		).toString("hex");
 		assert.equal(serialized, serializedPrevoteNoBlockForSignature);
 	});
 

@@ -30,20 +30,13 @@ export interface Message extends MessageData {
 }
 
 export interface MessageFactory {
-	makeMessage(
-		data: MakeMessageData,
-		keyPair: KeyPair,
-		context: SignatureMessageContext,
-	): Promise<Message>;
+	makeMessage(data: MakeMessageData, keyPair: KeyPair, context: SignatureMessageContext): Promise<Message>;
 	makeMessageFromBytes(data: Buffer): Promise<Message>;
 }
 
 export interface MessageSerializer {
 	serializeMessage(message: MessageData): Promise<Buffer>;
-	serializeMessageForSignature(
-		message: SignatureMessageData,
-		context: SignatureMessageContext,
-	): Promise<Buffer>;
+	serializeMessageForSignature(message: SignatureMessageData, context: SignatureMessageContext): Promise<Buffer>;
 }
 
 export interface MessageDeserializer {
