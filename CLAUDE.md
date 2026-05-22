@@ -18,6 +18,7 @@ pnpm run clean:packages   # Remove all distribution/ and tsbuildinfo artifacts
 ```
 
 Single package build:
+
 ```bash
 cd packages/<name> && pnpm run build
 # or from root:
@@ -91,6 +92,7 @@ When `core:run` is invoked, `Application.bootstrap()` registers service provider
 ### Consensus Engine (`packages/consensus`)
 
 Implements a Tendermint-like BFT consensus with three phases per round: **Propose → Prevote → Precommit**. Key files:
+
 - `consensus.ts` — main state machine tracking `blockNumber`, `round`, `step`, locked/valid values
 - `scheduler.ts` — timeout scheduling for each phase
 - `round-state.ts` / `round-state-repository.ts` — per-round state aggregation
@@ -101,6 +103,7 @@ Implements a Tendermint-like BFT consensus with three phases per round: **Propos
 ### Blockchain Utilities (`packages/blockchain-utils`)
 
 Four stateless calculators injected wherever needed:
+
 - **`RoundCalculator`** — derives round number, height, and `maxValidators` by iterating milestones. `isNewRound(height)` checks `(height − milestoneHeight) % roundValidators === 0`. Handles milestone transitions that change validator counts mid-chain.
 - **`ProposerCalculator`** — selects the proposer index for a round: `(totalRound + round) % roundValidators`. Fully deterministic without per-round state.
 - **`TimestampCalculator`** — computes the minimum valid block timestamp using block time + round timeouts with arithmetic progression (each extra round increases the timeout), preventing timestamp manipulation.
@@ -122,6 +125,7 @@ Bridges consensus and the transaction pool. When `Consensus.propose()` runs (it'
 ### Transaction Pool Architecture
 
 The mempool is split across three packages by concern:
+
 - **`packages/transaction-pool-service`** — main mempool: `Mempool`, `SenderMempool` (per-sender FIFO with nonce tracking), `Query` (lookup/iteration), `Processor` (accept/reject incoming transactions), `Storage` (LMDB persistence across restarts)
 - **`packages/transaction-pool-worker`** — runs the mempool inside a Node.js worker thread; main thread holds only a thin `Worker` proxy via IPC. This keeps transaction validation off the consensus thread.
 - **`packages/transaction-pool-broadcaster`** — gossips newly accepted transactions to peers over P2P
@@ -129,6 +133,7 @@ The mempool is split across three packages by concern:
 ### EVM Integration
 
 The EVM is a **Rust native addon** (`packages/evm`) compiled via napi-rs. TypeScript packages interact through:
+
 - `packages/evm-service` — manages EVM instances (tagged bindings: `"evm"`, `"validator"`, `"transaction-pool"`, `"rpc"`)
 - `packages/evm-consensus` — consensus-time EVM operations; also owns `ValidatorSet`
 - `packages/evm-state` — state management
@@ -138,6 +143,7 @@ The EVM is a **Rust native addon** (`packages/evm`) compiled via napi-rs. TypeSc
 ### Solidity Contracts (root `contracts/`)
 
 Separate from `packages/evm-contracts` (which holds compiled ABIs), the root **`contracts/`** directory contains the **Solidity source** for on-chain protocol contracts, built with **Foundry** (`foundry.toml`, solc 0.8.27, evm_version shanghai):
+
 - `contracts/src/consensus/ConsensusV1.sol` — validator registration, voting, vote-balance tracking, round selection. UUPS-upgradeable. This is the contract `packages/evm-consensus` interacts with for validator-set logic.
 - `contracts/src/multi-payment/MultiPaymentV1.sol` — batched payments
 - `contracts/src/usernames/UsernamesV1.sol` — username registration
@@ -161,6 +167,7 @@ WebSocket-based peer networking built on Hapi + custom `hapi-nes`. Handles peer 
 ### State Management (`packages/state`)
 
 In-memory blockchain state:
+
 - `Store` — last block, block number, genesis commit, milestone tracking
 - `State` — overall node state (syncing, forging flags)
 - `wallets/` — validator wallet state
@@ -172,7 +179,7 @@ PostgreSQL via TypeORM. Managed by `packages/database` (core DB service) and `pa
 ### API Layer (`packages/api-*`)
 
 - `api-http` — Hapi HTTP server setup
-- `api-common` — shared API utilities and base types  
+- `api-common` — shared API utilities and base types
 - `api-database` — TypeORM models, repositories, migrations for the read-optimized API DB
 - `api-sync` — syncs committed blocks from consensus to the API database
 - `api-transaction-pool` — exposes transaction pool over HTTP
@@ -210,16 +217,16 @@ Tests use `describe` from `@mainsail/test-runner` (wraps uvu suites):
 import { describe } from "@mainsail/test-runner";
 
 describe<Context>("ComponentName", ({ it, beforeEach, assert, stub, spy, clock }) => {
-    beforeEach((context) => {
-        // Set up stubs for injected dependencies
-        context.myService = { method: () => {} };
-        // Build container, bind stubs, resolve class under test
-    });
+	beforeEach((context) => {
+		// Set up stubs for injected dependencies
+		context.myService = { method: () => {} };
+		// Build container, bind stubs, resolve class under test
+	});
 
-    it("does something", async (context) => {
-        // arrange, act, assert
-        assert.equal(result, expected);
-    });
+	it("does something", async (context) => {
+		// arrange, act, assert
+		assert.equal(result, expected);
+	});
 });
 ```
 
