@@ -97,6 +97,11 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	context.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue({});
 
 	context.app.bind(Identifiers.State.Store).toConstantValue({
+		getGenesisCommit: () => ({
+			block: {
+				hash: "0000000000000000000000000000000000000000000000000000000000000001",
+			},
+		}),
 		getLastBlock: () => ({
 			hash: "0000000000000000000000000000000000000000000000000000000000000000",
 			logsBloom: "0".repeat(512),

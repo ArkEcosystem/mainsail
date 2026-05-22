@@ -55,12 +55,18 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 			return false;
 		}
 
-		const precommit = await this.serializer.serializeMessageForSignature({
-			blockHash: block.hash,
-			blockNumber: block.number,
-			round: proof.round,
-			type: Enums.Crypto.MessageType.Precommit,
-		});
+		const precommit = await this.serializer.serializeMessageForSignature(
+			{
+				blockHash: block.hash,
+				blockNumber: block.number,
+				round: proof.round,
+				type: Enums.Crypto.MessageType.Precommit,
+			},
+			{
+				genesisBlockHash: this.stateStore.getGenesisCommit().block.hash,
+				previousBlockHash: this.stateStore.getLastBlock().hash,
+			},
+		);
 
 		return this.aggregator.verify(proof, precommit, roundValidators);
 	}

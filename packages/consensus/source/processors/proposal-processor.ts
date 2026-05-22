@@ -101,12 +101,18 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			return true;
 		}
 
-		const data = await this.messageSerializer.serializeMessageForSignature({
-			blockHash: proposal.blockHeader.hash,
-			blockNumber: proposal.blockHeader.number,
-			round: proposal.validRound,
-			type: Enums.Crypto.MessageType.Prevote,
-		});
+		const data = await this.messageSerializer.serializeMessageForSignature(
+			{
+				blockHash: proposal.blockHeader.hash,
+				blockNumber: proposal.blockHeader.number,
+				round: proposal.validRound,
+				type: Enums.Crypto.MessageType.Prevote,
+			},
+			{
+				genesisBlockHash: this.stateStore.getGenesisCommit().block.hash,
+				previousBlockHash: this.stateStore.getLastBlock().hash,
+			},
+		);
 
 		const { roundValidators } = this.configuration.getMilestone(proposal.blockHeader.number);
 		const verified = await this.aggregator.verify(proposal.lockProof, data, roundValidators);
