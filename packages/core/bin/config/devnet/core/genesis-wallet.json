@@ -1,14 +1,14 @@
 {
-	"address": "0x18F8a91Aa88af45329fb1650BCdD53aAC1Ff4bfe",
+	"address": "0x20dF234537807Ff88584bEa00940694252777d7F",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "2061c5ae8a90cde5b53d1687c69da9226cd503de027c764f09a5044df188c577",
-		"publicKey": "b332de55ae9ed6fb195ace8f04a6c62de246b021f609f13abe3edfa5da03a8d9af8d46d00cc55a67a5b3bd9f51dd2dd5"
+		"privateKey": "6259d49de409808f4c47531686f6cb7f54dbd0a46834712c530e54a5d0ce139c",
+		"publicKey": "82951eb70bbaebc679f1210ace54d6e5b2f5d49fbd200e9ded60aa60cb827bd331a1fa251b1799265bdf2661537b0956"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "cb84466332df8ed7de08ee1b8255d9df0f6a0c7c79c96527e6aa18e31e91a633",
-		"publicKey": "03335579fc9eab385e3076e31a2bae5f7560e4697abe6d476c93d07ffae628a359"
+		"privateKey": "33dbbc97be2e9a82e2e79661d3be75ed347debf95a849fa91a48319e564cabd2",
+		"publicKey": "0354872289049c8f341c0c8edb68adc3c7d9450728c1cce66831fe4a449f40f57d"
 	},
-	"passphrase": "letter pledge tiger miracle aim best isolate rookie prosper faint expire buffalo toss account lamp gather crunch winter frozen robust humble mention treat remain"
+	"passphrase": "rival engine erase kitten half company film glow unusual swarm hole surface kiss goat decrease large misery quiz humor romance excite lady fringe crane"
 }
