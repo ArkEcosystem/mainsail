@@ -89,5 +89,3 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		}
 	}
 }
-
-export type TransactionHandlerConstructor = new () => TransactionHandler;

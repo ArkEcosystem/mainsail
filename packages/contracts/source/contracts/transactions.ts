@@ -1,8 +1,6 @@
-import type { Transaction, TransactionData } from "./crypto/index.js";
+import type { Transaction } from "./crypto/index.js";
 import type { BlockContext, Instance, TransactionReceipt } from "./evm/index.js";
 import type { Wallet } from "./state/index.js";
-
-export type TransactionHandlerConstructor = new () => TransactionHandler;
 
 export type TransactionHandlerContext = {
 	evm: {
@@ -15,22 +13,4 @@ export interface TransactionHandler {
 	throwIfCannotBeApplied(transaction: Transaction, sender: Wallet, evm: Instance): Promise<void>;
 
 	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionReceipt>;
-}
-
-export interface TransactionHandlerRegistry {
-	getRegisteredHandlers(): TransactionHandler[];
-
-	getRegisteredHandlerByType(type: number, version?: number): TransactionHandler;
-
-	getActivatedHandlers(): Promise<TransactionHandler[]>;
-
-	getActivatedHandlerByType(type: number, version?: number): Promise<TransactionHandler>;
-
-	getActivatedHandlerForData(transactionData: TransactionData): Promise<TransactionHandler>;
-}
-
-export interface TransactionHandlerProvider {
-	isRegistrationRequired(): boolean;
-
-	registerHandlers(): void;
 }
