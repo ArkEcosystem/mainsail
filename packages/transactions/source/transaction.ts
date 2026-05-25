@@ -22,15 +22,22 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		sender: Contracts.State.Wallet,
 		evm: Contracts.Evm.Instance,
 	): Promise<void> {
-		// Legacy
+		await this.#verifyLegacySecondSignature(transaction, sender);
+		await this.#preverifyEvm(transaction, evm);
+	}
+
+	async #verifyLegacySecondSignature(
+		transaction: Contracts.Crypto.Transaction,
+		sender: Contracts.State.Wallet,
+	): Promise<void> {
 		if (sender.hasLegacySecondPublicKey()) {
 			await this.verifier.verifyLegacySecondSignature(transaction, sender.legacySecondPublicKey());
-		} else {
-			if (transaction.legacySecondSignature) {
-				throw new UnexpectedLegacySecondSignatureError();
-			}
+		} else if (transaction.legacySecondSignature) {
+			throw new UnexpectedLegacySecondSignatureError();
 		}
+	}
 
+	async #preverifyEvm(transaction: Contracts.Crypto.Transaction, evm: Contracts.Evm.Instance): Promise<void> {
 		const milestone = this.configuration.getMilestone();
 
 		const preverified = await evm.preverifyTransaction({
