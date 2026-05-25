@@ -83,12 +83,6 @@ export class TransactionFailedToApplyError extends PoolError {
 	}
 }
 
-export class TransactionFailedToVerifyError extends PoolError {
-	public constructor(transaction: Contracts.Crypto.Transaction) {
-		super(`tx ${transaction.hash} didn't pass verification`, "ERR_BAD_DATA");
-	}
-}
-
 export class TransactionFromWrongNetworkError extends PoolError {
 	public currentNetwork: number;
 

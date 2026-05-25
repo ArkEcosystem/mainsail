@@ -22,11 +22,6 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	protected readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
-	public async verify(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
-		assert.string(transaction.from);
-		return this.verifier.verifyHash(transaction);
-	}
-
 	public async throwIfCannotBeApplied(
 		transaction: Contracts.Crypto.Transaction,
 		sender: Contracts.State.Wallet,

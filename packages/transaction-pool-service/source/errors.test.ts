@@ -74,14 +74,6 @@ describe<{
 		assert.equal(error.message, `tx ${context.transaction.hash} cannot be applied: Something went horribly wrong`);
 	});
 
-	it("TransactionFailedToVerifyError", (context) => {
-		const error = new Exceptions.TransactionFailedToVerifyError(context.transaction);
-
-		assert.instance(error, Exceptions.PoolError);
-		assert.equal(error.type, "ERR_BAD_DATA");
-		assert.equal(error.message, `tx ${context.transaction.hash} didn't pass verification`);
-	});
-
 	it("TransactionFromWrongNetworkError", (context) => {
 		const error = new Exceptions.TransactionFromWrongNetworkError(context.transaction, 23);
 

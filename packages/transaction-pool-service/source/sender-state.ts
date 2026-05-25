@@ -6,7 +6,6 @@ import {
 	InsufficientBalanceError,
 	TransactionExceedsMaximumByteSizeError,
 	TransactionFailedToApplyError,
-	TransactionFailedToVerifyError,
 	TransactionFromWrongNetworkError,
 	UnexpectedNonceError,
 } from "@mainsail/exceptions";
@@ -114,14 +113,10 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new InsufficientBalanceError();
 		}
 
-		if (await this.transactionHandler.verify(transaction)) {
-			try {
-				await this.transactionHandler.throwIfCannotBeApplied(transaction, this.#wallet, this.evm);
-			} catch (error) {
-				throw new TransactionFailedToApplyError(transaction, error);
-			}
-		} else {
-			throw new TransactionFailedToVerifyError(transaction);
+		try {
+			await this.transactionHandler.throwIfCannotBeApplied(transaction, this.#wallet, this.evm);
+		} catch (error) {
+			throw new TransactionFailedToApplyError(transaction, error);
 		}
 	}
 }

@@ -3,7 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { formatCurrency } from "@mainsail/blockchain-utils";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { InvalidSignatureError } from "@mainsail/exceptions";
 
 @injectable()
 export class TransactionProcessor implements Contracts.Processor.TransactionProcessor {
@@ -51,10 +50,6 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 				instance: this.evm,
 			},
 		};
-
-		if (!(await this.transactionHandler.verify(transaction))) {
-			throw new InvalidSignatureError();
-		}
 
 		const receipt = await this.transactionHandler.apply(transactionHandlerContext, transaction);
 
