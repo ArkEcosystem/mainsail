@@ -8,10 +8,10 @@ import { assert } from "@mainsail/utils";
 @injectable()
 export class TransactionHandler implements Contracts.Transactions.TransactionHandler {
 	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration!: Contracts.Crypto.Configuration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
+	private readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
 	public async throwIfCannotBeApplied(
 		transaction: Contracts.Crypto.Transaction,
