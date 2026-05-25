@@ -65,5 +65,4 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionPool.Storage).to(Storage).inSingletonScope();
 		this.app.bind(Identifiers.TransactionPool.Selector).to(Selector).inSingletonScope();
 	}
-
 }
