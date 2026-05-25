@@ -78,22 +78,22 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 		}),
 	});
 
-	const validator = {
-		getEvm: () => ({
-			dispose: async () => {},
-			initializeGenesis: async () => {},
-			logsBloom: async () => "0".repeat(512),
-			prepareNextCommit: async () => {},
-			rollback: async () => {},
-			snapshot: async () => {},
-			stateRoot: async () => "0000000000000000000000000000000000000000000000000000000000000000",
-			updateRewardsAndVotes: async () => {},
-		}),
-		validate: async () => true,
+	const evm = {
+		dispose: async () => {},
+		initializeGenesis: async () => {},
+		logsBloom: async () => "0".repeat(512),
+		prepareNextCommit: async () => {},
+		rollback: async () => {},
+		snapshot: async () => {},
+		stateRoot: async () => "0000000000000000000000000000000000000000000000000000000000000000",
+		updateRewardsAndVotes: async () => {},
 	};
-	context.app.rebind(Identifiers.Transaction.Validator.Factory).toConstantValue(() => validator);
+	context.app.bind(Identifiers.Evm.Instance).toConstantValue(evm).whenTagged("instance", "validator");
 
-	context.app.bind(Identifiers.Evm.Instance).toConstantValue(() => {});
+	context.app.rebind(Identifiers.Transaction.Handler).toConstantValue({
+		apply: async () => ({ gasRefunded: 0n, gasUsed: 0n, logs: [], status: 1 }),
+	});
+
 	context.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue({});
 
 	context.app.bind(Identifiers.State.Store).toConstantValue({

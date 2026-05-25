@@ -1,5 +1,5 @@
 import type { Transaction, TransactionData } from "./crypto/index.js";
-import type { BlockContext, CommitKey, Instance, TransactionReceipt } from "./evm/index.js";
+import type { BlockContext, Instance, TransactionReceipt } from "./evm/index.js";
 import type { Wallet } from "./state/index.js";
 
 export type TransactionHandlerConstructor = new () => TransactionHandler;
@@ -36,17 +36,3 @@ export interface TransactionHandlerProvider {
 
 	registerHandlers(): void;
 }
-
-export interface TransactionValidatorContext {
-	commitKey: CommitKey;
-	gasLimit: number;
-	timestamp: number;
-	generatorAddress: string;
-}
-
-export interface TransactionValidator {
-	getEvm(): Instance;
-	validate(context: TransactionValidatorContext, transaction: Transaction): Promise<TransactionReceipt>;
-}
-
-export type TransactionValidatorFactory = () => TransactionValidator;
