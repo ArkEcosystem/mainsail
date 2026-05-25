@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { Events, Identifiers } from "@mainsail/constants";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { TransactionFailedToPreverifyError, UnexpectedLegacySecondSignatureError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
@@ -21,12 +21,6 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	protected readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
-
-	@inject(Identifiers.Services.EventDispatcher.Service)
-	private readonly events!: Contracts.Kernel.EventDispatcher;
-
-	@inject(Identifiers.State.State)
-	private readonly state!: Contracts.State.State;
 
 	public async verify(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
 		assert.string(transaction.from);
@@ -94,24 +88,10 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 
 			const { receipt } = await instance.process(data);
 
-			void this.#emit(Events.EvmEvent.TransactionReceipt, {
-				receipt,
-				sender: transaction.from,
-				transactionId: transaction.hash,
-			});
-
 			return receipt;
 		} catch (error) {
 			throw new Error(`invalid EVM call: ${error.message}`);
 		}
-	}
-
-	async #emit<T>(event: string, data?: T): Promise<void> {
-		if (this.state.isBootstrap()) {
-			return;
-		}
-
-		return this.events.dispatch(event, data);
 	}
 }
 
