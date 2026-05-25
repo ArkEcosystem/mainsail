@@ -1,9 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
-import { Configuration } from "@mainsail/crypto-config";
 
-import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "@mainsail/test-runner";
 import { Processor } from "./processor";
 
@@ -15,7 +13,6 @@ describe<{
 	transaction1: any;
 	transaction2: any;
 	factory: any;
-	blockSerializer: any;
 }>("Processor", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll((context) => {
 		context.pool = {
@@ -24,32 +21,21 @@ describe<{
 
 		context.extensions = [{ throwIfCannotBroadcast: () => {} }, { throwIfCannotBroadcast: () => {} }];
 
-		context.broadcaster = {
-			broadcastTransactions: () => Promise.resolve(),
-		};
-
 		context.factory = {
 			fromBytes: (bytes) => ({}),
 			fromJson: (tx) => tx,
 		};
 
-		context.blockSerializer = {
-			headerSize: () => 152,
-		};
 		context.broadcaster = {
 			broadcastTransactions: async () => {},
 		};
 
 		context.container = new Container();
-		context.container.bind(Identifiers.Cryptography.Block.Serializer).toConstantValue(context.blockSerializer);
-		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
 		context.container.bind(Identifiers.TransactionPool.ProcessorExtension).toConstantValue(context.extensions[0]);
 		context.container.bind(Identifiers.TransactionPool.ProcessorExtension).toConstantValue(context.extensions[1]);
 		context.container.bind(Identifiers.TransactionPool.Service).toConstantValue(context.pool);
 		context.container.bind(Identifiers.Cryptography.Transaction.Factory).toConstantValue(context.factory);
-		context.container.bind(Identifiers.Cryptography.Transaction.Deserializer).toConstantValue({});
 		context.container.bind(Identifiers.TransactionPool.Broadcaster).toConstantValue(context.broadcaster);
 		context.container.bind(Identifiers.Services.Log.Service).toConstantValue({
 			error: () => {},
