@@ -7,7 +7,6 @@ import {
 	TransactionFailedToPreverifyError,
 	UnexpectedLegacySecondSignatureError,
 } from "@mainsail/exceptions";
-import { assert } from "@mainsail/utils";
 
 @injectable()
 export class TransactionHandler implements Contracts.Transactions.TransactionHandler {
@@ -55,7 +54,7 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		});
 
 		if (!preverified.success) {
-			throw new TransactionFailedToPreverifyError(transaction, new Error(preverified.error));
+			throw new TransactionFailedToPreverifyError(transaction, preverified.error ?? "unknown");
 		}
 	}
 
@@ -63,8 +62,6 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Evm.TransactionReceipt> {
-		assert.string(transaction.hash);
-
 		const { evmSpec } = this.configuration.getMilestone();
 
 		try {
@@ -84,7 +81,6 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 			};
 
 			const { receipt } = await instance.process(data);
-
 			return receipt;
 		} catch (error) {
 			throw new EvmCallFailedError(transaction, error);

@@ -66,11 +66,8 @@ export class TransactionPoolFullError extends PoolError {
 }
 
 export class TransactionFailedToPreverifyError extends PoolError {
-	public readonly error: Error;
-
-	public constructor(transaction: Contracts.Crypto.Transaction, error: Error) {
-		super(`tx ${transaction.hash} cannot be preverified: ${error.message}`, "ERR_PREVERIFY");
-		this.error = error;
+	public constructor(transaction: Contracts.Crypto.Transaction, reason: string) {
+		super(`tx ${transaction.hash} cannot be preverified: ${reason}`, "ERR_PREVERIFY");
 	}
 }
 
