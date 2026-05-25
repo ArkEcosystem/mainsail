@@ -40,17 +40,8 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		const milestone = this.configuration.getMilestone();
 
 		const preverified = await evm.preverifyTransaction({
+			...this.#toEvmTransactionFields(transaction, milestone.evmSpec),
 			blockGasLimit: BigInt(milestone.block.maxGasLimit),
-			data: Buffer.from(transaction.data.slice(2), "hex"),
-			from: transaction.from,
-			gasLimit: BigInt(transaction.gasLimit),
-			gasPrice: BigInt(transaction.gasPrice),
-			legacyAddress: transaction.senderLegacyAddress,
-			nonce: transaction.nonce,
-			specId: milestone.evmSpec,
-			to: transaction.to,
-			txHash: transaction.hash,
-			value: transaction.value,
 		});
 
 		if (!preverified.success) {
@@ -63,27 +54,31 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Evm.TransactionReceipt> {
 		const { evmSpec } = this.configuration.getMilestone();
+		const { blockContext, instance } = context.evm;
 
 		try {
-			const { blockContext, instance } = context.evm;
-			const data = {
+			const { receipt } = await instance.process({
+				...this.#toEvmTransactionFields(transaction, evmSpec),
 				blockContext,
-				data: Buffer.from(transaction.data.slice(2), "hex"),
-				from: transaction.from,
-				gasLimit: BigInt(transaction.gasLimit),
-				gasPrice: BigInt(transaction.gasPrice),
-				legacyAddress: transaction.senderLegacyAddress,
-				nonce: transaction.nonce,
-				specId: evmSpec,
-				to: transaction.to,
-				txHash: transaction.hash,
-				value: transaction.value,
-			};
-
-			const { receipt } = await instance.process(data);
+			});
 			return receipt;
 		} catch (error) {
 			throw new EvmCallFailedError(transaction, error);
 		}
+	}
+
+	#toEvmTransactionFields(transaction: Contracts.Crypto.Transaction, specId: Contracts.Evm.SpecId) {
+		return {
+			data: Buffer.from(transaction.data.slice(2), "hex"),
+			from: transaction.from,
+			gasLimit: BigInt(transaction.gasLimit),
+			gasPrice: BigInt(transaction.gasPrice),
+			legacyAddress: transaction.senderLegacyAddress,
+			nonce: transaction.nonce,
+			specId,
+			to: transaction.to,
+			txHash: transaction.hash,
+			value: transaction.value,
+		};
 	}
 }
