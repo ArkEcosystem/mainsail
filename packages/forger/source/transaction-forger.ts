@@ -26,6 +26,10 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "validator")
+	private readonly evm!: Contracts.Evm.Instance;
+
 	@inject(Identifiers.State.Store)
 	protected readonly stateStore!: Contracts.State.Store;
 
@@ -35,8 +39,8 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	@inject(Identifiers.BlockchainUtils.RoundCalculator)
 	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
 
-	@inject(Identifiers.Transaction.Validator.Factory)
-	private readonly createTransactionValidator!: Contracts.Transactions.TransactionValidatorFactory;
+	@inject(Identifiers.Transaction.Handler)
+	private readonly transactionHandler!: Contracts.Transactions.TransactionHandler;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -50,7 +54,6 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	#generatorAddress!: string;
 	#timestamp!: number;
 	#commitKey!: Contracts.Evm.CommitKey;
-	#validator!: Contracts.Transactions.TransactionValidator;
 	#evm!: Contracts.Evm.Instance;
 	#milestone!: Contracts.Crypto.Milestone;
 	#previousBlock!: Contracts.Crypto.Block;
@@ -67,8 +70,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 		this.#timestamp = timestamp;
 		this.#commitKey = commitKey;
 
-		this.#validator = this.createTransactionValidator();
-		this.#evm = this.#validator.getEvm();
+		this.#evm = this.evm;
 
 		this.#milestone = this.cryptoConfiguration.getMilestone();
 		this.#previousBlock = this.stateStore.getLastBlock();
@@ -190,12 +192,17 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	}
 
 	async #validateTransaction(transaction: Contracts.Crypto.Transaction): Promise<Contracts.Evm.TransactionReceipt> {
-		return this.#validator.validate(
+		return await this.transactionHandler.apply(
 			{
-				commitKey: this.#commitKey,
-				gasLimit: this.#milestone.block.maxGasLimit,
-				generatorAddress: this.#generatorAddress,
-				timestamp: this.#timestamp,
+				evm: {
+					blockContext: {
+						commitKey: this.#commitKey,
+						gasLimit: BigInt(this.#milestone.block.maxGasLimit),
+						timestamp: BigInt(this.#timestamp),
+						validatorAddress: this.#generatorAddress,
+					},
+					instance: this.#evm,
+				},
 			},
 			transaction,
 		);

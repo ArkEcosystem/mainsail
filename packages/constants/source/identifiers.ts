@@ -280,10 +280,6 @@ export const Identifiers = {
 	},
 	Transaction: {
 		Handler: Symbol("Transaction<Handler>"),
-		Validator: {
-			Factory: Symbol("Transaction<Validator.Factory>"),
-			Instance: Symbol("Transaction<Validator.Instance>"),
-		},
 	},
 	TransactionPool: {
 		API: {
