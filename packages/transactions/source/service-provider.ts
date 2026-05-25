@@ -4,8 +4,8 @@ import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 
-import { TransactionHandler } from "./handlers/index.js";
 import { TransactionValidator } from "./transaction-validator.js";
+import { TransactionHandler } from "./transaction.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
