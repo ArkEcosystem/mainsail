@@ -1,6 +1,7 @@
 import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
 import { Proposal } from "@mainsail/crypto-proposal";
 import { assert } from "@mainsail/utils";
 import { randomBytes } from "crypto";
@@ -29,10 +30,8 @@ export const makeCustomProposal = async (
 	const cryptoConfiguration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const milestone = cryptoConfiguration.getMilestone();
 
-	const transactionValidatorFactory = app.get<Contracts.Transactions.TransactionValidatorFactory>(
-		Identifiers.Transaction.Validator.Factory,
-	);
-	const transactionValidator = transactionValidatorFactory();
+	const transactionHandler = app.get<Contracts.Transactions.TransactionHandler>(Identifiers.Transaction.Handler);
+	const evm = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "validator");
 
 	// 2)
 	const round = app.get<Consensus>(Identifiers.Consensus.Service).getRound();
@@ -65,12 +64,17 @@ export const makeCustomProposal = async (
 		let result = { gasRefunded: 0n, gasUsed: 0n, logs: [] as any, status: 0 };
 
 		try {
-			result = await transactionValidator.validate(
+			result = await transactionHandler.apply(
 				{
-					commitKey,
-					gasLimit: milestone.block.maxGasLimit,
-					generatorAddress: validators[0].publicKey,
-					timestamp: dayjs().valueOf(),
+					evm: {
+						blockContext: {
+							commitKey,
+							gasLimit: BigInt(milestone.block.maxGasLimit),
+							timestamp: BigInt(dayjs().valueOf()),
+							validatorAddress: validators[0].publicKey,
+						},
+						instance: evm,
+					},
 				},
 				transaction,
 			);
@@ -95,7 +99,7 @@ export const makeCustomProposal = async (
 		payloadSize += transaction.serialized.byteLength + 2;
 	}
 
-	await transactionValidator.getEvm().dispose();
+	await evm.dispose();
 
 	const hashFactory = app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
 	const blockFactory = app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
@@ -131,8 +135,8 @@ export const makeCustomProposal = async (
 	const serializedProposal = await messageSerializer.serializeProposalUnsigned({
 		payloadSerialized: proposedBytes.toString("hex"),
 		round,
-		validRound: undefined,
 		validatorIndex: 0,
+		validRound: undefined,
 	});
 
 	const proposalSignature = await app
