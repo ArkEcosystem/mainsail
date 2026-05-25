@@ -29,7 +29,6 @@ pub struct JsTransactionContext {
     pub nonce: BigInt,
     pub data: Buffer,
     pub tx_hash: String,
-    pub index: Option<u32>,
     pub block_context: JsBlockContext,
     pub spec_id: String,
 }
