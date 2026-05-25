@@ -10,7 +10,6 @@ import {
 	TransactionFromWrongNetworkError,
 	UnexpectedNonceError,
 } from "@mainsail/exceptions";
-import { Services } from "@mainsail/kernel";
 import { Wallets } from "@mainsail/state";
 
 @injectable()
@@ -31,9 +30,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	@inject(Identifiers.Transaction.Handler)
 	private readonly transactionHandler!: Contracts.Transactions.TransactionHandler;
-
-	@inject(Identifiers.Services.Trigger.Service)
-	private readonly triggers!: Services.Triggers.Triggers;
 
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
@@ -118,19 +114,9 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new InsufficientBalanceError();
 		}
 
-		if (
-			await this.triggers.call("verifyTransaction", {
-				handler: this.transactionHandler,
-				transaction,
-			})
-		) {
+		if (await this.transactionHandler.verify(transaction)) {
 			try {
-				await this.triggers.call("throwIfCannotBeApplied", {
-					evm: this.evm,
-					handler: this.transactionHandler,
-					sender: this.#wallet,
-					transaction,
-				});
+				await this.transactionHandler.throwIfCannotBeApplied(transaction, this.#wallet, this.evm);
 			} catch (error) {
 				throw new TransactionFailedToApplyError(transaction, error);
 			}

@@ -2,10 +2,9 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Providers, Services } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { ThrowIfCannotBeAppliedAction, VerifyTransactionAction } from "./actions/index.js";
 import { Mempool } from "./mempool.js";
 import { Processor } from "./processor.js";
 import { Query } from "./query.js";
@@ -19,7 +18,6 @@ import { Storage } from "./storage.js";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.#registerServices();
-		this.#registerActions();
 	}
 
 	public async boot(): Promise<void> {
@@ -68,13 +66,4 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionPool.Selector).to(Selector).inSingletonScope();
 	}
 
-	#registerActions(): void {
-		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-			.bind("verifyTransaction", this.app.resolve(VerifyTransactionAction));
-
-		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-			.bind("throwIfCannotBeApplied", this.app.resolve(ThrowIfCannotBeAppliedAction));
-	}
 }
