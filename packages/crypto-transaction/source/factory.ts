@@ -21,7 +21,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 
 	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "wallet")
-	private readonly signatureSerializer!: Contracts.Crypto.SignatureEcdsa;
+	private readonly signatureEcdsa!: Contracts.Crypto.SignatureEcdsa;
 
 	@inject(Identifiers.Cryptography.Transaction.Deserializer)
 	private readonly deserializer!: Contracts.Crypto.TransactionDeserializer;
@@ -101,14 +101,14 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		assert.string(data.r);
 		assert.string(data.s);
 
-		if (!this.signatureSerializer.isLowS({ r: data.r, s: data.s, v: data.v })) {
+		if (!this.signatureEcdsa.isLowS({ r: data.r, s: data.s, v: data.v })) {
 			throw new InvalidTransactionBytesError("non-canonical signature (high S value)");
 		}
 
 		const unsignedHash = await this.hashFactory.toHashUnsigned(data);
 		const hash = await this.hashFactory.toHash(data);
 
-		const senderPublicKey = this.signatureSerializer.recoverPublicKey(unsignedHash, {
+		const senderPublicKey = this.signatureEcdsa.recoverPublicKey(unsignedHash, {
 			r: data.r,
 			s: data.s,
 			v: data.v,
