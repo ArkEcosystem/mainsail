@@ -1,14 +1,14 @@
 {
-    "address": "0xA92D69b4CC15dd3940ff8B247533302D3Bab4Ff2",
+    "address": "0xFaF2A197233DE670fEA2850C465F6Cf32aA0847F",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "40ccc91b2e0a06a4a819947893d48ec617ef4b662aa618eb087e06c0992318ff",
-        "publicKey": "b05c48df326aae69cf0d11d0ede76c5a38f3b50393e4ac61b657603f31c8d9fb69094f2794851b430f1f1d8429652358"
+        "privateKey": "2541b58a5f2c4eb39b6d47db7c93ba0582766352fa3a9a47c4e16b6c893345c3",
+        "publicKey": "8d036e6ce18f3c97db3a23a1480e4df456ab5f0fa570f4df90536a67b5257b859398376f8c44d6d22736ce95acab06ef"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "e7748bfed0a9958a65e54bc76314c43d070da9c3c1c97d9c0c7bc0099fc83c0b",
-        "publicKey": "0300790569f4d0d6d13e8960e73ccb1f91fb986d216ba212a07e192b06924698d9"
+        "privateKey": "d3ee16da2ef9f40ce2c30f0c78416baffc64dacff8a05c3dbcc3058c0575e618",
+        "publicKey": "02fea45ee10450bc012a8ffbade94317c24ed19b863509a67038fb2e2e2b8f3dc8"
     },
-    "passphrase": "chimney trip drink twelve scout open confirm unusual flag life response club camera village pill hope silk key absorb skirt phone view divide aspect"
+    "passphrase": "stem food dirt cave use what code uniform bike route fence few decline easily indicate erosion slender able ancient ritual meadow cart blur expose"
 }
