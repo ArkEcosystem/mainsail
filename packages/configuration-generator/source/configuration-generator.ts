@@ -159,6 +159,7 @@ export class ConfigurationGenerator {
 							// @ts-ignore
 							network: {
 								chainId: options.chainId,
+								pubKeyHash: options.pubKeyHash || 30,
 							},
 						},
 						false,
