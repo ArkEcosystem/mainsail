@@ -203,7 +203,7 @@ const bootstrap = async (app: Application) => {
 	//
 
 	const result = await blockProcessor.process(commitState);
-	if (!result) {
+	if (!result.success) {
 		throw new Error("Failed to process genesis block");
 	}
 

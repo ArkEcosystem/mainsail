@@ -175,6 +175,21 @@ fn hash_serialize_into<T: Serialize>(
     Ok(())
 }
 
+// fn dump_to_json(
+//     state: &mut StateCommit,
+//     path: impl AsRef<std::path::Path>,
+// ) -> Result<(), crate::db::Error> {
+//     let cs = &state.change_set;
+
+//     let file = std::fs::File::create(path)
+//         .map_err(|e| crate::db::Error::State(format!("dump_to_json open: {e}")))?;
+
+//     serde_json::to_writer_pretty(file, cs)
+//         .map_err(|e| crate::db::Error::State(format!("dump_to_json write: {e}")))?;
+
+//     Ok(())
+// }
+
 #[cfg(test)]
 mod tests {
     use std::io::Write;

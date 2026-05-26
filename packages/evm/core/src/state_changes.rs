@@ -5,13 +5,14 @@ use revm::{
     primitives::{Address, B256, KECCAK_EMPTY, U256},
     state::{AccountInfo, Bytecode},
 };
+use serde::Serialize;
 
 use crate::legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet};
 
 /// Loosely based on https://github.com/bluealloy/revm/blob/v36/crates/revm/src/db/states/changes.rs and https://github.com/bluealloy/revm/blob/v36/crates/revm/src/db/states/bundle_state.rs#L449
 //
 /// The only change being that we preserve the old storage value.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Serialize)]
 pub struct StateChangeset {
     /// Vector of **not** sorted accounts information.
     pub accounts: Vec<(Address, Option<AccountInfo>)>,

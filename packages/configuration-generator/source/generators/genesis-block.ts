@@ -88,7 +88,7 @@ export class GenesisBlockGenerator extends Generator {
 			transactions = [...transactions, ...validatorTransactions];
 		}
 
-		const genesis = await this.#createGenesisCommit(genesisWallet.keys, transactions, options);
+		const genesis = await this.#createGenesisCommit(genesisWallet.keys, validatorsMnemonics, transactions, options);
 
 		return {
 			block: { ...genesis.block, transactions: genesis.block.transactions.map((tx) => tx.toData()) },
@@ -223,10 +223,11 @@ export class GenesisBlockGenerator extends Generator {
 
 	async #createGenesisCommit(
 		premineKeys: Contracts.Crypto.KeyPair,
+		validatorsMnemonics: string[],
 		transactions: Contracts.Crypto.Transaction[],
 		options: Contracts.NetworkGenerator.InternalOptions,
 	): Promise<Contracts.Crypto.Commit> {
-		const genesisBlock = await this.#createGenesisBlock(premineKeys, transactions, options);
+		const genesisBlock = await this.#createGenesisBlock(premineKeys, validatorsMnemonics, transactions, options);
 
 		const commit: Contracts.Crypto.CommitSerializable = {
 			block: genesisBlock.block,
@@ -247,6 +248,7 @@ export class GenesisBlockGenerator extends Generator {
 
 	async #createGenesisBlock(
 		keys: Contracts.Crypto.KeyPair,
+		validatorsMnemonics: string[],
 		transactions: Contracts.Crypto.Transaction[],
 		options: Contracts.NetworkGenerator.InternalOptions,
 	): Promise<{ block: Contracts.Crypto.Block; transactions: Contracts.Crypto.TransactionData[] }> {
@@ -274,6 +276,10 @@ export class GenesisBlockGenerator extends Generator {
 		let payloadSize = transactions.length * 4;
 
 		await this.evm.prepareNextCommit({ commitKey });
+
+		if (options.createLegacyColdWallets) {
+			await this.#createLegacyColdWallets(validatorsMnemonics);
+		}
 
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
 		for (const transaction of transactions) {
@@ -386,5 +392,58 @@ export class GenesisBlockGenerator extends Generator {
 			.set("genesisBlock.block.number", options.initialBlockNumber);
 
 		console.log(result);
+	}
+
+	async #createLegacyColdWallets(validatorMnemonics: string[]) {
+		const legacyColdWallets = await this.#getLegacyColdWallets(validatorMnemonics);
+		await this.evm.importLegacyColdWallets(legacyColdWallets.map(({ legacyColdWallet }) => legacyColdWallet));
+	}
+
+	async #getLegacyColdWallets(validatorMnemonics: string[]): Promise<
+		{
+			keyPair: Contracts.Crypto.KeyPair;
+			mainsailAddress: string;
+			legacyColdWallet: Contracts.Evm.LegacyColdWallet;
+		}[]
+	> {
+		const walletKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(
+			Identifiers.Cryptography.Identity.KeyPair.Factory,
+			"type",
+			"wallet",
+		);
+
+		const mainsailAddressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
+			Identifiers.Cryptography.Identity.Address.Factory,
+		);
+
+		const legacyAddressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
+			Identifiers.Cryptography.Legacy.Identity.AddressFactory,
+		);
+
+		const legacyColdWallets: {
+			keyPair: Contracts.Crypto.KeyPair;
+			mainsailAddress: string;
+			legacyColdWallet: Contracts.Evm.LegacyColdWallet;
+		}[] = [];
+		for (const secret of validatorMnemonics.values()) {
+			// use reversed secret as seed to not conflict with validators
+			const reversed = secret.split(" ").reverse().join(" ");
+
+			const walletKeyPair = await walletKeyPairFactory.fromMnemonic(reversed);
+
+			const mainsailAddress = await mainsailAddressFactory.fromPublicKey(walletKeyPair.publicKey);
+			const legacyAddress = await legacyAddressFactory.fromPublicKey(walletKeyPair.publicKey);
+			legacyColdWallets.push({
+				keyPair: walletKeyPair,
+				legacyColdWallet: {
+					address: legacyAddress,
+					balance: 1_000_000_000_000_000_000n,
+					legacyAttributes: {},
+				},
+				mainsailAddress,
+			});
+		}
+
+		return legacyColdWallets;
 	}
 }

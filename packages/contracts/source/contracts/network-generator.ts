@@ -71,6 +71,9 @@ export type InternalOptions = EnvironmentOptions &
 		configPath?: string;
 		overwriteConfig: boolean;
 		force: boolean;
+
+		// Testing
+		createLegacyColdWallets?: boolean;
 	};
 
 export type Options = Partial<InternalOptions> & {

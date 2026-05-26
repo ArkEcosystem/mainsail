@@ -237,14 +237,9 @@ const bootstrap = async (app: Contracts.Kernel.Application): Promise<void> => {
 		await tryImportSnapshot(app, genesisCommit);
 
 		const result = await blockProcessor.process(commitState);
-		if (!result) {
+		if (!result.success) {
 			throw new Error("Failed to process genesis block");
 		}
-
-		// TODO:
-		// if (!result || !result.success) {
-		// 	throw new Error("Failed to process genesis block");
-		// }
 
 		commitState.setProcessorResult(result);
 		await blockProcessor.commit(commitState);
