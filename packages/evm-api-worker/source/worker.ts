@@ -6,7 +6,7 @@ import { inject, injectable, postConstruct } from "@mainsail/container";
 @injectable()
 export class Worker implements Contracts.Evm.Worker {
 	@inject(Identifiers.Evm.WorkerSubprocess.Factory)
-	private readonly createWorkerSubprocess!: Contracts.Crypto.WorkerSubprocessFactory;
+	private readonly createWorkerSubprocess!: Contracts.Kernel.IPC.SubprocessFactory;
 
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
@@ -14,7 +14,7 @@ export class Worker implements Contracts.Evm.Worker {
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly p2pRepository!: Contracts.P2P.PeerRepository;
 
-	private ipcSubprocess!: Contracts.Evm.WorkerSubprocess;
+	private ipcSubprocess!: Contracts.Kernel.IPC.Subprocess;
 
 	#bootPromise?: Promise<void>;
 

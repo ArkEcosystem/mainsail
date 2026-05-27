@@ -1,6 +1,6 @@
 import type { CommitHandler } from "../crypto/index.js";
 import type { EventListener } from "../kernel/index.js";
-import type { EventCallback, Subprocess } from "../kernel/ipc.js";
+import type { EventCallback } from "../kernel/ipc.js";
 import type { KeyValuePair } from "../types/index.js";
 import type { GetBatchResult, GetBatchOptions } from "./selector.js";
 
@@ -18,10 +18,6 @@ export interface WorkerScriptHandler {
 }
 
 export type WorkerFactory = () => Worker;
-
-export type WorkerSubprocess = Subprocess;
-
-export type WorkerSubprocessFactory = () => WorkerSubprocess;
 
 export interface Worker extends Omit<WorkerScriptHandler, "commit">, CommitHandler, EventListener {
 	getQueueSize(): number;

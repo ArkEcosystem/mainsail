@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 @injectable()
 export class Worker implements Contracts.TransactionPool.Worker {
 	@inject(Identifiers.TransactionPool.WorkerSubprocess.Factory)
-	private readonly createWorkerSubprocess!: Contracts.Crypto.WorkerSubprocessFactory;
+	private readonly createWorkerSubprocess!: Contracts.Kernel.IPC.SubprocessFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
@@ -15,7 +15,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
-	private ipcSubprocess!: Contracts.TransactionPool.WorkerSubprocess;
+	private ipcSubprocess!: Contracts.Kernel.IPC.Subprocess;
 
 	#bootPromise?: Promise<void>;
 

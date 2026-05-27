@@ -6,9 +6,9 @@ import { inject, injectable, postConstruct } from "@mainsail/container";
 @injectable()
 export class Worker implements Contracts.Crypto.Worker {
 	@inject(Identifiers.CryptoWorker.WorkerSubprocess.Factory)
-	private readonly createWorkerSubprocess!: Contracts.Crypto.WorkerSubprocessFactory;
+	private readonly createWorkerSubprocess!: Contracts.Kernel.IPC.SubprocessFactory;
 
-	private ipcSubprocess!: Contracts.Crypto.WorkerSubprocess;
+	private ipcSubprocess!: Contracts.Kernel.IPC.Subprocess;
 
 	#bootPromise?: Promise<void>;
 

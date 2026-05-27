@@ -45,3 +45,5 @@ export interface Subprocess {
 	sendRequest<T>(method: string, ...arguments_: unknown[]): Promise<T>;
 	registerEventHandler<T>(event: string, callback: EventCallback<T>): void;
 }
+
+export type SubprocessFactory = () => Subprocess;

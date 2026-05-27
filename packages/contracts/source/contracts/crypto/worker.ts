@@ -1,7 +1,7 @@
 import type { BlockFactory } from "../crypto/block.js";
 import type { PublicKeyFactory, SignatureBls, SignatureEcdsa } from "../crypto/identities.js";
 import type { TransactionFactory } from "../crypto/transactions.js";
-import type { MethodArguments, Requests, Subprocess } from "../kernel/ipc.js";
+import type { MethodArguments, Requests } from "../kernel/ipc.js";
 import type { JsonObject } from "../types/index.js";
 
 export interface WorkerFlags extends JsonObject {
@@ -33,10 +33,6 @@ export interface WorkerScriptHandler {
 }
 
 export type WorkerFactory = () => Worker;
-
-export type WorkerSubprocess = Subprocess;
-
-export type WorkerSubprocessFactory = () => WorkerSubprocess;
 
 export interface Worker {
 	boot(flags: WorkerFlags): Promise<void>;
