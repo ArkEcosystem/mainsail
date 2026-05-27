@@ -26,13 +26,15 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 
 		this.logger.info(`Booting up ${workerCount} crypto workers`);
 
+		const workers: Contracts.Crypto.Worker[] = [];
+
 		for (let index = 0; index < workerCount; index++) {
 			const worker = this.createWorker();
-			this.#workers.push(worker);
+			workers.push(worker);
 		}
 
 		await Promise.all(
-			this.#workers.map((worker) =>
+			workers.map((worker) =>
 				worker.boot({
 					...this.flags,
 					thread: "crypto-worker",
@@ -40,13 +42,21 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 				}),
 			),
 		);
+
+		this.#workers = workers;
 	}
 
 	public async shutdown(): Promise<void> {
-		await Promise.all(this.#workers.map(async (worker) => await worker.kill()));
+		const workers = this.#workers;
+		this.#workers = [];
+		await Promise.all(workers.map(async (worker) => await worker.kill()));
 	}
 
 	public async getWorker(): Promise<Contracts.Crypto.Worker> {
+		if(this.#workers.length === 0) {
+			throw new Error("No crypto workers available");
+		}
+
 		// Pick the worker with the fewest in-flight requests. Scanning starts at a
 		// rotating cursor and only replaces the pick on a strictly smaller queue, so
 		// ties (e.g. all workers idle) fall back to round-robin and spread evenly.
