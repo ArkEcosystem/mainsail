@@ -19,7 +19,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				stderr: true,
 				stdout: true,
 			});
-			return new Ipc.Subprocess(this.app, "api", subprocess);
+			return new Ipc.Subprocess(this.app, "evm-api", "api", subprocess);
 		});
 
 		this.app.bind(Identifiers.Evm.Worker).toConstantValue(this.app.resolve(WorkerInstance));

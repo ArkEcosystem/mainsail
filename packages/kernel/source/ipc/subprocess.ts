@@ -15,29 +15,30 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 
 	public constructor(
 		app: Contracts.Kernel.Application,
+		name: string,
 		loggerContext: Contracts.Kernel.LoggerContext,
 		subprocess: Worker,
 	) {
 		this.subprocess = subprocess;
 
 		// Capture the thread id up front: Node resets it to -1 once the worker exits.
-		const threadId = this.subprocess.threadId;
+		const workerName = `${name}-${this.subprocess.threadId}`;
 
 		this.subprocess.on("message", this.onSubprocessMessage.bind(this));
 		this.subprocess.on("message", this.onEmit.bind(this));
 		this.subprocess.on("error", (error: Error) => {
-			logger.error(`Worker ${threadId} error: ${error.message}`);
+			logger.error(`Worker ${workerName} error: ${error.message}`);
 			this.rejectPending(error);
 		});
 		this.subprocess.on("exit", (code) => {
-			logger.debug(`Worker ${threadId} stopped with exit code ${code}`);
-			this.rejectPending(new Error(`Worker stopped with exit code ${code}`));
+			logger.debug(`Worker ${workerName} stopped with exit code ${code}`);
+			this.rejectPending(new Error(`Worker ${workerName} stopped with exit code ${code}`));
 		});
 		// A reply that fails to deserialize cannot be matched back to its request id,
 		// so the pending callback can never be settled. Reject everything in flight to
 		// avoid a silent hang rather than leaking the stuck request.
 		this.subprocess.on("messageerror", (error: Error) => {
-			logger.error(`Worker ${threadId} message could not be deserialized: ${error.message}`);
+			logger.error(`Worker ${workerName} message could not be deserialized: ${error.message}`);
 			this.rejectPending(error);
 		});
 
