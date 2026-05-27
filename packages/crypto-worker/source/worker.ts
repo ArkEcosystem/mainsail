@@ -2,7 +2,6 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { sleep } from "@mainsail/utils";
 
 @injectable()
 export class Worker implements Contracts.Crypto.Worker {
@@ -11,26 +10,15 @@ export class Worker implements Contracts.Crypto.Worker {
 
 	private ipcSubprocess!: Contracts.Crypto.WorkerSubprocess;
 
-	#booted = false;
-	#booting = false;
+	#bootPromise?: Promise<void>;
 
 	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
-		this.ipcSubprocess = this.createWorkerSubprocess();
-
-		while (this.#booting) {
-			await sleep(50);
+		if (!this.#bootPromise) {
+			this.ipcSubprocess = this.createWorkerSubprocess();
+			this.#bootPromise = this.ipcSubprocess.sendRequest("boot", flags);
 		}
 
-		if (this.#booted) {
-			return;
-		}
-
-		this.#booting = true;
-
-		await this.ipcSubprocess.sendRequest("boot", flags);
-
-		this.#booting = false;
-		this.#booted = true;
+		await this.#bootPromise;
 	}
 
 	public async kill(): Promise<number> {

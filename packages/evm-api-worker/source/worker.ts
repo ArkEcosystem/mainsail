@@ -16,7 +16,7 @@ export class Worker implements Contracts.Evm.Worker {
 
 	private ipcSubprocess!: Contracts.Evm.WorkerSubprocess;
 
-	#booted = false;
+	#bootPromise?: Promise<void>;
 
 	@postConstruct()
 	public initialize(): void {
@@ -35,12 +35,11 @@ export class Worker implements Contracts.Evm.Worker {
 	}
 
 	public async boot(flags: Contracts.Evm.WorkerFlags): Promise<void> {
-		if (this.#booted) {
-			return;
+		if (!this.#bootPromise) {
+			this.#bootPromise = this.ipcSubprocess.sendRequest("boot", flags);
 		}
-		this.#booted = true;
 
-		await this.ipcSubprocess.sendRequest("boot", flags);
+		await this.#bootPromise;
 	}
 
 	public async kill(): Promise<number> {
