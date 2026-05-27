@@ -79,6 +79,10 @@ export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 		return this.callbacks.size;
 	}
 
+	public isStopped(): boolean {
+		return this.#stopped !== undefined;
+	}
+
 	public sendRequest<T>(method: string, ...arguments_: unknown[]): Promise<T> {
 		if (this.#stopped) {
 			return Promise.reject(this.#stopped);

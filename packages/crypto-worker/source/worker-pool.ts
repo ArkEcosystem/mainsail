@@ -53,18 +53,23 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 	}
 
 	public getWorker(): Contracts.Crypto.Worker {
-		if (this.#workers.length === 0) {
+		const workers = this.#workers.filter((worker) => !worker.isStopped());
+
+		if (workers.length === 0) {
 			throw new Error("No crypto workers available");
 		}
+
+		// Eviction may have shrunk the pool past the cursor; bring it back in range.
+		this.#currentWorkerIndex %= workers.length;
 
 		// Pick the worker with the fewest in-flight requests. Scanning starts at a
 		// rotating cursor and only replaces the pick on a strictly smaller queue, so
 		// ties (e.g. all workers idle) fall back to round-robin and spread evenly.
-		let selected = this.#workers[this.#currentWorkerIndex];
+		let selected = workers[this.#currentWorkerIndex];
 		let smallestQueueSize = selected.getQueueSize();
 
-		for (let offset = 1; offset < this.#workers.length; offset++) {
-			const worker = this.#workers[(this.#currentWorkerIndex + offset) % this.#workers.length];
+		for (let offset = 1; offset < workers.length; offset++) {
+			const worker = workers[(this.#currentWorkerIndex + offset) % workers.length];
 			const queueSize = worker.getQueueSize();
 
 			if (queueSize < smallestQueueSize) {
@@ -73,7 +78,7 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 			}
 		}
 
-		this.#currentWorkerIndex = (this.#currentWorkerIndex + 1) % this.#workers.length;
+		this.#currentWorkerIndex = (this.#currentWorkerIndex + 1) % workers.length;
 
 		return selected;
 	}

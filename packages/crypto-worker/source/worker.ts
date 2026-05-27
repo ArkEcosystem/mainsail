@@ -33,6 +33,10 @@ export class Worker implements Contracts.Crypto.Worker {
 		return this.ipcSubprocess.getQueueSize();
 	}
 
+	public isStopped(): boolean {
+		return this.ipcSubprocess.isStopped();
+	}
+
 	public async consensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureBls>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.SignatureBls[K]>

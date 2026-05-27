@@ -41,6 +41,7 @@ export interface Handler<T extends object> {
 
 export interface Subprocess {
 	getQueueSize(): number;
+	isStopped(): boolean;
 	kill(): Promise<number>;
 	sendRequest<T>(method: string, ...arguments_: unknown[]): Promise<T>;
 	registerEventHandler<T>(event: string, callback: EventCallback<T>): void;

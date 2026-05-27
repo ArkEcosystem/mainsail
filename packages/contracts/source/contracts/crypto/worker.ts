@@ -37,6 +37,7 @@ export type WorkerFactory = () => Worker;
 export interface Worker {
 	boot(flags: WorkerFlags): Promise<void>;
 	getQueueSize(): number;
+	isStopped(): boolean;
 	kill(): Promise<number>;
 	consensusSignature<K extends Requests<SignatureBls>>(
 		method: K,
