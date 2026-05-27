@@ -11,7 +11,7 @@ export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 	private readonly subprocess: Worker;
 	private readonly workerName: string;
 	private readonly callbacks = new Map<number, Contracts.Kernel.IPC.RequestCallback<unknown>>();
-	private readonly eventHandlers = new Map<string, Contracts.Kernel.IPC.EventCallback<string>>();
+	private readonly eventHandlers = new Map<string, Contracts.Kernel.IPC.EventCallback<unknown>>();
 	#stopped?: Error;
 
 	public constructor(

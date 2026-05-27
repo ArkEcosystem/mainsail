@@ -22,7 +22,7 @@ export type ErrorReply = {
 
 export type Event = {
 	event: string;
-	data: string;
+	data: unknown;
 };
 
 export type Reply<T = unknown> = SuccessReply<T> | ErrorReply;
