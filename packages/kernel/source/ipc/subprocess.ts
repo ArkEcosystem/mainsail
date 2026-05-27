@@ -25,6 +25,13 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 		this.subprocess.on("exit", (code) =>
 			this.rejectPending(new Error(`Worker stopped with exit code ${code}`)),
 		);
+		// A reply that fails to deserialize cannot be matched back to its request id,
+		// so the pending callback can never be settled. Reject everything in flight to
+		// avoid a silent hang rather than leaking the stuck request.
+		this.subprocess.on("messageerror", (error: Error) => {
+			logger.error(`Worker message could not be deserialized: ${error.message}`);
+			this.rejectPending(error);
+		});
 
 		const logger = app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service);
 
