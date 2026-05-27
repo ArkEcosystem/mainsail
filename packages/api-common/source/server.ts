@@ -11,7 +11,7 @@ import {
 } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { merge } from "@mainsail/utils";
+import { ensureError, merge } from "@mainsail/utils";
 import { readFileSync } from "fs";
 
 import { Processor } from "./rcp/index.js";
@@ -84,7 +84,8 @@ export abstract class AbstractServer {
 			await this.server.start();
 
 			this.logger.info(`${this.prettyName} Server started at ${this.server.info.uri}`);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			await this.app.terminate(`Failed to start ${this.prettyName} Server!`, error);
 		}
 	}
@@ -94,7 +95,8 @@ export abstract class AbstractServer {
 			await this.server.stop();
 
 			this.logger.info(`${this.prettyName} Server stopped at ${this.server.info.uri}`);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			await this.app.terminate(`Failed to stop ${this.prettyName} Server!`, error);
 		}
 	}

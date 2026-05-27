@@ -12,6 +12,9 @@ type RateLimitPluginData = {
 	reset: number;
 };
 
+const isRateLimiterResponse = (value: unknown): value is RateLimiterRes =>
+	typeof value === "object" && value !== null && "remainingPoints" in value && "msBeforeNext" in value;
+
 const isListed = (ip: string, patterns: string[]): boolean => {
 	if (!Array.isArray(patterns)) {
 		return true;
@@ -66,14 +69,18 @@ export const rateLimit = {
 						reset: Date.now() + rateLimitRes.msBeforeNext,
 					} as RateLimitPluginData;
 				} catch (error) {
+					// rate-limiter-flexible rejects with a RateLimiterRes (not an Error) when
+					// the limit is hit; a real Error only occurs on an internal failure.
 					if (error instanceof Error) {
 						return Boom.internal(error.message);
 					}
 
-					request.plugins["rate-limit"] = {
-						remaining: error.remainingPoints,
-						reset: Date.now() + error.msBeforeNext,
-					} as RateLimitPluginData;
+					if (isRateLimiterResponse(error)) {
+						request.plugins["rate-limit"] = {
+							remaining: error.remainingPoints,
+							reset: Date.now() + error.msBeforeNext,
+						};
+					}
 
 					return Boom.tooManyRequests();
 				}

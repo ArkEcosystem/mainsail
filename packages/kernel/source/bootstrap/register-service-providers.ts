@@ -9,7 +9,7 @@ import {
 	RequiredDependencyCannotBeFound,
 	ServiceProviderCannotBeRegistered,
 } from "@mainsail/exceptions";
-import { assert } from "@mainsail/utils";
+import { assert, ensureError } from "@mainsail/utils";
 import semver from "semver";
 
 import { ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
@@ -43,7 +43,8 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 				if (await this.#satisfiesDependencies(serviceProvider)) {
 					await serviceProviders.register(name);
 				}
-			} catch (error) {
+			} catch (rawError) {
+				const error = ensureError(rawError);
 				this.logger.error(`${name}: ${error.stack}`);
 
 				// Determine if the plugin is required to decide how to handle errors.

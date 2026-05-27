@@ -5,7 +5,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
-import { assert, chunk } from "@mainsail/utils";
+import { assert, chunk, ensureError } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
 import { createHash } from "node:crypto";
 import { promisify } from "node:util";
@@ -574,7 +574,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			const compressedData = await this.fileSystem.get(inputPath);
 			const decompressed = await promisify(brotliDecompress)(compressedData);
 			return JSON.parse(decompressed.toString()) as Interfaces.LegacySnapshot;
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			console.error("Error decompressing snapshot", error);
 			throw error;
 		}

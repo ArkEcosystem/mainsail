@@ -146,7 +146,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		for (const transaction of transactions) {
 			try {
 				await this.addTransaction(transaction);
-			} catch (ex) {
+			} catch {
 				removedTransactions.push(transaction);
 			}
 		}

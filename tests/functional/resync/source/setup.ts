@@ -2,6 +2,7 @@ import { TypeOrm } from "@mainsail/api-database";
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { Application, Bootstrap, Providers, Services } from "@mainsail/kernel";
+import { ensureError } from "@mainsail/utils";
 import { resolve } from "path";
 
 import { PoolWorker } from "./pool-worker.js";
@@ -307,8 +308,9 @@ const runDatabaseQuery = async <T>(databaseName: string, callback: (dataSource: 
 		const result = await callback(nodeDatabase);
 		return result;
 	} catch (ex) {
-		console.log("runDatabaseQuery", ex.message);
-		throw ex;
+		const error = ensureError(ex);
+		console.log("runDatabaseQuery", error.message);
+		throw error;
 	} finally {
 		await nodeDatabase.destroy();
 	}

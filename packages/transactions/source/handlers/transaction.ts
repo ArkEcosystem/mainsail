@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { TransactionFailedToPreverifyError, UnexpectedLegacySecondSignatureError } from "@mainsail/exceptions";
-import { assert } from "@mainsail/utils";
+import { assert, ensureError } from "@mainsail/utils";
 
 @injectable()
 export class TransactionHandler implements Contracts.Transactions.TransactionHandler {
@@ -101,7 +101,8 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 			});
 
 			return receipt;
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			throw new Error(`invalid EVM call: ${error.message}`);
 		}
 	}

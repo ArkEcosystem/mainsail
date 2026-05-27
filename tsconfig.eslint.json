@@ -24,7 +24,7 @@
 		"stripInternal": true,
 		"target": "es2021",
 		"typeRoots": ["reflect-metadata", "node_modules/@types"],
-		"useUnknownInCatchVariables": false
+		"useUnknownInCatchVariables": true
 	},
 	"exclude": ["distribution"]
 }

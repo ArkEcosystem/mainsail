@@ -3,6 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject, optional } from "@mainsail/container";
 import { InvalidTransactionDataError, PoolError } from "@mainsail/exceptions";
+import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class Processor implements Contracts.TransactionPool.Processor {
@@ -44,7 +45,8 @@ export class Processor implements Contracts.TransactionPool.Processor {
 						broadcastTransactions.push(transaction);
 						broadcast.push(index);
 					} catch {}
-				} catch (error) {
+				} catch (rawError) {
+					const error = ensureError(rawError);
 					invalid.push(index);
 
 					if (error instanceof PoolError) {
@@ -84,7 +86,8 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	async #getTransactionFromBuffer(transactionData: Buffer): Promise<Contracts.Crypto.Transaction> {
 		try {
 			return await this.transactionFactory.fromBytes(transactionData);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			throw new InvalidTransactionDataError(error.message);
 		}
 	}

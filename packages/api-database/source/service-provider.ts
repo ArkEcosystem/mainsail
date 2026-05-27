@@ -1,6 +1,6 @@
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
-import { assert } from "@mainsail/utils";
+import { assert, ensureError } from "@mainsail/utils";
 import { DataSource } from "typeorm";
 import { URL } from "url";
 
@@ -251,8 +251,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeLegacyColdWalletRepository(customDataSource ?? dataSource),
 				);
-		} catch (error) {
-			await this.app.terminate("Failed to configure database!", error);
+		} catch (rawError) {
+			await this.app.terminate("Failed to configure database!", ensureError(rawError));
 		}
 	}
 

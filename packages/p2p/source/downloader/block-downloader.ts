@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 import { constants } from "../constants.js";
 import { getRandomPeer } from "../utils/index.js";
@@ -115,7 +116,8 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 			job.blocks = result.blocks;
 			job.status = JobStatus.ReadyToProcess;
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.#handleJobError(job, error);
 		}
 
@@ -176,7 +178,8 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			}
 
 			this.state.resetLastMessageTime();
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.#handleJobError(job, error);
 			return;
 		}

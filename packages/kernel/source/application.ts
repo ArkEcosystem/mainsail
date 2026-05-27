@@ -3,6 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Events, Identifiers } from "@mainsail/constants";
 import { Application as BaseApplication } from "@mainsail/container";
 import { DirectoryCannotBeFound } from "@mainsail/exceptions";
+import { ensureError } from "@mainsail/utils";
 import { exit } from "node:process";
 import { join } from "path";
 import { isMainThread } from "worker_threads";
@@ -46,7 +47,8 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 		try {
 			await this.#bootstrapWith("serviceProviders");
 			this.#booted = true;
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			await this.terminate(error.name, error);
 		}
 	}

@@ -1,6 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { injectable, postConstruct } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 import { AnySchema, FormatDefinition, KeywordDefinition, Schema } from "ajv";
 import formats from "ajv-formats";
 import keywords from "ajv-keywords";
@@ -35,7 +36,8 @@ export class Validator implements Contracts.Crypto.Validator {
 				errors: this.ajv_.errors || undefined,
 				value: data,
 			};
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			return { error: error.stack, errors: [], value: data };
 		}
 	}

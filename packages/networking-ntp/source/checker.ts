@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import Sntp from "@hapi/sntp";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { shuffle } from "@mainsail/utils";
+import { ensureError, shuffle } from "@mainsail/utils";
 
 @injectable()
 export class Checker {
@@ -27,7 +27,8 @@ export class Checker {
 				this.logger.info(`Successfully connected to NTP host: ${host}. Time offset: ${result.t} ms`);
 
 				return;
-			} catch (error) {
+			} catch (rawError) {
+				const error = ensureError(rawError);
 				this.logger.error(`Host ${host} responded with: ${error.message}`);
 			}
 		}

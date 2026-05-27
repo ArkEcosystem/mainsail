@@ -3,6 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import Hapi from "@hapi/hapi";
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 import { getPeerIp } from "../../utils/index.js";
 
@@ -34,8 +35,9 @@ export class PostMessageController implements Contracts.P2P.Controller {
 			}
 
 			this.state.resetLastMessageTime();
-		} catch (error) {
-			this.peerDisposer.banPeer(getPeerIp(request), error.message);
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			this.peerDisposer.banPeer(getPeerIp(request), error);
 		}
 
 		return {};

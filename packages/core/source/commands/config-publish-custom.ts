@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Commands } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { http } from "@mainsail/utils";
+import { ensureError, http } from "@mainsail/utils";
 import { createWriteStream, existsSync, readFileSync, writeFileSync } from "fs";
 import { ensureDirSync, removeSync } from "fs-extra/esm";
 import got from "got";
@@ -202,7 +202,8 @@ export class Command extends Commands.Command {
 
 			const { data } = await http.get<string>(url);
 			return data;
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			console.error(`Error fetching file from ${url}:`, error);
 
 			throw new Error(

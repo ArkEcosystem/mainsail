@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { MessageDeserializationError } from "@mainsail/exceptions";
-import { ByteBuffer } from "@mainsail/utils";
+import { ByteBuffer, ensureError } from "@mainsail/utils";
 
 import { schema } from "./serializer-schemas.js";
 
@@ -27,7 +27,8 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 			if (buffer.getRemainderLength() === 0) {
 				return result;
 			}
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			throw new MessageDeserializationError(error instanceof Error ? error.message : "");
 		}
 

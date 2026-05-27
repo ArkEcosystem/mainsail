@@ -4,6 +4,7 @@ import Hapi from "@hapi/hapi";
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { RpcError } from "@mainsail/exceptions";
+import { ensureError } from "@mainsail/utils";
 
 import { getRcpId, prepareRcpError } from "./utilities.js";
 
@@ -54,7 +55,8 @@ export class Processor implements Contracts.Api.RPC.Processor {
 				jsonrpc: "2.0",
 				result: await action.handle(rcpRequest.params),
 			};
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			if (error instanceof RpcError) {
 				return prepareRcpError(rcpRequest.id, error.code, error.message, error.data);
 			}
