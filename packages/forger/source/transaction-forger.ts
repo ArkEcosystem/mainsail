@@ -3,6 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
+import { ensureError } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { TransactionIterable } from "./transaction-iterable.js";
@@ -183,7 +184,8 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 			result.gasUsed += gasUsed;
 			result.fee += this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, validation.gasUsed);
 			result.transactions.push(transaction);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			await this.#handleFailedTransaction(transaction, error as Error);
 		}
 	}

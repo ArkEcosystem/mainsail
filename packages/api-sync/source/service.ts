@@ -10,7 +10,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { parseTransactionError } from "@mainsail/evm-contracts";
-import { assert, chunk, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
+import { assert, chunk, ensureError, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { Listeners, TokenParser } from "./contracts.js";
@@ -450,11 +450,12 @@ export class Sync implements Contracts.ApiSync.Service {
 					try {
 						await this.#syncToDatabase(deferredSync);
 						success = true;
-					} catch (error) {
+					} catch (rawError) {
+						const error = ensureError(rawError);
 						const nextAttemptDelay = Math.min(baseDelay + attempts * 500, maxDelay);
 						attempts++;
 						this.logger.warn(
-							`sync encountered exception: ${error.message} (query: ${error.query}). retry #${attempts} in ... ${nextAttemptDelay}ms`,
+							`sync encountered exception: ${error.message} (query: ${(error as { query?: string }).query}). retry #${attempts} in ... ${nextAttemptDelay}ms`,
 						);
 						await sleep(nextAttemptDelay);
 					}
@@ -683,8 +684,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			await (this.dataSource as TypeOrm.DataSource)
 				.createQueryRunner()
 				.query("CREATE EXTENSION IF NOT EXISTS pg_trgm;");
-		} catch (error) {
-			await this.app.terminate("failed to reset database", error);
+		} catch (rawError) {
+			await this.app.terminate("failed to reset database", ensureError(rawError));
 		}
 	}
 }

@@ -3,6 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { isMajority, isMinority } from "@mainsail/blockchain-utils";
 import { Enums, Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 import { getRandomPeer } from "../utils/index.js";
 
@@ -338,8 +339,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			}
 
 			this.#checkResponse(prevotes, precommits, job);
-		} catch (error_) {
-			error = error_;
+		} catch (rawError) {
+			error = ensureError(rawError);
 		}
 
 		this.#removeDownloadJob(job);

@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Services } from "@mainsail/kernel";
-import { shuffle } from "@mainsail/utils";
+import { ensureError, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 import { normalizeUrl } from "./utils/index.js";
@@ -42,7 +42,8 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 					options: Contracts.P2P.AcceptNewPeerOptions;
 				}>("validateAndAcceptApiNode", { apiNode, options: {} });
 			}
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.logger.debug(`Failed to get api nodes from ${peer.ip}: ${error.message}`, "p2p");
 		}
 	}

@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged, optional } from "@mainsail/container";
 import { InvalidTransactionBytesError, TransactionSchemaError } from "@mainsail/exceptions";
-import { assert } from "@mainsail/utils";
+import { assert, ensureError } from "@mainsail/utils";
 
 import { BlockTransaction } from "./block-transaction.js";
 import { Transaction } from "./transaction.js";
@@ -135,7 +135,8 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			}
 
 			return new Transaction(tx, serialized);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			if (error instanceof TransactionSchemaError) {
 				throw error;
 			}

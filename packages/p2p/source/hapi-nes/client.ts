@@ -11,6 +11,7 @@ import WebSocket from "ws";
 import { parseNesMessage, stringifyNesMessage } from "./utilities.js";
 import { errorTypes } from "./constants.js";
 import { constants } from "../constants.js";
+import { ensureError } from "@mainsail/utils";
 
 /* eslint no-undef: 0 */
 const version = "2";
@@ -32,7 +33,8 @@ const NesError = function (err, type) {
 
 	try {
 		throw err; // ensure stack trace for IE11
-	} catch (error) {
+	} catch (rawError) {
+		const error = ensureError(rawError);
 		return error;
 	}
 };
@@ -390,7 +392,8 @@ export class Client {
 		let encoded;
 		try {
 			encoded = stringifyNesMessage(request);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			return Promise.reject(error);
 		}
 
@@ -400,7 +403,8 @@ export class Client {
 			try {
 				this._ws.send(encoded);
 				return Promise.resolve();
-			} catch (error) {
+			} catch (rawError) {
+				const error = ensureError(rawError);
 				return Promise.reject(NesError(error, errorTypes.WS));
 			}
 		}
@@ -435,7 +439,8 @@ export class Client {
 
 		try {
 			this._ws.send(encoded);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			clearTimeout(this._requests[request.id].timeout);
 			delete this._requests[request.id];
 			return Promise.reject(NesError(error, errorTypes.WS));
@@ -462,7 +467,8 @@ export class Client {
 				return this.onError(NesError("Received message is not a Buffer", errorTypes.PROTOCOL));
 			}
 			update = parseNesMessage(message.data);
-		} catch (error_) {
+		} catch (rawError) {
+			const error_ = ensureError(rawError);
 			return this.onError(NesError(error_, errorTypes.PROTOCOL));
 		}
 

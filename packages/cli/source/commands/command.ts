@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 import { ActionFactory } from "../action-factory.js";
 import { ComponentFactory } from "../component-factory.js";
@@ -57,7 +58,8 @@ export abstract class Command implements Contracts.Cli.Command {
 			} else {
 				this.output.setVerbosity(this.input.getFlag("v") || 1);
 			}
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.components.fatal(error.message);
 		}
 	}
@@ -79,7 +81,8 @@ export abstract class Command implements Contracts.Cli.Command {
 			}
 
 			await this.execute();
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.components.fatal(error.message);
 		}
 	}

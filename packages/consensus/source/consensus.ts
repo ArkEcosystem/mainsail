@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { assert, Lock } from "@mainsail/utils";
+import { assert, ensureError, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 const FAILED_PROCESSOR_RESULT: Contracts.Processor.BlockProcessorResult = {
@@ -143,7 +143,8 @@ export class Consensus implements Contracts.Consensus.Service {
 			for (let index = 0; index < this.#round; index++) {
 				await this.handle(this.roundStateRepository.getRoundState(this.#blockNumber, index));
 			}
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			await this.app.terminate("Consensus bootstrap error", error);
 		}
 	}
@@ -406,7 +407,8 @@ export class Consensus implements Contracts.Consensus.Service {
 		await this.commitLock.runExclusive(async () => {
 			try {
 				await this.processor.commit(processState);
-			} catch (error) {
+			} catch (rawError) {
+				const error = ensureError(rawError);
 				await this.app.terminate("Failed to commit block", error);
 			}
 
@@ -634,7 +636,8 @@ export class Consensus implements Contracts.Consensus.Service {
 				}
 
 				roundState.setProcessorResult(await this.processor.process(roundState));
-			} catch (error) {
+			} catch (rawError) {
+				const error = ensureError(rawError);
 				this.logger.error(
 					`Failed to process proposal ${this.#getHeightRoundString()}: ${error.message}`,
 					"consensus",

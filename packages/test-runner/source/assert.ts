@@ -7,6 +7,8 @@ import { join } from "path";
 import { Assertion, equal, fixture, instance, is, match, not, ok, throws, type, unreachable } from "uvu/assert";
 import { z } from "zod";
 
+import { ensureError } from "./ensure-error.js";
+
 interface Constructable<T = unknown> {
 	new (...arguments_: unknown[]): T;
 }
@@ -98,7 +100,8 @@ export const assert = {
 			await callback();
 
 			ok(false, "Expected promise to be rejected but it resolved.");
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			if (error instanceof Assertion) {
 				throw error;
 			}
@@ -127,7 +130,8 @@ export const assert = {
 			await callback();
 
 			ok(true);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			if (error instanceof Assertion) {
 				throw error;
 			}

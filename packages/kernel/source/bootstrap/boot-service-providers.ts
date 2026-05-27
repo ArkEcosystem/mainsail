@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ServiceProviderCannotBeBooted } from "@mainsail/exceptions";
-import { assert } from "@mainsail/utils";
+import { assert, ensureError } from "@mainsail/utils";
 
 import { ServiceProviderRepository } from "../providers/index.js";
 import { ChangeServiceProviderState } from "./listeners.js";
@@ -33,7 +33,8 @@ export class BootServiceProviders implements Contracts.Kernel.Bootstrapper {
 			if (await serviceProvider.bootWhen()) {
 				try {
 					await this.serviceProviders.boot(name);
-				} catch (error) {
+				} catch (rawError) {
+					const error = ensureError(rawError);
 					const isRequired: boolean = await serviceProvider.required();
 
 					if (isRequired) {

@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 import { totalmem } from "os";
 
 import { Application } from "../application.js";
@@ -55,8 +56,10 @@ export class DaemonizeProcess {
 				},
 				flagsProcess,
 			);
-		} catch (error) {
-			throw new Error(error.stderr ? `${error.message}: ${error.stderr}` : error.message);
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			const stderr = (rawError as { stderr?: string }).stderr;
+			throw new Error(stderr ? `${error.message}: ${stderr}` : error.message);
 		} finally {
 			spinner.stop();
 		}

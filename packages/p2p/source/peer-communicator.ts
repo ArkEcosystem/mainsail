@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { assert, http } from "@mainsail/utils";
+import { assert, ensureError, http } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { constants } from "./constants.js";
@@ -46,7 +46,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	public async postProposal(peer: Contracts.P2P.Peer, proposal: Buffer): Promise<void> {
 		try {
 			await this.#emit(peer, Routes.PostProposal, { proposal }, { timeout: 6000 });
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.#handleSocketError(peer, error);
 		}
 	}
@@ -54,7 +55,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	public async postMessage(peer: Contracts.P2P.Peer, message: Buffer): Promise<void> {
 		try {
 			await this.#emit(peer, Routes.PostMessage, { message }, { timeout: 6000 });
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.#handleSocketError(peer, error);
 		}
 	}
@@ -243,7 +245,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			statistic.success = true;
 
 			return { data, ...statistic };
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.logger.debugExtra(`Error communicating with peer ${peer.ip} on event ${event}. Error ${error}`);
 			throw error;
 		} finally {

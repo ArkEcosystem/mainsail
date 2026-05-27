@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class CommitHandler {
@@ -35,7 +36,8 @@ export class CommitHandler {
 			} else {
 				await this.transactionPoolService.commit(sendersAddresses, consumedGas, isSyncing);
 			}
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			throw new Error(`Failed to commit block: ${error.message}`);
 		}
 	}

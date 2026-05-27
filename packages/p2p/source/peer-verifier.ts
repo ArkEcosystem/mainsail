@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { assert } from "@mainsail/utils";
+import { assert, ensureError } from "@mainsail/utils";
 
 import { isValidVersion } from "./utils/index.js";
 
@@ -54,7 +54,8 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			peer.plugins = status.config.plugins;
 
 			return true;
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.logger.debugExtra(`Peer ${peer.ip} verification failed: ${error.message}`, "p2p");
 
 			this.peerDisposer.banPeer(peer.ip, error);

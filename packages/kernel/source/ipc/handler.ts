@@ -1,5 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
+import { ensureError } from "@mainsail/utils";
 import { parentPort } from "worker_threads";
 
 export class Handler<T extends object> implements Contracts.Kernel.IPC.Handler<T> {
@@ -25,7 +26,8 @@ export class Handler<T extends object> implements Contracts.Kernel.IPC.Handler<T
 
 			const result = await this.handler[message.method](...message.args);
 			parentPort?.postMessage({ id: message.id, result });
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			parentPort?.postMessage({ error: error.message, id: message.id });
 		}
 	}
