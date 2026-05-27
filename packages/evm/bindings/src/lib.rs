@@ -793,7 +793,13 @@ impl EvmInner {
             .get_mut(&commit_key)
             .expect("pending commit exists");
 
-        let result = state_root::calculate(&mut self.persistent_db, pending_commit, current_hash);
+        let genesis_info = self
+            .persistent_db
+            .genesis_info
+            .as_ref()
+            .expect("genesis info exists");
+
+        let result = state_root::calculate(&genesis_info, pending_commit, current_hash);
 
         match result {
             Ok(result) => Ok(result.encode_hex()),
