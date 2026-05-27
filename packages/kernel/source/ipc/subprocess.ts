@@ -21,8 +21,11 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 	) {
 		this.subprocess = subprocess;
 
+		const logger = app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service);
+
 		// Capture the thread id up front: Node resets it to -1 once the worker exits.
 		const workerName = `${name}-${this.subprocess.threadId}`;
+		logger.debug(`Spawning worker ${workerName}`);
 
 		this.subprocess.on("message", this.onSubprocessMessage.bind(this));
 		this.subprocess.on("message", this.onEmit.bind(this));
@@ -42,7 +45,6 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 			this.rejectPending(error);
 		});
 
-		const logger = app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service);
 
 		this.subprocess.stdout.pipe(split()).on("data", (line) => {
 			// [LEVEL] MESSAGE
