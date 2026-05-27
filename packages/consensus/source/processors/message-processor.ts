@@ -106,7 +106,7 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 	}
 
 	async #hasValidSignature(message: Contracts.Crypto.Message): Promise<boolean> {
-		const worker = await this.workerPool.getWorker();
+		const worker = this.workerPool.getWorker();
 		return worker.consensusSignature(
 			"verify",
 			Buffer.from(message.signature, "hex"),

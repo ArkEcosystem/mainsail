@@ -46,5 +46,5 @@ export interface Worker extends WorkerScriptHandler {
 export interface WorkerPool {
 	boot(): Promise<void>;
 	shutdown(): Promise<void>;
-	getWorker(): Promise<Worker>;
+	getWorker(): Worker;
 }

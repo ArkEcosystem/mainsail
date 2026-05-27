@@ -52,8 +52,8 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 		await Promise.all(workers.map(async (worker) => await worker.kill()));
 	}
 
-	public async getWorker(): Promise<Contracts.Crypto.Worker> {
-		if(this.#workers.length === 0) {
+	public getWorker(): Contracts.Crypto.Worker {
+		if (this.#workers.length === 0) {
 			throw new Error("No crypto workers available");
 		}
 
