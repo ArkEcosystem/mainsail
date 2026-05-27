@@ -25,12 +25,12 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 	public async boot(): Promise<void> {
 		const workerCount = this.configuration.getRequired<number>("workerCount");
 
+		this.logger.info(`Booting up ${workerCount} crypto workers`);
+
 		for (let index = 0; index < workerCount; index++) {
 			const worker = this.createWorker();
 			this.workers.push(worker);
 		}
-
-		this.logger.info(`Booting up ${this.workers.length} crypto workers`);
 
 		await Promise.all(
 			this.workers.map((worker) =>
