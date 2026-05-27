@@ -27,8 +27,7 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 		const workerName = `${name}-${this.subprocess.threadId}`;
 		logger.debug(`Spawning worker ${workerName}`);
 
-		this.subprocess.on("message", this.onSubprocessMessage.bind(this));
-		this.subprocess.on("message", this.onEmit.bind(this));
+		this.subprocess.on("message", this.onMessage.bind(this));
 		this.subprocess.on("error", (error: Error) => {
 			logger.error(`Worker ${workerName} error: ${error.message}`);
 			this.rejectPending(error);
@@ -96,31 +95,23 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 		this.callbacks.clear();
 	}
 
-	private onEmit(message: Contracts.Kernel.IPC.Event): void {
-		if (!("event" in message)) {
-			return;
-		}
-
-		const callback = this.eventHandlers.get(message.event);
-
-		if (callback) {
-			callback(message.data);
-		}
-	}
-
-	private onSubprocessMessage(message: Contracts.Kernel.IPC.Reply<void>): void {
-		if (!("id" in message)) {
-			return;
-		}
-
-		try {
-			if ("error" in message) {
-				this.callbacks.get(message.id)?.reject(new Error(message.error));
-			} else {
-				this.callbacks.get(message.id)?.resolve(message.result as unknown as T);
+	private onMessage(message: Contracts.Kernel.IPC.Reply<void> | Contracts.Kernel.IPC.Event): void {
+		if ("id" in message) {
+			try {
+				if ("error" in message) {
+					this.callbacks.get(message.id)?.reject(new Error(message.error));
+				} else {
+					this.callbacks.get(message.id)?.resolve(message.result as unknown as T);
+				}
+			} finally {
+				this.callbacks.delete(message.id);
 			}
-		} finally {
-			this.callbacks.delete(message.id);
+
+			return;
+		}
+
+		if ("event" in message) {
+			this.eventHandlers.get(message.event)?.(message.data);
 		}
 	}
 }
