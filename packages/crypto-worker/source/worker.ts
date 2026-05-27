@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 
 @injectable()
 export class Worker implements Contracts.Crypto.Worker {
@@ -12,9 +12,13 @@ export class Worker implements Contracts.Crypto.Worker {
 
 	#bootPromise?: Promise<void>;
 
+	@postConstruct()
+	public initialize(): void {
+		this.ipcSubprocess = this.createWorkerSubprocess();
+	}
+
 	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
 		if (!this.#bootPromise) {
-			this.ipcSubprocess = this.createWorkerSubprocess();
 			this.#bootPromise = this.ipcSubprocess.sendRequest("boot", flags);
 		}
 
