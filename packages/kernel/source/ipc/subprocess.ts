@@ -21,6 +21,10 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 		this.subprocess = subprocess;
 		this.subprocess.on("message", this.onSubprocessMessage.bind(this));
 		this.subprocess.on("message", this.onEmit.bind(this));
+		this.subprocess.on("error", (error: Error) => this.rejectPending(error));
+		this.subprocess.on("exit", (code) =>
+			this.rejectPending(new Error(`Worker stopped with exit code ${code}`)),
+		);
 
 		const logger = app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service);
 
@@ -67,6 +71,13 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 
 	public registerEventHandler<T>(event: string, callback: Contracts.Kernel.IPC.EventCallback<T>): void {
 		this.eventHandlers.set(event, callback as Contracts.Kernel.IPC.EventCallback<unknown>);
+	}
+
+	private rejectPending(error: Error): void {
+		for (const { reject } of this.callbacks.values()) {
+			reject(error);
+		}
+		this.callbacks.clear();
 	}
 
 	private onEmit(message: Contracts.Kernel.IPC.Event): void {
