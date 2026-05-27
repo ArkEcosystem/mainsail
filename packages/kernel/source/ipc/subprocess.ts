@@ -81,7 +81,6 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 		return new Promise((resolve, reject) => {
 			const id = this.lastId++;
 			this.callbacks.set(id, { reject, resolve } as unknown as Contracts.Kernel.IPC.RequestCallback);
-			// TODO: we have to make sure args are always serializable and ideally don't copy
 			this.subprocess.postMessage({ args: arguments_, id, method });
 		});
 	}
