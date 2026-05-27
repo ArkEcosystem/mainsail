@@ -14,7 +14,7 @@ export interface WorkerScriptHandler {
 
 export type WorkerFactory = () => Worker;
 
-export type WorkerSubprocess = Subprocess<WorkerScriptHandler>;
+export type WorkerSubprocess = Subprocess;
 
 export type WorkerSubprocessFactory = () => WorkerSubprocess;
 

@@ -39,7 +39,7 @@ export interface Handler<T extends object> {
 	handleRequest<K extends Requests<T>>(method: K): void;
 }
 
-export interface Subprocess<T> {
+export interface Subprocess {
 	getQueueSize(): number;
 	kill(): Promise<number>;
 	sendRequest<T>(method: string, ...arguments_: unknown[]): Promise<T>;

@@ -4,13 +4,12 @@ import type { Worker } from "worker_threads";
 import { Identifiers, LogLevels } from "@mainsail/constants";
 import split from "split2";
 
-export class Subprocess<T extends Record<string, unknown> = Record<string, unknown>> implements Contracts.Kernel.IPC
-	.Subprocess<T> {
+export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 	#logLevels = new Set(LogLevels);
 
 	private lastId = 1;
 	private readonly subprocess: Worker;
-	private readonly callbacks = new Map<number, Contracts.Kernel.IPC.RequestCallbacks<T>>();
+	private readonly callbacks = new Map<number, Contracts.Kernel.IPC.RequestCallback<unknown>>();
 	private readonly eventHandlers = new Map<string, Contracts.Kernel.IPC.EventCallback<string>>();
 
 	public constructor(
@@ -77,9 +76,12 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 	}
 
 	public sendRequest<T>(method: string, ...arguments_: unknown[]): Promise<T> {
-		return new Promise((resolve, reject) => {
+		return new Promise<T>((resolve, reject) => {
 			const id = this.lastId++;
-			this.callbacks.set(id, { reject, resolve } as unknown as Contracts.Kernel.IPC.RequestCallback);
+			// The callbacks map is heterogeneous (one entry per in-flight request, each with its
+			// own result type), so it stores `unknown`; this is the boundary where the request's
+			// `T` is erased. `sendRequest<T>` keeps the promise typed for the caller.
+			this.callbacks.set(id, { reject, resolve: resolve as (result: unknown) => void });
 			this.subprocess.postMessage({ args: arguments_, id, method });
 		});
 	}
@@ -95,13 +97,13 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 		this.callbacks.clear();
 	}
 
-	private onMessage(message: Contracts.Kernel.IPC.Reply<void> | Contracts.Kernel.IPC.Event): void {
+	private onMessage(message: Contracts.Kernel.IPC.Reply<unknown> | Contracts.Kernel.IPC.Event): void {
 		if ("id" in message) {
 			try {
 				if ("error" in message) {
 					this.callbacks.get(message.id)?.reject(new Error(message.error));
 				} else {
-					this.callbacks.get(message.id)?.resolve(message.result as unknown as T);
+					this.callbacks.get(message.id)?.resolve(message.result);
 				}
 			} finally {
 				this.callbacks.delete(message.id);
