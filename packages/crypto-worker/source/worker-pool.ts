@@ -48,9 +48,24 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 	}
 
 	public async getWorker(): Promise<Contracts.Crypto.Worker> {
-		const worker = this.workers[this.#currentWorkerIndex];
+		// Pick the worker with the fewest in-flight requests. Scanning starts at a
+		// rotating cursor and only replaces the pick on a strictly smaller queue, so
+		// ties (e.g. all workers idle) fall back to round-robin and spread evenly.
+		let selected = this.workers[this.#currentWorkerIndex];
+		let smallestQueueSize = selected.getQueueSize();
+
+		for (let offset = 1; offset < this.workers.length; offset++) {
+			const worker = this.workers[(this.#currentWorkerIndex + offset) % this.workers.length];
+			const queueSize = worker.getQueueSize();
+
+			if (queueSize < smallestQueueSize) {
+				selected = worker;
+				smallestQueueSize = queueSize;
+			}
+		}
+
 		this.#currentWorkerIndex = (this.#currentWorkerIndex + 1) % this.workers.length;
 
-		return worker;
+		return selected;
 	}
 }
