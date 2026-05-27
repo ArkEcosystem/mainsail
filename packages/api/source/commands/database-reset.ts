@@ -12,6 +12,7 @@ import { Providers, Services } from "@mainsail/kernel";
 import { parse } from "envfile";
 import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
+import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -118,8 +119,9 @@ export class Command extends Commands.Command {
 					title: `Running migrations...`,
 				},
 			]);
-		} catch (ex) {
-			this.components.fatal(ex.message);
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			this.components.fatal(error.message);
 		} finally {
 			await database.dispose();
 		}

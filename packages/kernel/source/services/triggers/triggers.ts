@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { injectable } from "@mainsail/container";
 import { InvalidArgumentException } from "@mainsail/exceptions";
-import { assert } from "@mainsail/utils";
+import { assert, ensureError } from "@mainsail/utils";
 
 import { Action } from "./action.js";
 
@@ -68,7 +68,8 @@ export class Triggers {
 
 			stage = "after";
 			await this.#callAfterHooks<T>(name, arguments_, result);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			// Handle errors inside error hooks. Rethrow error if there are no error hooks.
 			if (this.get(name)!.hooks("error").size > 0) {
 				await this.#callErrorHooks(name, arguments_, result, error, stage);

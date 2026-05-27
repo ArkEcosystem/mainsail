@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { get, http } from "@mainsail/utils";
+import { ensureError, get, http } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { conditions } from "./conditions.js";
@@ -61,8 +61,10 @@ export class Listener implements Contracts.Kernel.EventListener<{ name: string; 
 			);
 
 			await this.#dispatchWebhookEvent(start, webhook, payload);
-		} catch (error) {
-			this.logger.error(`Webhooks Job ${webhook.id} failed: ${error.code ?? error.message}`);
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			const code = (rawError as { code?: string }).code;
+			this.logger.error(`Webhooks Job ${webhook.id} failed: ${code ?? error.message}`);
 
 			await this.#dispatchWebhookEvent(start, webhook, payload, error);
 		}

@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Ipc } from "@mainsail/kernel";
-import { http } from "@mainsail/utils";
+import { ensureError, http } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 @injectable()
@@ -26,7 +26,8 @@ export class PeerCommunicator implements Contracts.TransactionPool.PeerCommunica
 			await http.post(`${peer.url}/api/transactions`, {
 				body: { transactions: transactions.map((transaction) => transaction.serialized.toString("hex")) },
 			});
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.handleSocketError(peer, error);
 		}
 

@@ -12,6 +12,7 @@ import {
 } from "@mainsail/exceptions";
 import { Services } from "@mainsail/kernel";
 import { Wallets } from "@mainsail/state";
+import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class SenderState implements Contracts.TransactionPool.SenderState {
@@ -131,7 +132,8 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 					sender: this.#wallet,
 					transaction,
 				});
-			} catch (error) {
+			} catch (rawError) {
+				const error = ensureError(rawError);
 				throw new TransactionFailedToApplyError(transaction, error);
 			}
 		} else {

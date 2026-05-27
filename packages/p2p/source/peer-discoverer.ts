@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Services } from "@mainsail/kernel";
-import { http } from "@mainsail/utils";
+import { ensureError, http } from "@mainsail/utils";
 import { readJSONSync } from "fs-extra/esm";
 
 @injectable()
@@ -33,7 +33,8 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 					options: Contracts.P2P.AcceptNewPeerOptions;
 				}>("validateAndAcceptPeer", { ip: peer.ip, options: {} });
 			}
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.logger.debug(`Failed to get peers from ${peer.ip}: ${error.message}`, "p2p");
 			this.peerDisposer.banPeer(peer.ip, error);
 		}

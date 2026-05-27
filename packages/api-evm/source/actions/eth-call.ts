@@ -5,6 +5,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { RpcError } from "@mainsail/exceptions";
 import dayjs from "dayjs";
 import { zeroAddress } from "viem";
+import { ensureError } from "@mainsail/utils";
 
 type TxData = {
 	from?: string;
@@ -75,11 +76,12 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 				const data = receipt.output ? `0x${receipt.output.toString("hex")}` : undefined;
 				throw new RpcError("execution reverted", data);
 			}
-		} catch (ex) {
-			if (ex instanceof RpcError) {
-				throw ex;
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			if (error instanceof RpcError) {
+				throw error;
 			}
-			throw new RpcError(`execution reverted: ${ex.message}`);
+			throw new RpcError(`execution reverted: ${error.message}`);
 		}
 	}
 

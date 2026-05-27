@@ -4,6 +4,7 @@ import { injectable, postConstruct } from "@mainsail/container";
 import { parse } from "envfile";
 import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
+import { ensureError } from "@mainsail/utils";
 
 // Recreate database
 // source ~/.config/mainsail/api/.env
@@ -92,8 +93,9 @@ export class Command extends Commands.Command {
 					title: `Create empty database "${databaseName}" with owner "${user}"`,
 				},
 			]);
-		} catch (ex) {
-			this.components.fatal(ex.message);
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			this.components.fatal(error.message);
 		} finally {
 			await client.end();
 		}

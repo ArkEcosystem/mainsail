@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 import { DataSource, QueryFailedError } from "typeorm";
 
 import { Migrations as ApiDatabaseContracts_Migrations } from "./contracts.js";
@@ -23,7 +24,8 @@ export class Migrations implements ApiDatabaseContracts_Migrations {
 			// Manually run 'synchronize' to create entity tables once. We cannot rely on TypeORM to run it unconditionally
 			// when creating the datasource since it will fail to establish a connection when it runs into the 'Table already exists' error.
 			await this.dataSource.synchronize(false);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			if (!(error instanceof QueryFailedError)) {
 				throw error;
 			}
@@ -50,8 +52,8 @@ export class Migrations implements ApiDatabaseContracts_Migrations {
 			for (const migration of migrations) {
 				this.logger.info(`>>> ${migration.name}`);
 			}
-		} catch (error) {
-			await this.app.terminate("failed to run migrations", error);
+		} catch (rawError) {
+			await this.app.terminate("failed to run migrations", ensureError(rawError));
 		} finally {
 			await this.dataSource.manager.query(`SET statement_timeout = '${oldTimeout}'`);
 		}

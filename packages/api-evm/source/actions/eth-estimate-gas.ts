@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { RpcError } from "@mainsail/exceptions";
-import { assert } from "@mainsail/utils";
+import { assert, ensureError } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 type TxData = {
@@ -169,7 +169,8 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action<[TxData]> 
 		try {
 			const { receipt } = await this.evm.simulate(context);
 			return { receipt, success: receipt.status === 1 };
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			return { executionError: error.message, success: false };
 		}
 	}

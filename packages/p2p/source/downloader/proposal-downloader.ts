@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 import { getRandomPeer } from "../utils/index.js";
 
@@ -139,8 +140,8 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 			}
 
 			this.state.resetLastMessageTime();
-		} catch (error_) {
-			error = error_;
+		} catch (rawError) {
+			error = ensureError(rawError);
 		}
 
 		this.#removeDownload(job);

@@ -5,6 +5,7 @@ import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
 import { getPeerIp } from "../../utils/index.js";
+import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class PostProposalController implements Contracts.P2P.Controller {
@@ -33,8 +34,9 @@ export class PostProposalController implements Contracts.P2P.Controller {
 			}
 
 			this.state.resetLastMessageTime();
-		} catch (error) {
-			this.peerDisposer.banPeer(getPeerIp(request), error.message);
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			this.peerDisposer.banPeer(getPeerIp(request), error);
 		}
 
 		return {};

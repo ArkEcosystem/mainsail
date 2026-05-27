@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { http, HttpResponse } from "@mainsail/utils";
+import { ensureError, http, HttpResponse } from "@mainsail/utils";
 
 const helloWorld = { data: "Hello World from Transaction Pool API!" };
 const helloWorldLength = JSON.stringify(helloWorld).length;
@@ -31,7 +31,8 @@ export class TxPoolNodeVerifier implements Contracts.P2P.TxPoolNodeVerifier {
 			this.#verifyStatusCode(response);
 			this.#verifyHeaders(response);
 			this.#verifyResponseBody(response);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.logger.debugExtra(`TX Pool node ${node.url} verification failed: ${error.message}`, "p2p");
 			return false;
 		}

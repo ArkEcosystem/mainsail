@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { shuffle } from "@mainsail/utils";
+import { ensureError, shuffle } from "@mainsail/utils";
 import dns from "dns";
 import { promisify } from "util";
 
@@ -23,7 +23,8 @@ export class Checker {
 				await lookupService(host, 53);
 
 				return;
-			} catch (error) {
+			} catch (rawError) {
+				const error = ensureError(rawError);
 				this.logger.error(error.message);
 			}
 		}
