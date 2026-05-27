@@ -855,10 +855,6 @@ impl PersistentDB {
                 merged_legacy_cold_wallets,
             } = change_set;
 
-            accounts.par_sort_unstable_by_key(|a| a.0);
-            contracts.par_sort_unstable_by_key(|a| a.0);
-            storage.par_sort_unstable_by_key(|a| a.address);
-
             // Update accounts
             for (address, account) in accounts.iter() {
                 let address = AddressWrapper(*address);
@@ -939,8 +935,6 @@ impl PersistentDB {
                         unsafe { iter.del_current_with_flags(heed::DeleteFlags::NO_DUP_DATA)? };
                     }
                 }
-
-                storage.par_sort_unstable_by_key(|a| a.0);
 
                 for value in storage.into_iter() {
                     let new_storage_value = &StorageEntryWrapper(value.0, value.1.present_value());
