@@ -5,7 +5,7 @@ import { injectable } from "@mainsail/container";
 import { Ipc, Providers } from "@mainsail/kernel";
 import Joi from "joi";
 import { cpus } from "os";
-import { URL } from "url";
+import { fileURLToPath } from "url";
 import { Worker } from "worker_threads";
 
 import { WorkerPool } from "./worker-pool.js";
@@ -25,7 +25,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.CryptoWorker.WorkerPool).to(WorkerPool).inSingletonScope();
 
 		this.app.bind<() => Ipc.Subprocess>(Identifiers.CryptoWorker.WorkerSubprocess.Factory).toFactory(() => () => {
-			const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {
+			const subprocess = new Worker(fileURLToPath(new URL("worker-script.js", import.meta.url)), {
 				stderr: true,
 				stdout: true,
 			});

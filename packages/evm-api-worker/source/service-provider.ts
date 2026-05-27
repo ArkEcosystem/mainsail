@@ -4,6 +4,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Ipc, Providers } from "@mainsail/kernel";
 import Joi from "joi";
+import { fileURLToPath } from "url";
 import { Worker } from "worker_threads";
 
 import { Worker as WorkerInstance } from "./worker.js";
@@ -15,7 +16,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async register(): Promise<void> {
 		this.app.bind<() => Ipc.Subprocess>(Identifiers.Evm.WorkerSubprocess.Factory).toFactory(() => () => {
-			const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {
+			const subprocess = new Worker(fileURLToPath(new URL("worker-script.js", import.meta.url)), {
 				stderr: true,
 				stdout: true,
 			});
