@@ -21,7 +21,10 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 		this.subprocess = subprocess;
 		this.subprocess.on("message", this.onSubprocessMessage.bind(this));
 		this.subprocess.on("message", this.onEmit.bind(this));
-		this.subprocess.on("error", (error: Error) => this.rejectPending(error));
+		this.subprocess.on("error", (error: Error) => {
+			logger.error(`Worker error: ${error.message}`);
+			this.rejectPending(error);
+		});
 		this.subprocess.on("exit", (code) =>
 			this.rejectPending(new Error(`Worker stopped with exit code ${code}`)),
 		);
