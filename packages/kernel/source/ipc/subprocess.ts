@@ -9,8 +9,10 @@ export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 
 	private lastId = 1;
 	private readonly subprocess: Worker;
+	private readonly workerName: string;
 	private readonly callbacks = new Map<number, Contracts.Kernel.IPC.RequestCallback<unknown>>();
 	private readonly eventHandlers = new Map<string, Contracts.Kernel.IPC.EventCallback<string>>();
+	#stopped?: Error;
 
 	public constructor(
 		app: Contracts.Kernel.Application,
@@ -20,26 +22,27 @@ export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 	) {
 		this.subprocess = subprocess;
 
+		// Capture the thread id up front: Node resets it to -1 once the worker exits.
+		this.workerName = `${name}-${subprocess.threadId}`;
+
 		const logger = app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service);
 
-		// Capture the thread id up front: Node resets it to -1 once the worker exits.
-		const workerName = `${name}-${this.subprocess.threadId}`;
-		logger.debug(`Spawning worker ${workerName}`);
+		logger.debug(`Spawning worker ${this.workerName}`);
 
 		this.subprocess.on("message", this.onMessage.bind(this));
 		this.subprocess.on("error", (error: Error) => {
-			logger.error(`Worker ${workerName} error: ${error.message}`);
-			this.rejectPending(error);
+			logger.error(`Worker ${this.workerName} error: ${error.message}`);
+			this.#stop(error);
 		});
 		this.subprocess.on("exit", (code) => {
-			logger.debug(`Worker ${workerName} stopped with exit code ${code}`);
-			this.rejectPending(new Error(`Worker ${workerName} stopped with exit code ${code}`));
+			logger.debug(`Worker ${this.workerName} stopped with exit code ${code}`);
+			this.#stop(new Error(`Worker ${this.workerName} stopped with exit code ${code}`));
 		});
-		// A reply that fails to deserialize cannot be matched back to its request id,
-		// so the pending callback can never be settled. Reject everything in flight to
-		// avoid a silent hang rather than leaking the stuck request.
+		// A reply that fails to deserialize cannot be matched back to its request id, so the
+		// pending callback can never be settled. Reject everything in flight to avoid a silent
+		// hang. The worker stays alive after this, so it is not marked stopped.
 		this.subprocess.on("messageerror", (error: Error) => {
-			logger.error(`Worker ${workerName} message could not be deserialized: ${error.message}`);
+			logger.error(`Worker ${this.workerName} message could not be deserialized: ${error.message}`);
 			this.rejectPending(error);
 		});
 
@@ -68,6 +71,7 @@ export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 	}
 
 	public async kill(): Promise<number> {
+		this.#stopped ??= new Error(`Worker ${this.workerName} was killed`);
 		return this.subprocess.terminate();
 	}
 
@@ -76,6 +80,10 @@ export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 	}
 
 	public sendRequest<T>(method: string, ...arguments_: unknown[]): Promise<T> {
+		if (this.#stopped) {
+			return Promise.reject(this.#stopped);
+		}
+
 		return new Promise<T>((resolve, reject) => {
 			const id = this.lastId++;
 			// The callbacks map is heterogeneous (one entry per in-flight request, each with its
@@ -88,6 +96,13 @@ export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 
 	public registerEventHandler<T>(event: string, callback: Contracts.Kernel.IPC.EventCallback<T>): void {
 		this.eventHandlers.set(event, callback as Contracts.Kernel.IPC.EventCallback<unknown>);
+	}
+
+	// Mark the worker permanently gone, then reject anything in flight. The first reason wins
+	// (a crash `error` is more informative than the `exit` that follows it).
+	#stop(error: Error): void {
+		this.#stopped ??= error;
+		this.rejectPending(error);
 	}
 
 	private rejectPending(error: Error): void {
