@@ -9,10 +9,10 @@ import { Commands } from "@mainsail/cli";
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { injectable, postConstruct } from "@mainsail/container";
 import { Providers, Services } from "@mainsail/kernel";
+import { ensureError } from "@mainsail/utils";
 import { parse } from "envfile";
 import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
-import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class Command extends Commands.Command {

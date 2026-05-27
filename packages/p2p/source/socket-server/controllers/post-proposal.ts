@@ -3,9 +3,9 @@ import type { Contracts } from "@mainsail/contracts";
 import Hapi from "@hapi/hapi";
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 import { getPeerIp } from "../../utils/index.js";
-import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class PostProposalController implements Contracts.P2P.Controller {

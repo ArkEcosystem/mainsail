@@ -1,7 +1,7 @@
 import { Commands } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
-import { removeSync } from "fs-extra/esm";
 import { ensureError } from "@mainsail/utils";
+import { removeSync } from "fs-extra/esm";
 
 @injectable()
 export class Command extends Commands.Command {

@@ -1,10 +1,10 @@
 import { Pg } from "@mainsail/api-database";
 import { Commands } from "@mainsail/cli";
 import { injectable, postConstruct } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 import { parse } from "envfile";
 import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
-import { ensureError } from "@mainsail/utils";
 
 // Recreate database
 // source ~/.config/mainsail/api/.env

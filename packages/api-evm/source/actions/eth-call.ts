@@ -3,9 +3,9 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { RpcError } from "@mainsail/exceptions";
+import { ensureError } from "@mainsail/utils";
 import dayjs from "dayjs";
 import { zeroAddress } from "viem";
-import { ensureError } from "@mainsail/utils";
 
 type TxData = {
 	from?: string;
