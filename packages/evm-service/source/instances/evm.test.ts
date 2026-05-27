@@ -774,6 +774,18 @@ describe<{
 	});
 
 	it("should return state hash", async ({ instance }) => {
+		const [sender] = wallets;
+		const initialSupply = parseEther("100");
+
+		await instance.initializeGenesis({
+			account: sender.address,
+			initialSupply,
+			initialBlockNumber: 0n,
+			deployerAccount: zeroAddress,
+			usernameContract: zeroAddress,
+			validatorContract: zeroAddress,
+		});
+
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
 		await instance.prepareNextCommit({ commitKey });
 
@@ -781,7 +793,7 @@ describe<{
 			commitKey,
 			"0000000000000000000000000000000000000000000000000000000000000000",
 		);
-		assert.equal(hash, "0722d8002560934d7004b8b849101024bf7ec2aaa2c3396f7292d4ac8cdae5ab");
+		assert.equal(hash, "a09fc67efe3184d31dc3f1351381ca57861c5a568c122ab3e9c9c06395c52516");
 	});
 
 	it("should return logs bloom", async ({ instance }) => {
