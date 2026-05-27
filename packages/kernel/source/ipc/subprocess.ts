@@ -46,7 +46,6 @@ export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 			this.rejectPending(error);
 		});
 
-
 		this.subprocess.stdout.pipe(split()).on("data", (line) => {
 			// [LEVEL] MESSAGE
 			const match = line.match(/^\[(\w+)]\s+(.*)$/);
