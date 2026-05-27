@@ -77,7 +77,6 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 		return this.callbacks.size;
 	}
 
-	// TODO: use type magic to infer args (didn't work when T is also using same signatures)
 	public sendRequest<T>(method: string, ...arguments_: unknown[]): Promise<T> {
 		return new Promise((resolve, reject) => {
 			const id = this.lastId++;

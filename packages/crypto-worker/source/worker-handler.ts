@@ -126,41 +126,36 @@ export class WorkerScriptHandler implements Contracts.Crypto.WorkerScriptHandler
 
 	public async consensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureBls>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.SignatureBls[K]>
+		arguments_: Contracts.Kernel.IPC.MethodArguments<Contracts.Crypto.SignatureBls, K>,
 	): Promise<ReturnType<Contracts.Crypto.SignatureBls[K]>> {
-		// @ts-ignore
-		return this.#impl.callConsensusSignature(method, arguments_[0]);
+		return this.#impl.callConsensusSignature(method, arguments_);
 	}
 
 	public async walletSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureEcdsa>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.SignatureEcdsa[K]>
+		arguments_: Contracts.Kernel.IPC.MethodArguments<Contracts.Crypto.SignatureEcdsa, K>,
 	): Promise<ReturnType<Contracts.Crypto.SignatureEcdsa[K]>> {
-		// @ts-ignore
-		return this.#impl.callWalletSignature(method, arguments_[0]);
+		return this.#impl.callWalletSignature(method, arguments_);
 	}
 
 	public async blockFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.BlockFactory>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.BlockFactory[K]>
+		arguments_: Contracts.Kernel.IPC.MethodArguments<Contracts.Crypto.BlockFactory, K>,
 	): Promise<ReturnType<Contracts.Crypto.BlockFactory[K]>> {
-		// @ts-ignore
-		return this.#impl.callBlockFactory(method, arguments_[0]);
+		return this.#impl.callBlockFactory(method, arguments_);
 	}
 
 	public async transactionFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.TransactionFactory>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.TransactionFactory[K]>
+		arguments_: Contracts.Kernel.IPC.MethodArguments<Contracts.Crypto.TransactionFactory, K>,
 	): Promise<ReturnType<Contracts.Crypto.TransactionFactory[K]>> {
-		// @ts-ignore
-		return this.#impl.callTransactionFactory(method, arguments_[0]);
+		return this.#impl.callTransactionFactory(method, arguments_);
 	}
 
 	public async publicKeyFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.PublicKeyFactory>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.PublicKeyFactory[K]>
+		arguments_: Contracts.Kernel.IPC.MethodArguments<Contracts.Crypto.PublicKeyFactory, K>,
 	): Promise<ReturnType<Contracts.Crypto.PublicKeyFactory[K]>> {
-		// @ts-ignore
-		return this.#impl.callPublicKeyFactory(method, arguments_[0]);
+		return this.#impl.callPublicKeyFactory(method, arguments_);
 	}
 }
