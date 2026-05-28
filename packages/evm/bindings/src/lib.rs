@@ -667,7 +667,7 @@ impl EvmInner {
         Ok(match result {
             Ok(result) => PreverifyTxResult {
                 success: true,
-                initial_gas_used: result.initial_total_gas,
+                initial_gas_used: result.initial_total_gas(),
                 ..Default::default()
             },
             Err(err) => PreverifyTxResult {
