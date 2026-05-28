@@ -195,7 +195,7 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 			"Application is gracefully terminated.",
 		);
 
-		exit(1);
+		exit(0);
 	}
 
 	async #bootstrapWith(type: string): Promise<void> {

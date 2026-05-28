@@ -124,7 +124,7 @@ export class WorkerScriptHandler implements Contracts.Crypto.WorkerScriptHandler
 	}
 
 	public async dispose(): Promise<void> {
-		await this.#app.dispose();
+		await this.#app.terminate();
 	}
 
 	public async consensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureBls>>(

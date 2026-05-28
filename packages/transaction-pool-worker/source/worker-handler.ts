@@ -25,7 +25,7 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 	}
 
 	public async dispose(): Promise<void> {
-		await this.#app.dispose();
+		await this.#app.terminate();
 	}
 
 	public async start(height: number): Promise<void> {
