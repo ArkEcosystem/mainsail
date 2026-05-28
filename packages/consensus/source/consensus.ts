@@ -295,7 +295,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		const lockedRound = this.getLockedRound();
 
-		if ((!lockedRound || lockedRound <= proposal.validRound) && roundState.getProcessorResult()) {
+		if ((!lockedRound || lockedRound <= proposal.validRound) && roundState.getProcessorResult().success) {
 			await this.prevote(proposal.blockHeader.hash);
 		} else {
 			await this.prevote();
