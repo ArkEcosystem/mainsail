@@ -57,7 +57,7 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 		await this.#disposeServiceProviders();
 
 		this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).debug(
-				`Application ${this.thread()} is disposed.`,
+			`Application ${this.thread()} is disposed.`,
 		);
 	}
 

@@ -16,7 +16,6 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 	#app = new Application();
 
 	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
-
 		await this.#app.bootstrap({
 			flags,
 		});
