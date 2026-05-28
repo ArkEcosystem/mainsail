@@ -74,6 +74,13 @@ export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 		return this.subprocess.terminate();
 	}
 
+	// Graceful counterpart to kill(): same termination, but signals "normal shutdown" rather
+	// than a critical-error abort. Any pending request still in flight rejects with this reason.
+	public async dispose(): Promise<number> {
+		this.#stopped ??= new Error(`Worker ${this.workerName} is being disposed`);
+		return this.subprocess.terminate();
+	}
+
 	public getQueueSize(): number {
 		return this.callbacks.size;
 	}

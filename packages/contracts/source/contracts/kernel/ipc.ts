@@ -40,6 +40,7 @@ export interface Handler<T extends object> {
 }
 
 export interface Subprocess {
+	dispose(): Promise<number>;
 	getQueueSize(): number;
 	isStopped(): boolean;
 	kill(): Promise<number>;

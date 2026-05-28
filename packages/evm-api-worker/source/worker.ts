@@ -45,10 +45,22 @@ export class Worker implements Contracts.Evm.Worker {
 
 	public async dispose(): Promise<void> {
 		if (!this.#disposePromise) {
-			this.#disposePromise = this.ipcSubprocess.sendRequest("dispose");
+			this.#disposePromise = this.#doDispose();
 		}
 
 		await this.#disposePromise;
+	}
+
+	async #doDispose(): Promise<void> {
+		try {
+			await this.ipcSubprocess.sendRequest("dispose");
+		} catch {
+			// Worker may have died mid-dispose; we still need to terminate the thread.
+		}
+
+		// Graceful inner shutdown is done; now terminate the worker thread so it doesn't hang
+		// around with an open parentPort listener. After this, isStopped() === true.
+		await this.ipcSubprocess.dispose();
 	}
 
 	public async kill(): Promise<number> {
