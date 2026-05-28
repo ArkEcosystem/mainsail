@@ -159,7 +159,7 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 
 		if (reason) {
 			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service)[error ? "error" : "warn"](
-				`Application shutdown: ${reason}`,
+				`${this.isWorker() ? "Worker " + this.thread() : "Application"} shutdown: ${reason}`,
 			);
 		}
 
@@ -178,7 +178,7 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 
 		const timeout = setTimeout(() => {
 			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warn(
-				"Force application termination. Service providers did not dispose in time.",
+				`Force ${this.isWorker() ? "worker " + this.thread() : "application"} termination. Service providers did not dispose in time.`,
 			);
 			exit(1);
 		}, 3000);
@@ -192,7 +192,7 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 		this.#logOpenHandlers();
 
 		this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice(
-			"Application is gracefully terminated.",
+			`${this.isWorker() ? "Worker " + this.thread() : "Application"} is gracefully terminated.`,
 		);
 
 		exit(0);
@@ -235,7 +235,6 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 
 	#logOpenHandlers(): void {
 		try {
-			// @ts-ignore
 			const resourcesInfo: string[] = process.getActiveResourcesInfo(); // Method is experimental
 
 			const timeouts = resourcesInfo.filter((resource) => resource.includes("Timeout"));
