@@ -6,8 +6,6 @@ export interface Application {
 
 	boot(): Promise<void>;
 
-	dispose(): Promise<void>;
-
 	reboot(): Promise<void>;
 
 	config<T = unknown>(key: string, value?: T, defaultValue?: T): T | undefined;
