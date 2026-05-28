@@ -54,6 +54,10 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	}
 
 	async #doDispose(): Promise<void> {
+		// Let any work already in flight finish before tearing the worker down, so the
+		// dispose doesn't cut off requests that other service providers issued before us.
+		await this.ipcSubprocess.drain();
+
 		try {
 			await this.ipcSubprocess.sendRequest("dispose");
 		} catch {

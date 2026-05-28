@@ -13,6 +13,8 @@ export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 	private readonly callbacks = new Map<number, Contracts.Kernel.IPC.RequestCallback<unknown>>();
 	private readonly eventHandlers = new Map<string, Contracts.Kernel.IPC.EventCallback<unknown>>();
 	#stopped?: Error;
+	#drainPromise?: Promise<void>;
+	#drainResolve?: () => void;
 
 	public constructor(
 		app: Contracts.Kernel.Application,
@@ -81,6 +83,23 @@ export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 		return this.subprocess.terminate();
 	}
 
+	// Resolves once every in-flight sendRequest has settled (either replied or rejected via
+	// #stop / messageerror). Callers use this to wait for the worker to be quiet before
+	// disposing, so terminate() doesn't cut off work in progress.
+	public async drain(): Promise<void> {
+		if (this.callbacks.size === 0) {
+			return;
+		}
+
+		if (!this.#drainPromise) {
+			this.#drainPromise = new Promise<void>((resolve) => {
+				this.#drainResolve = resolve;
+			});
+		}
+
+		return this.#drainPromise;
+	}
+
 	public getQueueSize(): number {
 		return this.callbacks.size;
 	}
@@ -120,6 +139,15 @@ export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 			reject(error);
 		}
 		this.callbacks.clear();
+		this.#notifyDrained();
+	}
+
+	#notifyDrained(): void {
+		if (this.#drainResolve) {
+			this.#drainResolve();
+			this.#drainResolve = undefined;
+			this.#drainPromise = undefined;
+		}
 	}
 
 	private onMessage(message: Contracts.Kernel.IPC.Reply<unknown> | Contracts.Kernel.IPC.Event): void {
@@ -132,6 +160,9 @@ export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 				}
 			} finally {
 				this.callbacks.delete(message.id);
+				if (this.callbacks.size === 0) {
+					this.#notifyDrained();
+				}
 			}
 
 			return;
