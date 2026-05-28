@@ -34,7 +34,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<Contracts.Evm.Worker>(Identifiers.Evm.Worker).kill();
+		await this.app.get<Contracts.Evm.Worker>(Identifiers.Evm.Worker).dispose();
 	}
 
 	public async required(): Promise<boolean> {

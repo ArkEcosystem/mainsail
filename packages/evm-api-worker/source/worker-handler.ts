@@ -5,17 +5,18 @@ import { Application } from "@mainsail/kernel";
 import { CommitHandler, SetPeerCountHandler, StartHandler } from "./handlers/index.js";
 
 export class WorkerScriptHandler implements Contracts.Evm.WorkerScriptHandler {
-	#app!: Contracts.Kernel.Application;
+	#app = new Application();
 
 	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
-		const app: Contracts.Kernel.Application = new Application();
-
-		await app.bootstrap({
+		await this.#app.bootstrap({
 			flags,
 		});
 
-		await app.boot();
-		this.#app = app;
+		await this.#app.boot();
+	}
+
+	public async dispose(): Promise<void> {
+		await this.#app.dispose();
 	}
 
 	public async start(height: number): Promise<void> {

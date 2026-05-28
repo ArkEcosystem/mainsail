@@ -36,7 +36,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<Contracts.TransactionPool.Worker>(Identifiers.TransactionPool.Worker).kill();
+		await this.app.get<Contracts.TransactionPool.Worker>(Identifiers.TransactionPool.Worker).dispose();
 	}
 
 	public async required(): Promise<boolean> {

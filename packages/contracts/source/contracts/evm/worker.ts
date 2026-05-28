@@ -6,6 +6,7 @@ export type WorkerFlags = KeyValuePair;
 
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
+	dispose(): Promise<void>;
 	setPeerCount(peerCount: number): Promise<void>;
 	commit(blockNumber: number): Promise<void>;
 	start(blockNumber: number): Promise<void>;

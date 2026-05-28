@@ -8,6 +8,7 @@ export type WorkerFlags = KeyValuePair;
 
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
+	dispose(): Promise<void>;
 	getTransactions(options: GetBatchOptions): Promise<GetBatchResult>;
 	removeTransaction(address: string, id: string): Promise<void>;
 	commit(height: number, sendersAddresses: string[], consumedGas: number, isSyncing: boolean): Promise<void>;

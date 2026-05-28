@@ -46,10 +46,10 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 		this.#workers = workers;
 	}
 
-	public async shutdown(): Promise<void> {
+	public async dispose(): Promise<void> {
 		const workers = this.#workers;
 		this.#workers = [];
-		await Promise.all(workers.map(async (worker) => await worker.kill()));
+		await Promise.all(workers.map(async (worker) => await worker.dispose()));
 	}
 
 	public getWorker(): Contracts.Crypto.Worker {

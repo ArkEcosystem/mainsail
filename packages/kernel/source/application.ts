@@ -53,8 +53,12 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 		}
 	}
 
-	public async reboot(): Promise<void> {
+	public async dispose(): Promise<void> {
 		await this.#disposeServiceProviders();
+	}
+
+	public async reboot(): Promise<void> {
+		await this.dispose();
 
 		await this.boot();
 	}

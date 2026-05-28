@@ -107,21 +107,24 @@ function isBufferJson(value: unknown): value is BufferJson {
 }
 
 export class WorkerScriptHandler implements Contracts.Crypto.WorkerScriptHandler {
+	#app = new Application();
 	#impl!: WorkerImpl;
 
 	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
-		const app: Contracts.Kernel.Application = new Application();
-
-		await app.bootstrap({
+		await this.#app.bootstrap({
 			flags,
 		});
 
 		if (!flags.workerLoggingEnabled) {
-			app.rebind(Identifiers.Services.Log.Service).to(Services.Log.NullLogger);
+			this.#app.rebind(Identifiers.Services.Log.Service).to(Services.Log.NullLogger);
 		}
 
-		await app.boot();
-		this.#impl = app.resolve(WorkerImpl);
+		await this.#app.boot();
+		this.#impl = this.#app.resolve(WorkerImpl);
+	}
+
+	public async dispose(): Promise<void> {
+		await this.#app.dispose();
 	}
 
 	public async consensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureBls>>(

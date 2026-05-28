@@ -10,6 +10,7 @@ export interface WorkerFlags extends JsonObject {
 
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
+	dispose(): Promise<void>;
 	consensusSignature<K extends Requests<SignatureBls>>(
 		method: K,
 		arguments_: MethodArguments<SignatureBls, K>,
@@ -36,6 +37,7 @@ export type WorkerFactory = () => Worker;
 
 export interface Worker {
 	boot(flags: WorkerFlags): Promise<void>;
+	dispose(): Promise<void>;
 	getQueueSize(): number;
 	isStopped(): boolean;
 	kill(): Promise<number>;
@@ -63,6 +65,6 @@ export interface Worker {
 
 export interface WorkerPool {
 	boot(): Promise<void>;
-	shutdown(): Promise<void>;
+	dispose(): Promise<void>;
 	getWorker(): Worker;
 }

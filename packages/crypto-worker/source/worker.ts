@@ -11,6 +11,7 @@ export class Worker implements Contracts.Crypto.Worker {
 	private ipcSubprocess!: Contracts.Kernel.IPC.Subprocess;
 
 	#bootPromise?: Promise<void>;
+	#disposePromise?: Promise<void>;
 
 	@postConstruct()
 	public initialize(): void {
@@ -23,6 +24,14 @@ export class Worker implements Contracts.Crypto.Worker {
 		}
 
 		await this.#bootPromise;
+	}
+
+	public async dispose(): Promise<void> {
+		if (!this.#disposePromise) {
+			this.#disposePromise = this.ipcSubprocess.sendRequest("dispose");
+		}
+
+		await this.#disposePromise;
 	}
 
 	public async kill(): Promise<number> {
