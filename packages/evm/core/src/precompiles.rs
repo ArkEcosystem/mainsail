@@ -1,5 +1,3 @@
-use std::boxed::Box;
-
 use blst::BLST_ERROR;
 use blst::min_pk::{PublicKey, Signature};
 
@@ -9,18 +7,25 @@ use revm::handler::{EthPrecompiles, PrecompileProvider, precompile_output_to_int
 use revm::interpreter::{CallInputs, InterpreterResult};
 use revm::precompile::{PrecompileHalt, PrecompileOutput, PrecompileResult};
 use revm::primitives::hardfork::SpecId;
-use revm::primitives::{Address, Bytes, address};
+use revm::primitives::{Address, AddressSet, Bytes, address};
 
 pub const BLS_POP_VERIFY_ADDR: Address = address!("0000000000000000000000000000000001181200");
 
 pub struct MainsailPrecompiles {
     eth: EthPrecompiles,
+    warm_addresses: AddressSet,
 }
 
 impl MainsailPrecompiles {
     pub fn new(spec: SpecId) -> Self {
+        let eth = EthPrecompiles::new(spec);
+
+        let mut warm_addresses = eth.warm_addresses().clone();
+        warm_addresses.insert(BLS_POP_VERIFY_ADDR);
+
         Self {
-            eth: EthPrecompiles::new(spec),
+            eth,
+            warm_addresses,
         }
     }
 }
@@ -49,10 +54,8 @@ impl<CTX: ContextTr> PrecompileProvider<CTX> for MainsailPrecompiles {
         PrecompileProvider::<CTX>::run(&mut self.eth, context, inputs)
     }
 
-    fn warm_addresses(&self) -> Box<impl Iterator<Item = Address>> {
-        let mut addrs: Vec<Address> = self.eth.warm_addresses().collect();
-        addrs.push(BLS_POP_VERIFY_ADDR);
-        Box::new(addrs.into_iter())
+    fn warm_addresses(&self) -> &AddressSet {
+        &self.warm_addresses
     }
 
     fn contains(&self, address: &Address) -> bool {
