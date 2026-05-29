@@ -2063,6 +2063,9 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
+      esmock:
+        specifier: 2.7.5
+        version: 2.7.5
       uvu:
         specifier: 0.5.6
         version: 0.5.6
