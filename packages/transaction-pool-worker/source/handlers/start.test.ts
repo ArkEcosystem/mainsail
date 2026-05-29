@@ -25,8 +25,6 @@ describe<{
 				key === "server.http.enabled" ? context.enabled.http : context.enabled.https,
 		};
 
-		// Application binds itself as Application.Instance, so the handler resolves the servers
-		// off the same container the test binds them into.
 		context.app = new Application();
 		context.app.bind(Identifiers.State.Store).toConstantValue(context.store);
 		context.app.bind(Identifiers.TransactionPool.Service).toConstantValue(context.transactionPoolService);
