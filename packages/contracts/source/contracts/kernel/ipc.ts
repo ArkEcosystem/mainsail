@@ -22,7 +22,7 @@ export type ErrorReply = {
 
 export type Event = {
 	event: string;
-	data: string;
+	data: unknown;
 };
 
 export type Reply<T = unknown> = SuccessReply<T> | ErrorReply;
@@ -39,9 +39,14 @@ export interface Handler<T extends object> {
 	handleRequest<K extends Requests<T>>(method: K): void;
 }
 
-export interface Subprocess<T> {
+export interface Subprocess {
+	dispose(): Promise<number>;
+	drain(): Promise<void>;
 	getQueueSize(): number;
+	isStopped(): boolean;
 	kill(): Promise<number>;
 	sendRequest<T>(method: string, ...arguments_: unknown[]): Promise<T>;
 	registerEventHandler<T>(event: string, callback: EventCallback<T>): void;
 }
+
+export type SubprocessFactory = () => Subprocess;

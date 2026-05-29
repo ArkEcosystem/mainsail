@@ -20,6 +20,8 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 	public async kill(): Promise<number> {
 		return 0;
 	}
+
+	public async dispose(): Promise<void> {}
 	public getQueueSize(): number {
 		return 0;
 	}

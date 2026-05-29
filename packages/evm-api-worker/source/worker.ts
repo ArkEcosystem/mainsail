@@ -6,7 +6,7 @@ import { inject, injectable, postConstruct } from "@mainsail/container";
 @injectable()
 export class Worker implements Contracts.Evm.Worker {
 	@inject(Identifiers.Evm.WorkerSubprocess.Factory)
-	private readonly createWorkerSubprocess!: Contracts.Crypto.WorkerSubprocessFactory;
+	private readonly createWorkerSubprocess!: Contracts.Kernel.IPC.SubprocessFactory;
 
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
@@ -14,9 +14,10 @@ export class Worker implements Contracts.Evm.Worker {
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly p2pRepository!: Contracts.P2P.PeerRepository;
 
-	private ipcSubprocess!: Contracts.Evm.WorkerSubprocess;
+	private ipcSubprocess!: Contracts.Kernel.IPC.Subprocess;
 
-	#booted = false;
+	#bootPromise?: Promise<void>;
+	#disposePromise?: Promise<void>;
 
 	@postConstruct()
 	public initialize(): void {
@@ -35,12 +36,35 @@ export class Worker implements Contracts.Evm.Worker {
 	}
 
 	public async boot(flags: Contracts.Evm.WorkerFlags): Promise<void> {
-		if (this.#booted) {
-			return;
+		if (!this.#bootPromise) {
+			this.#bootPromise = this.ipcSubprocess.sendRequest("boot", flags);
 		}
-		this.#booted = true;
 
-		await this.ipcSubprocess.sendRequest("boot", flags);
+		await this.#bootPromise;
+	}
+
+	public async dispose(): Promise<void> {
+		if (!this.#disposePromise) {
+			this.#disposePromise = this.#doDispose();
+		}
+
+		await this.#disposePromise;
+	}
+
+	async #doDispose(): Promise<void> {
+		// Let any work already in flight finish before tearing the worker down, so the
+		// dispose doesn't cut off requests that other service providers issued before us.
+		await this.ipcSubprocess.drain();
+
+		try {
+			await this.ipcSubprocess.sendRequest("dispose");
+		} catch {
+			// Worker may have died mid-dispose; we still need to terminate the thread.
+		}
+
+		// Graceful inner shutdown is done; now terminate the worker thread so it doesn't hang
+		// around with an open parentPort listener. After this, isStopped() === true.
+		await this.ipcSubprocess.dispose();
 	}
 
 	public async kill(): Promise<number> {

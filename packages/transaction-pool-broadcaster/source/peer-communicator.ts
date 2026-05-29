@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { Identifiers } from "@mainsail/constants";
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Ipc } from "@mainsail/kernel";
 import { ensureError, http } from "@mainsail/utils";
@@ -40,7 +40,7 @@ export class PeerCommunicator implements Contracts.TransactionPool.PeerCommunica
 
 		if (peer.errorCount++ > this.configuration.getRequired<number>("maxSequentialErrors")) {
 			this.repository.forgetPeer(peer.ip);
-			Ipc.emit("peer.removed", peer.ip);
+			Ipc.emit(Events.PeerEvent.Removed, peer.ip);
 		}
 	}
 }

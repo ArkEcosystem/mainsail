@@ -19,11 +19,11 @@ export class Handler<T extends object> implements Contracts.Kernel.IPC.Handler<T
 	}
 
 	async #onMessage(message: { method: string; id: string; args: [] }) {
-		if (this.handler[message.method] === undefined) {
-			throw new Error(`Method ${message.method} is not defined on the handler`);
-		}
-
 		try {
+			if (this.handler[message.method] === undefined) {
+				throw new Error(`Method ${message.method} is not defined on the handler`);
+			}
+
 			const result = await this.handler[message.method](...message.args);
 			parentPort?.postMessage({ id: message.id, result });
 		} catch (rawError) {

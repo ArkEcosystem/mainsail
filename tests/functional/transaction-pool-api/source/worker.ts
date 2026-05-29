@@ -4,7 +4,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 
 @injectable()
-export class Worker implements Contracts.Crypto.WorkerScriptHandler {
+export class Worker implements Contracts.Crypto.Worker {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactoryImp!: Contracts.Crypto.TransactionFactory;
 
@@ -49,13 +49,19 @@ export class Worker implements Contracts.Crypto.WorkerScriptHandler {
 		throw new Error("Method publicKeyFactory not implemented.");
 	}
 
-	public async getQueueSize(): Promise<number> {
+	public getQueueSize(): number {
 		return 0;
 	}
 
-	public async kill(signal?: number | NodeJS.Signals): Promise<boolean> {
-		return true;
+	public isStopped(): boolean {
+		return false;
 	}
+
+	public async kill(): Promise<number> {
+		return 0;
+	}
+
+	public async dispose(): Promise<void> {}
 
 	async #callConsensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureBls>>(
 		method: K,

@@ -15,25 +15,26 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 	@inject(Identifiers.CryptoWorker.Worker.Factory)
 	private readonly createWorker!: Contracts.Crypto.WorkerFactory;
 
-	private workers: Contracts.Crypto.Worker[] = [];
-
 	@inject(Identifiers.Config.Flags)
 	private readonly flags!: Contracts.Types.KeyValuePair;
 
+	#workers: Contracts.Crypto.Worker[] = [];
 	#currentWorkerIndex = 0;
 
 	public async boot(): Promise<void> {
 		const workerCount = this.configuration.getRequired<number>("workerCount");
 
+		this.logger.info(`Booting up ${workerCount} crypto workers`);
+
+		const workers: Contracts.Crypto.Worker[] = [];
+
 		for (let index = 0; index < workerCount; index++) {
 			const worker = this.createWorker();
-			this.workers.push(worker);
+			workers.push(worker);
 		}
 
-		this.logger.info(`Booting up ${this.workers.length} crypto workers`);
-
 		await Promise.all(
-			this.workers.map((worker) =>
+			workers.map((worker) =>
 				worker.boot({
 					...this.flags,
 					thread: "crypto-worker",
@@ -41,16 +42,44 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 				}),
 			),
 		);
+
+		this.#workers = workers;
 	}
 
-	public async shutdown(): Promise<void> {
-		await Promise.all(this.workers.map(async (worker) => await worker.kill()));
+	public async dispose(): Promise<void> {
+		const workers = this.#workers;
+		this.#workers = [];
+		await Promise.all(workers.map(async (worker) => await worker.dispose()));
 	}
 
-	public async getWorker(): Promise<Contracts.Crypto.Worker> {
-		const worker = this.workers[this.#currentWorkerIndex];
-		this.#currentWorkerIndex = (this.#currentWorkerIndex + 1) % this.workers.length;
+	public getWorker(): Contracts.Crypto.Worker {
+		const workers = this.#workers.filter((worker) => !worker.isStopped());
 
-		return worker;
+		if (workers.length === 0) {
+			throw new Error("No crypto workers available");
+		}
+
+		// Eviction may have shrunk the pool past the cursor; bring it back in range.
+		this.#currentWorkerIndex %= workers.length;
+
+		// Pick the worker with the fewest in-flight requests. Scanning starts at a
+		// rotating cursor and only replaces the pick on a strictly smaller queue, so
+		// ties (e.g. all workers idle) fall back to round-robin and spread evenly.
+		let selected = workers[this.#currentWorkerIndex];
+		let smallestQueueSize = selected.getQueueSize();
+
+		for (let offset = 1; offset < workers.length; offset++) {
+			const worker = workers[(this.#currentWorkerIndex + offset) % workers.length];
+			const queueSize = worker.getQueueSize();
+
+			if (queueSize < smallestQueueSize) {
+				selected = worker;
+				smallestQueueSize = queueSize;
+			}
+		}
+
+		this.#currentWorkerIndex = (this.#currentWorkerIndex + 1) % workers.length;
+
+		return selected;
 	}
 }
