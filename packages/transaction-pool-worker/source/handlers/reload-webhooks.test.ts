@@ -6,6 +6,7 @@ import { ReloadWebhooksHandler } from "./reload-webhooks";
 
 describe<{
 	app: Application;
+	handler: ReloadWebhooksHandler;
 	database: any;
 }>("ReloadWebhooksHandler", ({ beforeEach, it, spy }) => {
 	beforeEach((context) => {
@@ -13,12 +14,14 @@ describe<{
 
 		context.app = new Application();
 		context.app.bind(Identifiers.Webhooks.Database).toConstantValue(context.database);
+
+		context.handler = context.app.resolve(ReloadWebhooksHandler);
 	});
 
 	it("restores the webhooks database", async (context) => {
 		const restore = spy(context.database, "restore");
 
-		await context.app.resolve(ReloadWebhooksHandler).handle();
+		await context.handler.handle();
 
 		restore.calledOnce();
 	});

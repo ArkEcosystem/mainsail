@@ -6,6 +6,7 @@ import { StartHandler } from "./start";
 
 describe<{
 	app: Application;
+	handler: StartHandler;
 	store: any;
 	transactionPoolService: any;
 	httpServer: any;
@@ -35,15 +36,15 @@ describe<{
 			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(configuration)
 			.whenTagged("plugin", "api-transaction-pool");
-	});
 
-	const resolve = (context) => context.app.resolve(StartHandler);
+		context.handler = context.app.resolve(StartHandler);
+	});
 
 	it("sets the block number and re-adds the transactions", async (context) => {
 		const setBlockNumber = spy(context.store, "setBlockNumber");
 		const reAdd = spy(context.transactionPoolService, "reAddTransactions");
 
-		await resolve(context).handle(42);
+		await context.handler.handle(42);
 
 		setBlockNumber.calledOnce();
 		setBlockNumber.calledWith(42);
@@ -54,7 +55,7 @@ describe<{
 		const http = spy(context.httpServer, "boot");
 		const https = spy(context.httpsServer, "boot");
 
-		await resolve(context).handle(42);
+		await context.handler.handle(42);
 
 		http.neverCalled();
 		https.neverCalled();
@@ -65,7 +66,7 @@ describe<{
 		const http = spy(context.httpServer, "boot");
 		const https = spy(context.httpsServer, "boot");
 
-		await resolve(context).handle(42);
+		await context.handler.handle(42);
 
 		http.calledOnce();
 		https.neverCalled();
@@ -76,7 +77,7 @@ describe<{
 		const http = spy(context.httpServer, "boot");
 		const https = spy(context.httpsServer, "boot");
 
-		await resolve(context).handle(42);
+		await context.handler.handle(42);
 
 		http.neverCalled();
 		https.calledOnce();
@@ -88,7 +89,7 @@ describe<{
 		const http = spy(context.httpServer, "boot");
 		const https = spy(context.httpsServer, "boot");
 
-		await resolve(context).handle(42);
+		await context.handler.handle(42);
 
 		http.calledOnce();
 		https.calledOnce();

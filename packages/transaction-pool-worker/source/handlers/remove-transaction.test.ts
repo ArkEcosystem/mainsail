@@ -6,6 +6,7 @@ import { RemoveTransactionHandler } from "./remove-transaction";
 
 describe<{
 	app: Application;
+	handler: RemoveTransactionHandler;
 	mempool: any;
 	storage: any;
 }>("RemoveTransactionHandler", ({ beforeEach, it, spy }) => {
@@ -16,13 +17,15 @@ describe<{
 		context.app = new Application();
 		context.app.bind(Identifiers.TransactionPool.Mempool).toConstantValue(context.mempool);
 		context.app.bind(Identifiers.TransactionPool.Storage).toConstantValue(context.storage);
+
+		context.handler = context.app.resolve(RemoveTransactionHandler);
 	});
 
 	it("removes the transaction from the mempool and the storage", async (context) => {
 		const fromMempool = spy(context.mempool, "removeTransaction");
 		const fromStorage = spy(context.storage, "removeTransaction");
 
-		await context.app.resolve(RemoveTransactionHandler).handle("address-1", "hash-1");
+		await context.handler.handle("address-1", "hash-1");
 
 		fromMempool.calledOnce();
 		fromMempool.calledWith("address-1", "hash-1");

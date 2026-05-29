@@ -6,6 +6,7 @@ import { GetTransactionsHandler } from "./get-transactions";
 
 describe<{
 	app: Application;
+	handler: GetTransactionsHandler;
 	selector: any;
 }>("GetTransactionsHandler", ({ assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
@@ -13,6 +14,8 @@ describe<{
 
 		context.app = new Application();
 		context.app.bind(Identifiers.TransactionPool.Selector).toConstantValue(context.selector);
+
+		context.handler = context.app.resolve(GetTransactionsHandler);
 	});
 
 	it("delegates to the selector and returns its batch", async (context) => {
@@ -21,7 +24,7 @@ describe<{
 		const getBatch = spy(context.selector, "getBatch");
 
 		const options = { limit: 5 };
-		const result = await context.app.resolve(GetTransactionsHandler).handle(options as any);
+		const result = await context.handler.handle(options as any);
 
 		getBatch.calledOnce();
 		getBatch.calledWith(options);

@@ -6,6 +6,7 @@ import { CommitHandler } from "./commit";
 
 describe<{
 	app: Application;
+	handler: CommitHandler;
 	stateStore: any;
 	configuration: any;
 	transactionPoolService: any;
@@ -25,15 +26,15 @@ describe<{
 		context.app.bind(Identifiers.TransactionPool.Service).toConstantValue(context.transactionPoolService);
 		context.app.bind(Identifiers.TransactionPool.Selector).toConstantValue(context.selector);
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
-	});
 
-	const resolve = (context) => context.app.resolve(CommitHandler);
+		context.handler = context.app.resolve(CommitHandler);
+	});
 
 	it("sets the block number and clears the selector", async (context) => {
 		const setBlockNumber = spy(context.stateStore, "setBlockNumber");
 		const clear = spy(context.selector, "clear");
 
-		await resolve(context).handle(10, ["address-1"], 1000, false);
+		await context.handler.handle(10, ["address-1"], 1000, false);
 
 		setBlockNumber.calledOnce();
 		setBlockNumber.calledWith(10);
@@ -44,7 +45,7 @@ describe<{
 		const commit = spy(context.transactionPoolService, "commit");
 		const reAdd = spy(context.transactionPoolService, "reAddTransactions");
 
-		await resolve(context).handle(10, ["address-1", "address-2"], 5000, true);
+		await context.handler.handle(10, ["address-1", "address-2"], 5000, true);
 
 		commit.calledOnce();
 		commit.calledWith(["address-1", "address-2"], 5000, true);
@@ -56,7 +57,7 @@ describe<{
 		const commit = spy(context.transactionPoolService, "commit");
 		const reAdd = spy(context.transactionPoolService, "reAddTransactions");
 
-		await resolve(context).handle(10, ["address-1"], 1000, false);
+		await context.handler.handle(10, ["address-1"], 1000, false);
 
 		reAdd.calledOnce();
 		commit.neverCalled();
@@ -68,7 +69,7 @@ describe<{
 		};
 
 		await assert.rejects(
-			() => resolve(context).handle(10, ["address-1"], 1000, false),
+			() => context.handler.handle(10, ["address-1"], 1000, false),
 			"Failed to commit block: boom",
 		);
 	});
@@ -79,7 +80,7 @@ describe<{
 		};
 
 		await assert.rejects(
-			() => resolve(context).handle(10, ["address-1"], 1000, false),
+			() => context.handler.handle(10, ["address-1"], 1000, false),
 			"Failed to commit block: string failure",
 		);
 	});
