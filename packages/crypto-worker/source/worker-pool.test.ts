@@ -106,6 +106,7 @@ describe<{
 		await workerPool.boot();
 
 		assert.equal(workerPool.getWorker(), pool[1]);
+		assert.equal(workerPool.getWorker(), pool[1]);
 	});
 
 	it("getWorker round-robins when the queues are tied", async ({ workerPool, pool }) => {
