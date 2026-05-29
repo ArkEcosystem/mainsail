@@ -33,7 +33,7 @@ export class WalletFilter {
 				case "balance": {
 					return handleOrCriteria(criteria.balance, async (c) =>
 						// @ts-ignore
-						handleComparisonCriteria("nonce", c),
+						handleComparisonCriteria("balance", c),
 					);
 				}
 				case "nonce": {
