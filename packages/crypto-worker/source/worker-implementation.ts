@@ -21,7 +21,6 @@ function isBufferJson(value: unknown): value is BufferJson {
 	return Array.isArray(v.data) || v.data instanceof Uint8Array;
 }
 
-
 @injectable()
 export class WorkerImplementation {
 	@inject(Identifiers.Cryptography.Block.Factory)
