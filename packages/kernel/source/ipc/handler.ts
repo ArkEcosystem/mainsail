@@ -1,18 +1,12 @@
-import type { Contracts } from "@mainsail/contracts";
-
 import { ensureError } from "@mainsail/utils";
 import { parentPort } from "worker_threads";
 
-export class Handler<T extends object> implements Contracts.Kernel.IPC.Handler<T> {
+export class Handler<T extends object> {
 	private readonly handler: T;
 
 	public constructor(handler: T) {
 		this.handler = handler;
 
-		this.handleRequest();
-	}
-
-	public handleRequest(): void {
 		parentPort?.on("message", (message) => {
 			void this.#onMessage(message);
 		});
