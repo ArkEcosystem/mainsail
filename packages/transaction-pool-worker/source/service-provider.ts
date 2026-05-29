@@ -3,7 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Ipc, Providers } from "@mainsail/kernel";
-import Joi from "joi";
 import { fileURLToPath } from "url";
 import { Worker } from "worker_threads";
 
@@ -41,9 +40,5 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async required(): Promise<boolean> {
 		return true;
-	}
-
-	public configSchema(): Joi.AnySchema {
-		return Joi.object({}).required().unknown(true);
 	}
 }
