@@ -31,7 +31,7 @@ import { setGracefulCleanup } from "tmp";
 
 describe<{
 	app: Application;
-	instance: Contracts.Evm.Instance;
+	instance: Contracts.Evm.Instance & Contracts.Evm.Storage;
 }>("Instance", ({ it, assert, afterAll, afterEach, beforeEach }) => {
 	afterAll(() => setGracefulCleanup());
 
@@ -42,7 +42,7 @@ describe<{
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.instance = context.app.resolve<Contracts.Evm.Instance>(EvmInstance);
+		context.instance = context.app.resolve(EvmInstance);
 	});
 
 	const deployConfig = {
@@ -1120,6 +1120,117 @@ describe<{
 		assert.equal(senderAccountAfter.balance, senderAccountBefore.balance - 100n);
 		assert.equal(recipientAccountAfter.balance, recipientAccountBefore.balance + 100n);
 		assert.equal(zeroAccountBefore.balance, zeroAccountAfter.balance);
+	});
+
+	const genesisConfig = (account: string, initialSupply = parseEther("100")) => ({
+		account,
+		deployerAccount: zeroAddress,
+		initialBlockNumber: 0n,
+		initialSupply,
+		usernameContract: zeroAddress,
+		validatorContract: zeroAddress,
+	});
+
+	const emptyUnit = (commitKey: { blockNumber: bigint; round: bigint }) =>
+		({
+			blockNumber: commitKey.blockNumber,
+			getBlock: () => ({ number: commitKey.blockNumber, round: commitKey.round }),
+			round: commitKey.round,
+			setAccountUpdates: () => {},
+		}) as any;
+
+	it("getState returns a numeric block number and total round", async ({ instance }) => {
+		const state = await instance.getState();
+
+		assert.number(state.blockNumber);
+		assert.number(state.totalRound);
+		assert.equal(state, { blockNumber: 0, totalRound: 0 });
+	});
+
+	it("isEmpty is true for a fresh instance", async ({ instance }) => {
+		assert.true(await instance.isEmpty());
+	});
+
+	it("getBlockNumberByHash returns undefined for an unknown hash", async ({ instance }) => {
+		assert.undefined(await instance.getBlockNumberByHash(zeroHash));
+	});
+
+	it("getCommitData returns undefined for an unknown block", async ({ instance }) => {
+		assert.undefined(await instance.getCommitData(999));
+	});
+
+	it("getBlockHeaderData returns nothing for an unknown block", async ({ instance }) => {
+		assert.undefined((await instance.getBlockHeaderData(999)) ?? undefined);
+	});
+
+	it("getTransactionData returns nothing for an unknown key", async ({ instance }) => {
+		assert.undefined((await instance.getTransactionData(zeroHash)) ?? undefined);
+	});
+
+	it("getTransactionKeyByHash returns nothing for an unknown hash", async ({ instance }) => {
+		assert.undefined((await instance.getTransactionKeyByHash(zeroHash)) ?? undefined);
+	});
+
+	it("getReceiptsByBlockNumber returns an empty record for a block with no receipts", async ({ instance }) => {
+		assert.equal(await instance.getReceiptsByBlockNumber(999n), {});
+	});
+
+	it("getReceipts returns a result with a receipt list", async ({ instance }) => {
+		const result = await instance.getReceipts(0n, 10n);
+
+		assert.array(result.receipts);
+	});
+
+	it("getAccounts returns the accounts funded by genesis", async ({ instance }) => {
+		const [sender] = wallets;
+		await instance.initializeGenesis(genesisConfig(sender.address));
+
+		const result = await instance.getAccounts(0n, 100n);
+
+		assert.array(result.accounts);
+		assert.true(result.accounts.length > 0);
+	});
+
+	it("importAccountInfos imports account balances", async ({ instance }) => {
+		const [sender] = wallets;
+		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
+
+		// importAccountInfos must run inside a prepared commit (see snapshot-legacy-importer).
+		await instance.prepareNextCommit({ commitKey });
+		await instance.importAccountInfos([
+			{ address: sender.address, balance: 1234n, legacyAttributes: {}, nonce: 0n },
+		]);
+		await instance.onCommit(emptyUnit(commitKey));
+
+		const info = await instance.getAccountInfo(sender.address);
+		assert.equal(info.balance, 1234n);
+	});
+
+	it("getLegacyAttributes returns nothing for a non-legacy address", async ({ instance }) => {
+		const [sender] = wallets;
+
+		assert.undefined((await instance.getLegacyAttributes(sender.address)) ?? undefined);
+	});
+
+	it("simulate executes a transaction without persisting state", async ({ instance }) => {
+		const [sender, recipient] = wallets;
+		await instance.initializeGenesis(genesisConfig(sender.address));
+
+		const { receipt } = await instance.simulate({
+			blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(0), round: BigInt(0) } },
+			data: Buffer.alloc(0),
+			from: sender.address,
+			gasLimit: 21_000n,
+			gasPrice: 0n,
+			nonce: 0n,
+			specId: Enums.Evm.SpecId.SHANGHAI,
+			to: recipient.address,
+			value: parseEther("1"),
+		});
+
+		assert.equal(receipt.status, 1);
+		// The simulated transfer must not have moved any funds.
+		assert.equal((await instance.getAccountInfo(recipient.address)).balance, 0n);
 	});
 });
 
