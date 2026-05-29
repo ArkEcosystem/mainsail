@@ -11,21 +11,18 @@ describe<{
 	configuration: any;
 	transactionPoolService: any;
 	selector: any;
-	logger: any;
 }>("CommitHandler", ({ assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.stateStore = { setBlockNumber: () => {} };
 		context.configuration = { isNewMilestone: () => false };
 		context.transactionPoolService = { commit: async () => {}, reAddTransactions: async () => {} };
 		context.selector = { clear: () => {} };
-		context.logger = { error: () => {} };
 
 		context.app = new Application();
 		context.app.bind(Identifiers.State.Store).toConstantValue(context.stateStore);
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 		context.app.bind(Identifiers.TransactionPool.Service).toConstantValue(context.transactionPoolService);
 		context.app.bind(Identifiers.TransactionPool.Selector).toConstantValue(context.selector);
-		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
 		context.handler = context.app.resolve(CommitHandler);
 	});
