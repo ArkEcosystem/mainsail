@@ -249,6 +249,7 @@ describe<{
 ```
 
 Conventions for IoC-injected classes under test:
+
 - Bind stubs to their `Identifiers` on an `Application` instance and resolve the class with `app.resolve(Class)`. `Application.get(id)` takes only the identifier; use `resolve()` for autobinding the class under test.
 - Resolve the tested class **in `beforeEach`** and store it on the context (e.g. `context.handler`). Don't resolve inline inside an `it()`.
 - In `it()` callbacks, **destructure the context** — `async ({ handler, myService }) => {}` — instead of referencing `context.x`. Mutating a destructured stub (e.g. `myService.method = …`) still works since it's the same object the handler holds.
