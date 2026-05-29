@@ -2,7 +2,6 @@ import { Identifiers } from "@mainsail/constants";
 import { Application, Ipc } from "@mainsail/kernel";
 import { EventEmitter } from "events";
 import esmock from "esmock";
-import Joi from "joi";
 import { PassThrough } from "stream";
 
 import { describe } from "@mainsail/test-runner";
@@ -76,7 +75,7 @@ describe<{
 	it("the worker factory resolves a Worker instance", async (context) => {
 		await context.serviceProvider.register();
 
-		const factory = context.app.get(Identifiers.CryptoWorker.Worker.Factory) as () => WorkerInstance;
+		const factory = context.app.get<() => WorkerInstance>(Identifiers.CryptoWorker.Worker.Factory);
 
 		assert.instance(factory(), WorkerInstance);
 	});
@@ -108,18 +107,94 @@ describe<{
 	it("is required", async (context) => {
 		assert.true(await context.serviceProvider.required());
 	});
+});
 
-	it("configSchema accepts a valid worker configuration", (context) => {
-		const schema = context.serviceProvider.configSchema() as Joi.AnySchema;
+const importFresh = (moduleName: string) => import(`${moduleName}?${Date.now()}`);
 
-		assert.undefined(schema.validate({ workerCount: 1, workerLoggingEnabled: false }).error);
-		assert.undefined(schema.validate({ extra: true, workerCount: 1, workerLoggingEnabled: true }).error);
+describe<{
+	app: Application;
+	serviceProvider: any;
+}>("ServiceProvider.configSchema", ({ assert, beforeEach, it }) => {
+	const importDefaults = async () => (await importFresh("../distribution/defaults.js")).defaults;
+
+	beforeEach((context) => {
+		context.app = new Application();
+		context.serviceProvider = context.app.resolve(ServiceProvider);
+
+		for (const key of Object.keys(process.env)) {
+			if (key.includes("MAINSAIL_CRYPTO_WORKER")) {
+				delete process.env[key];
+			}
+		}
 	});
 
-	it("configSchema rejects a missing or out-of-range worker configuration", (context) => {
-		const schema = context.serviceProvider.configSchema() as Joi.AnySchema;
+	it("should validate schema using defaults", async ({ serviceProvider }) => {
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
-		assert.defined(schema.validate({ workerCount: 1 }).error);
-		assert.defined(schema.validate({ workerCount: 0, workerLoggingEnabled: true }).error);
+		assert.undefined(result.error);
+		assert.number(result.value.workerCount);
+		assert.boolean(result.value.workerLoggingEnabled);
+	});
+
+	it("should allow configuration extension", async ({ serviceProvider }) => {
+		const defaults = await importDefaults();
+		defaults.customField = "dummy";
+
+		const result = serviceProvider.configSchema().validate(defaults);
+
+		assert.undefined(result.error);
+		assert.equal(result.value.customField, "dummy");
+	});
+
+	it("should parse process.env.MAINSAIL_CRYPTO_WORKER_COUNT", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_CRYPTO_WORKER_COUNT = "1";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.workerCount, 1);
+	});
+
+	it("should throw if process.env.MAINSAIL_CRYPTO_WORKER_COUNT is below the minimum", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_CRYPTO_WORKER_COUNT = "0";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.defined(result.error);
+	});
+
+	it("should throw if process.env.MAINSAIL_CRYPTO_WORKER_COUNT is not a number", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_CRYPTO_WORKER_COUNT = "not-a-number";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.defined(result.error);
+	});
+
+	it("should throw if process.env.MAINSAIL_CRYPTO_WORKER_COUNT is not an integer", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_CRYPTO_WORKER_COUNT = "1.5";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.defined(result.error);
+	});
+
+	it("should throw if process.env.MAINSAIL_CRYPTO_WORKER_COUNT exceeds the available cpus", async ({
+		serviceProvider,
+	}) => {
+		process.env.MAINSAIL_CRYPTO_WORKER_COUNT = "9999";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.defined(result.error);
+	});
+
+	it("should parse process.env.MAINSAIL_CRYPTO_WORKER_LOGGING_ENABLED", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_CRYPTO_WORKER_LOGGING_ENABLED = "true";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.true(result.value.workerLoggingEnabled);
 	});
 });
