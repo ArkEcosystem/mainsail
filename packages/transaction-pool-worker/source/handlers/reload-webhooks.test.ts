@@ -18,10 +18,10 @@ describe<{
 		context.handler = context.app.resolve(ReloadWebhooksHandler);
 	});
 
-	it("restores the webhooks database", async (context) => {
-		const restore = spy(context.database, "restore");
+	it("restores the webhooks database", async ({ handler, database }) => {
+		const restore = spy(database, "restore");
 
-		await context.handler.handle();
+		await handler.handle();
 
 		restore.calledOnce();
 	});

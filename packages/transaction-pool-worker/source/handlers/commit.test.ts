@@ -30,57 +30,61 @@ describe<{
 		context.handler = context.app.resolve(CommitHandler);
 	});
 
-	it("sets the block number and clears the selector", async (context) => {
-		const setBlockNumber = spy(context.stateStore, "setBlockNumber");
-		const clear = spy(context.selector, "clear");
+	it("sets the block number and clears the selector", async ({ handler, stateStore, selector }) => {
+		const setBlockNumber = spy(stateStore, "setBlockNumber");
+		const clear = spy(selector, "clear");
 
-		await context.handler.handle(10, ["address-1"], 1000, false);
+		await handler.handle(10, ["address-1"], 1000, false);
 
 		setBlockNumber.calledOnce();
 		setBlockNumber.calledWith(10);
 		clear.calledOnce();
 	});
 
-	it("commits the senders, gas and syncing flag when not a new milestone", async (context) => {
-		const commit = spy(context.transactionPoolService, "commit");
-		const reAdd = spy(context.transactionPoolService, "reAddTransactions");
+	it("commits the senders, gas and syncing flag when not a new milestone", async ({
+		handler,
+		transactionPoolService,
+	}) => {
+		const commit = spy(transactionPoolService, "commit");
+		const reAdd = spy(transactionPoolService, "reAddTransactions");
 
-		await context.handler.handle(10, ["address-1", "address-2"], 5000, true);
+		await handler.handle(10, ["address-1", "address-2"], 5000, true);
 
 		commit.calledOnce();
 		commit.calledWith(["address-1", "address-2"], 5000, true);
 		reAdd.neverCalled();
 	});
 
-	it("re-adds transactions instead of committing on a new milestone", async (context) => {
-		context.configuration.isNewMilestone = () => true;
-		const commit = spy(context.transactionPoolService, "commit");
-		const reAdd = spy(context.transactionPoolService, "reAddTransactions");
+	it("re-adds transactions instead of committing on a new milestone", async ({
+		handler,
+		configuration,
+		transactionPoolService,
+	}) => {
+		configuration.isNewMilestone = () => true;
+		const commit = spy(transactionPoolService, "commit");
+		const reAdd = spy(transactionPoolService, "reAddTransactions");
 
-		await context.handler.handle(10, ["address-1"], 1000, false);
+		await handler.handle(10, ["address-1"], 1000, false);
 
 		reAdd.calledOnce();
 		commit.neverCalled();
 	});
 
-	it("wraps a thrown error with a 'Failed to commit block' message", async (context) => {
-		context.transactionPoolService.commit = async () => {
+	it("wraps a thrown error with a 'Failed to commit block' message", async ({ handler, transactionPoolService }) => {
+		transactionPoolService.commit = async () => {
 			throw new Error("boom");
 		};
 
-		await assert.rejects(
-			() => context.handler.handle(10, ["address-1"], 1000, false),
-			"Failed to commit block: boom",
-		);
+		await assert.rejects(() => handler.handle(10, ["address-1"], 1000, false), "Failed to commit block: boom");
 	});
 
-	it("normalizes a non-Error throw into the wrapped message", async (context) => {
-		context.selector.clear = () => {
+	it("normalizes a non-Error throw into the wrapped message", async ({ handler, selector }) => {
+		selector.clear = () => {
 			throw "string failure";
 		};
 
 		await assert.rejects(
-			() => context.handler.handle(10, ["address-1"], 1000, false),
+			() => handler.handle(10, ["address-1"], 1000, false),
 			"Failed to commit block: string failure",
 		);
 	});

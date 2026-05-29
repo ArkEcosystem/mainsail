@@ -18,13 +18,13 @@ describe<{
 		context.handler = context.app.resolve(GetTransactionsHandler);
 	});
 
-	it("delegates to the selector and returns its batch", async (context) => {
+	it("delegates to the selector and returns its batch", async ({ handler, selector }) => {
 		const batch = { transactions: [Buffer.from("tx")] };
-		context.selector.getBatch = async () => batch;
-		const getBatch = spy(context.selector, "getBatch");
+		selector.getBatch = async () => batch;
+		const getBatch = spy(selector, "getBatch");
 
 		const options = { limit: 5 };
-		const result = await context.handler.handle(options as any);
+		const result = await handler.handle(options as any);
 
 		getBatch.calledOnce();
 		getBatch.calledWith(options);

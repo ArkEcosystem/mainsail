@@ -21,11 +21,11 @@ describe<{
 		context.handler = context.app.resolve(RemoveTransactionHandler);
 	});
 
-	it("removes the transaction from the mempool and the storage", async (context) => {
-		const fromMempool = spy(context.mempool, "removeTransaction");
-		const fromStorage = spy(context.storage, "removeTransaction");
+	it("removes the transaction from the mempool and the storage", async ({ handler, mempool, storage }) => {
+		const fromMempool = spy(mempool, "removeTransaction");
+		const fromStorage = spy(storage, "removeTransaction");
 
-		await context.handler.handle("address-1", "hash-1");
+		await handler.handle("address-1", "hash-1");
 
 		fromMempool.calledOnce();
 		fromMempool.calledWith("address-1", "hash-1");

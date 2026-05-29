@@ -18,10 +18,10 @@ describe<{
 		context.handler = context.app.resolve(ForgetPeerHandler);
 	});
 
-	it("forgets the peer by ip", async (context) => {
-		const forgetPeer = spy(context.peerRepository, "forgetPeer");
+	it("forgets the peer by ip", async ({ handler, peerRepository }) => {
+		const forgetPeer = spy(peerRepository, "forgetPeer");
 
-		await context.handler.handle("127.0.0.1");
+		await handler.handle("127.0.0.1");
 
 		forgetPeer.calledOnce();
 		forgetPeer.calledWith("127.0.0.1");

@@ -40,56 +40,60 @@ describe<{
 		context.handler = context.app.resolve(StartHandler);
 	});
 
-	it("sets the block number and re-adds the transactions", async (context) => {
-		const setBlockNumber = spy(context.store, "setBlockNumber");
-		const reAdd = spy(context.transactionPoolService, "reAddTransactions");
+	it("sets the block number and re-adds the transactions", async ({ handler, store, transactionPoolService }) => {
+		const setBlockNumber = spy(store, "setBlockNumber");
+		const reAdd = spy(transactionPoolService, "reAddTransactions");
 
-		await context.handler.handle(42);
+		await handler.handle(42);
 
 		setBlockNumber.calledOnce();
 		setBlockNumber.calledWith(42);
 		reAdd.calledOnce();
 	});
 
-	it("does not boot any server when neither http nor https is enabled", async (context) => {
-		const http = spy(context.httpServer, "boot");
-		const https = spy(context.httpsServer, "boot");
+	it("does not boot any server when neither http nor https is enabled", async ({
+		handler,
+		httpServer,
+		httpsServer,
+	}) => {
+		const http = spy(httpServer, "boot");
+		const https = spy(httpsServer, "boot");
 
-		await context.handler.handle(42);
+		await handler.handle(42);
 
 		http.neverCalled();
 		https.neverCalled();
 	});
 
-	it("boots only the http server when http is enabled", async (context) => {
-		context.enabled.http = true;
-		const http = spy(context.httpServer, "boot");
-		const https = spy(context.httpsServer, "boot");
+	it("boots only the http server when http is enabled", async ({ handler, enabled, httpServer, httpsServer }) => {
+		enabled.http = true;
+		const http = spy(httpServer, "boot");
+		const https = spy(httpsServer, "boot");
 
-		await context.handler.handle(42);
+		await handler.handle(42);
 
 		http.calledOnce();
 		https.neverCalled();
 	});
 
-	it("boots only the https server when https is enabled", async (context) => {
-		context.enabled.https = true;
-		const http = spy(context.httpServer, "boot");
-		const https = spy(context.httpsServer, "boot");
+	it("boots only the https server when https is enabled", async ({ handler, enabled, httpServer, httpsServer }) => {
+		enabled.https = true;
+		const http = spy(httpServer, "boot");
+		const https = spy(httpsServer, "boot");
 
-		await context.handler.handle(42);
+		await handler.handle(42);
 
 		http.neverCalled();
 		https.calledOnce();
 	});
 
-	it("boots both servers when http and https are enabled", async (context) => {
-		context.enabled.http = true;
-		context.enabled.https = true;
-		const http = spy(context.httpServer, "boot");
-		const https = spy(context.httpsServer, "boot");
+	it("boots both servers when http and https are enabled", async ({ handler, enabled, httpServer, httpsServer }) => {
+		enabled.http = true;
+		enabled.https = true;
+		const http = spy(httpServer, "boot");
+		const https = spy(httpsServer, "boot");
 
-		await context.handler.handle(42);
+		await handler.handle(42);
 
 		http.calledOnce();
 		https.calledOnce();
