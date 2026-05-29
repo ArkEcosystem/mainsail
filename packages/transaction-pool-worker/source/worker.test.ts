@@ -115,9 +115,9 @@ describe<{
 	});
 
 	it("getTransactions requests and returns the batch", async ({ worker, ipc }) => {
-		const batch = { transactions: [Buffer.from("tx")] };
+		const batch = { remaining: 0, transactions: [] };
 		const sendRequest = stub(ipc, "sendRequest").resolvedValue(batch);
-		const options = { limit: 5 } as any;
+		const options = { blockRound: "0", maxBytes: 1024, maxSize: 100 };
 
 		const result = await worker.getTransactions(options);
 

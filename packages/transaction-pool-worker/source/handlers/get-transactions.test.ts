@@ -10,7 +10,7 @@ describe<{
 	selector: any;
 }>("GetTransactionsHandler", ({ assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
-		context.selector = { getBatch: async () => ({ transactions: [] }) };
+		context.selector = { getBatch: async () => ({ remaining: 0, transactions: [] }) };
 
 		context.app = new Application();
 		context.app.bind(Identifiers.TransactionPool.Selector).toConstantValue(context.selector);
@@ -19,12 +19,12 @@ describe<{
 	});
 
 	it("delegates to the selector and returns its batch", async ({ handler, selector }) => {
-		const batch = { transactions: [Buffer.from("tx")] };
+		const batch = { remaining: 2, transactions: [] };
 		selector.getBatch = async () => batch;
 		const getBatch = spy(selector, "getBatch");
 
-		const options = { limit: 5 };
-		const result = await handler.handle(options as any);
+		const options = { blockRound: "0", maxBytes: 1024, maxSize: 100 };
+		const result = await handler.handle(options);
 
 		getBatch.calledOnce();
 		getBatch.calledWith(options);

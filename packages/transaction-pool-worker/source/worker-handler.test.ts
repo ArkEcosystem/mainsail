@@ -68,9 +68,9 @@ describe<{
 		handler,
 		resolve,
 	}) => {
-		const batch = { transactions: [Buffer.from("tx")] };
+		const batch = { remaining: 0, transactions: [] };
 		const handle = stub(handler, "handle").resolvedValue(batch);
-		const options = { limit: 5 } as any;
+		const options = { blockRound: "0", maxBytes: 1024, maxSize: 100 };
 
 		const result = await subject.getTransactions(options);
 
