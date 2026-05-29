@@ -3,11 +3,11 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Application, Services } from "@mainsail/kernel";
 
-import { WorkerImpl } from "./worker-implementation.js";
+import { WorkerImplementation } from "./worker-implementation.js";
 
 export class WorkerScriptHandler implements Contracts.Crypto.WorkerScriptHandler {
 	#app = new Application();
-	#impl!: WorkerImpl;
+	#impl!: WorkerImplementation;
 
 	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
 		await this.#app.bootstrap({
@@ -19,7 +19,7 @@ export class WorkerScriptHandler implements Contracts.Crypto.WorkerScriptHandler
 		}
 
 		await this.#app.boot();
-		this.#impl = this.#app.resolve(WorkerImpl);
+		this.#impl = this.#app.resolve(WorkerImplementation);
 	}
 
 	public async dispose(): Promise<void> {

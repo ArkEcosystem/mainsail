@@ -25,7 +25,7 @@ describe<{
 		context.toCalls = [];
 
 		// WorkerScriptHandler owns a private `new Application()`; stub the prototype so bootstrap,
-		// boot, the WorkerImpl resolution and the logger rebind all stay in-process.
+		// boot, the WorkerImplementation resolution and the logger rebind all stay in-process.
 		context.resolve = stub(Application.prototype, "resolve").returnValue(context.impl);
 		context.bootstrap = stub(Application.prototype, "bootstrap").resolvedValue(undefined);
 		context.boot = stub(Application.prototype, "boot").resolvedValue(undefined);

@@ -2,17 +2,17 @@ import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 
 import { describe } from "@mainsail/test-runner";
-import { WorkerImpl } from "./worker-implementation";
+import { WorkerImplementation } from "./worker-implementation";
 
 describe<{
 	app: Application;
-	impl: WorkerImpl;
+	impl: WorkerImplementation;
 	consensusSignature: any;
 	walletSignature: any;
 	blockFactory: any;
 	transactionFactory: any;
 	publicKeyFactory: any;
-}>("WorkerImpl", ({ assert, beforeEach, it, spy }) => {
+}>("WorkerImplementation", ({ assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.consensusSignature = { aggregate: async () => "aggregated", sign: async () => "signature" };
 		context.walletSignature = { signRecoverable: async () => ({ r: "r", s: "s", v: 0 }) };
@@ -36,7 +36,7 @@ describe<{
 			.toConstantValue(context.publicKeyFactory)
 			.whenTagged("type", "consensus");
 
-		context.impl = context.app.resolve(WorkerImpl);
+		context.impl = context.app.resolve(WorkerImplementation);
 	});
 
 	it("calls the method on the consensus signature and returns its result", async ({ impl, consensusSignature }) => {

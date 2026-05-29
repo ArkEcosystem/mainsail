@@ -23,7 +23,7 @@ function isBufferJson(value: unknown): value is BufferJson {
 
 
 @injectable()
-export class WorkerImpl {
+export class WorkerImplementation {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
