@@ -73,45 +73,50 @@ describe<{
 	it("consensusSignature delegates to the worker impl", async ({ subject, impl }) => {
 		await subject.boot({ workerLoggingEnabled: true } as any);
 		const call = spy(impl, "callConsensusSignature");
+		const message = Buffer.from("message-to-sign");
+		const privateKey = Buffer.from("consensus-private-key");
 
-		await subject.consensusSignature("sign" as any, ["a"] as any);
+		await subject.consensusSignature("sign", [message, privateKey]);
 
-		call.calledWith("sign", ["a"]);
+		call.calledWith("sign", [message, privateKey]);
 	});
 
 	it("walletSignature delegates to the worker impl", async ({ subject, impl }) => {
 		await subject.boot({ workerLoggingEnabled: true } as any);
 		const call = spy(impl, "callWalletSignature");
+		const message = Buffer.from("message-to-sign");
+		const privateKey = Buffer.from("wallet-private-key");
 
-		await subject.walletSignature("verify" as any, ["a"] as any);
+		await subject.walletSignature("signRecoverable", [message, privateKey]);
 
-		call.calledWith("verify", ["a"]);
+		call.calledWith("signRecoverable", [message, privateKey]);
 	});
 
 	it("blockFactory delegates to the worker impl", async ({ subject, impl }) => {
 		await subject.boot({ workerLoggingEnabled: true } as any);
 		const call = spy(impl, "callBlockFactory");
 
-		await subject.blockFactory("make" as any, ["data"] as any);
+		await subject.blockFactory("fromHex", ["0a1b2c3d"]);
 
-		call.calledWith("make", ["data"]);
+		call.calledWith("fromHex", ["0a1b2c3d"]);
 	});
 
 	it("transactionFactory delegates to the worker impl", async ({ subject, impl }) => {
 		await subject.boot({ workerLoggingEnabled: true } as any);
 		const call = spy(impl, "callTransactionFactory");
+		const bytes = Buffer.from("deadbeef", "hex");
 
-		await subject.transactionFactory("fromBytes" as any, ["bytes"] as any);
+		await subject.transactionFactory("fromBytes", [bytes]);
 
-		call.calledWith("fromBytes", ["bytes"]);
+		call.calledWith("fromBytes", [bytes]);
 	});
 
 	it("publicKeyFactory delegates to the worker impl", async ({ subject, impl }) => {
 		await subject.boot({ workerLoggingEnabled: true } as any);
 		const call = spy(impl, "callPublicKeyFactory");
 
-		await subject.publicKeyFactory("fromMnemonic" as any, ["mnemonic"] as any);
+		await subject.publicKeyFactory("fromMnemonic", ["clay harbor essay analyst"]);
 
-		call.calledWith("fromMnemonic", ["mnemonic"]);
+		call.calledWith("fromMnemonic", ["clay harbor essay analyst"]);
 	});
 });
