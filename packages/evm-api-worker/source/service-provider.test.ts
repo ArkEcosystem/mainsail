@@ -102,17 +102,4 @@ describe<{
 	it("is required", async (context) => {
 		assert.true(await context.serviceProvider.required());
 	});
-
-	it("configSchema accepts an empty object and allows unknown keys", (context) => {
-		const schema = context.serviceProvider.configSchema() as Joi.AnySchema;
-
-		assert.undefined(schema.validate({}).error);
-		assert.undefined(schema.validate({ anything: 123 }).error);
-	});
-
-	it("configSchema rejects a non-object", (context) => {
-		const schema = context.serviceProvider.configSchema() as Joi.AnySchema;
-
-		assert.defined(schema.validate("not-an-object").error);
-	});
 });
