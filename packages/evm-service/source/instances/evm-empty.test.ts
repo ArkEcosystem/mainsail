@@ -51,6 +51,12 @@ describe<{
 		assert.equal(accounts, []);
 	});
 
+	it("getLegacyColdWallets is empty", async ({ instance }) => {
+		const { wallets: coldWallets } = await instance.getLegacyColdWallets(0n, 100n);
+
+		assert.equal(coldWallets, []);
+	});
+
 	it("getLegacyAttributes returns nothing", async ({ instance }) => {
 		const [wallet] = wallets;
 
