@@ -75,8 +75,6 @@ describe<{
 		assert.number(result.value.txPoolPort);
 	});
 
-
-
 	it("should allow configuration extension", async ({ serviceProvider }) => {
 		const defaults = await importDefaults();
 		defaults.customField = "dummy";
