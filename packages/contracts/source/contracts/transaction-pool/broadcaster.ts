@@ -18,14 +18,8 @@ export interface Peer {
 
 	readonly ip: string;
 
-	version: string | undefined;
-	latency: number | undefined;
-
 	lastPinged: Dayjs | undefined;
 	errorCount: number;
-
-	recentlyPinged(): boolean;
-	toBroadcast(): PeerBroadcast;
 }
 
 export type PeerFactory = (ip: string) => Peer;
