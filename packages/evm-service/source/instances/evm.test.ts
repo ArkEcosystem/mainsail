@@ -62,7 +62,7 @@ describe<{
 		validatorAddress: zeroAddress,
 	};
 
-	it("should deploy contract successfully", async ({ instance }) => {
+	it("#process - should deploy contract successfully", async ({ instance }) => {
 		const [sender] = wallets;
 
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
@@ -81,7 +81,7 @@ describe<{
 		assert.equal(receipt.contractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
 	});
 
-	it("should call log hook", async ({ app, instance }) => {
+	it("#initialize - should call log hook", async ({ app, instance }) => {
 		let hookCalled = 0;
 
 		const evm = new Evm({
