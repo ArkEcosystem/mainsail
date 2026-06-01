@@ -39,6 +39,12 @@ describe<{
 		assert.equal(await instance.getAccountInfo(wallet.address), { balance: 0n, nonce: 0n });
 	});
 
+	it("getAccountInfoExtended reports a zero balance and nonce for an unknown account", async ({ instance }) => {
+		const [wallet] = wallets;
+
+		assert.equal(await instance.getAccountInfoExtended(wallet.address), { balance: 0n, nonce: 0n, legacyAttributes: {}, address: wallet.address });
+	});
+
 	it("getAccounts is empty", async ({ instance }) => {
 		const { accounts } = await instance.getAccounts(0n, 100n);
 
@@ -48,7 +54,7 @@ describe<{
 	it("getLegacyAttributes returns nothing", async ({ instance }) => {
 		const [wallet] = wallets;
 
-		assert.undefined((await instance.getLegacyAttributes(wallet.address)) ?? undefined);
+		assert.undefined(await instance.getLegacyAttributes(wallet.address));
 	});
 
 	it("getReceipts is empty", async ({ instance }) => {

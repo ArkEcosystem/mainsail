@@ -112,8 +112,8 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 	public async getLegacyAttributes(
 		address: string,
 		legacyAddress?: string,
-	): Promise<Contracts.Evm.LegacyAttributes | undefined | null> {
-		return this.#evm.getLegacyAttributes(address, legacyAddress);
+	): Promise<Contracts.Evm.LegacyAttributes | undefined> {
+		return (await this.#evm.getLegacyAttributes(address, legacyAddress)) ?? undefined;
 	}
 
 	public async getLegacyColdWallets(
