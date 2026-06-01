@@ -1,3 +1,4 @@
+import { Enums } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 import { setGracefulCleanup } from "tmp";
@@ -117,6 +118,53 @@ describe<{
 			const logsBloom = await instance.logsBloom(commitKey);
 			assert.string(logsBloom);
 			assert.length(logsBloom, 512);
+		} finally {
+			await instance.dispose();
+		}
+	});
+
+	// updateRewardsAndVotes mutates state (credits the proposer + calls the validator contract),
+	// so it runs on its own instance.
+	it("updateRewardsAndVotes credits the proposer with the block reward", async () => {
+		const context = {} as { app: Application };
+		await prepareSandbox(context);
+		const instance = context.app.resolve<Contracts.Evm.Instance & Contracts.Evm.Storage>(EvmInstance);
+
+		try {
+			const proposer = "0x1111111111111111111111111111111111111111";
+			const reward = 2_000_000_000n;
+			const commitKey = { blockNumber: 0n, round: 0n };
+
+			// genesis sets the deployer/validator contract addresses updateRewardsAndVotes needs.
+			await instance.initializeGenesis({
+				account: proposer,
+				deployerAccount: "0x0000000000000000000000000000000000000001",
+				initialBlockNumber: 0n,
+				initialSupply: 0n,
+				usernameContract: "0x0000000000000000000000000000000000000001",
+				validatorContract: "0x0000000000000000000000000000000000000001",
+			});
+
+			// Before: the proposer is unfunded.
+			assert.equal((await instance.getAccountInfo(proposer)).balance, 0n);
+
+			await instance.prepareNextCommit({ commitKey });
+			await instance.updateRewardsAndVotes({
+				blockReward: reward,
+				commitKey,
+				specId: Enums.Evm.SpecId.SHANGHAI,
+				timestamp: 12_345n,
+				validatorAddress: proposer,
+			});
+			await instance.onCommit({
+				blockNumber: 0n,
+				getBlock: () => ({ number: 0n, round: 0n }),
+				round: 0n,
+				setAccountUpdates: () => {},
+			} as any);
+
+			// After: the block reward has been credited to the proposer.
+			assert.equal((await instance.getAccountInfo(proposer)).balance, reward);
 		} finally {
 			await instance.dispose();
 		}
