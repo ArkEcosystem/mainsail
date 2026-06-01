@@ -1,5 +1,6 @@
-import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
@@ -45,8 +46,8 @@ export const prepareSandbox = async (context: { app?: Application }) => {
 	await context.app.resolve(CoreCryptoWif).register();
 
 	context.app.bind(Identifiers.Services.Log.Service).toConstantValue({
-		info: (msg) => console.log(msg),
-		debug: (msg) => console.log(msg),
+		debug: (message) => console.log(message),
+		info: (message) => console.log(message),
 	});
 	context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
@@ -57,13 +58,4 @@ export const prepareSandbox = async (context: { app?: Application }) => {
 	await context.app.resolve(CoreTransactions).register();
 	await context.app.resolve(CoreCryptoBlock).register();
 	await context.app.resolve(CoreCryptoCommit).register();
-
-	context.app.bind(Identifiers.State.Store).toConstantValue({
-		getLastBlock: () => ({
-			data: {
-				number: 1,
-				id: "0000000000000000000000000000000000000000000000000000000000000000",
-			},
-		}),
-	});
 };

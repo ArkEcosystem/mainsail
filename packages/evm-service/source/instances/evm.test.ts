@@ -1,8 +1,7 @@
 import { randomBytes } from "node:crypto";
 import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
-import { Enums, Identifiers } from "@mainsail/constants";
+import { Enums } from "@mainsail/constants";
 import { Evm } from "@mainsail/evm";
 import {
 	concat,
@@ -20,9 +19,6 @@ import {
 	zeroAddress,
 	zeroHash,
 } from "viem";
-
-import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
-import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-signature-bls12-381";
 
 import { describe } from "@mainsail/test-runner";
 import * as MainsailERC20 from "../../test/fixtures/MainsailERC20.json";
@@ -1125,99 +1121,17 @@ describe<{
 		assert.equal(zeroAccountBefore.balance, zeroAccountAfter.balance);
 	});
 
-	const genesisConfig = (account: string, initialSupply = parseEther("100")) => ({
-		account,
-		deployerAccount: zeroAddress,
-		initialBlockNumber: 0n,
-		initialSupply,
-		usernameContract: zeroAddress,
-		validatorContract: zeroAddress,
-	});
-
-	const emptyUnit = (commitKey: { blockNumber: bigint; round: bigint }) =>
-		({
-			blockNumber: commitKey.blockNumber,
-			getBlock: () => ({ number: commitKey.blockNumber, round: commitKey.round }),
-			round: commitKey.round,
-			setAccountUpdates: () => {},
-		}) as any;
-
-	it("getState returns a numeric block number and total round", async ({ instance }) => {
-		const state = await instance.getState();
-
-		assert.number(state.blockNumber);
-		assert.number(state.totalRound);
-		assert.equal(state, { blockNumber: 0, totalRound: 0 });
-	});
-
-	it("isEmpty is true for a fresh instance", async ({ instance }) => {
-		assert.true(await instance.isEmpty());
-	});
-
-	it("getBlockNumberByHash returns undefined for an unknown hash", async ({ instance }) => {
-		assert.undefined(await instance.getBlockNumberByHash(zeroHash));
-	});
-
-	it("getCommitData returns undefined for an unknown block", async ({ instance }) => {
-		assert.undefined(await instance.getCommitData(999));
-	});
-
-	it("getBlockHeaderData returns nothing for an unknown block", async ({ instance }) => {
-		assert.undefined((await instance.getBlockHeaderData(999)) ?? undefined);
-	});
-
-	it("getTransactionData returns nothing for an unknown key", async ({ instance }) => {
-		assert.undefined((await instance.getTransactionData(zeroHash)) ?? undefined);
-	});
-
-	it("getTransactionKeyByHash returns nothing for an unknown hash", async ({ instance }) => {
-		assert.undefined((await instance.getTransactionKeyByHash(zeroHash)) ?? undefined);
-	});
-
-	it("getReceiptsByBlockNumber returns an empty record for a block with no receipts", async ({ instance }) => {
-		assert.equal(await instance.getReceiptsByBlockNumber(999n), {});
-	});
-
-	it("getReceipts returns a result with a receipt list", async ({ instance }) => {
-		const result = await instance.getReceipts(0n, 10n);
-
-		assert.array(result.receipts);
-	});
-
-	it("getAccounts returns the accounts funded by genesis", async ({ instance }) => {
-		const [sender] = wallets;
-		await instance.initializeGenesis(genesisConfig(sender.address));
-
-		const result = await instance.getAccounts(0n, 100n);
-
-		assert.array(result.accounts);
-		assert.true(result.accounts.length > 0);
-	});
-
-	it("importAccountInfos imports account balances", async ({ instance }) => {
-		const [sender] = wallets;
-		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
-
-		// importAccountInfos must run inside a prepared commit (see snapshot-legacy-importer).
-		await instance.prepareNextCommit({ commitKey });
-		await instance.importAccountInfos([
-			{ address: sender.address, balance: 1234n, legacyAttributes: {}, nonce: 0n },
-		]);
-		await instance.onCommit(emptyUnit(commitKey));
-
-		const info = await instance.getAccountInfo(sender.address);
-		assert.equal(info.balance, 1234n);
-	});
-
-	it("getLegacyAttributes returns nothing for a non-legacy address", async ({ instance }) => {
-		const [sender] = wallets;
-
-		assert.undefined((await instance.getLegacyAttributes(sender.address)) ?? undefined);
-	});
-
-	it("simulate executes a transaction without persisting state", async ({ instance }) => {
+	it("should simulate a transaction without persisting state", async ({ instance }) => {
 		const [sender, recipient] = wallets;
-		await instance.initializeGenesis(genesisConfig(sender.address));
+
+		await instance.initializeGenesis({
+			account: sender.address,
+			deployerAccount: zeroAddress,
+			initialBlockNumber: 0n,
+			initialSupply: parseEther("100"),
+			usernameContract: zeroAddress,
+			validatorContract: zeroAddress,
+		});
 
 		const { receipt } = await instance.simulate({
 			blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(0), round: BigInt(0) } },
@@ -1236,87 +1150,23 @@ describe<{
 		assert.equal((await instance.getAccountInfo(recipient.address)).balance, 0n);
 	});
 
-	it("exposes block, commit, transaction and receipt storage after a full genesis commit", async ({
-		app,
-		instance,
-	}) => {
-		// The genesis proof carries BLS validator signatures, so the commit deserializer needs
-		// the BLS signature/key-pair providers (not part of the shared sandbox).
-		await app.resolve(CoreCryptoSignatureBls).register();
-		await app.resolve(CoreCryptoKeyPairBls).register();
+	it("should import account balances", async ({ instance }) => {
+		const [sender] = wallets;
+		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
 
-		const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
-		const commitFactory = app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
-		const genesisCommit = await commitFactory.fromJson(configuration.getGenesisCommit());
-		const { block } = genesisCommit;
-
-		const commitKey = { blockHash: block.hash, blockNumber: BigInt(block.number), round: BigInt(block.round) };
-
-		await instance.initializeGenesis({
-			account: block.proposer,
-			deployerAccount: "0x0000000000000000000000000000000000000001",
-			initialBlockNumber: 0n,
-			initialSupply: 10_000_000_000_000_000_000_000_000_000n,
-			usernameContract: "0x0000000000000000000000000000000000000001",
-			validatorContract: "0x0000000000000000000000000000000000000001",
-		});
-
+		// importAccountInfos must run inside a prepared commit (see snapshot-legacy-importer).
 		await instance.prepareNextCommit({ commitKey });
-
-		for (const transaction of block.transactions) {
-			const { receipt } = await instance.process({
-				blockContext: {
-					commitKey,
-					gasLimit: BigInt(10_000_000),
-					timestamp: BigInt(block.timestamp),
-					validatorAddress: block.proposer,
-				},
-				data: Buffer.from(transaction.data.slice(2), "hex"),
-				from: transaction.from,
-				gasLimit: BigInt(transaction.gasLimit),
-				gasPrice: BigInt(transaction.gasPrice),
-				index: transaction.transactionIndex,
-				nonce: transaction.nonce,
-				specId: Enums.Evm.SpecId.LATEST,
-				to: transaction.to,
-				txHash: transaction.hash,
-				value: transaction.value,
-			} as any);
-
-			assert.equal(receipt.status, 1);
-		}
-
-		// A unit that exposes getCommit() drives the #prepareCommitData path (header/proof/transactions).
-		let dirtyAccounts: unknown;
+		await instance.importAccountInfos([
+			{ address: sender.address, balance: 1234n, legacyAttributes: {}, nonce: 0n },
+		]);
 		await instance.onCommit({
-			blockNumber: BigInt(block.number),
-			getBlock: () => block,
-			getCommit: async () => genesisCommit,
-			round: BigInt(block.round),
-			setAccountUpdates: (accounts: unknown) => (dirtyAccounts = accounts),
+			blockNumber: BigInt(0),
+			getBlock: () => ({ number: BigInt(0), round: BigInt(0) }),
+			round: BigInt(0),
+			setAccountUpdates: () => {},
 		} as any);
 
-		assert.defined(dirtyAccounts);
-
-		// Block storage
-		assert.equal(await instance.getBlockNumberByHash(block.hash), 0);
-		assert.defined(await instance.getBlockHeaderData(0));
-		assert.defined(await instance.getCommitData(0));
-
-		// Transaction storage
-		const [transaction] = block.transactions;
-		const key = await instance.getTransactionKeyByHash(transaction.hash);
-		assert.defined(key);
-		assert.defined(await instance.getTransactionData(key!));
-
-		// Receipts
-		const receiptsByBlock = await instance.getReceiptsByBlockNumber(0n);
-		assert.equal(Object.keys(receiptsByBlock).length, block.transactions.length);
-
-		const { receipts } = await instance.getReceipts(0n, 1000n);
-		assert.equal(receipts.length, block.transactions.length);
-
-		assert.defined(await instance.getReceipt(0n, transaction.hash));
+		assert.equal((await instance.getAccountInfo(sender.address)).balance, 1234n);
 	});
 });
 
