@@ -1,18 +1,27 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { Identifiers } from "@mainsail/constants";
+import { Events, Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
+import esmock from "esmock";
 
 import { describe } from "@mainsail/test-runner";
 import { Peer } from "./peer";
 import { PeerCommunicator } from "./peer-communicator";
 
+let emit: (event: string, data: unknown) => void = () => {};
+
+const { PeerCommunicator: PeerCommunicatorProxy } = await esmock("./peer-communicator", {
+	"@mainsail/kernel": {
+		Ipc: { emit: (event: string, data: unknown) => emit(event, data) },
+	},
+});
+
 describe<{
 	app: Application;
 	peerCommunicator: PeerCommunicator;
 	peer: Peer;
-}>("PeerCommunicator", ({ it, assert, beforeEach, stub }) => {
+}>("PeerCommunicator", ({ it, assert, beforeEach, stub, spyFn }) => {
 	const ip = "167.184.53.78";
 	const port = 4007;
 
@@ -26,6 +35,8 @@ describe<{
 	] as Contracts.Crypto.Transaction[];
 
 	beforeEach((context) => {
+		emit = () => {};
+
 		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
@@ -35,7 +46,7 @@ describe<{
 			.toConstantValue(configuration)
 			.whenTagged("plugin", "transaction-pool-broadcaster");
 
-		context.peerCommunicator = context.app.resolve(PeerCommunicator);
+		context.peerCommunicator = context.app.resolve(PeerCommunicatorProxy);
 		context.peer = context.app.resolve(Peer).init(ip, port);
 	});
 
@@ -92,15 +103,20 @@ describe<{
 		});
 		stub(configuration, "getRequired").returnValue(2);
 		const spyForget = stub(repository, "forgetPeer");
+		const spyEmit = spyFn();
+		emit = spyEmit.toFunction();
 
 		await peerCommunicator.postTransactions(peer, transactions);
 		spyForget.neverCalled();
+		spyEmit.neverCalled();
 
 		await peerCommunicator.postTransactions(peer, transactions);
 
 		assert.equal(peer.errorCount, 2);
 		spyForget.calledOnce();
 		spyForget.calledWith(ip);
+		spyEmit.calledOnce();
+		spyEmit.calledWith(Events.PeerEvent.Removed, ip);
 	});
 
 	it("#postTransactions - should reset errorCount after a successful retry", async ({ peerCommunicator, peer }) => {
