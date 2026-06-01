@@ -4,7 +4,7 @@ import { setGracefulCleanup } from "tmp";
 import { zeroHash } from "viem";
 
 import { describe } from "@mainsail/test-runner";
-import { commitGenesis } from "../../test/helpers/commit-genesis";
+import { commitGenesis, processGenesis } from "../../test/helpers/commit-genesis";
 import { prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { EvmInstance } from "./evm";
 
@@ -55,11 +55,11 @@ describe<{
 	});
 
 	it("exposes every committed transaction by hash and key", async ({ instance, genesisCommit }) => {
-		const [transaction] = genesisCommit.block.transactions;
-
-		const key = await instance.getTransactionKeyByHash(transaction.hash);
-		assert.defined(key);
-		assert.defined(await instance.getTransactionData(key!));
+		for (const transaction of genesisCommit.block.transactions) {
+			const key = await instance.getTransactionKeyByHash(transaction.hash);
+			assert.defined(key);
+			assert.defined(await instance.getTransactionData(key!));
+		}
 	});
 
 	it("stores one receipt per committed transaction", async ({ instance, genesisCommit }) => {
@@ -90,5 +90,35 @@ describe<{
 		const { accounts } = await instance.getAccounts(0n, 1000n);
 
 		assert.equal(accounts.length, 55); // initial wallet, validators 0x1;
+	});
+
+	it("getLegacyColdWallets is empty", async ({ instance }) => {
+		const { wallets: coldWallets } = await instance.getLegacyColdWallets(0n, 100n);
+
+		assert.equal(coldWallets, []);
+	});
+
+	// stateRoot/logsBloom operate on the pending commit, which the shared (already-committed)
+	// instance no longer has, so this runs the genesis up to — but not through — the commit.
+	it("computes the stateRoot and logsBloom of the pending genesis commit", async () => {
+		const context = {} as { app: Application };
+		await prepareSandbox(context);
+		const instance = context.app.resolve<Contracts.Evm.Instance & Contracts.Evm.Storage>(EvmInstance);
+
+		try {
+			const { genesisCommit, commitKey } = await processGenesis(context.app, instance);
+
+			const stateRoot = await instance.stateRoot(commitKey, genesisCommit.block.parentHash);
+			assert.string(stateRoot);
+			assert.length(stateRoot, 64);
+			// Genesis funds accounts, so the state is non-empty.
+			assert.false(stateRoot === "0".repeat(64));
+
+			const logsBloom = await instance.logsBloom(commitKey);
+			assert.string(logsBloom);
+			assert.length(logsBloom, 512);
+		} finally {
+			await instance.dispose();
+		}
 	});
 });

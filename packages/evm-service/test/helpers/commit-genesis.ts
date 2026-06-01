@@ -5,16 +5,17 @@ import { Enums, Identifiers } from "@mainsail/constants";
 import { ServiceProvider as CoreCryptoKeyPairBls } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-signature-bls12-381";
 
-// Applies the real devnet genesis commit to an EVM instance: deserializes the genesis Commit,
-// initializes genesis state, processes every genesis transaction and commits the block (with a
-// unit that exposes getCommit(), so the full commit storage path runs). Returns the Commit so
-// callers can assert against its block/transactions/proof.
-export const commitGenesis = async (
+type GenesisCommitKey = { blockHash: string; blockNumber: bigint; round: bigint };
+
+// Deserializes the real devnet genesis Commit, initializes genesis state and processes every
+// genesis transaction into a *pending* commit (without committing it). Returns the Commit and
+// the commit key so callers can inspect the pending block (e.g. stateRoot/logsBloom) before it
+// is sealed. The genesis proof carries BLS validator signatures, so the commit deserializer
+// needs the BLS signature/key-pair providers (not part of the shared sandbox).
+export const processGenesis = async (
 	app: Application,
 	instance: Contracts.Evm.Instance,
-): Promise<Contracts.Crypto.Commit> => {
-	// The genesis proof carries BLS validator signatures, so the commit deserializer needs the
-	// BLS signature/key-pair providers (not part of the shared sandbox).
+): Promise<{ genesisCommit: Contracts.Crypto.Commit; commitKey: GenesisCommitKey }> => {
 	await app.resolve(CoreCryptoSignatureBls).register();
 	await app.resolve(CoreCryptoKeyPairBls).register();
 
@@ -60,6 +61,18 @@ export const commitGenesis = async (
 			throw new Error(`Genesis transaction ${transaction.hash} failed to process`);
 		}
 	}
+
+	return { commitKey, genesisCommit };
+};
+
+// Processes and commits the genesis block (with a unit that exposes getCommit(), so the full
+// commit storage path runs). Returns the Commit so callers can assert against block/txs/proof.
+export const commitGenesis = async (
+	app: Application,
+	instance: Contracts.Evm.Instance,
+): Promise<Contracts.Crypto.Commit> => {
+	const { genesisCommit } = await processGenesis(app, instance);
+	const { block } = genesisCommit;
 
 	await instance.onCommit({
 		blockNumber: block.number,
