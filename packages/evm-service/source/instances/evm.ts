@@ -182,9 +182,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return { blockNumber: Number(state.blockNumber), totalRound: Number(state.totalRound) };
 	}
 
-	public async getBlockHeaderData(
-		blockNumber: number,
-	): Promise<Contracts.Evm.BlockHeaderStorageData | undefined> {
+	public async getBlockHeaderData(blockNumber: number): Promise<Contracts.Evm.BlockHeaderStorageData | undefined> {
 		const result = await this.#evm.getBlockHeaderData(BigInt(blockNumber));
 		if (result === null || result === undefined) {
 			return undefined;

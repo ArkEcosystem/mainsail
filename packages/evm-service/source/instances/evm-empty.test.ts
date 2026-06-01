@@ -42,7 +42,12 @@ describe<{
 	it("getAccountInfoExtended reports a zero balance and nonce for an unknown account", async ({ instance }) => {
 		const [wallet] = wallets;
 
-		assert.equal(await instance.getAccountInfoExtended(wallet.address), { balance: 0n, nonce: 0n, legacyAttributes: {}, address: wallet.address });
+		assert.equal(await instance.getAccountInfoExtended(wallet.address), {
+			balance: 0n,
+			nonce: 0n,
+			legacyAttributes: {},
+			address: wallet.address,
+		});
 	});
 
 	it("getAccounts is empty", async ({ instance }) => {
