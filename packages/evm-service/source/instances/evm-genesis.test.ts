@@ -169,4 +169,45 @@ describe<{
 			await instance.dispose();
 		}
 	});
+
+	it("calculateRoundValidators runs after updateRewardsAndVotes", async () => {
+		const context = {} as { app: Application };
+		await prepareSandbox(context);
+		const instance = context.app.resolve<Contracts.Evm.Instance & Contracts.Evm.Storage>(EvmInstance);
+
+		try {
+			const proposer = "0x1111111111111111111111111111111111111111";
+			const commitKey = { blockNumber: 0n, round: 0n };
+
+			await instance.initializeGenesis({
+				account: proposer,
+				deployerAccount: "0x0000000000000000000000000000000000000001",
+				initialBlockNumber: 0n,
+				initialSupply: 0n,
+				usernameContract: "0x0000000000000000000000000000000000000001",
+				validatorContract: "0x0000000000000000000000000000000000000001",
+			});
+
+			await instance.prepareNextCommit({ commitKey });
+			await instance.updateRewardsAndVotes({
+				blockReward: 0n,
+				commitKey,
+				specId: Enums.Evm.SpecId.SHANGHAI,
+				timestamp: 12_345n,
+				validatorAddress: proposer,
+			});
+
+			await assert.resolves(() =>
+				instance.calculateRoundValidators({
+					commitKey,
+					roundValidators: 0n,
+					specId: Enums.Evm.SpecId.SHANGHAI,
+					timestamp: 12_345n,
+					validatorAddress: proposer,
+				}),
+			);
+		} finally {
+			await instance.dispose();
+		}
+	});
 });
