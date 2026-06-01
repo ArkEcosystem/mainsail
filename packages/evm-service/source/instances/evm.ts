@@ -113,7 +113,11 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		address: string,
 		legacyAddress?: string,
 	): Promise<Contracts.Evm.LegacyAttributes | undefined> {
-		return (await this.#evm.getLegacyAttributes(address, legacyAddress)) ?? undefined;
+		const result = await this.#evm.getLegacyAttributes(address, legacyAddress);
+		if (result === null || result === undefined) {
+			return undefined;
+		}
+		return result;
 	}
 
 	public async getLegacyColdWallets(
@@ -234,7 +238,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		await this.#evm.rollback(commitKey);
 	}
 
-	async #prepareCommitData(unit: Contracts.Processor.ProcessableUnit): Promise<JsCommitData | undefined | null> {
+	async #prepareCommitData(unit: Contracts.Processor.ProcessableUnit): Promise<JsCommitData | undefined> {
 		if (!("getCommit" in unit)) {
 			return undefined;
 		}
