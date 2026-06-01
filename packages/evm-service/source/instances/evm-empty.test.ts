@@ -78,7 +78,7 @@ describe<{
 	});
 
 	it("getBlockHeaderData returns nothing", async ({ instance }) => {
-		assert.undefined((await instance.getBlockHeaderData(0)) ?? undefined);
+		assert.undefined(await instance.getBlockHeaderData(0));
 	});
 
 	it("getCommitData returns undefined", async ({ instance }) => {
@@ -86,11 +86,11 @@ describe<{
 	});
 
 	it("getTransactionData returns nothing", async ({ instance }) => {
-		assert.undefined((await instance.getTransactionData(zeroHash)) ?? undefined);
+		assert.undefined(await instance.getTransactionData(zeroHash));
 	});
 
 	it("getTransactionKeyByHash returns nothing", async ({ instance }) => {
-		assert.undefined((await instance.getTransactionKeyByHash(zeroHash)) ?? undefined);
+		assert.undefined(await instance.getTransactionKeyByHash(zeroHash));
 	});
 
 	it("codeAt returns empty code", async ({ instance }) => {
