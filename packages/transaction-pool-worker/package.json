@@ -25,12 +25,12 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"dayjs": "1.11.20",
-		"joi": "18.2.1"
+		"dayjs": "1.11.20"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
+		"esmock": "2.7.5",
 		"uvu": "0.5.6"
 	},
 	"engines": {

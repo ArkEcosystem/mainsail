@@ -214,21 +214,45 @@ The `mainsail` CLI binary. Commands in `source/commands/` cover: `core:run`, `co
 Tests use `describe` from `@mainsail/test-runner` (wraps uvu suites):
 
 ```typescript
+import { Identifiers } from "@mainsail/constants";
+import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { Handler } from "./handler";
 
-describe<Context>("ComponentName", ({ it, beforeEach, assert, stub, spy, clock }) => {
+describe<{
+	app: Application;
+	handler: Handler;
+	myService: any;
+}>("Handler", ({ it, beforeEach, assert, stub, spy, clock }) => {
 	beforeEach((context) => {
 		// Set up stubs for injected dependencies
 		context.myService = { method: () => {} };
-		// Build container, bind stubs, resolve class under test
+
+		// Use Application (from @mainsail/kernel), not the raw Container — it auto-binds itself
+		// as Identifiers.Application.Instance and exposes resolve() (which applies autobind).
+		context.app = new Application();
+		context.app.bind(Identifiers.SomeService).toConstantValue(context.myService);
+
+		// Resolve the class under test once, here — never inline inside an it().
+		context.handler = context.app.resolve(Handler);
 	});
 
-	it("does something", async (context) => {
-		// arrange, act, assert
-		assert.equal(result, expected);
+	// Destructure the context in the it() callback rather than threading `context.` through.
+	it("does something", async ({ handler, myService }) => {
+		const method = spy(myService, "method");
+
+		await handler.handle();
+
+		method.calledOnce();
 	});
 });
 ```
+
+Conventions for IoC-injected classes under test:
+
+- Bind stubs to their `Identifiers` on an `Application` instance and resolve the class with `app.resolve(Class)`. `Application.get(id)` takes only the identifier; use `resolve()` for autobinding the class under test.
+- Resolve the tested class **in `beforeEach`** and store it on the context (e.g. `context.handler`). Don't resolve inline inside an `it()`.
+- In `it()` callbacks, **destructure the context** — `async ({ handler, myService }) => {}` — instead of referencing `context.x`. Mutating a destructured stub (e.g. `myService.method = …`) still works since it's the same object the handler holds.
 
 Helpers available: `assert` (custom assertions), `stub()` / `spy()` (sinon wrappers), `clock()` (sinon fake timers), `nock` (HTTP mocking), `each()` (data-driven tests), `schema` (zod).
 
