@@ -312,6 +312,7 @@ export class Restore {
 
 		let ingestedBlocks = 0;
 		let ingestedTransactions = 0;
+		let totalRound = 0;
 
 		const multiPaymentContractAddress = this.app.get<string>(
 			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
@@ -387,7 +388,6 @@ export class Restore {
 				}
 			};
 
-			let totalRound = 0;
 			for await (const { block, proof } of commits) {
 				blocks.push({
 					commitRound: proof.round,
