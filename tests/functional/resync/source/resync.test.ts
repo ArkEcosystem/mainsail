@@ -23,7 +23,7 @@ describe<{
 	});
 
 	it("should be ok", async ({ syncNode }) => {
-		await waitBlock(syncNode, 5);
+		await waitBlock(syncNode, 54);
 	});
 
 	it("should be ok with votes", async ({ syncNode }) => {

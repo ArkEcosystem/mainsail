@@ -120,6 +120,11 @@ const setupNode = async (app: Application, dataDirectory: string, configDirector
 		},
 		"@mainsail/api-sync": {
 			maxSyncAttempts: 1,
+			restore: {
+				blocks: {
+					batchSize: 5,
+				},
+			},
 			syncInterval: 250,
 			truncateDatabase: "1",
 		},
