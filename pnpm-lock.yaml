@@ -2056,9 +2056,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      joi:
-        specifier: 18.2.1
-        version: 18.2.1
     devDependencies:
       '@mainsail/contracts':
         specifier: workspace:*
@@ -2066,6 +2063,9 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
+      esmock:
+        specifier: 2.7.5
+        version: 2.7.5
       uvu:
         specifier: 0.5.6
         version: 0.5.6
