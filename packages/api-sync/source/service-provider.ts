@@ -39,8 +39,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): Joi.ObjectSchema {
 		return Joi.object({
+			restore: Joi.object({
+				blocks: Joi.object({
+					batchSize: Joi.number().integer().positive().required(),
+				}),
+			}),
 			syncInterval: Joi.number().integer().positive().required(),
 			tokenCacheSize: Joi.number().integer().positive().required(),
+			tokenWhitelistRefreshInterval: Joi.number().integer().positive().required(),
 		}).unknown(true);
 	}
 
