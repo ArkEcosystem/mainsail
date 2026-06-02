@@ -31,6 +31,7 @@
 		"@types/chance": "1.1.8",
 		"@types/fs-extra": "11.0.4",
 		"@types/tmp": "0.2.6",
+		"esmock": "2.7.5",
 		"uvu": "0.5.6"
 	},
 	"engines": {
