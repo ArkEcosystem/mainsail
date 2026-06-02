@@ -35,7 +35,9 @@
 		"@mainsail/crypto-commit": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-hash-bcrypto": "workspace:*",
+		"@mainsail/crypto-key-pair-bls12-381": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
+		"@mainsail/crypto-signature-bls12-381": "workspace:*",
 		"@mainsail/crypto-signature-ecdsa": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
@@ -45,6 +47,7 @@
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/tmp": "0.2.6",
+		"esmock": "2.7.5",
 		"tmp": "0.2.5",
 		"uvu": "0.5.6",
 		"viem": "2.48.11"

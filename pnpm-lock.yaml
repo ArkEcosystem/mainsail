@@ -2162,9 +2162,15 @@ importers:
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
         version: link:../crypto-signature-ecdsa
@@ -2192,6 +2198,9 @@ importers:
       '@types/tmp':
         specifier: 0.2.6
         version: 0.2.6
+      esmock:
+        specifier: 2.7.5
+        version: 2.7.5
       tmp:
         specifier: 0.2.5
         version: 0.2.5
