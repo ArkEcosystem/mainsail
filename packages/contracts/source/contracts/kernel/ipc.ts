@@ -35,10 +35,6 @@ export type RequestCallbacks<T = unknown> = RequestCallback<T>;
 
 export type EventCallback<T = unknown> = (data: T) => void;
 
-export interface Handler<T extends object> {
-	handleRequest<K extends Requests<T>>(method: K): void;
-}
-
 export interface Subprocess {
 	dispose(): Promise<number>;
 	drain(): Promise<void>;
