@@ -2,7 +2,6 @@ import { Identifiers } from "@mainsail/constants";
 import { Application, Ipc } from "@mainsail/kernel";
 import { EventEmitter } from "events";
 import esmock from "esmock";
-import Joi from "joi";
 import { PassThrough } from "stream";
 
 import { describe } from "@mainsail/test-runner";
