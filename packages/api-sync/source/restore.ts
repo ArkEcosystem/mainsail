@@ -159,6 +159,10 @@ export class Restore {
 	@optional()
 	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
 
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "api-sync")
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
+
 	public async restore(): Promise<void> {
 		const isEmpty = await this.databaseService.isEmpty();
 		const mostRecentCommit = await (isEmpty
@@ -299,8 +303,8 @@ export class Restore {
 			validatorRounds,
 		} = context;
 
-		const BATCH_SIZE = 1000;
-		const CHUNK_SIZE = 1000;
+		const BATCH_SIZE = this.pluginConfiguration.getRequired<number>("restore.blocks.batchSize");
+		const CHUNK_SIZE = BATCH_SIZE;
 		const t0 = performance.now();
 
 		const genesisBlockNumber = this.configuration.getGenesisHeight();
@@ -308,6 +312,7 @@ export class Restore {
 
 		let ingestedBlocks = 0;
 		let ingestedTransactions = 0;
+		let totalRound = 0;
 
 		const multiPaymentContractAddress = this.app.get<string>(
 			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
@@ -383,7 +388,6 @@ export class Restore {
 				}
 			};
 
-			let totalRound = 0;
 			for await (const { block, proof } of commits) {
 				blocks.push({
 					commitRound: proof.round,

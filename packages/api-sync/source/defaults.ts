@@ -3,6 +3,11 @@ import { Environment } from "@mainsail/kernel";
 
 export const defaults = {
 	enabled: Environment.isTrue(EnvironmentVariables.MAINSAIL_API_SYNC_ENABLED),
+	restore: {
+		blocks: {
+			batchSize: Environment.get<number>(EnvironmentVariables.MAINSAIL_API_SYNC_RESTORE_BLOCKS_BATCH_SIZE, 1000),
+		},
+	},
 	syncInterval: Environment.get<number>(EnvironmentVariables.MAINSAIL_API_SYNC_INTERVAL, 8000),
 	tokenCacheSize: Environment.get<number>(EnvironmentVariables.MAINSAIL_API_SYNC_TOKEN_CACHE_SIZE, 256),
 	tokenWhitelistRefreshInterval: Environment.get<number>(
