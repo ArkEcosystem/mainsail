@@ -26,19 +26,19 @@ export class PeerCommunicator implements Contracts.TransactionPool.PeerCommunica
 			await http.post(`${peer.url}/api/transactions`, {
 				body: { transactions: transactions.map((transaction) => transaction.serialized.toString("hex")) },
 			});
+
+			peer.errorCount = 0;
+			peer.lastPinged = dayjs();
 		} catch (rawError) {
 			const error = ensureError(rawError);
 			this.handleSocketError(peer, error);
 		}
-
-		peer.errorCount = 0;
-		peer.lastPinged = dayjs();
 	}
 
 	private handleSocketError(peer: Contracts.TransactionPool.Peer, error: Error): void {
 		this.logger.debug(`socket error ${peer.ip}: ${error.message}`);
 
-		if (peer.errorCount++ > this.configuration.getRequired<number>("maxSequentialErrors")) {
+		if (++peer.errorCount >= this.configuration.getRequired<number>("maxSequentialErrors")) {
 			this.repository.forgetPeer(peer.ip);
 			Ipc.emit(Events.PeerEvent.Removed, peer.ip);
 		}
