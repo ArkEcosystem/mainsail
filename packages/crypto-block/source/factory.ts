@@ -3,7 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { BlockSchemaError } from "@mainsail/exceptions";
-import { BigNumber } from "@mainsail/utils";
 
 import { Block } from "./block.js";
 import { HashFactory } from "./hash.factory.js";
@@ -82,7 +81,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		header: Contracts.Evm.BlockHeaderStorageData,
 	): Promise<Contracts.Crypto.BlockHeader> {
 		return {
-			fee: BigNumber.make(header.fee),
+			fee: header.fee,
 			gasUsed: header.gasUsed,
 			hash: header.hash,
 			logsBloom: header.logsBloom,
@@ -90,7 +89,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 			parentHash: header.parentHash,
 			payloadSize: header.payloadSize,
 			proposer: header.proposer,
-			reward: BigNumber.make(header.reward),
+			reward: header.reward,
 			round: header.round,
 			stateRoot: header.stateRoot,
 			timestamp: Number(header.timestamp),
@@ -103,12 +102,12 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	public async fromJson(json: Contracts.Crypto.BlockJson): Promise<Contracts.Crypto.Block> {
 		const data: Contracts.Crypto.BlockData = {
 			...json,
-			fee: BigNumber.make(json.fee),
-			reward: BigNumber.make(json.reward),
+			fee: BigInt(json.fee),
+			reward: BigInt(json.reward),
 			transactions: json.transactions.map((tx) => ({
 				...tx,
-				nonce: BigNumber.make(tx.nonce),
-				value: BigNumber.make(tx.value),
+				nonce: BigInt(tx.nonce),
+				value: BigInt(tx.value),
 			})),
 		};
 

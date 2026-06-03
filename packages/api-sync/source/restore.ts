@@ -9,7 +9,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { parseTransactionError } from "@mainsail/evm-contracts";
-import { assert, BigNumber, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
+import { assert, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { TokenParser } from "./contracts.js";
@@ -42,7 +42,7 @@ interface RestoreContext extends RepositoryContext {
 	mostRecentCommit: Contracts.Crypto.Commit;
 
 	lastBlockNumber: number;
-	totalSupply: BigNumber;
+	totalSupply: bigint;
 
 	validatorAttributes: Record<string, ValidatorAttributes>;
 	userAttributes: Record<string, UserAttributes>;
@@ -52,12 +52,12 @@ interface RestoreContext extends RepositoryContext {
 
 interface ValidatorAttributes {
 	lastBlock?: Contracts.Crypto.BlockHeader;
-	totalForgedFees: BigNumber;
-	totalForgedRewards: BigNumber;
+	totalForgedFees: bigint;
+	totalForgedRewards: bigint;
 	producedBlocks: number;
 
-	voteBalance: BigNumber;
-	fee: BigNumber;
+	voteBalance: bigint;
+	fee: bigint;
 	votersCount: number;
 	blsPublicKey: string;
 	isResigned: boolean;
@@ -159,6 +159,10 @@ export class Restore {
 	@optional()
 	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
 
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "api-sync")
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
+
 	public async restore(): Promise<void> {
 		const isEmpty = await this.databaseService.isEmpty();
 		const mostRecentCommit = await (isEmpty
@@ -203,7 +207,7 @@ export class Restore {
 				tokenHolderRepository: this.tokenHolderRepositoryFactory(entityManager),
 				tokenRepository: this.tokenRepositoryFactory(entityManager),
 
-				totalSupply: BigNumber.ZERO,
+				totalSupply: 0n,
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				userAttributes: {},
 				validatorAttributes: {},
@@ -299,8 +303,8 @@ export class Restore {
 			validatorRounds,
 		} = context;
 
-		const BATCH_SIZE = 1000;
-		const CHUNK_SIZE = 1000;
+		const BATCH_SIZE = this.pluginConfiguration.getRequired<number>("restore.blocks.batchSize");
+		const CHUNK_SIZE = BATCH_SIZE;
 		const t0 = performance.now();
 
 		const genesisBlockNumber = this.configuration.getGenesisHeight();
@@ -308,6 +312,7 @@ export class Restore {
 
 		let ingestedBlocks = 0;
 		let ingestedTransactions = 0;
+		let totalRound = 0;
 
 		const multiPaymentContractAddress = this.app.get<string>(
 			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
@@ -383,18 +388,17 @@ export class Restore {
 				}
 			};
 
-			let totalRound = 0;
 			for await (const { block, proof } of commits) {
 				blocks.push({
 					commitRound: proof.round,
-					fee: block.fee.toFixed(),
+					fee: block.fee.toString(),
 					gasUsed: block.gasUsed,
 					hash: block.hash,
 					number: block.number.toFixed(),
 					parentHash: block.parentHash,
 					payloadSize: block.payloadSize,
 					proposer: block.proposer,
-					reward: block.reward.toFixed(),
+					reward: block.reward.toString(),
 					round: block.round,
 					signature: proof.signature,
 					stateRoot: block.stateRoot,
@@ -414,8 +418,8 @@ export class Restore {
 					}
 				} else {
 					validatorAttributes.producedBlocks += 1;
-					validatorAttributes.totalForgedFees = validatorAttributes.totalForgedFees.plus(block.fee);
-					validatorAttributes.totalForgedRewards = validatorAttributes.totalForgedRewards.plus(block.reward);
+					validatorAttributes.totalForgedFees += block.fee;
+					validatorAttributes.totalForgedRewards += block.reward;
 					validatorAttributes.lastBlock = block;
 				}
 
@@ -493,7 +497,7 @@ export class Restore {
 								? [...new Set(parsedMultiPayments.map((mp) => mp.to))]
 								: undefined,
 
-						nonce: transaction.nonce.toFixed(),
+						nonce: transaction.nonce.toString(),
 
 						output: receipt.output,
 						senderPublicKey: transaction.senderPublicKey,
@@ -502,7 +506,7 @@ export class Restore {
 						timestamp: block.timestamp.toFixed(),
 						to: transaction.to,
 						transactionIndex: transaction.transactionIndex!,
-						value: transaction.value.toFixed(),
+						value: transaction.value.toString(),
 					});
 
 					multiPayments.push(...parsedMultiPayments);
@@ -571,8 +575,8 @@ export class Restore {
 				fee: validator.fee,
 				isResigned: validator.isResigned,
 				producedBlocks: 0,
-				totalForgedFees: BigNumber.ZERO,
-				totalForgedRewards: BigNumber.ZERO,
+				totalForgedFees: 0n,
+				totalForgedRewards: 0n,
 				voteBalance: validator.voteBalance,
 				votersCount: validator.votersCount,
 			};
@@ -648,25 +652,25 @@ export class Restore {
 					attributes: {
 						...(validatorAttributes
 							? {
-									validatorFee: validatorAttributes.fee,
+									validatorFee: validatorAttributes.fee.toString(),
 									validatorPublicKey: validatorAttributes.blsPublicKey,
 									validatorResigned: validatorAttributes.isResigned,
-									validatorVoteBalance: validatorAttributes.voteBalance,
+									validatorVoteBalance: validatorAttributes.voteBalance.toString(),
 									validatorVotersCount: validatorAttributes.votersCount,
 
-									...(validatorAttributes.totalForgedFees.isGreaterThan(0)
-										? { validatorForgedFees: validatorAttributes.totalForgedFees.toFixed() }
+									...(validatorAttributes.totalForgedFees > 0n
+										? { validatorForgedFees: validatorAttributes.totalForgedFees.toString() }
 										: {}),
-									...(validatorAttributes.totalForgedRewards.isGreaterThan(0)
-										? { validatorForgedRewards: validatorAttributes.totalForgedRewards.toFixed() }
+									...(validatorAttributes.totalForgedRewards > 0n
+										? { validatorForgedRewards: validatorAttributes.totalForgedRewards.toString() }
 										: {}),
-									...(validatorAttributes.totalForgedFees
-										.plus(validatorAttributes.totalForgedRewards)
-										.isGreaterThan(0)
+									...(validatorAttributes.totalForgedFees + validatorAttributes.totalForgedRewards >
+									0n
 										? {
-												validatorForgedTotal: validatorAttributes.totalForgedFees
-													.plus(validatorAttributes.totalForgedRewards)
-													.toFixed(),
+												validatorForgedTotal: (
+													validatorAttributes.totalForgedFees +
+													validatorAttributes.totalForgedRewards
+												).toString(),
 											}
 										: {}),
 									...(validatorAttributes.producedBlocks > 0
@@ -720,8 +724,8 @@ export class Restore {
 								}
 							: {}),
 					} as string, // is converted into JSONB column
-					balance: BigNumber.make(account.balance).toFixed(),
-					nonce: BigNumber.make(account.nonce).toFixed(),
+					balance: account.balance.toString(),
+					nonce: account.nonce.toString(),
 					publicKey: context.addressToPublicKey[account.address] ?? null,
 					updated_at: "0",
 				});
@@ -737,7 +741,7 @@ export class Restore {
 			offset = result.nextOffset;
 		} while (offset);
 
-		context.totalSupply = context.totalSupply.plus(totalAccountBalance);
+		context.totalSupply += totalAccountBalance;
 
 		const t1 = performance.now();
 		this.logger.info(`Restored ${totalAccounts.toLocaleString()} wallets in ${t1 - t0}ms`);
@@ -761,7 +765,7 @@ export class Restore {
 			for (const wallet of result.wallets) {
 				legacyColdWallets.push({
 					address: wallet.address,
-					balance: BigNumber.make(wallet.balance).toFixed(),
+					balance: wallet.balance.toString(),
 					...(Object.keys(wallet.legacyAttributes).length > 0
 						? {
 								attributes: {
@@ -804,7 +808,7 @@ export class Restore {
 			offset = result.nextOffset;
 		} while (offset);
 
-		context.totalSupply = context.totalSupply.plus(totalLegacyAccountBalance);
+		context.totalSupply += totalLegacyAccountBalance;
 
 		const t1 = performance.now();
 		this.logger.info(`Restored ${totalLegacyAccounts.toLocaleString()} legacy cold wallets in ${t1 - t0}ms`);
@@ -855,7 +859,7 @@ export class Restore {
 
 				const proposer = validators[proposerIndex];
 				validatorAddresses[index] = proposer.address;
-				votes[index] = proposer.voteBalance.toFixed();
+				votes[index] = proposer.voteBalance.toString();
 			}
 
 			validatorRoundsToIngest.push({
@@ -899,7 +903,7 @@ export class Restore {
 			.values({
 				blockNumber: context.lastBlockNumber.toFixed(),
 				id: 1,
-				supply: context.totalSupply.toFixed(),
+				supply: context.totalSupply.toString(),
 			})
 			.execute();
 	}

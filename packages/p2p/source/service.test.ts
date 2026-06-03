@@ -1,6 +1,5 @@
 import { Identifiers, Events } from "@mainsail/constants";
 import { Providers } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
 import importFresh from "import-fresh";
 
 import { Application } from "@mainsail/kernel";
@@ -522,10 +521,10 @@ describeSkip<{
 				payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 				payloadLength: 0,
 				previousBlock: "17184958558311101492",
-				reward: BigNumber.make("0"),
+				reward: 0n,
 				timestamp: 46_583_330,
-				totalAmount: BigNumber.make("0"),
-				totalFee: BigNumber.make("0"),
+				totalAmount: 0n,
+				totalFee: 0n,
 				version: 0,
 			},
 			transactions: [],

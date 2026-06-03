@@ -4,25 +4,49 @@ import type { Worker } from "worker_threads";
 import { Identifiers, LogLevels } from "@mainsail/constants";
 import split from "split2";
 
-export class Subprocess<T extends Record<string, unknown> = Record<string, unknown>> implements Contracts.Kernel.IPC
-	.Subprocess<T> {
+export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 	#logLevels = new Set(LogLevels);
 
 	private lastId = 1;
 	private readonly subprocess: Worker;
-	private readonly callbacks = new Map<number, Contracts.Kernel.IPC.RequestCallbacks<T>>();
-	private readonly eventHandlers = new Map<string, Contracts.Kernel.IPC.EventCallback<string>>();
+	private readonly workerName: string;
+	private readonly callbacks = new Map<number, Contracts.Kernel.IPC.RequestCallback<unknown>>();
+	private readonly eventHandlers = new Map<string, Contracts.Kernel.IPC.EventCallback<unknown>>();
+	#stopped?: Error;
+	#drainPromise?: Promise<void>;
+	#drainResolve?: () => void;
 
 	public constructor(
 		app: Contracts.Kernel.Application,
+		name: string,
 		loggerContext: Contracts.Kernel.LoggerContext,
 		subprocess: Worker,
 	) {
 		this.subprocess = subprocess;
-		this.subprocess.on("message", this.onSubprocessMessage.bind(this));
-		this.subprocess.on("message", this.onEmit.bind(this));
+
+		// Capture the thread id up front: Node resets it to -1 once the worker exits.
+		this.workerName = `${name}-${subprocess.threadId}`;
 
 		const logger = app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service);
+
+		logger.debug(`Spawning worker ${this.workerName}`);
+
+		this.subprocess.on("message", this.onMessage.bind(this));
+		this.subprocess.on("error", (error: Error) => {
+			logger.error(`Worker ${this.workerName} error: ${error.message}`);
+			this.#stop(error);
+		});
+		this.subprocess.on("exit", (code) => {
+			logger.debug(`Worker ${this.workerName} stopped with exit code ${code}`);
+			this.#stop(new Error(`Worker ${this.workerName} stopped with exit code ${code}`));
+		});
+		// A reply that fails to deserialize cannot be matched back to its request id, so the
+		// pending callback can never be settled. Reject everything in flight to avoid a silent
+		// hang. The worker stays alive after this, so it is not marked stopped.
+		this.subprocess.on("messageerror", (error: Error) => {
+			logger.error(`Worker ${this.workerName} message could not be deserialized: ${error.message}`);
+			this.rejectPending(error);
+		});
 
 		this.subprocess.stdout.pipe(split()).on("data", (line) => {
 			// [LEVEL] MESSAGE
@@ -48,19 +72,53 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 	}
 
 	public async kill(): Promise<number> {
+		this.#stopped ??= new Error(`Worker ${this.workerName} was killed`);
 		return this.subprocess.terminate();
+	}
+
+	// Graceful counterpart to kill(): same termination, but signals "normal shutdown" rather
+	// than a critical-error abort. Any pending request still in flight rejects with this reason.
+	public async dispose(): Promise<number> {
+		this.#stopped ??= new Error(`Worker ${this.workerName} is being disposed`);
+		return this.subprocess.terminate();
+	}
+
+	// Resolves once every in-flight sendRequest has settled (either replied or rejected via
+	// #stop / messageerror). Callers use this to wait for the worker to be quiet before
+	// disposing, so terminate() doesn't cut off work in progress.
+	public async drain(): Promise<void> {
+		if (this.callbacks.size === 0) {
+			return;
+		}
+
+		if (!this.#drainPromise) {
+			this.#drainPromise = new Promise<void>((resolve) => {
+				this.#drainResolve = resolve;
+			});
+		}
+
+		return this.#drainPromise;
 	}
 
 	public getQueueSize(): number {
 		return this.callbacks.size;
 	}
 
-	// TODO: use type magic to infer args (didn't work when T is also using same signatures)
+	public isStopped(): boolean {
+		return this.#stopped !== undefined;
+	}
+
 	public sendRequest<T>(method: string, ...arguments_: unknown[]): Promise<T> {
-		return new Promise((resolve, reject) => {
+		if (this.#stopped) {
+			return Promise.reject(this.#stopped);
+		}
+
+		return new Promise<T>((resolve, reject) => {
 			const id = this.lastId++;
-			this.callbacks.set(id, { reject, resolve } as unknown as Contracts.Kernel.IPC.RequestCallback);
-			// TODO: we have to make sure args are always serializable and ideally don't copy
+			// The callbacks map is heterogeneous (one entry per in-flight request, each with its
+			// own result type), so it stores `unknown`; this is the boundary where the request's
+			// `T` is erased. `sendRequest<T>` keeps the promise typed for the caller.
+			this.callbacks.set(id, { reject, resolve: resolve as (result: unknown) => void });
 			this.subprocess.postMessage({ args: arguments_, id, method });
 		});
 	}
@@ -69,31 +127,49 @@ export class Subprocess<T extends Record<string, unknown> = Record<string, unkno
 		this.eventHandlers.set(event, callback as Contracts.Kernel.IPC.EventCallback<unknown>);
 	}
 
-	private onEmit(message: Contracts.Kernel.IPC.Event): void {
-		if (!("event" in message)) {
-			return;
+	// Mark the worker permanently gone, then reject anything in flight. The first reason wins
+	// (a crash `error` is more informative than the `exit` that follows it).
+	#stop(error: Error): void {
+		this.#stopped ??= error;
+		this.rejectPending(error);
+	}
+
+	private rejectPending(error: Error): void {
+		for (const { reject } of this.callbacks.values()) {
+			reject(error);
 		}
+		this.callbacks.clear();
+		this.#notifyDrained();
+	}
 
-		const callback = this.eventHandlers.get(message.event);
-
-		if (callback) {
-			callback(message.data);
+	#notifyDrained(): void {
+		if (this.#drainResolve) {
+			this.#drainResolve();
+			this.#drainResolve = undefined;
+			this.#drainPromise = undefined;
 		}
 	}
 
-	private onSubprocessMessage(message: Contracts.Kernel.IPC.Reply<void>): void {
-		if (!("id" in message)) {
+	private onMessage(message: Contracts.Kernel.IPC.Reply<unknown> | Contracts.Kernel.IPC.Event): void {
+		if ("id" in message) {
+			try {
+				if ("error" in message) {
+					this.callbacks.get(message.id)?.reject(new Error(message.error));
+				} else {
+					this.callbacks.get(message.id)?.resolve(message.result);
+				}
+			} finally {
+				this.callbacks.delete(message.id);
+				if (this.callbacks.size === 0) {
+					this.#notifyDrained();
+				}
+			}
+
 			return;
 		}
 
-		try {
-			if ("error" in message) {
-				this.callbacks.get(message.id)?.reject(new Error(message.error));
-			} else {
-				this.callbacks.get(message.id)?.resolve(message.result as unknown as T);
-			}
-		} finally {
-			this.callbacks.delete(message.id);
+		if ("event" in message) {
+			this.eventHandlers.get(message.event)?.(message.data);
 		}
 	}
 }

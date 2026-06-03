@@ -36,24 +36,16 @@ describe<{
 		assert.containKeys(configManager.all(), ["network", "milestones", "genesisBlock"]);
 	});
 
+	it("should throw if invalid config is provided", ({ configManager }) => {
+		assert.throws(() =>
+			configManager.setConfig({ ...cryptoJson, network: { ...cryptoJson.network, nethash: "dummy" } }),
+		);
+	});
+
 	it("should throw on set before config is initialized", () => {
 		const fresh = new Configuration();
 
 		assert.throws(() => fresh.set("network.nethash", "dummy"));
-	});
-
-	it('key should be "set" if it is on config object property', ({ configManager }) => {
-		configManager.set("network.key", "value");
-		assert.equal(configManager.get("network.key"), "value");
-	});
-
-	it('key should not be "set" if it is not on config property', ({ configManager }) => {
-		configManager.set("key", "value");
-		assert.undefined(configManager.get("key"));
-	});
-
-	it('key should be "get"', ({ configManager }) => {
-		assert.equal(configManager.get("network.nethash"), cryptoJson.network.nethash);
 	});
 
 	it("should build milestones", ({ configManager }) => {

@@ -29,7 +29,7 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 		const buffer: Buffer = this.hashFactory.ripemd160(Buffer.from(publicKey, "hex"));
 		const payload: Buffer = Buffer.alloc(21);
 
-		payload.writeUInt8(this.configuration.get("network.pubKeyHash"), 0);
+		payload.writeUInt8(this.configuration.getNetwork().pubKeyHash, 0);
 		buffer.copy(payload, 1);
 
 		return this.#encodeCheck(payload);
@@ -39,10 +39,6 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 		return this.fromPublicKey(await this.publicKeyFactory.fromWIF(wif));
 	}
 
-	public async fromMultiSignatureAsset(asset: Contracts.Crypto.MultiSignatureAsset): Promise<string> {
-		return this.fromPublicKey(await this.publicKeyFactory.fromMultiSignatureAsset(asset));
-	}
-
 	public async fromBuffer(buffer: Buffer): Promise<string> {
 		return this.#encodeCheck(buffer);
 	}
@@ -50,7 +46,7 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 	public async toBuffer(address: string): Promise<Buffer> {
 		const result: Buffer = this.#decodeCheck(address);
 
-		const pubKeyHash = this.configuration.get("network.pubKeyHash");
+		const pubKeyHash = this.configuration.getNetwork().pubKeyHash;
 
 		if (result[0] !== pubKeyHash) {
 			throw new Error(`Expected address network byte ${pubKeyHash}, but got ${result[0]}.`);
@@ -61,7 +57,7 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 
 	public async validate(address: string): Promise<boolean> {
 		try {
-			return this.#decodeCheck(address)[0] === this.configuration.get("network.pubKeyHash");
+			return this.#decodeCheck(address)[0] === this.configuration.getNetwork().pubKeyHash;
 		} catch {
 			return false;
 		}

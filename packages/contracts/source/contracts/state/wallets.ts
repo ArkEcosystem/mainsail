@@ -1,15 +1,13 @@
-import type { BigNumber } from "@mainsail/utils";
-
 export interface Wallet {
 	getAddress(): string;
 
-	getBalance(): BigNumber;
-	setBalance(balance: BigNumber): void;
-	increaseBalance(balance: BigNumber): Wallet;
-	decreaseBalance(balance: BigNumber): Wallet;
+	getBalance(): bigint;
+	setBalance(balance: bigint): void;
+	increaseBalance(balance: bigint): Wallet;
+	decreaseBalance(balance: bigint): Wallet;
 
-	getNonce(): BigNumber;
-	setNonce(nonce: BigNumber): void;
+	getNonce(): bigint;
+	setNonce(nonce: bigint): void;
 	increaseNonce(): void;
 	decreaseNonce(): void;
 
@@ -22,8 +20,8 @@ export interface Wallet {
 export interface ValidatorWallet {
 	address: string;
 	blsPublicKey: string;
-	voteBalance: BigNumber;
+	voteBalance: bigint;
 	votersCount: number;
-	fee: BigNumber;
+	fee: bigint;
 	isResigned: boolean;
 }

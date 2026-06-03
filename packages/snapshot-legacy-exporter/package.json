@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/snapshot-legacy-exporter",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "Mainsail V3 legacy state exporter",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -32,7 +32,7 @@
 		"@mainsail/validation": "workspace:*",
 		"pg": "8.20.0",
 		"tmp": "0.2.5",
-		"typeorm": "0.3.28"
+		"typeorm": "0.3.29"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",

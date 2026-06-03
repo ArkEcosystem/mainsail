@@ -2,12 +2,14 @@ import { TypeOrm } from "@mainsail/api-database";
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { Application, Bootstrap, Providers, Services } from "@mainsail/kernel";
+import { ensureError } from "@mainsail/utils";
 import { resolve } from "path";
 
 import { PoolWorker } from "./pool-worker.js";
 import { Worker } from "./worker.js";
 
 type PluginOptions = Record<string, any>;
+
 
 const setupSyncNode = async (dataDirectory: string): Promise<Contracts.Kernel.Application> => {
 	const app = new Application();
@@ -118,6 +120,11 @@ const setupNode = async (app: Application, dataDirectory: string, configDirector
 		},
 		"@mainsail/api-sync": {
 			maxSyncAttempts: 1,
+			restore: {
+				blocks: {
+					batchSize: 5,
+				},
+			},
 			syncInterval: 250,
 			truncateDatabase: "1",
 		},
@@ -152,6 +159,7 @@ const setupNode = async (app: Application, dataDirectory: string, configDirector
 		"@mainsail/crypto-commit",
 		"@mainsail/processor",
 		"@mainsail/evm-consensus",
+		"@mainsail/forger",
 		"@mainsail/validator",
 		"@mainsail/consensus",
 	];
@@ -218,7 +226,7 @@ const bootstrap = async (app: Contracts.Kernel.Application): Promise<void> => {
 	const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const commitFactory = app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
 
-	const genesisCommitJson = configuration.get<Contracts.Crypto.CommitJson>("genesisBlock");
+	const genesisCommitJson = configuration.getGenesisCommit();
 	const genesisCommit = await commitFactory.fromJson(genesisCommitJson);
 
 	const stateStore = app.get<Contracts.State.Store>(Identifiers.State.Store);
@@ -235,14 +243,9 @@ const bootstrap = async (app: Contracts.Kernel.Application): Promise<void> => {
 		await tryImportSnapshot(app, genesisCommit);
 
 		const result = await blockProcessor.process(commitState);
-		if (!result) {
+		if (!result.success) {
 			throw new Error("Failed to process genesis block");
 		}
-
-		// TODO:
-		// if (!result || !result.success) {
-		// 	throw new Error("Failed to process genesis block");
-		// }
 
 		commitState.setProcessorResult(result);
 		await blockProcessor.commit(commitState);
@@ -310,8 +313,9 @@ const runDatabaseQuery = async <T>(databaseName: string, callback: (dataSource: 
 		const result = await callback(nodeDatabase);
 		return result;
 	} catch (ex) {
-		console.log("runDatabaseQuery", ex.message);
-		throw ex;
+		const error = ensureError(ex);
+		console.log("runDatabaseQuery", error.message);
+		throw error;
 	} finally {
 		await nodeDatabase.destroy();
 	}

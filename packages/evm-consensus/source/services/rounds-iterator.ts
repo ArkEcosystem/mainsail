@@ -3,7 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
-import { BigNumber } from "@mainsail/utils";
 import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
@@ -98,7 +97,7 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 
 					return {
 						address,
-						voteBalance: BigNumber.make(voteBalance),
+						voteBalance: voteBalance,
 					};
 				}),
 			});

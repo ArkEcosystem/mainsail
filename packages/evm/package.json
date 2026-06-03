@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/evm",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "EVM for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -8,9 +8,9 @@
 	"types": "index.d.ts",
 	"scripts": {
 		"artifacts": "napi artifacts",
-		"build": "pnpm run clean && pnpm run build-napi",
 		"build-napi": "napi build --platform --output-dir ./ --manifest-path bindings/Cargo.toml --release",
 		"build-napi:debug": "napi build --platform --output-dir ./ --manifest-path bindings/Cargo.toml",
+		"build-rs": "pnpm run clean && pnpm run build-napi",
 		"clean": "rm -f index.js && rm -f index.d.ts && rm -f evm.*.node && rm -rf target",
 		"prepublishOnly": "napi prepublish -t pnpm",
 		"release": "pnpm publish --access public",
@@ -20,7 +20,7 @@
 		"version": "napi version"
 	},
 	"devDependencies": {
-		"@napi-rs/cli": "3.4.0"
+		"@napi-rs/cli": "3.6.2"
 	},
 	"engines": {
 		"node": ">=24"

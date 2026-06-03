@@ -294,6 +294,14 @@ describe<{
 				path: `/wallets/${walletsTokens[0].address}/tokens?minBalance=2`,
 				result: walletTokensResponse,
 			},
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens?tokenAddress=0x0ba3d7cba9701f76f6285733a5a877a557c86034`,
+				result: [walletTokensResponse[0]],
+			},
+			{
+				path: `/wallets/${walletsTokens[0].address}/tokens?tokenAddress=0x1ba3d7cba9701f76f6285733a5a877a557c86034`,
+				result: [],
+			},
 		];
 
 		for (const { path, result } of testCases) {
@@ -509,6 +517,41 @@ describe<{
 			{
 				path: `/wallets/tokens?whitelist=${tokens.map((t) => t.address).join(",")}&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7`,
 				result: walletTokenHoldersResponse,
+			},
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, { ...options });
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
+	});
+
+	it("/wallets/tokens?blacklist=", async () => {
+		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenHolderRepository.save(tokenHolders);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
+
+		const testCases = [
+			{
+				// All
+				path: "/wallets/tokens?addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7",
+				result: walletTokenHoldersResponse,
+			},
+			{
+				// Blacklist first token
+				path: `/wallets/tokens?blacklist=${tokens[0].address}&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7`,
+				result: [walletTokenHoldersResponse[1], walletTokenHoldersResponse[2]],
+			},
+			{
+				// Blacklist all
+				path: `/wallets/tokens?blacklist=${tokens.map((t) => t.address).join(",")}&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7`,
+				result: [],
+			},
+			{
+				// Blacklist takes precendence if whitelist overlaps
+				path: `/wallets/tokens?blacklist=${tokens.map((t) => t.address).join(",")}&whitelist=${tokens.map((t) => t.address).join(",")}&addresses=0x8233F6Df6449D7655f4643D2E752DC8D2283fAd5,0x432b093d9542B905C87587607491C369408475b4,0x3949B5aEb77059945e96c513F8F712450Ca89Eb7`,
+				result: [],
 			},
 		];
 

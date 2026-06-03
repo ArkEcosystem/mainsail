@@ -1,5 +1,5 @@
 import { parentPort } from "worker_threads";
 
-export const emit = <T>(event: string, data: T): void => {
+export const emit = (event: string, data: unknown): void => {
 	parentPort?.postMessage({ data, event });
 };

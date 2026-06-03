@@ -19,6 +19,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
+		"@mainsail/forger": "workspace:*",
 		"@mainsail/test-transaction-builders": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",

@@ -4,7 +4,7 @@ import { describe } from "@mainsail/test-runner";
 import { getPeerConfig } from "./get-peer-config";
 
 describe("getPeerConfig", ({ it, assert, beforeEach }) => {
-	let mockConfig;
+	let mockNetwork;
 	let configuration;
 	let version;
 	let appPlugins;
@@ -17,16 +17,18 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 	let result;
 
 	beforeEach(() => {
-		mockConfig = {
-			"network.client.explorer": "explorer.thechain.com",
-			"network.client.symbol": "TCH",
-			"network.client.token": "TCHAIN",
-			"network.name": "thechain",
-			"network.nethash": "nethahs",
-			"network.pubKeyHash": "pubkyhash",
+		mockNetwork = {
+			client: {
+				explorer: "explorer.thechain.com",
+				symbol: "TCH",
+				token: "TCHAIN",
+			},
+			name: "thechain",
+			nethash: "nethahs",
+			pubKeyHash: "pubkyhash",
 		};
 		configuration = {
-			get: (key) => mockConfig[key],
+			getNetwork: () => mockNetwork,
 		};
 
 		version = "3.0.9";
@@ -81,14 +83,14 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 
 		result = {
 			network: {
-				explorer: mockConfig["network.client.explorer"],
-				name: mockConfig["network.name"],
-				nethash: mockConfig["network.nethash"],
+				explorer: mockNetwork.client.explorer,
+				name: mockNetwork.name,
+				nethash: mockNetwork.nethash,
 				token: {
-					name: mockConfig["network.client.token"],
-					symbol: mockConfig["network.client.symbol"],
+					name: mockNetwork.client.token,
+					symbol: mockNetwork.client.symbol,
 				},
-				version: mockConfig["network.pubKeyHash"],
+				version: mockNetwork.pubKeyHash,
 			},
 			plugins: {
 				"@mainsail/api": {

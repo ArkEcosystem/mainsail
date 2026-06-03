@@ -13,7 +13,7 @@ export class AbstractProcessor {
 	protected readonly commitLock!: Contracts.Kernel.Lock;
 
 	@inject(Identifiers.State.Store)
-	private readonly stateStore!: Contracts.State.Store;
+	protected readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.BlockchainUtils.TimestampCalculator)
 	private readonly timestampCalculator!: Contracts.BlockchainUtils.TimestampCalculator;

@@ -18,6 +18,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/constants": "workspace:*",
+		"@mainsail/forger": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/test-transaction-builders": "workspace:*",
 		"@mainsail/validation": "workspace:*",

@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/test-factories",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "Test factories for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -48,7 +48,7 @@
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
-		"@types/chance": "1.1.7",
+		"@types/chance": "1.1.8",
 		"@types/memoizee": "0.4.12",
 		"uvu": "0.5.6"
 	},

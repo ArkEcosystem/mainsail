@@ -160,9 +160,10 @@ describe<{
 		const commitStateFactory = app.get<Contracts.Consensus.CommitStateFactory>(
 			Identifiers.Consensus.CommitState.Factory,
 		);
+
 		const evm = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 
-		const genesisCommitJson = configuration.get<Contracts.Crypto.CommitJson>("genesisBlock");
+		const genesisCommitJson = configuration.getGenesisCommit();
 		const genesisCommit = await commitFactory.fromJson(genesisCommitJson);
 
 		const commitState = commitStateFactory(genesisCommit);
@@ -197,11 +198,11 @@ describe<{
 				gasLimit: BigInt(transaction.gasLimit),
 				gasPrice: BigInt(transaction.gasPrice),
 				index: transaction.transactionIndex,
-				nonce: transaction.nonce.toBigInt(),
+				nonce: transaction.nonce,
 				specId: Enums.Evm.SpecId.LATEST,
 				to: transaction.to,
 				txHash: transaction.hash,
-				value: transaction.value.toBigInt(),
+				value: transaction.value,
 			});
 
 			if (receipt.status !== 1) {

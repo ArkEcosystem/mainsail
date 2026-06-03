@@ -10,7 +10,6 @@ use std::{
 
 use alloy_primitives::Bloom;
 use heed::{Comparator, EnvFlags, EnvOpenOptions};
-use rayon::slice::ParallelSliceMut;
 use revm::{
     Database, DatabaseRef,
     context::{DBErrorMarker, result::ExecutionResult},
@@ -148,9 +147,6 @@ impl Comparator for StorageEntryDupSortCmp {
 // txHash -> receipt
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub(crate) struct CommitReceipts {
-    accounts_hash: B256,
-    storage_hash: B256,
-    contracts_hash: B256,
     tx_receipts: HashMap<B256, TxReceipt>,
 }
 
@@ -266,14 +262,6 @@ pub struct PendingCommit {
 
     // Optimization to avoid unnecessary (deep) clones of commit data.
     pub built_commit: Option<StateCommit>,
-    pub commit_hashes: Option<CommitHashes>,
-}
-
-#[derive(Clone, Default, Debug, Serialize, Deserialize, PartialEq, Eq)]
-pub struct CommitHashes {
-    pub accounts_hash: B256,
-    pub contracts_hash: B256,
-    pub storage_hash: B256,
 }
 
 #[derive(Clone, Debug, Default, Serialize, PartialEq, Eq)]
@@ -480,8 +468,29 @@ impl PersistentDB {
         })
     }
 
-    pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) {
+    pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) -> Result<(), Error> {
+        let mut wtxn = self.env.write_txn()?;
+        let inner = self.inner.borrow_mut();
+
+        if inner
+            .accounts
+            .get(&wtxn, &AddressWrapper(genesis_info.account))?
+            .is_none()
+        {
+            inner.accounts.put(
+                &mut wtxn,
+                &AddressWrapper(genesis_info.account),
+                &CompressedBincode(&StoredAccountInfo::new(
+                    genesis_info.initial_supply,
+                    0,
+                    KECCAK_EMPTY,
+                )),
+            )?;
+            wtxn.commit()?;
+        }
+
         self.genesis_info.replace(genesis_info);
+        Ok(())
     }
 
     pub fn get_accounts(
@@ -752,18 +761,12 @@ impl DatabaseRef for PersistentDB {
         let txn = self.env.read_txn()?;
         let inner = self.inner.borrow();
 
-        let basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
-            Some(account) => account.0.into(),
-            None => match &self.genesis_info {
-                Some(genesis) if genesis.account == address => revm::state::AccountInfo {
-                    balance: genesis.initial_supply,
-                    ..Default::default()
-                },
-                _ => AccountInfo::default(),
-            },
-        };
+        let basic = inner
+            .accounts
+            .get(&txn, &AddressWrapper(address))?
+            .map(|a| a.0.into());
 
-        Ok(basic.into())
+        Ok(basic)
     }
 
     fn code_by_hash_ref(&self, code_hash: B256) -> Result<Bytecode, Self::Error> {
@@ -808,7 +811,6 @@ impl PersistentDB {
         &self,
         state_commit: &mut StateCommit,
         commit_data: &Option<CommitData>,
-        commit_hashes: &CommitHashes,
     ) -> Result<(), Error> {
         let StateCommit {
             key,
@@ -816,7 +818,7 @@ impl PersistentDB {
             results,
         } = state_commit;
 
-        match self.commit_to_db(key, change_set, commit_data, commit_hashes, results) {
+        match self.commit_to_db(key, change_set, commit_data, results) {
             Ok(_) => return Ok(()),
             Err(err) => match &err {
                 Error::Heed(heed_err) => match heed_err {
@@ -836,7 +838,6 @@ impl PersistentDB {
         key: &CommitKey,
         change_set: &mut state_changes::StateChangeset,
         commit_data: &Option<CommitData>,
-        commit_hashes: &CommitHashes,
         results: &BTreeMap<B256, (ExecutionResult, u64)>,
     ) -> Result<(), Error> {
         assert!(!self.is_block_committed(key.0));
@@ -853,10 +854,6 @@ impl PersistentDB {
                 legacy_cold_wallets,
                 merged_legacy_cold_wallets,
             } = change_set;
-
-            accounts.par_sort_unstable_by_key(|a| a.0);
-            contracts.par_sort_unstable_by_key(|a| a.0);
-            storage.par_sort_unstable_by_key(|a| a.address);
 
             // Update accounts
             for (address, account) in accounts.iter() {
@@ -938,8 +935,6 @@ impl PersistentDB {
                         unsafe { iter.del_current_with_flags(heed::DeleteFlags::NO_DUP_DATA)? };
                     }
                 }
-
-                storage.par_sort_unstable_by_key(|a| a.0);
 
                 for value in storage.into_iter() {
                     let new_storage_value = &StorageEntryWrapper(value.0, value.1.present_value());
@@ -1075,12 +1070,7 @@ impl PersistentDB {
             inner.commits.put(
                 rwtxn,
                 &key.0,
-                &CompressedBincode(&CommitReceipts {
-                    accounts_hash: commit_hashes.accounts_hash,
-                    contracts_hash: commit_hashes.contracts_hash,
-                    storage_hash: commit_hashes.storage_hash,
-                    tx_receipts,
-                }),
+                &CompressedBincode(&CommitReceipts { tx_receipts }),
             )?;
 
             Ok(())
@@ -1119,21 +1109,6 @@ impl PersistentDB {
         match inner.commits.get(&rtxn, &block_number)? {
             Some(receipts) => Ok((true, receipts.tx_receipts.get(&tx_hash).cloned())),
             None => Ok((false, None)),
-        }
-    }
-
-    pub fn get_committed_hashes(&self, block_number: u64) -> Result<Option<CommitHashes>, Error> {
-        let env = self.env.clone();
-        let rtxn = env.read_txn().expect("read");
-        let inner = self.inner.borrow();
-
-        match inner.commits.get(&rtxn, &block_number)? {
-            Some(receipts) => Ok(Some(CommitHashes {
-                accounts_hash: receipts.accounts_hash,
-                contracts_hash: receipts.contracts_hash,
-                storage_hash: receipts.storage_hash,
-            })),
-            None => Ok(None),
         }
     }
 
@@ -1239,7 +1214,6 @@ impl PendingCommit {
             legacy_cold_wallets: Default::default(),
             merged_legacy_cold_wallets: Default::default(),
             built_commit: Default::default(),
-            commit_hashes: Default::default(),
         }
     }
 
@@ -1283,10 +1257,10 @@ mod tests {
         account::StoredAccountInfo,
         compression::CompressedBincode,
         db::{
-            AddressWrapper, BlockHeaderData, CommitData, CommitHashes, CommitKey, CommitReceipts,
-            HashWrapper, LegacyAddressWrapper, MAP_SIZE_UNIT, PendingCommit, PersistentDB,
-            PersistentDBOptions, ProofData, StaticStringWrapper, StorageEntryWrapper,
-            StringWrapper, TransactionData, next_map_size,
+            AddressWrapper, BlockHeaderData, CommitData, CommitKey, CommitReceipts, HashWrapper,
+            LegacyAddressWrapper, MAP_SIZE_UNIT, PendingCommit, PersistentDB, PersistentDBOptions,
+            ProofData, StaticStringWrapper, StorageEntryWrapper, StringWrapper, TransactionData,
+            next_map_size,
         },
         historical::HistoricalAccountData,
         legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
@@ -1294,9 +1268,8 @@ mod tests {
         receipt::TxReceipt,
         state_changes::{StateChangeset, StorageChangeset},
         state_commit::{StateCommit, build_commit},
-        state_root,
     };
-    use alloy_primitives::{Address, B256, Bytes, FixedBytes, U256, address, b256, hex};
+    use alloy_primitives::{Address, B256, Bytes, U256, address, b256};
     use revm::{
         Database,
         context::result::{ExecutionResult, ResultGas, SuccessReason},
@@ -1338,19 +1311,13 @@ mod tests {
 
         // 1) Lookup empty account
         let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
-        let account = db.basic(address).expect("works").expect("account info");
-
-        assert_eq!(
-            account.code_hash,
-            FixedBytes(hex!(
-                "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
-            ))
-        );
+        let account = db.basic(address).expect("works");
+        assert_eq!(account, None);
 
         // 2) Update balance for account
         let mut state = HashMap::default();
 
-        let mut account = revm::state::Account::new_not_existing(0);
+        let mut account = revm::state::Account::new_not_existing(revm::state::TransactionId::ZERO);
         account.info.balance = U256::from(100);
         account.status = revm::state::AccountStatus::Touched;
 
@@ -1385,7 +1352,6 @@ mod tests {
             PendingCommit {
                 key: CommitKey::default(),
                 transitions: TransitionState { transitions: state },
-                commit_hashes: Some(Default::default()),
                 ..Default::default()
             },
             Default::default(),
@@ -1416,7 +1382,6 @@ mod tests {
         let mut db = create_temp_database();
         let mut pending_commit = PendingCommit::default();
         pending_commit.built_commit = Some(build_commit(&mut pending_commit).unwrap());
-        pending_commit.commit_hashes = Some(CommitHashes::default());
 
         crate::state_commit::commit_to_db(&mut db, pending_commit, Default::default()).unwrap();
     }
@@ -1426,7 +1391,6 @@ mod tests {
         let mut db = create_temp_database();
         let mut pending_commit = PendingCommit::default();
         pending_commit.built_commit = Some(build_commit(&mut pending_commit).unwrap());
-        pending_commit.commit_hashes = None;
 
         crate::state_commit::commit_to_db(&mut db, pending_commit, Default::default()).unwrap();
     }
@@ -1438,7 +1402,7 @@ mod tests {
         let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
         let mut state = HashMap::default();
 
-        let mut account = revm::state::Account::new_not_existing(0);
+        let mut account = revm::state::Account::new_not_existing(revm::state::TransactionId::ZERO);
         account.status = revm::state::AccountStatus::Touched;
 
         let mut storage = HashMap::default();
@@ -1481,7 +1445,6 @@ mod tests {
             PendingCommit {
                 key: CommitKey::default(),
                 transitions: TransitionState { transitions: state },
-                commit_hashes: Some(CommitHashes::default()),
                 ..Default::default()
             },
             Default::default(),
@@ -1506,7 +1469,7 @@ mod tests {
         let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
         let mut state = HashMap::default();
 
-        let mut account = revm::state::Account::new_not_existing(0);
+        let mut account = revm::state::Account::new_not_existing(revm::state::TransactionId::ZERO);
         account.status = revm::state::AccountStatus::Touched;
 
         let mut storage = HashMap::default();
@@ -1537,7 +1500,6 @@ mod tests {
             PendingCommit {
                 key: CommitKey::default(),
                 transitions: TransitionState { transitions: state },
-                commit_hashes: Some(Default::default()),
                 ..Default::default()
             },
             Default::default(),
@@ -1575,7 +1537,6 @@ mod tests {
             PendingCommit {
                 key: CommitKey(1, 0, B256::ZERO),
                 transitions: TransitionState { transitions: state },
-                commit_hashes: Some(Default::default()),
                 ..Default::default()
             },
             Default::default(),
@@ -1611,7 +1572,8 @@ mod tests {
 
             let mut state = HashMap::default();
 
-            let mut account = revm::state::Account::new_not_existing(0);
+            let mut account =
+                revm::state::Account::new_not_existing(revm::state::TransactionId::ZERO);
             account.status = revm::state::AccountStatus::Touched;
 
             let mut storage = HashMap::default();
@@ -1638,7 +1600,6 @@ mod tests {
             PendingCommit {
                 key: CommitKey(block_number, 0, B256::ZERO),
                 transitions: TransitionState { transitions: state },
-                commit_hashes: Some(Default::default()),
                 ..Default::default()
             }
         };
@@ -1977,7 +1938,8 @@ mod tests {
             account: genesis,
             initial_supply: U256::from(1_000_000),
             ..Default::default()
-        });
+        })
+        .unwrap();
 
         let info = db.basic(genesis).unwrap();
         assert_eq!(
@@ -1989,7 +1951,7 @@ mod tests {
         );
 
         let info = db.basic(account).unwrap();
-        assert_eq!(info, Some(Default::default()));
+        assert_eq!(info, None);
     }
 
     #[test]
@@ -2110,7 +2072,7 @@ mod tests {
 
         assert_eq!(db.genesis_info, None);
 
-        db.set_genesis_info(Default::default());
+        db.set_genesis_info(Default::default()).expect("ok");
 
         assert_eq!(db.genesis_info, Some(Default::default()));
     }
@@ -2235,52 +2197,6 @@ mod tests {
 
         assert_eq!(read_block_number, target_block);
         assert_eq!(read_receipts, total_receipts);
-    }
-
-    #[test]
-    fn test_get_committed_hashes() {
-        let db = create_temp_database();
-
-        let hashes = db.get_committed_hashes(1).unwrap();
-        assert_eq!(hashes, None);
-
-        let accounts_hash =
-            b256!("0000000000000000000000000000000000000000000000000000000000000001");
-        let contracts_hash =
-            b256!("0000000000000000000000000000000000000000000000000000000000000002");
-        let storage_hash =
-            b256!("0000000000000000000000000000000000000000000000000000000000000003");
-
-        {
-            let mut wtxn = db.env.write_txn().unwrap();
-
-            db.inner
-                .borrow_mut()
-                .commits
-                .put(
-                    &mut wtxn,
-                    &1,
-                    &CompressedBincode(&CommitReceipts {
-                        accounts_hash,
-                        contracts_hash,
-                        storage_hash,
-                        ..Default::default()
-                    }),
-                )
-                .unwrap();
-
-            wtxn.commit().unwrap();
-        }
-
-        let hashes = db.get_committed_hashes(1).unwrap();
-        assert_eq!(
-            hashes,
-            Some(CommitHashes {
-                accounts_hash,
-                contracts_hash,
-                storage_hash
-            })
-        );
     }
 
     #[test]
@@ -2687,13 +2603,7 @@ mod tests {
             ..Default::default()
         };
 
-        let commit_hashes = CommitHashes {
-            accounts_hash: state_root::calculate_accounts_hash(&state.change_set).unwrap(),
-            contracts_hash: state_root::calculate_contracts_hash(&state.change_set).unwrap(),
-            storage_hash: state_root::calculate_storage_hash(&state.change_set).unwrap(),
-        };
-
-        db.commit(&mut state, &Some(data), &commit_hashes).unwrap();
+        db.commit(&mut state, &Some(data)).unwrap();
     }
 
     fn create_temp_database() -> PersistentDB {

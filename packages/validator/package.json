@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/validator",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "Local validator utils for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -24,10 +24,8 @@
 		"@chainsafe/bls-keystore": "3.1.0",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"joi": "18.1.2"
+		"@mainsail/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@mainsail/blockchain-utils": "workspace:*",
@@ -46,6 +44,8 @@
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
+		"@mainsail/evm-consensus": "workspace:*",
+		"@mainsail/forger": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/transactions": "workspace:*",

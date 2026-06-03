@@ -5,7 +5,7 @@ import type { ContractFunctionParameters, EncodeFunctionDataParameters } from "v
 import { Identifiers as ApiDatabaseIdentifiers, Models } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import { assert } from "@mainsail/utils";
+import { assert, ensureError } from "@mainsail/utils";
 import { LRUCache } from "lru-cache";
 import { decodeFunctionResult, encodeFunctionData, parseAbi, parseEventLogs, toHex, zeroAddress } from "viem";
 
@@ -396,8 +396,9 @@ export class TokenParserService implements TokenParser {
 			});
 
 			return decoded.toString();
-		} catch (ex) {
-			console.log(ex.message);
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			console.log(error.message);
 		}
 
 		return "0";

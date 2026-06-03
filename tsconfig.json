@@ -26,7 +26,7 @@
 		"target": "es2023",
 		"types": ["node"],
 		"typeRoots": ["reflect-metadata", "node_modules/@types"],
-		"useUnknownInCatchVariables": false
+		"useUnknownInCatchVariables": true
 	},
 	"exclude": ["node_modules", "**/*.test.ts"],
 	"references": [
@@ -71,7 +71,6 @@
 		{ "path": "packages/evm-state" },
 		{ "path": "packages/kernel" },
 		{ "path": "packages/logger-pino" },
-		{ "path": "packages/logger-winston" },
 		{ "path": "packages/networking-dns" },
 		{ "path": "packages/networking-ntp" },
 		{ "path": "packages/p2p" },

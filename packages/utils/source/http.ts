@@ -5,8 +5,8 @@ import { globalAgent as httpGlobalAgent, request as httpRequest } from "http";
 import { globalAgent as httpsGlobalAgent, request as httpsRequest } from "https";
 import { URL } from "url";
 
+import { ensureError } from "./ensure-error.js";
 import { isObject } from "./is-object.js";
-import { isUndefined } from "./is-undefined.js";
 
 const sendRequest = <T>(method: string, url: string, options?: HttpOptions): Promise<HttpResponse<T>> =>
 	new Promise((resolve, reject) => {
@@ -43,7 +43,7 @@ const sendRequest = <T>(method: string, url: string, options?: HttpOptions): Pro
 			options.agent = globalAgent;
 		}
 
-		if (isUndefined(options.timeout)) {
+		if (options.timeout === undefined) {
 			options.timeout = 1500;
 		}
 
@@ -79,7 +79,8 @@ const sendRequest = <T>(method: string, url: string, options?: HttpOptions): Pro
 				if (type && accumulator && type.includes("application/json")) {
 					try {
 						accumulator = JSON.parse(accumulator);
-					} catch (error) {
+					} catch (rawError) {
+						const error = ensureError(rawError);
 						return reject(new HttpError(response, error));
 					}
 				}
@@ -98,10 +99,12 @@ const sendRequest = <T>(method: string, url: string, options?: HttpOptions): Pro
 
 		request_.on("error", reject);
 
-		request_.on("timeout", () => request_.abort());
+		request_.on("timeout", () => request_.destroy(new Error("Request timed out")));
 
 		if (options.body) {
-			const body: string = JSON.stringify(options.body);
+			const body: string = JSON.stringify(options.body, (_, value) =>
+				typeof value === "bigint" ? value.toString() : value,
+			);
 
 			request_.setHeader("content-type", "application/json");
 			request_.setHeader("content-length", Buffer.byteLength(body));

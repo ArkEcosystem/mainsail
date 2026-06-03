@@ -3,7 +3,6 @@ import { describe } from "@mainsail/test-runner";
 
 import { TransactionBuilder } from "./builder.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
-import { BigNumber } from "@mainsail/utils";
 import { MissingTransactionSignatureError, ValidationFailed } from "@mainsail/exceptions";
 
 const wallet = {
@@ -33,10 +32,10 @@ describe<{
 			senderPublicKey: wallet.publicKey,
 			senderLegacyAddress: wallet.legacyAddress,
 			to: undefined,
-			value: BigNumber.ZERO,
+			value: 0n,
 			gasPrice: 5000000000,
 			gasLimit: 1000000,
-			nonce: BigNumber.ZERO,
+			nonce: 0n,
 			data: "0x",
 			v: 1,
 			r: "8f0145edea568df2dd39db91be0bff4ebf5b1e54cae49bf2090bf84fa0dd45a2",
@@ -79,10 +78,10 @@ describe<{
 			senderPublicKey: wallet.publicKey,
 			senderLegacyAddress: wallet.legacyAddress,
 			to: undefined,
-			value: BigNumber.ZERO,
+			value: 0n,
 			gasPrice: 5000000000,
 			gasLimit: 1000000,
-			nonce: BigNumber.ZERO,
+			nonce: 0n,
 			data: "0x",
 			v: 1,
 			r: "8f0145edea568df2dd39db91be0bff4ebf5b1e54cae49bf2090bf84fa0dd45a2",
@@ -154,10 +153,10 @@ describe<{
 			senderPublicKey: wallet.publicKey,
 			senderLegacyAddress: wallet.legacyAddress,
 			to: wallet.address,
-			value: BigNumber.ONE,
+			value: 1n,
 			gasPrice: 6000000000,
 			gasLimit: 2_000_000,
-			nonce: BigNumber.ONE,
+			nonce: 1n,
 			data: "0x001122",
 			v: 1,
 			r: "f1f325baf58dcfea7a5b3f9c4bb2e36368e9599a810ab2641089dc455fc6e6e3",

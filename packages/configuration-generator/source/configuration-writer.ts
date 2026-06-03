@@ -65,6 +65,7 @@ export class ConfigurationWriter {
 				network,
 			},
 			{
+				replacer: (_, value) => (typeof value === "bigint" ? value.toString() : value),
 				spaces: 4,
 			},
 		);

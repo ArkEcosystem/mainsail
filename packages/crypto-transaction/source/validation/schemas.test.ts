@@ -4,7 +4,6 @@ import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
 import { schemas as base58addressSchemas } from "@mainsail/crypto-address-base58";
 import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-ecdsa";
 import { makeKeywords as makeBaseKeywords } from "@mainsail/crypto-validation";
-import { BigNumber } from "@mainsail/utils";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 
@@ -22,9 +21,9 @@ describe<{
 		gasLimit: 21_000,
 		gasPrice: 5 * 1e9,
 		network: 10_000,
-		nonce: BigNumber.ONE,
+		nonce: 1n,
 		data: "0x",
-		value: BigNumber.ZERO,
+		value: 0n,
 	};
 
 	const transactionSigned = {
@@ -162,8 +161,8 @@ describe<{
 		}
 	});
 
-	it("transactionBaseSchema - value should be big number min 0", ({ validator }) => {
-		const validValues = [BigNumber.ZERO, BigNumber.ONE, BigNumber.make(100)];
+	it("transactionBaseSchema - value should be bigInt min 0", ({ validator }) => {
+		const validValues = [0n, 1n, 100n];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
@@ -173,22 +172,7 @@ describe<{
 			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
-		const invalidValues = [
-			0,
-			"0",
-			"1",
-			-1,
-			"-1",
-			1.1,
-			100,
-			"100",
-			BigNumber.make(-1),
-			-1,
-			null,
-			undefined,
-			{},
-			"test",
-		];
+		const invalidValues = [0, "0", "1", -1, "-1", 1.1, 100, "100", -1n, -1, null, undefined, {}, "test"];
 
 		for (const value of invalidValues) {
 			const transaction = {
@@ -213,7 +197,7 @@ describe<{
 			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
-		const invalidValues = [0, -1, "-1", 1.1, BigNumber.make(-1), -1, null, undefined, {}, "test", 1 + 10000 * 1e9];
+		const invalidValues = [0, -1, "-1", 1.1, -1n, -1, null, undefined, {}, "test", 1 + 10000 * 1e9];
 
 		for (const value of invalidValues) {
 			const transaction = {
@@ -226,10 +210,10 @@ describe<{
 	});
 
 	it("transactionBaseSchema - gasPrice should accept 0 for genesis block", ({ app, validator }) => {
-		const configuration = app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 		configuration.setHeight(1);
 
-		const genesisBlock: Contracts.Crypto.BlockData = configuration.get("genesisBlock.block");
+		const genesisBlock: Contracts.Crypto.BlockData = configuration.getGenesisCommit().block;
 
 		const transaction = {
 			...transactionOriginal,
@@ -287,8 +271,8 @@ describe<{
 		}
 	});
 
-	it("transactionBaseSchema - nonce should be big number min 0", ({ validator }) => {
-		const validValues = [BigNumber.ZERO, BigNumber.ONE, BigNumber.make(100)];
+	it("transactionBaseSchema - nonce should be bigInt min 0", ({ validator }) => {
+		const validValues = [0n, 1n, 100n];
 
 		for (const value of validValues) {
 			const transaction = {
@@ -299,22 +283,7 @@ describe<{
 			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
-		const invalidValues = [
-			0,
-			"0",
-			"1",
-			-1,
-			"-1",
-			1.1,
-			100,
-			"100",
-			BigNumber.make(-1),
-			-1,
-			null,
-			undefined,
-			{},
-			"test",
-		];
+		const invalidValues = [0, "0", "1", -1, "-1", 1.1, 100, "100", -1n, -1, null, undefined, {}, "test"];
 
 		for (const value of invalidValues) {
 			const transaction = {

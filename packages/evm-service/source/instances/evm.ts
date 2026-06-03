@@ -112,8 +112,12 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 	public async getLegacyAttributes(
 		address: string,
 		legacyAddress?: string,
-	): Promise<Contracts.Evm.LegacyAttributes | undefined | null> {
-		return this.#evm.getLegacyAttributes(address, legacyAddress);
+	): Promise<Contracts.Evm.LegacyAttributes | undefined> {
+		const result = await this.#evm.getLegacyAttributes(address, legacyAddress);
+		if (result === null || result === undefined) {
+			return undefined;
+		}
+		return result;
 	}
 
 	public async getLegacyColdWallets(
@@ -178,13 +182,15 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return { blockNumber: Number(state.blockNumber), totalRound: Number(state.totalRound) };
 	}
 
-	public async getBlockHeaderData(
-		blockNumber: number,
-	): Promise<Contracts.Evm.BlockHeaderStorageData | undefined | null> {
-		return this.#evm.getBlockHeaderData(BigInt(blockNumber));
+	public async getBlockHeaderData(blockNumber: number): Promise<Contracts.Evm.BlockHeaderStorageData | undefined> {
+		const result = await this.#evm.getBlockHeaderData(BigInt(blockNumber));
+		if (result === null || result === undefined) {
+			return undefined;
+		}
+		return result;
 	}
 
-	public async getBlockNumberByHash(blockHash: string): Promise<number | undefined | null> {
+	public async getBlockNumberByHash(blockHash: string): Promise<number | undefined> {
 		const result = await this.#evm.getBlockNumberByHash(blockHash);
 		if (result === null || result === undefined) {
 			return undefined;
@@ -193,21 +199,29 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return Number(result);
 	}
 
-	public async getCommitData(blockNumber: number): Promise<Contracts.Evm.CommitStorageData | undefined | null> {
+	public async getCommitData(blockNumber: number): Promise<Contracts.Evm.CommitStorageData | undefined> {
 		const result = await this.#evm.getCommitData(BigInt(blockNumber));
-		if (!result) {
+		if (result === null || result === undefined) {
 			return undefined;
 		}
 
 		return result;
 	}
 
-	public async getTransactionData(key: string): Promise<Contracts.Evm.TransactionStorageData | undefined | null> {
-		return this.#evm.getTransactionData(key);
+	public async getTransactionData(key: string): Promise<Contracts.Evm.TransactionStorageData | undefined> {
+		const result = await this.#evm.getTransactionData(key);
+		if (result === null || result === undefined) {
+			return undefined;
+		}
+		return result;
 	}
 
-	public async getTransactionKeyByHash(txHash: string): Promise<string | undefined | null> {
-		return this.#evm.getTransactionKeyByHash(txHash);
+	public async getTransactionKeyByHash(txHash: string): Promise<string | undefined> {
+		const result = await this.#evm.getTransactionKeyByHash(txHash);
+		if (result === null || result === undefined) {
+			return undefined;
+		}
+		return result;
 	}
 
 	public async isEmpty(): Promise<boolean> {
@@ -222,7 +236,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		await this.#evm.rollback(commitKey);
 	}
 
-	async #prepareCommitData(unit: Contracts.Processor.ProcessableUnit): Promise<JsCommitData | undefined | null> {
+	async #prepareCommitData(unit: Contracts.Processor.ProcessableUnit): Promise<JsCommitData | undefined> {
 		if (!("getCommit" in unit)) {
 			return undefined;
 		}
@@ -246,20 +260,20 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 				index: transaction.transactionIndex,
 				legacyAddress: transaction.senderLegacyAddress,
 				legacySecondSignature: transaction.legacySecondSignature,
-				nonce: transaction.nonce.toBigInt(),
+				nonce: transaction.nonce,
 				r: transaction.r,
 				s: transaction.s,
 				senderPublicKey: transaction.senderPublicKey,
 				to: transaction.to,
 				txHash: transaction.hash,
 				v: transaction.v,
-				value: transaction.value.toBigInt(),
+				value: transaction.value,
 			});
 		}
 
 		return {
 			header: {
-				fee: block.fee.toBigInt(),
+				fee: block.fee,
 				gasUsed: block.gasUsed,
 				hash: block.hash,
 				logsBloom: block.logsBloom,
@@ -267,7 +281,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 				parentHash: block.parentHash,
 				payloadSize: block.payloadSize,
 				proposer: block.proposer,
-				reward: block.reward.toBigInt(),
+				reward: block.reward,
 				round: block.round,
 				stateRoot: block.stateRoot,
 				timestamp: BigInt(block.timestamp),

@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class CommitHandler {
@@ -14,8 +15,8 @@ export class CommitHandler {
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPoolService!: Contracts.TransactionPool.Service;
 
-	@inject(Identifiers.Services.Log.Service)
-	protected readonly logger!: Contracts.Kernel.Logger;
+	@inject(Identifiers.TransactionPool.Selector)
+	private readonly selector!: Contracts.TransactionPool.Selector;
 
 	public async handle(
 		blockNumber: number,
@@ -25,13 +26,15 @@ export class CommitHandler {
 	): Promise<void> {
 		try {
 			this.stateStore.setBlockNumber(blockNumber);
+			this.selector.clear();
 
 			if (this.configuration.isNewMilestone()) {
 				void this.transactionPoolService.reAddTransactions();
 			} else {
 				await this.transactionPoolService.commit(sendersAddresses, consumedGas, isSyncing);
 			}
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			throw new Error(`Failed to commit block: ${error.message}`);
 		}
 	}

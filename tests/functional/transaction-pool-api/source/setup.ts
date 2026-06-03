@@ -109,6 +109,7 @@ const setup = async (): Promise<Contracts.Kernel.Application> => {
 		"@mainsail/crypto-commit",
 		"@mainsail/processor",
 		"@mainsail/evm-consensus",
+		"@mainsail/forger",
 		"@mainsail/validator",
 		"@mainsail/consensus",
 	];
@@ -174,7 +175,7 @@ const bootstrap = async (app: Application) => {
 	const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const commitFactory = app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
 
-	const genesisCommitJson = configuration.get<Contracts.Crypto.CommitJson>("genesisBlock");
+	const genesisCommitJson = configuration.getGenesisCommit();
 	const genesisCommit = await commitFactory.fromJson(genesisCommitJson);
 
 	const store = app.get<Contracts.State.Store>(Identifiers.State.Store);
@@ -202,7 +203,7 @@ const bootstrap = async (app: Application) => {
 	//
 
 	const result = await blockProcessor.process(commitState);
-	if (!result) {
+	if (!result.success) {
 		throw new Error("Failed to process genesis block");
 	}
 

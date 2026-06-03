@@ -1,14 +1,14 @@
 {
-    "address": "0xd27a09189112D26ED1a243f252da588032d642c9",
+    "address": "0xE814073ea5f6c441CEFD39661c56Afd104CCd9C4",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "4ca884dde72cbfc06f5beccfa808a1dfe10220b08075542babd4b63ab72e46cf",
-        "publicKey": "b1d8f05088f1b497a7ff4dfb077126283e80b695d0c35866dc56ded6a40165124c622e526d9e42722522a6cbb48fe37b"
+        "privateKey": "121170bf5e7eb9b383001d8b2fe1f645667af698acac51298bda368d3400cccf",
+        "publicKey": "884b055b29e0850f8c4782d97f2b66a378f39d230618be17e932f19bd251edf97d53b7a91b10c3692b771fc6856ac285"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "f6ef63e4e49be1aaab915fa286b90c0ef67bb78fb75b62969e528c632a4c093e",
-        "publicKey": "02d8df07389b4d9d4c25cfd83a3fb772b2918a56abea0462b1690516c2b743da0a"
+        "privateKey": "eb3d53bd842888c1a60ccaeaf680bfeccbdc6d718febf6abbfa3107f6b2f15c2",
+        "publicKey": "02d5aca39c6c21af1b2bd3a030362a76365cb13ed27b6a53a73764605fd0e1ec99"
     },
-    "passphrase": "parent fine adapt bird rebuild bunker acoustic win seven virus assault winner tragic moral impact leisure lab salad expect please soft spot peace honey"
+    "passphrase": "glue solar quote anxiety accident stand since fancy derive depend isolate lunar digital betray board favorite absurd comfort mesh ball repair model detail enter"
 }

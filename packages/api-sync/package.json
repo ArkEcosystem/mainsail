@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/api-sync",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "API database sync for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -29,9 +29,9 @@
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"joi": "18.1.2",
-		"lru-cache": "11.2.7",
-		"viem": "2.47.6"
+		"joi": "18.2.1",
+		"lru-cache": "11.3.6",
+		"viem": "2.48.11"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",

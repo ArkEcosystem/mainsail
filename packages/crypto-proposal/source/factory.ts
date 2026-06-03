@@ -31,7 +31,7 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 		data: Contracts.Crypto.ProposalDataSerializableUnsigned,
 		keyPair: Contracts.Crypto.KeyPair,
 	): Promise<Contracts.Crypto.Proposal> {
-		const worker = await this.workerPool.getWorker();
+		const worker = this.workerPool.getWorker();
 
 		this.#verifySchema("proposalUnsigned", data);
 

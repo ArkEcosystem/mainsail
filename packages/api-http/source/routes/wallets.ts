@@ -6,6 +6,7 @@ import Joi from "joi";
 
 import { WalletsController } from "../controllers/wallets.js";
 import {
+	address,
 	tokenBalanceSchema,
 	tokenNameSchema,
 	transactionCriteriaSchemas,
@@ -70,6 +71,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			validate: {
 				query: Joi.object({
 					addresses: Schemas.orEqualCriteria(walletAddressSchema).required(),
+					blacklist: Schemas.orEqualCriteria(walletAddressSchema),
 					ignoreWhitelist: Joi.bool().default(false),
 					whitelist: Schemas.orEqualCriteria(walletAddressSchema),
 				}).concat(Schemas.pagination),
@@ -207,6 +209,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			validate: {
 				query: Joi.object({
 					addresses: Schemas.orEqualCriteria(walletAddressSchema),
+					blacklist: Schemas.orEqualCriteria(walletAddressSchema),
 					ignoreWhitelist: Joi.bool().default(false),
 					minBalance: Schemas.orNumericCriteria(tokenBalanceSchema),
 					name: Schemas.orEqualCriteria(tokenNameSchema),
@@ -231,9 +234,11 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					id: walletParameterSchema,
 				}),
 				query: Joi.object({
+					blacklist: Schemas.orEqualCriteria(walletAddressSchema),
 					ignoreWhitelist: Joi.bool().default(false),
 					minBalance: Schemas.orNumericCriteria(tokenBalanceSchema),
 					name: Schemas.orEqualCriteria(tokenNameSchema),
+					tokenAddress: Schemas.orEqualCriteria(address),
 					whitelist: Schemas.orEqualCriteria(walletAddressSchema),
 				}).concat(Schemas.pagination),
 			},

@@ -202,6 +202,7 @@ export class WalletsController extends Controller {
 		const tokenMetadata = pageTokensRows.reduce<Record<string, TokenMetadata>>(
 			(accumulator, row: TokenMetadata) => {
 				if (!accumulator[row.token]) {
+					delete row["search_rank"];
 					accumulator[row.token] = row;
 				}
 
@@ -285,7 +286,7 @@ export class WalletsController extends Controller {
 		const addresses = Array.isArray(request.query.addresses) ? request.query.addresses : [request.query.addresses];
 
 		if (addresses.length === 0) {
-			return [];
+			return this.getEmptyPage();
 		}
 
 		// Transactions
@@ -463,8 +464,15 @@ export class WalletsController extends Controller {
 		const tokenHoldersQuery = this.tokenHolderRepositoryFactory()
 			.createQueryBuilder("th")
 			.innerJoin(Models.Token, "tok", "tok.address = th.token_address")
-			.where("th.address = :address", { address: walletAddress })
-			.andWhere("th.balance / POW(10, tok.decimals) >= :minBalance", { minBalance });
+			.where("th.address = :address", { address: walletAddress });
+
+		if (request.query.tokenAddress) {
+			tokenHoldersQuery.andWhere("th.token_address = :tokenAddress", {
+				tokenAddress: request.query.tokenAddress,
+			});
+		}
+
+		tokenHoldersQuery.andWhere("th.balance / POW(10, tok.decimals) >= :minBalance", { minBalance });
 
 		TokensController.andWhereWhitelisted(tokenHoldersQuery, request);
 		TokensController.andWhereNameSearch(tokenHoldersQuery, request.query.name);

@@ -1,36 +1,53 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
-import { sleep } from "@mainsail/utils";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 
 @injectable()
 export class Worker implements Contracts.Crypto.Worker {
 	@inject(Identifiers.CryptoWorker.WorkerSubprocess.Factory)
-	private readonly createWorkerSubprocess!: Contracts.Crypto.WorkerSubprocessFactory;
+	private readonly createWorkerSubprocess!: Contracts.Kernel.IPC.SubprocessFactory;
 
-	private ipcSubprocess!: Contracts.Crypto.WorkerSubprocess;
+	private ipcSubprocess!: Contracts.Kernel.IPC.Subprocess;
 
-	#booted = false;
-	#booting = false;
+	#bootPromise?: Promise<void>;
+	#disposePromise?: Promise<void>;
+
+	@postConstruct()
+	public initialize(): void {
+		this.ipcSubprocess = this.createWorkerSubprocess();
+	}
 
 	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
-		this.ipcSubprocess = this.createWorkerSubprocess();
-
-		while (this.#booting) {
-			await sleep(50);
+		if (!this.#bootPromise) {
+			this.#bootPromise = this.ipcSubprocess.sendRequest("boot", flags);
 		}
 
-		if (this.#booted) {
-			return;
+		await this.#bootPromise;
+	}
+
+	public async dispose(): Promise<void> {
+		if (!this.#disposePromise) {
+			this.#disposePromise = this.#doDispose();
 		}
 
-		this.#booting = true;
+		await this.#disposePromise;
+	}
 
-		await this.ipcSubprocess.sendRequest("boot", flags);
+	async #doDispose(): Promise<void> {
+		// Let any work already in flight finish before tearing the worker down, so the
+		// dispose doesn't cut off requests that other service providers issued before us.
+		await this.ipcSubprocess.drain();
 
-		this.#booting = false;
-		this.#booted = true;
+		try {
+			await this.ipcSubprocess.sendRequest("dispose");
+		} catch {
+			// Worker may have died mid-dispose; we still need to terminate the thread.
+		}
+
+		// Graceful inner shutdown is done; now terminate the worker thread so it doesn't hang
+		// around with an open parentPort listener. After this, isStopped() === true.
+		await this.ipcSubprocess.dispose();
 	}
 
 	public async kill(): Promise<number> {
@@ -41,48 +58,62 @@ export class Worker implements Contracts.Crypto.Worker {
 		return this.ipcSubprocess.getQueueSize();
 	}
 
+	public isStopped(): boolean {
+		return this.ipcSubprocess.isStopped();
+	}
+
 	public async consensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureBls>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.SignatureBls[K]>
 	): Promise<ReturnType<Contracts.Crypto.SignatureBls[K]>> {
-		return this.ipcSubprocess.sendRequest("consensusSignature", method, arguments_) as Promise<
-			ReturnType<Contracts.Crypto.SignatureBls[K]>
-		>;
+		return this.ipcSubprocess.sendRequest<ReturnType<Contracts.Crypto.SignatureBls[K]>>(
+			"consensusSignature",
+			method,
+			arguments_,
+		);
 	}
 
 	public async walletSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.SignatureEcdsa>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.SignatureEcdsa[K]>
 	): Promise<ReturnType<Contracts.Crypto.SignatureEcdsa[K]>> {
-		return this.ipcSubprocess.sendRequest("walletSignature", method, arguments_) as Promise<
-			ReturnType<Contracts.Crypto.SignatureEcdsa[K]>
-		>;
+		return this.ipcSubprocess.sendRequest<ReturnType<Contracts.Crypto.SignatureEcdsa[K]>>(
+			"walletSignature",
+			method,
+			arguments_,
+		);
 	}
 
 	public async blockFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.BlockFactory>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.BlockFactory[K]>
 	): Promise<ReturnType<Contracts.Crypto.BlockFactory[K]>> {
-		return this.ipcSubprocess.sendRequest("blockFactory", method, arguments_) as Promise<
-			ReturnType<Contracts.Crypto.BlockFactory[K]>
-		>;
+		return this.ipcSubprocess.sendRequest<ReturnType<Contracts.Crypto.BlockFactory[K]>>(
+			"blockFactory",
+			method,
+			arguments_,
+		);
 	}
 
 	public async transactionFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.TransactionFactory>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.TransactionFactory[K]>
 	): Promise<ReturnType<Contracts.Crypto.TransactionFactory[K]>> {
-		return this.ipcSubprocess.sendRequest("transactionFactory", method, arguments_) as Promise<
-			ReturnType<Contracts.Crypto.TransactionFactory[K]>
-		>;
+		return this.ipcSubprocess.sendRequest<ReturnType<Contracts.Crypto.TransactionFactory[K]>>(
+			"transactionFactory",
+			method,
+			arguments_,
+		);
 	}
 
 	public async publicKeyFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.PublicKeyFactory>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.PublicKeyFactory[K]>
 	): Promise<ReturnType<Contracts.Crypto.PublicKeyFactory[K]>> {
-		return this.ipcSubprocess.sendRequest("publicKeyFactory", method, arguments_) as Promise<
-			ReturnType<Contracts.Crypto.PublicKeyFactory[K]>
-		>;
+		return this.ipcSubprocess.sendRequest<ReturnType<Contracts.Crypto.PublicKeyFactory[K]>>(
+			"publicKeyFactory",
+			method,
+			arguments_,
+		);
 	}
 }

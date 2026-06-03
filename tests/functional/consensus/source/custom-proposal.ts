@@ -1,8 +1,9 @@
 import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
 import { Proposal } from "@mainsail/crypto-proposal";
-import { assert, BigNumber } from "@mainsail/utils";
+import { assert } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 import dayjs from "dayjs";
 
@@ -18,7 +19,7 @@ import type { Validator } from "./contracts.js";
 // 3) concat with serialized transactions buffer
 // 4) manually make & sign proposal
 //
-// 1-3) replicates 'proposer.prepareBlock'
+// 1-3) replicates 'forger.forgeBlock'
 // 4) replicates 'messageFactory.makeProposal'
 export const makeCustomProposal = async (
 	{ app, validators }: { app: Contracts.Kernel.Application; validators: Validator[] },
@@ -29,10 +30,8 @@ export const makeCustomProposal = async (
 	const cryptoConfiguration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const milestone = cryptoConfiguration.getMilestone();
 
-	const transactionValidatorFactory = app.get<Contracts.Transactions.TransactionValidatorFactory>(
-		Identifiers.Transaction.Validator.Factory,
-	);
-	const transactionValidator = transactionValidatorFactory();
+	const transactionHandler = app.get<Contracts.Transactions.TransactionHandler>(Identifiers.Transaction.Handler);
+	const evm = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "validator");
 
 	// 2)
 	const round = app.get<Consensus>(Identifiers.Consensus.Service).getRound();
@@ -44,9 +43,9 @@ export const makeCustomProposal = async (
 	// - transactions
 	// - amount + fee
 
-	const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
-		amount: BigNumber.ZERO,
-		fee: BigNumber.ZERO,
+	const totals: { amount: bigint; fee: bigint; gasUsed: number } = {
+		amount: 0n,
+		fee: 0n,
 		gasUsed: 0,
 	};
 
@@ -65,12 +64,17 @@ export const makeCustomProposal = async (
 		let result = { gasRefunded: 0n, gasUsed: 0n, logs: [] as any, status: 0 };
 
 		try {
-			result = await transactionValidator.validate(
+			result = await transactionHandler.apply(
 				{
-					commitKey,
-					gasLimit: milestone.block.maxGasLimit,
-					generatorAddress: validators[0].publicKey,
-					timestamp: dayjs().valueOf(),
+					evm: {
+						blockContext: {
+							commitKey,
+							gasLimit: BigInt(milestone.block.maxGasLimit),
+							timestamp: BigInt(dayjs().valueOf()),
+							validatorAddress: validators[0].publicKey,
+						},
+						instance: evm,
+					},
 				},
 				transaction,
 			);
@@ -81,8 +85,8 @@ export const makeCustomProposal = async (
 		assert.string(transaction.hash);
 		transactionData.push(transaction);
 
-		totals.amount = totals.amount.plus(transaction.value);
-		totals.fee = totals.fee.plus(BigNumber.make(transaction.gasPrice).times(result.gasUsed));
+		totals.amount += transaction.value;
+		totals.fee += BigInt(transaction.gasPrice) * result.gasUsed;
 		totals.gasUsed += Number(result.gasUsed);
 
 		payloadBuffers.push(Buffer.from(transaction.hash, "hex"));
@@ -95,7 +99,7 @@ export const makeCustomProposal = async (
 		payloadSize += transaction.serialized.byteLength + 2;
 	}
 
-	await transactionValidator.getEvm().dispose();
+	await evm.dispose();
 
 	const hashFactory = app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
 	const blockFactory = app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
@@ -108,7 +112,7 @@ export const makeCustomProposal = async (
 			parentHash: previousBlock.hash,
 			payloadSize,
 			proposer: validators[0].address,
-			reward: BigNumber.make(milestone.reward),
+			reward: BigInt(milestone.reward),
 			round,
 			stateRoot: "0".repeat(64),
 			timestamp: dayjs().valueOf(),
@@ -131,8 +135,8 @@ export const makeCustomProposal = async (
 	const serializedProposal = await messageSerializer.serializeProposalUnsigned({
 		payloadSerialized: proposedBytes.toString("hex"),
 		round,
-		validRound: undefined,
 		validatorIndex: 0,
+		validRound: undefined,
 	});
 
 	const proposalSignature = await app
@@ -173,7 +177,7 @@ export const makeTransactionBuilderContext = (
 		...context,
 		fundedWalletProvider: async (
 			context: { app: Contracts.Kernel.Application; wallets: Contracts.Crypto.KeyPair[] },
-			amount?: BigNumber,
+			amount?: bigint,
 		): Promise<Contracts.Crypto.KeyPair> => {
 			// create a random wallet with funds (without sending a transaction)
 			const { app } = context;
@@ -192,7 +196,7 @@ export const makeTransactionBuilderContext = (
 			// 	.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 			// 	.fromPublicKey(randomKeyPair.publicKey);
 
-			// amount = amount ?? BigNumber.make("10000000000");
+			// amount = amount ?? 10000000000n;
 
 			// for (const node of nodes) {
 			// 	const { walletRepository } = app

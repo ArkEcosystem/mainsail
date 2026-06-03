@@ -7,7 +7,6 @@
 export { default as DARK20Abi } from "./abis/DARK20.json" with { type: "json" };
 export * as EvmCalls from "./evm-calls.js";
 // export * as MultiPayments from "./multi-payments.js";
-// export * as MultiSignatureRegistrations from "./multi-signature-registrations.js";
 // export * as Transfers from "./transfers.js";
 export * as Types from "./types.js";
 export * as Utils from "./utilities.js";

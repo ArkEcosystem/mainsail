@@ -1,12 +1,11 @@
 import type { Contracts } from "@mainsail/contracts";
-import type { BigNumber } from "@mainsail/utils";
 
 export interface Context {
 	app: Contracts.Kernel.Application;
 	wallets: Contracts.Crypto.KeyPair[];
 	fundedWalletProvider?: (
 		context: { app: Contracts.Kernel.Application; wallets: Contracts.Crypto.KeyPair[] },
-		amount?: BigNumber,
+		amount?: bigint,
 	) => Promise<Contracts.Crypto.KeyPair>;
 }
 
@@ -14,17 +13,14 @@ export interface TransactionOptions {
 	sender?: Contracts.Crypto.KeyPair;
 	gasPrice?: number;
 	signature?: string;
-	omitParticipantSignatures?: number[];
 	nonceOffset?: number;
-	multiSigKeys?: Contracts.Crypto.KeyPair[];
-	participantSignatures?: string[];
 
 	callback?: (transaction: Contracts.Crypto.Transaction) => Promise<void>;
 }
 
 export interface TransferOptions extends TransactionOptions {
 	recipient?: string;
-	amount?: number | string | BigNumber;
+	amount?: number | string | bigint;
 }
 
 export interface EvmCallOptions extends TransactionOptions {
@@ -35,7 +31,7 @@ export interface EvmCallOptions extends TransactionOptions {
 }
 
 export interface ValidatorRegistrationOptions extends EvmCallOptions {
-	validatorPublicKey?: string;
+	validatorKeyPair: Contracts.Crypto.KeyPair;
 }
 
 export type ValidatorResignationOptions = EvmCallOptions;

@@ -18,8 +18,8 @@ export interface RateLimiterConfigurations {
 
 // @TODO review the implementation
 export class RateLimiter {
-	#global: RateLimiterMemory;
-	#endpoints: Map<string, RateLimiterMemory>;
+	#global: RLWrapperBlackAndWhite;
+	#endpoints: Map<string, RLWrapperBlackAndWhite>;
 
 	public constructor({
 		configurations,
@@ -42,7 +42,7 @@ export class RateLimiter {
 		await this.#global.consume(ip);
 
 		if (endpoint && this.#endpoints.has(endpoint)) {
-			const rateLimiter: RateLimiterMemory | undefined = this.#endpoints.get(endpoint);
+			const rateLimiter: RLWrapperBlackAndWhite | undefined = this.#endpoints.get(endpoint);
 
 			assert.defined(rateLimiter);
 
@@ -67,7 +67,7 @@ export class RateLimiter {
 		}
 
 		if (endpoint && this.#endpoints.has(endpoint)) {
-			const endpointLimiters: RateLimiterMemory | undefined = this.#endpoints.get(endpoint);
+			const endpointLimiters: RLWrapperBlackAndWhite | undefined = this.#endpoints.get(endpoint);
 
 			assert.defined(endpointLimiters);
 
@@ -89,7 +89,7 @@ export class RateLimiter {
 		return res !== null && res.remainingPoints <= 0;
 	}
 
-	#buildRateLimiter(configuration: RateLimiterConfiguration, whitelist: string[]): RateLimiterMemory {
+	#buildRateLimiter(configuration: RateLimiterConfiguration, whitelist: string[]): RLWrapperBlackAndWhite {
 		return new RLWrapperBlackAndWhite({
 			limiter: new RateLimiterMemory({
 				blockDuration: configuration.blockDuration,

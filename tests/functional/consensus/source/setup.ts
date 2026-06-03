@@ -1,12 +1,14 @@
-import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
 import { Application, Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { join } from "path";
 import { dirSync } from "tmp";
 
 import type { ValidatorsJson } from "./contracts.js";
-import { TestLogger } from "./logger.js";
 import type { P2PRegistry } from "./p2p.js";
+
+import { TestLogger } from "./logger.js";
 import { ProposerCalculator } from "./proposer-calculator.js";
 import { Worker } from "./worker.js";
 
@@ -36,7 +38,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	});
 
 	app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
-		getTransactionBytes: async () => [],
+		getTransactions: async () => ({ remaining: 0, transactions: [] }),
 		onCommit: async () => { },
 	});
 	app.bind(Identifiers.Evm.Worker).toConstantValue({
@@ -99,6 +101,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/crypto-commit",
 		"@mainsail/processor",
 		"@mainsail/evm-consensus",
+		"@mainsail/forger",
 		"@mainsail/validator",
 		"@mainsail/consensus",
 	];
@@ -176,8 +179,7 @@ const bootMany = async (apps: Contracts.Kernel.Application[]): Promise<void> => 
 const bootstrap = async (app: Contracts.Kernel.Application) => {
 	const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const commitFactory = app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
-	const genesisCommitJson = configuration.get<Contracts.Crypto.CommitJson>("genesisBlock");
-
+	const genesisCommitJson = configuration.getGenesisCommit();
 	const genesisCommit = await commitFactory.fromJson(genesisCommitJson);
 	const store = app.get<Contracts.State.Store>(Identifiers.State.Store);
 	store.setGenesisCommit(genesisCommit);

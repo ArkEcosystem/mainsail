@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/validation",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "Crypto validation utilities for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -24,7 +24,8 @@
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"ajv": "8.18.0",
+		"@mainsail/utils": "workspace:*",
+		"ajv": "8.20.0",
 		"ajv-formats": "3.0.1",
 		"ajv-keywords": "5.1.0"
 	},

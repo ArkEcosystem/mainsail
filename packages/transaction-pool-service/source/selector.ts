@@ -1,0 +1,62 @@
+import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
+import { injectable, inject } from "@mainsail/container";
+
+@injectable()
+export class Selector implements Contracts.TransactionPool.Selector {
+	@inject(Identifiers.TransactionPool.Query)
+	private readonly poolQuery!: Contracts.TransactionPool.Query;
+
+	#transactions: Contracts.Crypto.Transaction[] = [];
+	#currentBlockRound = "";
+	#index = 0;
+
+	public async getBatch(
+		options: Contracts.TransactionPool.GetBatchOptions,
+	): Promise<Contracts.TransactionPool.GetBatchResult> {
+		await this.#prepare(options.blockRound);
+
+		const transactions: Contracts.Crypto.TransactionData[] = [];
+		let bytesLeft = options.maxBytes;
+
+		while (this.#index < this.#transactions.length) {
+			const transaction = this.#transactions[this.#index];
+
+			if (bytesLeft - 4 - transaction.serialized.length < 0) {
+				break;
+			}
+
+			transactions.push(transaction.toData());
+			bytesLeft -= 4;
+			bytesLeft -= transaction.serialized.length;
+
+			if (transactions.length >= options.maxSize) {
+				break;
+			}
+
+			this.#index++;
+		}
+
+		return {
+			remaining: this.#transactions.length - this.#index,
+			transactions,
+		};
+	}
+
+	public clear(): void {
+		this.#transactions = [];
+		this.#currentBlockRound = "";
+		this.#index = 0;
+	}
+
+	async #prepare(blockRound: string): Promise<void> {
+		if (this.#currentBlockRound === blockRound) {
+			return;
+		}
+
+		this.#currentBlockRound = blockRound;
+		this.#index = 0;
+		this.#transactions = await this.poolQuery.getFromHighestPriority().all();
+	}
+}

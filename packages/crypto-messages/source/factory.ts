@@ -23,10 +23,11 @@ export class Factory implements Contracts.Crypto.MessageFactory {
 	public async makeMessage(
 		data: Contracts.Crypto.MakeMessageData,
 		keyPair: Contracts.Crypto.KeyPair,
+		context: Contracts.Crypto.SignatureMessageContext,
 	): Promise<Contracts.Crypto.Message> {
-		const worker = await this.workerPool.getWorker();
+		const worker = this.workerPool.getWorker();
 
-		const bytes = await this.serializer.serializeMessageForSignature(data);
+		const bytes = await this.serializer.serializeMessageForSignature(data, context);
 		const signature = await worker.consensusSignature("sign", bytes, Buffer.from(keyPair.privateKey, "hex"));
 		const serialized = await this.serializer.serializeMessage({ ...data, signature });
 

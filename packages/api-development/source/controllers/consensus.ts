@@ -8,9 +8,6 @@ import { Controller } from "./controller.js";
 
 @injectable()
 export class ConsensusController extends Controller {
-	@inject(Identifiers.Consensus.Service)
-	private readonly consensus!: Contracts.Consensus.Service;
-
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepository!: Contracts.Consensus.RoundStateRepository;
 
@@ -18,7 +15,7 @@ export class ConsensusController extends Controller {
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	public async state(request: Types.HapiRequest): Promise<object> {
-		const state = this.consensus.getState();
+		const state = this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service).getState();
 
 		const roundStates = this.roundStateRepository.getRoundStates();
 

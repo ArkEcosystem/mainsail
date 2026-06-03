@@ -10,7 +10,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { parseTransactionError } from "@mainsail/evm-contracts";
-import { assert, BigNumber, chunk, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
+import { assert, chunk, ensureError, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { Listeners, TokenParser } from "./contracts.js";
@@ -89,6 +89,10 @@ export class Sync implements Contracts.ApiSync.Service {
 
 	@inject(ApiDatabaseIdentifiers.LegacyColdWalletRepositoryFactory)
 	private readonly legacyColdWalletRepositoryFactory!: ApiDatabaseContracts.LegacyColdWalletRepositoryFactory;
+
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "evm")
+	private readonly evm!: Contracts.Evm.Instance;
 
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
@@ -218,7 +222,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				multiPaymentRecipients:
 					parsedMultiPayments.length > 0 ? [...new Set(parsedMultiPayments.map((mp) => mp.to))] : undefined,
 
-				nonce: transaction.nonce.toFixed(),
+				nonce: transaction.nonce.toString(),
 
 				output: receipt.output,
 				senderPublicKey: transaction.senderPublicKey,
@@ -227,7 +231,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				timestamp: header.timestamp.toFixed(),
 				to: transaction.to,
 				transactionIndex: transaction.transactionIndex!,
-				value: transaction.value.toFixed(),
+				value: transaction.value.toString(),
 			});
 
 			multiPayments.push(...parsedMultiPayments);
@@ -256,6 +260,22 @@ export class Sync implements Contracts.ApiSync.Service {
 				return accumulator;
 			}, {});
 
+		// Add accountUpdate for genesisAccount on the very first non-genesis block to ensure
+		// the wallet is created in postgres.
+		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
+		assert.defined(genesisBlock);
+
+		if (unit.blockNumber - 1 === genesisBlock.block.number && !accountUpdates[genesisBlock.block.proposer]) {
+			const genesisAccount = await this.evm.getAccountInfo(genesisBlock.block.proposer);
+
+			accountUpdates[genesisBlock.block.proposer] = {
+				address: genesisBlock.block.proposer,
+				balance: genesisAccount.balance,
+				nonce: genesisAccount.nonce,
+				usernameResigned: false,
+			};
+		}
+
 		const validatorAttributes = (address: string) => {
 			const dirtyValidator = dirtyValidators[address];
 			const isBlockValidator = header.proposer === address;
@@ -263,10 +283,10 @@ export class Sync implements Contracts.ApiSync.Service {
 			return {
 				...(dirtyValidator
 					? {
-							validatorFee: dirtyValidator.fee,
+							validatorFee: dirtyValidator.fee.toString(),
 							validatorPublicKey: dirtyValidator.blsPublicKey,
 							validatorResigned: dirtyValidator.isResigned,
-							validatorVoteBalance: dirtyValidator.voteBalance,
+							validatorVoteBalance: dirtyValidator.voteBalance.toString(),
 							validatorVotersCount: dirtyValidator.votersCount,
 							// updated at end of db transaction
 							// - validatorRank
@@ -276,9 +296,9 @@ export class Sync implements Contracts.ApiSync.Service {
 				...(isBlockValidator
 					? {
 							// incrementally applied in UPSERT below
-							validatorForgedFees: header.fee.toFixed(),
-							validatorForgedRewards: header.reward.toFixed(),
-							validatorForgedTotal: header.fee.plus(header.reward).toFixed(),
+							validatorForgedFees: header.fee.toString(),
+							validatorForgedRewards: header.reward.toString(),
+							validatorForgedTotal: (header.fee + header.reward).toString(),
 							validatorLastBlock: {
 								hash: header.hash,
 								number: header.number,
@@ -313,8 +333,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			return [
 				account.address,
 				addressToPublicKey[account.address] ?? null,
-				BigNumber.make(account.balance).toFixed(),
-				BigNumber.make(account.nonce).toFixed(),
+				account.balance.toString(),
+				account.nonce.toString(),
 				attributes,
 				header.number.toFixed(),
 			];
@@ -345,14 +365,14 @@ export class Sync implements Contracts.ApiSync.Service {
 		const deferredSync: DeferredSync = {
 			block: {
 				commitRound: proof.round,
-				fee: header.fee.toFixed(),
+				fee: header.fee.toString(),
 				gasUsed: header.gasUsed,
 				hash: header.hash,
 				number: header.number.toFixed(),
 				parentHash: header.parentHash,
 				payloadSize: header.payloadSize,
 				proposer: header.proposer,
-				reward: header.reward.toFixed(),
+				reward: header.reward.toString(),
 				round: header.round,
 				signature: proof.signature,
 				stateRoot: header.stateRoot,
@@ -400,7 +420,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		return {
 			...this.roundCalculator.calculateRound(number),
 			validators: validatorWallets.map((v) => v.address),
-			votes: validatorWallets.map((v) => v.voteBalance.toFixed()),
+			votes: validatorWallets.map((v) => v.voteBalance.toString()),
 		};
 	}
 
@@ -430,11 +450,12 @@ export class Sync implements Contracts.ApiSync.Service {
 					try {
 						await this.#syncToDatabase(deferredSync);
 						success = true;
-					} catch (error) {
+					} catch (rawError) {
+						const error = ensureError(rawError);
 						const nextAttemptDelay = Math.min(baseDelay + attempts * 500, maxDelay);
 						attempts++;
 						this.logger.warn(
-							`sync encountered exception: ${error.message} (query: ${error.query}). retry #${attempts} in ... ${nextAttemptDelay}ms`,
+							`sync encountered exception: ${error.message} (query: ${(error as { query?: string }).query}). retry #${attempts} in ... ${nextAttemptDelay}ms`,
 						);
 						await sleep(nextAttemptDelay);
 					}
@@ -470,7 +491,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				})
 				.where("id = :id", { id: 1 })
 				.andWhere("blockNumber = :previousBlockNumber", {
-					previousBlockNumber: BigNumber.make(deferred.block.number).minus(1).toFixed(),
+					previousBlockNumber: (BigInt(deferred.block.number) - 1n).toString(),
 				})
 				.execute();
 
@@ -663,8 +684,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			await (this.dataSource as TypeOrm.DataSource)
 				.createQueryRunner()
 				.query("CREATE EXTENSION IF NOT EXISTS pg_trgm;");
-		} catch (error) {
-			await this.app.terminate("failed to reset database", error);
+		} catch (rawError) {
+			await this.app.terminate("failed to reset database", ensureError(rawError));
 		}
 	}
 }

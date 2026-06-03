@@ -20,10 +20,6 @@ export class PublicKeyFactory implements Contracts.Crypto.PublicKeyFactory {
 		throw new NotImplemented(this.constructor.name, "fromWIF");
 	}
 
-	public async fromMultiSignatureAsset(asset: Contracts.Crypto.MultiSignatureAsset): Promise<string> {
-		throw new NotImplemented(this.constructor.name, "fromMultiSignatureAsset");
-	}
-
 	public async verify(publicKey: string): Promise<boolean> {
 		const bls = await getBls();
 

@@ -3,7 +3,6 @@ import type { Contracts, Utils } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { MissingTransactionSignatureError, ValidationFailed } from "@mainsail/exceptions";
-import { BigNumber } from "@mainsail/utils";
 
 import { TransactionFactory } from "./factory.js";
 
@@ -44,15 +43,15 @@ export class TransactionBuilder {
 			gasLimit: 1_000_000,
 			gasPrice: 5 * 1e9,
 			hash: "",
-			network: this.configuration.get<number>("network.chainId"),
-			nonce: BigNumber.ZERO,
+			network: this.configuration.getNetwork().chainId,
+			nonce: 0n,
 			r: "",
 			s: "",
 			senderLegacyAddress: "",
 			senderPublicKey: "",
 			to: undefined,
 			v: 0,
-			value: BigNumber.ZERO,
+			value: 0n,
 		};
 	}
 
@@ -63,7 +62,7 @@ export class TransactionBuilder {
 
 	public nonce(nonce: string): TransactionBuilder {
 		if (nonce) {
-			this.data.nonce = BigNumber.make(nonce);
+			this.data.nonce = BigInt(nonce);
 		}
 
 		return this;
@@ -85,7 +84,7 @@ export class TransactionBuilder {
 	}
 
 	public value(value: string): TransactionBuilder {
-		this.data.value = BigNumber.make(value);
+		this.data.value = BigInt(value);
 		return this;
 	}
 

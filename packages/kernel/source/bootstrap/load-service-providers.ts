@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ServiceNotFound } from "@mainsail/exceptions";
-import { assert } from "@mainsail/utils";
+import { assert, ensureError } from "@mainsail/utils";
 import path from "path";
 import { URL } from "url";
 
@@ -53,8 +53,9 @@ export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 			let ServiceProvider;
 			try {
 				({ ServiceProvider } = await import(path.join(pluginPath, packageId)));
-			} catch (error) {
-				if (error.code === "ERR_MODULE_NOT_FOUND") {
+			} catch (rawError) {
+				const error = ensureError(rawError);
+				if ((error as NodeJS.ErrnoException).code === "ERR_MODULE_NOT_FOUND") {
 					// HACK: just a workaround to use import on local packages if they are not installed.
 					//
 					// Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@mainsail/validation' imported from

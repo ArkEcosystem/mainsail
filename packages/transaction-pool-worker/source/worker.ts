@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 @injectable()
 export class Worker implements Contracts.TransactionPool.Worker {
 	@inject(Identifiers.TransactionPool.WorkerSubprocess.Factory)
-	private readonly createWorkerSubprocess!: Contracts.Crypto.WorkerSubprocessFactory;
+	private readonly createWorkerSubprocess!: Contracts.Kernel.IPC.SubprocessFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
@@ -15,9 +15,10 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
-	private ipcSubprocess!: Contracts.TransactionPool.WorkerSubprocess;
+	private ipcSubprocess!: Contracts.Kernel.IPC.Subprocess;
 
-	#booted = false;
+	#bootPromise?: Promise<void>;
+	#disposePromise?: Promise<void>;
 
 	@postConstruct()
 	public initialize(): void {
@@ -37,12 +38,35 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	}
 
 	public async boot(flags: Contracts.TransactionPool.WorkerFlags): Promise<void> {
-		if (this.#booted) {
-			return;
+		if (!this.#bootPromise) {
+			this.#bootPromise = this.ipcSubprocess.sendRequest("boot", flags);
 		}
-		this.#booted = true;
 
-		await this.ipcSubprocess.sendRequest("boot", flags);
+		await this.#bootPromise;
+	}
+
+	public async dispose(): Promise<void> {
+		if (!this.#disposePromise) {
+			this.#disposePromise = this.#doDispose();
+		}
+
+		await this.#disposePromise;
+	}
+
+	async #doDispose(): Promise<void> {
+		// Let any work already in flight finish before tearing the worker down, so the
+		// dispose doesn't cut off requests that other service providers issued before us.
+		await this.ipcSubprocess.drain();
+
+		try {
+			await this.ipcSubprocess.sendRequest("dispose");
+		} catch {
+			// Worker may have died mid-dispose; we still need to terminate the thread.
+		}
+
+		// Graceful inner shutdown is done; now terminate the worker thread so it doesn't hang
+		// around with an open parentPort listener. After this, isStopped() === true.
+		await this.ipcSubprocess.dispose();
 	}
 
 	public async kill(): Promise<number> {
@@ -79,9 +103,10 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		await this.ipcSubprocess.sendRequest("start", blockNumber);
 	}
 
-	public async getTransactionBytes(): Promise<Buffer[]> {
-		const response: string[] = await this.ipcSubprocess.sendRequest("getTransactions");
-		return response.map((transaction: string) => Buffer.from(transaction, "hex"));
+	public async getTransactions(
+		options: Contracts.TransactionPool.GetBatchOptions,
+	): Promise<Contracts.TransactionPool.GetBatchResult> {
+		return this.ipcSubprocess.sendRequest("getTransactions", options);
 	}
 
 	public async removeTransaction(address: string, id: string): Promise<void> {

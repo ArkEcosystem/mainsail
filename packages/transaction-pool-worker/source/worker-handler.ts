@@ -13,17 +13,18 @@ import {
 } from "./handlers/index.js";
 
 export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScriptHandler {
-	#app!: Contracts.Kernel.Application;
+	#app = new Application();
 
 	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
-		const app: Contracts.Kernel.Application = new Application();
-
-		await app.bootstrap({
+		await this.#app.bootstrap({
 			flags,
 		});
 
-		await app.boot();
-		this.#app = app;
+		await this.#app.boot();
+	}
+
+	public async dispose(): Promise<void> {
+		await this.#app.terminate();
 	}
 
 	public async start(height: number): Promise<void> {
@@ -39,8 +40,10 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 		await this.#app.resolve(CommitHandler).handle(height, sendersAddresses, consumedGas, isSyncing);
 	}
 
-	public async getTransactions(): Promise<string[]> {
-		return await this.#app.resolve(GetTransactionsHandler).handle();
+	public async getTransactions(
+		options: Contracts.TransactionPool.GetBatchOptions,
+	): Promise<Contracts.TransactionPool.GetBatchResult> {
+		return await this.#app.resolve(GetTransactionsHandler).handle(options);
 	}
 
 	public async removeTransaction(address: string, id: string): Promise<void> {

@@ -135,7 +135,7 @@ describe<{
 		assert.true(await isTransactionCommitted(context, tx));
 
 		const legacyAfter = await evm.getAccountInfo(legacyColdWallet.mainsailAddress);
-		assert.equal(legacyAfter.balance, legacyBefore.balance - 108160000000000n - 5n);
+		assert.equal(legacyAfter.balance, legacyBefore.balance - 112900000000000n - 5n);
 
 		const recipientAfter = await evm.getAccountInfo(randomWallet.address);
 		assert.equal(recipientAfter.balance, 5n);
@@ -157,7 +157,7 @@ describe<{
 		const recipientBefore = await evm.getAccountInfo(randomWallet.address);
 		assert.equal(recipientBefore.balance, 0n);
 
-		const gasSpentPerTx = 108160000000000n;
+		const gasSpentPerTx = 112900000000000n;
 		const valuePerTx = 5n;
 		const N = 10n;
 
@@ -332,7 +332,7 @@ describe<{
 		await waitBlock(context);
 
 		for (let i = 0; i < 10; i++) {
-			if (txs[i].nonce.isEqualTo(replacementTx.nonce)) {
+			if (txs[i].nonce === replacementTx.nonce) {
 				assert.false(await isTransactionCommitted(context, txs[i]));
 				assert.true(await isTransactionCommitted(context, replacementTx));
 			} else {
@@ -423,11 +423,12 @@ describe<{
 		assert.undefined(errors);
 
 		await waitBlock(context);
+		await waitBlock(context);
 
 		for (let i = 0; i < 10; i++) {
-			if (txs[i].nonce.isLessThan(replacementTx.nonce)) {
+			if (txs[i].nonce < replacementTx.nonce) {
 				assert.true(await isTransactionCommitted(context, txs[i]));
-			} else if (txs[i].nonce.isEqualTo(replacementTx.nonce)) {
+			} else if (txs[i].nonce === replacementTx.nonce) {
 				assert.false(await isTransactionCommitted(context, txs[i]));
 				assert.true(await isTransactionCommitted(context, replacementTx));
 			} else {

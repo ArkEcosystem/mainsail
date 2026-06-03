@@ -29,7 +29,7 @@ export class Aggregator implements Contracts.Consensus.Aggregator {
 			validators[key] = true;
 		}
 
-		const worker = await this.workerPool.getWorker();
+		const worker = this.workerPool.getWorker();
 		const signature = await worker.consensusSignature("aggregate", signatures);
 
 		return {
@@ -51,7 +51,7 @@ export class Aggregator implements Contracts.Consensus.Aggregator {
 			return false;
 		}
 
-		const worker = await this.workerPool.getWorker();
+		const worker = this.workerPool.getWorker();
 
 		const aggregatedPublicKey = await worker.publicKeyFactory("aggregate", validatorPublicKeys);
 

@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/evm-consensus",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "EVM development support for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -27,7 +27,7 @@
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"viem": "2.47.6"
+		"viem": "2.48.11"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",

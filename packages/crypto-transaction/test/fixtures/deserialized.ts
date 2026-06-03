@@ -1,16 +1,14 @@
-import { BigNumber } from "@mainsail/utils";
-
 export const transactionTransfer = {
 	data: "0x",
 	gasLimit: 1000000,
 	gasPrice: 5000000000,
 	network: 10000,
-	nonce: BigNumber.make(0),
+	nonce: 0n,
 	r: "921101a4583fb153ec00e501f3c2e2636114e1c8c58d2df8a19426cc066a6768",
 	s: "22db4bce1e0ace485ce0838d178b4d5bcfa9f69b315a14c580d9b01e5c980bdd",
 	to: "0xBe89811e15f611C1db12e59679b6F3DC1F430155",
 	v: 0,
-	value: BigNumber.make(1),
+	value: 1n,
 };
 
 export const transactionContractCall = {
@@ -18,12 +16,12 @@ export const transactionContractCall = {
 	gasLimit: 1000000,
 	gasPrice: 5000000000,
 	network: 10000,
-	nonce: BigNumber.make(2),
+	nonce: 2n,
 	r: "b75a1acce8cb056addf031c1a5f5de1012a091b93b0889dba35e2cb6e38d5ec1",
 	s: "7971d23217d5df660070737d345758b06267379f962470125c5c2ac3ff393c23",
 	to: "0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1",
 	v: 0,
-	value: BigNumber.make(0),
+	value: 0n,
 };
 
 export const transactionContractCallWithSecondSignature = {
@@ -33,12 +31,12 @@ export const transactionContractCallWithSecondSignature = {
 	legacySecondSignature:
 		"6c948e849e7762219bc2e6461994b74e458f15cf018b6f971dc6d8c3b0bb876235e9e103b8042f17cb78a33bd6fe025cee015bd728ca7d53f198f5e6508b413d00",
 	network: 10000,
-	nonce: BigNumber.make(2),
+	nonce: 2n,
 	r: "b75a1acce8cb056addf031c1a5f5de1012a091b93b0889dba35e2cb6e38d5ec1",
 	s: "7971d23217d5df660070737d345758b06267379f962470125c5c2ac3ff393c23",
 	to: "0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1",
 	v: 0,
-	value: BigNumber.make(0),
+	value: 0n,
 };
 
 export const transactionDeploy = {
@@ -46,10 +44,10 @@ export const transactionDeploy = {
 	gasLimit: 2000000,
 	gasPrice: 5000000000,
 	network: 10000,
-	nonce: BigNumber.make(1),
+	nonce: 1n,
 	to: undefined,
 	r: "3df7e27048369116e65b3cbde990649f983d8c4670264a071abd8e0ddf1481fd",
 	s: "16997ba0483f4eb8e74b32777d17b2650ed51c78df313fe1f7b5f158eb9f9c9f",
 	v: 0,
-	value: BigNumber.make(0),
+	value: 0n,
 };

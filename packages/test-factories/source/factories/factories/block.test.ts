@@ -1,5 +1,4 @@
 import type { Contracts } from "@mainsail/contracts";
-import { BigNumber } from "@mainsail/utils";
 import { Application } from "@mainsail/kernel";
 import cryptoConfig from "../../../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "@mainsail/test-runner";
@@ -25,9 +24,9 @@ describe<{
 		assert.string(entity.block.stateRoot);
 		assert.number(entity.block.payloadSize);
 		assert.string(entity.block.parentHash);
-		assert.instance(entity.block.reward, BigNumber);
+		assert.type(entity.block.reward, "bigint");
 		assert.number(entity.block.timestamp);
-		assert.instance(entity.block.fee, BigNumber);
+		assert.type(entity.block.fee, "bigint");
 		assert.number(entity.block.version);
 		assert.string(entity.block.serialized);
 		assert.array(entity.block.transactions);
@@ -51,9 +50,9 @@ describe<{
 		assert.string(entity.block.stateRoot);
 		assert.number(entity.block.payloadSize);
 		assert.string(entity.block.parentHash);
-		assert.instance(entity.block.reward, BigNumber);
+		assert.type(entity.block.reward, "bigint");
 		assert.number(entity.block.timestamp);
-		assert.instance(entity.block.fee, BigNumber);
+		assert.type(entity.block.fee, "bigint");
 		assert.number(entity.block.version);
 		assert.string(entity.block.serialized);
 		assert.array(entity.block.transactions);
@@ -73,9 +72,9 @@ describe<{
 		assert.string(entity.block.stateRoot);
 		assert.number(entity.block.payloadSize);
 		assert.string(entity.block.parentHash);
-		assert.instance(entity.block.reward, BigNumber);
+		assert.type(entity.block.reward, "bigint");
 		assert.number(entity.block.timestamp);
-		assert.instance(entity.block.fee, BigNumber);
+		assert.type(entity.block.fee, "bigint");
 		assert.number(entity.block.version);
 		assert.string(entity.block.serialized);
 		assert.array(entity.block.transactions);

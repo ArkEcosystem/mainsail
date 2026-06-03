@@ -1,6 +1,6 @@
 import type { Contracts, Utils } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
-import clone from "lodash.clonedeep";
+import { cloneDeep } from "@mainsail/utils";
 
 import { BlockSchemaError, InvalidBlockBytesError } from "@mainsail/exceptions";
 import { Application } from "@mainsail/kernel";
@@ -31,14 +31,14 @@ describe<{
 	serializer: Serializer;
 	validator: Contracts.Crypto.Validator;
 }>("Factory", ({ it, assert, beforeEach, spy }) => {
-	const blockDataOriginal = clone(blockData);
-	const blockDataWithTransactionsOriginal = clone(blockDataWithTransactions);
+	const blockDataOriginal = cloneDeep(blockData);
+	const blockDataWithTransactionsOriginal = cloneDeep(blockDataWithTransactions);
 	let blockDataClone: Utils.Mutable<Contracts.Crypto.BlockData>;
 	let blockDataWithTransactionsClone: Utils.Mutable<Contracts.Crypto.BlockData>;
 
 	beforeEach(async (context) => {
-		blockDataClone = clone(blockDataOriginal);
-		blockDataWithTransactionsClone = clone(blockDataWithTransactionsOriginal);
+		blockDataClone = cloneDeep(blockDataOriginal);
+		blockDataWithTransactionsClone = cloneDeep(blockDataWithTransactionsOriginal);
 
 		await prepareSandbox(context);
 
@@ -233,10 +233,7 @@ describe<{
 	}) => {
 		const b2 = Object.assign({}, blockData, { fee: "abcd" });
 
-		await assert.rejects(
-			() => factory.fromData(b2),
-			`Height (2): data/fee must pass "bignumber" keyword validation`,
-		);
+		await assert.rejects(() => factory.fromData(b2), `Height (2): data/fee must pass "bigInt" keyword validation`);
 	});
 
 	it("#fromData - should throw on invalid input data - required block property is missing", async ({ factory }) => {

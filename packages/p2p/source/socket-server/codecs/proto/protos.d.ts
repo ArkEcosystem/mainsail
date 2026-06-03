@@ -1,33 +1,38 @@
-import * as $protobuf from "protobufjs/minimal.js";
-import Long from "long";
+import * as $protobuf from "protobufjs";
+import Long = require("long");
+
 /** Namespace getApiNodes. */
 export namespace getApiNodes {
 
-    /** Properties of an ApiNode. */
-    interface IApiNode {
-
-        /** ApiNode url */
-        url?: (string|null);
+    /**
+     * Properties of an ApiNode.
+     * @deprecated Use getApiNodes.ApiNode.$Properties instead.
+     */
+    interface IApiNode extends getApiNodes.ApiNode.$Properties {
     }
 
     /** Represents an ApiNode. */
-    class ApiNode implements IApiNode {
+    class ApiNode {
 
         /**
          * Constructs a new ApiNode.
          * @param [properties] Properties to set
          */
-        constructor(properties?: getApiNodes.IApiNode);
+        constructor(properties?: getApiNodes.ApiNode.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** ApiNode url. */
-        public url: string;
+        url: string;
 
         /**
          * Creates a new ApiNode instance using the specified properties.
          * @param [properties] Properties to set
          * @returns ApiNode instance
          */
-        public static create(properties?: getApiNodes.IApiNode): getApiNodes.ApiNode;
+        static create(properties: getApiNodes.ApiNode.$Shape): getApiNodes.ApiNode & getApiNodes.ApiNode.$Shape;
+        static create(properties?: getApiNodes.ApiNode.$Properties): getApiNodes.ApiNode;
 
         /**
          * Encodes the specified ApiNode message. Does not implicitly {@link getApiNodes.ApiNode.verify|verify} messages.
@@ -35,7 +40,7 @@ export namespace getApiNodes {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: getApiNodes.IApiNode, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: getApiNodes.ApiNode.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified ApiNode message, length delimited. Does not implicitly {@link getApiNodes.ApiNode.verify|verify} messages.
@@ -43,40 +48,40 @@ export namespace getApiNodes {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: getApiNodes.IApiNode, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: getApiNodes.ApiNode.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes an ApiNode message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns ApiNode
+         * @returns {getApiNodes.ApiNode & getApiNodes.ApiNode.$Shape} ApiNode
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getApiNodes.ApiNode;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getApiNodes.ApiNode & getApiNodes.ApiNode.$Shape;
 
         /**
          * Decodes an ApiNode message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns ApiNode
+         * @returns {getApiNodes.ApiNode & getApiNodes.ApiNode.$Shape} ApiNode
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getApiNodes.ApiNode;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getApiNodes.ApiNode & getApiNodes.ApiNode.$Shape;
 
         /**
          * Verifies an ApiNode message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates an ApiNode message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns ApiNode
          */
-        public static fromObject(object: { [k: string]: any }): getApiNodes.ApiNode;
+        static fromObject(object: { [k: string]: any }): getApiNodes.ApiNode;
 
         /**
          * Creates a plain object from an ApiNode message. Also converts values to other types if specified.
@@ -84,47 +89,67 @@ export namespace getApiNodes {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: getApiNodes.ApiNode, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: getApiNodes.ApiNode, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this ApiNode to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for ApiNode
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for ApiNode
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
     }
 
-    /** Properties of a GetApiNodesRequest. */
-    interface IGetApiNodesRequest {
+    namespace ApiNode {
 
-        /** GetApiNodesRequest headers */
-        headers?: (shared.IHeaders|null);
+        /** Properties of an ApiNode. */
+        interface $Properties {
+
+            /** ApiNode url */
+            url?: (string|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of an ApiNode. */
+        type $Shape = getApiNodes.ApiNode.$Properties;
+    }
+
+    /**
+     * Properties of a GetApiNodesRequest.
+     * @deprecated Use getApiNodes.GetApiNodesRequest.$Properties instead.
+     */
+    interface IGetApiNodesRequest extends getApiNodes.GetApiNodesRequest.$Properties {
     }
 
     /** Represents a GetApiNodesRequest. */
-    class GetApiNodesRequest implements IGetApiNodesRequest {
+    class GetApiNodesRequest {
 
         /**
          * Constructs a new GetApiNodesRequest.
          * @param [properties] Properties to set
          */
-        constructor(properties?: getApiNodes.IGetApiNodesRequest);
+        constructor(properties?: getApiNodes.GetApiNodesRequest.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** GetApiNodesRequest headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /**
          * Creates a new GetApiNodesRequest instance using the specified properties.
          * @param [properties] Properties to set
          * @returns GetApiNodesRequest instance
          */
-        public static create(properties?: getApiNodes.IGetApiNodesRequest): getApiNodes.GetApiNodesRequest;
+        static create(properties: getApiNodes.GetApiNodesRequest.$Shape): getApiNodes.GetApiNodesRequest & getApiNodes.GetApiNodesRequest.$Shape;
+        static create(properties?: getApiNodes.GetApiNodesRequest.$Properties): getApiNodes.GetApiNodesRequest;
 
         /**
          * Encodes the specified GetApiNodesRequest message. Does not implicitly {@link getApiNodes.GetApiNodesRequest.verify|verify} messages.
@@ -132,7 +157,7 @@ export namespace getApiNodes {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: getApiNodes.IGetApiNodesRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: getApiNodes.GetApiNodesRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified GetApiNodesRequest message, length delimited. Does not implicitly {@link getApiNodes.GetApiNodesRequest.verify|verify} messages.
@@ -140,40 +165,40 @@ export namespace getApiNodes {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: getApiNodes.IGetApiNodesRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: getApiNodes.GetApiNodesRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetApiNodesRequest message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns GetApiNodesRequest
+         * @returns {getApiNodes.GetApiNodesRequest & getApiNodes.GetApiNodesRequest.$Shape} GetApiNodesRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getApiNodes.GetApiNodesRequest;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getApiNodes.GetApiNodesRequest & getApiNodes.GetApiNodesRequest.$Shape;
 
         /**
          * Decodes a GetApiNodesRequest message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns GetApiNodesRequest
+         * @returns {getApiNodes.GetApiNodesRequest & getApiNodes.GetApiNodesRequest.$Shape} GetApiNodesRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getApiNodes.GetApiNodesRequest;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getApiNodes.GetApiNodesRequest & getApiNodes.GetApiNodesRequest.$Shape;
 
         /**
          * Verifies a GetApiNodesRequest message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a GetApiNodesRequest message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns GetApiNodesRequest
          */
-        public static fromObject(object: { [k: string]: any }): getApiNodes.GetApiNodesRequest;
+        static fromObject(object: { [k: string]: any }): getApiNodes.GetApiNodesRequest;
 
         /**
          * Creates a plain object from a GetApiNodesRequest message. Also converts values to other types if specified.
@@ -181,53 +206,70 @@ export namespace getApiNodes {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: getApiNodes.GetApiNodesRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: getApiNodes.GetApiNodesRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetApiNodesRequest to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for GetApiNodesRequest
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for GetApiNodesRequest
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
     }
 
-    /** Properties of a GetApiNodesResponse. */
-    interface IGetApiNodesResponse {
+    namespace GetApiNodesRequest {
 
-        /** GetApiNodesResponse headers */
-        headers?: (shared.IHeaders|null);
+        /** Properties of a GetApiNodesRequest. */
+        interface $Properties {
 
-        /** GetApiNodesResponse apiNodes */
-        apiNodes?: (getApiNodes.IApiNode[]|null);
+            /** GetApiNodesRequest headers */
+            headers?: (shared.Headers.$Properties|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a GetApiNodesRequest. */
+        type $Shape = getApiNodes.GetApiNodesRequest.$Properties;
+    }
+
+    /**
+     * Properties of a GetApiNodesResponse.
+     * @deprecated Use getApiNodes.GetApiNodesResponse.$Properties instead.
+     */
+    interface IGetApiNodesResponse extends getApiNodes.GetApiNodesResponse.$Properties {
     }
 
     /** Represents a GetApiNodesResponse. */
-    class GetApiNodesResponse implements IGetApiNodesResponse {
+    class GetApiNodesResponse {
 
         /**
          * Constructs a new GetApiNodesResponse.
          * @param [properties] Properties to set
          */
-        constructor(properties?: getApiNodes.IGetApiNodesResponse);
+        constructor(properties?: getApiNodes.GetApiNodesResponse.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** GetApiNodesResponse headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /** GetApiNodesResponse apiNodes. */
-        public apiNodes: getApiNodes.IApiNode[];
+        apiNodes: getApiNodes.ApiNode.$Properties[];
 
         /**
          * Creates a new GetApiNodesResponse instance using the specified properties.
          * @param [properties] Properties to set
          * @returns GetApiNodesResponse instance
          */
-        public static create(properties?: getApiNodes.IGetApiNodesResponse): getApiNodes.GetApiNodesResponse;
+        static create(properties: getApiNodes.GetApiNodesResponse.$Shape): getApiNodes.GetApiNodesResponse & getApiNodes.GetApiNodesResponse.$Shape;
+        static create(properties?: getApiNodes.GetApiNodesResponse.$Properties): getApiNodes.GetApiNodesResponse;
 
         /**
          * Encodes the specified GetApiNodesResponse message. Does not implicitly {@link getApiNodes.GetApiNodesResponse.verify|verify} messages.
@@ -235,7 +277,7 @@ export namespace getApiNodes {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: getApiNodes.IGetApiNodesResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: getApiNodes.GetApiNodesResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified GetApiNodesResponse message, length delimited. Does not implicitly {@link getApiNodes.GetApiNodesResponse.verify|verify} messages.
@@ -243,40 +285,40 @@ export namespace getApiNodes {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: getApiNodes.IGetApiNodesResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: getApiNodes.GetApiNodesResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetApiNodesResponse message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns GetApiNodesResponse
+         * @returns {getApiNodes.GetApiNodesResponse & getApiNodes.GetApiNodesResponse.$Shape} GetApiNodesResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getApiNodes.GetApiNodesResponse;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getApiNodes.GetApiNodesResponse & getApiNodes.GetApiNodesResponse.$Shape;
 
         /**
          * Decodes a GetApiNodesResponse message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns GetApiNodesResponse
+         * @returns {getApiNodes.GetApiNodesResponse & getApiNodes.GetApiNodesResponse.$Shape} GetApiNodesResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getApiNodes.GetApiNodesResponse;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getApiNodes.GetApiNodesResponse & getApiNodes.GetApiNodesResponse.$Shape;
 
         /**
          * Verifies a GetApiNodesResponse message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a GetApiNodesResponse message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns GetApiNodesResponse
          */
-        public static fromObject(object: { [k: string]: any }): getApiNodes.GetApiNodesResponse;
+        static fromObject(object: { [k: string]: any }): getApiNodes.GetApiNodesResponse;
 
         /**
          * Creates a plain object from a GetApiNodesResponse message. Also converts values to other types if specified.
@@ -284,90 +326,92 @@ export namespace getApiNodes {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: getApiNodes.GetApiNodesResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: getApiNodes.GetApiNodesResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetApiNodesResponse to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for GetApiNodesResponse
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for GetApiNodesResponse
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
+    }
+
+    namespace GetApiNodesResponse {
+
+        /** Properties of a GetApiNodesResponse. */
+        interface $Properties {
+
+            /** GetApiNodesResponse headers */
+            headers?: (shared.Headers.$Properties|null);
+
+            /** GetApiNodesResponse apiNodes */
+            apiNodes?: (getApiNodes.ApiNode.$Properties[]|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a GetApiNodesResponse. */
+        type $Shape = getApiNodes.GetApiNodesResponse.$Properties;
     }
 }
 
 /** Namespace shared. */
 export namespace shared {
 
-    /** Properties of a Headers. */
-    interface IHeaders {
-
-        /** Headers version */
-        version?: (string|null);
-
-        /** Headers blockNumber */
-        blockNumber?: (number|null);
-
-        /** Headers round */
-        round?: (number|null);
-
-        /** Headers step */
-        step?: (number|null);
-
-        /** Headers proposedBlockHash */
-        proposedBlockHash?: (string|null);
-
-        /** Headers validatorsSignedPrevote */
-        validatorsSignedPrevote?: (boolean[]|null);
-
-        /** Headers validatorsSignedPrecommit */
-        validatorsSignedPrecommit?: (boolean[]|null);
+    /**
+     * Properties of a Headers.
+     * @deprecated Use shared.Headers.$Properties instead.
+     */
+    interface IHeaders extends shared.Headers.$Properties {
     }
 
     /** Represents a Headers. */
-    class Headers implements IHeaders {
+    class Headers {
 
         /**
          * Constructs a new Headers.
          * @param [properties] Properties to set
          */
-        constructor(properties?: shared.IHeaders);
+        constructor(properties?: shared.Headers.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** Headers version. */
-        public version: string;
+        version: string;
 
         /** Headers blockNumber. */
-        public blockNumber: number;
+        blockNumber: number;
 
         /** Headers round. */
-        public round: number;
+        round: number;
 
         /** Headers step. */
-        public step: number;
+        step: number;
 
         /** Headers proposedBlockHash. */
-        public proposedBlockHash?: (string|null);
+        proposedBlockHash?: (string|null);
 
         /** Headers validatorsSignedPrevote. */
-        public validatorsSignedPrevote: boolean[];
+        validatorsSignedPrevote: boolean[];
 
         /** Headers validatorsSignedPrecommit. */
-        public validatorsSignedPrecommit: boolean[];
-
-        /** Headers _proposedBlockHash. */
-        public _proposedBlockHash?: "proposedBlockHash";
+        validatorsSignedPrecommit: boolean[];
 
         /**
          * Creates a new Headers instance using the specified properties.
          * @param [properties] Properties to set
          * @returns Headers instance
          */
-        public static create(properties?: shared.IHeaders): shared.Headers;
+        static create(properties: shared.Headers.$Shape): shared.Headers & shared.Headers.$Shape;
+        static create(properties?: shared.Headers.$Properties): shared.Headers;
 
         /**
          * Encodes the specified Headers message. Does not implicitly {@link shared.Headers.verify|verify} messages.
@@ -375,7 +419,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IHeaders, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: shared.Headers.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified Headers message, length delimited. Does not implicitly {@link shared.Headers.verify|verify} messages.
@@ -383,40 +427,40 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IHeaders, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: shared.Headers.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a Headers message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns Headers
+         * @returns {shared.Headers & shared.Headers.$Shape} Headers
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.Headers;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.Headers & shared.Headers.$Shape;
 
         /**
          * Decodes a Headers message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns Headers
+         * @returns {shared.Headers & shared.Headers.$Shape} Headers
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.Headers;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.Headers & shared.Headers.$Shape;
 
         /**
          * Verifies a Headers message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a Headers message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns Headers
          */
-        public static fromObject(object: { [k: string]: any }): shared.Headers;
+        static fromObject(object: { [k: string]: any }): shared.Headers;
 
         /**
          * Creates a plain object from a Headers message. Also converts values to other types if specified.
@@ -424,59 +468,91 @@ export namespace shared {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: shared.Headers, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: shared.Headers, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this Headers to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for Headers
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for Headers
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
     }
 
-    /** Properties of a PeerLike. */
-    interface IPeerLike {
+    namespace Headers {
 
-        /** PeerLike ip */
-        ip?: (string|null);
+        /** Properties of a Headers. */
+        interface $Properties {
 
-        /** PeerLike port */
-        port?: (number|null);
+            /** Headers version */
+            version?: (string|null);
 
-        /** PeerLike protocol */
-        protocol?: (number|null);
+            /** Headers blockNumber */
+            blockNumber?: (number|null);
+
+            /** Headers round */
+            round?: (number|null);
+
+            /** Headers step */
+            step?: (number|null);
+
+            /** Headers proposedBlockHash */
+            proposedBlockHash?: (string|null);
+
+            /** Headers validatorsSignedPrevote */
+            validatorsSignedPrevote?: (boolean[]|null);
+
+            /** Headers validatorsSignedPrecommit */
+            validatorsSignedPrecommit?: (boolean[]|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a Headers. */
+        type $Shape = shared.Headers.$Properties;
+    }
+
+    /**
+     * Properties of a PeerLike.
+     * @deprecated Use shared.PeerLike.$Properties instead.
+     */
+    interface IPeerLike extends shared.PeerLike.$Properties {
     }
 
     /** Represents a PeerLike. */
-    class PeerLike implements IPeerLike {
+    class PeerLike {
 
         /**
          * Constructs a new PeerLike.
          * @param [properties] Properties to set
          */
-        constructor(properties?: shared.IPeerLike);
+        constructor(properties?: shared.PeerLike.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** PeerLike ip. */
-        public ip: string;
+        ip: string;
 
         /** PeerLike port. */
-        public port: number;
+        port: number;
 
         /** PeerLike protocol. */
-        public protocol: number;
+        protocol: number;
 
         /**
          * Creates a new PeerLike instance using the specified properties.
          * @param [properties] Properties to set
          * @returns PeerLike instance
          */
-        public static create(properties?: shared.IPeerLike): shared.PeerLike;
+        static create(properties: shared.PeerLike.$Shape): shared.PeerLike & shared.PeerLike.$Shape;
+        static create(properties?: shared.PeerLike.$Properties): shared.PeerLike;
 
         /**
          * Encodes the specified PeerLike message. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
@@ -484,7 +560,7 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: shared.IPeerLike, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: shared.PeerLike.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified PeerLike message, length delimited. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
@@ -492,40 +568,40 @@ export namespace shared {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: shared.IPeerLike, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: shared.PeerLike.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a PeerLike message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns PeerLike
+         * @returns {shared.PeerLike & shared.PeerLike.$Shape} PeerLike
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.PeerLike;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.PeerLike & shared.PeerLike.$Shape;
 
         /**
          * Decodes a PeerLike message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns PeerLike
+         * @returns {shared.PeerLike & shared.PeerLike.$Shape} PeerLike
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.PeerLike;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.PeerLike & shared.PeerLike.$Shape;
 
         /**
          * Verifies a PeerLike message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a PeerLike message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns PeerLike
          */
-        public static fromObject(object: { [k: string]: any }): shared.PeerLike;
+        static fromObject(object: { [k: string]: any }): shared.PeerLike;
 
         /**
          * Creates a plain object from a PeerLike message. Also converts values to other types if specified.
@@ -533,63 +609,83 @@ export namespace shared {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: shared.PeerLike, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: shared.PeerLike, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this PeerLike to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for PeerLike
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for PeerLike
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
+    }
+
+    namespace PeerLike {
+
+        /** Properties of a PeerLike. */
+        interface $Properties {
+
+            /** PeerLike ip */
+            ip?: (string|null);
+
+            /** PeerLike port */
+            port?: (number|null);
+
+            /** PeerLike protocol */
+            protocol?: (number|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a PeerLike. */
+        type $Shape = shared.PeerLike.$Properties;
     }
 }
 
 /** Namespace getBlocks. */
 export namespace getBlocks {
 
-    /** Properties of a GetBlocksRequest. */
-    interface IGetBlocksRequest {
-
-        /** GetBlocksRequest fromBlockNumber */
-        fromBlockNumber?: (number|null);
-
-        /** GetBlocksRequest limit */
-        limit?: (number|null);
-
-        /** GetBlocksRequest headers */
-        headers?: (shared.IHeaders|null);
+    /**
+     * Properties of a GetBlocksRequest.
+     * @deprecated Use getBlocks.GetBlocksRequest.$Properties instead.
+     */
+    interface IGetBlocksRequest extends getBlocks.GetBlocksRequest.$Properties {
     }
 
     /** Represents a GetBlocksRequest. */
-    class GetBlocksRequest implements IGetBlocksRequest {
+    class GetBlocksRequest {
 
         /**
          * Constructs a new GetBlocksRequest.
          * @param [properties] Properties to set
          */
-        constructor(properties?: getBlocks.IGetBlocksRequest);
+        constructor(properties?: getBlocks.GetBlocksRequest.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** GetBlocksRequest fromBlockNumber. */
-        public fromBlockNumber: number;
+        fromBlockNumber: number;
 
         /** GetBlocksRequest limit. */
-        public limit: number;
+        limit: number;
 
         /** GetBlocksRequest headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /**
          * Creates a new GetBlocksRequest instance using the specified properties.
          * @param [properties] Properties to set
          * @returns GetBlocksRequest instance
          */
-        public static create(properties?: getBlocks.IGetBlocksRequest): getBlocks.GetBlocksRequest;
+        static create(properties: getBlocks.GetBlocksRequest.$Shape): getBlocks.GetBlocksRequest & getBlocks.GetBlocksRequest.$Shape;
+        static create(properties?: getBlocks.GetBlocksRequest.$Properties): getBlocks.GetBlocksRequest;
 
         /**
          * Encodes the specified GetBlocksRequest message. Does not implicitly {@link getBlocks.GetBlocksRequest.verify|verify} messages.
@@ -597,7 +693,7 @@ export namespace getBlocks {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: getBlocks.IGetBlocksRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: getBlocks.GetBlocksRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified GetBlocksRequest message, length delimited. Does not implicitly {@link getBlocks.GetBlocksRequest.verify|verify} messages.
@@ -605,40 +701,40 @@ export namespace getBlocks {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: getBlocks.IGetBlocksRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: getBlocks.GetBlocksRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetBlocksRequest message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns GetBlocksRequest
+         * @returns {getBlocks.GetBlocksRequest & getBlocks.GetBlocksRequest.$Shape} GetBlocksRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getBlocks.GetBlocksRequest;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getBlocks.GetBlocksRequest & getBlocks.GetBlocksRequest.$Shape;
 
         /**
          * Decodes a GetBlocksRequest message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns GetBlocksRequest
+         * @returns {getBlocks.GetBlocksRequest & getBlocks.GetBlocksRequest.$Shape} GetBlocksRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getBlocks.GetBlocksRequest;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getBlocks.GetBlocksRequest & getBlocks.GetBlocksRequest.$Shape;
 
         /**
          * Verifies a GetBlocksRequest message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a GetBlocksRequest message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns GetBlocksRequest
          */
-        public static fromObject(object: { [k: string]: any }): getBlocks.GetBlocksRequest;
+        static fromObject(object: { [k: string]: any }): getBlocks.GetBlocksRequest;
 
         /**
          * Creates a plain object from a GetBlocksRequest message. Also converts values to other types if specified.
@@ -646,53 +742,76 @@ export namespace getBlocks {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: getBlocks.GetBlocksRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: getBlocks.GetBlocksRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetBlocksRequest to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for GetBlocksRequest
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for GetBlocksRequest
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
     }
 
-    /** Properties of a GetBlocksResponse. */
-    interface IGetBlocksResponse {
+    namespace GetBlocksRequest {
 
-        /** GetBlocksResponse headers */
-        headers?: (shared.IHeaders|null);
+        /** Properties of a GetBlocksRequest. */
+        interface $Properties {
 
-        /** GetBlocksResponse blocks */
-        blocks?: (Uint8Array[]|null);
+            /** GetBlocksRequest fromBlockNumber */
+            fromBlockNumber?: (number|null);
+
+            /** GetBlocksRequest limit */
+            limit?: (number|null);
+
+            /** GetBlocksRequest headers */
+            headers?: (shared.Headers.$Properties|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a GetBlocksRequest. */
+        type $Shape = getBlocks.GetBlocksRequest.$Properties;
+    }
+
+    /**
+     * Properties of a GetBlocksResponse.
+     * @deprecated Use getBlocks.GetBlocksResponse.$Properties instead.
+     */
+    interface IGetBlocksResponse extends getBlocks.GetBlocksResponse.$Properties {
     }
 
     /** Represents a GetBlocksResponse. */
-    class GetBlocksResponse implements IGetBlocksResponse {
+    class GetBlocksResponse {
 
         /**
          * Constructs a new GetBlocksResponse.
          * @param [properties] Properties to set
          */
-        constructor(properties?: getBlocks.IGetBlocksResponse);
+        constructor(properties?: getBlocks.GetBlocksResponse.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** GetBlocksResponse headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /** GetBlocksResponse blocks. */
-        public blocks: Uint8Array[];
+        blocks: Uint8Array[];
 
         /**
          * Creates a new GetBlocksResponse instance using the specified properties.
          * @param [properties] Properties to set
          * @returns GetBlocksResponse instance
          */
-        public static create(properties?: getBlocks.IGetBlocksResponse): getBlocks.GetBlocksResponse;
+        static create(properties: getBlocks.GetBlocksResponse.$Shape): getBlocks.GetBlocksResponse & getBlocks.GetBlocksResponse.$Shape;
+        static create(properties?: getBlocks.GetBlocksResponse.$Properties): getBlocks.GetBlocksResponse;
 
         /**
          * Encodes the specified GetBlocksResponse message. Does not implicitly {@link getBlocks.GetBlocksResponse.verify|verify} messages.
@@ -700,7 +819,7 @@ export namespace getBlocks {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: getBlocks.IGetBlocksResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: getBlocks.GetBlocksResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified GetBlocksResponse message, length delimited. Does not implicitly {@link getBlocks.GetBlocksResponse.verify|verify} messages.
@@ -708,40 +827,40 @@ export namespace getBlocks {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: getBlocks.IGetBlocksResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: getBlocks.GetBlocksResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetBlocksResponse message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns GetBlocksResponse
+         * @returns {getBlocks.GetBlocksResponse & getBlocks.GetBlocksResponse.$Shape} GetBlocksResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getBlocks.GetBlocksResponse;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getBlocks.GetBlocksResponse & getBlocks.GetBlocksResponse.$Shape;
 
         /**
          * Decodes a GetBlocksResponse message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns GetBlocksResponse
+         * @returns {getBlocks.GetBlocksResponse & getBlocks.GetBlocksResponse.$Shape} GetBlocksResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getBlocks.GetBlocksResponse;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getBlocks.GetBlocksResponse & getBlocks.GetBlocksResponse.$Shape;
 
         /**
          * Verifies a GetBlocksResponse message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a GetBlocksResponse message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns GetBlocksResponse
          */
-        public static fromObject(object: { [k: string]: any }): getBlocks.GetBlocksResponse;
+        static fromObject(object: { [k: string]: any }): getBlocks.GetBlocksResponse;
 
         /**
          * Creates a plain object from a GetBlocksResponse message. Also converts values to other types if specified.
@@ -749,51 +868,74 @@ export namespace getBlocks {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: getBlocks.GetBlocksResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: getBlocks.GetBlocksResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetBlocksResponse to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for GetBlocksResponse
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for GetBlocksResponse
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
+    }
+
+    namespace GetBlocksResponse {
+
+        /** Properties of a GetBlocksResponse. */
+        interface $Properties {
+
+            /** GetBlocksResponse headers */
+            headers?: (shared.Headers.$Properties|null);
+
+            /** GetBlocksResponse blocks */
+            blocks?: (Uint8Array[]|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a GetBlocksResponse. */
+        type $Shape = getBlocks.GetBlocksResponse.$Properties;
     }
 }
 
 /** Namespace getMessages. */
 export namespace getMessages {
 
-    /** Properties of a GetMessagesRequest. */
-    interface IGetMessagesRequest {
-
-        /** GetMessagesRequest headers */
-        headers?: (shared.IHeaders|null);
+    /**
+     * Properties of a GetMessagesRequest.
+     * @deprecated Use getMessages.GetMessagesRequest.$Properties instead.
+     */
+    interface IGetMessagesRequest extends getMessages.GetMessagesRequest.$Properties {
     }
 
     /** Represents a GetMessagesRequest. */
-    class GetMessagesRequest implements IGetMessagesRequest {
+    class GetMessagesRequest {
 
         /**
          * Constructs a new GetMessagesRequest.
          * @param [properties] Properties to set
          */
-        constructor(properties?: getMessages.IGetMessagesRequest);
+        constructor(properties?: getMessages.GetMessagesRequest.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** GetMessagesRequest headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /**
          * Creates a new GetMessagesRequest instance using the specified properties.
          * @param [properties] Properties to set
          * @returns GetMessagesRequest instance
          */
-        public static create(properties?: getMessages.IGetMessagesRequest): getMessages.GetMessagesRequest;
+        static create(properties: getMessages.GetMessagesRequest.$Shape): getMessages.GetMessagesRequest & getMessages.GetMessagesRequest.$Shape;
+        static create(properties?: getMessages.GetMessagesRequest.$Properties): getMessages.GetMessagesRequest;
 
         /**
          * Encodes the specified GetMessagesRequest message. Does not implicitly {@link getMessages.GetMessagesRequest.verify|verify} messages.
@@ -801,7 +943,7 @@ export namespace getMessages {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: getMessages.IGetMessagesRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: getMessages.GetMessagesRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified GetMessagesRequest message, length delimited. Does not implicitly {@link getMessages.GetMessagesRequest.verify|verify} messages.
@@ -809,40 +951,40 @@ export namespace getMessages {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: getMessages.IGetMessagesRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: getMessages.GetMessagesRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetMessagesRequest message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns GetMessagesRequest
+         * @returns {getMessages.GetMessagesRequest & getMessages.GetMessagesRequest.$Shape} GetMessagesRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getMessages.GetMessagesRequest;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getMessages.GetMessagesRequest & getMessages.GetMessagesRequest.$Shape;
 
         /**
          * Decodes a GetMessagesRequest message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns GetMessagesRequest
+         * @returns {getMessages.GetMessagesRequest & getMessages.GetMessagesRequest.$Shape} GetMessagesRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getMessages.GetMessagesRequest;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getMessages.GetMessagesRequest & getMessages.GetMessagesRequest.$Shape;
 
         /**
          * Verifies a GetMessagesRequest message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a GetMessagesRequest message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns GetMessagesRequest
          */
-        public static fromObject(object: { [k: string]: any }): getMessages.GetMessagesRequest;
+        static fromObject(object: { [k: string]: any }): getMessages.GetMessagesRequest;
 
         /**
          * Creates a plain object from a GetMessagesRequest message. Also converts values to other types if specified.
@@ -850,59 +992,73 @@ export namespace getMessages {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: getMessages.GetMessagesRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: getMessages.GetMessagesRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetMessagesRequest to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for GetMessagesRequest
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for GetMessagesRequest
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
     }
 
-    /** Properties of a GetMessagesResponse. */
-    interface IGetMessagesResponse {
+    namespace GetMessagesRequest {
 
-        /** GetMessagesResponse headers */
-        headers?: (shared.IHeaders|null);
+        /** Properties of a GetMessagesRequest. */
+        interface $Properties {
 
-        /** GetMessagesResponse prevotes */
-        prevotes?: (Uint8Array[]|null);
+            /** GetMessagesRequest headers */
+            headers?: (shared.Headers.$Properties|null);
 
-        /** GetMessagesResponse precommits */
-        precommits?: (Uint8Array[]|null);
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a GetMessagesRequest. */
+        type $Shape = getMessages.GetMessagesRequest.$Properties;
+    }
+
+    /**
+     * Properties of a GetMessagesResponse.
+     * @deprecated Use getMessages.GetMessagesResponse.$Properties instead.
+     */
+    interface IGetMessagesResponse extends getMessages.GetMessagesResponse.$Properties {
     }
 
     /** Represents a GetMessagesResponse. */
-    class GetMessagesResponse implements IGetMessagesResponse {
+    class GetMessagesResponse {
 
         /**
          * Constructs a new GetMessagesResponse.
          * @param [properties] Properties to set
          */
-        constructor(properties?: getMessages.IGetMessagesResponse);
+        constructor(properties?: getMessages.GetMessagesResponse.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** GetMessagesResponse headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /** GetMessagesResponse prevotes. */
-        public prevotes: Uint8Array[];
+        prevotes: Uint8Array[];
 
         /** GetMessagesResponse precommits. */
-        public precommits: Uint8Array[];
+        precommits: Uint8Array[];
 
         /**
          * Creates a new GetMessagesResponse instance using the specified properties.
          * @param [properties] Properties to set
          * @returns GetMessagesResponse instance
          */
-        public static create(properties?: getMessages.IGetMessagesResponse): getMessages.GetMessagesResponse;
+        static create(properties: getMessages.GetMessagesResponse.$Shape): getMessages.GetMessagesResponse & getMessages.GetMessagesResponse.$Shape;
+        static create(properties?: getMessages.GetMessagesResponse.$Properties): getMessages.GetMessagesResponse;
 
         /**
          * Encodes the specified GetMessagesResponse message. Does not implicitly {@link getMessages.GetMessagesResponse.verify|verify} messages.
@@ -910,7 +1066,7 @@ export namespace getMessages {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: getMessages.IGetMessagesResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: getMessages.GetMessagesResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified GetMessagesResponse message, length delimited. Does not implicitly {@link getMessages.GetMessagesResponse.verify|verify} messages.
@@ -918,40 +1074,40 @@ export namespace getMessages {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: getMessages.IGetMessagesResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: getMessages.GetMessagesResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetMessagesResponse message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns GetMessagesResponse
+         * @returns {getMessages.GetMessagesResponse & getMessages.GetMessagesResponse.$Shape} GetMessagesResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getMessages.GetMessagesResponse;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getMessages.GetMessagesResponse & getMessages.GetMessagesResponse.$Shape;
 
         /**
          * Decodes a GetMessagesResponse message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns GetMessagesResponse
+         * @returns {getMessages.GetMessagesResponse & getMessages.GetMessagesResponse.$Shape} GetMessagesResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getMessages.GetMessagesResponse;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getMessages.GetMessagesResponse & getMessages.GetMessagesResponse.$Shape;
 
         /**
          * Verifies a GetMessagesResponse message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a GetMessagesResponse message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns GetMessagesResponse
          */
-        public static fromObject(object: { [k: string]: any }): getMessages.GetMessagesResponse;
+        static fromObject(object: { [k: string]: any }): getMessages.GetMessagesResponse;
 
         /**
          * Creates a plain object from a GetMessagesResponse message. Also converts values to other types if specified.
@@ -959,51 +1115,77 @@ export namespace getMessages {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: getMessages.GetMessagesResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: getMessages.GetMessagesResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetMessagesResponse to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for GetMessagesResponse
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for GetMessagesResponse
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
+    }
+
+    namespace GetMessagesResponse {
+
+        /** Properties of a GetMessagesResponse. */
+        interface $Properties {
+
+            /** GetMessagesResponse headers */
+            headers?: (shared.Headers.$Properties|null);
+
+            /** GetMessagesResponse prevotes */
+            prevotes?: (Uint8Array[]|null);
+
+            /** GetMessagesResponse precommits */
+            precommits?: (Uint8Array[]|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a GetMessagesResponse. */
+        type $Shape = getMessages.GetMessagesResponse.$Properties;
     }
 }
 
 /** Namespace getPeers. */
 export namespace getPeers {
 
-    /** Properties of a GetPeersRequest. */
-    interface IGetPeersRequest {
-
-        /** GetPeersRequest headers */
-        headers?: (shared.IHeaders|null);
+    /**
+     * Properties of a GetPeersRequest.
+     * @deprecated Use getPeers.GetPeersRequest.$Properties instead.
+     */
+    interface IGetPeersRequest extends getPeers.GetPeersRequest.$Properties {
     }
 
     /** Represents a GetPeersRequest. */
-    class GetPeersRequest implements IGetPeersRequest {
+    class GetPeersRequest {
 
         /**
          * Constructs a new GetPeersRequest.
          * @param [properties] Properties to set
          */
-        constructor(properties?: getPeers.IGetPeersRequest);
+        constructor(properties?: getPeers.GetPeersRequest.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** GetPeersRequest headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /**
          * Creates a new GetPeersRequest instance using the specified properties.
          * @param [properties] Properties to set
          * @returns GetPeersRequest instance
          */
-        public static create(properties?: getPeers.IGetPeersRequest): getPeers.GetPeersRequest;
+        static create(properties: getPeers.GetPeersRequest.$Shape): getPeers.GetPeersRequest & getPeers.GetPeersRequest.$Shape;
+        static create(properties?: getPeers.GetPeersRequest.$Properties): getPeers.GetPeersRequest;
 
         /**
          * Encodes the specified GetPeersRequest message. Does not implicitly {@link getPeers.GetPeersRequest.verify|verify} messages.
@@ -1011,7 +1193,7 @@ export namespace getPeers {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: getPeers.IGetPeersRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: getPeers.GetPeersRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified GetPeersRequest message, length delimited. Does not implicitly {@link getPeers.GetPeersRequest.verify|verify} messages.
@@ -1019,40 +1201,40 @@ export namespace getPeers {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: getPeers.IGetPeersRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: getPeers.GetPeersRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetPeersRequest message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns GetPeersRequest
+         * @returns {getPeers.GetPeersRequest & getPeers.GetPeersRequest.$Shape} GetPeersRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getPeers.GetPeersRequest;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getPeers.GetPeersRequest & getPeers.GetPeersRequest.$Shape;
 
         /**
          * Decodes a GetPeersRequest message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns GetPeersRequest
+         * @returns {getPeers.GetPeersRequest & getPeers.GetPeersRequest.$Shape} GetPeersRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getPeers.GetPeersRequest;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getPeers.GetPeersRequest & getPeers.GetPeersRequest.$Shape;
 
         /**
          * Verifies a GetPeersRequest message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a GetPeersRequest message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns GetPeersRequest
          */
-        public static fromObject(object: { [k: string]: any }): getPeers.GetPeersRequest;
+        static fromObject(object: { [k: string]: any }): getPeers.GetPeersRequest;
 
         /**
          * Creates a plain object from a GetPeersRequest message. Also converts values to other types if specified.
@@ -1060,53 +1242,70 @@ export namespace getPeers {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: getPeers.GetPeersRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: getPeers.GetPeersRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetPeersRequest to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for GetPeersRequest
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for GetPeersRequest
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
     }
 
-    /** Properties of a GetPeersResponse. */
-    interface IGetPeersResponse {
+    namespace GetPeersRequest {
 
-        /** GetPeersResponse headers */
-        headers?: (shared.IHeaders|null);
+        /** Properties of a GetPeersRequest. */
+        interface $Properties {
 
-        /** GetPeersResponse peers */
-        peers?: (shared.IPeerLike[]|null);
+            /** GetPeersRequest headers */
+            headers?: (shared.Headers.$Properties|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a GetPeersRequest. */
+        type $Shape = getPeers.GetPeersRequest.$Properties;
+    }
+
+    /**
+     * Properties of a GetPeersResponse.
+     * @deprecated Use getPeers.GetPeersResponse.$Properties instead.
+     */
+    interface IGetPeersResponse extends getPeers.GetPeersResponse.$Properties {
     }
 
     /** Represents a GetPeersResponse. */
-    class GetPeersResponse implements IGetPeersResponse {
+    class GetPeersResponse {
 
         /**
          * Constructs a new GetPeersResponse.
          * @param [properties] Properties to set
          */
-        constructor(properties?: getPeers.IGetPeersResponse);
+        constructor(properties?: getPeers.GetPeersResponse.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** GetPeersResponse headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /** GetPeersResponse peers. */
-        public peers: shared.IPeerLike[];
+        peers: shared.PeerLike.$Properties[];
 
         /**
          * Creates a new GetPeersResponse instance using the specified properties.
          * @param [properties] Properties to set
          * @returns GetPeersResponse instance
          */
-        public static create(properties?: getPeers.IGetPeersResponse): getPeers.GetPeersResponse;
+        static create(properties: getPeers.GetPeersResponse.$Shape): getPeers.GetPeersResponse & getPeers.GetPeersResponse.$Shape;
+        static create(properties?: getPeers.GetPeersResponse.$Properties): getPeers.GetPeersResponse;
 
         /**
          * Encodes the specified GetPeersResponse message. Does not implicitly {@link getPeers.GetPeersResponse.verify|verify} messages.
@@ -1114,7 +1313,7 @@ export namespace getPeers {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: getPeers.IGetPeersResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: getPeers.GetPeersResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified GetPeersResponse message, length delimited. Does not implicitly {@link getPeers.GetPeersResponse.verify|verify} messages.
@@ -1122,40 +1321,40 @@ export namespace getPeers {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: getPeers.IGetPeersResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: getPeers.GetPeersResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetPeersResponse message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns GetPeersResponse
+         * @returns {getPeers.GetPeersResponse & getPeers.GetPeersResponse.$Shape} GetPeersResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getPeers.GetPeersResponse;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getPeers.GetPeersResponse & getPeers.GetPeersResponse.$Shape;
 
         /**
          * Decodes a GetPeersResponse message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns GetPeersResponse
+         * @returns {getPeers.GetPeersResponse & getPeers.GetPeersResponse.$Shape} GetPeersResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getPeers.GetPeersResponse;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getPeers.GetPeersResponse & getPeers.GetPeersResponse.$Shape;
 
         /**
          * Verifies a GetPeersResponse message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a GetPeersResponse message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns GetPeersResponse
          */
-        public static fromObject(object: { [k: string]: any }): getPeers.GetPeersResponse;
+        static fromObject(object: { [k: string]: any }): getPeers.GetPeersResponse;
 
         /**
          * Creates a plain object from a GetPeersResponse message. Also converts values to other types if specified.
@@ -1163,51 +1362,74 @@ export namespace getPeers {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: getPeers.GetPeersResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: getPeers.GetPeersResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetPeersResponse to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for GetPeersResponse
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for GetPeersResponse
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
+    }
+
+    namespace GetPeersResponse {
+
+        /** Properties of a GetPeersResponse. */
+        interface $Properties {
+
+            /** GetPeersResponse headers */
+            headers?: (shared.Headers.$Properties|null);
+
+            /** GetPeersResponse peers */
+            peers?: (shared.PeerLike.$Properties[]|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a GetPeersResponse. */
+        type $Shape = getPeers.GetPeersResponse.$Properties;
     }
 }
 
 /** Namespace getProposal. */
 export namespace getProposal {
 
-    /** Properties of a GetProposalRequest. */
-    interface IGetProposalRequest {
-
-        /** GetProposalRequest headers */
-        headers?: (shared.IHeaders|null);
+    /**
+     * Properties of a GetProposalRequest.
+     * @deprecated Use getProposal.GetProposalRequest.$Properties instead.
+     */
+    interface IGetProposalRequest extends getProposal.GetProposalRequest.$Properties {
     }
 
     /** Represents a GetProposalRequest. */
-    class GetProposalRequest implements IGetProposalRequest {
+    class GetProposalRequest {
 
         /**
          * Constructs a new GetProposalRequest.
          * @param [properties] Properties to set
          */
-        constructor(properties?: getProposal.IGetProposalRequest);
+        constructor(properties?: getProposal.GetProposalRequest.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** GetProposalRequest headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /**
          * Creates a new GetProposalRequest instance using the specified properties.
          * @param [properties] Properties to set
          * @returns GetProposalRequest instance
          */
-        public static create(properties?: getProposal.IGetProposalRequest): getProposal.GetProposalRequest;
+        static create(properties: getProposal.GetProposalRequest.$Shape): getProposal.GetProposalRequest & getProposal.GetProposalRequest.$Shape;
+        static create(properties?: getProposal.GetProposalRequest.$Properties): getProposal.GetProposalRequest;
 
         /**
          * Encodes the specified GetProposalRequest message. Does not implicitly {@link getProposal.GetProposalRequest.verify|verify} messages.
@@ -1215,7 +1437,7 @@ export namespace getProposal {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: getProposal.IGetProposalRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: getProposal.GetProposalRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified GetProposalRequest message, length delimited. Does not implicitly {@link getProposal.GetProposalRequest.verify|verify} messages.
@@ -1223,40 +1445,40 @@ export namespace getProposal {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: getProposal.IGetProposalRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: getProposal.GetProposalRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetProposalRequest message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns GetProposalRequest
+         * @returns {getProposal.GetProposalRequest & getProposal.GetProposalRequest.$Shape} GetProposalRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getProposal.GetProposalRequest;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getProposal.GetProposalRequest & getProposal.GetProposalRequest.$Shape;
 
         /**
          * Decodes a GetProposalRequest message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns GetProposalRequest
+         * @returns {getProposal.GetProposalRequest & getProposal.GetProposalRequest.$Shape} GetProposalRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getProposal.GetProposalRequest;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getProposal.GetProposalRequest & getProposal.GetProposalRequest.$Shape;
 
         /**
          * Verifies a GetProposalRequest message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a GetProposalRequest message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns GetProposalRequest
          */
-        public static fromObject(object: { [k: string]: any }): getProposal.GetProposalRequest;
+        static fromObject(object: { [k: string]: any }): getProposal.GetProposalRequest;
 
         /**
          * Creates a plain object from a GetProposalRequest message. Also converts values to other types if specified.
@@ -1264,53 +1486,70 @@ export namespace getProposal {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: getProposal.GetProposalRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: getProposal.GetProposalRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetProposalRequest to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for GetProposalRequest
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for GetProposalRequest
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
     }
 
-    /** Properties of a GetProposalResponse. */
-    interface IGetProposalResponse {
+    namespace GetProposalRequest {
 
-        /** GetProposalResponse headers */
-        headers?: (shared.IHeaders|null);
+        /** Properties of a GetProposalRequest. */
+        interface $Properties {
 
-        /** GetProposalResponse proposal */
-        proposal?: (Uint8Array|null);
+            /** GetProposalRequest headers */
+            headers?: (shared.Headers.$Properties|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a GetProposalRequest. */
+        type $Shape = getProposal.GetProposalRequest.$Properties;
+    }
+
+    /**
+     * Properties of a GetProposalResponse.
+     * @deprecated Use getProposal.GetProposalResponse.$Properties instead.
+     */
+    interface IGetProposalResponse extends getProposal.GetProposalResponse.$Properties {
     }
 
     /** Represents a GetProposalResponse. */
-    class GetProposalResponse implements IGetProposalResponse {
+    class GetProposalResponse {
 
         /**
          * Constructs a new GetProposalResponse.
          * @param [properties] Properties to set
          */
-        constructor(properties?: getProposal.IGetProposalResponse);
+        constructor(properties?: getProposal.GetProposalResponse.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** GetProposalResponse headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /** GetProposalResponse proposal. */
-        public proposal: Uint8Array;
+        proposal: Uint8Array;
 
         /**
          * Creates a new GetProposalResponse instance using the specified properties.
          * @param [properties] Properties to set
          * @returns GetProposalResponse instance
          */
-        public static create(properties?: getProposal.IGetProposalResponse): getProposal.GetProposalResponse;
+        static create(properties: getProposal.GetProposalResponse.$Shape): getProposal.GetProposalResponse & getProposal.GetProposalResponse.$Shape;
+        static create(properties?: getProposal.GetProposalResponse.$Properties): getProposal.GetProposalResponse;
 
         /**
          * Encodes the specified GetProposalResponse message. Does not implicitly {@link getProposal.GetProposalResponse.verify|verify} messages.
@@ -1318,7 +1557,7 @@ export namespace getProposal {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: getProposal.IGetProposalResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: getProposal.GetProposalResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified GetProposalResponse message, length delimited. Does not implicitly {@link getProposal.GetProposalResponse.verify|verify} messages.
@@ -1326,40 +1565,40 @@ export namespace getProposal {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: getProposal.IGetProposalResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: getProposal.GetProposalResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetProposalResponse message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns GetProposalResponse
+         * @returns {getProposal.GetProposalResponse & getProposal.GetProposalResponse.$Shape} GetProposalResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getProposal.GetProposalResponse;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getProposal.GetProposalResponse & getProposal.GetProposalResponse.$Shape;
 
         /**
          * Decodes a GetProposalResponse message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns GetProposalResponse
+         * @returns {getProposal.GetProposalResponse & getProposal.GetProposalResponse.$Shape} GetProposalResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getProposal.GetProposalResponse;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getProposal.GetProposalResponse & getProposal.GetProposalResponse.$Shape;
 
         /**
          * Verifies a GetProposalResponse message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a GetProposalResponse message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns GetProposalResponse
          */
-        public static fromObject(object: { [k: string]: any }): getProposal.GetProposalResponse;
+        static fromObject(object: { [k: string]: any }): getProposal.GetProposalResponse;
 
         /**
          * Creates a plain object from a GetProposalResponse message. Also converts values to other types if specified.
@@ -1367,51 +1606,74 @@ export namespace getProposal {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: getProposal.GetProposalResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: getProposal.GetProposalResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetProposalResponse to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for GetProposalResponse
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for GetProposalResponse
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
+    }
+
+    namespace GetProposalResponse {
+
+        /** Properties of a GetProposalResponse. */
+        interface $Properties {
+
+            /** GetProposalResponse headers */
+            headers?: (shared.Headers.$Properties|null);
+
+            /** GetProposalResponse proposal */
+            proposal?: (Uint8Array|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a GetProposalResponse. */
+        type $Shape = getProposal.GetProposalResponse.$Properties;
     }
 }
 
 /** Namespace getStatus. */
 export namespace getStatus {
 
-    /** Properties of a GetStatusRequest. */
-    interface IGetStatusRequest {
-
-        /** GetStatusRequest headers */
-        headers?: (shared.IHeaders|null);
+    /**
+     * Properties of a GetStatusRequest.
+     * @deprecated Use getStatus.GetStatusRequest.$Properties instead.
+     */
+    interface IGetStatusRequest extends getStatus.GetStatusRequest.$Properties {
     }
 
     /** Represents a GetStatusRequest. */
-    class GetStatusRequest implements IGetStatusRequest {
+    class GetStatusRequest {
 
         /**
          * Constructs a new GetStatusRequest.
          * @param [properties] Properties to set
          */
-        constructor(properties?: getStatus.IGetStatusRequest);
+        constructor(properties?: getStatus.GetStatusRequest.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** GetStatusRequest headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /**
          * Creates a new GetStatusRequest instance using the specified properties.
          * @param [properties] Properties to set
          * @returns GetStatusRequest instance
          */
-        public static create(properties?: getStatus.IGetStatusRequest): getStatus.GetStatusRequest;
+        static create(properties: getStatus.GetStatusRequest.$Shape): getStatus.GetStatusRequest & getStatus.GetStatusRequest.$Shape;
+        static create(properties?: getStatus.GetStatusRequest.$Properties): getStatus.GetStatusRequest;
 
         /**
          * Encodes the specified GetStatusRequest message. Does not implicitly {@link getStatus.GetStatusRequest.verify|verify} messages.
@@ -1419,7 +1681,7 @@ export namespace getStatus {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: getStatus.IGetStatusRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: getStatus.GetStatusRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified GetStatusRequest message, length delimited. Does not implicitly {@link getStatus.GetStatusRequest.verify|verify} messages.
@@ -1427,40 +1689,40 @@ export namespace getStatus {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: getStatus.IGetStatusRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: getStatus.GetStatusRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetStatusRequest message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns GetStatusRequest
+         * @returns {getStatus.GetStatusRequest & getStatus.GetStatusRequest.$Shape} GetStatusRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusRequest;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusRequest & getStatus.GetStatusRequest.$Shape;
 
         /**
          * Decodes a GetStatusRequest message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns GetStatusRequest
+         * @returns {getStatus.GetStatusRequest & getStatus.GetStatusRequest.$Shape} GetStatusRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusRequest;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusRequest & getStatus.GetStatusRequest.$Shape;
 
         /**
          * Verifies a GetStatusRequest message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a GetStatusRequest message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns GetStatusRequest
          */
-        public static fromObject(object: { [k: string]: any }): getStatus.GetStatusRequest;
+        static fromObject(object: { [k: string]: any }): getStatus.GetStatusRequest;
 
         /**
          * Creates a plain object from a GetStatusRequest message. Also converts values to other types if specified.
@@ -1468,59 +1730,73 @@ export namespace getStatus {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: getStatus.GetStatusRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: getStatus.GetStatusRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetStatusRequest to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for GetStatusRequest
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for GetStatusRequest
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
     }
 
-    /** Properties of a GetStatusResponse. */
-    interface IGetStatusResponse {
+    namespace GetStatusRequest {
 
-        /** GetStatusResponse headers */
-        headers?: (shared.IHeaders|null);
+        /** Properties of a GetStatusRequest. */
+        interface $Properties {
 
-        /** GetStatusResponse state */
-        state?: (getStatus.GetStatusResponse.IState|null);
+            /** GetStatusRequest headers */
+            headers?: (shared.Headers.$Properties|null);
 
-        /** GetStatusResponse config */
-        config?: (getStatus.GetStatusResponse.IConfig|null);
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a GetStatusRequest. */
+        type $Shape = getStatus.GetStatusRequest.$Properties;
+    }
+
+    /**
+     * Properties of a GetStatusResponse.
+     * @deprecated Use getStatus.GetStatusResponse.$Properties instead.
+     */
+    interface IGetStatusResponse extends getStatus.GetStatusResponse.$Properties {
     }
 
     /** Represents a GetStatusResponse. */
-    class GetStatusResponse implements IGetStatusResponse {
+    class GetStatusResponse {
 
         /**
          * Constructs a new GetStatusResponse.
          * @param [properties] Properties to set
          */
-        constructor(properties?: getStatus.IGetStatusResponse);
+        constructor(properties?: getStatus.GetStatusResponse.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** GetStatusResponse headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /** GetStatusResponse state. */
-        public state?: (getStatus.GetStatusResponse.IState|null);
+        state?: (getStatus.GetStatusResponse.State.$Properties|null);
 
         /** GetStatusResponse config. */
-        public config?: (getStatus.GetStatusResponse.IConfig|null);
+        config?: (getStatus.GetStatusResponse.Config.$Properties|null);
 
         /**
          * Creates a new GetStatusResponse instance using the specified properties.
          * @param [properties] Properties to set
          * @returns GetStatusResponse instance
          */
-        public static create(properties?: getStatus.IGetStatusResponse): getStatus.GetStatusResponse;
+        static create(properties: getStatus.GetStatusResponse.$Shape): getStatus.GetStatusResponse & getStatus.GetStatusResponse.$Shape;
+        static create(properties?: getStatus.GetStatusResponse.$Properties): getStatus.GetStatusResponse;
 
         /**
          * Encodes the specified GetStatusResponse message. Does not implicitly {@link getStatus.GetStatusResponse.verify|verify} messages.
@@ -1528,7 +1804,7 @@ export namespace getStatus {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: getStatus.IGetStatusResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: getStatus.GetStatusResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified GetStatusResponse message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.verify|verify} messages.
@@ -1536,40 +1812,40 @@ export namespace getStatus {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: getStatus.IGetStatusResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: getStatus.GetStatusResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetStatusResponse message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns GetStatusResponse
+         * @returns {getStatus.GetStatusResponse & getStatus.GetStatusResponse.$Shape} GetStatusResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse & getStatus.GetStatusResponse.$Shape;
 
         /**
          * Decodes a GetStatusResponse message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns GetStatusResponse
+         * @returns {getStatus.GetStatusResponse & getStatus.GetStatusResponse.$Shape} GetStatusResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse & getStatus.GetStatusResponse.$Shape;
 
         /**
          * Verifies a GetStatusResponse message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a GetStatusResponse message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns GetStatusResponse
          */
-        public static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse;
+        static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse;
 
         /**
          * Creates a plain object from a GetStatusResponse message. Also converts values to other types if specified.
@@ -1577,55 +1853,75 @@ export namespace getStatus {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: getStatus.GetStatusResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: getStatus.GetStatusResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetStatusResponse to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for GetStatusResponse
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for GetStatusResponse
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
     }
 
     namespace GetStatusResponse {
 
-        /** Properties of a State. */
-        interface IState {
+        /** Properties of a GetStatusResponse. */
+        interface $Properties {
 
-            /** State blockNumber */
-            blockNumber?: (number|null);
+            /** GetStatusResponse headers */
+            headers?: (shared.Headers.$Properties|null);
 
-            /** State blockHash */
-            blockHash?: (string|null);
+            /** GetStatusResponse state */
+            state?: (getStatus.GetStatusResponse.State.$Properties|null);
+
+            /** GetStatusResponse config */
+            config?: (getStatus.GetStatusResponse.Config.$Properties|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a GetStatusResponse. */
+        type $Shape = getStatus.GetStatusResponse.$Properties;
+
+        /**
+         * Properties of a State.
+         * @deprecated Use getStatus.GetStatusResponse.State.$Properties instead.
+         */
+        interface IState extends getStatus.GetStatusResponse.State.$Properties {
         }
 
         /** Represents a State. */
-        class State implements IState {
+        class State {
 
             /**
              * Constructs a new State.
              * @param [properties] Properties to set
              */
-            constructor(properties?: getStatus.GetStatusResponse.IState);
+            constructor(properties?: getStatus.GetStatusResponse.State.$Properties);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
 
             /** State blockNumber. */
-            public blockNumber: number;
+            blockNumber: number;
 
             /** State blockHash. */
-            public blockHash: string;
+            blockHash: string;
 
             /**
              * Creates a new State instance using the specified properties.
              * @param [properties] Properties to set
              * @returns State instance
              */
-            public static create(properties?: getStatus.GetStatusResponse.IState): getStatus.GetStatusResponse.State;
+            static create(properties: getStatus.GetStatusResponse.State.$Shape): getStatus.GetStatusResponse.State & getStatus.GetStatusResponse.State.$Shape;
+            static create(properties?: getStatus.GetStatusResponse.State.$Properties): getStatus.GetStatusResponse.State;
 
             /**
              * Encodes the specified State message. Does not implicitly {@link getStatus.GetStatusResponse.State.verify|verify} messages.
@@ -1633,7 +1929,7 @@ export namespace getStatus {
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: getStatus.GetStatusResponse.IState, writer?: $protobuf.Writer): $protobuf.Writer;
+            static encode(message: getStatus.GetStatusResponse.State.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
              * Encodes the specified State message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.State.verify|verify} messages.
@@ -1641,40 +1937,40 @@ export namespace getStatus {
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encodeDelimited(message: getStatus.GetStatusResponse.IState, writer?: $protobuf.Writer): $protobuf.Writer;
+            static encodeDelimited(message: getStatus.GetStatusResponse.State.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
              * Decodes a State message from the specified reader or buffer.
              * @param reader Reader or buffer to decode from
              * @param [length] Message length if known beforehand
-             * @returns State
+             * @returns {getStatus.GetStatusResponse.State & getStatus.GetStatusResponse.State.$Shape} State
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.State;
+            static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.State & getStatus.GetStatusResponse.State.$Shape;
 
             /**
              * Decodes a State message from the specified reader or buffer, length delimited.
              * @param reader Reader or buffer to decode from
-             * @returns State
+             * @returns {getStatus.GetStatusResponse.State & getStatus.GetStatusResponse.State.$Shape} State
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.State;
+            static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.State & getStatus.GetStatusResponse.State.$Shape;
 
             /**
              * Verifies a State message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
-            public static verify(message: { [k: string]: any }): (string|null);
+            static verify(message: { [k: string]: any }): (string|null);
 
             /**
              * Creates a State message from a plain object. Also converts values to their respective internal types.
              * @param object Plain object
              * @returns State
              */
-            public static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.State;
+            static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.State;
 
             /**
              * Creates a plain object from a State message. Also converts values to other types if specified.
@@ -1682,59 +1978,76 @@ export namespace getStatus {
              * @param [options] Conversion options
              * @returns Plain object
              */
-            public static toObject(message: getStatus.GetStatusResponse.State, options?: $protobuf.IConversionOptions): { [k: string]: any };
+            static toObject(message: getStatus.GetStatusResponse.State, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
             /**
              * Converts this State to JSON.
              * @returns JSON object
              */
-            public toJSON(): { [k: string]: any };
+            toJSON(): { [k: string]: any };
 
             /**
-             * Gets the default type url for State
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
+             * Gets the type url for State
+             * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+             * @returns The type url
              */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
+            static getTypeUrl(prefix?: string): string;
         }
 
-        /** Properties of a Config. */
-        interface IConfig {
+        namespace State {
 
-            /** Config version */
-            version?: (string|null);
+            /** Properties of a State. */
+            interface $Properties {
 
-            /** Config network */
-            network?: (getStatus.GetStatusResponse.Config.INetwork|null);
+                /** State blockNumber */
+                blockNumber?: (number|null);
 
-            /** Config plugins */
-            plugins?: ({ [k: string]: getStatus.GetStatusResponse.Config.IPlugin }|null);
+                /** State blockHash */
+                blockHash?: (string|null);
+
+                /** Unknown fields preserved while decoding */
+                $unknowns?: Uint8Array[];
+            }
+
+            /** Shape of a State. */
+            type $Shape = getStatus.GetStatusResponse.State.$Properties;
+        }
+
+        /**
+         * Properties of a Config.
+         * @deprecated Use getStatus.GetStatusResponse.Config.$Properties instead.
+         */
+        interface IConfig extends getStatus.GetStatusResponse.Config.$Properties {
         }
 
         /** Represents a Config. */
-        class Config implements IConfig {
+        class Config {
 
             /**
              * Constructs a new Config.
              * @param [properties] Properties to set
              */
-            constructor(properties?: getStatus.GetStatusResponse.IConfig);
+            constructor(properties?: getStatus.GetStatusResponse.Config.$Properties);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
 
             /** Config version. */
-            public version: string;
+            version: string;
 
             /** Config network. */
-            public network?: (getStatus.GetStatusResponse.Config.INetwork|null);
+            network?: (getStatus.GetStatusResponse.Config.Network.$Properties|null);
 
             /** Config plugins. */
-            public plugins: { [k: string]: getStatus.GetStatusResponse.Config.IPlugin };
+            plugins: { [k: string]: getStatus.GetStatusResponse.Config.Plugin.$Properties };
 
             /**
              * Creates a new Config instance using the specified properties.
              * @param [properties] Properties to set
              * @returns Config instance
              */
-            public static create(properties?: getStatus.GetStatusResponse.IConfig): getStatus.GetStatusResponse.Config;
+            static create(properties: getStatus.GetStatusResponse.Config.$Shape): getStatus.GetStatusResponse.Config & getStatus.GetStatusResponse.Config.$Shape;
+            static create(properties?: getStatus.GetStatusResponse.Config.$Properties): getStatus.GetStatusResponse.Config;
 
             /**
              * Encodes the specified Config message. Does not implicitly {@link getStatus.GetStatusResponse.Config.verify|verify} messages.
@@ -1742,7 +2055,7 @@ export namespace getStatus {
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: getStatus.GetStatusResponse.IConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+            static encode(message: getStatus.GetStatusResponse.Config.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
              * Encodes the specified Config message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.Config.verify|verify} messages.
@@ -1750,40 +2063,40 @@ export namespace getStatus {
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encodeDelimited(message: getStatus.GetStatusResponse.IConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+            static encodeDelimited(message: getStatus.GetStatusResponse.Config.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
              * Decodes a Config message from the specified reader or buffer.
              * @param reader Reader or buffer to decode from
              * @param [length] Message length if known beforehand
-             * @returns Config
+             * @returns {getStatus.GetStatusResponse.Config & getStatus.GetStatusResponse.Config.$Shape} Config
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.Config;
+            static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.Config & getStatus.GetStatusResponse.Config.$Shape;
 
             /**
              * Decodes a Config message from the specified reader or buffer, length delimited.
              * @param reader Reader or buffer to decode from
-             * @returns Config
+             * @returns {getStatus.GetStatusResponse.Config & getStatus.GetStatusResponse.Config.$Shape} Config
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.Config;
+            static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.Config & getStatus.GetStatusResponse.Config.$Shape;
 
             /**
              * Verifies a Config message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
-            public static verify(message: { [k: string]: any }): (string|null);
+            static verify(message: { [k: string]: any }): (string|null);
 
             /**
              * Creates a Config message from a plain object. Also converts values to their respective internal types.
              * @param object Plain object
              * @returns Config
              */
-            public static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.Config;
+            static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.Config;
 
             /**
              * Creates a plain object from a Config message. Also converts values to other types if specified.
@@ -1791,73 +2104,84 @@ export namespace getStatus {
              * @param [options] Conversion options
              * @returns Plain object
              */
-            public static toObject(message: getStatus.GetStatusResponse.Config, options?: $protobuf.IConversionOptions): { [k: string]: any };
+            static toObject(message: getStatus.GetStatusResponse.Config, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
             /**
              * Converts this Config to JSON.
              * @returns JSON object
              */
-            public toJSON(): { [k: string]: any };
+            toJSON(): { [k: string]: any };
 
             /**
-             * Gets the default type url for Config
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
+             * Gets the type url for Config
+             * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+             * @returns The type url
              */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
+            static getTypeUrl(prefix?: string): string;
         }
 
         namespace Config {
 
-            /** Properties of a Network. */
-            interface INetwork {
+            /** Properties of a Config. */
+            interface $Properties {
 
-                /** Network name */
-                name?: (string|null);
+                /** Config version */
+                version?: (string|null);
 
-                /** Network nethash */
-                nethash?: (string|null);
+                /** Config network */
+                network?: (getStatus.GetStatusResponse.Config.Network.$Properties|null);
 
-                /** Network explorer */
-                explorer?: (string|null);
+                /** Config plugins */
+                plugins?: ({ [k: string]: getStatus.GetStatusResponse.Config.Plugin.$Properties }|null);
 
-                /** Network token */
-                token?: (getStatus.GetStatusResponse.Config.Network.IToken|null);
+                /** Unknown fields preserved while decoding */
+                $unknowns?: Uint8Array[];
+            }
 
-                /** Network version */
-                version?: (number|null);
+            /** Shape of a Config. */
+            type $Shape = getStatus.GetStatusResponse.Config.$Properties;
+
+            /**
+             * Properties of a Network.
+             * @deprecated Use getStatus.GetStatusResponse.Config.Network.$Properties instead.
+             */
+            interface INetwork extends getStatus.GetStatusResponse.Config.Network.$Properties {
             }
 
             /** Represents a Network. */
-            class Network implements INetwork {
+            class Network {
 
                 /**
                  * Constructs a new Network.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: getStatus.GetStatusResponse.Config.INetwork);
+                constructor(properties?: getStatus.GetStatusResponse.Config.Network.$Properties);
+
+                /** Unknown fields preserved while decoding */
+                $unknowns?: Uint8Array[];
 
                 /** Network name. */
-                public name: string;
+                name: string;
 
                 /** Network nethash. */
-                public nethash: string;
+                nethash: string;
 
                 /** Network explorer. */
-                public explorer: string;
+                explorer: string;
 
                 /** Network token. */
-                public token?: (getStatus.GetStatusResponse.Config.Network.IToken|null);
+                token?: (getStatus.GetStatusResponse.Config.Network.Token.$Properties|null);
 
                 /** Network version. */
-                public version: number;
+                version: number;
 
                 /**
                  * Creates a new Network instance using the specified properties.
                  * @param [properties] Properties to set
                  * @returns Network instance
                  */
-                public static create(properties?: getStatus.GetStatusResponse.Config.INetwork): getStatus.GetStatusResponse.Config.Network;
+                static create(properties: getStatus.GetStatusResponse.Config.Network.$Shape): getStatus.GetStatusResponse.Config.Network & getStatus.GetStatusResponse.Config.Network.$Shape;
+                static create(properties?: getStatus.GetStatusResponse.Config.Network.$Properties): getStatus.GetStatusResponse.Config.Network;
 
                 /**
                  * Encodes the specified Network message. Does not implicitly {@link getStatus.GetStatusResponse.Config.Network.verify|verify} messages.
@@ -1865,7 +2189,7 @@ export namespace getStatus {
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: getStatus.GetStatusResponse.Config.INetwork, writer?: $protobuf.Writer): $protobuf.Writer;
+                static encode(message: getStatus.GetStatusResponse.Config.Network.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Encodes the specified Network message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.Config.Network.verify|verify} messages.
@@ -1873,40 +2197,40 @@ export namespace getStatus {
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: getStatus.GetStatusResponse.Config.INetwork, writer?: $protobuf.Writer): $protobuf.Writer;
+                static encodeDelimited(message: getStatus.GetStatusResponse.Config.Network.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a Network message from the specified reader or buffer.
                  * @param reader Reader or buffer to decode from
                  * @param [length] Message length if known beforehand
-                 * @returns Network
+                 * @returns {getStatus.GetStatusResponse.Config.Network & getStatus.GetStatusResponse.Config.Network.$Shape} Network
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.Config.Network;
+                static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.Config.Network & getStatus.GetStatusResponse.Config.Network.$Shape;
 
                 /**
                  * Decodes a Network message from the specified reader or buffer, length delimited.
                  * @param reader Reader or buffer to decode from
-                 * @returns Network
+                 * @returns {getStatus.GetStatusResponse.Config.Network & getStatus.GetStatusResponse.Config.Network.$Shape} Network
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.Config.Network;
+                static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.Config.Network & getStatus.GetStatusResponse.Config.Network.$Shape;
 
                 /**
                  * Verifies a Network message.
                  * @param message Plain object to verify
                  * @returns `null` if valid, otherwise the reason why it is not
                  */
-                public static verify(message: { [k: string]: any }): (string|null);
+                static verify(message: { [k: string]: any }): (string|null);
 
                 /**
                  * Creates a Network message from a plain object. Also converts values to their respective internal types.
                  * @param object Plain object
                  * @returns Network
                  */
-                public static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.Config.Network;
+                static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.Config.Network;
 
                 /**
                  * Creates a plain object from a Network message. Also converts values to other types if specified.
@@ -1914,55 +2238,81 @@ export namespace getStatus {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: getStatus.GetStatusResponse.Config.Network, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                static toObject(message: getStatus.GetStatusResponse.Config.Network, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this Network to JSON.
                  * @returns JSON object
                  */
-                public toJSON(): { [k: string]: any };
+                toJSON(): { [k: string]: any };
 
                 /**
-                 * Gets the default type url for Network
-                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-                 * @returns The default type url
+                 * Gets the type url for Network
+                 * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+                 * @returns The type url
                  */
-                public static getTypeUrl(typeUrlPrefix?: string): string;
+                static getTypeUrl(prefix?: string): string;
             }
 
             namespace Network {
 
-                /** Properties of a Token. */
-                interface IToken {
+                /** Properties of a Network. */
+                interface $Properties {
 
-                    /** Token name */
+                    /** Network name */
                     name?: (string|null);
 
-                    /** Token symbol */
-                    symbol?: (string|null);
+                    /** Network nethash */
+                    nethash?: (string|null);
+
+                    /** Network explorer */
+                    explorer?: (string|null);
+
+                    /** Network token */
+                    token?: (getStatus.GetStatusResponse.Config.Network.Token.$Properties|null);
+
+                    /** Network version */
+                    version?: (number|null);
+
+                    /** Unknown fields preserved while decoding */
+                    $unknowns?: Uint8Array[];
+                }
+
+                /** Shape of a Network. */
+                type $Shape = getStatus.GetStatusResponse.Config.Network.$Properties;
+
+                /**
+                 * Properties of a Token.
+                 * @deprecated Use getStatus.GetStatusResponse.Config.Network.Token.$Properties instead.
+                 */
+                interface IToken extends getStatus.GetStatusResponse.Config.Network.Token.$Properties {
                 }
 
                 /** Represents a Token. */
-                class Token implements IToken {
+                class Token {
 
                     /**
                      * Constructs a new Token.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: getStatus.GetStatusResponse.Config.Network.IToken);
+                    constructor(properties?: getStatus.GetStatusResponse.Config.Network.Token.$Properties);
+
+                    /** Unknown fields preserved while decoding */
+                    $unknowns?: Uint8Array[];
 
                     /** Token name. */
-                    public name: string;
+                    name: string;
 
                     /** Token symbol. */
-                    public symbol: string;
+                    symbol: string;
 
                     /**
                      * Creates a new Token instance using the specified properties.
                      * @param [properties] Properties to set
                      * @returns Token instance
                      */
-                    public static create(properties?: getStatus.GetStatusResponse.Config.Network.IToken): getStatus.GetStatusResponse.Config.Network.Token;
+                    static create(properties: getStatus.GetStatusResponse.Config.Network.Token.$Shape): getStatus.GetStatusResponse.Config.Network.Token & getStatus.GetStatusResponse.Config.Network.Token.$Shape;
+                    static create(properties?: getStatus.GetStatusResponse.Config.Network.Token.$Properties): getStatus.GetStatusResponse.Config.Network.Token;
 
                     /**
                      * Encodes the specified Token message. Does not implicitly {@link getStatus.GetStatusResponse.Config.Network.Token.verify|verify} messages.
@@ -1970,7 +2320,7 @@ export namespace getStatus {
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: getStatus.GetStatusResponse.Config.Network.IToken, writer?: $protobuf.Writer): $protobuf.Writer;
+                    static encode(message: getStatus.GetStatusResponse.Config.Network.Token.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Encodes the specified Token message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.Config.Network.Token.verify|verify} messages.
@@ -1978,40 +2328,40 @@ export namespace getStatus {
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: getStatus.GetStatusResponse.Config.Network.IToken, writer?: $protobuf.Writer): $protobuf.Writer;
+                    static encodeDelimited(message: getStatus.GetStatusResponse.Config.Network.Token.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a Token message from the specified reader or buffer.
                      * @param reader Reader or buffer to decode from
                      * @param [length] Message length if known beforehand
-                     * @returns Token
+                     * @returns {getStatus.GetStatusResponse.Config.Network.Token & getStatus.GetStatusResponse.Config.Network.Token.$Shape} Token
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.Config.Network.Token;
+                    static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.Config.Network.Token & getStatus.GetStatusResponse.Config.Network.Token.$Shape;
 
                     /**
                      * Decodes a Token message from the specified reader or buffer, length delimited.
                      * @param reader Reader or buffer to decode from
-                     * @returns Token
+                     * @returns {getStatus.GetStatusResponse.Config.Network.Token & getStatus.GetStatusResponse.Config.Network.Token.$Shape} Token
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.Config.Network.Token;
+                    static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.Config.Network.Token & getStatus.GetStatusResponse.Config.Network.Token.$Shape;
 
                     /**
                      * Verifies a Token message.
                      * @param message Plain object to verify
                      * @returns `null` if valid, otherwise the reason why it is not
                      */
-                    public static verify(message: { [k: string]: any }): (string|null);
+                    static verify(message: { [k: string]: any }): (string|null);
 
                     /**
                      * Creates a Token message from a plain object. Also converts values to their respective internal types.
                      * @param object Plain object
                      * @returns Token
                      */
-                    public static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.Config.Network.Token;
+                    static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.Config.Network.Token;
 
                     /**
                      * Creates a plain object from a Token message. Also converts values to other types if specified.
@@ -2019,60 +2369,77 @@ export namespace getStatus {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: getStatus.GetStatusResponse.Config.Network.Token, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    static toObject(message: getStatus.GetStatusResponse.Config.Network.Token, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this Token to JSON.
                      * @returns JSON object
                      */
-                    public toJSON(): { [k: string]: any };
+                    toJSON(): { [k: string]: any };
 
                     /**
-                     * Gets the default type url for Token
-                     * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-                     * @returns The default type url
+                     * Gets the type url for Token
+                     * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+                     * @returns The type url
                      */
-                    public static getTypeUrl(typeUrlPrefix?: string): string;
+                    static getTypeUrl(prefix?: string): string;
+                }
+
+                namespace Token {
+
+                    /** Properties of a Token. */
+                    interface $Properties {
+
+                        /** Token name */
+                        name?: (string|null);
+
+                        /** Token symbol */
+                        symbol?: (string|null);
+
+                        /** Unknown fields preserved while decoding */
+                        $unknowns?: Uint8Array[];
+                    }
+
+                    /** Shape of a Token. */
+                    type $Shape = getStatus.GetStatusResponse.Config.Network.Token.$Properties;
                 }
             }
 
-            /** Properties of a Plugin. */
-            interface IPlugin {
-
-                /** Plugin port */
-                port?: (number|null);
-
-                /** Plugin enabled */
-                enabled?: (boolean|null);
-
-                /** Plugin estimateTotalCount */
-                estimateTotalCount?: (boolean|null);
+            /**
+             * Properties of a Plugin.
+             * @deprecated Use getStatus.GetStatusResponse.Config.Plugin.$Properties instead.
+             */
+            interface IPlugin extends getStatus.GetStatusResponse.Config.Plugin.$Properties {
             }
 
             /** Represents a Plugin. */
-            class Plugin implements IPlugin {
+            class Plugin {
 
                 /**
                  * Constructs a new Plugin.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: getStatus.GetStatusResponse.Config.IPlugin);
+                constructor(properties?: getStatus.GetStatusResponse.Config.Plugin.$Properties);
+
+                /** Unknown fields preserved while decoding */
+                $unknowns?: Uint8Array[];
 
                 /** Plugin port. */
-                public port: number;
+                port: number;
 
                 /** Plugin enabled. */
-                public enabled: boolean;
+                enabled: boolean;
 
                 /** Plugin estimateTotalCount. */
-                public estimateTotalCount: boolean;
+                estimateTotalCount: boolean;
 
                 /**
                  * Creates a new Plugin instance using the specified properties.
                  * @param [properties] Properties to set
                  * @returns Plugin instance
                  */
-                public static create(properties?: getStatus.GetStatusResponse.Config.IPlugin): getStatus.GetStatusResponse.Config.Plugin;
+                static create(properties: getStatus.GetStatusResponse.Config.Plugin.$Shape): getStatus.GetStatusResponse.Config.Plugin & getStatus.GetStatusResponse.Config.Plugin.$Shape;
+                static create(properties?: getStatus.GetStatusResponse.Config.Plugin.$Properties): getStatus.GetStatusResponse.Config.Plugin;
 
                 /**
                  * Encodes the specified Plugin message. Does not implicitly {@link getStatus.GetStatusResponse.Config.Plugin.verify|verify} messages.
@@ -2080,7 +2447,7 @@ export namespace getStatus {
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: getStatus.GetStatusResponse.Config.IPlugin, writer?: $protobuf.Writer): $protobuf.Writer;
+                static encode(message: getStatus.GetStatusResponse.Config.Plugin.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Encodes the specified Plugin message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.Config.Plugin.verify|verify} messages.
@@ -2088,40 +2455,40 @@ export namespace getStatus {
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: getStatus.GetStatusResponse.Config.IPlugin, writer?: $protobuf.Writer): $protobuf.Writer;
+                static encodeDelimited(message: getStatus.GetStatusResponse.Config.Plugin.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a Plugin message from the specified reader or buffer.
                  * @param reader Reader or buffer to decode from
                  * @param [length] Message length if known beforehand
-                 * @returns Plugin
+                 * @returns {getStatus.GetStatusResponse.Config.Plugin & getStatus.GetStatusResponse.Config.Plugin.$Shape} Plugin
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.Config.Plugin;
+                static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.Config.Plugin & getStatus.GetStatusResponse.Config.Plugin.$Shape;
 
                 /**
                  * Decodes a Plugin message from the specified reader or buffer, length delimited.
                  * @param reader Reader or buffer to decode from
-                 * @returns Plugin
+                 * @returns {getStatus.GetStatusResponse.Config.Plugin & getStatus.GetStatusResponse.Config.Plugin.$Shape} Plugin
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.Config.Plugin;
+                static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.Config.Plugin & getStatus.GetStatusResponse.Config.Plugin.$Shape;
 
                 /**
                  * Verifies a Plugin message.
                  * @param message Plain object to verify
                  * @returns `null` if valid, otherwise the reason why it is not
                  */
-                public static verify(message: { [k: string]: any }): (string|null);
+                static verify(message: { [k: string]: any }): (string|null);
 
                 /**
                  * Creates a Plugin message from a plain object. Also converts values to their respective internal types.
                  * @param object Plain object
                  * @returns Plugin
                  */
-                public static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.Config.Plugin;
+                static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.Config.Plugin;
 
                 /**
                  * Creates a plain object from a Plugin message. Also converts values to other types if specified.
@@ -2129,20 +2496,42 @@ export namespace getStatus {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: getStatus.GetStatusResponse.Config.Plugin, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                static toObject(message: getStatus.GetStatusResponse.Config.Plugin, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this Plugin to JSON.
                  * @returns JSON object
                  */
-                public toJSON(): { [k: string]: any };
+                toJSON(): { [k: string]: any };
 
                 /**
-                 * Gets the default type url for Plugin
-                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-                 * @returns The default type url
+                 * Gets the type url for Plugin
+                 * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+                 * @returns The type url
                  */
-                public static getTypeUrl(typeUrlPrefix?: string): string;
+                static getTypeUrl(prefix?: string): string;
+            }
+
+            namespace Plugin {
+
+                /** Properties of a Plugin. */
+                interface $Properties {
+
+                    /** Plugin port */
+                    port?: (number|null);
+
+                    /** Plugin enabled */
+                    enabled?: (boolean|null);
+
+                    /** Plugin estimateTotalCount */
+                    estimateTotalCount?: (boolean|null);
+
+                    /** Unknown fields preserved while decoding */
+                    $unknowns?: Uint8Array[];
+                }
+
+                /** Shape of a Plugin. */
+                type $Shape = getStatus.GetStatusResponse.Config.Plugin.$Properties;
             }
         }
     }
@@ -2151,37 +2540,38 @@ export namespace getStatus {
 /** Namespace postMessage. */
 export namespace postMessage {
 
-    /** Properties of a PostMessageRequest. */
-    interface IPostMessageRequest {
-
-        /** PostMessageRequest message */
-        message?: (Uint8Array|null);
-
-        /** PostMessageRequest headers */
-        headers?: (shared.IHeaders|null);
+    /**
+     * Properties of a PostMessageRequest.
+     * @deprecated Use postMessage.PostMessageRequest.$Properties instead.
+     */
+    interface IPostMessageRequest extends postMessage.PostMessageRequest.$Properties {
     }
 
     /** Represents a PostMessageRequest. */
-    class PostMessageRequest implements IPostMessageRequest {
+    class PostMessageRequest {
 
         /**
          * Constructs a new PostMessageRequest.
          * @param [properties] Properties to set
          */
-        constructor(properties?: postMessage.IPostMessageRequest);
+        constructor(properties?: postMessage.PostMessageRequest.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** PostMessageRequest message. */
-        public message: Uint8Array;
+        message: Uint8Array;
 
         /** PostMessageRequest headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /**
          * Creates a new PostMessageRequest instance using the specified properties.
          * @param [properties] Properties to set
          * @returns PostMessageRequest instance
          */
-        public static create(properties?: postMessage.IPostMessageRequest): postMessage.PostMessageRequest;
+        static create(properties: postMessage.PostMessageRequest.$Shape): postMessage.PostMessageRequest & postMessage.PostMessageRequest.$Shape;
+        static create(properties?: postMessage.PostMessageRequest.$Properties): postMessage.PostMessageRequest;
 
         /**
          * Encodes the specified PostMessageRequest message. Does not implicitly {@link postMessage.PostMessageRequest.verify|verify} messages.
@@ -2189,7 +2579,7 @@ export namespace postMessage {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: postMessage.IPostMessageRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: postMessage.PostMessageRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified PostMessageRequest message, length delimited. Does not implicitly {@link postMessage.PostMessageRequest.verify|verify} messages.
@@ -2197,40 +2587,40 @@ export namespace postMessage {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: postMessage.IPostMessageRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: postMessage.PostMessageRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a PostMessageRequest message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns PostMessageRequest
+         * @returns {postMessage.PostMessageRequest & postMessage.PostMessageRequest.$Shape} PostMessageRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postMessage.PostMessageRequest;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postMessage.PostMessageRequest & postMessage.PostMessageRequest.$Shape;
 
         /**
          * Decodes a PostMessageRequest message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns PostMessageRequest
+         * @returns {postMessage.PostMessageRequest & postMessage.PostMessageRequest.$Shape} PostMessageRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postMessage.PostMessageRequest;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postMessage.PostMessageRequest & postMessage.PostMessageRequest.$Shape;
 
         /**
          * Verifies a PostMessageRequest message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a PostMessageRequest message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns PostMessageRequest
          */
-        public static fromObject(object: { [k: string]: any }): postMessage.PostMessageRequest;
+        static fromObject(object: { [k: string]: any }): postMessage.PostMessageRequest;
 
         /**
          * Creates a plain object from a PostMessageRequest message. Also converts values to other types if specified.
@@ -2238,47 +2628,70 @@ export namespace postMessage {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: postMessage.PostMessageRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: postMessage.PostMessageRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this PostMessageRequest to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for PostMessageRequest
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for PostMessageRequest
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
     }
 
-    /** Properties of a PostMessageResponse. */
-    interface IPostMessageResponse {
+    namespace PostMessageRequest {
 
-        /** PostMessageResponse headers */
-        headers?: (shared.IHeaders|null);
+        /** Properties of a PostMessageRequest. */
+        interface $Properties {
+
+            /** PostMessageRequest message */
+            message?: (Uint8Array|null);
+
+            /** PostMessageRequest headers */
+            headers?: (shared.Headers.$Properties|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a PostMessageRequest. */
+        type $Shape = postMessage.PostMessageRequest.$Properties;
+    }
+
+    /**
+     * Properties of a PostMessageResponse.
+     * @deprecated Use postMessage.PostMessageResponse.$Properties instead.
+     */
+    interface IPostMessageResponse extends postMessage.PostMessageResponse.$Properties {
     }
 
     /** Represents a PostMessageResponse. */
-    class PostMessageResponse implements IPostMessageResponse {
+    class PostMessageResponse {
 
         /**
          * Constructs a new PostMessageResponse.
          * @param [properties] Properties to set
          */
-        constructor(properties?: postMessage.IPostMessageResponse);
+        constructor(properties?: postMessage.PostMessageResponse.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** PostMessageResponse headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /**
          * Creates a new PostMessageResponse instance using the specified properties.
          * @param [properties] Properties to set
          * @returns PostMessageResponse instance
          */
-        public static create(properties?: postMessage.IPostMessageResponse): postMessage.PostMessageResponse;
+        static create(properties: postMessage.PostMessageResponse.$Shape): postMessage.PostMessageResponse & postMessage.PostMessageResponse.$Shape;
+        static create(properties?: postMessage.PostMessageResponse.$Properties): postMessage.PostMessageResponse;
 
         /**
          * Encodes the specified PostMessageResponse message. Does not implicitly {@link postMessage.PostMessageResponse.verify|verify} messages.
@@ -2286,7 +2699,7 @@ export namespace postMessage {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: postMessage.IPostMessageResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: postMessage.PostMessageResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified PostMessageResponse message, length delimited. Does not implicitly {@link postMessage.PostMessageResponse.verify|verify} messages.
@@ -2294,40 +2707,40 @@ export namespace postMessage {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: postMessage.IPostMessageResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: postMessage.PostMessageResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a PostMessageResponse message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns PostMessageResponse
+         * @returns {postMessage.PostMessageResponse & postMessage.PostMessageResponse.$Shape} PostMessageResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postMessage.PostMessageResponse;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postMessage.PostMessageResponse & postMessage.PostMessageResponse.$Shape;
 
         /**
          * Decodes a PostMessageResponse message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns PostMessageResponse
+         * @returns {postMessage.PostMessageResponse & postMessage.PostMessageResponse.$Shape} PostMessageResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postMessage.PostMessageResponse;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postMessage.PostMessageResponse & postMessage.PostMessageResponse.$Shape;
 
         /**
          * Verifies a PostMessageResponse message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a PostMessageResponse message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns PostMessageResponse
          */
-        public static fromObject(object: { [k: string]: any }): postMessage.PostMessageResponse;
+        static fromObject(object: { [k: string]: any }): postMessage.PostMessageResponse;
 
         /**
          * Creates a plain object from a PostMessageResponse message. Also converts values to other types if specified.
@@ -2335,57 +2748,74 @@ export namespace postMessage {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: postMessage.PostMessageResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: postMessage.PostMessageResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this PostMessageResponse to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for PostMessageResponse
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for PostMessageResponse
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
+    }
+
+    namespace PostMessageResponse {
+
+        /** Properties of a PostMessageResponse. */
+        interface $Properties {
+
+            /** PostMessageResponse headers */
+            headers?: (shared.Headers.$Properties|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a PostMessageResponse. */
+        type $Shape = postMessage.PostMessageResponse.$Properties;
     }
 }
 
 /** Namespace postProposal. */
 export namespace postProposal {
 
-    /** Properties of a PostProposalRequest. */
-    interface IPostProposalRequest {
-
-        /** PostProposalRequest proposal */
-        proposal?: (Uint8Array|null);
-
-        /** PostProposalRequest headers */
-        headers?: (shared.IHeaders|null);
+    /**
+     * Properties of a PostProposalRequest.
+     * @deprecated Use postProposal.PostProposalRequest.$Properties instead.
+     */
+    interface IPostProposalRequest extends postProposal.PostProposalRequest.$Properties {
     }
 
     /** Represents a PostProposalRequest. */
-    class PostProposalRequest implements IPostProposalRequest {
+    class PostProposalRequest {
 
         /**
          * Constructs a new PostProposalRequest.
          * @param [properties] Properties to set
          */
-        constructor(properties?: postProposal.IPostProposalRequest);
+        constructor(properties?: postProposal.PostProposalRequest.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** PostProposalRequest proposal. */
-        public proposal: Uint8Array;
+        proposal: Uint8Array;
 
         /** PostProposalRequest headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /**
          * Creates a new PostProposalRequest instance using the specified properties.
          * @param [properties] Properties to set
          * @returns PostProposalRequest instance
          */
-        public static create(properties?: postProposal.IPostProposalRequest): postProposal.PostProposalRequest;
+        static create(properties: postProposal.PostProposalRequest.$Shape): postProposal.PostProposalRequest & postProposal.PostProposalRequest.$Shape;
+        static create(properties?: postProposal.PostProposalRequest.$Properties): postProposal.PostProposalRequest;
 
         /**
          * Encodes the specified PostProposalRequest message. Does not implicitly {@link postProposal.PostProposalRequest.verify|verify} messages.
@@ -2393,7 +2823,7 @@ export namespace postProposal {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: postProposal.IPostProposalRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: postProposal.PostProposalRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified PostProposalRequest message, length delimited. Does not implicitly {@link postProposal.PostProposalRequest.verify|verify} messages.
@@ -2401,40 +2831,40 @@ export namespace postProposal {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: postProposal.IPostProposalRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: postProposal.PostProposalRequest.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a PostProposalRequest message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns PostProposalRequest
+         * @returns {postProposal.PostProposalRequest & postProposal.PostProposalRequest.$Shape} PostProposalRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postProposal.PostProposalRequest;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postProposal.PostProposalRequest & postProposal.PostProposalRequest.$Shape;
 
         /**
          * Decodes a PostProposalRequest message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns PostProposalRequest
+         * @returns {postProposal.PostProposalRequest & postProposal.PostProposalRequest.$Shape} PostProposalRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postProposal.PostProposalRequest;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postProposal.PostProposalRequest & postProposal.PostProposalRequest.$Shape;
 
         /**
          * Verifies a PostProposalRequest message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a PostProposalRequest message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns PostProposalRequest
          */
-        public static fromObject(object: { [k: string]: any }): postProposal.PostProposalRequest;
+        static fromObject(object: { [k: string]: any }): postProposal.PostProposalRequest;
 
         /**
          * Creates a plain object from a PostProposalRequest message. Also converts values to other types if specified.
@@ -2442,47 +2872,70 @@ export namespace postProposal {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: postProposal.PostProposalRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: postProposal.PostProposalRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this PostProposalRequest to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for PostProposalRequest
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for PostProposalRequest
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
     }
 
-    /** Properties of a PostProposalResponse. */
-    interface IPostProposalResponse {
+    namespace PostProposalRequest {
 
-        /** PostProposalResponse headers */
-        headers?: (shared.IHeaders|null);
+        /** Properties of a PostProposalRequest. */
+        interface $Properties {
+
+            /** PostProposalRequest proposal */
+            proposal?: (Uint8Array|null);
+
+            /** PostProposalRequest headers */
+            headers?: (shared.Headers.$Properties|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a PostProposalRequest. */
+        type $Shape = postProposal.PostProposalRequest.$Properties;
+    }
+
+    /**
+     * Properties of a PostProposalResponse.
+     * @deprecated Use postProposal.PostProposalResponse.$Properties instead.
+     */
+    interface IPostProposalResponse extends postProposal.PostProposalResponse.$Properties {
     }
 
     /** Represents a PostProposalResponse. */
-    class PostProposalResponse implements IPostProposalResponse {
+    class PostProposalResponse {
 
         /**
          * Constructs a new PostProposalResponse.
          * @param [properties] Properties to set
          */
-        constructor(properties?: postProposal.IPostProposalResponse);
+        constructor(properties?: postProposal.PostProposalResponse.$Properties);
+
+        /** Unknown fields preserved while decoding */
+        $unknowns?: Uint8Array[];
 
         /** PostProposalResponse headers. */
-        public headers?: (shared.IHeaders|null);
+        headers?: (shared.Headers.$Properties|null);
 
         /**
          * Creates a new PostProposalResponse instance using the specified properties.
          * @param [properties] Properties to set
          * @returns PostProposalResponse instance
          */
-        public static create(properties?: postProposal.IPostProposalResponse): postProposal.PostProposalResponse;
+        static create(properties: postProposal.PostProposalResponse.$Shape): postProposal.PostProposalResponse & postProposal.PostProposalResponse.$Shape;
+        static create(properties?: postProposal.PostProposalResponse.$Properties): postProposal.PostProposalResponse;
 
         /**
          * Encodes the specified PostProposalResponse message. Does not implicitly {@link postProposal.PostProposalResponse.verify|verify} messages.
@@ -2490,7 +2943,7 @@ export namespace postProposal {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: postProposal.IPostProposalResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encode(message: postProposal.PostProposalResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Encodes the specified PostProposalResponse message, length delimited. Does not implicitly {@link postProposal.PostProposalResponse.verify|verify} messages.
@@ -2498,40 +2951,40 @@ export namespace postProposal {
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: postProposal.IPostProposalResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        static encodeDelimited(message: postProposal.PostProposalResponse.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a PostProposalResponse message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns PostProposalResponse
+         * @returns {postProposal.PostProposalResponse & postProposal.PostProposalResponse.$Shape} PostProposalResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postProposal.PostProposalResponse;
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postProposal.PostProposalResponse & postProposal.PostProposalResponse.$Shape;
 
         /**
          * Decodes a PostProposalResponse message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns PostProposalResponse
+         * @returns {postProposal.PostProposalResponse & postProposal.PostProposalResponse.$Shape} PostProposalResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postProposal.PostProposalResponse;
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postProposal.PostProposalResponse & postProposal.PostProposalResponse.$Shape;
 
         /**
          * Verifies a PostProposalResponse message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
-        public static verify(message: { [k: string]: any }): (string|null);
+        static verify(message: { [k: string]: any }): (string|null);
 
         /**
          * Creates a PostProposalResponse message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
          * @returns PostProposalResponse
          */
-        public static fromObject(object: { [k: string]: any }): postProposal.PostProposalResponse;
+        static fromObject(object: { [k: string]: any }): postProposal.PostProposalResponse;
 
         /**
          * Creates a plain object from a PostProposalResponse message. Also converts values to other types if specified.
@@ -2539,19 +2992,35 @@ export namespace postProposal {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: postProposal.PostProposalResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        static toObject(message: postProposal.PostProposalResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this PostProposalResponse to JSON.
          * @returns JSON object
          */
-        public toJSON(): { [k: string]: any };
+        toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for PostProposalResponse
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
+         * Gets the type url for PostProposalResponse
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
          */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
+        static getTypeUrl(prefix?: string): string;
+    }
+
+    namespace PostProposalResponse {
+
+        /** Properties of a PostProposalResponse. */
+        interface $Properties {
+
+            /** PostProposalResponse headers */
+            headers?: (shared.Headers.$Properties|null);
+
+            /** Unknown fields preserved while decoding */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a PostProposalResponse. */
+        type $Shape = postProposal.PostProposalResponse.$Properties;
     }
 }

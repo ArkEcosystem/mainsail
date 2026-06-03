@@ -173,6 +173,9 @@ export const Identifiers = {
 			Factory: Symbol("Evm<WorkerSubprocess.Factory>"),
 		},
 	},
+	Forger: {
+		Block: Symbol("Forger<Block>"),
+	},
 	P2P: {
 		ApiNode: {
 			Discoverer: Symbol("P2P<ApiNode.Discoverer>"),
@@ -277,10 +280,6 @@ export const Identifiers = {
 	},
 	Transaction: {
 		Handler: Symbol("Transaction<Handler>"),
-		Validator: {
-			Factory: Symbol("Transaction<Validator.Factory>"),
-			Instance: Symbol("Transaction<Validator.Instance>"),
-		},
 	},
 	TransactionPool: {
 		API: {
@@ -297,6 +296,7 @@ export const Identifiers = {
 		Processor: Symbol("TransactionPool<Processor>"),
 		ProcessorExtension: Symbol("TransactionPool<ProcessorExtension>"),
 		Query: Symbol("TransactionPool<Query>"),
+		Selector: Symbol("TransactionPool<Selector>"),
 		SenderMempool: {
 			Factory: Symbol("TransactionPool<SenderMempool.Factory>"),
 		},

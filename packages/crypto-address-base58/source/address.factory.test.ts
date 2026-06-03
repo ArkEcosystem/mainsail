@@ -29,20 +29,6 @@ describe<{ app: Application; factory: AddressFactory }>("AddressFactory", ({ ass
 		assert.is(await factory.fromMnemonic(mnemonic), "DLsMhiUzAVEXBXDTY1NGNZteWz8SDvphfa");
 	});
 
-	it("#fromMultiSignatureAsset - should derive an address from multi signature address", async ({ factory }) => {
-		assert.is(
-			await factory.fromMultiSignatureAsset({
-				min: 3,
-				publicKeys: [
-					"0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3",
-					"03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a",
-					"03d7dfe44e771039334f4712fb95ad355254f674c8f5d286503199157b7bf7c357",
-				],
-			}),
-			"D8UtPGvjKzjn1fN5GfESoTrTrkQv6XjALS",
-		);
-	});
-
 	it("#fromPublicKey - should derive an address from a public key", async ({ factory }) => {
 		assert.is(
 			await factory.fromPublicKey("034151a3ec46b5670a682b0a63394f863587d1bc97483b1b6c70eb58e7f0aed192"),

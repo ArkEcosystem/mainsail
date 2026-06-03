@@ -1,15 +1,13 @@
 import type { Contracts } from "@mainsail/contracts";
 import type { FuncKeywordDefinition } from "ajv";
 
-import { BigNumber } from "@mainsail/utils";
-
 import { parseBlockNumber } from "./parse-block-number.js";
 
 export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
 ): {
 	maxBytes: FuncKeywordDefinition;
-	bignumber: FuncKeywordDefinition;
+	bigInt: FuncKeywordDefinition;
 	buffer: FuncKeywordDefinition;
 	isValidatorIndex: FuncKeywordDefinition;
 	limitToRoundValidators: FuncKeywordDefinition;
@@ -25,27 +23,30 @@ export const makeKeywords = (
 		type: "string",
 	};
 
-	const bignumber: FuncKeywordDefinition = {
+	const bigInt: FuncKeywordDefinition = {
 		compile: (schema) => (data) => {
-			const minimum = schema.minimum !== undefined ? schema.minimum : 0;
-			const maximum = schema.maximum !== undefined ? schema.maximum : BigNumber.UINT256_MAX;
+			const minimum = schema.minimum !== undefined ? schema.minimum : 0n;
+			const maximum =
+				schema.maximum !== undefined
+					? schema.maximum
+					: BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
 
-			if (!(data instanceof BigNumber)) {
+			if (typeof data !== "bigint") {
 				return false;
 			}
 
-			if (data.isLessThan(minimum)) {
+			if (data < minimum) {
 				return false;
 			}
 
-			if (data.isGreaterThan(maximum)) {
+			if (data > maximum) {
 				return false;
 			}
 
 			return true;
 		},
 		errors: false,
-		keyword: "bignumber",
+		keyword: "bigInt",
 		metaSchema: {
 			properties: {
 				maximum: { type: "integer" },
@@ -121,5 +122,5 @@ export const makeKeywords = (
 		},
 	};
 
-	return { bignumber, buffer, isValidatorIndex, limitToRoundValidators, maxBytes };
+	return { bigInt, buffer, isValidatorIndex, limitToRoundValidators, maxBytes };
 };

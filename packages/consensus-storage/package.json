@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/consensus-storage",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "Consensus storage for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -25,7 +25,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"lmdb": "3.5.2"
+		"lmdb": "3.5.4"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",

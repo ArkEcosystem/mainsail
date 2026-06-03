@@ -27,6 +27,7 @@ type Context = {
 	roundState: Contracts.Consensus.RoundState;
 	roundStateRepository: any;
 	peerStatistic: any;
+	forger: any;
 };
 
 describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each }) => {
@@ -135,6 +136,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			newRound: () => {},
 		};
 
+		context.forger = {
+			forgeBlock: () => {},
+		};
+
 		context.app = new Application();
 
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
@@ -152,6 +157,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.app.bind(Identifiers.Consensus.RoundStateRepository).toConstantValue(context.roundStateRepository);
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue(context.peerStatistic);
+		context.app.bind(Identifiers.Forger.Block).toConstantValue(context.forger);
 
 		context.consensus = context.app.resolve(Consensus);
 	});
@@ -240,15 +246,15 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		validatorSet,
 		eventDispatcher,
 		scheduler,
+		forger,
 	}) => {
 		const validator = {
-			prepareBlock: () => {},
 			propose: () => {},
 		};
 
 		const spyScheduleClear = spy(scheduler, "clear");
 		const spyScheduleTimeoutBlockPrepare = spy(scheduler, "scheduleTimeoutBlockPrepare");
-		const spyValidatorPrepareBlock = stub(validator, "prepareBlock").resolvedValue(block);
+		const spyForgerForgeBlock = stub(forger, "forgeBlock").resolvedValue(block);
 		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
 
 		const spyLoggerInfo = spy(logger, "info");
@@ -269,8 +275,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyGetRoundState.calledWith(1, 0);
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(proposer.blsPublicKey);
-		spyValidatorPrepareBlock.calledOnce();
-		spyValidatorPrepareBlock.calledWith(proposer.address, 0);
+		spyForgerForgeBlock.calledOnce();
+		spyForgerForgeBlock.calledWith(proposer.address, 0);
 		getValidatorIndexByWalletAddress.calledOnce();
 		getValidatorIndexByWalletAddress.calledWith(proposer.address);
 		spyValidatorPropose.calledOnce();
@@ -299,16 +305,16 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		validatorSet,
 		eventDispatcher,
 		scheduler,
+		forger,
 	}) => {
 		const validator = {
-			prepareBlock: () => {},
 			propose: () => {},
 		};
 
 		const spyScheduleClear = spy(scheduler, "clear");
 		const spyScheduleTimeoutBlockPrepare = spy(scheduler, "scheduleTimeoutBlockPrepare");
 
-		const spyValidatorPrepareBlock = stub(validator, "prepareBlock").resolvedValue(block);
+		const spyForgerForgeBlock = stub(forger, "forgeBlock").resolvedValue(block);
 		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
 
 		const spyLoggerInfo = spy(logger, "info");
@@ -339,7 +345,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyGetRoundState.calledWith(1, 1);
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(proposer.blsPublicKey);
-		spyValidatorPrepareBlock.neverCalled();
+		spyForgerForgeBlock.neverCalled();
 		spyRoundStateAggregatePrevotes.calledOnce();
 		spyRoundStateGetBlock.calledOnce();
 		getValidatorIndexByWalletAddress.calledOnce();

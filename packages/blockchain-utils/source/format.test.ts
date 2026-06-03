@@ -1,5 +1,4 @@
 import { Identifiers } from "@mainsail/constants";
-import { BigNumber } from "@mainsail/utils";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
@@ -11,7 +10,7 @@ import { Contracts } from "@mainsail/contracts";
 describe<{
 	app: Application;
 	configuration: Contracts.Crypto.Configuration;
-}>("formatCurrency", ({ assert, beforeEach, it }) => {
+}>("formatCurrency", ({ assert, beforeEach, it, each }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
 		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
@@ -23,9 +22,20 @@ describe<{
 	});
 
 	it("should format currency", ({ configuration }) => {
-		assert.equal(formatCurrency(configuration, BigNumber.ONE), "0.000000000000000001 TѦ");
-		assert.equal(formatCurrency(configuration, BigNumber.ZERO), "0 TѦ");
-		assert.equal(formatCurrency(configuration, BigNumber.make(1e18)), "1 TѦ");
-		assert.equal(formatCurrency(configuration, BigNumber.make(1e18).times(100)), "100 TѦ");
+		assert.equal(formatCurrency(configuration, 1n), "0.000000000000000001 TѦ");
+		assert.equal(formatCurrency(configuration, 0n), "0 TѦ");
+		assert.equal(formatCurrency(configuration, BigInt(1e18)), "1 TѦ");
+		assert.equal(formatCurrency(configuration, BigInt(1e18) * 100n), "100 TѦ");
 	});
+
+	each(
+		"should throw if decimals are invalid",
+		({ dataset: data, context: { configuration } }) => {
+			const milestones = configuration.getMilestones();
+			milestones[0].satoshi.decimals = data;
+			configuration.set("milestones", milestones);
+			assert.throws(() => formatCurrency(configuration, 1n), "Invalid decimals");
+		},
+		[21, 100],
+	);
 });

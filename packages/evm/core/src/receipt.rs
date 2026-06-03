@@ -21,7 +21,7 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
             gas, output, logs, ..
         } => match output {
             Output::Call(output) => TxReceipt {
-                gas_used: gas.used(),
+                gas_used: gas.tx_gas_used(),
                 gas_refunded: gas.inner_refunded(),
                 cumulative_gas_used,
                 success: 1,
@@ -30,7 +30,7 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
                 output: Some(output),
             },
             Output::Create(output, address) => TxReceipt {
-                gas_used: gas.used(),
+                gas_used: gas.tx_gas_used(),
                 gas_refunded: gas.inner_refunded(),
                 cumulative_gas_used,
                 success: 1,
@@ -40,7 +40,7 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
             },
         },
         ExecutionResult::Revert { gas, output, .. } => TxReceipt {
-            gas_used: gas.used(),
+            gas_used: gas.tx_gas_used(),
             success: 0,
             cumulative_gas_used,
             gas_refunded: 0,
@@ -49,7 +49,7 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
             output: Some(output),
         },
         ExecutionResult::Halt { gas, .. } => TxReceipt {
-            gas_used: gas.used(),
+            gas_used: gas.tx_gas_used(),
             success: 0,
             cumulative_gas_used,
             gas_refunded: 0,
@@ -71,7 +71,7 @@ mod tests {
     fn test_map_execution_result_call() {
         let result = ExecutionResult::Success {
             reason: SuccessReason::Stop,
-            gas: ResultGas::new(30000, 25000, 2100, 0, 0),
+            gas: ResultGas::new_with_state_gas(25000, 2100, 0, 0),
             logs: vec![],
             output: Output::Call(alloy_primitives::Bytes(Bytes::new())),
         };
@@ -91,7 +91,7 @@ mod tests {
     fn test_map_execution_result_create() {
         let result = ExecutionResult::Success {
             reason: SuccessReason::Stop,
-            gas: ResultGas::new(1_000_000, 355_000, 0, 0, 0),
+            gas: ResultGas::new_with_state_gas(355_000, 0, 0, 0),
             logs: vec![],
             output: Output::Create(
                 alloy_primitives::Bytes(Bytes::new()),
@@ -116,7 +116,7 @@ mod tests {
     #[test]
     fn test_map_execution_result_revert() {
         let result = ExecutionResult::Revert {
-            gas: ResultGas::new(30000, 30000, 0, 0, 0),
+            gas: ResultGas::new_with_state_gas(30000, 0, 0, 0),
             logs: vec![],
             output: alloy_primitives::Bytes(Bytes::new()),
         };
@@ -136,7 +136,7 @@ mod tests {
     fn test_map_execution_result_halt() {
         let result = ExecutionResult::Halt {
             reason: HaltReason::StackOverflow,
-            gas: ResultGas::new(30000, 30000, 0, 0, 0),
+            gas: ResultGas::new_with_state_gas(30000, 0, 0, 0),
             logs: vec![],
         };
 

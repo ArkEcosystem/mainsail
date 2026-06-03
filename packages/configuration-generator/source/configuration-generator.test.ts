@@ -1,5 +1,4 @@
 import { Application } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
 import envPaths from "env-paths";
 import fs from "fs-extra/esm";
 import { join } from "path";
@@ -53,10 +52,10 @@ describe<{
 						payloadHash: match.string,
 						payloadLength: match.number,
 						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-						reward: BigNumber.ZERO,
+						reward: 0n,
 						timestamp: match.number,
-						totalAmount: BigNumber.make("12500000000000000"),
-						totalFee: BigNumber.ZERO,
+						totalAmount: 12500000000000000n,
+						totalFee: 0n,
 						transactions: match.array,
 						version: 1,
 					},
@@ -189,10 +188,10 @@ describe<{
 						payloadHash: match.string,
 						payloadLength: match.number,
 						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-						reward: BigNumber.ZERO,
+						reward: 0n,
 						timestamp: match.number,
-						totalAmount: BigNumber.make("12499999999999969"),
-						totalFee: BigNumber.ZERO,
+						totalAmount: 12499999999999969n,
+						totalFee: 0n,
 						transactions: match.array,
 						version: 1,
 					},

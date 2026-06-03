@@ -16,10 +16,10 @@ import {
 	serializedPrevoteNoBlock,
 	serializedPrecommitNoBlock,
 	precommitDataNoBlock,
+	signatureContext,
 	validatorMnemonic,
 } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
-import { toData } from "../test/helpers/utilities.js";
 import { Factory } from "./factory";
 
 describe<{
@@ -71,13 +71,13 @@ describe<{
 	});
 
 	it("#makeMessage - should correctly make signed prevote", async ({ factory, identity }) => {
-		const message = await factory.makeMessage(prevoteData, identity.keys);
+		const message = await factory.makeMessage(prevoteData, identity.keys, signatureContext);
 
 		assert.equal(message.signature, prevoteData.signature);
 	});
 
 	it("#makeMessage - should correctly make signed precommit", async ({ factory, identity }) => {
-		const message = await factory.makeMessage(precommitData, identity.keys);
+		const message = await factory.makeMessage(precommitData, identity.keys, signatureContext);
 
 		assert.equal(message.signature, precommitData.signature);
 	});
@@ -92,12 +92,10 @@ describe<{
 				validatorIndex: 0,
 			},
 			identity.keys,
+			signatureContext,
 		);
 
-		assert.equal(
-			message.signature,
-			"927628d67c385fe216aa800def9cce0c09f5f9fbf836583d7c07ab6a98e1b5681802c92f81ad54984236a07fa389dbab1519f3c91ad39a505a61c3624a88c65da71fe721d7af0ed452516771b94d027be713dba68e14fa2c9680e35b63f0e038",
-		);
+		assert.equal(message.signature, prevoteDataNoBlock.signature);
 	});
 
 	it("#makeMessage - should correctly make signed precommit no block", async ({ factory, identity }) => {
@@ -110,12 +108,10 @@ describe<{
 				validatorIndex: 0,
 			},
 			identity.keys,
+			signatureContext,
 		);
 
-		assert.equal(
-			message.signature,
-			"904c8055242bd7736a1cf7ce20c8fedeee5f2f8fe3f6cab6a166c36c1be0f616c2b7a333912becfa3ecb799c8cd420a012bf41018f5c52f67a2858a6d5bd016e8ef6f56a84d8a734ba6ce5f9a5260201fd9d73ce8688ff0019df2c07a1c33c4d",
-		);
+		assert.equal(message.signature, precommitDataNoBlock.signature);
 	});
 
 	it("#makeMessage - should throw if schema is invalid", async ({ factory, identity }) => {
@@ -124,31 +120,34 @@ describe<{
 			blockNumber: 0, // invalid block number
 		};
 
-		await assert.rejects(() => factory.makeMessage(invalidPrecommitData, identity.keys), MessageSchemaError);
+		await assert.rejects(
+			() => factory.makeMessage(invalidPrecommitData, identity.keys, signatureContext),
+			MessageSchemaError,
+		);
 	});
 
 	it("#makeMessageFromBytes - should be ok for prevote", async ({ factory }) => {
 		const prevote = await factory.makeMessageFromBytes(Buffer.from(serializedPrevote, "hex"));
 
-		assert.equal(toData(prevote), prevoteData);
+		assert.equal(prevote.toData(), prevoteData);
 	});
 
 	it("#makeMessageFromBytes - should be ok for precommit", async ({ factory }) => {
 		const precommit = await factory.makeMessageFromBytes(Buffer.from(serializedPrecommit, "hex"));
 
-		assert.equal(toData(precommit), precommitData);
+		assert.equal(precommit.toData(), precommitData);
 	});
 
 	it("#makeMessageFromBytes - should be ok for prevote with no block", async ({ factory }) => {
 		const prevote = await factory.makeMessageFromBytes(Buffer.from(serializedPrevoteNoBlock, "hex"));
 
-		assert.equal(toData(prevote), prevoteDataNoBlock);
+		assert.equal(prevote.toData(), prevoteDataNoBlock);
 	});
 
 	it("#makeMessageFromBytes - should be ok for precommit with no block", async ({ factory }) => {
 		const precommit = await factory.makeMessageFromBytes(Buffer.from(serializedPrecommitNoBlock, "hex"));
 
-		assert.equal(toData(precommit), precommitDataNoBlock);
+		assert.equal(precommit.toData(), precommitDataNoBlock);
 	});
 
 	it("#makeMessageFromBytes - should throw if extra bytes are present", async ({ factory }) => {

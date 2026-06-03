@@ -106,11 +106,14 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 	}
 
 	async #hasValidSignature(message: Contracts.Crypto.Message): Promise<boolean> {
-		const worker = await this.workerPool.getWorker();
+		const worker = this.workerPool.getWorker();
 		return worker.consensusSignature(
 			"verify",
 			Buffer.from(message.signature, "hex"),
-			await this.serializer.serializeMessageForSignature(message),
+			await this.serializer.serializeMessageForSignature(message.toData(), {
+				genesisBlockHash: this.stateStore.getGenesisCommit().block.hash,
+				previousBlockHash: this.stateStore.getLastBlock().hash,
+			}),
 			Buffer.from(this.validatorSet.getValidator(message.validatorIndex).blsPublicKey, "hex"),
 		);
 	}

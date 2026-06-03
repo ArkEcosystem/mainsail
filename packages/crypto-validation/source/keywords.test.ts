@@ -1,5 +1,4 @@
 import { Identifiers } from "@mainsail/constants";
-import { BigNumber } from "@mainsail/utils";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
 import type { Contracts } from "@mainsail/contracts";
@@ -61,6 +60,68 @@ describe<{
 		assert.true(context.validator.validate("test", "1234").error!.includes("data must be >= 0"));
 	});
 
+	it("keyword bigInt should be ok if only one possible value is allowed", (context) => {
+		const schema = {
+			$id: "test",
+			bigInt: { maximum: 100, minimum: 100 },
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined(context.validator.validate("test", 100n).error);
+
+		assert.defined(context.validator.validate("test", 100).error);
+		assert.defined(context.validator.validate("test", "100").error);
+		assert.defined(context.validator.validate("test", 99n).error);
+		assert.defined(context.validator.validate("test", 101n).error);
+		assert.defined(context.validator.validate("test", null).error);
+		assert.defined(context.validator.validate("test", undefined).error);
+		assert.defined(context.validator.validate("test", {}).error);
+	});
+
+	it("keyword bigInt should be ok if above or equal minimum", (context) => {
+		const schema = {
+			$id: "test",
+			bigInt: { minimum: 20 },
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined(context.validator.validate("test", 25n).error);
+		assert.undefined(context.validator.validate("test", 20n).error);
+
+		assert.defined(context.validator.validate("test", 19n).error);
+	});
+
+	it("keyword bigInt should be ok if below or equal maximum", (context) => {
+		const schema = {
+			$id: "test",
+			bigInt: { maximum: 20 },
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined(context.validator.validate("test", 19n).error);
+		assert.undefined(context.validator.validate("test", 20n).error);
+		assert.undefined(context.validator.validate("test", 0n).error);
+
+		assert.defined(context.validator.validate("test", -1n).error);
+		assert.defined(context.validator.validate("test", 21n).error);
+	});
+
+	it("keyword bigInt should not be ok for values bigger than the absolute maximum", (context) => {
+		const schema = {
+			$id: "test",
+			bigInt: {},
+		};
+		context.validator.addSchema(schema);
+
+		const UINT256_MAX = (1n << 256n) - 1n;
+
+		assert.undefined(context.validator.validate("test", BigInt(Number.MAX_SAFE_INTEGER)).error);
+		assert.undefined(context.validator.validate("test", BigInt("9223372036854775808")).error);
+		assert.undefined(context.validator.validate("test", BigInt(UINT256_MAX)).error);
+
+		assert.defined(context.validator.validate("test", BigInt(UINT256_MAX) + 1n).error);
+	});
+
 	it("keyword buffer should be ok", (context) => {
 		const schema = {
 			$id: "test",
@@ -86,108 +147,6 @@ describe<{
 		assert.defined(context.validator.validate("test").error);
 		assert.defined(context.validator.validate("test", null).error);
 		assert.defined(context.validator.validate("test", {}).error);
-	});
-
-	it("keyword bignumber should be ok if only one possible value is allowed", (context) => {
-		const schema = {
-			$id: "test",
-			bignumber: { maximum: 100, minimum: 100 },
-		};
-		context.validator.addSchema(schema);
-
-		assert.undefined(context.validator.validate("test", BigNumber.make(100)).error);
-
-		assert.defined(context.validator.validate("test", 100).error);
-		assert.defined(context.validator.validate("test", "100").error);
-		assert.defined(context.validator.validate("test", BigNumber.make(99)).error);
-		assert.defined(context.validator.validate("test", BigNumber.make(101)).error);
-		assert.defined(context.validator.validate("test", null).error);
-		assert.defined(context.validator.validate("test", undefined).error);
-		assert.defined(context.validator.validate("test", {}).error);
-	});
-
-	it("keyword bignumber should be ok if above or equal minimum", (context) => {
-		const schema = {
-			$id: "test",
-			bignumber: { minimum: 20 },
-		};
-		context.validator.addSchema(schema);
-
-		assert.undefined(context.validator.validate("test", BigNumber.make(25)).error);
-		assert.undefined(context.validator.validate("test", BigNumber.make(20)).error);
-
-		assert.defined(context.validator.validate("test", BigNumber.make(19)).error);
-	});
-
-	it("keyword bignumber should be ok if below or equal maximum", (context) => {
-		const schema = {
-			$id: "test",
-			bignumber: { maximum: 20 },
-		};
-		context.validator.addSchema(schema);
-
-		assert.undefined(context.validator.validate("test", BigNumber.make(19)).error);
-		assert.undefined(context.validator.validate("test", BigNumber.make(20)).error);
-		assert.undefined(context.validator.validate("test", BigNumber.make(0)).error);
-
-		assert.defined(context.validator.validate("test", BigNumber.make(-1)).error);
-		assert.defined(context.validator.validate("test", BigNumber.make(21)).error);
-	});
-
-	it("keyword bignumber should not be ok for values bigger than the absolute maximum", (context) => {
-		const schema = {
-			$id: "test",
-			bignumber: {},
-		};
-		context.validator.addSchema(schema);
-
-		assert.undefined(context.validator.validate("test", BigNumber.make(Number.MAX_SAFE_INTEGER)).error);
-		assert.undefined(context.validator.validate("test", BigNumber.make("9223372036854775808")).error);
-		assert.undefined(context.validator.validate("test", BigNumber.UINT256_MAX).error);
-
-		assert.defined(context.validator.validate("test", BigNumber.UINT256_MAX.plus(1)).error);
-	});
-
-	it("keyword bignumber should not be ok for number and string", (context) => {
-		const schema = {
-			$id: "test",
-			bignumber: { maximum: 2000, minimum: 100, type: "number" },
-		};
-		context.validator.addSchema(schema);
-
-		assert.defined(context.validator.validate("test", 120).error);
-		assert.defined(context.validator.validate("test", "120").error);
-	});
-
-	it("keyword bignumber should not accept garbage", (context) => {
-		const schema = {
-			$id: "test",
-			bignumber: {},
-		};
-		context.validator.addSchema(schema);
-
-		assert.defined(context.validator.validate("test").error);
-		assert.defined(context.validator.validate("test", {}).error);
-		assert.defined(context.validator.validate("test", /d+/).error);
-		assert.defined(context.validator.validate("test", "").error);
-		assert.defined(context.validator.validate("test", "\u0000").error);
-	});
-
-	it("keyword bignumber should not modify parent", (context) => {
-		const schema = {
-			$id: "test",
-			properties: {
-				id: { type: "string" },
-				amount: { bignumber: { minimum: 1 } },
-			},
-			type: "object",
-		};
-		context.validator.addSchema(schema);
-
-		const object: any = { id: "test", amount: BigNumber.make("12") };
-		assert.true(object.amount instanceof BigNumber);
-		assert.undefined(context.validator.validate("test", object).error);
-		assert.true(object.amount instanceof BigNumber);
 	});
 
 	it("keyword limitToRoundValidators - should be ok", (context) => {

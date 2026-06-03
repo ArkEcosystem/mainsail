@@ -18,6 +18,7 @@ use mainsail_evm_core::{
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
     logs_bloom,
+    precompiles::MainsailPrecompiles,
     receipt::{TxReceipt, map_execution_result},
     state_changes::AccountUpdate,
     state_commit, state_root,
@@ -196,16 +197,19 @@ impl EvmInner {
         &mut self,
         genesis_ctx: GenesisContext,
     ) -> std::result::Result<(), EVMError<String>> {
-        self.persistent_db.set_genesis_info(GenesisInfo {
+        match self.persistent_db.set_genesis_info(GenesisInfo {
             account: genesis_ctx.account,
             deployer_account: genesis_ctx.deployer_account,
             validator_contract: genesis_ctx.validator_contract,
             username_contract: genesis_ctx.username_contract,
             initial_block_number: genesis_ctx.initial_block_number,
             initial_supply: genesis_ctx.initial_supply,
-        });
-
-        Ok(())
+        }) {
+            Ok(_) => Ok(()),
+            Err(err) => Err(EVMError::Database(
+                format!("set_genesis_info failed: {}", err).into(),
+            )),
+        }
     }
 
     pub fn calculate_round_validators(
@@ -648,19 +652,22 @@ impl EvmInner {
 
                 tx_env.data = ctx.data;
             })
-            .build_mainnet();
+            .build_mainnet()
+            .with_precompiles(MainsailPrecompiles::new(ctx.spec_id));
 
         let ctx = evm.ctx_ref();
         let result = revm::handler::validation::validate_initial_tx_gas(
             ctx.tx(),
             (*ctx.cfg().spec()).into(),
             false,
+            false,
+            0,
         );
 
         Ok(match result {
             Ok(result) => PreverifyTxResult {
                 success: true,
-                initial_gas_used: result.initial_gas,
+                initial_gas_used: result.initial_total_gas(),
                 ..Default::default()
             },
             Err(err) => PreverifyTxResult {
@@ -786,7 +793,13 @@ impl EvmInner {
             .get_mut(&commit_key)
             .expect("pending commit exists");
 
-        let result = state_root::calculate(&mut self.persistent_db, pending_commit, current_hash);
+        let genesis_info = self
+            .persistent_db
+            .genesis_info
+            .as_ref()
+            .expect("genesis info exists");
+
+        let result = state_root::calculate(&genesis_info, pending_commit, current_hash);
 
         match result {
             Ok(result) => Ok(result.encode_hex()),
@@ -1056,7 +1069,8 @@ impl EvmInner {
 
                 tx_env.data = ctx.data;
             })
-            .build_mainnet();
+            .build_mainnet()
+            .with_precompiles(MainsailPrecompiles::new(ctx.spec_id));
 
         let result = evm.replay();
 
@@ -1077,7 +1091,7 @@ impl EvmInner {
                         pending_commit.cache = std::mem::take(&mut state_db.cache);
 
                         if let Some(tx_hash) = ctx.tx_hash {
-                            pending_commit.cumulative_gas_used += result.gas_used();
+                            pending_commit.cumulative_gas_used += result.tx_gas_used();
                             pending_commit.results.insert(
                                 tx_hash,
                                 (result.clone(), pending_commit.cumulative_gas_used),

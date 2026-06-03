@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-worker",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "Crypto worker based on node child processes for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -23,16 +23,15 @@
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"joi": "18.1.2"
+		"joi": "18.2.1"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
-		"@types/chance": "1.1.7",
+		"@types/chance": "1.1.8",
 		"@types/fs-extra": "11.0.4",
-		"@types/lodash.clonedeep": "4.5.9",
 		"@types/tmp": "0.2.6",
+		"esmock": "2.7.5",
 		"uvu": "0.5.6"
 	},
 	"engines": {

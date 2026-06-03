@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 
@@ -147,7 +148,8 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 				});
 
 				this.emit("jobDone", job, data);
-			} catch (error) {
+			} catch (rawError) {
+				const error = ensureError(rawError);
 				await this.events.dispatch(Events.QueueEvent.Failed, {
 					driver: "memory",
 					error: error,

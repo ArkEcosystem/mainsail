@@ -33,7 +33,7 @@ export class WalletFilter {
 				case "balance": {
 					return handleOrCriteria(criteria.balance, async (c) =>
 						// @ts-ignore
-						handleComparisonCriteria("nonce", c),
+						handleComparisonCriteria("balance", c),
 					);
 				}
 				case "nonce": {
@@ -106,7 +106,7 @@ export class WalletFilter {
 		walletAttributeRepository.set("publicKey", Contracts.State.AttributeType.String);
 		walletAttributeRepository.set("username", Contracts.State.AttributeType.String);
 		walletAttributeRepository.set("validatorPublicKey", Contracts.State.AttributeType.String);
-		walletAttributeRepository.set("validatorRank", Contracts.State.AttributeType.Number);
+		walletAttributeRepository.set("validatorRank", Contracts.State.AttributeType.Number); 
 		walletAttributeRepository.set("validatorVoteBalance", Contracts.State.AttributeType.BigNumber);
 		walletAttributeRepository.set("validatorLastBlock", Contracts.State.AttributeType.Object);
 		walletAttributeRepository.set("validatorForgedFees", Contracts.State.AttributeType.BigNumber);

@@ -2,11 +2,11 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { assert, BigNumber, Lock } from "@mainsail/utils";
+import { assert, ensureError, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 const FAILED_PROCESSOR_RESULT: Contracts.Processor.BlockProcessorResult = {
-	feeUsed: BigNumber.ZERO,
+	feeUsed: 0n,
 	gasUsed: 0,
 	receipts: new Map(),
 	success: false,
@@ -49,6 +49,9 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
+
+	@inject(Identifiers.Forger.Block)
+	private readonly blockForger!: Contracts.Forger.BlockForger;
 
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
@@ -140,7 +143,8 @@ export class Consensus implements Contracts.Consensus.Service {
 			for (let index = 0; index < this.#round; index++) {
 				await this.handle(this.roundStateRepository.getRoundState(this.#blockNumber, index));
 			}
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			await this.app.terminate("Consensus bootstrap error", error);
 		}
 	}
@@ -267,7 +271,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.logger.info(`Received proposal ${this.#getBlockString(proposal.blockHeader)}`, "consensus");
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
-		await this.prevote(roundState.getProcessorResult() ? proposal.blockHeader.hash : undefined);
+		await this.prevote(roundState.getProcessorResult().success ? proposal.blockHeader.hash : undefined);
 	}
 
 	protected async onProposalLocked(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -291,7 +295,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		const lockedRound = this.getLockedRound();
 
-		if ((!lockedRound || lockedRound <= proposal.validRound) && roundState.getProcessorResult()) {
+		if ((!lockedRound || lockedRound <= proposal.validRound) && roundState.getProcessorResult().success) {
 			await this.prevote(proposal.blockHeader.hash);
 		} else {
 			await this.prevote();
@@ -403,7 +407,8 @@ export class Consensus implements Contracts.Consensus.Service {
 		await this.commitLock.runExclusive(async () => {
 			try {
 				await this.processor.commit(processState);
-			} catch (error) {
+			} catch (rawError) {
+				const error = ensureError(rawError);
 				await this.app.terminate("Failed to commit block", error);
 			}
 
@@ -524,7 +529,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			);
 		}
 
-		this.#proposedBlock = this.#proposedBlock = await registeredProposer.prepareBlock(
+		this.#proposedBlock = this.#proposedBlock = await this.blockForger.forgeBlock(
 			roundState.proposer.address,
 			this.#round,
 			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
@@ -631,7 +636,8 @@ export class Consensus implements Contracts.Consensus.Service {
 				}
 
 				roundState.setProcessorResult(await this.processor.process(roundState));
-			} catch (error) {
+			} catch (rawError) {
+				const error = ensureError(rawError);
 				this.logger.error(
 					`Failed to process proposal ${this.#getHeightRoundString()}: ${error.message}`,
 					"consensus",

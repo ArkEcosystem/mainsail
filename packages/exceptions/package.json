@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/exceptions",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "Exceptions for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -21,8 +21,7 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
-		"@mainsail/constants": "workspace:*",
-		"@mainsail/utils": "workspace:*"
+		"@mainsail/constants": "workspace:*"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",

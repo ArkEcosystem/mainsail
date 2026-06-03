@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { assert, BigNumber } from "@mainsail/utils";
+import { assert } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 import type { FactoryBuilder } from "../factory-builder.js";
@@ -32,9 +32,8 @@ export const registerBlockFactory = async (
 	factory.set("Block", async ({ options }: { options: Options }): Promise<Contracts.Crypto.Commit> => {
 		const previousBlock: Contracts.Crypto.BlockData = options.getPreviousBlock
 			? options.getPreviousBlock()
-			: await app
-					.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-					.get("genesisBlock.block");
+			: (app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).getGenesisCommit()
+					.block as unknown as Contracts.Crypto.BlockData);
 
 		const { reward } = app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
@@ -43,7 +42,7 @@ export const registerBlockFactory = async (
 		const transactions: Contracts.Crypto.Transaction[] = options.transactions || [];
 		if (options.transactionsCount) {
 			const signer = new Signer(
-				app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).all()!,
+				app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).all(),
 				options.nonce ?? "0",
 			);
 
@@ -63,8 +62,8 @@ export const registerBlockFactory = async (
 			}
 		}
 
-		const totals: { gasPrice: BigNumber; gasUsed: number } = {
-			gasPrice: BigNumber.ZERO,
+		const totals: { gasPrice: bigint; gasUsed: number } = {
+			gasPrice: 0n,
 			gasUsed: 0,
 		};
 		const payloadBuffers: Buffer[] = [];
@@ -74,7 +73,7 @@ export const registerBlockFactory = async (
 		for (const transaction of transactions) {
 			assert.string(transaction.hash);
 
-			totals.gasPrice = totals.gasPrice.plus(transaction.gasPrice);
+			totals.gasPrice += BigInt(transaction.gasPrice);
 			// TODO: calculate actual gas used
 			totals.gasUsed += transaction.gasLimit;
 
@@ -88,7 +87,7 @@ export const registerBlockFactory = async (
 		const commit = {
 			block: await app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
-					fee: BigNumber.make(totals.gasPrice),
+					fee: totals.gasPrice,
 					gasUsed: totals.gasUsed,
 					logsBloom: "0".repeat(512),
 					number: previousBlock.number + 1,
@@ -101,7 +100,7 @@ export const registerBlockFactory = async (
 							"wallet",
 						)
 						.fromMnemonic(passphrase),
-					reward: BigNumber.make(options.reward || reward),
+					reward: BigInt(options.reward || reward),
 					round: 0,
 					stateRoot: "0".repeat(64),
 					timestamp: options.timestamp || dayjs().valueOf(),

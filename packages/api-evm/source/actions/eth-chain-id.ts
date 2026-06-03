@@ -17,6 +17,6 @@ export class EthChainIdAction implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: []): Promise<string> {
-		return `0x${this.configuration.get<number>("network.chainId").toString(16)}`;
+		return `0x${this.configuration.getNetwork().chainId.toString(16)}`;
 	}
 }

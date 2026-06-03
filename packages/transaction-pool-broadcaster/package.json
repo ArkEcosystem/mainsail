@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/transaction-pool-broadcaster",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "Transaction Pool Broadcaster for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -26,11 +26,12 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.11.20",
-		"joi": "18.1.2"
+		"joi": "18.2.1"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
+		"esmock": "2.7.5",
 		"uvu": "0.5.6"
 	},
 	"engines": {

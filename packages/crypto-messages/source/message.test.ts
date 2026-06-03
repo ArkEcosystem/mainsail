@@ -44,6 +44,11 @@ describe<{
 		assert.equal(precommit.serialized.toString("hex"), "dead");
 	});
 
+	it("#toData", async () => {
+		assert.equal(prevote.toData(), prevoteData);
+		assert.equal(precommit.toData(), precommitData);
+	});
+
 	it("#toString", async () => {
 		assert.equal(
 			prevote.toString(),

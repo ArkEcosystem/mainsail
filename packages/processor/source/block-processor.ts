@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import { assert, BigNumber, sleep } from "@mainsail/utils";
+import { assert, ensureError, sleep } from "@mainsail/utils";
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
@@ -58,7 +58,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	protected readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<Contracts.Processor.BlockProcessorResult> {
-		const processResult = { feeUsed: BigNumber.ZERO, gasUsed: 0, receipts: new Map(), success: false };
+		const processResult = { feeUsed: 0n, gasUsed: 0, receipts: new Map(), success: false };
 
 		try {
 			await this.verifier.verify(unit);
@@ -93,7 +93,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await this.#verifyLogsBloom(block);
 
 			processResult.success = true;
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			void this.#emit(Events.BlockEvent.Invalid, { block: unit.getBlock().toData(), error });
 			this.logger.error(`Cannot process block because: ${error.message}`, "consensus");
 		}
@@ -182,13 +183,13 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		transaction: Contracts.Crypto.BlockTransaction,
 		gasUsed: number,
 	): void {
-		const fee = this.feeCalculator.calculateConsumed(gasUsed, transaction.gasPrice);
+		const fee = this.feeCalculator.calculateConsumed(gasUsed, BigInt(transaction.gasPrice));
 
-		if (processorResult.feeUsed.plus(fee).isGreaterThan(block.fee)) {
+		if (processorResult.feeUsed + fee > block.fee) {
 			throw new Error("Cannot consume more fee");
 		}
 
-		processorResult.feeUsed = processorResult.feeUsed.plus(fee);
+		processorResult.feeUsed += fee;
 	}
 
 	#verifyConsumedAllGas(
@@ -201,7 +202,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	#verifyTotalFee(block: Contracts.Crypto.Block, processorResult: Contracts.Processor.BlockProcessorResult): void {
-		if (!processorResult.feeUsed.isEqualTo(block.fee)) {
+		if (processorResult.feeUsed !== block.fee) {
 			throw new Error(`Block fee ${block.fee} does not match consumed fee ${processorResult.feeUsed}`);
 		}
 	}
@@ -261,7 +262,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const block = unit.getBlock();
 
 		await this.evm.updateRewardsAndVotes({
-			blockReward: BigNumber.make(milestone.reward).toBigInt(),
+			blockReward: BigInt(milestone.reward),
 			commitKey: {
 				blockHash: block.hash,
 				blockNumber: BigInt(block.number),
@@ -288,7 +289,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 				blockNumber: BigInt(block.number),
 				round: BigInt(block.round),
 			},
-			roundValidators: BigNumber.make(roundValidators).toBigInt(),
+			roundValidators: BigInt(roundValidators),
 			specId: evmSpec,
 			timestamp: BigInt(block.timestamp),
 			validatorAddress: block.proposer,

@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { TransactionBuilder, TransactionFactory, Verifier } from "@mainsail/crypto-transaction";
-import { BigNumber, sleep } from "@mainsail/utils";
+import { sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
 import type { Context, TransactionOptions } from "./types.js";
@@ -30,33 +30,7 @@ const applyCustomSignature = async (
 	//transaction.data.signature = signature;
 };
 
-const applyCustomSignatures = async (
-	app: Contracts.Kernel.Application,
-	transaction: Contracts.Crypto.Transaction,
-	{ omitParticipantSignatures, participantSignatures }: TransactionOptions,
-) => {
-	throw new Error("unsupported");
-	// if (!omitParticipantSignatures || !participantSignatures) {
-	// 	return;
-	// }
-
-	// let transactionHex = transaction.serialized.toString("hex");
-
-	// omitParticipantSignatures.sort((a, b) => b - a);
-
-	// for (const index of omitParticipantSignatures) {
-	// 	const signatureToOmit = participantSignatures[index];
-
-	// 	const signatureIndex = transactionHex.indexOf(signatureToOmit);
-	// 	transactionHex = transactionHex.slice(0, signatureIndex);
-
-	// 	transaction.data.signatures!.splice(transaction.data.signatures!.indexOf(signatureToOmit), 1);
-	// }
-
-	// transaction.serialized = Buffer.from(transactionHex, "hex");
-};
-
-export const getNonceByPublicKey = async (app: Contracts.Kernel.Application, publicKey: string): Promise<BigNumber> => {
+export const getNonceByPublicKey = async (app: Contracts.Kernel.Application, publicKey: string): Promise<bigint> => {
 	const address = await app
 		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 		.fromPublicKey(publicKey);
@@ -64,7 +38,7 @@ export const getNonceByPublicKey = async (app: Contracts.Kernel.Application, pub
 	const instance = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 	const accountInfo = await instance.getAccountInfo(address);
 
-	return BigNumber.make(accountInfo.nonce);
+	return accountInfo.nonce;
 };
 
 export const buildSignedTransaction = async <TBuilder extends TransactionBuilder>(
@@ -79,42 +53,14 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 	(builder as unknown as { verifier: Contracts.Crypto.TransactionVerifier }).verifier =
 		app.resolve(AcceptAnyTransactionVerifier);
 
-	if (options.multiSigKeys) {
-		throw new Error("unsupported");
-		// const participants = options.multiSigKeys;
-		// const multiSigPublicKey = await app
-		// 	.getTagged<Contracts.Crypto.PublicKeyFactory>(
-		// 		Identifiers.Cryptography.Identity.PublicKey.Factory,
-		// 		"type",
-		// 		"wallet",
-		// 	)
-		// 	.fromMultiSignatureAsset({
-		// 		min: participants.length,
-		// 		publicKeys: participants.map((p) => p.publicKey),
-		// 	});
-
-		// const nonce = await getNonceByPublicKey(app, multiSigPublicKey);
-
-		// const { multiSigKeys, nonceOffset = 0 } = options;
-		// builder = builder.nonce(nonce.plus(nonceOffset).toString()).senderPublicKey(multiSigPublicKey);
-
-		// for (const [index, participant] of multiSigKeys.entries()) {
-		// 	builder = await builder.multiSignWithKeyPair(participant, index);
-		// }
-	} else {
-		const nonce = await getNonceByPublicKey(app, keyPair.publicKey);
-		const { nonceOffset = 0 } = options;
-		builder = await builder.nonce(nonce.plus(nonceOffset).toString()).signWithKeyPair(keyPair);
-	}
+	const nonce = await getNonceByPublicKey(app, keyPair.publicKey);
+	const { nonceOffset = 0 } = options;
+	builder = await builder.nonce((nonce + BigInt(nonceOffset)).toString()).signWithKeyPair(keyPair);
 
 	const transaction = await builder.build();
 
 	if (options.signature) {
 		await applyCustomSignature(app, transaction, options.signature);
-	}
-
-	if (options.omitParticipantSignatures) {
-		await applyCustomSignatures(app, transaction, options);
 	}
 
 	if (options.callback) {
@@ -178,10 +124,7 @@ export const waitBlock = async (app: Contracts.Kernel.Application, count: number
 	} while (currentBlockNumber < targetBlockNumber);
 };
 
-export const getRandomFundedWallet = async (
-	context: Context,
-	amount?: BigNumber,
-): Promise<Contracts.Crypto.KeyPair> => {
+export const getRandomFundedWallet = async (context: Context, amount?: bigint): Promise<Contracts.Crypto.KeyPair> => {
 	if (context.fundedWalletProvider) {
 		return context.fundedWalletProvider(context, amount);
 	}
@@ -197,7 +140,7 @@ export const getRandomFundedWallet = async (
 	const recipient = await app
 		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 		.fromPublicKey(randomKeyPair.publicKey);
-	amount = amount ?? BigNumber.make("1000000000000000000");
+	amount = amount ?? BigInt("1000000000000000000");
 
 	const nonce = await getNonceByPublicKey(app, wallets[0].publicKey);
 
@@ -206,8 +149,8 @@ export const getRandomFundedWallet = async (
 			.resolve(TransactionBuilder)
 			.gasPrice(5)
 			.recipientAddress(recipient)
-			.value(BigNumber.make(amount).toFixed())
-			.nonce(nonce.plus(1).toFixed())
+			.value(amount.toString())
+			.nonce((nonce + 1n).toString())
 			.signWithKeyPair(wallets[0])
 	).build();
 

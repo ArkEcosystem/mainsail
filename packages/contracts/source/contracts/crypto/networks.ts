@@ -1,14 +1,14 @@
 import type { SpecId } from "../evm/evm.js";
-import type { CommitJson } from "./commit.js";
+import type { CommitJsonCrypto } from "./commit.js";
 
 export type NetworkConfig = {
-	genesisBlock: CommitJson;
+	genesisBlock: CommitJsonCrypto;
 	milestones: Milestone[];
 	network: Network;
 };
 
 export type NetworkConfigPartial = {
-	genesisBlock: CommitJson;
+	genesisBlock: CommitJsonCrypto;
 	milestones: MilestonePartial[];
 	network: Network;
 };

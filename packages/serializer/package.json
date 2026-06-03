@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/serializer",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "Serializer and deserializer for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -29,7 +29,14 @@
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/crypto-address-keccak256": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/crypto-hash-bcrypto": "workspace:*",
+		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
+		"@mainsail/crypto-signature-bls12-381": "workspace:*",
+		"@mainsail/crypto-signature-ecdsa": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"uvu": "0.5.6"
 	},
 	"engines": {

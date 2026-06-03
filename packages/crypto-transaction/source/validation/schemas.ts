@@ -25,10 +25,10 @@ const transaction: SchemaObject = {
 
 		network: { $ref: "networkByte" },
 		to: { $ref: "address" },
-		value: { bignumber: { maximum: undefined, minimum: 0 } },
+		value: { bigInt: { maximum: undefined, minimum: 0 } },
 		gasLimit: { transactionGasLimit: {} },
 		gasPrice: { transactionGasPrice: {} },
-		nonce: { bignumber: { minimum: 0 } },
+		nonce: { bigInt: { minimum: 0 } },
 		data: { bytecode: {} },
 
 		from: { $ref: "address" },

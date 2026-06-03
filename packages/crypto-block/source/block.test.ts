@@ -1,5 +1,5 @@
 import type { TransactionBuilder } from "@mainsail/crypto-transaction";
-import clone from "lodash.clone";
+import { cloneDeep } from "@mainsail/utils";
 
 import crypto from "../../core/bin/config/devnet/core/crypto.json";
 import { describe } from "@mainsail/test-runner";
@@ -18,8 +18,8 @@ describe<{}>("Block", ({ it, assert }) => {
 		const transaction1 = await transactionBuilder1.build();
 		const transaction2 = await transactionBuilder2.build();
 
-		const indexedTransaction1 = clone(transaction1).toData();
-		const indexedTransaction2 = clone(transaction2).toData();
+		const indexedTransaction1 = cloneDeep(transaction1).toData();
+		const indexedTransaction2 = cloneDeep(transaction2).toData();
 
 		const block = new Block({
 			data: blockData,

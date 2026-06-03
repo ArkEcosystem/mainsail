@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/core",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "Core CLI commands for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -66,6 +66,7 @@
 		"@mainsail/evm-service": "workspace:*",
 		"@mainsail/evm-state": "workspace:*",
 		"@mainsail/exceptions": "workspace:*",
+		"@mainsail/forger": "workspace:*",
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/networking-dns": "workspace:*",
 		"@mainsail/networking-ntp": "workspace:*",
@@ -86,9 +87,9 @@
 		"dayjs": "1.11.20",
 		"env-paths": "4.0.0",
 		"envfile": "7.1.0",
-		"fs-extra": "11.3.4",
-		"got": "14.6.6",
-		"joi": "18.1.2",
+		"fs-extra": "11.3.5",
+		"got": "15.0.5",
+		"joi": "18.2.1",
 		"kleur": "4.1.5",
 		"prompts": "2.4.2"
 	},

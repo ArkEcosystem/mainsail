@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/test-transaction-builders",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "Test transaction builders for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -23,15 +23,16 @@
 	"dependencies": {
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
+		"@mainsail/crypto-key-pair-bls12-381": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"viem": "2.47.6"
+		"viem": "2.48.11"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
-		"@types/chance": "1.1.7",
+		"@types/chance": "1.1.8",
 		"@types/fs-extra": "11.0.4",
 		"uvu": "0.5.6"
 	},

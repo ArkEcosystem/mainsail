@@ -1,6 +1,10 @@
 use std::collections::BTreeMap;
 
 use alloy_sol_types::SolEvent;
+use rayon::{
+    iter::{IntoParallelRefMutIterator, ParallelIterator},
+    slice::ParallelSliceMut,
+};
 use revm::{
     context::result::ExecutionResult,
     database::{DatabaseCommitExt, WrapDatabaseRef},
@@ -10,7 +14,6 @@ use revm::{
 use crate::{
     db::{CommitData, CommitKey, Error, GenesisInfo, PendingCommit, PersistentDB},
     state_changes::{self, AccountMergeInfo, AccountUpdate},
-    state_root::calculate_commit_hashes,
 };
 
 #[derive(Clone, Debug, Default)]
@@ -41,11 +44,15 @@ pub fn build_commit(pending_commit: &mut PendingCommit) -> Result<StateCommit, c
             .filter_map(|(key, legacy)| legacy.map(|v| (key, v)))
             .collect();
 
-    Ok(StateCommit {
+    let mut state_commit = StateCommit {
         key: pending_commit.key,
         change_set,
         results: std::mem::take(&mut pending_commit.results),
-    })
+    };
+
+    finalize(&mut state_commit);
+
+    Ok(state_commit)
 }
 
 pub fn apply_rewards(
@@ -87,24 +94,35 @@ pub fn commit_to_db(
         None => build_commit(&mut pending_commit)?,
     };
 
-    let commit_hashes = match pending_commit.commit_hashes {
-        Some(commit_hashes) => commit_hashes,
-        None => calculate_commit_hashes(&mut commit)?,
-    };
-
-    match db.commit(&mut commit, &commit_data, &commit_hashes) {
+    match db.commit(&mut commit, &commit_data) {
         Ok(_) => Ok(collect_dirty_accounts(commit, &genesis_info)),
         Err(err) => match &err {
             Error::DbFull => {
                 // try to resize the db and attempt another commit on success
                 db.resize().and_then(|_| {
-                    db.commit(&mut commit, &commit_data, &commit_hashes)
+                    db.commit(&mut commit, &commit_data)
                         .and_then(|_| Ok(collect_dirty_accounts(commit, &genesis_info)))
                 })
             }
             _ => Err(err),
         },
     }
+}
+
+fn finalize(state: &mut StateCommit) {
+    state.change_set.accounts.par_sort_unstable_by_key(|a| a.0);
+    state.change_set.contracts.par_sort_unstable_by_key(|a| a.0);
+
+    state
+        .change_set
+        .storage
+        .par_iter_mut()
+        .for_each(|s| s.storage.par_sort_unstable_by_key(|slot| slot.0));
+
+    state
+        .change_set
+        .storage
+        .par_sort_unstable_by_key(|a| a.address);
 }
 
 fn collect_dirty_accounts(
@@ -316,7 +334,7 @@ mod tests {
             (
                 ExecutionResult::Success {
                     reason: SuccessReason::Stop,
-                    gas: ResultGas::new(30000, 30000, 0, 0, 0),
+                    gas: ResultGas::new_with_state_gas(30000, 30000, 0, 0),
                     logs: vec![
                         Log {
                             address: genesis_info.validator_contract,
@@ -377,7 +395,7 @@ mod tests {
             b256!("0000000000000000000000000000000000000000000000000000000000000002"),
             (
                 ExecutionResult::Revert {
-                    gas: ResultGas::new(30000, 30000, 0, 0, 0),
+                    gas: ResultGas::new_with_state_gas(30000, 30000, 0, 0),
                     logs: vec![],
                     output: alloy_primitives::Bytes(Bytes::new()),
                 },
@@ -460,7 +478,7 @@ mod tests {
         assert!(cache_account2.account.is_none());
         assert_eq!(
             cache_account2.status,
-            revm::database::AccountStatus::Destroyed
+            revm::database::AccountStatus::LoadedNotExisting
         );
 
         let transition_account1 = pending
@@ -475,16 +493,7 @@ mod tests {
         );
         assert_eq!(transition_account1.storage_was_destroyed, false);
 
-        let transition_account2 = pending
-            .transitions
-            .transitions
-            .get(&account2)
-            .expect("transition_account2");
-        assert!(transition_account2.info.is_none());
-        assert_eq!(
-            transition_account2.status,
-            revm::database::AccountStatus::Destroyed
-        );
-        assert_eq!(transition_account2.storage_was_destroyed, true);
+        let transition_account2 = pending.transitions.transitions.get(&account2);
+        assert_eq!(transition_account2, None);
     }
 }

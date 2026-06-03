@@ -1,6 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
-import { BigNumber } from "@mainsail/utils";
 
 import { TransactionBuilder } from "../source/builder.js";
 import { Application } from "@mainsail/kernel";
@@ -33,7 +32,7 @@ describe<{
 			await builder
 				.gasPrice(5 * 1e9)
 				.recipientAddress("0xAe44ad925374b90B5f2A285461A70D6ba655EE28")
-				.value(BigNumber.make(1).toFixed())
+				.value("1")
 				.nonce("0")
 				.signWithKeyPair(context.keyPair)
 		).build();

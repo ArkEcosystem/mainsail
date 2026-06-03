@@ -1,5 +1,4 @@
 import type { Contracts } from "@mainsail/contracts";
-import type { BigNumber } from "@mainsail/utils";
 
 import { Exception } from "./base.js";
 
@@ -181,18 +180,6 @@ export class InvalidNumberOfRoundValidatorsError extends Exception {
 	}
 }
 
-export class InvalidMultiSignatureAssetError extends Exception {
-	public constructor() {
-		super(`The multi signature asset is invalid.`);
-	}
-}
-
-export class DuplicateParticipantInMultiSignatureError extends Exception {
-	public constructor() {
-		super(`Invalid multi signature, because duplicate participant found.`);
-	}
-}
-
 export class DeactivatedTransactionHandlerError extends Exception {
 	public constructor(type: number) {
 		super(`Transaction type ${type.toString()} is deactivated.`);
@@ -212,10 +199,10 @@ export class AlreadyRegisteredError extends Exception {
 }
 
 export class UnexpectedNonceError extends Exception {
-	public constructor(txNonce: BigNumber, sender: Contracts.State.Wallet) {
+	public constructor(txNonce: bigint, sender: Contracts.State.Wallet) {
 		super(
-			`Cannot apply a transaction with nonce ${txNonce.toFixed()}: the ` +
-				`sender ${sender.getAddress()} has nonce ${sender.getNonce().toFixed()}${sender.getNonce().isZero() ? " (this might be due to a wrong signature)" : ""}.`,
+			`Cannot apply a transaction with nonce ${txNonce.toString()}: the ` +
+				`sender ${sender.getAddress()} has nonce ${sender.getNonce().toString()}${sender.getNonce() === 0n ? " (this might be due to a wrong signature)" : ""}.`,
 		);
 	}
 }
@@ -253,30 +240,6 @@ export class InvalidLegacySecondSignatureError extends Exception {
 export class MissingLegacySecondSignatureError extends Exception {
 	public constructor() {
 		super(`Failed to apply transaction, because the legacy second signature is missing.`);
-	}
-}
-
-export class MissingMultiSignatureOnSenderError extends Exception {
-	public constructor() {
-		super(`Failed to apply transaction, because sender does not have a multi signature.`);
-	}
-}
-
-export class InvalidMultiSignaturesError extends Exception {
-	public constructor() {
-		super(`Failed to apply transaction, because the multi signatures are invalid.`);
-	}
-}
-
-export class UnsupportedMultiSignatureRegistrationTransactionError extends Exception {
-	public constructor() {
-		super(`Failed to apply transaction, because the transaction does not support multi signatures.`);
-	}
-}
-
-export class UnsupportedMultiSignatureRegistrationException extends Exception {
-	public constructor() {
-		super(`Failed to apply transaction, because the transaction does not support multi signatures.`);
 	}
 }
 
@@ -374,44 +337,6 @@ export class NotEnoughValidatorsError extends Exception {
 export class InvalidSignatureError extends Exception {
 	public constructor() {
 		super(`Failed to apply transaction, because signature is invalid.`);
-	}
-}
-
-export class MultiSignatureAlreadyRegisteredError extends Exception {
-	public constructor() {
-		super(`Failed to apply transaction, because multi signature is already enabled.`);
-	}
-}
-
-export class InvalidMultiSignatureError extends Exception {
-	public constructor() {
-		super(`Failed to apply transaction, because the multi signature could not be verified.`);
-	}
-}
-
-export class LegacyMultiSignatureError extends Exception {
-	public constructor() {
-		super(`Failed to apply transaction, because legacy multi signature is no longer supported.`);
-	}
-}
-
-export class LegacyMultiSignatureRegistrationError extends Exception {
-	public constructor() {
-		super(`Failed to apply transaction, because legacy multi signature registrations are no longer supported.`);
-	}
-}
-
-export class MultiSignatureMinimumKeysError extends Exception {
-	public constructor() {
-		super(`Failed to apply transaction, because too few keys were provided.`);
-	}
-}
-
-export class MultiSignatureKeyCountMismatchError extends Exception {
-	public constructor() {
-		super(
-			`Failed to apply transaction, because the number of provided keys does not match the number of signatures.`,
-		);
 	}
 }
 

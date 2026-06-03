@@ -55,7 +55,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			handle: async (): Promise<void> => this.#disconnectInvalidPeers(),
 		});
 
-		this.transactionPoolWorker.registerEventHandler("peer.removed", (ip: string) => {
+		this.transactionPoolWorker.registerEventHandler(Events.PeerEvent.Removed, (ip: string) => {
 			this.peerDisposer.disposePeer(ip);
 		});
 	}

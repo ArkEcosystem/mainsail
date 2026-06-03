@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Ipc, Providers } from "@mainsail/kernel";
-import Joi from "joi";
+import { fileURLToPath } from "url";
 import { Worker } from "worker_threads";
 
 import { Worker as WorkerInstance } from "./worker.js";
@@ -15,11 +15,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async register(): Promise<void> {
 		this.app.bind<() => Ipc.Subprocess>(Identifiers.Evm.WorkerSubprocess.Factory).toFactory(() => () => {
-			const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {
+			const subprocess = new Worker(fileURLToPath(new URL("worker-script.js", import.meta.url)), {
 				stderr: true,
 				stdout: true,
 			});
-			return new Ipc.Subprocess(this.app, "api", subprocess);
+			return new Ipc.Subprocess(this.app, "evm-api", "api", subprocess);
 		});
 
 		this.app.bind(Identifiers.Evm.Worker).toConstantValue(this.app.resolve(WorkerInstance));
@@ -33,14 +33,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<Contracts.Evm.Worker>(Identifiers.Evm.Worker).kill();
+		await this.app.get<Contracts.Evm.Worker>(Identifiers.Evm.Worker).dispose();
 	}
 
 	public async required(): Promise<boolean> {
 		return true;
-	}
-
-	public configSchema(): Joi.AnySchema {
-		return Joi.object({}).required().unknown(true);
 	}
 }

@@ -1,5 +1,6 @@
 import { Commands } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 import { removeSync } from "fs-extra/esm";
 
 @injectable()
@@ -23,7 +24,8 @@ export class Command extends Commands.Command {
 			) {
 				this.#removeFiles();
 			}
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.components.fatal(error.message);
 		}
 	}

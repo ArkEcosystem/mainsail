@@ -1,13 +1,9 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable, tagged } from "@mainsail/container";
-import {
-	DuplicateParticipantInMultiSignatureError,
-	InvalidTransactionBytesError,
-	TransactionSchemaError,
-} from "@mainsail/exceptions";
-import { assert, BigNumber } from "@mainsail/utils";
+import { inject, injectable, tagged, optional } from "@mainsail/container";
+import { InvalidTransactionBytesError, TransactionSchemaError } from "@mainsail/exceptions";
+import { assert, ensureError } from "@mainsail/utils";
 
 import { BlockTransaction } from "./block-transaction.js";
 import { Transaction } from "./transaction.js";
@@ -39,6 +35,10 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
+	@optional()
+	@inject(Identifiers.CryptoWorker.WorkerPool)
+	private readonly workerPool!: Contracts.Crypto.WorkerPool;
+
 	public async fromHex(hex: string): Promise<Contracts.Crypto.Transaction> {
 		return this.#fromSerialized(Buffer.from(hex, "hex"));
 	}
@@ -50,8 +50,8 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	public async fromJson(json: Contracts.Crypto.TransactionJson): Promise<Contracts.Crypto.Transaction> {
 		const transactionData: Contracts.Crypto.TransactionSerializable = {
 			...json,
-			nonce: BigNumber.make(json.nonce),
-			value: BigNumber.make(json.value),
+			nonce: BigInt(json.nonce),
+			value: BigInt(json.value),
 		};
 
 		return this.fromData(transactionData);
@@ -66,12 +66,12 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			gasLimit: Number(transaction.gasLimit),
 			gasPrice: Number(transaction.gasPrice),
 			hash: transaction.txHash,
-			network: this.configuration.get<number>("network.chainId"),
-			nonce: BigNumber.make(transaction.nonce),
+			network: this.configuration.getNetwork().chainId,
+			nonce: transaction.nonce,
 			senderLegacyAddress:
 				transaction.legacyAddress ||
 				(await this.legacyAddressFactory.fromPublicKey(transaction.senderPublicKey)), // TODO: Make legacy address mandatory
-			value: BigNumber.make(transaction.value),
+			value: transaction.value,
 		};
 
 		const serialized = await this.serializer.serialize(transactionData);
@@ -101,15 +101,6 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		assert.string(data.r);
 		assert.string(data.s);
 
-		// Passing via IPC converts BigNumber to '{ value: bigint }'
-		// if ("value" in data.value) {
-		// 	data.value = BigNumber.make(data.value["value"]);
-		// }
-
-		// if ("value" in data.nonce) {
-		// 	data.nonce = BigNumber.make(data.nonce["value"]);
-		// }
-
 		const unsignedHash = await this.hashFactory.toHashUnsigned(data);
 		const hash = await this.hashFactory.toHash(data);
 
@@ -130,7 +121,11 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	async #fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.Transaction> {
 		try {
 			const { data: transaction } = await this.deserializer.deserialize(serialized);
-			const cryptoData = await this.computeCryptoData(transaction);
+
+			const worker = this.workerPool ? this.workerPool.getWorker() : undefined;
+			const cryptoData = worker
+				? await worker.transactionFactory("computeCryptoData", transaction)
+				: await this.computeCryptoData(transaction);
 
 			const tx = { ...cryptoData, ...transaction };
 
@@ -140,8 +135,9 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			}
 
 			return new Transaction(tx, serialized);
-		} catch (error) {
-			if (error instanceof TransactionSchemaError || error instanceof DuplicateParticipantInMultiSignatureError) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			if (error instanceof TransactionSchemaError) {
 				throw error;
 			}
 

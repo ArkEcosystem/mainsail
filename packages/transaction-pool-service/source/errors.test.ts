@@ -1,6 +1,4 @@
 import * as Exceptions from "@mainsail/exceptions";
-import { BigNumber } from "@mainsail/utils";
-
 import { describe } from "@mainsail/test-runner";
 
 describe<{
@@ -8,11 +6,11 @@ describe<{
 }>("Errors", ({ it, assert, beforeAll }) => {
 	beforeAll((context) => {
 		context.transaction = {
-			amount: BigNumber.make(100),
+			amount: 100n,
 			gasPrice: 900 * 1e9,
 			hash: "dummy-tx-id",
 			network: 30,
-			nonce: BigNumber.make(1),
+			nonce: 1n,
 			from: "dummy-sender-key",
 			type: 0,
 			hash: "dummy-tx-id",
@@ -55,7 +53,7 @@ describe<{
 	});
 
 	it("TransactionPoolFullError", (context) => {
-		const error = new Exceptions.TransactionPoolFullError(context.transaction, new BigNumber(1000 * 1e9));
+		const error = new Exceptions.TransactionPoolFullError(context.transaction, 1000 * 1e9);
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_POOL_FULL");

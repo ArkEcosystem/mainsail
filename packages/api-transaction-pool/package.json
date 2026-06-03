@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/api-transaction-pool",
-	"version": "0.0.1-evm.46",
+	"version": "0.0.1-rc.9",
 	"description": "Transaction Pool API for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -22,12 +22,13 @@
 	},
 	"dependencies": {
 		"@hapi/boom": "10.0.1",
-		"@hapi/hapi": "21.4.7",
+		"@hapi/hapi": "21.4.9",
 		"@mainsail/api-common": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"joi": "18.1.2"
+		"@mainsail/utils": "workspace:*",
+		"joi": "18.2.1"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",

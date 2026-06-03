@@ -3,14 +3,14 @@ import { cloneDeep } from "./clone-deep";
 
 describe("#cloneDeep", ({ it, assert }) => {
 	it("should work with objects", () => {
-		const object = { a: 1 };
+		const object = { a: 1, b: 2n };
 
 		assert.equal(cloneDeep(object), object);
 	});
 
 	it("should work with class instances", () => {
 		class Wallet {
-			constructor(readonly address) {}
+			constructor(readonly address: string) {}
 
 			public isDelegate() {
 				return true;

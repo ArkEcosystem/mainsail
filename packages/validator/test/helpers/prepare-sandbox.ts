@@ -1,6 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { ServiceProvider as BlockchainUtilities } from "@mainsail/blockchain-utils";
 import { Identifiers } from "@mainsail/constants";
-import type { Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
@@ -16,6 +17,7 @@ import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-trans
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
+import { ServiceProvider as Forger } from "@mainsail/forger";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
@@ -57,10 +59,10 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	await context.app.resolve(CoreCryptoBlock).register();
 	await context.app.resolve(CoreCryptoProposal).register();
 	await context.app.resolve(CoreCryptoMessages).register();
+	await context.app.resolve(Forger).register();
 
 	const workerPool = {
 		getWorker: () => ({
-			// @ts-ignore
 			consensusSignature: (method, message, privateKey) =>
 				context
 					.app!.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
@@ -70,28 +72,36 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	context.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
 	context.app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
-		getTransactionBytes: async () => [],
+		getTransactions: async () => ({
+			remaining: 0,
+			transactions: [],
+		}),
 	});
 
-	const validator = {
-		getEvm: () => ({
-			dispose: async () => {},
-			initializeGenesis: async () => {},
-			logsBloom: async () => "0".repeat(512),
-			prepareNextCommit: async () => {},
-			rollback: async () => {},
-			snapshot: async () => {},
-			stateRoot: async () => "0000000000000000000000000000000000000000000000000000000000000000",
-			updateRewardsAndVotes: async () => {},
-		}),
-		validate: async () => true,
+	const evm = {
+		dispose: async () => {},
+		initializeGenesis: async () => {},
+		logsBloom: async () => "0".repeat(512),
+		prepareNextCommit: async () => {},
+		rollback: async () => {},
+		snapshot: async () => {},
+		stateRoot: async () => "0000000000000000000000000000000000000000000000000000000000000000",
+		updateRewardsAndVotes: async () => {},
 	};
-	context.app.rebind(Identifiers.Transaction.Validator.Factory).toConstantValue(() => validator);
+	context.app.bind(Identifiers.Evm.Instance).toConstantValue(evm).whenTagged("instance", "validator");
 
-	context.app.bind(Identifiers.Evm.Instance).toConstantValue(() => {});
+	context.app.rebind(Identifiers.Transaction.Handler).toConstantValue({
+		apply: async () => ({ gasRefunded: 0n, gasUsed: 0n, logs: [], status: 1 }),
+	});
+
 	context.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue({});
 
 	context.app.bind(Identifiers.State.Store).toConstantValue({
+		getGenesisCommit: () => ({
+			block: {
+				hash: "0000000000000000000000000000000000000000000000000000000000000001",
+			},
+		}),
 		getLastBlock: () => ({
 			hash: "0000000000000000000000000000000000000000000000000000000000000000",
 			logsBloom: "0".repeat(512),

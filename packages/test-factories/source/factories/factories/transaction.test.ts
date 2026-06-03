@@ -97,16 +97,6 @@ describe<{
 	// 	assert.undefined(transaction.data.signatures);
 	// });
 
-	// it("Vote - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
-	// 	const transaction: Contracts.Crypto.Transaction = await factoryBuilder
-	// 		.get("Vote")
-	// 		.withStates("multiSign")
-	// 		.make();
-
-	// 	assert.undefined(transaction.data.signature);
-	// 	assert.defined(transaction.data.signatures);
-	// });
-
 	// it("Unvote - should create a builder", async ({ factoryBuilder }) => {
 	// 	const transaction: Contracts.Crypto.Transaction = await factoryBuilder.get("Unvote").make();
 
@@ -119,43 +109,6 @@ describe<{
 
 	// 	assert.defined(transaction.data.signature);
 	// 	assert.undefined(transaction.data.signatures);
-	// });
-
-	// it("Unvote - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
-	// 	const transaction: Contracts.Crypto.Transaction = await factoryBuilder
-	// 		.get("Unvote")
-	// 		.withStates("multiSign")
-	// 		.make();
-
-	// 	assert.undefined(transaction.data.signature);
-	// 	assert.defined(transaction.data.signatures);
-	// });
-
-	// it("MultiSignature - should create a builder", async ({ factoryBuilder }) => {
-	// 	const transaction: Contracts.Crypto.Transaction = await factoryBuilder.get("MultiSignature").make();
-
-	// 	assert.undefined(transaction.data.signature);
-	// 	assert.undefined(transaction.data.signatures);
-	// });
-
-	// it("MultiSignature - should sign it with single passphrase", async ({ factoryBuilder }) => {
-	// 	const transaction: Contracts.Crypto.Transaction = await factoryBuilder
-	// 		.get("MultiSignature")
-	// 		.withStates("sign")
-	// 		.make();
-
-	// 	assert.defined(transaction.data.signature);
-	// 	assert.undefined(transaction.data.signatures);
-	// });
-
-	// it("MultiSignature - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
-	// 	const transaction: Contracts.Crypto.Transaction = await factoryBuilder
-	// 		.get("MultiSignature")
-	// 		.withStates("multiSign")
-	// 		.make();
-
-	// 	assert.undefined(transaction.data.signature);
-	// 	assert.defined(transaction.data.signatures);
 	// });
 
 	// it("MultiPayment - should create a builder", async ({ factoryBuilder }) => {
@@ -173,15 +126,5 @@ describe<{
 
 	// 	assert.defined(transaction.data.signature);
 	// 	assert.undefined(transaction.data.signatures);
-	// });
-
-	// it("MultiPayment - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
-	// 	const transaction: Contracts.Crypto.Transaction = await factoryBuilder
-	// 		.get("MultiPayment")
-	// 		.withStates("multiSign")
-	// 		.make();
-
-	// 	assert.undefined(transaction.data.signature);
-	// 	assert.defined(transaction.data.signatures);
 	// });
 });

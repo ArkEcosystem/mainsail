@@ -1,7 +1,6 @@
 import { randomBytes } from "node:crypto";
 import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { Enums } from "@mainsail/constants";
 import { Evm } from "@mainsail/evm";
 import {
@@ -31,7 +30,7 @@ import { setGracefulCleanup } from "tmp";
 
 describe<{
 	app: Application;
-	instance: Contracts.Evm.Instance;
+	instance: Contracts.Evm.Instance & Contracts.Evm.Storage;
 }>("Instance", ({ it, assert, afterAll, afterEach, beforeEach }) => {
 	afterAll(() => setGracefulCleanup());
 
@@ -42,7 +41,7 @@ describe<{
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.instance = context.app.resolve<Contracts.Evm.Instance>(EvmInstance);
+		context.instance = context.app.resolve(EvmInstance);
 	});
 
 	const deployConfig = {
@@ -63,7 +62,7 @@ describe<{
 		validatorAddress: zeroAddress,
 	};
 
-	it("should deploy contract successfully", async ({ instance }) => {
+	it("#process - should deploy contract successfully", async ({ instance }) => {
 		const [sender] = wallets;
 
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
@@ -82,7 +81,7 @@ describe<{
 		assert.equal(receipt.contractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
 	});
 
-	it("should call log hook", async ({ app, instance }) => {
+	it("#initialize - should call log hook", async ({ app, instance }) => {
 		let hookCalled = 0;
 
 		const evm = new Evm({
@@ -774,6 +773,18 @@ describe<{
 	});
 
 	it("should return state hash", async ({ instance }) => {
+		const [sender] = wallets;
+		const initialSupply = parseEther("100");
+
+		await instance.initializeGenesis({
+			account: sender.address,
+			initialSupply,
+			initialBlockNumber: 0n,
+			deployerAccount: zeroAddress,
+			usernameContract: zeroAddress,
+			validatorContract: zeroAddress,
+		});
+
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
 		await instance.prepareNextCommit({ commitKey });
 
@@ -781,7 +792,7 @@ describe<{
 			commitKey,
 			"0000000000000000000000000000000000000000000000000000000000000000",
 		);
-		assert.equal(hash, "0722d8002560934d7004b8b849101024bf7ec2aaa2c3396f7292d4ac8cdae5ab");
+		assert.equal(hash, "a09fc67efe3184d31dc3f1351381ca57861c5a568c122ab3e9c9c06395c52516");
 	});
 
 	it("should return logs bloom", async ({ instance }) => {
@@ -1108,6 +1119,54 @@ describe<{
 		assert.equal(senderAccountAfter.balance, senderAccountBefore.balance - 100n);
 		assert.equal(recipientAccountAfter.balance, recipientAccountBefore.balance + 100n);
 		assert.equal(zeroAccountBefore.balance, zeroAccountAfter.balance);
+	});
+
+	it("should simulate a transaction without persisting state", async ({ instance }) => {
+		const [sender, recipient] = wallets;
+
+		await instance.initializeGenesis({
+			account: sender.address,
+			deployerAccount: zeroAddress,
+			initialBlockNumber: 0n,
+			initialSupply: parseEther("100"),
+			usernameContract: zeroAddress,
+			validatorContract: zeroAddress,
+		});
+
+		const { receipt } = await instance.simulate({
+			blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(0), round: BigInt(0) } },
+			data: Buffer.alloc(0),
+			from: sender.address,
+			gasLimit: 21_000n,
+			gasPrice: 0n,
+			nonce: 0n,
+			specId: Enums.Evm.SpecId.SHANGHAI,
+			to: recipient.address,
+			value: parseEther("1"),
+		});
+
+		assert.equal(receipt.status, 1);
+		// The simulated transfer must not have moved any funds.
+		assert.equal((await instance.getAccountInfo(recipient.address)).balance, 0n);
+	});
+
+	it("should import account balances", async ({ instance }) => {
+		const [sender] = wallets;
+		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
+
+		// importAccountInfos must run inside a prepared commit (see snapshot-legacy-importer).
+		await instance.prepareNextCommit({ commitKey });
+		await instance.importAccountInfos([
+			{ address: sender.address, balance: 1234n, legacyAttributes: {}, nonce: 0n },
+		]);
+		await instance.onCommit({
+			blockNumber: BigInt(0),
+			getBlock: () => ({ number: BigInt(0), round: BigInt(0) }),
+			round: BigInt(0),
+			setAccountUpdates: () => {},
+		} as any);
+
+		assert.equal((await instance.getAccountInfo(sender.address)).balance, 1234n);
 	});
 });
 

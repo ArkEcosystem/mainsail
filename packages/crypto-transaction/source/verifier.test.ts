@@ -1,7 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
 import { describe } from "@mainsail/test-runner";
 import { Transactions, Serialized } from "../test/fixtures/index";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -19,10 +18,10 @@ describe<{
 		senderPublicKey: "03e0812731df97edc9990d55d919b33294f131b5fd44996266859cfd2514514121",
 		senderLegacyAddress: "DH8WhBj6ron2tQhdFPQzjDcrk2CCY997MP",
 		to: "0xBe89811e15f611C1db12e59679b6F3DC1F430155",
-		value: BigNumber.ONE,
+		value: 1n,
 		gasPrice: 5000000000,
 		gasLimit: 1000000,
-		nonce: BigNumber.ZERO,
+		nonce: 0n,
 		data: "0x",
 		v: 0,
 		r: "921101a4583fb153ec00e501f3c2e2636114e1c8c58d2df8a19426cc066a6768",

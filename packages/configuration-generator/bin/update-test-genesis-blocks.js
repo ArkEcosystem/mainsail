@@ -21,6 +21,7 @@ const configurations = [
 		validators: 53,
 		initialHeight: 0,
 		overwriteConfig: true,
+		createLegacyColdWallets: true,
 		timeouts: {
 			blockPrepareTime: 100,
 			blockTime: 100,

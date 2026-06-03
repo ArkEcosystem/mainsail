@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { EnvironmentVariables, Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { PoolError, TransactionAlreadyInPoolError, TransactionPoolFullError } from "@mainsail/exceptions";
-import { BigNumber, Lock, randomNumber } from "@mainsail/utils";
+import { ensureError, Lock, randomNumber } from "@mainsail/utils";
 
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {
@@ -110,7 +110,8 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.#txRebroadcastCooldowns.set(transaction.hash, this.stateStore.getBlockNumber());
 
 				void this.events.dispatch(Events.TransactionEvent.AddedToPool, transaction);
-			} catch (error) {
+			} catch (rawError) {
+				const error = ensureError(rawError);
 				this.storage.removeTransaction(transaction.hash);
 				this.logger.warn(`tx ${transaction.hash} failed to enter pool: ${error.message}`);
 
@@ -149,7 +150,8 @@ export class Service implements Contracts.TransactionPool.Service {
 						);
 
 						previouslyStoredSuccesses++;
-					} catch (error) {
+					} catch (rawError) {
+						const error = ensureError(rawError);
 						this.storage.removeTransaction(hash);
 						this.logger.debug(`Failed to re-add previously stored tx ${hash}: ${error.message}`);
 
@@ -248,7 +250,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 		if (this.getPoolSize() >= maxTransactionsInPool) {
 			const lowest = await this.poolQuery.getFromLowestPriority().first();
-			if (BigNumber.make(transaction.gasPrice).isLessThanEqual(lowest.gasPrice)) {
+			if (transaction.gasPrice <= lowest.gasPrice) {
 				throw new TransactionPoolFullError(transaction, lowest.gasPrice);
 			}
 

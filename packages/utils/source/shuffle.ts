@@ -1,15 +1,11 @@
-import { cloneArray } from "./clone-array.js";
-
 export const shuffle = <T>(iterable: T[]): T[] => {
-	const shuffledValues: T[] = cloneArray<T>(iterable);
-
-	for (let index = 0; index < shuffledValues.length; index++) {
+	for (let index = iterable.length - 1; index > 0; index--) {
 		const rand: number = Math.floor(Math.random() * (index + 1));
-		const value: T = shuffledValues[index];
+		const value: T = iterable[index];
 
-		shuffledValues[index] = shuffledValues[rand];
-		shuffledValues[rand] = value;
+		iterable[index] = iterable[rand];
+		iterable[rand] = value;
 	}
 
-	return shuffledValues;
+	return iterable;
 };
