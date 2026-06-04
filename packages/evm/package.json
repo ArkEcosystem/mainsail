@@ -1,34 +1,34 @@
 {
-  "name": "@mainsail/evm",
-  "version": "0.0.1-evm.48",
-  "description": "EVM for the Mainsail blockchain",
-  "license": "GPL-3.0-only",
-  "contributors": [],
-  "main": "index.js",
-  "types": "index.d.ts",
-  "scripts": {
-    "artifacts": "napi artifacts",
-    "build-napi": "napi build --platform --output-dir ./ --manifest-path bindings/Cargo.toml --release",
-    "build-napi:debug": "napi build --platform --output-dir ./ --manifest-path bindings/Cargo.toml",
-    "build-rs": "pnpm run clean && pnpm run build-napi",
-    "clean": "rm -f index.js && rm -f index.d.ts && rm -f evm.*.node && rm -rf target",
-    "release": "pnpm publish --access public",
-    "test": "cargo test --release",
-    "test:coverage": "mkdir -p coverage && cargo llvm-cov --lcov --output-path coverage/lcov.info --remap-path-prefix",
-    "test:coverage:html": "mkdir -p coverage && cargo llvm-cov --html --output-dir coverage/ --remap-path-prefix",
-    "version": "napi version"
-  },
-  "devDependencies": {
-    "@napi-rs/cli": "3.6.2"
-  },
-  "engines": {
-    "node": ">=24"
-  },
-  "napi": {
-    "binaryName": "evm",
-    "targets": [
-      "aarch64-unknown-linux-gnu",
-      "x86_64-unknown-linux-gnu"
-    ]
-  }
+	"name": "@mainsail/evm",
+	"version": "0.0.1-evm.48",
+	"description": "EVM for the Mainsail blockchain",
+	"license": "GPL-3.0-only",
+	"contributors": [],
+	"main": "index.js",
+	"types": "index.d.ts",
+	"scripts": {
+		"artifacts": "napi artifacts",
+		"build-napi": "napi build --platform --output-dir ./ --manifest-path bindings/Cargo.toml --release",
+		"build-napi:debug": "napi build --platform --output-dir ./ --manifest-path bindings/Cargo.toml",
+		"build-rs": "pnpm run clean && pnpm run build-napi",
+		"clean": "rm -f index.js && rm -f index.d.ts && rm -f evm.*.node && rm -rf target",
+		"release": "pnpm publish --access public",
+		"test": "cargo test --release",
+		"test:coverage": "mkdir -p coverage && cargo llvm-cov --lcov --output-path coverage/lcov.info --remap-path-prefix",
+		"test:coverage:html": "mkdir -p coverage && cargo llvm-cov --html --output-dir coverage/ --remap-path-prefix",
+		"version": "napi version"
+	},
+	"devDependencies": {
+		"@napi-rs/cli": "3.6.2"
+	},
+	"engines": {
+		"node": ">=24"
+	},
+	"napi": {
+		"binaryName": "evm",
+		"targets": [
+			"aarch64-unknown-linux-gnu",
+			"x86_64-unknown-linux-gnu"
+		]
+	}
 }
