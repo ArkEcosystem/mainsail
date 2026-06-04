@@ -22,9 +22,6 @@ if [ "${1:-}" = "--" ]; then
 	shift
 fi
 
-# Sync versions + optionalDependencies only; we publish the platform packages ourselves below.
-pnpm exec napi prepublish -t pnpm --skip-optional-publish --no-gh-release
-
 for dir in npm/*/; do
 	echo "Publishing ${dir%/} $*"
 	(cd "$dir" && pnpm publish --access public "$@")
