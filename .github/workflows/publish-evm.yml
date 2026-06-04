@@ -138,7 +138,7 @@ jobs:
 
             - name: Publish to NPM
               run: |
-                  pnpm run release -- --publish-branch=evm --tag=evm --no-git-checks
+                  pnpm run release --scope=@mainsail/evm -- --publish-branch=evm --tag=evm --no-git-checks
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
                   npm_config_tag: evm
