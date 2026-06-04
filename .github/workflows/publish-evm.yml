@@ -138,6 +138,11 @@ jobs:
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
+            - name: Publish native packages
+              run: pnpm run release:napi -- --publish-branch=evm --tag=evm --no-git-checks
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
             # - name: Set dist-tag latest
             #   run: |
             #       bash ./scripts/dist-tag-latest.sh
