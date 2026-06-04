@@ -138,7 +138,7 @@ jobs:
               shell: bash
 
             - name: Prepare release
-              run: pnpm run release:prepare && pnpm install --lockfile-only
+              run: pnpm run release:prepare && pnpm install
 
             - name: Publish native to NPM
               run: pnpm run release:native -- --publish-branch=evm --tag=evm --no-git-checks
