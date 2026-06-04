@@ -137,19 +137,27 @@ jobs:
               run: ls -R ./npm
               shell: bash
 
+            # release:prepare bumps the evm version and adds the native packages as
+            # optionalDependencies, so the lockfile no longer matches package.json. Disable pnpm's
+            # implicit deps verification from here on (the initial install above keeps it) so the
+            # publish commands don't fail on the now-intentionally-out-of-sync lockfile.
             - name: Prepare release
-              run: pnpm run release:prepare && pnpm install
+              run: pnpm run release:prepare && pnpm install --lockfile-only
+              env:
+                  PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "false"
 
             - name: Publish native to NPM
               run: pnpm run release:native -- --publish-branch=evm --tag=evm --no-git-checks
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+                  PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "false"
 
             - name: Publish to NPM
               run: |
                   pnpm run release -- --publish-branch=evm --tag=evm --no-git-checks
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+                  PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "false"
 
             # - name: Set dist-tag latest
             #   run: |
