@@ -131,14 +131,14 @@ jobs:
               run: ls -R ./npm
               shell: bash
 
-            - name: Publish native packages
-              run: pnpm run release:napi -- --tag=evm --publish-branch=evm --no-git-checks
+            - name: Publish to NPM
+              run: |
+                  pnpm run release --no-bail -- --publish-branch=evm --tag=evm --no-git-checks
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
-            - name: Publish to NPM
-              run: |
-                  pnpm run release --scope=@mainsail/evm -- --publish-branch=evm --tag=evm --no-git-checks
+            - name: Publish native packages
+              run: pnpm run release:napi -- --tag=evm --publish-branch=evm --no-git-checks
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
