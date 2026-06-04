@@ -8,13 +8,9 @@ env:
 permissions:
     contents: read
 
-# on:
-#     push:
-#         branches:
-#             - "evm"
-
 on:
-    workflow_call:
+    pull_request:
+        types: [opened, synchronize, reopened]
 
 jobs:
     build:
