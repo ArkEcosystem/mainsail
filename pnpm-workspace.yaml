@@ -13,3 +13,5 @@ allowBuilds:
   nsfw: true
   nx: true
   protobufjs: true
+minimumReleaseAgeExclude:
+  - "@mainsail/*"
