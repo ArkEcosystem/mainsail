@@ -132,7 +132,10 @@ jobs:
               run: ls -R ./npm
               shell: bash
 
-            - name: Publish native packages
+            - name: Prepare release
+              run: pnpm run release:prepare && pnpm install
+
+            - name: Publish native to NPM
               run: pnpm run release:native -- --publish-branch=evm --tag=evm --no-git-checks
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
