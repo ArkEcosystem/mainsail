@@ -132,14 +132,14 @@ jobs:
               run: ls -R ./npm
               shell: bash
 
-            - name: Publish to NPM
-              run: |
-                  pnpm run release -- --publish-branch=develop --tag=rc --no-git-checks
+            - name: Publish native packages
+              run: pnpm run release:native -- --publish-branch=develop --tag=rc --no-git-checks
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
-            - name: Publish native packages
-              run: pnpm run release:native -- --publish-branch=develop --tag=rc --no-git-checks
+            - name: Publish to NPM
+              run: |
+                  pnpm run release -- --publish-branch=develop --tag=rc --no-git-checks
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
