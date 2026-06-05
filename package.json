@@ -44,8 +44,9 @@
 		"test:unit": "lerna run test --parallel --no-bail",
 		"test:unit:coverage": "lerna run test:coverage --parallel",
 		"test:unit:merge": "bash scripts/development/create-lcov-report.sh",
-		"version": "lerna version --no-git-tag-version --yes",
+		"version": "bash ./scripts/version.sh",
 		"version:evm": "lerna run release:prepare --scope=@mainsail/evm",
+		"version:ts": "lerna version --no-git-tag-version --yes",
 		"workflows:unit": "node scripts/generate-unit-workflow.js"
 	},
 	"devDependencies": {
