@@ -165,7 +165,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 				const hasValidSignatures = await Promise.all(
 					commits.map(async (commit, index) =>
 						index === 0
-							? await this.commitProcessor.hasValidSignature(commit)
+							? await this.commitProcessor.hasValidSignature(commit, this.stateStore.getLastBlock().hash)
 							: await this.commitProcessor.hasValidSignature(commit, commits[index - 1].block.hash),
 					),
 				);
