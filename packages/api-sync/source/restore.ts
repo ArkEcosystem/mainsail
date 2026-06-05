@@ -324,7 +324,7 @@ export class Restore {
 			const fromBlockNumber = Math.min(currentBlockNumber, mostRecentCommit.block.number);
 			const toBlockNumber = Math.min(currentBlockNumber + BATCH_SIZE - 1, mostRecentCommit.block.number);
 
-			const commits = this.databaseService.readCommits(fromBlockNumber, toBlockNumber);
+			const commits = this.databaseService.readCommits(fromBlockNumber, toBlockNumber, Number.MAX_SAFE_INTEGER);
 
 			const blocks: Models.Block[] = [];
 			const transactions: Models.Transaction[] = [];

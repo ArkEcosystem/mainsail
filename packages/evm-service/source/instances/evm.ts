@@ -208,6 +208,14 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return result;
 	}
 
+	public async getCommitsByBlockRange(
+		fromBlockNumber: number,
+		toBlockNumber: number,
+		maxBytes: number,
+	): Promise<Contracts.Evm.CommitStorageData[]> {
+		return this.#evm.getCommitsByBlockRange(BigInt(fromBlockNumber), BigInt(toBlockNumber), BigInt(maxBytes));
+	}
+
 	public async getTransactionData(key: string): Promise<Contracts.Evm.TransactionStorageData | undefined> {
 		const result = await this.#evm.getTransactionData(key);
 		if (result === null || result === undefined) {

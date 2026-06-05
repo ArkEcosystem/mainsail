@@ -642,6 +642,57 @@ impl PersistentDB {
         }
     }
 
+    pub fn get_commits_by_block_range(
+        &self,
+        from_block_number: u64,
+        to_block_number: u64,
+        max_bytes: u64,
+    ) -> Result<Vec<(ProofData, BlockHeaderData, Vec<TransactionData>)>, Error> {
+        // Per-commit fixed cost charged against the budget on top of the block's transaction payload,
+        // so that a long run of (near-)empty blocks is still bounded by block count, not just bytes.
+        const PER_COMMIT_OVERHEAD_BYTES: u64 = 1024;
+
+        let tx_env = self.env.read_txn()?;
+        let inner = self.inner.borrow();
+
+        let capacity = to_block_number.saturating_sub(from_block_number).min(512) as usize;
+        let mut commits = Vec::with_capacity(capacity);
+        let mut accumulated_bytes: u64 = 0;
+
+        for item in inner
+            .blocks
+            .range(&tx_env, &(from_block_number..=to_block_number))?
+        {
+            let (block_number, header) = item?;
+
+            // Headers and proofs are written together per commit; a missing proof means the end of
+            // the available data has been reached.
+            let Some(proof) = inner.proofs.get(&tx_env, &block_number)? else {
+                break;
+            };
+
+            // Collect this block's transactions via a single range scan over its key prefix; the
+            // keys sort by (block_number, index), so they arrive in index order.
+            let mut transactions = Vec::with_capacity(header.0.transactions_count as usize);
+            let tx_from = TransactionKey::new(block_number, 0);
+            let tx_to = TransactionKey::new(block_number, u16::MAX);
+            for tx_item in inner.transactions.range(&tx_env, &(tx_from..=tx_to))? {
+                let (_, transaction) = tx_item?;
+                transactions.push(transaction.0);
+            }
+
+            let estimated_bytes = header.0.payload_size as u64 + PER_COMMIT_OVERHEAD_BYTES;
+            commits.push((proof.0, header.0, transactions));
+
+            accumulated_bytes += estimated_bytes;
+            if accumulated_bytes >= max_bytes {
+                break;
+            }
+        }
+
+        Ok(commits)
+    }
+
     pub fn get_historical_account_info(
         &self,
         block_number: u64,
@@ -2092,6 +2143,103 @@ mod tests {
         db.set_genesis_info(Default::default()).expect("ok");
 
         assert_eq!(db.genesis_info, Some(Default::default()));
+    }
+
+    #[test]
+    fn test_get_commits_by_block_range() {
+        let db = create_temp_database();
+
+        // Empty range before anything is written.
+        assert!(
+            db.get_commits_by_block_range(1, 3, u64::MAX)
+                .unwrap()
+                .is_empty()
+        );
+
+        // Write blocks 1..=3; block N has N transactions, inserted in reverse sequence order to
+        // prove the reader returns them ordered by (block_number, sequence).
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            let inner = db.inner.borrow();
+
+            for block_number in 1u64..=3 {
+                inner
+                    .blocks
+                    .put(
+                        &mut wtxn,
+                        &block_number,
+                        &CompactBincode(&BlockHeaderData {
+                            number: block_number as u32,
+                            transactions_count: block_number as u16,
+                            ..Default::default()
+                        }),
+                    )
+                    .unwrap();
+
+                inner
+                    .proofs
+                    .put(
+                        &mut wtxn,
+                        &block_number,
+                        &CompactBincode(&ProofData {
+                            round: block_number as u32,
+                            ..Default::default()
+                        }),
+                    )
+                    .unwrap();
+
+                for sequence in (0..block_number).rev() {
+                    inner
+                        .transactions
+                        .put(
+                            &mut wtxn,
+                            &TransactionKey::new(block_number, sequence as u16),
+                            &CompactBincode(&TransactionData {
+                                block_number: block_number as u32,
+                                index: sequence as u32,
+                                tx_hash: B256::from(U256::from(block_number * 100 + sequence)),
+                                ..Default::default()
+                            }),
+                        )
+                        .unwrap();
+                }
+            }
+
+            wtxn.commit().unwrap();
+        }
+
+        // Full range (unbounded budget): blocks ascending, transactions per block in sequence order.
+        let commits = db.get_commits_by_block_range(1, 3, u64::MAX).unwrap();
+        assert_eq!(commits.len(), 3);
+
+        for (index, (proof, header, transactions)) in commits.iter().enumerate() {
+            let block_number = (index + 1) as u64;
+
+            assert_eq!(header.number, block_number as u32);
+            assert_eq!(proof.round, block_number as u32);
+            assert_eq!(transactions.len(), block_number as usize);
+
+            for (sequence, transaction) in transactions.iter().enumerate() {
+                assert_eq!(transaction.index, sequence as u32);
+                assert_eq!(transaction.block_number, block_number as u32);
+            }
+        }
+
+        // Sub-range returns only the requested block.
+        let commits = db.get_commits_by_block_range(2, 2, u64::MAX).unwrap();
+        assert_eq!(commits.len(), 1);
+        assert_eq!(commits[0].1.number, 2);
+        assert_eq!(commits[0].2.len(), 2);
+
+        // Range extending past the tip stops at the last available block.
+        let commits = db.get_commits_by_block_range(2, 99, u64::MAX).unwrap();
+        assert_eq!(commits.len(), 2);
+
+        // A tiny byte budget stops early but always makes progress (returns at least one commit),
+        // so callers can resume from the last returned block.
+        let commits = db.get_commits_by_block_range(1, 3, 1).unwrap();
+        assert_eq!(commits.len(), 1);
+        assert_eq!(commits[0].1.number, 1);
     }
 
     #[test]

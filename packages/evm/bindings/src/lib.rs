@@ -915,6 +915,27 @@ impl EvmInner {
         Ok(Some((proof, header, txs)))
     }
 
+    pub fn get_commits_by_block_range(
+        &mut self,
+        from_block_number: u64,
+        to_block_number: u64,
+        max_bytes: u64,
+    ) -> std::result::Result<
+        Vec<(ProofData, BlockHeaderData, Vec<TransactionData>)>,
+        EVMError<String>,
+    > {
+        match self.persistent_db.get_commits_by_block_range(
+            from_block_number,
+            to_block_number,
+            max_bytes,
+        ) {
+            Ok(commits) => Ok(commits),
+            Err(err) => Err(EVMError::Database(
+                format!("failed reading commits by block range: {}", err).into(),
+            )),
+        }
+    }
+
     pub fn get_transaction_data(
         &mut self,
         key: String,
@@ -1626,6 +1647,33 @@ impl JsEvmWrapper {
     }
 
     #[napi]
+    pub fn get_commits_by_block_range<'env>(
+        &mut self,
+        env: &'env Env,
+        from_block_number: BigInt,
+        to_block_number: BigInt,
+        max_bytes: BigInt,
+    ) -> Result<PromiseRaw<'env, Vec<JsCommitData>>> {
+        let from_block_number = from_block_number.get_u64().1;
+        let to_block_number = to_block_number.get_u64().1;
+        let max_bytes = max_bytes.get_u64().1;
+        env.spawn_future_with_callback(
+            Self::get_commits_by_block_range_async(
+                self.evm.clone(),
+                from_block_number,
+                to_block_number,
+                max_bytes,
+            ),
+            |_, result| {
+                Ok(result
+                    .into_iter()
+                    .map(|(proof, header, txs)| JsCommitData::new(proof, header, txs))
+                    .collect())
+            },
+        )
+    }
+
+    #[napi]
     pub fn get_transaction_data<'env>(
         &mut self,
         env: &'env Env,
@@ -2043,6 +2091,21 @@ impl JsEvmWrapper {
     ) -> Result<Option<(ProofData, BlockHeaderData, Vec<TransactionData>)>> {
         let mut lock = evm.lock().await;
         let result = lock.get_commit_data(block_number);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_commits_by_block_range_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        from_block_number: u64,
+        to_block_number: u64,
+        max_bytes: u64,
+    ) -> Result<Vec<(ProofData, BlockHeaderData, Vec<TransactionData>)>> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_commits_by_block_range(from_block_number, to_block_number, max_bytes);
 
         match result {
             Ok(result) => Result::Ok(result),

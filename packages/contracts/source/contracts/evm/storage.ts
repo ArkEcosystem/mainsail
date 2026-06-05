@@ -55,6 +55,11 @@ export interface Storage {
 	getBlockHeaderData(blockNumber: number): Promise<BlockHeaderStorageData | undefined>;
 	getBlockNumberByHash(blockHash: string): Promise<number | undefined>;
 	getCommitData(blockNumber: number): Promise<CommitStorageData | undefined>;
+	getCommitsByBlockRange(
+		fromBlockNumber: number,
+		toBlockNumber: number,
+		maxBytes: number,
+	): Promise<CommitStorageData[]>;
 	getTransactionData(key: string): Promise<TransactionStorageData | undefined>;
 	getTransactionKeyByHash(txHash: string): Promise<string | undefined>;
 	isEmpty(): Promise<boolean>;

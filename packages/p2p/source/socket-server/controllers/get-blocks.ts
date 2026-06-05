@@ -31,14 +31,15 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 			return { blocks: [] };
 		}
 
+		const maxPayload = constants.MAX_PAYLOAD_CLIENT;
 		const commits: Buffer[] = await this.database.findCommitBuffers(
 			requestBlockNumber,
 			requestBlockNumber + requestBlockLimit - 1,
+			maxPayload,
 		);
 
 		// Only return the blocks fetched while we are below the p2p maxPayload limit
 		const blocksToReturn: Buffer[] = [];
-		const maxPayload = constants.MAX_PAYLOAD_CLIENT;
 		let totalSize = 0;
 
 		for (const commit of commits) {
