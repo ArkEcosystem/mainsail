@@ -2044,6 +2044,13 @@ importers:
       '@napi-rs/cli':
         specifier: 3.6.2
         version: 3.6.2(@emnapi/core@1.4.5)(@emnapi/runtime@1.4.5)(@types/node@25.7.0)(node-addon-api@8.5.0)
+    optionalDependencies:
+      '@mainsail/evm-linux-arm64-gnu':
+        specifier: 0.0.1-rc.9
+        version: 0.0.1-rc.9
+      '@mainsail/evm-linux-x64-gnu':
+        specifier: 0.0.1-rc.9
+        version: 0.0.1-rc.9
 
   packages/evm-api-worker:
     dependencies:
@@ -4842,6 +4849,20 @@ packages:
     resolution: {integrity: sha512-JF1BmLCm9kGEVZgYmJq43zeQVdHVgAJnTi/NURWEsy6L1ZrrlSmdltS+D17QN4LODwf+1LMXAA9auIZVXtWwzw==}
     cpu: [x64]
     os: [win32]
+
+  '@mainsail/evm-linux-arm64-gnu@0.0.1-rc.9':
+    resolution: {integrity: sha512-wvw2dTP/UBSw2LXgr2+A61fH12bfrMYp/6Ocse5UP6gODHDPh9clyJ5pHIpEkMNXiOeXXfXi7BvlH/M1VhqgQA==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@mainsail/evm-linux-x64-gnu@0.0.1-rc.9':
+    resolution: {integrity: sha512-dUD5zCcXMcXa/aBoD/avVOH3qryg4SFRxKLALDigg04qn1LCe9dvpIC59ba5Ok7phQp63CMdfcPctqAfNh8sPw==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     resolution: {integrity: sha512-QZHtlVgbAdy2zAqNA9Gu1UpIuI8Xvsd1v8ic6B2pZmeFnFcMWiPLfWXh7TVw4eGEZ/C9TH281KwhVoeQUKbyjw==}
@@ -11970,6 +11991,12 @@ snapshots:
     optional: true
 
   '@lmdb/lmdb-win32-x64@3.5.4':
+    optional: true
+
+  '@mainsail/evm-linux-arm64-gnu@0.0.1-rc.9':
+    optional: true
+
+  '@mainsail/evm-linux-x64-gnu@0.0.1-rc.9':
     optional: true
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
