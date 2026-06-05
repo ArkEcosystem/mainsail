@@ -12,5 +12,5 @@ export interface MessageProcessor {
 
 export interface CommitProcessor {
 	process(commit: Commit, broadcast?: boolean): Promise<ProcessorResult>;
-	hasValidSignature(commit: Commit): Promise<boolean>;
+	hasValidSignature(commit: Commit, previousBlockHash: string): Promise<boolean>;
 }
