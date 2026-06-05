@@ -23,8 +23,8 @@
 		"@napi-rs/cli": "3.6.2"
 	},
 	"optionalDependencies": {
-		"@mainsail/evm-linux-arm64-gnu": "0.0.1-rc.9",
-		"@mainsail/evm-linux-x64-gnu": "0.0.1-rc.9"
+		"@mainsail/evm-linux-arm64-gnu": "workspace:*",
+		"@mainsail/evm-linux-x64-gnu": "workspace:*"
 	},
 	"engines": {
 		"node": ">=24"
