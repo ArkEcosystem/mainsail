@@ -133,7 +133,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	public async *readCommits(start: number, end: number, maxBytes: number): AsyncGenerator<Contracts.Crypto.Commit> {
-		let from = start;
+		let from = Math.max(0, start);
 		let remainingBytes = maxBytes;
 
 		while (from <= end) {
