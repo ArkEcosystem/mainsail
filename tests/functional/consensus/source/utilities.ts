@@ -222,9 +222,8 @@ export const getLastCommit = async (app: Contracts.Kernel.Application): Promise<
 	const [serialized] = await databaseService.findCommitBuffers(
 		lasCommit.block.number,
 		lasCommit.block.number,
+		Number.MAX_SAFE_INTEGER,
 	);
 
-	return app
-		.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory)
-		.fromBytes(serialized);
+	return app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory).fromBytes(serialized);
 };

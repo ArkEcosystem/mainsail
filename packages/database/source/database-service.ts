@@ -38,26 +38,14 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return blockNumber !== undefined;
 	}
 
-	public async findCommitBuffers(start: number, end: number): Promise<Buffer[]> {
-		const blockNumbers: number[] = [];
+	public async findCommitBuffers(start: number, end: number, maxBytes: number): Promise<Buffer[]> {
+		const buffers: Buffer[] = [];
 
-		for (const blockNumber of this.#range(start, end)) {
-			blockNumbers.push(blockNumber);
+		for await (const commit of this.readCommits(start, end, maxBytes)) {
+			buffers.push(Buffer.from(commit.serialized, "hex"));
 		}
 
-		const buffers = await Promise.all(
-			blockNumbers.map(async (blockNumber: number) => {
-				const commitStorage = await this.#readCommitStorage(blockNumber);
-				if (!commitStorage) {
-					return;
-				}
-
-				const commit = await this.commitFactory.fromStorage(commitStorage);
-				return Buffer.from(commit.serialized, "hex");
-			}),
-		);
-
-		return buffers.filter((commit) => !!commit);
+		return buffers;
 	}
 
 	public async getBlock(blockNumber: number): Promise<Contracts.Crypto.Block | undefined> {
@@ -106,12 +94,13 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	public async findBlocks(start: number, end: number): Promise<Contracts.Crypto.Block[]> {
-		const commitBuffers = await this.findCommitBuffers(start, end);
+		const blocks: Contracts.Crypto.Block[] = [];
 
-		return await this.#map(
-			commitBuffers,
-			async (buffer: Buffer) => (await this.commitFactory.fromBytes(buffer)).block,
-		);
+		for await (const commit of this.readCommits(start, end, Number.MAX_SAFE_INTEGER)) {
+			blocks.push(commit.block);
+		}
+
+		return blocks;
 	}
 
 	public async getTransactionByHash(transactionHash: string): Promise<Contracts.Crypto.BlockTransaction | undefined> {
@@ -143,16 +132,29 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return this.#readTransaction(`${blockNumber}-${index}`);
 	}
 
-	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {
-		for (let blockNumber = start; blockNumber <= end; blockNumber++) {
-			const data = await this.#readCommitStorage(blockNumber);
+	public async *readCommits(start: number, end: number, maxBytes: number): AsyncGenerator<Contracts.Crypto.Commit> {
+		let from = Math.max(0, start);
+		let remainingBytes = maxBytes;
 
-			if (!data) {
+		while (from <= end) {
+			const commitsData = await this.storage.getCommitsByBlockRange(from, end, remainingBytes);
+			if (commitsData.length === 0) {
 				return;
 			}
 
-			const commit = await this.commitFactory.fromStorage(data);
-			yield commit;
+			let lastBlockNumber = from;
+			for (const data of commitsData) {
+				const commit = await this.commitFactory.fromStorage(data);
+				lastBlockNumber = commit.block.number;
+				yield commit;
+
+				remainingBytes -= commit.serialized.length / 2;
+				if (remainingBytes <= 0) {
+					return;
+				}
+			}
+
+			from = lastBlockNumber + 1;
 		}
 	}
 
@@ -200,20 +202,5 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		assert.defined(blockHeaderData);
 
 		return this.transactionFactory.fromStorage({ ...transactionStorageData, blockHash: blockHeaderData.hash });
-	}
-
-	async #map<T, U>(data: U[], callback: (...arguments_: U[]) => Promise<T>): Promise<T[]> {
-		const result: T[] = [];
-		for (const [index, datum] of data.entries()) {
-			result[index] = await callback(datum);
-		}
-
-		return result;
-	}
-
-	*#range(start: number, end: number): Generator<number> {
-		for (let index = start; index <= end; index++) {
-			yield index;
-		}
 	}
 }

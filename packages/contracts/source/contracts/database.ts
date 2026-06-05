@@ -14,8 +14,8 @@ export interface DatabaseService extends CommitHandler {
 
 	getLastCommit(): Promise<Commit>;
 	hasCommitByHash(blockHash: string): Promise<boolean>;
-	findCommitBuffers(start: number, end: number): Promise<Buffer[]>;
-	readCommits(start: number, end: number): AsyncGenerator<Commit>;
+	findCommitBuffers(start: number, end: number, maxBytes: number): Promise<Buffer[]>;
+	readCommits(start: number, end: number, maxBytes: number): AsyncGenerator<Commit>;
 
 	getBlock(blockNumber: number): Promise<Block | undefined>;
 	getBlockByHash(blockHash: string): Promise<Block | undefined>;
