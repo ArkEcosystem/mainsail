@@ -84,3 +84,77 @@ impl<T> Deref for CompressedBincode<T> {
         &self.0
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use heed::{BytesDecode, BytesEncode};
+
+    use super::*;
+
+    fn encode(value: &Vec<u8>) -> Vec<u8> {
+        let item = CompressedBincode(value);
+        <CompressedBincode<Vec<u8>> as BytesEncode>::bytes_encode(&item)
+            .unwrap()
+            .into_owned()
+    }
+
+    fn decode(bytes: &[u8]) -> Vec<u8> {
+        <CompressedBincode<Vec<u8>> as BytesDecode>::bytes_decode(bytes)
+            .unwrap()
+            .0
+    }
+
+    #[test]
+    fn small_value_is_stored_raw() {
+        let value = vec![1u8, 2, 3, 4, 5];
+        let encoded = encode(&value);
+        assert_eq!(encoded[0], TAG_RAW);
+        assert_eq!(decode(&encoded), value);
+    }
+
+    #[test]
+    fn large_compressible_value_is_stored_zstd_and_smaller() {
+        let value = vec![7u8; 4096];
+        let encoded = encode(&value);
+        assert_eq!(encoded[0], TAG_ZSTD);
+        assert!(encoded.len() < value.len());
+        assert_eq!(decode(&encoded), value);
+    }
+
+    #[test]
+    fn output_never_exceeds_raw_plus_tag() {
+        // A large, hard-to-compress value: compression is attempted but must fall back to raw
+        // rather than store something bigger.
+        let value: Vec<u8> = (0..2048u32)
+            .map(|i| (i.wrapping_mul(2_654_435_761) >> 13) as u8)
+            .collect();
+        let raw_len = bincode::serialize(&value).unwrap().len();
+
+        let encoded = encode(&value);
+        assert!(
+            encoded.len() <= raw_len + 1,
+            "encoded {} raw {}",
+            encoded.len(),
+            raw_len
+        );
+        assert_eq!(decode(&encoded), value);
+    }
+
+    #[test]
+    fn empty_input_is_an_error_not_a_panic() {
+        assert!(<CompressedBincode<Vec<u8>> as BytesDecode>::bytes_decode(&[]).is_err());
+    }
+
+    #[test]
+    fn truncated_zstd_header_is_an_error_not_a_panic() {
+        // TAG_ZSTD with fewer than the four orig_len header bytes must error, not panic on the slice.
+        assert!(
+            <CompressedBincode<Vec<u8>> as BytesDecode>::bytes_decode(&[TAG_ZSTD, 1, 2]).is_err()
+        );
+    }
+
+    #[test]
+    fn unknown_tag_is_an_error_not_a_panic() {
+        assert!(<CompressedBincode<Vec<u8>> as BytesDecode>::bytes_decode(&[9, 0, 0]).is_err());
+    }
+}
