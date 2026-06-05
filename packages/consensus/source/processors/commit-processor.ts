@@ -37,7 +37,10 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 			: Enums.Consensus.ProcessorResult.Invalid;
 	}
 
-	async hasValidSignature(commit: Contracts.Crypto.Commit): Promise<boolean> {
+	async hasValidSignature(
+		commit: Contracts.Crypto.Commit,
+		previousBlockHash: string = this.stateStore.getLastBlock().hash,
+	): Promise<boolean> {
 		const { block, proof } = commit;
 
 		const publicKeys: Buffer[] = [];
@@ -64,7 +67,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 			},
 			{
 				genesisBlockHash: this.stateStore.getGenesisCommit().block.hash,
-				previousBlockHash: this.stateStore.getLastBlock().hash,
+				previousBlockHash,
 			},
 		);
 
