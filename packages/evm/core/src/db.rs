@@ -77,21 +77,60 @@ impl heed::BytesEncode<'_> for HashWrapper {
     }
 }
 
-#[derive(Debug)]
-pub(crate) struct StringWrapper(String);
-impl heed::BytesEncode<'_> for StringWrapper {
-    type EItem = StringWrapper;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct TransactionKey {
+    pub block_number: u64,
+    pub index: u16,
+}
 
-    fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
-        Ok(Cow::Borrowed(item.0.as_bytes()))
+impl TransactionKey {
+    pub fn new(block_number: u64, index: u16) -> Self {
+        Self {
+            block_number,
+            index,
+        }
+    }
+
+    // Parses the "<block_number>-<index>" token exchanged across the napi boundary.
+    pub fn parse(token: &str) -> Option<Self> {
+        let (block_number, index) = token.split_once('-')?;
+        Some(Self {
+            block_number: block_number.parse().ok()?,
+            index: index.parse().ok()?,
+        })
+    }
+
+    pub fn to_token(&self) -> String {
+        format!("{}-{}", self.block_number, self.index)
     }
 }
 
-impl heed::BytesDecode<'_> for StringWrapper {
-    type DItem = StringWrapper;
+impl heed::BytesEncode<'_> for TransactionKey {
+    type EItem = TransactionKey;
+
+    fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
+        let mut buffer = Vec::with_capacity(10);
+        buffer.extend_from_slice(&item.block_number.to_be_bytes());
+        buffer.extend_from_slice(&item.index.to_be_bytes());
+        Ok(Cow::Owned(buffer))
+    }
+}
+
+impl heed::BytesDecode<'_> for TransactionKey {
+    type DItem = TransactionKey;
 
     fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
-        Ok(StringWrapper(String::from_utf8(bytes.into())?))
+        let Some((block_number, rest)) = bytes.split_first_chunk::<8>() else {
+            return Err("TransactionKey: truncated key".into());
+        };
+        let Some((index, _)) = rest.split_first_chunk::<2>() else {
+            return Err("TransactionKey: truncated key".into());
+        };
+
+        Ok(TransactionKey {
+            block_number: u64::from_be_bytes(*block_number),
+            index: u16::from_be_bytes(*index),
+        })
     }
 }
 
@@ -170,8 +209,8 @@ pub(crate) struct InnerStorage {
     pub proofs: heed::Database<HeedBlockNumber, CompactBincode<ProofData>>,
     pub blocks: heed::Database<HeedBlockNumber, CompactBincode<BlockHeaderData>>,
     pub blocks_hash_number: heed::Database<HashWrapper, HeedBlockNumber>,
-    pub transactions: heed::Database<StringWrapper, CompactBincode<TransactionData>>,
-    pub transactions_hash_key: heed::Database<HashWrapper, heed::types::SerdeBincode<String>>,
+    pub transactions: heed::Database<TransactionKey, CompactBincode<TransactionData>>,
+    pub transactions_hash_key: heed::Database<HashWrapper, TransactionKey>,
     //
 }
 
@@ -426,15 +465,14 @@ impl PersistentDB {
             &mut wtxn,
             Some("blocks_hash_number"),
         )?;
-        let transactions = env.create_database::<StringWrapper, CompactBincode<TransactionData>>(
+        let transactions = env.create_database::<TransactionKey, CompactBincode<TransactionData>>(
             &mut wtxn,
             Some("transactions"),
         )?;
-        let transactions_hash_key = env
-            .create_database::<HashWrapper, heed::types::SerdeBincode<String>>(
-                &mut wtxn,
-                Some("transactions_hash_key"),
-            )?;
+        let transactions_hash_key = env.create_database::<HashWrapper, TransactionKey>(
+            &mut wtxn,
+            Some("transactions_hash_key"),
+        )?;
 
         wtxn.commit()?;
 
@@ -1018,7 +1056,9 @@ impl PersistentDB {
 
                 // Update transactions
                 for (sequence, _) in transactions.iter().enumerate() {
-                    let key = format!("{}-{}", key.0, sequence);
+                    debug_assert!(sequence <= u16::MAX as usize);
+
+                    let key = TransactionKey::new(key.0, sequence as u16);
                     let transaction = &transactions[sequence];
 
                     inner.transactions_hash_key.put(
@@ -1027,11 +1067,9 @@ impl PersistentDB {
                         &key,
                     )?;
 
-                    inner.transactions.put(
-                        rwtxn,
-                        &StringWrapper(key),
-                        &CompactBincode(transaction),
-                    )?;
+                    inner
+                        .transactions
+                        .put(rwtxn, &key, &CompactBincode(transaction))?;
                 }
 
                 // Update state
@@ -1155,15 +1193,19 @@ impl PersistentDB {
         Ok(inner.blocks.get(&rtxn, &block_number)?.map(|data| data.0))
     }
 
-    pub fn get_transaction_data(&self, key: String) -> Result<Option<TransactionData>, Error> {
+    pub fn get_transaction(&self, key: TransactionKey) -> Result<Option<TransactionData>, Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
 
-        Ok(inner
-            .transactions
-            .get(&rtxn, &StringWrapper(key))?
-            .map(|data| data.0))
+        Ok(inner.transactions.get(&rtxn, &key)?.map(|data| data.0))
+    }
+
+    pub fn get_transaction_data(&self, key: String) -> Result<Option<TransactionData>, Error> {
+        match TransactionKey::parse(&key) {
+            Some(key) => self.get_transaction(key),
+            None => Ok(None),
+        }
     }
 
     pub fn get_transaction_key_by_hash(&self, tx_hash: B256) -> Result<Option<String>, Error> {
@@ -1173,7 +1215,8 @@ impl PersistentDB {
 
         Ok(inner
             .transactions_hash_key
-            .get(&rtxn, &HashWrapper(tx_hash))?)
+            .get(&rtxn, &HashWrapper(tx_hash))?
+            .map(|key| key.to_token()))
     }
 }
 
@@ -1246,7 +1289,7 @@ mod tests {
         db::{
             AddressWrapper, BlockHeaderData, CommitData, CommitKey, CommitReceipts, HashWrapper,
             LegacyAddressWrapper, MAP_SIZE_UNIT, PendingCommit, PersistentDB, PersistentDBOptions,
-            ProofData, StaticStringWrapper, StorageEntryWrapper, StringWrapper, TransactionData,
+            ProofData, StaticStringWrapper, StorageEntryWrapper, TransactionData, TransactionKey,
             next_map_size,
         },
         historical::HistoricalAccountData,
@@ -1853,17 +1896,6 @@ mod tests {
     }
 
     #[test]
-    fn test_string_wrapper() {
-        let string = "test".to_owned();
-
-        let wrapper = StringWrapper(string);
-        let serialized = <StringWrapper as BytesEncode>::bytes_encode(&wrapper).expect("ok");
-        let deserialized = <StringWrapper as BytesDecode>::bytes_decode(&serialized).expect("ok");
-
-        assert_eq!("test", deserialized.0);
-    }
-
-    #[test]
     fn test_static_string_wrapper() {
         let string = "test";
 
@@ -2389,11 +2421,86 @@ mod tests {
     }
 
     #[test]
+    fn test_transaction_key_encode_decode_roundtrip() {
+        for (block_number, index) in [(0u64, 0u16), (1, 2), (5, 9999), (u64::MAX, u16::MAX)] {
+            let key = TransactionKey::new(block_number, index);
+            let encoded = <TransactionKey as BytesEncode>::bytes_encode(&key).unwrap();
+            assert_eq!(encoded.len(), 10, "key is 8-byte block + 2-byte index");
+
+            let decoded = <TransactionKey as BytesDecode>::bytes_decode(&encoded).unwrap();
+            assert_eq!(decoded, key);
+        }
+    }
+
+    #[test]
+    fn test_transaction_key_orders_by_block_then_index() {
+        // The transactions DB relies on byte (memcmp) key order matching numeric
+        // (block_number, index) order, so get_commits_by_block_range can scan by block number.
+        // Big-endian encoding is what guarantees this (e.g. block 2 sorts before block 10).
+        let ascending = [
+            TransactionKey::new(0, 0),
+            TransactionKey::new(0, 1),
+            TransactionKey::new(0, u16::MAX),
+            TransactionKey::new(1, 0), // block 1 sorts after every transaction of block 0
+            TransactionKey::new(2, 0),
+            TransactionKey::new(10, 0), // numeric order, not lexicographic on decimal
+            TransactionKey::new(u64::MAX, 0),
+            TransactionKey::new(u64::MAX, u16::MAX),
+        ];
+
+        for window in ascending.windows(2) {
+            let lo = <TransactionKey as BytesEncode>::bytes_encode(&window[0]).unwrap();
+            let hi = <TransactionKey as BytesEncode>::bytes_encode(&window[1]).unwrap();
+            assert!(lo < hi, "encoded keys must sort by (block, index)");
+            // The derived Ord must agree with the on-disk byte order.
+            assert!(window[0] < window[1]);
+        }
+    }
+
+    #[test]
+    fn test_transaction_key_token_roundtrip_and_lenient_parse() {
+        assert_eq!(TransactionKey::new(5, 2).to_token(), "5-2");
+
+        let key = TransactionKey::new(123, 45);
+        assert_eq!(TransactionKey::parse(&key.to_token()), Some(key));
+
+        // Malformed or out-of-range tokens parse to None (treated as "no such transaction").
+        assert_eq!(TransactionKey::parse("nope"), None);
+        assert_eq!(TransactionKey::parse("-5"), None);
+        assert_eq!(TransactionKey::parse("1-2-3"), None);
+        assert_eq!(TransactionKey::parse("1-70000"), None); // index exceeds u16::MAX
+    }
+
+    #[test]
+    fn test_transaction_key_range_bounds_capture_a_block_range() {
+        // Mirrors the scan bounds get_commits_by_block_range builds for [from, to].
+        let from = TransactionKey::new(5, 0);
+        let to = TransactionKey::new(7, u16::MAX);
+
+        for block in 5..=7u64 {
+            for index in [0u16, 1, 1000, u16::MAX] {
+                let key = TransactionKey::new(block, index);
+                assert!(
+                    key >= from && key <= to,
+                    "{block}-{index} should be within range"
+                );
+            }
+        }
+
+        // The neighbouring blocks fall outside the range on each side.
+        assert!(TransactionKey::new(4, u16::MAX) < from);
+        assert!(TransactionKey::new(8, 0) > to);
+    }
+
+    #[test]
     fn test_get_transaction_data() {
         let db = create_temp_database();
 
-        let key = String::from("tx-1");
-        assert_eq!(db.get_transaction_data(key.clone()).unwrap(), None);
+        // Lookups go through the "<block>-<index>" token; before anything is written it is absent,
+        // and malformed/out-of-range tokens resolve to None rather than erroring.
+        assert_eq!(db.get_transaction_data("1-0".into()).unwrap(), None);
+        assert_eq!(db.get_transaction_data("not-a-key".into()).unwrap(), None);
+        assert_eq!(db.get_transaction_data("1-70000".into()).unwrap(), None);
 
         let hash = b256!("0000000000000000000000000000000000000000000000000000000000000001");
 
@@ -2405,7 +2512,7 @@ mod tests {
                 .transactions
                 .put(
                     &mut wtxn,
-                    &StringWrapper(key.clone()),
+                    &TransactionKey::new(1, 0),
                     &CompactBincode(&TransactionData {
                         tx_hash: hash,
                         ..Default::default()
@@ -2417,7 +2524,7 @@ mod tests {
         }
 
         assert_eq!(
-            db.get_transaction_data(key.clone()).unwrap(),
+            db.get_transaction_data("1-0".into()).unwrap(),
             Some(TransactionData {
                 tx_hash: hash,
                 ..Default::default()
@@ -2429,7 +2536,6 @@ mod tests {
     fn test_get_transaction_hash_by_hash() {
         let db = create_temp_database();
 
-        let key = String::from("tx-1");
         let hash = b256!("0000000000000000000000000000000000000000000000000000000000000001");
 
         assert_eq!(db.get_transaction_key_by_hash(hash).unwrap(), None);
@@ -2440,13 +2546,17 @@ mod tests {
             db.inner
                 .borrow_mut()
                 .transactions_hash_key
-                .put(&mut wtxn, &HashWrapper(hash), &key)
+                .put(&mut wtxn, &HashWrapper(hash), &TransactionKey::new(1, 0))
                 .unwrap();
 
             wtxn.commit().unwrap();
         }
 
-        assert_eq!(db.get_transaction_key_by_hash(hash).unwrap(), Some(key));
+        // The stored typed key is returned to the napi boundary as its "<block>-<index>" token.
+        assert_eq!(
+            db.get_transaction_key_by_hash(hash).unwrap(),
+            Some("1-0".to_string())
+        );
     }
 
     #[test]
