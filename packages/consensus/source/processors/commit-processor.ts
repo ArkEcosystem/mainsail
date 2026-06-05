@@ -37,10 +37,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 			: Enums.Consensus.ProcessorResult.Invalid;
 	}
 
-	async hasValidSignature(
-		commit: Contracts.Crypto.Commit,
-		previousBlockHash: string,
-	): Promise<boolean> {
+	async hasValidSignature(commit: Contracts.Crypto.Commit, previousBlockHash: string): Promise<boolean> {
 		const { block, proof } = commit;
 
 		const publicKeys: Buffer[] = [];
