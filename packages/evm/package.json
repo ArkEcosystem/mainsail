@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/evm",
-	"version": "0.0.1-evm.49",
+	"version": "0.0.1-evm.50",
 	"description": "EVM for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -23,8 +23,8 @@
 		"@napi-rs/cli": "3.6.2"
 	},
 	"optionalDependencies": {
-		"@mainsail/evm-linux-arm64-gnu": "0.0.1-rc.9",
-		"@mainsail/evm-linux-x64-gnu": "0.0.1-rc.9"
+		"@mainsail/evm-linux-arm64-gnu": "0.0.1-evm.50",
+		"@mainsail/evm-linux-x64-gnu": "0.0.1-evm.50"
 	},
 	"engines": {
 		"node": ">=24"
