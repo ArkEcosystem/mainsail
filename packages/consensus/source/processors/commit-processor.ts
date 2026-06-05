@@ -39,7 +39,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 
 	async hasValidSignature(
 		commit: Contracts.Crypto.Commit,
-		previousBlockHash: string = this.stateStore.getLastBlock().hash,
+		previousBlockHash: string,
 	): Promise<boolean> {
 		const { block, proof } = commit;
 
