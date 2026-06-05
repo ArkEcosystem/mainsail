@@ -83,13 +83,13 @@ describe<{
 	});
 
 	it("findCommitBuffers - should be ok", async ({ databaseService }) => {
-		const commits = await databaseService.findCommitBuffers(1, 2);
+		const commits = await databaseService.findCommitBuffers(1, 2, Number.MAX_SAFE_INTEGER);
 		assert.empty(commits);
 	});
 
 	it("readCommits - should be ok", async ({ databaseService }) => {
 		const commits = [];
-		for await (const commit of databaseService.readCommits(1, 2)) {
+		for await (const commit of databaseService.readCommits(1, 2, Number.MAX_SAFE_INTEGER)) {
 			commits.push(commit);
 		}
 
@@ -197,7 +197,6 @@ describe<{
 				from: transaction.from,
 				gasLimit: BigInt(transaction.gasLimit),
 				gasPrice: BigInt(transaction.gasPrice),
-				index: transaction.transactionIndex,
 				nonce: transaction.nonce,
 				specId: Enums.Evm.SpecId.LATEST,
 				to: transaction.to,
@@ -237,7 +236,9 @@ describe<{
 	});
 
 	it("#findCommitBuffers - should return commit buffer", async ({ databaseService, genesisCommit }) => {
-		assert.equal(await databaseService.findCommitBuffers(0, 1), [Buffer.from(genesisCommit.serialized, "hex")]);
+		assert.equal(await databaseService.findCommitBuffers(0, 1, Number.MAX_SAFE_INTEGER), [
+			Buffer.from(genesisCommit.serialized, "hex"),
+		]);
 	});
 
 	it("#getBlock - should return block", async ({ databaseService, genesisCommit }) => {
@@ -269,7 +270,7 @@ describe<{
 
 	it("#readCommits - should return commits", async ({ databaseService, genesisCommit }) => {
 		const commits = [];
-		for await (const commit of databaseService.readCommits(0, 1)) {
+		for await (const commit of databaseService.readCommits(0, 1, Number.MAX_SAFE_INTEGER)) {
 			commits.push(commit);
 		}
 		assert.equal(
