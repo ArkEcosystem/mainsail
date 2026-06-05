@@ -159,8 +159,15 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 					}
 				}
 
+				// Each commit's precommit signature covers the previous block hash, so verify
+				// against the actual predecessor in the chain instead of the store's last block
+				// (which is stale for every commit but the first until the batch is processed).
 				const hasValidSignatures = await Promise.all(
-					commits.map(async (commit) => await this.commitProcessor.hasValidSignature(commit)),
+					commits.map(async (commit, index) =>
+						index === 0
+							? await this.commitProcessor.hasValidSignature(commit, this.stateStore.getLastBlock().hash)
+							: await this.commitProcessor.hasValidSignature(commit, commits[index - 1].block.hash),
+					),
 				);
 
 				if (!hasValidSignatures.every(Boolean)) {
