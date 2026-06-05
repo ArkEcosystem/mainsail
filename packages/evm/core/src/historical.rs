@@ -6,7 +6,7 @@ use revm::{
     state::AccountInfo,
 };
 
-use crate::{compression::CompressedBincode, db::Error};
+use crate::{compression::CompactBincode, db::Error};
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct HistoricalAccountData {
@@ -39,7 +39,7 @@ impl AccountHistory {
         txn: &mut RwTxn,
         database: &heed::Database<
             heed::types::U64<heed::byteorder::BigEndian>,
-            CompressedBincode<BTreeMap<Address, HistoricalAccountData>>,
+            CompactBincode<BTreeMap<Address, HistoricalAccountData>>,
         >,
         block_number: u64,
         accounts: Vec<(Address, AccountInfo)>,
@@ -58,7 +58,7 @@ impl AccountHistory {
             .map(|a| (a.0, HistoricalAccountData::from(a.1)))
             .collect::<BTreeMap<Address, HistoricalAccountData>>();
 
-        database.put(txn, &block_number, &CompressedBincode(&data))?;
+        database.put(txn, &block_number, &CompactBincode(&data))?;
 
         Ok(())
     }
@@ -68,7 +68,7 @@ impl AccountHistory {
         txn: &RoTxn,
         database: &heed::Database<
             heed::types::U64<heed::byteorder::BigEndian>,
-            CompressedBincode<BTreeMap<Address, HistoricalAccountData>>,
+            CompactBincode<BTreeMap<Address, HistoricalAccountData>>,
         >,
         block_number: u64,
         address: &Address,

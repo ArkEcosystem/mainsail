@@ -20,9 +20,9 @@ const ZSTD_LEVEL: i32 = 3;
 const MIN_COMPRESS_LEN: usize = 256;
 
 #[derive(Debug)]
-pub struct CompressedBincode<T>(pub T);
-impl<'a, T: serde::Serialize + 'a> heed::BytesEncode<'a> for CompressedBincode<T> {
-    type EItem = CompressedBincode<&'a T>;
+pub struct CompactBincode<T>(pub T);
+impl<'a, T: serde::Serialize + 'a> heed::BytesEncode<'a> for CompactBincode<T> {
+    type EItem = CompactBincode<&'a T>;
 
     fn bytes_encode(item: &'a Self::EItem) -> Result<Cow<'a, [u8]>, heed::BoxedError> {
         let raw = bincode::serialize(&item.0)?;
@@ -51,8 +51,8 @@ impl<'a, T: serde::Serialize + 'a> heed::BytesEncode<'a> for CompressedBincode<T
     }
 }
 
-impl<'a, T: serde::de::DeserializeOwned + 'a> heed::BytesDecode<'a> for CompressedBincode<T> {
-    type DItem = CompressedBincode<T>;
+impl<'a, T: serde::de::DeserializeOwned + 'a> heed::BytesDecode<'a> for CompactBincode<T> {
+    type DItem = CompactBincode<T>;
 
     fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
         let (&tag, payload) = bytes
@@ -73,11 +73,11 @@ impl<'a, T: serde::de::DeserializeOwned + 'a> heed::BytesDecode<'a> for Compress
             other => return Err(format!("CompressedBincode: unknown tag {other}").into()),
         };
 
-        Ok(CompressedBincode(deserialized))
+        Ok(CompactBincode(deserialized))
     }
 }
 
-impl<T> Deref for CompressedBincode<T> {
+impl<T> Deref for CompactBincode<T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
@@ -92,14 +92,14 @@ mod tests {
     use super::*;
 
     fn encode(value: &Vec<u8>) -> Vec<u8> {
-        let item = CompressedBincode(value);
-        <CompressedBincode<Vec<u8>> as BytesEncode>::bytes_encode(&item)
+        let item = CompactBincode(value);
+        <CompactBincode<Vec<u8>> as BytesEncode>::bytes_encode(&item)
             .unwrap()
             .into_owned()
     }
 
     fn decode(bytes: &[u8]) -> Vec<u8> {
-        <CompressedBincode<Vec<u8>> as BytesDecode>::bytes_decode(bytes)
+        <CompactBincode<Vec<u8>> as BytesDecode>::bytes_decode(bytes)
             .unwrap()
             .0
     }
@@ -142,19 +142,17 @@ mod tests {
 
     #[test]
     fn empty_input_is_an_error_not_a_panic() {
-        assert!(<CompressedBincode<Vec<u8>> as BytesDecode>::bytes_decode(&[]).is_err());
+        assert!(<CompactBincode<Vec<u8>> as BytesDecode>::bytes_decode(&[]).is_err());
     }
 
     #[test]
     fn truncated_zstd_header_is_an_error_not_a_panic() {
         // TAG_ZSTD with fewer than the four orig_len header bytes must error, not panic on the slice.
-        assert!(
-            <CompressedBincode<Vec<u8>> as BytesDecode>::bytes_decode(&[TAG_ZSTD, 1, 2]).is_err()
-        );
+        assert!(<CompactBincode<Vec<u8>> as BytesDecode>::bytes_decode(&[TAG_ZSTD, 1, 2]).is_err());
     }
 
     #[test]
     fn unknown_tag_is_an_error_not_a_panic() {
-        assert!(<CompressedBincode<Vec<u8>> as BytesDecode>::bytes_decode(&[9, 0, 0]).is_err());
+        assert!(<CompactBincode<Vec<u8>> as BytesDecode>::bytes_decode(&[9, 0, 0]).is_err());
     }
 }
