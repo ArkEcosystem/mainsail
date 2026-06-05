@@ -77,21 +77,60 @@ impl heed::BytesEncode<'_> for HashWrapper {
     }
 }
 
-#[derive(Debug)]
-pub(crate) struct StringWrapper(String);
-impl heed::BytesEncode<'_> for StringWrapper {
-    type EItem = StringWrapper;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct TransactionKey {
+    pub block_number: u64,
+    pub index: u16,
+}
 
-    fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
-        Ok(Cow::Borrowed(item.0.as_bytes()))
+impl TransactionKey {
+    pub fn new(block_number: u64, index: u16) -> Self {
+        Self {
+            block_number,
+            index,
+        }
+    }
+
+    // Parses the "<block_number>-<index>" token exchanged across the napi boundary.
+    pub fn parse(token: &str) -> Option<Self> {
+        let (block_number, index) = token.split_once('-')?;
+        Some(Self {
+            block_number: block_number.parse().ok()?,
+            index: index.parse().ok()?,
+        })
+    }
+
+    pub fn to_token(&self) -> String {
+        format!("{}-{}", self.block_number, self.index)
     }
 }
 
-impl heed::BytesDecode<'_> for StringWrapper {
-    type DItem = StringWrapper;
+impl heed::BytesEncode<'_> for TransactionKey {
+    type EItem = TransactionKey;
+
+    fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, heed::BoxedError> {
+        let mut buffer = Vec::with_capacity(10);
+        buffer.extend_from_slice(&item.block_number.to_be_bytes());
+        buffer.extend_from_slice(&item.index.to_be_bytes());
+        Ok(Cow::Owned(buffer))
+    }
+}
+
+impl heed::BytesDecode<'_> for TransactionKey {
+    type DItem = TransactionKey;
 
     fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
-        Ok(StringWrapper(String::from_utf8(bytes.into())?))
+        let Some((block_number, rest)) = bytes.split_first_chunk::<8>() else {
+            return Err("TransactionKey: truncated key".into());
+        };
+        let Some((index, _)) = rest.split_first_chunk::<2>() else {
+            return Err("TransactionKey: truncated key".into());
+        };
+
+        Ok(TransactionKey {
+            block_number: u64::from_be_bytes(*block_number),
+            index: u16::from_be_bytes(*index),
+        })
     }
 }
 
@@ -170,8 +209,8 @@ pub(crate) struct InnerStorage {
     pub proofs: heed::Database<HeedBlockNumber, CompactBincode<ProofData>>,
     pub blocks: heed::Database<HeedBlockNumber, CompactBincode<BlockHeaderData>>,
     pub blocks_hash_number: heed::Database<HashWrapper, HeedBlockNumber>,
-    pub transactions: heed::Database<StringWrapper, CompactBincode<TransactionData>>,
-    pub transactions_hash_key: heed::Database<HashWrapper, heed::types::SerdeBincode<String>>,
+    pub transactions: heed::Database<TransactionKey, CompactBincode<TransactionData>>,
+    pub transactions_hash_key: heed::Database<HashWrapper, TransactionKey>,
     //
 }
 
@@ -426,15 +465,14 @@ impl PersistentDB {
             &mut wtxn,
             Some("blocks_hash_number"),
         )?;
-        let transactions = env.create_database::<StringWrapper, CompactBincode<TransactionData>>(
+        let transactions = env.create_database::<TransactionKey, CompactBincode<TransactionData>>(
             &mut wtxn,
             Some("transactions"),
         )?;
-        let transactions_hash_key = env
-            .create_database::<HashWrapper, heed::types::SerdeBincode<String>>(
-                &mut wtxn,
-                Some("transactions_hash_key"),
-            )?;
+        let transactions_hash_key = env.create_database::<HashWrapper, TransactionKey>(
+            &mut wtxn,
+            Some("transactions_hash_key"),
+        )?;
 
         wtxn.commit()?;
 
@@ -1018,7 +1056,9 @@ impl PersistentDB {
 
                 // Update transactions
                 for (sequence, _) in transactions.iter().enumerate() {
-                    let key = format!("{}-{}", key.0, sequence);
+                    debug_assert!(sequence <= u16::MAX as usize);
+
+                    let key = TransactionKey::new(key.0, sequence as u16);
                     let transaction = &transactions[sequence];
 
                     inner.transactions_hash_key.put(
@@ -1027,11 +1067,9 @@ impl PersistentDB {
                         &key,
                     )?;
 
-                    inner.transactions.put(
-                        rwtxn,
-                        &StringWrapper(key),
-                        &CompactBincode(transaction),
-                    )?;
+                    inner
+                        .transactions
+                        .put(rwtxn, &key, &CompactBincode(transaction))?;
                 }
 
                 // Update state
@@ -1155,15 +1193,19 @@ impl PersistentDB {
         Ok(inner.blocks.get(&rtxn, &block_number)?.map(|data| data.0))
     }
 
-    pub fn get_transaction_data(&self, key: String) -> Result<Option<TransactionData>, Error> {
+    pub fn get_transaction(&self, key: TransactionKey) -> Result<Option<TransactionData>, Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
 
-        Ok(inner
-            .transactions
-            .get(&rtxn, &StringWrapper(key))?
-            .map(|data| data.0))
+        Ok(inner.transactions.get(&rtxn, &key)?.map(|data| data.0))
+    }
+
+    pub fn get_transaction_data(&self, key: String) -> Result<Option<TransactionData>, Error> {
+        match TransactionKey::parse(&key) {
+            Some(key) => self.get_transaction(key),
+            None => Ok(None),
+        }
     }
 
     pub fn get_transaction_key_by_hash(&self, tx_hash: B256) -> Result<Option<String>, Error> {
@@ -1173,7 +1215,8 @@ impl PersistentDB {
 
         Ok(inner
             .transactions_hash_key
-            .get(&rtxn, &HashWrapper(tx_hash))?)
+            .get(&rtxn, &HashWrapper(tx_hash))?
+            .map(|key| key.to_token()))
     }
 }
 
