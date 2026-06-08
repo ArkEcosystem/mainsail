@@ -148,7 +148,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			throw new Error("maxBytes must be > 0");
 		}
 
-		let from = Math.max(0, start);
+		let from = start;
 		let remainingBytes = maxBytes;
 		let yieldedAny = false;
 
