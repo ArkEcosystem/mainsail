@@ -277,6 +277,14 @@ describe<{
 		);
 	});
 
+	it("#readCommits - throws when start is greater than end", async ({ databaseService }) => {
+		await assert.rejects(() => databaseService.readCommits(5, 0, 1).next(), "start must be <= end");
+	});
+
+	it("#readCommits - throws when maxBytes is not positive", async ({ databaseService }) => {
+		await assert.rejects(() => databaseService.readCommits(0, 5, 0).next(), "maxBytes must be > 0");
+	});
+
 	it("#getLastCommit - should return last commit", async ({ databaseService, genesisCommit }) => {
 		assert.equal((await databaseService.getLastCommit()).block.hash, genesisCommit.block.hash);
 	});

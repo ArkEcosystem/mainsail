@@ -141,6 +141,13 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		end: number,
 		maxBytes: number = Number.MAX_SAFE_INTEGER,
 	): AsyncGenerator<Contracts.Crypto.Commit> {
+		if (start > end) {
+			throw new Error("start must be <= end");
+		}
+		if (maxBytes <= 0) {
+			throw new Error("maxBytes must be > 0");
+		}
+
 		let from = Math.max(0, start);
 		let remainingBytes = maxBytes;
 		let yieldedAny = false;
