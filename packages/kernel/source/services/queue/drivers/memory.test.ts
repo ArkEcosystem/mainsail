@@ -442,7 +442,7 @@ describe<{
 		jobMethod1.calledOnce();
 		jobMethod2.calledOnce();
 
-		assert.false(context.driver.isStarted());
+		assert.true(context.driver.isStarted());
 		assert.false(context.driver.isRunning());
 	});
 

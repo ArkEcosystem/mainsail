@@ -68,8 +68,6 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 
 			await this.#waitUntilProcessed();
 		}
-
-		this.#started = false;
 	}
 
 	public async push(job: Contracts.Kernel.QueueJob): Promise<void> {
