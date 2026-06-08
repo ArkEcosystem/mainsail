@@ -31,7 +31,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 			return { blocks: [] };
 		}
 
-		// Budget the response so its fully serialized frame fits the client's WS maxPayload. readCommits
+		// Budget the response so its fully serialized frame fits the client's WS maxPayload. `findCommitBuffers`
 		// returns at most `maxBytes` of raw block data without overfetching; on top of that the protobuf
 		// encoding adds up to PROTO_BLOCK_OVERHEAD per block, and the frame carries a fixed nes envelope +
 		// protobuf `headers` field (RESPONSE_ENVELOPE_RESERVE). Reserving both up front — for the worst
