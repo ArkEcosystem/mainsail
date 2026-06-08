@@ -38,7 +38,11 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return blockNumber !== undefined;
 	}
 
-	public async findCommitBuffers(start: number, end: number, maxBytes: number): Promise<Buffer[]> {
+	public async findCommitBuffers(
+		start: number,
+		end: number,
+		maxBytes: number = Number.MAX_SAFE_INTEGER,
+	): Promise<Buffer[]> {
 		const buffers: Buffer[] = [];
 
 		for await (const commit of this.readCommits(start, end, maxBytes)) {
@@ -132,7 +136,11 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return this.#readTransaction(`${blockNumber}-${index}`);
 	}
 
-	public async *readCommits(start: number, end: number, maxBytes: number): AsyncGenerator<Contracts.Crypto.Commit> {
+	public async *readCommits(
+		start: number,
+		end: number,
+		maxBytes: number = Number.MAX_SAFE_INTEGER,
+	): AsyncGenerator<Contracts.Crypto.Commit> {
 		let from = Math.max(0, start);
 		let remainingBytes = maxBytes;
 
