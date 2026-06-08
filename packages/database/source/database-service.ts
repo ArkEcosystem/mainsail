@@ -143,8 +143,9 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	): AsyncGenerator<Contracts.Crypto.Commit> {
 		let from = Math.max(0, start);
 		let remainingBytes = maxBytes;
+		let yieldedAny = false;
 
-		while (from <= end) {
+		while (from <= end && remainingBytes > 0) {
 			const commitsData = await this.storage.getCommitsByBlockRange(from, end, remainingBytes);
 			if (commitsData.length === 0) {
 				return;
@@ -153,10 +154,21 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			let lastBlockNumber = from;
 			for (const data of commitsData) {
 				const commit = await this.commitFactory.fromStorage(data);
+
+				const commitBytes = commit.serialized.length / 2;
+
+				// Stop before exceeding the budget; always emit at least one commit to guarantee progress.
+				if (yieldedAny && commitBytes > remainingBytes) {
+					return;
+				}
+
 				lastBlockNumber = commit.block.number;
+
 				yield commit;
 
-				remainingBytes -= commit.serialized.length / 2;
+				yieldedAny = true;
+
+				remainingBytes -= commitBytes;
 				if (remainingBytes <= 0) {
 					return;
 				}
