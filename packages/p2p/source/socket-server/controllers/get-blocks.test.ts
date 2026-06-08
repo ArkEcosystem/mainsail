@@ -3,6 +3,7 @@ import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { GetBlocksController } from "./get-blocks";
+import { constants } from "../../constants.js";
 
 describe<{
 	app: Application;
@@ -41,6 +42,19 @@ describe<{
 
 		assert.equal(response, { blocks: mockBlocks });
 		spyGetBlocksForDownload.calledOnce();
-		spyGetBlocksForDownload.calledWith(payload.fromBlockNumber, payload.fromBlockNumber + payload.limit - 1);
+
+		// // The byte budget must leave room for the nes envelope + protobuf headers (RESPONSE_ENVELOPE_RESERVE)
+		// // and the per-block protobuf framing (PROTO_BLOCK_OVERHEAD) for up to `limit` blocks, so the
+		// // serialized response frame never exceeds the client's MAX_PAYLOAD_CLIENT.
+		const expectedMaxBytes =
+			constants.MAX_PAYLOAD_CLIENT -
+			constants.RESPONSE_ENVELOPE_RESERVE -
+			payload.limit * constants.PROTO_BLOCK_OVERHEAD;
+
+		spyGetBlocksForDownload.calledWith(
+			payload.fromBlockNumber,
+			payload.fromBlockNumber + payload.limit - 1,
+			expectedMaxBytes,
+		);
 	});
 });
