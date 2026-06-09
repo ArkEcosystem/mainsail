@@ -589,6 +589,22 @@ impl EvmInner {
         }
     }
 
+    pub fn get_receipts_by_block_range(
+        &mut self,
+        from_block_number: u64,
+        to_block_number: u64,
+    ) -> std::result::Result<Vec<(u64, Vec<(B256, TxReceipt)>)>, EVMError<String>> {
+        match self
+            .persistent_db
+            .get_receipts_by_block_range(from_block_number, to_block_number)
+        {
+            Ok(receipts) => Ok(receipts),
+            Err(err) => Err(EVMError::Database(
+                format!("failed reading receipts by block range: {}", err).into(),
+            )),
+        }
+    }
+
     pub fn preverify_transaction(
         &mut self,
         ctx: PreverifyTxContext,
@@ -1480,6 +1496,26 @@ impl JsEvmWrapper {
     }
 
     #[napi]
+    pub fn get_receipts_by_block_range<'env>(
+        &mut self,
+        node_env: &'env Env,
+        from_block_number: BigInt,
+        to_block_number: BigInt,
+    ) -> Result<PromiseRaw<'env, result::JsGetReceipts>> {
+        let from_block_number = from_block_number.get_u64().1;
+        let to_block_number = to_block_number.get_u64().1;
+
+        node_env.spawn_future_with_callback(
+            Self::get_receipts_by_block_range_async(
+                self.evm.clone(),
+                from_block_number,
+                to_block_number,
+            ),
+            |_, result| Ok(result::JsGetReceipts::new(None, result)?),
+        )
+    }
+
+    #[napi]
     pub fn get_receipt<'env>(
         &mut self,
         env: &'env Env,
@@ -2018,6 +2054,20 @@ impl JsEvmWrapper {
     ) -> Result<HashMap<B256, TxReceipt>> {
         let mut lock = evm.lock().await;
         let result = lock.get_receipts_by_block_number(block_number);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_receipts_by_block_range_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        from_block_number: u64,
+        to_block_number: u64,
+    ) -> Result<Vec<(u64, Vec<(B256, TxReceipt)>)>> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_receipts_by_block_range(from_block_number, to_block_number);
 
         match result {
             Ok(result) => Result::Ok(result),

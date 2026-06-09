@@ -642,6 +642,31 @@ impl PersistentDB {
         }
     }
 
+    pub fn get_receipts_by_block_range(
+        &self,
+        from_block_number: u64,
+        to_block_number: u64,
+    ) -> Result<Vec<(u64, Vec<(B256, TxReceipt)>)>, Error> {
+        assert!(
+            from_block_number <= to_block_number,
+            "from_block_number ({from_block_number}) must be <= to_block_number ({to_block_number})"
+        );
+
+        let tx_env = self.env.read_txn()?;
+        let inner = self.inner.borrow();
+        let range = from_block_number..=to_block_number;
+
+        let capacity = to_block_number.saturating_sub(from_block_number).min(512) as usize;
+        let mut receipts = Vec::with_capacity(capacity);
+
+        for item in inner.commits.range(&tx_env, &range)? {
+            let (block_number, commit) = item?;
+            receipts.push((block_number, commit.0.tx_receipts.into_iter().collect()));
+        }
+
+        Ok(receipts)
+    }
+
     pub fn get_commits_by_block_range(
         &self,
         from_block_number: u64,
