@@ -83,13 +83,13 @@ describe<{
 	});
 
 	it("findCommitBuffers - should be ok", async ({ databaseService }) => {
-		const commits = await databaseService.findCommitBuffers(1, 2, Number.MAX_SAFE_INTEGER);
+		const commits = await databaseService.findCommitBuffers(1, 2);
 		assert.empty(commits);
 	});
 
 	it("readCommits - should be ok", async ({ databaseService }) => {
 		const commits = [];
-		for await (const commit of databaseService.readCommits(1, 2, Number.MAX_SAFE_INTEGER)) {
+		for await (const commit of databaseService.readCommits(1, 2)) {
 			commits.push(commit);
 		}
 
@@ -236,9 +236,7 @@ describe<{
 	});
 
 	it("#findCommitBuffers - should return commit buffer", async ({ databaseService, genesisCommit }) => {
-		assert.equal(await databaseService.findCommitBuffers(0, 1, Number.MAX_SAFE_INTEGER), [
-			Buffer.from(genesisCommit.serialized, "hex"),
-		]);
+		assert.equal(await databaseService.findCommitBuffers(0, 1), [Buffer.from(genesisCommit.serialized, "hex")]);
 	});
 
 	it("#getBlock - should return block", async ({ databaseService, genesisCommit }) => {
@@ -270,13 +268,21 @@ describe<{
 
 	it("#readCommits - should return commits", async ({ databaseService, genesisCommit }) => {
 		const commits = [];
-		for await (const commit of databaseService.readCommits(0, 1, Number.MAX_SAFE_INTEGER)) {
+		for await (const commit of databaseService.readCommits(0, 1)) {
 			commits.push(commit);
 		}
 		assert.equal(
 			commits.map((c) => c.block.hash),
 			[genesisCommit.block.hash],
 		);
+	});
+
+	it("#readCommits - throws when start is greater than end", async ({ databaseService }) => {
+		await assert.rejects(() => databaseService.readCommits(5, 0, 1).next(), "start must be <= end");
+	});
+
+	it("#readCommits - throws when maxBytes is not positive", async ({ databaseService }) => {
+		await assert.rejects(() => databaseService.readCommits(0, 5, 0).next(), "maxBytes must be > 0");
 	});
 
 	it("#getLastCommit - should return last commit", async ({ databaseService, genesisCommit }) => {

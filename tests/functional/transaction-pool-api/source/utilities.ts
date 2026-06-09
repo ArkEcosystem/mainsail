@@ -142,7 +142,7 @@ export const isTransactionCommitted = async (
 
 	const database = app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
 	const forgedBlocks = await database.findBlocks(
-		currentBlockNumber - 5,
+		Math.max(0, currentBlockNumber - 5),
 		currentBlockNumber + 5 /* just a buffer in case tx got included after target height */,
 	);
 

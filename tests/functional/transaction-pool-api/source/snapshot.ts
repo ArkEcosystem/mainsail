@@ -324,7 +324,7 @@ export class Snapshot {
 			return { accountDeltas, lastHeight: 0 };
 		}
 
-		const blocks = await database.findBlocks(1, (await database.getLastCommit()).block.number);
+		const blocks = await database.findBlocks(1, Math.max(1, (await database.getLastCommit()).block.number));
 		const updateBalanceDelta = async (addressOrPublicKey: string, delta: bigint): Promise<void> => {
 			const account = await getAccountByAddressOrPublicKey({ app: this.app }, addressOrPublicKey);
 
