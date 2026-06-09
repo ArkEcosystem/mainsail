@@ -927,9 +927,10 @@ impl PersistentDB {
         commit_data: &Option<CommitData>,
         results: &BTreeMap<B256, (ExecutionResult, u64)>,
     ) -> Result<(), Error> {
-        assert!(!self.is_block_committed(key.0));
-
         let mut rwtxn = self.env.write_txn()?;
+
+        assert!(!self.is_block_committed(&rwtxn, key.0));
+
         let inner = self.inner.borrow_mut();
 
         let mut apply_changes = |rwtxn: &mut heed::RwTxn| -> Result<(), Error> {
@@ -1167,14 +1168,11 @@ impl PersistentDB {
         Ok(())
     }
 
-    pub fn is_block_committed(&self, block_number: u64) -> bool {
-        let env = self.env.clone();
-        let rtxn = env.read_txn().expect("read");
-        let inner = self.inner.borrow();
-
-        inner
+    pub fn is_block_committed(&self, rtxn: &heed::RoTxn, block_number: u64) -> bool {
+        self.inner
+            .borrow()
             .commits
-            .get(&rtxn, &block_number)
+            .get(rtxn, &block_number)
             .is_ok_and(|v| v.is_some())
     }
 
