@@ -148,40 +148,9 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			throw new Error("maxBytes must be > 0");
 		}
 
-		let from = start;
-		let remainingBytes = maxBytes;
-		let yieldedAny = false;
-
-		while (from <= end && remainingBytes > 0) {
-			const commitsData = await this.storage.getCommitsByBlockRange(from, end, remainingBytes);
-			if (commitsData.length === 0) {
-				return;
-			}
-
-			let lastBlockNumber = from;
-			for (const data of commitsData) {
-				const commit = await this.commitFactory.fromStorage(data);
-
-				const commitBytes = commit.serialized.length / 2;
-
-				// Stop before exceeding the budget; always emit at least one commit to guarantee progress.
-				if (yieldedAny && commitBytes > remainingBytes) {
-					return;
-				}
-
-				lastBlockNumber = commit.block.number;
-
-				yield commit;
-
-				yieldedAny = true;
-
-				remainingBytes -= commitBytes;
-				if (remainingBytes <= 0) {
-					return;
-				}
-			}
-
-			from = lastBlockNumber + 1;
+		const commitsData = await this.storage.getCommitsByBlockRange(start, end, maxBytes);
+		for (const data of commitsData) {
+			yield await this.commitFactory.fromStorage(data);
 		}
 	}
 

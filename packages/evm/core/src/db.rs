@@ -648,6 +648,12 @@ impl PersistentDB {
         to_block_number: u64,
         max_bytes: u64,
     ) -> Result<Vec<(ProofData, BlockHeaderData, Vec<TransactionData>)>, Error> {
+        assert!(
+            from_block_number <= to_block_number,
+            "from_block_number ({from_block_number}) must be <= to_block_number ({to_block_number})"
+        );
+        assert!(max_bytes > 0, "max_bytes ({max_bytes}) must be > 0");
+
         // Per-commit fixed cost charged against the budget on top of the block's transaction payload,
         // so that a long run of (near-)empty blocks is still bounded by block count, not just bytes.
         const PER_COMMIT_OVERHEAD_BYTES: u64 = 1024;
@@ -664,6 +670,11 @@ impl PersistentDB {
             .range(&tx_env, &(from_block_number..=to_block_number))?
         {
             let (block_number, header) = item?;
+            let estimated_bytes = header.0.payload_size as u64 + PER_COMMIT_OVERHEAD_BYTES;
+            accumulated_bytes += estimated_bytes;
+            if accumulated_bytes > max_bytes {
+                break;
+            }
 
             // Headers and proofs are written together per commit; a missing proof means the end of
             // the available data has been reached.
@@ -681,13 +692,7 @@ impl PersistentDB {
                 transactions.push(transaction.0);
             }
 
-            let estimated_bytes = header.0.payload_size as u64 + PER_COMMIT_OVERHEAD_BYTES;
             commits.push((proof.0, header.0, transactions));
-
-            accumulated_bytes += estimated_bytes;
-            if accumulated_bytes >= max_bytes {
-                break;
-            }
         }
 
         Ok(commits)
@@ -2144,7 +2149,6 @@ mod tests {
 
         assert_eq!(db.genesis_info, Some(Default::default()));
     }
-
     #[test]
     fn test_get_commits_by_block_range() {
         let db = create_temp_database();
@@ -2235,11 +2239,129 @@ mod tests {
         let commits = db.get_commits_by_block_range(2, 99, u64::MAX).unwrap();
         assert_eq!(commits.len(), 2);
 
-        // A tiny byte budget stops early but always makes progress (returns at least one commit),
-        // so callers can resume from the last returned block.
+        // A too tiny byte budget stops early and does not make progress.
         let commits = db.get_commits_by_block_range(1, 3, 1).unwrap();
+        assert!(commits.is_empty());
+    }
+
+    #[test]
+    #[should_panic(expected = "must be <= to_block_number")]
+    fn test_get_commits_by_block_range_panics_when_from_exceeds_to() {
+        let db = create_temp_database();
+        let _ = db.get_commits_by_block_range(3, 1, u64::MAX);
+    }
+
+    #[test]
+    #[should_panic(expected = "must be > 0")]
+    fn test_get_commits_by_block_range_panics_when_max_bytes_0() {
+        let db = create_temp_database();
+        let _ = db.get_commits_by_block_range(1, 3, 0);
+    }
+
+    #[test]
+    fn test_get_commits_by_block_range_respects_max_bytes() {
+        let db = create_temp_database();
+
+        // A commit's budget cost is its payload_size plus a fixed per-commit overhead. Use a payload
+        // large enough to dominate that overhead so the expected counts below are unambiguous without
+        // coupling the test to the exact overhead constant.
+        const PAYLOAD: u32 = 1_000_000;
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            let inner = db.inner.borrow();
+
+            for block_number in 1u64..=3 {
+                inner
+                    .blocks
+                    .put(
+                        &mut wtxn,
+                        &block_number,
+                        &CompactBincode(&BlockHeaderData {
+                            number: block_number as u32,
+                            payload_size: PAYLOAD,
+                            ..Default::default()
+                        }),
+                    )
+                    .unwrap();
+
+                inner
+                    .proofs
+                    .put(
+                        &mut wtxn,
+                        &block_number,
+                        &CompactBincode(&ProofData::default()),
+                    )
+                    .unwrap();
+            }
+
+            wtxn.commit().unwrap();
+        }
+
+        let count = |max_bytes: u64| {
+            db.get_commits_by_block_range(1, 3, max_bytes)
+                .unwrap()
+                .len()
+        };
+
+        // The budget bounds how many commits come back: ~1 payload fits one, ~2 two, ~3 all three.
+        const PER_COMMIT_OVERHEAD_BYTES: u64 = 1024;
+        assert_eq!(count(PAYLOAD as u64 + PER_COMMIT_OVERHEAD_BYTES), 1);
+        assert_eq!(count(2 * (PAYLOAD as u64 + PER_COMMIT_OVERHEAD_BYTES)), 2);
+        assert_eq!(count(3 * (PAYLOAD as u64 + PER_COMMIT_OVERHEAD_BYTES)), 3);
+
+        // An unbounded budget returns the whole range.
+        assert_eq!(count(u64::MAX), 3);
+    }
+
+    #[test]
+    fn test_commit_persists_transactions_for_range_read() {
+        // Exercises the real write path (commit_to_db via db.commit) end to end, unlike
+        // test_get_commits_by_block_range which writes the transactions DB directly. Guards against a
+        // key mismatch between how commit_to_db writes transactions and how get_commits_by_block_range
+        // scans them.
+        let db = create_temp_database();
+
+        let block_number = 1u64;
+        let transaction_count = 3u16;
+
+        let transactions: Vec<TransactionData> = (0..transaction_count)
+            .map(|index| TransactionData {
+                block_number: block_number as u32,
+                index: index as u32,
+                tx_hash: B256::from(U256::from(100 + index as u64)),
+                ..Default::default()
+            })
+            .collect();
+
+        let mut state_commit = StateCommit {
+            key: CommitKey(block_number, 0, B256::ZERO),
+            change_set: StateChangeset::default(),
+            results: Default::default(),
+        };
+
+        let commit_data = CommitData {
+            proof: ProofData::default(),
+            header: BlockHeaderData {
+                number: block_number as u32,
+                transactions_count: transaction_count,
+                ..Default::default()
+            },
+            transactions,
+        };
+
+        db.commit(&mut state_commit, &Some(commit_data)).unwrap();
+
+        // Read back through the same path findBlocks/restore use.
+        let commits = db
+            .get_commits_by_block_range(block_number, block_number, u64::MAX)
+            .unwrap();
         assert_eq!(commits.len(), 1);
-        assert_eq!(commits[0].1.number, 1);
+        assert_eq!(
+            commits[0].2.len(),
+            transaction_count as usize,
+            "transactions committed via commit_to_db must be read back by get_commits_by_block_range"
+        );
     }
 
     #[test]
