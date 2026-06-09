@@ -656,7 +656,7 @@ impl PersistentDB {
         let inner = self.inner.borrow();
         let range = from_block_number..=to_block_number;
 
-        let capacity = to_block_number.saturating_sub(from_block_number).min(512) as usize;
+        let capacity = to_block_number.saturating_sub(from_block_number).min(1024) as usize;
         let mut receipts = Vec::with_capacity(capacity);
 
         for item in inner.commits.range(&tx_env, &range)? {
