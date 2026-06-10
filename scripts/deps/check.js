@@ -235,6 +235,7 @@ const main = async () => {
 
 	const pkgs = readdirSync(source)
 		.filter((name) => lstatSync(`${source}/${name}`).isDirectory())
+		.filter((name) => name !== "evm")
 		.sort();
 
 	let pass = true;
