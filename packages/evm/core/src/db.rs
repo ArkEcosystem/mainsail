@@ -642,6 +642,31 @@ impl PersistentDB {
         }
     }
 
+    pub fn get_receipts_by_block_range(
+        &self,
+        from_block_number: u64,
+        to_block_number: u64,
+    ) -> Result<Vec<(u64, Vec<(B256, TxReceipt)>)>, Error> {
+        assert!(
+            from_block_number <= to_block_number,
+            "from_block_number ({from_block_number}) must be <= to_block_number ({to_block_number})"
+        );
+
+        let tx_env = self.env.read_txn()?;
+        let inner = self.inner.borrow();
+        let range = from_block_number..=to_block_number;
+
+        let capacity = to_block_number.saturating_sub(from_block_number).min(1024) as usize;
+        let mut receipts = Vec::with_capacity(capacity);
+
+        for item in inner.commits.range(&tx_env, &range)? {
+            let (block_number, commit) = item?;
+            receipts.push((block_number, commit.0.tx_receipts.into_iter().collect()));
+        }
+
+        Ok(receipts)
+    }
+
     pub fn get_commits_by_block_range(
         &self,
         from_block_number: u64,
@@ -2482,6 +2507,71 @@ mod tests {
 
         assert_eq!(read_block_number, target_block);
         assert_eq!(read_receipts, total_receipts);
+    }
+
+    #[test]
+    fn test_get_receipts_by_block_range() {
+        let db = create_temp_database();
+
+        // Empty before anything is written.
+        assert!(db.get_receipts_by_block_range(1, 3).unwrap().is_empty());
+
+        // Write blocks 1..=3; block N gets N receipts with distinct hashes.
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            let inner = db.inner.borrow();
+
+            for block_number in 1u64..=3 {
+                let mut tx_receipts: HashMap<B256, TxReceipt> = Default::default();
+                for index in 0..block_number {
+                    tx_receipts.insert(
+                        B256::from(U256::from(block_number * 100 + index)),
+                        Default::default(),
+                    );
+                }
+
+                inner
+                    .commits
+                    .put(
+                        &mut wtxn,
+                        &block_number,
+                        &CompactBincode(&CommitReceipts {
+                            tx_receipts,
+                            ..Default::default()
+                        }),
+                    )
+                    .unwrap();
+            }
+
+            wtxn.commit().unwrap();
+        }
+
+        // Full range: blocks ascending, receipt count per block matches what was written.
+        let receipts = db.get_receipts_by_block_range(1, 3).unwrap();
+        assert_eq!(receipts.len(), 3);
+        for (index, (block_number, block_receipts)) in receipts.iter().enumerate() {
+            assert_eq!(*block_number, (index + 1) as u64);
+            assert_eq!(block_receipts.len(), *block_number as usize);
+        }
+
+        // Sub-range returns only the requested block.
+        let receipts = db.get_receipts_by_block_range(2, 2).unwrap();
+        assert_eq!(receipts.len(), 1);
+        assert_eq!(receipts[0].0, 2);
+        assert_eq!(receipts[0].1.len(), 2);
+
+        // Range extending past the tip stops at the last available block.
+        let receipts = db.get_receipts_by_block_range(2, 99).unwrap();
+        assert_eq!(receipts.len(), 2);
+        assert_eq!(receipts[0].0, 2);
+        assert_eq!(receipts[1].0, 3);
+    }
+
+    #[test]
+    #[should_panic(expected = "must be <= to_block_number")]
+    fn test_get_receipts_by_block_range_panics_when_from_exceeds_to() {
+        let db = create_temp_database();
+        let _ = db.get_receipts_by_block_range(3, 1);
     }
 
     #[test]

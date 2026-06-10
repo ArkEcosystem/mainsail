@@ -40,6 +40,7 @@ export interface Instance extends CommitHandler {
 	getLegacyColdWallets(offset: bigint, limit: bigint): Promise<GetLegacyColdWalletsResult>;
 	getReceipts(offset: bigint, limit: bigint): Promise<GetReceiptsResult>;
 	getReceiptsByBlockNumber(blockNumber: bigint): Promise<Record<string, TransactionReceipt>>;
+	getReceiptsByBlockRange(fromBlockNumber: bigint, toBlockNumber: bigint): Promise<GetReceiptsResult>;
 	getReceipt(height: bigint, txHash: string): Promise<GetReceiptResult>;
 	calculateRoundValidators(context: CalculateRoundValidatorsContext): Promise<void>;
 	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;
