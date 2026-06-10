@@ -94,19 +94,26 @@ pub fn commit_to_db(
         None => build_commit(&mut pending_commit)?,
     };
 
-    match db.commit(&mut commit, &commit_data) {
-        Ok(_) => Ok(collect_dirty_accounts(commit, &genesis_info)),
-        Err(err) => match &err {
-            Error::DbFull => {
-                // try to resize the db and attempt another commit on success
-                db.resize().and_then(|_| {
-                    db.commit(&mut commit, &commit_data)
-                        .and_then(|_| Ok(collect_dirty_accounts(commit, &genesis_info)))
-                })
-            }
-            _ => Err(err),
-        },
+    commit_with_resize_retry(|| db.commit(&mut commit, &commit_data), || db.resize())?;
+
+    Ok(collect_dirty_accounts(commit, &genesis_info))
+}
+
+/// Maximum number of resize-and-retry attempts after an initial `DbFull` on commit.
+const MAX_RESIZE_RETRIES: usize = 3;
+
+fn commit_with_resize_retry(
+    mut try_commit: impl FnMut() -> Result<(), Error>,
+    mut resize: impl FnMut() -> Result<(), Error>,
+) -> Result<(), Error> {
+    for _ in 0..=MAX_RESIZE_RETRIES {
+        match try_commit() {
+            Ok(()) => return Ok(()),
+            Err(Error::DbFull) => resize()?,
+            Err(err) => return Err(err),
+        }
     }
+    Err(Error::DbFull)
 }
 
 fn finalize(state: &mut StateCommit) {
@@ -237,8 +244,9 @@ fn collect_dirty_accounts(
 mod tests {
     use std::collections::BTreeMap;
 
+    use super::commit_with_resize_retry;
     use crate::{
-        db::{GenesisInfo, PendingCommit, PersistentDB},
+        db::{Error, GenesisInfo, PendingCommit, PersistentDB},
         events,
         state_changes::{AccountMergeInfo, AccountUpdate, StateChangeset},
         state_commit::{StateCommit, apply_rewards, collect_dirty_accounts},
@@ -495,5 +503,113 @@ mod tests {
 
         let transition_account2 = pending.transitions.transitions.get(&account2);
         assert_eq!(transition_account2, None);
+    }
+
+    #[test]
+    fn commit_succeeds_without_resizing() {
+        let mut commits = 0;
+        let mut resizes = 0;
+
+        let result = commit_with_resize_retry(
+            || {
+                commits += 1;
+                Ok(())
+            },
+            || {
+                resizes += 1;
+                Ok(())
+            },
+        );
+
+        assert!(result.is_ok());
+        assert_eq!(commits, 1); // committed on the first attempt
+        assert_eq!(resizes, 0); // never had to grow the map
+    }
+
+    #[test]
+    fn commit_recovers_after_one_resize() {
+        let mut commits = 0;
+        let mut resizes = 0;
+
+        let result = commit_with_resize_retry(
+            || {
+                commits += 1;
+                if commits == 1 {
+                    Err(Error::DbFull)
+                } else {
+                    Ok(())
+                }
+            },
+            || {
+                resizes += 1;
+                Ok(())
+            },
+        );
+
+        assert!(result.is_ok());
+        assert_eq!(commits, 2); // one DbFull, then success
+        assert_eq!(resizes, 1);
+    }
+
+    #[test]
+    fn commit_recovers_after_two_resizes() {
+        let mut commits = 0;
+        let mut resizes = 0;
+
+        let result = commit_with_resize_retry(
+            || {
+                commits += 1;
+                if commits <= 2 {
+                    Err(Error::DbFull)
+                } else {
+                    Ok(())
+                }
+            },
+            || {
+                resizes += 1;
+                Ok(())
+            },
+        );
+
+        assert!(result.is_ok());
+        assert_eq!(commits, 3); // two DbFull, then success
+        assert_eq!(resizes, 2);
+    }
+
+    #[test]
+    fn commit_gives_up_after_max_retries() {
+        let mut commits = 0;
+        let mut resizes = 0;
+
+        let result = commit_with_resize_retry(
+            || {
+                commits += 1;
+                Err(Error::DbFull) // never fits, no matter how often we grow
+            },
+            || {
+                resizes += 1;
+                Ok(())
+            },
+        );
+
+        assert!(matches!(result, Err(Error::DbFull)));
+        assert_eq!(commits, 4); // initial attempt + MAX_RESIZE_RETRIES (3)
+        assert_eq!(resizes, 4); // a resize follows every DbFull
+    }
+
+    #[test]
+    fn commit_propagates_non_dbfull_error_without_resizing() {
+        let mut resizes = 0;
+
+        let result = commit_with_resize_retry(
+            || Err(Error::Lock),
+            || {
+                resizes += 1;
+                Ok(())
+            },
+        );
+
+        assert!(matches!(result, Err(Error::Lock)));
+        assert_eq!(resizes, 0); // non-DbFull errors return immediately
     }
 }
