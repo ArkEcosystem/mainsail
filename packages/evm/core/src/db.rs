@@ -991,17 +991,17 @@ impl<'a> TxnDatabaseReader<'a> {
 
 impl DatabaseRef for TxnDatabaseReader<'_> {
     type Error = Error;
-    fn basic_ref(&self, a: Address) -> Result<Option<AccountInfo>, Error> {
-        self.db.basic_ref_tx(&self.txn, a)
+    fn basic_ref(&self, address: Address) -> Result<Option<AccountInfo>, Error> {
+        self.db.basic_ref_tx(&self.txn, address)
     }
-    fn storage_ref(&self, a: Address, i: U256) -> Result<U256, Error> {
-        self.db.storage_ref_tx(&self.txn, a, i)
+    fn storage_ref(&self, address: Address, index: U256) -> Result<U256, Error> {
+        self.db.storage_ref_tx(&self.txn, address, index)
     }
-    fn code_by_hash_ref(&self, h: B256) -> Result<Bytecode, Error> {
-        self.db.code_by_hash_ref_tx(&self.txn, h)
+    fn code_by_hash_ref(&self, hash: B256) -> Result<Bytecode, Error> {
+        self.db.code_by_hash_ref_tx(&self.txn, hash)
     }
-    fn block_hash_ref(&self, n: u64) -> Result<B256, Error> {
-        self.db.block_hash_ref_tx(&self.txn, n)
+    fn block_hash_ref(&self, number: u64) -> Result<B256, Error> {
+        self.db.block_hash_ref_tx(&self.txn, number)
     }
 }
 
