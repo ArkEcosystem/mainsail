@@ -675,19 +675,20 @@ impl PersistentDB {
             "from_block_number ({from_block_number}) must be <= to_block_number ({to_block_number})"
         );
 
-        let tx_env = self.env.read_txn()?;
-        let inner = self.inner.borrow();
-        let range = from_block_number..=to_block_number;
+        self.with_read_txn(|tx_env| {
+            let inner = self.inner.borrow();
+            let range = from_block_number..=to_block_number;
 
-        let capacity = to_block_number.saturating_sub(from_block_number).min(1024) as usize;
-        let mut receipts = Vec::with_capacity(capacity);
+            let capacity = to_block_number.saturating_sub(from_block_number).min(1024) as usize;
+            let mut receipts = Vec::with_capacity(capacity);
 
-        for item in inner.commits.range(&tx_env, &range)? {
-            let (block_number, commit) = item?;
-            receipts.push((block_number, commit.0.tx_receipts.into_iter().collect()));
-        }
+            for item in inner.commits.range(&tx_env, &range)? {
+                let (block_number, commit) = item?;
+                receipts.push((block_number, commit.0.tx_receipts.into_iter().collect()));
+            }
 
-        Ok(receipts)
+            Ok(receipts)
+        })
     }
 
     pub fn get_commits_by_block_range(
@@ -984,7 +985,9 @@ impl PersistentDB {
         results: &BTreeMap<B256, (ExecutionResult, u64)>,
     ) -> Result<(), Error> {
         self.with_write_txn(|rwtxn| {
-            assert!(!self.is_block_committed(&rwtxn, key.0));
+            if self.is_block_committed(&rwtxn, key.0) {
+                return Err(Error::State("block already committed".into()));
+            }
 
             let inner = self.inner.borrow_mut();
 
@@ -2435,6 +2438,42 @@ mod tests {
             commits[0].2.len(),
             transaction_count as usize,
             "transactions committed via commit_to_db must be read back by get_commits_by_block_range"
+        );
+    }
+
+    #[test]
+    fn test_commit_rejects_already_committed_block() {
+        let db = create_temp_database();
+        let block_number = 1u64;
+
+        let make_commit = || {
+            (
+                StateCommit {
+                    key: CommitKey(block_number, 0, B256::ZERO),
+                    change_set: StateChangeset::default(),
+                    results: Default::default(),
+                },
+                CommitData {
+                    proof: ProofData::default(),
+                    header: BlockHeaderData {
+                        number: block_number as u32,
+                        ..Default::default()
+                    },
+                    transactions: vec![],
+                },
+            )
+        };
+
+        // First commit of the block succeeds.
+        let (mut state_commit, commit_data) = make_commit();
+        db.commit(&mut state_commit, &Some(commit_data)).unwrap();
+
+        // Committing the same block number again is rejected gracefully, not asserted.
+        let (mut state_commit, commit_data) = make_commit();
+        let result = db.commit(&mut state_commit, &Some(commit_data));
+        assert!(
+            matches!(result, Err(crate::db::Error::State(_))),
+            "expected Err(State(block already committed)), got {result:?}"
         );
     }
 

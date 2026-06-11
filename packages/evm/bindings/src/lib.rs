@@ -59,9 +59,6 @@ pub struct EvmInner {
     logger: JsLogger,
 }
 
-// NOTE: we guarantee that this can be sent between threads, since it only is accessed through a mutex
-unsafe impl Send for EvmInner {}
-
 impl EvmInner {
     pub fn new(opts: EvmOptions) -> Self {
         let logger = JsLogger::new(opts.logger_callback).expect("logger ok");
