@@ -675,19 +675,20 @@ impl PersistentDB {
             "from_block_number ({from_block_number}) must be <= to_block_number ({to_block_number})"
         );
 
-        let tx_env = self.env.read_txn()?;
-        let inner = self.inner.borrow();
-        let range = from_block_number..=to_block_number;
+        self.with_read_txn(|tx_env| {
+            let inner = self.inner.borrow();
+            let range = from_block_number..=to_block_number;
 
-        let capacity = to_block_number.saturating_sub(from_block_number).min(1024) as usize;
-        let mut receipts = Vec::with_capacity(capacity);
+            let capacity = to_block_number.saturating_sub(from_block_number).min(1024) as usize;
+            let mut receipts = Vec::with_capacity(capacity);
 
-        for item in inner.commits.range(&tx_env, &range)? {
-            let (block_number, commit) = item?;
-            receipts.push((block_number, commit.0.tx_receipts.into_iter().collect()));
-        }
+            for item in inner.commits.range(&tx_env, &range)? {
+                let (block_number, commit) = item?;
+                receipts.push((block_number, commit.0.tx_receipts.into_iter().collect()));
+            }
 
-        Ok(receipts)
+            Ok(receipts)
+        })
     }
 
     pub fn get_commits_by_block_range(
