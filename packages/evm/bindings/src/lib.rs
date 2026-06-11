@@ -13,7 +13,7 @@ use mainsail_evm_core::{
     account::AccountInfoExtended,
     db::{
         BlockHeaderData, CommitData, CommitKey, GenesisInfo, PendingCommit, PersistentDB,
-        PersistentDBOptions, ProofData, TransactionData,
+        PersistentDBOptions, ProofData, TransactionData, TxnDatabaseReader,
     },
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
@@ -637,10 +637,14 @@ impl EvmInner {
             }
         }
 
+        let db_reader = TxnDatabaseReader::new(&self.persistent_db).map_err(|err| {
+            EVMError::Database(format!("failed to create tx database reader {}", err))
+        })?;
+
         let state_db = State::builder()
             .with_bundle_update()
             .with_cached_prestate(std::mem::take(&mut pending_commit.cache))
-            .with_database(WrapDatabaseRef(&self.persistent_db))
+            .with_database(WrapDatabaseRef(db_reader))
             .build();
 
         let evm = revm::Context::mainnet()
@@ -1068,8 +1072,11 @@ impl EvmInner {
             }
         }
 
+        let db_reader = TxnDatabaseReader::new(&self.persistent_db)
+            .map_err(|err| EVMError::Database(EvmDatabaseError::Database(err)))?;
+
         let state_db = state_builder
-            .with_database(WrapDatabaseRef(&self.persistent_db))
+            .with_database(WrapDatabaseRef(db_reader))
             .build();
 
         let mut evm = revm::Context::mainnet()

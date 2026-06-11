@@ -5,7 +5,7 @@ use std::{
     collections::BTreeMap,
     convert::Infallible,
     path::PathBuf,
-    sync::{Arc, LazyLock, RwLock},
+    sync::{Arc, LazyLock, RwLock, RwLockReadGuard},
 };
 
 use alloy_primitives::Bloom;
@@ -874,6 +874,61 @@ fn next_map_size(map_size: usize) -> usize {
     map_size / MAP_SIZE_UNIT * MAP_SIZE_UNIT + MAP_SIZE_UNIT
 }
 
+impl PersistentDB {
+    fn basic_ref_tx(
+        &self,
+        txn: &heed::RoTxn,
+        address: Address,
+    ) -> Result<Option<AccountInfo>, Error> {
+        let inner = self.inner.borrow();
+
+        let basic = inner
+            .accounts
+            .get(txn, &AddressWrapper(address))?
+            .map(|a| a.0.into());
+
+        Ok(basic)
+    }
+
+    fn code_by_hash_ref_tx(&self, txn: &heed::RoTxn, code_hash: B256) -> Result<Bytecode, Error> {
+        let inner = self.inner.borrow();
+
+        let contract = match inner.contracts.get(txn, &HashWrapper(code_hash))? {
+            Some(contract) => contract.0,
+            None => Default::default(),
+        };
+
+        Ok(contract.try_into()?)
+    }
+
+    fn storage_ref_tx(
+        &self,
+        txn: &heed::RoTxn,
+        address: Address,
+        index: U256,
+    ) -> Result<U256, Error> {
+        let inner = self.inner.borrow_mut();
+
+        let mut iter = inner.storage.iter(txn)?;
+        let location = &StorageEntryWrapper(index, U256::ZERO);
+
+        match iter.move_on_key_dup(&AddressWrapper(address), &location)? {
+            Some((_, value)) if value.0 == location.0 => Ok(value.1),
+            _ => Ok(U256::ZERO),
+        }
+    }
+
+    fn block_hash_ref_tx(&self, txn: &heed::RoTxn, number: u64) -> Result<B256, Error> {
+        let inner = self.inner.borrow_mut();
+
+        let data = inner.blocks.get(txn, &number)?;
+        match data {
+            Some(data) => Ok(data.hash),
+            None => Ok(B256::ZERO),
+        }
+    }
+}
+
 impl Database for PersistentDB {
     type Error = Error;
 
@@ -898,55 +953,55 @@ impl DatabaseRef for PersistentDB {
     type Error = Error;
 
     fn basic_ref(&self, address: Address) -> Result<Option<AccountInfo>, Self::Error> {
-        self.with_read_txn(|txn| {
-            let inner = self.inner.borrow();
-
-            let basic = inner
-                .accounts
-                .get(txn, &AddressWrapper(address))?
-                .map(|a| a.0.into());
-
-            Ok(basic)
-        })
+        self.with_read_txn(|txn| self.basic_ref_tx(txn, address))
     }
 
     fn code_by_hash_ref(&self, code_hash: B256) -> Result<Bytecode, Self::Error> {
-        self.with_read_txn(|txn| {
-            let inner = self.inner.borrow();
-
-            let contract = match inner.contracts.get(txn, &HashWrapper(code_hash))? {
-                Some(contract) => contract.0,
-                None => Default::default(),
-            };
-
-            Ok(contract.try_into()?)
-        })
+        self.with_read_txn(|txn| self.code_by_hash_ref_tx(txn, code_hash))
     }
 
     fn storage_ref(&self, address: Address, index: U256) -> Result<U256, Self::Error> {
-        self.with_read_txn(|txn| {
-            let inner = self.inner.borrow_mut();
-
-            let mut iter = inner.storage.iter(txn)?;
-            let location = &StorageEntryWrapper(index, U256::ZERO);
-
-            match iter.move_on_key_dup(&AddressWrapper(address), &location)? {
-                Some((_, value)) if value.0 == location.0 => Ok(value.1),
-                _ => Ok(U256::ZERO),
-            }
-        })
+        self.with_read_txn(|txn| self.storage_ref_tx(txn, address, index))
     }
 
     fn block_hash_ref(&self, number: u64) -> Result<B256, Self::Error> {
-        self.with_read_txn(|txn| {
-            let inner = self.inner.borrow_mut();
+        self.with_read_txn(|txn| self.block_hash_ref_tx(txn, number))
+    }
+}
 
-            let data = inner.blocks.get(txn, &number)?;
-            match data {
-                Some(data) => Ok(data.hash),
-                None => Ok(B256::ZERO),
-            }
+/// `DatabaseRef` view that serves all reads from one `RoTxn` instead of opening one per read.
+/// Holds the resize gate for the txn's lifetime so the env can't be remapped while it's open.
+pub struct TxnDatabaseReader<'a> {
+    db: &'a PersistentDB,
+    txn: heed::RoTxn<'a, heed::WithTls>,
+    _resize_guard: RwLockReadGuard<'a, ()>,
+}
+
+impl<'a> TxnDatabaseReader<'a> {
+    pub fn new(db: &'a PersistentDB) -> Result<Self, Error> {
+        let resize_guard = db.resize_lock.read().map_err(|_| Error::Lock)?;
+        let txn = db.env.read_txn()?;
+        Ok(Self {
+            db,
+            txn,
+            _resize_guard: resize_guard,
         })
+    }
+}
+
+impl DatabaseRef for TxnDatabaseReader<'_> {
+    type Error = Error;
+    fn basic_ref(&self, address: Address) -> Result<Option<AccountInfo>, Error> {
+        self.db.basic_ref_tx(&self.txn, address)
+    }
+    fn storage_ref(&self, address: Address, index: U256) -> Result<U256, Error> {
+        self.db.storage_ref_tx(&self.txn, address, index)
+    }
+    fn code_by_hash_ref(&self, hash: B256) -> Result<Bytecode, Error> {
+        self.db.code_by_hash_ref_tx(&self.txn, hash)
+    }
+    fn block_hash_ref(&self, number: u64) -> Result<B256, Error> {
+        self.db.block_hash_ref_tx(&self.txn, number)
     }
 }
 
@@ -1413,7 +1468,7 @@ mod tests {
             AddressWrapper, BlockHeaderData, CommitData, CommitKey, CommitReceipts, HashWrapper,
             LegacyAddressWrapper, MAP_SIZE_UNIT, PendingCommit, PersistentDB, PersistentDBOptions,
             ProofData, StaticStringWrapper, StorageEntryWrapper, TransactionData, TransactionKey,
-            next_map_size,
+            TxnDatabaseReader, next_map_size,
         },
         historical::HistoricalAccountData,
         legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
@@ -1424,7 +1479,7 @@ mod tests {
     };
     use alloy_primitives::{Address, B256, Bytes, U256, address, b256};
     use revm::{
-        Database,
+        Database, DatabaseRef,
         context::result::{ExecutionResult, ResultGas, SuccessReason},
         database::{TransitionState, states::StorageSlot},
         primitives::HashMap,
@@ -2389,6 +2444,90 @@ mod tests {
 
         // An unbounded budget returns the whole range.
         assert_eq!(count(u64::MAX), 3);
+    }
+
+    #[test]
+    fn test_txn_read_db_serves_all_reads() {
+        // TxnReadDb answers every read kind through its single held txn, matching what the
+        // transient DatabaseRef path returns (including the empties for unknown entries).
+        let db = create_temp_database();
+
+        let account = address!("0000000000000000000000000000000000000001");
+        let code = Bytecode::new_raw(Bytes::from_static(&[0, 1, 2, 3]));
+        let code_hash = code.hash_slow();
+        let block_hash = b256!("0000000000000000000000000000000000000000000000000000000000000001");
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            let inner = db.inner.borrow_mut();
+
+            inner
+                .accounts
+                .put(
+                    &mut wtxn,
+                    &AddressWrapper(account),
+                    &CompactBincode(&StoredAccountInfo::new(U256::from(100), 7, code_hash)),
+                )
+                .unwrap();
+            inner
+                .contracts
+                .put(
+                    &mut wtxn,
+                    &HashWrapper(code_hash),
+                    &CompactBincode(&code.clone().into()),
+                )
+                .unwrap();
+            inner
+                .storage
+                .put(
+                    &mut wtxn,
+                    &AddressWrapper(account),
+                    &StorageEntryWrapper(U256::from(1), U256::from(42)),
+                )
+                .unwrap();
+            inner
+                .blocks
+                .put(
+                    &mut wtxn,
+                    &1,
+                    &CompactBincode(&BlockHeaderData {
+                        hash: block_hash,
+                        ..Default::default()
+                    }),
+                )
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        let read_db = TxnDatabaseReader::new(&db).unwrap();
+
+        let info = read_db.basic_ref(account).unwrap().expect("account");
+        assert_eq!(info.balance, U256::from(100));
+        assert_eq!(info.nonce, 7);
+        assert_eq!(info.code_hash, code_hash);
+
+        assert_eq!(
+            read_db
+                .code_by_hash_ref(code_hash)
+                .unwrap()
+                .original_byte_slice(),
+            &[0, 1, 2, 3][..]
+        );
+        assert_eq!(
+            read_db.storage_ref(account, U256::from(1)).unwrap(),
+            U256::from(42)
+        );
+        assert_eq!(
+            read_db.storage_ref(account, U256::from(2)).unwrap(),
+            U256::ZERO
+        );
+        assert_eq!(read_db.block_hash_ref(1).unwrap(), block_hash);
+
+        // Unknown entries return the documented empties.
+        let other = address!("0000000000000000000000000000000000000002");
+        assert_eq!(read_db.basic_ref(other).unwrap(), None);
+        assert_eq!(read_db.block_hash_ref(2).unwrap(), B256::ZERO);
     }
 
     #[test]
