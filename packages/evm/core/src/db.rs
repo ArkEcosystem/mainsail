@@ -5,7 +5,7 @@ use std::{
     collections::BTreeMap,
     convert::Infallible,
     path::PathBuf,
-    sync::{Arc, LazyLock, RwLock},
+    sync::{Arc, LazyLock, RwLock, RwLockReadGuard},
 };
 
 use alloy_primitives::Bloom;
@@ -874,6 +874,61 @@ fn next_map_size(map_size: usize) -> usize {
     map_size / MAP_SIZE_UNIT * MAP_SIZE_UNIT + MAP_SIZE_UNIT
 }
 
+impl PersistentDB {
+    fn basic_ref_tx(
+        &self,
+        txn: &heed::RoTxn,
+        address: Address,
+    ) -> Result<Option<AccountInfo>, Error> {
+        let inner = self.inner.borrow();
+
+        let basic = inner
+            .accounts
+            .get(txn, &AddressWrapper(address))?
+            .map(|a| a.0.into());
+
+        Ok(basic)
+    }
+
+    fn code_by_hash_ref_tx(&self, txn: &heed::RoTxn, code_hash: B256) -> Result<Bytecode, Error> {
+        let inner = self.inner.borrow();
+
+        let contract = match inner.contracts.get(txn, &HashWrapper(code_hash))? {
+            Some(contract) => contract.0,
+            None => Default::default(),
+        };
+
+        Ok(contract.try_into()?)
+    }
+
+    fn storage_ref_tx(
+        &self,
+        txn: &heed::RoTxn,
+        address: Address,
+        index: U256,
+    ) -> Result<U256, Error> {
+        let inner = self.inner.borrow_mut();
+
+        let mut iter = inner.storage.iter(txn)?;
+        let location = &StorageEntryWrapper(index, U256::ZERO);
+
+        match iter.move_on_key_dup(&AddressWrapper(address), &location)? {
+            Some((_, value)) if value.0 == location.0 => Ok(value.1),
+            _ => Ok(U256::ZERO),
+        }
+    }
+
+    fn block_hash_ref_tx(&self, txn: &heed::RoTxn, number: u64) -> Result<B256, Error> {
+        let inner = self.inner.borrow_mut();
+
+        let data = inner.blocks.get(txn, &number)?;
+        match data {
+            Some(data) => Ok(data.hash),
+            None => Ok(B256::ZERO),
+        }
+    }
+}
+
 impl Database for PersistentDB {
     type Error = Error;
 
@@ -898,55 +953,55 @@ impl DatabaseRef for PersistentDB {
     type Error = Error;
 
     fn basic_ref(&self, address: Address) -> Result<Option<AccountInfo>, Self::Error> {
-        self.with_read_txn(|txn| {
-            let inner = self.inner.borrow();
-
-            let basic = inner
-                .accounts
-                .get(txn, &AddressWrapper(address))?
-                .map(|a| a.0.into());
-
-            Ok(basic)
-        })
+        self.with_read_txn(|txn| self.basic_ref_tx(txn, address))
     }
 
     fn code_by_hash_ref(&self, code_hash: B256) -> Result<Bytecode, Self::Error> {
-        self.with_read_txn(|txn| {
-            let inner = self.inner.borrow();
-
-            let contract = match inner.contracts.get(txn, &HashWrapper(code_hash))? {
-                Some(contract) => contract.0,
-                None => Default::default(),
-            };
-
-            Ok(contract.try_into()?)
-        })
+        self.with_read_txn(|txn| self.code_by_hash_ref_tx(txn, code_hash))
     }
 
     fn storage_ref(&self, address: Address, index: U256) -> Result<U256, Self::Error> {
-        self.with_read_txn(|txn| {
-            let inner = self.inner.borrow_mut();
-
-            let mut iter = inner.storage.iter(txn)?;
-            let location = &StorageEntryWrapper(index, U256::ZERO);
-
-            match iter.move_on_key_dup(&AddressWrapper(address), &location)? {
-                Some((_, value)) if value.0 == location.0 => Ok(value.1),
-                _ => Ok(U256::ZERO),
-            }
-        })
+        self.with_read_txn(|txn| self.storage_ref_tx(txn, address, index))
     }
 
     fn block_hash_ref(&self, number: u64) -> Result<B256, Self::Error> {
-        self.with_read_txn(|txn| {
-            let inner = self.inner.borrow_mut();
+        self.with_read_txn(|txn| self.block_hash_ref_tx(txn, number))
+    }
+}
 
-            let data = inner.blocks.get(txn, &number)?;
-            match data {
-                Some(data) => Ok(data.hash),
-                None => Ok(B256::ZERO),
-            }
+/// `DatabaseRef` view that serves all reads from one `RoTxn` instead of opening one per read.
+/// Holds the resize gate for the txn's lifetime so the env can't be remapped while it's open.
+pub struct TxnDatabaseReader<'a> {
+    db: &'a PersistentDB,
+    txn: heed::RoTxn<'a, heed::WithTls>,
+    _resize_guard: RwLockReadGuard<'a, ()>,
+}
+
+impl<'a> TxnDatabaseReader<'a> {
+    pub fn new(db: &'a PersistentDB) -> Result<Self, Error> {
+        let resize_guard = db.resize_lock.read().map_err(|_| Error::Lock)?;
+        let txn = db.env.read_txn()?;
+        Ok(Self {
+            db,
+            txn,
+            _resize_guard: resize_guard,
         })
+    }
+}
+
+impl DatabaseRef for TxnDatabaseReader<'_> {
+    type Error = Error;
+    fn basic_ref(&self, a: Address) -> Result<Option<AccountInfo>, Error> {
+        self.db.basic_ref_tx(&self.txn, a)
+    }
+    fn storage_ref(&self, a: Address, i: U256) -> Result<U256, Error> {
+        self.db.storage_ref_tx(&self.txn, a, i)
+    }
+    fn code_by_hash_ref(&self, h: B256) -> Result<Bytecode, Error> {
+        self.db.code_by_hash_ref_tx(&self.txn, h)
+    }
+    fn block_hash_ref(&self, n: u64) -> Result<B256, Error> {
+        self.db.block_hash_ref_tx(&self.txn, n)
     }
 }
 
