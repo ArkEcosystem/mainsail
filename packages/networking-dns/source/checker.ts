@@ -22,10 +22,12 @@ export class Checker {
 			try {
 				await lookupService(host, 53);
 
+				this.logger.info(`Your network DNS connectivity has been verified by ${host}`);
+
 				return;
 			} catch (rawError) {
 				const error = ensureError(rawError);
-				this.logger.error(error.message);
+				this.logger.error(`Host ${host} responded with: ${error.message}`);
 			}
 		}
 
