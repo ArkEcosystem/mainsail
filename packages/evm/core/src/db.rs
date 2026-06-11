@@ -1468,7 +1468,7 @@ mod tests {
             AddressWrapper, BlockHeaderData, CommitData, CommitKey, CommitReceipts, HashWrapper,
             LegacyAddressWrapper, MAP_SIZE_UNIT, PendingCommit, PersistentDB, PersistentDBOptions,
             ProofData, StaticStringWrapper, StorageEntryWrapper, TransactionData, TransactionKey,
-            next_map_size,
+            TxnDatabaseReader, next_map_size,
         },
         historical::HistoricalAccountData,
         legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
@@ -1479,7 +1479,7 @@ mod tests {
     };
     use alloy_primitives::{Address, B256, Bytes, U256, address, b256};
     use revm::{
-        Database,
+        Database, DatabaseRef,
         context::result::{ExecutionResult, ResultGas, SuccessReason},
         database::{TransitionState, states::StorageSlot},
         primitives::HashMap,
@@ -2444,6 +2444,90 @@ mod tests {
 
         // An unbounded budget returns the whole range.
         assert_eq!(count(u64::MAX), 3);
+    }
+
+    #[test]
+    fn test_txn_read_db_serves_all_reads() {
+        // TxnReadDb answers every read kind through its single held txn, matching what the
+        // transient DatabaseRef path returns (including the empties for unknown entries).
+        let db = create_temp_database();
+
+        let account = address!("0000000000000000000000000000000000000001");
+        let code = Bytecode::new_raw(Bytes::from_static(&[0, 1, 2, 3]));
+        let code_hash = code.hash_slow();
+        let block_hash = b256!("0000000000000000000000000000000000000000000000000000000000000001");
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            let inner = db.inner.borrow_mut();
+
+            inner
+                .accounts
+                .put(
+                    &mut wtxn,
+                    &AddressWrapper(account),
+                    &CompactBincode(&StoredAccountInfo::new(U256::from(100), 7, code_hash)),
+                )
+                .unwrap();
+            inner
+                .contracts
+                .put(
+                    &mut wtxn,
+                    &HashWrapper(code_hash),
+                    &CompactBincode(&code.clone().into()),
+                )
+                .unwrap();
+            inner
+                .storage
+                .put(
+                    &mut wtxn,
+                    &AddressWrapper(account),
+                    &StorageEntryWrapper(U256::from(1), U256::from(42)),
+                )
+                .unwrap();
+            inner
+                .blocks
+                .put(
+                    &mut wtxn,
+                    &1,
+                    &CompactBincode(&BlockHeaderData {
+                        hash: block_hash,
+                        ..Default::default()
+                    }),
+                )
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        let read_db = TxnDatabaseReader::new(&db).unwrap();
+
+        let info = read_db.basic_ref(account).unwrap().expect("account");
+        assert_eq!(info.balance, U256::from(100));
+        assert_eq!(info.nonce, 7);
+        assert_eq!(info.code_hash, code_hash);
+
+        assert_eq!(
+            read_db
+                .code_by_hash_ref(code_hash)
+                .unwrap()
+                .original_byte_slice(),
+            &[0, 1, 2, 3][..]
+        );
+        assert_eq!(
+            read_db.storage_ref(account, U256::from(1)).unwrap(),
+            U256::from(42)
+        );
+        assert_eq!(
+            read_db.storage_ref(account, U256::from(2)).unwrap(),
+            U256::ZERO
+        );
+        assert_eq!(read_db.block_hash_ref(1).unwrap(), block_hash);
+
+        // Unknown entries return the documented empties.
+        let other = address!("0000000000000000000000000000000000000002");
+        assert_eq!(read_db.basic_ref(other).unwrap(), None);
+        assert_eq!(read_db.block_hash_ref(2).unwrap(), B256::ZERO);
     }
 
     #[test]
