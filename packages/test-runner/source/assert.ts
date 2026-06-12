@@ -24,7 +24,7 @@ const normalize = (value: unknown): unknown => {
 	}
 
 	if ("toBigInt" in value && typeof (value as BigIntLike).toBigInt === "function") {
-		return value.toString();
+		return (value as BigIntLike).toString();
 	}
 
 	if (Array.isArray(value)) {

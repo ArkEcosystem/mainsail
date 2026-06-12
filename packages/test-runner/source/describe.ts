@@ -83,9 +83,9 @@ const runSuite = <T = Context, TDataset = unknown>(
 		loader,
 		match: sinon.match,
 		nock,
-		only: test.only,
+		only: (name, handler) => test.only(name, handler),
 		schema,
-		skip: test.skip,
+		skip: (name, handler) => test.skip(name, handler),
 		spy: (owner: object, method: string) => {
 			const result: Spy = new Spy(sinon.spy(owner, method as never));
 
