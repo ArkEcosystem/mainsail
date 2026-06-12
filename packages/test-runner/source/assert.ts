@@ -19,13 +19,23 @@ type BigIntLike = {
 };
 
 const normalize = (value: unknown): unknown => {
-	if (
-		value &&
-		typeof value === "object" &&
-		"toBigInt" in value &&
-		typeof (value as BigIntLike).toBigInt === "function"
-	) {
+	if (!value || typeof value !== "object") {
+		return value;
+	}
+
+	if ("toBigInt" in value && typeof (value as BigIntLike).toBigInt === "function") {
 		return value.toString();
+	}
+
+	if (Array.isArray(value)) {
+		return value.map((entry) => normalize(entry));
+	}
+
+	// Only recurse into plain objects — class instances (Buffer, Map, transactions, …)
+	// are compared as-is by uvu's deep equality.
+	const prototype = Object.getPrototypeOf(value);
+	if (prototype === Object.prototype || prototype === null) {
+		return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, normalize(entry)]));
 	}
 
 	return value;
@@ -49,13 +59,15 @@ export const assert = {
 	boolean: (value: unknown): void => type(value, "boolean"),
 	buffer: (value: unknown): void => instance(value, Buffer),
 	bufferArray: (values: unknown[]): void => ok(values.every((value) => value instanceof Buffer)),
-	containKey: (value: object, key: string): void => assert.true(Object.keys(value).includes(key)),
+	containKey: (value: object, key: string): void =>
+		ok(Object.keys(value).includes(key), `Expected object to contain key [${key}].`),
 	containKeys: (value: object, keys: string[]): void => {
 		for (const key of keys) {
 			assert.containKey(value, key);
 		}
 	},
-	containValues: (value: object, expected: unknown): void => assert.true(Object.values(value).includes(expected)),
+	containValues: (value: object, expected: unknown): void =>
+		ok(Object.values(value).includes(expected), `Expected object to contain value [${inspect(expected)}].`),
 	defined: (value: unknown): void => ok(value !== undefined, "Expected value to be defined."),
 	empty: (value: string | unknown[] | Record<string, unknown> | null | undefined): void =>
 		ok(
@@ -79,10 +91,17 @@ export const assert = {
 	lt: (a: number, b: number): void => ok(a < b),
 	lte: (a: number, b: number): void => ok(a <= b),
 	match,
-	matchesObject: (value: unknown, schema: ZodRawShape): void => not.throws(() => z.object(schema).parse(value)),
+	matchesObject: (value: unknown, schema: ZodRawShape): void => {
+		const result = z.object(schema).safeParse(value);
+
+		if (!result.success) {
+			ok(false, z.prettifyError(result.error));
+		}
+	},
 	not: {
 		...not,
-		containKey: (value: object, key: string): void => assert.false(Object.keys(value).includes(key)),
+		containKey: (value: object, key: string): void =>
+			ok(!Object.keys(value).includes(key), `Expected object not to contain key [${key}].`),
 		defined: (value: unknown): void => ok(value === undefined, "Expected value not to be defined."),
 		empty: (value: string | unknown[] | Record<string, unknown> | null | undefined): void =>
 			ok(
@@ -94,7 +113,8 @@ export const assert = {
 		equal: (a: unknown, b: unknown): void => {
 			not.equal(normalize(a), normalize(b));
 		},
-		matchesObject: (value: unknown, schema: ZodRawShape): void => throws(() => z.object(schema).parse(value)),
+		matchesObject: (value: unknown, schema: ZodRawShape): void =>
+			ok(!z.object(schema).safeParse(value).success, "Expected value not to match the given schema."),
 		undefined: (value: unknown): void => ok(value !== undefined, "Expected value not to be undefined."),
 	},
 	null: (value: unknown): void => ok(value === null),
@@ -104,28 +124,30 @@ export const assert = {
 	positive: (value: number): void => ok(value > 0),
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	rejects: async (callback: Function, ...expected: (Message | Constructable)[]): Promise<void> => {
+		let error: Error | undefined;
+
 		try {
 			await callback();
-
-			ok(false, "Expected promise to be rejected but it resolved.");
 		} catch (rawError) {
-			const error = ensureError(rawError);
-			if (error instanceof Assertion) {
-				throw error;
-			}
+			error = ensureError(rawError);
+		}
 
-			for (const item of expected) {
-				if (item instanceof Error) {
-					instance(error, item.constructor);
-					is(error.message, item.message);
-				} else if (typeof item === "function") {
-					instance(error, item);
-				} else if (typeof item === "string") {
-					ok(error.message.includes(item) || error.name.includes(item));
-				}
-			}
+		// Assertion failures raised inside the callback are not rejections to match against.
+		if (error instanceof Assertion) {
+			throw error;
+		}
 
-			ok(true);
+		ok(error, "Expected promise to be rejected but it resolved.");
+
+		for (const item of expected) {
+			if (item instanceof Error) {
+				instance(error, item.constructor);
+				is(error.message, item.message);
+			} else if (typeof item === "function") {
+				instance(error, item);
+			} else if (typeof item === "string") {
+				ok(error.message.includes(item) || error.name.includes(item));
+			}
 		}
 	},
 
@@ -133,15 +155,13 @@ export const assert = {
 	resolves: async (callback: Function): Promise<void> => {
 		try {
 			await callback();
-
-			ok(true);
 		} catch (rawError) {
 			const error = ensureError(rawError);
 			if (error instanceof Assertion) {
 				throw error;
 			}
 
-			ok(false, "Expected promise to be resolved but it rejected.");
+			ok(false, `Expected promise to be resolved but it rejected with: ${error.message}`);
 		}
 	},
 	snapshot: (name: string, value: unknown): void => {

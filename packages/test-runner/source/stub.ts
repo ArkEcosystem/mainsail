@@ -5,13 +5,7 @@ import type { FakeLike } from "./fake.js";
 
 import { Fake } from "./fake.js";
 
-type SinonStubLike<TArguments extends unknown[], TResult> = FakeLike<TArguments, TResult> &
-	SinonStub & {
-		returns(value: TResult): SinonStubLike<TArguments, TResult>;
-		onCall(nth: number): SinonStubLike<TArguments, TResult>;
-		resolves(value: unknown): SinonStubLike<TArguments, TResult>;
-		rejects(value: unknown): SinonStubLike<TArguments, TResult>;
-	};
+type SinonStubLike<TArguments extends unknown[], TResult> = FakeLike<TArguments, TResult> & SinonStub;
 
 export class Stub<TArguments extends unknown[] = unknown[], TResult = unknown>
 	extends Fake<TArguments, TResult>

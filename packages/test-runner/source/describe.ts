@@ -24,7 +24,7 @@ interface CallbackArguments<T> {
 	assert: typeof assert;
 	beforeAll: (callback_: ContextCallback<T>) => void;
 	beforeEach: (callback_: ContextCallback<T>) => void;
-	clock: (config?: number | Date | { now?: number | Date | undefined }) => sinon.SinonFakeTimers;
+	clock: (config?: Parameters<typeof sinon.useFakeTimers>[0]) => sinon.SinonFakeTimers;
 
 	dataset: unknown;
 
@@ -44,7 +44,7 @@ interface CallbackArguments<T> {
 }
 type CallbackFunction<T> = (arguments_: CallbackArguments<T>) => void;
 
-const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, dataset?: unknown): void => {
+const runSuite = <T = Context>(test: Test<T>, callback: CallbackFunction<T>, dataset?: unknown): void => {
 	const clocks: sinon.SinonFakeTimers[] = [];
 	const stubs: Stub[] = [];
 	const spies: Spy[] = [];
@@ -56,17 +56,17 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 	let suiteStubs = 0;
 	let suiteSpies = 0;
 
-	suite.before(() => {
+	test.before(() => {
 		nock.disableNetConnect();
 	});
 
 	callback({
-		afterAll: (callback_: ContextCallback<T>) => suite.after(runHook(callback_)),
-		afterEach: (callback_: ContextCallback<T>) => suite.after.each(runHook(callback_)),
+		afterAll: (callback_: ContextCallback<T>) => test.after(runHook(callback_)),
+		afterEach: (callback_: ContextCallback<T>) => test.after.each(runHook(callback_)),
 		assert,
-		beforeAll: (callback_: ContextCallback<T>) => suite.before(runHook(callback_)),
-		beforeEach: (callback_: ContextCallback<T>) => suite.before.each(runHook(callback_)),
-		clock: (config?: number | Date | { now?: number | Date | undefined }) => {
+		beforeAll: (callback_: ContextCallback<T>) => test.before(runHook(callback_)),
+		beforeEach: (callback_: ContextCallback<T>) => test.before.each(runHook(callback_)),
+		clock: (config?: Parameters<typeof sinon.useFakeTimers>[0]) => {
 			const result: sinon.SinonFakeTimers = sinon.useFakeTimers(config);
 
 			clocks.push(result);
@@ -74,14 +74,14 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 			return result;
 		},
 		dataset,
-		each: each(suite),
-		it: suite,
+		each: each(test),
+		it: test,
 		loader,
 		match: sinon.match,
 		nock,
-		only: suite.only,
+		only: test.only,
 		schema,
-		skip: suite.skip,
+		skip: test.skip,
 		spy: (owner: object, method: string) => {
 			const result: Spy = new Spy(sinon.spy(owner, method as never));
 
@@ -103,13 +103,13 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 	// Registered after the user's hooks so the snapshot runs after all beforeAll
 	// hooks, and cleanup runs after the user's afterEach/afterAll hooks — user
 	// teardown still sees active fakes.
-	suite.before(() => {
+	test.before(() => {
 		suiteClocks = clocks.length;
 		suiteStubs = stubs.length;
 		suiteSpies = spies.length;
 	});
 
-	suite.after.each(() => {
+	test.after.each(() => {
 		nock.cleanAll();
 
 		for (const clock of clocks.splice(suiteClocks)) {
@@ -125,7 +125,7 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 		}
 	});
 
-	suite.after(() => {
+	test.after(() => {
 		nock.enableNetConnect();
 
 		for (const clock of clocks.splice(0)) {
@@ -141,7 +141,7 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 		}
 	});
 
-	suite.run();
+	test.run();
 };
 
 export const describe = <T = Context>(title: string, callback: CallbackFunction<T>): void =>

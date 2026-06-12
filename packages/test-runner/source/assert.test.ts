@@ -13,12 +13,12 @@ describe("assert", ({ assert, it, schema }) => {
 	});
 
 	it("determines if a value is defined or undefined", () => {
-		assert.undefined();
+		assert.undefined(undefined);
 		assert.defined({});
 
 		// Not...
 		assert.not.undefined({});
-		assert.not.defined();
+		assert.not.defined(undefined);
 	});
 
 	it("determines if two numbers are equal", () => {

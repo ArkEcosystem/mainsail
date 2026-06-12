@@ -1,12 +1,16 @@
 import { describe, describeWithContext } from "./describe";
 
-describe("Date.now()", ({ assert, beforeAll, afterAll, only, skip, it, nock, loader }) => {
+describe("Date.now()", ({ assert, beforeAll, beforeEach, afterAll, skip, it }) => {
 	let _Date;
+	let count = 0;
 
 	beforeAll(() => {
-		let count = 0;
 		_Date = global.Date;
 		global.Date = { now: () => 100 + count++ };
+	});
+
+	beforeEach(() => {
+		count = 0;
 	});
 
 	afterAll(() => {
@@ -21,10 +25,20 @@ describe("Date.now()", ({ assert, beforeAll, afterAll, only, skip, it, nock, loa
 		assert.type(Date.now(), "number");
 	});
 
-	only("should progress with time", () => {
+	it("should progress with time", () => {
 		assert.is(Date.now(), 100);
 		assert.is(Date.now(), 101);
 		assert.is(Date.now(), 102);
+	});
+});
+
+describe("Only", ({ assert, it, only }) => {
+	only("should be the only test that runs", () => {
+		assert.true(true);
+	});
+
+	it("should never run when another test uses only", () => {
+		assert.unreachable();
 	});
 });
 

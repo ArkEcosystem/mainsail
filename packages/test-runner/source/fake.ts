@@ -1,4 +1,5 @@
-import { not, ok } from "uvu/assert";
+import { inspect } from "node:util";
+import { is, not, ok } from "uvu/assert";
 
 import type { Fake as FakeInterface } from "./contracts.js";
 
@@ -28,22 +29,23 @@ export abstract class Fake<TArguments extends unknown[], TResult> implements Fak
 	}
 
 	public called(): void {
-		ok(this.subject.called);
+		ok(this.subject.called, "Expected fake to be called at least once.");
 	}
 	public calledWith(...arguments_: TArguments): void {
-		ok(this.subject.calledWith(...arguments_));
+		ok(this.subject.calledWith(...arguments_), `Expected fake to be called with: ${inspect(arguments_)}`);
 	}
 
 	public notCalledWith(...arguments_: TArguments): void {
-		not.ok(this.subject.calledWith(...arguments_));
+		not.ok(this.subject.calledWith(...arguments_), `Expected fake not to be called with: ${inspect(arguments_)}`);
 	}
 
 	public calledNthWith(index: number, ...arguments_: TArguments): void {
-		if (this.subject.callCount <= index) {
-			throw new Error(`Failed to get arguments for call#${index}`);
-		}
+		this.#ensureCall(index);
 
-		ok(this.subject.getCall(index).calledWith(...arguments_));
+		ok(
+			this.subject.getCall(index).calledWith(...arguments_),
+			`Expected call #${index} to have arguments: ${inspect(arguments_)}`,
+		);
 	}
 
 	public calledOnce(): void {
@@ -51,7 +53,7 @@ export abstract class Fake<TArguments extends unknown[], TResult> implements Fak
 	}
 
 	public calledTimes(times: number): void {
-		ok(this.subject.callCount === times);
+		is(this.subject.callCount, times);
 	}
 
 	public neverCalled(): void {
@@ -59,11 +61,9 @@ export abstract class Fake<TArguments extends unknown[], TResult> implements Fak
 	}
 
 	public getCallArgs(index: number): TArguments {
-		if (this.subject.callCount > index) {
-			return this.subject.getCall(index).args;
-		}
+		this.#ensureCall(index);
 
-		throw new Error(`Failed to get arguments for call#${index}`);
+		return this.subject.getCall(index).args;
 	}
 
 	public restore(): void {
@@ -76,5 +76,11 @@ export abstract class Fake<TArguments extends unknown[], TResult> implements Fak
 
 	public toFunction(): (...arguments_: TArguments) => TResult {
 		return this.subject;
+	}
+
+	#ensureCall(index: number): void {
+		if (this.subject.callCount <= index) {
+			throw new Error(`Call #${index} does not exist; the fake was called ${this.subject.callCount} time(s).`);
+		}
 	}
 }
