@@ -55,10 +55,14 @@ const serialize = (value: unknown): string =>
 // Overrides: snapshot, equal, throws, not.equal, not.throws
 
 export const assert = {
-	array: (value: unknown): void => ok(Array.isArray(value)),
+	array: (value: unknown): void => ok(Array.isArray(value), `Expected value to be an array but got: ${inspect(value)}`),
 	boolean: (value: unknown): void => type(value, "boolean"),
 	buffer: (value: unknown): void => instance(value, Buffer),
-	bufferArray: (values: unknown[]): void => ok(values.every((value) => value instanceof Buffer)),
+	bufferArray: (values: unknown[]): void =>
+		ok(
+			values.every((value) => value instanceof Buffer),
+			"Expected every value to be a buffer.",
+		),
 	containKey: (value: object, key: string): void =>
 		ok(Object.keys(value).includes(key), `Expected object to contain key [${key}].`),
 	containKeys: (value: object, keys: string[]): void => {
@@ -75,6 +79,7 @@ export const assert = {
 				(typeof value === "string" && value.length === 0) ||
 				(Array.isArray(value) && value.length === 0) ||
 				(typeof value === "object" && !Array.isArray(value) && Object.keys(value).length === 0),
+			`Expected value to be empty but got: ${inspect(value)}`,
 		),
 	equal: (a: unknown, b: unknown): void => {
 		equal(normalize(a), normalize(b));
@@ -82,14 +87,18 @@ export const assert = {
 	false: (value: unknown): void => is(value, false),
 	fixture,
 	function: (value: unknown): void => type(value, "function"),
-	gt: (a: number, b: number): void => ok(a > b),
-	gte: (a: number, b: number): void => ok(a >= b),
-	includeAllMembers: (values: unknown[], items: unknown[]): void => ok(items.every((item) => values.includes(item))),
+	gt: (a: number, b: number): void => ok(a > b, `Expected ${a} to be greater than ${b}.`),
+	gte: (a: number, b: number): void => ok(a >= b, `Expected ${a} to be greater than or equal to ${b}.`),
+	includeAllMembers: (values: unknown[], items: unknown[]): void =>
+		ok(
+			items.every((item) => values.includes(item)),
+			`Expected values to include: ${inspect(items.filter((item) => !values.includes(item)))}`,
+		),
 	instance,
 	is,
 	length: (value: string | unknown[], length: number): void => is(value.length, length),
-	lt: (a: number, b: number): void => ok(a < b),
-	lte: (a: number, b: number): void => ok(a <= b),
+	lt: (a: number, b: number): void => ok(a < b, `Expected ${a} to be less than ${b}.`),
+	lte: (a: number, b: number): void => ok(a <= b, `Expected ${a} to be less than or equal to ${b}.`),
 	match,
 	matchesObject: (value: unknown, schema: ZodRawShape): void => {
 		const result = z.object(schema).safeParse(value);
@@ -109,6 +118,7 @@ export const assert = {
 					((typeof value === "string" && value.length > 0) ||
 						(Array.isArray(value) && value.length > 0) ||
 						(typeof value === "object" && !Array.isArray(value) && Object.keys(value).length > 0)),
+				"Expected value not to be empty.",
 			),
 		equal: (a: unknown, b: unknown): void => {
 			not.equal(normalize(a), normalize(b));
@@ -117,11 +127,11 @@ export const assert = {
 			ok(!z.object(schema).safeParse(value).success, "Expected value not to match the given schema."),
 		undefined: (value: unknown): void => ok(value !== undefined, "Expected value not to be undefined."),
 	},
-	null: (value: unknown): void => ok(value === null),
+	null: (value: unknown): void => ok(value === null, `Expected value to be null but got: ${inspect(value)}`),
 	number: (value: unknown): void => type(value, "number"),
 	object: (value: unknown): void => type(value, "object"),
 	ok,
-	positive: (value: number): void => ok(value > 0),
+	positive: (value: number): void => ok(value > 0, `Expected ${value} to be positive.`),
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	rejects: async (callback: Function, ...expected: (Message | Constructable)[]): Promise<void> => {
 		let error: Error | undefined;
@@ -146,7 +156,10 @@ export const assert = {
 			} else if (typeof item === "function") {
 				instance(error, item);
 			} else if (typeof item === "string") {
-				ok(error.message.includes(item) || error.name.includes(item));
+				ok(
+					error.message.includes(item) || error.name.includes(item),
+					`Expected rejection message to include "${item}" but got: ${error.message}`,
+				);
 			}
 		}
 	},
@@ -181,19 +194,32 @@ export const assert = {
 
 		assert.equal(serialize(value), readFileSync(snapshot, "utf8"));
 	},
-	startsWith: (value: string, prefix: string): void => ok(value.startsWith(prefix)),
+	startsWith: (value: string, prefix: string): void =>
+		ok(value.startsWith(prefix), `Expected "${value}" to start with "${prefix}".`),
 	string: (value: unknown): void => type(value, "string"),
-	stringArray: (values: unknown[]): void => ok(values.every((value) => typeof value === "string")),
+	stringArray: (values: unknown[]): void =>
+		ok(
+			values.every((value) => typeof value === "string"),
+			"Expected every value to be a string.",
+		),
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	throws: (function_: Function, expects?: Message | RegExp | Function): void => {
 		if (typeof expects === "string") {
 			expects = new RegExp(escapeRegExp(expects));
 		}
 
+		// uvu calls function expectations as predicates, which would misfire on Error
+		// classes: built-ins are callable without `new` (always-truthy), ES classes are
+		// not (TypeError). Turn them into instanceof checks instead.
+		if (typeof expects === "function" && (expects === Error || expects.prototype instanceof Error)) {
+			const constructor = expects;
+			expects = (error: unknown) => error instanceof constructor;
+		}
+
 		throws(function_, expects);
 	},
 	true: (value: unknown): void => is(value, true),
-	truthy: (value: unknown): void => ok(!!value),
+	truthy: (value: unknown): void => ok(!!value, `Expected value to be truthy but got: ${inspect(value)}`),
 	type,
 	undefined: (value: unknown): void => ok(value === undefined, "Expected value to be undefined."),
 	unreachable,

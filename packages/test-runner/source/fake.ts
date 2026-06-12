@@ -79,7 +79,7 @@ export abstract class Fake<TArguments extends unknown[], TResult> implements Fak
 	}
 
 	#ensureCall(index: number): void {
-		if (this.subject.callCount <= index) {
+		if (index < 0 || this.subject.callCount <= index) {
 			throw new Error(`Call #${index} does not exist; the fake was called ${this.subject.callCount} time(s).`);
 		}
 	}

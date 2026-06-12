@@ -18,7 +18,7 @@ import { Stub } from "./stub.js";
 type ContextFunction<T> = () => T;
 type ContextCallback<T> = (context: T) => Promise<void> | void;
 
-interface CallbackArguments<T> {
+interface CallbackArguments<T, TDataset = unknown> {
 	afterAll: (callback_: ContextCallback<T>) => void;
 	afterEach: (callback_: ContextCallback<T>) => void;
 	assert: typeof assert;
@@ -26,7 +26,7 @@ interface CallbackArguments<T> {
 	beforeEach: (callback_: ContextCallback<T>) => void;
 	clock: (config?: Parameters<typeof sinon.useFakeTimers>[0]) => sinon.SinonFakeTimers;
 
-	dataset: unknown;
+	dataset: TDataset;
 
 	each: <TDataset>(name: string, callback: EachCallback<TDataset, T>, datasets: TDataset[]) => void;
 
@@ -42,9 +42,13 @@ interface CallbackArguments<T> {
 	stub: (owner: object, method: string) => Stub;
 	stubFn: () => Stub;
 }
-type CallbackFunction<T> = (arguments_: CallbackArguments<T>) => void;
+type CallbackFunction<T, TDataset = unknown> = (arguments_: CallbackArguments<T, TDataset>) => void;
 
-const runSuite = <T = Context>(test: Test<T>, callback: CallbackFunction<T>, dataset?: unknown): void => {
+const runSuite = <T = Context, TDataset = unknown>(
+	test: Test<T>,
+	callback: CallbackFunction<T, TDataset>,
+	dataset: TDataset,
+): void => {
 	const clocks: sinon.SinonFakeTimers[] = [];
 	const stubs: Stub[] = [];
 	const spies: Spy[] = [];
@@ -145,17 +149,26 @@ const runSuite = <T = Context>(test: Test<T>, callback: CallbackFunction<T>, dat
 };
 
 export const describe = <T = Context>(title: string, callback: CallbackFunction<T>): void =>
-	runSuite<T>(suite<T>(title), callback);
+	runSuite<T>(suite<T>(title), callback, undefined);
 
 export const describeWithContext = <T = Context>(
 	title: string,
-	context: Context | ContextFunction<T>,
+	context: T | ContextFunction<T>,
 	callback: CallbackFunction<T>,
-): void => runSuite<T>(suite<T>(title, typeof context === "function" ? context() : context), callback);
+): void =>
+	runSuite<T>(
+		suite<T>(title, typeof context === "function" ? (context as ContextFunction<T>)() : context),
+		callback,
+		undefined,
+	);
 
-export const describeEach = <T = Context>(title: string, callback: CallbackFunction<T>, datasets: unknown[]): void => {
+export const describeEach = <T = Context, TDataset = unknown>(
+	title: string,
+	callback: CallbackFunction<T, TDataset>,
+	datasets: TDataset[],
+): void => {
 	for (const dataset of datasets) {
-		runSuite<T>(suite<T>(formatName(title, dataset)), callback);
+		runSuite<T, TDataset>(suite<T>(formatName(title, dataset)), callback, dataset);
 	}
 };
 

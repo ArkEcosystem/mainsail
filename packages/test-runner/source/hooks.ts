@@ -9,7 +9,7 @@ export const runHook =
 			await callback(context);
 		} catch (rawError) {
 			const error = ensureError(rawError);
-			console.log(kleur.bold(kleur.bgRed(kleur.white(error.stack ?? error.message))));
+			console.error(kleur.bold(kleur.bgRed(kleur.white(error.stack ?? error.message))));
 			throw error;
 		}
 	};
