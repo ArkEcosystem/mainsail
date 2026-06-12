@@ -5,7 +5,7 @@ import sinon from "sinon";
 import { suite } from "uvu";
 import { z as schema } from "zod";
 
-import type { EachCallback } from "./each.js";
+import type { Each } from "./each.js";
 
 import { assert } from "./assert.js";
 import { each, formatName } from "./each.js";
@@ -28,7 +28,7 @@ interface CallbackArguments<T, TDataset = unknown> {
 
 	dataset: TDataset;
 
-	each: <TDataset>(name: string, callback: EachCallback<TDataset, T>, datasets: TDataset[]) => void;
+	each: Each<T>;
 
 	it: Test<T>;
 	loader: typeof loader;

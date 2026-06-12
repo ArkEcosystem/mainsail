@@ -52,6 +52,34 @@ describe("Datasets", ({ assert, each }) => {
 	);
 });
 
+describe("Datasets (only)", ({ assert, each, it }) => {
+	each.only(
+		"only number %s should run",
+		({ dataset }) => {
+			assert.true(dataset > 0);
+		},
+		[1, 2],
+	);
+
+	it("should never run when each.only is used", () => {
+		assert.unreachable();
+	});
+});
+
+describe("Datasets (skip)", ({ assert, each, it }) => {
+	each.skip(
+		"skipped number %s should never run",
+		() => {
+			assert.unreachable();
+		},
+		[1, 2],
+	);
+
+	it("should run alongside skipped dataset tests", () => {
+		assert.true(true);
+	});
+});
+
 describeWithContext("Context (Object)", { hello: "world" }, ({ assert, it }) => {
 	it("should have context from an object", (context) => {
 		assert.is(context.hello, "world");
