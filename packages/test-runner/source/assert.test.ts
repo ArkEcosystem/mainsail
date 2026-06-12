@@ -378,7 +378,10 @@ describe("assert (objects and collections)", ({ assert, it }) => {
 	it("not.containKey - should mirror containKey", () => {
 		assert.not.containKey({ hello: "world" }, "nope");
 
-		expectFail(() => assert.not.containKey({ hello: "world" }, "hello"), "Expected object not to contain key [hello].");
+		expectFail(
+			() => assert.not.containKey({ hello: "world" }, "hello"),
+			"Expected object not to contain key [hello].",
+		);
 	});
 
 	it("containKeys - should pass when every key is present", () => {

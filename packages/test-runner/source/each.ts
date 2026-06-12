@@ -24,8 +24,11 @@ export const each = <TContext>(test: Test<TContext>): Each<TContext> => {
 			}
 		};
 
-	return Object.assign(register((name, callback) => test(name, callback)), {
-		only: register((name, callback) => test.only(name, callback)),
-		skip: register((name, callback) => test.skip(name, callback)),
-	});
+	return Object.assign(
+		register((name, callback) => test(name, callback)),
+		{
+			only: register((name, callback) => test.only(name, callback)),
+			skip: register((name, callback) => test.skip(name, callback)),
+		},
+	);
 };

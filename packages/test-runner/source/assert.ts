@@ -46,7 +46,8 @@ const serialize = (value: unknown): string =>
 // Overrides: snapshot, equal, throws, not.equal, not.throws
 
 export const assert = {
-	array: (value: unknown): void => ok(Array.isArray(value), `Expected value to be an array but got: ${inspect(value)}`),
+	array: (value: unknown): void =>
+		ok(Array.isArray(value), `Expected value to be an array but got: ${inspect(value)}`),
 	boolean: (value: unknown): void => type(value, "boolean"),
 	buffer: (value: unknown): void => instance(value, Buffer),
 	bufferArray: (values: unknown[]): void =>
