@@ -1,7 +1,7 @@
 import type { Message } from "uvu/assert";
 import type { ZodRawShape } from "zod";
 
-import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { inspect } from "node:util";
 import { join } from "path";
 import { Assertion, equal, fixture, instance, is, match, not, ok, throws, type, unreachable } from "uvu/assert";
@@ -31,6 +31,8 @@ const normalize = (value: unknown): unknown => {
 	return value;
 };
 
+const escapeRegExp = (value: string): string => value.replace(/[$()*+.?[\\\]^{|}]/g, String.raw`\$&`);
+
 const serialize = (value: unknown): string =>
 	inspect(value, {
 		breakLength: Infinity,
@@ -50,10 +52,10 @@ export const assert = {
 	containKey: (value: object, key: string): void => assert.true(Object.keys(value).includes(key)),
 	containKeys: (value: object, keys: string[]): void => {
 		for (const key of keys) {
-			ok(value[key] !== undefined);
+			assert.containKey(value, key);
 		}
 	},
-	containValues: (value: object, key: string): void => assert.false(Object.values(value).includes(key)),
+	containValues: (value: object, expected: unknown): void => assert.true(Object.values(value).includes(expected)),
 	defined: (value: unknown): void => ok(value !== undefined, "Expected value to be defined."),
 	empty: (value: string | unknown[] | Record<string, unknown> | null | undefined): void =>
 		ok(
@@ -82,7 +84,13 @@ export const assert = {
 		...not,
 		containKey: (value: object, key: string): void => assert.false(Object.keys(value).includes(key)),
 		defined: (value: unknown): void => ok(value === undefined, "Expected value not to be defined."),
-		empty: (value: unknown[]): void => ok(Object.keys(value).length > 0),
+		empty: (value: string | unknown[] | Record<string, unknown> | null | undefined): void =>
+			ok(
+				!!value &&
+					((typeof value === "string" && value.length > 0) ||
+						(Array.isArray(value) && value.length > 0) ||
+						(typeof value === "object" && !Array.isArray(value) && Object.keys(value).length > 0)),
+			),
 		equal: (a: unknown, b: unknown): void => {
 			not.equal(normalize(a), normalize(b));
 		},
@@ -108,14 +116,11 @@ export const assert = {
 
 			for (const item of expected) {
 				if (item instanceof Error) {
+					instance(error, item.constructor);
+					is(error.message, item.message);
+				} else if (typeof item === "function") {
 					instance(error, item);
-				}
-
-				if (typeof item === "function") {
-					instance(error, item);
-				}
-
-				if (typeof item === "string") {
+				} else if (typeof item === "string") {
 					ok(error.message.includes(item) || error.name.includes(item));
 				}
 			}
@@ -150,11 +155,7 @@ export const assert = {
 
 		const updateSnapshots: boolean = process.argv.includes("--update-snapshots");
 
-		if (updateSnapshots) {
-			unlinkSync(snapshot);
-		}
-
-		if (!existsSync(snapshot)) {
+		if (updateSnapshots || !existsSync(snapshot)) {
 			writeFileSync(snapshot, serialize(value));
 		}
 
@@ -166,7 +167,7 @@ export const assert = {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	throws: (function_: Function, expects?: Message | RegExp | Function): void => {
 		if (typeof expects === "string") {
-			expects = new RegExp(expects);
+			expects = new RegExp(escapeRegExp(expects));
 		}
 
 		throws(function_, expects);
