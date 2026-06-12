@@ -57,11 +57,10 @@ contract ConsensusTest is Base {
         registerValidator(address(2));
         resignValidator(addr);
 
+        // Only one eligible (non-resigned) validator remains; a round of 2 would have required
+        // duplicating it across slots, which is now rejected instead of silently produced.
+        vm.expectRevert(abi.encodeWithSelector(ConsensusV1.InsufficientActiveValidators.selector, 1, 2));
         consensus.calculateRoundValidators(2);
-        ConsensusV1.Validator[] memory validators = consensus.getRoundValidators();
-        assertEq(validators.length, 2);
-        assertEq(validators[0].addr, address(2));
-        assertEq(validators[1].addr, address(2)); // Second validator is duplicated
     }
 
     // Inverted order
@@ -72,11 +71,8 @@ contract ConsensusTest is Base {
         registerValidator(address(2));
         resignValidator(address(2));
 
+        vm.expectRevert(abi.encodeWithSelector(ConsensusV1.InsufficientActiveValidators.selector, 1, 2));
         consensus.calculateRoundValidators(2);
-        ConsensusV1.Validator[] memory validators = consensus.getRoundValidators();
-        assertEq(validators.length, 2);
-        assertEq(validators[0].addr, addr);
-        assertEq(validators[1].addr, addr); // Second validator is duplicated
     }
 
     function test_should_ignore_validators_without_bls_public_key() public {
@@ -85,11 +81,24 @@ contract ConsensusTest is Base {
         registerValidator(addr);
         consensus.addValidator(address(2), new bytes(0), false);
 
+        // address(2) has no BLS key so it is not eligible; only one eligible validator remains.
+        vm.expectRevert(abi.encodeWithSelector(ConsensusV1.InsufficientActiveValidators.selector, 1, 2));
+        consensus.calculateRoundValidators(2);
+    }
+
+    function test_should_exclude_resigned_validator_and_form_distinct_round() public {
+        registerValidator(address(1));
+        registerValidator(address(2));
+        registerValidator(address(3));
+        resignValidator(address(2));
+
+        // Two eligible validators remain (1 and 3); the round is formed from DISTINCT validators,
+        // excluding the resigned one and never duplicating a slot.
         consensus.calculateRoundValidators(2);
         ConsensusV1.Validator[] memory validators = consensus.getRoundValidators();
         assertEq(validators.length, 2);
-        assertEq(validators[0].addr, addr);
-        assertEq(validators[1].addr, addr); // Second validator is duplicated
+        assertTrue(validators[0].addr != validators[1].addr); // no duplicate slot
+        assertTrue(validators[0].addr != address(2) && validators[1].addr != address(2)); // resigned excluded
     }
 
     function test_consensus_sortedValidators_sameVoteCounts() public {
