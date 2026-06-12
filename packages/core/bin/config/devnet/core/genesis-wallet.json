@@ -1,14 +1,14 @@
 {
-	"address": "0xEcC98f90285F69B65f9c306534e8C051DFc10E1c",
+	"address": "0xb2c71eFe47EA0615064573D9E0E26fc78b785816",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "0b400cc0ad44d043081e5337d5fbb05f02cfaffa5f5c9cbdb381ea054fe9adcf",
-		"publicKey": "a314cb958eefdf5c7bb7433504bee1128da171ca3fb8a8c2203995c0c985158e4cbb744936845fc263fbc5acca92a5c0"
+		"privateKey": "1babf3e87873f3780138d8901532f85496da97db4dade6f2e19d15796646323a",
+		"publicKey": "ab18ef7db8bb76997127cae1fe1c61be36b87859237dabdef009178fcc6c7a0b6e393b93163e45a41360bd86c6963892"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "8515189f5fc1c698a255404025c043fc840bf29d5400791b5a4b2af6e1e868dd",
-		"publicKey": "03df162bedbc767fb7403e0f2b32fa931e1f697d82f5546839424bb0357e73101a"
+		"privateKey": "eedde05db6f3cf4b1ad0922106314a2d61fd369b2b3cf85fdce6af45f95fb008",
+		"publicKey": "03eef4cbd24d314209781e0e356fb0cd1275783dd7e5ebbce05d1ec6b8a05c7eb8"
 	},
-	"passphrase": "elephant spray erode lawsuit just hole baby slam tag general trap achieve road fish grab casino quantum snow awesome vibrant rookie grow labor young"
+	"passphrase": "anchor law wet truck horror shrug detail turn defy yellow ugly bomb hidden dwarf surface parrot defense entry brief rack sell clump drift govern"
 }
