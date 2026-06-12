@@ -44,122 +44,211 @@ const expectFailAsync = async (callback: () => Promise<void>, messageIncludes?: 
 };
 
 describe("assert (types)", ({ assert, it }) => {
-	it("array - should pass for arrays and fail for everything else", () => {
+	it("array - should pass for arrays", () => {
 		assert.array([]);
 		assert.array([1, 2, 3]);
-
-		expectFail(() => assert.array("nope"), "Expected value to be an array");
-		expectFail(() => assert.array({ length: 0 }), "Expected value to be an array");
 	});
 
-	it("boolean - should pass for booleans and fail for everything else", () => {
+	it("array - should fail for non-arrays", () => {
+		expectFail(() => assert.array("some string"), "Expected value to be an array");
+		expectFail(() => assert.array({ length: 0 }), "Expected value to be an array");
+		expectFail(() => assert.array(null));
+		expectFail(() => assert.array(undefined));
+	});
+
+	it("boolean - should pass for booleans", () => {
 		assert.boolean(true);
 		assert.boolean(false);
-
-		expectFail(() => assert.boolean("true"));
-		expectFail(() => assert.boolean(1));
 	});
 
-	it("buffer - should pass for buffers and fail for everything else", () => {
-		assert.buffer(Buffer.from("hello"));
+	it("boolean - should fail for non-booleans", () => {
+		expectFail(() => assert.boolean("true"));
+		expectFail(() => assert.boolean(1));
+		expectFail(() => assert.boolean(0));
+		expectFail(() => assert.boolean(null));
+		expectFail(() => assert.boolean(undefined));
+	});
 
+	it("buffer - should pass for buffers", () => {
+		assert.buffer(Buffer.from("hello"));
+	});
+
+	it("buffer - should fail for non-buffers", () => {
 		expectFail(() => assert.buffer("hello"));
+		expectFail(() => assert.buffer(new Uint8Array(2)));
+		expectFail(() => assert.buffer(null));
 	});
 
 	it("bufferArray - should pass when every value is a buffer", () => {
 		assert.bufferArray([Buffer.from("a"), Buffer.from("b")]);
 		assert.bufferArray([]); // vacuously true
+	});
 
+	it("bufferArray - should fail when any value is not a buffer", () => {
 		expectFail(() => assert.bufferArray([Buffer.from("a"), "b"]), "Expected every value to be a buffer.");
+		expectFail(() => assert.bufferArray(["a", "b"]), "Expected every value to be a buffer.");
 	});
 
-	it("function - should pass for functions and fail for everything else", () => {
+	it("function - should pass for functions", () => {
 		assert.function(() => {});
-
-		expectFail(() => assert.function("nope"));
+		assert.function(async () => {});
+		assert.function(class {});
 	});
 
-	it("null - should pass for null and fail for everything else", () => {
-		assert.null(null);
+	it("function - should fail for non-functions", () => {
+		expectFail(() => assert.function("some string"));
+		expectFail(() => assert.function({}));
+		expectFail(() => assert.function(null));
+	});
 
+	it("null - should pass for null", () => {
+		assert.null(null);
+	});
+
+	it("null - should fail for non-null values", () => {
 		expectFail(() => assert.null(undefined), "Expected value to be null");
 		expectFail(() => assert.null(0), "Expected value to be null");
+		expectFail(() => assert.null(""), "Expected value to be null");
+		expectFail(() => assert.null({}), "Expected value to be null");
 	});
 
-	it("number - should pass for numbers and fail for everything else", () => {
+	it("number - should pass for numbers", () => {
 		assert.number(1);
+		assert.number(-1.5);
 		assert.number(Number.NaN);
+		assert.number(Number.POSITIVE_INFINITY);
+	});
 
+	it("number - should fail for non-numbers", () => {
+		expectFail(() => assert.number("some string"));
 		expectFail(() => assert.number("1"));
+		expectFail(() => assert.number(25n)); // bigint is not typeof number
+		expectFail(() => assert.number(null));
+		expectFail(() => assert.number(undefined));
+		expectFail(() => assert.number({}));
 	});
 
-	it("object - should pass for objects and fail for everything else", () => {
+	it("object - should pass for objects", () => {
 		assert.object({});
+		assert.object([]);
 		assert.object(null); // typeof null === "object"
-
-		expectFail(() => assert.object("nope"));
 	});
 
-	it("string - should pass for strings and fail for everything else", () => {
-		assert.string("hello");
+	it("object - should fail for non-objects", () => {
+		expectFail(() => assert.object("some string"));
+		expectFail(() => assert.object(1));
+		expectFail(() => assert.object(true));
+		expectFail(() => assert.object(undefined));
+	});
 
+	it("string - should pass for strings", () => {
+		assert.string("hello");
+		assert.string("");
+	});
+
+	it("string - should fail for non-strings", () => {
 		expectFail(() => assert.string(1));
+		expectFail(() => assert.string(null));
+		expectFail(() => assert.string(undefined));
+		expectFail(() => assert.string({}));
 	});
 
 	it("stringArray - should pass when every value is a string", () => {
 		assert.stringArray(["a", "b"]);
 		assert.stringArray([]); // vacuously true
+	});
 
+	it("stringArray - should fail when any value is not a string", () => {
 		expectFail(() => assert.stringArray(["a", 1]), "Expected every value to be a string.");
+		expectFail(() => assert.stringArray([null]), "Expected every value to be a string.");
+		expectFail(() => assert.stringArray([undefined]), "Expected every value to be a string.");
 	});
 
 	it("instance - should pass for matching constructors", () => {
 		assert.instance(new Date(), Date);
+		assert.instance(new TypeError("boom"), Error); // subclasses match their parent
+	});
 
+	it("instance - should fail for non-matching constructors", () => {
 		expectFail(() => assert.instance({}, Date));
+		expectFail(() => assert.instance("some string", Date));
 	});
 
 	it("type - should pass for matching typeof results", () => {
 		assert.type(1, "number");
 		assert.type("a", "string");
+		assert.type(undefined, "undefined");
+	});
 
+	it("type - should fail for non-matching typeof results", () => {
 		expectFail(() => assert.type(1, "string"));
+		expectFail(() => assert.type("some string", "number"));
 	});
 });
 
 describe("assert (truthiness)", ({ assert, it }) => {
-	it("true/false - should require strict booleans", () => {
+	it("true - should pass for true", () => {
 		assert.true(true);
-		assert.false(false);
+	});
 
+	it("true - should fail for everything that is not strictly true", () => {
 		expectFail(() => assert.true(1));
+		expectFail(() => assert.true("true"));
+		expectFail(() => assert.true(false));
+	});
+
+	it("false - should pass for false", () => {
+		assert.false(false);
+	});
+
+	it("false - should fail for everything that is not strictly false", () => {
 		expectFail(() => assert.false(0));
+		expectFail(() => assert.false(""));
+		expectFail(() => assert.false(true));
 	});
 
 	it("truthy - should pass for truthy values", () => {
 		assert.truthy(1);
 		assert.truthy("a");
 		assert.truthy({});
+	});
 
+	it("truthy - should fail for falsy values", () => {
 		expectFail(() => assert.truthy(0), "Expected value to be truthy");
 		expectFail(() => assert.truthy(""), "Expected value to be truthy");
+		expectFail(() => assert.truthy(null), "Expected value to be truthy");
+		expectFail(() => assert.truthy(undefined), "Expected value to be truthy");
+		expectFail(() => assert.truthy(false), "Expected value to be truthy");
 	});
 
 	it("ok - should pass for truthy values", () => {
 		assert.ok(1);
+	});
 
+	it("ok - should fail for falsy values", () => {
 		expectFail(() => assert.ok(0));
 	});
 
-	it("defined/undefined - should distinguish undefined from everything else", () => {
+	it("defined - should pass for anything that is not undefined", () => {
 		assert.defined({});
 		assert.defined(null);
-		assert.undefined(undefined);
+		assert.defined(0);
+	});
 
+	it("defined - should fail for undefined", () => {
 		expectFail(() => assert.defined(undefined), "Expected value to be defined.");
-		expectFail(() => assert.undefined({}), "Expected value to be undefined.");
+	});
 
-		// Not...
+	it("undefined - should pass for undefined", () => {
+		assert.undefined(undefined);
+	});
+
+	it("undefined - should fail for anything that is not undefined", () => {
+		expectFail(() => assert.undefined({}), "Expected value to be undefined.");
+		expectFail(() => assert.undefined(null), "Expected value to be undefined.");
+	});
+
+	it("not.defined/not.undefined - should mirror defined/undefined", () => {
 		assert.not.defined(undefined);
 		assert.not.undefined({});
 
@@ -173,108 +262,150 @@ describe("assert (truthiness)", ({ assert, it }) => {
 });
 
 describe("assert (comparisons)", ({ assert, it }) => {
-	it("equal - should deeply compare primitives, plain objects and arrays", () => {
+	it("equal - should pass for deeply equal primitives, plain objects and arrays", () => {
 		assert.equal("hello", "hello");
 		assert.equal(5, 5);
 		assert.equal(25n, 25n);
 		assert.equal({ a: [{ b: 1 }] }, { a: [{ b: 1 }] });
 		assert.equal([1, [2, 3]], [1, [2, 3]]);
+	});
 
-		// Not...
+	it("equal - should fail for unequal values", () => {
+		expectFail(() => assert.equal("hello", "world"));
+		expectFail(() => assert.equal(5, 6));
+		expectFail(() => assert.equal(10n, 15n));
+		expectFail(() => assert.equal({ a: 1 }, { a: 2 }));
+		expectFail(() => assert.equal([1], [1, 2]));
+		expectFail(() => assert.equal({ a: [{ b: 1 }] }, { a: [{ b: 2 }] }));
+	});
+
+	it("not.equal - should mirror equal", () => {
 		assert.not.equal("hello", "world");
 		assert.not.equal(10n, 15n);
 		assert.not.equal({ a: [{ b: 1 }] }, { a: [{ b: 2 }] });
 
-		expectFail(() => assert.equal({ a: 1 }, { a: 2 }));
 		expectFail(() => assert.not.equal({ a: 1 }, { a: 1 }));
+		expectFail(() => assert.not.equal("hello", "hello"));
 	});
 
 	it("equal - should compare class instances as-is", () => {
 		assert.equal(Buffer.from("abc"), Buffer.from("abc"));
-		assert.not.equal(Buffer.from("abc"), Buffer.from("abd"));
 		assert.equal(new Map([["a", 1]]), new Map([["a", 1]]));
 		assert.equal(new Date(0), new Date(0));
+
+		expectFail(() => assert.equal(Buffer.from("abc"), Buffer.from("abd")));
+		expectFail(() => assert.equal(new Date(0), new Date(1)));
 	});
 
-	it("is - should compare by strict equality", () => {
+	it("is - should pass for strictly equal values", () => {
 		assert.is(1, 1);
 
 		const reference = {};
 		assert.is(reference, reference);
+	});
 
+	it("is - should fail for values that are not strictly equal", () => {
+		expectFail(() => assert.is(1, 2));
 		expectFail(() => assert.is({}, {})); // not the same reference
 	});
 
-	it("gt/gte/lt/lte - should compare numbers", () => {
+	it("gt/gte/lt/lte - should pass for valid comparisons", () => {
 		assert.gt(2, 1);
 		assert.gte(2, 2);
 		assert.lt(1, 2);
 		assert.lte(2, 2);
+	});
 
+	it("gt/gte/lt/lte - should fail for invalid comparisons", () => {
 		expectFail(() => assert.gt(1, 1), "Expected 1 to be greater than 1.");
+		expectFail(() => assert.gt(1, 2), "Expected 1 to be greater than 2.");
 		expectFail(() => assert.gte(1, 2), "Expected 1 to be greater than or equal to 2.");
 		expectFail(() => assert.lt(1, 1), "Expected 1 to be less than 1.");
+		expectFail(() => assert.lt(2, 1), "Expected 2 to be less than 1.");
 		expectFail(() => assert.lte(2, 1), "Expected 2 to be less than or equal to 1.");
 	});
 
-	it("positive - should require a number greater than zero", () => {
+	it("positive - should pass for numbers greater than zero", () => {
 		assert.positive(1);
+		assert.positive(0.1);
+	});
 
+	it("positive - should fail for zero and negative numbers", () => {
 		expectFail(() => assert.positive(0), "Expected 0 to be positive.");
 		expectFail(() => assert.positive(-1), "Expected -1 to be positive.");
 	});
 
-	it("length - should compare string and array lengths", () => {
+	it("length - should pass for matching string and array lengths", () => {
 		assert.length("abc", 3);
 		assert.length([1, 2], 2);
-
-		expectFail(() => assert.length("abc", 2));
 	});
 
-	it("startsWith - should check string prefixes", () => {
-		assert.startsWith("hello world", "hello");
+	it("length - should fail for non-matching lengths", () => {
+		expectFail(() => assert.length("abc", 2));
+		expectFail(() => assert.length([1, 2], 3));
+	});
 
+	it("startsWith - should pass for matching prefixes", () => {
+		assert.startsWith("hello world", "hello");
+	});
+
+	it("startsWith - should fail for non-matching prefixes", () => {
 		expectFail(() => assert.startsWith("hello world", "world"), 'Expected "hello world" to start with "world".');
 	});
 
-	it("match - should match substrings and patterns", () => {
+	it("match - should pass for matching substrings and patterns", () => {
 		assert.match("hello world", "world");
 		assert.match("hello world", /^hello/);
+	});
 
+	it("match - should fail for non-matching substrings and patterns", () => {
 		expectFail(() => assert.match("hello world", "nope"));
+		expectFail(() => assert.match("hello world", /^world/));
 	});
 });
 
 describe("assert (objects and collections)", ({ assert, it }) => {
-	it("containKey - should check key presence", () => {
+	it("containKey - should pass for present keys", () => {
 		assert.containKey({ hello: "world" }, "hello");
 		assert.containKey({ key: undefined }, "key"); // present keys count even when undefined
+	});
 
+	it("containKey - should fail for missing keys", () => {
 		expectFail(() => assert.containKey({ hello: "world" }, "nope"), "Expected object to contain key [nope].");
+		expectFail(() => assert.containKey({}, "any"), "Expected object to contain key [any].");
+	});
 
-		// Not...
+	it("not.containKey - should mirror containKey", () => {
 		assert.not.containKey({ hello: "world" }, "nope");
 
 		expectFail(() => assert.not.containKey({ hello: "world" }, "hello"), "Expected object not to contain key [hello].");
 	});
 
-	it("containKeys - should check that every key is present", () => {
+	it("containKeys - should pass when every key is present", () => {
 		assert.containKeys({ a: 1, b: 2, c: 3 }, ["a", "b"]);
+	});
 
+	it("containKeys - should fail when any key is missing", () => {
 		expectFail(() => assert.containKeys({ a: 1 }, ["a", "b"]), "Expected object to contain key [b].");
 	});
 
-	it("containValues - should check value presence", () => {
+	it("containValues - should pass for present values", () => {
 		assert.containValues({ hello: "world" }, "world");
-
-		expectFail(() => assert.containValues({ hello: "world" }, "nope"), "Expected object to contain value");
 	});
 
-	it("includeAllMembers - should check that every item is included", () => {
+	it("containValues - should fail for missing values", () => {
+		expectFail(() => assert.containValues({ hello: "world" }, "nope"), "Expected object to contain value");
+		expectFail(() => assert.containValues({}, "any"), "Expected object to contain value");
+	});
+
+	it("includeAllMembers - should pass when every item is included", () => {
 		assert.includeAllMembers([1, 2, 3], [1, 3]);
 		assert.includeAllMembers([1], []); // vacuously true
+	});
 
+	it("includeAllMembers - should fail when any item is missing", () => {
 		expectFail(() => assert.includeAllMembers([1, 2], [2, 9]), "Expected values to include: [ 9 ]");
+		expectFail(() => assert.includeAllMembers([], [1]), "Expected values to include: [ 1 ]");
 	});
 
 	it("empty - should pass for empty strings, arrays, objects and nullish values", () => {
@@ -283,7 +414,9 @@ describe("assert (objects and collections)", ({ assert, it }) => {
 		assert.empty({});
 		assert.empty(null);
 		assert.empty(undefined);
+	});
 
+	it("empty - should fail for non-empty values", () => {
 		expectFail(() => assert.empty("a"), "Expected value to be empty");
 		expectFail(() => assert.empty([1]), "Expected value to be empty");
 		expectFail(() => assert.empty({ a: 1 }), "Expected value to be empty");
@@ -293,7 +426,9 @@ describe("assert (objects and collections)", ({ assert, it }) => {
 		assert.not.empty("a");
 		assert.not.empty([1]);
 		assert.not.empty({ a: 1 });
+	});
 
+	it("not.empty - should fail for empty and nullish values", () => {
 		expectFail(() => assert.not.empty(""), "Expected value not to be empty.");
 		expectFail(() => assert.not.empty([]), "Expected value not to be empty.");
 		expectFail(() => assert.not.empty({}), "Expected value not to be empty.");
@@ -311,13 +446,16 @@ describe("assert (schemas)", ({ assert, it, schema }) => {
 		assert.matchesObject({ extra: 1, hello: "world" }, { hello: schema.string() });
 	});
 
-	it("matchesObject - should report zod issues on mismatch", () => {
+	it("matchesObject - should fail with zod issues on mismatch", () => {
 		expectFail(() => assert.matchesObject({ hello: 1 }, { hello: schema.string() }), "Invalid input");
+		expectFail(() => assert.matchesObject("not an object", { hello: schema.string() }));
 	});
 
 	it("not.matchesObject - should pass when the value does not match the shape", () => {
 		assert.not.matchesObject({ hello: 1 }, { hello: schema.string() });
+	});
 
+	it("not.matchesObject - should fail when the value matches the shape", () => {
 		expectFail(
 			() => assert.not.matchesObject({ hello: "world" }, { hello: schema.string() }),
 			"Expected value not to match the given schema.",
@@ -326,11 +464,13 @@ describe("assert (schemas)", ({ assert, it, schema }) => {
 });
 
 describe("assert (throws)", ({ assert, it }) => {
-	it("should pass when the function throws and fail when it does not", () => {
+	it("should pass when the function throws", () => {
 		assert.throws(() => {
 			throw new Error("boom");
 		});
+	});
 
+	it("should fail when the function does not throw", () => {
 		expectFail(() => assert.throws(() => {}), "Expected function to throw");
 	});
 
@@ -342,7 +482,9 @@ describe("assert (throws)", ({ assert, it }) => {
 		assert.throws(() => {
 			throw new Error("prefix boom suffix");
 		}, "boom"); // substring match
+	});
 
+	it("should fail when the message does not match the string expectation", () => {
 		expectFail(() =>
 			assert.throws(() => {
 				throw new Error("actual");
@@ -438,7 +580,9 @@ describe("assert (rejects and resolves)", ({ assert, it }) => {
 		await assert.rejects(async () => {
 			throw "raw string"; // non-Error rejections are wrapped
 		}, "raw string");
+	});
 
+	it("rejects - should fail when the message does not match the string expectation", async () => {
 		await expectFailAsync(
 			() =>
 				assert.rejects(async () => {

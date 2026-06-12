@@ -204,6 +204,31 @@ describe("spyFn / stubFn", ({ assert, it, spyFn, stubFn }) => {
 	});
 });
 
+describe("Fake helper failures", ({ assert, clock, it, spy, stub }) => {
+	it("stub - should throw when stubbing a missing method", () => {
+		assert.throws(() => stub({}, "missing"), "Cannot stub non-existent property missing");
+		assert.throws(() => stub({}, "missing"), TypeError);
+	});
+
+	it("stub - should throw when the method is already stubbed", () => {
+		const target = { value: () => "original" };
+
+		stub(target, "value");
+
+		assert.throws(() => stub(target, "value"), "already wrapped");
+	});
+
+	it("spy - should throw when spying on a missing method", () => {
+		assert.throws(() => spy({}, "missing"), TypeError);
+	});
+
+	it("clock - should throw when fake timers are already installed", () => {
+		clock();
+
+		assert.throws(() => clock(), "Can't install fake timers twice");
+	});
+});
+
 describe("describeSkip", ({ assert, it, stub }) => {
 	it("should log the suite as ignored without invoking the callback", () => {
 		const log = stub(console, "log");
