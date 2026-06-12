@@ -29,4 +29,8 @@ export interface Stub<TArguments extends unknown[], TResult> extends Fake<TArgum
 
 	rejectedValue(value: unknown): this;
 	rejectedValueNth(nth: number, value: unknown): this;
+	rejectedValueSequence(sequence: unknown[]): this;
+
+	callsFake(value: (...arguments_: unknown[]) => unknown): this;
+	callsFakeNth(nth: number, value: (...arguments_: unknown[]) => unknown): this;
 }
