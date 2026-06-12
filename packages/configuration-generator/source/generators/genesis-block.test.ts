@@ -62,7 +62,7 @@ describe<{
 	});
 
 	it("#generate - should return generated data", async ({ generator, mnemonicGenerator }) => {
-		const validatorsCount = 10;
+		const validatorsCount = 53;
 		assert.object(
 			await generator.generate(mnemonicGenerator.generate(), mnemonicGenerator.generateMany(validatorsCount), {
 				chainId: 123,
