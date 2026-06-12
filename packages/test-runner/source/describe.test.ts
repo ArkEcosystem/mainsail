@@ -1,4 +1,4 @@
-import { describe, describeWithContext } from "./describe";
+import { describe, describeEach, describeSkip, describeWithContext } from "./describe";
 
 describe("Date.now()", ({ assert, beforeAll, beforeEach, afterAll, skip, it }) => {
 	let _Date;
@@ -52,7 +52,7 @@ describe("Datasets", ({ assert, each }) => {
 	);
 });
 
-describeWithContext("Context (Object)", { hello: "world" }, ({ assert, it, nock, loader }) => {
+describeWithContext("Context (Object)", { hello: "world" }, ({ assert, it }) => {
 	it("should have context from an object", (context) => {
 		assert.is(context.hello, "world");
 	});
@@ -61,9 +61,159 @@ describeWithContext("Context (Object)", { hello: "world" }, ({ assert, it, nock,
 describeWithContext(
 	"Context (Function)",
 	() => ({ hello: "world" }),
-	({ assert, it, nock, loader }) => {
+	({ assert, it }) => {
 		it("should have context from an object", (context) => {
 			assert.is(context.hello, "world");
 		});
 	},
 );
+
+describeEach(
+	"describeEach %s",
+	({ assert, dataset, it }) => {
+		it("should expose the dataset to the suite", () => {
+			assert.number(dataset);
+			assert.gt(dataset, 0);
+		});
+	},
+	[1, 2, 3],
+);
+
+describe("Dataset (plain describe)", ({ assert, dataset, it }) => {
+	it("should be undefined when the suite has no dataset", () => {
+		assert.undefined(dataset);
+	});
+});
+
+const perTestTarget = { value: () => "original" };
+const teardownOrder: string[] = [];
+
+describe("Lifecycle (per-test fakes)", ({ afterEach, assert, it, stub }) => {
+	afterEach(() => {
+		teardownOrder.push(perTestTarget.value());
+	});
+
+	it("should stub a method within a test", () => {
+		stub(perTestTarget, "value").returnValue("stubbed");
+
+		assert.is(perTestTarget.value(), "stubbed");
+	});
+
+	it("should restore the stub before the next test", () => {
+		assert.is(perTestTarget.value(), "original");
+	});
+});
+
+describe("Lifecycle (teardown order)", ({ assert, it }) => {
+	it("should run user afterEach hooks before fakes are restored", () => {
+		assert.equal(teardownOrder, ["stubbed", "original"]);
+	});
+});
+
+const suiteLevelTarget = { value: () => "original" };
+
+describe("Lifecycle (suite-level fakes)", ({ assert, beforeAll, it, stub }) => {
+	beforeAll(() => {
+		stub(suiteLevelTarget, "value").returnValue("suite-stubbed");
+	});
+
+	it("should see the suite-level stub in the first test", () => {
+		assert.is(suiteLevelTarget.value(), "suite-stubbed");
+	});
+
+	it("should keep the suite-level stub for later tests", () => {
+		assert.is(suiteLevelTarget.value(), "suite-stubbed");
+	});
+});
+
+describe("Lifecycle (suite-level fakes restore)", ({ assert, it }) => {
+	it("should restore suite-level stubs once the suite ends", () => {
+		assert.is(suiteLevelTarget.value(), "original");
+	});
+});
+
+const originalValue = () => "original";
+const suiteLevelSpyTarget = { value: originalValue };
+
+describe("Lifecycle (suite-level spies and clocks)", ({ assert, beforeAll, clock, it, spy }) => {
+	beforeAll(() => {
+		clock({ now: 5000 });
+		spy(suiteLevelSpyTarget, "value");
+	});
+
+	it("should keep the suite-level clock and spy active in the first test", () => {
+		assert.is(Date.now(), 5000);
+		assert.is(suiteLevelSpyTarget.value(), "original");
+	});
+
+	it("should keep the suite-level clock and spy active in later tests", () => {
+		assert.is(Date.now(), 5000);
+		assert.is(suiteLevelSpyTarget.value(), "original");
+	});
+});
+
+describe("Lifecycle (suite-level spies and clocks restore)", ({ assert, it }) => {
+	it("should restore the suite-level clock and spy once the suite ends", () => {
+		assert.gt(Date.now(), 1_600_000_000_000);
+		assert.is(suiteLevelSpyTarget.value, originalValue);
+	});
+});
+
+describe("Lifecycle (spies)", ({ assert, it, spy }) => {
+	it("should record calls to the spied method while delegating to the original", () => {
+		const target = { greet: (name: string) => `hi ${name}` };
+		const greet = spy(target, "greet");
+
+		assert.is(target.greet("ann"), "hi ann");
+
+		greet.calledOnce();
+		greet.calledWith("ann");
+	});
+});
+
+describe("clock", ({ assert, clock, it }) => {
+	it("should fake timers within a test", () => {
+		const fake = clock({ now: 1000 });
+
+		assert.is(Date.now(), 1000);
+
+		fake.tick(500);
+
+		assert.is(Date.now(), 1500);
+	});
+
+	it("should restore real timers after each test", () => {
+		assert.gt(Date.now(), 1_600_000_000_000);
+	});
+});
+
+describe("spyFn / stubFn", ({ assert, it, spyFn, stubFn }) => {
+	it("spyFn should create an anonymous spy", () => {
+		const spy = spyFn();
+
+		spy.call(1, 2);
+
+		spy.calledOnce();
+		spy.calledWith(1, 2);
+	});
+
+	it("stubFn should create an anonymous stub", () => {
+		const stub = stubFn().returnValue("value");
+
+		assert.is(stub.call(), "value");
+	});
+});
+
+describe("describeSkip", ({ assert, it, stub }) => {
+	it("should log the suite as ignored without invoking the callback", () => {
+		const log = stub(console, "log");
+		let invoked = false;
+
+		describeSkip("ignored suite", () => {
+			invoked = true;
+		});
+
+		log.calledOnce();
+		assert.false(invoked);
+	});
+});
