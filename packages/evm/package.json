@@ -12,6 +12,7 @@
 		"build-napi:debug": "napi build --platform --output-dir ./ --manifest-path bindings/Cargo.toml",
 		"build-rs": "pnpm run clean && pnpm run build-napi",
 		"clean": "rm -f index.js && rm -f index.d.ts && rm -f evm.*.node && rm -rf target",
+		"postinstall": "node scripts/postinstall.mjs",
 		"release": "pnpm publish --access public",
 		"release:prepare": "napi prepublish -t pnpm --skip-optional-publish --no-gh-release",
 		"test": "cargo test --release",
@@ -19,7 +20,7 @@
 		"test:coverage:html": "mkdir -p coverage && cargo llvm-cov --html --output-dir coverage/ --remap-path-prefix",
 		"version": "napi version"
 	},
-	"devDependencies": {
+	"dependencies": {
 		"@napi-rs/cli": "3.6.2"
 	},
 	"optionalDependencies": {

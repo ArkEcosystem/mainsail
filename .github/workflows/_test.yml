@@ -530,7 +530,7 @@ jobs:
 
     e2e-sync:
         name: "E2E Sync"
-        if: true
+        if: false
         needs:
             - build
         concurrency:

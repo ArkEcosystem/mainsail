@@ -5,7 +5,7 @@ use std::{
     collections::BTreeMap,
     convert::Infallible,
     path::PathBuf,
-    sync::{LazyLock, RwLock},
+    sync::{Arc, LazyLock, RwLock, RwLockReadGuard},
 };
 
 use alloy_primitives::Bloom;
@@ -312,6 +312,7 @@ pub struct PersistentDB {
     pub(crate) env: heed::Env,
     pub(crate) inner: RefCell<InnerStorage>,
     pub(crate) accounts_history: Option<AccountHistory>,
+    resize_lock: Arc<RwLock<()>>,
     logger: Logger,
     pub genesis_info: Option<GenesisInfo>,
 }
@@ -364,7 +365,8 @@ pub enum Error {
 
 impl DBErrorMarker for Error {}
 
-static ENV: LazyLock<RwLock<HashMap<PathBuf, heed::Env>>> = LazyLock::new(RwLock::default);
+static ENV: LazyLock<RwLock<HashMap<PathBuf, (heed::Env, Arc<RwLock<()>>)>>> =
+    LazyLock::new(RwLock::default);
 
 impl PersistentDB {
     const MAX_DBS: u32 = 12;
@@ -374,8 +376,8 @@ impl PersistentDB {
 
         let mut lock = ENV.write().map_err(|_| Error::Lock)?;
 
-        let env = match lock.get(&opts.path) {
-            Some(env) => env.clone(),
+        let (env, resize_lock) = match lock.get(&opts.path) {
+            Some((env, resize_lock)) => (env.clone(), resize_lock.clone()),
             None => {
                 let mut env_builder = EnvOpenOptions::new();
 
@@ -389,21 +391,34 @@ impl PersistentDB {
                 unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
 
                 let env = unsafe { env_builder.open(opts.path.join("evm.mdb")) }?;
-                lock.insert(opts.path.clone(), env.clone());
+                // One resize gate per env, shared by every instance for this path.
+                let resize_lock = Arc::new(RwLock::new(()));
+                lock.insert(opts.path.clone(), (env.clone(), resize_lock.clone()));
 
-                env
+                (env, resize_lock)
             }
         };
 
-        Self::new_with_env(env, opts)
+        Self::new_with_env(env, resize_lock, opts)
     }
 
-    pub fn new_with_env(env: heed::Env, opts: PersistentDBOptions) -> Result<Self, Error> {
+    pub fn new_with_env(
+        env: heed::Env,
+        resize_lock: Arc<RwLock<()>>,
+        opts: PersistentDBOptions,
+    ) -> Result<Self, Error> {
         let real_disk_size = env.real_disk_size()?;
         if real_disk_size >= env.info().map_size as u64 {
-            // ensure initial map size is always larger than disk size
+            // Ensure initial map size is always larger than disk size. Resize requires exclusive
+            // access to the (possibly shared) env, so take the write side of the gate.
+            let _resize_guard = resize_lock.write().map_err(|_| Error::Lock)?;
             unsafe { env.resize(next_map_size(real_disk_size as usize))? };
         }
+
+        // Database creation is a write txn; hold the read side so a concurrent resize on the
+        // shared env cannot remap memory underneath it. Dropped right after commit, before
+        // `resize_lock` is moved into the struct.
+        let init_guard = resize_lock.read().map_err(|_| Error::Lock)?;
 
         let tx_env = env.clone();
         let mut wtxn = tx_env.write_txn()?;
@@ -475,6 +490,7 @@ impl PersistentDB {
         )?;
 
         wtxn.commit()?;
+        drop(init_guard);
 
         Ok(Self {
             env,
@@ -494,31 +510,34 @@ impl PersistentDB {
                 transactions,
             }),
             accounts_history,
+            resize_lock,
             logger: opts.logger.unwrap_or_default(),
             genesis_info: None,
         })
     }
 
     pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) -> Result<(), Error> {
-        let mut wtxn = self.env.write_txn()?;
-        let inner = self.inner.borrow_mut();
+        self.with_write_txn(|wtxn| {
+            let inner = self.inner.borrow_mut();
 
-        if inner
-            .accounts
-            .get(&wtxn, &AddressWrapper(genesis_info.account))?
-            .is_none()
-        {
-            inner.accounts.put(
-                &mut wtxn,
-                &AddressWrapper(genesis_info.account),
-                &CompactBincode(&StoredAccountInfo::new(
-                    genesis_info.initial_supply,
-                    0,
-                    KECCAK_EMPTY,
-                )),
-            )?;
-            wtxn.commit()?;
-        }
+            if inner
+                .accounts
+                .get(wtxn, &AddressWrapper(genesis_info.account))?
+                .is_none()
+            {
+                inner.accounts.put(
+                    wtxn,
+                    &AddressWrapper(genesis_info.account),
+                    &CompactBincode(&StoredAccountInfo::new(
+                        genesis_info.initial_supply,
+                        0,
+                        KECCAK_EMPTY,
+                    )),
+                )?;
+            }
+
+            Ok(())
+        })?;
 
         self.genesis_info.replace(genesis_info);
         Ok(())
@@ -529,47 +548,48 @@ impl PersistentDB {
         offset: u64,
         limit: u64,
     ) -> Result<(Option<u64>, Vec<AccountInfoExtended>), Error> {
-        let tx_env = self.env.read_txn()?;
-        let iter = self
-            .inner
-            .borrow()
-            .accounts
-            .iter(&tx_env)?
-            .skip(offset as usize);
-
-        let (cursor, mut accounts) = self.get_items(
-            iter,
-            |item| match item {
-                Some(item) => {
-                    let (address, info) = item?;
-                    Ok(Some(AccountInfoExtended {
-                        address: address.0,
-                        info: AccountInfo {
-                            balance: info.balance,
-                            nonce: info.nonce,
-                            ..Default::default()
-                        },
-                        ..Default::default()
-                    }))
-                }
-                None => Ok(None),
-            },
-            offset,
-            limit,
-        )?;
-
-        for account in accounts.iter_mut() {
-            if let Some(legacy_attributes) = self
+        self.with_read_txn(|tx_env| {
+            let iter = self
                 .inner
                 .borrow()
-                .legacy_attributes
-                .get(&tx_env, &AddressWrapper(account.address))?
-            {
-                account.legacy_attributes = legacy_attributes.0;
-            }
-        }
+                .accounts
+                .iter(tx_env)?
+                .skip(offset as usize);
 
-        Ok((cursor, accounts))
+            let (cursor, mut accounts) = self.get_items(
+                iter,
+                |item| match item {
+                    Some(item) => {
+                        let (address, info) = item?;
+                        Ok(Some(AccountInfoExtended {
+                            address: address.0,
+                            info: AccountInfo {
+                                balance: info.balance,
+                                nonce: info.nonce,
+                                ..Default::default()
+                            },
+                            ..Default::default()
+                        }))
+                    }
+                    None => Ok(None),
+                },
+                offset,
+                limit,
+            )?;
+
+            for account in accounts.iter_mut() {
+                if let Some(legacy_attributes) = self
+                    .inner
+                    .borrow()
+                    .legacy_attributes
+                    .get(tx_env, &AddressWrapper(account.address))?
+                {
+                    account.legacy_attributes = legacy_attributes.0;
+                }
+            }
+
+            Ok((cursor, accounts))
+        })
     }
 
     pub fn get_legacy_cold_wallets(
@@ -577,26 +597,27 @@ impl PersistentDB {
         offset: u64,
         limit: u64,
     ) -> Result<(Option<u64>, Vec<LegacyColdWallet>), Error> {
-        let tx_env = self.env.read_txn()?;
-        let iter = self
-            .inner
-            .borrow()
-            .legacy_cold_wallets
-            .iter(&tx_env)?
-            .skip(offset as usize);
+        self.with_read_txn(|tx_env| {
+            let iter = self
+                .inner
+                .borrow()
+                .legacy_cold_wallets
+                .iter(tx_env)?
+                .skip(offset as usize);
 
-        self.get_items(
-            iter,
-            |item| match item {
-                Some(item) => {
-                    let (_, legacy_cold_wallet) = item?;
-                    Ok(Some(legacy_cold_wallet.0))
-                }
-                None => Ok(None),
-            },
-            offset,
-            limit,
-        )
+            self.get_items(
+                iter,
+                |item| match item {
+                    Some(item) => {
+                        let (_, legacy_cold_wallet) = item?;
+                        Ok(Some(legacy_cold_wallet.0))
+                    }
+                    None => Ok(None),
+                },
+                offset,
+                limit,
+            )
+        })
     }
 
     pub fn get_receipts(
@@ -604,42 +625,70 @@ impl PersistentDB {
         offset: u64,
         limit: u64,
     ) -> Result<(Option<u64>, Vec<(u64, Vec<(B256, TxReceipt)>)>), Error> {
-        let tx_env = self.env.read_txn()?;
-        let iter = self
-            .inner
-            .borrow()
-            .commits
-            .iter(&tx_env)?
-            .skip(offset as usize);
+        self.with_read_txn(|tx_env| {
+            let iter = self
+                .inner
+                .borrow()
+                .commits
+                .iter(tx_env)?
+                .skip(offset as usize);
 
-        self.get_items(
-            iter,
-            |item| match item {
-                Some(item) => {
-                    let (block_number, commit) = item?;
-                    Ok(Some((
-                        block_number,
-                        commit.0.tx_receipts.into_iter().collect(),
-                    )))
-                }
-                None => Ok(None),
-            },
-            offset,
-            limit,
-        )
+            self.get_items(
+                iter,
+                |item| match item {
+                    Some(item) => {
+                        let (block_number, commit) = item?;
+                        Ok(Some((
+                            block_number,
+                            commit.0.tx_receipts.into_iter().collect(),
+                        )))
+                    }
+                    None => Ok(None),
+                },
+                offset,
+                limit,
+            )
+        })
     }
 
     pub fn get_receipts_by_block_number(
         &self,
         block_number: u64,
     ) -> Result<HashMap<B256, TxReceipt>, Error> {
-        let tx_env = self.env.read_txn()?;
-        let commit = self.inner.borrow().commits.get(&tx_env, &block_number)?;
+        self.with_read_txn(|tx_env| {
+            let commit = self.inner.borrow().commits.get(tx_env, &block_number)?;
 
-        match commit {
-            Some(inner) => Ok(inner.0.tx_receipts),
-            None => Ok(Default::default()),
-        }
+            match commit {
+                Some(inner) => Ok(inner.0.tx_receipts),
+                None => Ok(Default::default()),
+            }
+        })
+    }
+
+    pub fn get_receipts_by_block_range(
+        &self,
+        from_block_number: u64,
+        to_block_number: u64,
+    ) -> Result<Vec<(u64, Vec<(B256, TxReceipt)>)>, Error> {
+        assert!(
+            from_block_number <= to_block_number,
+            "from_block_number ({from_block_number}) must be <= to_block_number ({to_block_number})"
+        );
+
+        self.with_read_txn(|tx_env| {
+            let inner = self.inner.borrow();
+            let range = from_block_number..=to_block_number;
+
+            let capacity = to_block_number.saturating_sub(from_block_number).min(1024) as usize;
+            let mut receipts = Vec::with_capacity(capacity);
+
+            for item in inner.commits.range(&tx_env, &range)? {
+                let (block_number, commit) = item?;
+                receipts.push((block_number, commit.0.tx_receipts.into_iter().collect()));
+            }
+
+            Ok(receipts)
+        })
     }
 
     pub fn get_commits_by_block_range(
@@ -648,49 +697,55 @@ impl PersistentDB {
         to_block_number: u64,
         max_bytes: u64,
     ) -> Result<Vec<(ProofData, BlockHeaderData, Vec<TransactionData>)>, Error> {
+        assert!(
+            from_block_number <= to_block_number,
+            "from_block_number ({from_block_number}) must be <= to_block_number ({to_block_number})"
+        );
+        assert!(max_bytes > 0, "max_bytes ({max_bytes}) must be > 0");
+
         // Per-commit fixed cost charged against the budget on top of the block's transaction payload,
         // so that a long run of (near-)empty blocks is still bounded by block count, not just bytes.
         const PER_COMMIT_OVERHEAD_BYTES: u64 = 1024;
 
-        let tx_env = self.env.read_txn()?;
-        let inner = self.inner.borrow();
+        self.with_read_txn(|tx_env| {
+            let inner = self.inner.borrow();
 
-        let capacity = to_block_number.saturating_sub(from_block_number).min(512) as usize;
-        let mut commits = Vec::with_capacity(capacity);
-        let mut accumulated_bytes: u64 = 0;
+            let capacity = to_block_number.saturating_sub(from_block_number).min(512) as usize;
+            let mut commits = Vec::with_capacity(capacity);
+            let mut accumulated_bytes: u64 = 0;
 
-        for item in inner
-            .blocks
-            .range(&tx_env, &(from_block_number..=to_block_number))?
-        {
-            let (block_number, header) = item?;
+            for item in inner
+                .blocks
+                .range(tx_env, &(from_block_number..=to_block_number))?
+            {
+                let (block_number, header) = item?;
+                let estimated_bytes = header.0.payload_size as u64 + PER_COMMIT_OVERHEAD_BYTES;
+                accumulated_bytes += estimated_bytes;
+                if accumulated_bytes > max_bytes {
+                    break;
+                }
 
-            // Headers and proofs are written together per commit; a missing proof means the end of
-            // the available data has been reached.
-            let Some(proof) = inner.proofs.get(&tx_env, &block_number)? else {
-                break;
-            };
+                // Headers and proofs are written together per commit; a missing proof means the end of
+                // the available data has been reached.
+                let Some(proof) = inner.proofs.get(tx_env, &block_number)? else {
+                    break;
+                };
 
-            // Collect this block's transactions via a single range scan over its key prefix; the
-            // keys sort by (block_number, index), so they arrive in index order.
-            let mut transactions = Vec::with_capacity(header.0.transactions_count as usize);
-            let tx_from = TransactionKey::new(block_number, 0);
-            let tx_to = TransactionKey::new(block_number, u16::MAX);
-            for tx_item in inner.transactions.range(&tx_env, &(tx_from..=tx_to))? {
-                let (_, transaction) = tx_item?;
-                transactions.push(transaction.0);
+                // Collect this block's transactions via a single range scan over its key prefix; the
+                // keys sort by (block_number, index), so they arrive in index order.
+                let mut transactions = Vec::with_capacity(header.0.transactions_count as usize);
+                let tx_from = TransactionKey::new(block_number, 0);
+                let tx_to = TransactionKey::new(block_number, u16::MAX);
+                for tx_item in inner.transactions.range(tx_env, &(tx_from..=tx_to))? {
+                    let (_, transaction) = tx_item?;
+                    transactions.push(transaction.0);
+                }
+
+                commits.push((proof.0, header.0, transactions));
             }
 
-            let estimated_bytes = header.0.payload_size as u64 + PER_COMMIT_OVERHEAD_BYTES;
-            commits.push((proof.0, header.0, transactions));
-
-            accumulated_bytes += estimated_bytes;
-            if accumulated_bytes >= max_bytes {
-                break;
-            }
-        }
-
-        Ok(commits)
+            Ok(commits)
+        })
     }
 
     pub fn get_historical_account_info(
@@ -699,34 +754,30 @@ impl PersistentDB {
         address: Address,
     ) -> Result<(Option<AccountInfo>, bool), Error> {
         match self.inner.borrow().accounts_history {
-            Some(db) => {
-                let tx_env = self.env.read_txn()?;
+            Some(db) => self.with_read_txn(|tx_env| match self.accounts_history.as_ref() {
+                Some(accounts_history) => {
+                    let (data, missing_fallback) = accounts_history.get_by_block_and_address(
+                        tx_env,
+                        &db,
+                        block_number,
+                        &address,
+                    )?;
 
-                match self.accounts_history.as_ref() {
-                    Some(accounts_history) => {
-                        let (data, missing_fallback) = accounts_history.get_by_block_and_address(
-                            &tx_env,
-                            &db,
-                            block_number,
-                            &address,
-                        )?;
-
-                        match data {
-                            Some(data) => Ok((
-                                Some(AccountInfo {
-                                    balance: data.balance,
-                                    nonce: data.nonce,
-                                    code_hash: data.code_hash,
-                                    ..Default::default()
-                                }),
-                                missing_fallback,
-                            )),
-                            None => Ok((None, missing_fallback)),
-                        }
+                    match data {
+                        Some(data) => Ok((
+                            Some(AccountInfo {
+                                balance: data.balance,
+                                nonce: data.nonce,
+                                code_hash: data.code_hash,
+                                ..Default::default()
+                            }),
+                            missing_fallback,
+                        )),
+                        None => Ok((None, missing_fallback)),
                     }
-                    None => Ok((None, false)),
                 }
-            }
+                None => Ok((None, false)),
+            }),
             None => Ok((None, false)),
         }
     }
@@ -735,29 +786,36 @@ impl PersistentDB {
         &self,
         address: Address,
     ) -> Result<Option<LegacyAccountAttributes>, Error> {
-        let tx_env = self.env.read_txn()?;
-        Ok(self
-            .inner
-            .borrow()
-            .legacy_attributes
-            .get(&tx_env, &AddressWrapper(address))?
-            .map(|inner| inner.0))
+        self.with_read_txn(|tx_env| {
+            Ok(self
+                .inner
+                .borrow()
+                .legacy_attributes
+                .get(tx_env, &AddressWrapper(address))?
+                .map(|inner| inner.0))
+        })
     }
 
     pub fn get_legacy_cold_wallet(
         &self,
         address: LegacyAddress,
     ) -> Result<Option<LegacyColdWallet>, Error> {
-        let tx_env = self.env.read_txn()?;
-        Ok(self
-            .inner
-            .borrow()
-            .legacy_cold_wallets
-            .get(&tx_env, &LegacyAddressWrapper(address))?
-            .map(|inner| inner.0))
+        self.with_read_txn(|tx_env| {
+            Ok(self
+                .inner
+                .borrow()
+                .legacy_cold_wallets
+                .get(tx_env, &LegacyAddressWrapper(address))?
+                .map(|inner| inner.0))
+        })
     }
 
     pub fn resize(&self) -> Result<(), Error> {
+        // Exclusive access: blocks until every in-flight transaction (across all instances sharing
+        // this env in the process) has released its read guard, and prevents new ones from starting
+        // until the remap completes. This is what makes the unsafe env.resize() sound.
+        let _resize_guard = self.resize_lock.write().map_err(|_| Error::Lock)?;
+
         let info = self.env.info();
 
         let current_map_size = info.map_size;
@@ -816,6 +874,61 @@ fn next_map_size(map_size: usize) -> usize {
     map_size / MAP_SIZE_UNIT * MAP_SIZE_UNIT + MAP_SIZE_UNIT
 }
 
+impl PersistentDB {
+    fn basic_ref_tx(
+        &self,
+        txn: &heed::RoTxn,
+        address: Address,
+    ) -> Result<Option<AccountInfo>, Error> {
+        let inner = self.inner.borrow();
+
+        let basic = inner
+            .accounts
+            .get(txn, &AddressWrapper(address))?
+            .map(|a| a.0.into());
+
+        Ok(basic)
+    }
+
+    fn code_by_hash_ref_tx(&self, txn: &heed::RoTxn, code_hash: B256) -> Result<Bytecode, Error> {
+        let inner = self.inner.borrow();
+
+        let contract = match inner.contracts.get(txn, &HashWrapper(code_hash))? {
+            Some(contract) => contract.0,
+            None => Default::default(),
+        };
+
+        Ok(contract.try_into()?)
+    }
+
+    fn storage_ref_tx(
+        &self,
+        txn: &heed::RoTxn,
+        address: Address,
+        index: U256,
+    ) -> Result<U256, Error> {
+        let inner = self.inner.borrow_mut();
+
+        let mut iter = inner.storage.iter(txn)?;
+        let location = &StorageEntryWrapper(index, U256::ZERO);
+
+        match iter.move_on_key_dup(&AddressWrapper(address), &location)? {
+            Some((_, value)) if value.0 == location.0 => Ok(value.1),
+            _ => Ok(U256::ZERO),
+        }
+    }
+
+    fn block_hash_ref_tx(&self, txn: &heed::RoTxn, number: u64) -> Result<B256, Error> {
+        let inner = self.inner.borrow_mut();
+
+        let data = inner.blocks.get(txn, &number)?;
+        match data {
+            Some(data) => Ok(data.hash),
+            None => Ok(B256::ZERO),
+        }
+    }
+}
+
 impl Database for PersistentDB {
     type Error = Error;
 
@@ -840,51 +953,55 @@ impl DatabaseRef for PersistentDB {
     type Error = Error;
 
     fn basic_ref(&self, address: Address) -> Result<Option<AccountInfo>, Self::Error> {
-        let txn = self.env.read_txn()?;
-        let inner = self.inner.borrow();
-
-        let basic = inner
-            .accounts
-            .get(&txn, &AddressWrapper(address))?
-            .map(|a| a.0.into());
-
-        Ok(basic)
+        self.with_read_txn(|txn| self.basic_ref_tx(txn, address))
     }
 
     fn code_by_hash_ref(&self, code_hash: B256) -> Result<Bytecode, Self::Error> {
-        let txn = self.env.read_txn()?;
-        let inner = self.inner.borrow();
-
-        let contract = match inner.contracts.get(&txn, &HashWrapper(code_hash))? {
-            Some(contract) => contract.0,
-            None => Default::default(),
-        };
-
-        Ok(contract.try_into()?)
+        self.with_read_txn(|txn| self.code_by_hash_ref_tx(txn, code_hash))
     }
 
     fn storage_ref(&self, address: Address, index: U256) -> Result<U256, Self::Error> {
-        let txn = self.env.read_txn()?;
-        let inner = self.inner.borrow_mut();
-
-        let mut iter = inner.storage.iter(&txn)?;
-        let location = &StorageEntryWrapper(index, U256::ZERO);
-
-        match iter.move_on_key_dup(&AddressWrapper(address), &location)? {
-            Some((_, value)) if value.0 == location.0 => Ok(value.1),
-            _ => Ok(U256::ZERO),
-        }
+        self.with_read_txn(|txn| self.storage_ref_tx(txn, address, index))
     }
 
     fn block_hash_ref(&self, number: u64) -> Result<B256, Self::Error> {
-        let txn = self.env.read_txn()?;
-        let inner = self.inner.borrow_mut();
+        self.with_read_txn(|txn| self.block_hash_ref_tx(txn, number))
+    }
+}
 
-        let data = inner.blocks.get(&txn, &number)?;
-        match data {
-            Some(data) => Ok(data.hash),
-            None => Ok(B256::ZERO),
-        }
+/// `DatabaseRef` view that serves all reads from one `RoTxn` instead of opening one per read.
+/// Holds the resize gate for the txn's lifetime so the env can't be remapped while it's open.
+pub struct TxnDatabaseReader<'a> {
+    db: &'a PersistentDB,
+    txn: heed::RoTxn<'a, heed::WithTls>,
+    _resize_guard: RwLockReadGuard<'a, ()>,
+}
+
+impl<'a> TxnDatabaseReader<'a> {
+    pub fn new(db: &'a PersistentDB) -> Result<Self, Error> {
+        let resize_guard = db.resize_lock.read().map_err(|_| Error::Lock)?;
+        let txn = db.env.read_txn()?;
+        Ok(Self {
+            db,
+            txn,
+            _resize_guard: resize_guard,
+        })
+    }
+}
+
+impl DatabaseRef for TxnDatabaseReader<'_> {
+    type Error = Error;
+    fn basic_ref(&self, address: Address) -> Result<Option<AccountInfo>, Error> {
+        self.db.basic_ref_tx(&self.txn, address)
+    }
+    fn storage_ref(&self, address: Address, index: U256) -> Result<U256, Error> {
+        self.db.storage_ref_tx(&self.txn, address, index)
+    }
+    fn code_by_hash_ref(&self, hash: B256) -> Result<Bytecode, Error> {
+        self.db.code_by_hash_ref_tx(&self.txn, hash)
+    }
+    fn block_hash_ref(&self, number: u64) -> Result<B256, Error> {
+        self.db.block_hash_ref_tx(&self.txn, number)
     }
 }
 
@@ -922,12 +1039,13 @@ impl PersistentDB {
         commit_data: &Option<CommitData>,
         results: &BTreeMap<B256, (ExecutionResult, u64)>,
     ) -> Result<(), Error> {
-        assert!(!self.is_block_committed(key.0));
+        self.with_write_txn(|rwtxn| {
+            if self.is_block_committed(&rwtxn, key.0) {
+                return Err(Error::State("block already committed".into()));
+            }
 
-        let mut rwtxn = self.env.write_txn()?;
-        let inner = self.inner.borrow_mut();
+            let inner = self.inner.borrow_mut();
 
-        let mut apply_changes = |rwtxn: &mut heed::RwTxn| -> Result<(), Error> {
             let state_changes::StateChangeset {
                 accounts,
                 storage,
@@ -1150,26 +1268,14 @@ impl PersistentDB {
             )?;
 
             Ok(())
-        };
-
-        if let Err(err) = apply_changes(&mut rwtxn) {
-            rwtxn.abort();
-            return Err(err.into());
-        }
-
-        rwtxn.commit()?;
-
-        Ok(())
+        })
     }
 
-    pub fn is_block_committed(&self, block_number: u64) -> bool {
-        let env = self.env.clone();
-        let rtxn = env.read_txn().expect("read");
-        let inner = self.inner.borrow();
-
-        inner
+    pub fn is_block_committed(&self, rtxn: &heed::RoTxn, block_number: u64) -> bool {
+        self.inner
+            .borrow()
             .commits
-            .get(&rtxn, &block_number)
+            .get(rtxn, &block_number)
             .is_ok_and(|v| v.is_some())
     }
 
@@ -1178,78 +1284,75 @@ impl PersistentDB {
         block_number: u64,
         tx_hash: B256,
     ) -> Result<(bool, Option<TxReceipt>), Error> {
-        let env = self.env.clone();
-        let rtxn = env.read_txn()?;
-        let inner = self.inner.borrow();
+        self.with_read_txn(|rtxn| {
+            let inner = self.inner.borrow();
 
-        match inner.commits.get(&rtxn, &block_number)? {
-            Some(receipts) => Ok((true, receipts.tx_receipts.get(&tx_hash).cloned())),
-            None => Ok((false, None)),
-        }
+            match inner.commits.get(rtxn, &block_number)? {
+                Some(receipts) => Ok((true, receipts.tx_receipts.get(&tx_hash).cloned())),
+                None => Ok((false, None)),
+            }
+        })
     }
 
     pub fn is_empty(&self) -> Result<bool, Error> {
-        let env = self.env.clone();
-        let rtxn = env.read_txn().expect("read");
-        let inner = self.inner.borrow();
+        self.with_read_txn(|rtxn| {
+            let inner = self.inner.borrow();
 
-        Ok(inner.blocks.is_empty(&rtxn)?)
+            Ok(inner.blocks.is_empty(rtxn)?)
+        })
     }
 
     pub fn get_state(&self) -> Result<(u64, u64), Error> {
-        let env = self.env.clone();
-        let rtxn = env.read_txn().expect("read");
-        let inner = self.inner.borrow();
+        self.with_read_txn(|rtxn| {
+            let inner = self.inner.borrow();
 
-        let total_round = read_total_round(
-            inner
-                .state
-                .get(&rtxn, &StaticStringWrapper("total_round"))?,
-        );
+            let total_round =
+                read_total_round(inner.state.get(rtxn, &StaticStringWrapper("total_round"))?);
 
-        let block_number = match inner.blocks.last(&rtxn)? {
-            Some((block_number, _)) => block_number,
-            None => 0,
-        };
+            let block_number = match inner.blocks.last(rtxn)? {
+                Some((block_number, _)) => block_number,
+                None => 0,
+            };
 
-        Ok((block_number, total_round))
+            Ok((block_number, total_round))
+        })
     }
 
     pub fn get_block_number_by_hash(&self, block_hash: B256) -> Result<Option<u64>, Error> {
-        let env = self.env.clone();
-        let rtxn = env.read_txn().expect("read");
-        let inner = self.inner.borrow();
+        self.with_read_txn(|rtxn| {
+            let inner = self.inner.borrow();
 
-        Ok(inner
-            .blocks_hash_number
-            .get(&rtxn, &HashWrapper(block_hash))?)
+            Ok(inner
+                .blocks_hash_number
+                .get(rtxn, &HashWrapper(block_hash))?)
+        })
     }
 
     pub fn get_proof_data(&self, block_number: u64) -> Result<Option<ProofData>, Error> {
-        let env = self.env.clone();
-        let rtxn = env.read_txn().expect("read");
-        let inner = self.inner.borrow();
+        self.with_read_txn(|rtxn| {
+            let inner = self.inner.borrow();
 
-        Ok(inner.proofs.get(&rtxn, &block_number)?.map(|data| data.0))
+            Ok(inner.proofs.get(rtxn, &block_number)?.map(|data| data.0))
+        })
     }
 
     pub fn get_block_header_data(
         &self,
         block_number: u64,
     ) -> Result<Option<BlockHeaderData>, Error> {
-        let env = self.env.clone();
-        let rtxn = env.read_txn().expect("read");
-        let inner = self.inner.borrow();
+        self.with_read_txn(|rtxn| {
+            let inner = self.inner.borrow();
 
-        Ok(inner.blocks.get(&rtxn, &block_number)?.map(|data| data.0))
+            Ok(inner.blocks.get(rtxn, &block_number)?.map(|data| data.0))
+        })
     }
 
     pub fn get_transaction(&self, key: TransactionKey) -> Result<Option<TransactionData>, Error> {
-        let env = self.env.clone();
-        let rtxn = env.read_txn().expect("read");
-        let inner = self.inner.borrow();
+        self.with_read_txn(|rtxn| {
+            let inner = self.inner.borrow();
 
-        Ok(inner.transactions.get(&rtxn, &key)?.map(|data| data.0))
+            Ok(inner.transactions.get(rtxn, &key)?.map(|data| data.0))
+        })
     }
 
     pub fn get_transaction_data(&self, key: String) -> Result<Option<TransactionData>, Error> {
@@ -1260,14 +1363,38 @@ impl PersistentDB {
     }
 
     pub fn get_transaction_key_by_hash(&self, tx_hash: B256) -> Result<Option<String>, Error> {
-        let env = self.env.clone();
-        let rtxn = env.read_txn().expect("read");
-        let inner = self.inner.borrow();
+        self.with_read_txn(|rtxn| {
+            let inner = self.inner.borrow();
 
-        Ok(inner
-            .transactions_hash_key
-            .get(&rtxn, &HashWrapper(tx_hash))?
-            .map(|key| key.to_token()))
+            Ok(inner
+                .transactions_hash_key
+                .get(rtxn, &HashWrapper(tx_hash))?
+                .map(|key| key.to_token()))
+        })
+    }
+
+    /// Runs `f` inside a read txn while holding the shared resize guard, so the env can't be remapped
+    /// (mdb_env_set_mapsize) while the txn is live.
+    fn with_read_txn<T>(
+        &self,
+        f: impl FnOnce(&heed::RoTxn) -> Result<T, Error>,
+    ) -> Result<T, Error> {
+        let _resize_guard = self.resize_lock.read().map_err(|_| Error::Lock)?;
+        let txn = self.env.read_txn()?;
+        f(&txn)
+    }
+
+    /// Runs `f` inside a write txn while holding the shared resize guard, so the env can't be remapped
+    /// (mdb_env_set_mapsize) while the txn is live.
+    fn with_write_txn<T>(
+        &self,
+        f: impl FnOnce(&mut heed::RwTxn) -> Result<T, Error>,
+    ) -> Result<T, Error> {
+        let _resize_guard = self.resize_lock.read().map_err(|_| Error::Lock)?;
+        let mut txn = self.env.write_txn()?;
+        let out = f(&mut txn)?;
+        txn.commit()?;
+        Ok(out)
     }
 }
 
@@ -1341,7 +1468,7 @@ mod tests {
             AddressWrapper, BlockHeaderData, CommitData, CommitKey, CommitReceipts, HashWrapper,
             LegacyAddressWrapper, MAP_SIZE_UNIT, PendingCommit, PersistentDB, PersistentDBOptions,
             ProofData, StaticStringWrapper, StorageEntryWrapper, TransactionData, TransactionKey,
-            next_map_size,
+            TxnDatabaseReader, next_map_size,
         },
         historical::HistoricalAccountData,
         legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
@@ -1352,7 +1479,7 @@ mod tests {
     };
     use alloy_primitives::{Address, B256, Bytes, U256, address, b256};
     use revm::{
-        Database,
+        Database, DatabaseRef,
         context::result::{ExecutionResult, ResultGas, SuccessReason},
         database::{TransitionState, states::StorageSlot},
         primitives::HashMap,
@@ -1698,7 +1825,12 @@ mod tests {
 
         let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
 
-        let mut db = PersistentDB::new_with_env(env, Default::default()).expect("open");
+        let mut db = PersistentDB::new_with_env(
+            env,
+            std::sync::Arc::new(std::sync::RwLock::new(())),
+            Default::default(),
+        )
+        .expect("open");
         assert_eq!(db.env.info().map_size, 4096 * 10);
 
         // large commit to trigger a resize
@@ -1727,7 +1859,12 @@ mod tests {
         drop(db);
 
         let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
-        let db = PersistentDB::new_with_env(env, Default::default()).expect("open");
+        let db = PersistentDB::new_with_env(
+            env,
+            std::sync::Arc::new(std::sync::RwLock::new(())),
+            Default::default(),
+        )
+        .expect("open");
         assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
     }
 
@@ -2144,7 +2281,6 @@ mod tests {
 
         assert_eq!(db.genesis_info, Some(Default::default()));
     }
-
     #[test]
     fn test_get_commits_by_block_range() {
         let db = create_temp_database();
@@ -2235,11 +2371,249 @@ mod tests {
         let commits = db.get_commits_by_block_range(2, 99, u64::MAX).unwrap();
         assert_eq!(commits.len(), 2);
 
-        // A tiny byte budget stops early but always makes progress (returns at least one commit),
-        // so callers can resume from the last returned block.
+        // A too tiny byte budget stops early and does not make progress.
         let commits = db.get_commits_by_block_range(1, 3, 1).unwrap();
+        assert!(commits.is_empty());
+    }
+
+    #[test]
+    #[should_panic(expected = "must be <= to_block_number")]
+    fn test_get_commits_by_block_range_panics_when_from_exceeds_to() {
+        let db = create_temp_database();
+        let _ = db.get_commits_by_block_range(3, 1, u64::MAX);
+    }
+
+    #[test]
+    #[should_panic(expected = "must be > 0")]
+    fn test_get_commits_by_block_range_panics_when_max_bytes_0() {
+        let db = create_temp_database();
+        let _ = db.get_commits_by_block_range(1, 3, 0);
+    }
+
+    #[test]
+    fn test_get_commits_by_block_range_respects_max_bytes() {
+        let db = create_temp_database();
+
+        // A commit's budget cost is its payload_size plus a fixed per-commit overhead. Use a payload
+        // large enough to dominate that overhead so the expected counts below are unambiguous without
+        // coupling the test to the exact overhead constant.
+        const PAYLOAD: u32 = 1_000_000;
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            let inner = db.inner.borrow();
+
+            for block_number in 1u64..=3 {
+                inner
+                    .blocks
+                    .put(
+                        &mut wtxn,
+                        &block_number,
+                        &CompactBincode(&BlockHeaderData {
+                            number: block_number as u32,
+                            payload_size: PAYLOAD,
+                            ..Default::default()
+                        }),
+                    )
+                    .unwrap();
+
+                inner
+                    .proofs
+                    .put(
+                        &mut wtxn,
+                        &block_number,
+                        &CompactBincode(&ProofData::default()),
+                    )
+                    .unwrap();
+            }
+
+            wtxn.commit().unwrap();
+        }
+
+        let count = |max_bytes: u64| {
+            db.get_commits_by_block_range(1, 3, max_bytes)
+                .unwrap()
+                .len()
+        };
+
+        // The budget bounds how many commits come back: ~1 payload fits one, ~2 two, ~3 all three.
+        const PER_COMMIT_OVERHEAD_BYTES: u64 = 1024;
+        assert_eq!(count(PAYLOAD as u64 + PER_COMMIT_OVERHEAD_BYTES), 1);
+        assert_eq!(count(2 * (PAYLOAD as u64 + PER_COMMIT_OVERHEAD_BYTES)), 2);
+        assert_eq!(count(3 * (PAYLOAD as u64 + PER_COMMIT_OVERHEAD_BYTES)), 3);
+
+        // An unbounded budget returns the whole range.
+        assert_eq!(count(u64::MAX), 3);
+    }
+
+    #[test]
+    fn test_txn_read_db_serves_all_reads() {
+        // TxnReadDb answers every read kind through its single held txn, matching what the
+        // transient DatabaseRef path returns (including the empties for unknown entries).
+        let db = create_temp_database();
+
+        let account = address!("0000000000000000000000000000000000000001");
+        let code = Bytecode::new_raw(Bytes::from_static(&[0, 1, 2, 3]));
+        let code_hash = code.hash_slow();
+        let block_hash = b256!("0000000000000000000000000000000000000000000000000000000000000001");
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            let inner = db.inner.borrow_mut();
+
+            inner
+                .accounts
+                .put(
+                    &mut wtxn,
+                    &AddressWrapper(account),
+                    &CompactBincode(&StoredAccountInfo::new(U256::from(100), 7, code_hash)),
+                )
+                .unwrap();
+            inner
+                .contracts
+                .put(
+                    &mut wtxn,
+                    &HashWrapper(code_hash),
+                    &CompactBincode(&code.clone().into()),
+                )
+                .unwrap();
+            inner
+                .storage
+                .put(
+                    &mut wtxn,
+                    &AddressWrapper(account),
+                    &StorageEntryWrapper(U256::from(1), U256::from(42)),
+                )
+                .unwrap();
+            inner
+                .blocks
+                .put(
+                    &mut wtxn,
+                    &1,
+                    &CompactBincode(&BlockHeaderData {
+                        hash: block_hash,
+                        ..Default::default()
+                    }),
+                )
+                .unwrap();
+
+            wtxn.commit().unwrap();
+        }
+
+        let read_db = TxnDatabaseReader::new(&db).unwrap();
+
+        let info = read_db.basic_ref(account).unwrap().expect("account");
+        assert_eq!(info.balance, U256::from(100));
+        assert_eq!(info.nonce, 7);
+        assert_eq!(info.code_hash, code_hash);
+
+        assert_eq!(
+            read_db
+                .code_by_hash_ref(code_hash)
+                .unwrap()
+                .original_byte_slice(),
+            &[0, 1, 2, 3][..]
+        );
+        assert_eq!(
+            read_db.storage_ref(account, U256::from(1)).unwrap(),
+            U256::from(42)
+        );
+        assert_eq!(
+            read_db.storage_ref(account, U256::from(2)).unwrap(),
+            U256::ZERO
+        );
+        assert_eq!(read_db.block_hash_ref(1).unwrap(), block_hash);
+
+        // Unknown entries return the documented empties.
+        let other = address!("0000000000000000000000000000000000000002");
+        assert_eq!(read_db.basic_ref(other).unwrap(), None);
+        assert_eq!(read_db.block_hash_ref(2).unwrap(), B256::ZERO);
+    }
+
+    #[test]
+    fn test_commit_persists_transactions_for_range_read() {
+        // Exercises the real write path (commit_to_db via db.commit) end to end, unlike
+        // test_get_commits_by_block_range which writes the transactions DB directly. Guards against a
+        // key mismatch between how commit_to_db writes transactions and how get_commits_by_block_range
+        // scans them.
+        let db = create_temp_database();
+
+        let block_number = 1u64;
+        let transaction_count = 3u16;
+
+        let transactions: Vec<TransactionData> = (0..transaction_count)
+            .map(|index| TransactionData {
+                block_number: block_number as u32,
+                index: index as u32,
+                tx_hash: B256::from(U256::from(100 + index as u64)),
+                ..Default::default()
+            })
+            .collect();
+
+        let mut state_commit = StateCommit {
+            key: CommitKey(block_number, 0, B256::ZERO),
+            change_set: StateChangeset::default(),
+            results: Default::default(),
+        };
+
+        let commit_data = CommitData {
+            proof: ProofData::default(),
+            header: BlockHeaderData {
+                number: block_number as u32,
+                transactions_count: transaction_count,
+                ..Default::default()
+            },
+            transactions,
+        };
+
+        db.commit(&mut state_commit, &Some(commit_data)).unwrap();
+
+        // Read back through the same path findBlocks/restore use.
+        let commits = db
+            .get_commits_by_block_range(block_number, block_number, u64::MAX)
+            .unwrap();
         assert_eq!(commits.len(), 1);
-        assert_eq!(commits[0].1.number, 1);
+        assert_eq!(
+            commits[0].2.len(),
+            transaction_count as usize,
+            "transactions committed via commit_to_db must be read back by get_commits_by_block_range"
+        );
+    }
+
+    #[test]
+    fn test_commit_rejects_already_committed_block() {
+        let db = create_temp_database();
+        let block_number = 1u64;
+
+        let make_commit = || {
+            (
+                StateCommit {
+                    key: CommitKey(block_number, 0, B256::ZERO),
+                    change_set: StateChangeset::default(),
+                    results: Default::default(),
+                },
+                CommitData {
+                    proof: ProofData::default(),
+                    header: BlockHeaderData {
+                        number: block_number as u32,
+                        ..Default::default()
+                    },
+                    transactions: vec![],
+                },
+            )
+        };
+
+        // First commit of the block succeeds.
+        let (mut state_commit, commit_data) = make_commit();
+        db.commit(&mut state_commit, &Some(commit_data)).unwrap();
+
+        // Committing the same block number again is rejected gracefully, not asserted.
+        let (mut state_commit, commit_data) = make_commit();
+        let result = db.commit(&mut state_commit, &Some(commit_data));
+        assert!(
+            matches!(result, Err(crate::db::Error::State(_))),
+            "expected Err(State(block already committed)), got {result:?}"
+        );
     }
 
     #[test]
@@ -2362,6 +2736,71 @@ mod tests {
 
         assert_eq!(read_block_number, target_block);
         assert_eq!(read_receipts, total_receipts);
+    }
+
+    #[test]
+    fn test_get_receipts_by_block_range() {
+        let db = create_temp_database();
+
+        // Empty before anything is written.
+        assert!(db.get_receipts_by_block_range(1, 3).unwrap().is_empty());
+
+        // Write blocks 1..=3; block N gets N receipts with distinct hashes.
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            let inner = db.inner.borrow();
+
+            for block_number in 1u64..=3 {
+                let mut tx_receipts: HashMap<B256, TxReceipt> = Default::default();
+                for index in 0..block_number {
+                    tx_receipts.insert(
+                        B256::from(U256::from(block_number * 100 + index)),
+                        Default::default(),
+                    );
+                }
+
+                inner
+                    .commits
+                    .put(
+                        &mut wtxn,
+                        &block_number,
+                        &CompactBincode(&CommitReceipts {
+                            tx_receipts,
+                            ..Default::default()
+                        }),
+                    )
+                    .unwrap();
+            }
+
+            wtxn.commit().unwrap();
+        }
+
+        // Full range: blocks ascending, receipt count per block matches what was written.
+        let receipts = db.get_receipts_by_block_range(1, 3).unwrap();
+        assert_eq!(receipts.len(), 3);
+        for (index, (block_number, block_receipts)) in receipts.iter().enumerate() {
+            assert_eq!(*block_number, (index + 1) as u64);
+            assert_eq!(block_receipts.len(), *block_number as usize);
+        }
+
+        // Sub-range returns only the requested block.
+        let receipts = db.get_receipts_by_block_range(2, 2).unwrap();
+        assert_eq!(receipts.len(), 1);
+        assert_eq!(receipts[0].0, 2);
+        assert_eq!(receipts[0].1.len(), 2);
+
+        // Range extending past the tip stops at the last available block.
+        let receipts = db.get_receipts_by_block_range(2, 99).unwrap();
+        assert_eq!(receipts.len(), 2);
+        assert_eq!(receipts[0].0, 2);
+        assert_eq!(receipts[1].0, 3);
+    }
+
+    #[test]
+    #[should_panic(expected = "must be <= to_block_number")]
+    fn test_get_receipts_by_block_range_panics_when_from_exceeds_to() {
+        let db = create_temp_database();
+        let _ = db.get_receipts_by_block_range(3, 1);
     }
 
     #[test]

@@ -1,16 +1,14 @@
+# The Rust source (bindings/, core/, Cargo.toml, Cargo.lock, .cargo/) IS published so that
+# scripts/postinstall.mjs can build the native addon from source on platforms without a prebuilt
+# binary. The host-built binary itself is not shipped — it comes from the optionalDependencies on
+# supported platforms, or is produced on install everywhere else.
+
 artifacts/
-bindings/
-core/
 node_modules/
 npm/
 target/
-
-Cargo.lock
-Cargo.toml
 
 .gitignore
 
 evm.*.node
 set_optional_dependencies.js
-
-

@@ -326,6 +326,27 @@ export class Restore {
 
 			const commits = this.databaseService.readCommits(fromBlockNumber, toBlockNumber, Number.MAX_SAFE_INTEGER);
 
+			// Prefetch every receipt for the batch in a single read
+			const { receipts: batchReceipts } = await this.evm.getReceiptsByBlockRange(
+				BigInt(fromBlockNumber),
+				BigInt(toBlockNumber),
+			);
+
+			const receiptsByBlock = new Map<number, Record<string, Contracts.Evm.TransactionReceipt>>();
+			for (const receipt of batchReceipts) {
+				assert.defined(receipt.blockNumber);
+				assert.defined(receipt.txHash);
+
+				const blockNumber = Number(receipt.blockNumber);
+				let blockReceipts = receiptsByBlock.get(blockNumber);
+				if (!blockReceipts) {
+					blockReceipts = {};
+					receiptsByBlock.set(blockNumber, blockReceipts);
+				}
+
+				blockReceipts[receipt.txHash] = receipt;
+			}
+
 			const blocks: Models.Block[] = [];
 			const transactions: Models.Transaction[] = [];
 			const multiPayments: Models.MultiPayment[] = [];
@@ -433,7 +454,7 @@ export class Restore {
 				}
 
 				// Handle transactions
-				const receipts = await this.evm.getReceiptsByBlockNumber(BigInt(block.number));
+				const receipts = receiptsByBlock.get(block.number) ?? {};
 
 				for (const transaction of block.transactions) {
 					const receipt = receipts[transaction.hash];

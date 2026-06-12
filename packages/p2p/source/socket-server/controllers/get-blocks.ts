@@ -31,35 +31,32 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 			return { blocks: [] };
 		}
 
-		const maxPayload = constants.MAX_PAYLOAD_CLIENT;
-		const commits: Buffer[] = await this.database.findCommitBuffers(
+		// Budget the response so its fully serialized frame fits the client's WS maxPayload. `findCommitBuffers`
+		// returns at most `maxBytes` of raw block data without overfetching; on top of that the protobuf
+		// encoding adds up to PROTO_BLOCK_OVERHEAD per block, and the frame carries a fixed nes envelope +
+		// protobuf `headers` field (RESPONSE_ENVELOPE_RESERVE). Reserving both up front — for the worst
+		// case of `requestBlockLimit` blocks — keeps the encoded frame within MAX_PAYLOAD_CLIENT (see
+		// hapi-nes/client.ts), so the returned buffers can be relayed as-is.
+		const maxBytes =
+			constants.MAX_PAYLOAD_CLIENT -
+			constants.RESPONSE_ENVELOPE_RESERVE -
+			requestBlockLimit * constants.PROTO_BLOCK_OVERHEAD;
+
+		const blocks: Buffer[] = await this.database.findCommitBuffers(
 			requestBlockNumber,
 			requestBlockNumber + requestBlockLimit - 1,
-			maxPayload,
+			maxBytes,
 		);
-
-		// Only return the blocks fetched while we are below the p2p maxPayload limit
-		const blocksToReturn: Buffer[] = [];
-		let totalSize = 0;
-
-		for (const commit of commits) {
-			totalSize += commit.length;
-			if (totalSize > maxPayload) {
-				break;
-			}
-
-			blocksToReturn.push(commit);
-		}
 
 		this.logger.info(
 			`${mapAddr(request.info.remoteAddress)} has downloaded ${pluralize(
 				"block",
-				blocksToReturn.length,
+				blocks.length,
 				true,
 			)} from block number ${requestBlockNumber.toLocaleString()}`,
 			"p2p",
 		);
 
-		return { blocks: blocksToReturn };
+		return { blocks };
 	}
 }

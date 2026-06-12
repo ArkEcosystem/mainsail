@@ -86,7 +86,13 @@ export class Client {
 		options.ws = options.ws || {};
 
 		options.ws = {
-			maxPayload: constants.MAX_PAYLOAD_CLIENT + 2048, // Add header margin
+			// Hard ceiling on any single frame this client will accept. It applies to every inbound
+			// message - all controller responses, relayed consensus messages, etc. - not just get-blocks.
+			// get-blocks is simply the largest response and the only one that approaches the limit: its
+			// controller explicitly caps the serialized frame at MAX_PAYLOAD_CLIENT (reserving
+			// RESPONSE_ENVELOPE_RESERVE for the nes envelope + protobuf headers and counting
+			// PROTO_BLOCK_OVERHEAD per block). All other message types stay well below it.
+			maxPayload: constants.MAX_PAYLOAD_CLIENT,
 			...options.ws,
 			perMessageDeflate: false,
 		};

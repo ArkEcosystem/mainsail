@@ -15,9 +15,9 @@ export class Checker {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(): Promise<void> {
-		const timeout: number = this.configuration.getOptional("timeout", 2000);
+		const timeout: number = this.configuration.getRequired<number>("timeout");
 
-		for (const host of shuffle(this.configuration.getOptional<string[]>("hosts", []))) {
+		for (const host of shuffle(this.configuration.getRequired<string[]>("hosts"))) {
 			try {
 				const result = await Sntp.time({
 					host,

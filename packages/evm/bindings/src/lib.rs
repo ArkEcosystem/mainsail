@@ -13,7 +13,7 @@ use mainsail_evm_core::{
     account::AccountInfoExtended,
     db::{
         BlockHeaderData, CommitData, CommitKey, GenesisInfo, PendingCommit, PersistentDB,
-        PersistentDBOptions, ProofData, TransactionData,
+        PersistentDBOptions, ProofData, TransactionData, TxnDatabaseReader,
     },
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
@@ -58,9 +58,6 @@ pub struct EvmInner {
 
     logger: JsLogger,
 }
-
-// NOTE: we guarantee that this can be sent between threads, since it only is accessed through a mutex
-unsafe impl Send for EvmInner {}
 
 impl EvmInner {
     pub fn new(opts: EvmOptions) -> Self {
@@ -589,6 +586,22 @@ impl EvmInner {
         }
     }
 
+    pub fn get_receipts_by_block_range(
+        &mut self,
+        from_block_number: u64,
+        to_block_number: u64,
+    ) -> std::result::Result<Vec<(u64, Vec<(B256, TxReceipt)>)>, EVMError<String>> {
+        match self
+            .persistent_db
+            .get_receipts_by_block_range(from_block_number, to_block_number)
+        {
+            Ok(receipts) => Ok(receipts),
+            Err(err) => Err(EVMError::Database(
+                format!("failed reading receipts by block range: {}", err).into(),
+            )),
+        }
+    }
+
     pub fn preverify_transaction(
         &mut self,
         ctx: PreverifyTxContext,
@@ -624,10 +637,14 @@ impl EvmInner {
             }
         }
 
+        let db_reader = TxnDatabaseReader::new(&self.persistent_db).map_err(|err| {
+            EVMError::Database(format!("failed to create tx database reader {}", err))
+        })?;
+
         let state_db = State::builder()
             .with_bundle_update()
             .with_cached_prestate(std::mem::take(&mut pending_commit.cache))
-            .with_database(WrapDatabaseRef(&self.persistent_db))
+            .with_database(WrapDatabaseRef(db_reader))
             .build();
 
         let evm = revm::Context::mainnet()
@@ -1055,8 +1072,11 @@ impl EvmInner {
             }
         }
 
+        let db_reader = TxnDatabaseReader::new(&self.persistent_db)
+            .map_err(|err| EVMError::Database(EvmDatabaseError::Database(err)))?;
+
         let state_db = state_builder
-            .with_database(WrapDatabaseRef(&self.persistent_db))
+            .with_database(WrapDatabaseRef(db_reader))
             .build();
 
         let mut evm = revm::Context::mainnet()
@@ -1476,6 +1496,26 @@ impl JsEvmWrapper {
                     .map(|(k, v)| (format!("{:x}", k), JsTransactionReceipt::new(v)))
                     .collect())
             },
+        )
+    }
+
+    #[napi]
+    pub fn get_receipts_by_block_range<'env>(
+        &mut self,
+        node_env: &'env Env,
+        from_block_number: BigInt,
+        to_block_number: BigInt,
+    ) -> Result<PromiseRaw<'env, result::JsGetReceipts>> {
+        let from_block_number = from_block_number.get_u64().1;
+        let to_block_number = to_block_number.get_u64().1;
+
+        node_env.spawn_future_with_callback(
+            Self::get_receipts_by_block_range_async(
+                self.evm.clone(),
+                from_block_number,
+                to_block_number,
+            ),
+            |_, result| Ok(result::JsGetReceipts::new(None, result)?),
         )
     }
 
@@ -2018,6 +2058,20 @@ impl JsEvmWrapper {
     ) -> Result<HashMap<B256, TxReceipt>> {
         let mut lock = evm.lock().await;
         let result = lock.get_receipts_by_block_number(block_number);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_receipts_by_block_range_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        from_block_number: u64,
+        to_block_number: u64,
+    ) -> Result<Vec<(u64, Vec<(B256, TxReceipt)>)>> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_receipts_by_block_range(from_block_number, to_block_number);
 
         match result {
             Ok(result) => Result::Ok(result),

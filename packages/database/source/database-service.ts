@@ -38,7 +38,11 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return blockNumber !== undefined;
 	}
 
-	public async findCommitBuffers(start: number, end: number, maxBytes: number): Promise<Buffer[]> {
+	public async findCommitBuffers(
+		start: number,
+		end: number,
+		maxBytes: number = Number.MAX_SAFE_INTEGER,
+	): Promise<Buffer[]> {
 		const buffers: Buffer[] = [];
 
 		for await (const commit of this.readCommits(start, end, maxBytes)) {
@@ -132,29 +136,21 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return this.#readTransaction(`${blockNumber}-${index}`);
 	}
 
-	public async *readCommits(start: number, end: number, maxBytes: number): AsyncGenerator<Contracts.Crypto.Commit> {
-		let from = Math.max(0, start);
-		let remainingBytes = maxBytes;
+	public async *readCommits(
+		start: number,
+		end: number,
+		maxBytes: number = Number.MAX_SAFE_INTEGER,
+	): AsyncGenerator<Contracts.Crypto.Commit> {
+		if (start > end) {
+			throw new Error("start must be <= end");
+		}
+		if (maxBytes <= 0) {
+			throw new Error("maxBytes must be > 0");
+		}
 
-		while (from <= end) {
-			const commitsData = await this.storage.getCommitsByBlockRange(from, end, remainingBytes);
-			if (commitsData.length === 0) {
-				return;
-			}
-
-			let lastBlockNumber = from;
-			for (const data of commitsData) {
-				const commit = await this.commitFactory.fromStorage(data);
-				lastBlockNumber = commit.block.number;
-				yield commit;
-
-				remainingBytes -= commit.serialized.length / 2;
-				if (remainingBytes <= 0) {
-					return;
-				}
-			}
-
-			from = lastBlockNumber + 1;
+		const commitsData = await this.storage.getCommitsByBlockRange(start, end, maxBytes);
+		for (const data of commitsData) {
+			yield await this.commitFactory.fromStorage(data);
 		}
 	}
 
