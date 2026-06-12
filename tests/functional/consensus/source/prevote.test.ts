@@ -20,7 +20,7 @@ import {
 import type { Contracts } from "@mainsail/contracts";
 
 describe<{
-	nodes: Contracts.Kernel.Application[],
+	nodes: Contracts.Kernel.Application[];
 	validators: Validator[];
 	p2p: P2PRegistry;
 }>("Propose", ({ beforeEach, afterEach, it, assert, stub }) => {
@@ -121,13 +121,7 @@ describe<{
 				.getMessages(1, 0)
 				.map((prevote) => prevote.blockHash)
 				.sort(),
-			[
-				undefined,
-				commit.block.hash,
-				commit.block.hash,
-				commit.block.hash,
-				commit.block.hash,
-			].sort(),
+			[undefined, commit.block.hash, commit.block.hash, commit.block.hash, commit.block.hash].sort(),
 		);
 
 		// Next block
