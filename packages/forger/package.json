@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/forger",
-	"version": "0.0.1-evm.52",
+	"version": "0.0.1-evm.53",
 	"description": "Forging utils for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
