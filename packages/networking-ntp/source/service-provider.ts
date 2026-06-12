@@ -17,7 +17,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public configSchema(): object {
 		return Joi.object({
 			hosts: Joi.array().items(Joi.string()).required(),
-			timeout: Joi.number(),
+			timeout: Joi.number().integer().min(1).required(),
 		}).unknown(true);
 	}
 }
