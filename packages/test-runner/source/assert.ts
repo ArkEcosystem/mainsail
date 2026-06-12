@@ -13,18 +13,9 @@ interface Constructable<T = unknown> {
 	new (...arguments_: unknown[]): T;
 }
 
-type BigIntLike = {
-	toBigInt?: () => bigint;
-	toString(): string;
-};
-
 const normalize = (value: unknown): unknown => {
 	if (!value || typeof value !== "object") {
 		return value;
-	}
-
-	if ("toBigInt" in value && typeof (value as BigIntLike).toBigInt === "function") {
-		return (value as BigIntLike).toString();
 	}
 
 	if (Array.isArray(value)) {
