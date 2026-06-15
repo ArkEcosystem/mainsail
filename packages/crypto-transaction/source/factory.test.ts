@@ -106,6 +106,26 @@ describe<{
 		}
 	});
 
+	it("fromPoolData - should deserialize well-formed transaction", async ({ factory }) => {
+		for (const transaction of [
+			Transactions.transactionTransfer,
+			Transactions.transactionContractCall,
+			Transactions.transactionContractCallWithSecondSignature,
+			Transactions.transactionDeploy,
+		]) {
+			const original = await factory.fromBytes(transaction.serialized);
+			const fromPool = await factory.fromPoolData(original.toData());
+
+			assert.equal(fromPool.hash, original.hash);
+			assert.equal(fromPool.from, original.from);
+			assert.equal(fromPool.to, original.to);
+			assert.equal(fromPool.senderPublicKey, original.senderPublicKey);
+			assert.equal(fromPool.senderLegacyAddress, original.senderLegacyAddress);
+			assert.true(fromPool.serialized.equals(original.serialized));
+			assert.equal(fromPool.toData(), original.toData());
+		}
+	});
+
 	it("fromStorage - should deserialize well-formed transaction", async ({ factory }) => {
 		for (const [storage, transaction] of [
 			[Storage.transactionTransfer, Transactions.transactionTransfer],

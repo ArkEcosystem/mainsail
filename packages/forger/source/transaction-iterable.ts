@@ -27,7 +27,8 @@ export class TransactionIterable implements AsyncIterable<Contracts.Crypto.Trans
 			});
 
 			for (const tx of batch.transactions) {
-				const transaction = await this.transactionFactory.fromData(tx);
+				// Pool-sourced txs are already verified by this node's mempool
+				const transaction = await this.transactionFactory.fromPoolData(tx);
 				yield transaction;
 			}
 
