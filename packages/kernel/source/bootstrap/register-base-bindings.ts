@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { assert } from "@mainsail/utils";
 import path from "path";
@@ -28,12 +28,5 @@ export class RegisterBaseBindings implements Contracts.Kernel.Bootstrapper {
 		this.app.bind<string>(Identifiers.Application.Name).toConstantValue(flags.name);
 		this.app.bind<string>(Identifiers.Application.Thread).toConstantValue(flags.thread || "main");
 		this.app.bind<string>(Identifiers.Application.Version).toConstantValue(version);
-
-		// @@TODO implement a getter/setter that sets vars locally and in the process.env variables
-		process.env[EnvironmentVariables.MAINSAIL_ENV] = flags.env;
-		// process.env[EnvironmentVariables.MAINSAIL_ENV] = process.env.MAINSAIL_ENV;
-		process.env[EnvironmentVariables.MAINSAIL_TOKEN] = flags.token;
-		process.env[EnvironmentVariables.MAINSAIL_NETWORK_NAME] = flags.network;
-		process.env[EnvironmentVariables.MAINSAIL_VERSION] = version;
 	}
 }
