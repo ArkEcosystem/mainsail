@@ -118,7 +118,9 @@ describe<{
 
 			assert.equal(fromPool.hash, original.hash);
 			assert.equal(fromPool.from, original.from);
+			assert.equal(fromPool.to, original.to);
 			assert.equal(fromPool.senderPublicKey, original.senderPublicKey);
+			assert.equal(fromPool.senderLegacyAddress, original.senderLegacyAddress);
 			assert.true(fromPool.serialized.equals(original.serialized));
 			assert.equal(fromPool.toData(), original.toData());
 		}
