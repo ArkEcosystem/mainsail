@@ -6,6 +6,12 @@ import { assert } from "@mainsail/utils";
 import path from "path";
 import { URL } from "url";
 
+type Flags = {
+	env?: string;
+	name?: string;
+	thread?: string;
+}
+
 @injectable()
 export class RegisterBaseBindings implements Contracts.Kernel.Bootstrapper {
 	@inject(Identifiers.Application.Instance)
@@ -15,7 +21,7 @@ export class RegisterBaseBindings implements Contracts.Kernel.Bootstrapper {
 	private readonly fileSystem!: Contracts.Kernel.Filesystem;
 
 	public async bootstrap(): Promise<void> {
-		const flags: Record<string, string> | undefined = this.app.config("app.flags");
+		const flags = this.app.config<Flags>("app.flags");
 
 		const { version } = this.fileSystem.readJSONSync<Contracts.Types.PackageJson>(
 			path.resolve(new URL(".", import.meta.url).pathname, "../../package.json"),
@@ -23,6 +29,8 @@ export class RegisterBaseBindings implements Contracts.Kernel.Bootstrapper {
 
 		assert.defined(version);
 		assert.defined(flags);
+		assert.defined(flags.env);
+		assert.defined(flags.name);
 
 		this.app.bind<string>(Identifiers.Application.Environment).toConstantValue(flags.env);
 		this.app.bind<string>(Identifiers.Application.Name).toConstantValue(flags.name);
