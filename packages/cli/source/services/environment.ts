@@ -20,17 +20,19 @@ export class Environment implements Contracts.Cli.Environment {
 			paths[key] = path.join(value, this.appName);
 		}
 
-		if (process.env[EnvironmentVariables.MAINSAIL_PATH_CONFIG]) {
+		const pathConfig = process.env[EnvironmentVariables.MAINSAIL_PATH_CONFIG];
+		if (pathConfig) {
 			paths = {
 				...paths,
-				config: path.resolve(process.env[EnvironmentVariables.MAINSAIL_PATH_CONFIG]!, this.appName),
+				config: path.resolve(pathConfig, this.appName),
 			};
 		}
 
-		if (process.env[EnvironmentVariables.MAINSAIL_PATH_DATA]) {
+		const pathData = process.env[EnvironmentVariables.MAINSAIL_PATH_DATA];
+		if (pathData) {
 			paths = {
 				...paths,
-				data: path.resolve(process.env[EnvironmentVariables.MAINSAIL_PATH_DATA]!, this.appName),
+				data: path.resolve(pathData, this.appName),
 			};
 		}
 
