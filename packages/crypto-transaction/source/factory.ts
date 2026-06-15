@@ -57,6 +57,11 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		return this.fromData(transactionData);
 	}
 
+	public async fromPoolData(data: Contracts.Crypto.TransactionData): Promise<Contracts.Crypto.Transaction> {
+		const serialized = await this.serializer.serialize(data);
+		return new Transaction(data, serialized);
+	}
+
 	public async fromStorage(
 		transaction: Contracts.Crypto.TransactionStorageDataExtended,
 	): Promise<Contracts.Crypto.BlockTransaction> {
