@@ -22,8 +22,8 @@ export class ServiceProviderRepository {
 
 	readonly #deferredProviders: Set<string> = new Set<string>();
 
-	public all(): Array<[string, ServiceProvider]> {
-		return [...this.#serviceProviders.entries()];
+	public all(): ServiceProvider[] {
+		return [...this.#serviceProviders.values()];
 	}
 
 	public allLoadedProviders(): ServiceProvider[] {

@@ -23,8 +23,8 @@ export class BootServiceProviders implements Contracts.Kernel.Bootstrapper {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async bootstrap(): Promise<void> {
-		for (const [name, serviceProvider] of this.serviceProviders.all()) {
-			const serviceProviderName = serviceProvider.name();
+		for (const serviceProvider of this.serviceProviders.all()) {
+			const name = serviceProvider.name();
 
 			if (await serviceProvider.bootWhen()) {
 				try {
@@ -33,7 +33,7 @@ export class BootServiceProviders implements Contracts.Kernel.Bootstrapper {
 					const error = ensureError(rawError);
 					this.logger.error(`${name}: ${error.stack}`);
 
-					throw new ServiceProviderCannotBeBooted(serviceProviderName, error.message);
+					throw new ServiceProviderCannotBeBooted(name, error.message);
 				}
 			} else {
 				this.serviceProviders.defer(name);
@@ -41,7 +41,7 @@ export class BootServiceProviders implements Contracts.Kernel.Bootstrapper {
 
 			const eventListener: Contracts.Kernel.EventListener = this.app
 				.resolve(ChangeServiceProviderState)
-				.initialize(serviceProviderName, serviceProvider);
+				.initialize(name, serviceProvider);
 
 			this.events.listen(Events.BlockEvent.Applied, eventListener);
 			this.events.listen(Events.KernelEvent.ServiceProviderBooted, eventListener);
