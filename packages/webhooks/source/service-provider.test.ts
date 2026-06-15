@@ -65,10 +65,6 @@ describe<Context>("ServiceProvider", ({ beforeEach, afterAll, it, assert }) => {
 
 		assert.true(await serviceProvider.bootWhen());
 	});
-
-	it("should not be required", async ({ serviceProvider }) => {
-		assert.false(await serviceProvider.required());
-	});
 });
 
 describe<Context>("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {

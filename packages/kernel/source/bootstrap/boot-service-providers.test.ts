@@ -7,7 +7,6 @@ import {
 	DeferredDisposeServiceProvider,
 	DeferredServiceProvider,
 	FaultyBootServiceProvider,
-	RequiredFaultyBootServiceProvider,
 } from "../../test/stubs/bootstrap/service-providers";
 import { Application } from "../application";
 import { ServiceProvider, ServiceProviderRepository } from "../providers";
@@ -40,10 +39,10 @@ describe<{
 		delete process.env.DEFFERED_DISABLE;
 	});
 
-	it("RequiredFaultyBootServiceProvider", async (context) => {
+	it("FaultyBootServiceProvider", async (context) => {
 		const bootServiceProviders = context.app.resolve<BootServiceProviders>(BootServiceProviders);
 
-		const serviceProvider: ServiceProvider = new RequiredFaultyBootServiceProvider();
+		const serviceProvider: ServiceProvider = new FaultyBootServiceProvider();
 		context.serviceProviderRepository.set("stub", serviceProvider);
 
 		await assert.rejects(
@@ -51,18 +50,6 @@ describe<{
 			Exceptions.ServiceProviderCannotBeBooted,
 			"Boot Error",
 		);
-	});
-
-	it("FaultyBootServiceProvider", async (context) => {
-		const bootServiceProviders = context.app.resolve<BootServiceProviders>(BootServiceProviders);
-
-		const serviceProvider: ServiceProvider = new FaultyBootServiceProvider();
-		const spyBoot = spy(serviceProvider, "boot");
-		context.serviceProviderRepository.set("stub", serviceProvider);
-
-		await assert.resolves(() => bootServiceProviders.bootstrap());
-
-		spyBoot.calledOnce();
 	});
 
 	it("DeferredServiceProvider", async (context) => {

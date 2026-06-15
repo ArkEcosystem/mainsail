@@ -11,7 +11,6 @@ import {
 	RequiredDependencyCannotBeFoundServiceProvider,
 	RequiredDependencyVersionCanBeSatisfiedServiceProvider,
 	RequiredDependencyVersionCannotBeSatisfiedServiceProvider,
-	RequiredInvalidConfigurationServiceProvider,
 	StubServiceProvider,
 	ValidConfigurationServiceProvider,
 } from "../../test/stubs/bootstrap/service-providers";
@@ -72,23 +71,8 @@ describe<{
 		assert.equal(serviceProvider.config().getRequired("username"), "johndoe");
 	});
 
-	it("should mark the service provider as failed if the configuration validation fails", async (context) => {
+	it("should throw if the configuration validation fails", async (context) => {
 		const serviceProvider: ServiceProvider = new InvalidConfigurationServiceProvider();
-		serviceProvider.setManifest(context.app.resolve(PluginManifest));
-		serviceProvider.setConfig(context.app.resolve(PluginConfiguration));
-
-		const spyRegister = spy(serviceProvider, "register");
-		context.serviceProviderRepository.set("stub", serviceProvider);
-
-		await context.app.resolve<ValidationServiceProvider>(ValidationServiceProvider).register();
-		await context.app.resolve<RegisterServiceProviders>(RegisterServiceProviders).bootstrap();
-
-		spyRegister.neverCalled();
-		assert.true(context.serviceProviderRepository.failed("stub"));
-	});
-
-	it("should throw if the service provider is required and the configuration validation fails", async (context) => {
-		const serviceProvider: ServiceProvider = new RequiredInvalidConfigurationServiceProvider();
 		serviceProvider.setManifest(context.app.resolve(PluginManifest));
 		serviceProvider.setConfig(context.app.resolve(PluginConfiguration));
 		context.serviceProviderRepository.set("stub", serviceProvider);

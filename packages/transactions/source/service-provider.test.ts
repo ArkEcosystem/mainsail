@@ -15,8 +15,4 @@ describe<{
 	it("should register", async (context) => {
 		await assert.resolves(() => context.serviceProvider.register());
 	});
-
-	it("should be required", async (context) => {
-		assert.true(await context.serviceProvider.required());
-	});
 });

@@ -127,17 +127,4 @@ describeSkip<{
 	it(".disposeWhen", async (context) => {
 		assert.false(await context.app.resolve(StubServiceProvider).disposeWhen());
 	});
-
-	it(".required", async (context) => {
-		const serviceProvider: ServiceProvider = context.app.resolve(StubServiceProvider);
-
-		const pluginManifest = context.app.resolve(PluginManifest);
-		serviceProvider.setManifest(pluginManifest.discover(resolve(__dirname, "../../test/stubs/stub-plugin")));
-
-		assert.true(await serviceProvider.required());
-	});
-
-	it(".required (no manifest)", async (context) => {
-		assert.false(await context.app.resolve(StubServiceProvider).required());
-	});
 });
