@@ -75,10 +75,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		await this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).disposePeers();
 	}
 
-	public async required(): Promise<boolean> {
-		return true;
-	}
-
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
 			apiNodes: Joi.array().items(Joi.string()).default([]),

@@ -9,8 +9,4 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Snapshot.Legacy.Importer).to(Importer).inSingletonScope();
 	}
-
-	public async required(): Promise<boolean> {
-		return true;
-	}
 }

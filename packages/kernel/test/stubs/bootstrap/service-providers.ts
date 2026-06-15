@@ -13,16 +13,6 @@ export class StubServiceProvider extends ServiceProvider {
 	}
 }
 
-export class RequiredServiceProvider extends ServiceProvider {
-	public name(): string {
-		return "stub";
-	}
-
-	public async required(): Promise<boolean> {
-		return true;
-	}
-}
-
 export class InvalidConfigurationServiceProvider extends ServiceProvider {
 	public name(): string {
 		return "stub";
@@ -32,22 +22,6 @@ export class InvalidConfigurationServiceProvider extends ServiceProvider {
 		return Joi.object({
 			username: Joi.string().required(),
 		});
-	}
-}
-
-export class RequiredInvalidConfigurationServiceProvider extends ServiceProvider {
-	public name(): string {
-		return "stub";
-	}
-
-	public configSchema(): object {
-		return Joi.object({
-			username: Joi.string().required(),
-		});
-	}
-
-	public async required(): Promise<boolean> {
-		return true;
 	}
 }
 
@@ -148,20 +122,6 @@ export class FaultyBootServiceProvider extends ServiceProvider {
 
 	public version(): string {
 		return "version";
-	}
-}
-
-export class RequiredFaultyBootServiceProvider extends ServiceProvider {
-	public async boot(): Promise<void> {
-		throw new Error("Boot Error");
-	}
-
-	public name(): string {
-		return "stub";
-	}
-
-	public async required(): Promise<boolean> {
-		return true;
 	}
 }
 

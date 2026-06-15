@@ -43,8 +43,4 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Processor.BlockProcessor).to(BlockProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Processor.TransactionProcessor).to(TransactionProcessor).inSingletonScope();
 	}
-
-	public async required(): Promise<boolean> {
-		return true;
-	}
 }

@@ -77,14 +77,5 @@ export class ServiceProvider {
 	public async disposeWhen(serviceProvider?: string): Promise<boolean> {
 		return false;
 	}
-
-	public async required(): Promise<boolean> {
-		if (this.#packageManifest) {
-			return this.#packageManifest.get("arkecosystem.core.required", false);
-		}
-
-		return false;
-	}
-
 	public async register(): Promise<void> {}
 }
