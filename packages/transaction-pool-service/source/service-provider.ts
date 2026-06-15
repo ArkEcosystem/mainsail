@@ -32,10 +32,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.get<Storage>(Identifiers.TransactionPool.Storage).dispose();
 	}
 
-	public async required(): Promise<boolean> {
-		return true;
-	}
-
 	public configSchema(): object {
 		return Joi.object({
 			allowedSenders: Joi.array().items(Joi.string()).required(),

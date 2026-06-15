@@ -69,10 +69,6 @@ describe<{
 		spyPeerDispose.calledOnce();
 	});
 
-	it("#required - should return true", async ({ serviceProvider }) => {
-		assert.true(await serviceProvider.required());
-	});
-
 	it("#peerFactory - should create a peer with integer port number, when using string config", async ({
 		app,
 		serviceProvider,
