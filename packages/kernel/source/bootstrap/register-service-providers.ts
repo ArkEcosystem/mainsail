@@ -77,6 +77,8 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 			Identifiers.ServiceProvider.Repository,
 		);
 
+		const serviceProviderName = serviceProvider.name();
+
 		for (const dependency of serviceProvider.dependencies()) {
 			const { name, required, version: constraint } = dependency;
 
@@ -95,7 +97,7 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 
 				this.logger.warn(error.message);
 
-				serviceProviders.fail(serviceProvider.name());
+				serviceProviders.fail(serviceProviderName);
 
 				return false;
 			}
@@ -114,7 +116,7 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 
 					this.logger.warn(error.message);
 
-					serviceProviders.fail(serviceProvider.name());
+					serviceProviders.fail(serviceProviderName);
 				}
 			}
 		}
