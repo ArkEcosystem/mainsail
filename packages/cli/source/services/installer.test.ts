@@ -216,7 +216,7 @@ describe<{
 
 		assert.throws(
 			() => installer.installRangeLatest("@mainsail/core", "^4.0.0 <4.4.0"),
-			"No @mainsail/core version to satisfy ^4.0.0 <4.4.0".replace(/[\s#$()*+,.?[\\\]^{|}-]/g, "\\$&"),
+			"No @mainsail/core version to satisfy ^4.0.0 <4.4.0",
 		);
 
 		spySync.calledWith("pnpm info @mainsail/core versions --json", {
