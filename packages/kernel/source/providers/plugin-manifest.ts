@@ -18,8 +18,17 @@ export class PluginManifest {
 		return this;
 	}
 
-	public get<T>(key: string, defaultValue?: T): T {
-		return get(this.#manifest, key, defaultValue)!;
+	public get<T>(key: string, defaultValue?: T): T | undefined {
+		return get(this.#manifest, key, defaultValue);
+	}
+
+	public getRequired<T>(key: string): T {
+		const value =  get(this.#manifest, key);
+		if (value === undefined) {
+			throw new Error(`Missing required manifest key: ${key}`);
+		}
+
+		return value as T;
 	}
 
 	public has(key: string): boolean {
