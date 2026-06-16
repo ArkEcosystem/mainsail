@@ -19,10 +19,5 @@ export class RegisterBaseConfiguration implements Contracts.Kernel.Bootstrapper 
 		await this.app.get<ConfigManager>(Identifiers.Services.Config.Manager).boot();
 
 		this.configRepository.set("app.flags", this.app.get<Contracts.Types.KeyValuePair>(Identifiers.Config.Flags));
-		// @@TODO better name for storing pluginOptions
-		this.configRepository.set(
-			"app.pluginOptions",
-			this.app.get<Contracts.Types.KeyValuePair>(Identifiers.Config.Plugins),
-		);
 	}
 }

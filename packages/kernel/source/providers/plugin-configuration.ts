@@ -1,37 +1,33 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
-import { get, has, set, unset } from "@mainsail/utils";
+import { injectable } from "@mainsail/container";
+import { ensureError, get, has, set, unset } from "@mainsail/utils";
 import deepmerge from "deepmerge";
 
-import { ConfigRepository } from "../services/config/index.js";
-
-// @TODO review the implementation
 
 @injectable()
 export class PluginConfiguration implements Contracts.Kernel.PluginConfiguration {
-	@inject(Identifiers.Config.Repository)
-	private readonly configRepository!: ConfigRepository;
-
 	#items: Contracts.Types.JsonObject = {};
 
 	public from(name: string, config: Contracts.Types.JsonObject): this {
-		this.#items = config;
-
-		this.#mergeWithGlobal(name);
+		this.#items = deepmerge({}, config);
 
 		return this;
 	}
 
+
 	public async discover(name: string, packageId: string): Promise<this> {
 		try {
-			this.#items = (await import(`${packageId}/distribution/defaults.js`)).defaults;
-		} catch {
-			// Failed to discover the defaults configuration file. This can be intentional.
-		}
+			// Clone so we never mutate the cached module export via later set()/unset()/merge() calls.
+			this.#items = deepmerge({}, (await import(`${packageId}/distribution/defaults.js`)).defaults ?? {});
+		} catch (rawError) {
+			const error = ensureError(rawError);
 
-		this.#mergeWithGlobal(name);
+			// A missing defaults file can be intentional; anything else (e.g. a broken module) is a real error.
+			if ((error as NodeJS.ErrnoException).code !== "ERR_MODULE_NOT_FOUND") {
+				throw error;
+			}
+		}
 
 		return this;
 	}
@@ -55,7 +51,13 @@ export class PluginConfiguration implements Contracts.Kernel.PluginConfiguration
 			throw new Error(`Missing required ${key} configuration value`);
 		}
 
-		return get(this.#items, key)!;
+		const item: T | undefined = get(this.#items, key);
+
+		if (item === undefined) {
+			throw new Error(`Missing required ${key} configuration value`);
+		}
+
+		return item;
 	}
 
 	public getOptional<T>(key: string, defaultValue: T): T {
@@ -63,7 +65,13 @@ export class PluginConfiguration implements Contracts.Kernel.PluginConfiguration
 			return defaultValue;
 		}
 
-		return get(this.#items, key)!;
+		const item: T | undefined = get(this.#items, key);
+
+		if (item === undefined) {
+			return defaultValue;
+		}
+
+		return item;
 	}
 
 	public set<T>(key: string, value: T): boolean {
@@ -80,14 +88,5 @@ export class PluginConfiguration implements Contracts.Kernel.PluginConfiguration
 
 	public has(key: string): boolean {
 		return has(this.#items, key);
-	}
-
-	#mergeWithGlobal(name: string): void {
-		// @@TODO better name for storing pluginOptions
-		if (!this.configRepository || !this.configRepository.has(`app.pluginOptions.${name}`)) {
-			return;
-		}
-
-		this.merge(this.configRepository.get(`app.pluginOptions.${name}`));
 	}
 }
