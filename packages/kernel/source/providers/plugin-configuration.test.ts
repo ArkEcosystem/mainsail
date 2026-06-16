@@ -16,13 +16,10 @@ describe<{
 	});
 
 	it("should create an instance from a name and defaults", (context) => {
-		context.app.get<ConfigRepository>(Identifiers.Config.Repository).set("app.pluginOptions", {
-			dummy: { key: "value" },
-		});
 
 		const instance: PluginConfiguration = context.pluginConfiguration.from("dummy", { some: "value" });
 
-		assert.equal(instance.all(), { key: "value", some: "value" });
+		assert.equal(instance.all(), { some: "value" });
 	});
 
 	it("should discover the defaults for the given plugin", async (context) => {

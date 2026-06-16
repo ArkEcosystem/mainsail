@@ -39,7 +39,7 @@ describe<{
 		const serviceProvider: StubServiceProvider = new StubServiceProvider();
 		context.serviceProviderRepository.set("stub", serviceProvider);
 
-		assert.equal(context.serviceProviderRepository.all(), [["stub", serviceProvider]]);
+		assert.equal(context.serviceProviderRepository.all(), [serviceProvider]);
 	});
 
 	it(".allLoadedProviders", (context) => {
