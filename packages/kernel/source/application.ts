@@ -62,7 +62,7 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 	public config<T = unknown>(key: string, value?: T, defaultValue?: T): T | undefined {
 		const config: ConfigRepository = this.get<ConfigRepository>(Identifiers.Config.Repository);
 
-		if (value) {
+		if (value !== undefined) {
 			config.set(key, value);
 		}
 
@@ -149,45 +149,46 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 		}
 		this.#terminating = true;
 
-		if (reason) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service)[error ? "error" : "warn"](
-				`${this.isWorker() ? "Worker " + this.thread() : "Application"} shutdown: ${reason}`,
-			);
-		}
+		let timeout: ReturnType<typeof setTimeout> | undefined;
 
-		if (error) {
-			let errors: Error[] = [error];
-
-			// Check for AggregateError
-			if ("errors" in error) {
-				errors = [...errors, ...(error as unknown as { errors: Error[] }).errors];
+		try {
+			if (reason) {
+				this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service)[error ? "error" : "warn"](
+					`${this.isWorker() ? "Worker " + this.thread() : "Application"} shutdown: ${reason}`,
+				);
 			}
 
-			for (const error of errors) {
-				this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).error(error.stack ?? error.message);
+			if (error) {
+				this.#logTerminationErrors(error);
 			}
-		}
 
-		const timeout = setTimeout(() => {
-			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warn(
-				`Force ${this.isWorker() ? "worker " + this.thread() : "application"} termination. Service providers did not dispose in time.`,
+			timeout = setTimeout(() => {
+				this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warn(
+					`Force ${this.isWorker() ? "worker " + this.thread() : "application"} termination. Service providers did not dispose in time.`,
+				);
+				exit(1);
+			}, 3000);
+
+			await this.#disposeServiceProviders();
+			clearTimeout(timeout);
+
+			// Await all async operations to finish
+			await new Promise((resolve) => setTimeout(resolve, 0));
+
+			this.#logOpenHandlers();
+
+			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice(
+				`${this.isWorker() ? "Worker " + this.thread() : "Application"} is gracefully terminated.`,
 			);
+
+			exit(error ? 1 : 0);
+		} catch {
+			if (timeout) {
+				clearTimeout(timeout);
+			}
+
 			exit(1);
-		}, 3000);
-
-		await this.#disposeServiceProviders();
-		clearTimeout(timeout);
-
-		// Await all async operations to finish
-		await new Promise((resolve) => setTimeout(resolve, 0));
-
-		this.#logOpenHandlers();
-
-		this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice(
-			`${this.isWorker() ? "Worker " + this.thread() : "Application"} is gracefully terminated.`,
-		);
-
-		exit(0);
+		}
 	}
 
 	async #bootstrapWith(type: string): Promise<void> {
@@ -207,6 +208,21 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 
 	async #registerEventDispatcher(): Promise<void> {
 		await this.resolve(EventServiceProvider).register();
+	}
+
+	#logTerminationErrors(error: Error): void {
+		const logger = this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service);
+
+		let errors: Error[] = [error];
+
+		// Unwrap AggregateError so each underlying error is logged individually.
+		if ("errors" in error && Array.isArray((error as unknown as { errors: unknown }).errors)) {
+			errors = [...errors, ...(error as unknown as { errors: Error[] }).errors];
+		}
+
+		for (const item of errors) {
+			logger.error(item.stack ?? item.message);
+		}
 	}
 
 	async #disposeServiceProviders(): Promise<void> {
