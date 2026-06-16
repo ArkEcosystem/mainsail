@@ -48,43 +48,7 @@ export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 			const installedPlugin = installedPlugins.find((installedPlugin) => installedPlugin.name === plugin.package);
 			const packageId = installedPlugin ? installedPlugin.path : plugin.package;
 
-			let packageModule = path.join(pluginPath, packageId);
-
-			let ServiceProvider;
-			try {
-				({ ServiceProvider } = await import(path.join(pluginPath, packageId)));
-			} catch (rawError) {
-				const error = ensureError(rawError);
-				if ((error as NodeJS.ErrnoException).code === "ERR_MODULE_NOT_FOUND") {
-					// HACK: just a workaround to use import on local packages if they are not installed.
-					//
-					// Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@mainsail/validation' imported from
-					// ~/git/mainsail/packages/kernel/distribution/bootstrap/load-service-providers.js
-					// =>
-					// ~/git/mainsail/packages/kernel/distribution/bootstrap/
-					// ~/git/mainsail/packages/
-					// ~/git/mainsail/packages/validation/distribution/index.js
-					const fallback = path.resolve(
-						new URL(".", import.meta.url).pathname,
-						"..",
-						"..",
-						"..",
-						packageId.split("/")[1],
-						"distribution",
-						"index.js",
-					);
-
-					({ ServiceProvider } = await import(fallback));
-
-					// ~/git/mainsail/packages/validation/distribution/index.js
-					// ~/git/mainsail/packages/validation/
-					packageModule = path.resolve(fallback.replaceAll("/index.js", ""), "..");
-				}
-			}
-
-			if (!ServiceProvider) {
-				throw new ServiceNotFound(packageId);
-			}
+			const { packageModule, ServiceProvider } = await this.#discoverServiceProvider(pluginPath, packageId);
 
 			const serviceProvider: ServiceProvider = this.app.resolve(ServiceProvider);
 			serviceProvider.setManifest(this.app.resolve(PluginManifest).discover(packageModule, import.meta.url));
@@ -94,6 +58,54 @@ export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 
 			this.serviceProviderRepository.set(plugin.package, serviceProvider);
 		}
+	}
+
+	async #discoverServiceProvider(
+		pluginPath: string,
+		packageId: string,
+	): Promise<{
+		ServiceProvider: typeof ServiceProvider;
+		packageModule: string;
+	}> {
+		let packageModule = path.join(pluginPath, packageId);
+
+		let ServiceProvider;
+		try {
+			({ ServiceProvider } = await import(path.join(pluginPath, packageId)));
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			if ((error as NodeJS.ErrnoException).code === "ERR_MODULE_NOT_FOUND") {
+				// HACK: just a workaround to use import on local packages if they are not installed.
+				//
+				// Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@mainsail/validation' imported from
+				// ~/git/mainsail/packages/kernel/distribution/bootstrap/load-service-providers.js
+				// =>
+				// ~/git/mainsail/packages/kernel/distribution/bootstrap/
+				// ~/git/mainsail/packages/
+				// ~/git/mainsail/packages/validation/distribution/index.js
+				const fallback = path.resolve(
+					new URL(".", import.meta.url).pathname,
+					"..",
+					"..",
+					"..",
+					packageId.split("/")[1],
+					"distribution",
+					"index.js",
+				);
+
+				({ ServiceProvider } = await import(fallback));
+
+				// ~/git/mainsail/packages/validation/distribution/index.js
+				// ~/git/mainsail/packages/validation/
+				packageModule = path.resolve(fallback.replaceAll("/index.js", ""), "..");
+			}
+		}
+
+		if (!ServiceProvider) {
+			throw new ServiceNotFound(packageId);
+		}
+
+		return { packageModule, ServiceProvider };
 	}
 
 	async #discoverConfiguration(
