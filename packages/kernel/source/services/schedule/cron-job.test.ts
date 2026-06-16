@@ -189,7 +189,9 @@ describe<{
 		expectExecutionAfterDelay(context, context.job.quarterly(), 43_200 * 4);
 	});
 
-	it.skip("should execute yearly", (context) => {
-		expectExecutionAfterDelay(context, context.job.yearly(), 525_600);
+	it("should execute yearly", (context) => {
+		// A fixed-delay tick can't model yearly across a leap year (Jan 1 boundaries aren't 365 days
+		// apart), so assert a single fire on the boundary instead.
+		expectExecutionOnDate(context, context.job.yearly(), "2019-01-01 00:00:00");
 	});
 });

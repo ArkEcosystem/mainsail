@@ -2,12 +2,12 @@ import { Identifiers } from "@mainsail/constants";
 import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
-import { describeSkip } from "@mainsail/test-runner";
+import { describe } from "@mainsail/test-runner";
 import { Application } from "../application";
 import { ConfigRepository } from "../services/config";
 import { PluginManifest } from "./plugin-manifest";
 
-describeSkip<{
+describe<{
 	app: Application;
 	pluginManifest: PluginManifest;
 }>("PluginManifest", ({ assert, beforeEach, it }) => {
@@ -22,7 +22,7 @@ describeSkip<{
 	});
 
 	it("should discover the manifest for the given plugin", (context) => {
-		context.pluginManifest.discover(resolve(__dirname, "../../test/stubs/stub-plugin"));
+		context.pluginManifest.discover(resolve(import.meta.dirname, "../../test/stubs/stub-plugin"), import.meta.url);
 
 		assert.true(context.pluginManifest.has("name"));
 		assert.equal(context.pluginManifest.get("name"), "stub-plugin");
