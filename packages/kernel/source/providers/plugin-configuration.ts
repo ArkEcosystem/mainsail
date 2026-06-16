@@ -47,10 +47,6 @@ export class PluginConfiguration implements Contracts.Kernel.PluginConfiguration
 	}
 
 	public getRequired<T>(key: string): T {
-		if (!this.has(key)) {
-			throw new Error(`Missing required ${key} configuration value`);
-		}
-
 		const item: T | undefined = get(this.#items, key);
 
 		if (item === undefined) {
@@ -61,10 +57,6 @@ export class PluginConfiguration implements Contracts.Kernel.PluginConfiguration
 	}
 
 	public getOptional<T>(key: string, defaultValue: T): T {
-		if (!this.has(key)) {
-			return defaultValue;
-		}
-
 		const item: T | undefined = get(this.#items, key);
 
 		if (item === undefined) {
