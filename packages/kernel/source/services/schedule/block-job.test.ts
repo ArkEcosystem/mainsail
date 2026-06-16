@@ -36,13 +36,13 @@ describe<{
 
 		function_.neverCalled();
 
-		await context.eventDispatcher.dispatch(Events.BlockEvent.Received, { number: 1 });
-		await context.eventDispatcher.dispatch(Events.BlockEvent.Received, { number: 3 });
-		await context.eventDispatcher.dispatch(Events.BlockEvent.Received, { number: 4 });
-		await context.eventDispatcher.dispatch(Events.BlockEvent.Received, { number: 6 });
-		await context.eventDispatcher.dispatch(Events.BlockEvent.Received, { number: 7 });
-		await context.eventDispatcher.dispatch(Events.BlockEvent.Received, { number: 9 });
-		await context.eventDispatcher.dispatch(Events.BlockEvent.Received, { number: 10 });
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 1 });
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 3 });
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 4 });
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 6 });
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 7 });
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 9 });
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 10 });
 
 		function_.calledTimes(3);
 

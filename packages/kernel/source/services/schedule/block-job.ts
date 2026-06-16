@@ -14,20 +14,28 @@ export class BlockJob implements Job {
 
 	protected blockCount = 1;
 
-	public execute(callback: () => void): void {
+	public execute(callback: () => void | Promise<void>): void {
 		const onCallback = async () => {
 			const start = performance.now();
 
-			callback();
+			// Swallow callback failures so a faulty scheduled job cannot break the block.applied dispatch.
+			try {
+				await callback();
 
-			await this.eventDispatcher.dispatch(Events.ScheduleEvent.BlockJobFinished, {
-				blockCount: this.blockCount,
-				executionTime: performance.now() - start,
-			});
+				await this.eventDispatcher.dispatch(Events.ScheduleEvent.BlockJobFinished, {
+					blockCount: this.blockCount,
+					executionTime: performance.now() - start,
+				});
+			} catch {
+				await this.eventDispatcher.dispatch(Events.ScheduleEvent.BlockJobFailed, {
+					blockCount: this.blockCount,
+					executionTime: performance.now() - start,
+				});
+			}
 		};
 
 		this.eventDispatcher.listen(
-			Events.BlockEvent.Received,
+			Events.BlockEvent.Applied,
 			new ExecuteCallbackWhenReady(onCallback, this.blockCount),
 		);
 	}
