@@ -1373,15 +1373,42 @@ impl PersistentDB {
         })
     }
 
+    /// Maximum number of map-resize adoptions to attempt when a peer process has grown
+    /// the shared env out from under us. Mirrors the write-side MAX_RESIZE_RETRIES.
+    const MAX_READ_RESIZE_RETRIES: usize = 3;
+
     /// Runs `f` inside a read txn while holding the shared resize guard, so the env can't be remapped
     /// (mdb_env_set_mapsize) while the txn is live.
     fn with_read_txn<T>(
         &self,
         f: impl FnOnce(&heed::RoTxn) -> Result<T, Error>,
     ) -> Result<T, Error> {
-        let _resize_guard = self.resize_lock.read().map_err(|_| Error::Lock)?;
-        let txn = self.env.read_txn()?;
-        f(&txn)
+        let mut attempts = 0;
+
+        loop {
+            // Hold the read side for the whole `f` call so a same-process resize can't
+            // remap memory underneath the txn (unchanged invariant).
+            let guard = self.resize_lock.read().map_err(|_| Error::Lock)?;
+
+            match self.env.read_txn() {
+                Ok(txn) => return f(&txn),
+
+                // Another process grew the shared map beyond ours. Release the read guard
+                // BEFORE taking the write side — std::sync::RwLock self-deadlocks on a
+                // same-thread read->write upgrade — then adopt the new size and retry.
+                Err(heed::Error::Mdb(heed::MdbError::MapResized))
+                    if attempts < Self::MAX_READ_RESIZE_RETRIES =>
+                {
+                    drop(guard);
+                    attempts += 1;
+                    self.adopt_grown_map_size()?;
+                }
+
+                // Anything else (incl. a persistent MapResized after exhausting retries)
+                // surfaces as before.
+                Err(err) => return Err(err.into()),
+            }
+        }
     }
 
     /// Runs `f` inside a write txn while holding the shared resize guard, so the env can't be remapped
@@ -1395,6 +1422,33 @@ impl PersistentDB {
         let out = f(&mut txn)?;
         txn.commit()?;
         Ok(out)
+    }
+
+    /// Adopt a map size grown by another process sharing this env.
+    ///
+    /// Idempotent: only resizes when the on-disk file has actually outgrown our mapping,
+    /// so two readers racing on the same `MAP_RESIZED` serialize and the second one no-ops.
+    /// Takes the write side of the resize gate (drains all in-process txns) exactly like
+    /// `resize()`, which is what makes the unsafe `env.resize()` sound.
+    fn adopt_grown_map_size(&self) -> Result<(), Error> {
+        let _resize_guard = self.resize_lock.write().map_err(|_| Error::Lock)?;
+
+        let map_size = self.env.info().map_size;
+        let disk_size = self.env.real_disk_size()? as usize;
+
+        if disk_size >= map_size {
+            let next = next_map_size(disk_size);
+            self.logger.log(
+                LogLevel::Info,
+                format!(
+                    "adopting externally grown map size {} -> {}",
+                    map_size, next
+                ),
+            );
+            unsafe { self.env.resize(next)? };
+        }
+
+        Ok(())
     }
 }
 
