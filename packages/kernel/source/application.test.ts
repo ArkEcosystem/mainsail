@@ -36,6 +36,7 @@ describe<{
 			debug: () => {},
 			error: () => {},
 			notice: () => {},
+			warn: () => {},
 		};
 
 		context.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
@@ -100,7 +101,7 @@ describe<{
 		assert.true(context.app.isBooted());
 	});
 
-	it.skip("should reboot the application", async (context) => {
+	it("should reboot the application", async (context) => {
 		// Arrange
 		context.app
 			.bind(Identifiers.Services.EventDispatcher.Service)
@@ -121,8 +122,8 @@ describe<{
 		await context.app.reboot();
 
 		// Assert
-		expect(spyRegister).toHaveBeenCalled();
-		expect(spyBoot).toHaveBeenCalled();
+		spyRegister.called();
+		spyBoot.called();
 		spyDispose.calledOnce();
 		assert.true(context.app.isBooted());
 	});
@@ -244,7 +245,7 @@ describe<{
 		assert.is(context.app.environment(), "production");
 	});
 
-	it.skip("should terminate the application", async (context) => {
+	it("should terminate the application", async (context) => {
 		// Arrange
 		context.app
 			.bind(Identifiers.Services.EventDispatcher.Service)
@@ -257,6 +258,8 @@ describe<{
 		const serviceProvider = context.app.resolve(StubServiceProvider);
 		const spyDispose = spy(serviceProvider, "dispose");
 		serviceProviderRepository.set("stub", serviceProvider);
+
+		const spyExit = stub(process, "exit");
 
 		// Act
 		serviceProviderRepository.load("stub");
@@ -265,10 +268,11 @@ describe<{
 
 		// Assert
 		spyDispose.calledOnce();
+		spyExit.calledWith(0);
 		assert.false(context.app.isBooted());
 	});
 
-	it.skip("should terminate the application with a reason", async (context) => {
+	it("should terminate the application with a reason", async (context) => {
 		// Arrange
 		context.app
 			.bind(Identifiers.Services.EventDispatcher.Service)
@@ -282,18 +286,22 @@ describe<{
 		const spyDispose = spy(serviceProvider, "dispose");
 		serviceProviderRepository.set("stub", serviceProvider);
 
+		const spyExit = stub(process, "exit");
+		const spyWarn = spy(context.logger, "warn");
+
 		// Act
 		serviceProviderRepository.load("stub");
 		await context.app.boot();
 		await context.app.terminate("Hello World");
 
 		// Assert
-		expect(context.logger.notice).toHaveBeenCalledWith("Hello World");
+		spyWarn.calledWith("Application shutdown: Hello World");
 		spyDispose.calledOnce();
+		spyExit.calledWith(0);
 		assert.false(context.app.isBooted());
 	});
 
-	it.skip("should terminate the application with an error", async (context) => {
+	it("should terminate the application with an error", async (context) => {
 		// Arrange
 		context.app
 			.bind(Identifiers.Services.EventDispatcher.Service)
@@ -308,6 +316,8 @@ describe<{
 		const errorLogSpy = spy(context.logger, "error");
 		serviceProviderRepository.set("stub", serviceProvider);
 
+		const spyExit = stub(process, "exit");
+
 		// Act
 		serviceProviderRepository.load("stub");
 		const error = new Error("Hello World");
@@ -317,6 +327,7 @@ describe<{
 		// Assert
 		errorLogSpy.calledWith(error.stack);
 		spyDispose.calledOnce();
+		spyExit.calledWith(1);
 		assert.false(context.app.isBooted());
 	});
 });

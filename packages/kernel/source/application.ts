@@ -4,7 +4,6 @@ import { Events, Identifiers } from "@mainsail/constants";
 import { Application as BaseApplication } from "@mainsail/container";
 import { DirectoryCannotBeFound } from "@mainsail/exceptions";
 import { ensureError } from "@mainsail/utils";
-import { exit } from "node:process";
 import { join } from "path";
 import { isMainThread } from "worker_threads";
 
@@ -166,7 +165,7 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 				this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warn(
 					`Force ${this.isWorker() ? "worker " + this.thread() : "application"} termination. Service providers did not dispose in time.`,
 				);
-				exit(1);
+				process.exit(1);
 			}, 3000);
 
 			await this.#disposeServiceProviders();
@@ -181,13 +180,13 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 				`${this.isWorker() ? "Worker " + this.thread() : "Application"} is gracefully terminated.`,
 			);
 
-			exit(error ? 1 : 0);
+			process.exit(error ? 1 : 0);
 		} catch {
 			if (timeout) {
 				clearTimeout(timeout);
 			}
 
-			exit(1);
+			process.exit(1);
 		}
 	}
 
