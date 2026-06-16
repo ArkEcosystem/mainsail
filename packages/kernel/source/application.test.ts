@@ -12,7 +12,7 @@ import { MemoryEventDispatcher } from "./services/events";
 
 class StubServiceProvider extends ServiceProvider {
 	public name(): string {
-		return "name";
+		return "stub";
 	}
 
 	public version(): string {
@@ -48,28 +48,29 @@ describe<{
 	});
 
 	it("should bootstrap the application", async (context) => {
-		context.app.unbind(Identifiers.Services.Filesystem.Service);
-
-		await context.app.bootstrap({
-			flags: {
-				name: "local",
-				network: "devnet",
-				paths: { config: join(import.meta.dirname, "../test/stubs/config/local") },
-				token: "ark",
-			},
-		});
-	});
-
-	it("should bootstrap the application with a config path from process.env", async (context) => {
 		process.env.MAINSAIL_PATH_CONFIG = join(import.meta.dirname, "../test/stubs/config");
 
 		context.app.unbind(Identifiers.Services.Filesystem.Service);
 
+		await assert.resolves(() =>
+			context.app.bootstrap({
+				flags: { env: "test", name: "local", network: "devnet", token: "ark" },
+			}),
+		);
+	});
+
+	it("should bootstrap the application with a config path from process.env", async (context) => {
+		// The base path is joined with the application name to form the final config path.
+		const configBase = join(import.meta.dirname, "../test/stubs/config");
+		process.env.MAINSAIL_PATH_CONFIG = configBase;
+
+		context.app.unbind(Identifiers.Services.Filesystem.Service);
+
 		await context.app.bootstrap({
-			flags: { name: "local", network: "devnet", token: "ark" },
+			flags: { env: "test", name: "local", network: "devnet", token: "ark" },
 		});
 
-		assert.is(context.app.configPath(), process.env.MAINSAIL_PATH_CONFIG);
+		assert.is(context.app.configPath(), join(configBase, "local"));
 	});
 
 	it("should boot the application", async (context) => {
