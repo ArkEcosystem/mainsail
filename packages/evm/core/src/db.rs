@@ -1,6 +1,5 @@
 use std::{
     borrow::Cow,
-    cell::RefCell,
     cmp::Ordering,
     collections::BTreeMap,
     convert::Infallible,
@@ -310,7 +309,7 @@ pub struct GenesisInfo {
 
 pub struct PersistentDB {
     pub(crate) env: heed::Env,
-    pub(crate) inner: RefCell<InnerStorage>,
+    pub(crate) inner: InnerStorage,
     pub(crate) accounts_history: Option<AccountHistory>,
     resize_lock: Arc<RwLock<()>>,
     logger: Logger,
@@ -494,7 +493,7 @@ impl PersistentDB {
 
         Ok(Self {
             env,
-            inner: RefCell::new(InnerStorage {
+            inner: InnerStorage {
                 accounts,
                 accounts_history: accounts_history_db,
                 commits,
@@ -508,7 +507,7 @@ impl PersistentDB {
                 proofs,
                 transactions_hash_key,
                 transactions,
-            }),
+            },
             accounts_history,
             resize_lock,
             logger: opts.logger.unwrap_or_default(),
@@ -518,7 +517,7 @@ impl PersistentDB {
 
     pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) -> Result<(), Error> {
         self.with_write_txn(|wtxn| {
-            let inner = self.inner.borrow_mut();
+            let inner = &self.inner;
 
             if inner
                 .accounts
@@ -549,12 +548,7 @@ impl PersistentDB {
         limit: u64,
     ) -> Result<(Option<u64>, Vec<AccountInfoExtended>), Error> {
         self.with_read_txn(|tx_env| {
-            let iter = self
-                .inner
-                .borrow()
-                .accounts
-                .iter(tx_env)?
-                .skip(offset as usize);
+            let iter = self.inner.accounts.iter(tx_env)?.skip(offset as usize);
 
             let (cursor, mut accounts) = self.get_items(
                 iter,
@@ -580,7 +574,6 @@ impl PersistentDB {
             for account in accounts.iter_mut() {
                 if let Some(legacy_attributes) = self
                     .inner
-                    .borrow()
                     .legacy_attributes
                     .get(tx_env, &AddressWrapper(account.address))?
                 {
@@ -600,7 +593,6 @@ impl PersistentDB {
         self.with_read_txn(|tx_env| {
             let iter = self
                 .inner
-                .borrow()
                 .legacy_cold_wallets
                 .iter(tx_env)?
                 .skip(offset as usize);
@@ -626,12 +618,7 @@ impl PersistentDB {
         limit: u64,
     ) -> Result<(Option<u64>, Vec<(u64, Vec<(B256, TxReceipt)>)>), Error> {
         self.with_read_txn(|tx_env| {
-            let iter = self
-                .inner
-                .borrow()
-                .commits
-                .iter(tx_env)?
-                .skip(offset as usize);
+            let iter = self.inner.commits.iter(tx_env)?.skip(offset as usize);
 
             self.get_items(
                 iter,
@@ -656,7 +643,7 @@ impl PersistentDB {
         block_number: u64,
     ) -> Result<HashMap<B256, TxReceipt>, Error> {
         self.with_read_txn(|tx_env| {
-            let commit = self.inner.borrow().commits.get(tx_env, &block_number)?;
+            let commit = self.inner.commits.get(tx_env, &block_number)?;
 
             match commit {
                 Some(inner) => Ok(inner.0.tx_receipts),
@@ -676,7 +663,7 @@ impl PersistentDB {
         );
 
         self.with_read_txn(|tx_env| {
-            let inner = self.inner.borrow();
+            let inner = &self.inner;
             let range = from_block_number..=to_block_number;
 
             let capacity = to_block_number.saturating_sub(from_block_number).min(1024) as usize;
@@ -708,7 +695,7 @@ impl PersistentDB {
         const PER_COMMIT_OVERHEAD_BYTES: u64 = 1024;
 
         self.with_read_txn(|tx_env| {
-            let inner = self.inner.borrow();
+            let inner = &self.inner;
 
             let capacity = to_block_number.saturating_sub(from_block_number).min(512) as usize;
             let mut commits = Vec::with_capacity(capacity);
@@ -753,7 +740,7 @@ impl PersistentDB {
         block_number: u64,
         address: Address,
     ) -> Result<(Option<AccountInfo>, bool), Error> {
-        match self.inner.borrow().accounts_history {
+        match self.inner.accounts_history {
             Some(db) => self.with_read_txn(|tx_env| match self.accounts_history.as_ref() {
                 Some(accounts_history) => {
                     let (data, missing_fallback) = accounts_history.get_by_block_and_address(
@@ -789,7 +776,6 @@ impl PersistentDB {
         self.with_read_txn(|tx_env| {
             Ok(self
                 .inner
-                .borrow()
                 .legacy_attributes
                 .get(tx_env, &AddressWrapper(address))?
                 .map(|inner| inner.0))
@@ -803,7 +789,6 @@ impl PersistentDB {
         self.with_read_txn(|tx_env| {
             Ok(self
                 .inner
-                .borrow()
                 .legacy_cold_wallets
                 .get(tx_env, &LegacyAddressWrapper(address))?
                 .map(|inner| inner.0))
@@ -880,7 +865,7 @@ impl PersistentDB {
         txn: &heed::RoTxn,
         address: Address,
     ) -> Result<Option<AccountInfo>, Error> {
-        let inner = self.inner.borrow();
+        let inner = &self.inner;
 
         let basic = inner
             .accounts
@@ -891,7 +876,7 @@ impl PersistentDB {
     }
 
     fn code_by_hash_ref_tx(&self, txn: &heed::RoTxn, code_hash: B256) -> Result<Bytecode, Error> {
-        let inner = self.inner.borrow();
+        let inner = &self.inner;
 
         let contract = match inner.contracts.get(txn, &HashWrapper(code_hash))? {
             Some(contract) => contract.0,
@@ -907,9 +892,7 @@ impl PersistentDB {
         address: Address,
         index: U256,
     ) -> Result<U256, Error> {
-        let inner = self.inner.borrow_mut();
-
-        let mut iter = inner.storage.iter(txn)?;
+        let mut iter = self.inner.storage.iter(txn)?;
         let location = &StorageEntryWrapper(index, U256::ZERO);
 
         match iter.move_on_key_dup(&AddressWrapper(address), &location)? {
@@ -919,9 +902,7 @@ impl PersistentDB {
     }
 
     fn block_hash_ref_tx(&self, txn: &heed::RoTxn, number: u64) -> Result<B256, Error> {
-        let inner = self.inner.borrow_mut();
-
-        let data = inner.blocks.get(txn, &number)?;
+        let data = self.inner.blocks.get(txn, &number)?;
         match data {
             Some(data) => Ok(data.hash),
             None => Ok(B256::ZERO),
@@ -1044,7 +1025,7 @@ impl PersistentDB {
                 return Err(Error::State("block already committed".into()));
             }
 
-            let inner = self.inner.borrow_mut();
+            let inner = &self.inner;
 
             let state_changes::StateChangeset {
                 accounts,
@@ -1273,7 +1254,6 @@ impl PersistentDB {
 
     pub fn is_block_committed(&self, rtxn: &heed::RoTxn, block_number: u64) -> bool {
         self.inner
-            .borrow()
             .commits
             .get(rtxn, &block_number)
             .is_ok_and(|v| v.is_some())
@@ -1284,27 +1264,19 @@ impl PersistentDB {
         block_number: u64,
         tx_hash: B256,
     ) -> Result<(bool, Option<TxReceipt>), Error> {
-        self.with_read_txn(|rtxn| {
-            let inner = self.inner.borrow();
-
-            match inner.commits.get(rtxn, &block_number)? {
-                Some(receipts) => Ok((true, receipts.tx_receipts.get(&tx_hash).cloned())),
-                None => Ok((false, None)),
-            }
+        self.with_read_txn(|rtxn| match self.inner.commits.get(rtxn, &block_number)? {
+            Some(receipts) => Ok((true, receipts.tx_receipts.get(&tx_hash).cloned())),
+            None => Ok((false, None)),
         })
     }
 
     pub fn is_empty(&self) -> Result<bool, Error> {
-        self.with_read_txn(|rtxn| {
-            let inner = self.inner.borrow();
-
-            Ok(inner.blocks.is_empty(rtxn)?)
-        })
+        self.with_read_txn(|rtxn| Ok(self.inner.blocks.is_empty(rtxn)?))
     }
 
     pub fn get_state(&self) -> Result<(u64, u64), Error> {
         self.with_read_txn(|rtxn| {
-            let inner = self.inner.borrow();
+            let inner = &self.inner;
 
             let total_round =
                 read_total_round(inner.state.get(rtxn, &StaticStringWrapper("total_round"))?);
@@ -1320,9 +1292,8 @@ impl PersistentDB {
 
     pub fn get_block_number_by_hash(&self, block_hash: B256) -> Result<Option<u64>, Error> {
         self.with_read_txn(|rtxn| {
-            let inner = self.inner.borrow();
-
-            Ok(inner
+            Ok(self
+                .inner
                 .blocks_hash_number
                 .get(rtxn, &HashWrapper(block_hash))?)
         })
@@ -1330,9 +1301,11 @@ impl PersistentDB {
 
     pub fn get_proof_data(&self, block_number: u64) -> Result<Option<ProofData>, Error> {
         self.with_read_txn(|rtxn| {
-            let inner = self.inner.borrow();
-
-            Ok(inner.proofs.get(rtxn, &block_number)?.map(|data| data.0))
+            Ok(self
+                .inner
+                .proofs
+                .get(rtxn, &block_number)?
+                .map(|data| data.0))
         })
     }
 
@@ -1341,18 +1314,16 @@ impl PersistentDB {
         block_number: u64,
     ) -> Result<Option<BlockHeaderData>, Error> {
         self.with_read_txn(|rtxn| {
-            let inner = self.inner.borrow();
-
-            Ok(inner.blocks.get(rtxn, &block_number)?.map(|data| data.0))
+            Ok(self
+                .inner
+                .blocks
+                .get(rtxn, &block_number)?
+                .map(|data| data.0))
         })
     }
 
     pub fn get_transaction(&self, key: TransactionKey) -> Result<Option<TransactionData>, Error> {
-        self.with_read_txn(|rtxn| {
-            let inner = self.inner.borrow();
-
-            Ok(inner.transactions.get(rtxn, &key)?.map(|data| data.0))
-        })
+        self.with_read_txn(|rtxn| Ok(self.inner.transactions.get(rtxn, &key)?.map(|data| data.0)))
     }
 
     pub fn get_transaction_data(&self, key: String) -> Result<Option<TransactionData>, Error> {
@@ -1364,7 +1335,7 @@ impl PersistentDB {
 
     pub fn get_transaction_key_by_hash(&self, tx_hash: B256) -> Result<Option<String>, Error> {
         self.with_read_txn(|rtxn| {
-            let inner = self.inner.borrow();
+            let inner = &self.inner;
 
             Ok(inner
                 .transactions_hash_key
@@ -1893,7 +1864,6 @@ mod tests {
 
             for (index, address) in addresses.iter().enumerate() {
                 db.inner
-                    .borrow_mut()
                     .accounts
                     .put(
                         &mut wtxn,
@@ -1907,7 +1877,6 @@ mod tests {
                     .unwrap();
 
                 db.inner
-                    .borrow_mut()
                     .legacy_attributes
                     .put(
                         &mut wtxn,
@@ -1964,7 +1933,6 @@ mod tests {
             for (index, legacy) in legacy_addresses.iter().enumerate() {
                 let legacy_address: LegacyAddress = (*legacy).try_into().unwrap();
                 db.inner
-                    .borrow_mut()
                     .legacy_cold_wallets
                     .put(
                         &mut wtxn,
@@ -2043,7 +2011,6 @@ mod tests {
             );
 
             db.inner
-                .borrow_mut()
                 .accounts_history
                 .unwrap()
                 .put(&mut wtxn, &1, &CompactBincode(&entries))
@@ -2171,8 +2138,7 @@ mod tests {
 
         {
             let mut wtxn = db.env.write_txn().unwrap();
-            let inner = db.inner.borrow_mut();
-            inner
+            db.inner
                 .contracts
                 .put(
                     &mut wtxn,
@@ -2201,8 +2167,7 @@ mod tests {
 
         {
             let mut wtxn = db.env.write_txn().unwrap();
-            let inner = db.inner.borrow_mut();
-            inner
+            db.inner
                 .storage
                 .put(
                     &mut wtxn,
@@ -2226,9 +2191,8 @@ mod tests {
 
         {
             let mut wtxn = db.env.write_txn().unwrap();
-            let inner = db.inner.borrow_mut();
 
-            inner
+            db.inner
                 .blocks
                 .put(
                     &mut wtxn,
@@ -2296,10 +2260,9 @@ mod tests {
         // prove the reader returns them ordered by (block_number, sequence).
         {
             let mut wtxn = db.env.write_txn().unwrap();
-            let inner = db.inner.borrow();
 
             for block_number in 1u64..=3 {
-                inner
+                db.inner
                     .blocks
                     .put(
                         &mut wtxn,
@@ -2312,7 +2275,7 @@ mod tests {
                     )
                     .unwrap();
 
-                inner
+                db.inner
                     .proofs
                     .put(
                         &mut wtxn,
@@ -2325,7 +2288,7 @@ mod tests {
                     .unwrap();
 
                 for sequence in (0..block_number).rev() {
-                    inner
+                    db.inner
                         .transactions
                         .put(
                             &mut wtxn,
@@ -2401,10 +2364,9 @@ mod tests {
 
         {
             let mut wtxn = db.env.write_txn().unwrap();
-            let inner = db.inner.borrow();
 
             for block_number in 1u64..=3 {
-                inner
+                db.inner
                     .blocks
                     .put(
                         &mut wtxn,
@@ -2417,7 +2379,7 @@ mod tests {
                     )
                     .unwrap();
 
-                inner
+                db.inner
                     .proofs
                     .put(
                         &mut wtxn,
@@ -2459,9 +2421,8 @@ mod tests {
 
         {
             let mut wtxn = db.env.write_txn().unwrap();
-            let inner = db.inner.borrow_mut();
 
-            inner
+            db.inner
                 .accounts
                 .put(
                     &mut wtxn,
@@ -2469,7 +2430,7 @@ mod tests {
                     &CompactBincode(&StoredAccountInfo::new(U256::from(100), 7, code_hash)),
                 )
                 .unwrap();
-            inner
+            db.inner
                 .contracts
                 .put(
                     &mut wtxn,
@@ -2477,7 +2438,7 @@ mod tests {
                     &CompactBincode(&code.clone().into()),
                 )
                 .unwrap();
-            inner
+            db.inner
                 .storage
                 .put(
                     &mut wtxn,
@@ -2485,7 +2446,7 @@ mod tests {
                     &StorageEntryWrapper(U256::from(1), U256::from(42)),
                 )
                 .unwrap();
-            inner
+            db.inner
                 .blocks
                 .put(
                     &mut wtxn,
@@ -2635,7 +2596,6 @@ mod tests {
             tx_receipts.insert(hash, Default::default());
 
             db.inner
-                .borrow_mut()
                 .commits
                 .put(
                     &mut wtxn,
@@ -2692,7 +2652,6 @@ mod tests {
                 total_receipts += receipts.len();
 
                 db.inner
-                    .borrow_mut()
                     .commits
                     .put(
                         &mut wtxn,
@@ -2748,7 +2707,6 @@ mod tests {
         // Write blocks 1..=3; block N gets N receipts with distinct hashes.
         {
             let mut wtxn = db.env.write_txn().unwrap();
-            let inner = db.inner.borrow();
 
             for block_number in 1u64..=3 {
                 let mut tx_receipts: HashMap<B256, TxReceipt> = Default::default();
@@ -2759,7 +2717,7 @@ mod tests {
                     );
                 }
 
-                inner
+                db.inner
                     .commits
                     .put(
                         &mut wtxn,
@@ -2815,7 +2773,6 @@ mod tests {
             let mut wtxn = db.env.write_txn().unwrap();
 
             db.inner
-                .borrow_mut()
                 .legacy_attributes
                 .put(
                     &mut wtxn,
@@ -2851,7 +2808,6 @@ mod tests {
             let mut wtxn = db.env.write_txn().unwrap();
 
             db.inner
-                .borrow_mut()
                 .blocks
                 .put(
                     &mut wtxn,
@@ -2881,7 +2837,6 @@ mod tests {
             let mut wtxn = db.env.write_txn().unwrap();
 
             db.inner
-                .borrow_mut()
                 .state
                 .put(
                     &mut wtxn,
@@ -2891,7 +2846,6 @@ mod tests {
                 .unwrap();
 
             db.inner
-                .borrow_mut()
                 .blocks
                 .put(
                     &mut wtxn,
@@ -2923,7 +2877,6 @@ mod tests {
             let mut wtxn = db.env.write_txn().unwrap();
 
             db.inner
-                .borrow_mut()
                 .blocks_hash_number
                 .put(&mut wtxn, &HashWrapper(hash), &10)
                 .unwrap();
@@ -2945,7 +2898,6 @@ mod tests {
             let mut wtxn = db.env.write_txn().unwrap();
 
             db.inner
-                .borrow_mut()
                 .blocks
                 .put(
                     &mut wtxn,
@@ -2981,7 +2933,6 @@ mod tests {
             let mut wtxn = db.env.write_txn().unwrap();
 
             db.inner
-                .borrow_mut()
                 .proofs
                 .put(
                     &mut wtxn,
@@ -3095,7 +3046,6 @@ mod tests {
             let mut wtxn = db.env.write_txn().unwrap();
 
             db.inner
-                .borrow_mut()
                 .transactions
                 .put(
                     &mut wtxn,
@@ -3131,7 +3081,6 @@ mod tests {
             let mut wtxn = db.env.write_txn().unwrap();
 
             db.inner
-                .borrow_mut()
                 .transactions_hash_key
                 .put(&mut wtxn, &HashWrapper(hash), &TransactionKey::new(1, 0))
                 .unwrap();
