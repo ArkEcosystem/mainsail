@@ -1217,7 +1217,7 @@ impl EvmInner {
 
 #[napi(js_name = "Evm")]
 pub struct JsEvmWrapper {
-    evm: Arc<tokio::sync::Mutex<EvmInner>>,
+    evm: Arc<parking_lot::RwLock<EvmInner>>,
 }
 
 #[napi]
@@ -1226,7 +1226,7 @@ impl JsEvmWrapper {
     pub fn new(opts: JsEvmOptions) -> Result<Self> {
         let opts = EvmOptions::try_from(opts)?;
         Ok(JsEvmWrapper {
-            evm: Arc::new(tokio::sync::Mutex::new(EvmInner::new(opts))),
+            evm: Arc::new(parking_lot::RwLock::new(EvmInner::new(opts))),
         })
     }
 
@@ -2227,5 +2227,62 @@ impl JsEvmWrapper {
             Ok(result) => Result::Ok(result),
             Err(err) => Result::Err(serde::de::Error::custom(err)),
         }
+    }
+}
+
+impl JsEvmWrapper {
+    fn read<'env, F, R, E, C, V>(&self, env: &'env Env, f: F, cb: C) -> Result<PromiseRaw<'env, V>>
+    where
+        F: FnOnce(&EvmInner) -> std::result::Result<R, E> + Send + 'static,
+        R: Send + 'static,
+        E: std::fmt::Display + Send + 'static,
+        V: ToNapiValue,
+        C: FnOnce(&'env Env, R) -> Result<V> + 'static,
+    {
+        env.spawn_future_with_callback(Self::with_read(self.evm.clone(), f), cb)
+    }
+
+    fn write<'env, F, R, E, C, V>(&self, env: &'env Env, f: F, cb: C) -> Result<PromiseRaw<'env, V>>
+    where
+        F: FnOnce(&mut EvmInner) -> std::result::Result<R, E> + Send + 'static,
+        R: Send + 'static,
+        E: std::fmt::Display + Send + 'static,
+        V: ToNapiValue,
+        C: FnOnce(&'env Env, R) -> Result<V> + 'static,
+    {
+        env.spawn_future_with_callback(Self::with_write(self.evm.clone(), f), cb)
+    }
+
+    /// Run `f` against a shared (read) view of the EVM on the blocking pool.
+    /// Concurrent readers proceed in parallel; only an in-flight writer blocks them.
+    async fn with_read<F, R, E>(evm: Arc<parking_lot::RwLock<EvmInner>>, f: F) -> Result<R>
+    where
+        F: FnOnce(&EvmInner) -> std::result::Result<R, E> + Send + 'static,
+        R: Send + 'static,
+        E: std::fmt::Display + Send + 'static,
+    {
+        tokio::task::spawn_blocking(move || {
+            let evm = evm.read(); // shared lock; dropped at closure end
+            f(&evm)
+        })
+        .await
+        .map_err(|e| napi::Error::from_reason(format!("evm read task failed: {e}")))? // JoinError (panic/cancel)
+        .map_err(|e| napi::Error::from_reason(e.to_string())) // inner EVM error
+    }
+
+    /// Run `f` against an exclusive (write) view of the EVM on the blocking pool.
+    async fn with_write<F, R, E>(evm: Arc<parking_lot::RwLock<EvmInner>>, f: F) -> Result<R>
+    where
+        F: FnOnce(&mut EvmInner) -> std::result::Result<R, E> + Send + 'static,
+        R: Send + 'static,
+        E: std::fmt::Display + Send + 'static,
+    {
+        tokio::task::spawn_blocking(move || {
+            let mut evm = evm.write(); // exclusive lock
+            f(&mut evm)
+        })
+        .await
+        .map_err(|e| napi::Error::from_reason(format!("evm write task failed: {e}")))?
+        .map_err(|e| napi::Error::from_reason(e.to_string()))
     }
 }
