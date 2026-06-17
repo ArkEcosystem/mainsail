@@ -1236,9 +1236,11 @@ impl JsEvmWrapper {
         env: &'env Env,
         tx_ctx: JsPreverifyTransactionContext,
     ) -> Result<PromiseRaw<'env, result::JsPreverifyTransactionResult>> {
-        let tx_ctx = PreverifyTxContext::try_from(tx_ctx)?;
-        env.spawn_future_with_callback(
-            Self::preverify_transaction_async(self.evm.clone(), tx_ctx),
+        let ctx = PreverifyTxContext::try_from(tx_ctx)?;
+
+        self.write(
+            env,
+            move |evm| evm.preverify_transaction(ctx),
             |_, result| Ok(result::JsPreverifyTransactionResult::new(result)),
         )
     }
@@ -1249,10 +1251,13 @@ impl JsEvmWrapper {
         env: &'env Env,
         view_ctx: JsTransactionViewContext,
     ) -> Result<PromiseRaw<'env, result::JsViewResult>> {
-        let view_ctx = TxViewContext::try_from(view_ctx)?;
-        env.spawn_future_with_callback(Self::view_async(self.evm.clone(), view_ctx), |_, result| {
-            Ok(result::JsViewResult::new(result)?)
-        })
+        let ctx = TxViewContext::try_from(view_ctx)?;
+
+        self.write(
+            env,
+            move |evm| evm.view(ctx),
+            |_, result| Ok(result::JsViewResult::new(result)?),
+        )
     }
 
     #[napi]
@@ -1261,9 +1266,11 @@ impl JsEvmWrapper {
         env: &'env Env,
         tx_ctx: JsTransactionContext,
     ) -> Result<PromiseRaw<'env, result::JsProcessResult>> {
-        let tx_ctx = TxContext::try_from(tx_ctx)?;
-        env.spawn_future_with_callback(
-            Self::process_async(self.evm.clone(), tx_ctx),
+        let ctx = TxContext::try_from(tx_ctx)?;
+
+        self.write(
+            env,
+            move |evm| evm.process(ctx),
             |_, result| Ok(result::JsProcessResult::new(result)),
         )
     }
@@ -1274,9 +1281,11 @@ impl JsEvmWrapper {
         env: &'env Env,
         tx_ctx: JsTransactionSimulateContext,
     ) -> Result<PromiseRaw<'env, result::JsSimulateResult>> {
-        let tx_ctx = TxSimulateContext::try_from(tx_ctx)?;
-        env.spawn_future_with_callback(
-            Self::simulate_async(self.evm.clone(), tx_ctx),
+        let ctx = TxSimulateContext::try_from(tx_ctx)?;
+
+        self.write(
+            env,
+            move |evm| evm.simulate(ctx),
             |_, result| Ok(result::JsSimulateResult::new(result)),
         )
     }
@@ -1287,11 +1296,9 @@ impl JsEvmWrapper {
         env: &'env Env,
         genesis_ctx: JsGenesisContext,
     ) -> Result<PromiseRaw<'env, ()>> {
-        let genesis_ctx = GenesisContext::try_from(genesis_ctx)?;
-        env.spawn_future_with_callback(
-            Self::initialize_genesis_async(self.evm.clone(), genesis_ctx),
-            |_, _| Ok(()),
-        )
+        let ctx = GenesisContext::try_from(genesis_ctx)?;
+
+        self.write(env, move |evm| evm.initialize_genesis(ctx), |_, _| Ok(()))
     }
 
     #[napi]
@@ -1301,10 +1308,8 @@ impl JsEvmWrapper {
         ctx: JsPrepareNextCommitContext,
     ) -> Result<PromiseRaw<'env, ()>> {
         let ctx = PrepareNextCommitContext::try_from(ctx)?;
-        env.spawn_future_with_callback(
-            Self::prepare_next_commit_async(self.evm.clone(), ctx),
-            |_, _| Ok(()),
-        )
+
+        self.write(env, move |evm| evm.prepare_next_commit(ctx), |_, _| Ok(()))
     }
 
     #[napi]
@@ -1314,8 +1319,10 @@ impl JsEvmWrapper {
         ctx: JsCalculateRoundValidatorsContext,
     ) -> Result<PromiseRaw<'env, ()>> {
         let ctx = CalculateRoundValidatorsContext::try_from(ctx)?;
-        env.spawn_future_with_callback(
-            Self::calculate_round_validators_async(self.evm.clone(), ctx),
+
+        self.write(
+            env,
+            move |evm| evm.calculate_round_validators(ctx),
             |_, _| Ok(()),
         )
     }
@@ -1327,8 +1334,10 @@ impl JsEvmWrapper {
         ctx: JsUpdateRewardsAndVotesContext,
     ) -> Result<PromiseRaw<'env, ()>> {
         let ctx = UpdateRewardsAndVotesContext::try_from(ctx)?;
-        env.spawn_future_with_callback(
-            Self::update_rewards_and_votes_async(self.evm.clone(), ctx),
+
+        self.write(
+            env,
+            move |evm| evm.update_rewards_and_votes(ctx),
             |_, _| Ok(()),
         )
     }
@@ -1347,8 +1356,9 @@ impl JsEvmWrapper {
             None => None,
         };
 
-        env.spawn_future_with_callback(
-            Self::get_account_info_async(self.evm.clone(), address, block_number),
+        self.read(
+            env,
+            move |evm| evm.get_account_info(address, block_number),
             |_, result| Ok(result::JsAccountInfo::new(result)?),
         )
     }
@@ -1367,8 +1377,9 @@ impl JsEvmWrapper {
             None
         };
 
-        env.spawn_future_with_callback(
-            Self::get_account_info_extended_async(self.evm.clone(), address, legacy_address),
+        self.read(
+            env,
+            move |evm| evm.get_account_info_extended(address, legacy_address),
             |_, result| Ok(result::JsAccountInfoExtended::new(result)),
         )
     }
@@ -1384,8 +1395,9 @@ impl JsEvmWrapper {
             accounts.push(info.try_into()?);
         }
 
-        env.spawn_future_with_callback(
-            Self::import_account_infos_async(self.evm.clone(), accounts),
+        self.write(
+            env,
+            move |evm| evm.import_account_infos(accounts),
             |_, _| Ok(()),
         )
     }
@@ -1401,8 +1413,9 @@ impl JsEvmWrapper {
             cold_wallets.push(info.try_into()?);
         }
 
-        env.spawn_future_with_callback(
-            Self::import_legacy_cold_wallets_async(self.evm.clone(), cold_wallets),
+        self.write(
+            env,
+            move |evm| evm.import_legacy_cold_wallets(cold_wallets),
             |_, _| Ok(()),
         )
     }
@@ -1417,8 +1430,9 @@ impl JsEvmWrapper {
         let offset = offset.get_u64().1;
         let limit = limit.get_u64().1;
 
-        env.spawn_future_with_callback(
-            Self::get_accounts_async(self.evm.clone(), offset, limit),
+        self.read(
+            env,
+            move |evm| evm.get_accounts(offset, limit),
             |_, result| Ok(result::JsGetAccounts::new(result.0, result.1)),
         )
     }
@@ -1437,8 +1451,9 @@ impl JsEvmWrapper {
             None
         };
 
-        env.spawn_future_with_callback(
-            Self::get_legacy_attributes_async(self.evm.clone(), address, legacy_address),
+        self.read(
+            env,
+            move |evm| evm.get_legacy_attributes(address, legacy_address),
             |_, result| {
                 Ok(match result {
                     Some(result) => Some(JsLegacyAttributes::new(result)),
@@ -1458,8 +1473,9 @@ impl JsEvmWrapper {
         let offset = offset.get_u64().1;
         let limit = limit.get_u64().1;
 
-        env.spawn_future_with_callback(
-            Self::get_legacy_cold_wallets_async(self.evm.clone(), offset, limit),
+        self.read(
+            env,
+            move |evm| evm.get_legacy_cold_wallets(offset, limit),
             |_, result| Ok(result::JsGetLegacyColdWallets::new(result.0, result.1)),
         )
     }
@@ -1467,15 +1483,16 @@ impl JsEvmWrapper {
     #[napi]
     pub fn get_receipts<'env>(
         &mut self,
-        node_env: &'env Env,
+        env: &'env Env,
         offset: BigInt,
         limit: BigInt,
     ) -> Result<PromiseRaw<'env, result::JsGetReceipts>> {
         let offset = offset.get_u64().1;
         let limit = limit.get_u64().1;
 
-        node_env.spawn_future_with_callback(
-            Self::get_receipts_async(self.evm.clone(), offset, limit),
+        self.read(
+            env,
+            move |evm| evm.get_receipts(offset, limit),
             |_, result| Ok(result::JsGetReceipts::new(result.0, result.1)?),
         )
     }
@@ -1483,13 +1500,14 @@ impl JsEvmWrapper {
     #[napi]
     pub fn get_receipts_by_block_number<'env>(
         &mut self,
-        node_env: &'env Env,
+        env: &'env Env,
         block_number: BigInt,
     ) -> Result<PromiseRaw<'env, HashMap<String, result::JsTransactionReceipt>>> {
         let block_number = block_number.get_u64().1;
 
-        node_env.spawn_future_with_callback(
-            Self::get_receipts_by_block_number_async(self.evm.clone(), block_number),
+        self.read(
+            env,
+            move |evm| evm.get_receipts_by_block_number(block_number),
             |_, result| {
                 Ok(result
                     .into_iter()
@@ -1502,19 +1520,16 @@ impl JsEvmWrapper {
     #[napi]
     pub fn get_receipts_by_block_range<'env>(
         &mut self,
-        node_env: &'env Env,
+        env: &'env Env,
         from_block_number: BigInt,
         to_block_number: BigInt,
     ) -> Result<PromiseRaw<'env, result::JsGetReceipts>> {
         let from_block_number = from_block_number.get_u64().1;
         let to_block_number = to_block_number.get_u64().1;
 
-        node_env.spawn_future_with_callback(
-            Self::get_receipts_by_block_range_async(
-                self.evm.clone(),
-                from_block_number,
-                to_block_number,
-            ),
+        self.read(
+            env,
+            move |evm| evm.get_receipts_by_block_range(from_block_number, to_block_number),
             |_, result| Ok(result::JsGetReceipts::new(None, result)?),
         )
     }
@@ -1529,8 +1544,9 @@ impl JsEvmWrapper {
         let block_number = block_number.get_u64().1;
         let tx_hash = utils::convert_string_to_b256(tx_hash)?;
 
-        env.spawn_future_with_callback(
-            Self::get_receipt_async(self.evm.clone(), block_number, tx_hash),
+        self.read(
+            env,
+            move |evm| evm.get_receipt(block_number, tx_hash),
             move |_, result| Ok(result::JsGetReceipt::new(result, block_number, tx_hash)),
         )
     }
@@ -1548,9 +1564,10 @@ impl JsEvmWrapper {
             None => None,
         };
 
-        env.spawn_future_with_callback(
-            Self::code_at_async(self.evm.clone(), address, block_number),
-            |_, result| Ok(result),
+        self.read(
+            env,
+            move |evm| evm.code_at(address, block_number),
+            move |_, result| Ok(revm::primitives::hex::encode_prefixed(result.as_ref())),
         )
     }
 
@@ -1563,9 +1580,15 @@ impl JsEvmWrapper {
     ) -> Result<PromiseRaw<'env, String>> {
         let address = utils::create_address_from_string(&address)?;
         let slot = utils::convert_bigint_to_u256(slot)?;
-        env.spawn_future_with_callback(
-            Self::storage_at_async(self.evm.clone(), address, slot),
-            |_, result| Ok(result),
+
+        self.read(
+            env,
+            move |evm| evm.storage_at(address, slot),
+            move |_, result| {
+                Ok(revm::primitives::hex::encode_prefixed(
+                    result.to_be_bytes::<32>(),
+                ))
+            },
         )
     }
 
@@ -1583,9 +1606,14 @@ impl JsEvmWrapper {
             None
         };
 
-        env.spawn_future_with_callback(
-            Self::commit_async(self.evm.clone(), commit_key, commit_data),
-            |_, result| Ok(result::JsCommitResult::new(result)?),
+        self.write(
+            env,
+            move |evm| evm.commit(commit_key, commit_data),
+            |_, result| {
+                Ok(result::JsCommitResult::new(CommitResult {
+                    dirty_accounts: result,
+                })?)
+            },
         )
     }
 
@@ -1598,8 +1626,10 @@ impl JsEvmWrapper {
     ) -> Result<PromiseRaw<'env, String>> {
         let commit_key = CommitKey::try_from(commit_key)?;
         let current_hash = utils::convert_string_to_b256(current_hash)?;
-        env.spawn_future_with_callback(
-            Self::state_root_async(self.evm.clone(), commit_key, current_hash),
+
+        self.write(
+            env,
+            move |evm| evm.state_root(commit_key, current_hash),
             |_, result| Ok(result),
         )
     }
@@ -1611,24 +1641,26 @@ impl JsEvmWrapper {
         commit_key: JsCommitKey,
     ) -> Result<PromiseRaw<'env, String>> {
         let commit_key = CommitKey::try_from(commit_key)?;
-        env.spawn_future_with_callback(
-            Self::logs_bloom_async(self.evm.clone(), commit_key),
+
+        self.read(
+            env,
+            move |evm| evm.logs_bloom(commit_key),
             |_, result| Ok(result),
         )
     }
 
     #[napi]
     pub fn is_empty<'env>(&mut self, env: &'env Env) -> Result<PromiseRaw<'env, bool>> {
-        env.spawn_future_with_callback(Self::is_empty_async(self.evm.clone()), |_, result| {
-            Ok(result)
-        })
+        self.read(env, move |evm| evm.is_empty(), |_, result| Ok(result))
     }
 
     #[napi]
     pub fn get_state<'env>(&mut self, env: &'env Env) -> Result<PromiseRaw<'env, JsGetState>> {
-        env.spawn_future_with_callback(Self::get_state_async(self.evm.clone()), |_, result| {
-            Ok(result::JsGetState::new(result))
-        })
+        self.read(
+            env,
+            move |evm| evm.get_state(),
+            |_, result| Ok(result::JsGetState::new(result)),
+        )
     }
 
     #[napi]
@@ -1638,8 +1670,10 @@ impl JsEvmWrapper {
         block_number: BigInt,
     ) -> Result<PromiseRaw<'env, Option<JsBlockHeaderData>>> {
         let block_number = block_number.get_u64().1;
-        env.spawn_future_with_callback(
-            Self::get_block_header_data_async(self.evm.clone(), block_number),
+
+        self.read(
+            env,
+            move |evm| evm.get_block_header_data(block_number),
             |_, result| {
                 Ok(match result {
                     Some(data) => Some(JsBlockHeaderData::new(data)),
@@ -1657,8 +1691,9 @@ impl JsEvmWrapper {
     ) -> Result<PromiseRaw<'env, Option<BigInt>>> {
         let block_hash = utils::convert_string_to_b256(block_hash)?;
 
-        env.spawn_future_with_callback(
-            Self::get_block_number_by_hash_async(self.evm.clone(), block_hash),
+        self.read(
+            env,
+            move |evm| evm.get_block_number_by_hash(block_hash),
             |_, result| {
                 Ok(match result {
                     Some(result) => Some(BigInt::from(result)),
@@ -1675,8 +1710,10 @@ impl JsEvmWrapper {
         block_number: BigInt,
     ) -> Result<PromiseRaw<'env, Option<JsCommitData>>> {
         let block_number = block_number.get_u64().1;
-        env.spawn_future_with_callback(
-            Self::get_commit_data_async(self.evm.clone(), block_number),
+
+        self.read(
+            env,
+            move |evm| evm.get_commit_data(block_number),
             |_, result| {
                 Ok(match result {
                     Some((proof, header, txs)) => Some(JsCommitData::new(proof, header, txs)),
@@ -1697,13 +1734,12 @@ impl JsEvmWrapper {
         let from_block_number = from_block_number.get_u64().1;
         let to_block_number = to_block_number.get_u64().1;
         let max_bytes = max_bytes.get_u64().1;
-        env.spawn_future_with_callback(
-            Self::get_commits_by_block_range_async(
-                self.evm.clone(),
-                from_block_number,
-                to_block_number,
-                max_bytes,
-            ),
+
+        self.read(
+            env,
+            move |evm| {
+                evm.get_commits_by_block_range(from_block_number, to_block_number, max_bytes)
+            },
             |_, result| {
                 Ok(result
                     .into_iter()
@@ -1719,8 +1755,9 @@ impl JsEvmWrapper {
         env: &'env Env,
         key: String,
     ) -> Result<PromiseRaw<'env, Option<JsTransactionData>>> {
-        env.spawn_future_with_callback(
-            Self::get_transaction_data_async(self.evm.clone(), key),
+        self.read(
+            env,
+            move |evm| evm.get_transaction_data(key),
             |_, result| Ok(result.map(|data| JsTransactionData::new(data))),
         )
     }
@@ -1733,8 +1770,9 @@ impl JsEvmWrapper {
     ) -> Result<PromiseRaw<'env, Option<String>>> {
         let tx_hash = utils::convert_string_to_b256(tx_hash)?;
 
-        env.spawn_future_with_callback(
-            Self::get_transaction_key_by_hash_async(self.evm.clone(), tx_hash),
+        self.read(
+            env,
+            move |evm| evm.get_transaction_key_by_hash(tx_hash),
             |_, result| Ok(result),
         )
     }
@@ -1746,10 +1784,8 @@ impl JsEvmWrapper {
         commit_key: JsCommitKey,
     ) -> Result<PromiseRaw<'env, ()>> {
         let commit_key = CommitKey::try_from(commit_key)?;
-        env.spawn_future_with_callback(
-            Self::snapshot_async(self.evm.clone(), commit_key),
-            |_, _| Ok(()),
-        )
+
+        self.write(env, move |evm| evm.snapshot(commit_key), |_, _| Ok(()))
     }
 
     #[napi]
@@ -1759,15 +1795,13 @@ impl JsEvmWrapper {
         commit_key: JsCommitKey,
     ) -> Result<PromiseRaw<'env, ()>> {
         let commit_key = CommitKey::try_from(commit_key)?;
-        env.spawn_future_with_callback(
-            Self::rollback_async(self.evm.clone(), commit_key),
-            |_, _| Ok(()),
-        )
+
+        self.write(env, move |evm| evm.rollback(commit_key), |_, _| Ok(()))
     }
 
     #[napi]
     pub fn dispose<'env>(&mut self, env: &'env Env) -> Result<PromiseRaw<'env, ()>> {
-        env.spawn_future_with_callback(Self::dispose_async(self.evm.clone()), |_, _| Ok(()))
+        self.write(env, move |evm| evm.dispose(), |_, _| Ok(()))
     }
 
     async fn preverify_transaction_async(
