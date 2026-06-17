@@ -16,7 +16,6 @@ describe<{
 	});
 
 	it("should create an instance from a name and defaults", (context) => {
-
 		const instance: PluginConfiguration = context.pluginConfiguration.from("dummy", { some: "value" });
 
 		assert.equal(instance.all(), { some: "value" });
@@ -29,6 +28,17 @@ describe<{
 		);
 
 		assert.equal(context.pluginConfiguration.all(), { defaultKey: "defaultValue" });
+	});
+
+	it("should rethrow non-module-not-found errors raised by a broken defaults module", async (context) => {
+		await assert.rejects(
+			() =>
+				context.pluginConfiguration.discover(
+					"stub-plugin-broken-defaults",
+					join(import.meta.dirname, "../../test/stubs/stub-plugin-broken-defaults"),
+				),
+			"broken defaults module",
+		);
 	});
 
 	it("should set and get the given value", (context) => {

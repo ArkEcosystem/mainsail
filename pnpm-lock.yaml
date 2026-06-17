@@ -2438,6 +2438,8 @@ importers:
 
   packages/kernel/test/stubs/stub-plugin: {}
 
+  packages/kernel/test/stubs/stub-plugin-no-export: {}
+
   packages/kernel/test/stubs/stub-plugin-with-defaults: {}
 
   packages/logger-pino:

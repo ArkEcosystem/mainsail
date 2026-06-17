@@ -1,0 +1,6 @@
+{
+	"name": "stub-plugin-no-export",
+	"version": "1.0.0",
+	"main": "distribution/index.js",
+	"type": "module"
+}

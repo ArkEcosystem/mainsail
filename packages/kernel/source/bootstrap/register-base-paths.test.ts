@@ -11,7 +11,7 @@ describe<{
 	app: Application;
 	fileSystem: Record<string, any>;
 	handler: RegisterBasePaths;
-}>("RegisterBasePaths", ({ assert, afterEach, beforeEach, it, spy }) => {
+}>("RegisterBasePaths", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		context.fileSystem = { ensureDirSync: () => {}, existsSync: () => true };
 
@@ -54,5 +54,16 @@ describe<{
 
 		assert.equal(app.get("path.data"), resolve("/tmp/custom-data", "mainsail-test"));
 		assert.equal(app.get("path.config"), resolve("/tmp/custom-config", "mainsail-test"));
+	});
+
+	it("should use the env-provided path verbatim when running inside a worker", async ({ app, handler }) => {
+		// In a worker the env is inherited from the parent, so the path is already correct and
+		// must NOT be joined with the application name again.
+		stub(app, "isWorker").returnValue(true);
+		process.env.MAINSAIL_PATH_DATA = "/tmp/worker-data";
+
+		await handler.bootstrap();
+
+		assert.equal(app.get("path.data"), resolve("/tmp/worker-data"));
 	});
 });

@@ -124,6 +124,24 @@ describe<{
 		assert.false(await context.fs.makeDirectory());
 	});
 
+	it("should write the given contents synchronously", async (context) => {
+		const file: string = fileSync().name;
+
+		context.fs.writeFileSync(file, "sync contents", "utf8");
+
+		assert.equal(await context.fs.get(file), Buffer.from("sync contents"));
+	});
+
+	it("should delete the given path synchronously", (context) => {
+		const file: string = fileSync().name;
+
+		assert.true(context.fs.existsSync(file));
+
+		context.fs.removeSync(file);
+
+		assert.false(context.fs.existsSync(file));
+	});
+
 	it("should delete the given directory", async (context) => {
 		const dir: string = dirSync().name;
 

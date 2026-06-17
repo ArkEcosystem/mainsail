@@ -34,6 +34,15 @@ class MyInvalidManager extends InstanceManager<MyDriver> {
 	}
 }
 
+// Injectable (so @postConstruct sets the default driver) but with no matching create*Driver method,
+// which is what reaches the "driver is not supported" throw inside #createDriver.
+@injectable()
+class MyUnsupportedDriverManager extends InstanceManager<MyDriver> {
+	protected getDefaultDriver(): string {
+		return "memory";
+	}
+}
+
 describe<{
 	app: Application;
 }>("ClassManager", ({ beforeEach, assert, it }) => {
@@ -46,6 +55,12 @@ describe<{
 		const promise = invalidManager.boot();
 
 		await assert.rejects(() => promise);
+	});
+
+	it("should throw a descriptive error when the default driver has no creator method", async ({ app }) => {
+		const manager = app.resolve(MyUnsupportedDriverManager);
+
+		await assert.rejects(() => manager.boot(), "memory driver is not supported by MyUnsupportedDriverManager.");
 	});
 
 	it("should return default driver instance", async ({ app }) => {

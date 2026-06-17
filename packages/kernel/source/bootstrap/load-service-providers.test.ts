@@ -67,6 +67,19 @@ describe<{
 		);
 	});
 
+	it("should throw if the plugin package exports no ServiceProvider", async (context) => {
+		stub(context.app, "dataPath").returnValue(resolve(new URL(".", import.meta.url).pathname, "../../test/stubs"));
+
+		context.configRepository.merge({
+			app: { plugins: [{ package: "stub-plugin-no-export" }] },
+		});
+
+		await assert.rejects(
+			() => context.app.resolve<LoadServiceProviders>(LoadServiceProviders).bootstrap(),
+			"stub-plugin-no-export",
+		);
+	});
+
 	it("should bootstrap if plugins path doesn't exist", async (context) => {
 		stub(context.app, "dataPath").returnValue("/invalid/path");
 
