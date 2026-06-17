@@ -23,7 +23,7 @@ export class PluginManifest {
 	}
 
 	public getRequired<T>(key: string): T {
-		const value =  get(this.#manifest, key);
+		const value = get(this.#manifest, key);
 		if (value === undefined) {
 			throw new Error(`Missing required manifest key: ${key}`);
 		}

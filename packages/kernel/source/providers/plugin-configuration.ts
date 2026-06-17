@@ -4,7 +4,6 @@ import { injectable } from "@mainsail/container";
 import { ensureError, get, has, set, unset } from "@mainsail/utils";
 import deepmerge from "deepmerge";
 
-
 @injectable()
 export class PluginConfiguration implements Contracts.Kernel.PluginConfiguration {
 	#items: Contracts.Types.JsonObject = {};
@@ -14,7 +13,6 @@ export class PluginConfiguration implements Contracts.Kernel.PluginConfiguration
 
 		return this;
 	}
-
 
 	public async discover(name: string, packageId: string): Promise<this> {
 		try {

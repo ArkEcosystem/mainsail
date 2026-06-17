@@ -6,7 +6,6 @@ import { camelCase, expandTilde, set } from "@mainsail/utils";
 import envPaths from "env-paths";
 import { join, resolve } from "path";
 
-
 @injectable()
 export class RegisterBasePaths implements Contracts.Kernel.Bootstrapper {
 	@inject(Identifiers.Application.Instance)

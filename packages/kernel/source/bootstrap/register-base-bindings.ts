@@ -10,7 +10,7 @@ type Flags = {
 	env?: string;
 	name?: string;
 	thread?: string;
-}
+};
 
 @injectable()
 export class RegisterBaseBindings implements Contracts.Kernel.Bootstrapper {
