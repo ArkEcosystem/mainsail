@@ -109,8 +109,8 @@ impl EvmInner {
         Ok(())
     }
 
-    pub fn view(&mut self, tx_ctx: TxViewContext) -> Result<TxViewResult> {
-        let result = self.transact_evm(tx_ctx.into());
+    pub fn view(&self, tx_ctx: TxViewContext) -> Result<TxViewResult> {
+        let result = self.transact_read(tx_ctx.into());
 
         Ok(match result {
             Ok((r, _)) => {
@@ -240,7 +240,7 @@ impl EvmInner {
             .get_account_nonce(&ctx.commit_key, genesis_info.deployer_account)
             .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
 
-        match self.transact_evm(ExecutionContext {
+        match self.transact_write(ExecutionContext {
             block_context: Some(BlockContext {
                 commit_key: ctx.commit_key,
                 gas_limit: u64::MAX,
@@ -256,7 +256,6 @@ impl EvmInner {
             gas_price: 0,
             spec_id: ctx.spec_id,
             tx_hash: None,
-            stateful: true,
         }) {
             Ok((receipt, _)) => {
                 self.logger.log(
@@ -326,7 +325,7 @@ impl EvmInner {
                     .encode("updateVoters", voters.clone())
                     .expect("encode updateVoters");
 
-                match self.transact_evm(ExecutionContext {
+                match self.transact_write(ExecutionContext {
                     block_context: Some(BlockContext {
                         commit_key: ctx.commit_key,
                         gas_limit: u64::MAX,
@@ -342,7 +341,6 @@ impl EvmInner {
                     gas_price: 0,
                     spec_id: ctx.spec_id,
                     tx_hash: None,
-                    stateful: true,
                 }) {
                     Ok((receipt, _)) => {
                         self.logger.log(
@@ -708,10 +706,21 @@ impl EvmInner {
     }
 
     pub fn simulate(
-        &mut self,
+        &self,
         ctx: TxSimulateContext,
     ) -> std::result::Result<TxReceipt, EVMError<String>> {
-        self.execute(ctx.into())
+        match self.transact_read(ctx.into()) {
+            Ok((result, cumulative_gas_used)) => {
+                let receipt = map_execution_result(result, cumulative_gas_used);
+                Ok(receipt)
+            }
+            Err(err) => match err {
+                EVMError::Transaction(err) => Err(EVMError::Transaction(err)),
+                _ => {
+                    panic!("fatal evm err {:?}", err);
+                }
+            },
+        }
     }
 
     pub fn process(
@@ -773,7 +782,18 @@ impl EvmInner {
             }
         }
 
-        self.execute(tx_ctx.into())
+        match self.transact_write(tx_ctx.into()) {
+            Ok((result, cumulative_gas_used)) => {
+                let receipt = map_execution_result(result, cumulative_gas_used);
+                Ok(receipt)
+            }
+            Err(err) => match err {
+                EVMError::Transaction(err) => Err(EVMError::Transaction(err)),
+                _ => {
+                    panic!("fatal evm err {:?}", err);
+                }
+            },
+        }
     }
 
     pub fn commit(
@@ -1029,32 +1049,9 @@ impl EvmInner {
         Ok(())
     }
 
-    fn execute(
-        &mut self,
-        ctx: ExecutionContext,
-    ) -> std::result::Result<TxReceipt, EVMError<String>> {
-        match self.transact_evm(ctx.into()) {
-            Ok((result, cumulative_gas_used)) => {
-                let receipt = map_execution_result(result, cumulative_gas_used);
-                Ok(receipt)
-            }
-            Err(err) => {
-                match err {
-                    EVMError::Transaction(err) => {
-                        return Err(EVMError::Transaction(err));
-                    }
-                    // EVMError::Header(_) => todo!(),
-                    // EVMError::Database(_) => todo!(),
-                    // EVMError::Custom(_) => todo!(),
-                    _ => {
-                        panic!("fatal evm err {:?}", err);
-                    }
-                }
-            }
-        }
-    }
-
-    fn transact_evm(
+    /// Executes `ctx` and writes the result into the pending commit (`&mut self`).
+    /// For read-only calls that must not mutate state, use `transact_read`.
+    fn transact_write(
         &mut self,
         ctx: ExecutionContext,
     ) -> std::result::Result<
@@ -1063,9 +1060,7 @@ impl EvmInner {
     > {
         let mut state_builder = State::builder().with_bundle_update();
 
-        if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key)
-            && ctx.stateful
-        {
+        if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key) {
             if let Some(pending_commit) = self.pending_commits.get_mut(commit_key) {
                 state_builder =
                     state_builder.with_cached_prestate(std::mem::take(&mut pending_commit.cache));
@@ -1122,9 +1117,7 @@ impl EvmInner {
                 let mut cumulative_gas_used = 0;
 
                 // Update state if transaction is part of a commit
-                if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key)
-                    && ctx.stateful
-                {
+                if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key) {
                     let state_db = evm.db_mut();
                     state_db.commit(state);
 
@@ -1156,6 +1149,58 @@ impl EvmInner {
             }
             Err(err) => Err(err),
         }
+    }
+
+    /// Executes `ctx` read-only: runs against committed state and throws the
+    /// resulting state away — no pending-commit prestate, no write-back, so `&self`.
+    /// (Contrast `transact_write`, which is `&mut self` and folds the result into the
+    /// pending commit while a block is being built.)
+    fn transact_read(
+        &self,
+        ctx: ExecutionContext,
+    ) -> std::result::Result<
+        (ExecutionResult, u64),
+        EVMError<EvmDatabaseError<mainsail_evm_core::db::Error>>,
+    > {
+        let state_db = State::builder()
+            .with_bundle_update()
+            .with_database(WrapDatabaseRef(&self.persistent_db))
+            .build();
+
+        let mut evm = revm::Context::mainnet()
+            .with_db(state_db)
+            .modify_cfg_chained(|cfg| {
+                cfg.spec = ctx.spec_id;
+                cfg.disable_nonce_check = ctx.nonce.is_none();
+            })
+            .modify_block_chained(|block_env: &mut BlockEnv| {
+                let Some(block_ctx) = ctx.block_context.as_ref() else {
+                    return;
+                };
+                block_env.number = U256::from(block_ctx.commit_key.0);
+                block_env.beneficiary = block_ctx.validator_address;
+                block_env.timestamp = U256::from(block_ctx.timestamp);
+                block_env.gas_limit = block_ctx.gas_limit;
+                block_env.difficulty = U256::ZERO;
+            })
+            .modify_tx_chained(|tx_env: &mut TxEnv| {
+                tx_env.gas_limit = ctx.gas_limit.unwrap_or(u64::MAX);
+                tx_env.gas_price = ctx.gas_price;
+                tx_env.gas_priority_fee = None;
+                tx_env.caller = ctx.from;
+                tx_env.value = ctx.value;
+                tx_env.nonce = ctx.nonce.unwrap_or_default();
+                tx_env.kind = match ctx.to {
+                    Some(recipient) => TxKind::Call(recipient),
+                    None => TxKind::Create,
+                };
+                tx_env.data = ctx.data;
+            })
+            .build_mainnet()
+            .with_precompiles(MainsailPrecompiles::new(ctx.spec_id));
+
+        let ResultAndState { result, .. } = evm.replay()?;
+        Ok((result, 0))
     }
 
     fn get_account_nonce(
@@ -1247,13 +1292,13 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn view<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         view_ctx: JsTransactionViewContext,
     ) -> Result<PromiseRaw<'env, result::JsViewResult>> {
         let ctx = TxViewContext::try_from(view_ctx)?;
 
-        self.write(
+        self.read(
             env,
             move |evm| evm.view(ctx),
             |_, result| Ok(result::JsViewResult::new(result)?),
@@ -1277,13 +1322,13 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn simulate<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         tx_ctx: JsTransactionSimulateContext,
     ) -> Result<PromiseRaw<'env, result::JsSimulateResult>> {
         let ctx = TxSimulateContext::try_from(tx_ctx)?;
 
-        self.write(
+        self.read(
             env,
             move |evm| evm.simulate(ctx),
             |_, result| Ok(result::JsSimulateResult::new(result)),
@@ -1344,7 +1389,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_account_info<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         address: String,
         block_number: Option<BigInt>,
@@ -1365,7 +1410,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_account_info_extended<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         address: String,
         legacy_address: Option<String>,
@@ -1422,7 +1467,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_accounts<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         offset: BigInt,
         limit: BigInt,
@@ -1439,7 +1484,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_legacy_attributes<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         address: String,
         legacy_address: Option<String>,
@@ -1465,7 +1510,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_legacy_cold_wallets<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         offset: BigInt,
         limit: BigInt,
@@ -1482,7 +1527,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_receipts<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         offset: BigInt,
         limit: BigInt,
@@ -1499,7 +1544,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_receipts_by_block_number<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         block_number: BigInt,
     ) -> Result<PromiseRaw<'env, HashMap<String, result::JsTransactionReceipt>>> {
@@ -1519,7 +1564,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_receipts_by_block_range<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         from_block_number: BigInt,
         to_block_number: BigInt,
@@ -1536,7 +1581,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_receipt<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         block_number: BigInt,
         tx_hash: String,
@@ -1553,7 +1598,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn code_at<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         address: String,
         block_number: Option<BigInt>,
@@ -1573,7 +1618,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn storage_at<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         address: String,
         slot: BigInt,
@@ -1636,7 +1681,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn logs_bloom<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         commit_key: JsCommitKey,
     ) -> Result<PromiseRaw<'env, String>> {
@@ -1650,12 +1695,12 @@ impl JsEvmWrapper {
     }
 
     #[napi]
-    pub fn is_empty<'env>(&mut self, env: &'env Env) -> Result<PromiseRaw<'env, bool>> {
+    pub fn is_empty<'env>(&self, env: &'env Env) -> Result<PromiseRaw<'env, bool>> {
         self.read(env, move |evm| evm.is_empty(), |_, result| Ok(result))
     }
 
     #[napi]
-    pub fn get_state<'env>(&mut self, env: &'env Env) -> Result<PromiseRaw<'env, JsGetState>> {
+    pub fn get_state<'env>(&self, env: &'env Env) -> Result<PromiseRaw<'env, JsGetState>> {
         self.read(
             env,
             move |evm| evm.get_state(),
@@ -1665,7 +1710,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_block_header_data<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         block_number: BigInt,
     ) -> Result<PromiseRaw<'env, Option<JsBlockHeaderData>>> {
@@ -1685,7 +1730,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_block_number_by_hash<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         block_hash: String,
     ) -> Result<PromiseRaw<'env, Option<BigInt>>> {
@@ -1705,7 +1750,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_commit_data<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         block_number: BigInt,
     ) -> Result<PromiseRaw<'env, Option<JsCommitData>>> {
@@ -1725,7 +1770,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_commits_by_block_range<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         from_block_number: BigInt,
         to_block_number: BigInt,
@@ -1751,7 +1796,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_transaction_data<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         key: String,
     ) -> Result<PromiseRaw<'env, Option<JsTransactionData>>> {
@@ -1764,7 +1809,7 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn get_transaction_key_by_hash<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         tx_hash: String,
     ) -> Result<PromiseRaw<'env, Option<String>>> {
