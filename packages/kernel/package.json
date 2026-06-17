@@ -41,7 +41,6 @@
 		"joi": "18.2.1",
 		"log-process-errors": "12.0.1",
 		"micromatch": "4.0.8",
-		"nsfw": "2.3.1",
 		"semver": "7.8.0",
 		"split2": "4.2.0"
 	},
