@@ -56,7 +56,7 @@ pub fn build_commit(pending_commit: &mut PendingCommit) -> Result<StateCommit, c
 }
 
 pub fn apply_rewards(
-    db: &mut PersistentDB,
+    db: &PersistentDB,
     pending: &mut PendingCommit,
     rewards: HashMap<Address, u128>,
 ) -> Result<(), crate::db::Error> {

@@ -30,7 +30,7 @@ use result::{
     JsLegacyColdWallet, JsTransactionReceipt, PreverifyTxResult, TxViewResult,
 };
 use revm::{
-    Database, DatabaseCommit, ExecuteEvm, MainBuilder, MainContext,
+    Database, DatabaseCommit, DatabaseRef, ExecuteEvm, MainBuilder, MainContext,
     context::{
         BlockEnv, ContextTr, TxEnv,
         result::{EVMError, ExecutionResult, ResultAndState},
@@ -139,12 +139,12 @@ impl EvmInner {
     }
 
     pub fn code_at(
-        &mut self,
+        &self,
         address: Address,
         block_number: Option<u64>,
     ) -> std::result::Result<Bytes, EVMError<String>> {
         let account = match block_number {
-            None => self.persistent_db.basic(address),
+            None => self.persistent_db.basic_ref(address),
             Some(block_number) => {
                 let result = self
                     .persistent_db
@@ -153,7 +153,7 @@ impl EvmInner {
                 match result {
                     Ok((historical, _)) if historical.is_some() => Ok(historical),
                     Ok((_, missing_fallback)) if missing_fallback => {
-                        self.persistent_db.basic(address)
+                        self.persistent_db.basic_ref(address)
                     } // fallback
                     Ok(_) => Ok(None),
                     Err(err) => Err(err),
@@ -166,7 +166,7 @@ impl EvmInner {
             Some(account) => {
                 let code = self
                     .persistent_db
-                    .code_by_hash(account.code_hash)
+                    .code_by_hash_ref(account.code_hash)
                     .map_err(|err| {
                         EVMError::Database(format!("code lookup failed: {}", err).into())
                     })?;
@@ -178,11 +178,11 @@ impl EvmInner {
     }
 
     pub fn storage_at(
-        &mut self,
+        &self,
         address: Address,
         slot: U256,
     ) -> std::result::Result<U256, EVMError<String>> {
-        match self.persistent_db.storage(address, slot) {
+        match self.persistent_db.storage_ref(address, slot) {
             Ok(slot) => Ok(slot),
             Err(err) => Err(EVMError::Database(
                 format!("storage lookup failed: {}", err).into(),
@@ -370,12 +370,12 @@ impl EvmInner {
     }
 
     pub fn get_account_info(
-        &mut self,
+        &self,
         address: Address,
         block_number: Option<u64>,
     ) -> std::result::Result<AccountInfo, EVMError<String>> {
         let result = match block_number {
-            None => self.persistent_db.basic(address),
+            None => self.persistent_db.basic_ref(address),
             Some(block_number) => {
                 let result = self
                     .persistent_db
@@ -384,7 +384,7 @@ impl EvmInner {
                 match result {
                     Ok((historical, _)) if historical.is_some() => Ok(historical),
                     Ok((_, missing_fallback)) if missing_fallback => {
-                        self.persistent_db.basic(address)
+                        self.persistent_db.basic_ref(address)
                     } // fallback
                     Ok(_) => Ok(None),
                     Err(err) => Err(err),
@@ -401,13 +401,13 @@ impl EvmInner {
     }
 
     pub fn get_account_info_extended(
-        &mut self,
+        &self,
         address: Address,
         legacy_address: Option<LegacyAddress>,
     ) -> std::result::Result<AccountInfoExtended, EVMError<String>> {
         let mut info = self
             .persistent_db
-            .basic(address)
+            .basic_ref(address)
             .map_err(|err| {
                 EVMError::Database(format!("account info lookup failed: {}", err).into())
             })?
@@ -496,7 +496,7 @@ impl EvmInner {
     }
 
     pub fn get_accounts(
-        &mut self,
+        &self,
         offset: u64,
         limit: u64,
     ) -> std::result::Result<(Option<u64>, Vec<AccountInfoExtended>), EVMError<String>> {
@@ -509,7 +509,7 @@ impl EvmInner {
     }
 
     pub fn get_legacy_attributes(
-        &mut self,
+        &self,
         address: Address,
         legacy_address: Option<LegacyAddress>,
     ) -> std::result::Result<Option<LegacyAccountAttributes>, EVMError<String>> {
@@ -545,7 +545,7 @@ impl EvmInner {
     }
 
     pub fn get_legacy_cold_wallets(
-        &mut self,
+        &self,
         offset: u64,
         limit: u64,
     ) -> std::result::Result<(Option<u64>, Vec<LegacyColdWallet>), EVMError<String>> {
@@ -558,7 +558,7 @@ impl EvmInner {
     }
 
     pub fn get_receipts(
-        &mut self,
+        &self,
         offset: u64,
         limit: u64,
     ) -> std::result::Result<(Option<u64>, Vec<(u64, Vec<(B256, TxReceipt)>)>), EVMError<String>>
@@ -572,7 +572,7 @@ impl EvmInner {
     }
 
     pub fn get_receipts_by_block_number(
-        &mut self,
+        &self,
         block_number: u64,
     ) -> std::result::Result<HashMap<B256, TxReceipt>, EVMError<String>> {
         match self
@@ -587,7 +587,7 @@ impl EvmInner {
     }
 
     pub fn get_receipts_by_block_range(
-        &mut self,
+        &self,
         from_block_number: u64,
         to_block_number: u64,
     ) -> std::result::Result<Vec<(u64, Vec<(B256, TxReceipt)>)>, EVMError<String>> {
@@ -603,7 +603,7 @@ impl EvmInner {
     }
 
     pub fn preverify_transaction(
-        &mut self,
+        &self,
         ctx: PreverifyTxContext,
     ) -> std::result::Result<PreverifyTxResult, EVMError<String>> {
         let mut pending_commit = PendingCommit::new(Default::default());
@@ -623,7 +623,7 @@ impl EvmInner {
                         legacy_cold_wallet.balance.try_into().expect("fit u128"),
                     );
                     state_commit::apply_rewards(
-                        &mut self.persistent_db,
+                        &self.persistent_db,
                         &mut pending_commit,
                         legacy_balances,
                     )
@@ -695,7 +695,7 @@ impl EvmInner {
     }
 
     pub fn get_receipt(
-        &mut self,
+        &self,
         block_number: u64,
         tx_hash: B256,
     ) -> std::result::Result<Option<TxReceipt>, EVMError<String>> {
@@ -827,7 +827,7 @@ impl EvmInner {
     }
 
     pub fn logs_bloom(
-        &mut self,
+        &self,
         commit_key: CommitKey,
     ) -> std::result::Result<String, EVMError<String>> {
         let pending_commit = self
@@ -845,7 +845,7 @@ impl EvmInner {
         }
     }
 
-    pub fn is_empty(&mut self) -> std::result::Result<bool, EVMError<String>> {
+    pub fn is_empty(&self) -> std::result::Result<bool, EVMError<String>> {
         let result = self.persistent_db.is_empty();
 
         match result {
@@ -856,7 +856,7 @@ impl EvmInner {
         }
     }
 
-    pub fn get_state(&mut self) -> std::result::Result<(u64, u64), EVMError<String>> {
+    pub fn get_state(&self) -> std::result::Result<(u64, u64), EVMError<String>> {
         let result = self.persistent_db.get_state();
 
         match result {
@@ -868,7 +868,7 @@ impl EvmInner {
     }
 
     pub fn get_block_header_data(
-        &mut self,
+        &self,
         block_number: u64,
     ) -> std::result::Result<Option<BlockHeaderData>, EVMError<String>> {
         let result = self.persistent_db.get_block_header_data(block_number);
@@ -882,7 +882,7 @@ impl EvmInner {
     }
 
     pub fn get_block_number_by_hash(
-        &mut self,
+        &self,
         block_hash: B256,
     ) -> std::result::Result<Option<u64>, EVMError<String>> {
         let result = self.persistent_db.get_block_number_by_hash(block_hash);
@@ -896,7 +896,7 @@ impl EvmInner {
     }
 
     pub fn get_commit_data(
-        &mut self,
+        &self,
         block_number: u64,
     ) -> std::result::Result<
         Option<(ProofData, BlockHeaderData, Vec<TransactionData>)>,
@@ -933,7 +933,7 @@ impl EvmInner {
     }
 
     pub fn get_commits_by_block_range(
-        &mut self,
+        &self,
         from_block_number: u64,
         to_block_number: u64,
         max_bytes: u64,
@@ -954,7 +954,7 @@ impl EvmInner {
     }
 
     pub fn get_transaction_data(
-        &mut self,
+        &self,
         key: String,
     ) -> std::result::Result<Option<TransactionData>, EVMError<String>> {
         let result = self.persistent_db.get_transaction_data(key);
@@ -968,7 +968,7 @@ impl EvmInner {
     }
 
     pub fn get_transaction_key_by_hash(
-        &mut self,
+        &self,
         tx_hash: B256,
     ) -> std::result::Result<Option<String>, EVMError<String>> {
         let result = self.persistent_db.get_transaction_key_by_hash(tx_hash);
