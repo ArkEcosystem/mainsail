@@ -49,4 +49,16 @@ describe<{
 		spyOnDispatch.calledTimes(10); // 7 + 3 calls for BlockJobFinished
 		spyOnDispatch.calledWith(Events.ScheduleEvent.BlockJobFinished, expectFinishedEventData());
 	});
+
+	it("should dispatch BlockJobFailed when the callback throws", async (context) => {
+		const spyOnDispatch = spy(context.eventDispatcher, "dispatch");
+
+		context.job.cron(1).execute(() => {
+			throw new Error("boom");
+		});
+
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 1 });
+
+		spyOnDispatch.calledWith(Events.ScheduleEvent.BlockJobFailed, expectFinishedEventData());
+	});
 });

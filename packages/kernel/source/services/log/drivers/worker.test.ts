@@ -49,4 +49,12 @@ describe<{
 
 		spyWrite.neverCalled();
 	});
+
+	it("should inspect a non-string message", ({ logger }) => {
+		const spyWrite = stub(process.stdout, "write");
+
+		logger.info({ hello: "world" } as never);
+
+		spyWrite.calledWith("[info] { hello: 'world' }\n");
+	});
 });

@@ -34,4 +34,12 @@ describe<{
 
 		assert.equal(context.pluginManifest.get("some"), "value");
 	});
+
+	it("getRequired should return a present value and throw for a missing one", (context) => {
+		// @ts-ignore
+		context.pluginManifest.merge({ some: "value" });
+
+		assert.equal(context.pluginManifest.getRequired("some"), "value");
+		assert.throws(() => context.pluginManifest.getRequired("missing"));
+	});
 });

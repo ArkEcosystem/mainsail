@@ -194,4 +194,36 @@ describe<{
 		// apart), so assert a single fire on the boundary instead.
 		expectExecutionOnDate(context, context.job.yearly(), "2019-01-01 00:00:00");
 	});
+
+	it("should await an asynchronous callback", (context) => {
+		const fakeTimers = clock({ now: 0 });
+		const function_ = spyFn();
+
+		context.job.everyMinute().execute(async () => {
+			function_.call();
+		});
+
+		fakeTimers.tick(60 * 1000);
+
+		function_.calledOnce();
+	});
+
+	it("should dispatch CronJobFailed when the callback throws", (context) => {
+		const dispatchSpy = spy(context.mockEventDispatcher, "dispatch");
+		const fakeTimers = clock({ now: 0 });
+
+		context.job.everyMinute().execute(() => {
+			throw new Error("boom");
+		});
+
+		fakeTimers.tick(60 * 1000);
+
+		dispatchSpy.calledWith(
+			Events.ScheduleEvent.CronJobFailed,
+			match({
+				executionTime: match.number,
+				expression: match.string,
+			}),
+		);
+	});
 });
