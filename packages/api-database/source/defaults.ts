@@ -5,10 +5,8 @@ export const defaults = {
 	database: {
 		applicationName: "mainsail/api-http",
 		database:
-			Environment.get(EnvironmentVariables.MAINSAIL_DB_DATABASE) ??
-			`${Environment.get(EnvironmentVariables.MAINSAIL_TOKEN)}_${Environment.get(EnvironmentVariables.MAINSAIL_NETWORK_NAME)}`,
+			Environment.get(EnvironmentVariables.MAINSAIL_DB_DATABASE),
 		entityPrefix: "public.",
-		// TODO
 		extra: {
 			options: "-c statement_timeout=3000ms",
 		},
@@ -25,8 +23,7 @@ export const defaults = {
 
 		type: "postgres",
 		username:
-			Environment.get(EnvironmentVariables.MAINSAIL_DB_USERNAME) ??
-			Environment.get(EnvironmentVariables.MAINSAIL_TOKEN),
+			Environment.get(EnvironmentVariables.MAINSAIL_DB_USERNAME),
 	},
 	enabled: Environment.isTrue(EnvironmentVariables.MAINSAIL_API_SYNC_ENABLED),
 };
