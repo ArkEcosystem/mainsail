@@ -10,7 +10,7 @@ export class ListenToShutdownSignals implements Contracts.Kernel.Bootstrapper {
 
 	public async bootstrap(): Promise<void> {
 		for (const signal in Enums.Kernel.ShutdownSignal) {
-			process.on(signal, (_) => {
+			process.on(signal, () => {
 				void this.#onSignal(signal);
 			});
 		}

@@ -1,5 +1,6 @@
 {
 	"name": "stub-plugin",
 	"version": "1.0.0",
-	"main": "distribution/index.js"
+	"main": "distribution/index.js",
+	"type": "module"
 }

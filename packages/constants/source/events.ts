@@ -86,7 +86,9 @@ export enum EvmEvent {
 
 export enum ScheduleEvent {
 	BlockJobFinished = "schedule.blockJob.finished",
+	BlockJobFailed = "schedule.blockJob.failed",
 	CronJobFinished = "schedule.cronJob.finished",
+	CronJobFailed = "schedule.cronJob.failed",
 }
 
 export enum QueueEvent {

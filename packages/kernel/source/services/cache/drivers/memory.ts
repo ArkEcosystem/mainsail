@@ -52,7 +52,7 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	}
 
 	public async putMany(values: Array<[K, T]>, seconds?: number): Promise<boolean[]> {
-		return Promise.all(values.map(async (value: [K, T]) => this.put(value[0], value[1])));
+		return Promise.all(values.map(async (value: [K, T]) => this.put(value[0], value[1], seconds)));
 	}
 
 	public async has(key: K): Promise<boolean> {
@@ -72,11 +72,11 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	}
 
 	public async forever(key: K, value: T): Promise<boolean> {
-		throw new NotImplemented(this.constructor.name, "forever");
+		throw new NotImplemented("forever", this.constructor.name);
 	}
 
 	public async foreverMany(values: Array<[K, T]>): Promise<boolean[]> {
-		throw new NotImplemented(this.constructor.name, "foreverMany");
+		throw new NotImplemented("foreverMany", this.constructor.name);
 	}
 
 	public async forget(key: K): Promise<boolean> {
@@ -100,6 +100,6 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	}
 
 	public async getPrefix(): Promise<string> {
-		throw new NotImplemented(this.constructor.name, "getPrefix");
+		throw new NotImplemented("getPrefix", this.constructor.name);
 	}
 }

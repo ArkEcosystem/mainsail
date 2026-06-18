@@ -2383,9 +2383,6 @@ importers:
       micromatch:
         specifier: 4.0.8
         version: 4.0.8
-      nsfw:
-        specifier: 2.3.1
-        version: 2.3.1
       semver:
         specifier: 7.8.0
         version: 7.8.0
@@ -2437,6 +2434,8 @@ importers:
         version: 0.5.6
 
   packages/kernel/test/stubs/stub-plugin: {}
+
+  packages/kernel/test/stubs/stub-plugin-no-export: {}
 
   packages/kernel/test/stubs/stub-plugin-with-defaults: {}
 
@@ -9148,10 +9147,6 @@ packages:
   npm-run-path@6.0.0:
     resolution: {integrity: sha512-9qny7Z9DsQU8Ou39ERsPU4OZQlSTP47ShQzuKZ6PRXpYLtIFgl/DEBYEXKlvcEa+9tHVcK8CF81Y2V72qaZhWA==}
     engines: {node: '>=18'}
-
-  nsfw@2.3.1:
-    resolution: {integrity: sha512-017wsh/hyyFAeUhmo59N4c1aTRcJa3CFSSDfneYrcA43F5YmVvKnaQWE22nT409ojzsQosJa3dVcy+JKqO2C8A==}
-    engines: {node: '>=10.16.0'}
 
   number-is-nan@1.0.1:
     resolution: {integrity: sha512-4jbtZXNAsfZbAHiiqjLPBiCl16dES1zI4Hpzzxw61Tk+loF+sBDBKx1ICKKKwIqQ7M0mFn1TmkN7euSncWgHiQ==}
@@ -16530,7 +16525,8 @@ snapshots:
 
   node-addon-api@6.1.0: {}
 
-  node-addon-api@8.5.0: {}
+  node-addon-api@8.5.0:
+    optional: true
 
   node-gyp-build-optional-packages@5.2.2:
     dependencies:
@@ -16681,10 +16677,6 @@ snapshots:
     dependencies:
       path-key: 4.0.0
       unicorn-magic: 0.3.0
-
-  nsfw@2.3.1:
-    dependencies:
-      node-addon-api: 8.5.0
 
   number-is-nan@1.0.1: {}
 

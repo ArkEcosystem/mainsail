@@ -165,8 +165,8 @@ const boot = async (app: Contracts.Kernel.Application): Promise<void> => {
 		Identifiers.ServiceProvider.Repository,
 	);
 
-	for (const [name] of serviceProviderRepository.all()) {
-		await serviceProviderRepository.boot(name);
+	for (const serviceProvider of serviceProviderRepository.all()) {
+		await serviceProviderRepository.boot(serviceProvider.name());
 	}
 };
 
@@ -227,8 +227,8 @@ const stop = async (app: Contracts.Kernel.Application) => {
 		Identifiers.ServiceProvider.Repository,
 	);
 
-	for (const [name] of serviceProviderRepository.all()) {
-		await serviceProviderRepository.dispose(name);
+	for (const serviceProvider of serviceProviderRepository.all()) {
+		await serviceProviderRepository.dispose(serviceProvider.name());
 	}
 };
 

@@ -16,10 +16,7 @@ export class JoiValidator implements Contracts.Kernel.Validator {
 		const { error, value } = (schema as AnySchema).validate(this.#data);
 
 		this.#resultValue = error ? undefined : value;
-
-		if (error) {
-			this.#resultError = error.details;
-		}
+		this.#resultError = error ? error.details : undefined;
 	}
 
 	public passes(): boolean {

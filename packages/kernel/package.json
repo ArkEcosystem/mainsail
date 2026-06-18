@@ -22,6 +22,7 @@
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 -r=text -r=lcov --all pnpm run test",
+		"test:coverage:file": "c8 -r=text -r=lcov --all pnpm run test:file",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
 		"test:file": "pnpm run uvu source",
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
@@ -40,7 +41,6 @@
 		"joi": "18.2.1",
 		"log-process-errors": "12.0.1",
 		"micromatch": "4.0.8",
-		"nsfw": "2.3.1",
 		"semver": "7.8.0",
 		"split2": "4.2.0"
 	},

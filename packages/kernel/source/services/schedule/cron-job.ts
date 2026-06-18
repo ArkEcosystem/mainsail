@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { CronCommand, CronJob as Cron } from "cron";
+import { CronJob as Cron } from "cron";
 import { performance } from "perf_hooks";
 
 import { Job } from "./interfaces.js";
@@ -14,16 +14,29 @@ export class CronJob implements Job {
 
 	protected expression = "* * * * *";
 
-	public execute(callback: CronCommand<CronJob>): void {
-		const onCallback = () => {
+	public execute(callback: () => void | Promise<void>): void {
+		const onCallback = async () => {
 			const start = performance.now();
-			// @ts-ignore
-			callback();
 
-			void this.events.dispatch(Events.ScheduleEvent.CronJobFinished, {
-				executionTime: performance.now() - start,
-				expression: this.expression,
-			});
+			// Dispatch synchronously for synchronous callbacks; await (and swallow rejections from)
+			// asynchronous ones so a failing job can never crash the cron timer tick.
+			try {
+				const result = callback();
+
+				if (result instanceof Promise) {
+					await result;
+				}
+
+				void this.events.dispatch(Events.ScheduleEvent.CronJobFinished, {
+					executionTime: performance.now() - start,
+					expression: this.expression,
+				});
+			} catch {
+				void this.events.dispatch(Events.ScheduleEvent.CronJobFailed, {
+					executionTime: performance.now() - start,
+					expression: this.expression,
+				});
+			}
 		};
 
 		new Cron(this.expression, onCallback).start();

@@ -36,17 +36,29 @@ describe<{
 
 		function_.neverCalled();
 
-		await context.eventDispatcher.dispatch(Events.BlockEvent.Received, { number: 1 });
-		await context.eventDispatcher.dispatch(Events.BlockEvent.Received, { number: 3 });
-		await context.eventDispatcher.dispatch(Events.BlockEvent.Received, { number: 4 });
-		await context.eventDispatcher.dispatch(Events.BlockEvent.Received, { number: 6 });
-		await context.eventDispatcher.dispatch(Events.BlockEvent.Received, { number: 7 });
-		await context.eventDispatcher.dispatch(Events.BlockEvent.Received, { number: 9 });
-		await context.eventDispatcher.dispatch(Events.BlockEvent.Received, { number: 10 });
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 1 });
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 3 });
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 4 });
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 6 });
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 7 });
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 9 });
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 10 });
 
 		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(10); // 7 + 3 calls for BlockJobFinished
 		spyOnDispatch.calledWith(Events.ScheduleEvent.BlockJobFinished, expectFinishedEventData());
+	});
+
+	it("should dispatch BlockJobFailed when the callback throws", async (context) => {
+		const spyOnDispatch = spy(context.eventDispatcher, "dispatch");
+
+		context.job.cron(1).execute(() => {
+			throw new Error("boom");
+		});
+
+		await context.eventDispatcher.dispatch(Events.BlockEvent.Applied, { number: 1 });
+
+		spyOnDispatch.calledWith(Events.ScheduleEvent.BlockJobFailed, expectFinishedEventData());
 	});
 });

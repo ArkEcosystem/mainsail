@@ -131,6 +131,20 @@ describe<{
 		assert.equal(context.worker.posted, []);
 	});
 
+	it("sendRequest rejects and drops the callback when postMessage throws synchronously", async (context) => {
+		const subprocess = context.create();
+		// postMessage throws synchronously for non-serializable arguments (DataCloneError).
+		context.worker.postMessage = () => {
+			throw new Error("could not be cloned");
+		};
+
+		await assert.rejects(() => subprocess.sendRequest("noop", () => {}), "could not be cloned");
+
+		// The orphaned callback must be removed so it doesn't inflate the queue or hang drain().
+		assert.equal(subprocess.getQueueSize(), 0);
+		await assert.resolves(() => subprocess.drain());
+	});
+
 	it("onMessage ignores a reply whose id has no pending callback", (context) => {
 		const subprocess = context.create();
 

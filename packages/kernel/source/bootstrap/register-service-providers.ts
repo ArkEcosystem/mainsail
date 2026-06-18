@@ -30,10 +30,8 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 			Identifiers.ServiceProvider.Repository,
 		);
 
-		for (const [name, serviceProvider] of serviceProviders.all()) {
-			const serviceProviderName: string | undefined = serviceProvider.name();
-
-			assert.string(serviceProviderName);
+		for (const serviceProvider of serviceProviders.all()) {
+			const name = serviceProvider.name();
 
 			try {
 				// Does the configuration conform to the given rules?
@@ -47,7 +45,7 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 				const error = ensureError(rawError);
 				this.logger.error(`${name}: ${error.stack}`);
 
-				throw new ServiceProviderCannotBeRegistered(serviceProviderName, error.message);
+				throw new ServiceProviderCannotBeRegistered(name, error.message);
 			}
 		}
 	}
@@ -79,14 +77,12 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 			Identifiers.ServiceProvider.Repository,
 		);
 
+		const serviceProviderName = serviceProvider.name();
+
 		for (const dependency of serviceProvider.dependencies()) {
 			const { name, required, version: constraint } = dependency;
 
 			const isRequired: boolean = typeof required === "function" ? await required() : !!required;
-
-			const serviceProviderName: string | undefined = serviceProvider.name();
-
-			assert.string(serviceProviderName);
 
 			if (!serviceProviders.has(name)) {
 				// The dependency is necessary for this package to function. We'll output an error and terminate the process.
