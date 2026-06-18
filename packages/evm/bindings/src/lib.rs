@@ -1220,6 +1220,25 @@ pub struct JsEvmWrapper {
     evm: Arc<tokio::sync::Mutex<EvmInner>>,
 }
 
+/// Pin the napi tokio runtime explicitly instead of relying on napi-rs's implicit default.
+///
+/// Mirrors napi's default (`new_multi_thread().enable_all()`), but states the blocking-pool size
+/// outright: every EVM read/write runs via `spawn_blocking`, so `max_blocking_threads` is the real
+/// concurrency ceiling. 512 == tokio's current default, kept comfortably under the LMDB reader table
+/// (`PersistentDB::MAX_READERS == 2048`) so concurrent readers can never exhaust slots.
+///
+/// Runs once at addon load before the runtime is first used.
+#[napi_derive::module_init]
+fn init_tokio_runtime() {
+    let rt = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .max_blocking_threads(512)
+        .build()
+        .expect("failed to build EVM tokio runtime");
+
+    napi::bindgen_prelude::create_custom_tokio_runtime(rt);
+}
+
 #[napi]
 impl JsEvmWrapper {
     #[napi(constructor)]
