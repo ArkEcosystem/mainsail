@@ -5,7 +5,6 @@ import { inject, injectable } from "@mainsail/container";
 import {
 	DependencyVersionOutOfRange,
 	InvalidPluginConfiguration,
-	OptionalDependencyCannotBeFound,
 	RequiredDependencyCannotBeFound,
 	ServiceProviderCannotBeRegistered,
 } from "@mainsail/exceptions";
@@ -38,9 +37,9 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 				await this.#validateConfiguration(serviceProvider);
 
 				// Are all dependencies installed with the correct versions?
-				if (await this.#satisfiesDependencies(serviceProvider)) {
-					await serviceProviders.register(name);
-				}
+				await this.#satisfiesDependencies(serviceProvider);
+
+				await serviceProviders.register(name);
 			} catch (rawError) {
 				const error = ensureError(rawError);
 				this.logger.error(`${name}: ${error.stack}`);
@@ -72,7 +71,7 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 		}
 	}
 
-	async #satisfiesDependencies(serviceProvider: ServiceProvider): Promise<boolean> {
+	async #satisfiesDependencies(serviceProvider: ServiceProvider): Promise<void> {
 		const serviceProviders: ServiceProviderRepository = this.app.get<ServiceProviderRepository>(
 			Identifiers.ServiceProvider.Repository,
 		);
@@ -80,26 +79,12 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 		const serviceProviderName = serviceProvider.name();
 
 		for (const dependency of serviceProvider.dependencies()) {
-			const { name, required, version: constraint } = dependency;
-
-			const isRequired: boolean = typeof required === "function" ? await required() : !!required;
+			const { name, version: constraint } = dependency;
 
 			if (!serviceProviders.has(name)) {
-				// The dependency is necessary for this package to function. We'll output an error and terminate the process.
-				if (isRequired) {
-					const error = new RequiredDependencyCannotBeFound(serviceProviderName, name);
+				const error = new RequiredDependencyCannotBeFound(serviceProviderName, name);
 
-					await this.app.terminate(error.message, error);
-				}
-
-				// The dependency is optional for this package to function. We'll only output a warning.
-				const error = new OptionalDependencyCannotBeFound(serviceProviderName, name);
-
-				this.logger.warn(error.message);
-
-				serviceProviders.fail(serviceProviderName);
-
-				return false;
+				await this.app.terminate(error.message, error);
 			}
 
 			if (constraint) {
@@ -110,17 +95,9 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 				if (!semver.satisfies(version, constraint)) {
 					const error = new DependencyVersionOutOfRange(name, constraint, version);
 
-					if (isRequired) {
-						await this.app.terminate(error.message, error);
-					}
-
-					this.logger.warn(error.message);
-
-					serviceProviders.fail(serviceProviderName);
+					await this.app.terminate(error.message, error);
 				}
 			}
 		}
-
-		return true;
 	}
 }
