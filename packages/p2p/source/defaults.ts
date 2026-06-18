@@ -19,7 +19,7 @@ export const defaults = {
 	remoteAccess: ["127.0.0.1", "::ffff:127.0.0.1", "::1"],
 	server: {
 		hostname: Environment.get(EnvironmentVariables.MAINSAIL_P2P_HOST, "0.0.0.0"),
-		logLevel: Environment.get(EnvironmentVariables.MAINSAIL_NETWORK_NAME) === "devnet" ? 1 : 0,
+		logLevel: Environment.get(EnvironmentVariables.MAINSAIL_P2P_LOG_LEVEL, 0),
 		port: Environment.get(EnvironmentVariables.MAINSAIL_P2P_PORT, 4002),
 	},
 	skipPeerStateVerification: Environment.isTrue(EnvironmentVariables.MAINSAIL_SKIP_PEER_STATE_VERIFICATION),
