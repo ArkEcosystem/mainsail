@@ -1373,15 +1373,42 @@ impl PersistentDB {
         })
     }
 
+    /// Maximum number of map-resize adoptions to attempt when a peer process has grown
+    /// the shared env out from under us. Mirrors the write-side MAX_RESIZE_RETRIES.
+    const MAX_READ_RESIZE_RETRIES: usize = 3;
+
     /// Runs `f` inside a read txn while holding the shared resize guard, so the env can't be remapped
     /// (mdb_env_set_mapsize) while the txn is live.
     fn with_read_txn<T>(
         &self,
         f: impl FnOnce(&heed::RoTxn) -> Result<T, Error>,
     ) -> Result<T, Error> {
-        let _resize_guard = self.resize_lock.read().map_err(|_| Error::Lock)?;
-        let txn = self.env.read_txn()?;
-        f(&txn)
+        let mut attempts = 0;
+
+        loop {
+            // Hold the read side for the whole `f` call so a same-process resize can't
+            // remap memory underneath the txn (unchanged invariant).
+            let guard = self.resize_lock.read().map_err(|_| Error::Lock)?;
+
+            match self.env.read_txn() {
+                Ok(txn) => return f(&txn),
+
+                // Another process grew the shared map beyond ours. Release the read guard
+                // BEFORE taking the write side — std::sync::RwLock self-deadlocks on a
+                // same-thread read->write upgrade — then adopt the new size and retry.
+                Err(heed::Error::Mdb(heed::MdbError::MapResized))
+                    if attempts < Self::MAX_READ_RESIZE_RETRIES =>
+                {
+                    drop(guard);
+                    attempts += 1;
+                    self.adopt_grown_map_size()?;
+                }
+
+                // Anything else (incl. a persistent MapResized after exhausting retries)
+                // surfaces as before.
+                Err(err) => return Err(err.into()),
+            }
+        }
     }
 
     /// Runs `f` inside a write txn while holding the shared resize guard, so the env can't be remapped
@@ -1395,6 +1422,33 @@ impl PersistentDB {
         let out = f(&mut txn)?;
         txn.commit()?;
         Ok(out)
+    }
+
+    /// Adopt a map size grown by another process sharing this env.
+    ///
+    /// Idempotent: only resizes when the on-disk file has actually outgrown our mapping,
+    /// so two readers racing on the same `MAP_RESIZED` serialize and the second one no-ops.
+    /// Takes the write side of the resize gate (drains all in-process txns) exactly like
+    /// `resize()`, which is what makes the unsafe `env.resize()` sound.
+    fn adopt_grown_map_size(&self) -> Result<(), Error> {
+        let _resize_guard = self.resize_lock.write().map_err(|_| Error::Lock)?;
+
+        let map_size = self.env.info().map_size;
+        let disk_size = self.env.real_disk_size()? as usize;
+
+        if disk_size >= map_size {
+            let next = next_map_size(disk_size);
+            self.logger.log(
+                LogLevel::Info,
+                format!(
+                    "adopting externally grown map size {} -> {}",
+                    map_size, next
+                ),
+            );
+            unsafe { self.env.resize(next)? };
+        }
+
+        Ok(())
     }
 }
 
@@ -3307,5 +3361,137 @@ mod tests {
 
         let db = PersistentDB::new(opts).expect("database");
         db
+    }
+
+    #[test]
+    fn map_resized_recovery_across_processes() {
+        const SMALL_MAP: usize = 4096 * 10; // ~40 KiB, same tiny size as test_resize_on_commit
+
+        // A commit large enough that a few of them push the file well past SMALL_MAP.
+        let large_commit = |block_number: u64, n: usize| -> PendingCommit {
+            let mut buf = vec![0; 32];
+            buf[0..8].copy_from_slice(&block_number.to_le_bytes());
+            let address = Address::from_word(ethers_core::utils::keccak256(buf).into());
+
+            let mut account =
+                revm::state::Account::new_not_existing(revm::state::TransactionId::ZERO);
+            account.status = revm::state::AccountStatus::Touched;
+
+            let mut storage = HashMap::default();
+            for i in 0..n {
+                storage.insert(
+                    U256::from(i + 1),
+                    revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+                );
+            }
+
+            let mut state = HashMap::default();
+            state.insert(
+                address,
+                revm::database::TransitionAccount {
+                    status: revm::database::AccountStatus::InMemoryChange,
+                    info: Some(account.info.clone()),
+                    previous_status: revm::database::AccountStatus::Loaded,
+                    previous_info: None,
+                    storage,
+                    storage_was_destroyed: false,
+                },
+            );
+
+            PendingCommit {
+                key: CommitKey(block_number, 0, B256::ZERO),
+                transitions: TransitionState { transitions: state },
+                ..Default::default()
+            }
+        };
+
+        // ---- WRITER (child) branch: separate process, so heed lets us open the same path ----
+        if let Ok(dir) = std::env::var("MAPRESIZE_CHILD_DIR") {
+            let mut db = PersistentDB::new(PersistentDBOptions::new(std::path::PathBuf::from(dir)))
+                .expect("child: open");
+            for b in 0..4u64 {
+                crate::state_commit::commit_to_db(
+                    &mut db,
+                    large_commit(b, 4096),
+                    Default::default(),
+                )
+                .expect("child: commit");
+            }
+            return; // child exits; never re-spawns (env var guard)
+        }
+
+        // ---- READER (parent) branch ----
+        let tmp = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+        let dir = tmp.path().to_path_buf();
+        let dbfile = dir.join("evm.mdb");
+
+        // Reader env pinned to the tiny map (simulates the pool worker that never grew its own map).
+        // new_with_env won't bump it: the file is still empty/below SMALL_MAP.
+        let mut env_builder = EnvOpenOptions::new();
+        env_builder.max_dbs(PersistentDB::MAX_DBS);
+        env_builder.map_size(SMALL_MAP);
+        unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
+        let env = unsafe { env_builder.open(&dbfile) }.expect("reader: open");
+
+        let mut reader = PersistentDB::new_with_env(
+            env,
+            std::sync::Arc::new(std::sync::RwLock::new(())),
+            PersistentDBOptions::new(dir.clone()),
+        )
+        .expect("reader: db");
+        assert_eq!(
+            reader.env.info().map_size,
+            SMALL_MAP,
+            "reader starts with the small map"
+        );
+
+        // Grow the shared file from another process, beyond SMALL_MAP.
+        let status = std::process::Command::new(std::env::current_exe().unwrap())
+            .args([
+                "--exact",
+                "db::tests::map_resized_recovery_across_processes",
+            ])
+            .env("MAPRESIZE_CHILD_DIR", &dir)
+            .status()
+            .expect("spawn writer child");
+        assert!(status.success(), "writer child failed");
+        assert!(
+            std::fs::metadata(&dbfile).unwrap().len() as usize > SMALL_MAP,
+            "writer must have grown the file past the reader's map size",
+        );
+
+        // Reader's map is still SMALL_MAP but the file is bigger => the next read hits
+        // MDB_MAP_RESIZED. With the fix, with_read_txn adopts the new size and retries;
+        // without it, this returns Err(heed MapResized) and the assert fails.
+        let some_addr = address!("00000000000000000000000000000000000000ff");
+        let result = reader.basic(some_addr);
+        assert!(
+            result.is_ok(),
+            "read after external growth must recover from MAP_RESIZED, got {:?}",
+            result.err(),
+        );
+
+        // And it should have adopted a map that covers the grown file.
+        assert!(
+            reader.env.info().map_size as u64 >= std::fs::metadata(&dbfile).unwrap().len(),
+            "reader map size should have grown to cover the file",
+        );
+    }
+
+    /// Cheap in-process check that the adopt helper is a safe no-op on a healthy db
+    /// (disk < map). The grow branch is only reachable cross-process (see the test above).
+    #[test]
+    fn adopt_grown_map_size_is_noop_when_file_fits() {
+        let db = create_temp_database();
+        let before = db.env.info().map_size;
+        db.adopt_grown_map_size().expect("adopt ok");
+        assert_eq!(
+            db.env.info().map_size,
+            before,
+            "adopt must not change a healthy map"
+        );
     }
 }
