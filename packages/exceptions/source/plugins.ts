@@ -26,10 +26,10 @@ export class DependencyVersionOutOfRange extends OutOfRangeException {
 }
 
 
-export class RequiredDependencyCannotBeFound extends RuntimeException {
+export class DependencyCannotBeFound extends RuntimeException {
 	public constructor(serviceProvider: string, dependency: string) {
 		super(
-			`The "${dependency}" package is required but missing. Please, make sure to install this library to take advantage of ${serviceProvider}.`,
+			`The "${dependency}" package is missing. Please, make sure to install this library to take advantage of ${serviceProvider}.`,
 		);
 	}
 }

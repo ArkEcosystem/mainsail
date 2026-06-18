@@ -5,7 +5,7 @@ import { inject, injectable } from "@mainsail/container";
 import {
 	DependencyVersionOutOfRange,
 	InvalidPluginConfiguration,
-	RequiredDependencyCannotBeFound,
+	DependencyCannotBeFound,
 	ServiceProviderCannotBeRegistered,
 } from "@mainsail/exceptions";
 import { assert, ensureError } from "@mainsail/utils";
@@ -82,7 +82,7 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 			const { name, version: constraint } = dependency;
 
 			if (!serviceProviders.has(name)) {
-				const error = new RequiredDependencyCannotBeFound(serviceProviderName, name);
+				const error = new DependencyCannotBeFound(serviceProviderName, name);
 
 				await this.app.terminate(error.message, error);
 			}

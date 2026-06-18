@@ -98,7 +98,7 @@ describe<{
 
 		spyTerminate.calledOnce();
 		spyTerminate.calledWith(
-			'The "deps-required" package is required but missing. Please, make sure to install this library to take advantage of stub.',
+			'The "deps-required" package is missing. Please, make sure to install this library to take advantage of stub.',
 		);
 	});
 
