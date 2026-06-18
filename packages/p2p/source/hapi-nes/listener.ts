@@ -22,6 +22,7 @@ export class Listener {
 	private _heartbeat;
 	private _beatTimeout;
 	private _wss;
+	private _connectionsPerIp;
 
 	public constructor(server, settings) {
 		this._server = server;
@@ -31,6 +32,7 @@ export class Listener {
 		this._heartbeat = null;
 		this._beatTimeout = null;
 		this._stopped = false;
+		this._connectionsPerIp = new Set();
 
 		// WebSocket listener
 
@@ -50,7 +52,8 @@ export class Listener {
 
 			if (
 				this._stopped ||
-				(this._settings.maxConnections && this._sockets.length() >= this._settings.maxConnections)
+				(this._settings.maxConnections && this._sockets.length() >= this._settings.maxConnections) ||
+				this._hasExceededMaxConnectionsPerIp(req.socket.remoteAddress)
 			) {
 				return ws.close();
 			}
@@ -127,9 +130,11 @@ export class Listener {
 		const socket = new Socket(ws, req, this);
 
 		this._sockets.add(socket);
+		this._trackConnection(socket.info.remoteAddress);
 
 		ws.once("close", async (code, message) => {
 			this._sockets.remove(socket);
+			this._untrackConnection(socket.info.remoteAddress);
 
 			if (this._settings.onDisconnection) {
 				this._settings.onDisconnection(socket);
@@ -137,6 +142,26 @@ export class Listener {
 
 			socket._removed.attend();
 		});
+	}
+
+	private _hasExceededMaxConnectionsPerIp(ip) {
+		return 		this._connectionsPerIp.has(ip);
+	}
+
+	private _trackConnection(ip) {
+		if (ip === undefined) {
+			return;
+		}
+
+		this._connectionsPerIp.set(ip);
+	}
+
+	private _untrackConnection(ip) {
+		if (ip === undefined) {
+			return;
+		}
+
+		this._connectionsPerIp.delete(ip);
 	}
 }
 
