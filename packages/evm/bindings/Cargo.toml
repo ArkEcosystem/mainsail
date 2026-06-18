@@ -28,6 +28,7 @@ napi = { version = "3.4.0", default-features = false, features = [
 napi-derive = "3.3.0"
 
 mainsail_evm_core = { path = "../core", version = "0.1.0" }
+parking_lot = { version = "0.12.5" }
 
 [build-dependencies]
 napi-build = "2.2.4"

@@ -287,7 +287,6 @@ pub struct ExecutionContext {
     pub tx_hash: Option<B256>,
     pub block_context: Option<BlockContext>,
     pub spec_id: SpecId,
-    pub stateful: bool,
 }
 
 impl From<TxViewContext> for ExecutionContext {
@@ -303,7 +302,6 @@ impl From<TxViewContext> for ExecutionContext {
             tx_hash: None,
             block_context: None,
             spec_id: value.spec_id,
-            stateful: false,
         }
     }
 }
@@ -321,7 +319,6 @@ impl From<TxContext> for ExecutionContext {
             tx_hash: Some(value.tx_hash),
             block_context: Some(value.block_context),
             spec_id: value.spec_id,
-            stateful: true,
         }
     }
 }
@@ -339,7 +336,6 @@ impl From<TxSimulateContext> for ExecutionContext {
             tx_hash: None,
             block_context: Some(value.block_context),
             spec_id: value.spec_id,
-            stateful: false,
         }
     }
 }
