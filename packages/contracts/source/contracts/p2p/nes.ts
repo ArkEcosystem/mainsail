@@ -6,7 +6,6 @@ export interface Client {
 
 export interface Socket {
 	info: {
-		"x-forwarded-for"?: string;
 		remoteAddress: string;
 	};
 }
