@@ -11,10 +11,10 @@
 		"/distribution"
 	],
 	"scripts": {
-		"build": "tsc -b",
+		"build": "tsc -b && pnpm copy:protos",
 		"build:proto": "pnpm pbjs && pnpm pbts",
 		"build:watch": "pnpm run clean && tsc -w",
-		"pbjs": "pbjs -t static-module -w commonjs source/socket-server/codecs/proto/*.proto -o source/socket-server/codecs/proto/protos.js",
+		"copy:protos": "node scripts/copy-protos.mjs",
 		"pbjs": "pbjs -t static-module -w esm source/socket-server/codecs/proto/*.proto -o source/socket-server/codecs/proto/protos.js",
 		"pbts": "pbts source/socket-server/codecs/proto/protos.js -o source/socket-server/codecs/proto/protos.d.ts",
 		"release": "pnpm publish --access public",
