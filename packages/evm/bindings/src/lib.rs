@@ -1092,7 +1092,7 @@ impl EvmInner {
                 block_env.difficulty = U256::ZERO;
             })
             .modify_tx_chained(|tx_env: &mut TxEnv| {
-                tx_env.gas_limit = ctx.gas_limit.unwrap_or_else(|| u64::MAX);
+                tx_env.gas_limit = ctx.gas_limit.unwrap_or(u64::MAX);
                 tx_env.gas_price = ctx.gas_price;
                 tx_env.gas_priority_fee = None;
                 tx_env.caller = ctx.from;
@@ -1162,9 +1162,12 @@ impl EvmInner {
         (ExecutionResult, u64),
         EVMError<EvmDatabaseError<mainsail_evm_core::db::Error>>,
     > {
+        let db_reader = TxnDatabaseReader::new(&self.persistent_db)
+            .map_err(|err| EVMError::Database(EvmDatabaseError::Database(err)))?;
+
         let state_db = State::builder()
             .with_bundle_update()
-            .with_database(WrapDatabaseRef(&self.persistent_db))
+            .with_database(WrapDatabaseRef(db_reader))
             .build();
 
         let mut evm = revm::Context::mainnet()
@@ -1277,13 +1280,13 @@ impl JsEvmWrapper {
 
     #[napi]
     pub fn preverify_transaction<'env>(
-        &mut self,
+        &self,
         env: &'env Env,
         tx_ctx: JsPreverifyTransactionContext,
     ) -> Result<PromiseRaw<'env, result::JsPreverifyTransactionResult>> {
         let ctx = PreverifyTxContext::try_from(tx_ctx)?;
 
-        self.write(
+        self.read(
             env,
             move |evm| evm.preverify_transaction(ctx),
             |_, result| Ok(result::JsPreverifyTransactionResult::new(result)),
