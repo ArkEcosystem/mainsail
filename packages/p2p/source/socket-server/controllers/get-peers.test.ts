@@ -50,7 +50,7 @@ describe<{
 		});
 	});
 
-	it("should return the peers except forwarded peer sorted by latency", async ({ controller, app }) => {
+	it("should ignore the x-forwarded-for header and use the real remote address", async ({ controller, app }) => {
 		const peers = [
 			app.resolve(Peer).init("180.177.54.4", 4000),
 			app.resolve(Peer).init("181.177.54.4", 4000),
@@ -65,6 +65,7 @@ describe<{
 		peers[4].latency = 1_197_634;
 		stub(peerRepository, "getPeers").returnValue(peers);
 
+		// A spoofed x-forwarded-for must not influence which peer is treated as the requester.
 		const request = {
 			socket: {
 				info: { remoteAddress: "1.2.3.4", "x-forwarded-for": "180.177.54.4" },
@@ -72,8 +73,9 @@ describe<{
 		};
 		const peersBroadcast = await controller.handle(request, {});
 
+		// peers[0] (180.177.54.4) is NOT excluded, because only the real remoteAddress (1.2.3.4) is used.
 		assert.equal(peersBroadcast, {
-			peers: [peers[2], peers[1], peers[3], peers[4]].map((p) => p.toBroadcast()),
+			peers: [peers[2], peers[1], peers[0], peers[3], peers[4]].map((p) => p.toBroadcast()),
 		});
 	});
 });
