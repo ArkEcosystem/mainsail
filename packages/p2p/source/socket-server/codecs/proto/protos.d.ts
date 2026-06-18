@@ -20,7 +20,7 @@ export namespace getApiNodes {
          */
         constructor(properties?: getApiNodes.ApiNode.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** ApiNode url. */
@@ -113,7 +113,7 @@ export namespace getApiNodes {
             /** ApiNode url */
             url?: (string|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -137,7 +137,7 @@ export namespace getApiNodes {
          */
         constructor(properties?: getApiNodes.GetApiNodesRequest.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** GetApiNodesRequest headers. */
@@ -230,7 +230,7 @@ export namespace getApiNodes {
             /** GetApiNodesRequest headers */
             headers?: (shared.Headers.$Properties|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -254,7 +254,7 @@ export namespace getApiNodes {
          */
         constructor(properties?: getApiNodes.GetApiNodesResponse.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** GetApiNodesResponse headers. */
@@ -353,7 +353,7 @@ export namespace getApiNodes {
             /** GetApiNodesResponse apiNodes */
             apiNodes?: (getApiNodes.ApiNode.$Properties[]|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -381,7 +381,7 @@ export namespace shared {
          */
         constructor(properties?: shared.Headers.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** Headers version. */
@@ -510,7 +510,7 @@ export namespace shared {
             /** Headers validatorsSignedPrecommit */
             validatorsSignedPrecommit?: (boolean[]|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -534,7 +534,7 @@ export namespace shared {
          */
         constructor(properties?: shared.PeerLike.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** PeerLike ip. */
@@ -639,7 +639,7 @@ export namespace shared {
             /** PeerLike protocol */
             protocol?: (number|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -667,7 +667,7 @@ export namespace getBlocks {
          */
         constructor(properties?: getBlocks.GetBlocksRequest.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** GetBlocksRequest fromBlockNumber. */
@@ -772,7 +772,7 @@ export namespace getBlocks {
             /** GetBlocksRequest headers */
             headers?: (shared.Headers.$Properties|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -796,7 +796,7 @@ export namespace getBlocks {
          */
         constructor(properties?: getBlocks.GetBlocksResponse.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** GetBlocksResponse headers. */
@@ -895,7 +895,7 @@ export namespace getBlocks {
             /** GetBlocksResponse blocks */
             blocks?: (Uint8Array[]|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -923,7 +923,7 @@ export namespace getMessages {
          */
         constructor(properties?: getMessages.GetMessagesRequest.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** GetMessagesRequest headers. */
@@ -1016,7 +1016,7 @@ export namespace getMessages {
             /** GetMessagesRequest headers */
             headers?: (shared.Headers.$Properties|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -1040,7 +1040,7 @@ export namespace getMessages {
          */
         constructor(properties?: getMessages.GetMessagesResponse.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** GetMessagesResponse headers. */
@@ -1145,7 +1145,7 @@ export namespace getMessages {
             /** GetMessagesResponse precommits */
             precommits?: (Uint8Array[]|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -1173,7 +1173,7 @@ export namespace getPeers {
          */
         constructor(properties?: getPeers.GetPeersRequest.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** GetPeersRequest headers. */
@@ -1266,7 +1266,7 @@ export namespace getPeers {
             /** GetPeersRequest headers */
             headers?: (shared.Headers.$Properties|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -1290,7 +1290,7 @@ export namespace getPeers {
          */
         constructor(properties?: getPeers.GetPeersResponse.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** GetPeersResponse headers. */
@@ -1389,7 +1389,7 @@ export namespace getPeers {
             /** GetPeersResponse peers */
             peers?: (shared.PeerLike.$Properties[]|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -1417,7 +1417,7 @@ export namespace getProposal {
          */
         constructor(properties?: getProposal.GetProposalRequest.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** GetProposalRequest headers. */
@@ -1510,7 +1510,7 @@ export namespace getProposal {
             /** GetProposalRequest headers */
             headers?: (shared.Headers.$Properties|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -1534,7 +1534,7 @@ export namespace getProposal {
          */
         constructor(properties?: getProposal.GetProposalResponse.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** GetProposalResponse headers. */
@@ -1633,7 +1633,7 @@ export namespace getProposal {
             /** GetProposalResponse proposal */
             proposal?: (Uint8Array|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -1661,7 +1661,7 @@ export namespace getStatus {
          */
         constructor(properties?: getStatus.GetStatusRequest.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** GetStatusRequest headers. */
@@ -1754,7 +1754,7 @@ export namespace getStatus {
             /** GetStatusRequest headers */
             headers?: (shared.Headers.$Properties|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -1778,7 +1778,7 @@ export namespace getStatus {
          */
         constructor(properties?: getStatus.GetStatusResponse.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** GetStatusResponse headers. */
@@ -1883,7 +1883,7 @@ export namespace getStatus {
             /** GetStatusResponse config */
             config?: (getStatus.GetStatusResponse.Config.$Properties|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -1906,7 +1906,7 @@ export namespace getStatus {
              */
             constructor(properties?: getStatus.GetStatusResponse.State.$Properties);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
 
             /** State blockNumber. */
@@ -2005,7 +2005,7 @@ export namespace getStatus {
                 /** State blockHash */
                 blockHash?: (string|null);
 
-                /** Unknown fields preserved while decoding */
+                /** Unknown fields preserved while decoding when enabled */
                 $unknowns?: Uint8Array[];
             }
 
@@ -2029,7 +2029,7 @@ export namespace getStatus {
              */
             constructor(properties?: getStatus.GetStatusResponse.Config.$Properties);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
 
             /** Config version. */
@@ -2134,7 +2134,7 @@ export namespace getStatus {
                 /** Config plugins */
                 plugins?: ({ [k: string]: getStatus.GetStatusResponse.Config.Plugin.$Properties }|null);
 
-                /** Unknown fields preserved while decoding */
+                /** Unknown fields preserved while decoding when enabled */
                 $unknowns?: Uint8Array[];
             }
 
@@ -2157,7 +2157,7 @@ export namespace getStatus {
                  */
                 constructor(properties?: getStatus.GetStatusResponse.Config.Network.$Properties);
 
-                /** Unknown fields preserved while decoding */
+                /** Unknown fields preserved while decoding when enabled */
                 $unknowns?: Uint8Array[];
 
                 /** Network name. */
@@ -2274,7 +2274,7 @@ export namespace getStatus {
                     /** Network version */
                     version?: (number|null);
 
-                    /** Unknown fields preserved while decoding */
+                    /** Unknown fields preserved while decoding when enabled */
                     $unknowns?: Uint8Array[];
                 }
 
@@ -2297,7 +2297,7 @@ export namespace getStatus {
                      */
                     constructor(properties?: getStatus.GetStatusResponse.Config.Network.Token.$Properties);
 
-                    /** Unknown fields preserved while decoding */
+                    /** Unknown fields preserved while decoding when enabled */
                     $unknowns?: Uint8Array[];
 
                     /** Token name. */
@@ -2396,7 +2396,7 @@ export namespace getStatus {
                         /** Token symbol */
                         symbol?: (string|null);
 
-                        /** Unknown fields preserved while decoding */
+                        /** Unknown fields preserved while decoding when enabled */
                         $unknowns?: Uint8Array[];
                     }
 
@@ -2421,7 +2421,7 @@ export namespace getStatus {
                  */
                 constructor(properties?: getStatus.GetStatusResponse.Config.Plugin.$Properties);
 
-                /** Unknown fields preserved while decoding */
+                /** Unknown fields preserved while decoding when enabled */
                 $unknowns?: Uint8Array[];
 
                 /** Plugin port. */
@@ -2526,7 +2526,7 @@ export namespace getStatus {
                     /** Plugin estimateTotalCount */
                     estimateTotalCount?: (boolean|null);
 
-                    /** Unknown fields preserved while decoding */
+                    /** Unknown fields preserved while decoding when enabled */
                     $unknowns?: Uint8Array[];
                 }
 
@@ -2556,7 +2556,7 @@ export namespace postMessage {
          */
         constructor(properties?: postMessage.PostMessageRequest.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** PostMessageRequest message. */
@@ -2655,7 +2655,7 @@ export namespace postMessage {
             /** PostMessageRequest headers */
             headers?: (shared.Headers.$Properties|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -2679,7 +2679,7 @@ export namespace postMessage {
          */
         constructor(properties?: postMessage.PostMessageResponse.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** PostMessageResponse headers. */
@@ -2772,7 +2772,7 @@ export namespace postMessage {
             /** PostMessageResponse headers */
             headers?: (shared.Headers.$Properties|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -2800,7 +2800,7 @@ export namespace postProposal {
          */
         constructor(properties?: postProposal.PostProposalRequest.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** PostProposalRequest proposal. */
@@ -2899,7 +2899,7 @@ export namespace postProposal {
             /** PostProposalRequest headers */
             headers?: (shared.Headers.$Properties|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
@@ -2923,7 +2923,7 @@ export namespace postProposal {
          */
         constructor(properties?: postProposal.PostProposalResponse.$Properties);
 
-        /** Unknown fields preserved while decoding */
+        /** Unknown fields preserved while decoding when enabled */
         $unknowns?: Uint8Array[];
 
         /** PostProposalResponse headers. */
@@ -3016,7 +3016,7 @@ export namespace postProposal {
             /** PostProposalResponse headers */
             headers?: (shared.Headers.$Properties|null);
 
-            /** Unknown fields preserved while decoding */
+            /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
         }
 
