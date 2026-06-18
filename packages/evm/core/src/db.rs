@@ -322,6 +322,7 @@ pub struct PersistentDBOptions {
     pub path: PathBuf,
     pub logger: Option<Logger>,
     pub history_size: Option<u64>,
+    pub max_readers: Option<u32>,
 }
 
 impl PersistentDBOptions {
@@ -371,6 +372,13 @@ static ENV: LazyLock<RwLock<HashMap<PathBuf, (heed::Env, Arc<RwLock<()>>)>>> =
 impl PersistentDB {
     const MAX_DBS: u32 = 12;
 
+    // WithTls binds one reader slot per *thread* for that thread's lifetime, and the table is shared
+    // (lock file) across every EVM instance in this process AND every other process on this env
+    // (consensus, tx-pool worker, rpc/api). With reads fanning out over tokio's blocking pool
+    // (default 512) in several processes, LMDB's default of 126 overflows (MDB_READERS_FULL). Size
+    // well above blocking-pool-max × processes  headroom. Set once here so all openers agree.
+    const MAX_READERS: u32 = 2048;
+
     pub fn new(opts: PersistentDBOptions) -> Result<Self, Error> {
         std::fs::create_dir_all(&opts.path)?;
 
@@ -387,6 +395,7 @@ impl PersistentDB {
                 }
 
                 env_builder.max_dbs(max_dbs);
+                env_builder.max_readers(opts.max_readers.unwrap_or(Self::MAX_READERS));
                 env_builder.map_size(1 * MAP_SIZE_UNIT);
                 unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
 
