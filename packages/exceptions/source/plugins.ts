@@ -25,7 +25,6 @@ export class DependencyVersionOutOfRange extends OutOfRangeException {
 	}
 }
 
-
 export class DependencyCannotBeFound extends RuntimeException {
 	public constructor(serviceProvider: string, dependency: string) {
 		super(
