@@ -145,7 +145,7 @@ export class Listener {
 	}
 
 	private _hasExceededMaxConnectionsPerIp(ip) {
-		return 		this._connectionsPerIp.has(ip);
+		return this._connectionsPerIp.has(ip);
 	}
 
 	private _trackConnection(ip) {
