@@ -321,6 +321,7 @@ pub struct PersistentDBOptions {
     pub path: PathBuf,
     pub logger: Option<Logger>,
     pub history_size: Option<u64>,
+    pub max_readers: Option<u32>,
 }
 
 impl PersistentDBOptions {
@@ -370,6 +371,13 @@ static ENV: LazyLock<RwLock<HashMap<PathBuf, (heed::Env, Arc<RwLock<()>>)>>> =
 impl PersistentDB {
     const MAX_DBS: u32 = 12;
 
+    // WithTls binds one reader slot per *thread* for that thread's lifetime, and the table is shared
+    // (lock file) across every EVM instance in this process AND every other process on this env
+    // (consensus, tx-pool worker, rpc/api). With reads fanning out over tokio's blocking pool
+    // (default 512) in several processes, LMDB's default of 126 overflows (MDB_READERS_FULL). Size
+    // well above blocking-pool-max × processes  headroom. Set once here so all openers agree.
+    const MAX_READERS: u32 = 2048;
+
     pub fn new(opts: PersistentDBOptions) -> Result<Self, Error> {
         std::fs::create_dir_all(&opts.path)?;
 
@@ -386,6 +394,7 @@ impl PersistentDB {
                 }
 
                 env_builder.max_dbs(max_dbs);
+                env_builder.max_readers(opts.max_readers.unwrap_or(Self::MAX_READERS));
                 env_builder.map_size(1 * MAP_SIZE_UNIT);
                 unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
 
@@ -3289,6 +3298,122 @@ mod tests {
         };
 
         db.commit(&mut state, &Some(data)).unwrap();
+    }
+
+    #[test]
+    fn read_txns_survive_thread_fanout_beyond_default_reader_table() {
+        // WithTls binds a reader slot per thread for the thread's lifetime. Spawn far more threads
+        // than LMDB's default 126-slot table and hold a read txn in each *simultaneously*; this
+        // overflows with MDB_READERS_FULL unless max_readers was raised at env open. Mirrors the
+        // RwLock + spawn_blocking pattern (reads live across many blocking-pool threads at once).
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        use std::sync::{Arc, Barrier};
+
+        let db = create_temp_database();
+
+        assert!(
+            db.env.max_readers() >= 256,
+            "reader table not raised (got {})",
+            db.env.max_readers()
+        );
+
+        const THREADS: usize = 300; // > default 126, < MAX_READERS
+        let env = db.env.clone();
+        let gate = Arc::new(Barrier::new(THREADS + 1));
+        let failures = Arc::new(AtomicUsize::new(0));
+
+        let handles: Vec<_> = (0..THREADS)
+            .map(|_| {
+                let (env, gate, failures) = (env.clone(), gate.clone(), failures.clone());
+                std::thread::spawn(move || {
+                    // Claim a WithTls slot and keep the txn alive across the barrier, so all
+                    // THREADS slots are held at once.
+                    match env.read_txn() {
+                        Ok(_txn) => gate.wait(),
+                        Err(_) => {
+                            failures.fetch_add(1, Ordering::SeqCst);
+                            gate.wait()
+                        }
+                    }
+                })
+            })
+            .collect();
+
+        gate.wait(); // every thread has opened (or failed); release them to drop their txns
+        for h in handles {
+            h.join().unwrap();
+        }
+
+        assert_eq!(
+            failures.load(Ordering::SeqCst),
+            0,
+            "read txns hit MDB_READERS_FULL under {THREADS}-thread fanout"
+        );
+    }
+
+    #[test]
+    fn read_txns_hit_readers_full_when_table_smaller_than_live_readers() {
+        // Negative control: with a tiny reader table, holding more concurrent WithTls readers than
+        // slots MUST surface MDB_READERS_FULL. Proves the positive fanout test passes because
+        // max_readers was raised, not because LMDB happens to tolerate the load.
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        use std::sync::{Arc, Barrier};
+
+        const MAX_READERS: u32 = 4;
+        const THREADS: usize = 16; // > MAX_READERS
+
+        let db = create_temp_database_opts(|opts| {
+            opts.max_readers = Some(MAX_READERS);
+        });
+
+        let env = db.env.clone();
+        let gate = Arc::new(Barrier::new(THREADS + 1));
+        let readers_full = Arc::new(AtomicUsize::new(0));
+        let opened = Arc::new(AtomicUsize::new(0));
+        let unexpected = Arc::new(AtomicUsize::new(0));
+
+        let handles: Vec<_> = (0..THREADS)
+            .map(|_| {
+                let (env, gate) = (env.clone(), gate.clone());
+                let (readers_full, opened, unexpected) =
+                    (readers_full.clone(), opened.clone(), unexpected.clone());
+                std::thread::spawn(move || {
+                    // Each distinct thread claims its own WithTls slot. Bind the result (the RoTxn on
+                    // Ok) and keep it alive across the barrier so successful slots are NOT released
+                    // before the others attempt -> the table actually fills.
+                    let txn = env.read_txn();
+                    match &txn {
+                        Ok(_) => opened.fetch_add(1, Ordering::SeqCst),
+                        Err(heed::Error::Mdb(heed::MdbError::ReadersFull)) => {
+                            readers_full.fetch_add(1, Ordering::SeqCst)
+                        }
+                        Err(_) => unexpected.fetch_add(1, Ordering::SeqCst),
+                    };
+                    gate.wait(); // every thread reaches here regardless of outcome -> no deadlock
+                    drop(txn); // release the slot only after the barrier
+                })
+            })
+            .collect();
+
+        gate.wait(); // all threads have attempted; release the holders
+        for h in handles {
+            h.join().unwrap();
+        }
+
+        assert_eq!(
+            unexpected.load(Ordering::SeqCst),
+            0,
+            "read_txn failed with an error other than ReadersFull"
+        );
+        assert!(
+            readers_full.load(Ordering::SeqCst) > 0,
+            "expected MDB_READERS_FULL with {THREADS} readers over a {MAX_READERS}-slot table, got none"
+        );
+        assert!(
+            opened.load(Ordering::SeqCst) <= MAX_READERS as usize,
+            "more readers opened ({}) than the table allows ({MAX_READERS})",
+            opened.load(Ordering::SeqCst)
+        );
     }
 
     fn create_temp_database() -> PersistentDB {
