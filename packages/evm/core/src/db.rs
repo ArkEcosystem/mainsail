@@ -961,6 +961,7 @@ impl DatabaseRef for PersistentDB {
 
 /// `DatabaseRef` view that serves all reads from one `RoTxn` instead of opening one per read.
 /// Holds the resize gate for the txn's lifetime so the env can't be remapped while it's open.
+/// Field order is drop-order: txn must precede _resize_guard.
 pub struct TxnDatabaseReader<'a> {
     db: &'a PersistentDB,
     txn: heed::RoTxn<'a, heed::WithTls>,
@@ -1408,6 +1409,14 @@ impl PersistentDB {
 
     /// Runs `f` inside a write txn while holding the shared resize guard, so the env can't be remapped
     /// (mdb_env_set_mapsize) while the txn is live.
+    ///
+    /// Unlike [`Self::open_read_txn`], this deliberately has no `MDB_MAP_RESIZED` recovery. Every
+    /// write txn on this env — genesis bootstrap (`set_genesis_info`) and block commits
+    /// (`commit_to_db`) alike — is opened by the single consensus/core process, which is also the one
+    /// that grows the map (via `resize()` on `DbFull`); it adopts its own new size under the resize
+    /// write-guard and never observes a peer-induced `MapResized`. If a second writer process is ever
+    /// introduced against the same env, this path must gain the same adopt-and-retry loop as
+    /// `open_read_txn`.
     fn with_write_txn<T>(
         &self,
         f: impl FnOnce(&mut heed::RwTxn) -> Result<T, Error>,
